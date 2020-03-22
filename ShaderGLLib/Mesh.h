@@ -19,12 +19,15 @@ namespace sgl {
 		virtual ~Mesh();
 
 	public:
-		const sgl::Buffer& PointBuffer() const;
-		const sgl::Buffer& NormalBuffer() const;
-		const sgl::Buffer& TextureBuffer() const;
-		const sgl::Buffer& IndexBuffer() const;
+		const sgl::Buffer& Mesh::PointBuffer() const { return point_buffer_; }
+		const sgl::Buffer& Mesh::NormalBuffer() const {	return normal_buffer_; }
+		const sgl::Buffer& Mesh::TextureBuffer() const 
+		{ 
+			return texture_buffer_;
+		}
+		const sgl::Buffer& Mesh::IndexBuffer() const { return index_buffer_; }
 		const size_t IndexSize() const { return index_size_; }
-		void SetTexture(std::initializer_list<std::string> values);
+		void SetTextures(std::initializer_list<std::string> values);
 		void Draw(
 			const sgl::Program& program,
 			const sgl::TextureManager& texture_manager,

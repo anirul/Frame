@@ -21,13 +21,11 @@ namespace sgl {
 	public:
 		// This will initialize the GL context and make the GLEW init.
 		Device(SDL_Window* sdl_window);
-		virtual ~Device();
+		virtual ~Device() = default;
 
 	public:
-		// Startup the scene.
-		// Return an error string with the current error none if there is no
-		// errors.
-		std::optional<std::string> Startup(std::pair<int, int> size);
+		// Startup the scene. Throw errors in case there is any.
+		void Startup(std::pair<int, int> size);
 		// Draw what is on the scene.
 		// Take the total time from the beginning of the program to now as a
 		// const double parameter.

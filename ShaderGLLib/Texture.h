@@ -28,7 +28,7 @@ namespace sgl {
 	class TextureManager 
 	{
 	public:
-		TextureManager();
+		TextureManager() = default;
 		virtual ~TextureManager();
 		bool AddTexture(
 			const std::string& name, 

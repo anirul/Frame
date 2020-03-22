@@ -34,40 +34,31 @@ namespace sgl {
 
 	void Program::UniformBool(const std::string& name, bool value) const
 	{
-		glUniform1i(
-			glGetUniformLocation(program_id_, name.c_str()), 
-			(int)value);
+		glUniform1i(GetMemoizeUniformLocation(name), (int)value);
 	}
 
 	void Program::UniformInt(const std::string& name, int value) const
 	{
-		glUniform1i(glGetUniformLocation(program_id_, name.c_str()), value);
+		glUniform1i(GetMemoizeUniformLocation(name), value);
 	}
 
 	void Program::UniformFloat(const std::string& name, float value) const
 	{
-		glUniform1f(glGetUniformLocation(program_id_, name.c_str()), value);
+		glUniform1f(GetMemoizeUniformLocation(name), value);
 	}
 
 	void Program::UniformVector2(
 		const std::string& name, 
 		const sgl::vector2& vec2) const
 	{
-		glUniform2f(
-			glGetUniformLocation(program_id_, name.c_str()), 
-			vec2.x, 
-			vec2.y);
+		glUniform2f(GetMemoizeUniformLocation(name), vec2.x, vec2.y);
 	}
 
 	void Program::UniformVector3(
 		const std::string& name, 
 		const sgl::vector3& vec3) const
 	{
-		glUniform3f(
-			glGetUniformLocation(program_id_, name.c_str()), 
-			vec3.x, 
-			vec3.y, 
-			vec3.z);
+		glUniform3f(GetMemoizeUniformLocation(name), vec3.x, vec3.y, vec3.z);
 	}
 
 	void Program::UniformVector4(
@@ -75,7 +66,7 @@ namespace sgl {
 		const sgl::vector4& vec4) const
 	{
 		glUniform4f(
-			glGetUniformLocation(program_id_, name.c_str()),
+			GetMemoizeUniformLocation(name),
 			vec4.x,
 			vec4.y,
 			vec4.z,
@@ -88,10 +79,21 @@ namespace sgl {
 		const bool transpose /*= false*/) const
 	{
 		glUniformMatrix4fv(
-			glGetUniformLocation(program_id_, name.c_str()), 
+			GetMemoizeUniformLocation(name),
 			1, 
 			transpose ? GL_TRUE : GL_FALSE,
 			&mat._11);
+	}
+
+	const int Program::GetMemoizeUniformLocation(const std::string& name) const
+	{
+		auto it = memoize_map_.find(name);
+		if (it == memoize_map_.end())
+		{
+			memoize_map_[name] = 
+				glGetUniformLocation(program_id_, name.c_str());
+		}
+		return memoize_map_[name];
 	}
 
 } // End namespace sgl.

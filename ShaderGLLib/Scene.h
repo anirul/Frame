@@ -12,6 +12,7 @@ namespace sgl {
 	struct Scene 
 	{
 		virtual void SetParent(const std::shared_ptr<Scene>& parent) = 0;
+		virtual const std::shared_ptr<Scene>& GetParent() const = 0;
 		virtual const matrix GetLocalModel(const double dt) const = 0;
 		virtual const std::shared_ptr<Mesh> GetLocalMesh() const = 0;
 		virtual bool IsLeaf() const = 0;
@@ -24,7 +25,14 @@ namespace sgl {
 		SceneMatrix(const matrix& matrix) : matrix_(matrix) {}
 		SceneMatrix(const std::function<matrix(const double)> func) : 
 			func_(func) {}
-		void SetParent(const std::shared_ptr<Scene>& parent) override;
+		void SetParent(const std::shared_ptr<Scene>& parent) override
+		{
+			parent_ = parent;
+		}
+		const std::shared_ptr<Scene>& GetParent() const override 
+		{ 
+			return parent_; 
+		}
 		const matrix GetLocalModel(const double dt) const override;
 		const std::shared_ptr<Mesh> GetLocalMesh() const override;
 		bool IsLeaf() const override { return false; }
@@ -41,7 +49,14 @@ namespace sgl {
 	{
 	public:
 		SceneMesh(std::shared_ptr<sgl::Mesh> mesh) : mesh_(mesh) {}
-		void SetParent(const std::shared_ptr<Scene>& parent) override;
+		void SetParent(const std::shared_ptr<Scene>& parent) override
+		{
+			parent_ = parent;
+		}
+		const std::shared_ptr<Scene>& GetParent() const override
+		{
+			return parent_;
+		}
 		const matrix GetLocalModel(const double dt) const override;
 		const std::shared_ptr<Mesh> GetLocalMesh() const override;
 		bool IsLeaf() const override { return true; }
@@ -58,7 +73,7 @@ namespace sgl {
 		void AddNode(
 			const std::shared_ptr<Scene>& node, 
 			const std::shared_ptr<Scene>& parent = nullptr);
-		std::shared_ptr<Scene> Root() { return *begin(); }
+		const std::shared_ptr<Scene> GetRoot() const;
 	};
 
 } // End namespace sgl.

@@ -1,8 +1,8 @@
 #pragma once
 
 #include <optional>
+#include <map>
 #include "../ShaderGLLib/Shader.h"
-#include "../ShaderGLLib/Buffer.h"
 #include "../ShaderGLLib/Vector.h"
 
 namespace sgl {
@@ -43,7 +43,11 @@ namespace sgl {
 			const sgl::matrix& mat,
 			const bool flip = false) const;
 
+	protected:
+		const int GetMemoizeUniformLocation(const std::string& name) const;
+
 	private:
+		mutable std::map<std::string, int> memoize_map_;
 		int program_id_ = 0;
 	};
 

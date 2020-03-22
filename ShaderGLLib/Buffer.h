@@ -45,8 +45,6 @@ namespace sgl {
 		void BindCopy(const size_t size, const void* data = nullptr) const;
 		void Bind() const;
 		void UnBind() const;
-		void* BindMap(const size_t size) const;
-		void UnBindUnMap() const;
 		const unsigned int GetId() const { return buffer_object_; }
 
 	private:

@@ -151,22 +151,18 @@ namespace SoftwareGL {
 		}
 
 		// Device Startup call.
-		auto maybe_error = device_->Startup(window_interface_->GetWindowSize());
-		if (maybe_error)
-		{
-			ErrorMessageDisplay(maybe_error.value());
-		}
+		device_->Startup(window_interface_->GetWindowSize());
 
 		// Mesh creation.
 		auto gl_mesh = 
-			std::make_shared<sgl::Mesh>("../asset/TorusUVNormal.obj");
+			std::make_shared<sgl::Mesh>("../Asset/TorusUVNormal.obj");
 
 		// Create the texture and bind it to the mesh.
 		sgl::TextureManager texture_manager{};
 		texture_manager.AddTexture(
 			"texture1",
-			std::make_shared<sgl::Texture>("../asset/Texture.tga"));
-		gl_mesh->SetTexture({ "texture1" });
+			std::make_shared<sgl::Texture>("../Asset/Texture.tga"));
+		gl_mesh->SetTextures({ "texture1" });
 		device_->SetTextureManager(texture_manager);
 
 		// Pack it into a Scene object.

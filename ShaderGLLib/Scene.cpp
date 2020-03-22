@@ -3,11 +3,6 @@
 
 namespace sgl {
 
-	void SceneMatrix::SetParent(const std::shared_ptr<Scene>& parent)
-	{
-		parent_ = parent;
-	}
-
 	const sgl::matrix SceneMatrix::GetLocalModel(const double dt) const
 	{
 		if (parent_)
@@ -23,11 +18,6 @@ namespace sgl {
 	const std::shared_ptr<sgl::Mesh> SceneMatrix::GetLocalMesh() const
 	{
 		return nullptr;
-	}
-
-	void SceneMesh::SetParent(const std::shared_ptr<Scene>& parent)
-	{
-		parent_ = parent;
 	}
 
 	const sgl::matrix SceneMesh::GetLocalModel(const double dt) const
@@ -53,6 +43,23 @@ namespace sgl {
 	{
 		node->SetParent(parent);
 		push_back(node);
+	}
+
+	const std::shared_ptr<Scene> SceneTree::GetRoot() const
+	{
+		std::shared_ptr<Scene> ret;
+		for (const auto& scene : *this)
+		{
+			if (!scene->GetParent())
+			{
+				if (ret)
+				{
+					throw std::runtime_error("More than one root?");
+				}
+				ret = scene;
+			}
+		}
+		return ret;
 	}
 
 } // End namespace sgl.

@@ -45,14 +45,6 @@ namespace sgl {
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
-	TextureManager::TextureManager()
-	{
-		for (auto& str : name_array_)
-		{
-			str = "";
-		}
-	}
-
 	TextureManager::~TextureManager()
 	{
 		DisableAll();

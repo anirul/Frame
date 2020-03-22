@@ -24,9 +24,9 @@ namespace sgl {
 #else
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 #endif
-		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 		SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &major_version_);
 		SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &minor_version_);
+		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 		// Vsync off.
 		SDL_GL_SetSwapInterval(0);
 
@@ -42,28 +42,27 @@ namespace sgl {
 
 		// Enable Z buffer.
 		glEnable(GL_DEPTH_TEST);
-
-		// Create a program.
-		program_ = std::make_shared<Program>();
 	}
 
-	Device::~Device() {}
-
-	std::optional<std::string> Device::Startup(std::pair<int, int> size)
+	void Device::Startup(std::pair<int, int> size)
 	{
+		// Create a program.
+		program_ = std::make_shared<Program>();
+
 		// Vertex Shader program.
 		sgl::Shader vertex_shader(ShaderType::VERTEX_SHADER);
 		if (!vertex_shader.LoadFromFile("../Asset/SimpleVertex.glsl"))
 		{
-			return "Fragment shader Error: " + vertex_shader.GetErrorMessage();
+			throw std::runtime_error(
+				"Fragment shader Error: " + vertex_shader.GetErrorMessage());
 		}
 
 		// Fragment Shader program.
 		sgl::Shader fragment_shader(ShaderType::FRAGMENT_SHADER);
 		if (!fragment_shader.LoadFromFile("../Asset/SimpleFragment.glsl"))
 		{
-			return "Fragment shader Error: " + 
-				fragment_shader.GetErrorMessage();
+			throw std::runtime_error(
+				"Fragment shader Error: " + fragment_shader.GetErrorMessage());
 		}
 
 		// Create the program.
@@ -89,8 +88,6 @@ namespace sgl {
 		// Set the model matrix (identity for now).
 		sgl::matrix model = {};
 		program_->UniformMatrix("model", model);
-
-		return std::nullopt;
 	}
 
 	void Device::Draw(const double dt)

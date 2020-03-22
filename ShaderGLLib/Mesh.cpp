@@ -9,7 +9,6 @@ namespace sgl {
 
 	Mesh::Mesh(const std::string& file)
 	{
-		// TODO(anirul): Could read extension to check if this is an obj file.
 		auto maybe_obj_file = LoadFromObj(file);
 		if (!maybe_obj_file) 
 		{
@@ -110,27 +109,7 @@ namespace sgl {
 		glDeleteVertexArrays(1, &vertex_array_object_);
 	}
 
-	const sgl::Buffer& Mesh::PointBuffer() const
-	{
-		return point_buffer_;
-	}
-
-	const sgl::Buffer& Mesh::NormalBuffer() const
-	{
-		return normal_buffer_;
-	}
-
-	const sgl::Buffer& Mesh::TextureBuffer() const
-	{
-		return texture_buffer_;
-	}
-
-	const sgl::Buffer& Mesh::IndexBuffer() const
-	{
-		return index_buffer_;
-	}
-
-	void Mesh::SetTexture(std::initializer_list<std::string> values)
+	void Mesh::SetTextures(std::initializer_list<std::string> values)
 	{
 		textures_.clear();
 		textures_.assign(values.begin(), values.end());
