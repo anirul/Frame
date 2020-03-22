@@ -6,6 +6,7 @@
 *.lo
 *.o
 *.obj
+!/Asset
 
 # Precompiled Headers
 *.gch
@@ -30,3 +31,9 @@
 *.exe
 *.out
 *.app
+*.filters
+
+# Other
+*.DS_Store
+.vs/**
+/Build/**
