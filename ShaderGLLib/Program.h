@@ -47,7 +47,8 @@ namespace sgl {
 		const int GetMemoizeUniformLocation(const std::string& name) const;
 
 	private:
-		mutable std::map<std::string, int> memoize_map_;
+		mutable std::map<std::string, int> memoize_map_ = {};
+		std::vector<unsigned int> attached_shaders_ = {};
 		int program_id_ = 0;
 	};
 

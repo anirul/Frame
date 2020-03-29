@@ -12,8 +12,8 @@ namespace sgl {
 			const sgl::vector3& up = { 0.f, 1.f, 0.f }) :
 			pos_(pos), to_(to), up_(up) {}
 		const sgl::matrix LookAt() const;
-		const sgl::vector Direction() const;
-		const sgl::vector Position() const;
+		const sgl::vector3 Direction() const;
+		const sgl::vector3 Position() const;
 
 	protected:
 		sgl::vector3 pos_ = { 0, 0, 0 };

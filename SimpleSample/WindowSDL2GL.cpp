@@ -6,7 +6,6 @@
 #include <algorithm>
 #include <numeric>
 #include <functional>
-#include <imgui.h>
 #include <set>
 #include <sdl2/SDL.h>
 #include <GL/glew.h>
@@ -32,6 +31,9 @@ namespace SoftwareGL {
 		// Remove notifications.
  		if (severity == GL_DEBUG_SEVERITY_NOTIFICATION) 
  			return;
+		// Remove medium
+		if (severity == GL_DEBUG_SEVERITY_MEDIUM)
+			return;
 		std::ostringstream oss;
 		oss << "message\t: " << message << std::endl;
 		oss << "type\t: ";
@@ -160,9 +162,23 @@ namespace SoftwareGL {
 		// Create the texture and bind it to the mesh.
 		sgl::TextureManager texture_manager{};
 		texture_manager.AddTexture(
-			"texture1",
-			std::make_shared<sgl::Texture>("../Asset/Texture.tga"));
-		gl_mesh->SetTextures({ "texture1" });
+			"Color",
+			std::make_shared<sgl::Texture>("../Asset/Planks/Color.jpg"));
+		texture_manager.AddTexture(
+			"Normal",
+			std::make_shared<sgl::Texture>("../Asset/Planks/Normal.jpg"));
+		texture_manager.AddTexture(
+			"Metallic",
+			std::make_shared<sgl::Texture>("../Asset/Planks/Metalness.jpg"));
+		texture_manager.AddTexture(
+			"Roughness",
+			std::make_shared<sgl::Texture>("../Asset/Planks/Roughness.jpg"));
+		texture_manager.AddTexture(
+			"AmbientOcclusion",
+			std::make_shared<sgl::Texture>(
+				"../Asset/Planks/AmbientOcclusion.jpg"));
+		gl_mesh->SetTextures(
+			{ "Color", "Normal", "Metallic", "Roughness", "AmbientOcclusion" });
 		device_->SetTextureManager(texture_manager);
 
 		// Pack it into a Scene object.

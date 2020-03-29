@@ -25,11 +25,16 @@ namespace sgl {
 
 	public:
 		// Startup the scene. Throw errors in case there is any.
+		// This will force the uniform camera and light position to be set!
 		void Startup(std::pair<int, int> size);
 		// Draw what is on the scene.
 		// Take the total time from the beginning of the program to now as a
 		// const double parameter.
 		void Draw(const double dt);
+		// Set the light position and color.
+		void SetLight(const sgl::vector3 position, const sgl::vector3 color);
+		// Set the camera.
+		void SetCamera(const sgl::Camera& camera);
 		// Get the scene description.
 		void SetSceneTree(const sgl::SceneTree& scene_tree)
 		{
@@ -41,12 +46,7 @@ namespace sgl {
 		{
 			texture_manager_ = texture_manager;
 		}
-		// Set the camera.
-		void SetCamera(const sgl::Camera& camera)
-		{
-			camera_ = camera;
-		}
-
+		
 	public:
 		// Get the GL version.
 		std::pair<int, int> GetGLVersion() const

@@ -51,7 +51,7 @@ namespace sgl {
 
 		// Vertex Shader program.
 		sgl::Shader vertex_shader(ShaderType::VERTEX_SHADER);
-		if (!vertex_shader.LoadFromFile("../Asset/SimpleVertex.glsl"))
+		if (!vertex_shader.LoadFromFile("../Asset/PBRVertex.glsl"))
 		{
 			throw std::runtime_error(
 				"Fragment shader Error: " + vertex_shader.GetErrorMessage());
@@ -59,7 +59,7 @@ namespace sgl {
 
 		// Fragment Shader program.
 		sgl::Shader fragment_shader(ShaderType::FRAGMENT_SHADER);
-		if (!fragment_shader.LoadFromFile("../Asset/SimpleFragment.glsl"))
+		if (!fragment_shader.LoadFromFile("../Asset/PBRFragment.glsl"))
 		{
 			throw std::runtime_error(
 				"Fragment shader Error: " + fragment_shader.GetErrorMessage());
@@ -78,7 +78,7 @@ namespace sgl {
 			65.0f * static_cast<float>(M_PI) / 180.0f,
 			aspect,
 			0.1f,
-			1000.0f);
+			100.0f);
 		program_->UniformMatrix("projection", perspective);
 
 		// Set the camera.
@@ -88,6 +88,10 @@ namespace sgl {
 		// Set the model matrix (identity for now).
 		sgl::matrix model = {};
 		program_->UniformMatrix("model", model);
+
+		// Set the camera and light uniform!
+		SetCamera(camera_);
+		SetLight({ -10.f, 10.f, 10.f }, { 300.f, 300.f, 300.f });
 	}
 
 	void Device::Draw(const double dt)
@@ -107,6 +111,18 @@ namespace sgl {
 			// Draw the mesh.
 			mesh->Draw(*program_, texture_manager_, scene->GetLocalModel(dt));
 		}
+	}
+
+	void Device::SetLight(const sgl::vector3 position, const sgl::vector3 color)
+	{
+		program_->UniformVector3("light_position", position);
+		program_->UniformVector3("light_color", color);
+	}
+
+	void Device::SetCamera(const sgl::Camera& camera)
+	{
+		camera_ = camera;
+		program_->UniformVector3("camera_position", camera_.Position());
 	}
 
 } // End namespace sgl.

@@ -35,6 +35,8 @@ add_library(ShaderGLLib
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Buffer.cpp
     ${PROJECT_SOURCE_DIR}/Asset/SimpleVertex.glsl
     ${PROJECT_SOURCE_DIR}/Asset/SimpleFragment.glsl
+    ${PROJECT_SOURCE_DIR}/Asset/PBRVertex.glsl
+    ${PROJECT_SOURCE_DIR}/Asset/PBRFragment.glsl
 )
 
 target_link_libraries(ShaderGLLib 

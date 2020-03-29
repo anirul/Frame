@@ -25,16 +25,14 @@ namespace sgl {
 		return result;
 	}
 
-	const sgl::vector Camera::Direction() const
+	const sgl::vector3 Camera::Direction() const
 	{
-		sgl::vector to = { to_.x, to_.y, to_.z, 0 };
-		sgl::vector pos = { pos_.x, pos_.y, pos_.z, 0 };
-		return (to - pos).Normalize();
+		return (to_ - pos_).Normalize();
 	}
 
-	const sgl::vector Camera::Position() const
+	const sgl::vector3 Camera::Position() const
 	{
-		return { pos_.x, pos_.y, pos_.z, 0 };
+		return pos_;
 	}
 
 }	// End namespace sgl.

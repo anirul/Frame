@@ -20,11 +20,16 @@ namespace sgl {
 	void Program::AddShader(const Shader& shader)
 	{
 		glAttachShader(program_id_, shader.GetId());
+		attached_shaders_.push_back(shader.GetId());
 	}
 
 	void Program::LinkShader()
 	{
 		glLinkProgram(program_id_);
+		for (const auto& id : attached_shaders_)
+		{
+			glDetachShader(program_id_, id);
+		}
 	}
 
 	void Program::Use() const

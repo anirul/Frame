@@ -20,22 +20,6 @@ namespace sgl {
 		std::vector<float> flat_textures_ = {};
 		std::vector<unsigned int> flat_indices_ = {};
 		std::vector<std::array<float, 8>> vertices;
-		auto lambda = [&vertices](const std::array<float, 8>& v) ->unsigned int
-		{
-			auto next = static_cast<unsigned int>(vertices.size());
-			auto it = std::find(vertices.begin(), vertices.end(), v);
-			if (it == vertices.end())
-			{
-				vertices.push_back(v);
-			}
-			else
-			{
-				next =
-					static_cast<unsigned int>(
-						std::distance(vertices.begin(), it));
-			}
-			return next;
-		};
 		for (size_t i = 0; i < obj_file.indices.size(); ++i)
 		{
 			std::array<float, 8> v{};
@@ -47,7 +31,8 @@ namespace sgl {
 			v[5] = obj_file.normals[obj_file.indices[i][2]].z;
 			v[6] = obj_file.textures[obj_file.indices[i][1]].x;
 			v[7] = obj_file.textures[obj_file.indices[i][1]].y;
-			flat_indices_.push_back(lambda(v));
+			vertices.emplace_back(v);
+			flat_indices_.push_back(static_cast<unsigned int>(i));
 		}
 		for (const std::array<float, 8>& v : vertices)
 		{
