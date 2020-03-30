@@ -9,7 +9,6 @@ namespace sgl {
 	{
 		sgl::Image img(file);
 		size_ = img.GetSize();
-		assert(img.size() % size_.first == 0);
 		glGenTextures(1, &texture_id_);
 		glBindTexture(GL_TEXTURE_2D, texture_id_);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -24,8 +23,8 @@ namespace sgl {
 			static_cast<GLsizei>(size_.second),
 			0,
 			GL_RGBA,
-			GL_FLOAT,
-			img.data());
+			GL_UNSIGNED_BYTE,
+			img.Data());
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 

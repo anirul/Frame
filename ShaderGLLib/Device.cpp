@@ -91,7 +91,13 @@ namespace sgl {
 
 		// Set the camera and light uniform!
 		SetCamera(camera_);
-		SetLight({ -10.f, 10.f, 10.f }, { 300.f, 300.f, 300.f });
+		const float light_value = 10.f;
+		const sgl::vector3 light_vec = 
+			{ light_value, light_value, light_value };
+		AddLight({ -10.f,  10.f,  10.f }, light_vec);
+		AddLight({ 10.f,  10.f,  10.f }, light_vec);
+		AddLight({ -10.f,  -10.f,  10.f }, light_vec);
+		AddLight({ 10.f,  -10.f,  10.f }, light_vec);
 	}
 
 	void Device::Draw(const double dt)
@@ -113,10 +119,17 @@ namespace sgl {
 		}
 	}
 
-	void Device::SetLight(const sgl::vector3 position, const sgl::vector3 color)
+	bool Device::AddLight(const sgl::vector3 position, const sgl::vector3 color)
 	{
-		program_->UniformVector3("light_position", position);
-		program_->UniformVector3("light_color", color);
+		if (light_count >= max_light_count) return false;
+		program_->UniformVector3(
+			"light_position[" + std::to_string(light_count) + "]", 
+			position);
+		program_->UniformVector3(
+			"light_color[" + std::to_string(light_count) + "]", 
+			color);
+		light_count++;
+		return true;
 	}
 
 	void Device::SetCamera(const sgl::Camera& camera)

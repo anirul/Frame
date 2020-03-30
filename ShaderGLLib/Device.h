@@ -32,7 +32,7 @@ namespace sgl {
 		// const double parameter.
 		void Draw(const double dt);
 		// Set the light position and color.
-		void SetLight(const sgl::vector3 position, const sgl::vector3 color);
+		bool AddLight(const sgl::vector3 position, const sgl::vector3 color);
 		// Set the camera.
 		void SetCamera(const sgl::Camera& camera);
 		// Get the scene description.
@@ -62,6 +62,8 @@ namespace sgl {
 		sgl::TextureManager texture_manager_ = {};
 		sgl::Camera camera_ = sgl::Camera({ 0.f, 0.f, -4.f });
 		SDL_GLContext sdl_gl_context_ = nullptr;
+		int light_count = 0;
+		const int max_light_count = 4;
 		int major_version_ = 0;
 		int minor_version_ = 0;
 	};
