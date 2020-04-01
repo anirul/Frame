@@ -23,9 +23,9 @@ const float PI = 3.14159265359;
 // Don't worry if you don't get what's going on; you generally want to do normal 
 // mapping the usual way for performance anways; I do plan make a note of this 
 // technique somewhere later in the normal mapping tutorial.
-vec3 getNormalFromMap()
+vec3 getNormalFromMap(vec3 normalMapPosition)
 {
-    vec3 tangentNormal = texture(Normal, out_texcoord).xyz * 2.0 - 1.0;
+    vec3 tangentNormal = normalMapPosition * 2.0 - 1.0;
 
     vec3 Q1  = dFdx(out_world);
     vec3 Q2  = dFdy(out_world);
@@ -86,17 +86,21 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0)
 
 // ----------------------------------------------------------------------------
 void main()
-{		
-    vec3 albedo     = pow(texture(Color, out_texcoord).rgb, vec3(2.2));
-    float metallic  = texture(Metallic, out_texcoord).r;
-    float roughness = texture(Roughness, out_texcoord).r;
-    float ao        = texture(AmbientOcclusion, out_texcoord).r;
-//    vec3 albedo = pow(vec3(0.5, 0.0, 0.0), vec3(2.2));
-//    float metallic = 1.0;
-//    float roughness = 0.0;
-//    float ao = 1.0;
-
-    vec3 N = getNormalFromMap();
+{
+    vec3 albedo             = pow(texture(Color, out_texcoord).rgb, vec3(2.2));
+    float metallic          = texture(Metallic, out_texcoord).r;
+    float roughness         = texture(Roughness, out_texcoord).r;
+    float ao                = texture(AmbientOcclusion, out_texcoord).r;
+    vec3 normal             = texture(Normal, out_texcoord).xyz;
+/*
+    // Red metallic surface.
+    vec3 albedo             = pow(vec3(0.5, 0.0, 0.0), vec3(2.2));
+    float metallic          = 1.0;
+    float roughness         = 0.5; // This has to be > 0.
+    float ao                = 1.0;
+    vec3 normal  = vec3(0.5, 0.5, 1.0);
+*/
+    vec3 N = getNormalFromMap(normal);
     vec3 V = normalize(camera_position - out_world);
 
     // calculate reflectance at normal incidence; if dia-electric (like plastic)
@@ -110,13 +114,11 @@ void main()
     
     for (int i = 0; i < 4; ++i)
     {
-        if (light_color[i] == vec3(0, 0, 0)) continue;
-
         // calculate per-light radiance
         vec3 L = normalize(light_position[i] - out_world);
         vec3 H = normalize(V + L);
         float distance = length(light_position[i] - out_world);
-        float attenuation = 1.0; // 1.0 / (distance * distance);
+        float attenuation = 1.0 / (distance * distance);
         vec3 radiance = light_color[i] * attenuation;
 
         // Cook-Torrance BRDF

@@ -91,7 +91,7 @@ namespace sgl {
 
 		// Set the camera and light uniform!
 		SetCamera(camera_);
-		const float light_value = 10.f;
+		const float light_value = 300.f;
 		const sgl::vector3 light_vec = 
 			{ light_value, light_value, light_value };
 		AddLight({ -10.f,  10.f,  10.f }, light_vec);

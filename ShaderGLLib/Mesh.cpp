@@ -108,7 +108,7 @@ namespace sgl {
 		texture_manager.DisableAll();
 		for (const auto& str : textures_)
 		{
-			texture_manager.EnableTexture(str);
+			program.UniformInt(str, texture_manager.EnableTexture(str));
 		}
 
 		glBindVertexArray(vertex_array_object_);

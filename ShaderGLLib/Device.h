@@ -60,7 +60,7 @@ namespace sgl {
 		std::shared_ptr<sgl::Program> program_ = nullptr;
 		sgl::SceneTree scene_tree_ = {};
 		sgl::TextureManager texture_manager_ = {};
-		sgl::Camera camera_ = sgl::Camera({ 0.f, 0.f, 4.f });
+		sgl::Camera camera_ = sgl::Camera({ 0.f, 0.f, 3.f });
 		SDL_GLContext sdl_gl_context_ = nullptr;
 		int light_count = 0;
 		const int max_light_count = 4;

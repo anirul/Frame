@@ -156,27 +156,30 @@ namespace SoftwareGL {
 		device_->Startup(window_interface_->GetWindowSize());
 
 		// Mesh creation.
-		auto gl_mesh = 
-			std::make_shared<sgl::Mesh>("../Asset/TorusUVNormal.obj");
+		auto gl_mesh = std::make_shared<sgl::Mesh>("../Asset/Apple.obj");
 
 		// Create the texture and bind it to the mesh.
 		sgl::TextureManager texture_manager{};
 		texture_manager.AddTexture(
 			"Color",
-			std::make_shared<sgl::Texture>("../Asset/Planks/Color.jpg"));
+			std::make_shared<sgl::Texture>(
+				"../Asset/Apple/Color.jpg"));
 		texture_manager.AddTexture(
 			"Normal",
-			std::make_shared<sgl::Texture>("../Asset/Planks/Normal.jpg"));
+			std::make_shared<sgl::Texture>(
+				"../Asset/Apple/Normal.jpg"));
 		texture_manager.AddTexture(
 			"Metallic",
-			std::make_shared<sgl::Texture>("../Asset/Planks/Metalness.jpg"));
+			std::make_shared<sgl::Texture>(
+				"../Asset/Apple/Metalness.jpg"));
 		texture_manager.AddTexture(
 			"Roughness",
-			std::make_shared<sgl::Texture>("../Asset/Planks/Roughness.jpg"));
+			std::make_shared<sgl::Texture>(
+				"../Asset/Apple/Roughness.jpg"));
 		texture_manager.AddTexture(
 			"AmbientOcclusion",
 			std::make_shared<sgl::Texture>(
-				"../Asset/Planks/AmbientOcclusion.jpg"));
+				"../Asset/Apple/AmbientOcclusion.jpg"));
 		gl_mesh->SetTextures(
 			{ "Color", "Normal", "Metallic", "Roughness", "AmbientOcclusion" });
 		device_->SetTextureManager(texture_manager);

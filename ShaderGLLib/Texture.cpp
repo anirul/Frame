@@ -68,7 +68,7 @@ namespace sgl {
 		return true;
 	}
 
-	void TextureManager::EnableTexture(const std::string& name) const
+	int TextureManager::EnableTexture(const std::string& name) const
 	{
 		auto it1 = name_texture_map_.find(name);
 		if (it1 == name_texture_map_.end())
@@ -81,7 +81,7 @@ namespace sgl {
 			{
 				name_array_[i] = name;
 				it1->second->Bind(i);
-				return;
+				return i;
 			}
 		}
 		throw std::runtime_error("No free slots!");
