@@ -1,16 +1,14 @@
 #include <iostream>
 #include <vector>
+#include <utility>
 
 #if defined(_WIN32) || defined(_WIN64)
 #define WINDOWS_LEAN_AND_MEAN
 #include <windows.h>
 #endif
 
-#include <GL/glew.h>
-#include <SDL.h>
-
-#include "WindowSDL2GL.h"
-#include "WindowSoftwareGL.h"
+#include "Application.h"
+#include "../ShaderGLLib/Window.h"
 
 #if defined(_WIN32) || defined(_WIN64)
 int WINAPI WinMain(
@@ -22,12 +20,11 @@ int WINAPI WinMain(
 int main(int ac, char** av)
 #endif
 {
-	SoftwareGL::WindowSDL2GL window(
-		std::make_shared<WindowSoftwareGL>(640, 480));
-	if (!window.Startup())
+	Application app(sgl::MakeSDLOpenGL({ 640, 480 }));
+	if (!app.Startup())
 	{
 		return -1;
 	}
-	window.Run();
+	app.Run();
 	return 0;
 }

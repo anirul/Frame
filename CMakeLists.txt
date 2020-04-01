@@ -33,6 +33,8 @@ add_library(ShaderGLLib
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Device.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Buffer.h
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Buffer.cpp
+    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Window.h
+    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Window.cpp
     ${PROJECT_SOURCE_DIR}/Asset/SimpleVertex.glsl
     ${PROJECT_SOURCE_DIR}/Asset/SimpleFragment.glsl
     ${PROJECT_SOURCE_DIR}/Asset/PBRVertex.glsl
@@ -68,6 +70,8 @@ add_executable(ShaderGLTest
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/DeviceTest.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/BufferTest.h
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/BufferTest.cpp
+    ${PROJECT_SOURCE_DIR}/ShaderGLTest/WindowTest.h
+    ${PROJECT_SOURCE_DIR}/ShaderGLTest/WindowTest.cpp
 )
 
 target_link_libraries(ShaderGLTest
@@ -83,11 +87,8 @@ target_link_libraries(ShaderGLTest
 add_executable(SimpleSample
   WIN32
     ${PROJECT_SOURCE_DIR}/SimpleSample/main.cpp
-    ${PROJECT_SOURCE_DIR}/SimpleSample/WindowInterface.h
-    ${PROJECT_SOURCE_DIR}/SimpleSample/WindowSoftwareGL.h
-    ${PROJECT_SOURCE_DIR}/SimpleSample/WindowSoftwareGL.cpp
-    ${PROJECT_SOURCE_DIR}/SimpleSample/WindowSDL2GL.cpp
-    ${PROJECT_SOURCE_DIR}/SimpleSample/WindowSDL2GL.h
+    ${PROJECT_SOURCE_DIR}/SimpleSample/Application.h
+    ${PROJECT_SOURCE_DIR}/SimpleSample/Application.cpp
 )
 
 target_link_libraries(SimpleSample

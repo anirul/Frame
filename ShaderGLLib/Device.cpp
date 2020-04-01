@@ -44,6 +44,11 @@ namespace sgl {
 		glEnable(GL_DEPTH_TEST);
 	}
 
+	Device::~Device()
+	{
+		SDL_GL_DeleteContext(sdl_gl_context_);
+	}
+
 	void Device::Startup(std::pair<int, int> size)
 	{
 		// Create a program.

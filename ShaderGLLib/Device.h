@@ -21,7 +21,7 @@ namespace sgl {
 	public:
 		// This will initialize the GL context and make the GLEW init.
 		Device(SDL_Window* sdl_window);
-		virtual ~Device() = default;
+		virtual ~Device();
 
 	public:
 		// Startup the scene. Throw errors in case there is any.
@@ -46,13 +46,6 @@ namespace sgl {
 		{
 			texture_manager_ = texture_manager;
 		}
-		
-	public:
-		// Get the GL version.
-		std::pair<int, int> GetGLVersion() const
-		{
-			return std::make_pair(major_version_, minor_version_);
-		}
 
 	private:
 		// Has to be a shared ptr as the program has to be created after the
@@ -60,7 +53,7 @@ namespace sgl {
 		std::shared_ptr<sgl::Program> program_ = nullptr;
 		sgl::SceneTree scene_tree_ = {};
 		sgl::TextureManager texture_manager_ = {};
-		sgl::Camera camera_ = sgl::Camera({ 0.f, 0.f, 3.f });
+		sgl::Camera camera_ = sgl::Camera({ 0.f, 0.f, 2.f });
 		SDL_GLContext sdl_gl_context_ = nullptr;
 		int light_count = 0;
 		const int max_light_count = 4;
