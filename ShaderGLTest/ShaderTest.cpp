@@ -22,7 +22,7 @@ namespace test {
 		EXPECT_FALSE(shader_);
 		shader_ = std::make_shared<sgl::Shader>(sgl::ShaderType::VERTEX_SHADER);
 		EXPECT_TRUE(shader_);
-		shader_->LoadFromFile("../Asset/SimpleVertex.glsl");
+		shader_->LoadFromFile("../Asset/Simple.Vertex.glsl");
 		EXPECT_NE(0, shader_->GetId());
 	}
 
@@ -32,7 +32,7 @@ namespace test {
 		shader_ = 
 			std::make_shared<sgl::Shader>(sgl::ShaderType::FRAGMENT_SHADER);
 		EXPECT_TRUE(shader_);
-		shader_->LoadFromFile("../Asset/SimpleFragment.glsl");
+		shader_->LoadFromFile("../Asset/Simple.Fragment.glsl");
 		EXPECT_NE(0, shader_->GetId());
 	}
 

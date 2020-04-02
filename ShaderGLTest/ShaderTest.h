@@ -1,20 +1,21 @@
 #pragma once
 
 #include <gtest/gtest.h>
-#include "OpenGLTest.h"
+#include "../ShaderGLLib/Window.h"
 #include "../ShaderGLLib/Shader.h"
 
 namespace test {
 
-	class ShaderTest : public OpenGLTest
+	class ShaderTest : public testing::Test
 	{
 	public:
-		ShaderTest() : OpenGLTest()
+		ShaderTest()
 		{
-			GLContextAndGlewInit();
+			window_ = sgl::MakeSDLOpenGL({ 320, 200 });
 		}
 
 	protected:
+		std::shared_ptr<sgl::Window> window_ = nullptr;
 		std::shared_ptr<sgl::Shader> shader_ = nullptr;
 	};
 

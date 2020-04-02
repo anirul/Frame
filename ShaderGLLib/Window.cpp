@@ -81,13 +81,10 @@ namespace sgl {
 				// Vsync off.
 				SDL_GL_SetSwapInterval(0);
 
-				// Create a new device.
-				device_ = std::make_shared<sgl::Device>(gl_context_);
-
 				return gl_version;
 			}
 
-			bool Startup() override
+			void Startup() override
 			{
 #if _DEBUG && !defined(__APPLE__)
 				// Enable error message.
@@ -96,10 +93,6 @@ namespace sgl {
 					SDLWindow::ErrorMessageHandler,
 					nullptr);
 #endif
-				// Device Startup call.
-				device_->Startup(size_);
-
-				return true;
 			}
 
 			void Run() override
@@ -125,7 +118,7 @@ namespace sgl {
 						}
 					}
 
-					device_->Draw(time.count());
+					CreateDevice()->Draw(time.count());
 					previous_count = time.count();
 					SDL_GL_SwapWindow(sdl_window_);
 				} while (loop);
@@ -136,9 +129,18 @@ namespace sgl {
 				draw_func_ = draw_func;
 			}
 
-			std::shared_ptr<Device> GetDevice() override
+			std::shared_ptr<Device> CreateDevice() override
 			{
+				if (!device_)
+				{
+					device_ = std::make_shared<sgl::Device>(gl_context_);
+				}
 				return device_;
+			}
+
+			std::pair<int, int> GetSize() const override
+			{
+				return size_;
 			}
 
 		protected:
@@ -180,9 +182,6 @@ namespace sgl {
 			{
 				// Remove notifications.
 				if (severity == GL_DEBUG_SEVERITY_NOTIFICATION)
-					return;
-				// Remove medium
-				if (severity == GL_DEBUG_SEVERITY_MEDIUM)
 					return;
 				std::ostringstream oss;
 				oss << "message\t: " << message << std::endl;

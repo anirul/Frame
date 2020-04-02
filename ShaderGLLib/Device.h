@@ -20,12 +20,16 @@ namespace sgl {
 	public:
 		// This will initialize the GL context and make the GLEW init.
 		Device(void* gl_context);
-		virtual ~Device() = default;
 
 	public:
 		// Startup the scene. Throw errors in case there is any.
 		// This will force the uniform camera and light position to be set!
-		void Startup(std::pair<int, int> size);
+		// Also include the shaders this will be set to simple in case they are
+		// not provided.
+		void Startup(
+			std::pair<int, int> size, 
+			const std::optional<const sgl::Shader>& vertex = std::nullopt, 
+			const std::optional<const sgl::Shader>& fragment = std::nullopt);
 		// Draw what is on the scene.
 		// Take the total time from the beginning of the program to now as a
 		// const double parameter.

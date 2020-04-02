@@ -5,16 +5,17 @@ namespace test {
 	TEST_F(DeviceTest, CreateDeviceTest)
 	{
 		EXPECT_FALSE(device_);
-		device_ = std::make_shared<sgl::Device>(sdl_window_);
+		EXPECT_TRUE(window_);
+		device_ = window_->CreateDevice();
 		EXPECT_TRUE(device_);
 	}
 
 	TEST_F(DeviceTest, StartupDeviceTest)
 	{
 		EXPECT_FALSE(device_);
-		device_ = std::make_shared<sgl::Device>(sdl_window_);
-		PostGlewInit();
-		device_->Startup(std::make_pair<int, int>(640, 480));
+		EXPECT_TRUE(window_);
+		device_ = window_->CreateDevice();
+		device_->Startup(window_->GetSize());
 		EXPECT_TRUE(device_);
 	}
 

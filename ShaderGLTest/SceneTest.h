@@ -3,18 +3,18 @@
 #include <gtest/gtest.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include "OpenGLTest.h"
+#include "../ShaderGLLib/Window.h"
 #include "../ShaderGLLib/Scene.h"
 
 namespace test {
 
-	class SceneTest : public OpenGLTest
+	class SceneTest : public testing::Test
 	{
 	public:
 		// OpenGL is needed as this is used by mesh.
-		SceneTest() : OpenGLTest()
+		SceneTest()
 		{
-			GLContextAndGlewInit();
+			window_ = sgl::MakeSDLOpenGL({ 320, 200 });
 		}
 		// Populate the tree with:
 		//	    Matrix (contain identity)
@@ -27,8 +27,7 @@ namespace test {
 			auto matrix_scene = std::make_shared<sgl::SceneMatrix>(identity);
 			scene_tree_->AddNode(matrix_scene);
 			{
-				auto mesh = std::make_shared<sgl::Mesh>(
-					"../asset/CubeUVNormal.obj");
+				auto mesh = std::make_shared<sgl::Mesh>("../Asset/Cube.obj");
 				scene_tree_->AddNode(
 					std::make_shared<sgl::SceneMesh>(mesh),
 					matrix_scene);
@@ -41,7 +40,7 @@ namespace test {
 				scene_tree_->AddNode(disp_scene, matrix_scene);
 				{
 					auto mesh = std::make_shared<sgl::Mesh>(
-						"../asset/TorusUVNormal.obj");
+						"../Asset/Torus.obj");
 					scene_tree_->AddNode(
 						std::make_shared<sgl::SceneMesh>(mesh),
 						disp_scene);
@@ -50,6 +49,7 @@ namespace test {
 		}
 
 	protected:
+		std::shared_ptr<sgl::Window> window_ = nullptr;
 		std::shared_ptr<sgl::Scene> scene_ = nullptr;
 		std::shared_ptr<sgl::SceneTree> scene_tree_ = nullptr;
 	};

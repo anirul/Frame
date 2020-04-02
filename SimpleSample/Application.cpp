@@ -6,10 +6,26 @@ Application::Application(const std::shared_ptr<sgl::Window>& window) :
 
 bool Application::Startup()
 {
-	bool ret = window_->Startup();
-	if (!ret) return false;
+	auto device = window_->CreateDevice();
 
-	auto device = window_->GetDevice();
+	sgl::Shader vertex(sgl::ShaderType::VERTEX_SHADER);
+	sgl::Shader fragment(sgl::ShaderType::FRAGMENT_SHADER);
+	if (!vertex.LoadFromFile("../Asset/PBR.Vertex.glsl"))
+	{
+		throw 
+			std::runtime_error(
+				"Error loading vertex shader: " + 
+				vertex.GetErrorMessage());
+	}
+	if (!fragment.LoadFromFile("../Asset/PBR.Fragment.glsl"))
+	{
+		throw
+			std::runtime_error(
+				"Error loading fragment shader: " +
+				fragment.GetErrorMessage());
+	}
+	device->Startup(window_->GetSize(), vertex, fragment);
+	
 	// Mesh creation.
 	auto gl_mesh = std::make_shared<sgl::Mesh>("../Asset/Apple.obj");
 
@@ -60,6 +76,7 @@ bool Application::Startup()
 			scene_matrix);
 	}
 	device->SetSceneTree(scene_tree);
+	window_->Startup();
 	return true;
 }
 

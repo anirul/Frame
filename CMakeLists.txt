@@ -33,10 +33,10 @@ add_library(ShaderGLLib
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Buffer.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Window.h
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Window.cpp
-    ${PROJECT_SOURCE_DIR}/Asset/SimpleVertex.glsl
-    ${PROJECT_SOURCE_DIR}/Asset/SimpleFragment.glsl
-    ${PROJECT_SOURCE_DIR}/Asset/PBRVertex.glsl
-    ${PROJECT_SOURCE_DIR}/Asset/PBRFragment.glsl
+    ${PROJECT_SOURCE_DIR}/Asset/Simple.Vertex.glsl
+    ${PROJECT_SOURCE_DIR}/Asset/Simple.Fragment.glsl
+    ${PROJECT_SOURCE_DIR}/Asset/PBR.Vertex.glsl
+    ${PROJECT_SOURCE_DIR}/Asset/PBR.Fragment.glsl
 )
 
 target_link_libraries(ShaderGLLib 
@@ -47,7 +47,6 @@ target_link_libraries(ShaderGLLib
 
 add_executable(ShaderGLTest
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/main.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLTest/OpenGLTest.h
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/MeshTest.h
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/MeshTest.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/CameraTest.h

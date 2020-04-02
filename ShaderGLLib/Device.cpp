@@ -28,30 +28,49 @@ namespace sgl {
 		glEnable(GL_DEPTH_TEST);
 	}
 
-	void Device::Startup(std::pair<int, int> size)
+	void Device::Startup(
+		std::pair<int, int> size,
+		const std::optional<const sgl::Shader>& vertex /*= std::nullopt*/,
+		const std::optional<const sgl::Shader>& fragment /*= std::nullopt*/)
 	{
 		// Create a program.
 		program_ = std::make_shared<Program>();
 
-		// Vertex Shader program.
-		sgl::Shader vertex_shader(ShaderType::VERTEX_SHADER);
-		if (!vertex_shader.LoadFromFile("../Asset/PBRVertex.glsl"))
+		if (!vertex)
 		{
-			throw std::runtime_error(
-				"Fragment shader Error: " + vertex_shader.GetErrorMessage());
+			// Vertex Shader program.
+			sgl::Shader vertex_shader(ShaderType::VERTEX_SHADER);
+			if (!vertex_shader.LoadFromFile("../Asset/Simple.Vertex.glsl"))
+			{
+				throw std::runtime_error(
+					"Fragment shader Error: " + 
+					vertex_shader.GetErrorMessage());
+			}
+			program_->AddShader(vertex_shader);
+		}
+		else
+		{
+			program_->AddShader(vertex.value());
 		}
 
-		// Fragment Shader program.
-		sgl::Shader fragment_shader(ShaderType::FRAGMENT_SHADER);
-		if (!fragment_shader.LoadFromFile("../Asset/PBRFragment.glsl"))
+		if (!fragment)
 		{
-			throw std::runtime_error(
-				"Fragment shader Error: " + fragment_shader.GetErrorMessage());
+			// Fragment Shader program.
+			sgl::Shader fragment_shader(ShaderType::FRAGMENT_SHADER);
+			if (!fragment_shader.LoadFromFile("../Asset/Simple.Fragment.glsl"))
+			{
+				throw std::runtime_error(
+					"Fragment shader Error: " + 
+					fragment_shader.GetErrorMessage());
+			}
+			program_->AddShader(fragment_shader);
+		}
+		else
+		{
+			program_->AddShader(fragment.value());
 		}
 
 		// Create the program.
-		program_->AddShader(vertex_shader);
-		program_->AddShader(fragment_shader);
 		program_->LinkShader();
 		program_->Use();
 
@@ -82,7 +101,7 @@ namespace sgl {
 		AddLight({ -10.f,  -10.f,  10.f }, light_vec);
 		AddLight({ 10.f,  -10.f,  10.f }, light_vec);
 	}
-
+	
 	void Device::Draw(const double dt)
 	{
 		// Clear the screen.

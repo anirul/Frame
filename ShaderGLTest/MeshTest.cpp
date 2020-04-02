@@ -5,7 +5,8 @@ namespace test {
 	TEST_F(MeshTest, CreateCubeMeshTest)
 	{
 		EXPECT_FALSE(mesh_);
-		mesh_ = std::make_shared<sgl::Mesh>("../Asset/CubeUVNormal.obj");
+		EXPECT_TRUE(window_);
+		mesh_ = std::make_shared<sgl::Mesh>("../Asset/Cube.obj");
 		EXPECT_NE(0, mesh_->PointBuffer().GetId());
 		EXPECT_NE(0, mesh_->NormalBuffer().GetId());
 		EXPECT_NE(0, mesh_->TextureBuffer().GetId());
@@ -18,7 +19,8 @@ namespace test {
 	TEST_F(MeshTest, CreateTorusMeshTest)
 	{
 		EXPECT_FALSE(mesh_);
-		mesh_ = std::make_shared<sgl::Mesh>("../Asset/TorusUVNormal.obj");
+		EXPECT_TRUE(window_);
+		mesh_ = std::make_shared<sgl::Mesh>("../Asset/Torus.obj");
 		EXPECT_NE(0, mesh_->PointBuffer().GetId());
 		EXPECT_NE(0, mesh_->NormalBuffer().GetId());
 		EXPECT_NE(0, mesh_->TextureBuffer().GetId());
