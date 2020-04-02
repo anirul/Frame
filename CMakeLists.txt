@@ -19,8 +19,6 @@ add_library(ShaderGLLib
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Camera.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Image.h
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Image.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Vector.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Vector.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Scene.h
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Scene.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Shader.h
@@ -56,8 +54,6 @@ add_executable(ShaderGLTest
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/CameraTest.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/ImageTest.h
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/ImageTest.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLTest/VectorTest.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLTest/VectorTest.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/SceneTest.h
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/SceneTest.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/ShaderTest.h

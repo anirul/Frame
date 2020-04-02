@@ -3,7 +3,7 @@
 
 namespace sgl {
 
-	const sgl::matrix SceneMatrix::GetLocalModel(const double dt) const
+	const glm::mat4 SceneMatrix::GetLocalModel(const double dt) const
 	{
 		if (parent_)
 		{
@@ -20,7 +20,7 @@ namespace sgl {
 		return nullptr;
 	}
 
-	const sgl::matrix SceneMesh::GetLocalModel(const double dt) const
+	const glm::mat4 SceneMesh::GetLocalModel(const double dt) const
 	{
 		if (parent_)
 		{
@@ -28,7 +28,7 @@ namespace sgl {
 		}
 		else
 		{
-			return matrix{};
+			return glm::mat4(1.0f);
 		}
 	}
 

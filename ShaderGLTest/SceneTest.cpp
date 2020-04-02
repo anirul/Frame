@@ -5,7 +5,7 @@ namespace test {
 	TEST_F(SceneTest, CheckConstructorMatrixTest)
 	{
 		EXPECT_FALSE(scene_);
-		sgl::matrix test;
+		glm::mat4 test(1.0f);
 		scene_ = std::make_shared<sgl::SceneMatrix>(test);
 		EXPECT_TRUE(scene_);
 	}

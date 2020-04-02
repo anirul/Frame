@@ -1,5 +1,4 @@
 #include "BufferTest.h"
-#include "../ShaderGLLib/Vector.h"
 
 namespace test {
 

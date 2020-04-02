@@ -7,6 +7,7 @@
 #else
 	#include <iostream>
 #endif
+#include <glm/gtc/matrix_transform.hpp>
 #include "Device.h"
 
 namespace sgl {
@@ -80,26 +81,25 @@ namespace sgl {
 		// Set the perspective matrix.
 		const float aspect =
 			static_cast<float>(size.first) / static_cast<float>(size.second);
-		sgl::matrix perspective = sgl::Perspective(
-			65.0f * static_cast<float>(M_PI) / 180.0f,
+		glm::mat4 perspective = glm::perspective(
+			glm::radians(65.0f),
 			aspect,
 			0.1f,
 			100.0f);
 		program_->UniformMatrix("projection", perspective);
 
 		// Set the camera.
-		sgl::matrix view = camera_.LookAt();
+		glm::mat4 view = camera_.LookAt();
 		program_->UniformMatrix("view", view);
 
 		// Set the model matrix (identity for now).
-		sgl::matrix model = {};
+		glm::mat4 model(1.0f);
 		program_->UniformMatrix("model", model);
 
 		// Set the camera and light uniform!
 		SetCamera(camera_);
 		const float light_value = 300.f;
-		const sgl::vector3 light_vec = 
-			{ light_value, light_value, light_value };
+		const glm::vec3 light_vec(light_value, light_value, light_value);
 		AddLight({ -10.f,  10.f,  10.f }, light_vec);
 		AddLight({ 10.f,  10.f,  10.f }, light_vec);
 		AddLight({ -10.f,  -10.f,  10.f }, light_vec);
@@ -125,7 +125,7 @@ namespace sgl {
 		}
 	}
 
-	bool Device::AddLight(const sgl::vector3 position, const sgl::vector3 color)
+	bool Device::AddLight(const glm::vec3& position, const glm::vec3& color)
 	{
 		if (light_count >= max_light_count) return false;
 		program_->UniformVector3(

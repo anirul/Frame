@@ -103,7 +103,7 @@ namespace sgl {
 	void Mesh::Draw(
 		const sgl::Program& program,
 		const sgl::TextureManager& texture_manager,
-		const sgl::matrix& model /*= {}*/) const
+		const glm::mat4& model /*= {}*/) const
 	{
 		texture_manager.DisableAll();
 		for (const auto& str : textures_)
@@ -152,7 +152,7 @@ namespace sgl {
 					case 'n':
 					{
 						assert(dump == "vn");
-						sgl::vector3 v(0, 0, 0);
+						glm::vec3 v(0, 0, 0);
 						if (!(iss >> v.x)) return std::nullopt;
 						if (!(iss >> v.y)) return std::nullopt;
 						if (!(iss >> v.z)) return std::nullopt;
@@ -162,7 +162,7 @@ namespace sgl {
 					case 't':
 					{
 						assert(dump == "vt");
-						sgl::vector2 v(0, 0);
+						glm::vec2 v(0, 0);
 						if (!(iss >> v.x)) return std::nullopt;
 						if (!(iss >> v.y)) return std::nullopt;
 						obj_file.textures.push_back(v);
@@ -175,7 +175,7 @@ namespace sgl {
 				else
 				{
 					if (dump != "v") return std::nullopt;
-					sgl::vector3 v(0, 0, 0);
+					glm::vec3 v(0, 0, 0);
 					if (!(iss >> v.x)) return std::nullopt;
 					if (!(iss >> v.y)) return std::nullopt;
 					if (!(iss >> v.z)) return std::nullopt;

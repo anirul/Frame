@@ -54,21 +54,21 @@ namespace sgl {
 
 	void Program::UniformVector2(
 		const std::string& name, 
-		const sgl::vector2& vec2) const
+		const glm::vec2& vec2) const
 	{
 		glUniform2f(GetMemoizeUniformLocation(name), vec2.x, vec2.y);
 	}
 
 	void Program::UniformVector3(
 		const std::string& name, 
-		const sgl::vector3& vec3) const
+		const glm::vec3& vec3) const
 	{
 		glUniform3f(GetMemoizeUniformLocation(name), vec3.x, vec3.y, vec3.z);
 	}
 
 	void Program::UniformVector4(
 		const std::string& name, 
-		const sgl::vector4& vec4) const
+		const glm::vec4& vec4) const
 	{
 		glUniform4f(
 			GetMemoizeUniformLocation(name),
@@ -80,14 +80,14 @@ namespace sgl {
 
 	void Program::UniformMatrix(
 		const std::string& name, 
-		const sgl::matrix& mat,
+		const glm::mat4& mat,
 		const bool transpose /*= false*/) const
 	{
 		glUniformMatrix4fv(
 			GetMemoizeUniformLocation(name),
 			1, 
 			transpose ? GL_TRUE : GL_FALSE,
-			&mat._11);
+			&mat[0][0]);
 	}
 
 	const int Program::GetMemoizeUniformLocation(const std::string& name) const

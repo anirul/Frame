@@ -9,7 +9,6 @@
 #include "Program.h"
 #include "Texture.h"
 #include "../ShaderGLLib/Buffer.h"
-#include "../ShaderGLLib/Vector.h"
 #include "../ShaderGLLib/Mesh.h"
 #include "../ShaderGLLib/Scene.h"
 #include "../ShaderGLLib/Camera.h"
@@ -32,7 +31,7 @@ namespace sgl {
 		// const double parameter.
 		void Draw(const double dt);
 		// Set the light position and color.
-		bool AddLight(const sgl::vector3 position, const sgl::vector3 color);
+		bool AddLight(const glm::vec3& position, const glm::vec3& color);
 		// Set the camera.
 		void SetCamera(const sgl::Camera& camera);
 		// Get the scene description.

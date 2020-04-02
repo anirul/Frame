@@ -2,8 +2,9 @@
 
 #include <optional>
 #include <map>
+#include <vector>
+#include <glm/glm.hpp>
 #include "../ShaderGLLib/Shader.h"
-#include "../ShaderGLLib/Vector.h"
 
 namespace sgl {
 
@@ -28,19 +29,19 @@ namespace sgl {
 		// Create a uniform from a string and a vector2.
 		void UniformVector2(
 			const std::string& name, 
-			const sgl::vector2& vec2) const;
+			const glm::vec2& vec2) const;
 		// Create a uniform from a string and a vector3.
 		void UniformVector3(
 			const std::string& name,
-			const sgl::vector3& vec3) const;
+			const glm::vec3& vec3) const;
 		// Create a uniform from a string and a vector4.
 		void UniformVector4(
 			const std::string& name,
-			const sgl::vector4& vec4) const;
+			const glm::vec4& vec4) const;
 		// Create a uniform from a string and a matrix.
 		void UniformMatrix(
 			const std::string& name,
-			const sgl::matrix& mat,
+			const glm::mat4& mat,
 			const bool flip = false) const;
 
 	protected:

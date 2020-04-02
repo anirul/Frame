@@ -2,7 +2,6 @@
 
 #include <vector>
 #include <string>
-#include "Vector.h"
 
 namespace sgl {
 

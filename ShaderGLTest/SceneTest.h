@@ -1,6 +1,8 @@
 #pragma once
 
 #include <gtest/gtest.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include "OpenGLTest.h"
 #include "../ShaderGLLib/Scene.h"
 
@@ -21,13 +23,7 @@ namespace test {
 		//	         \--- Mesh   (contain TorusUVNormal.obj)
 		void PopulateTree()
 		{
-			sgl::matrix identity =
-			{
-				1, 0, 0, 0,
-				0, 1, 0, 0,
-				0, 0, 1, 0,
-				0, 0, 0, 1,
-			};
+			glm::mat4 identity(1.0f);
 			auto matrix_scene = std::make_shared<sgl::SceneMatrix>(identity);
 			scene_tree_->AddNode(matrix_scene);
 			{
@@ -38,13 +34,8 @@ namespace test {
 					matrix_scene);
 			}
 			{
-				sgl::matrix disp =
-				{
-					1, 0, 0, 10,
-					0, 1, 0, 10,
-					0, 0, 1, 10,
-					0, 0, 0, 1,
-				};
+				glm::mat4 disp(1.0);
+				disp = glm::translate(disp, glm::vec3(10.0, 10.0, 10.));
 				auto disp_scene =
 					std::make_shared<sgl::SceneMatrix>(disp);
 				scene_tree_->AddNode(disp_scene, matrix_scene);

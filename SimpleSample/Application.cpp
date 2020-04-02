@@ -1,4 +1,5 @@
 #include "Application.h"
+#include <glm/gtc/matrix_transform.hpp>
 
 Application::Application(const std::shared_ptr<sgl::Window>& window) :
 	window_(window) {}
@@ -42,15 +43,15 @@ bool Application::Startup()
 	sgl::SceneTree scene_tree{};
 	{
 		auto scene_matrix = std::make_shared<sgl::SceneMatrix>(
-			[](const double dt)
+			[](const double dt) -> glm::mat4
 		{
-			sgl::matrix r_x;
-			sgl::matrix r_y;
-			sgl::matrix r_z;
+			glm::mat4 r_x(1.0f);
+			glm::mat4 r_y(1.0f);
+			glm::mat4 r_z(1.0f);
 			const auto dtf = static_cast<float>(dt);
-			r_x.RotateXMatrix(dtf * 0.7f);
-			r_y.RotateYMatrix(dtf * 0.5f);
-			r_z.RotateZMatrix(dtf);
+			r_x = glm::rotate(r_x, dtf * 0.7f, glm::vec3(1.0f, 0.0f, 0.0f));
+			r_y = glm::rotate(r_y, dtf * 0.5f, glm::vec3(0.0f, 1.0f, 0.0f));
+			r_z = glm::rotate(r_z, dtf       , glm::vec3(0.0f, 0.0f, 1.0f));
 			return r_x * r_y * r_z;
 		});
 		scene_tree.AddNode(scene_matrix);

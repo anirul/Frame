@@ -8,7 +8,7 @@
 #include "SceneTest.h"
 #include "ShaderTest.h"
 #include "TextureTest.h"
-#include "VectorTest.h"
+#include "WindowTest.h"
 
 int main(int ac, char** av) {
 	testing::InitGoogleTest(&ac, av);

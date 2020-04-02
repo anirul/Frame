@@ -31,13 +31,13 @@ namespace sgl {
 		void Draw(
 			const sgl::Program& program,
 			const sgl::TextureManager& texture_manager,
-			const sgl::matrix& model = {}) const;
+			const glm::mat4& model = {}) const;
 		
 	protected:
 		struct ObjFile {
-			std::vector<sgl::vector3> positions;
-			std::vector<sgl::vector3> normals;
-			std::vector<sgl::vector2> textures;
+			std::vector<glm::vec3> positions;
+			std::vector<glm::vec3> normals;
+			std::vector<glm::vec2> textures;
 			std::vector<std::array<int, 3>> indices;
 		};
 		std::optional<ObjFile> LoadFromObj(const std::string& file);

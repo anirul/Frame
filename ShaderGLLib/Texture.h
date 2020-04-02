@@ -6,7 +6,6 @@
 #include <memory>
 #include <map>
 #include <array>
-#include "../ShaderGLLib/Vector.h"
 
 namespace sgl {
 

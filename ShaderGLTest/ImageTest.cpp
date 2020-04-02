@@ -1,4 +1,5 @@
 #include "ImageTest.h"
+#include <glm/glm.hpp>
 
 namespace test {
 
@@ -37,7 +38,7 @@ namespace test {
 		const std::uint8_t* pixel = (std::uint8_t*)(image_->Data());
 		for (int i = 0; i < image_->GetWidth() * image_->GetHeight(); ++i)
 		{
-			sgl::vector4 value = {
+			glm::vec4 value = {
 				static_cast<float>(pixel[i * 4 + 0]) / 255.0f,
 				static_cast<float>(pixel[i * 4 + 1]) / 255.0f,
 				static_cast<float>(pixel[i * 4 + 2]) / 255.0f,
