@@ -12,26 +12,8 @@
 
 namespace sgl {
 
-	Device::Device(SDL_Window* sdl_window) 
+	Device::Device(void* gl_context) : gl_context_(gl_context) 
 	{
-		// GL context.
-		sdl_gl_context_ = SDL_GL_CreateContext(sdl_window);
-		SDL_GL_SetAttribute(
-			SDL_GL_CONTEXT_PROFILE_MASK,
-			SDL_GL_CONTEXT_PROFILE_CORE);
-#if defined(__APPLE__)
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-#else
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-#endif
-		SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &major_version_);
-		SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &minor_version_);
-		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-		// Vsync off.
-		SDL_GL_SetSwapInterval(0);
-
 		// Initialize GLEW.
 		if (GLEW_OK != glewInit())
 		{
@@ -44,11 +26,6 @@ namespace sgl {
 
 		// Enable Z buffer.
 		glEnable(GL_DEPTH_TEST);
-	}
-
-	Device::~Device()
-	{
-		SDL_GL_DeleteContext(sdl_gl_context_);
 	}
 
 	void Device::Startup(std::pair<int, int> size)

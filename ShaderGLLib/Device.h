@@ -19,8 +19,8 @@ namespace sgl {
 	{
 	public:
 		// This will initialize the GL context and make the GLEW init.
-		Device(SDL_Window* sdl_window);
-		virtual ~Device();
+		Device(void* gl_context);
+		virtual ~Device() = default;
 
 	public:
 		// Startup the scene. Throw errors in case there is any.
@@ -53,7 +53,7 @@ namespace sgl {
 		sgl::SceneTree scene_tree_ = {};
 		sgl::TextureManager texture_manager_ = {};
 		sgl::Camera camera_ = sgl::Camera({ 0.f, 0.f, 2.f });
-		SDL_GLContext sdl_gl_context_ = nullptr;
+		void* gl_context_ = nullptr;
 		int light_count = 0;
 		const int max_light_count = 4;
 		int major_version_ = 0;

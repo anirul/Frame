@@ -43,14 +43,48 @@ namespace sgl {
 				SDL_GetWindowWMInfo(sdl_window_, &wmInfo);
 				hwnd_ = wmInfo.info.win.window;
 #endif
-				// Create a new device.
-				device_ = std::make_shared<sgl::Device>(sdl_window_);
 			}
 
 			virtual ~SDLWindow()
 			{
+				if (gl_context_)
+				{
+					SDL_GL_DeleteContext(gl_context_);
+				}
 				SDL_DestroyWindow(sdl_window_);
 				SDL_Quit();
+			}
+
+			std::optional<std::pair<int, int>> InitOpenGLDevice()
+			{
+				std::pair<int, int> gl_version;
+				// GL context.
+				gl_context_ = SDL_GL_CreateContext(sdl_window_);
+				SDL_GL_SetAttribute(
+					SDL_GL_CONTEXT_PROFILE_MASK,
+					SDL_GL_CONTEXT_PROFILE_CORE);
+				if (!gl_context_) return std::nullopt;
+#if defined(__APPLE__)
+				SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+				SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+#else
+				SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+				SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+#endif
+				SDL_GL_GetAttribute(
+					SDL_GL_CONTEXT_MAJOR_VERSION,
+					&gl_version.first);
+				SDL_GL_GetAttribute(
+					SDL_GL_CONTEXT_MINOR_VERSION,
+					&gl_version.second);
+				SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+				// Vsync off.
+				SDL_GL_SetSwapInterval(0);
+
+				// Create a new device.
+				device_ = std::make_shared<sgl::Device>(gl_context_);
+
+				return gl_version;
 			}
 
 			bool Startup() override
@@ -203,6 +237,7 @@ namespace sgl {
 			std::shared_ptr<sgl::Device> device_ = nullptr;
 			std::function<void(const double)> draw_func_ = nullptr;
 			SDL_Window* sdl_window_ = nullptr;
+			void* gl_context_ = nullptr;
 #if defined(_WIN32) || defined(_WIN64)
 			HWND hwnd_ = nullptr;
 #endif
@@ -212,7 +247,10 @@ namespace sgl {
 
 	std::shared_ptr<sgl::Window> MakeSDLOpenGL(std::pair<int, int> size)
 	{
-		return std::make_shared<SDLWindow>(size);
+		auto window_ptr = std::make_shared<SDLWindow>(size);
+		auto maybe_version = window_ptr->InitOpenGLDevice();
+		if (!maybe_version) return nullptr;
+		return window_ptr;
 	}
 
 } // End namespace sgl.
