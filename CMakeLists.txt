@@ -33,6 +33,8 @@ add_library(ShaderGLLib
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Buffer.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Window.h
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Window.cpp
+    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Pixel.h
+    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Pixel.cpp
     ${PROJECT_SOURCE_DIR}/Asset/Simple.Vertex.glsl
     ${PROJECT_SOURCE_DIR}/Asset/Simple.Fragment.glsl
     ${PROJECT_SOURCE_DIR}/Asset/PBR.Vertex.glsl

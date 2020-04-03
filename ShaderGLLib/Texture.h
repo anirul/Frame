@@ -6,13 +6,17 @@
 #include <memory>
 #include <map>
 #include <array>
+#include "../ShaderGLLib/Pixel.h"
 
 namespace sgl {
 
 	class Texture 
 	{
 	public:
-		Texture(const std::string& file);
+		Texture(
+			const std::string& file, 
+			const PixelElementSize pixel_element_size = PixelElementSize::BYTE,
+			const PixelStructure pixel_structure = PixelStructure::RGB_ALPHA);
 		virtual ~Texture();
 		void Bind(const unsigned int slot = 0) const;
 		void UnBind() const;
@@ -22,6 +26,8 @@ namespace sgl {
 	private:
 		unsigned int texture_id_ = 0;
 		std::pair<size_t, size_t> size_ = { 0, 0 };
+		const PixelElementSize pixel_element_size_;
+		const PixelStructure pixel_structure_;
 	};
 
 	class TextureManager 

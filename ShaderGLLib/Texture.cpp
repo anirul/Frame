@@ -5,7 +5,12 @@
 
 namespace sgl {
 
-	Texture::Texture(const std::string& file)
+	Texture::Texture(
+		const std::string& file, 
+		const PixelElementSize pixel_element_size /*= PixelElementSize::BYTE*/, 
+		const PixelStructure pixel_structure /*= PixelStructure::RGB_ALPHA*/) :
+		pixel_element_size_(pixel_element_size),
+		pixel_structure_(pixel_structure)
 	{
 		sgl::Image img(file);
 		size_ = img.GetSize();
@@ -18,17 +23,17 @@ namespace sgl {
 		glTexImage2D(
 			GL_TEXTURE_2D,
 			0,
-			GL_RGBA8,
+			sgl::ConvertToGLType(pixel_element_size_, pixel_structure_),
 			static_cast<GLsizei>(size_.first),
 			static_cast<GLsizei>(size_.second),
 			0,
-			GL_RGBA,
-			GL_UNSIGNED_BYTE,
+			sgl::ConvertToGLType(pixel_structure_),
+			sgl::ConvertToGLType(pixel_element_size_),
 			img.Data());
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 
-	Texture::~Texture() 
+	Texture::~Texture()
 	{
 		glDeleteTextures(1, &texture_id_);
 	}

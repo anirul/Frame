@@ -2,25 +2,27 @@
 
 #include <vector>
 #include <string>
+#include <memory>
+#include "../ShaderGLLib/Pixel.h"
 
 namespace sgl {
 
 	class Image
 	{
 	public:
-		Image(const std::string& file);
+		Image(
+			const std::string& file, 
+			const PixelElementSize pixel_element_size = PixelElementSize::BYTE,
+			const PixelStructure pixel_structure = PixelStructure::RGB_ALPHA);
 		virtual ~Image();
 
 	public:
-		const std::pair<size_t, size_t> GetSize() const { return { dx_, dy_ }; }
-		const float GetWidth() const { return static_cast<float>(dx_); }
-		const float GetHeight() const { return static_cast<float>(dy_); }
-		const std::uint8_t* Data() const { return image_; }
+		const std::pair<int, int> GetSize() const { return size_; }
+		const void* Data() const {	return image_; }
 
 	private:
-		size_t dx_ = 0;
-		size_t dy_ = 0;
-		std::uint8_t* image_;
+		std::pair<int, int> size_ = { 0, 0 };
+		void* image_ = nullptr;
 	};
 
 }	// End of namespace sgl.

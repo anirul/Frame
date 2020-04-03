@@ -20,11 +20,23 @@ int WINAPI WinMain(
 int main(int ac, char** av)
 #endif
 {
-	Application app(sgl::MakeSDLOpenGL({ 640, 480 }));
-	if (!app.Startup())
+	try
 	{
-		return -1;
+		Application app(sgl::MakeSDLOpenGL({ 640, 480 }));
+		if (!app.Startup())
+		{
+			return -1;
+		}
+		app.Run();
 	}
-	app.Run();
+	catch (std::exception ex)
+	{
+#if defined(_WIN32) || defined(_WIN64)
+		MessageBox(nullptr, "Error", ex.what(), 0);
+#else
+		std::cerr << "Error: " << ex.what() << std::endl;
+#endif
+		return -2;
+	}
 	return 0;
 }
