@@ -1,4 +1,4 @@
-#version 410 core
+#version 330 core
 
 layout(location = 0) in vec3 in_position;
 layout(location = 1) in vec3 in_normal;
@@ -16,5 +16,6 @@ void main()
 	out_normal = vec3(model * vec4(in_normal, 1.0));
 	out_texcoord = in_texcoord;
 	mat4 mvp = projection * view * model;
+
 	gl_Position = mvp * vec4(in_position, 1.0);
 }

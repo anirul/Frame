@@ -7,8 +7,9 @@
 
 namespace sgl {
 
-	Mesh::Mesh(const std::string& file)
+	Mesh::Mesh(const std::string& file, const std::shared_ptr<Program>& program)
 	{
+		SetProgram(program);
 		auto maybe_obj_file = LoadFromObj(file);
 		if (!maybe_obj_file) 
 		{
@@ -100,20 +101,34 @@ namespace sgl {
 		textures_.assign(values.begin(), values.end());
 	}
 
+	void Mesh::SetProgram(const std::shared_ptr<Program>& program)
+	{
+		if (!program)
+		{
+			throw std::runtime_error("no program set.");
+		}
+		program_ = program;
+	}
+
+
 	void Mesh::Draw(
-		const sgl::Program& program,
 		const sgl::TextureManager& texture_manager,
-		const glm::mat4& model /*= {}*/) const
+		const glm::mat4& model /*= glm::mat4(1.0f)*/) const
 	{
 		texture_manager.DisableAll();
+		if (!program_)
+		{
+			throw std::runtime_error("program is not set.");
+		}
+		program_->Use();
 		for (const auto& str : textures_)
 		{
-			program.UniformInt(str, texture_manager.EnableTexture(str));
+			program_->UniformInt(str, texture_manager.EnableTexture(str));
 		}
 
 		glBindVertexArray(vertex_array_object_);
 
-		program.UniformMatrix("model", model);
+		program_->UniformMatrix("model", model);
 
 		index_buffer_.Bind();
 		glDrawElements(

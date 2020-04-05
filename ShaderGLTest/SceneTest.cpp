@@ -13,7 +13,8 @@ namespace test {
 	TEST_F(SceneTest, CheckConstructorMeshTest)
 	{
 		EXPECT_FALSE(scene_);
-		auto mesh = std::make_shared<sgl::Mesh>("../Asset/Cube.obj");
+		auto program = sgl::CreateSimpleProgram();
+		auto mesh = std::make_shared<sgl::Mesh>("../Asset/Cube.obj", program);
 		scene_ = std::make_shared<sgl::SceneMesh>(mesh);
 		EXPECT_TRUE(scene_);
 	}

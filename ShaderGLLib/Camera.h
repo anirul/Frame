@@ -10,9 +10,9 @@ namespace sgl {
 			const glm::vec3& position = { 0.f, 0.f, 0.f },
 			const glm::vec3& front = { 0.f, 0.f, -1.f },
 			const glm::vec3& up = { 0.f, 1.f, 0.f });
-		const glm::mat4 LookAt() const;
-		const glm::vec3 Front() const { return front_; }
-		const glm::vec3 Position() const { return position_; }
+		const glm::mat4 GetLookAt() const;
+		const glm::vec3 GetFront() const { return front_; }
+		const glm::vec3 GetPosition() const { return position_; }
 
 	protected:
 		void UpdateCameraVectors();

@@ -17,17 +17,54 @@ namespace sgl {
 			const std::string& file, 
 			const PixelElementSize pixel_element_size = PixelElementSize::BYTE,
 			const PixelStructure pixel_structure = PixelStructure::RGB_ALPHA);
+		Texture(
+			const PixelElementSize pixel_element_size = PixelElementSize::BYTE,
+			const PixelStructure pixel_structure = PixelStructure::RGB_ALPHA);
 		virtual ~Texture();
+
+	public:
 		void Bind(const unsigned int slot = 0) const;
 		void UnBind() const;
-		int GetId() const { return texture_id_; }
+		const int GetId() const { return texture_id_; }
 		std::pair<size_t, size_t> GetSize() const { return size_; }
+		const PixelElementSize GetPixelElementSize() const 
+		{
+			return pixel_element_size_; 
+		}
+		const PixelStructure GetPixelStructure() const
+		{
+			return pixel_structure_;
+		}
 
-	private:
+	protected:
 		unsigned int texture_id_ = 0;
 		std::pair<size_t, size_t> size_ = { 0, 0 };
 		const PixelElementSize pixel_element_size_;
 		const PixelStructure pixel_structure_;
+	};
+
+	class TextureCubeMap : public Texture
+	{
+	public:
+		// Take a single texture and map it to the cube map.
+		TextureCubeMap(
+			const std::string& file,
+			const PixelElementSize pixel_element_size = PixelElementSize::BYTE,
+			const PixelStructure pixel_structure = PixelStructure::RGB_ALPHA);
+		// Take 6 texture to be mapped to the cube map, Order is:
+		// right, left
+		// top, bottom
+		// front, back
+		TextureCubeMap(
+			const std::initializer_list<std::string>& cube_file,
+			const PixelElementSize pixel_element_size = PixelElementSize::BYTE,
+			const PixelStructure pixel_structure = PixelStructure::RGB_ALPHA);
+
+	protected:
+		// Create a cube map and assign it to the texture_id_.
+		void CreateCubeMap();
+		// Draw in the cube map.
+		void DrawCubeMap(unsigned int texture_out);
 	};
 
 	class TextureManager 
@@ -40,7 +77,7 @@ namespace sgl {
 			const std::shared_ptr<sgl::Texture>& texture);
 		bool RemoveTexture(const std::string& name);
 		// Return the binding slot of the texture (to be passed to the program).
-		int EnableTexture(const std::string& name) const;
+		const int EnableTexture(const std::string& name) const;
 		void DisableTexture(const std::string& name) const;
 		void DisableAll() const;
 

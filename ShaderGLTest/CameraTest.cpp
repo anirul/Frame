@@ -19,7 +19,7 @@ namespace test {
 		glm::vec3 up = { 0.f, 1.f, 0.f };
 		camera_ = std::make_shared<sgl::Camera>(position, direction, up);
 		glm::mat4 look_at = glm::lookAt(position, direction - position, up);
-		glm::mat4 camera_look_at = camera_->LookAt();
+		glm::mat4 camera_look_at = camera_->GetLookAt();
 		for (int i = 0; i < 4; ++i)
 		{
 			for (int j = 0; j < 4; ++j)

@@ -7,27 +7,34 @@ Application::Application(const std::shared_ptr<sgl::Window>& window) :
 bool Application::Startup()
 {
 	auto device = window_->CreateDevice();
+	device->Startup(window_->GetSize());
 
-	sgl::Shader vertex(sgl::ShaderType::VERTEX_SHADER);
-	sgl::Shader fragment(sgl::ShaderType::FRAGMENT_SHADER);
-	if (!vertex.LoadFromFile("../Asset/PBR.Vertex.glsl"))
-	{
-		throw 
-			std::runtime_error(
-				"Error loading vertex shader: " + 
-				vertex.GetErrorMessage());
-	}
-	if (!fragment.LoadFromFile("../Asset/PBR.Fragment.glsl"))
-	{
-		throw
-			std::runtime_error(
-				"Error loading fragment shader: " +
-				fragment.GetErrorMessage());
-	}
-	device->Startup(window_->GetSize(), vertex, fragment);
+	// Create the physically based rendering program.
+	auto pbr_program = sgl::CreatePBRProgram(
+		device->GetProjection(), 
+		device->GetView(), 
+		device->GetModel());
+
+	// Set the camera position
+	pbr_program->UniformVector3(
+		"camera_position",
+		device->GetCamera().GetPosition());
+
+	// Create lights.
+	sgl::LightManager light_manager{};
+	const float light_value = 300.f;
+	const glm::vec3 light_vec(light_value, light_value, light_value);
+	light_manager.AddLight(sgl::Light({ 10.f,  10.f,  10.f }, light_vec));
+	light_manager.AddLight(sgl::Light({ 10.f, -10.f,  10.f }, light_vec));
+	light_manager.AddLight(sgl::Light({ -10.f,  10.f,  10.f }, light_vec));
+	light_manager.AddLight(sgl::Light({ -10.f, -10.f,  10.f }, light_vec));
+	light_manager.RegisterToProgram(pbr_program);
+	device->SetLightManager(light_manager);
 	
 	// Mesh creation.
-	auto gl_mesh = std::make_shared<sgl::Mesh>("../Asset/Apple.obj");
+	auto gl_mesh = std::make_shared<sgl::Mesh>(
+		"../Asset/Apple.obj", 
+		pbr_program);
 
 	// Create the texture and bind it to the mesh.
 	sgl::TextureManager texture_manager{};
@@ -60,9 +67,9 @@ bool Application::Startup()
 			glm::mat4 r_y(1.0f);
 			glm::mat4 r_z(1.0f);
 			const auto dtf = static_cast<float>(dt);
-			r_x = glm::rotate(r_x, dtf * .7f, glm::vec3(1.0f, 0.0f, 0.0f));
+			r_x = glm::rotate(r_x, dtf * .1f, glm::vec3(1.0f, 0.0f, 0.0f));
 			r_y = glm::rotate(r_y, dtf * .5f, glm::vec3(0.0f, 1.0f, 0.0f));
-			r_z = glm::rotate(r_z, dtf * .1f, glm::vec3(0.0f, 0.0f, 1.0f));
+			r_z = glm::rotate(r_z, dtf * .2f, glm::vec3(0.0f, 0.0f, 1.0f));
 			return r_x * r_y * r_z;
 		});
 		scene_tree.AddNode(scene_matrix);

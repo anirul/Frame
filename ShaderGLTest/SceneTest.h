@@ -25,9 +25,15 @@ namespace test {
 		{
 			glm::mat4 identity(1.0f);
 			auto matrix_scene = std::make_shared<sgl::SceneMatrix>(identity);
+			auto program = sgl::CreateSimpleProgram(
+				glm::mat4(1.0f), 
+				glm::mat4(1.0f), 
+				glm::mat4(1.0f));
 			scene_tree_->AddNode(matrix_scene);
 			{
-				auto mesh = std::make_shared<sgl::Mesh>("../Asset/Cube.obj");
+				auto mesh = std::make_shared<sgl::Mesh>(
+					"../Asset/Cube.obj",
+					program);
 				scene_tree_->AddNode(
 					std::make_shared<sgl::SceneMesh>(mesh),
 					matrix_scene);
@@ -40,7 +46,8 @@ namespace test {
 				scene_tree_->AddNode(disp_scene, matrix_scene);
 				{
 					auto mesh = std::make_shared<sgl::Mesh>(
-						"../Asset/Torus.obj");
+						"../Asset/Torus.obj", 
+						program);
 					scene_tree_->AddNode(
 						std::make_shared<sgl::SceneMesh>(mesh),
 						disp_scene);

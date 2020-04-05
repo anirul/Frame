@@ -12,6 +12,7 @@
 #include "../ShaderGLLib/Mesh.h"
 #include "../ShaderGLLib/Scene.h"
 #include "../ShaderGLLib/Camera.h"
+#include "../ShaderGLLib/Light.h"
 
 namespace sgl {
 
@@ -23,24 +24,20 @@ namespace sgl {
 
 	public:
 		// Startup the scene. Throw errors in case there is any.
-		// This will force the uniform camera and light position to be set!
-		// Also include the shaders this will be set to simple in case they are
-		// not provided.
-		void Startup(
-			std::pair<int, int> size, 
-			const std::optional<const sgl::Shader>& vertex = std::nullopt, 
-			const std::optional<const sgl::Shader>& fragment = std::nullopt);
+		void Startup(const std::pair<int, int>& size);
 		// Draw what is on the scene.
 		// Take the total time from the beginning of the program to now as a
 		// const double parameter.
 		void Draw(const double dt);
-		// Set the light position and color.
-		bool AddLight(const glm::vec3& position, const glm::vec3& color);
+		// Get the camera.
+		Camera GetCamera() const { return camera_; }
 		// Set the camera.
-		void SetCamera(const sgl::Camera& camera);
-		// Get the scene description.
-		void SetSceneTree(const sgl::SceneTree& scene_tree)
-		{
+		void SetCamera(const sgl::Camera& camera) { camera_ = camera; }
+		// Get current scene tree.
+		SceneTree GetSceneTree() const { return scene_tree_; }
+		// Set the scene description.
+		void SetSceneTree(const SceneTree& scene_tree) 
+		{ 
 			scene_tree_ = scene_tree;
 		}
 		// Get texture manager this is made to share texture between the scene
@@ -49,6 +46,14 @@ namespace sgl {
 		{
 			texture_manager_ = texture_manager;
 		}
+		LightManager GetLightManager() const { return light_manager_; }
+		void SetLightManager(const LightManager& light_manager)
+		{
+			light_manager_ = light_manager;
+		}
+		const glm::mat4 GetProjection() const { return perspective_; }
+		const glm::mat4 GetView() const { return view_; }
+		const glm::mat4 GetModel() const { return model_; }
 
 	private:
 		// Has to be a shared ptr as the program has to be created after the
@@ -56,12 +61,12 @@ namespace sgl {
 		std::shared_ptr<sgl::Program> program_ = nullptr;
 		sgl::SceneTree scene_tree_ = {};
 		sgl::TextureManager texture_manager_ = {};
+		sgl::LightManager light_manager_ = {};
 		sgl::Camera camera_ = sgl::Camera({ 0.f, 0.f, 2.f });
 		void* gl_context_ = nullptr;
-		int light_count = 0;
-		const int max_light_count = 4;
-		int major_version_ = 0;
-		int minor_version_ = 0;
+		glm::mat4 perspective_ = glm::mat4(1.0f);
+		glm::mat4 view_ = glm::mat4(1.0f);
+		glm::mat4 model_ = glm::mat4(1.0f);
 	};
 
 } // End namespace sgl.

@@ -15,7 +15,7 @@ namespace sgl {
 	class Mesh
 	{
 	public:
-		Mesh(const std::string& file);
+		Mesh(const std::string& file, const std::shared_ptr<Program>& program);
 		virtual ~Mesh();
 
 	public:
@@ -28,10 +28,10 @@ namespace sgl {
 		const sgl::Buffer& Mesh::IndexBuffer() const { return index_buffer_; }
 		const size_t IndexSize() const { return index_size_; }
 		void SetTextures(std::initializer_list<std::string> values);
+		std::shared_ptr<Program> GetProgram() { return program_; }
 		void Draw(
-			const sgl::Program& program,
-			const sgl::TextureManager& texture_manager,
-			const glm::mat4& model = {}) const;
+			const TextureManager& texture_manager,
+			const glm::mat4& model = glm::mat4(1.0f)) const;
 		
 	protected:
 		struct ObjFile {
@@ -41,8 +41,10 @@ namespace sgl {
 			std::vector<std::array<int, 3>> indices;
 		};
 		std::optional<ObjFile> LoadFromObj(const std::string& file);
+		void SetProgram(const std::shared_ptr<Program>& program);
 
-	private:
+	protected:
+		std::shared_ptr<Program> program_ = nullptr;
 		std::vector<std::string> textures_ = {};
 		sgl::Buffer point_buffer_ = {};
 		sgl::Buffer normal_buffer_ = {};

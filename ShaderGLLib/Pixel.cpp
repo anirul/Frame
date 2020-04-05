@@ -16,9 +16,10 @@ namespace sgl {
 		case PixelElementSize::LONG:
 			return GL_FLOAT;
 		}
-		throw std::runtime_error(
-			"unknown element size : " +
-			std::to_string(static_cast<int>(pixel_element_size)));
+		throw 
+			std::runtime_error(
+				"unknown element size : " +	
+				static_cast<int>(pixel_element_size));
 	}
 
 	int ConvertToGLType(const PixelStructure pixel_structure)
@@ -34,9 +35,9 @@ namespace sgl {
 		case PixelStructure::RGB_ALPHA:
 			return GL_RGBA;
 		}
-		throw std::runtime_error(
-			"unknown structure : " + 
-			std::to_string(static_cast<int>(pixel_structure)));
+		throw 
+			std::runtime_error(
+				"unknown structure : " + static_cast<int>(pixel_structure));
 	}
 
 	int ConvertToGLType(
@@ -82,11 +83,12 @@ namespace sgl {
 				return GL_RGBA32F;
 			}
 		}
-		throw std::runtime_error(
-			"unknown structure : " + 
-			std::to_string(static_cast<int>(pixel_structure)) + 
-			" or element size : " + 
-			std::to_string(static_cast<int>(pixel_element_size)));
+		throw 
+			std::runtime_error(
+				"unknown structure : " + 
+				std::to_string(static_cast<int>(pixel_structure)) + 
+				" or element size : " + 
+				std::to_string(static_cast<int>(pixel_element_size)));
 	}
 
 } // End namespace sgl.

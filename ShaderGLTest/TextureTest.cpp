@@ -19,6 +19,20 @@ namespace test {
 		EXPECT_EQ(pair, texture_->GetSize());
 	}
 
+	TEST_F(TextureTest, CreateHDRTextureTest)
+	{
+		ASSERT_FALSE(texture_);
+		texture_ =
+			std::make_shared<sgl::Texture>(
+				"../Asset/CubeMap/Hamarikyu.hdr",
+				sgl::PixelElementSize::LONG,
+				sgl::PixelStructure::RGB_ALPHA);
+		ASSERT_TRUE(texture_);
+		EXPECT_NE(0, texture_->GetId());
+		auto pair = std::make_pair<size_t, size_t>(3200, 1600);
+		EXPECT_EQ(pair, texture_->GetSize());
+	}
+
 	TEST_F(TextureTest, CreateTextureManagerTest)
 	{
 		EXPECT_FALSE(texture_manager_);

@@ -114,6 +114,9 @@ void main()
     
     for (int i = 0; i < 4; ++i)
     {
+        // skip in case there is no light.
+        if (light_color[i] == vec3(0, 0, 0)) continue;
+
         // calculate per-light radiance
         vec3 L = normalize(light_position[i] - out_world);
         vec3 H = normalize(V + L);

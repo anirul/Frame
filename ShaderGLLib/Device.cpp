@@ -28,80 +28,21 @@ namespace sgl {
 		glEnable(GL_DEPTH_TEST);
 	}
 
-	void Device::Startup(
-		std::pair<int, int> size,
-		const std::optional<const sgl::Shader>& vertex /*= std::nullopt*/,
-		const std::optional<const sgl::Shader>& fragment /*= std::nullopt*/)
+	void Device::Startup(const std::pair<int, int>& size)
 	{
-		// Create a program.
-		program_ = std::make_shared<Program>();
-
-		if (!vertex)
-		{
-			// Vertex Shader program.
-			sgl::Shader vertex_shader(ShaderType::VERTEX_SHADER);
-			if (!vertex_shader.LoadFromFile("../Asset/Simple.Vertex.glsl"))
-			{
-				throw std::runtime_error(
-					"Fragment shader Error: " + 
-					vertex_shader.GetErrorMessage());
-			}
-			program_->AddShader(vertex_shader);
-		}
-		else
-		{
-			program_->AddShader(vertex.value());
-		}
-
-		if (!fragment)
-		{
-			// Fragment Shader program.
-			sgl::Shader fragment_shader(ShaderType::FRAGMENT_SHADER);
-			if (!fragment_shader.LoadFromFile("../Asset/Simple.Fragment.glsl"))
-			{
-				throw std::runtime_error(
-					"Fragment shader Error: " + 
-					fragment_shader.GetErrorMessage());
-			}
-			program_->AddShader(fragment_shader);
-		}
-		else
-		{
-			program_->AddShader(fragment.value());
-		}
-
-		// Create the program.
-		program_->LinkShader();
-		program_->Use();
-
 		// Set the perspective matrix.
 		const float aspect =
 			static_cast<float>(size.first) / static_cast<float>(size.second);
-		glm::mat4 perspective = glm::perspective(
+		perspective_ = glm::perspective(
 			glm::radians(65.0f),
 			aspect,
 			0.1f,
 			100.0f);
-		program_->UniformMatrix("projection", perspective);
-
+		
 		// Set the camera.
-		glm::mat4 view = camera_.LookAt();
-		program_->UniformMatrix("view", view);
-
-		// Set the model matrix (identity for now).
-		glm::mat4 model(1.0f);
-		program_->UniformMatrix("model", model);
-
-		// Set the camera and light uniform!
-		SetCamera(camera_);
-		const float light_value = 300.f;
-		const glm::vec3 light_vec(light_value, light_value, light_value);
-		AddLight({ -10.f,  10.f,  10.f }, light_vec);
-		AddLight({ 10.f,  10.f,  10.f }, light_vec);
-		AddLight({ -10.f,  -10.f,  10.f }, light_vec);
-		AddLight({ 10.f,  -10.f,  10.f }, light_vec);
+		view_ = camera_.GetLookAt();
 	}
-	
+
 	void Device::Draw(const double dt)
 	{
 		// Clear the screen.
@@ -117,27 +58,8 @@ namespace sgl {
 			}
 
 			// Draw the mesh.
-			mesh->Draw(*program_, texture_manager_, scene->GetLocalModel(dt));
+			mesh->Draw(texture_manager_, scene->GetLocalModel(dt));
 		}
-	}
-
-	bool Device::AddLight(const glm::vec3& position, const glm::vec3& color)
-	{
-		if (light_count >= max_light_count) return false;
-		program_->UniformVector3(
-			"light_position[" + std::to_string(light_count) + "]", 
-			position);
-		program_->UniformVector3(
-			"light_color[" + std::to_string(light_count) + "]", 
-			color);
-		light_count++;
-		return true;
-	}
-
-	void Device::SetCamera(const sgl::Camera& camera)
-	{
-		camera_ = camera;
-		program_->UniformVector3("camera_position", camera_.Position());
 	}
 
 } // End namespace sgl.

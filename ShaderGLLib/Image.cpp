@@ -13,7 +13,9 @@ namespace sgl {
 	Image::Image(
 		const std::string& file, 
 		const PixelElementSize pixel_element_size /*= PixelElementSize::BYTE*/, 
-		const PixelStructure pixel_structure /*= PixelStructure::RGB_ALPHA*/)
+		const PixelStructure pixel_structure /*= PixelStructure::RGB_ALPHA*/) :
+		pixel_element_size_(pixel_element_size),
+		pixel_structure_(pixel_structure)
 	{
 		int channels;
 		int desired_channels = { static_cast<int>(pixel_structure) };
@@ -53,7 +55,10 @@ namespace sgl {
 			break;
 		}
 		default:
-			break;
+			throw 
+				std::runtime_error(
+					"unsupported element size : " +
+					static_cast<int>(pixel_element_size_));
 		}
 		if (!image_)
 		{
