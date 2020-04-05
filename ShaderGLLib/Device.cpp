@@ -1,14 +1,6 @@
-#include <exception>
-#include <stdexcept>
-#include <chrono>
-#if defined(_WIN32) || defined(_WIN64)
-	#define WINDOWS_LEAN_AND_MEAN
-	#include <windows.h>
-#else
-	#include <iostream>
-#endif
-#include <glm/gtc/matrix_transform.hpp>
 #include "Device.h"
+#include <stdexcept>
+#include <glm/gtc/matrix_transform.hpp>
 
 namespace sgl {
 

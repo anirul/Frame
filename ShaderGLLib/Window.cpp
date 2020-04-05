@@ -121,7 +121,8 @@ namespace sgl {
 					CreateDevice()->Draw(time.count());
 					previous_count = time.count();
 					SDL_GL_SwapWindow(sdl_window_);
-				} while (loop);
+				} 
+				while (loop);
 			}
 
 			void SetDraw(std::function<void(const double)> draw_func) override

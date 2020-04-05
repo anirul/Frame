@@ -44,6 +44,7 @@ bool Application::Startup()
 			scene_matrix);
 	}
 	device->SetSceneTree(scene_tree);
+	window_->Startup();
 	return true;
 }
 

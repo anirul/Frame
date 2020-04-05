@@ -3,7 +3,6 @@
 #include <fstream>
 #include <sstream>
 #include <gl/glew.h>
-#include "Mesh.h"
 
 namespace sgl {
 

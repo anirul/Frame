@@ -1,10 +1,7 @@
 #include "Image.h"
-
 #include <algorithm>
 #include <fstream>
 #include <vector>
-#include <tuple>
-#include <assert.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
