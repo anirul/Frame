@@ -25,6 +25,8 @@ namespace sgl {
 	public:
 		void Bind(const unsigned int slot = 0) const;
 		void UnBind() const;
+
+	public:
 		const int GetId() const { return texture_id_; }
 		std::pair<size_t, size_t> GetSize() const { return size_; }
 		const PixelElementSize GetPixelElementSize() const 
@@ -47,16 +49,17 @@ namespace sgl {
 	{
 	public:
 		// Take a single texture and map it to the cube map.
+		// NOT WORKING YET!
 		TextureCubeMap(
 			const std::string& file,
 			const PixelElementSize pixel_element_size = PixelElementSize::BYTE,
 			const PixelStructure pixel_structure = PixelStructure::RGB_ALPHA);
 		// Take 6 texture to be mapped to the cube map, Order is:
-		// right, left
-		// top, bottom
-		// front, back
+		// right, left - (positive X, negative X)
+		// top, bottom - (positive Y, negative Y)
+		// front, back - (positive Z, negative Z)
 		TextureCubeMap(
-			const std::initializer_list<std::string>& cube_file,
+			const std::array<std::string, 6>& cube_file,
 			const PixelElementSize pixel_element_size = PixelElementSize::BYTE,
 			const PixelStructure pixel_structure = PixelStructure::RGB_ALPHA);
 
@@ -72,6 +75,8 @@ namespace sgl {
 	public:
 		TextureManager() = default;
 		virtual ~TextureManager();
+
+	public:
 		bool AddTexture(
 			const std::string& name, 
 			const std::shared_ptr<sgl::Texture>& texture);

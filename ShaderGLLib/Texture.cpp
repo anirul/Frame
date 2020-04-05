@@ -177,21 +177,18 @@ namespace sgl {
 	}
 
 	TextureCubeMap::TextureCubeMap(
-		const std::initializer_list<std::string>& cube_file, 
+		const std::array<std::string, 6>& cube_file, 
 		const PixelElementSize pixel_element_size /*= PixelElementSize::BYTE*/, 
 		const PixelStructure pixel_structure /*= PixelStructure::RGB_ALPHA*/) :
 		Texture(pixel_element_size, pixel_structure)
 	{
-		// Check the size.
-		if (cube_file.size() != 6)
-		{
-			throw std::runtime_error("cube map should be == 6.");
-		}
 		CreateCubeMap();
-		auto it = cube_file.begin();
-		for (int i : {0, 1, 2, 3, 4, 5})
+		for (const int i : {0, 1, 2, 3, 4, 5})
 		{
-			sgl::Image image(*it, pixel_element_size_, pixel_structure_);
+			sgl::Image image(
+				cube_file[i], 
+				pixel_element_size_, 
+				pixel_structure_);
 			auto size = image.GetSize();
 			glTexImage2D(
 				GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
@@ -203,11 +200,6 @@ namespace sgl {
 				sgl::ConvertToGLType(pixel_structure_),
 				sgl::ConvertToGLType(pixel_element_size_),
 				image.Data());
-			it++;
-		}
-		if (it != cube_file.end())
-		{
-			throw std::runtime_error("Should not have come here.");
 		}
 	}
 
@@ -237,7 +229,7 @@ namespace sgl {
 
 	void TextureCubeMap::DrawCubeMap(unsigned int texture_out)
 	{
-		
+		// TODO(anirul): Do the stuff!
 	}
 
 } // End namespace sgl.

@@ -15,8 +15,12 @@ namespace sgl {
 	public:
 		Shader(const ShaderType type) : type_(type) {}
 		virtual ~Shader();
+
+	public:
 		bool LoadFromSource(const std::string& source);
 		bool LoadFromFile(const std::string& path);
+
+	public:
 		unsigned int GetId() const { return id_; }
 		const std::string GetErrorMessage() const { return error_message_; }
 

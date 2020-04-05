@@ -10,7 +10,11 @@ namespace sgl {
 			const glm::vec3& position = { 0.f, 0.f, 0.f },
 			const glm::vec3& front = { 0.f, 0.f, -1.f },
 			const glm::vec3& up = { 0.f, 1.f, 0.f });
+
+	public:
 		const glm::mat4 GetLookAt() const;
+
+	public:
 		const glm::vec3 GetFront() const { return front_; }
 		const glm::vec3 GetPosition() const { return position_; }
 

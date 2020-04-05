@@ -19,6 +19,12 @@ namespace sgl {
 		virtual ~Mesh();
 
 	public:
+		void SetTextures(std::initializer_list<std::string> values);
+		void Draw(
+			const TextureManager& texture_manager,
+			const glm::mat4& model = glm::mat4(1.0f)) const;
+
+	public:
 		const sgl::Buffer& Mesh::PointBuffer() const { return point_buffer_; }
 		const sgl::Buffer& Mesh::NormalBuffer() const {	return normal_buffer_; }
 		const sgl::Buffer& Mesh::TextureBuffer() const 
@@ -27,11 +33,8 @@ namespace sgl {
 		}
 		const sgl::Buffer& Mesh::IndexBuffer() const { return index_buffer_; }
 		const size_t IndexSize() const { return index_size_; }
-		void SetTextures(std::initializer_list<std::string> values);
 		std::shared_ptr<Program> GetProgram() { return program_; }
-		void Draw(
-			const TextureManager& texture_manager,
-			const glm::mat4& model = glm::mat4(1.0f)) const;
+		void ClearDepthBuffer(bool clear) { clear_depth_buffer_ = clear; }
 		
 	protected:
 		struct ObjFile {
@@ -44,6 +47,7 @@ namespace sgl {
 		void SetProgram(const std::shared_ptr<Program>& program);
 
 	protected:
+		bool clear_depth_buffer_ = false;
 		std::shared_ptr<Program> program_ = nullptr;
 		std::vector<std::string> textures_ = {};
 		sgl::Buffer point_buffer_ = {};

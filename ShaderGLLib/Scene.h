@@ -24,6 +24,12 @@ namespace sgl {
 		SceneMatrix(const glm::mat4& matrix) : matrix_(matrix) {}
 		SceneMatrix(const std::function<glm::mat4(const double)> func) : 
 			func_(func) {}
+
+	public:
+		const glm::mat4 GetLocalModel(const double dt) const override;
+		const std::shared_ptr<Mesh> GetLocalMesh() const override;
+
+	public:
 		void SetParent(const std::shared_ptr<Scene>& parent) override
 		{
 			parent_ = parent;
@@ -32,8 +38,6 @@ namespace sgl {
 		{ 
 			return parent_; 
 		}
-		const glm::mat4 GetLocalModel(const double dt) const override;
-		const std::shared_ptr<Mesh> GetLocalMesh() const override;
 		bool IsLeaf() const override { return false; }
 		bool IsRoot() const override { return !parent_; }
 
@@ -48,6 +52,12 @@ namespace sgl {
 	{
 	public:
 		SceneMesh(std::shared_ptr<sgl::Mesh> mesh) : mesh_(mesh) {}
+
+	public:
+		const glm::mat4 GetLocalModel(const double dt) const override;
+		const std::shared_ptr<Mesh> GetLocalMesh() const override; 
+
+	public:
 		void SetParent(const std::shared_ptr<Scene>& parent) override
 		{
 			parent_ = parent;
@@ -56,8 +66,6 @@ namespace sgl {
 		{
 			return parent_;
 		}
-		const glm::mat4 GetLocalModel(const double dt) const override;
-		const std::shared_ptr<Mesh> GetLocalMesh() const override;
 		bool IsLeaf() const override { return true; }
 		bool IsRoot() const override { return !parent_; }
 

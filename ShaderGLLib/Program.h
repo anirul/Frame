@@ -15,6 +15,8 @@ namespace sgl {
 		Program();
 		// Destructor
 		virtual ~Program();
+
+	public:
 		// Attach shader to a program.
 		void AddShader(const Shader& shader);
 		// Link shaders to a program.

@@ -141,6 +141,11 @@ namespace sgl {
 		glBindVertexArray(0);
 
 		texture_manager.DisableAll();
+
+		if (clear_depth_buffer_)
+		{
+			glClear(GL_DEPTH_BUFFER_BIT);
+		}
 	}
 
 	std::optional<sgl::Mesh::ObjFile> Mesh::LoadFromObj(const std::string& file)

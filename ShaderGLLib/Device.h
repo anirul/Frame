@@ -29,20 +29,17 @@ namespace sgl {
 		// Take the total time from the beginning of the program to now as a
 		// const double parameter.
 		void Draw(const double dt);
-		// Get the camera.
+
+	public:
 		Camera GetCamera() const { return camera_; }
-		// Set the camera.
 		void SetCamera(const sgl::Camera& camera) { camera_ = camera; }
-		// Get current scene tree.
 		SceneTree GetSceneTree() const { return scene_tree_; }
-		// Set the scene description.
 		void SetSceneTree(const SceneTree& scene_tree) 
 		{ 
 			scene_tree_ = scene_tree;
 		}
-		// Get texture manager this is made to share texture between the scene
-		// and the device.
-		void SetTextureManager(const sgl::TextureManager& texture_manager)
+		TextureManager GetTextureManager() { return texture_manager_; }
+		void SetTextureManager(const TextureManager& texture_manager)
 		{
 			texture_manager_ = texture_manager;
 		}

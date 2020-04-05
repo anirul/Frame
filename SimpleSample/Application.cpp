@@ -8,11 +8,57 @@ bool Application::Startup()
 {
 	auto device = window_->CreateDevice();
 	device->Startup(window_->GetSize());
+	auto apple_mesh = CreateAppleMesh(device);
+	auto cube_map_mesh = CreateCubeMapMesh(device);
 
+	// Pack it into a Scene object.
+	sgl::SceneTree scene_tree{};
+	{
+		auto scene_root = std::make_shared<sgl::SceneMatrix>(
+			[](const double dt) -> glm::mat4 
+		{
+			glm::mat4 r_y(1.0f);
+			const auto dtf = static_cast<float>(dt);
+			r_y = glm::rotate(r_y, dtf * -.2f, glm::vec3(0.0f, 1.0f, 0.0f));
+			return r_y;
+		});
+		scene_tree.AddNode(scene_root);
+		scene_tree.AddNode(
+			std::make_shared<sgl::SceneMesh>(cube_map_mesh),
+			scene_root);
+		auto scene_matrix = std::make_shared<sgl::SceneMatrix>(
+			[](const double dt) -> glm::mat4
+		{
+			glm::mat4 r_x(1.0f);
+			glm::mat4 r_y(1.0f);
+			glm::mat4 r_z(1.0f);
+			const auto dtf = static_cast<float>(dt);
+			r_x = glm::rotate(r_x, dtf * .1f, glm::vec3(1.0f, 0.0f, 0.0f));
+			r_y = glm::rotate(r_y, dtf * .0f, glm::vec3(0.0f, 1.0f, 0.0f));
+			r_z = glm::rotate(r_z, dtf * .2f, glm::vec3(0.0f, 0.0f, 1.0f));
+			return r_x * r_y * r_z;
+		});
+		scene_tree.AddNode(scene_matrix, scene_root);
+		scene_tree.AddNode(
+			std::make_shared<sgl::SceneMesh>(apple_mesh),
+			scene_matrix);
+	}
+	device->SetSceneTree(scene_tree);
+	return true;
+}
+
+void Application::Run()
+{
+	window_->Run();
+}
+
+std::shared_ptr<sgl::Mesh> Application::CreateAppleMesh(
+	const std::shared_ptr<sgl::Device>& device)
+{
 	// Create the physically based rendering program.
 	auto pbr_program = sgl::CreatePBRProgram(
-		device->GetProjection(), 
-		device->GetView(), 
+		device->GetProjection(),
+		device->GetView(),
 		device->GetModel());
 
 	// Set the camera position
@@ -30,14 +76,14 @@ bool Application::Startup()
 	light_manager.AddLight(sgl::Light({ -10.f, -10.f,  10.f }, light_vec));
 	light_manager.RegisterToProgram(pbr_program);
 	device->SetLightManager(light_manager);
-	
+
 	// Mesh creation.
-	auto gl_mesh = std::make_shared<sgl::Mesh>(
+	auto apple_mesh = std::make_shared<sgl::Mesh>(
 		"../Asset/Apple.obj", 
 		pbr_program);
 
 	// Create the texture and bind it to the mesh.
-	sgl::TextureManager texture_manager{};
+	auto texture_manager = device->GetTextureManager();
 	texture_manager.AddTexture(
 		"Color",
 		std::make_shared<sgl::Texture>("../Asset/Apple/Color.jpg"));
@@ -53,35 +99,42 @@ bool Application::Startup()
 	texture_manager.AddTexture(
 		"AmbientOcclusion",
 		std::make_shared<sgl::Texture>("../Asset/Apple/AmbientOcclusion.jpg"));
-	gl_mesh->SetTextures(
+	apple_mesh->SetTextures(
 		{ "Color", "Normal", "Metallic", "Roughness", "AmbientOcclusion" });
 	device->SetTextureManager(texture_manager);
 
-	// Pack it into a Scene object.
-	sgl::SceneTree scene_tree{};
-	{
-		auto scene_matrix = std::make_shared<sgl::SceneMatrix>(
-			[](const double dt) -> glm::mat4
-		{
-			glm::mat4 r_x(1.0f);
-			glm::mat4 r_y(1.0f);
-			glm::mat4 r_z(1.0f);
-			const auto dtf = static_cast<float>(dt);
-			r_x = glm::rotate(r_x, dtf * .1f, glm::vec3(1.0f, 0.0f, 0.0f));
-			r_y = glm::rotate(r_y, dtf * .5f, glm::vec3(0.0f, 1.0f, 0.0f));
-			r_z = glm::rotate(r_z, dtf * .2f, glm::vec3(0.0f, 0.0f, 1.0f));
-			return r_x * r_y * r_z;
-		});
-		scene_tree.AddNode(scene_matrix);
-		scene_tree.AddNode(
-			std::make_shared<sgl::SceneMesh>(gl_mesh),
-			scene_matrix);
-	}
-	device->SetSceneTree(scene_tree);
-	return true;
+	return apple_mesh;
 }
 
-void Application::Run()
+std::shared_ptr<sgl::Mesh> Application::CreateCubeMapMesh(
+	const std::shared_ptr<sgl::Device>& device)
 {
-	window_->Run();
+	// Create the cube map program.
+	auto cubemap_program = sgl::CreateCubemapProgram(
+		device->GetProjection());
+
+	// Create the mesh for the cube.
+	auto cube_mesh = std::make_shared<sgl::Mesh>(
+		"../Asset/Cube.obj", 
+		cubemap_program);
+
+	// Create the texture manager.
+	auto texture_manager = device->GetTextureManager();
+	std::array<std::string, 6> cube_map_list = 
+	{
+		"../Asset/CubeMap/PositiveX.png",
+		"../Asset/CubeMap/NegativeX.png",
+		"../Asset/CubeMap/PositiveY.png",
+		"../Asset/CubeMap/NegativeY.png",
+		"../Asset/CubeMap/PositiveZ.png",
+		"../Asset/CubeMap/NegativeZ.png" 
+	};
+	texture_manager.AddTexture(
+		"Skybox",
+		std::make_shared<sgl::TextureCubeMap>(cube_map_list));
+	cube_mesh->SetTextures({ "Skybox" });
+	device->SetTextureManager(texture_manager);
+
+	cube_mesh->ClearDepthBuffer(true);
+	return cube_mesh;
 }
