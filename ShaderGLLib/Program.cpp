@@ -121,7 +121,7 @@ namespace sgl {
 		return program;
 	}
 
-	std::shared_ptr<sgl::Program> CreateCubemapProgram(
+	std::shared_ptr<sgl::Program> CreateCubeMapProgram(
 		const glm::mat4& projection /*= glm::mat4(1.0f)*/,
 		const glm::mat4& view /*= glm::mat4(1.0f)*/,
 		const glm::mat4& model /*= glm::mat4(1.0f)*/)
@@ -129,8 +129,8 @@ namespace sgl {
 		auto program = std::make_shared<sgl::Program>();
 		sgl::Shader vertex(sgl::ShaderType::VERTEX_SHADER);
 		sgl::Shader fragment(sgl::ShaderType::FRAGMENT_SHADER);
-		vertex.LoadFromFile("../Asset/Cubemap.Vertex.glsl");
-		fragment.LoadFromFile("../Asset/Cubemap.Fragment.glsl");
+		vertex.LoadFromFile("../Asset/CubeMap.Vertex.glsl");
+		fragment.LoadFromFile("../Asset/CubeMap.Fragment.glsl");
 		program->AddShader(vertex);
 		program->AddShader(fragment);
 		program->LinkShader();

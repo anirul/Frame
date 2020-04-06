@@ -39,4 +39,36 @@ namespace test {
 		program_->Use();
 	}
 
+	// TODO(anirul): add uniform tests!
+
+	TEST_F(ProgramTest, CreateSimpleProgramProgramTest)
+	{
+		EXPECT_FALSE(program_);
+		program_ = sgl::CreateSimpleProgram(
+			glm::mat4(1.0), 
+			glm::mat4(1.0), 
+			glm::mat4(1.0));
+		EXPECT_TRUE(program_);
+	}
+
+	TEST_F(ProgramTest, CreatePBRProgramProgramTest)
+	{
+		EXPECT_FALSE(program_);
+		program_ = sgl::CreatePBRProgram(
+			glm::mat4(1.0),
+			glm::mat4(1.0),
+			glm::mat4(1.0));
+		EXPECT_TRUE(program_);
+	}
+
+	TEST_F(ProgramTest, CreateCubeMapProgramProgramTest)
+	{
+		EXPECT_FALSE(program_);
+		program_ = sgl::CreateCubeMapProgram(
+			glm::mat4(1.0),
+			glm::mat4(1.0),
+			glm::mat4(1.0));
+		EXPECT_TRUE(program_);
+	}
+
 } // End namespace test.

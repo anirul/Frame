@@ -41,8 +41,8 @@ add_library(ShaderGLLib
     ${PROJECT_SOURCE_DIR}/Asset/Simple.Fragment.glsl
     ${PROJECT_SOURCE_DIR}/Asset/PBR.Vertex.glsl
     ${PROJECT_SOURCE_DIR}/Asset/PBR.Fragment.glsl
-    ${PROJECT_SOURCE_DIR}/Asset/Cubemap.Vertex.glsl
-    ${PROJECT_SOURCE_DIR}/Asset/Cubemap.Fragment.glsl
+    ${PROJECT_SOURCE_DIR}/Asset/CubeMap.Vertex.glsl
+    ${PROJECT_SOURCE_DIR}/Asset/CubeMap.Fragment.glsl
 )
 
 target_link_libraries(ShaderGLLib 
@@ -61,6 +61,8 @@ add_executable(ShaderGLTest
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/ImageTest.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/LightTest.h
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/LightTest.cpp
+    ${PROJECT_SOURCE_DIR}/ShaderGLTest/PixelTest.h
+    ${PROJECT_SOURCE_DIR}/ShaderGLTest/PixelTest.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/SceneTest.h
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/SceneTest.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/ShaderTest.h

@@ -19,7 +19,9 @@ namespace sgl {
 			const PixelStructure pixel_structure = PixelStructure::RGB_ALPHA);
 		Texture(
 			const PixelElementSize pixel_element_size = PixelElementSize::BYTE,
-			const PixelStructure pixel_structure = PixelStructure::RGB_ALPHA);
+			const PixelStructure pixel_structure = PixelStructure::RGB_ALPHA) :
+			pixel_element_size_(pixel_element_size),
+			pixel_structure_(pixel_structure) {}
 		virtual ~Texture();
 
 	public:
@@ -48,12 +50,6 @@ namespace sgl {
 	class TextureCubeMap : public Texture
 	{
 	public:
-		// Take a single texture and map it to the cube map.
-		// NOT WORKING YET!
-		TextureCubeMap(
-			const std::string& file,
-			const PixelElementSize pixel_element_size = PixelElementSize::BYTE,
-			const PixelStructure pixel_structure = PixelStructure::RGB_ALPHA);
 		// Take 6 texture to be mapped to the cube map, Order is:
 		// right, left - (positive X, negative X)
 		// top, bottom - (positive Y, negative Y)
@@ -66,8 +62,6 @@ namespace sgl {
 	protected:
 		// Create a cube map and assign it to the texture_id_.
 		void CreateCubeMap();
-		// Draw in the cube map.
-		void DrawCubeMap(unsigned int texture_out);
 	};
 
 	class TextureManager 

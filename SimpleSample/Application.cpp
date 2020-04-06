@@ -44,7 +44,8 @@ bool Application::Startup()
 			scene_matrix);
 	}
 	device->SetSceneTree(scene_tree);
-	window_->Startup();
+	// Comment out if you want to see the errors.
+	// window_->Startup();
 	return true;
 }
 
@@ -111,7 +112,7 @@ std::shared_ptr<sgl::Mesh> Application::CreateCubeMapMesh(
 	const std::shared_ptr<sgl::Device>& device)
 {
 	// Create the cube map program.
-	auto cubemap_program = sgl::CreateCubemapProgram(
+	auto cubemap_program = sgl::CreateCubeMapProgram(
 		device->GetProjection());
 
 	// Create the mesh for the cube.

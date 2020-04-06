@@ -12,6 +12,7 @@ namespace test {
 
 	protected:
 		std::shared_ptr<sgl::Light> light_ = nullptr;
+		std::shared_ptr<sgl::LightManager> light_manager_ = nullptr;
 	};
 
 } // End namespace test.

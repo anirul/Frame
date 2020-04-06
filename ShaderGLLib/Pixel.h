@@ -13,8 +13,6 @@ namespace sgl {
 		LONG = 4,
 	};
 
-	int ConvertToGLType(const PixelElementSize pixel_element_size);
-
 	// Simple enum to hold the structure of a pixel.
 	enum class PixelStructure : std::uint8_t
 	{
@@ -24,7 +22,11 @@ namespace sgl {
 		RGB_ALPHA = 4,
 	};
 
+	// Get the GL_FLOAT and GL_UNSIGNED_BYTE.
+	int ConvertToGLType(const PixelElementSize pixel_element_size);
+	// Get the GL_RGBA or GL_R.
 	int ConvertToGLType(const PixelStructure pixel_structure);
+	// Get the GL_RGBA8 and GL_RG32F.
 	int ConvertToGLType(
 		const PixelElementSize pixel_element_size, 
 		const PixelStructure pixel_structure);

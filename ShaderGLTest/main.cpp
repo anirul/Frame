@@ -4,6 +4,7 @@
 #include "DeviceTest.h"
 #include "ImageTest.h"
 #include "LightTest.h"
+#include "PixelTest.h"
 #include "MeshTest.h"
 #include "ProgramTest.h"
 #include "SceneTest.h"
