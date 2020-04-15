@@ -8,6 +8,7 @@
 #include <SDL2/SDL.h>
 #include <SDL_syswm.h>
 #include <gl/glew.h>
+#include "Error.h"
 
 namespace sgl {
 
@@ -17,7 +18,8 @@ namespace sgl {
 		class SDLWindow : public Window
 		{
 		public:
-			SDLWindow(std::pair<int, int> size) : size_(size)
+			SDLWindow(const std::pair<std::uint32_t, std::uint32_t> size) : 
+				size_(size)
 			{
 				if (SDL_Init(SDL_INIT_VIDEO) != 0)
 				{
@@ -42,6 +44,7 @@ namespace sgl {
 				SDL_VERSION(&wmInfo.version);
 				SDL_GetWindowWMInfo(sdl_window_, &wmInfo);
 				hwnd_ = wmInfo.info.win.window;
+				Error::SetWindowPtr(hwnd_);
 #endif
 			}
 
@@ -134,7 +137,7 @@ namespace sgl {
 			{
 				if (!device_)
 				{
-					device_ = std::make_shared<sgl::Device>(gl_context_);
+					device_ = std::make_shared<sgl::Device>(gl_context_, size_);
 				}
 				return device_;
 			}
@@ -233,7 +236,7 @@ namespace sgl {
 #endif
 
 		private:
-			std::pair<int, int> size_;
+			const std::pair<std::uint32_t, std::uint32_t> size_;
 			std::shared_ptr<sgl::Device> device_ = nullptr;
 			std::function<void(const double)> draw_func_ = nullptr;
 			SDL_Window* sdl_window_ = nullptr;

@@ -1,25 +1,35 @@
 #pragma once
 
 #include <cstdint>
+#include <gl/glew.h>
 #include <glm/glm.hpp>
 
 namespace sgl {
 
 	// Simple enum to hold the size of an element of a pixel.
-	enum class PixelElementSize : std::uint8_t 
+	enum class PixelElementSize : std::uint8_t
 	{
-		BYTE = 1,
+		BYTE  = 1,
 		SHORT = 2,
-		LONG = 4,
+		HALF  = 3,
+		FLOAT = 4,
+	};
+
+	enum class PixelDepthComponent : std::uint16_t
+	{
+		DEPTH_COMPONENT8  = GL_DEPTH_COMPONENT,
+		DEPTH_COMPONENT16 = GL_DEPTH_COMPONENT16,
+		DEPTH_COMPONENT24 = GL_DEPTH_COMPONENT24,
+		DEPTH_COMPONENT32 = GL_DEPTH_COMPONENT32,
 	};
 
 	// Simple enum to hold the structure of a pixel.
 	enum class PixelStructure : std::uint8_t
 	{
-		GREY = 1,
+		GREY       = 1,
 		GREY_ALPHA = 2,
-		RGB = 3,
-		RGB_ALPHA = 4,
+		RGB        = 3,
+		RGB_ALPHA  = 4,
 	};
 
 	// Get the GL_FLOAT and GL_UNSIGNED_BYTE.

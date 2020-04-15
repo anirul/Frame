@@ -70,10 +70,10 @@ namespace test {
 		image_ = 
 			std::make_shared<sgl::Image>(
 				"../Asset/CubeMap/Hamarikyu.hdr",
-				sgl::PixelElementSize::LONG,
+				sgl::PixelElementSize::FLOAT,
 				sgl::PixelStructure::RGB_ALPHA);
 		EXPECT_TRUE(image_);
-		EXPECT_EQ(sgl::PixelElementSize::LONG, image_->GetPixelElementSize());
+		EXPECT_EQ(sgl::PixelElementSize::FLOAT, image_->GetPixelElementSize());
 		EXPECT_EQ(sgl::PixelStructure::RGB_ALPHA, image_->GetPixelStructure());
 		// Cast to the correct value.
 		const float* ptr = static_cast<const float*>(image_->Data());

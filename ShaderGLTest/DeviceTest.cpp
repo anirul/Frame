@@ -15,7 +15,7 @@ namespace test {
 		EXPECT_FALSE(device_);
 		EXPECT_TRUE(window_);
 		device_ = window_->CreateDevice();
-		device_->Startup(window_->GetSize());
+		device_->Startup();
 		EXPECT_TRUE(device_);
 	}
 

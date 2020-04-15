@@ -1,10 +1,10 @@
 #version 330 core
 
-layout(location = 0) out vec4 frag_color;
-
 in vec3 out_normal;
 in vec3 out_world;
 in vec2 out_texcoord;
+
+layout(location = 0) out vec4 frag_color;
 
 uniform sampler2D Color;
 uniform sampler2D Normal;
@@ -96,7 +96,7 @@ void main()
     // Red metallic surface.
     vec3 albedo             = pow(vec3(0.5, 0.0, 0.0), vec3(2.2));
     float metallic          = 1.0;
-    float roughness         = 0.5; // This has to be > 0.
+    float roughness         = 0.2; // This has to be > 0.
     float ao                = 1.0;
     vec3 normal  = vec3(0.5, 0.5, 1.0);
 */

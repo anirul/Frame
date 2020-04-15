@@ -10,7 +10,7 @@ namespace sgl {
 	Image::Image(
 		const std::string& file, 
 		const PixelElementSize pixel_element_size /*= PixelElementSize::BYTE*/, 
-		const PixelStructure pixel_structure /*= PixelStructure::RGB_ALPHA*/) :
+		const PixelStructure pixel_structure /*= PixelStructure::RGB*/) :
 		pixel_element_size_(pixel_element_size),
 		pixel_structure_(pixel_structure)
 	{
@@ -40,7 +40,7 @@ namespace sgl {
 					desired_channels);
 			break;
 		}
-		case PixelElementSize::LONG :
+		case PixelElementSize::FLOAT :
 		{
 			image_ =
 				stbi_loadf(

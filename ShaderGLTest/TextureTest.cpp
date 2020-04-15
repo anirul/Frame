@@ -25,7 +25,7 @@ namespace test {
 		texture_ =
 			std::make_shared<sgl::Texture>(
 				"../Asset/CubeMap/Hamarikyu.hdr",
-				sgl::PixelElementSize::LONG,
+				sgl::PixelElementSize::HALF,
 				sgl::PixelStructure::RGB_ALPHA);
 		ASSERT_TRUE(texture_);
 		EXPECT_NE(0, texture_->GetId());

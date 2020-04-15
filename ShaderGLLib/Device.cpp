@@ -4,7 +4,11 @@
 
 namespace sgl {
 
-	Device::Device(void* gl_context) : gl_context_(gl_context) 
+	Device::Device(
+		void* gl_context, 
+		const std::pair<std::uint32_t, std::uint32_t> size) : 
+		gl_context_(gl_context),
+		size_(size)
 	{
 		// Initialize GLEW.
 		if (GLEW_OK != glewInit())
@@ -20,11 +24,11 @@ namespace sgl {
 		glEnable(GL_DEPTH_TEST);
 	}
 
-	void Device::Startup(const std::pair<int, int>& size)
+	void Device::Startup()
 	{
 		// Set the perspective matrix.
 		const float aspect =
-			static_cast<float>(size.first) / static_cast<float>(size.second);
+			static_cast<float>(size_.first) / static_cast<float>(size_.second);
 		perspective_ = glm::perspective(
 			glm::radians(65.0f),
 			aspect,
@@ -33,10 +37,14 @@ namespace sgl {
 		
 		// Set the camera.
 		view_ = camera_.GetLookAt();
+
 	}
 
 	void Device::Draw(const double dt)
 	{
+		// Set the view port for rendering.
+		glViewport(0, 0, size_.first, size_.second);
+
 		// Clear the screen.
 		glClearColor(.2f, 0.f, .2f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

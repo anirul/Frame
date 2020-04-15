@@ -1,7 +1,8 @@
 #version 330 core
+
 layout (location = 0) in vec3 in_position;
 
-out vec3 out_texcoord;
+out vec3 out_local_pos;
 
 uniform mat4 projection;
 uniform mat4 view;
@@ -9,8 +10,13 @@ uniform mat4 model;
 
 void main()
 {
-    out_texcoord = in_position;
-    mat4 pvm = projection * view * model;
+    out_local_pos = in_position;
+    // Remove translation.
+    mat4 rotation_view = mat4(mat3(view));
+    mat4 rotation_model = mat4(mat3(model));
+    // Compute the new PVM matrix.
+    mat4 pvm = projection * rotation_view * rotation_model;
+    vec4 clip_pos = pvm * vec4(out_local_pos, 1.0);
 
-    gl_Position = pvm * vec4(in_position, 1.0);
-}  
+    gl_Position = clip_pos.xyww;
+}

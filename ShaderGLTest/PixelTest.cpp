@@ -12,8 +12,11 @@ namespace test {
 			GL_UNSIGNED_SHORT,
 			sgl::ConvertToGLType(sgl::PixelElementSize::SHORT));
 		EXPECT_EQ(
+			GL_HALF_FLOAT,
+			sgl::ConvertToGLType(sgl::PixelElementSize::HALF));
+		EXPECT_EQ(
 			GL_FLOAT,
-			sgl::ConvertToGLType(sgl::PixelElementSize::LONG));
+			sgl::ConvertToGLType(sgl::PixelElementSize::FLOAT));
 	}
 
 	TEST_F(PixelTest, ConvertToGLTypePixelStructurePixelTest)
@@ -73,22 +76,22 @@ namespace test {
 		EXPECT_EQ(
 			GL_R32F,
 			sgl::ConvertToGLType(
-				sgl::PixelElementSize::LONG,
+				sgl::PixelElementSize::FLOAT,
 				sgl::PixelStructure::GREY));
 		EXPECT_EQ(
 			GL_RG32F,
 			sgl::ConvertToGLType(
-				sgl::PixelElementSize::LONG,
+				sgl::PixelElementSize::FLOAT,
 				sgl::PixelStructure::GREY_ALPHA));
 		EXPECT_EQ(
 			GL_RGB32F,
 			sgl::ConvertToGLType(
-				sgl::PixelElementSize::LONG,
+				sgl::PixelElementSize::FLOAT,
 				sgl::PixelStructure::RGB));
 		EXPECT_EQ(
 			GL_RGBA32F,
 			sgl::ConvertToGLType(
-				sgl::PixelElementSize::LONG,
+				sgl::PixelElementSize::FLOAT,
 				sgl::PixelStructure::RGB_ALPHA));
 	}
 

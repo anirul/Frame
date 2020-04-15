@@ -13,7 +13,7 @@ namespace sgl {
 		Image(
 			const std::string& file, 
 			const PixelElementSize pixel_element_size = PixelElementSize::BYTE,
-			const PixelStructure pixel_structure = PixelStructure::RGB_ALPHA);
+			const PixelStructure pixel_structure = PixelStructure::RGB);
 		virtual ~Image();
 
 	public:

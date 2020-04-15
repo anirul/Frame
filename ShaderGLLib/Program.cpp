@@ -1,11 +1,13 @@
 #include "Program.h"
 #include <stdexcept>
+#include "Error.h"
 
 namespace sgl {
 
 	Program::Program()
 	{
 		program_id_ = glCreateProgram();
+		error_->DisplayError(__FILE__, __LINE__);
 		if (program_id_ <= 0)
 		{
 			throw std::runtime_error("Could not have a program that is <= 0");
@@ -15,11 +17,13 @@ namespace sgl {
 	Program::~Program()
 	{
 		glDeleteProgram(program_id_);
+		// error_->DisplayError(__FILE__, __LINE__);
 	}
 
 	void Program::AddShader(const Shader& shader)
 	{
 		glAttachShader(program_id_, shader.GetId());
+		error_->DisplayError(__FILE__, __LINE__);
 		attached_shaders_.push_back(shader.GetId());
 	}
 
@@ -30,26 +34,31 @@ namespace sgl {
 		{
 			glDetachShader(program_id_, id);
 		}
+		error_->DisplayError(__FILE__, __LINE__);
 	}
 
 	void Program::Use() const
 	{
 		glUseProgram(program_id_);
+		error_->DisplayError(__FILE__, __LINE__);
 	}
 
 	void Program::UniformBool(const std::string& name, bool value) const
 	{
 		glUniform1i(GetMemoizeUniformLocation(name), (int)value);
+		error_->DisplayError(__FILE__, __LINE__);
 	}
 
 	void Program::UniformInt(const std::string& name, int value) const
 	{
 		glUniform1i(GetMemoizeUniformLocation(name), value);
+		error_->DisplayError(__FILE__, __LINE__);
 	}
 
 	void Program::UniformFloat(const std::string& name, float value) const
 	{
 		glUniform1f(GetMemoizeUniformLocation(name), value);
+		error_->DisplayError(__FILE__, __LINE__);
 	}
 
 	void Program::UniformVector2(
@@ -57,6 +66,7 @@ namespace sgl {
 		const glm::vec2& vec2) const
 	{
 		glUniform2f(GetMemoizeUniformLocation(name), vec2.x, vec2.y);
+		error_->DisplayError(__FILE__, __LINE__);
 	}
 
 	void Program::UniformVector3(
@@ -64,6 +74,7 @@ namespace sgl {
 		const glm::vec3& vec3) const
 	{
 		glUniform3f(GetMemoizeUniformLocation(name), vec3.x, vec3.y, vec3.z);
+		error_->DisplayError(__FILE__, __LINE__);
 	}
 
 	void Program::UniformVector4(
@@ -76,6 +87,7 @@ namespace sgl {
 			vec4.y,
 			vec4.z,
 			vec4.w);
+		error_->DisplayError(__FILE__, __LINE__);
 	}
 
 	void Program::UniformMatrix(
@@ -88,6 +100,7 @@ namespace sgl {
 			1, 
 			transpose ? GL_TRUE : GL_FALSE,
 			&mat[0][0]);
+		error_->DisplayError(__FILE__, __LINE__);
 	}
 
 	const int Program::GetMemoizeUniformLocation(const std::string& name) const
@@ -97,6 +110,7 @@ namespace sgl {
 		{
 			memoize_map_[name] = 
 				glGetUniformLocation(program_id_, name.c_str());
+			error_->DisplayError(__FILE__, __LINE__);
 		}
 		return memoize_map_[name];
 	}
@@ -141,7 +155,28 @@ namespace sgl {
 		return program;
 	}
 
-	std::shared_ptr<sgl::Program> CreatePBRProgram(
+	std::shared_ptr<sgl::Program> CreateEquirectangulareCubeMapProgram(
+		const glm::mat4& projection /*= glm::mat4(1.0f)*/, 
+		const glm::mat4& view /*= glm::mat4(1.0f)*/, 
+		const glm::mat4& model /*= glm::mat4(1.0f)*/)
+	{
+		auto error = Error::GetInstance();
+		auto program = std::make_shared<sgl::Program>();
+		Shader vertex(ShaderType::VERTEX_SHADER);
+		Shader fragment(ShaderType::FRAGMENT_SHADER);
+		vertex.LoadFromFile("../Asset/EquirectangularCubeMap.Vertex.glsl");
+		fragment.LoadFromFile("../Asset/EquirectangularCubeMap.Fragment.glsl");
+		program->AddShader(vertex);
+		program->AddShader(fragment);
+		program->LinkShader();
+		program->Use();
+		program->UniformMatrix("projection", projection);
+		program->UniformMatrix("view", view);
+		program->UniformMatrix("model", model);
+		return program;
+	}
+
+	std::shared_ptr<sgl::Program> CreatePhysicallyBasedRenderingProgram(
 		const glm::mat4& projection /*= glm::mat4(1.0f)*/,
 		const glm::mat4& view /*= glm::mat4(1.0f)*/,
 		const glm::mat4& model /*= glm::mat4(1.0f)*/)
@@ -149,8 +184,9 @@ namespace sgl {
 		auto program = std::make_shared<sgl::Program>();
 		sgl::Shader vertex(sgl::ShaderType::VERTEX_SHADER);
 		sgl::Shader fragment(sgl::ShaderType::FRAGMENT_SHADER);
-		vertex.LoadFromFile("../Asset/PBR.Vertex.glsl");
-		fragment.LoadFromFile("../Asset/PBR.Fragment.glsl");
+		vertex.LoadFromFile("../Asset/PhysicallyBasedRendering.Vertex.glsl");
+		fragment.LoadFromFile(
+			"../Asset/PhysicallyBasedRendering.Fragment.glsl");
 		program->AddShader(vertex);
 		program->AddShader(fragment);
 		program->LinkShader();

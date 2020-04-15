@@ -13,7 +13,9 @@ namespace sgl {
 			return GL_UNSIGNED_BYTE;
 		case PixelElementSize::SHORT:
 			return GL_UNSIGNED_SHORT;
-		case PixelElementSize::LONG:
+		case PixelElementSize::HALF:
+			return GL_HALF_FLOAT;
+		case PixelElementSize::FLOAT:
 			return GL_FLOAT;
 		}
 		throw 
@@ -70,7 +72,19 @@ namespace sgl {
 			case PixelStructure::RGB_ALPHA:
 				return GL_RGBA16;
 			}
-		case PixelElementSize::LONG:
+		case PixelElementSize::HALF:
+			switch (pixel_structure)
+			{
+			case PixelStructure::GREY:
+				return GL_R16F;
+			case PixelStructure::GREY_ALPHA:
+				return GL_RG16F;
+			case PixelStructure::RGB:
+				return GL_RGB16F;
+			case PixelStructure::RGB_ALPHA:
+				return GL_RGBA16F;
+			}
+		case PixelElementSize::FLOAT:
 			switch (pixel_structure)
 			{
 			case PixelStructure::GREY:

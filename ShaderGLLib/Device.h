@@ -20,11 +20,13 @@ namespace sgl {
 	{
 	public:
 		// This will initialize the GL context and make the GLEW init.
-		Device(void* gl_context);
+		Device(
+			void* gl_context, 
+			const std::pair<std::uint32_t, std::uint32_t> size);
 
 	public:
 		// Startup the scene. Throw errors in case there is any.
-		void Startup(const std::pair<int, int>& size);
+		void Startup();
 		// Draw what is on the scene.
 		// Take the total time from the beginning of the program to now as a
 		// const double parameter.
@@ -60,10 +62,11 @@ namespace sgl {
 		sgl::TextureManager texture_manager_ = {};
 		sgl::LightManager light_manager_ = {};
 		sgl::Camera camera_ = sgl::Camera({ 0.f, 0.f, 2.f });
-		void* gl_context_ = nullptr;
 		glm::mat4 perspective_ = glm::mat4(1.0f);
 		glm::mat4 view_ = glm::mat4(1.0f);
 		glm::mat4 model_ = glm::mat4(1.0f);
+		void* gl_context_ = nullptr;
+		const std::pair<std::uint32_t, std::uint32_t> size_;
 	};
 
 } // End namespace sgl.

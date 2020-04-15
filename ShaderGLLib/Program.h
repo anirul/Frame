@@ -6,6 +6,7 @@
 #include <vector>
 #include <glm/glm.hpp>
 #include "../ShaderGLLib/Shader.h"
+#include "../ShaderGLLib/Error.h"
 
 namespace sgl {
 
@@ -54,6 +55,7 @@ namespace sgl {
 		mutable std::map<std::string, int> memoize_map_ = {};
 		std::vector<unsigned int> attached_shaders_ = {};
 		int program_id_ = 0;
+		const std::shared_ptr<Error> error_ = Error::GetInstance();
 	};
 
 	// Create a simple program (mainly for testing purpose).
@@ -78,7 +80,17 @@ namespace sgl {
 		const glm::mat4& view = glm::mat4(1.0f),
 		const glm::mat4& model = glm::mat4(1.0f));
 
-	// Create a PBR program to be used with meshes.
+	// Create a equirectangular cube map program.
+	// Vector needed in entry are:
+	//		- in_position
+	// Should also need in uniform texture:
+	//		- Equirectangular (for the color)
+	std::shared_ptr<sgl::Program> CreateEquirectangulareCubeMapProgram(
+		const glm::mat4& projection = glm::mat4(1.0f),
+		const glm::mat4& view = glm::mat4(1.0f),
+		const glm::mat4& model = glm::mat4(1.0f));
+
+	// Create a Physic Based Rendering program to be used with meshes.
 	// Vector needed in entry are:
 	//		- in_position
 	//		- in_normal
@@ -93,7 +105,7 @@ namespace sgl {
 	//		- camera_position (the position of the camera)
 	//		- light_position[4] (position of the lights)
 	//		- light_color[4] (colors of the lights)
-	std::shared_ptr<sgl::Program> CreatePBRProgram(
+	std::shared_ptr<sgl::Program> CreatePhysicallyBasedRenderingProgram(
 		const glm::mat4& projection = glm::mat4(1.0f),
 		const glm::mat4& view = glm::mat4(1.0f),
 		const glm::mat4& model = glm::mat4(1.0f));

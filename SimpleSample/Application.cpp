@@ -7,9 +7,12 @@ Application::Application(const std::shared_ptr<sgl::Window>& window) :
 bool Application::Startup()
 {
 	auto device = window_->CreateDevice();
-	device->Startup(window_->GetSize());
+	device->Startup();
 	auto apple_mesh = CreateAppleMesh(device);
-	auto cube_map_mesh = CreateCubeMapMesh(device);
+	auto cube_map_mesh = GenerateCubeMapMesh(device);
+
+	// Comment out if you want to see the errors.
+	// window_->Startup();
 
 	// Pack it into a Scene object.
 	sgl::SceneTree scene_tree{};
@@ -18,6 +21,7 @@ bool Application::Startup()
 			[](const double dt) -> glm::mat4 
 		{
 			glm::mat4 r_y(1.0f);
+			r_y[1][1] = -1.f;
 			const auto dtf = static_cast<float>(dt);
 			r_y = glm::rotate(r_y, dtf * -.2f, glm::vec3(0.0f, 1.0f, 0.0f));
 			return r_y;
@@ -43,9 +47,8 @@ bool Application::Startup()
 			std::make_shared<sgl::SceneMesh>(apple_mesh),
 			scene_matrix);
 	}
+
 	device->SetSceneTree(scene_tree);
-	// Comment out if you want to see the errors.
-	// window_->Startup();
 	return true;
 }
 
@@ -58,7 +61,7 @@ std::shared_ptr<sgl::Mesh> Application::CreateAppleMesh(
 	const std::shared_ptr<sgl::Device>& device)
 {
 	// Create the physically based rendering program.
-	auto pbr_program = sgl::CreatePBRProgram(
+	auto pbr_program = sgl::CreatePhysicallyBasedRenderingProgram(
 		device->GetProjection(),
 		device->GetView(),
 		device->GetModel());
@@ -108,6 +111,34 @@ std::shared_ptr<sgl::Mesh> Application::CreateAppleMesh(
 	return apple_mesh;
 }
 
+std::shared_ptr<sgl::Mesh> Application::GenerateCubeMapMesh(
+	const std::shared_ptr<sgl::Device>& device)
+{
+	// Create the cube map program.
+	auto cubemap_program = sgl::CreateCubeMapProgram(
+		device->GetProjection());
+
+	// Create the mesh for the cube.
+	auto cube_mesh = std::make_shared<sgl::Mesh>(
+		"../Asset/Cube.obj",
+		cubemap_program);
+
+	// Get the texture manager.
+	auto texture_manager = device->GetTextureManager();
+	texture_manager.AddTexture(
+		"Skybox",
+		std::make_shared<sgl::TextureCubeMap>(
+			"../Asset/CubeMap/Hamarikyu.hdr",
+			sgl::PixelElementSize::FLOAT,
+			sgl::PixelStructure::RGB));
+	cube_mesh->SetTextures({ "Skybox" });
+	device->SetTextureManager(texture_manager);
+
+	// Enable the cleaning of the depth.
+	cube_mesh->ClearDepthBuffer(true);
+	return cube_mesh;
+}
+
 std::shared_ptr<sgl::Mesh> Application::CreateCubeMapMesh(
 	const std::shared_ptr<sgl::Device>& device)
 {
@@ -120,7 +151,7 @@ std::shared_ptr<sgl::Mesh> Application::CreateCubeMapMesh(
 		"../Asset/Cube.obj", 
 		cubemap_program);
 
-	// Create the texture manager.
+	// Get the texture manager.
 	auto texture_manager = device->GetTextureManager();
 	std::array<std::string, 6> cube_map_list = 
 	{
@@ -137,6 +168,7 @@ std::shared_ptr<sgl::Mesh> Application::CreateCubeMapMesh(
 	cube_mesh->SetTextures({ "Skybox" });
 	device->SetTextureManager(texture_manager);
 
+	// Enable the cleaning of the depth.
 	cube_mesh->ClearDepthBuffer(true);
 	return cube_mesh;
 }

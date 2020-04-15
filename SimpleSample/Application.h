@@ -13,6 +13,8 @@ public:
 protected:
 	std::shared_ptr<sgl::Mesh> CreateAppleMesh(
 		const std::shared_ptr<sgl::Device>& device);
+	std::shared_ptr<sgl::Mesh> GenerateCubeMapMesh(
+		const std::shared_ptr<sgl::Device>& device);
 	std::shared_ptr<sgl::Mesh> CreateCubeMapMesh(
 		const std::shared_ptr<sgl::Device>& device);
 	std::shared_ptr<sgl::Window> window_;
