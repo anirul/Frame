@@ -18,7 +18,6 @@ namespace sgl {
 	Buffer::~Buffer()
 	{
 		glDeleteBuffers(1, &buffer_object_);
-		error_->DisplayError(__FILE__, __LINE__ - 1);
 	}
 
 	void Buffer::Bind() const
