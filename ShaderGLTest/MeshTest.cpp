@@ -4,6 +4,7 @@ namespace test {
 
 	TEST_F(MeshTest, CreateCubeMeshTest)
 	{
+		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(mesh_);
 		EXPECT_TRUE(window_);
 		auto program = sgl::CreateSimpleProgram();
@@ -19,6 +20,7 @@ namespace test {
 
 	TEST_F(MeshTest, CreateTorusMeshTest)
 	{
+		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(mesh_);
 		EXPECT_TRUE(window_);
 		auto program = sgl::CreateSimpleProgram();

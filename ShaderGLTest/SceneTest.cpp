@@ -4,6 +4,7 @@ namespace test {
 
 	TEST_F(SceneTest, CheckConstructorMatrixTest)
 	{
+		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(scene_);
 		glm::mat4 test(1.0f);
 		scene_ = std::make_shared<sgl::SceneMatrix>(test);
@@ -12,6 +13,7 @@ namespace test {
 
 	TEST_F(SceneTest, CheckConstructorMeshTest)
 	{
+		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(scene_);
 		auto program = sgl::CreateSimpleProgram();
 		auto mesh = std::make_shared<sgl::Mesh>("../Asset/Cube.obj", program);
@@ -22,6 +24,7 @@ namespace test {
 	// Simple test scene with populate tree.
 	TEST_F(SceneTest, CheckTreeConstructTest)
 	{
+		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(scene_tree_);
 		scene_tree_ = std::make_shared<sgl::SceneTree>();
 		EXPECT_TRUE(scene_tree_);

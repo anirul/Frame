@@ -42,7 +42,10 @@ namespace test {
 	{
 		EXPECT_FALSE(image_);
 		image_ = 
-			std::make_shared<sgl::Image>("../Asset/Planks/Color.jpg");
+			std::make_shared<sgl::Image>(
+				"../Asset/Planks/Color.jpg", 
+				sgl::PixelElementSize::BYTE,
+				sgl::PixelStructure::RGB_ALPHA);
 		EXPECT_TRUE(image_);
 		const std::uint8_t* pixel = (std::uint8_t*)(image_->Data());
 		for (int i = 0; i < image_->GetLength(); ++i)

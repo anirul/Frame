@@ -11,7 +11,7 @@ namespace test {
 	public:
 		TextureTest()
 		{
-			window_ = sgl::MakeSDLOpenGL({ 320, 200 });
+			window_ = sgl::CreateSDLOpenGL({ 320, 200 });
 		}
 
 	protected:

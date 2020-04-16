@@ -4,6 +4,7 @@ namespace test {
 
 	TEST_F(ShaderTest, CreateVertexShaderTest)
 	{
+		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(shader_);
 		shader_ = std::make_shared<sgl::Shader>(sgl::ShaderType::VERTEX_SHADER);
 		EXPECT_TRUE(shader_);
@@ -11,6 +12,7 @@ namespace test {
 
 	TEST_F(ShaderTest, CreateFragmentShaderTest)
 	{
+		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(shader_);
 		shader_ = 
 			std::make_shared<sgl::Shader>(sgl::ShaderType::FRAGMENT_SHADER);
@@ -19,6 +21,7 @@ namespace test {
 
 	TEST_F(ShaderTest, LoadFromFileVertexShaderTest)
 	{
+		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(shader_);
 		shader_ = std::make_shared<sgl::Shader>(sgl::ShaderType::VERTEX_SHADER);
 		EXPECT_TRUE(shader_);
@@ -28,6 +31,7 @@ namespace test {
 
 	TEST_F(ShaderTest, LoadFromFileFragmentShaderTest)
 	{
+		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(shader_);
 		shader_ = 
 			std::make_shared<sgl::Shader>(sgl::ShaderType::FRAGMENT_SHADER);

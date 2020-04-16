@@ -22,7 +22,7 @@ int main(int ac, char** av)
 {
 	try
 	{
-		Application app(sgl::MakeSDLOpenGL({ 640, 480 }));
+		Application app(sgl::CreateSDLOpenGL({ 640, 480 }));
 		if (!app.Startup())
 		{
 			return -1;

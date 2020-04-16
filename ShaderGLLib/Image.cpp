@@ -29,6 +29,8 @@ namespace sgl {
 					desired_channels);
 			break;
 		}
+		case PixelElementSize::HALF:
+			[[fallthrough]];
 		case PixelElementSize::SHORT :
 		{
 			image_ =

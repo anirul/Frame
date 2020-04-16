@@ -75,10 +75,10 @@ std::shared_ptr<sgl::Mesh> Application::CreateAppleMesh(
 	sgl::LightManager light_manager{};
 	const float light_value = 300.f;
 	const glm::vec3 light_vec(light_value, light_value, light_value);
-	light_manager.AddLight(sgl::Light({ 10.f,  10.f,  10.f }, light_vec));
-	light_manager.AddLight(sgl::Light({ 10.f, -10.f,  10.f }, light_vec));
-	light_manager.AddLight(sgl::Light({ -10.f,  10.f,  10.f }, light_vec));
-	light_manager.AddLight(sgl::Light({ -10.f, -10.f,  10.f }, light_vec));
+	light_manager.AddLight(sgl::Light({ 10.f, 10.f, 10.f }, light_vec));
+	light_manager.AddLight(sgl::Light({ 10.f, -10.f, 10.f }, light_vec));
+	light_manager.AddLight(sgl::Light({ -10.f, 10.f, 10.f }, light_vec));
+	light_manager.AddLight(sgl::Light({ -10.f, -10.f, 10.f }, light_vec));
 	light_manager.RegisterToProgram(pbr_program);
 	device->SetLightManager(light_manager);
 

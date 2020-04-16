@@ -248,7 +248,7 @@ namespace sgl {
 
 	}
 
-	std::shared_ptr<sgl::Window> MakeSDLOpenGL(std::pair<int, int> size)
+	std::shared_ptr<sgl::Window> CreateSDLOpenGL(std::pair<int, int> size)
 	{
 		auto window_ptr = std::make_shared<SDLWindow>(size);
 		auto maybe_version = window_ptr->InitOpenGLDevice();

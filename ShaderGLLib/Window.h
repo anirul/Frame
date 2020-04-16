@@ -17,6 +17,6 @@ namespace sgl {
 	};
 
 	// Create an instance of the window.
-	std::shared_ptr<Window> MakeSDLOpenGL(std::pair<int, int> size);
+	std::shared_ptr<Window> CreateSDLOpenGL(std::pair<int, int> size);
 
 } // End namespace sgl.

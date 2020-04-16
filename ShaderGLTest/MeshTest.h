@@ -11,11 +11,7 @@ namespace test {
 	public:
 		MeshTest()
 		{
-			window_ = sgl::MakeSDLOpenGL({ 320, 200 });
-			if (glewInit() != GLEW_OK)
-			{
-				window_ = nullptr;
-			}
+			window_ = sgl::CreateSDLOpenGL({ 320, 200 });
 		}
 
 	protected:

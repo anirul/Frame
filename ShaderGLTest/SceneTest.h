@@ -14,7 +14,7 @@ namespace test {
 		// OpenGL is needed as this is used by mesh.
 		SceneTest()
 		{
-			window_ = sgl::MakeSDLOpenGL({ 320, 200 });
+			window_ = sgl::CreateSDLOpenGL({ 320, 200 });
 		}
 		// Populate the tree with:
 		//	    Matrix (contain identity)
