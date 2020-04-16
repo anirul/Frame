@@ -220,7 +220,7 @@ namespace sgl {
 		for (glm::mat4 view : views_)
 		{
 			frame.BindTexture2D(
-				GetId(), 
+				*this, 
 				static_cast<FrameTextureType>(i));
 			i++;
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

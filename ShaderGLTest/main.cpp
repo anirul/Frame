@@ -2,6 +2,7 @@
 #include "BufferTest.h"
 #include "CameraTest.h"
 #include "DeviceTest.h"
+#include "ErrorTest.h"
 #include "FrameTest.h"
 #include "ImageTest.h"
 #include "LightTest.h"

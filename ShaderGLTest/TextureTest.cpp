@@ -8,6 +8,7 @@ namespace test {
 		EXPECT_FALSE(texture_);
 		texture_ = std::make_shared<sgl::Texture>("../Asset/Texture.tga");
 		EXPECT_TRUE(texture_);
+		EXPECT_NO_THROW(error_->DisplayError());
 	}
 
 	TEST_F(TextureTest, GetSizeTextureTest)
@@ -19,6 +20,7 @@ namespace test {
 		EXPECT_NE(0, texture_->GetId());
 		auto pair = std::make_pair<size_t, size_t>(256, 256);
 		EXPECT_EQ(pair, texture_->GetSize());
+		EXPECT_NO_THROW(error_->DisplayError());
 	}
 
 	TEST_F(TextureTest, CreateHDRTextureTest)
@@ -33,6 +35,7 @@ namespace test {
 		EXPECT_NE(0, texture_->GetId());
 		auto pair = std::make_pair<size_t, size_t>(3200, 1600);
 		EXPECT_EQ(pair, texture_->GetSize());
+		EXPECT_NO_THROW(error_->DisplayError());
 	}
 
 	TEST_F(TextureTest, CreateCubeMapTextureTest)
@@ -49,6 +52,7 @@ namespace test {
 				"../Asset/CubeMap/NegativeZ.png" });
 		EXPECT_TRUE(texture_);
 		EXPECT_NE(0, texture_->GetId());
+		EXPECT_NO_THROW(error_->DisplayError());
 	}
 
 	TEST_F(TextureTest, CreateEquirectangularTextureTest)
@@ -59,6 +63,7 @@ namespace test {
 			"../Asset/CubeMap/Hamarikyu.hdr");
 		EXPECT_TRUE(texture_);
 		EXPECT_NE(0, texture_->GetId());
+		EXPECT_NO_THROW(error_->DisplayError());
 	}
 
 	TEST_F(TextureTest, CreateTextureManagerTest)
@@ -67,6 +72,7 @@ namespace test {
 		EXPECT_FALSE(texture_manager_);
 		texture_manager_ = std::make_shared<sgl::TextureManager>();
 		EXPECT_TRUE(texture_manager_);
+		EXPECT_NO_THROW(error_->DisplayError());
 	}
 
 	TEST_F(TextureTest, AddRemoveTextureManagerTest)
@@ -80,6 +86,7 @@ namespace test {
 		ASSERT_TRUE(texture_);
 		EXPECT_TRUE(texture_manager_->AddTexture("texture1", texture_));
 		EXPECT_TRUE(texture_manager_->RemoveTexture("texture1"));
+		EXPECT_NO_THROW(error_->DisplayError());
 	}
 
 } // End namespace test.

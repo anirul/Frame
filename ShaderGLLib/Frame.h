@@ -3,6 +3,7 @@
 #include <memory>
 #include "../ShaderGLLib/Render.h"
 #include "../ShaderGLLib/Texture.h"
+#include "../ShaderGLLib/Error.h"
 
 namespace sgl {
 
@@ -28,7 +29,7 @@ namespace sgl {
 		void UnBind() const;
 		void BindAttach(const Render& render) const;
 		void BindTexture2D(
-			const int texture_id,
+			const Texture& texture,
 			const FrameTextureType frame_texture_type = 
 				FrameTextureType::TEXTURE_2D) const;
 
@@ -41,6 +42,7 @@ namespace sgl {
 
 	protected:
 		unsigned int frame_id_ = 0;
+		const std::shared_ptr<Error> error_ = Error::GetInstance();
 	};
 
 } // End namespace sgl.

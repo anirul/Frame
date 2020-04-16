@@ -7,26 +7,24 @@ namespace sgl {
 	Frame::Frame()
 	{
 		glGenFramebuffers(1, &frame_id_);
-		if (frame_id_ == 0)
-		{
-			throw std::runtime_error("Couldn't create a Frame Buffer.");
-		}
+		error_->DisplayError(__FILE__, __LINE__ - 1);
 	}
 
 	Frame::~Frame()
 	{
-		UnBind();
 		glDeleteFramebuffers(1, &frame_id_);
 	}
 
 	void Frame::Bind() const
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, frame_id_);
+		error_->DisplayError(__FILE__, __LINE__ - 1);
 	}
 
 	void Frame::UnBind() const
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		error_->DisplayError(__FILE__, __LINE__ - 1);
 	}
 
 	void Frame::BindAttach(const Render& render) const
@@ -38,10 +36,11 @@ namespace sgl {
 			GL_DEPTH_ATTACHMENT, 
 			GL_RENDERBUFFER, 
 			render.GetId());
+		error_->DisplayError(__FILE__, __LINE__ - 5);
 	}
 
 	void Frame::BindTexture2D(
-		const int texture_id,
+		const Texture& texture,
 		const FrameTextureType frame_texture_type 
 			/*= FrameTextureType::TEXTURE_2D*/) const
 	{
@@ -50,8 +49,9 @@ namespace sgl {
 			GL_FRAMEBUFFER,
 			GL_COLOR_ATTACHMENT0,
 			GetFrameTextureType(frame_texture_type),
-			texture_id,
+			texture.GetId(),
 			0);
+		error_->DisplayError(__FILE__, __LINE__ - 6);
 	}
 
 	const int Frame::GetFrameTextureType(

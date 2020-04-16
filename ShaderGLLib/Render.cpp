@@ -7,26 +7,24 @@ namespace sgl {
 	Render::Render()
 	{
 		glGenRenderbuffers(1, &render_id_);
-		if (render_id_ == 0)
-		{
-			throw std::runtime_error("Couldn't generate a render buffer.");
-		}
+		error_->DisplayError(__FILE__, __LINE__ - 1);
 	}
 
 	Render::~Render()
 	{
-		UnBind();
 		glDeleteRenderbuffers(1, &render_id_);
 	}
 
 	void Render::Bind() const
 	{
 		glBindRenderbuffer(GL_RENDERBUFFER, render_id_);
+		error_->DisplayError(__FILE__, __LINE__ - 1);
 	}
 
 	void Render::UnBind() const
 	{
 		glBindRenderbuffer(GL_RENDERBUFFER, 0);
+		error_->DisplayError(__FILE__, __LINE__ - 1);
 	}
 
 	void Render::BindStorage(
@@ -40,6 +38,7 @@ namespace sgl {
 			static_cast<int>(pixel_depth_component),
 			size.first,
 			size.second);
+		error_->DisplayError(__FILE__, __LINE__ - 5);
 	}
 
 } // End namespace sgl.
