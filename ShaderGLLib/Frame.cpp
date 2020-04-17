@@ -7,7 +7,7 @@ namespace sgl {
 	Frame::Frame()
 	{
 		glGenFramebuffers(1, &frame_id_);
-		error_->DisplayError(__FILE__, __LINE__ - 1);
+		error_->Display(__FILE__, __LINE__ - 1);
 	}
 
 	Frame::~Frame()
@@ -18,13 +18,13 @@ namespace sgl {
 	void Frame::Bind() const
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, frame_id_);
-		error_->DisplayError(__FILE__, __LINE__ - 1);
+		error_->Display(__FILE__, __LINE__ - 1);
 	}
 
 	void Frame::UnBind() const
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		error_->DisplayError(__FILE__, __LINE__ - 1);
+		error_->Display(__FILE__, __LINE__ - 1);
 	}
 
 	void Frame::BindAttach(const Render& render) const
@@ -36,7 +36,7 @@ namespace sgl {
 			GL_DEPTH_ATTACHMENT, 
 			GL_RENDERBUFFER, 
 			render.GetId());
-		error_->DisplayError(__FILE__, __LINE__ - 5);
+		error_->Display(__FILE__, __LINE__ - 5);
 	}
 
 	void Frame::BindTexture2D(
@@ -51,7 +51,7 @@ namespace sgl {
 			GetFrameTextureType(frame_texture_type),
 			texture.GetId(),
 			0);
-		error_->DisplayError(__FILE__, __LINE__ - 6);
+		error_->Display(__FILE__, __LINE__ - 6);
 	}
 
 	const int Frame::GetFrameTextureType(

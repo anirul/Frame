@@ -12,6 +12,8 @@ uniform sampler2D Metallic;
 uniform sampler2D Roughness;
 uniform sampler2D AmbientOcclusion;
 
+uniform samplerCube Irradiance;
+
 uniform vec3 camera_position;
 uniform vec3 light_position[4];
 uniform vec3 light_color[4];
@@ -87,20 +89,26 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0)
 // ----------------------------------------------------------------------------
 void main()
 {
+#if 1
+    // Surface come from textures.
     vec3 albedo             = pow(texture(Color, out_texcoord).rgb, vec3(2.2));
     float metallic          = texture(Metallic, out_texcoord).r;
     float roughness         = texture(Roughness, out_texcoord).r;
     float ao                = texture(AmbientOcclusion, out_texcoord).r;
     vec3 normal             = texture(Normal, out_texcoord).xyz;
-/*
+    vec3 N                  = getNormalFromMap(normal);
+    vec3 irradiance         = texture(Irradiance, N).rgb;
+#else
     // Red metallic surface.
     vec3 albedo             = pow(vec3(0.5, 0.0, 0.0), vec3(2.2));
     float metallic          = 1.0;
     float roughness         = 0.2; // This has to be > 0.
     float ao                = 1.0;
-    vec3 normal  = vec3(0.5, 0.5, 1.0);
-*/
-    vec3 N = getNormalFromMap(normal);
+    vec3 normal             = vec3(0.5, 0.5, 1.0);
+    vec3 N                  = getNormalFromMap(normal);
+    vec3 irradiance         = vec3(0.0, 1.0, 0.0);
+#endif
+    
     vec3 V = normalize(camera_position - out_world);
 
     // calculate reflectance at normal incidence; if dia-electric (like plastic)
@@ -155,9 +163,12 @@ void main()
         Lo += (kD * albedo / PI + specular) * radiance * NdotL;    
     }
 
-    // ambient lighting (note that the next IBL tutorial will replace 
-    // this ambient lighting with environment lighting).
-    vec3 ambient = vec3(0.03) * albedo * ao;
+    // ambient lighting (we now use IBL as the ambient term)
+    vec3 kS = fresnelSchlick(max(dot(N, V), 0.0), F0);
+    vec3 kD = 1.0 - kS;
+    kD *= 1.0 - metallic;
+    vec3 diffuse = irradiance * albedo;
+    vec3 ambient = (kD * diffuse) * ao;
     
     vec3 color = ambient + Lo;
 

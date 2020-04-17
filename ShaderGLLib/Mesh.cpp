@@ -9,12 +9,7 @@ namespace sgl {
 	Mesh::Mesh(const std::string& file, const std::shared_ptr<Program>& program)
 	{
 		SetProgram(program);
-		auto maybe_obj_file = LoadFromObj(file);
-		if (!maybe_obj_file) 
-		{
-			throw std::runtime_error("Error could not read file: " + file);
-		}
-		auto obj_file = maybe_obj_file.value();
+		auto obj_file = LoadFromObj(file);
 		std::vector<float> flat_positions_ = {};
 		std::vector<float> flat_normals_ = {};
 		std::vector<float> flat_textures_ = {};
@@ -71,22 +66,31 @@ namespace sgl {
 
 		// Create a new vertex array (to render the mesh).
 		glGenVertexArrays(1, &vertex_array_object_);
+		error_->Display(__FILE__, __LINE__ - 1);
 		glBindVertexArray(vertex_array_object_);
+		error_->Display(__FILE__, __LINE__ - 1);
 		point_buffer_.Bind();
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+		error_->Display(__FILE__, __LINE__ - 1);
 		point_buffer_.UnBind();
 		normal_buffer_.Bind();
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+		error_->Display(__FILE__, __LINE__ - 1);
 		normal_buffer_.UnBind();
 		texture_buffer_.Bind();
 		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+		error_->Display(__FILE__, __LINE__ - 1);
 		texture_buffer_.UnBind();
 
 		// Enable vertex attrib array.
 		glEnableVertexAttribArray(0);
+		error_->Display(__FILE__, __LINE__ - 1);
 		glEnableVertexAttribArray(1);
+		error_->Display(__FILE__, __LINE__ - 1);
 		glEnableVertexAttribArray(2);
+		error_->Display(__FILE__, __LINE__ - 1);
 		glBindVertexArray(0);
+		error_->Display(__FILE__, __LINE__ - 1);
 	}
 
 	Mesh::~Mesh()
@@ -117,6 +121,7 @@ namespace sgl {
 		if (clear_depth_buffer_)
 		{
 			glDepthFunc(GL_LEQUAL);
+			error_->Display(__FILE__, __LINE__ - 1);
 		}
 
 		texture_manager.DisableAll();
@@ -131,6 +136,7 @@ namespace sgl {
 		}
 
 		glBindVertexArray(vertex_array_object_);
+		error_->Display(__FILE__, __LINE__ - 1);
 
 		program_->UniformMatrix("model", model);
 
@@ -140,32 +146,47 @@ namespace sgl {
 			static_cast<GLsizei>(index_size_),
 			GL_UNSIGNED_INT,
 			nullptr);
+		error_->Display(__FILE__, __LINE__ - 5);
 		index_buffer_.UnBind();
 
 		glBindVertexArray(0);
+		error_->Display(__FILE__, __LINE__ - 1);
 
 		texture_manager.DisableAll();
 
 		if (clear_depth_buffer_)
 		{
 			glClear(GL_DEPTH_BUFFER_BIT);
+			error_->Display(__FILE__, __LINE__ - 1);
 		}
 	}
 
-	std::optional<sgl::Mesh::ObjFile> Mesh::LoadFromObj(const std::string& file)
+	sgl::Mesh::ObjFile Mesh::LoadFromObj(const std::string& file)
 	{
 		sgl::Mesh::ObjFile obj_file{};
 		std::ifstream ifs;
 		ifs.open(file, std::ifstream::in);
-		if (!ifs.is_open())	return std::nullopt;
-		while (!ifs.eof()) {
+		if (!ifs.is_open())
+		{
+			throw std::runtime_error("Couldn't open file: " + file);
+		}
+		while (!ifs.eof()) 
+		{
 			std::string line = "";
 			if (!std::getline(ifs, line)) break;
 			if (line.empty()) continue;
 			std::istringstream iss(line);
 			std::string dump;
-			if (!(iss >> dump))	return std::nullopt;
-			if (dump.size() > 2) return std::nullopt;
+			if (!(iss >> dump))
+			{
+				throw std::runtime_error(
+					"Error parsing file: " + file + " no token found.");
+			}
+			if (dump.size() > 2)
+			{
+				throw std::runtime_error(
+					"Error parsing file: " + file + " token is too long.");
+			}
 			switch (dump[0]) {
 			case 'v':
 			{
@@ -177,9 +198,27 @@ namespace sgl {
 					{
 						assert(dump == "vn");
 						glm::vec3 v(0, 0, 0);
-						if (!(iss >> v.x)) return std::nullopt;
-						if (!(iss >> v.y)) return std::nullopt;
-						if (!(iss >> v.z)) return std::nullopt;
+						if (!(iss >> v.x))
+						{
+							throw std::runtime_error(
+								"Error parsing file : " + 
+								file + 
+								" no x found in vn.");
+						}
+						if (!(iss >> v.y))
+						{
+							throw std::runtime_error(
+								"Error parsing file : " +
+								file +
+								" no y found in vn.");
+						}
+						if (!(iss >> v.z))
+						{
+							throw std::runtime_error(
+								"Error parsing file : " +
+								file +
+								" no z found in vn.");
+						}
 						obj_file.normals.push_back(v);
 						break;
 					}
@@ -187,33 +226,81 @@ namespace sgl {
 					{
 						assert(dump == "vt");
 						glm::vec2 v(0, 0);
-						if (!(iss >> v.x)) return std::nullopt;
-						if (!(iss >> v.y)) return std::nullopt;
+						if (!(iss >> v.x))
+						{
+							throw std::runtime_error(
+								"Error parsing file : " +
+								file +
+								" no x found in vt.");
+						}
+						if (!(iss >> v.y))
+						{
+							throw std::runtime_error(
+								"Error parsing file : " +
+								file +
+								" no y found in vt.");
+						}
 						obj_file.textures.push_back(v);
 						break;
 					}
 					default:
-						return std::nullopt;
+					{
+						throw std::runtime_error(
+							"Error parsing file : " + 
+							file +
+							" unknown command : " +
+							dump);
+					}
 					}
 				}
 				else
 				{
-					if (dump != "v") return std::nullopt;
 					glm::vec3 v(0, 0, 0);
-					if (!(iss >> v.x)) return std::nullopt;
-					if (!(iss >> v.y)) return std::nullopt;
-					if (!(iss >> v.z)) return std::nullopt;
+					if (!(iss >> v.x))
+					{
+						throw std::runtime_error(
+							"Error parsing file : " +
+							file +
+							" no x found in v.");
+					}
+					if (!(iss >> v.y))
+					{
+						throw std::runtime_error(
+							"Error parsing file : " +
+							file +
+							" no y found in v.");
+					}
+					if (!(iss >> v.z))
+					{
+						throw std::runtime_error(
+							"Error parsing file : " +
+							file +
+							" no z found in v.");
+					}
 					obj_file.positions.push_back(v);
 				}
 			}
 			break;
 			case 'f':
 			{
-				if (dump != "f") return std::nullopt;
+				if (dump.size() > 1)
+				{
+					throw std::runtime_error(
+						"Error parsing file : " +
+						file +
+						" unknown command : " +
+						dump);
+				}
 				for (int i = 0; i < 3; ++i)
 				{
 					std::string inner;
-					if (!(iss >> inner)) return std::nullopt;
+					if (!(iss >> inner))
+					{
+						throw std::runtime_error(
+							"Error parsing file : " +
+							file +
+							" missing inner part of a description.");
+					}
 					std::array<int, 3> vi;
 					std::istringstream viss(inner);
 					for (int& i : vi)
@@ -237,7 +324,13 @@ namespace sgl {
 				break;
 			}
 		}
-		if (obj_file.indices.size() % 3 != 0) return std::nullopt;
+		if (obj_file.indices.size() % 3 != 0)
+		{
+			throw std::runtime_error(
+				"Error parsing file : " +
+				file +
+				" indices are not triangles!");
+		}
 		return obj_file;
 	}
 

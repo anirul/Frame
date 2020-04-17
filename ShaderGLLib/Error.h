@@ -8,7 +8,7 @@ namespace sgl {
 	class Error
 	{
 	public:
-		void DisplayError(
+		void Display(
 			const std::string& file = "", 
 			const int line = -1) const;
 		static std::shared_ptr<Error> GetInstance();

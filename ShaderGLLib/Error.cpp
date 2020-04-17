@@ -46,7 +46,7 @@ namespace sgl {
 		return "";
 	}
 
-	void Error::DisplayError(
+	void Error::Display(
 		const std::string& file /*= ""*/,
 		const int line /*= -1*/) const
 	{

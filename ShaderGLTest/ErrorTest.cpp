@@ -19,7 +19,7 @@ namespace test {
 		EXPECT_EQ(GLEW_OK, glewInit());
 		unsigned int texture;
 		glCreateTextures(GL_TEXTURE_2D, -1, &texture);
-		EXPECT_THROW(error_->DisplayError(), std::runtime_error);
+		EXPECT_THROW(error_->Display(), std::runtime_error);
 	}
 
 } // End namespace test.

@@ -48,6 +48,8 @@ add_library(ShaderGLLib
     ${PROJECT_SOURCE_DIR}/Asset/CubeMap.Vertex.glsl
     ${PROJECT_SOURCE_DIR}/Asset/EquirectangularCubeMap.Fragment.glsl
     ${PROJECT_SOURCE_DIR}/Asset/EquirectangularCubeMap.Vertex.glsl
+    ${PROJECT_SOURCE_DIR}/Asset/IrradianceCubeMap.Fragment.glsl
+    ${PROJECT_SOURCE_DIR}/Asset/IrradianceCubeMap.Vertex.glsl
     ${PROJECT_SOURCE_DIR}/Asset/PhysicallyBasedRendering.Fragment.glsl
     ${PROJECT_SOURCE_DIR}/Asset/PhysicallyBasedRendering.Vertex.glsl
     ${PROJECT_SOURCE_DIR}/Asset/Simple.Fragment.glsl

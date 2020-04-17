@@ -2,6 +2,7 @@
 
 #include <memory>
 #include "../ShaderGLLib/Window.h"
+#include "../ShaderGLLib/Texture.h"
 
 class Application
 {
@@ -12,10 +13,10 @@ public:
 
 protected:
 	std::shared_ptr<sgl::Mesh> CreateAppleMesh(
-		const std::shared_ptr<sgl::Device>& device);
-	std::shared_ptr<sgl::Mesh> GenerateCubeMapMesh(
-		const std::shared_ptr<sgl::Device>& device);
+		const std::shared_ptr<sgl::Device>& device,
+		const std::shared_ptr<sgl::TextureCubeMap>& irradiance);
 	std::shared_ptr<sgl::Mesh> CreateCubeMapMesh(
-		const std::shared_ptr<sgl::Device>& device);
+		const std::shared_ptr<sgl::Device>& device,
+		const std::shared_ptr<sgl::TextureCubeMap>& texture);
 	std::shared_ptr<sgl::Window> window_;
 };

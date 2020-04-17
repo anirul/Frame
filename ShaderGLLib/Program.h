@@ -90,6 +90,16 @@ namespace sgl {
 		const glm::mat4& view = glm::mat4(1.0f),
 		const glm::mat4& model = glm::mat4(1.0f));
 
+	// Create a irradiance cube map program.
+	// Vector needed in entry are:
+	//		- in_position
+	// Should also need in uniform texture:
+	//		- Skybox (for the color)
+	std::shared_ptr<sgl::Program> CreateIrradianceCubeMapProgram(
+		const glm::mat4& projection = glm::mat4(1.0f),
+		const glm::mat4& view = glm::mat4(1.0f),
+		const glm::mat4& model = glm::mat4(1.0f));
+
 	// Create a Physic Based Rendering program to be used with meshes.
 	// Vector needed in entry are:
 	//		- in_position
