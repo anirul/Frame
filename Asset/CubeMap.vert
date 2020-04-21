@@ -18,5 +18,5 @@ void main()
     mat4 pvm = projection * rotation_view * rotation_model;
     vec4 clip_pos = pvm * vec4(out_local_pos, 1.0);
 
-    gl_Position = clip_pos.xyww;
+    gl_Position = clip_pos.xyzw;
 }

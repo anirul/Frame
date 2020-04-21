@@ -101,7 +101,7 @@ void main()
 
 	// vec3 color = JapaneseFlag(uv);
 	// vec3 color = vec3(result.w / 8, result.w / 4, result.w);
-	vec3 color = vec3(light);
-	// vec3 color = vec3(light_shadow);
+	// vec3 color = vec3(light);
+	vec3 color = vec3(light_shadow);
 	frag_color = vec4(color, 1);
 }
