@@ -11,12 +11,6 @@ uniform mat4 model;
 void main()
 {
     out_local_pos = in_position;
-    // Remove translation.
-    mat4 rotation_view = mat4(mat3(view));
-    mat4 rotation_model = mat4(mat3(model));
-    // Compute the new PVM matrix.
-    mat4 pvm = projection * rotation_view * rotation_model;
-    vec4 clip_pos = pvm * vec4(out_local_pos, 1.0);
-
-    gl_Position = clip_pos.xyzw;
+    mat4 pvm = projection * view * model;
+    gl_Position = pvm * vec4(out_local_pos, 1.0);
 }

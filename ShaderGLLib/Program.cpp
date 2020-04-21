@@ -191,6 +191,26 @@ namespace sgl {
 		return program;
 	}
 
+	std::shared_ptr<sgl::Program> CreateCubeMapHighDynamicRangeProgram(
+		const glm::mat4& projection /*= glm::mat4(1.0f)*/, 
+		const glm::mat4& view /*= glm::mat4(1.0f)*/, 
+		const glm::mat4& model /*= glm::mat4(1.0f)*/)
+	{
+		auto program = std::make_shared<sgl::Program>();
+		Shader vertex(ShaderType::VERTEX_SHADER);
+		Shader fragment(ShaderType::FRAGMENT_SHADER);
+		vertex.LoadFromFile("../Asset/CubeMapHighDynamicRange.vert");
+		fragment.LoadFromFile("../Asset/CubeMapHighDynamicRange.frag");
+		program->AddShader(vertex);
+		program->AddShader(fragment);
+		program->LinkShader();
+		program->Use();
+		program->UniformMatrix("projection", projection);
+		program->UniformMatrix("view", view);
+		program->UniformMatrix("model", model);
+		return program;
+	}
+
 	std::shared_ptr<sgl::Program> CreateEquirectangulareCubeMapProgram(
 		const glm::mat4& projection /*= glm::mat4(1.0f)*/, 
 		const glm::mat4& view /*= glm::mat4(1.0f)*/, 

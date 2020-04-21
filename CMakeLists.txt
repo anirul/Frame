@@ -17,6 +17,8 @@ add_library(ShaderGLLib
   STATIC
     ${PROJECT_SOURCE_DIR}/Asset/CubeMap.frag
     ${PROJECT_SOURCE_DIR}/Asset/CubeMap.vert
+    ${PROJECT_SOURCE_DIR}/Asset/CubeMapHighDynamicRange.frag
+    ${PROJECT_SOURCE_DIR}/Asset/CubeMapHighDynamicRange.vert
     ${PROJECT_SOURCE_DIR}/Asset/EquirectangularCubeMap.frag
     ${PROJECT_SOURCE_DIR}/Asset/EquirectangularCubeMap.vert
     ${PROJECT_SOURCE_DIR}/Asset/IrradianceCubeMap.frag

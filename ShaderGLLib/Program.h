@@ -98,6 +98,16 @@ namespace sgl {
 		const glm::mat4& view = glm::mat4(1.0f),
 		const glm::mat4& model = glm::mat4(1.0f));
 
+	// Create a cube map in HDR program to render the environment map.
+	// Vector needed in entry are:
+	//		- in_position
+	// Should also need in uniform texture:
+	//		- Skybox (for the color)
+	std::shared_ptr<sgl::Program> CreateCubeMapHighDynamicRangeProgram(
+		const glm::mat4& projection = glm::mat4(1.0f),
+		const glm::mat4& view = glm::mat4(1.0f),
+		const glm::mat4& model = glm::mat4(1.0f));
+
 	// Create a equirectangular cube map program.
 	// Vector needed in entry are:
 	//		- in_position
