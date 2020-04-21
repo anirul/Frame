@@ -70,6 +70,15 @@ namespace sgl {
 		const glm::mat4& view = glm::mat4(1.0f),
 		const glm::mat4& model = glm::mat4(1.0f));
 
+	// Create a ray marshing program (mainly for testing purpose).
+	// Vector needed in entry are:
+	//		- in_position
+	//		- in_texcoord
+	std::shared_ptr<sgl::Program> CreateRayMarchingProgram(
+		const glm::mat4& projection = glm::mat4(1.0f),
+		const glm::mat4& view = glm::mat4(1.0f),
+		const glm::mat4& model = glm::mat4(1.0f));
+
 	// Create a cube map program to render the environment map.
 	// Vector needed in entry are:
 	//		- in_position

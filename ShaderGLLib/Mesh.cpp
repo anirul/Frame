@@ -10,10 +10,10 @@ namespace sgl {
 	{
 		SetProgram(program);
 		auto obj_file = LoadFromObj(file);
-		std::vector<float> flat_positions_ = {};
-		std::vector<float> flat_normals_ = {};
-		std::vector<float> flat_textures_ = {};
-		std::vector<unsigned int> flat_indices_ = {};
+		std::vector<float> points = {};
+		std::vector<float> normals = {};
+		std::vector<float> texcoords = {};
+		std::vector<std::int32_t> indices = {};
 		std::vector<std::array<float, 8>> vertices;
 		for (size_t i = 0; i < obj_file.indices.size(); ++i)
 		{
@@ -27,42 +27,83 @@ namespace sgl {
 			v[6] = obj_file.textures[obj_file.indices[i][1]].x;
 			v[7] = obj_file.textures[obj_file.indices[i][1]].y;
 			vertices.emplace_back(v);
-			flat_indices_.push_back(static_cast<unsigned int>(i));
+			indices.push_back(static_cast<unsigned int>(i));
 		}
 		for (const std::array<float, 8>& v : vertices)
 		{
-			flat_positions_.push_back(v[0]);
-			flat_positions_.push_back(v[1]);
-			flat_positions_.push_back(v[2]);
-			flat_normals_.push_back(v[3]);
-			flat_normals_.push_back(v[4]);
-			flat_normals_.push_back(v[5]);
-			flat_textures_.push_back(v[6]);
-			flat_textures_.push_back(v[7]);
+			points.push_back(v[0]);
+			points.push_back(v[1]);
+			points.push_back(v[2]);
+			normals.push_back(v[3]);
+			normals.push_back(v[4]);
+			normals.push_back(v[5]);
+			texcoords.push_back(v[6]);
+			texcoords.push_back(v[7]);
 		}
+		CreateMeshFromFlat(points, normals, texcoords, indices);
+	}
 
+	
+	Mesh::Mesh(
+		const std::vector<float>& points,
+		const std::vector<float>& normals,
+		const std::vector<float>& texcoords,
+		const std::vector<std::int32_t>& indices,
+		const std::shared_ptr<Program>& program)
+	{
+		SetProgram(program);
+		CreateMeshFromFlat(points, normals, texcoords, indices);
+	}
+
+	Mesh::~Mesh()
+	{
+		glDeleteVertexArrays(1, &vertex_array_object_);
+	}
+
+	void Mesh::SetTextures(std::initializer_list<std::string> values)
+	{
+		textures_.clear();
+		textures_.assign(values.begin(), values.end());
+	}
+
+	void Mesh::SetProgram(const std::shared_ptr<Program>& program)
+	{
+		if (!program)
+		{
+			throw std::runtime_error("no program set.");
+		}
+		program_ = program;
+	}
+
+
+	void Mesh::CreateMeshFromFlat(
+		const std::vector<float>& points,
+		const std::vector<float>& normals,
+		const std::vector<float>& texcoords,
+		const std::vector<std::int32_t>& indices)
+	{
 		// Position buffer initialization.
 		point_buffer_.BindCopy(
-			flat_positions_.size() * sizeof(float),
-			flat_positions_.data());
+			points.size() * sizeof(float),
+			points.data());
 
 		// Normal buffer initialization.
 		normal_buffer_.BindCopy(
-			flat_normals_.size() * sizeof(float),
-			flat_normals_.data());
-		
+			normals.size() * sizeof(float),
+			normals.data());
+
 		// Texture coordinates buffer initialization.
 		texture_buffer_.BindCopy(
-			flat_textures_.size() * sizeof(float),
-			flat_textures_.data());
+			texcoords.size() * sizeof(float),
+			texcoords.data());
 
 		// Index buffer array.
 		index_buffer_.BindCopy(
-			flat_indices_.size() * sizeof(unsigned int),
-			flat_indices_.data());
+			indices.size() * sizeof(std::int32_t),
+			indices.data());
 
 		// Get the size of the indices.
-		index_size_ = static_cast<GLsizei>(flat_indices_.size());
+		index_size_ = static_cast<GLsizei>(indices.size());
 
 		// Create a new vertex array (to render the mesh).
 		glGenVertexArrays(1, &vertex_array_object_);
@@ -92,27 +133,6 @@ namespace sgl {
 		glBindVertexArray(0);
 		error_->Display(__FILE__, __LINE__ - 1);
 	}
-
-	Mesh::~Mesh()
-	{
-		glDeleteVertexArrays(1, &vertex_array_object_);
-	}
-
-	void Mesh::SetTextures(std::initializer_list<std::string> values)
-	{
-		textures_.clear();
-		textures_.assign(values.begin(), values.end());
-	}
-
-	void Mesh::SetProgram(const std::shared_ptr<Program>& program)
-	{
-		if (!program)
-		{
-			throw std::runtime_error("no program set.");
-		}
-		program_ = program;
-	}
-
 
 	void Mesh::Draw(
 		const sgl::TextureManager& texture_manager,

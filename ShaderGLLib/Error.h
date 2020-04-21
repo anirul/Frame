@@ -11,6 +11,10 @@ namespace sgl {
 		void Display(
 			const std::string& file = "", 
 			const int line = -1) const;
+		void DisplayShader(
+			unsigned int shader,
+			const std::string& file = "",
+			const int line = -1) const;
 		static std::shared_ptr<Error> GetInstance();
 
 	public:

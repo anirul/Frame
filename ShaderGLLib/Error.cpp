@@ -67,6 +67,33 @@ namespace sgl {
 		throw std::runtime_error(error);
 	}
 
+	void Error::DisplayShader(
+		unsigned int shader, 
+		const std::string& file /*= ""*/, 
+		const int line /*= -1*/) const
+	{
+		const int max_length = 256;
+		char info_log[max_length] = "";
+		int length = 0;
+		glGetShaderInfoLog(shader, max_length, &length, info_log);
+		std::string error = GetLastError();
+		if (error.empty()) return;
+		if (line != -1) error = std::to_string(line) + ":" + error;
+		if (!file.empty()) error = file + ":" + error;
+		if (length)	error = error + "\n" + info_log;
+		if (window_ptr_)
+		{
+#if defined(_WIN32) || defined(_WIN64)
+			MessageBox(
+				(HWND)window_ptr_,
+				error.c_str(),
+				"sgl::Error",
+				MB_ICONEXCLAMATION);
+#endif
+		}
+		throw std::runtime_error(error);
+	}
+
 	std::shared_ptr<sgl::Error> Error::GetInstance()
 	{
 		if (!instance_)

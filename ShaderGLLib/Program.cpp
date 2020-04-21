@@ -18,7 +18,7 @@ namespace sgl {
 	void Program::AddShader(const Shader& shader)
 	{
 		glAttachShader(program_id_, shader.GetId());
-		error_->Display(__FILE__, __LINE__ - 1);
+		error_->DisplayShader(shader.GetId(), __FILE__, __LINE__ - 1);
 		attached_shaders_.push_back(shader.GetId());
 	}
 
@@ -119,8 +119,28 @@ namespace sgl {
 		auto program = std::make_shared<sgl::Program>();
 		sgl::Shader vertex(sgl::ShaderType::VERTEX_SHADER);
 		sgl::Shader fragment(sgl::ShaderType::FRAGMENT_SHADER);
-		vertex.LoadFromFile("../Asset/Simple.Vertex.glsl");
-		fragment.LoadFromFile("../Asset/Simple.Fragment.glsl");
+		vertex.LoadFromFile("../Asset/Simple.vert");
+		fragment.LoadFromFile("../Asset/Simple.frag");
+		program->AddShader(vertex);
+		program->AddShader(fragment);
+		program->LinkShader();
+		program->Use();
+		program->UniformMatrix("projection", projection);
+		program->UniformMatrix("view", view);
+		program->UniformMatrix("model", model);
+		return program;
+	}
+
+	std::shared_ptr<sgl::Program> CreateRayMarchingProgram(
+		const glm::mat4& projection /*= glm::mat4(1.0f)*/, 
+		const glm::mat4& view /*= glm::mat4(1.0f)*/, 
+		const glm::mat4& model /*= glm::mat4(1.0f)*/)
+	{
+		auto program = std::make_shared<sgl::Program>();
+		sgl::Shader vertex(sgl::ShaderType::VERTEX_SHADER);
+		sgl::Shader fragment(sgl::ShaderType::FRAGMENT_SHADER);
+		vertex.LoadFromFile("../Asset/RayMarching.vert");
+		fragment.LoadFromFile("../Asset/RayMarching.frag");
 		program->AddShader(vertex);
 		program->AddShader(fragment);
 		program->LinkShader();
@@ -139,8 +159,8 @@ namespace sgl {
 		auto program = std::make_shared<sgl::Program>();
 		sgl::Shader vertex(sgl::ShaderType::VERTEX_SHADER);
 		sgl::Shader fragment(sgl::ShaderType::FRAGMENT_SHADER);
-		vertex.LoadFromFile("../Asset/CubeMap.Vertex.glsl");
-		fragment.LoadFromFile("../Asset/CubeMap.Fragment.glsl");
+		vertex.LoadFromFile("../Asset/CubeMap.vert");
+		fragment.LoadFromFile("../Asset/CubeMap.frag");
 		program->AddShader(vertex);
 		program->AddShader(fragment);
 		program->LinkShader();
@@ -159,8 +179,8 @@ namespace sgl {
 		auto program = std::make_shared<sgl::Program>();
 		Shader vertex(ShaderType::VERTEX_SHADER);
 		Shader fragment(ShaderType::FRAGMENT_SHADER);
-		vertex.LoadFromFile("../Asset/EquirectangularCubeMap.Vertex.glsl");
-		fragment.LoadFromFile("../Asset/EquirectangularCubeMap.Fragment.glsl");
+		vertex.LoadFromFile("../Asset/EquirectangularCubeMap.vert");
+		fragment.LoadFromFile("../Asset/EquirectangularCubeMap.frag");
 		program->AddShader(vertex);
 		program->AddShader(fragment);
 		program->LinkShader();
@@ -179,9 +199,8 @@ namespace sgl {
 		auto program = std::make_shared<sgl::Program>();
 		sgl::Shader vertex(sgl::ShaderType::VERTEX_SHADER);
 		sgl::Shader fragment(sgl::ShaderType::FRAGMENT_SHADER);
-		vertex.LoadFromFile("../Asset/PhysicallyBasedRendering.Vertex.glsl");
-		fragment.LoadFromFile(
-			"../Asset/PhysicallyBasedRendering.Fragment.glsl");
+		vertex.LoadFromFile("../Asset/PhysicallyBasedRendering.vert");
+		fragment.LoadFromFile("../Asset/PhysicallyBasedRendering.frag");
 		program->AddShader(vertex);
 		program->AddShader(fragment);
 		program->LinkShader();
@@ -200,8 +219,8 @@ namespace sgl {
 		auto program = std::make_shared<sgl::Program>();
 		sgl::Shader vertex(sgl::ShaderType::VERTEX_SHADER);
 		sgl::Shader fragment(sgl::ShaderType::FRAGMENT_SHADER);
-		vertex.LoadFromFile("../Asset/IrradianceCubeMap.Vertex.glsl");
-		fragment.LoadFromFile("../Asset/IrradianceCubeMap.Fragment.glsl");
+		vertex.LoadFromFile("../Asset/IrradianceCubeMap.vert");
+		fragment.LoadFromFile("../Asset/IrradianceCubeMap.frag");
 		program->AddShader(vertex);
 		program->AddShader(fragment);
 		program->LinkShader();

@@ -17,6 +17,12 @@ namespace sgl {
 	{
 	public:
 		Mesh(const std::string& file, const std::shared_ptr<Program>& program);
+		Mesh(
+			const std::vector<float>& points,
+			const std::vector<float>& normals,
+			const std::vector<float>& texcoords,
+			const std::vector<std::int32_t>& indices,
+			const std::shared_ptr<Program>& program);
 		virtual ~Mesh();
 
 	public:
@@ -34,7 +40,7 @@ namespace sgl {
 		}
 		const Buffer& Mesh::IndexBuffer() const { return index_buffer_; }
 		const size_t IndexSize() const { return index_size_; }
-		std::shared_ptr<Program> GetProgram() { return program_; }
+		const std::shared_ptr<Program> GetProgram() { return program_; }
 		void ClearDepthBuffer(bool clear) { clear_depth_buffer_ = clear; }
 		
 	protected:
@@ -47,6 +53,11 @@ namespace sgl {
 		// Load from OBJ throw an exception in case of error.
 		ObjFile LoadFromObj(const std::string& file);
 		void SetProgram(const std::shared_ptr<Program>& program);
+		void CreateMeshFromFlat(
+			const std::vector<float>& points,
+			const std::vector<float>& normals,
+			const std::vector<float>& texcoords,
+			const std::vector<std::int32_t>& indices);
 
 	protected:
 		bool clear_depth_buffer_ = false;

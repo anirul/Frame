@@ -14,6 +14,18 @@ find_package(Gtest CONFIG REQUIRED)
 
 add_library(ShaderGLLib
   STATIC
+    ${PROJECT_SOURCE_DIR}/Asset/CubeMap.frag
+    ${PROJECT_SOURCE_DIR}/Asset/CubeMap.vert
+    ${PROJECT_SOURCE_DIR}/Asset/EquirectangularCubeMap.frag
+    ${PROJECT_SOURCE_DIR}/Asset/EquirectangularCubeMap.vert
+    ${PROJECT_SOURCE_DIR}/Asset/IrradianceCubeMap.frag
+    ${PROJECT_SOURCE_DIR}/Asset/IrradianceCubeMap.vert
+    ${PROJECT_SOURCE_DIR}/Asset/PhysicallyBasedRendering.frag
+    ${PROJECT_SOURCE_DIR}/Asset/PhysicallyBasedRendering.vert
+    ${PROJECT_SOURCE_DIR}/Asset/RayMarching.frag
+    ${PROJECT_SOURCE_DIR}/Asset/RayMarching.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Simple.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Simple.vert
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Buffer.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Buffer.h
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Camera.cpp
@@ -44,16 +56,6 @@ add_library(ShaderGLLib
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Texture.h
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Window.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Window.h
-    ${PROJECT_SOURCE_DIR}/Asset/CubeMap.Fragment.glsl
-    ${PROJECT_SOURCE_DIR}/Asset/CubeMap.Vertex.glsl
-    ${PROJECT_SOURCE_DIR}/Asset/EquirectangularCubeMap.Fragment.glsl
-    ${PROJECT_SOURCE_DIR}/Asset/EquirectangularCubeMap.Vertex.glsl
-    ${PROJECT_SOURCE_DIR}/Asset/IrradianceCubeMap.Fragment.glsl
-    ${PROJECT_SOURCE_DIR}/Asset/IrradianceCubeMap.Vertex.glsl
-    ${PROJECT_SOURCE_DIR}/Asset/PhysicallyBasedRendering.Fragment.glsl
-    ${PROJECT_SOURCE_DIR}/Asset/PhysicallyBasedRendering.Vertex.glsl
-    ${PROJECT_SOURCE_DIR}/Asset/Simple.Fragment.glsl
-    ${PROJECT_SOURCE_DIR}/Asset/Simple.Vertex.glsl
 )
 
 target_link_libraries(ShaderGLLib 
@@ -108,6 +110,22 @@ target_link_libraries(ShaderGLTest
     glm
 )
 
+add_executable(RayMarching
+  WIN32
+    ${PROJECT_SOURCE_DIR}/RayMarching/Application.cpp
+    ${PROJECT_SOURCE_DIR}/RayMarching/Application.h
+    ${PROJECT_SOURCE_DIR}/RayMarching/main.cpp
+)
+
+target_link_libraries(RayMarching
+  PUBLIC
+    ShaderGLLib
+  PRIVATE
+    SDL2::SDL2
+    GLEW::GLEW
+    glm
+)
+
 add_executable(SimpleSample
   WIN32
     ${PROJECT_SOURCE_DIR}/SimpleSample/Application.cpp
@@ -116,6 +134,22 @@ add_executable(SimpleSample
 )
 
 target_link_libraries(SimpleSample
+  PUBLIC
+    ShaderGLLib
+  PRIVATE
+    SDL2::SDL2
+    GLEW::GLEW
+    glm
+)
+
+add_executable(PhysicallyBasedRendering
+  WIN32
+    ${PROJECT_SOURCE_DIR}/PhysicallyBasedRendering/Application.cpp
+    ${PROJECT_SOURCE_DIR}/PhysicallyBasedRendering/Application.h
+    ${PROJECT_SOURCE_DIR}/PhysicallyBasedRendering/main.cpp
+)
+
+target_link_libraries(PhysicallyBasedRendering
   PUBLIC
     ShaderGLLib
   PRIVATE
