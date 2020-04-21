@@ -12,11 +12,6 @@ public:
 	void Run();
 
 protected:
-	std::shared_ptr<sgl::Mesh> CreateAppleMesh(
-		const std::shared_ptr<sgl::Device>& device,
-		const std::shared_ptr<sgl::TextureCubeMap>& irradiance) const;
-	std::shared_ptr<sgl::Mesh> CreateCubeMapMesh(
-		const std::shared_ptr<sgl::Device>& device,
-		const std::shared_ptr<sgl::TextureCubeMap>& texture) const;
+	std::shared_ptr<sgl::Mesh> CreateBillboardMesh() const;
 	std::shared_ptr<sgl::Window> window_;
 };

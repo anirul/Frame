@@ -64,17 +64,26 @@ namespace sgl {
 	//		- in_normal
 	//		- in_texcoord
 	// Should also need in uniform texture:
-	//		- texture1 (for the albedo).
+	//		- Color (for the albedo).
 	std::shared_ptr<sgl::Program> CreateSimpleProgram(
 		const glm::mat4& projection = glm::mat4(1.0f), 
 		const glm::mat4& view = glm::mat4(1.0f),
 		const glm::mat4& model = glm::mat4(1.0f));
 
-	// Create a ray marshing program (mainly for testing purpose).
+	// Create a ray marching program (mainly for testing purpose).
 	// Vector needed in entry are:
 	//		- in_position
 	//		- in_texcoord
 	std::shared_ptr<sgl::Program> CreateRayMarchingProgram(
+		const glm::mat4& projection = glm::mat4(1.0f),
+		const glm::mat4& view = glm::mat4(1.0f),
+		const glm::mat4& model = glm::mat4(1.0f));
+
+	// Create a Japanese Flag program (mainly for testing purpose).
+	// Vector needed in entry are:
+	//		- in_position
+	//		- in_texcoord
+	std::shared_ptr<sgl::Program> CreateJapaneseFlagProgram(
 		const glm::mat4& projection = glm::mat4(1.0f),
 		const glm::mat4& view = glm::mat4(1.0f),
 		const glm::mat4& model = glm::mat4(1.0f));

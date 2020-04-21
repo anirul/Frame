@@ -15,6 +15,7 @@ void main()
 {
 	out_normal = vec3(model * vec4(in_normal, 1.0));
 	out_texcoord = in_texcoord;
+	out_texcoord.y = 1.0 - out_texcoord.y;
 	mat4 mvp = projection * view * model;
 
 	gl_Position = mvp * vec4(in_position, 1.0);

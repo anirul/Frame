@@ -31,6 +31,9 @@ int main(int ac, char** av)
 	}
 	catch (std::exception ex)
 	{
+#if defined(_WIN32) || defined(_WIN64)
+		MessageBox(nullptr, ex.what(), "Error", MB_ICONEXCLAMATION);
+#endif
 		std::cerr << "Error: " << ex.what() << std::endl;
 		return -2;
 	}
