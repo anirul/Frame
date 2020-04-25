@@ -1,7 +1,7 @@
 #include "Error.h"
 
 #include <stdexcept>
-#include <gl/glew.h>
+#include <GL/glew.h>
 #if defined(_WIN32) || defined(_WIN64)
 #define WINDOWS_LEAN_AND_MEAN
 #include <windows.h>

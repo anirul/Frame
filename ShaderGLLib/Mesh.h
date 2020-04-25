@@ -32,13 +32,13 @@ namespace sgl {
 			const glm::mat4& model = glm::mat4(1.0f)) const;
 
 	public:
-		const Buffer& Mesh::PointBuffer() const { return point_buffer_; }
-		const Buffer& Mesh::NormalBuffer() const {	return normal_buffer_; }
-		const Buffer& Mesh::TextureBuffer() const 
+		const Buffer& PointBuffer() const { return point_buffer_; }
+		const Buffer& NormalBuffer() const {	return normal_buffer_; }
+		const Buffer& TextureBuffer() const 
 		{ 
 			return texture_buffer_;
 		}
-		const Buffer& Mesh::IndexBuffer() const { return index_buffer_; }
+		const Buffer& IndexBuffer() const { return index_buffer_; }
 		const size_t IndexSize() const { return index_size_; }
 		const std::shared_ptr<Program> GetProgram() { return program_; }
 		void ClearDepthBuffer(bool clear) { clear_depth_buffer_ = clear; }

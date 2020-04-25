@@ -1,6 +1,6 @@
 #include "Frame.h"
 #include <stdexcept>
-#include <gl/glew.h>
+#include <GL/glew.h>
 
 namespace sgl {
 

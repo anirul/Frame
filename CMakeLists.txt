@@ -10,8 +10,7 @@ project(ShaderGL)
 find_package(SDL2 CONFIG REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(glm CONFIG REQUIRED)
-find_package(Gtest CONFIG REQUIRED)
-find_package(nlohmann_json CONFIG REQUIRED)
+find_package(GTest CONFIG REQUIRED)
 
 add_library(ShaderGLLib
   STATIC
@@ -55,8 +54,6 @@ add_library(ShaderGLLib
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Render.h
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Scene.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Scene.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Setting.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Setting.h
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Shader.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Shader.h
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Texture.cpp
@@ -70,8 +67,6 @@ target_link_libraries(ShaderGLLib
     SDL2::SDL2
     GLEW::GLEW
     glm
-    nlohmann_json 
-    nlohmann_json::nlohmann_json
 )
 
 add_executable(ShaderGLTest
@@ -100,8 +95,6 @@ add_executable(ShaderGLTest
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/RenderTest.h
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/SceneTest.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/SceneTest.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLTest/SettingTest.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLTest/SettingTest.h
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/ShaderTest.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/ShaderTest.h
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/TextureTest.cpp
@@ -124,8 +117,6 @@ target_link_libraries(ShaderGLTest
     SDL2::SDL2
     GLEW::GLEW
     glm
-    nlohmann_json 
-    nlohmann_json::nlohmann_json
 )
 
 add_executable(JapaneseFlag
@@ -147,8 +138,6 @@ target_link_libraries(JapaneseFlag
     SDL2::SDL2
     GLEW::GLEW
     glm
-    nlohmann_json 
-    nlohmann_json::nlohmann_json
 )
 
 add_executable(RayMarching
@@ -170,8 +159,6 @@ target_link_libraries(RayMarching
     SDL2::SDL2
     GLEW::GLEW
     glm
-    nlohmann_json 
-    nlohmann_json::nlohmann_json
 )
 
 add_executable(Simple
@@ -193,8 +180,6 @@ target_link_libraries(Simple
     SDL2::SDL2
     GLEW::GLEW
     glm
-    nlohmann_json 
-    nlohmann_json::nlohmann_json
 )
 
 add_executable(PhysicallyBasedRendering
@@ -216,6 +201,4 @@ target_link_libraries(PhysicallyBasedRendering
     SDL2::SDL2
     GLEW::GLEW
     glm
-    nlohmann_json 
-    nlohmann_json::nlohmann_json
 )

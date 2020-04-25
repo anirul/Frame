@@ -1,4 +1,5 @@
 #include "Texture.h"
+#include <algorithm>
 #include <GL/glew.h>
 #include "Image.h"
 #include "Frame.h"

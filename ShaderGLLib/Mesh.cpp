@@ -2,7 +2,7 @@
 #include <iterator>
 #include <fstream>
 #include <sstream>
-#include <gl/glew.h>
+#include <GL/glew.h>
 
 namespace sgl {
 
