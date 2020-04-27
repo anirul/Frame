@@ -93,7 +93,7 @@ namespace test {
 	{
 		EXPECT_EQ(GLEW_OK, glewInit());
 		auto cube_map = std::make_shared<sgl::TextureCubeMap>(
-			"../Asset/CubeMap/Hamarikya.hdr");
+			"../Asset/CubeMap/Hamarikyu.hdr");
 		EXPECT_TRUE(cube_map);
 		EXPECT_NE(0, cube_map->GetId());
 		EXPECT_NO_THROW(error_->Display());

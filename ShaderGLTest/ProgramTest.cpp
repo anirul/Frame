@@ -20,11 +20,11 @@ namespace test {
 		program_ = std::make_shared<sgl::Program>();
 		EXPECT_TRUE(program_);
 		sgl::Shader vertex_shader(sgl::ShaderType::VERTEX_SHADER);
-		EXPECT_TRUE(vertex_shader.LoadFromFile("../Asset/Simple.Vertex.glsl"));
+		EXPECT_TRUE(vertex_shader.LoadFromFile("../Asset/Simple.vert"));
 		program_->AddShader(vertex_shader);
 		sgl::Shader fragment_shader(sgl::ShaderType::FRAGMENT_SHADER);
 		EXPECT_TRUE(
-			fragment_shader.LoadFromFile("../Asset/Simple.Fragment.glsl"));
+			fragment_shader.LoadFromFile("../Asset/Simple.frag"));
 		program_->AddShader(fragment_shader);
 	}
 
@@ -38,12 +38,12 @@ namespace test {
 		sgl::Shader vertex_shader(sgl::ShaderType::VERTEX_SHADER);
 		EXPECT_TRUE(
 			vertex_shader.LoadFromFile(
-				"../Asset/PhysicallyBasedRendering.Vertex.glsl"));
+				"../Asset/PhysicallyBasedRendering.vert"));
 		program_->AddShader(vertex_shader);
 		sgl::Shader fragment_shader(sgl::ShaderType::FRAGMENT_SHADER);
 		EXPECT_TRUE(
 			fragment_shader.LoadFromFile(
-				"../Asset/PhysicallyBasedRendering.Fragment.glsl"));
+				"../Asset/PhysicallyBasedRendering.frag"));
 		program_->AddShader(fragment_shader);
 		program_->LinkShader();
 		program_->Use();
@@ -65,7 +65,7 @@ namespace test {
 		EXPECT_EQ(GLEW_OK, glewInit());
 		sgl::Error::SetWindowPtr(nullptr);
 		EXPECT_FALSE(program_);
-		program_ = sgl::CreateProgram("EquirectangulareCubeMap");
+		program_ = sgl::CreateProgram("EquirectangularCubeMap");
 		EXPECT_TRUE(program_);
 	}
 
