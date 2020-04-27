@@ -67,16 +67,15 @@ std::shared_ptr<sgl::Mesh> Application::CreateAppleMesh(
 	const std::shared_ptr<sgl::Device>& device) const
 {
 	// Create the physically based rendering program.
-	auto pbr_program = sgl::CreateProgram(
-		"Simple",
-		device->GetProjection(),
-		device->GetView(),
-		device->GetModel());
+	auto simple_program = sgl::CreateProgram("Simple");
+	simple_program->UniformMatrix("projection", device->GetProjection());
+	simple_program->UniformMatrix("view", device->GetView());
+	simple_program->UniformMatrix("model", device->GetModel());
 
 	// Mesh creation.
 	auto apple_mesh = std::make_shared<sgl::Mesh>(
 		"../Asset/Apple.obj", 
-		pbr_program);
+		simple_program);
 
 	// Create the texture and bind it to the mesh.
 	auto texture_manager = device->GetTextureManager();
@@ -94,9 +93,8 @@ std::shared_ptr<sgl::Mesh> Application::CreateCubeMapMesh(
 	const std::shared_ptr<sgl::TextureCubeMap>& texture) const
 {
 	// Create the cube map program.
-	auto cubemap_program = sgl::CreateProgram(
-		"CubeMap",
-		device->GetProjection());
+	auto cubemap_program = sgl::CreateProgram("CubeMap");
+	cubemap_program->UniformMatrix("projection", device->GetProjection());
 
 	// Create the mesh for the cube.
 	auto cube_mesh = std::make_shared<sgl::Mesh>(

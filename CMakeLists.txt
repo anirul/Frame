@@ -14,22 +14,6 @@ find_package(GTest CONFIG REQUIRED)
 
 add_library(ShaderGLLib
   STATIC
-    ${PROJECT_SOURCE_DIR}/Asset/CubeMap.frag
-    ${PROJECT_SOURCE_DIR}/Asset/CubeMap.vert
-    ${PROJECT_SOURCE_DIR}/Asset/CubeMapHighDynamicRange.frag
-    ${PROJECT_SOURCE_DIR}/Asset/CubeMapHighDynamicRange.vert
-    ${PROJECT_SOURCE_DIR}/Asset/EquirectangularCubeMap.frag
-    ${PROJECT_SOURCE_DIR}/Asset/EquirectangularCubeMap.vert
-    ${PROJECT_SOURCE_DIR}/Asset/IrradianceCubeMap.frag
-    ${PROJECT_SOURCE_DIR}/Asset/IrradianceCubeMap.vert
-    ${PROJECT_SOURCE_DIR}/Asset/JapaneseFlag.frag
-    ${PROJECT_SOURCE_DIR}/Asset/JapaneseFlag.vert
-    ${PROJECT_SOURCE_DIR}/Asset/PhysicallyBasedRendering.frag
-    ${PROJECT_SOURCE_DIR}/Asset/PhysicallyBasedRendering.vert
-    ${PROJECT_SOURCE_DIR}/Asset/RayMarching.frag
-    ${PROJECT_SOURCE_DIR}/Asset/RayMarching.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Simple.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Simple.vert
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Buffer.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Buffer.h
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Camera.cpp
@@ -198,8 +182,6 @@ add_executable(PhysicallyBasedRendering
     ${PROJECT_SOURCE_DIR}/Asset/EquirectangularCubeMap.vert
     ${PROJECT_SOURCE_DIR}/Asset/IrradianceCubeMap.frag
     ${PROJECT_SOURCE_DIR}/Asset/IrradianceCubeMap.vert
-    ${PROJECT_SOURCE_DIR}/Asset/JapaneseFlag.frag
-    ${PROJECT_SOURCE_DIR}/Asset/JapaneseFlag.vert
     ${PROJECT_SOURCE_DIR}/Asset/PhysicallyBasedRendering.frag
     ${PROJECT_SOURCE_DIR}/Asset/PhysicallyBasedRendering.vert
     ${PROJECT_SOURCE_DIR}/Sample/PhysicallyBasedRendering/Application.cpp

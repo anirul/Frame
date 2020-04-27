@@ -62,10 +62,7 @@ namespace sgl {
 	// Will load a program at location: 
 	// - "../Asset/<name>.vert"
 	// - "../Asset/<name>.frag"
-	std::shared_ptr<sgl::Program> CreateProgram(
-		const std::string& name,
-		const glm::mat4& projection = glm::mat4(1.0f),
-		const glm::mat4& view = glm::mat4(1.0f),
-		const glm::mat4& model = glm::mat4(1.0f));
+	// Also set the projection view and model to identity.
+	std::shared_ptr<sgl::Program> CreateProgram(const std::string& name);
 
 } // End namespace sgl.

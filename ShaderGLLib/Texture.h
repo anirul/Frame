@@ -10,6 +10,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "../ShaderGLLib/Pixel.h"
 #include "../ShaderGLLib/Error.h"
+#include "../ShaderGLLib/Program.h"
 
 namespace sgl {
 
@@ -96,11 +97,12 @@ namespace sgl {
 		void CreateTextureCubeMap();
 	};
 	
-	// Create an irradiance cube map from a texture.
+	// Create a cube map from a cube map texture and a program.
 	//		- from_texture			: input texture.
 	//		- size					: output size (*6).
-	std::shared_ptr<TextureCubeMap> CreateIrradianceCubeMap(
+	std::shared_ptr<TextureCubeMap> CreateProgramTextureCubeMap(
 		const std::shared_ptr<TextureCubeMap>& from_texture,
+		const std::shared_ptr<Program>& program,
 		const std::pair<std::uint32_t, std::uint32_t> size,
 		const PixelElementSize pixel_element_size = PixelElementSize::BYTE,
 		const PixelStructure pixel_structure = PixelStructure::RGB);

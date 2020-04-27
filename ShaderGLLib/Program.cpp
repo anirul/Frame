@@ -111,11 +111,7 @@ namespace sgl {
 		return memoize_map_[name];
 	}
 
-	std::shared_ptr<sgl::Program> CreateProgram(
-		const std::string& name,
-		const glm::mat4& projection /*= glm::mat4(1.0f)*/,
-		const glm::mat4& view /*= glm::mat4(1.0f)*/,
-		const glm::mat4& model /*= glm::mat4(1.0f)*/)
+	std::shared_ptr<sgl::Program> CreateProgram(const std::string& name)
 	{
 		auto program = std::make_shared<sgl::Program>();
 		sgl::Shader vertex(sgl::ShaderType::VERTEX_SHADER);
@@ -126,9 +122,9 @@ namespace sgl {
 		program->AddShader(fragment);
 		program->LinkShader();
 		program->Use();
-		program->UniformMatrix("projection", projection);
-		program->UniformMatrix("view", view);
-		program->UniformMatrix("model", model);
+		program->UniformMatrix("projection", glm::mat4(1.0));
+		program->UniformMatrix("view", glm::mat4(1.0));
+		program->UniformMatrix("model", glm::mat4(1.0));
 		return program;
 	}
 

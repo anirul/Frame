@@ -12,8 +12,9 @@ bool Application::Startup()
 		"../Asset/CubeMap/Shiodome.hdr",
 		sgl::PixelElementSize::FLOAT,
 		sgl::PixelStructure::RGB);
-	auto irradiance = sgl::CreateIrradianceCubeMap(
+	auto irradiance = sgl::CreateProgramTextureCubeMap(
 		texture, 
+		sgl::CreateProgram("IrradianceCubeMap"),
 		{ 32, 32 }, 
 		sgl::PixelElementSize::FLOAT,
 		sgl::PixelStructure::RGB);
@@ -70,11 +71,10 @@ std::shared_ptr<sgl::Mesh> Application::CreateAppleMesh(
 	const std::shared_ptr<sgl::TextureCubeMap>& irradiance) const
 {
 	// Create the physically based rendering program.
-	auto pbr_program = sgl::CreateProgram(
-		"PhysicallyBasedRendering",
-		device->GetProjection(),
-		device->GetView(),
-		device->GetModel());
+	auto pbr_program = sgl::CreateProgram("PhysicallyBasedRendering");
+	pbr_program->UniformMatrix("projection", device->GetProjection());
+	pbr_program->UniformMatrix("view", device->GetView());
+	pbr_program->UniformMatrix("model", device->GetModel());
 
 	// Set the camera position
 	pbr_program->UniformVector3(
@@ -134,9 +134,8 @@ std::shared_ptr<sgl::Mesh> Application::CreateCubeMapMesh(
 	const std::shared_ptr<sgl::TextureCubeMap>& texture) const
 {
 	// Create the cube map program.
-	auto cubemap_program = sgl::CreateProgram(
-		"CubeMapHighDynamicRange",
-		device->GetProjection());
+	auto cubemap_program = sgl::CreateProgram("CubeMapHighDynamicRange");
+	cubemap_program->UniformMatrix("projection", device->GetProjection());
 
 	// Create the mesh for the cube.
 	auto cube_mesh = std::make_shared<sgl::Mesh>(

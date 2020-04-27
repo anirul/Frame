@@ -97,7 +97,10 @@ namespace test {
 		EXPECT_TRUE(cube_map);
 		EXPECT_NE(0, cube_map->GetId());
 		EXPECT_NO_THROW(error_->Display());
-		auto irradiance = CreateIrradianceCubeMap(cube_map, { 32, 32 });
+		auto irradiance = CreateProgramTextureCubeMap(
+			cube_map,
+			sgl::CreateProgram("IrradianceCubeMap"),
+			{ 32, 32 });
 		EXPECT_NE(0, irradiance->GetId());
 		EXPECT_NO_THROW(error_->Display());
 	}

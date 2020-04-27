@@ -271,7 +271,8 @@ namespace sgl {
 		}
 		glm::mat4 projection =
 			glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
-		auto program = CreateProgram("EquirectangularCubeMap", projection);
+		auto program = CreateProgram("EquirectangularCubeMap");
+		program->UniformMatrix("projection", projection);
 		Mesh cube("../Asset/Cube.obj", program);
 		cube.SetTextures({ "Equirectangular" });
 		glViewport(0, 0, 512, 512);
@@ -336,8 +337,9 @@ namespace sgl {
 		error_->Display(__FILE__, __LINE__ - 1);
 	}
 
-	std::shared_ptr<TextureCubeMap> CreateIrradianceCubeMap(
+	std::shared_ptr<TextureCubeMap> CreateProgramTextureCubeMap(
 		const std::shared_ptr<TextureCubeMap>& from_texture,
+		const std::shared_ptr<Program>& program,
 		const std::pair<std::uint32_t, std::uint32_t> size,
 		const PixelElementSize pixel_element_size /*= PixelElementSize::BYTE*/,
 		const PixelStructure pixel_structure /*= PixelStructure::RGB*/)
@@ -354,7 +356,7 @@ namespace sgl {
 				pixel_structure);
 		glm::mat4 projection =
 			glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
-		auto program = CreateProgram("IrradianceCubeMap", projection);
+		program->UniformMatrix("projection", projection);
 		TextureManager texture_manager{};
 		texture_manager.AddTexture(
 			"Environment", 
