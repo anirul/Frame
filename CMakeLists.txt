@@ -10,7 +10,7 @@ project(ShaderGL)
 find_package(SDL2 CONFIG REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(glm CONFIG REQUIRED)
-find_package(Gtest CONFIG REQUIRED)
+find_package(GTest CONFIG REQUIRED)
 
 add_library(ShaderGLLib
   STATIC

@@ -1,5 +1,5 @@
 #include "Window.h"
-
+#include <iostream>
 #include <exception>
 #include <stdexcept>
 #include <chrono>
@@ -7,7 +7,7 @@
 #include <sstream>
 #include <SDL2/SDL.h>
 #include <SDL_syswm.h>
-#include <gl/glew.h>
+#include <GL/glew.h>
 #include "Error.h"
 
 namespace sgl {

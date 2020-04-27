@@ -1,5 +1,5 @@
 #include "PixelTest.h"
-#include <gl/glew.h>
+#include <GL/glew.h>
 
 namespace test {
 

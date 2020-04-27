@@ -1,7 +1,7 @@
 #include "Pixel.h"
 #include <string>
 #include <stdexcept>
-#include <gl/glew.h>
+#include <GL/glew.h>
 
 namespace sgl {
 

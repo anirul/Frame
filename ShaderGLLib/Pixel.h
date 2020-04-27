@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstdint>
-#include <gl/glew.h>
+#include <GL/glew.h>
 #include <glm/glm.hpp>
 
 namespace sgl {
