@@ -271,7 +271,7 @@ namespace sgl {
 		}
 		glm::mat4 projection =
 			glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
-		auto program = CreateEquirectangulareCubeMapProgram(projection);
+		auto program = CreateProgram("EquirectangularCubeMap", projection);
 		Mesh cube("../Asset/Cube.obj", program);
 		cube.SetTextures({ "Equirectangular" });
 		glViewport(0, 0, 512, 512);
@@ -354,7 +354,7 @@ namespace sgl {
 				pixel_structure);
 		glm::mat4 projection =
 			glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
-		auto program = CreateIrradianceCubeMapProgram(projection);
+		auto program = CreateProgram("IrradianceCubeMap", projection);
 		TextureManager texture_manager{};
 		texture_manager.AddTexture(
 			"Environment", 

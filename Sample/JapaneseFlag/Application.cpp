@@ -37,7 +37,7 @@ void Application::Run()
 std::shared_ptr<sgl::Mesh> Application::CreateBillboardMesh() const
 {
 	// Create the ray marching program.
-	auto ray_marshing_program = sgl::CreateJapaneseFlagProgram();
+	auto ray_marshing_program = sgl::CreateProgram("JapaneseFlag");
 
 	std::vector<float> points =
 	{

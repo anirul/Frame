@@ -111,67 +111,8 @@ namespace sgl {
 		return memoize_map_[name];
 	}
 
-	std::shared_ptr<sgl::Program> CreateSimpleProgram(
-		const glm::mat4& projection /*= glm::mat4(1.0f)*/, 
-		const glm::mat4& view /*= glm::mat4(1.0f)*/,
-		const glm::mat4& model /*= glm::mat4(1.0f)*/)
-	{
-		auto program = std::make_shared<sgl::Program>();
-		sgl::Shader vertex(sgl::ShaderType::VERTEX_SHADER);
-		sgl::Shader fragment(sgl::ShaderType::FRAGMENT_SHADER);
-		vertex.LoadFromFile("../Asset/Simple.vert");
-		fragment.LoadFromFile("../Asset/Simple.frag");
-		program->AddShader(vertex);
-		program->AddShader(fragment);
-		program->LinkShader();
-		program->Use();
-		program->UniformMatrix("projection", projection);
-		program->UniformMatrix("view", view);
-		program->UniformMatrix("model", model);
-		return program;
-	}
-
-	std::shared_ptr<sgl::Program> CreateRayMarchingProgram(
-		const glm::mat4& projection /*= glm::mat4(1.0f)*/, 
-		const glm::mat4& view /*= glm::mat4(1.0f)*/, 
-		const glm::mat4& model /*= glm::mat4(1.0f)*/)
-	{
-		auto program = std::make_shared<sgl::Program>();
-		sgl::Shader vertex(sgl::ShaderType::VERTEX_SHADER);
-		sgl::Shader fragment(sgl::ShaderType::FRAGMENT_SHADER);
-		vertex.LoadFromFile("../Asset/RayMarching.vert");
-		fragment.LoadFromFile("../Asset/RayMarching.frag");
-		program->AddShader(vertex);
-		program->AddShader(fragment);
-		program->LinkShader();
-		program->Use();
-		program->UniformMatrix("projection", projection);
-		program->UniformMatrix("view", view);
-		program->UniformMatrix("model", model);
-		return program;
-	}
-
-	std::shared_ptr<sgl::Program> CreateJapaneseFlagProgram(
-		const glm::mat4& projection /*= glm::mat4(1.0f)*/, 
-		const glm::mat4& view /*= glm::mat4(1.0f)*/, 
-		const glm::mat4& model /*= glm::mat4(1.0f)*/)
-	{
-		auto program = std::make_shared<sgl::Program>();
-		sgl::Shader vertex(sgl::ShaderType::VERTEX_SHADER);
-		sgl::Shader fragment(sgl::ShaderType::FRAGMENT_SHADER);
-		vertex.LoadFromFile("../Asset/JapaneseFlag.vert");
-		fragment.LoadFromFile("../Asset/JapaneseFlag.frag");
-		program->AddShader(vertex);
-		program->AddShader(fragment);
-		program->LinkShader();
-		program->Use();
-		program->UniformMatrix("projection", projection);
-		program->UniformMatrix("view", view);
-		program->UniformMatrix("model", model);
-		return program;
-	}
-
-	std::shared_ptr<sgl::Program> CreateCubeMapProgram(
+	std::shared_ptr<sgl::Program> CreateProgram(
+		const std::string& name,
 		const glm::mat4& projection /*= glm::mat4(1.0f)*/,
 		const glm::mat4& view /*= glm::mat4(1.0f)*/,
 		const glm::mat4& model /*= glm::mat4(1.0f)*/)
@@ -179,88 +120,8 @@ namespace sgl {
 		auto program = std::make_shared<sgl::Program>();
 		sgl::Shader vertex(sgl::ShaderType::VERTEX_SHADER);
 		sgl::Shader fragment(sgl::ShaderType::FRAGMENT_SHADER);
-		vertex.LoadFromFile("../Asset/CubeMap.vert");
-		fragment.LoadFromFile("../Asset/CubeMap.frag");
-		program->AddShader(vertex);
-		program->AddShader(fragment);
-		program->LinkShader();
-		program->Use();
-		program->UniformMatrix("projection", projection);
-		program->UniformMatrix("view", view);
-		program->UniformMatrix("model", model);
-		return program;
-	}
-
-	std::shared_ptr<sgl::Program> CreateCubeMapHighDynamicRangeProgram(
-		const glm::mat4& projection /*= glm::mat4(1.0f)*/, 
-		const glm::mat4& view /*= glm::mat4(1.0f)*/, 
-		const glm::mat4& model /*= glm::mat4(1.0f)*/)
-	{
-		auto program = std::make_shared<sgl::Program>();
-		Shader vertex(ShaderType::VERTEX_SHADER);
-		Shader fragment(ShaderType::FRAGMENT_SHADER);
-		vertex.LoadFromFile("../Asset/CubeMapHighDynamicRange.vert");
-		fragment.LoadFromFile("../Asset/CubeMapHighDynamicRange.frag");
-		program->AddShader(vertex);
-		program->AddShader(fragment);
-		program->LinkShader();
-		program->Use();
-		program->UniformMatrix("projection", projection);
-		program->UniformMatrix("view", view);
-		program->UniformMatrix("model", model);
-		return program;
-	}
-
-	std::shared_ptr<sgl::Program> CreateEquirectangulareCubeMapProgram(
-		const glm::mat4& projection /*= glm::mat4(1.0f)*/, 
-		const glm::mat4& view /*= glm::mat4(1.0f)*/, 
-		const glm::mat4& model /*= glm::mat4(1.0f)*/)
-	{
-		auto program = std::make_shared<sgl::Program>();
-		Shader vertex(ShaderType::VERTEX_SHADER);
-		Shader fragment(ShaderType::FRAGMENT_SHADER);
-		vertex.LoadFromFile("../Asset/EquirectangularCubeMap.vert");
-		fragment.LoadFromFile("../Asset/EquirectangularCubeMap.frag");
-		program->AddShader(vertex);
-		program->AddShader(fragment);
-		program->LinkShader();
-		program->Use();
-		program->UniformMatrix("projection", projection);
-		program->UniformMatrix("view", view);
-		program->UniformMatrix("model", model);
-		return program;
-	}
-
-	std::shared_ptr<sgl::Program> CreatePhysicallyBasedRenderingProgram(
-		const glm::mat4& projection /*= glm::mat4(1.0f)*/,
-		const glm::mat4& view /*= glm::mat4(1.0f)*/,
-		const glm::mat4& model /*= glm::mat4(1.0f)*/)
-	{
-		auto program = std::make_shared<sgl::Program>();
-		sgl::Shader vertex(sgl::ShaderType::VERTEX_SHADER);
-		sgl::Shader fragment(sgl::ShaderType::FRAGMENT_SHADER);
-		vertex.LoadFromFile("../Asset/PhysicallyBasedRendering.vert");
-		fragment.LoadFromFile("../Asset/PhysicallyBasedRendering.frag");
-		program->AddShader(vertex);
-		program->AddShader(fragment);
-		program->LinkShader();
-		program->Use();
-		program->UniformMatrix("projection", projection);
-		program->UniformMatrix("view", view);
-		program->UniformMatrix("model", model);
-		return program;
-	}
-
-	std::shared_ptr<sgl::Program> CreateIrradianceCubeMapProgram(
-		const glm::mat4& projection /*= glm::mat4(1.0f)*/,
-		const glm::mat4& view /*= glm::mat4(1.0f)*/,
-		const glm::mat4& model /*= glm::mat4(1.0f)*/)
-	{
-		auto program = std::make_shared<sgl::Program>();
-		sgl::Shader vertex(sgl::ShaderType::VERTEX_SHADER);
-		sgl::Shader fragment(sgl::ShaderType::FRAGMENT_SHADER);
-		vertex.LoadFromFile("../Asset/IrradianceCubeMap.vert");
-		fragment.LoadFromFile("../Asset/IrradianceCubeMap.frag");
+		vertex.LoadFromFile("../Asset/" + name + ".vert");
+		fragment.LoadFromFile("../Asset/" + name + ".frag");
 		program->AddShader(vertex);
 		program->AddShader(fragment);
 		program->LinkShader();

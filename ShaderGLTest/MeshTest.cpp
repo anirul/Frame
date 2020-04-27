@@ -7,7 +7,7 @@ namespace test {
 		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(mesh_);
 		EXPECT_TRUE(window_);
-		auto program = sgl::CreateSimpleProgram();
+		auto program = sgl::CreateProgram("Simple");
 		mesh_ = std::make_shared<sgl::Mesh>("../Asset/Cube.obj", program);
 		EXPECT_NE(0, mesh_->PointBuffer().GetId());
 		EXPECT_NE(0, mesh_->NormalBuffer().GetId());
@@ -23,7 +23,7 @@ namespace test {
 		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(mesh_);
 		EXPECT_TRUE(window_);
-		auto program = sgl::CreateSimpleProgram();
+		auto program = sgl::CreateProgram("Simple");
 		mesh_ = std::make_shared<sgl::Mesh>("../Asset/Torus.obj", program);
 		EXPECT_NE(0, mesh_->PointBuffer().GetId());
 		EXPECT_NE(0, mesh_->NormalBuffer().GetId());

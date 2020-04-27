@@ -58,92 +58,12 @@ namespace sgl {
 		const std::shared_ptr<Error> error_ = Error::GetInstance();
 	};
 
-	// Create a simple program (mainly for testing purpose).
-	// Vector needed in entry are:
-	//		- in_position
-	//		- in_normal
-	//		- in_texcoord
-	// Should also need in uniform texture:
-	//		- Color (for the albedo).
-	std::shared_ptr<sgl::Program> CreateSimpleProgram(
-		const glm::mat4& projection = glm::mat4(1.0f), 
-		const glm::mat4& view = glm::mat4(1.0f),
-		const glm::mat4& model = glm::mat4(1.0f));
-
-	// Create a ray marching program (mainly for testing purpose).
-	// Vector needed in entry are:
-	//		- in_position
-	//		- in_texcoord
-	std::shared_ptr<sgl::Program> CreateRayMarchingProgram(
-		const glm::mat4& projection = glm::mat4(1.0f),
-		const glm::mat4& view = glm::mat4(1.0f),
-		const glm::mat4& model = glm::mat4(1.0f));
-
-	// Create a Japanese Flag program (mainly for testing purpose).
-	// Vector needed in entry are:
-	//		- in_position
-	//		- in_texcoord
-	std::shared_ptr<sgl::Program> CreateJapaneseFlagProgram(
-		const glm::mat4& projection = glm::mat4(1.0f),
-		const glm::mat4& view = glm::mat4(1.0f),
-		const glm::mat4& model = glm::mat4(1.0f));
-
-	// Create a cube map program to render the environment map.
-	// Vector needed in entry are:
-	//		- in_position
-	// Should also need in uniform texture:
-	//		- Skybox (for the color)
-	std::shared_ptr<sgl::Program> CreateCubeMapProgram(
-		const glm::mat4& projection = glm::mat4(1.0f),
-		const glm::mat4& view = glm::mat4(1.0f),
-		const glm::mat4& model = glm::mat4(1.0f));
-
-	// Create a cube map in HDR program to render the environment map.
-	// Vector needed in entry are:
-	//		- in_position
-	// Should also need in uniform texture:
-	//		- Skybox (for the color)
-	std::shared_ptr<sgl::Program> CreateCubeMapHighDynamicRangeProgram(
-		const glm::mat4& projection = glm::mat4(1.0f),
-		const glm::mat4& view = glm::mat4(1.0f),
-		const glm::mat4& model = glm::mat4(1.0f));
-
-	// Create a equirectangular cube map program.
-	// Vector needed in entry are:
-	//		- in_position
-	// Should also need in uniform texture:
-	//		- Equirectangular (for the color)
-	std::shared_ptr<sgl::Program> CreateEquirectangulareCubeMapProgram(
-		const glm::mat4& projection = glm::mat4(1.0f),
-		const glm::mat4& view = glm::mat4(1.0f),
-		const glm::mat4& model = glm::mat4(1.0f));
-
-	// Create a irradiance cube map program.
-	// Vector needed in entry are:
-	//		- in_position
-	// Should also need in uniform texture:
-	//		- Skybox (for the color)
-	std::shared_ptr<sgl::Program> CreateIrradianceCubeMapProgram(
-		const glm::mat4& projection = glm::mat4(1.0f),
-		const glm::mat4& view = glm::mat4(1.0f),
-		const glm::mat4& model = glm::mat4(1.0f));
-
-	// Create a Physic Based Rendering program to be used with meshes.
-	// Vector needed in entry are:
-	//		- in_position
-	//		- in_normal
-	//		- in_texcoord
-	// Should also need in uniform texture:
-	//		- Color (for the albedo color)
-	//		- Normal (for the normal map)
-	//		- Metallic (for the metallic map)
-	//		- Roughness (for the roughness map)
-	//		- AmbientOcclusion (for the ambient occlusion map)
-	// We will also need in vec3 uniform:
-	//		- camera_position (the position of the camera)
-	//		- light_position[4] (position of the lights)
-	//		- light_color[4] (colors of the lights)
-	std::shared_ptr<sgl::Program> CreatePhysicallyBasedRenderingProgram(
+	// Create a program from a string!
+	// Will load a program at location: 
+	// - "../Asset/<name>.vert"
+	// - "../Asset/<name>.frag"
+	std::shared_ptr<sgl::Program> CreateProgram(
+		const std::string& name,
 		const glm::mat4& projection = glm::mat4(1.0f),
 		const glm::mat4& view = glm::mat4(1.0f),
 		const glm::mat4& model = glm::mat4(1.0f));

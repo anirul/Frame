@@ -70,7 +70,8 @@ std::shared_ptr<sgl::Mesh> Application::CreateAppleMesh(
 	const std::shared_ptr<sgl::TextureCubeMap>& irradiance) const
 {
 	// Create the physically based rendering program.
-	auto pbr_program = sgl::CreatePhysicallyBasedRenderingProgram(
+	auto pbr_program = sgl::CreateProgram(
+		"PhysicallyBasedRendering",
 		device->GetProjection(),
 		device->GetView(),
 		device->GetModel());
@@ -133,7 +134,8 @@ std::shared_ptr<sgl::Mesh> Application::CreateCubeMapMesh(
 	const std::shared_ptr<sgl::TextureCubeMap>& texture) const
 {
 	// Create the cube map program.
-	auto cubemap_program = sgl::CreateCubeMapHighDynamicRangeProgram(
+	auto cubemap_program = sgl::CreateProgram(
+		"CubeMapHighDynamicRange",
 		device->GetProjection());
 
 	// Create the mesh for the cube.
