@@ -15,7 +15,8 @@ bool Application::Startup()
 	auto irradiance = sgl::CreateProgramTextureCubeMap(
 		texture, 
 		sgl::CreateProgram("IrradianceCubeMap"),
-		{ 32, 32 }, 
+		{ 32, 32 },
+		0,
 		sgl::PixelElementSize::FLOAT,
 		sgl::PixelStructure::RGB);
 	auto apple_mesh = CreateAppleMesh(device, irradiance);

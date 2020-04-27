@@ -41,6 +41,7 @@ namespace sgl {
 
 	void Frame::BindTexture2D(
 		const Texture& texture,
+		const int mipmap /*= 0*/,
 		const FrameTextureType frame_texture_type 
 			/*= FrameTextureType::TEXTURE_2D*/) const
 	{
@@ -50,7 +51,7 @@ namespace sgl {
 			GL_COLOR_ATTACHMENT0,
 			GetFrameTextureType(frame_texture_type),
 			texture.GetId(),
-			0);
+			mipmap);
 		error_->Display(__FILE__, __LINE__ - 6);
 	}
 

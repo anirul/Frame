@@ -100,13 +100,18 @@ namespace sgl {
 	// Create a cube map from a cube map texture and a program.
 	//		- from_texture			: input texture.
 	//		- size					: output size (*6).
+	//		- mipmap				: level of mipmap (0 == 1).
 	std::shared_ptr<TextureCubeMap> CreateProgramTextureCubeMap(
 		const std::shared_ptr<TextureCubeMap>& from_texture,
 		const std::shared_ptr<Program>& program,
 		const std::pair<std::uint32_t, std::uint32_t> size,
+		const int mipmap = 0,
 		const PixelElementSize pixel_element_size = PixelElementSize::BYTE,
 		const PixelStructure pixel_structure = PixelStructure::RGB);
 
+	// This texture manager is there to hold texture to the mesh in order to be
+	// rendered. So you can have a single texture manager for a large set of
+	// meshes.
 	class TextureManager 
 	{
 	public:

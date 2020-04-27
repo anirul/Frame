@@ -30,6 +30,7 @@ namespace sgl {
 		void BindAttach(const Render& render) const;
 		void BindTexture2D(
 			const Texture& texture,
+			const int mipmap = 0,
 			const FrameTextureType frame_texture_type = 
 				FrameTextureType::TEXTURE_2D) const;
 
