@@ -19,18 +19,20 @@ namespace sgl {
 		// Enable blending to 1 - source alpha.
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 		// Enable Z buffer.
 		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LEQUAL);
+		// Enable seamless cube map.
+		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 	}
 
-	void Device::Startup()
+	void Device::Startup(const float fov /*= 65.0f*/)
 	{
 		// Set the perspective matrix.
 		const float aspect =
 			static_cast<float>(size_.first) / static_cast<float>(size_.second);
 		perspective_ = glm::perspective(
-			glm::radians(65.0f),
+			glm::radians(fov),
 			aspect,
 			0.1f,
 			100.0f);

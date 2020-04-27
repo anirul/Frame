@@ -30,7 +30,6 @@ bool Application::Startup()
 			[](const double dt) -> glm::mat4 
 		{
 			glm::mat4 r_y(1.0f);
-			r_y[1][1] = -1.f;
 			const auto dtf = static_cast<float>(dt);
 			r_y = glm::rotate(r_y, dtf * -.2f, glm::vec3(0.0f, 1.0f, 0.0f));
 			return r_y;

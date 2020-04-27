@@ -11,13 +11,13 @@ bool Application::Startup()
 	auto texture = std::make_shared<sgl::TextureCubeMap>(
 		std::array<std::string, 6>{ 
 			"../Asset/CubeMap/PositiveX.png", "../Asset/CubeMap/NegativeX.png", 
-			"../Asset/CubeMap/PositiveY.png", "../Asset/CubeMap/NegativeY.png",
+			"../Asset/CubeMap/NegativeY.png", "../Asset/CubeMap/PositiveY.png",
 			"../Asset/CubeMap/PositiveZ.png", "../Asset/CubeMap/NegativeZ.png",
 		});
 	auto apple_mesh = CreateAppleMesh(device);
 	auto cube_map_mesh = CreateCubeMapMesh(device, texture);
 
-	// Comment out if you want to see the errors.
+	// Comment out if you want to see more errors.
 	// window_->Startup();
 
 	// Pack it into a Scene object.
@@ -27,8 +27,9 @@ bool Application::Startup()
 			[](const double dt) -> glm::mat4 
 		{
 			glm::mat4 r_y(1.0f);
+			r_y[1][1] = -1.0f;
 			const auto dtf = static_cast<float>(dt);
-			r_y = glm::rotate(r_y, dtf * -.2f, glm::vec3(0.0f, 1.0f, 0.0f));
+			r_y = glm::rotate(r_y, dtf * .2f, glm::vec3(0.0f, 1.0f, 0.0f));
 			return r_y;
 		});
 		scene_tree.AddNode(scene_root);

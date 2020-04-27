@@ -138,12 +138,6 @@ namespace sgl {
 		const sgl::TextureManager& texture_manager,
 		const glm::mat4& model /*= glm::mat4(1.0f)*/) const
 	{
-		if (clear_depth_buffer_)
-		{
-			glDepthFunc(GL_LEQUAL);
-			error_->Display(__FILE__, __LINE__ - 1);
-		}
-
 		texture_manager.DisableAll();
 		if (!program_)
 		{

@@ -16,6 +16,8 @@ namespace sgl {
 	{
 		int channels;
 		int desired_channels = { static_cast<int>(pixel_structure) };
+		// This is in the case of OpenGL (for now the only case).
+		stbi_set_flip_vertically_on_load(true);
 		switch (pixel_element_size)
 		{
 		case PixelElementSize::BYTE :
@@ -29,7 +31,7 @@ namespace sgl {
 					desired_channels);
 			break;
 		}
-		case PixelElementSize::HALF:
+		case PixelElementSize::HALF :
 			[[fallthrough]];
 		case PixelElementSize::SHORT :
 		{

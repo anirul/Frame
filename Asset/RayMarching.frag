@@ -1,20 +1,20 @@
 #version 330 core
 
-in vec3 out_normal;
-in vec2 out_texcoord;
+in vec2 vert_texcoord;
 
 layout(location = 0) out vec4 frag_color;
 
 uniform float Time;
 
 const vec2 resolution = vec2(640, 480);
+
 const int max_steps = 200;
 const float min_dist = 0.01;
 const float max_dist = 100.;
 
 // Get the distance and normal to the surface
 // (if the distance is < min_dist in w).
-vec4 GetDist(vec3 position)
+vec4 GetDistance(vec3 position)
 {
 	vec4 sphere = vec4(0, 1, 6, 1);
 	float dist_sphere = length(position - sphere.xyz) - sphere.w;
@@ -33,7 +33,7 @@ vec4 RayMarching(vec3 ray_origin, vec3 ray_direction)
 	for (int i = 0; i < max_steps; ++i)
 	{
 		vec3 p = ray_origin + ray_direction * dist0;
-		vec4 normal_dist = GetDist(p);
+		vec4 normal_dist = GetDistance(p);
 		dist0 += normal_dist.w;
 		if (normal_dist.w < min_dist || dist0 > max_dist)
 			return vec4(normal_dist.xyz, dist0);
@@ -72,35 +72,49 @@ float LightAndShadow(vec3 position, vec3 normal)
 	float dist_light = 
 		RayMarching(position + normal * min_dist * 2, light_normal_value.xyz).w;
 	if (dist_light < length(light_position - position)) 
-		light_normal_value.w *= .1;
+		light_normal_value.w *= 0.1;
 	return light_normal_value.w;
 }
 
-// Get the color of the japanese flag at the coordonates given by uv.
-// (uv is centered at the middle and uv.x is multiply by aspect ratio).
-vec3 JapaneseFlag(vec2 uv)
+float GetDistance1(vec3 p) 
 {
-	float l = length(uv);
-	vec3 col = vec3(1, 1, 1);
-	if (l < .3) col = vec3(1, 0, 0);
-	return col;
+    vec4 sphere = vec4(0, 1, 6, 1);
+    float dist_sphere = length(p - sphere.xyz) - sphere.w;
+    float dist_plane = p.y;
+    return min(dist_sphere, dist_plane);
+}
+
+float RayMarching1(vec3 ray_origin, vec3 ray_direction)
+{
+	float dist0 = 0.0;
+	for (int i = 0; i < max_steps; ++i) 
+	{
+		vec3 p = ray_origin + ray_direction * dist0;
+		float dist = GetDistance1(p);
+		dist0 += dist;
+		if (dist < min_dist || dist0 > max_dist)
+			break;
+	}
+	return dist0;
 }
 
 void main()
 {
-	vec2 uv = out_texcoord - vec2(0.5);
+	vec2 uv = vert_texcoord - vec2(0.5);
 	uv.x *= resolution.x / resolution.y;
 	uv.y = -uv.y;
-	
+
 	vec3 ray_origin = vec3(0, 1, 0);
 	vec3 ray_direction = normalize(vec3(uv.x, uv.y, 1));
+
 	vec4 result = RayMarching(ray_origin, ray_direction);
 	vec3 position = ray_origin + ray_direction * result.w;
 	float light = LightOnly(position, result.xyz);
 	float light_shadow = LightAndShadow(position, result.xyz);
 
-	// vec3 color = JapaneseFlag(uv);
-	// vec3 color = vec3(result.w / 8, result.w / 4, result.w);
+	float res = RayMarching1(ray_origin, ray_direction);
+
+	// vec3 color = vec3(res / 8, res / 4, res);
 	// vec3 color = vec3(light);
 	vec3 color = vec3(light_shadow);
 	frag_color = vec4(color, 1);

@@ -11,7 +11,6 @@ find_package(SDL2 CONFIG REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(glm CONFIG REQUIRED)
 find_package(Gtest CONFIG REQUIRED)
-find_package(nlohmann_json CONFIG REQUIRED)
 
 add_library(ShaderGLLib
   STATIC
@@ -55,8 +54,6 @@ add_library(ShaderGLLib
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Render.h
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Scene.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Scene.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Setting.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Setting.h
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Shader.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Shader.h
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Texture.cpp
@@ -70,8 +67,6 @@ target_link_libraries(ShaderGLLib
     SDL2::SDL2
     GLEW::GLEW
     glm
-    nlohmann_json 
-    nlohmann_json::nlohmann_json
 )
 
 add_executable(ShaderGLTest
@@ -100,8 +95,6 @@ add_executable(ShaderGLTest
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/RenderTest.h
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/SceneTest.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/SceneTest.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLTest/SettingTest.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLTest/SettingTest.h
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/ShaderTest.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/ShaderTest.h
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/TextureTest.cpp
@@ -124,12 +117,12 @@ target_link_libraries(ShaderGLTest
     SDL2::SDL2
     GLEW::GLEW
     glm
-    nlohmann_json 
-    nlohmann_json::nlohmann_json
 )
 
 add_executable(JapaneseFlag
   WIN32
+    ${PROJECT_SOURCE_DIR}/Asset/JapaneseFlag.frag
+    ${PROJECT_SOURCE_DIR}/Asset/JapaneseFlag.vert
     ${PROJECT_SOURCE_DIR}/Sample/JapaneseFlag/Application.cpp
     ${PROJECT_SOURCE_DIR}/Sample/JapaneseFlag/Application.h
     ${PROJECT_SOURCE_DIR}/Sample/JapaneseFlag/main.cpp
@@ -147,12 +140,12 @@ target_link_libraries(JapaneseFlag
     SDL2::SDL2
     GLEW::GLEW
     glm
-    nlohmann_json 
-    nlohmann_json::nlohmann_json
 )
 
 add_executable(RayMarching
   WIN32
+    ${PROJECT_SOURCE_DIR}/Asset/RayMarching.frag
+    ${PROJECT_SOURCE_DIR}/Asset/RayMarching.vert
     ${PROJECT_SOURCE_DIR}/Sample/RayMarching/Application.cpp
     ${PROJECT_SOURCE_DIR}/Sample/RayMarching/Application.h
     ${PROJECT_SOURCE_DIR}/Sample/RayMarching/main.cpp
@@ -170,12 +163,14 @@ target_link_libraries(RayMarching
     SDL2::SDL2
     GLEW::GLEW
     glm
-    nlohmann_json 
-    nlohmann_json::nlohmann_json
 )
 
 add_executable(Simple
   WIN32
+    ${PROJECT_SOURCE_DIR}/Asset/CubeMap.frag
+    ${PROJECT_SOURCE_DIR}/Asset/CubeMap.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Simple.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Simple.vert
     ${PROJECT_SOURCE_DIR}/Sample/Simple/Application.cpp
     ${PROJECT_SOURCE_DIR}/Sample/Simple/Application.h
     ${PROJECT_SOURCE_DIR}/Sample/Simple/main.cpp
@@ -193,12 +188,20 @@ target_link_libraries(Simple
     SDL2::SDL2
     GLEW::GLEW
     glm
-    nlohmann_json 
-    nlohmann_json::nlohmann_json
 )
 
 add_executable(PhysicallyBasedRendering
   WIN32
+    ${PROJECT_SOURCE_DIR}/Asset/CubeMapHighDynamicRange.frag
+    ${PROJECT_SOURCE_DIR}/Asset/CubeMapHighDynamicRange.vert
+    ${PROJECT_SOURCE_DIR}/Asset/EquirectangularCubeMap.frag
+    ${PROJECT_SOURCE_DIR}/Asset/EquirectangularCubeMap.vert
+    ${PROJECT_SOURCE_DIR}/Asset/IrradianceCubeMap.frag
+    ${PROJECT_SOURCE_DIR}/Asset/IrradianceCubeMap.vert
+    ${PROJECT_SOURCE_DIR}/Asset/JapaneseFlag.frag
+    ${PROJECT_SOURCE_DIR}/Asset/JapaneseFlag.vert
+    ${PROJECT_SOURCE_DIR}/Asset/PhysicallyBasedRendering.frag
+    ${PROJECT_SOURCE_DIR}/Asset/PhysicallyBasedRendering.vert
     ${PROJECT_SOURCE_DIR}/Sample/PhysicallyBasedRendering/Application.cpp
     ${PROJECT_SOURCE_DIR}/Sample/PhysicallyBasedRendering/Application.h
     ${PROJECT_SOURCE_DIR}/Sample/PhysicallyBasedRendering/main.cpp
@@ -216,6 +219,4 @@ target_link_libraries(PhysicallyBasedRendering
     SDL2::SDL2
     GLEW::GLEW
     glm
-    nlohmann_json 
-    nlohmann_json::nlohmann_json
 )

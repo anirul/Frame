@@ -25,8 +25,9 @@ namespace sgl {
 			const std::pair<std::uint32_t, std::uint32_t> size);
 
 	public:
-		// Startup the scene. Throw errors in case there is any.
-		void Startup();
+		// Startup the scene. Throw errors in case there is any, takes fov in 
+		// degrees.
+		void Startup(const float fov = 65.0f);
 		// Draw what is on the scene.
 		// Take the total time from the beginning of the program to now as a
 		// const double parameter.
