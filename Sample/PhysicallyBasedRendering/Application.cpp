@@ -12,8 +12,11 @@ bool Application::Startup()
 		"../Asset/CubeMap/Shiodome.hdr",
 		sgl::PixelElementSize::FLOAT,
 		sgl::PixelStructure::RGB);
+	sgl::TextureManager texture_manager{};
+	texture_manager.AddTexture("Environment", texture);
 	auto irradiance = sgl::CreateProgramTextureCubeMap(
-		texture, 
+		texture_manager,
+		{ "Environment" },
 		sgl::CreateProgram("IrradianceCubeMap"),
 		{ 32, 32 },
 		0,
@@ -115,9 +118,7 @@ std::shared_ptr<sgl::Mesh> Application::CreateAppleMesh(
 	texture_manager.AddTexture(
 		"AmbientOcclusion",
 		std::make_shared<sgl::Texture>("../Asset/Apple/AmbientOcclusion.jpg"));
-	texture_manager.AddTexture(
-		"Irradiance",
-		irradiance);
+	texture_manager.AddTexture("Irradiance", irradiance);
 	apple_mesh->SetTextures({ 
 		"Color", 
 		"Normal", 
@@ -145,9 +146,7 @@ std::shared_ptr<sgl::Mesh> Application::CreateCubeMapMesh(
 
 	// Get the texture manager.
 	auto texture_manager = device->GetTextureManager();
-	texture_manager.AddTexture(
-		"Skybox",
-		texture);
+	texture_manager.AddTexture("Skybox", texture);
 	cube_mesh->SetTextures({ "Skybox" });
 	device->SetTextureManager(texture_manager);
 

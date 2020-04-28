@@ -96,18 +96,6 @@ namespace sgl {
 		// Create a cube map and assign it to the texture_id_.
 		void CreateTextureCubeMap();
 	};
-	
-	// Create a cube map from a cube map texture and a program.
-	//		- from_texture			: input texture.
-	//		- size					: output size (*6).
-	//		- mipmap				: level of mipmap (0 == 1).
-	std::shared_ptr<TextureCubeMap> CreateProgramTextureCubeMap(
-		const std::shared_ptr<TextureCubeMap>& from_texture,
-		const std::shared_ptr<Program>& program,
-		const std::pair<std::uint32_t, std::uint32_t> size,
-		const int mipmap = 0,
-		const PixelElementSize pixel_element_size = PixelElementSize::BYTE,
-		const PixelStructure pixel_structure = PixelStructure::RGB);
 
 	// This texture manager is there to hold texture to the mesh in order to be
 	// rendered. So you can have a single texture manager for a large set of
@@ -132,5 +120,35 @@ namespace sgl {
 		std::map<std::string, std::shared_ptr<Texture>> name_texture_map_;
 		mutable std::array<std::string, 32> name_array_;
 	};
+
+	// Create a texture from a program.
+	//		- texture_manager		: input texture.
+	//		- texture_selected		: set of selected texture to be used.
+	//		- program				: program to be used.
+	//		- size					: output size (*6).
+	//		- mipmap				: level of mipmap (0 == 1).
+	std::shared_ptr<Texture> CreateProgramTexture(
+		const TextureManager& texture_manager,
+		const std::vector<std::string>& texture_selected,
+		const std::shared_ptr<Program>& program,
+		const std::pair<std::uint32_t, std::uint32_t> size,
+		const int mipmap = 0,
+		const PixelElementSize pixel_element_size = PixelElementSize::BYTE,
+		const PixelStructure pixel_structure = PixelStructure::RGB);
+
+	// Create a cube map texture from a program.
+	//		- texture_manager		: input texture.
+	//		- texture_selected		: set of selected texture to be used.
+	//		- program				: program to be used.
+	//		- size					: output size (*6).
+	//		- mipmap				: level of mipmap (0 == 1).
+	std::shared_ptr<TextureCubeMap> CreateProgramTextureCubeMap(
+		const TextureManager& texture_manager,
+		const std::vector<std::string>& texture_selected,
+		const std::shared_ptr<Program>& program,
+		const std::pair<std::uint32_t, std::uint32_t> size,
+		const int mipmap = 0,
+		const PixelElementSize pixel_element_size = PixelElementSize::BYTE,
+		const PixelStructure pixel_structure = PixelStructure::RGB);
 
 } // End namespace sgl.

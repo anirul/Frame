@@ -365,8 +365,58 @@ namespace sgl {
 		error_->Display(__FILE__, __LINE__ - 4);
 	}
 
+	std::shared_ptr<sgl::Texture> CreateProgramTexture(
+		const TextureManager& texture_manager, 
+		const std::vector<std::string>& texture_selected, 
+		const std::shared_ptr<Program>& program, 
+		const std::pair<std::uint32_t, std::uint32_t> size, 
+		const int mipmap /*= 0*/, 
+		const PixelElementSize pixel_element_size /*= PixelElementSize::BYTE*/, 
+		const PixelStructure pixel_structure /*= PixelStructure::RGB*/)
+	{
+		auto error = Error::GetInstance();
+		Frame frame{};
+		Render render{};
+		frame.BindAttach(render);
+		render.BindStorage(size);
+		auto texture = std::make_shared<Texture>(
+			size,
+			pixel_element_size,
+			pixel_structure);
+		int max_mipmap = (mipmap <= 0) ? 1 : mipmap;
+		if (max_mipmap > 1) texture->BindEnableMipmap();
+		glm::mat4 projection = glm::perspective(
+			glm::radians(90.0f),
+			1.0f,
+			0.1f,
+			10.0f);
+		program->UniformMatrix("projection", projection);
+		auto quad = CreateQuadMesh(program);
+		quad->SetTextures(texture_selected);
+		std::pair<uint32_t, uint32_t> temporary_size = size;
+		program->UniformInt("max_mipmap", max_mipmap);
+		for (int mipmap_level = 0; mipmap_level < max_mipmap; ++mipmap_level)
+		{
+			program->UniformInt("mipmap_level", mipmap_level);
+			double fact = std::pow(0.5, mipmap_level);
+			temporary_size.first =
+				static_cast<std::uint32_t>(size.first * fact);
+			temporary_size.second =
+				static_cast<std::uint32_t>(size.second * fact);
+			glViewport(0, 0, temporary_size.first, temporary_size.second);
+			error->Display(__FILE__, __LINE__ - 1);
+			frame.BindTexture2D(
+				*texture,
+				mipmap_level);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			quad->Draw(texture_manager);
+		}
+		return texture;
+	}
+
 	std::shared_ptr<TextureCubeMap> CreateProgramTextureCubeMap(
-		const std::shared_ptr<TextureCubeMap>& from_texture,
+		const TextureManager& texture_manager,
+		const std::vector<std::string>& texture_selected,
 		const std::shared_ptr<Program>& program,
 		const std::pair<std::uint32_t, std::uint32_t> size,
 		const int mipmap /*= 0*/,
@@ -390,12 +440,8 @@ namespace sgl {
 			0.1f, 
 			10.0f);
 		program->UniformMatrix("projection", projection);
-		TextureManager texture_manager{};
-		texture_manager.AddTexture(
-			"Environment",
-			from_texture);
-		Mesh cube("../Asset/Cube.obj", program);
-		cube.SetTextures({ "Environment" });
+		auto cube = CreateCubeMesh(program);
+		cube->SetTextures(texture_selected);
 		std::pair<uint32_t, uint32_t> temporary_size = size;
 		program->UniformInt("max_mipmap", max_mipmap);
 		for (int mipmap_level = 0; mipmap_level < max_mipmap; ++mipmap_level)
@@ -417,7 +463,7 @@ namespace sgl {
 					static_cast<FrameTextureType>(cubemap_element));
 				cubemap_element++;
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-				cube.Draw(texture_manager, view);
+				cube->Draw(texture_manager, view);
 			}
 		}
 		return texture;

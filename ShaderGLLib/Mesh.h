@@ -27,6 +27,7 @@ namespace sgl {
 
 	public:
 		void SetTextures(std::initializer_list<std::string> values);
+		void SetTextures(const std::vector<std::string>& vec);
 		void Draw(
 			const TextureManager& texture_manager,
 			const glm::mat4& model = glm::mat4(1.0f)) const;
@@ -71,5 +72,13 @@ namespace sgl {
 		unsigned int vertex_array_object_ = 0;
 		const std::shared_ptr<Error> error_ = Error::GetInstance();
 	};
+
+	// Create a Quad Mesh that is on the edge of the screen.
+	std::shared_ptr<Mesh> CreateQuadMesh(
+		const std::shared_ptr<Program>& program);
+
+	// Create a Cube Mesh that correspond to a cube map.
+	std::shared_ptr<Mesh> CreateCubeMesh(
+		const std::shared_ptr<Program>& program);
 
 } // End namespace sgl.

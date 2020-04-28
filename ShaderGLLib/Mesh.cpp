@@ -66,6 +66,12 @@ namespace sgl {
 		textures_.assign(values.begin(), values.end());
 	}
 
+	void Mesh::SetTextures(const std::vector<std::string>& vec)
+	{
+		textures_.clear();
+		textures_.assign(vec.begin(), vec.end());
+	}
+
 	void Mesh::SetProgram(const std::shared_ptr<Program>& program)
 	{
 		if (!program)
@@ -346,6 +352,49 @@ namespace sgl {
 				" indices are not triangles!");
 		}
 		return obj_file;
+	}
+
+	std::shared_ptr<sgl::Mesh> CreateQuadMesh(
+		const std::shared_ptr<Program>& program)
+	{
+		std::vector<float> points =
+		{
+			-1.f, 1.f, 0.f,
+			1.f, 1.f, 0.f,
+			-1.f, -1.f, 0.f,
+			1.f, -1.f, 0.f,
+		};
+		std::vector<float> normals =
+		{
+			0.f, 0.f, 1.f,
+			0.f, 0.f, 1.f,
+			0.f, 0.f, 1.f,
+			0.f, 0.f, 1.f,
+		};
+		std::vector<float> texcoords =
+		{
+			0, 1,
+			1, 1,
+			0, 0,
+			1, 0,
+		};
+		std::vector<std::int32_t> indices =
+		{
+			0, 1, 2,
+			1, 3, 2,
+		};
+		return std::make_shared<Mesh>(
+			points, 
+			normals, 
+			texcoords, 
+			indices, 
+			program);
+	}
+
+	std::shared_ptr<sgl::Mesh> CreateCubeMesh(
+		const std::shared_ptr<Program>& program)
+	{
+		return std::make_shared<Mesh>("../Asset/Cube.obj", program);
 	}
 
 } // End namespace sgl.

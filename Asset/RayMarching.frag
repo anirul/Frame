@@ -76,33 +76,10 @@ float LightAndShadow(vec3 position, vec3 normal)
 	return light_normal_value.w;
 }
 
-float GetDistance1(vec3 p) 
-{
-    vec4 sphere = vec4(0, 1, 6, 1);
-    float dist_sphere = length(p - sphere.xyz) - sphere.w;
-    float dist_plane = p.y;
-    return min(dist_sphere, dist_plane);
-}
-
-float RayMarching1(vec3 ray_origin, vec3 ray_direction)
-{
-	float dist0 = 0.0;
-	for (int i = 0; i < max_steps; ++i) 
-	{
-		vec3 p = ray_origin + ray_direction * dist0;
-		float dist = GetDistance1(p);
-		dist0 += dist;
-		if (dist < min_dist || dist0 > max_dist)
-			break;
-	}
-	return dist0;
-}
-
 void main()
 {
 	vec2 uv = vert_texcoord - vec2(0.5);
 	uv.x *= resolution.x / resolution.y;
-	uv.y = -uv.y;
 
 	vec3 ray_origin = vec3(0, 1, 0);
 	vec3 ray_direction = normalize(vec3(uv.x, uv.y, 1));
@@ -111,8 +88,6 @@ void main()
 	vec3 position = ray_origin + ray_direction * result.w;
 	float light = LightOnly(position, result.xyz);
 	float light_shadow = LightAndShadow(position, result.xyz);
-
-	float res = RayMarching1(ray_origin, ray_direction);
 
 	// vec3 color = vec3(res / 8, res / 4, res);
 	// vec3 color = vec3(light);

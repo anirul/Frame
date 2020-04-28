@@ -97,8 +97,11 @@ namespace test {
 		EXPECT_TRUE(cube_map);
 		EXPECT_NE(0, cube_map->GetId());
 		EXPECT_NO_THROW(error_->Display());
+		sgl::TextureManager texture_manager{};
+		texture_manager.AddTexture("Environment", cube_map);
 		auto irradiance = CreateProgramTextureCubeMap(
-			cube_map,
+			texture_manager,
+			{ "Environment" },
 			sgl::CreateProgram("IrradianceCubeMap"),
 			{ 32, 32 });
 		EXPECT_NE(0, irradiance->GetId());
