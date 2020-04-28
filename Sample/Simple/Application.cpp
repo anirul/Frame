@@ -8,6 +8,7 @@ bool Application::Startup()
 {
 	auto device = window_->CreateDevice();
 	device->Startup();
+	// TODO(anirul): Correct this mess in the CreateCubeMesh!
 	auto texture = std::make_shared<sgl::TextureCubeMap>(
 		std::array<std::string, 6>{ 
 			"../Asset/CubeMap/PositiveX.png", "../Asset/CubeMap/NegativeX.png", 
@@ -97,15 +98,11 @@ std::shared_ptr<sgl::Mesh> Application::CreateCubeMapMesh(
 	cubemap_program->UniformMatrix("projection", device->GetProjection());
 
 	// Create the mesh for the cube.
-	auto cube_mesh = std::make_shared<sgl::Mesh>(
-		"../Asset/Cube.obj", 
-		cubemap_program);
+	auto cube_mesh = sgl::CreateCubeMesh(cubemap_program);
 
 	// Get the texture manager.
 	auto texture_manager = device->GetTextureManager();
-	texture_manager.AddTexture(
-		"Skybox",
-		texture);
+	texture_manager.AddTexture("Skybox", texture);
 	cube_mesh->SetTextures({ "Skybox" });
 	device->SetTextureManager(texture_manager);
 
