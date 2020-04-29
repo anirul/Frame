@@ -394,7 +394,7 @@ namespace sgl {
 	std::shared_ptr<sgl::Mesh> CreateCubeMesh(
 		const std::shared_ptr<Program>& program)
 	{
-		return std::make_shared<Mesh>("../Asset/Cube.obj", program);
+		return std::make_shared<Mesh>("../Asset/Model/Cube.obj", program);
 	}
 
 } // End namespace sgl.

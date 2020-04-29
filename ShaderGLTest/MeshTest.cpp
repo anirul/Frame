@@ -8,7 +8,7 @@ namespace test {
 		EXPECT_FALSE(mesh_);
 		EXPECT_TRUE(window_);
 		auto program = sgl::CreateProgram("Simple");
-		mesh_ = std::make_shared<sgl::Mesh>("../Asset/Cube.obj", program);
+		mesh_ = std::make_shared<sgl::Mesh>("../Asset/Model/Cube.obj", program);
 		EXPECT_NE(0, mesh_->PointBuffer().GetId());
 		EXPECT_NE(0, mesh_->NormalBuffer().GetId());
 		EXPECT_NE(0, mesh_->TextureBuffer().GetId());
@@ -24,7 +24,9 @@ namespace test {
 		EXPECT_FALSE(mesh_);
 		EXPECT_TRUE(window_);
 		auto program = sgl::CreateProgram("Simple");
-		mesh_ = std::make_shared<sgl::Mesh>("../Asset/Torus.obj", program);
+		mesh_ = std::make_shared<sgl::Mesh>(
+			"../Asset/Model/Torus.obj", 
+			program);
 		EXPECT_NE(0, mesh_->PointBuffer().GetId());
 		EXPECT_NE(0, mesh_->NormalBuffer().GetId());
 		EXPECT_NE(0, mesh_->TextureBuffer().GetId());

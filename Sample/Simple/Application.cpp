@@ -75,7 +75,7 @@ std::shared_ptr<sgl::Mesh> Application::CreateAppleMesh(
 
 	// Mesh creation.
 	auto apple_mesh = std::make_shared<sgl::Mesh>(
-		"../Asset/Apple.obj", 
+		"../Asset/Model/Apple.obj", 
 		simple_program);
 
 	// Create the texture and bind it to the mesh.

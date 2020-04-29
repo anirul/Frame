@@ -105,8 +105,8 @@ target_link_libraries(ShaderGLTest
 
 add_executable(JapaneseFlag
   WIN32
-    ${PROJECT_SOURCE_DIR}/Asset/JapaneseFlag.frag
-    ${PROJECT_SOURCE_DIR}/Asset/JapaneseFlag.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/JapaneseFlag.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/JapaneseFlag.vert
     ${PROJECT_SOURCE_DIR}/Sample/JapaneseFlag/Application.cpp
     ${PROJECT_SOURCE_DIR}/Sample/JapaneseFlag/Application.h
     ${PROJECT_SOURCE_DIR}/Sample/JapaneseFlag/main.cpp
@@ -128,8 +128,8 @@ target_link_libraries(JapaneseFlag
 
 add_executable(RayMarching
   WIN32
-    ${PROJECT_SOURCE_DIR}/Asset/RayMarching.frag
-    ${PROJECT_SOURCE_DIR}/Asset/RayMarching.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/RayMarching.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/RayMarching.vert
     ${PROJECT_SOURCE_DIR}/Sample/RayMarching/Application.cpp
     ${PROJECT_SOURCE_DIR}/Sample/RayMarching/Application.h
     ${PROJECT_SOURCE_DIR}/Sample/RayMarching/main.cpp
@@ -151,10 +151,10 @@ target_link_libraries(RayMarching
 
 add_executable(Simple
   WIN32
-    ${PROJECT_SOURCE_DIR}/Asset/CubeMap.frag
-    ${PROJECT_SOURCE_DIR}/Asset/CubeMap.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Simple.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Simple.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/CubeMap.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/CubeMap.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/Simple.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/Simple.vert
     ${PROJECT_SOURCE_DIR}/Sample/Simple/Application.cpp
     ${PROJECT_SOURCE_DIR}/Sample/Simple/Application.h
     ${PROJECT_SOURCE_DIR}/Sample/Simple/main.cpp
@@ -176,14 +176,18 @@ target_link_libraries(Simple
 
 add_executable(PhysicallyBasedRendering
   WIN32
-    ${PROJECT_SOURCE_DIR}/Asset/CubeMapHighDynamicRange.frag
-    ${PROJECT_SOURCE_DIR}/Asset/CubeMapHighDynamicRange.vert
-    ${PROJECT_SOURCE_DIR}/Asset/EquirectangularCubeMap.frag
-    ${PROJECT_SOURCE_DIR}/Asset/EquirectangularCubeMap.vert
-    ${PROJECT_SOURCE_DIR}/Asset/IrradianceCubeMap.frag
-    ${PROJECT_SOURCE_DIR}/Asset/IrradianceCubeMap.vert
-    ${PROJECT_SOURCE_DIR}/Asset/PhysicallyBasedRendering.frag
-    ${PROJECT_SOURCE_DIR}/Asset/PhysicallyBasedRendering.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/CubeMapHighDynamicRange.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/CubeMapHighDynamicRange.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/EquirectangularCubeMap.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/EquirectangularCubeMap.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/IntegrateBRDF.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/IntegrateBRDF.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/IrradianceCubeMap.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/IrradianceCubeMap.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/MonteCarloPrefilter.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/MonteCarloPrefilter.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/PhysicallyBasedRendering.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/PhysicallyBasedRendering.vert
     ${PROJECT_SOURCE_DIR}/Sample/PhysicallyBasedRendering/Application.cpp
     ${PROJECT_SOURCE_DIR}/Sample/PhysicallyBasedRendering/Application.h
     ${PROJECT_SOURCE_DIR}/Sample/PhysicallyBasedRendering/main.cpp

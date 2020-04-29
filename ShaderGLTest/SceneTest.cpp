@@ -16,7 +16,9 @@ namespace test {
 		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(scene_);
 		auto program = sgl::CreateProgram("Simple");
-		auto mesh = std::make_shared<sgl::Mesh>("../Asset/Cube.obj", program);
+		auto mesh = std::make_shared<sgl::Mesh>(
+			"../Asset/Model/Cube.obj", 
+			program);
 		scene_ = std::make_shared<sgl::SceneMesh>(mesh);
 		EXPECT_TRUE(scene_);
 	}

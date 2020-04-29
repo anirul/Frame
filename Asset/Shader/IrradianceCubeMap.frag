@@ -1,6 +1,6 @@
 #version 330 core
 
-in vec3 out_local;
+in vec3 vert_local;
 
 layout(location = 0) out vec4 frag_color;
 
@@ -15,7 +15,7 @@ void main()
     // incoming radiance of the environment. The result of this radiance
     // is the radiance of light coming from -Normal direction, which is what
     // we use in the PBR shader to sample irradiance.
-    vec3 normal = normalize(out_local);
+    vec3 normal = normalize(vert_local);
   
     vec3 irradiance = vec3(0.0);
 

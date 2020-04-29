@@ -1,5 +1,6 @@
 #include "Texture.h"
 #include <algorithm>
+#include <functional>
 #include <GL/glew.h>
 #include "Image.h"
 #include "Frame.h"
@@ -238,6 +239,7 @@ namespace sgl {
 
 	TextureCubeMap::TextureCubeMap(
 		const std::string& file_name, 
+		const std::pair<std::uint32_t, std::uint32_t> size,
 		const PixelElementSize pixel_element_size /*= PixelElementSize::BYTE*/, 
 		const PixelStructure pixel_structure /*= PixelStructure::RGB*/) :
 		Texture(pixel_element_size, pixel_structure)
@@ -251,7 +253,7 @@ namespace sgl {
 				pixel_structure_));
 		Frame frame{};
 		Render render{};
-		size_ = std::make_pair<std::uint32_t, std::uint32_t>(512, 512);
+		size_ = size;
 		frame.BindAttach(render);
 		render.BindStorage(size_);
 		CreateTextureCubeMap();
@@ -273,8 +275,8 @@ namespace sgl {
 			glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
 		auto program = CreateProgram("EquirectangularCubeMap");
 		program->UniformMatrix("projection", projection);
-		Mesh cube("../Asset/Cube.obj", program);
-		cube.SetTextures({ "Equirectangular" });
+		auto cube = CreateCubeMesh(program);
+		cube->SetTextures({ "Equirectangular" });
 		glViewport(0, 0, 512, 512);
 		error_->Display(__FILE__, __LINE__ - 1);
 		Bind(texture_manager.EnableTexture("Equirectangular"));
@@ -288,7 +290,7 @@ namespace sgl {
 			i++;
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			error_->Display(__FILE__, __LINE__ - 1);
-			cube.Draw(texture_manager, view);
+			cube->Draw(texture_manager, view);
 		}
 	}
 
@@ -366,11 +368,34 @@ namespace sgl {
 	}
 
 	std::shared_ptr<sgl::Texture> CreateProgramTexture(
+		const TextureManager& texture_manager,
+		const std::vector<std::string>& texture_selected,
+		const std::shared_ptr<Program>& program,
+		const std::pair<std::uint32_t, std::uint32_t> size,
+		const PixelElementSize pixel_element_size /*= PixelElementSize::BYTE*/,
+		const PixelStructure pixel_structure /*= PixelStructure::RGB*/)
+	{
+		return CreateProgramTextureMipmap(
+			texture_manager,
+			texture_selected,
+			program,
+			size,
+			0,
+			[](const int, const std::shared_ptr<sgl::Program>&) {},
+			pixel_element_size,
+			pixel_structure);
+	}
+
+	std::shared_ptr<sgl::Texture> CreateProgramTextureMipmap(
 		const TextureManager& texture_manager, 
 		const std::vector<std::string>& texture_selected, 
 		const std::shared_ptr<Program>& program, 
 		const std::pair<std::uint32_t, std::uint32_t> size, 
-		const int mipmap /*= 0*/, 
+		const int mipmap,
+		const std::function<void(
+			const int mipmap,
+			const std::shared_ptr<sgl::Program>& program)> func /*=
+				[](const int, const std::shared_ptr<sgl::Program>&) {}*/,
 		const PixelElementSize pixel_element_size /*= PixelElementSize::BYTE*/, 
 		const PixelStructure pixel_structure /*= PixelStructure::RGB*/)
 	{
@@ -419,7 +444,30 @@ namespace sgl {
 		const std::vector<std::string>& texture_selected,
 		const std::shared_ptr<Program>& program,
 		const std::pair<std::uint32_t, std::uint32_t> size,
-		const int mipmap /*= 0*/,
+		const PixelElementSize pixel_element_size /*= PixelElementSize::BYTE*/,
+		const PixelStructure pixel_structure /*= PixelStructure::RGB*/)
+	{
+		return CreateProgramTextureCubeMapMipmap(
+			texture_manager,
+			texture_selected,
+			program,
+			size,
+			0,
+			[](const int, const std::shared_ptr<sgl::Program>&) {},
+			pixel_element_size,
+			pixel_structure);
+	}
+
+	std::shared_ptr<TextureCubeMap> CreateProgramTextureCubeMapMipmap(
+		const TextureManager& texture_manager,
+		const std::vector<std::string>& texture_selected,
+		const std::shared_ptr<Program>& program,
+		const std::pair<std::uint32_t, std::uint32_t> size,
+		const int mipmap,
+		const std::function<void(
+			const int mipmap,
+			const std::shared_ptr<sgl::Program>& program)> func /*=
+				[](const int, const std::shared_ptr<sgl::Program>&) {}*/,
 		const PixelElementSize pixel_element_size /*= PixelElementSize::BYTE*/,
 		const PixelStructure pixel_structure /*= PixelStructure::RGB*/)
 	{
@@ -427,31 +475,30 @@ namespace sgl {
 		Frame frame{};
 		Render render{};
 		frame.BindAttach(render);
-		render.BindStorage(size);
 		auto texture = std::make_shared<TextureCubeMap>(
-				size,
-				pixel_element_size,
-				pixel_structure);
+			size,
+			pixel_element_size,
+			pixel_structure);
 		int max_mipmap = (mipmap <= 0) ? 1 : mipmap;
 		if (max_mipmap > 1) texture->BindEnableMipmap();
 		glm::mat4 projection = glm::perspective(
-			glm::radians(90.0f), 
-			1.0f, 
-			0.1f, 
+			glm::radians(90.0f),
+			1.0f,
+			0.1f,
 			10.0f);
 		program->UniformMatrix("projection", projection);
 		auto cube = CreateCubeMesh(program);
 		cube->SetTextures(texture_selected);
-		std::pair<uint32_t, uint32_t> temporary_size = size;
-		program->UniformInt("max_mipmap", max_mipmap);
+		std::pair<std::uint32_t, std::uint32_t> temporary_size = { 0, 0 };
 		for (int mipmap_level = 0; mipmap_level < max_mipmap; ++mipmap_level)
 		{
-			program->UniformInt("mipmap_level", mipmap_level);
+			func(mipmap_level, program);
 			double fact = std::pow(0.5, mipmap_level);
 			temporary_size.first = 
 				static_cast<std::uint32_t>(size.first * fact);
 			temporary_size.second = 
 				static_cast<std::uint32_t>(size.second * fact);
+			render.BindStorage(temporary_size);
 			glViewport(0, 0, temporary_size.first, temporary_size.second);
 			error->Display(__FILE__, __LINE__ - 1);
 			int cubemap_element = 0;
@@ -463,7 +510,9 @@ namespace sgl {
 					static_cast<FrameTextureType>(cubemap_element));
 				cubemap_element++;
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-				cube->Draw(texture_manager, view);
+				error->Display(__FILE__, __LINE__ - 1);
+				program->UniformMatrix("view", view);
+				cube->Draw(texture_manager);
 			}
 		}
 		return texture;

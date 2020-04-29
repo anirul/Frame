@@ -116,8 +116,8 @@ namespace sgl {
 		auto program = std::make_shared<sgl::Program>();
 		sgl::Shader vertex(sgl::ShaderType::VERTEX_SHADER);
 		sgl::Shader fragment(sgl::ShaderType::FRAGMENT_SHADER);
-		vertex.LoadFromFile("../Asset/" + name + ".vert");
-		fragment.LoadFromFile("../Asset/" + name + ".frag");
+		vertex.LoadFromFile("../Asset/Shader/" + name + ".vert");
+		fragment.LoadFromFile("../Asset/Shader/" + name + ".frag");
 		program->AddShader(vertex);
 		program->AddShader(fragment);
 		program->LinkShader();

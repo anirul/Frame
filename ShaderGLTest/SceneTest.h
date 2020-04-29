@@ -30,7 +30,7 @@ namespace test {
 			scene_tree_->AddNode(matrix_scene);
 			{
 				auto mesh = std::make_shared<sgl::Mesh>(
-					"../Asset/Cube.obj",
+					"../Asset/Model/Cube.obj",
 					program);
 				scene_tree_->AddNode(
 					std::make_shared<sgl::SceneMesh>(mesh),
@@ -44,7 +44,7 @@ namespace test {
 				scene_tree_->AddNode(disp_scene, matrix_scene);
 				{
 					auto mesh = std::make_shared<sgl::Mesh>(
-						"../Asset/Torus.obj", 
+						"../Asset/Model/Torus.obj", 
 						program);
 					scene_tree_->AddNode(
 						std::make_shared<sgl::SceneMesh>(mesh),

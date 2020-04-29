@@ -11,7 +11,7 @@ namespace sgl {
 	{
 		BYTE  = 1,
 		SHORT = 2,
-		HALF  = 3,
+		HALF  = 3, // Doesn't work????
 		FLOAT = 4,
 	};
 
@@ -27,7 +27,7 @@ namespace sgl {
 	enum class PixelStructure : std::uint8_t
 	{
 		GREY       = 1,
-		GREY_ALPHA = 2,
+		GREY_ALPHA = 2, // Doesn't work????
 		RGB        = 3,
 		RGB_ALPHA  = 4,
 	};
