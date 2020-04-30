@@ -12,7 +12,7 @@ namespace sgl {
 		virtual void Startup() = 0;
 		virtual void Run() = 0;
 		virtual void SetDraw(std::function<void(const double)> draw_func) = 0;
-		virtual std::shared_ptr<Device> CreateDevice() = 0;
+		virtual std::shared_ptr<Device> GetUniqueDevice() = 0;
 		virtual std::pair<int, int> GetSize() const = 0;
 	};
 

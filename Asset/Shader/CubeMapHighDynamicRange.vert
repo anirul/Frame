@@ -16,7 +16,7 @@ void main()
     mat4 rotation_model = mat4(mat3(model));
     // Compute the new PVM matrix.
     mat4 pvm = projection * rotation_view * rotation_model;
-    vec4 clip_pos = pvm * vec4(vert_world_position, 1.0);
 
+    vec4 clip_pos = pvm * vec4(vert_world_position, 1.0);
     gl_Position = clip_pos.xyww;
 }

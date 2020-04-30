@@ -142,6 +142,8 @@ namespace sgl {
 
 	void Mesh::Draw(
 		const sgl::TextureManager& texture_manager,
+		const glm::mat4& projection /*= glm::mat4(1.0f)*/,
+		const glm::mat4& view /*= glm::mat4(1.0f)*/,
 		const glm::mat4& model /*= glm::mat4(1.0f)*/) const
 	{
 		texture_manager.DisableAll();
@@ -158,6 +160,9 @@ namespace sgl {
 		glBindVertexArray(vertex_array_object_);
 		error_->Display(__FILE__, __LINE__ - 1);
 
+		// Push updated matrices.
+		program_->UniformMatrix("projection", projection);
+		program_->UniformMatrix("view", view);
 		program_->UniformMatrix("model", model);
 
 		index_buffer_.Bind();

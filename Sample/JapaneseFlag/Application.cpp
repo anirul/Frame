@@ -6,7 +6,7 @@ Application::Application(const std::shared_ptr<sgl::Window>& window) :
 
 bool Application::Startup()
 {
-	auto device = window_->CreateDevice();
+	auto device = window_->GetUniqueDevice();
 	device->Startup();
 	auto billboard_mesh = CreateBillboardMesh();
 	auto billboard_program = billboard_mesh->GetProgram();

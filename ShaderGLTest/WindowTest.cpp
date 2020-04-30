@@ -23,7 +23,7 @@ namespace test {
 		ASSERT_FALSE(window_);
 		window_ = sgl::CreateSDLOpenGL({ 320, 200 });
 		ASSERT_TRUE(window_);
-		EXPECT_TRUE(window_->CreateDevice());
+		EXPECT_TRUE(window_->GetUniqueDevice());
 	}
 
 } // End namespace test.

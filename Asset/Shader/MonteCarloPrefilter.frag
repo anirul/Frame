@@ -117,9 +117,9 @@ void main()
         // generates a sample vector that's biased towards the preferred
         // alignment direction (importance sampling).
 #if 0
-        vec2 Xi = HammersleyNoBitOps(i, SAMPLE_COUNT);
-#else
         vec2 Xi = Hammersley(i, SAMPLE_COUNT);
+#else
+        vec2 Xi = HammersleyNoBitOps(i, SAMPLE_COUNT);
 #endif
         vec3 H  = ImportanceSampleGGX(Xi, N, roughness);
         vec3 L  = normalize(2.0 * dot(V, H) * H - V);

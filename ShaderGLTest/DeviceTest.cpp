@@ -6,7 +6,7 @@ namespace test {
 	{
 		EXPECT_FALSE(device_);
 		EXPECT_TRUE(window_);
-		device_ = window_->CreateDevice();
+		device_ = window_->GetUniqueDevice();
 		EXPECT_TRUE(device_);
 	}
 
@@ -14,7 +14,7 @@ namespace test {
 	{
 		EXPECT_FALSE(device_);
 		EXPECT_TRUE(window_);
-		device_ = window_->CreateDevice();
+		device_ = window_->GetUniqueDevice();
 		device_->Startup();
 		EXPECT_TRUE(device_);
 	}

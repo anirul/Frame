@@ -415,7 +415,6 @@ namespace sgl {
 			1.0f,
 			0.1f,
 			10.0f);
-		program->UniformMatrix("projection", projection);
 		auto quad = CreateQuadMesh(program);
 		quad->SetTextures(texture_selected);
 		std::pair<uint32_t, uint32_t> temporary_size = size;
@@ -434,7 +433,7 @@ namespace sgl {
 				*texture,
 				mipmap_level);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			quad->Draw(texture_manager);
+			quad->Draw(texture_manager, projection);
 		}
 		return texture;
 	}
@@ -486,7 +485,6 @@ namespace sgl {
 			1.0f,
 			0.1f,
 			10.0f);
-		program->UniformMatrix("projection", projection);
 		auto cube = CreateCubeMesh(program);
 		cube->SetTextures(texture_selected);
 		std::pair<std::uint32_t, std::uint32_t> temporary_size = { 0, 0 };
@@ -511,8 +509,7 @@ namespace sgl {
 				cubemap_element++;
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 				error->Display(__FILE__, __LINE__ - 1);
-				program->UniformMatrix("view", view);
-				cube->Draw(texture_manager);
+				cube->Draw(texture_manager, projection, view);
 			}
 		}
 		return texture;

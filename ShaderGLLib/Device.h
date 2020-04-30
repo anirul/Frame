@@ -35,7 +35,7 @@ namespace sgl {
 
 	public:
 		Camera GetCamera() const { return camera_; }
-		void SetCamera(const sgl::Camera& camera) { camera_ = camera; }
+		void SetCamera(const Camera& camera) { camera_ = camera; }
 		SceneTree GetSceneTree() const { return scene_tree_; }
 		void SetSceneTree(const SceneTree& scene_tree) 
 		{ 
@@ -55,17 +55,21 @@ namespace sgl {
 		const glm::mat4 GetView() const { return view_; }
 		const glm::mat4 GetModel() const { return model_; }
 
+	protected:
+		void SetupCamera();
+
 	private:
 		// Has to be a shared ptr as the program has to be created after the
 		// window is present and the GLEW init is done.
-		std::shared_ptr<sgl::Program> program_ = nullptr;
-		sgl::SceneTree scene_tree_ = {};
-		sgl::TextureManager texture_manager_ = {};
-		sgl::LightManager light_manager_ = {};
-		sgl::Camera camera_ = sgl::Camera({ 0.f, 0.f, 2.f });
+		std::shared_ptr<Program> program_ = nullptr;
+		SceneTree scene_tree_ = {};
+		TextureManager texture_manager_ = {};
+		LightManager light_manager_ = {};
+		Camera camera_ = Camera({ 0.f, 0.f, 2.f }, { 0.f, 0.f, 0.f });
 		glm::mat4 perspective_ = glm::mat4(1.0f);
 		glm::mat4 view_ = glm::mat4(1.0f);
 		glm::mat4 model_ = glm::mat4(1.0f);
+		float fov_ = 65.f;
 		void* gl_context_ = nullptr;
 		const std::pair<std::uint32_t, std::uint32_t> size_;
 	};

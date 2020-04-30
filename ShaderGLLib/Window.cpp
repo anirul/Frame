@@ -121,7 +121,11 @@ namespace sgl {
 						}
 					}
 
-					CreateDevice()->Draw(time.count());
+					if (draw_func_)
+					{
+						draw_func_(time.count());
+					}
+					GetUniqueDevice()->Draw(time.count());
 					previous_count = time.count();
 					SDL_GL_SwapWindow(sdl_window_);
 				} 
@@ -133,7 +137,7 @@ namespace sgl {
 				draw_func_ = draw_func;
 			}
 
-			std::shared_ptr<Device> CreateDevice() override
+			std::shared_ptr<Device> GetUniqueDevice() override
 			{
 				if (!device_)
 				{

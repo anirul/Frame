@@ -30,6 +30,8 @@ namespace sgl {
 		void SetTextures(const std::vector<std::string>& vec);
 		void Draw(
 			const TextureManager& texture_manager,
+			const glm::mat4& projection = glm::mat4(1.0f),
+			const glm::mat4& view = glm::mat4(1.0f),
 			const glm::mat4& model = glm::mat4(1.0f)) const;
 
 	public:

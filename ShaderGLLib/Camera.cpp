@@ -20,14 +20,21 @@ namespace sgl {
 		return glm::lookAt(position_, front_ - position_, { 0, 1, 0 });
 	}
 
+	void Camera::SetFront(const glm::vec3& vec)
+	{
+		front_ = vec;
+		UpdateCameraVectors();
+	}
+
+	void Camera::SetPosition(const glm::vec3& vec)
+	{
+		position_ = vec;
+		UpdateCameraVectors();
+	}
+
 	void Camera::UpdateCameraVectors()
 	{
-		front_.x = 
-			std::cos(glm::radians(yaw_)) * std::cos(glm::radians(pitch_));
-		front_.y = std::sin(glm::radians(pitch_));
-		front_.z = 
-			std::sin(glm::radians(yaw_)) * std::cos(glm::radians(pitch_));
-		front_ = glm::normalize(front_);
+		front_ = glm::normalize(front_ - position_);
 		right_ = glm::normalize(glm::cross(front_, world_up_));
 		up_ = glm::normalize(glm::cross(right_, front_));
 	}

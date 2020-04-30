@@ -131,6 +131,7 @@ void main()
     // reflectance equation
     vec3 Lo = vec3(0.0);
     
+#if 0
     for (int i = 0; i < 4; ++i)
     {
         // calculate per-light radiance
@@ -170,6 +171,7 @@ void main()
         // won't multiply by kS again
         Lo += (kD * albedo / PI + specular) * radiance * NdotL;    
     }
+#endif
 
     // ambient lighting (we now use IBL as the ambient term)
     vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
