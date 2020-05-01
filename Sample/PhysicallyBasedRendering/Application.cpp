@@ -1,10 +1,13 @@
 #include "Application.h"
 #include <glm/gtc/matrix_transform.hpp>
 
-const bool draw_apple = false;
-
-Application::Application(const std::shared_ptr<sgl::Window>& window) :
-	window_(window) {}
+Application::Application(
+	const std::shared_ptr<sgl::Window>& window, 
+	const draw_model_enum draw_model /*= draw_model_enum::SPHERE*/,
+	const texture_model_enum texture_model /*= texture_model_enum::METAL*/) :
+	window_(window),
+	draw_model_(draw_model),
+	texture_model_(texture_model) {}
 
 bool Application::Startup()
 {
@@ -15,24 +18,12 @@ bool Application::Startup()
 
 	// Create Environment cube map texture.
 	auto texture = std::make_shared<sgl::TextureCubeMap>(
-		"../Asset/CubeMap/Shiodome.hdr",
+		"../Asset/CubeMap/Hamarikyu.hdr",
 		std::make_pair<std::uint32_t, std::uint32_t>(512, 512),
 		sgl::PixelElementSize::FLOAT,
 		sgl::PixelStructure::RGB);
 
-	std::shared_ptr<sgl::Mesh> apple_mesh = nullptr;
-	std::shared_ptr<sgl::Mesh> sphere_mesh = nullptr;
-
-	if (draw_apple)
-	{
-		// Create an apple mesh.
-		apple_mesh = CreateAppleMesh(device, texture);
-	}
-	else
-	{
-		// Create a sphere mesh.
-		sphere_mesh = CreateSphereMesh(device, texture);
-	}
+	auto mesh = CreatePhysicallyBasedRenderedMesh(device, texture);
 
 	// Create the back cube map.
 	auto cube_map_mesh = CreateCubeMapMesh(device, texture);
@@ -47,18 +38,9 @@ bool Application::Startup()
 			scene_root);
 		auto scene_matrix = std::make_shared<sgl::SceneMatrix>(glm::mat4(1.0));
 		scene_tree.AddNode(scene_matrix, scene_root);
-		if (draw_apple)
-		{
-			scene_tree.AddNode(
-				std::make_shared<sgl::SceneMesh>(apple_mesh),
-				scene_matrix);
-		}
-		else
-		{
-			scene_tree.AddNode(
-				std::make_shared<sgl::SceneMesh>(sphere_mesh),
-				scene_matrix);
-		}
+		scene_tree.AddNode(
+			std::make_shared<sgl::SceneMesh>(mesh),
+			scene_matrix);
 	}
 
 	device->SetSceneTree(scene_tree);
@@ -91,9 +73,11 @@ void Application::Run()
 
 std::vector<std::string> Application::CreateTextures(
 	sgl::TextureManager& texture_manager,
-	const std::shared_ptr<sgl::TextureCubeMap>& texture,
-	const std::string& name) const
+	const std::shared_ptr<sgl::TextureCubeMap>& texture) const
 {
+	// Get the name of the texture.
+	std::string name = texture_model_texture_map_.at(texture_model_);
+
 	// Add the default texture to the texture manager.
 	texture_manager.AddTexture("Environment", texture);
 
@@ -162,7 +146,7 @@ std::vector<std::string> Application::CreateTextures(
 	};
 }
 
-std::shared_ptr<sgl::Mesh> Application::CreateSphereMesh(
+std::shared_ptr<sgl::Mesh> Application::CreatePhysicallyBasedRenderedMesh(
 	const std::shared_ptr<sgl::Device>& device,
 	const std::shared_ptr<sgl::TextureCubeMap>& texture)
 {
@@ -184,54 +168,18 @@ std::shared_ptr<sgl::Mesh> Application::CreateSphereMesh(
 	device->SetLightManager(light_manager);
 
 	// Mesh creation.
-	auto sphere_mesh = std::make_shared<sgl::Mesh>(
-		"../Asset/Model/Sphere.obj",
+	auto mesh = std::make_shared<sgl::Mesh>(
+		"../Asset/Model/" + draw_model_shape_map_.at(draw_model_) + ".obj",
 		pbr_program_);
 
 	// Get the texture manager.
 	auto texture_manager = device->GetTextureManager();
 	
 	// Set the texture to be used in the shader.
-	sphere_mesh->SetTextures(CreateTextures(texture_manager, texture, "Metal"));
+	mesh->SetTextures(CreateTextures(texture_manager, texture));
 	device->SetTextureManager(texture_manager);
 
-	return sphere_mesh;
-}
-
-std::shared_ptr<sgl::Mesh> Application::CreateAppleMesh(
-	const std::shared_ptr<sgl::Device>& device,
-	const std::shared_ptr<sgl::TextureCubeMap>& texture)
-{
-	// Create the physically based rendering program.
-	pbr_program_ = sgl::CreateProgram("PhysicallyBasedRendering");
-	pbr_program_->UniformMatrix("projection", device->GetProjection());
-	pbr_program_->UniformMatrix("view", device->GetView());
-	pbr_program_->UniformMatrix("model", device->GetModel());
-
-	// Create lights.
-	sgl::LightManager light_manager{};
-	const float light_value = 300.f;
-	const glm::vec3 light_vec(light_value, light_value, light_value);
-	light_manager.AddLight(sgl::Light({ 10.f, 10.f, 10.f }, light_vec));
-	light_manager.AddLight(sgl::Light({ 10.f, -10.f, 10.f }, light_vec));
-	light_manager.AddLight(sgl::Light({ -10.f, 10.f, 10.f }, light_vec));
-	light_manager.AddLight(sgl::Light({ -10.f, -10.f, 10.f }, light_vec));
-	light_manager.RegisterToProgram(pbr_program_);
-	device->SetLightManager(light_manager);
-
-	// Mesh creation.
-	auto apple_mesh = std::make_shared<sgl::Mesh>(
-		"../Asset/Model/Apple.obj", 
-		pbr_program_);
-
-	// Get the texture manager.
-	auto texture_manager = device->GetTextureManager();
-	
-	// Set the texture to be used in the shader.
-	apple_mesh->SetTextures(CreateTextures(texture_manager, texture, "Apple"));
-	device->SetTextureManager(texture_manager);
-
-	return apple_mesh;
+	return mesh;
 }
 
 std::shared_ptr<sgl::Mesh> Application::CreateCubeMapMesh(

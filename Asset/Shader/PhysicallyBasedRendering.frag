@@ -131,7 +131,7 @@ void main()
     // reflectance equation
     vec3 Lo = vec3(0.0);
     
-#if 0
+#if 1
     for (int i = 0; i < 4; ++i)
     {
         // calculate per-light radiance
@@ -161,15 +161,15 @@ void main()
         // multiply kD by the inverse metalness such that only non-metals 
         // have diffuse lighting, or a linear blend if partly metal (pure metals
         // have no diffuse light).
-        kD *= 1.0 - metallic;	  
+        kD *= 1.0 - metallic;
 
         // scale light by NdotL
-        float NdotL = max(dot(N, L), 0.0);        
+        float NdotL = max(dot(N, L), 0.0);
 
         // add to outgoing radiance Lo
         // note that we already multiplied the BRDF by the Fresnel (kS) so we
         // won't multiply by kS again
-        Lo += (kD * albedo / PI + specular) * radiance * NdotL;    
+        Lo += (kD * albedo / PI + specular) * radiance * NdotL;
     }
 #endif
 
