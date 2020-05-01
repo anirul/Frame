@@ -85,7 +85,7 @@ This will draw a cube map and an apple (simple just albedo).
 
 ### PhysicallyBasedRendering
 
-![PhysicallyBasedRendering](https://github.com/anirul/ShaderGL/raw/master/Sample/PhysicallyBasedRendering.png "A physically based rendering of an apple on an HDR background.")
+![PhysicallyBasedRendering](https://github.com/anirul/ShaderGL/raw/master/Sample/Sphere.png "A physically based rendering of a Sphere on an HDR background.")
 
 This is a full physically based rendering example this will use albedo, normal,
 metallic, roughness and ambient occlusion map. It will also make an irradiance 
