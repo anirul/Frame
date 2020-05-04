@@ -113,31 +113,31 @@ namespace sgl {
 
 		// Create a new vertex array (to render the mesh).
 		glGenVertexArrays(1, &vertex_array_object_);
-		error_->Display(__FILE__, __LINE__ - 1);
+		error_.Display(__FILE__, __LINE__ - 1);
 		glBindVertexArray(vertex_array_object_);
-		error_->Display(__FILE__, __LINE__ - 1);
+		error_.Display(__FILE__, __LINE__ - 1);
 		point_buffer_.Bind();
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-		error_->Display(__FILE__, __LINE__ - 1);
+		error_.Display(__FILE__, __LINE__ - 1);
 		point_buffer_.UnBind();
 		normal_buffer_.Bind();
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-		error_->Display(__FILE__, __LINE__ - 1);
+		error_.Display(__FILE__, __LINE__ - 1);
 		normal_buffer_.UnBind();
 		texture_buffer_.Bind();
 		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
-		error_->Display(__FILE__, __LINE__ - 1);
+		error_.Display(__FILE__, __LINE__ - 1);
 		texture_buffer_.UnBind();
 
 		// Enable vertex attrib array.
 		glEnableVertexAttribArray(0);
-		error_->Display(__FILE__, __LINE__ - 1);
+		error_.Display(__FILE__, __LINE__ - 1);
 		glEnableVertexAttribArray(1);
-		error_->Display(__FILE__, __LINE__ - 1);
+		error_.Display(__FILE__, __LINE__ - 1);
 		glEnableVertexAttribArray(2);
-		error_->Display(__FILE__, __LINE__ - 1);
+		error_.Display(__FILE__, __LINE__ - 1);
 		glBindVertexArray(0);
-		error_->Display(__FILE__, __LINE__ - 1);
+		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
 	void Mesh::Draw(
@@ -158,7 +158,7 @@ namespace sgl {
 		}
 
 		glBindVertexArray(vertex_array_object_);
-		error_->Display(__FILE__, __LINE__ - 1);
+		error_.Display(__FILE__, __LINE__ - 1);
 
 		// Push updated matrices.
 		program_->UniformMatrix("projection", projection);
@@ -171,18 +171,18 @@ namespace sgl {
 			static_cast<GLsizei>(index_size_),
 			GL_UNSIGNED_INT,
 			nullptr);
-		error_->Display(__FILE__, __LINE__ - 5);
+		error_.Display(__FILE__, __LINE__ - 5);
 		index_buffer_.UnBind();
 
 		glBindVertexArray(0);
-		error_->Display(__FILE__, __LINE__ - 1);
+		error_.Display(__FILE__, __LINE__ - 1);
 
 		texture_manager.DisableAll();
 
 		if (clear_depth_buffer_)
 		{
 			glClear(GL_DEPTH_BUFFER_BIT);
-			error_->Display(__FILE__, __LINE__ - 1);
+			error_.Display(__FILE__, __LINE__ - 1);
 		}
 	}
 

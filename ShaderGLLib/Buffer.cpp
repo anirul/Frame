@@ -12,7 +12,7 @@ namespace sgl {
 		buffer_usage_(buffer_usage)
 	{
 		glGenBuffers(1, &buffer_object_);
-		error_->Display(__FILE__, __LINE__ - 1);
+		error_.Display(__FILE__, __LINE__ - 1);
 	}
 	
 	Buffer::~Buffer()
@@ -23,13 +23,13 @@ namespace sgl {
 	void Buffer::Bind() const
 	{
 		glBindBuffer(static_cast<GLenum>(buffer_type_), buffer_object_);
-		error_->Display(__FILE__, __LINE__ - 1);
+		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
 	void Buffer::UnBind() const
 	{
 		glBindBuffer(static_cast<GLenum>(buffer_type_), 0);
-		error_->Display(__FILE__, __LINE__ - 1);
+		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
 	void Buffer::BindCopy(
@@ -42,7 +42,7 @@ namespace sgl {
 			size,
 			data,
 			static_cast<GLenum>(buffer_usage_));
-		error_->Display(__FILE__, __LINE__ - 5);
+		error_.Display(__FILE__, __LINE__ - 5);
 		UnBind();
 	}
 

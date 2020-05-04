@@ -54,7 +54,7 @@ namespace sgl {
 		const BufferType buffer_type_;
 		const BufferUsage buffer_usage_;
 		unsigned int buffer_object_ = 0;
-		std::shared_ptr<Error> error_ = Error::GetInstance();
+		const Error& error_ = Error::GetInstance();
 	};
 
 } // End namespace sgl.

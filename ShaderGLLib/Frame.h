@@ -28,7 +28,7 @@ namespace sgl {
 		void Bind() const;
 		void UnBind() const;
 		void BindAttach(const Render& render) const;
-		void BindTexture2D(
+		void BindTexture(
 			const Texture& texture,
 			const int mipmap = 0,
 			const FrameTextureType frame_texture_type = 
@@ -43,7 +43,7 @@ namespace sgl {
 
 	protected:
 		unsigned int frame_id_ = 0;
-		const std::shared_ptr<Error> error_ = Error::GetInstance();
+		const Error& error_ = Error::GetInstance();
 	};
 
 } // End namespace sgl.

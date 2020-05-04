@@ -20,11 +20,11 @@ namespace test {
 		program_ = std::make_shared<sgl::Program>();
 		EXPECT_TRUE(program_);
 		sgl::Shader vertex_shader(sgl::ShaderType::VERTEX_SHADER);
-		EXPECT_TRUE(vertex_shader.LoadFromFile("../Asset/Simple.vert"));
+		EXPECT_TRUE(vertex_shader.LoadFromFile("../Asset/Shader/Simple.vert"));
 		program_->AddShader(vertex_shader);
 		sgl::Shader fragment_shader(sgl::ShaderType::FRAGMENT_SHADER);
 		EXPECT_TRUE(
-			fragment_shader.LoadFromFile("../Asset/Simple.frag"));
+			fragment_shader.LoadFromFile("../Asset/Shader/Simple.frag"));
 		program_->AddShader(fragment_shader);
 	}
 
@@ -38,12 +38,12 @@ namespace test {
 		sgl::Shader vertex_shader(sgl::ShaderType::VERTEX_SHADER);
 		EXPECT_TRUE(
 			vertex_shader.LoadFromFile(
-				"../Asset/PhysicallyBasedRendering.vert"));
+				"../Asset/Shader/PhysicallyBasedRendering.vert"));
 		program_->AddShader(vertex_shader);
 		sgl::Shader fragment_shader(sgl::ShaderType::FRAGMENT_SHADER);
 		EXPECT_TRUE(
 			fragment_shader.LoadFromFile(
-				"../Asset/PhysicallyBasedRendering.frag"));
+				"../Asset/Shader/PhysicallyBasedRendering.frag"));
 		program_->AddShader(fragment_shader);
 		program_->LinkShader();
 		program_->Use();

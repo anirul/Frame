@@ -55,7 +55,7 @@ namespace sgl {
 		mutable std::map<std::string, int> memoize_map_ = {};
 		std::vector<unsigned int> attached_shaders_ = {};
 		int program_id_ = 0;
-		const std::shared_ptr<Error> error_ = Error::GetInstance();
+		const Error& error_ = Error::GetInstance();
 	};
 
 	// Create a program from a string!

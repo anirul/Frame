@@ -23,7 +23,7 @@ int main(int ac, char** av)
 	try
 	{
 		// FIXME(anirul): Fix this by using the command line or the environment
-		// variables and pass the parameters to the applications.
+		// variables and pass the parameters to the application.
 		Application app(sgl::CreateSDLOpenGL({ 640, 480 }));
 		if (!app.Startup())
 		{

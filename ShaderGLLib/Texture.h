@@ -63,7 +63,7 @@ namespace sgl {
 		std::pair<std::uint32_t, std::uint32_t> size_ = { 0, 0 };
 		const PixelElementSize pixel_element_size_;
 		const PixelStructure pixel_structure_;
-		const std::shared_ptr<Error> error_ = Error::GetInstance();
+		const Error& error_ = Error::GetInstance();
 	};
 
 	class TextureCubeMap : public Texture
@@ -113,6 +113,8 @@ namespace sgl {
 		bool AddTexture(
 			const std::string& name, 
 			const std::shared_ptr<sgl::Texture>& texture);
+		const std::shared_ptr<sgl::Texture>& GetTexture(
+			const std::string& name) const;
 		bool RemoveTexture(const std::string& name);
 		// Return the binding slot of the texture (to be passed to the program).
 		const int EnableTexture(const std::string& name) const;

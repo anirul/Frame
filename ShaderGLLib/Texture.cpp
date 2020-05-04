@@ -61,7 +61,7 @@ namespace sgl {
 			sgl::ConvertToGLType(pixel_structure_),
 			sgl::ConvertToGLType(pixel_element_size_),
 			img.Data());
-		error_->Display(__FILE__, __LINE__ - 10);
+		error_.Display(__FILE__, __LINE__ - 10);
 	}
 
 	Texture::Texture(
@@ -83,25 +83,25 @@ namespace sgl {
 			sgl::ConvertToGLType(pixel_structure_),
 			sgl::ConvertToGLType(pixel_element_size_),
 			nullptr);
-		error_->Display(__FILE__, __LINE__ - 10);
+		error_.Display(__FILE__, __LINE__ - 10);
 	}
 
 	void Texture::CreateTexture()
 	{
 		glGenTextures(1, &texture_id_);
-		error_->Display(__FILE__, __LINE__ - 1);
+		error_.Display(__FILE__, __LINE__ - 1);
 		glBindTexture(GL_TEXTURE_2D, texture_id_);
-		error_->Display(__FILE__, __LINE__ - 1);
+		error_.Display(__FILE__, __LINE__ - 1);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		error_->Display(__FILE__, __LINE__ - 1);
+		error_.Display(__FILE__, __LINE__ - 1);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		error_->Display(__FILE__, __LINE__ - 1);
+		error_.Display(__FILE__, __LINE__ - 1);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-		error_->Display(__FILE__, __LINE__ - 1);
+		error_.Display(__FILE__, __LINE__ - 1);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		error_->Display(__FILE__, __LINE__ - 1);
+		error_.Display(__FILE__, __LINE__ - 1);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		error_->Display(__FILE__, __LINE__ - 1);
+		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
 	Texture::~Texture()
@@ -112,22 +112,22 @@ namespace sgl {
 	void Texture::Bind(const unsigned int slot /*= 0*/) const
 	{
 		glActiveTexture(GL_TEXTURE0 + slot);
-		error_->Display(__FILE__, __LINE__ - 1);
+		error_.Display(__FILE__, __LINE__ - 1);
 		glBindTexture(GL_TEXTURE_2D, texture_id_);
-		error_->Display(__FILE__, __LINE__ - 1);
+		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
 	void Texture::UnBind() const
 	{
 		glBindTexture(GL_TEXTURE_2D, 0);
-		error_->Display(__FILE__, __LINE__ - 1);
+		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
 	void Texture::BindEnableMipmap() const
 	{
 		Bind();
 		glGenerateMipmap(GL_TEXTURE_2D);
-		error_->Display(__FILE__, __LINE__ - 1);
+		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
 	TextureManager::~TextureManager()
@@ -141,6 +141,17 @@ namespace sgl {
 	{
 		auto ret = name_texture_map_.insert({ name, texture });
 		return ret.second;
+	}
+
+	const std::shared_ptr<sgl::Texture>& TextureManager::GetTexture(
+		const std::string& name) const
+	{
+		auto it = name_texture_map_.find(name);
+		if (it == name_texture_map_.end())
+		{
+			throw std::runtime_error("No such texture: " + name);
+		}
+		return it->second;
 	}
 
 	bool TextureManager::RemoveTexture(const std::string& name)
@@ -233,7 +244,7 @@ namespace sgl {
 				sgl::ConvertToGLType(pixel_structure_),
 				sgl::ConvertToGLType(pixel_element_size_),
 				image.Data());
-			error_->Display(__FILE__, __LINE__ - 10);
+			error_.Display(__FILE__, __LINE__ - 10);
 		}
 	}
 
@@ -245,15 +256,15 @@ namespace sgl {
 		Texture(pixel_element_size, pixel_structure)
 	{
 		TextureManager texture_manager{};
+		Frame frame{};
+		Render render{};
+		size_ = size;
 		texture_manager.AddTexture(
 			"Equirectangular", 
 			std::make_shared<Texture>(
 				file_name,
 				pixel_element_size_,
 				pixel_structure_));
-		Frame frame{};
-		Render render{};
-		size_ = size;
 		frame.BindAttach(render);
 		render.BindStorage(size_);
 		CreateTextureCubeMap();
@@ -269,7 +280,7 @@ namespace sgl {
 				ConvertToGLType(pixel_structure_), 
 				ConvertToGLType(pixel_element_size_),
 				nullptr);
-			error_->Display(__FILE__, __LINE__ - 10);
+			error_.Display(__FILE__, __LINE__ - 10);
 		}
 		glm::mat4 projection =
 			glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
@@ -277,19 +288,20 @@ namespace sgl {
 		program->UniformMatrix("projection", projection);
 		auto cube = CreateCubeMesh(program);
 		cube->SetTextures({ "Equirectangular" });
-		glViewport(0, 0, 512, 512);
-		error_->Display(__FILE__, __LINE__ - 1);
-		Bind(texture_manager.EnableTexture("Equirectangular"));
+		glViewport(0, 0, size_.first, size_.second);
+		error_.Display(__FILE__, __LINE__ - 1);
 		int i = 0;
 		for (glm::mat4 view : views_cubemap)
 		{
-			frame.BindTexture2D(
+			frame.BindTexture(
 				*this,
 				0,
 				static_cast<FrameTextureType>(i));
 			i++;
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			error_->Display(__FILE__, __LINE__ - 1);
+			error_.Display(__FILE__, __LINE__ - 1);
+			// TODO(anirul): change this as the view is passed to the program
+			// and not the view passed as a projection.
 			cube->Draw(texture_manager, view);
 		}
 	}
@@ -315,56 +327,56 @@ namespace sgl {
 				ConvertToGLType(pixel_structure_),
 				ConvertToGLType(pixel_element_size_),
 				nullptr);
-			error_->Display(__FILE__, __LINE__ - 10);
+			error_.Display(__FILE__, __LINE__ - 10);
 		}
 	}
 
 	void TextureCubeMap::Bind(const unsigned int slot /*= 0*/) const
 	{
 		glActiveTexture(GL_TEXTURE0 + slot);
-		error_->Display(__FILE__, __LINE__ - 1);
+		error_.Display(__FILE__, __LINE__ - 1);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, texture_id_);
-		error_->Display(__FILE__, __LINE__ - 1);
+		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
 	void TextureCubeMap::UnBind() const
 	{
 		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-		error_->Display(__FILE__, __LINE__ - 1);
+		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
 	void TextureCubeMap::BindEnableMipmap() const
 	{
 		Bind();
 		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
-		error_->Display(__FILE__, __LINE__ - 1);
+		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
 	void TextureCubeMap::CreateTextureCubeMap()
 	{
 		glGenTextures(1, &texture_id_);
-		error_->Display(__FILE__, __LINE__ - 1);
+		error_.Display(__FILE__, __LINE__ - 1);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, texture_id_);
-		error_->Display(__FILE__, __LINE__ - 1);
+		error_.Display(__FILE__, __LINE__ - 1);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		error_->Display(__FILE__, __LINE__ - 1);
+		error_.Display(__FILE__, __LINE__ - 1);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		error_->Display(__FILE__, __LINE__ - 1);
+		error_.Display(__FILE__, __LINE__ - 1);
 		glTexParameteri(
 			GL_TEXTURE_CUBE_MAP,
 			GL_TEXTURE_WRAP_S,
 			GL_CLAMP_TO_EDGE);
-		error_->Display(__FILE__, __LINE__ - 4);
+		error_.Display(__FILE__, __LINE__ - 4);
 		glTexParameteri(
 			GL_TEXTURE_CUBE_MAP,
 			GL_TEXTURE_WRAP_T,
 			GL_CLAMP_TO_EDGE);
-		error_->Display(__FILE__, __LINE__ - 4);
+		error_.Display(__FILE__, __LINE__ - 4);
 		glTexParameteri(
 			GL_TEXTURE_CUBE_MAP,
 			GL_TEXTURE_WRAP_R,
 			GL_CLAMP_TO_EDGE);
-		error_->Display(__FILE__, __LINE__ - 4);
+		error_.Display(__FILE__, __LINE__ - 4);
 	}
 
 	std::shared_ptr<sgl::Texture> CreateProgramTexture(
@@ -399,7 +411,7 @@ namespace sgl {
 		const PixelElementSize pixel_element_size /*= PixelElementSize::BYTE*/, 
 		const PixelStructure pixel_structure /*= PixelStructure::RGB*/)
 	{
-		auto error = Error::GetInstance();
+		auto& error = Error::GetInstance();
 		Frame frame{};
 		Render render{};
 		frame.BindAttach(render);
@@ -418,18 +430,17 @@ namespace sgl {
 		auto quad = CreateQuadMesh(program);
 		quad->SetTextures(texture_selected);
 		std::pair<uint32_t, uint32_t> temporary_size = size;
-		program->UniformInt("max_mipmap", max_mipmap);
 		for (int mipmap_level = 0; mipmap_level < max_mipmap; ++mipmap_level)
 		{
-			program->UniformInt("mipmap_level", mipmap_level);
+			func(mipmap_level, program);
 			double fact = std::pow(0.5, mipmap_level);
 			temporary_size.first =
 				static_cast<std::uint32_t>(size.first * fact);
 			temporary_size.second =
 				static_cast<std::uint32_t>(size.second * fact);
 			glViewport(0, 0, temporary_size.first, temporary_size.second);
-			error->Display(__FILE__, __LINE__ - 1);
-			frame.BindTexture2D(
+			error.Display(__FILE__, __LINE__ - 1);
+			frame.BindTexture(
 				*texture,
 				mipmap_level);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -470,7 +481,7 @@ namespace sgl {
 		const PixelElementSize pixel_element_size /*= PixelElementSize::BYTE*/,
 		const PixelStructure pixel_structure /*= PixelStructure::RGB*/)
 	{
-		auto error = Error::GetInstance();
+		auto& error = Error::GetInstance();
 		Frame frame{};
 		Render render{};
 		frame.BindAttach(render);
@@ -498,17 +509,17 @@ namespace sgl {
 				static_cast<std::uint32_t>(size.second * fact);
 			render.BindStorage(temporary_size);
 			glViewport(0, 0, temporary_size.first, temporary_size.second);
-			error->Display(__FILE__, __LINE__ - 1);
+			error.Display(__FILE__, __LINE__ - 1);
 			int cubemap_element = 0;
 			for (glm::mat4 view : views_cubemap)
 			{
-				frame.BindTexture2D(
+				frame.BindTexture(
 					*texture,
 					mipmap_level,
 					static_cast<FrameTextureType>(cubemap_element));
 				cubemap_element++;
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-				error->Display(__FILE__, __LINE__ - 1);
+				error.Display(__FILE__, __LINE__ - 1);
 				cube->Draw(texture_manager, projection, view);
 			}
 		}

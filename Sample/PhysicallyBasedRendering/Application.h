@@ -41,7 +41,7 @@ public:
 public:
 	Application(
 		const std::shared_ptr<sgl::Window>& window,
-		const draw_model_enum draw_model = draw_model_enum::SPHERE,
+		const draw_model_enum draw_model = draw_model_enum::MONKEY,
 		const texture_model_enum texture_model = texture_model_enum::METAL);
 	bool Startup();
 	void Run();
@@ -67,9 +67,9 @@ private:
 	};
 	const std::map<texture_model_enum, std::string> 
 		texture_model_texture_map_ = {
-		{ texture_model_enum::METAL, "Metal" },
+		{ texture_model_enum::METAL,  "Metal" },
 		{ texture_model_enum::APPLE,  "Apple" },
-		{ texture_model_enum::PLANKS,   "Planks" },
+		{ texture_model_enum::PLANKS, "Planks" },
 	};
 	std::shared_ptr<sgl::Window> window_ = nullptr;
 	std::shared_ptr<sgl::Program> pbr_program_ = nullptr;

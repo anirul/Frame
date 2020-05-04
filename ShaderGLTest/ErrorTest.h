@@ -11,7 +11,7 @@ namespace test {
 		ErrorTest() = default;
 
 	protected:
-		std::shared_ptr<sgl::Error> error_ = sgl::Error::GetInstance();
+		sgl::Error& error_ = sgl::Error::GetInstance();
 	};
 
 } // End namespace test.

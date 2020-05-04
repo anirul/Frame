@@ -72,7 +72,7 @@ namespace sgl {
 		Buffer index_buffer_ =	{ sgl::BufferType::ELEMENT_ARRAY_BUFFER };
 		size_t index_size_ = 0;
 		unsigned int vertex_array_object_ = 0;
-		const std::shared_ptr<Error> error_ = Error::GetInstance();
+		const Error& error_ = Error::GetInstance();
 	};
 
 	// Create a Quad Mesh that is on the edge of the screen.

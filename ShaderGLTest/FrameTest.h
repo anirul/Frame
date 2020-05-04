@@ -13,13 +13,13 @@ namespace test {
 		FrameTest() 
 		{
 			window_ = sgl::CreateSDLOpenGL({ 320, 200 });
-			error_->SetWindowPtr(nullptr);
+			error_.SetWindowPtr(nullptr);
 		}
 
 	protected:
 		std::shared_ptr<sgl::Frame> frame_ = nullptr;
 		std::shared_ptr<sgl::Window> window_ = nullptr;
-		std::shared_ptr<sgl::Error> error_ = sgl::Error::GetInstance();
+		sgl::Error& error_ = sgl::Error::GetInstance();
 	};
 
 } // End namespace test.

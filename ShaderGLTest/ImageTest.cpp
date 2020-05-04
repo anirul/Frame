@@ -7,7 +7,7 @@ namespace test {
 	{
 		EXPECT_FALSE(image_);
 		image_ =
-			std::make_shared<sgl::Image>("../Asset/Texture.tga");
+			std::make_shared<sgl::Image>("../Asset/CubeMap/PositiveX.png");
 		EXPECT_TRUE(image_);
 	}
 
@@ -23,18 +23,18 @@ namespace test {
 	TEST_F(ImageTest, GetSizeImageTest)
 	{
 		EXPECT_FALSE(image_);
-		image_ = std::make_shared<sgl::Image>("../Asset/Texture.tga");
+		image_ = std::make_shared<sgl::Image>("../Asset/CubeMap/PositiveX.png");
 		EXPECT_TRUE(image_);
-		auto pair = std::make_pair<int, int>(256, 256);
+		auto pair = std::make_pair<int, int>(1024, 1024);
 		EXPECT_EQ(pair, image_->GetSize());
 	}
 
 	TEST_F(ImageTest, GetLengthImageTest)
 	{
 		EXPECT_FALSE(image_);
-		image_ = std::make_shared<sgl::Image>("../Asset/Texture.tga");
+		image_ = std::make_shared<sgl::Image>("../Asset/CubeMap/PositiveX.png");
 		EXPECT_TRUE(image_);
-		auto pair = std::make_pair<int, int>(256, 256);
+		auto pair = std::make_pair<int, int>(1024, 1024);
 		EXPECT_EQ(pair.first * pair.second, image_->GetLength());
 	}
 

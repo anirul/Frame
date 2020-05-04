@@ -13,12 +13,12 @@ namespace test {
 		TextureTest()
 		{
 			window_ = sgl::CreateSDLOpenGL({ 320, 200 });
-			error_->SetWindowPtr(nullptr);
+			error_.SetWindowPtr(nullptr);
 		}
 
 	protected:
 		std::shared_ptr<sgl::Window> window_ = nullptr;
-		std::shared_ptr<sgl::Error> error_ = sgl::Error::GetInstance();
+		sgl::Error& error_ = sgl::Error::GetInstance();
 		std::shared_ptr<sgl::Texture> texture_ = nullptr;
 		std::shared_ptr<sgl::TextureManager> texture_manager_ = nullptr;
 	};

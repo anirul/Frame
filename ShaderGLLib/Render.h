@@ -25,7 +25,7 @@ namespace sgl {
 
 	protected:
 		unsigned int render_id_;
-		const std::shared_ptr<Error> error_ = Error::GetInstance();
+		const Error& error_ = Error::GetInstance();
 	};
 
 } // End namespace sgl.

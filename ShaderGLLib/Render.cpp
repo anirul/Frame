@@ -7,7 +7,7 @@ namespace sgl {
 	Render::Render()
 	{
 		glGenRenderbuffers(1, &render_id_);
-		error_->Display(__FILE__, __LINE__ - 1);
+		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
 	Render::~Render()
@@ -18,13 +18,13 @@ namespace sgl {
 	void Render::Bind() const
 	{
 		glBindRenderbuffer(GL_RENDERBUFFER, render_id_);
-		error_->Display(__FILE__, __LINE__ - 1);
+		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
 	void Render::UnBind() const
 	{
 		glBindRenderbuffer(GL_RENDERBUFFER, 0);
-		error_->Display(__FILE__, __LINE__ - 1);
+		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
 	void Render::BindStorage(
@@ -38,7 +38,7 @@ namespace sgl {
 			static_cast<int>(pixel_depth_component),
 			size.first,
 			size.second);
-		error_->Display(__FILE__, __LINE__ - 5);
+		error_.Display(__FILE__, __LINE__ - 5);
 	}
 
 } // End namespace sgl.
