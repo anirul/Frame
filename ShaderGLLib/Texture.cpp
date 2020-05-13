@@ -440,10 +440,9 @@ namespace sgl {
 				static_cast<std::uint32_t>(size.second * fact);
 			glViewport(0, 0, temporary_size.first, temporary_size.second);
 			error.Display(__FILE__, __LINE__ - 1);
-			frame.BindTexture(
-				*texture,
-				mipmap_level);
+			frame.BindTexture(*texture, mipmap_level);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			error.Display(__FILE__, __LINE__ - 1);
 			quad->Draw(texture_manager, projection);
 		}
 		return texture;
