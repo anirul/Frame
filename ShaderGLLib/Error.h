@@ -17,8 +17,13 @@ namespace sgl {
 		void Display(
 			const std::string& file = "", 
 			const int line = -1) const;
+		void CreateError(
+			const std::string& error,
+			const std::string& file,
+			const int line = -1) const;
 
 	public:
+		bool AlreadyRaized() const { return already_raized_; }
 		static Error& GetInstance()
 		{
 			static Error error_;
@@ -32,6 +37,7 @@ namespace sgl {
 	private:
 		Error() = default;
 		static void* window_ptr_;
+		static bool already_raized_;
 	};
 
 } // End namespace sgl.

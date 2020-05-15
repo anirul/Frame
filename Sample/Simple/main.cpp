@@ -31,10 +31,14 @@ int main(int ac, char** av)
 	}
 	catch (std::exception ex)
 	{
+		if (!sgl::Error::GetInstance().AlreadyRaized())
+		{
 #if defined(_WIN32) || defined(_WIN64)
-		MessageBox(nullptr, ex.what(), "Error", MB_ICONEXCLAMATION);
+			MessageBox(nullptr, ex.what(), "Exception", MB_ICONEXCLAMATION);
+#else
+			std::cerr << "Error: " << ex.what() << std::endl;
 #endif
-		std::cerr << "Error: " << ex.what() << std::endl;
+		}
 		return -2;
 	}
 	return 0;

@@ -10,6 +10,7 @@
 namespace sgl {
 
 	void* Error::window_ptr_ = nullptr;
+	bool Error::already_raized_ = false;
 
 	std::string Error::GetLastError() const
 	{
@@ -51,19 +52,32 @@ namespace sgl {
 	{
 		std::string error = GetLastError();
 		if (error.empty()) return;
-		if (line != -1) error = std::to_string(line) + ":" + error;
-		if (!file.empty()) error = file + ":" + error;
+		CreateError(error, file, line);
+	}
+
+	void Error::CreateError(
+		const std::string& error, 
+		const std::string& file, 
+		const int line /*= -1*/) const
+	{
+		std::string temporary_error = error;
+		if (line != -1) 
+		{
+			temporary_error = std::to_string(line) + "\n" + temporary_error;
+		}
+		if (!file.empty()) temporary_error = file + ":" + temporary_error;
 		if (window_ptr_)
 		{
 #if defined(_WIN32) || defined(_WIN64)
 			MessageBox(
-				(HWND)window_ptr_, 
-				error.c_str(), 
-				"sgl::Error", 
+				(HWND)window_ptr_,
+				temporary_error.c_str(),
+				"sgl::Error",
 				MB_ICONEXCLAMATION);
 #endif
 		}
-		throw std::runtime_error(error);
+		already_raized_ = true;
+		throw std::runtime_error(temporary_error);
 	}
 
 } // End namespace sgl.

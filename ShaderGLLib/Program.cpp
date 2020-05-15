@@ -111,13 +111,26 @@ namespace sgl {
 		return memoize_map_[name];
 	}
 
-	std::shared_ptr<sgl::Program> CreateProgram(const std::string& name)
+	std::shared_ptr<Program> CreateProgram(const std::string& name)
 	{
 		auto program = std::make_shared<sgl::Program>();
+		const auto& error = Error::GetInstance();
 		sgl::Shader vertex(sgl::ShaderType::VERTEX_SHADER);
 		sgl::Shader fragment(sgl::ShaderType::FRAGMENT_SHADER);
-		vertex.LoadFromFile("../Asset/Shader/" + name + ".vert");
-		fragment.LoadFromFile("../Asset/Shader/" + name + ".frag");
+		if (!vertex.LoadFromFile("../Asset/Shader/" + name + ".vert"))
+		{
+			error.CreateError(
+				vertex.GetErrorMessage(), 
+				__FILE__, 
+				__LINE__ - 5);
+		}
+		if (!fragment.LoadFromFile("../Asset/Shader/" + name + ".frag"))
+		{
+			error.CreateError(
+				fragment.GetErrorMessage(), 
+				__FILE__, 
+				__LINE__ - 5);
+		}
 		program->AddShader(vertex);
 		program->AddShader(fragment);
 		program->LinkShader();
