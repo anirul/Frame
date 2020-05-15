@@ -57,6 +57,31 @@ namespace sgl {
 		error_.Display(__FILE__, __LINE__ - 6);
 	}
 
+	FrameColorAttachment Frame::GetFrameColorAttachment(const int i)
+	{
+		switch (i)
+		{
+			case 0:
+				return FrameColorAttachment::COLOR_ATTACHMENT0;
+			case 1:
+				return FrameColorAttachment::COLOR_ATTACHMENT1;
+			case 2:
+				return FrameColorAttachment::COLOR_ATTACHMENT2;
+			case 3:
+				return FrameColorAttachment::COLOR_ATTACHMENT3;
+			case 4:
+				return FrameColorAttachment::COLOR_ATTACHMENT4;
+			case 5:
+				return FrameColorAttachment::COLOR_ATTACHMENT5;
+			case 6:
+				return FrameColorAttachment::COLOR_ATTACHMENT6;
+			case 7:
+				return FrameColorAttachment::COLOR_ATTACHMENT7;
+			default :
+				throw std::runtime_error("Only [0-7] level allowed.");
+		}
+	}
+
 	const int Frame::GetFrameTextureType(
 		const FrameTextureType frame_texture_type) const
 	{
@@ -66,6 +91,11 @@ namespace sgl {
 			return GL_TEXTURE_CUBE_MAP_POSITIVE_X + value;
 		}
 		return GL_TEXTURE_2D;
+	}
+
+	FrameTextureType Frame::GetFrameTextureType(const int i)
+	{
+		return static_cast<FrameTextureType>(i);
 	}
 
 } // End namespace sgl.

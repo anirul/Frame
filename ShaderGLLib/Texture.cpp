@@ -296,6 +296,7 @@ namespace sgl {
 			frame.BindTexture(
 				*this,
 				0,
+				FrameColorAttachment::COLOR_ATTACHMENT0,
 				static_cast<FrameTextureType>(i));
 			i++;
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -393,7 +394,28 @@ namespace sgl {
 			program,
 			size,
 			0,
-			[](const int, const std::shared_ptr<sgl::Program>&) {},
+			[](const int, const std::shared_ptr<Program>&) {},
+			pixel_element_size,
+			pixel_structure);
+	}
+
+	void CreateProgramMultiTexture(
+		std::vector<std::shared_ptr<Texture>>& out_textures, 
+		const TextureManager& texture_manager, 
+		const std::vector<std::string>& texture_selected, 
+		const std::shared_ptr<Program>& program, 
+		const std::pair<std::uint32_t, std::uint32_t> size, 
+		const PixelElementSize pixel_element_size /*= PixelElementSize::BYTE*/, 
+		const PixelStructure pixel_structure /*= PixelStructure::RGB*/)
+	{
+		return CreateProgramMultiTextureMipmap(
+			out_textures,
+			texture_manager,
+			texture_selected,
+			program,
+			size,
+			0,
+			[](const int, const std::shared_ptr<Program>&) {},
 			pixel_element_size,
 			pixel_structure);
 	}
@@ -406,9 +428,41 @@ namespace sgl {
 		const int mipmap,
 		const std::function<void(
 			const int mipmap,
-			const std::shared_ptr<sgl::Program>& program)> func /*=
-				[](const int, const std::shared_ptr<sgl::Program>&) {}*/,
+			const std::shared_ptr<Program>& program)> func /*=
+				[](const int, const std::shared_ptr<Program>&) {}*/,
 		const PixelElementSize pixel_element_size /*= PixelElementSize::BYTE*/, 
+		const PixelStructure pixel_structure /*= PixelStructure::RGB*/)
+	{
+		auto texture = std::make_shared<Texture>(
+			size,
+			pixel_element_size,
+			pixel_structure);
+		std::vector<std::shared_ptr<Texture>> temp = { texture };
+		CreateProgramMultiTextureMipmap(
+			temp,
+			texture_manager,
+			texture_selected,
+			program,
+			size,
+			mipmap,
+			func,
+			pixel_element_size,
+			pixel_structure);
+		return texture;
+	}
+
+	void CreateProgramMultiTextureMipmap(
+		std::vector<std::shared_ptr<Texture>>& out_textures,
+		const TextureManager& texture_manager,
+		const std::vector<std::string>& texture_selected,
+		const std::shared_ptr<Program>& program,
+		const std::pair<std::uint32_t, std::uint32_t> size,
+		const int mipmap,
+		const std::function<void(
+			const int mipmap,
+			const std::shared_ptr<Program>& program)> func /*=
+				[](const int, const std::shared_ptr<sgl::Program>&) {}*/,
+		const PixelElementSize pixel_element_size /*= PixelElementSize::BYTE*/,
 		const PixelStructure pixel_structure /*= PixelStructure::RGB*/)
 	{
 		auto& error = Error::GetInstance();
@@ -416,12 +470,13 @@ namespace sgl {
 		Render render{};
 		frame.BindAttach(render);
 		render.BindStorage(size);
-		auto texture = std::make_shared<Texture>(
-			size,
-			pixel_element_size,
-			pixel_structure);
 		int max_mipmap = (mipmap <= 0) ? 1 : mipmap;
-		if (max_mipmap > 1) texture->BindEnableMipmap();
+		if (max_mipmap > 1) {
+			for (const auto& texture : out_textures)
+			{
+				texture->BindEnableMipmap();
+			}
+		}
 		glm::mat4 projection = glm::perspective(
 			glm::radians(90.0f),
 			1.0f,
@@ -440,12 +495,17 @@ namespace sgl {
 				static_cast<std::uint32_t>(size.second * fact);
 			glViewport(0, 0, temporary_size.first, temporary_size.second);
 			error.Display(__FILE__, __LINE__ - 1);
-			frame.BindTexture(*texture, mipmap_level);
+			for (int i = 0; i < out_textures.size(); ++i)
+			{
+				frame.BindTexture(
+					*out_textures[i], 
+					mipmap_level, 
+					Frame::GetFrameColorAttachment(i));
+			}
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			error.Display(__FILE__, __LINE__ - 1);
 			quad->Draw(texture_manager, projection);
 		}
-		return texture;
 	}
 
 	std::shared_ptr<TextureCubeMap> CreateProgramTextureCubeMap(
@@ -467,6 +527,27 @@ namespace sgl {
 			pixel_structure);
 	}
 
+	void CreateProgramMuliTextureCubeMap(
+		std::vector<std::shared_ptr<Texture>>& out_textures, 
+		const TextureManager& texture_manager, 
+		const std::vector<std::string>& texture_selected, 
+		const std::shared_ptr<Program>& program, 
+		const std::pair<std::uint32_t, std::uint32_t> size, 
+		const PixelElementSize pixel_element_size /*= PixelElementSize::BYTE*/, 
+		const PixelStructure pixel_structure /*= PixelStructure::RGB*/)
+	{
+		return CreateProgramMultiTextureCubeMapMipmap(
+			out_textures,
+			texture_manager,
+			texture_selected,
+			program,
+			size,
+			0,
+			[](const int, const std::shared_ptr<Program>&) {},
+			pixel_element_size,
+			pixel_structure);
+	}
+
 	std::shared_ptr<TextureCubeMap> CreateProgramTextureCubeMapMipmap(
 		const TextureManager& texture_manager,
 		const std::vector<std::string>& texture_selected,
@@ -475,8 +556,40 @@ namespace sgl {
 		const int mipmap,
 		const std::function<void(
 			const int mipmap,
+			const std::shared_ptr<Program>& program)> func /*=
+				[](const int, const std::shared_ptr<Program>&) {}*/,
+		const PixelElementSize pixel_element_size /*= PixelElementSize::BYTE*/,
+		const PixelStructure pixel_structure /*= PixelStructure::RGB*/)
+	{
+		auto texture = std::make_shared<TextureCubeMap>(
+			size,
+			pixel_element_size,
+			pixel_structure);
+		std::vector<std::shared_ptr<Texture>> temp = { texture };
+		CreateProgramMultiTextureCubeMapMipmap(
+			temp,
+			texture_manager,
+			texture_selected,
+			program,
+			size,
+			mipmap,
+			func,
+			pixel_element_size,
+			pixel_structure);
+		return texture;
+	}
+
+	void CreateProgramMultiTextureCubeMapMipmap(
+		std::vector<std::shared_ptr<Texture>>& out_textures,
+		const TextureManager& texture_manager,
+		const std::vector<std::string>& texture_selected,
+		const std::shared_ptr<Program>& program,
+		const std::pair<std::uint32_t, std::uint32_t> size,
+		const int mipmap,
+		const std::function<void(
+			const int mipmap,
 			const std::shared_ptr<sgl::Program>& program)> func /*=
-				[](const int, const std::shared_ptr<sgl::Program>&) {}*/,
+		[](const int, const std::shared_ptr<sgl::Program>&) {}*/,
 		const PixelElementSize pixel_element_size /*= PixelElementSize::BYTE*/,
 		const PixelStructure pixel_structure /*= PixelStructure::RGB*/)
 	{
@@ -484,12 +597,14 @@ namespace sgl {
 		Frame frame{};
 		Render render{};
 		frame.BindAttach(render);
-		auto texture = std::make_shared<TextureCubeMap>(
-			size,
-			pixel_element_size,
-			pixel_structure);
 		int max_mipmap = (mipmap <= 0) ? 1 : mipmap;
-		if (max_mipmap > 1) texture->BindEnableMipmap();
+		if (max_mipmap > 1) 
+		{
+			for (const auto& texture : out_textures)
+			{
+				texture->BindEnableMipmap();
+			}
+		}
 		glm::mat4 projection = glm::perspective(
 			glm::radians(90.0f),
 			1.0f,
@@ -502,9 +617,9 @@ namespace sgl {
 		{
 			func(mipmap_level, program);
 			double fact = std::pow(0.5, mipmap_level);
-			temporary_size.first = 
+			temporary_size.first =
 				static_cast<std::uint32_t>(size.first * fact);
-			temporary_size.second = 
+			temporary_size.second =
 				static_cast<std::uint32_t>(size.second * fact);
 			render.BindStorage(temporary_size);
 			glViewport(0, 0, temporary_size.first, temporary_size.second);
@@ -512,17 +627,21 @@ namespace sgl {
 			int cubemap_element = 0;
 			for (glm::mat4 view : views_cubemap)
 			{
-				frame.BindTexture(
-					*texture,
-					mipmap_level,
-					static_cast<FrameTextureType>(cubemap_element));
+				for (int i = 0; i < out_textures.size(); ++i)
+				{
+					frame.BindTexture(
+						*out_textures[i],
+						mipmap_level,
+						Frame::GetFrameColorAttachment(i),
+						static_cast<FrameTextureType>(cubemap_element));
+				}
 				cubemap_element++;
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 				error.Display(__FILE__, __LINE__ - 1);
 				cube->Draw(texture_manager, projection, view);
 			}
 		}
-		return texture;
-	}
 
+	}
+		
 } // End namespace sgl.

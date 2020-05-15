@@ -130,8 +130,23 @@ namespace sgl {
 	//		- texture_manager		: input texture.
 	//		- texture_selected		: set of selected texture to be used.
 	//		- program				: program to be used.
-	//		- size					: output size (*6).
+	//		- size					: output size.
 	std::shared_ptr<Texture> CreateProgramTexture(
+		const TextureManager& texture_manager,
+		const std::vector<std::string>& texture_selected,
+		const std::shared_ptr<Program>& program,
+		const std::pair<std::uint32_t, std::uint32_t> size,
+		const PixelElementSize pixel_element_size = PixelElementSize::BYTE,
+		const PixelStructure pixel_structure = PixelStructure::RGB);
+
+	// Create a texture from a program.
+	//		- out_textures			: output textures (should be allocated).
+	//		- texture_manager		: input texture.
+	//		- texture_selected		: set of selected texture to be used.
+	//		- program				: program to be used.
+	//		- size					: output size.
+	void CreateProgramMultiTexture(
+		std::vector<std::shared_ptr<Texture>>& out_textures,
 		const TextureManager& texture_manager,
 		const std::vector<std::string>& texture_selected,
 		const std::shared_ptr<Program>& program,
@@ -154,8 +169,30 @@ namespace sgl {
 		const int mipmap,
 		const std::function<void(
 			const int mipmap,
-			const std::shared_ptr<sgl::Program> & program)> func = 
-				[](const int, const std::shared_ptr<sgl::Program>&) {},
+			const std::shared_ptr<Program> & program)> func = 
+				[](const int, const std::shared_ptr<Program>&) {},
+		const PixelElementSize pixel_element_size = PixelElementSize::BYTE,
+		const PixelStructure pixel_structure = PixelStructure::RGB);
+
+	// Create a texture from a program.
+	//		- out_textures			: output textures (should be allocated).
+	//		- texture_manager		: input texture.
+	//		- texture_selected		: set of selected texture to be used.
+	//		- program				: program to be used.
+	//		- size					: output size (*6).
+	//		- mipmap				: level of mipmap (0 == 1).
+	//		- func					: a lambda that will be call per mipmap.
+	void CreateProgramMultiTextureMipmap(
+		std::vector<std::shared_ptr<Texture>>& out_textures,
+		const TextureManager& texture_manager,
+		const std::vector<std::string>& texture_selected,
+		const std::shared_ptr<Program>& program,
+		const std::pair<std::uint32_t, std::uint32_t> size,
+		const int mipmap,
+		const std::function<void(
+			const int mipmap,
+			const std::shared_ptr<sgl::Program>& program)> func =
+		[](const int, const std::shared_ptr<sgl::Program>&) {},
 		const PixelElementSize pixel_element_size = PixelElementSize::BYTE,
 		const PixelStructure pixel_structure = PixelStructure::RGB);
 
@@ -165,6 +202,21 @@ namespace sgl {
 	//		- program				: program to be used.
 	//		- size					: output size (*6).
 	std::shared_ptr<TextureCubeMap> CreateProgramTextureCubeMap(
+		const TextureManager& texture_manager,
+		const std::vector<std::string>& texture_selected,
+		const std::shared_ptr<Program>& program,
+		const std::pair<std::uint32_t, std::uint32_t> size,
+		const PixelElementSize pixel_element_size = PixelElementSize::BYTE,
+		const PixelStructure pixel_structure = PixelStructure::RGB);
+
+	// Create a cube map texture from a program.
+	//		- out_textures			: output textures (should be allocated).
+	//		- texture_manager		: input texture.
+	//		- texture_selected		: set of selected texture to be used.
+	//		- program				: program to be used.
+	//		- size					: output size (*6).
+	void CreateProgramMuliTextureCubeMap(
+		std::vector<std::shared_ptr<Texture>>& out_textures,
 		const TextureManager& texture_manager,
 		const std::vector<std::string>& texture_selected,
 		const std::shared_ptr<Program>& program,
@@ -189,6 +241,28 @@ namespace sgl {
 			const int mipmap, 
 			const std::shared_ptr<sgl::Program> & program)> func = 
 				[](const int, const std::shared_ptr<sgl::Program>&) {},
+		const PixelElementSize pixel_element_size = PixelElementSize::BYTE,
+		const PixelStructure pixel_structure = PixelStructure::RGB);
+
+	// Create a cube map texture from a program.
+	//		- out_textures			: output textures (should be allocated).
+	//		- texture_manager		: input texture.
+	//		- texture_selected		: set of selected texture to be used.
+	//		- program				: program to be used.
+	//		- size					: output size (*6).
+	//		- mipmap				: level of mipmap (0 == 1).
+	//		- func					: a lambda that will be call per mipmap.
+	void CreateProgramMultiTextureCubeMapMipmap(
+		std::vector<std::shared_ptr<Texture>>& out_textures,
+		const TextureManager& texture_manager,
+		const std::vector<std::string>& texture_selected,
+		const std::shared_ptr<Program>& program,
+		const std::pair<std::uint32_t, std::uint32_t> size,
+		const int mipmap,
+		const std::function<void(
+			const int mipmap,
+			const std::shared_ptr<Program>& program)> func =
+				[](const int, const std::shared_ptr<Program>&) {},
 		const PixelElementSize pixel_element_size = PixelElementSize::BYTE,
 		const PixelStructure pixel_structure = PixelStructure::RGB);
 

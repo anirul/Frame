@@ -18,6 +18,18 @@ namespace sgl {
 		CUBE_MAP_NEGATIVE_Z = 5,
 	};
 
+	enum class FrameColorAttachment
+	{
+		COLOR_ATTACHMENT0 = GL_COLOR_ATTACHMENT0,
+		COLOR_ATTACHMENT1 = GL_COLOR_ATTACHMENT1,
+		COLOR_ATTACHMENT2 = GL_COLOR_ATTACHMENT2,
+		COLOR_ATTACHMENT3 = GL_COLOR_ATTACHMENT3,
+		COLOR_ATTACHMENT4 = GL_COLOR_ATTACHMENT4,
+		COLOR_ATTACHMENT5 = GL_COLOR_ATTACHMENT5,
+		COLOR_ATTACHMENT6 = GL_COLOR_ATTACHMENT6,
+		COLOR_ATTACHMENT7 = GL_COLOR_ATTACHMENT7,
+	};
+
 	class Frame 
 	{
 	public:
@@ -31,8 +43,12 @@ namespace sgl {
 		void BindTexture(
 			const Texture& texture,
 			const int mipmap = 0,
+			const FrameColorAttachment frame_color_attachment =
+				FrameColorAttachment::COLOR_ATTACHMENT0,
 			const FrameTextureType frame_texture_type = 
 				FrameTextureType::TEXTURE_2D) const;
+		static FrameColorAttachment GetFrameColorAttachment(const int i);
+		static FrameTextureType GetFrameTextureType(const int i);
 
 	public:
 		const unsigned int GetId() const { return frame_id_; }

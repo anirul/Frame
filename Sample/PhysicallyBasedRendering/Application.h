@@ -41,7 +41,7 @@ public:
 public:
 	Application(
 		const std::shared_ptr<sgl::Window>& window,
-		const draw_model_enum draw_model = draw_model_enum::MONKEY,
+		const draw_model_enum draw_model = draw_model_enum::SPHERE,
 		const texture_model_enum texture_model = texture_model_enum::METAL);
 	bool Startup();
 	void Run();
