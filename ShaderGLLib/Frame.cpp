@@ -42,13 +42,15 @@ namespace sgl {
 	void Frame::BindTexture(
 		const Texture& texture,
 		const int mipmap /*= 0*/,
-		const FrameTextureType frame_texture_type 
-			/*= FrameTextureType::TEXTURE_2D*/) const
+		const FrameColorAttachment frame_color_attachment /*=
+			FrameColorAttachment::COLOR_ATTACHMENT0*/,
+		const FrameTextureType frame_texture_type /*= 
+			FrameTextureType::TEXTURE_2D*/) const
 	{
 		Bind();
 		glFramebufferTexture2D(
 			GL_FRAMEBUFFER,
-			GL_COLOR_ATTACHMENT0,
+			static_cast<GLenum>(frame_color_attachment),
 			GetFrameTextureType(frame_texture_type),
 			texture.GetId(),
 			mipmap);
