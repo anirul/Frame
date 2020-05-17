@@ -36,7 +36,9 @@ namespace sgl {
 		virtual void BindEnableMipmap() const;
 
 	public:
-		void CreateTexture();
+		void Draw() const;
+
+	public:
 		const int GetId() const { return texture_id_; }
 		std::pair<std::uint32_t, std::uint32_t> GetSize() const 
 		{ 
@@ -52,6 +54,7 @@ namespace sgl {
 		}
 
 	protected:
+		void CreateTexture();
 		Texture(
 			const PixelElementSize pixel_element_size = PixelElementSize::BYTE,
 			const PixelStructure pixel_structure = PixelStructure::RGB) :

@@ -12,11 +12,14 @@ namespace sgl {
 		virtual void Startup() = 0;
 		virtual void Run() = 0;
 		virtual void SetDraw(std::function<void(const double)> draw_func) = 0;
+		virtual void SetUniqueDevice(const std::shared_ptr<Device>& device) = 0;
 		virtual std::shared_ptr<Device> GetUniqueDevice() = 0;
-		virtual std::pair<int, int> GetSize() const = 0;
+		virtual std::pair<std::uint32_t, std::uint32_t> GetSize() const = 0;
+		virtual void* GetWindowContext() const = 0;
 	};
 
-	// Create an instance of the window.
-	std::shared_ptr<Window> CreateSDLOpenGL(std::pair<int, int> size);
+	// Create an instance of the window in SDL using OpenGL.
+	std::shared_ptr<Window> CreateSDLOpenGL(
+		std::pair<std::uint32_t, std::uint32_t> size);
 
 } // End namespace sgl.

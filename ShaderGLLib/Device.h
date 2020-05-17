@@ -54,14 +54,12 @@ namespace sgl {
 		const glm::mat4 GetProjection() const { return perspective_; }
 		const glm::mat4 GetView() const { return view_; }
 		const glm::mat4 GetModel() const { return model_; }
+		void* GetDeviceContext() const { return gl_context_; }
 
 	protected:
 		void SetupCamera();
 
 	private:
-		// Has to be a shared ptr as the program has to be created after the
-		// window is present and the GLEW init is done.
-		std::shared_ptr<Program> program_ = nullptr;
 		SceneTree scene_tree_ = {};
 		TextureManager texture_manager_ = {};
 		LightManager light_manager_ = {};

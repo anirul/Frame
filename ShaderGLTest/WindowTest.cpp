@@ -14,7 +14,7 @@ namespace test {
 		ASSERT_FALSE(window_);
 		window_ = sgl::CreateSDLOpenGL({ 640, 512 });
 		ASSERT_TRUE(window_);
-		std::pair<int, int> pair = { 640, 512 };
+		std::pair<std::uint32_t, std::uint32_t> pair = { 640, 512 };
 		EXPECT_EQ(pair, window_->GetSize());
 	}
 

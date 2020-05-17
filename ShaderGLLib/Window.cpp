@@ -50,53 +50,16 @@ namespace sgl {
 
 			virtual ~SDLWindow()
 			{
-				if (gl_context_)
+				// TODO(anirul): Fix me to check which device this is.
+				if (device_)
 				{
-					SDL_GL_DeleteContext(gl_context_);
+					SDL_GL_DeleteContext(device_->GetDeviceContext());
 				}
 				SDL_DestroyWindow(sdl_window_);
 				SDL_Quit();
 			}
 
-			std::optional<std::pair<int, int>> InitOpenGLDevice()
-			{
-				std::pair<int, int> gl_version;
-				// GL context.
-				gl_context_ = SDL_GL_CreateContext(sdl_window_);
-				SDL_GL_SetAttribute(
-					SDL_GL_CONTEXT_PROFILE_MASK,
-					SDL_GL_CONTEXT_PROFILE_CORE);
-				if (!gl_context_) return std::nullopt;
-#if defined(__APPLE__)
-				SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-				SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-#else
-				SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-				SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-#endif
-				SDL_GL_GetAttribute(
-					SDL_GL_CONTEXT_MAJOR_VERSION,
-					&gl_version.first);
-				SDL_GL_GetAttribute(
-					SDL_GL_CONTEXT_MINOR_VERSION,
-					&gl_version.second);
-				SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-				// Vsync off.
-				SDL_GL_SetSwapInterval(0);
-
-				return gl_version;
-			}
-
-			void Startup() override
-			{
-#if _DEBUG && !defined(__APPLE__)
-				// Enable error message.
-				glEnable(GL_DEBUG_OUTPUT);
-				glDebugMessageCallback(
-					SDLWindow::ErrorMessageHandler,
-					nullptr);
-#endif
-			}
+			void Startup() override {}
 
 			void Run() override
 			{
@@ -127,7 +90,11 @@ namespace sgl {
 					}
 					GetUniqueDevice()->Draw(time.count());
 					previous_count = time.count();
-					SDL_GL_SwapWindow(sdl_window_);
+					// TODO(anirul): Fix me to check which device this is.
+					if (device_)
+					{
+						SDL_GL_SwapWindow(sdl_window_);
+					}
 				} 
 				while (loop);
 			}
@@ -137,18 +104,24 @@ namespace sgl {
 				draw_func_ = draw_func;
 			}
 
+			void SetUniqueDevice(const std::shared_ptr<Device>& device) override
+			{
+				device_ = device;
+			}
+
 			std::shared_ptr<Device> GetUniqueDevice() override
 			{
-				if (!device_)
-				{
-					device_ = std::make_shared<sgl::Device>(gl_context_, size_);
-				}
 				return device_;
 			}
 
-			std::pair<int, int> GetSize() const override
+			std::pair<std::uint32_t, std::uint32_t> GetSize() const override
 			{
 				return size_;
+			}
+
+			void* GetWindowContext() const override
+			{
+				return sdl_window_;
 			}
 
 		protected:
@@ -178,86 +151,57 @@ namespace sgl {
 #endif
 			}
 
-#if !defined(__APPLE__)
-			static void GLAPIENTRY ErrorMessageHandler(
-				GLenum source,
-				GLenum type,
-				GLuint id,
-				GLenum severity,
-				GLsizei length,
-				const GLchar* message,
-				const void* userParam)
-			{
-				// Remove notifications.
-				if (severity == GL_DEBUG_SEVERITY_NOTIFICATION)
-					return;
-				std::ostringstream oss;
-				oss << "message\t: " << message << std::endl;
-				oss << "type\t: ";
-				switch (type)
-				{
-				case GL_DEBUG_TYPE_ERROR:
-					oss << "ERROR";
-					break;
-				case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
-					oss << "DEPRECATED_BEHAVIOR";
-					break;
-				case GL_DEBUG_TYPE_PORTABILITY:
-					oss << "PORABILITY";
-					break;
-				case GL_DEBUG_TYPE_PERFORMANCE:
-					oss << "PERFORMANCE";
-					break;
-				case GL_DEBUG_TYPE_OTHER:
-					oss << "OTHER";
-					break;
-				}
-				oss << std::endl;
-				oss << "id\t: " << id << std::endl;
-				oss << "severity\t: ";
-				switch (severity)
-				{
-				case GL_DEBUG_SEVERITY_LOW:
-					oss << "LOW";
-					break;
-				case GL_DEBUG_SEVERITY_MEDIUM:
-					oss << "MEDIUM";
-					break;
-				case GL_DEBUG_SEVERITY_HIGH:
-					oss << "HIGH";
-					break;
-				case GL_DEBUG_SEVERITY_NOTIFICATION:
-					oss << "NOTIFICATION";
-					break;
-				}
-				oss << std::endl;
-#if defined(_WIN32) || defined(_WIN64)
-				MessageBox(nullptr, oss.str().c_str(), "OpenGL Error", 0);
-#else
-				std::cerr << "OpenGL Error: " << oss.str() << std::endl;
-#endif
-			}
-#endif
-
 		private:
 			const std::pair<std::uint32_t, std::uint32_t> size_;
 			std::shared_ptr<sgl::Device> device_ = nullptr;
 			std::function<void(const double)> draw_func_ = nullptr;
 			SDL_Window* sdl_window_ = nullptr;
-			void* gl_context_ = nullptr;
 #if defined(_WIN32) || defined(_WIN64)
 			HWND hwnd_ = nullptr;
 #endif
 		};
 
-	}
+		void* InitOpenGLDevice(
+			const std::shared_ptr<Window>& window)
+		{
+			std::pair<int, int> gl_version;
+			// GL context.
+			void* gl_context = SDL_GL_CreateContext(
+				static_cast<SDL_Window*>(window->GetWindowContext()));
+			SDL_GL_SetAttribute(
+				SDL_GL_CONTEXT_PROFILE_MASK,
+				SDL_GL_CONTEXT_PROFILE_CORE);
+			if (!gl_context) return nullptr;
+#if defined(__APPLE__)
+			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+#else
+			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+#endif
+			SDL_GL_GetAttribute(
+				SDL_GL_CONTEXT_MAJOR_VERSION,
+				&gl_version.first);
+			SDL_GL_GetAttribute(
+				SDL_GL_CONTEXT_MINOR_VERSION,
+				&gl_version.second);
+			SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+			// Vsync off.
+			SDL_GL_SetSwapInterval(0);
 
-	std::shared_ptr<sgl::Window> CreateSDLOpenGL(std::pair<int, int> size)
+			return gl_context;
+		}
+
+	} // End namespace.
+
+	std::shared_ptr<sgl::Window> CreateSDLOpenGL(
+		std::pair<std::uint32_t, std::uint32_t> size)
 	{
-		auto window_ptr = std::make_shared<SDLWindow>(size);
-		auto maybe_version = window_ptr->InitOpenGLDevice();
-		if (!maybe_version) return nullptr;
-		return window_ptr;
+		auto window = std::make_shared<SDLWindow>(size);
+		auto context = InitOpenGLDevice(window);
+		if (!context) return nullptr;
+		window->SetUniqueDevice(std::make_shared<Device>(context, size));
+		return window;
 	}
 
 } // End namespace sgl.
