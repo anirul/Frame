@@ -18,9 +18,6 @@ bool Application::Startup()
 	auto apple_mesh = CreateAppleMesh(device);
 	auto cube_map_mesh = CreateCubeMapMesh(device, texture);
 
-	// Comment out if you want to see more errors.
-	// window_->Startup();
-
 	// Pack it into a Scene object.
 	sgl::SceneTree scene_tree{};
 	{

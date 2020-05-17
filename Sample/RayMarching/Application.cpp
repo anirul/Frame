@@ -11,9 +11,6 @@ bool Application::Startup()
 	auto billboard_mesh = CreateBillboardMesh();
 	auto billboard_program = billboard_mesh->GetProgram();
 
-	// Comment out if you want to see the errors.
-	// window_->Startup();
-
 	// Pack it into a Scene object.
 	sgl::SceneTree scene_tree{};
 	auto root = std::make_shared<sgl::SceneMatrix>(

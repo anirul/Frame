@@ -59,8 +59,6 @@ namespace sgl {
 				SDL_Quit();
 			}
 
-			void Startup() override {}
-
 			void Run() override
 			{
 				// While Run return true continue.

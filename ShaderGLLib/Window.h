@@ -9,7 +9,6 @@ namespace sgl {
 	// Interface to a window.
 	struct Window
 	{
-		virtual void Startup() = 0;
 		virtual void Run() = 0;
 		virtual void SetDraw(std::function<void(const double)> draw_func) = 0;
 		virtual void SetUniqueDevice(const std::shared_ptr<Device>& device) = 0;
