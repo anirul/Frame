@@ -82,37 +82,45 @@ std::vector<std::string> Application::CreateTextures(
 	texture_manager.AddTexture("Environment", texture);
 
 	// Create the Monte-Carlo prefilter.
-	auto monte_carlo_prefilter = sgl::CreateProgramTextureCubeMapMipmap(
+	auto monte_carlo_prefilter = std::make_shared<sgl::TextureCubeMap>(
+		std::make_pair<std::uint32_t, std::uint32_t>(128, 128), 
+		sgl::PixelElementSize::FLOAT, 
+		sgl::PixelStructure::RGB);
+	sgl::FillProgramMultiTextureCubeMapMipmap(
+		std::vector<std::shared_ptr<sgl::Texture>>{ monte_carlo_prefilter },
 		texture_manager,
 		{ "Environment" },
 		sgl::CreateProgram("MonteCarloPrefilter"),
-		{ 128, 128 },
 		5,
 		[](const int mipmap, const std::shared_ptr<sgl::Program>& program)
 		{
 			float roughness = static_cast<float>(mipmap) / 4.0f;
 			program->UniformFloat("roughness", roughness);
-		},
+		});
+	texture_manager.AddTexture("MonteCarloPrefilter", monte_carlo_prefilter);
+
+	// Create the Irradiance cube map texture.
+	auto irradiance = std::make_shared<sgl::TextureCubeMap>(
+		std::make_pair<std::uint32_t, std::uint32_t>(32, 32),
 		sgl::PixelElementSize::FLOAT,
 		sgl::PixelStructure::RGB);
-	texture_manager.AddTexture("MonteCarloPrefilter", monte_carlo_prefilter);
-	// Create the Irradiance cube map texture.
-	auto irradiance = sgl::CreateProgramTextureCubeMap(
+	sgl::FillProgramMultiTextureCubeMap(
+		std::vector<std::shared_ptr<sgl::Texture>>{ irradiance },
 		texture_manager,
 		{ "Environment" },
-		sgl::CreateProgram("IrradianceCubeMap"),
-		{ 32, 32 },
+		sgl::CreateProgram("IrradianceCubeMap"));
+	texture_manager.AddTexture("Irradiance", irradiance);
+
+	// Create the LUT BRDF.
+	auto integrate_brdf = std::make_shared<sgl::Texture>(
+		std::make_pair<std::uint32_t, std::uint32_t>(512, 512),
 		sgl::PixelElementSize::FLOAT,
 		sgl::PixelStructure::RGB);
-	texture_manager.AddTexture("Irradiance", irradiance);
-	// Create the LUT BRDF.
-	auto integrate_brdf = sgl::CreateProgramTexture(
+	sgl::FillProgramMultiTexture(
+		std::vector<std::shared_ptr<sgl::Texture>>{ integrate_brdf },
 		texture_manager,
 		{},
-		sgl::CreateProgram("IntegrateBRDF"),
-		{ 512, 512 },
-		sgl::PixelElementSize::FLOAT,
-		sgl::PixelStructure::RGB);
+		sgl::CreateProgram("IntegrateBRDF"));
 	texture_manager.AddTexture("IntegrateBRDF", integrate_brdf);
 
 	// Create the texture and bind it to the mesh.

@@ -102,11 +102,13 @@ namespace test {
 		EXPECT_NO_THROW(error_.Display());
 		sgl::TextureManager texture_manager{};
 		texture_manager.AddTexture("Environment", cube_map);
-		auto irradiance = CreateProgramTextureCubeMap(
+		auto irradiance = std::make_shared<sgl::TextureCubeMap>(
+			std::make_pair<std::uint32_t, std::uint32_t>(32, 32));
+		FillProgramMultiTextureCubeMap(
+			std::vector<std::shared_ptr<sgl::Texture>>{ irradiance },
 			texture_manager,
 			{ "Environment" },
-			sgl::CreateProgram("IrradianceCubeMap"),
-			{ 32, 32 });
+			sgl::CreateProgram("IrradianceCubeMap"));
 		EXPECT_NE(0, irradiance->GetId());
 		std::pair<std::uint32_t, std::uint32_t> pair(32, 32);
 		EXPECT_EQ(pair, irradiance->GetSize());

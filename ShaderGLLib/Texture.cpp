@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <functional>
 #include <GL/glew.h>
+#include <cassert>
 #include "Image.h"
 #include "Frame.h"
 #include "Render.h"
@@ -380,69 +381,19 @@ namespace sgl {
 		error_.Display(__FILE__, __LINE__ - 4);
 	}
 
-	std::shared_ptr<sgl::Texture> CreateProgramTexture(
-		const TextureManager& texture_manager,
-		const std::vector<std::string>& texture_selected,
-		const std::shared_ptr<Program>& program,
-		const std::pair<std::uint32_t, std::uint32_t> size,
-		const PixelElementSize pixel_element_size /*= PixelElementSize::BYTE*/,
-		const PixelStructure pixel_structure /*= PixelStructure::RGB*/)
-	{
-		return CreateProgramTextureMipmap(
-			texture_manager,
-			texture_selected,
-			program,
-			size,
-			0,
-			[](const int, const std::shared_ptr<Program>&) {},
-			pixel_element_size,
-			pixel_structure);
-	}
-
 	void FillProgramMultiTexture(
 		std::vector<std::shared_ptr<Texture>>& out_textures, 
 		const TextureManager& texture_manager, 
 		const std::vector<std::string>& texture_selected, 
-		const std::shared_ptr<Program>& program, 
-		const std::pair<std::uint32_t, std::uint32_t> size)
+		const std::shared_ptr<Program>& program)
 	{
 		FillProgramMultiTextureMipmap(
 			out_textures,
 			texture_manager,
 			texture_selected,
 			program,
-			size,
 			0,
 			[](const int, const std::shared_ptr<Program>&) {});
-	}
-
-	std::shared_ptr<sgl::Texture> CreateProgramTextureMipmap(
-		const TextureManager& texture_manager, 
-		const std::vector<std::string>& texture_selected, 
-		const std::shared_ptr<Program>& program, 
-		const std::pair<std::uint32_t, std::uint32_t> size, 
-		const int mipmap,
-		const std::function<void(
-			const int mipmap,
-			const std::shared_ptr<Program>& program)> func /*=
-				[](const int, const std::shared_ptr<Program>&) {}*/,
-		const PixelElementSize pixel_element_size /*= PixelElementSize::BYTE*/, 
-		const PixelStructure pixel_structure /*= PixelStructure::RGB*/)
-	{
-		auto texture = std::make_shared<Texture>(
-			size,
-			pixel_element_size,
-			pixel_structure);
-		std::vector<std::shared_ptr<Texture>> temp = { texture };
-		FillProgramMultiTextureMipmap(
-			temp,
-			texture_manager,
-			texture_selected,
-			program,
-			size,
-			mipmap,
-			func);
-		return texture;
 	}
 
 	void FillProgramMultiTextureMipmap(
@@ -450,7 +401,6 @@ namespace sgl {
 		const TextureManager& texture_manager,
 		const std::vector<std::string>& texture_selected,
 		const std::shared_ptr<Program>& program,
-		const std::pair<std::uint32_t, std::uint32_t> size,
 		const int mipmap,
 		const std::function<void(
 			const int mipmap,
@@ -458,6 +408,8 @@ namespace sgl {
 				[](const int, const std::shared_ptr<sgl::Program>&) {}*/)
 	{
 		auto& error = Error::GetInstance();
+		assert(out_textures.size());
+		auto size = out_textures[0]->GetSize();
 		Frame frame{};
 		Render render{};
 		frame.BindAttach(render);
@@ -500,69 +452,19 @@ namespace sgl {
 		}
 	}
 
-	std::shared_ptr<TextureCubeMap> CreateProgramTextureCubeMap(
-		const TextureManager& texture_manager,
-		const std::vector<std::string>& texture_selected,
-		const std::shared_ptr<Program>& program,
-		const std::pair<std::uint32_t, std::uint32_t> size,
-		const PixelElementSize pixel_element_size /*= PixelElementSize::BYTE*/,
-		const PixelStructure pixel_structure /*= PixelStructure::RGB*/)
-	{
-		return CreateProgramTextureCubeMapMipmap(
-			texture_manager,
-			texture_selected,
-			program,
-			size,
-			0,
-			[](const int, const std::shared_ptr<sgl::Program>&) {},
-			pixel_element_size,
-			pixel_structure);
-	}
-
-	void FillProgramMuliTextureCubeMap(
+	void FillProgramMultiTextureCubeMap(
 		std::vector<std::shared_ptr<Texture>>& out_textures, 
 		const TextureManager& texture_manager, 
 		const std::vector<std::string>& texture_selected, 
-		const std::shared_ptr<Program>& program, 
-		const std::pair<std::uint32_t, std::uint32_t> size)
+		const std::shared_ptr<Program>& program)
 	{
 		FillProgramMultiTextureCubeMapMipmap(
 			out_textures,
 			texture_manager,
 			texture_selected,
 			program,
-			size,
 			0,
 			[](const int, const std::shared_ptr<Program>&) {});
-	}
-
-	std::shared_ptr<TextureCubeMap> CreateProgramTextureCubeMapMipmap(
-		const TextureManager& texture_manager,
-		const std::vector<std::string>& texture_selected,
-		const std::shared_ptr<Program>& program,
-		const std::pair<std::uint32_t, std::uint32_t> size,
-		const int mipmap,
-		const std::function<void(
-			const int mipmap,
-			const std::shared_ptr<Program>& program)> func /*=
-				[](const int, const std::shared_ptr<Program>&) {}*/,
-		const PixelElementSize pixel_element_size /*= PixelElementSize::BYTE*/,
-		const PixelStructure pixel_structure /*= PixelStructure::RGB*/)
-	{
-		auto texture = std::make_shared<TextureCubeMap>(
-			size,
-			pixel_element_size,
-			pixel_structure);
-		std::vector<std::shared_ptr<Texture>> temp = { texture };
-		FillProgramMultiTextureCubeMapMipmap(
-			temp,
-			texture_manager,
-			texture_selected,
-			program,
-			size,
-			mipmap,
-			func);
-		return texture;
 	}
 
 	void FillProgramMultiTextureCubeMapMipmap(
@@ -570,7 +472,6 @@ namespace sgl {
 		const TextureManager& texture_manager,
 		const std::vector<std::string>& texture_selected,
 		const std::shared_ptr<Program>& program,
-		const std::pair<std::uint32_t, std::uint32_t> size,
 		const int mipmap,
 		const std::function<void(
 			const int mipmap,
@@ -578,6 +479,8 @@ namespace sgl {
 		[](const int, const std::shared_ptr<sgl::Program>&) {}*/)
 	{
 		auto& error = Error::GetInstance();
+		assert(out_textures.size());
+		auto size = out_textures[0]->GetSize();
 		Frame frame{};
 		Render render{};
 		frame.BindAttach(render);
