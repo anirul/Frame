@@ -18,12 +18,17 @@ namespace sgl {
 
 		// Enable blending to 1 - source alpha.
 		glEnable(GL_BLEND);
+		error_.Display(__FILE__, __LINE__ - 1);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		error_.Display(__FILE__, __LINE__ - 1);
 		// Enable Z buffer.
 		glEnable(GL_DEPTH_TEST);
+		error_.Display(__FILE__, __LINE__ - 1);
 		glDepthFunc(GL_LEQUAL);
+		error_.Display(__FILE__, __LINE__ - 1);
 		// Enable seamless cube map.
 		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
 	void Device::Startup(const float fov /*= 65.0f*/)
@@ -39,10 +44,13 @@ namespace sgl {
 
 		// Set the view port for rendering.
 		glViewport(0, 0, size_.first, size_.second);
+		error_.Display(__FILE__, __LINE__ - 1);
 
 		// Clear the screen.
 		glClearColor(.2f, 0.f, .2f, 1.0f);
+		error_.Display(__FILE__, __LINE__ - 1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		error_.Display(__FILE__, __LINE__ - 1);
 
 		for (const std::shared_ptr<sgl::Scene>& scene : scene_tree_)
 		{

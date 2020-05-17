@@ -72,6 +72,7 @@ namespace sgl {
 		float fov_ = 65.f;
 		void* gl_context_ = nullptr;
 		const std::pair<std::uint32_t, std::uint32_t> size_;
+		const Error& error_ = Error::GetInstance();
 	};
 
 } // End namespace sgl.
