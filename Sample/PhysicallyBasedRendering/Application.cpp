@@ -188,8 +188,6 @@ std::shared_ptr<sgl::Texture> Application::CreateBrightness(
 	error.Display(__FILE__, __LINE__ - 1);
 
 	// Clear the screen.
-	glClearColor(.2f, 0.f, .2f, 1.0f);
-	error.Display(__FILE__, __LINE__ - 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	error.Display(__FILE__, __LINE__ - 1);
 
@@ -232,8 +230,6 @@ std::shared_ptr<sgl::Texture> Application::CreateGaussianBlur(
 	error.Display(__FILE__, __LINE__ - 1);
 
 	// Clear the screen.
-	glClearColor(.2f, 0.f, .2f, 1.0f);
-	error.Display(__FILE__, __LINE__ - 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	error.Display(__FILE__, __LINE__ - 1);
 
@@ -252,9 +248,9 @@ std::shared_ptr<sgl::Texture> Application::CreateGaussianBlur(
 		program->UniformInt("horizontal", horizontal);
 		frame[horizontal].Bind();
 		texture_manager.AddTexture(
-			"Display", 
+			"Image", 
 			(first_iteration) ? texture : texture_out[!horizontal]);
-		quad->SetTextures({ "Display" });
+		quad->SetTextures({ "Image" });
 		quad->Draw(texture_manager);
 		horizontal = !horizontal;
 		if (first_iteration) first_iteration = false;
@@ -285,8 +281,6 @@ std::shared_ptr<sgl::Texture> Application::MergeDisplayAndGaussianBlur(
 	error.Display(__FILE__, __LINE__ - 1);
 
 	// Clear the screen.
-	glClearColor(.2f, 0.f, .2f, 1.0f);
-	error.Display(__FILE__, __LINE__ - 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	error.Display(__FILE__, __LINE__ - 1);
 
