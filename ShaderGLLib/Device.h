@@ -32,6 +32,10 @@ namespace sgl {
 		// Take the total time from the beginning of the program to now as a
 		// const double parameter.
 		void Draw(const double dt);
+		// Draw to a texture.
+		std::shared_ptr<Texture> DrawTexture(const double dt);
+		// Display a texture to the display.
+		void Display(const std::shared_ptr<Texture>& texture);
 
 	public:
 		Camera GetCamera() const { return camera_; }
@@ -69,7 +73,7 @@ namespace sgl {
 		glm::mat4 model_ = glm::mat4(1.0f);
 		float fov_ = 65.f;
 		void* gl_context_ = nullptr;
-		const std::pair<std::uint32_t, std::uint32_t> size_;
+		const std::pair<std::uint32_t, std::uint32_t> size_ = { 0, 0 };
 		// Error setup.
 		const Error& error_ = Error::GetInstance();
 	};

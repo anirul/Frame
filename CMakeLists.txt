@@ -176,10 +176,18 @@ target_link_libraries(Simple
 
 add_executable(PhysicallyBasedRendering
   WIN32
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/Brightness.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/Brightness.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/Combine.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/Combine.vert
     ${PROJECT_SOURCE_DIR}/Asset/Shader/CubeMapHighDynamicRange.frag
     ${PROJECT_SOURCE_DIR}/Asset/Shader/CubeMapHighDynamicRange.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/Display.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/Display.vert
     ${PROJECT_SOURCE_DIR}/Asset/Shader/EquirectangularCubeMap.frag
     ${PROJECT_SOURCE_DIR}/Asset/Shader/EquirectangularCubeMap.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/GaussianBlur.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/GaussianBlur.vert
     ${PROJECT_SOURCE_DIR}/Asset/Shader/IntegrateBRDF.frag
     ${PROJECT_SOURCE_DIR}/Asset/Shader/IntegrateBRDF.vert
     ${PROJECT_SOURCE_DIR}/Asset/Shader/IrradianceCubeMap.frag

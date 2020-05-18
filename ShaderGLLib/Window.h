@@ -10,7 +10,10 @@ namespace sgl {
 	struct Window
 	{
 		virtual void Run() = 0;
-		virtual void SetDraw(std::function<void(const double)> draw_func) = 0;
+		virtual void SetDraw(
+			std::function<void(
+				const double, 
+				std::shared_ptr<Texture>&)> draw_func) = 0;
 		virtual void SetUniqueDevice(const std::shared_ptr<Device>& device) = 0;
 		virtual std::shared_ptr<Device> GetUniqueDevice() = 0;
 		virtual std::pair<std::uint32_t, std::uint32_t> GetSize() const = 0;

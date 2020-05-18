@@ -41,9 +41,9 @@ namespace sgl {
 
 	void Frame::BindTexture(
 		const Texture& texture,
-		const int mipmap /*= 0*/,
 		const FrameColorAttachment frame_color_attachment /*=
 			FrameColorAttachment::COLOR_ATTACHMENT0*/,
+		const int mipmap /*= 0*/,
 		const FrameTextureType frame_texture_type /*= 
 			FrameTextureType::TEXTURE_2D*/) const
 	{

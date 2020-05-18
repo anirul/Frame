@@ -296,8 +296,8 @@ namespace sgl {
 		{
 			frame.BindTexture(
 				*this,
-				0,
 				FrameColorAttachment::COLOR_ATTACHMENT0,
+				0,
 				static_cast<FrameTextureType>(i));
 			i++;
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -443,8 +443,8 @@ namespace sgl {
 			{
 				frame.BindTexture(
 					*out_textures[i], 
-					mipmap_level, 
-					Frame::GetFrameColorAttachment(i));
+					Frame::GetFrameColorAttachment(i),
+					mipmap_level);
 			}
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			error.Display(__FILE__, __LINE__ - 1);
@@ -518,8 +518,8 @@ namespace sgl {
 				{
 					frame.BindTexture(
 						*out_textures[i],
-						mipmap_level,
 						Frame::GetFrameColorAttachment(i),
+						mipmap_level,
 						Frame::GetFrameTextureType(cubemap_element));
 				}
 				cubemap_element++;

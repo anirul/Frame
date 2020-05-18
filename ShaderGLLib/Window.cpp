@@ -82,11 +82,13 @@ namespace sgl {
 						}
 					}
 
+					auto texture = device_->DrawTexture(time.count());
 					if (draw_func_)
 					{
-						draw_func_(time.count());
+						draw_func_(time.count(), texture);
 					}
-					GetUniqueDevice()->Draw(time.count());
+					device_->Display(texture);
+
 					previous_count = time.count();
 					// TODO(anirul): Fix me to check which device this is.
 					if (device_)
@@ -97,7 +99,10 @@ namespace sgl {
 				while (loop);
 			}
 
-			void SetDraw(std::function<void(const double)> draw_func) override
+			void SetDraw(
+				std::function<void(
+					const double, 
+					std::shared_ptr<Texture>&)> draw_func) override
 			{
 				draw_func_ = draw_func;
 			}
@@ -152,7 +157,9 @@ namespace sgl {
 		private:
 			const std::pair<std::uint32_t, std::uint32_t> size_;
 			std::shared_ptr<sgl::Device> device_ = nullptr;
-			std::function<void(const double)> draw_func_ = nullptr;
+			std::function<void(
+				const double, 
+				std::shared_ptr<Texture>&)> draw_func_ = nullptr;
 			SDL_Window* sdl_window_ = nullptr;
 #if defined(_WIN32) || defined(_WIN64)
 			HWND hwnd_ = nullptr;

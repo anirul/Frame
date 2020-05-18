@@ -56,6 +56,16 @@ protected:
 	std::vector<std::string> CreateTextures(
 		sgl::TextureManager& texture_manager,
 		const std::shared_ptr<sgl::TextureCubeMap>& texture) const;
+	std::shared_ptr<sgl::Texture> AddBloom(
+		const std::shared_ptr<sgl::Texture>& texture) const;
+	std::shared_ptr<sgl::Texture> CreateBrightness(
+		const std::shared_ptr<sgl::Texture>& texture) const;
+	std::shared_ptr<sgl::Texture> CreateGaussianBlur(
+		const std::shared_ptr<sgl::Texture>& texture) const;
+	std::shared_ptr<sgl::Texture> MergeDisplayAndGaussianBlur(
+		const std::shared_ptr<sgl::Texture>& display,
+		const std::shared_ptr<sgl::Texture>& gaussian_blur,
+		const float exposure = 1.0f) const;
 
 private:
 	const std::map<draw_model_enum, std::string> draw_model_shape_map_ = {

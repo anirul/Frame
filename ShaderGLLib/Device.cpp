@@ -1,6 +1,8 @@
 #include "Device.h"
 #include <stdexcept>
 #include <glm/gtc/matrix_transform.hpp>
+#include "Frame.h"
+#include "Render.h"
 
 namespace sgl {
 
@@ -39,8 +41,34 @@ namespace sgl {
 
 	void Device::Draw(const double dt)
 	{
+		Display(DrawTexture(dt));
+	}
+
+	void Device::Display(const std::shared_ptr<Texture>& texture)
+	{
+		auto program = CreateProgram("Display");
+		auto quad = CreateQuadMesh(program);
+		TextureManager texture_manager{};
+		texture_manager.AddTexture("Display", texture);
+		quad->SetTextures({ "Display" });
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		quad->Draw(texture_manager);
+	}
+
+	std::shared_ptr<Texture> Device::DrawTexture(const double dt)
+	{
 		// Setup the camera.
 		SetupCamera();
+
+		auto texture = std::make_shared<Texture>(
+			size_, 
+			PixelElementSize::FLOAT, 
+			PixelStructure::RGB);
+
+		Frame frame{};
+		Render render{};
+		frame.BindAttach(render);
+		render.BindStorage(size_);
 
 		// Set the view port for rendering.
 		glViewport(0, 0, size_.first, size_.second);
@@ -52,9 +80,11 @@ namespace sgl {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		error_.Display(__FILE__, __LINE__ - 1);
 
-		for (const std::shared_ptr<sgl::Scene>& scene : scene_tree_)
+		frame.BindTexture(*texture);
+
+		for (const std::shared_ptr<Scene>& scene : scene_tree_)
 		{
-			const std::shared_ptr<sgl::Mesh>& mesh = scene->GetLocalMesh();
+			const std::shared_ptr<Mesh>& mesh = scene->GetLocalMesh();
 			if (!mesh)
 			{
 				continue;
@@ -67,6 +97,7 @@ namespace sgl {
 				view_, 
 				scene->GetLocalModel(dt));
 		}
+		return texture;
 	}
 
 	void Device::SetupCamera()

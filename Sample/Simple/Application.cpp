@@ -54,7 +54,9 @@ bool Application::Startup()
 
 void Application::Run()
 {
-	window_->SetDraw([this](const double dt)
+	window_->SetDraw([this](
+		const double dt,
+		std::shared_ptr<sgl::Texture>& texture)
 	{
 		float dtf = static_cast<float>(dt);
 		auto device = window_->GetUniqueDevice();
