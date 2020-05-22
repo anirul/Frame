@@ -1,6 +1,7 @@
 #include "Texture.h"
 #include <algorithm>
 #include <functional>
+#include <stdexcept>
 #include <GL/glew.h>
 #include <cassert>
 #include "Image.h"
