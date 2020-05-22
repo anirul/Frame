@@ -60,7 +60,7 @@ namespace sgl {
 
 	protected:
 		unsigned int frame_id_ = 0;
-		std::vector<FrameColorAttachment> draw_buffer_ = {};
+		std::vector<unsigned int> draw_buffer_ = {};
 		const Error& error_ = Error::GetInstance();
 	};
 

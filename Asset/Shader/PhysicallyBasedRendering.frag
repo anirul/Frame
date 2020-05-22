@@ -131,7 +131,7 @@ void main()
     // reflectance equation
     vec3 Lo = vec3(0.0);
     
-#if 1
+#if 0
     for (int i = 0; i < 4; ++i)
     {
         // calculate per-light radiance

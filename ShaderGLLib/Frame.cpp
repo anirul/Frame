@@ -99,13 +99,18 @@ namespace sgl {
 		return static_cast<FrameTextureType>(i);
 	}
 
-	void Frame::DrawBuffers(const std::uint32_t size /*= 1*/) const
+	void Frame::DrawBuffers(const std::uint32_t size /*= 1*/)
 	{
-		std::assert(i < 9);
-		for (int i = 0; i < size; ++i)
+		assert(size < 9);
+		draw_buffer_.clear();
+		for (std::uint32_t i = 0; i < size; ++i)
 		{
-
+			draw_buffer_.emplace_back(
+				static_cast<unsigned int>(Frame::GetFrameColorAttachment(i)));
 		}
+		glDrawBuffers(
+			static_cast<GLsizei>(draw_buffer_.size()), 
+			draw_buffer_.data());
 	}
 
 } // End namespace sgl.

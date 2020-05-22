@@ -485,6 +485,7 @@ namespace sgl {
 		Frame frame{};
 		Render render{};
 		frame.BindAttach(render);
+		frame.DrawBuffers(out_textures.size());
 		int max_mipmap = (mipmap <= 0) ? 1 : mipmap;
 		if (max_mipmap > 1) 
 		{
