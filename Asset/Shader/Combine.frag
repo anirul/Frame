@@ -19,8 +19,8 @@ void main()
     
 #if 1
     // tone mapping
-    // vec3 result = vec3(1.0) - exp(-hdrColor * exposure);
-    vec3 result = hdrColor / hdrColor - vec3(1.0);
+    vec3 result = vec3(1.0) - exp(-hdrColor * exposure);
+    // vec3 result = hdrColor / hdrColor - vec3(1.0);
     // also gamma correct while we're at it       
     result = pow(result, vec3(1.0 / gamma));
     frag_color = vec4(result, 1.0);
