@@ -415,6 +415,7 @@ namespace sgl {
 		Render render{};
 		frame.BindAttach(render);
 		render.BindStorage(size);
+		frame.DrawBuffers(static_cast<std::uint32_t>(out_textures.size()));
 		int max_mipmap = (mipmap <= 0) ? 1 : mipmap;
 		if (max_mipmap > 1) {
 			for (const auto& texture : out_textures)
@@ -477,7 +478,7 @@ namespace sgl {
 		const std::function<void(
 			const int mipmap,
 			const std::shared_ptr<sgl::Program>& program)> func /*=
-		[](const int, const std::shared_ptr<sgl::Program>&) {}*/)
+				[](const int, const std::shared_ptr<sgl::Program>&) {}*/)
 	{
 		auto& error = Error::GetInstance();
 		assert(out_textures.size());
@@ -485,7 +486,7 @@ namespace sgl {
 		Frame frame{};
 		Render render{};
 		frame.BindAttach(render);
-		frame.DrawBuffers(out_textures.size());
+		frame.DrawBuffers(static_cast<std::uint32_t>(out_textures.size()));
 		int max_mipmap = (mipmap <= 0) ? 1 : mipmap;
 		if (max_mipmap > 1) 
 		{

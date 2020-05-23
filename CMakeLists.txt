@@ -157,6 +157,8 @@ add_executable(Simple
     ${PROJECT_SOURCE_DIR}/Asset/Shader/Simple.vert
     ${PROJECT_SOURCE_DIR}/Sample/Simple/Application.cpp
     ${PROJECT_SOURCE_DIR}/Sample/Simple/Application.h
+    ${PROJECT_SOURCE_DIR}/Sample/Simple/Draw.cpp
+    ${PROJECT_SOURCE_DIR}/Sample/Simple/Draw.h
     ${PROJECT_SOURCE_DIR}/Sample/Simple/main.cpp
 )
 
@@ -198,6 +200,8 @@ add_executable(PhysicallyBasedRendering
     ${PROJECT_SOURCE_DIR}/Asset/Shader/PhysicallyBasedRendering.vert
     ${PROJECT_SOURCE_DIR}/Sample/PhysicallyBasedRendering/Application.cpp
     ${PROJECT_SOURCE_DIR}/Sample/PhysicallyBasedRendering/Application.h
+    ${PROJECT_SOURCE_DIR}/Sample/PhysicallyBasedRendering/Draw.cpp
+    ${PROJECT_SOURCE_DIR}/Sample/PhysicallyBasedRendering/Draw.h
     ${PROJECT_SOURCE_DIR}/Sample/PhysicallyBasedRendering/main.cpp
 )
 

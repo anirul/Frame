@@ -34,6 +34,10 @@ namespace sgl {
 		void Draw(const double dt);
 		// Draw to a texture.
 		std::shared_ptr<Texture> DrawTexture(const double dt);
+		// Draw to multiple textures.
+		void DrawMultiTextures(
+			const std::vector<std::shared_ptr<Texture>>& out_textures,
+			const double dt);
 		// Display a texture to the display.
 		void Display(const std::shared_ptr<Texture>& texture);
 

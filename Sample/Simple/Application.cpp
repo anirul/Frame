@@ -1,7 +1,8 @@
 #include "Application.h"
+#include "Draw.h"
 #include <glm/gtc/matrix_transform.hpp>
 
-Application::Application(const std::shared_ptr<sgl::Window>& window) :
+Application::Application(const std::shared_ptr<sgl::WindowInterface>& window) :
 	window_(window) {}
 
 bool Application::Startup()
@@ -54,18 +55,8 @@ bool Application::Startup()
 
 void Application::Run()
 {
-	window_->SetDraw([this](
-		const double dt,
-		std::shared_ptr<sgl::Texture>& texture)
-	{
-		float dtf = static_cast<float>(dt);
-		auto device = window_->GetUniqueDevice();
-		glm::vec4 position = { 0.f, 0.f, 2.f, 1.f };
-		glm::mat4 rot_y(1.0f);
-		rot_y = glm::rotate(rot_y, dtf * -.1f, glm::vec3(0.f, 1.f, 0.f));
-		sgl::Camera cam(glm::vec3(position * rot_y), { 0.f, 0.f, 0.f });
-		device->SetCamera(cam);
-	});
+	auto draw = std::make_shared<Draw>(window_);
+	window_->SetDrawInterface(draw);
 	window_->Run();
 }
 

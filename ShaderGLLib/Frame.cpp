@@ -111,6 +111,7 @@ namespace sgl {
 		glDrawBuffers(
 			static_cast<GLsizei>(draw_buffer_.size()), 
 			draw_buffer_.data());
+		error_.Display(__FILE__, __LINE__ - 3);
 	}
 
 } // End namespace sgl.

@@ -5,6 +5,7 @@ in vec3 vert_normal;
 in vec2 vert_texcoord;
 
 layout (location = 0) out vec4 frag_color;
+layout (location = 1) out vec4 frag_normal;
 
 uniform sampler2D Color;
 uniform sampler2D Normal;
@@ -121,6 +122,7 @@ void main()
     
     vec3 V = normalize(camera_position - vert_world_position);
     vec3 R = reflect(-V, N);
+    frag_normal = vec4(N, 1.0);
 
     // calculate reflectance at normal incidence; if dia-electric (like plastic)
     // use F0 of 0.04 and if it's a metal, use the albedo color as F0 (metallic

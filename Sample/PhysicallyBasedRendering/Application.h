@@ -3,6 +3,7 @@
 #include <memory>
 #include "../ShaderGLLib/Window.h"
 #include "../ShaderGLLib/Texture.h"
+#include "Draw.h"
 
 class Application
 {
@@ -40,7 +41,7 @@ public:
 
 public:
 	Application(
-		const std::shared_ptr<sgl::Window>& window,
+		const std::shared_ptr<sgl::WindowInterface>& window,
 		const draw_model_enum draw_model = draw_model_enum::SPHERE,
 		const texture_model_enum texture_model = texture_model_enum::METAL);
 	bool Startup();
@@ -81,8 +82,10 @@ private:
 		{ texture_model_enum::APPLE,  "Apple" },
 		{ texture_model_enum::PLANKS, "Planks" },
 	};
-	std::shared_ptr<sgl::Window> window_ = nullptr;
+	std::shared_ptr<sgl::WindowInterface> window_ = nullptr;
 	std::shared_ptr<sgl::Program> pbr_program_ = nullptr;
 	const draw_model_enum draw_model_ = draw_model_enum::SPHERE;
 	const texture_model_enum texture_model_ = texture_model_enum::METAL;
+
+	friend class Draw;
 };

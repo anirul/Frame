@@ -1,7 +1,7 @@
 #include "Application.h"
 #include <glm/gtc/matrix_transform.hpp>
 
-Application::Application(const std::shared_ptr<sgl::Window>& window) :
+Application::Application(const std::shared_ptr<sgl::WindowInterface>& window) :
 	window_(window) {}
 
 bool Application::Startup()
@@ -16,6 +16,7 @@ bool Application::Startup()
 	auto root = std::make_shared<sgl::SceneMatrix>(
 		[billboard_program](const double dt) -> glm::mat4
 	{
+		billboard_program->Use();
 		billboard_program->UniformFloat("Time", static_cast<float>(dt));
 		return glm::mat4(1.0);
 	});

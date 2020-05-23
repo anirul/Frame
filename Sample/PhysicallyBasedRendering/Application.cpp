@@ -4,7 +4,7 @@
 #include "Render.h"
 
 Application::Application(
-	const std::shared_ptr<sgl::Window>& window, 
+	const std::shared_ptr<sgl::WindowInterface>& window, 
 	const draw_model_enum draw_model /*= draw_model_enum::SPHERE*/,
 	const texture_model_enum texture_model /*= texture_model_enum::METAL*/) :
 	window_(window),
@@ -51,28 +51,8 @@ bool Application::Startup()
 
 void Application::Run()
 {
-	window_->SetDraw([this](
-		const double dt, 
-		std::shared_ptr<sgl::Texture>& texture)
-	{
-		// Update the camera.
-		float dtf = static_cast<float>(dt);
-		auto device = window_->GetUniqueDevice();
-		glm::vec4 position = { 0.f, 0.f, 2.f, 1.f };
-		glm::mat4 rot_y(1.0f);
-		rot_y = glm::rotate(rot_y, dtf * -.1f, glm::vec3(0.f, 1.f, 0.f));
-		sgl::Camera cam(glm::vec3(position * rot_y), { 0.f, 0.f, 0.f });
-		device->SetCamera(cam);
-		if (pbr_program_)
-		{
-			// Don't forget to use before setting any uniform.
-			pbr_program_->Use();
-			pbr_program_->UniformVector3(
-				"camera_position",
-				device->GetCamera().GetPosition());
-		}
-		texture = AddBloom(texture);
-	});
+	window_->SetDrawInterface(
+		std::make_shared<Draw>(window_, std::shared_ptr<Application>(this)));
 	window_->Run();
 }
 

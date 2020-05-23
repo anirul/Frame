@@ -11,7 +11,7 @@ namespace test {
 		WindowTest() = default;
 
 	protected:
-		std::shared_ptr<sgl::Window> window_ = nullptr;
+		std::shared_ptr<sgl::WindowInterface> window_ = nullptr;
 	};
 
 } // End namespace test.
