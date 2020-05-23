@@ -89,11 +89,8 @@ namespace sgl {
 
 					if (draw_interface_)
 					{
-						device_->DrawMultiTextures(
-							draw_interface_->GetTextures(), 
-							time.count());
-						draw_interface_->Run(time.count());
-						device_->Display(draw_interface_->GetTextures()[0]);
+						draw_interface_->RunDraw(time.count());
+						device_->Display(draw_interface_->GetDrawTexture());
 					}
 					else
 					{

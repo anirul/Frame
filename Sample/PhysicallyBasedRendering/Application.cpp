@@ -69,7 +69,7 @@ std::vector<std::string> Application::CreateTextures(
 	// Create the Monte-Carlo prefilter.
 	auto monte_carlo_prefilter = std::make_shared<sgl::TextureCubeMap>(
 		std::make_pair<std::uint32_t, std::uint32_t>(128, 128), 
-		sgl::PixelElementSize::FLOAT, 
+		sgl::PixelElementSize::HALF, 
 		sgl::PixelStructure::RGB);
 	sgl::FillProgramMultiTextureCubeMapMipmap(
 		std::vector<std::shared_ptr<sgl::Texture>>{ monte_carlo_prefilter },
@@ -87,7 +87,7 @@ std::vector<std::string> Application::CreateTextures(
 	// Create the Irradiance cube map texture.
 	auto irradiance = std::make_shared<sgl::TextureCubeMap>(
 		std::make_pair<std::uint32_t, std::uint32_t>(32, 32),
-		sgl::PixelElementSize::FLOAT,
+		sgl::PixelElementSize::HALF,
 		sgl::PixelStructure::RGB);
 	sgl::FillProgramMultiTextureCubeMap(
 		std::vector<std::shared_ptr<sgl::Texture>>{ irradiance },
@@ -99,7 +99,7 @@ std::vector<std::string> Application::CreateTextures(
 	// Create the LUT BRDF.
 	auto integrate_brdf = std::make_shared<sgl::Texture>(
 		std::make_pair<std::uint32_t, std::uint32_t>(512, 512),
-		sgl::PixelElementSize::FLOAT,
+		sgl::PixelElementSize::HALF,
 		sgl::PixelStructure::RGB);
 	sgl::FillProgramMultiTexture(
 		std::vector<std::shared_ptr<sgl::Texture>>{ integrate_brdf },
@@ -160,7 +160,7 @@ std::shared_ptr<sgl::Texture> Application::CreateBrightness(
 
 	auto texture_out = std::make_shared<sgl::Texture>(
 		size,
-		sgl::PixelElementSize::FLOAT,
+		sgl::PixelElementSize::HALF,
 		sgl::PixelStructure::RGB);
 
 	// Set the view port for rendering.
@@ -197,11 +197,11 @@ std::shared_ptr<sgl::Texture> Application::CreateGaussianBlur(
 	std::shared_ptr<sgl::Texture> texture_out[2] = {
 		std::make_shared<sgl::Texture>(
 			size,
-			sgl::PixelElementSize::FLOAT,
+			sgl::PixelElementSize::HALF,
 			sgl::PixelStructure::RGB),
 		std::make_shared<sgl::Texture>(
 			size,
-			sgl::PixelElementSize::FLOAT,
+			sgl::PixelElementSize::HALF,
 			sgl::PixelStructure::RGB)
 	};
 
@@ -253,7 +253,7 @@ std::shared_ptr<sgl::Texture> Application::MergeDisplayAndGaussianBlur(
 
 	auto texture_out = std::make_shared<sgl::Texture>(
 		size,
-		sgl::PixelElementSize::FLOAT,
+		sgl::PixelElementSize::HALF,
 		sgl::PixelStructure::RGB);
 
 	// Set the view port for rendering.

@@ -9,10 +9,14 @@ namespace sgl {
 	// This is the structure that define what draw has to do.
 	struct DrawInterface 
 	{
+		// Initialize with the size of the out buffer.
 		virtual void Initialize(
 			const std::pair<std::uint32_t, std::uint32_t> size) = 0;
-		virtual void Run(const double dt) = 0;
-		virtual const std::vector<std::shared_ptr<Texture>>& GetTextures() = 0;
+		// This should call the DrawMultiTextures or any draw from the device.
+		virtual void RunDraw(const double dt) = 0;
+		// Should get the output buffer.
+		virtual const std::shared_ptr<Texture>& GetDrawTexture() const = 0;
+		// This is there to free optional buffers (if needed).
 		virtual void Delete() = 0;
 	}; 
 

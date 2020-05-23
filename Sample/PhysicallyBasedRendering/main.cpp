@@ -27,7 +27,7 @@ int main(int ac, char** av)
 		Application app(
 			sgl::CreateSDLOpenGL({ 640, 480 }), 
 			Application::draw_model_enum::SPHERE, 
-			Application::texture_model_enum::PLANKS);
+			Application::texture_model_enum::METAL);
 		if (!app.Startup())
 		{
 			return -1;

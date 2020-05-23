@@ -4,17 +4,17 @@
 void Draw::Initialize(const std::pair<std::uint32_t, std::uint32_t> size)
 {
 	out_textures_.emplace_back(
-		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::FLOAT));
+		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF));
 	out_textures_.emplace_back(
-		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::FLOAT));
+		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF));
 }
 
-const std::vector<std::shared_ptr<sgl::Texture>>& Draw::GetTextures()
+const std::shared_ptr<sgl::Texture>& Draw::GetDrawTexture() const
 {
-	return out_textures_;
+	return out_textures_[0];
 }
 
-void Draw::Run(const double dt)
+void Draw::RunDraw(const double dt)
 {
 	// Update the camera.
 	float dtf = static_cast<float>(dt);
@@ -32,6 +32,7 @@ void Draw::Run(const double dt)
 			"camera_position",
 			device->GetCamera().GetPosition());
 	}
+	device->DrawMultiTextures(out_textures_, dt);
 	out_textures_[0] = application_->AddBloom(out_textures_[0]);
 }
 
