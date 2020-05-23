@@ -261,12 +261,13 @@ namespace sgl {
 		Frame frame{};
 		Render render{};
 		size_ = size;
+		auto equirectangular = std::make_shared<Texture>(
+			file_name,
+			pixel_element_size_,
+			pixel_structure_);
 		texture_manager.AddTexture(
 			"Equirectangular", 
-			std::make_shared<Texture>(
-				file_name,
-				pixel_element_size_,
-				pixel_structure_));
+			equirectangular);
 		frame.BindAttach(render);
 		render.BindStorage(size_);
 		CreateTextureCubeMap();

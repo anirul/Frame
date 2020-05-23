@@ -10,7 +10,7 @@ namespace sgl {
 	struct DrawInterface 
 	{
 		// Initialize with the size of the out buffer.
-		virtual void Initialize(
+		virtual void Startup(
 			const std::pair<std::uint32_t, std::uint32_t> size) = 0;
 		// This should call the DrawMultiTextures or any draw from the device.
 		virtual void RunDraw(const double dt) = 0;

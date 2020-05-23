@@ -31,8 +31,6 @@ namespace sgl {
 					desired_channels);
 			break;
 		}
-		case PixelElementSize::HALF :
-			[[fallthrough]];
 		case PixelElementSize::SHORT :
 		{
 			image_ =
@@ -44,6 +42,8 @@ namespace sgl {
 					desired_channels);
 			break;
 		}
+		case PixelElementSize::HALF:
+			[[fallthrough]];
 		case PixelElementSize::FLOAT :
 		{
 			image_ =

@@ -55,7 +55,7 @@ bool Application::Startup()
 
 void Application::Run()
 {
-	auto draw = std::make_shared<Draw>(window_);
+	auto draw = std::make_shared<Draw>(window_->GetUniqueDevice());
 	window_->SetDrawInterface(draw);
 	window_->Run();
 }

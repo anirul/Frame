@@ -15,15 +15,12 @@ bool Application::Startup()
 {
 	auto device = window_->GetUniqueDevice();
 	device->Startup();
-	// Comment out if you want to see the errors.
-	// window_->Startup();
 
 	// Create Environment cube map texture.
 	auto texture = std::make_shared<sgl::TextureCubeMap>(
 		"../Asset/CubeMap/Hamarikyu.hdr",
 		std::make_pair<std::uint32_t, std::uint32_t>(512, 512),
-		sgl::PixelElementSize::FLOAT,
-		sgl::PixelStructure::RGB);
+		sgl::PixelElementSize::HALF);
 
 	auto mesh = CreatePhysicallyBasedRenderedMesh(device, texture);
 
@@ -52,7 +49,7 @@ bool Application::Startup()
 void Application::Run()
 {
 	window_->SetDrawInterface(
-		std::make_shared<Draw>(window_, std::shared_ptr<Application>(this)));
+		std::make_shared<Draw>(window_->GetUniqueDevice(), pbr_program_));
 	window_->Run();
 }
 
@@ -69,8 +66,7 @@ std::vector<std::string> Application::CreateTextures(
 	// Create the Monte-Carlo prefilter.
 	auto monte_carlo_prefilter = std::make_shared<sgl::TextureCubeMap>(
 		std::make_pair<std::uint32_t, std::uint32_t>(128, 128), 
-		sgl::PixelElementSize::HALF, 
-		sgl::PixelStructure::RGB);
+		sgl::PixelElementSize::HALF);
 	sgl::FillProgramMultiTextureCubeMapMipmap(
 		std::vector<std::shared_ptr<sgl::Texture>>{ monte_carlo_prefilter },
 		texture_manager,
@@ -87,8 +83,7 @@ std::vector<std::string> Application::CreateTextures(
 	// Create the Irradiance cube map texture.
 	auto irradiance = std::make_shared<sgl::TextureCubeMap>(
 		std::make_pair<std::uint32_t, std::uint32_t>(32, 32),
-		sgl::PixelElementSize::HALF,
-		sgl::PixelStructure::RGB);
+		sgl::PixelElementSize::HALF);
 	sgl::FillProgramMultiTextureCubeMap(
 		std::vector<std::shared_ptr<sgl::Texture>>{ irradiance },
 		texture_manager,
@@ -99,8 +94,7 @@ std::vector<std::string> Application::CreateTextures(
 	// Create the LUT BRDF.
 	auto integrate_brdf = std::make_shared<sgl::Texture>(
 		std::make_pair<std::uint32_t, std::uint32_t>(512, 512),
-		sgl::PixelElementSize::HALF,
-		sgl::PixelStructure::RGB);
+		sgl::PixelElementSize::HALF);
 	sgl::FillProgramMultiTexture(
 		std::vector<std::shared_ptr<sgl::Texture>>{ integrate_brdf },
 		texture_manager,
@@ -137,145 +131,6 @@ std::vector<std::string> Application::CreateTextures(
 		"Irradiance",
 		"IntegrateBRDF" 
 	};
-}
-
-std::shared_ptr<sgl::Texture> Application::AddBloom(
-	const std::shared_ptr<sgl::Texture>& texture) const
-{
-	auto brightness = CreateBrightness(texture);
-	auto gaussian_blur = CreateGaussianBlur(brightness);
-	auto merge = MergeDisplayAndGaussianBlur(texture, gaussian_blur);
-	return merge;
-}
-
-std::shared_ptr<sgl::Texture> Application::CreateBrightness(
-	const std::shared_ptr<sgl::Texture>& texture) const
-{
-	const sgl::Error& error = sgl::Error::GetInstance();
-	sgl::Frame frame{};
-	sgl::Render render{};
-	auto size = texture->GetSize();
-	frame.BindAttach(render);
-	render.BindStorage(size);
-
-	auto texture_out = std::make_shared<sgl::Texture>(
-		size,
-		sgl::PixelElementSize::HALF,
-		sgl::PixelStructure::RGB);
-
-	// Set the view port for rendering.
-	glViewport(0, 0, size.first, size.second);
-	error.Display(__FILE__, __LINE__ - 1);
-
-	// Clear the screen.
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	error.Display(__FILE__, __LINE__ - 1);
-
-	frame.BindTexture(*texture_out);
-
-	sgl::TextureManager texture_manager;
-	texture_manager.AddTexture("Display", texture);
-	auto program = sgl::CreateProgram("Brightness");
-	auto quad = sgl::CreateQuadMesh(program);
-	quad->SetTextures({ "Display" });
-	quad->Draw(texture_manager);
-
-	return texture_out;
-}
-
-std::shared_ptr<sgl::Texture> Application::CreateGaussianBlur(
-	const std::shared_ptr<sgl::Texture>& texture) const
-{
-	const sgl::Error& error = sgl::Error::GetInstance();
-	sgl::Frame frame[2];
-	sgl::Render render{};
-	auto size = texture->GetSize();
-	frame[0].BindAttach(render);
-	frame[1].BindAttach(render);
-	render.BindStorage(size);
-
-	std::shared_ptr<sgl::Texture> texture_out[2] = {
-		std::make_shared<sgl::Texture>(
-			size,
-			sgl::PixelElementSize::HALF,
-			sgl::PixelStructure::RGB),
-		std::make_shared<sgl::Texture>(
-			size,
-			sgl::PixelElementSize::HALF,
-			sgl::PixelStructure::RGB)
-	};
-
-	// Set the view port for rendering.
-	glViewport(0, 0, size.first, size.second);
-	error.Display(__FILE__, __LINE__ - 1);
-
-	// Clear the screen.
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	error.Display(__FILE__, __LINE__ - 1);
-
-	frame[0].BindTexture(*texture_out[0]);
-	frame[1].BindTexture(*texture_out[1]);
-
-	auto program = sgl::CreateProgram("GaussianBlur");
-	auto quad = sgl::CreateQuadMesh(program);
-
-	bool horizontal = true;
-	bool first_iteration = true;
-	for (int i = 0; i < 10; ++i)
-	{
-		// Reset the texture manager.
-		sgl::TextureManager texture_manager;
-		program->UniformInt("horizontal", horizontal);
-		frame[horizontal].Bind();
-		texture_manager.AddTexture(
-			"Image", 
-			(first_iteration) ? texture : texture_out[!horizontal]);
-		quad->SetTextures({ "Image" });
-		quad->Draw(texture_manager);
-		horizontal = !horizontal;
-		if (first_iteration) first_iteration = false;
-	}
-
-	return texture_out[!horizontal];
-}
-
-std::shared_ptr<sgl::Texture> Application::MergeDisplayAndGaussianBlur(
-	const std::shared_ptr<sgl::Texture>& display,
-	const std::shared_ptr<sgl::Texture>& gaussian_blur,
-	const float exposure /*= 1.0f*/) const
-{
-	const sgl::Error& error = sgl::Error::GetInstance();
-	sgl::Frame frame{};
-	sgl::Render render{};
-	auto size = display->GetSize();
-	frame.BindAttach(render);
-	render.BindStorage(size);
-
-	auto texture_out = std::make_shared<sgl::Texture>(
-		size,
-		sgl::PixelElementSize::HALF,
-		sgl::PixelStructure::RGB);
-
-	// Set the view port for rendering.
-	glViewport(0, 0, size.first, size.second);
-	error.Display(__FILE__, __LINE__ - 1);
-
-	// Clear the screen.
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	error.Display(__FILE__, __LINE__ - 1);
-
-	frame.BindTexture(*texture_out);
-
-	sgl::TextureManager texture_manager;
-	texture_manager.AddTexture("Display", display);
-	texture_manager.AddTexture("GaussianBlur", gaussian_blur);
-	auto program = sgl::CreateProgram("Combine");
-	program->UniformFloat("exposure", exposure);
-	auto quad = sgl::CreateQuadMesh(program);
-	quad->SetTextures({ "Display", "GaussianBlur" });
-	quad->Draw(texture_manager);
-
-	return texture_out;
 }
 
 std::shared_ptr<sgl::Mesh> Application::CreatePhysicallyBasedRenderedMesh(

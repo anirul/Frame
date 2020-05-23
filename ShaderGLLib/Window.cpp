@@ -64,7 +64,7 @@ namespace sgl {
 				// FIXME(anirul): will crash in case you resize the window.
 				if (draw_interface_)
 				{
-					draw_interface_->Initialize(size_);
+					draw_interface_->Startup(size_);
 				}
 				// While Run return true continue.
 				bool loop = true;
