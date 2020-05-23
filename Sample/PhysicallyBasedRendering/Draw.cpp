@@ -3,7 +3,10 @@
 
 void Draw::Initialize(const std::pair<std::uint32_t, std::uint32_t> size)
 {
-
+	out_textures_.emplace_back(
+		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::FLOAT));
+	out_textures_.emplace_back(
+		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::FLOAT));
 }
 
 const std::vector<std::shared_ptr<sgl::Texture>>& Draw::GetTextures()
