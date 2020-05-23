@@ -202,6 +202,7 @@ add_executable(PhysicallyBasedRendering
     ${PROJECT_SOURCE_DIR}/Sample/PhysicallyBasedRendering/Application.h
     ${PROJECT_SOURCE_DIR}/Sample/PhysicallyBasedRendering/Draw.cpp
     ${PROJECT_SOURCE_DIR}/Sample/PhysicallyBasedRendering/Draw.h
+    ${PROJECT_SOURCE_DIR}/Sample/PhysicallyBasedRendering/Types.h
     ${PROJECT_SOURCE_DIR}/Sample/PhysicallyBasedRendering/main.cpp
 )
 

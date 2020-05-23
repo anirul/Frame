@@ -15,6 +15,13 @@ public:
 	void RunDraw(const double dt) override;
 	void Delete() override;
 
+protected:
+	std::shared_ptr<sgl::Mesh> CreateAppleMesh(
+		const std::shared_ptr<sgl::Device>& device) const;
+	std::shared_ptr<sgl::Mesh> CreateCubeMapMesh(
+		const std::shared_ptr<sgl::Device>& device,
+		const std::shared_ptr<sgl::TextureCubeMap>& texture) const;
+
 private:
 	std::vector<std::shared_ptr<sgl::Texture>> out_textures_ = {};
 	std::shared_ptr<sgl::Device> device_ = nullptr;
