@@ -194,6 +194,8 @@ add_executable(PhysicallyBasedRendering
     ${PROJECT_SOURCE_DIR}/Asset/Shader/IntegrateBRDF.vert
     ${PROJECT_SOURCE_DIR}/Asset/Shader/IrradianceCubeMap.frag
     ${PROJECT_SOURCE_DIR}/Asset/Shader/IrradianceCubeMap.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/Lighting.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/Lighting.vert
     ${PROJECT_SOURCE_DIR}/Asset/Shader/MonteCarloPrefilter.frag
     ${PROJECT_SOURCE_DIR}/Asset/Shader/MonteCarloPrefilter.vert
     ${PROJECT_SOURCE_DIR}/Asset/Shader/PhysicallyBasedRendering.frag

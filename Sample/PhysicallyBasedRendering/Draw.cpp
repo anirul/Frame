@@ -29,7 +29,6 @@ void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 			std::make_shared<sgl::SceneMesh>(mesh),
 			scene_matrix);
 	}
-
 	device_->SetSceneTree(scene_tree);
 
 	out_textures_.emplace_back(
