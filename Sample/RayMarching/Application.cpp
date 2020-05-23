@@ -4,7 +4,7 @@
 Application::Application(const std::shared_ptr<sgl::WindowInterface>& window) :
 	window_(window) {}
 
-bool Application::Startup()
+void Application::Startup()
 {
 	auto device = window_->GetUniqueDevice();
 	device->Startup();
@@ -23,8 +23,6 @@ bool Application::Startup()
 	scene_tree.AddNode(root);
 	scene_tree.AddNode(std::make_shared<sgl::SceneMesh>(billboard_mesh), root);
 	device->SetSceneTree(scene_tree);
-
-	return true;
 }
 
 void Application::Run()

@@ -8,7 +8,7 @@ class Application
 {
 public:
 	Application(const std::shared_ptr<sgl::WindowInterface>& window);
-	bool Startup();
+	void Startup();
 	void Run();
 
 protected:

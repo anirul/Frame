@@ -89,8 +89,7 @@ std::shared_ptr<sgl::Texture> Draw::CreateBrightness(
 
 	auto texture_out = std::make_shared<sgl::Texture>(
 		size,
-		sgl::PixelElementSize::HALF,
-		sgl::PixelStructure::RGB);
+		sgl::PixelElementSize::HALF);
 
 	// Set the view port for rendering.
 	glViewport(0, 0, size.first, size.second);
@@ -126,12 +125,10 @@ std::shared_ptr<sgl::Texture> Draw::CreateGaussianBlur(
 	std::shared_ptr<sgl::Texture> texture_out[2] = {
 		std::make_shared<sgl::Texture>(
 			size,
-			sgl::PixelElementSize::HALF,
-			sgl::PixelStructure::RGB),
+			sgl::PixelElementSize::HALF),
 		std::make_shared<sgl::Texture>(
 			size,
-			sgl::PixelElementSize::HALF,
-			sgl::PixelStructure::RGB)
+			sgl::PixelElementSize::HALF)
 	};
 
 	// Set the view port for rendering.
