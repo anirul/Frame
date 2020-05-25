@@ -190,6 +190,8 @@ add_executable(PhysicallyBasedRendering
     ${PROJECT_SOURCE_DIR}/Asset/Shader/EquirectangularCubeMap.vert
     ${PROJECT_SOURCE_DIR}/Asset/Shader/GaussianBlur.frag
     ${PROJECT_SOURCE_DIR}/Asset/Shader/GaussianBlur.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/HighDynamicRange.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/HighDynamicRange.vert
     ${PROJECT_SOURCE_DIR}/Asset/Shader/IntegrateBRDF.frag
     ${PROJECT_SOURCE_DIR}/Asset/Shader/IntegrateBRDF.vert
     ${PROJECT_SOURCE_DIR}/Asset/Shader/IrradianceCubeMap.frag

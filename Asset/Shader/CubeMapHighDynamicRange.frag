@@ -2,19 +2,21 @@
 
 in vec3 vert_world_position;
 
-layout(location = 0) out vec4 frag_color;
-layout(location = 1) out vec4 frag_normal;
+layout (location = 0) out vec4 frag_ambient;
+layout (location = 1) out vec4 frag_normal;
+layout (location = 2) out vec4 frag_mra;
+layout (location = 3) out vec4 frag_position;
 
 uniform samplerCube Skybox;
+
+// Basically far.
+const float far = 1000.0;
 
 void main()
 {
     vec3 env_color = textureLod(Skybox, vert_world_position, 0.0).rgb;
-    frag_normal = vec4(vert_world_position, 1.0);
-    // deactivate the HDR as this is computed in the Bloom filter
-#if 0
-    env_color = env_color / (env_color + vec3(1.0));
-    env_color = pow(env_color, vec3(1.0 / 2.2));
-#endif
-    frag_color = vec4(env_color, 1.0);
+    frag_ambient = vec4(env_color, 1.0);
+    frag_normal = vec4(normalize(vert_world_position), 1.0);
+    frag_mra = vec4(0.0, 0.0, 0.0, 1.0);
+    frag_position = vec4(far * normalize(vert_world_position), 1.0);
 }

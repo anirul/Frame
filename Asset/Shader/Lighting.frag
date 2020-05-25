@@ -3,7 +3,6 @@
 in vec2 vert_texcoord;
 
 layout (location = 0) out vec4 frag_color;
-layout (location = 1) out vec4 frag_brightness;
 
 uniform sampler2D Ambient;
 uniform sampler2D Normal;
@@ -11,9 +10,8 @@ uniform sampler2D MetalRoughAO;
 uniform sampler2D Position;
 
 uniform vec3 camera_position;
-
-uniform vec3 light_position[4];
-uniform vec3 light_color[4];
+uniform vec3 light_position;
+uniform vec3 light_color;
 
 const float PI = 3.14159265359;
 
@@ -69,9 +67,15 @@ void main()
     float roughness = texture(MetalRoughAO, vert_texcoord).y;
     float ao = texture(MetalRoughAO, vert_texcoord).z;
     vec3 N = texture(Normal, vert_texcoord).xyz;
-    vec3 vert_world_position = texture(Position, vert_texcoord).xyz;
+    vec3 world_position = texture(Position, vert_texcoord).xyz;
+
+    if (length(world_position) > 1000)
+    {
+        frag_color = vec4(0.0, 0.0, 0.0, 1.0);
+        return;
+    }
     
-    vec3 V = normalize(camera_position - vert_world_position);
+    vec3 V = normalize(camera_position - world_position);
     vec3 R = reflect(-V, N);
 
     // calculate reflectance at normal incidence; if dia-electric (like plastic)
@@ -83,56 +87,42 @@ void main()
     // reflectance equation
     vec3 Lo = vec3(0.0);
     
-#if 1
-    for (int i = 0; i < 4; ++i)
-    {
-        // calculate per-light radiance
-        vec3 L = normalize(light_position[i] - vert_world_position);
-        vec3 H = normalize(V + L);
-        float distance = length(light_position[i] - vert_world_position);
-        float attenuation = 1.0 / (distance * distance);
-        vec3 radiance = light_color[i] * attenuation;
+    // calculate per-light radiance
+    vec3 L = normalize(light_position - world_position);
+    vec3 H = normalize(V + L);
+    float dist = length(light_position - world_position);
+    float attenuation = 1.0 / (dist * dist);
+    vec3 radiance = light_color * attenuation;
 
-        // Cook-Torrance BRDF
-        float NDF = DistributionGGX(N, H, roughness);   
-        float G   = GeometrySmith(N, V, L, roughness);      
-        vec3 F    = fresnelSchlick(max(dot(H, V), 0.0), F0);
+    // Cook-Torrance BRDF
+    float NDF = DistributionGGX(N, H, roughness);   
+    float G   = GeometrySmith(N, V, L, roughness);      
+    vec3 F    = fresnelSchlick(max(dot(H, V), 0.0), F0);
            
-        vec3 nominator = NDF * G * F; 
-        // 0.001 to prevent divide by zero.
-        float denominator = 
-            4 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001;
-        vec3 specular = nominator / denominator;
+    vec3 nominator = NDF * G * F; 
+    // 0.001 to prevent divide by zero.
+    float denominator = 
+        4 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001;
+    vec3 specular = nominator / denominator;
         
-        // kS is equal to Fresnel
-        vec3 kS = F;
-        // for energy conservation, the diffuse and specular light can't
-        // be above 1.0 (unless the surface emits light); to preserve this
-        // relationship the diffuse component (kD) should equal 1.0 - kS.
-        vec3 kD = vec3(1.0) - kS;
-        // multiply kD by the inverse metalness such that only non-metals 
-        // have diffuse lighting, or a linear blend if partly metal (pure metals
-        // have no diffuse light).
-        kD *= 1.0 - metallic;
+    // kS is equal to Fresnel
+    vec3 kS = F;
+    // for energy conservation, the diffuse and specular light can't
+    // be above 1.0 (unless the surface emits light); to preserve this
+    // relationship the diffuse component (kD) should equal 1.0 - kS.
+    vec3 kD = vec3(1.0) - kS;
+    // multiply kD by the inverse metalness such that only non-metals 
+    // have diffuse lighting, or a linear blend if partly metal (pure metals
+    // have no diffuse light).
+    kD *= 1.0 - metallic;
 
-        // scale light by NdotL
-        float NdotL = max(dot(N, L), 0.0);
+    // scale light by NdotL
+    float NdotL = max(dot(N, L), 0.0);
 
-        // add to outgoing radiance Lo
-        // note that we already multiplied the BRDF by the Fresnel (kS) so we
-        // won't multiply by kS again
-        Lo += (kD * albedo / PI + specular) * radiance * NdotL;
-    }
-#endif
+    // add to outgoing radiance Lo
+    // note that we already multiplied the BRDF by the Fresnel (kS) so we
+    // won't multiply by kS again
+    Lo += (kD * albedo / PI + specular) * radiance * NdotL;
 
-    albedo = albedo + Lo;
-	frag_color = vec4(albedo, 1.0);
-
-    // check whether fragment output is higher than threshold, if so output as
-    // brightness color
-    float brightness = dot(albedo.rgb, vec3(0.2126, 0.7152, 0.0722));
-    if(brightness > 1.0)
-        frag_brightness = vec4(albedo.rgb, 1.0);
-    else
-        frag_brightness = vec4(0.0, 0.0, 0.0, 1.0);
+	frag_color = vec4(Lo, 1.0);
 }

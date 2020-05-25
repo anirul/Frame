@@ -8,7 +8,7 @@ void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 	auto texture = std::make_shared<sgl::TextureCubeMap>(
 		"../Asset/CubeMap/Hamarikyu.hdr",
 		std::make_pair<std::uint32_t, std::uint32_t>(512, 512),
-		sgl::PixelElementSize::HALF);
+		pixel_element_size_);
 
 	auto mesh = CreatePhysicallyBasedRenderedMesh(device_, texture);
 
@@ -31,17 +31,26 @@ void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 	}
 	device_->SetSceneTree(scene_tree);
 
-	out_textures_.emplace_back(
-		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF));
-	out_textures_.emplace_back(
-		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF));
-	out_textures_.emplace_back(
-		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF));
+	// Albedo.
+	deferred_textures_.emplace_back(
+		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::FLOAT));
+	// Normal.
+	deferred_textures_.emplace_back(
+		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::FLOAT));
+	// MetalicRoughAO.
+	deferred_textures_.emplace_back(
+		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::FLOAT));
+	// Position.
+	deferred_textures_.emplace_back(
+		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::FLOAT));
+
+	light_manager_ = CreateLightManager();
+	lighting_program_ = sgl::CreateProgram("Lighting");
 }
 
 const std::shared_ptr<sgl::Texture>& Draw::GetDrawTexture() const
 {
-	return out_textures_[0];
+	return final_texture_;
 }
 
 void Draw::RunDraw(const double dt)
@@ -61,19 +70,118 @@ void Draw::RunDraw(const double dt)
 			"camera_position",
 			device_->GetCamera().GetPosition());
 	}
-	device_->DrawMultiTextures(out_textures_, dt);
-	out_textures_[0] = AddBloom(out_textures_[0]);
+	// Make the PBR deferred lighting step.
+	device_->DrawMultiTextures(deferred_textures_, dt);
+	std::vector<std::shared_ptr<sgl::Texture>> lighting_textures;
+	lighting_textures.push_back(deferred_textures_[0]);
+	if (lighting_program_)
+	{
+		lighting_program_->Use();
+		lighting_program_->UniformVector3(
+			"camera_position",
+			device_->GetCamera().GetPosition());
+	}
+	for (int i = 0; i < light_manager_->GetLightCount(); ++i)
+	{
+		light_manager_->RegisterToProgram(lighting_program_, i);
+		// Make the lighting step.
+		lighting_textures.push_back(ComputeLighting(deferred_textures_));
+	}
+	// Merge all the light together.
+	auto merge = Combine(lighting_textures);
+	// Add bloom.
+	final_texture_ = AddBloom(merge);
 }
 
 void Draw::Delete() {}
+
+std::shared_ptr<sgl::LightManager> Draw::CreateLightManager() const
+{
+	// Create lights.
+	auto light_manager = std::make_shared<sgl::LightManager>();
+	const float light_value = 300.f;
+	const glm::vec3 light_vec(light_value, light_value, light_value);
+	light_manager->AddLight(
+		std::make_shared<sgl::LightPoint>(
+			glm::vec3{ 5.f, 5.f, 5.f }, 
+			light_vec));
+	light_manager->AddLight(
+		std::make_shared<sgl::LightPoint>(
+			glm::vec3{ 5.f, -5.f, 5.f }, 
+			light_vec));
+	light_manager->AddLight(
+		std::make_shared<sgl::LightPoint>(
+			glm::vec3{ -5.f, 5.f, 5.f }, 
+			light_vec));
+	light_manager->AddLight(
+		std::make_shared<sgl::LightPoint>(
+			glm::vec3{ -5.f, -5.f, 5.f }, 
+			light_vec));
+	light_manager->AddLight(
+		std::make_shared<sgl::LightPoint>(
+			glm::vec3{ 5.f, 5.f, -5.f },
+			light_vec));
+	light_manager->AddLight(
+		std::make_shared<sgl::LightPoint>(
+			glm::vec3{ 5.f, -5.f, -5.f },
+			light_vec));
+	light_manager->AddLight(
+		std::make_shared<sgl::LightPoint>(
+			glm::vec3{ -5.f, 5.f, -5.f },
+			light_vec));
+	light_manager->AddLight(
+		std::make_shared<sgl::LightPoint>(
+			glm::vec3{ -5.f, -5.f, -5.f },
+			light_vec));
+	return light_manager;
+}
+
+std::shared_ptr<sgl::Texture> Draw::ComputeLighting(
+	const std::vector<std::shared_ptr<sgl::Texture>>& in_textures) const
+{
+	const sgl::Error& error = sgl::Error::GetInstance();
+	sgl::Frame frame{};
+	sgl::Render render{};
+	auto size = in_textures[0]->GetSize();
+	frame.BindAttach(render);
+	render.BindStorage(size);
+
+	// Set the view port for rendering.
+	glViewport(0, 0, size.first, size.second);
+	error.Display(__FILE__, __LINE__ - 1);
+
+	// Clear the screen.
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	error.Display(__FILE__, __LINE__ - 1);
+
+	auto out_texture = std::make_shared<sgl::Texture>(
+		size, 
+		sgl::PixelElementSize::FLOAT);
+
+	frame.BindTexture(*out_texture);
+	frame.DrawBuffers(1);
+
+	auto quad = sgl::CreateQuadMesh(lighting_program_);
+
+	sgl::TextureManager texture_manager{};
+	texture_manager.AddTexture("Ambient", in_textures[0]);
+	texture_manager.AddTexture("Normal", in_textures[1]);
+	texture_manager.AddTexture("MetalRoughAO", in_textures[2]);
+	texture_manager.AddTexture("Position", in_textures[3]);
+	quad->SetTextures({ "Ambient", "Normal", "MetalRoughAO", "Position" });
+	quad->Draw(texture_manager);
+
+	return out_texture;
+}
 
 std::shared_ptr<sgl::Texture> Draw::AddBloom(
 	const std::shared_ptr<sgl::Texture>& texture) const
 {
 	auto brightness = CreateBrightness(texture);
 	auto gaussian_blur = CreateGaussianBlur(brightness);
-	auto merge = MergeDisplayAndGaussianBlur(texture, gaussian_blur);
-	return merge;
+	auto merge = Combine({ texture, gaussian_blur });
+	auto hdr = HighDynamicRange(merge);
+	return hdr;
 }
 
 std::shared_ptr<sgl::Texture> Draw::CreateBrightness(
@@ -87,8 +195,8 @@ std::shared_ptr<sgl::Texture> Draw::CreateBrightness(
 	render.BindStorage(size);
 
 	auto texture_out = std::make_shared<sgl::Texture>(
-		size,
-		sgl::PixelElementSize::HALF);
+		size, 
+		pixel_element_size_);
 
 	// Set the view port for rendering.
 	glViewport(0, 0, size.first, size.second);
@@ -124,10 +232,10 @@ std::shared_ptr<sgl::Texture> Draw::CreateGaussianBlur(
 	std::shared_ptr<sgl::Texture> texture_out[2] = {
 		std::make_shared<sgl::Texture>(
 			size,
-			sgl::PixelElementSize::HALF),
+			pixel_element_size_),
 		std::make_shared<sgl::Texture>(
 			size,
-			sgl::PixelElementSize::HALF)
+			pixel_element_size_)
 	};
 
 	// Set the view port for rendering.
@@ -143,6 +251,7 @@ std::shared_ptr<sgl::Texture> Draw::CreateGaussianBlur(
 
 	auto program = sgl::CreateProgram("GaussianBlur");
 	auto quad = sgl::CreateQuadMesh(program);
+	program->Use();
 
 	bool horizontal = true;
 	bool first_iteration = true;
@@ -164,22 +273,20 @@ std::shared_ptr<sgl::Texture> Draw::CreateGaussianBlur(
 	return texture_out[!horizontal];
 }
 
-std::shared_ptr<sgl::Texture> Draw::MergeDisplayAndGaussianBlur(
-	const std::shared_ptr<sgl::Texture>& display, 
-	const std::shared_ptr<sgl::Texture>& gaussian_blur, 
-	const float exposure /*= 1.0f*/) const
+std::shared_ptr<sgl::Texture> Draw::Combine(
+	const std::vector<std::shared_ptr<sgl::Texture>>& add_textures) const
 {
+	assert(add_textures.size() <= 16);
 	const sgl::Error& error = sgl::Error::GetInstance();
 	sgl::Frame frame{};
 	sgl::Render render{};
-	auto size = display->GetSize();
+	auto size = add_textures[0]->GetSize();
 	frame.BindAttach(render);
 	render.BindStorage(size);
 
 	auto texture_out = std::make_shared<sgl::Texture>(
 		size,
-		sgl::PixelElementSize::HALF,
-		sgl::PixelStructure::RGB);
+		pixel_element_size_);
 
 	// Set the view port for rendering.
 	glViewport(0, 0, size.first, size.second);
@@ -190,14 +297,61 @@ std::shared_ptr<sgl::Texture> Draw::MergeDisplayAndGaussianBlur(
 	error.Display(__FILE__, __LINE__ - 1);
 
 	frame.BindTexture(*texture_out);
+	frame.DrawBuffers(1);
 
 	sgl::TextureManager texture_manager;
-	texture_manager.AddTexture("Display", display);
-	texture_manager.AddTexture("GaussianBlur", gaussian_blur);
 	auto program = sgl::CreateProgram("Combine");
-	program->UniformFloat("exposure", exposure);
 	auto quad = sgl::CreateQuadMesh(program);
-	quad->SetTextures({ "Display", "GaussianBlur" });
+	int i = 0;
+	std::vector<std::string> vec = {};
+	for (const auto& texture : add_textures)
+	{
+		texture_manager.AddTexture("Texture" + std::to_string(i), texture);
+		vec.push_back("Texture" + std::to_string(i));
+		i++;
+	}
+	program->Use();
+	program->UniformInt("texture_max", static_cast<int>(add_textures.size()));
+	quad->SetTextures(vec);
+	quad->Draw(texture_manager);
+
+	return texture_out;
+}
+
+std::shared_ptr<sgl::Texture> Draw::HighDynamicRange(
+	const std::shared_ptr<sgl::Texture>& texture, 
+	const float exposure /*= 1.0f*/,
+	const float gamma /*= 2.2f*/) const
+{
+	const sgl::Error& error = sgl::Error::GetInstance();
+	sgl::Frame frame{};
+	sgl::Render render{};
+	auto size = texture->GetSize();
+	frame.BindAttach(render);
+	render.BindStorage(size);
+
+	auto texture_out = std::make_shared<sgl::Texture>(
+		size,
+		pixel_element_size_);
+
+	// Set the view port for rendering.
+	glViewport(0, 0, size.first, size.second);
+	error.Display(__FILE__, __LINE__ - 1);
+
+	// Clear the screen.
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	error.Display(__FILE__, __LINE__ - 1);
+
+	frame.BindTexture(*texture_out);
+	frame.DrawBuffers(1);
+
+	sgl::TextureManager texture_manager;
+	texture_manager.AddTexture("Display", texture);
+	auto program = sgl::CreateProgram("HighDynamicRange");
+	program->UniformFloat("exposure", exposure);
+	program->UniformFloat("gamma", gamma);
+	auto quad = sgl::CreateQuadMesh(program);
+	quad->SetTextures({ "Display" });
 	quad->Draw(texture_manager);
 
 	return texture_out;
@@ -217,7 +371,7 @@ std::vector<std::string> Draw::CreateTextures(
 	// Create the Monte-Carlo prefilter.
 	auto monte_carlo_prefilter = std::make_shared<sgl::TextureCubeMap>(
 		std::make_pair<std::uint32_t, std::uint32_t>(128, 128),
-		sgl::PixelElementSize::HALF);
+		sgl::PixelElementSize::FLOAT);
 	sgl::FillProgramMultiTextureCubeMapMipmap(
 		std::vector<std::shared_ptr<sgl::Texture>>{ monte_carlo_prefilter },
 		texture_manager,
@@ -234,7 +388,7 @@ std::vector<std::string> Draw::CreateTextures(
 	// Create the Irradiance cube map texture.
 	auto irradiance = std::make_shared<sgl::TextureCubeMap>(
 		std::make_pair<std::uint32_t, std::uint32_t>(32, 32),
-		sgl::PixelElementSize::HALF);
+		pixel_element_size_);
 	sgl::FillProgramMultiTextureCubeMap(
 		std::vector<std::shared_ptr<sgl::Texture>>{ irradiance },
 		texture_manager,
@@ -245,7 +399,7 @@ std::vector<std::string> Draw::CreateTextures(
 	// Create the LUT BRDF.
 	auto integrate_brdf = std::make_shared<sgl::Texture>(
 		std::make_pair<std::uint32_t, std::uint32_t>(512, 512),
-		sgl::PixelElementSize::HALF);
+		pixel_element_size_);
 	sgl::FillProgramMultiTexture(
 		std::vector<std::shared_ptr<sgl::Texture>>{ integrate_brdf },
 		texture_manager,
@@ -293,17 +447,6 @@ std::shared_ptr<sgl::Mesh> Draw::CreatePhysicallyBasedRenderedMesh(
 	pbr_program_->UniformMatrix("projection", device->GetProjection());
 	pbr_program_->UniformMatrix("view", device->GetView());
 	pbr_program_->UniformMatrix("model", device->GetModel());
-
-	// Create lights.
-	sgl::LightManager light_manager{};
-	const float light_value = 300.f;
-	const glm::vec3 light_vec(light_value, light_value, light_value);
-	light_manager.AddLight(sgl::Light({ 10.f, 10.f, 10.f }, light_vec));
-	light_manager.AddLight(sgl::Light({ 10.f, -10.f, 10.f }, light_vec));
-	light_manager.AddLight(sgl::Light({ -10.f, 10.f, 10.f }, light_vec));
-	light_manager.AddLight(sgl::Light({ -10.f, -10.f, 10.f }, light_vec));
-	light_manager.RegisterToProgram(pbr_program_);
-	device->SetLightManager(light_manager);
 
 	// Mesh creation.
 	auto mesh = std::make_shared<sgl::Mesh>(
