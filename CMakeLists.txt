@@ -182,8 +182,8 @@ add_executable(PhysicallyBasedRendering
     ${PROJECT_SOURCE_DIR}/Asset/Shader/Brightness.vert
     ${PROJECT_SOURCE_DIR}/Asset/Shader/Combine.frag
     ${PROJECT_SOURCE_DIR}/Asset/Shader/Combine.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/CubeMapHighDynamicRange.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/CubeMapHighDynamicRange.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/CubeMapDeferred.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/CubeMapDeferred.vert
     ${PROJECT_SOURCE_DIR}/Asset/Shader/Display.frag
     ${PROJECT_SOURCE_DIR}/Asset/Shader/Display.vert
     ${PROJECT_SOURCE_DIR}/Asset/Shader/EquirectangularCubeMap.frag

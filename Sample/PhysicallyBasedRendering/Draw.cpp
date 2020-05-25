@@ -468,7 +468,7 @@ std::shared_ptr<sgl::Mesh> Draw::CreateCubeMapMesh(
 	const std::shared_ptr<sgl::TextureCubeMap>& texture) const
 {
 	// Create the cube map program.
-	auto cubemap_program = sgl::CreateProgram("CubeMapHighDynamicRange");
+	auto cubemap_program = sgl::CreateProgram("CubeMapDeferred");
 	cubemap_program->UniformMatrix("projection", device->GetProjection());
 
 	// Create the mesh for the cube.

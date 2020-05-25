@@ -9,14 +9,11 @@ layout (location = 3) out vec4 frag_position;
 
 uniform samplerCube Skybox;
 
-// Basically far.
-const float far = 1000.0;
-
 void main()
 {
     vec3 env_color = textureLod(Skybox, vert_world_position, 0.0).rgb;
     frag_ambient = vec4(env_color, 1.0);
     frag_normal = vec4(normalize(vert_world_position), 1.0);
     frag_mra = vec4(0.0, 0.0, 0.0, 1.0);
-    frag_position = vec4(far * normalize(vert_world_position), 1.0);
+    frag_position = vec4(0.0, 0.0, 0.0, 1.0);
 }
