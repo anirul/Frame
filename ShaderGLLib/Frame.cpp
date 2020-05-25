@@ -102,15 +102,15 @@ namespace sgl {
 	void Frame::DrawBuffers(const std::uint32_t size /*= 1*/)
 	{
 		assert(size < 9);
-		draw_buffer_.clear();
+		std::vector<unsigned int> draw_buffer = {};
 		for (std::uint32_t i = 0; i < size; ++i)
 		{
-			draw_buffer_.emplace_back(
+			draw_buffer.emplace_back(
 				static_cast<unsigned int>(Frame::GetFrameColorAttachment(i)));
 		}
 		glDrawBuffers(
-			static_cast<GLsizei>(draw_buffer_.size()), 
-			draw_buffer_.data());
+			static_cast<GLsizei>(draw_buffer.size()), 
+			draw_buffer.data());
 		error_.Display(__FILE__, __LINE__ - 3);
 	}
 

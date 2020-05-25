@@ -44,6 +44,11 @@ void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 	deferred_textures_.emplace_back(
 		std::make_shared<sgl::Texture>(size, pixel_element_size_));
 
+	// First texture (suppose to be the base color albedo).
+	lighting_textures_.emplace_back(nullptr);
+	// The second is the accumulation color.
+	lighting_textures_.emplace_back(nullptr);
+
 	light_manager_ = CreateLightManager();
 	lighting_program_ = sgl::CreateProgram("Lighting");
 }
@@ -72,8 +77,8 @@ void Draw::RunDraw(const double dt)
 
 	// Make the PBR deferred lighting step.
 	device_->DrawMultiTextures(deferred_textures_, dt);
-	std::vector<std::shared_ptr<sgl::Texture>> lighting_textures;
-	lighting_textures.push_back(deferred_textures_[0]);
+	
+	lighting_textures_[0] = deferred_textures_[0];
 
 	assert(lighting_program_);
 	lighting_program_->Use();
@@ -82,10 +87,10 @@ void Draw::RunDraw(const double dt)
 		device_->GetCamera().GetPosition());
 	light_manager_->RegisterToProgram(lighting_program_);
 	// Make the lighting step.
-	lighting_textures.push_back(ComputeLighting(deferred_textures_));
+	lighting_textures_[1] = ComputeLighting(deferred_textures_);
 
 	// Merge all the light together.
-	auto merge = Combine(lighting_textures);
+	auto merge = Combine(lighting_textures_);
 
 	// Add bloom.
 	final_texture_ = AddBloom(merge);

@@ -59,7 +59,7 @@ private:
 	std::shared_ptr<sgl::Program> lighting_program_ = nullptr;
 	std::shared_ptr<sgl::LightManager> light_manager_ = nullptr;
 	const sgl::PixelElementSize pixel_element_size_ = 
-		sgl::PixelElementSize::FLOAT;
+		sgl::PixelElementSize::HALF;
 	const types::draw_model_enum draw_model_ = types::draw_model_enum::SPHERE;
 	const types::texture_model_enum texture_model_ = 
 		types::texture_model_enum::METAL;
