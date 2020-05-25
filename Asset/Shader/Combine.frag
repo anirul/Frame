@@ -25,7 +25,7 @@ uniform int texture_max;
 
 void main()
 {
-    vec3 total = vec3(0, 0, 0);
+    vec3 total = vec3(0.0, 0.0, 0.0);
     if (texture_max > 0)
         total += texture(Texture0, vert_texcoord).rgb;
     if (texture_max > 1)

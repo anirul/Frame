@@ -90,8 +90,7 @@ namespace sgl {
 
 	public:
 		void RegisterToProgram(
-			const std::shared_ptr<Program>& program,
-			const int position) const;
+			const std::shared_ptr<Program>& program) const;
 
 	protected:
 		std::vector<std::shared_ptr<LightInterface>> lights_;

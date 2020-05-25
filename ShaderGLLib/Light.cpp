@@ -4,20 +4,25 @@
 namespace sgl {
 
 	void LightManager::RegisterToProgram(
-		const std::shared_ptr<Program>& program,
-		const int position) const
+		const std::shared_ptr<Program>& program) const
 	{
-		if (position > lights_.size())
+		if (lights_.size() > 32)
 		{
-			throw std::runtime_error("Light is out of range.");
+			throw std::runtime_error("too many lights!");
 		}
 		program->Use();
-		program->UniformVector3(
-			"light_position", 
-			lights_[position]->GetVector());
-		program->UniformVector3(
-			"light_color",
-			lights_[position]->GetColorIntensity());
+		int i = 0;
+		for (const auto& light : lights_)
+		{
+			program->UniformVector3(
+				"light_position[" + std::to_string(i) + "]", 
+				lights_[i]->GetVector());
+			program->UniformVector3(
+				"light_color[" + std::to_string(i) + "]",
+				lights_[i]->GetColorIntensity());
+			++i;
+		}
+		program->UniformInt("light_max", static_cast<int>(lights_.size()));
 	}
 
 } // End namespace sgl.

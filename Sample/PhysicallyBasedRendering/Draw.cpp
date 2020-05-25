@@ -33,16 +33,16 @@ void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 
 	// Albedo.
 	deferred_textures_.emplace_back(
-		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::FLOAT));
+		std::make_shared<sgl::Texture>(size, pixel_element_size_));
 	// Normal.
 	deferred_textures_.emplace_back(
-		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::FLOAT));
+		std::make_shared<sgl::Texture>(size, pixel_element_size_));
 	// MetalicRoughAO.
 	deferred_textures_.emplace_back(
-		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::FLOAT));
+		std::make_shared<sgl::Texture>(size, pixel_element_size_));
 	// Position.
 	deferred_textures_.emplace_back(
-		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::FLOAT));
+		std::make_shared<sgl::Texture>(size, pixel_element_size_));
 
 	light_manager_ = CreateLightManager();
 	lighting_program_ = sgl::CreateProgram("Lighting");
@@ -62,33 +62,31 @@ void Draw::RunDraw(const double dt)
 	rot_y = glm::rotate(rot_y, dtf * -.1f, glm::vec3(0.f, 1.f, 0.f));
 	sgl::Camera cam(glm::vec3(position * rot_y), { 0.f, 0.f, 0.f });
 	device_->SetCamera(cam);
-	if (pbr_program_)
-	{
-		// Don't forget to use before setting any uniform.
-		pbr_program_->Use();
-		pbr_program_->UniformVector3(
-			"camera_position",
-			device_->GetCamera().GetPosition());
-	}
+
+	assert(pbr_program_);
+	// Don't forget to use before setting any uniform.
+	pbr_program_->Use();
+	pbr_program_->UniformVector3(
+		"camera_position",
+		device_->GetCamera().GetPosition());
+
 	// Make the PBR deferred lighting step.
 	device_->DrawMultiTextures(deferred_textures_, dt);
 	std::vector<std::shared_ptr<sgl::Texture>> lighting_textures;
 	lighting_textures.push_back(deferred_textures_[0]);
-	if (lighting_program_)
-	{
-		lighting_program_->Use();
-		lighting_program_->UniformVector3(
-			"camera_position",
-			device_->GetCamera().GetPosition());
-	}
-	for (int i = 0; i < light_manager_->GetLightCount(); ++i)
-	{
-		light_manager_->RegisterToProgram(lighting_program_, i);
-		// Make the lighting step.
-		lighting_textures.push_back(ComputeLighting(deferred_textures_));
-	}
+
+	assert(lighting_program_);
+	lighting_program_->Use();
+	lighting_program_->UniformVector3(
+		"camera_position",
+		device_->GetCamera().GetPosition());
+	light_manager_->RegisterToProgram(lighting_program_);
+	// Make the lighting step.
+	lighting_textures.push_back(ComputeLighting(deferred_textures_));
+
 	// Merge all the light together.
 	auto merge = Combine(lighting_textures);
+
 	// Add bloom.
 	final_texture_ = AddBloom(merge);
 }
@@ -156,7 +154,7 @@ std::shared_ptr<sgl::Texture> Draw::ComputeLighting(
 
 	auto out_texture = std::make_shared<sgl::Texture>(
 		size, 
-		sgl::PixelElementSize::FLOAT);
+		pixel_element_size_);
 
 	frame.BindTexture(*out_texture);
 	frame.DrawBuffers(1);
