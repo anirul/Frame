@@ -8,8 +8,8 @@
 namespace sgl {
 
 	Image::Image(
-		const std::string& file, 
-		const PixelElementSize pixel_element_size /*= PixelElementSize::BYTE*/, 
+		const std::string& file,
+		const PixelElementSize pixel_element_size /*= PixelElementSize::BYTE*/,
 		const PixelStructure pixel_structure /*= PixelStructure::RGB*/) :
 		pixel_element_size_(pixel_element_size),
 		pixel_structure_(pixel_structure)
@@ -22,7 +22,7 @@ namespace sgl {
 		{
 		case PixelElementSize::BYTE :
 		{
-			image_ = 
+			image_ =
 				stbi_load(
 					file.c_str(),
 					&size_.first,
@@ -56,10 +56,10 @@ namespace sgl {
 			break;
 		}
 		default:
-			throw 
+			throw
 				std::runtime_error(
 					"unsupported element size : " +
-					static_cast<int>(pixel_element_size_));
+					std::to_string(static_cast<int>(pixel_element_size_)));
 		}
 		if (!image_)
 		{

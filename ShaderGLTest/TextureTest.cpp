@@ -46,11 +46,11 @@ namespace test {
 		EXPECT_FALSE(texture_);
 		texture_ = std::make_shared<sgl::TextureCubeMap>(
 			std::array<std::string, 6>{
-				"../Asset/CubeMap/PositiveX.png", 
+				"../Asset/CubeMap/PositiveX.png",
 				"../Asset/CubeMap/NegativeX.png",
-				"../Asset/CubeMap/PositiveY.png", 
+				"../Asset/CubeMap/PositiveY.png",
 				"../Asset/CubeMap/NegativeY.png",
-				"../Asset/CubeMap/PositiveZ.png", 
+				"../Asset/CubeMap/PositiveZ.png",
 				"../Asset/CubeMap/NegativeZ.png" });
 		EXPECT_TRUE(texture_);
 		EXPECT_NE(0, texture_->GetId());
@@ -104,8 +104,9 @@ namespace test {
 		texture_manager.AddTexture("Environment", cube_map);
 		auto irradiance = std::make_shared<sgl::TextureCubeMap>(
 			std::make_pair<std::uint32_t, std::uint32_t>(32, 32));
+		std::vector<std::shared_ptr<sgl::Texture>> vec{ irradiance };
 		FillProgramMultiTextureCubeMap(
-			std::vector<std::shared_ptr<sgl::Texture>>{ irradiance },
+			vec,
 			texture_manager,
 			{ "Environment" },
 			sgl::CreateProgram("IrradianceCubeMap"));
