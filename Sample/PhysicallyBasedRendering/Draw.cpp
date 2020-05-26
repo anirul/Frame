@@ -68,18 +68,16 @@ void Draw::RunDraw(const double dt)
 	sgl::Camera cam(glm::vec3(position * rot_y), { 0.f, 0.f, 0.f });
 	device_->SetCamera(cam);
 
+	// Deferred lighting G-buffer part.
 	assert(pbr_program_);
-	// Don't forget to use before setting any uniform.
 	pbr_program_->Use();
 	pbr_program_->UniformVector3(
 		"camera_position",
 		device_->GetCamera().GetPosition());
+	device_->DrawMultiTextures(deferred_textures_, dt);
 
 	// Make the PBR deferred lighting step.
-	device_->DrawMultiTextures(deferred_textures_, dt);
-	
 	lighting_textures_[0] = deferred_textures_[0];
-
 	assert(lighting_program_);
 	lighting_program_->Use();
 	lighting_program_->UniformVector3(
