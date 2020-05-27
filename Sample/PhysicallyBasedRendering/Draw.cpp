@@ -87,11 +87,8 @@ void Draw::RunDraw(const double dt)
 	// Make the lighting step.
 	lighting_textures_[1] = ComputeLighting(deferred_textures_);
 
-	// Merge all the light together.
-	auto merge = Combine(lighting_textures_);
-
-	// Add bloom.
-	final_texture_ = AddBloom(merge);
+	// Merge and add bloom.
+	final_texture_ = AddBloom(Combine(lighting_textures_));
 }
 
 void Draw::Delete() {}
