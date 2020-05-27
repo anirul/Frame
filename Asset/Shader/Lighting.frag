@@ -63,7 +63,7 @@ float DistributionGGX(vec3 N, vec3 H, float roughness)
 void main()
 {
     // Surface come from textures.
-    vec3 albedo = pow(texture(Ambient, vert_texcoord).rgb, vec3(2.2));
+    vec3 albedo = texture(Ambient, vert_texcoord).rgb;
     float metallic = texture(MetalRoughAO, vert_texcoord).x;
     float roughness = texture(MetalRoughAO, vert_texcoord).y;
     float ao = texture(MetalRoughAO, vert_texcoord).z;

@@ -55,6 +55,7 @@ void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 
 const std::shared_ptr<sgl::Texture>& Draw::GetDrawTexture() const
 {
+	// return lighting_textures_[0];
 	return final_texture_;
 }
 
@@ -193,11 +194,11 @@ std::shared_ptr<sgl::Texture> Draw::CreateBrightness(
 	render.BindStorage(size);
 
 	auto texture_out = std::make_shared<sgl::Texture>(
-		size, 
+		std::pair{size.first / 2, size.second / 2}, 
 		pixel_element_size_);
 
 	// Set the view port for rendering.
-	glViewport(0, 0, size.first, size.second);
+	glViewport(0, 0, size.first / 2, size.second / 2);
 	error.Display(__FILE__, __LINE__ - 1);
 
 	// Clear the screen.
