@@ -64,13 +64,15 @@ void main()
 {
     // Surface come from textures.
     vec3 albedo = texture(Ambient, vert_texcoord).rgb;
-    float metallic = texture(MetalRoughAO, vert_texcoord).x;
-    float roughness = texture(MetalRoughAO, vert_texcoord).y;
-    float ao = texture(MetalRoughAO, vert_texcoord).z;
+    vec3 MRA = texture(MetalRoughAO, vert_texcoord).rgb;
+    float metallic = MRA.x;
+    float roughness = MRA.y;
+    float ao = MRA.z;
     vec3 N = texture(Normal, vert_texcoord).xyz;
     vec3 world_position = texture(Position, vert_texcoord).xyz;
 
-    if (length(world_position) > 1000)
+    // In cas they are both 0 then this is the background.
+    if (MRA == vec3(0, 0, 0) && world_position == vec3(0, 0, 0))
     {
         frag_color = vec4(0.0, 0.0, 0.0, 1.0);
         return;

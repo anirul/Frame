@@ -59,7 +59,7 @@ private:
 	std::shared_ptr<sgl::LightManager> light_manager_ = nullptr;
 	const sgl::PixelElementSize pixel_element_size_ = 
 		sgl::PixelElementSize::HALF;
-	const types::draw_model_enum draw_model_ = types::draw_model_enum::APPLE;
+	const types::draw_model_enum draw_model_ = types::draw_model_enum::MONKEY;
 	const types::texture_model_enum texture_model_ = 
-		types::texture_model_enum::APPLE;
+		types::texture_model_enum::METAL;
 };
