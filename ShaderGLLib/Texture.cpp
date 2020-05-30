@@ -88,6 +88,29 @@ namespace sgl {
 		error_.Display(__FILE__, __LINE__ - 10);
 	}
 
+	Texture::Texture(
+		const std::pair<std::uint32_t, std::uint32_t> size, 
+		const void* data, 
+		const PixelElementSize pixel_element_size /*= PixelElementSize::BYTE*/, 
+		const PixelStructure pixel_structure /*= PixelStructure::RGB*/) :
+		size_(size),
+		pixel_element_size_(pixel_element_size),
+		pixel_structure_(pixel_structure)
+	{
+		CreateTexture();
+		glTexImage2D(
+			GL_TEXTURE_2D,
+			0,
+			sgl::ConvertToGLType(pixel_element_size_, pixel_structure_),
+			static_cast<GLsizei>(size_.first),
+			static_cast<GLsizei>(size_.second),
+			0,
+			sgl::ConvertToGLType(pixel_structure_),
+			sgl::ConvertToGLType(pixel_element_size_),
+			data);
+		error_.Display(__FILE__, __LINE__ - 10);
+	}
+
 	void Texture::CreateTexture()
 	{
 		glGenTextures(1, &texture_id_);

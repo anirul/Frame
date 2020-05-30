@@ -67,7 +67,6 @@ void main()
     vec3 MRA = texture(MetalRoughAO, vert_texcoord).rgb;
     float metallic = MRA.x;
     float roughness = MRA.y;
-    float ao = MRA.z;
     vec3 N = texture(Normal, vert_texcoord).xyz;
     vec3 world_position = texture(Position, vert_texcoord).xyz;
 
@@ -79,7 +78,6 @@ void main()
     }
     
     vec3 V = normalize(camera_position - world_position);
-    vec3 R = reflect(-V, N);
 
     // calculate reflectance at normal incidence; if dia-electric (like plastic)
     // use F0 of 0.04 and if it's a metal, use the albedo color as F0 (metallic

@@ -1,4 +1,5 @@
 #include "Scene.h"
+#include <cassert>
 #include <stdexcept>
 
 namespace sgl {
@@ -60,6 +61,12 @@ namespace sgl {
 			}
 		}
 		return ret;
+	}
+
+	std::shared_ptr<sgl::Scene> LoadSceneFromObj(const std::string& file_path)
+	{
+		assert(!file_path.empty());
+		return nullptr;
 	}
 
 } // End namespace sgl.

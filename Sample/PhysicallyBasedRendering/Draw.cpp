@@ -448,7 +448,7 @@ std::shared_ptr<sgl::Mesh> Draw::CreatePhysicallyBasedRenderedMesh(
 	pbr_program_->UniformMatrix("model", device->GetModel());
 
 	// Mesh creation.
-	auto mesh = std::make_shared<sgl::Mesh>(
+	auto mesh = sgl::CreateMeshFromObjFile(
 		"../Asset/Model/" + 
 		types::draw_model_shape_map.at(draw_model_) + 
 		".obj",

@@ -6,10 +6,13 @@
 
 namespace sgl {
 
-	Mesh::Mesh(const std::string& file, const std::shared_ptr<Program>& program)
+	Mesh::Mesh(
+		std::istream& is,
+		const std::string& name,
+		const std::shared_ptr<Program>& program)
 	{
 		SetProgram(program);
-		auto obj_file = LoadFromObj(file);
+		auto obj_file = LoadFromObj(is, name);
 		std::vector<float> points = {};
 		std::vector<float> normals = {};
 		std::vector<float> texcoords = {};
@@ -80,7 +83,6 @@ namespace sgl {
 		}
 		program_ = program;
 	}
-
 
 	void Mesh::CreateMeshFromFlat(
 		const std::vector<float>& points,
@@ -186,32 +188,51 @@ namespace sgl {
 		}
 	}
 
-	sgl::Mesh::ObjFile Mesh::LoadFromObj(const std::string& file)
+	sgl::Mesh::ObjFile Mesh::LoadFromObj(
+		std::istream& is, 
+		const std::string& name)
 	{
-		sgl::Mesh::ObjFile obj_file{};
-		std::ifstream ifs;
-		ifs.open(file, std::ifstream::in);
-		if (!ifs.is_open())
-		{
-			throw std::runtime_error("Couldn't open file: " + file);
-		}
-		while (!ifs.eof()) 
+		Mesh::ObjFile obj_file{};
+		while (!is.eof()) 
 		{
 			std::string line = "";
-			if (!std::getline(ifs, line)) break;
+			if (!std::getline(is, line)) break;
 			if (line.empty()) continue;
 			std::istringstream iss(line);
 			std::string dump;
 			if (!(iss >> dump))
 			{
 				throw std::runtime_error(
-					"Error parsing file: " + file + " no token found.");
+					"Error parsing file: " + name + " no token found.");
 			}
 			if (dump.size() > 2)
 			{
 				if (dump == "mtllib") continue;
+				if (dump == "usemtl") {
+					std::string material = "";
+					iss >> material;
+					if (material.empty())
+					{
+						throw std::runtime_error(
+							"Error parsing file: " + 
+							name + 
+							" cannot get material name.");
+					}
+					if (!obj_file.material.empty())
+					{
+						throw std::runtime_error(
+							"Error parsing file: " +
+							name +
+							" material was already defined as: " +
+							obj_file.material +
+							" is redefined as : " +
+							material);
+					}
+					obj_file.material = material;
+					continue;
+				}
 				throw std::runtime_error(
-					"Error parsing file: " + file + " token is too long.");
+					"Error parsing file: " + name + " token is too long.");
 			}
 			switch (dump[0]) {
 			case 'v':
@@ -228,21 +249,21 @@ namespace sgl {
 						{
 							throw std::runtime_error(
 								"Error parsing file : " + 
-								file + 
+								name + 
 								" no x found in vn.");
 						}
 						if (!(iss >> v.y))
 						{
 							throw std::runtime_error(
 								"Error parsing file : " +
-								file +
+								name +
 								" no y found in vn.");
 						}
 						if (!(iss >> v.z))
 						{
 							throw std::runtime_error(
 								"Error parsing file : " +
-								file +
+								name +
 								" no z found in vn.");
 						}
 						obj_file.normals.push_back(v);
@@ -256,14 +277,14 @@ namespace sgl {
 						{
 							throw std::runtime_error(
 								"Error parsing file : " +
-								file +
+								name +
 								" no x found in vt.");
 						}
 						if (!(iss >> v.y))
 						{
 							throw std::runtime_error(
 								"Error parsing file : " +
-								file +
+								name +
 								" no y found in vt.");
 						}
 						obj_file.textures.push_back(v);
@@ -273,7 +294,7 @@ namespace sgl {
 					{
 						throw std::runtime_error(
 							"Error parsing file : " + 
-							file +
+							name +
 							" unknown command : " +
 							dump);
 					}
@@ -286,21 +307,21 @@ namespace sgl {
 					{
 						throw std::runtime_error(
 							"Error parsing file : " +
-							file +
+							name +
 							" no x found in v.");
 					}
 					if (!(iss >> v.y))
 					{
 						throw std::runtime_error(
 							"Error parsing file : " +
-							file +
+							name +
 							" no y found in v.");
 					}
 					if (!(iss >> v.z))
 					{
 						throw std::runtime_error(
 							"Error parsing file : " +
-							file +
+							name +
 							" no z found in v.");
 					}
 					obj_file.positions.push_back(v);
@@ -313,7 +334,7 @@ namespace sgl {
 				{
 					throw std::runtime_error(
 						"Error parsing file : " +
-						file +
+						name +
 						" unknown command : " +
 						dump);
 				}
@@ -324,7 +345,7 @@ namespace sgl {
 					{
 						throw std::runtime_error(
 							"Error parsing file : " +
-							file +
+							name +
 							" missing inner part of a description.");
 					}
 					std::array<int, 3> vi;
@@ -354,7 +375,7 @@ namespace sgl {
 		{
 			throw std::runtime_error(
 				"Error parsing file : " +
-				file +
+				name +
 				" indices are not triangles!");
 		}
 		return obj_file;
@@ -400,7 +421,19 @@ namespace sgl {
 	std::shared_ptr<sgl::Mesh> CreateCubeMesh(
 		const std::shared_ptr<Program>& program)
 	{
-		return std::make_shared<Mesh>("../Asset/Model/Cube.obj", program);
+		return CreateMeshFromObjFile("../Asset/Model/Cube.obj", program);
+	}
+
+	std::shared_ptr<sgl::Mesh> CreateMeshFromObjFile(
+		const std::string& file_path, 
+		const std::shared_ptr<Program>& program)
+	{
+		auto ifs = std::ifstream(file_path);
+		if (!ifs.is_open())
+		{
+			throw std::runtime_error("could not open file: " + file_path);
+		}
+		return std::make_shared<sgl::Mesh>(ifs, file_path, program);
 	}
 
 } // End namespace sgl.

@@ -74,7 +74,7 @@ std::shared_ptr<sgl::Mesh> Draw::CreateAppleMesh(
 	simple_program->UniformMatrix("model", device->GetModel());
 
 	// Mesh creation.
-	auto apple_mesh = std::make_shared<sgl::Mesh>(
+	auto apple_mesh = sgl::CreateMeshFromObjFile(
 		"../Asset/Model/Apple.obj",
 		simple_program);
 

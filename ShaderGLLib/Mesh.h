@@ -16,7 +16,10 @@ namespace sgl {
 	class Mesh
 	{
 	public:
-		Mesh(const std::string& file, const std::shared_ptr<Program>& program);
+		Mesh(
+			std::istream& is, 
+			const std::string& name, 
+			const std::shared_ptr<Program>& program);
 		Mesh(
 			const std::vector<float>& points,
 			const std::vector<float>& normals,
@@ -52,9 +55,10 @@ namespace sgl {
 			std::vector<glm::vec3> normals;
 			std::vector<glm::vec2> textures;
 			std::vector<std::array<int, 3>> indices;
+			std::string material = {};
 		};
 		// Load from OBJ throw an exception in case of error.
-		ObjFile LoadFromObj(const std::string& file);
+		ObjFile LoadFromObj(std::istream& is, const std::string& name);
 		void SetProgram(const std::shared_ptr<Program>& program);
 		void CreateMeshFromFlat(
 			const std::vector<float>& points,
@@ -66,6 +70,7 @@ namespace sgl {
 		bool clear_depth_buffer_ = false;
 		std::shared_ptr<Program> program_ = nullptr;
 		std::vector<std::string> textures_ = {};
+		std::string material_ = "";
 		Buffer point_buffer_ = {};
 		Buffer normal_buffer_ = {};
 		Buffer texture_buffer_ = {};
@@ -81,6 +86,10 @@ namespace sgl {
 
 	// Create a Cube Mesh that correspond to a cube map.
 	std::shared_ptr<Mesh> CreateCubeMesh(
+		const std::shared_ptr<Program>& program);
+
+	std::shared_ptr<Mesh> CreateMeshFromObjFile(
+		const std::string& file_path,
 		const std::shared_ptr<Program>& program);
 
 } // End namespace sgl.

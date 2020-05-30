@@ -83,4 +83,8 @@ namespace sgl {
 		const std::shared_ptr<Scene> GetRoot() const;
 	};
 
+	std::shared_ptr<Scene> LoadSceneFromObj(
+		std::istream& is, 
+		const std::string& name);
+
 } // End namespace sgl.

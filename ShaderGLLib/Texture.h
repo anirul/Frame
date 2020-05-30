@@ -28,6 +28,11 @@ namespace sgl {
 			const std::string& file,
 			const PixelElementSize pixel_element_size = PixelElementSize::BYTE,
 			const PixelStructure pixel_structure = PixelStructure::RGB);
+		Texture(
+			const std::pair<std::uint32_t, std::uint32_t> size,
+			const void* data,
+			const PixelElementSize pixel_element_size = PixelElementSize::BYTE,
+			const PixelStructure pixel_structure = PixelStructure::RGB);
 		virtual ~Texture();
 
 	public:
