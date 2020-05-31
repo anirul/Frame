@@ -188,7 +188,7 @@ namespace sgl {
 		}
 	}
 
-	sgl::Mesh::ObjFile Mesh::LoadFromObj(
+	Mesh::ObjFile Mesh::LoadFromObj(
 		std::istream& is, 
 		const std::string& name)
 	{
@@ -207,8 +207,8 @@ namespace sgl {
 			}
 			if (dump.size() > 2)
 			{
-				if (dump == "mtllib") continue;
-				if (dump == "usemtl") {
+				if (dump == "usemtl")
+				{
 					std::string material = "";
 					iss >> material;
 					if (material.empty())
@@ -244,50 +244,15 @@ namespace sgl {
 					case 'n':
 					{
 						assert(dump == "vn");
-						glm::vec3 v(0, 0, 0);
-						if (!(iss >> v.x))
-						{
-							throw std::runtime_error(
-								"Error parsing file : " + 
-								name + 
-								" no x found in vn.");
-						}
-						if (!(iss >> v.y))
-						{
-							throw std::runtime_error(
-								"Error parsing file : " +
-								name +
-								" no y found in vn.");
-						}
-						if (!(iss >> v.z))
-						{
-							throw std::runtime_error(
-								"Error parsing file : " +
-								name +
-								" no z found in vn.");
-						}
-						obj_file.normals.push_back(v);
+						obj_file.normals.push_back(
+							GetVec3From3Float(iss, name, dump));
 						break;
 					}
 					case 't':
 					{
 						assert(dump == "vt");
-						glm::vec2 v(0, 0);
-						if (!(iss >> v.x))
-						{
-							throw std::runtime_error(
-								"Error parsing file : " +
-								name +
-								" no x found in vt.");
-						}
-						if (!(iss >> v.y))
-						{
-							throw std::runtime_error(
-								"Error parsing file : " +
-								name +
-								" no y found in vt.");
-						}
-						obj_file.textures.push_back(v);
+						obj_file.textures.push_back(
+							Getvec2From2Float(iss, name, dump));
 						break;
 					}
 					default:
@@ -302,29 +267,8 @@ namespace sgl {
 				}
 				else
 				{
-					glm::vec3 v(0, 0, 0);
-					if (!(iss >> v.x))
-					{
-						throw std::runtime_error(
-							"Error parsing file : " +
-							name +
-							" no x found in v.");
-					}
-					if (!(iss >> v.y))
-					{
-						throw std::runtime_error(
-							"Error parsing file : " +
-							name +
-							" no y found in v.");
-					}
-					if (!(iss >> v.z))
-					{
-						throw std::runtime_error(
-							"Error parsing file : " +
-							name +
-							" no z found in v.");
-					}
-					obj_file.positions.push_back(v);
+					obj_file.positions.push_back(
+						GetVec3From3Float(iss, name, dump));
 				}
 			}
 			break;
@@ -379,6 +323,64 @@ namespace sgl {
 				" indices are not triangles!");
 		}
 		return obj_file;
+	}
+
+	glm::vec3 Mesh::GetVec3From3Float(
+		std::istream& is, 
+		const std::string& stream_name, 
+		const std::string& element_name) const
+	{
+		glm::vec3 v3(0, 0, 0);
+		if (!(is >> v3.x))
+		{
+			throw std::runtime_error(
+				"Error parsing file : " +
+				stream_name +
+				" no x found in " +
+				element_name);
+		}
+		if (!(is >> v3.y))
+		{
+			throw std::runtime_error(
+				"Error parsing file : " +
+				stream_name +
+				" no y found in " +
+				element_name);
+		}
+		if (!(is >> v3.z))
+		{
+			throw std::runtime_error(
+				"Error parsing file : " +
+				stream_name +
+				" no z found in " +
+				element_name);
+		}
+		return v3;
+	}
+
+	glm::vec2 Mesh::Getvec2From2Float(
+		std::istream& is, 
+		const std::string& stream_name, 
+		const std::string& element_name) const
+	{
+		glm::vec2 v2(0, 0);
+		if (!(is >> v2.x))
+		{
+			throw std::runtime_error(
+				"Error parsing file : " +
+				stream_name +
+				" no x found in " +
+				element_name);
+		}
+		if (!(is >> v2.y))
+		{
+			throw std::runtime_error(
+				"Error parsing file : " +
+				stream_name +
+				" no y found in " +
+				element_name);
+		}
+		return v2;
 	}
 
 	std::shared_ptr<sgl::Mesh> CreateQuadMesh(

@@ -16,10 +16,12 @@ namespace sgl {
 	class Mesh
 	{
 	public:
+		// Open a mesh from a OBJ stream.
 		Mesh(
 			std::istream& is, 
 			const std::string& name, 
 			const std::shared_ptr<Program>& program);
+		// Create a mesh from a set of vectors.
 		Mesh(
 			const std::vector<float>& points,
 			const std::vector<float>& normals,
@@ -48,6 +50,7 @@ namespace sgl {
 		const size_t IndexSize() const { return index_size_; }
 		const std::shared_ptr<Program> GetProgram() { return program_; }
 		void ClearDepthBuffer(bool clear) { clear_depth_buffer_ = clear; }
+		const std::string GetMaterialName() const { return material_name_; }
 		
 	protected:
 		struct ObjFile {
@@ -57,9 +60,19 @@ namespace sgl {
 			std::vector<std::array<int, 3>> indices;
 			std::string material = {};
 		};
+		// Set the program for the mesh (it is supposed to be done at creation).
+		void SetProgram(const std::shared_ptr<Program>& program);
 		// Load from OBJ throw an exception in case of error.
 		ObjFile LoadFromObj(std::istream& is, const std::string& name);
-		void SetProgram(const std::shared_ptr<Program>& program);
+		// Get a vector from a number of float.
+		glm::vec3 GetVec3From3Float(
+			std::istream& is,
+			const std::string& stream_name,
+			const std::string& element_name) const;
+		glm::vec2 Getvec2From2Float(
+			std::istream& is,
+			const std::string& stream_name,
+			const std::string& element_name) const;
 		void CreateMeshFromFlat(
 			const std::vector<float>& points,
 			const std::vector<float>& normals,
@@ -78,6 +91,7 @@ namespace sgl {
 		size_t index_size_ = 0;
 		unsigned int vertex_array_object_ = 0;
 		const Error& error_ = Error::GetInstance();
+		std::string material_name_ = "";
 	};
 
 	// Create a Quad Mesh that is on the edge of the screen.

@@ -23,6 +23,10 @@ namespace sgl {
 			const std::shared_ptr<Texture>& ambient_occlusion);
 
 	public:
+		std::vector<std::string> GetTextures() const;
+		TextureManager GetTextureManager() const;
+
+	public:
 		const std::shared_ptr<Texture>& GetColor() const { return color_; }
 		const std::shared_ptr<Texture>& GetNormal() const { return normal_; }
 		const std::shared_ptr<Texture>& GetMetal() const { return metal_; }
@@ -57,6 +61,8 @@ namespace sgl {
 		std::shared_ptr<Texture> ambient_occlusion_ = nullptr;
 	};
 
-	using MaterialMap = std::map<std::string, std::shared_ptr<Material>>;
+	std::map<std::string, std::shared_ptr<Material>> LoadMaterialFromMtlStream(
+		std::istream& is,
+		const std::string& name);
 
 } // End namespace sgl.

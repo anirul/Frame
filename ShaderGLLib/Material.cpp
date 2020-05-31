@@ -93,6 +93,22 @@ namespace sgl {
 		ambient_occlusion_ = ambient_occlusion;
 	}
 
+	std::vector<std::string> Material::GetTextures() const
+	{
+		return { "Color", "Normal", "Metal", "Roughness", "AmbientOcclusion" };
+	}
+
+	TextureManager Material::GetTextureManager() const
+	{
+		TextureManager texture_manager;
+		texture_manager.AddTexture("Color", color_);
+		texture_manager.AddTexture("Normal", normal_);
+		texture_manager.AddTexture("Metal", metal_);
+		texture_manager.AddTexture("Roughness", roughness_);
+		texture_manager.AddTexture("AmbientOcclusion", ambient_occlusion_);
+		return texture_manager;
+	}
+
 	std::shared_ptr<sgl::Texture> Material::GetTextureFromFile(
 		std::istream& is, 
 		const std::string& stream_name,
@@ -169,6 +185,55 @@ namespace sgl {
 			PixelElementSize::FLOAT,
 			PixelStructure::GREY);
 		return texture;
+	}
+
+	std::map<std::string, std::shared_ptr<Material>> LoadMaterialFromMtlStream(
+		std::istream& is, 
+		const std::string& name)
+	{
+		std::map<std::string, std::shared_ptr<Material>> material_map{};
+		std::string mtl_part = "";
+		std::string name_extended = "";
+		std::string mtl_name = "";
+		auto lambda_create_material = 
+			[&material_map, &mtl_part, &mtl_name, &name_extended]()
+		{
+			material_map.emplace(
+				mtl_name,
+				std::make_shared<Material>(
+					std::istringstream(mtl_part),
+					name_extended));
+			mtl_part.clear();
+		};
+		while (!is.eof())
+		{
+			std::string line = "";
+			if (!std::getline(is, line)) break;
+			if (line.empty()) continue;
+			std::istringstream iss(line);
+			std::string dump;
+			if (!(iss >> dump))
+			{
+				throw std::runtime_error(
+					"Error parsing file: " + name + " no token found.");
+			}
+			if (dump == "newmtl")
+			{
+				if (!mtl_part.empty()) lambda_create_material();
+				if (!(iss >> mtl_name))
+				{
+					throw std::runtime_error(
+						"Material should have name: " + name);
+				}
+				name_extended = name + ":" + mtl_name;
+			}
+			else
+			{
+				mtl_part += line + "\n";
+			}
+		}
+		if (!mtl_part.empty()) lambda_create_material();
+		return material_map;
 	}
 
 } // End namespace sgl.
