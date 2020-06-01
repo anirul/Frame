@@ -3,43 +3,26 @@
 
 namespace sgl {
 
-	sgl::LightManager& LightManager::operator=(
-		const LightManager& light_manager)
-	{
-		lights_ = light_manager.lights_;
-		return *this;
-	}
-
 	void LightManager::RegisterToProgram(
-		const std::shared_ptr<Program>& program)
+		const std::shared_ptr<Program>& program) const
 	{
-		if (lights_.size() > max_dynamic_lights_)
+		if (lights_.size() > 32)
 		{
-			throw std::runtime_error("too many lights.");
+			throw std::runtime_error("too many lights!");
 		}
+		program->Use();
 		int i = 0;
-		// Fill correct lights.
-		for (sgl::Light light : lights_)
+		for (const auto& light : lights_)
 		{
 			program->UniformVector3(
 				"light_position[" + std::to_string(i) + "]", 
-				light.GetPosition());
+				lights_[i]->GetVector());
 			program->UniformVector3(
 				"light_color[" + std::to_string(i) + "]",
-				light.GetColorIntensity());
+				lights_[i]->GetColorIntensity());
 			++i;
 		}
-		sgl::Light light_zero(glm::vec3(0, 0, 0), glm::vec3(0, 0, 0));
-		// Fill what is left with empty ones.
-		for (; i < max_dynamic_lights_; ++i)
-		{
-			program->UniformVector3(
-				"light_position[" + std::to_string(i) + "]",
-				light_zero.GetPosition());
-			program->UniformVector3(
-				"light_color[" + std::to_string(i) + "]",
-				light_zero.GetColorIntensity());
-		}
+		program->UniformInt("light_max", static_cast<int>(lights_.size()));
 	}
 
 } // End namespace sgl.

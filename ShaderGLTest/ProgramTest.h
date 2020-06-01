@@ -15,7 +15,7 @@ namespace test {
 		}
 
 	protected:
-		std::shared_ptr<sgl::Window> window_ = nullptr;
+		std::shared_ptr<sgl::WindowInterface> window_ = nullptr;
 		std::shared_ptr<sgl::Program> program_ = nullptr;
 	};
 

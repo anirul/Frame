@@ -11,7 +11,7 @@ namespace test {
 		LightTest() = default;
 
 	protected:
-		std::shared_ptr<sgl::Light> light_ = nullptr;
+		std::shared_ptr<sgl::LightInterface> light_ = nullptr;
 		std::shared_ptr<sgl::LightManager> light_manager_ = nullptr;
 	};
 

@@ -17,7 +17,7 @@ namespace test {
 		}
 
 	protected:
-		std::shared_ptr<sgl::Window> window_ = nullptr;
+		std::shared_ptr<sgl::WindowInterface> window_ = nullptr;
 		sgl::Error& error_ = sgl::Error::GetInstance();
 		std::shared_ptr<sgl::Texture> texture_ = nullptr;
 		std::shared_ptr<sgl::TextureManager> texture_manager_ = nullptr;

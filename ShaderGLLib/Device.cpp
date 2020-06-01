@@ -57,13 +57,25 @@ namespace sgl {
 
 	std::shared_ptr<Texture> Device::DrawTexture(const double dt)
 	{
-		// Setup the camera.
-		SetupCamera();
-
 		auto texture = std::make_shared<Texture>(
 			size_, 
 			PixelElementSize::FLOAT, 
 			PixelStructure::RGB);
+		DrawMultiTextures({ texture }, dt);
+		return texture;
+	}
+
+	void Device::DrawMultiTextures(
+		const std::vector<std::shared_ptr<Texture>>& out_textures, 
+		const double dt)
+	{
+		if (out_textures.empty())
+		{
+			throw std::runtime_error("Cannot draw on empty textures.");
+		}
+
+		// Setup the camera.
+		SetupCamera();
 
 		Frame frame{};
 		Render render{};
@@ -80,7 +92,13 @@ namespace sgl {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		error_.Display(__FILE__, __LINE__ - 1);
 
-		frame.BindTexture(*texture);
+		int i = 0;
+		for (const auto& texture : out_textures)
+		{
+			frame.BindTexture(*texture, Frame::GetFrameColorAttachment(i));
+			++i;
+		}
+		frame.DrawBuffers(static_cast<std::uint32_t>(out_textures.size()));
 
 		for (const std::shared_ptr<Scene>& scene : scene_tree_)
 		{
@@ -92,12 +110,11 @@ namespace sgl {
 
 			// Draw the mesh.
 			mesh->Draw(
-				texture_manager_, 
-				perspective_, 
-				view_, 
+				texture_manager_,
+				perspective_,
+				view_,
 				scene->GetLocalModel(dt));
 		}
-		return texture;
 	}
 
 	void Device::SetupCamera()

@@ -15,7 +15,7 @@ namespace sgl {
 	// Private space.
 	namespace {
 
-		class SDLWindow : public Window
+		class SDLWindow : public WindowInterface
 		{
 		public:
 			SDLWindow(const std::pair<std::uint32_t, std::uint32_t> size) : 
@@ -61,6 +61,11 @@ namespace sgl {
 
 			void Run() override
 			{
+				// FIXME(anirul): will crash in case you resize the window.
+				if (draw_interface_)
+				{
+					draw_interface_->Startup(size_);
+				}
 				// While Run return true continue.
 				bool loop = true;
 				double previous_count = 0.0f;
@@ -82,12 +87,15 @@ namespace sgl {
 						}
 					}
 
-					auto texture = device_->DrawTexture(time.count());
-					if (draw_func_)
+					if (draw_interface_)
 					{
-						draw_func_(time.count(), texture);
+						draw_interface_->RunDraw(time.count());
+						device_->Display(draw_interface_->GetDrawTexture());
 					}
-					device_->Display(texture);
+					else
+					{
+						device_->Draw(time.count());
+					}
 
 					previous_count = time.count();
 					// TODO(anirul): Fix me to check which device this is.
@@ -97,14 +105,17 @@ namespace sgl {
 					}
 				} 
 				while (loop);
+
+				if (draw_interface_)
+				{
+					draw_interface_->Delete();
+				}
 			}
 
-			void SetDraw(
-				std::function<void(
-					const double, 
-					std::shared_ptr<Texture>&)> draw_func) override
+			void SetDrawInterface(
+				const std::shared_ptr<DrawInterface>& draw_interface) override
 			{
-				draw_func_ = draw_func;
+				draw_interface_ = draw_interface;
 			}
 
 			void SetUniqueDevice(const std::shared_ptr<Device>& device) override
@@ -157,9 +168,7 @@ namespace sgl {
 		private:
 			const std::pair<std::uint32_t, std::uint32_t> size_;
 			std::shared_ptr<sgl::Device> device_ = nullptr;
-			std::function<void(
-				const double, 
-				std::shared_ptr<Texture>&)> draw_func_ = nullptr;
+			std::shared_ptr<DrawInterface> draw_interface_ = nullptr;
 			SDL_Window* sdl_window_ = nullptr;
 #if defined(_WIN32) || defined(_WIN64)
 			HWND hwnd_ = nullptr;
@@ -167,7 +176,7 @@ namespace sgl {
 		};
 
 		void* InitOpenGLDevice(
-			const std::shared_ptr<Window>& window)
+			const std::shared_ptr<WindowInterface>& window)
 		{
 			std::pair<int, int> gl_version;
 			// GL context.
@@ -199,7 +208,7 @@ namespace sgl {
 
 	} // End namespace.
 
-	std::shared_ptr<sgl::Window> CreateSDLOpenGL(
+	std::shared_ptr<WindowInterface> CreateSDLOpenGL(
 		std::pair<std::uint32_t, std::uint32_t> size)
 	{
 		auto window = std::make_shared<SDLWindow>(size);

@@ -1,6 +1,7 @@
 #include "Frame.h"
 #include <stdexcept>
 #include <GL/glew.h>
+#include <cassert>
 
 namespace sgl {
 
@@ -96,6 +97,21 @@ namespace sgl {
 	FrameTextureType Frame::GetFrameTextureType(const int i)
 	{
 		return static_cast<FrameTextureType>(i);
+	}
+
+	void Frame::DrawBuffers(const std::uint32_t size /*= 1*/)
+	{
+		assert(size < 9);
+		std::vector<unsigned int> draw_buffer = {};
+		for (std::uint32_t i = 0; i < size; ++i)
+		{
+			draw_buffer.emplace_back(
+				static_cast<unsigned int>(Frame::GetFrameColorAttachment(i)));
+		}
+		glDrawBuffers(
+			static_cast<GLsizei>(draw_buffer.size()), 
+			draw_buffer.data());
+		error_.Display(__FILE__, __LINE__ - 3);
 	}
 
 } // End namespace sgl.

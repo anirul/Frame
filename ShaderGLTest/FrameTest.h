@@ -18,7 +18,7 @@ namespace test {
 
 	protected:
 		std::shared_ptr<sgl::Frame> frame_ = nullptr;
-		std::shared_ptr<sgl::Window> window_ = nullptr;
+		std::shared_ptr<sgl::WindowInterface> window_ = nullptr;
 		sgl::Error& error_ = sgl::Error::GetInstance();
 	};
 

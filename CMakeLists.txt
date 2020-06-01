@@ -157,6 +157,8 @@ add_executable(Simple
     ${PROJECT_SOURCE_DIR}/Asset/Shader/Simple.vert
     ${PROJECT_SOURCE_DIR}/Sample/Simple/Application.cpp
     ${PROJECT_SOURCE_DIR}/Sample/Simple/Application.h
+    ${PROJECT_SOURCE_DIR}/Sample/Simple/Draw.cpp
+    ${PROJECT_SOURCE_DIR}/Sample/Simple/Draw.h
     ${PROJECT_SOURCE_DIR}/Sample/Simple/main.cpp
 )
 
@@ -180,24 +182,31 @@ add_executable(PhysicallyBasedRendering
     ${PROJECT_SOURCE_DIR}/Asset/Shader/Brightness.vert
     ${PROJECT_SOURCE_DIR}/Asset/Shader/Combine.frag
     ${PROJECT_SOURCE_DIR}/Asset/Shader/Combine.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/CubeMapHighDynamicRange.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/CubeMapHighDynamicRange.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/CubeMapDeferred.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/CubeMapDeferred.vert
     ${PROJECT_SOURCE_DIR}/Asset/Shader/Display.frag
     ${PROJECT_SOURCE_DIR}/Asset/Shader/Display.vert
     ${PROJECT_SOURCE_DIR}/Asset/Shader/EquirectangularCubeMap.frag
     ${PROJECT_SOURCE_DIR}/Asset/Shader/EquirectangularCubeMap.vert
     ${PROJECT_SOURCE_DIR}/Asset/Shader/GaussianBlur.frag
     ${PROJECT_SOURCE_DIR}/Asset/Shader/GaussianBlur.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/HighDynamicRange.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/HighDynamicRange.vert
     ${PROJECT_SOURCE_DIR}/Asset/Shader/IntegrateBRDF.frag
     ${PROJECT_SOURCE_DIR}/Asset/Shader/IntegrateBRDF.vert
     ${PROJECT_SOURCE_DIR}/Asset/Shader/IrradianceCubeMap.frag
     ${PROJECT_SOURCE_DIR}/Asset/Shader/IrradianceCubeMap.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/Lighting.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/Lighting.vert
     ${PROJECT_SOURCE_DIR}/Asset/Shader/MonteCarloPrefilter.frag
     ${PROJECT_SOURCE_DIR}/Asset/Shader/MonteCarloPrefilter.vert
     ${PROJECT_SOURCE_DIR}/Asset/Shader/PhysicallyBasedRendering.frag
     ${PROJECT_SOURCE_DIR}/Asset/Shader/PhysicallyBasedRendering.vert
     ${PROJECT_SOURCE_DIR}/Sample/PhysicallyBasedRendering/Application.cpp
     ${PROJECT_SOURCE_DIR}/Sample/PhysicallyBasedRendering/Application.h
+    ${PROJECT_SOURCE_DIR}/Sample/PhysicallyBasedRendering/Draw.cpp
+    ${PROJECT_SOURCE_DIR}/Sample/PhysicallyBasedRendering/Draw.h
+    ${PROJECT_SOURCE_DIR}/Sample/PhysicallyBasedRendering/Types.h
     ${PROJECT_SOURCE_DIR}/Sample/PhysicallyBasedRendering/main.cpp
 )
 

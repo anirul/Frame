@@ -209,6 +209,7 @@ namespace sgl {
 			}
 			if (dump.size() > 2)
 			{
+				if (dump == "mtllib") continue;
 				throw std::runtime_error(
 					"Error parsing file: " + file + " token is too long.");
 			}

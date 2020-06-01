@@ -14,7 +14,7 @@ namespace sgl {
 		case PixelElementSize::SHORT:
 			return GL_UNSIGNED_SHORT;
 		case PixelElementSize::HALF:
-			return GL_HALF_FLOAT;
+			return GL_FLOAT; // Not half float.
 		case PixelElementSize::FLOAT:
 			return GL_FLOAT;
 		}

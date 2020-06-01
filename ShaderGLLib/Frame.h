@@ -49,6 +49,7 @@ namespace sgl {
 				FrameTextureType::TEXTURE_2D) const;
 		static FrameColorAttachment GetFrameColorAttachment(const int i);
 		static FrameTextureType GetFrameTextureType(const int i);
+		void DrawBuffers(const std::uint32_t size = 1);
 
 	public:
 		const unsigned int GetId() const { return frame_id_; }

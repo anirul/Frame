@@ -7,11 +7,11 @@
 class Application
 {
 public:
-	Application(const std::shared_ptr<sgl::Window>& window);
-	bool Startup();
+	Application(const std::shared_ptr<sgl::WindowInterface>& window);
+	void Startup();
 	void Run();
 
 protected:
 	std::shared_ptr<sgl::Mesh> CreateBillboardMesh() const;
-	std::shared_ptr<sgl::Window> window_;
+	std::shared_ptr<sgl::WindowInterface> window_;
 };
