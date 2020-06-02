@@ -1,5 +1,7 @@
 #include "Device.h"
 #include <stdexcept>
+#include <sstream>
+#include <fstream>
 #include <glm/gtc/matrix_transform.hpp>
 #include "Frame.h"
 #include "Render.h"
@@ -31,6 +33,10 @@ namespace sgl {
 		// Enable seamless cube map.
 		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 		error_.Display(__FILE__, __LINE__ - 1);
+
+		// Create programs.
+		pbr_program_ = CreateProgram("PhysicallyBasedRendering");
+		lighting_program_ = CreateProgram("Lighting");
 	}
 
 	void Device::Startup(const float fov /*= 65.0f*/)
@@ -130,6 +136,64 @@ namespace sgl {
 
 		// Set the camera.
 		view_ = camera_.GetLookAt();
+	}
+
+	void Device::LoadSceneFromObjFile(const std::string& obj_file)
+	{
+		if (obj_file.empty())
+		{
+			throw std::runtime_error(
+				"Error invalid file name: " + obj_file);
+		}
+		std::string mtl_file = "";
+		std::string mtl_path = obj_file;
+		while (mtl_path.back() != '/' && mtl_path.back() != '\\')
+		{
+			mtl_path.pop_back();
+		}
+		std::ifstream obj_ifs(obj_file);
+		if (!obj_ifs.is_open())
+		{
+			throw std::runtime_error(
+				"Could not open file: " + obj_file);
+		}
+		std::string obj_content = "";
+		while (!obj_ifs.eof())
+		{
+			std::string line = "";
+			if (!std::getline(obj_ifs, line)) break;
+			if (line.empty()) continue;
+			std::istringstream iss(line);
+			std::string dump;
+			if (!(iss >> dump))
+			{
+				throw std::runtime_error(
+					"Error parsing file: " + obj_file);
+			}
+			if (dump[0] == '#') continue;
+			if (dump == "mtllib")
+			{
+				if (!(iss >> mtl_file))
+				{
+					throw std::runtime_error(
+						"Error parsing file: " + obj_file);
+				}
+				mtl_file = mtl_path + mtl_file;
+				continue;
+			}
+			obj_content += line + "\n";
+		}
+		std::ifstream mtl_ifs(mtl_file);
+		if (!mtl_ifs.is_open())
+		{
+			throw std::runtime_error(
+				"Error cannot open file: " + mtl_file);
+		}
+		scene_tree_ = LoadSceneFromObjStream(
+			std::istringstream(obj_content),
+			pbr_program_,
+			obj_file);
+		materials_ = LoadMaterialFromMtlStream(mtl_ifs, mtl_file);
 	}
 
 } // End namespace sgl.

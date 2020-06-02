@@ -84,18 +84,7 @@ namespace sgl {
 		const std::shared_ptr<Scene> GetRoot() const;
 	};
 
-	// The full scene tree and materials (the content of OBJ/MTL files).
-	struct SceneTreeMaterial 
-	{
-		std::shared_ptr<SceneTree> scene_tree;
-		std::map<std::string, std::shared_ptr<Material>> materials;
-	};
-		
-	SceneTreeMaterial LoadSceneFromObjFile(
-		const std::string& obj_file,
-		const std::shared_ptr<Program>& program);
-
-	std::shared_ptr<SceneTree> LoadSceneFromObjStream(
+	SceneTree LoadSceneFromObjStream(
 		std::istream& is, 
 		const std::shared_ptr<Program>& program,
 		const std::string& name);

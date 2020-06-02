@@ -13,6 +13,7 @@
 #include "../ShaderGLLib/Scene.h"
 #include "../ShaderGLLib/Camera.h"
 #include "../ShaderGLLib/Light.h"
+#include "../ShaderGLLib/Material.h"
 
 namespace sgl {
 
@@ -40,6 +41,8 @@ namespace sgl {
 			const double dt);
 		// Display a texture to the display.
 		void Display(const std::shared_ptr<Texture>& texture);
+		// Load scene from an OBJ file.
+		void LoadSceneFromObjFile(const std::string& obj_file);
 
 	public:
 		Camera GetCamera() const { return camera_; }
@@ -68,16 +71,28 @@ namespace sgl {
 		void SetupCamera();
 
 	private:
+		std::map<std::string, std::shared_ptr<Material>> materials_ = {};
+		std::shared_ptr<Program> pbr_program_ = nullptr;
+		std::shared_ptr<Program> lighting_program_ = nullptr;
+		std::vector<std::shared_ptr<Texture>> deferred_textures_ = {};
+		std::vector<std::shared_ptr<Texture>> lighting_textures_ = {};
+		std::shared_ptr<Texture> final_texture_ = nullptr;
 		SceneTree scene_tree_ = {};
 		TextureManager texture_manager_ = {};
 		LightManager light_manager_ = {};
+		// Camera storage.
 		Camera camera_ = Camera({ 0.f, 0.f, 2.f }, { 0.f, 0.f, 0.f });
+		// PVM matrices.
 		glm::mat4 perspective_ = glm::mat4(1.0f);
 		glm::mat4 view_ = glm::mat4(1.0f);
 		glm::mat4 model_ = glm::mat4(1.0f);
+		// Field of view (in degrees).
 		float fov_ = 65.f;
+		// Open GL context.
 		void* gl_context_ = nullptr;
+		// Constants.
 		const std::pair<std::uint32_t, std::uint32_t> size_ = { 0, 0 };
+		const PixelElementSize pixel_element_size_ = PixelElementSize::HALF;
 		// Error setup.
 		const Error& error_ = Error::GetInstance();
 	};

@@ -67,76 +67,14 @@ namespace sgl {
 		return ret;
 	}
 
-	SceneTreeMaterial LoadSceneFromObjFile(
-		const std::string& obj_file, 
-		const std::shared_ptr<Program>& program)
-	{
-		if (obj_file.empty())
-		{
-			throw std::runtime_error(
-				"Error invalid file name: " + obj_file);
-		}
-		std::string mtl_file = "";
-		std::string mtl_path = obj_file;
-		while (mtl_path.back() != '/' || mtl_path.back() != '\\')
-		{
-			mtl_path.pop_back();
-		}
-		std::ifstream obj_ifs(obj_file);
-		if (!obj_ifs.is_open())
-		{
-			throw std::runtime_error(
-				"Could not open file: " + obj_file);
-		}
-		std::string obj_content = "";
-		while (!obj_ifs.eof())
-		{
-			std::string line = "";
-			if (!std::getline(obj_ifs, line)) break;
-			if (line.empty()) continue;
-			std::istringstream iss(line);
-			std::string dump;
-			if (!(iss >> dump))
-			{
-				throw std::runtime_error(
-					"Error parsing file: " + obj_file);
-			}
-			if (dump[0] == '#') continue;
-			if (dump == "mtllib")
-			{
-				if (!(iss >> mtl_file))
-				{
-					mtl_file = mtl_path + mtl_file;
-				}
-				continue;
-			}
-			obj_content += line + "\n";
-		}
-		std::ifstream mtl_ifs(mtl_file);
-		if (!mtl_ifs.is_open())
-		{
-			throw std::runtime_error(
-				"Error cannot open file: " + mtl_file);
-		}
-		SceneTreeMaterial scene_tree_material{};
-		scene_tree_material.scene_tree =
-			LoadSceneFromObjStream(
-				std::istringstream(obj_content), 
-				program, 
-				obj_file);
-		scene_tree_material.materials =
-			LoadMaterialFromMtlStream(mtl_ifs, mtl_file);
-		return scene_tree_material;
-	}
-
-	std::shared_ptr<sgl::SceneTree> LoadSceneFromObjStream(
+	SceneTree LoadSceneFromObjStream(
 		std::istream& is,
 		const std::shared_ptr<Program>& program,
 		const std::string& name) 
 	{
 		auto root_node = std::make_shared<SceneMatrix>(glm::mat4(1.0f));
-		auto scene_tree = std::make_shared<SceneTree>();
-		scene_tree->AddNode(root_node);
+		SceneTree scene_tree = {};
+		scene_tree.AddNode(root_node);
 		// Open the OBJ file.
 		std::string obj_text = "";
 		std::string obj_name = "";
@@ -147,12 +85,14 @@ namespace sgl {
 			auto mesh = std::make_shared<Mesh>(obj_iss, obj_name, program);
 			auto mesh_node = std::make_shared<SceneMesh>(mesh);
 			mesh_node->SetParent(root_node);
-			scene_tree->AddNode(mesh_node);
+			scene_tree.AddNode(mesh_node);
+			obj_text.clear();
+			obj_name.clear();
 		};
 		while (!is.eof())
 		{
 			std::string line = "";
-			if (std::getline(is, line)) break;
+			if (!std::getline(is, line)) break;
 			if (line.empty()) continue;
 			std::istringstream iss(line);
 			std::string dump;

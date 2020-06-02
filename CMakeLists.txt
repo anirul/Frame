@@ -225,3 +225,26 @@ target_link_libraries(PhysicallyBasedRendering
     GLEW::GLEW
     glm
 )
+
+add_executable(SceneRendering
+  WIN32
+    ${PROJECT_SOURCE_DIR}/Sample/SceneRendering/Application.cpp
+    ${PROJECT_SOURCE_DIR}/Sample/SceneRendering/Application.h
+    ${PROJECT_SOURCE_DIR}/Sample/SceneRendering/Draw.cpp
+    ${PROJECT_SOURCE_DIR}/Sample/SceneRendering/Draw.h
+    ${PROJECT_SOURCE_DIR}/Sample/SceneRendering/main.cpp
+)
+
+target_include_directories(SceneRendering
+  PUBLIC
+    ${PROJECT_SOURCE_DIR}/ShaderGLLib
+)
+
+target_link_libraries(SceneRendering
+  PUBLIC
+    ShaderGLLib
+  PRIVATE
+    SDL2::SDL2
+    GLEW::GLEW
+    glm
+)

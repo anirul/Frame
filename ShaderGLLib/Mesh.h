@@ -41,11 +41,8 @@ namespace sgl {
 
 	public:
 		const Buffer& PointBuffer() const { return point_buffer_; }
-		const Buffer& NormalBuffer() const {	return normal_buffer_; }
-		const Buffer& TextureBuffer() const 
-		{ 
-			return texture_buffer_;
-		}
+		const Buffer& NormalBuffer() const { return normal_buffer_; }
+		const Buffer& TextureBuffer() const { return texture_buffer_; }
 		const Buffer& IndexBuffer() const { return index_buffer_; }
 		const size_t IndexSize() const { return index_size_; }
 		const std::shared_ptr<Program> GetProgram() { return program_; }
@@ -54,10 +51,17 @@ namespace sgl {
 		
 	protected:
 		struct ObjFile {
+			// Minimum index element this is useful for scene OBJ.
+			int min_position = std::numeric_limits<int>::max();
+			int min_normal = std::numeric_limits<int>::max();
+			int min_texture = std::numeric_limits<int>::max();
+			// Position, normal and texture coordinates.
 			std::vector<glm::vec3> positions;
 			std::vector<glm::vec3> normals;
 			std::vector<glm::vec2> textures;
+			// Indices you should subtract the min_element.
 			std::vector<std::array<int, 3>> indices;
+			// List of material to include (should only be one!).
 			std::string material = {};
 		};
 		// Set the program for the mesh (it is supposed to be done at creation).

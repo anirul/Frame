@@ -20,15 +20,18 @@ namespace sgl {
 		std::vector<std::array<float, 8>> vertices;
 		for (size_t i = 0; i < obj_file.indices.size(); ++i)
 		{
+			const size_t min_position = obj_file.min_position;
+			const size_t min_normal = obj_file.min_normal;
+			const size_t min_texture = obj_file.min_texture;
 			std::array<float, 8> v{};
-			v[0] = obj_file.positions[obj_file.indices[i][0]].x;
-			v[1] = obj_file.positions[obj_file.indices[i][0]].y;
-			v[2] = obj_file.positions[obj_file.indices[i][0]].z;
-			v[3] = obj_file.normals[obj_file.indices[i][2]].x;
-			v[4] = obj_file.normals[obj_file.indices[i][2]].y;
-			v[5] = obj_file.normals[obj_file.indices[i][2]].z;
-			v[6] = obj_file.textures[obj_file.indices[i][1]].x;
-			v[7] = obj_file.textures[obj_file.indices[i][1]].y;
+			v[0] = obj_file.positions[obj_file.indices[i][0] - min_position].x;
+			v[1] = obj_file.positions[obj_file.indices[i][0] - min_position].y;
+			v[2] = obj_file.positions[obj_file.indices[i][0] - min_position].z;
+			v[3] = obj_file.normals[obj_file.indices[i][2] - min_normal].x;
+			v[4] = obj_file.normals[obj_file.indices[i][2] - min_normal].y;
+			v[5] = obj_file.normals[obj_file.indices[i][2] - min_normal].z;
+			v[6] = obj_file.textures[obj_file.indices[i][1] - min_texture].x;
+			v[7] = obj_file.textures[obj_file.indices[i][1] - min_texture].y;
 			vertices.emplace_back(v);
 			indices.push_back(static_cast<unsigned int>(i));
 		}
@@ -294,17 +297,39 @@ namespace sgl {
 					}
 					std::array<int, 3> vi;
 					std::istringstream viss(inner);
-					for (int& i : vi)
+					auto lambda_set_minimum = [&obj_file](int index, int value)
+					{
+						switch (index)
+						{
+							case 0:
+								obj_file.min_position = 
+									std::min(value, obj_file.min_position);
+								return;
+							case 1:
+								obj_file.min_texture =
+									std::min(value, obj_file.min_texture);
+								return;
+							case 2:
+								obj_file.min_normal = 
+									std::min(value, obj_file.min_normal);
+								return;
+						}
+						throw std::runtime_error(
+							"Invalid index should be (0 - 2) is: " + index);
+					};
+					for (int i = 0; i < 3; ++i)
 					{
 						std::string inner_val;
 						std::getline(viss, inner_val, '/');
 						if (!inner_val.empty())
 						{
-							i = atoi(inner_val.c_str()) - 1;
+							int val = atoi(inner_val.c_str()) - 1;
+							lambda_set_minimum(i, val);
+							vi[i] = val;
 						}
 						else
 						{
-							i = -1;
+							vi[i] = -1;
 						}
 					}
 					obj_file.indices.push_back(vi);
