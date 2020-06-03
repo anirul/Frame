@@ -120,9 +120,11 @@ namespace sgl {
 			const std::shared_ptr<sgl::Texture>& texture);
 		const std::shared_ptr<sgl::Texture>& GetTexture(
 			const std::string& name) const;
+		bool HasTexture(const std::string& name) const;
 		bool RemoveTexture(const std::string& name);
 		// Return the binding slot of the texture (to be passed to the program).
 		const int EnableTexture(const std::string& name) const;
+		const std::vector<std::string> GetTexturesNames() const;
 		void DisableTexture(const std::string& name) const;
 		void DisableAll() const;
 
@@ -130,6 +132,18 @@ namespace sgl {
 		std::map<std::string, std::shared_ptr<Texture>> name_texture_map_;
 		mutable std::array<std::string, 32> name_array_;
 	};
+
+	// Get the brightness from a texture (usually before HDR).
+	std::shared_ptr<sgl::Texture> TextureBrightness(
+		const std::shared_ptr<sgl::Texture>& texture);
+
+	// Get the Gaussian blur of a texture.
+	std::shared_ptr<sgl::Texture> TextureGaussianBlur(
+		const std::shared_ptr<sgl::Texture>& texture);
+
+	// Combine a number of texture (maximum 16) into one.
+	std::shared_ptr<sgl::Texture> TextureCombine(
+		const std::vector<std::shared_ptr<sgl::Texture>>& add_textures);
 
 	// Fill multiple textures from a program.
 	//		- out_textures			: output textures (should be allocated).

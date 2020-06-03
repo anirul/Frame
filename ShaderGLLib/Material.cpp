@@ -1,8 +1,22 @@
 #include "Material.h"
 #include <sstream>
+#include <cassert>
 #include "Image.h"
 
 namespace sgl {	
+
+	namespace {
+		const std::vector<std::string> texture_vec = {
+				"Color",
+				"Normal",
+				"Metallic",
+				"Roughness",
+				"AmbientOcclusion",
+				"MonteCarloPrefilter",
+				"Irradiance",
+				"IntegrateBRDF"
+		};
+	}
 
 	Material::Material(std::istream& is, const std::string& name)
 	{
@@ -20,93 +34,92 @@ namespace sgl {
 			}
 			if (dump == "map_Ka") 
 			{
-				if (!color_) color_ = GetTextureFromFile(iss, name, dump);
+				AddTexture("Color", GetTextureFromFile(iss, name, dump));
 			}
 			if (dump == "Ka")
 			{
-				if (!color_) color_ = GetTextureFrom3Float(iss, name, dump);
+				AddTexture("Color", GetTextureFrom3Float(iss, name, dump));
 			}
 			if (dump == "map_Kd")
 			{
-				if (!color_) color_ = GetTextureFromFile(iss, name, dump);
+				AddTexture("Color", GetTextureFromFile(iss, name, dump));
 			}
 			if (dump == "Kd")
 			{
-				if (!color_) color_ = GetTextureFrom3Float(iss, name, dump);
+				AddTexture("Color", GetTextureFrom3Float(iss, name, dump));
 			}
 			if (dump == "map_norm")
 			{
-				if (!normal_) normal_ = GetTextureFromFile(iss, name, dump);
+				AddTexture("Normal", GetTextureFromFile(iss, name, dump));
 			}
 			if (dump == "norm")
 			{
-				if (!normal_) normal_ = GetTextureFrom3Float(iss, name, dump);
+				AddTexture("Normal", GetTextureFrom3Float(iss, name, dump));
 			}
 			if (dump == "map_Pm")
 			{
-				if (!metal_) metal_ = GetTextureFromFile(iss, name, dump);
+				AddTexture("Metallic", GetTextureFromFile(iss, name, dump));
 			}
 			if (dump == "Pm")
 			{
-				if (!metal_) metal_ = GetTextureFrom1Float(iss, name, dump);
+				AddTexture("Metallic", GetTextureFrom1Float(iss, name, dump));
 			}
 			if (dump == "map_Pr")
 			{
-				if (!roughness_) 
-					roughness_ = GetTextureFromFile(iss, name, dump);
+				AddTexture("Roughness", GetTextureFromFile(iss, name, dump));
 			}
 			if (dump == "Pr")
 			{
-				if (!roughness_) 
-					roughness_ = GetTextureFrom1Float(iss, name, dump);
+				AddTexture("Roughness", GetTextureFrom1Float(iss, name, dump));
 			}
 			// TODO(anirul) Implement the "d" and "illum" and all others.
 		}
+		if (!HasTexture("AmbientOcclusion"))
+		{
+			unsigned char single_pixel[3] = { 255, 255, 255 };
+			AddTexture("AmbientOcclusion", std::make_shared<Texture>(
+				std::pair{ 1, 1 },
+				&single_pixel,
+				sgl::PixelElementSize::BYTE));
+		}
 	}
 
-	Material::Material(
-		const std::shared_ptr<Texture>& color, 
-		const std::shared_ptr<Texture>& normal, 
-		const std::shared_ptr<Texture>& metal, 
-		const std::shared_ptr<Texture>& roughness)
+	const std::vector<std::string> Material::GetTextures() const
 	{
-		color_ = color;
-		normal_ = normal;
-		metal_ = metal;
-		roughness_ = roughness;
-		if (ambient_occlusion_) return;
-		unsigned char single_pixel[3] = { 255, 255, 255 };
-		ambient_occlusion_ = std::make_shared<Texture>(
-			std::pair{1, 1},
-			&single_pixel,
-			sgl::PixelElementSize::BYTE);
+		for (const auto& str : texture_vec)
+		{
+			if (!HasTexture(str))
+			{
+				throw std::runtime_error("Couldn't get texture: " + str);
+			}
+		}
+		return texture_vec;
 	}
 
-	Material::Material(
-		const std::shared_ptr<Texture>& color, 
-		const std::shared_ptr<Texture>& normal, 
-		const std::shared_ptr<Texture>& metal, 
-		const std::shared_ptr<Texture>& roughness, 
-		const std::shared_ptr<Texture>& ambient_occlusion) :
-		Material(color, normal, metal, roughness)
+	void Material::UpdateTextureManager(TextureManager& texture_manager)
 	{
-		ambient_occlusion_ = ambient_occlusion;
-	}
-
-	std::vector<std::string> Material::GetTextures() const
-	{
-		return { "Color", "Normal", "Metal", "Roughness", "AmbientOcclusion" };
-	}
-
-	TextureManager Material::GetTextureManager() const
-	{
-		TextureManager texture_manager;
-		texture_manager.AddTexture("Color", color_);
-		texture_manager.AddTexture("Normal", normal_);
-		texture_manager.AddTexture("Metal", metal_);
-		texture_manager.AddTexture("Roughness", roughness_);
-		texture_manager.AddTexture("AmbientOcclusion", ambient_occlusion_);
-		return texture_manager;
+		for (const auto& str: texture_vec)
+		{
+			if (!HasTexture(str))
+			{
+				if (texture_manager.HasTexture(str))
+				{
+					AddTexture(str, texture_manager.GetTexture(str));
+				}
+				else
+				{
+					throw std::runtime_error(
+						"Texture: " + str + 
+						" is neither in the material nor in the texture " +
+						"manager?");
+				}
+			}
+		}
+		auto textures_names_vec  = GetTexturesNames();
+		for (const auto& str : textures_names_vec)
+		{
+			texture_manager.AddTexture(str, GetTexture(str));
+		}
 	}
 
 	std::shared_ptr<sgl::Texture> Material::GetTextureFromFile(
@@ -114,7 +127,6 @@ namespace sgl {
 		const std::string& stream_name,
 		const std::string& element_name) const
 	{
-		std::shared_ptr<Texture> texture = nullptr;
 		std::string file_name;
 		if (!(is >> file_name))
 		{
@@ -124,7 +136,7 @@ namespace sgl {
 				" no file name at " +
 				element_name);
 		}
-		return texture;
+		return std::make_shared<Texture>(file_name);
 	}
 
 	std::shared_ptr<sgl::Texture> Material::GetTextureFrom3Float(
@@ -157,12 +169,11 @@ namespace sgl {
 				" could not get the b value for " +
 				element_name);
 		}
-		auto texture = std::make_shared<Texture>(
+		return std::make_shared<Texture>(
 			std::pair{ 1, 1 },
 			&rgb,
 			PixelElementSize::FLOAT,
 			PixelStructure::RGB);
-		return texture;
 	}
 
 	std::shared_ptr<sgl::Texture> Material::GetTextureFrom1Float(
@@ -179,12 +190,11 @@ namespace sgl {
 				" could not get the r value for " +
 				element_name);
 		}
-		auto texture = std::make_shared<Texture>(
+		return std::make_shared<Texture>(
 			std::pair{ 1, 1 },
 			&grey,
 			PixelElementSize::FLOAT,
 			PixelStructure::GREY);
-		return texture;
 	}
 
 	std::map<std::string, std::shared_ptr<Material>> LoadMaterialFromMtlStream(
@@ -196,8 +206,9 @@ namespace sgl {
 		std::string name_extended = "";
 		std::string mtl_name = "";
 		auto lambda_create_material = 
-			[&material_map, &mtl_part, &mtl_name, &name_extended]()
+			[&material_map, &mtl_part, &name_extended, &mtl_name]()
 		{
+			assert(!mtl_name.empty());
 			material_map.emplace(
 				mtl_name,
 				std::make_shared<Material>(
@@ -210,6 +221,7 @@ namespace sgl {
 			std::string line = "";
 			if (!std::getline(is, line)) break;
 			if (line.empty()) continue;
+			if (line[0] == '#') continue;
 			std::istringstream iss(line);
 			std::string dump;
 			if (!(iss >> dump))
@@ -219,7 +231,10 @@ namespace sgl {
 			}
 			if (dump == "newmtl")
 			{
-				if (!mtl_part.empty()) lambda_create_material();
+				if (!mtl_part.empty() && !mtl_name.empty()) 
+				{
+					lambda_create_material();
+				}
 				if (!(iss >> mtl_name))
 				{
 					throw std::runtime_error(
@@ -232,7 +247,7 @@ namespace sgl {
 				mtl_part += line + "\n";
 			}
 		}
-		if (!mtl_part.empty()) lambda_create_material();
+		if (!mtl_part.empty() && !mtl_name.empty()) lambda_create_material();
 		return material_map;
 	}
 

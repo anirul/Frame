@@ -10,6 +10,7 @@
 #include "../ShaderGLLib/Program.h"
 #include "../ShaderGLLib/Texture.h"
 #include "../ShaderGLLib/Error.h"
+#include "../ShaderGLLib/Material.h"
 
 namespace sgl {
 
@@ -31,8 +32,16 @@ namespace sgl {
 		virtual ~Mesh();
 
 	public:
+		// Set a material for this mesh.
+		void SetMaterial(const Material& material) { material_ = material; }
+		// TODO(anirul): Old way set a material list to be removed.
 		void SetTextures(std::initializer_list<std::string> values);
 		void SetTextures(const std::vector<std::string>& vec);
+		// Already set materials.
+		void Draw(
+			const glm::mat4& projection = glm::mat4(1.0f),
+			const glm::mat4& view = glm::mat4(1.0f),
+			const glm::mat4& model = glm::mat4(1.0f)) const;
 		void Draw(
 			const TextureManager& texture_manager,
 			const glm::mat4& projection = glm::mat4(1.0f),
@@ -87,11 +96,11 @@ namespace sgl {
 		bool clear_depth_buffer_ = false;
 		std::shared_ptr<Program> program_ = nullptr;
 		std::vector<std::string> textures_ = {};
-		std::string material_ = "";
 		Buffer point_buffer_ = {};
 		Buffer normal_buffer_ = {};
 		Buffer texture_buffer_ = {};
 		Buffer index_buffer_ =	{ sgl::BufferType::ELEMENT_ARRAY_BUFFER };
+		Material material_ = {};
 		size_t index_size_ = 0;
 		unsigned int vertex_array_object_ = 0;
 		const Error& error_ = Error::GetInstance();
@@ -106,6 +115,7 @@ namespace sgl {
 	std::shared_ptr<Mesh> CreateCubeMesh(
 		const std::shared_ptr<Program>& program);
 
+	// Create a new OBJ file from a file.
 	std::shared_ptr<Mesh> CreateMeshFromObjFile(
 		const std::string& file_path,
 		const std::shared_ptr<Program>& program);

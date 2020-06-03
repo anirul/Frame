@@ -33,12 +33,30 @@ namespace sgl {
 		// Take the total time from the beginning of the program to now as a
 		// const double parameter.
 		void Draw(const double dt);
+		// Draw to the deferred texture set.
+		void DrawDeferred(
+			const double dt,
+			const std::vector<std::shared_ptr<Texture>>& 
+				deferred_textures = {});
+		// Draw the lighting texture from either the inside deferred textures or
+		// from the provided deferred textures.
+		std::shared_ptr<Texture> DrawLighting(
+			const std::vector<std::shared_ptr<Texture>>& in_textures = {});
+		// Add Bloom to the provided texture.
+		std::shared_ptr<Texture> DrawBloom(
+			const std::shared_ptr<Texture>& texture);
+		// Add HDR to a texture (with associated gamma and exposure).
+		std::shared_ptr<Texture> DrawHighDynamicRange(
+			const std::shared_ptr<Texture>& texture,
+			const float exposure = 1.0f,
+			const float gamma = 2.2f);
 		// Draw to a texture.
 		std::shared_ptr<Texture> DrawTexture(const double dt);
 		// Draw to multiple textures.
 		void DrawMultiTextures(
 			const std::vector<std::shared_ptr<Texture>>& out_textures,
 			const double dt);
+		void AddEnvironment(const std::string& environment_map);
 		// Display a texture to the display.
 		void Display(const std::shared_ptr<Texture>& texture);
 		// Load scene from an OBJ file.
@@ -71,17 +89,17 @@ namespace sgl {
 		void SetupCamera();
 
 	private:
-		std::map<std::string, std::shared_ptr<Material>> materials_ = {};
 		std::shared_ptr<Program> pbr_program_ = nullptr;
 		std::shared_ptr<Program> lighting_program_ = nullptr;
 		std::vector<std::shared_ptr<Texture>> deferred_textures_ = {};
 		std::vector<std::shared_ptr<Texture>> lighting_textures_ = {};
 		std::shared_ptr<Texture> final_texture_ = nullptr;
+		std::map<std::string, std::shared_ptr<Material>> materials_ = {};
 		SceneTree scene_tree_ = {};
 		TextureManager texture_manager_ = {};
 		LightManager light_manager_ = {};
 		// Camera storage.
-		Camera camera_ = Camera({ 0.f, 0.f, 2.f }, { 0.f, 0.f, 0.f });
+		Camera camera_ = Camera({ 0.f, 5.f, -7.f }, { 0.f, -1.f, 2.f });
 		// PVM matrices.
 		glm::mat4 perspective_ = glm::mat4(1.0f);
 		glm::mat4 view_ = glm::mat4(1.0f);

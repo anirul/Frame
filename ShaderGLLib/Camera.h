@@ -26,7 +26,6 @@ namespace sgl {
 		glm::vec3 front_ = { 0, 0, -1 };
 		glm::vec3 up_ = { 0, 1, 0 };
 		glm::vec3 right_ = { 1, 0, 0 };
-		glm::vec3 world_up_ = { 0, 1, 0 };
 		float yaw_ = -90.0f;
 		float pitch_ = 0.0f;
 	};

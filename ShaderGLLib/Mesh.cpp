@@ -13,6 +13,7 @@ namespace sgl {
 	{
 		SetProgram(program);
 		auto obj_file = LoadFromObj(is, name);
+		material_name_ = obj_file.material;
 		std::vector<float> points = {};
 		std::vector<float> normals = {};
 		std::vector<float> texcoords = {};

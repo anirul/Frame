@@ -6,38 +6,22 @@
 
 namespace sgl {
 
-	class Material 
+	// Specialized version of a texture manager.
+	class Material : public TextureManager
 	{
 	public:
+		// Default constructor (this will do NOTHING!).
+		Material() = default;
+		Material(const Material&) = default;
+		// Parse from a MTL file.
 		Material(std::istream& is, const std::string& name);
-		Material(
-			const std::shared_ptr<Texture>& color,
-			const std::shared_ptr<Texture>& normal,
-			const std::shared_ptr<Texture>& metal,
-			const std::shared_ptr<Texture>& roughness);
-		Material(
-			const std::shared_ptr<Texture>& color,
-			const std::shared_ptr<Texture>& normal,
-			const std::shared_ptr<Texture>& metal,
-			const std::shared_ptr<Texture>& roughness,
-			const std::shared_ptr<Texture>& ambient_occlusion);
 
 	public:
-		std::vector<std::string> GetTextures() const;
-		TextureManager GetTextureManager() const;
-
-	public:
-		const std::shared_ptr<Texture>& GetColor() const { return color_; }
-		const std::shared_ptr<Texture>& GetNormal() const { return normal_; }
-		const std::shared_ptr<Texture>& GetMetal() const { return metal_; }
-		const std::shared_ptr<Texture>& GetRoughness() const 
-		{ 
-			return roughness_; 
-		}
-		const std::shared_ptr<Texture>& GetAmbientOcclusion() const
-		{
-			return ambient_occlusion_;
-		}
+		// Suppose to return a list of string of the needed textures.
+		const std::vector<std::string> GetTextures() const;
+		// Update a texture manager with the texture contains in the material 
+		// and the Material with the texture manager missing texture.
+		void UpdateTextureManager(TextureManager& texture_manager);
 
 	protected:
 		std::shared_ptr<Texture> GetTextureFromFile(
@@ -52,15 +36,9 @@ namespace sgl {
 			std::istream& is,
 			const std::string& stream_name,
 			const std::string& element_name) const;
-
-	private:
-		std::shared_ptr<Texture> color_ = nullptr;
-		std::shared_ptr<Texture> normal_ = nullptr;
-		std::shared_ptr<Texture> metal_ = nullptr;
-		std::shared_ptr<Texture> roughness_ = nullptr;
-		std::shared_ptr<Texture> ambient_occlusion_ = nullptr;
 	};
 
+	// Load a texture set from a MTL file.
 	std::map<std::string, std::shared_ptr<Material>> LoadMaterialFromMtlStream(
 		std::istream& is,
 		const std::string& name);

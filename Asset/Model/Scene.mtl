@@ -2,29 +2,29 @@
 # Material Count: 5
 
 newmtl AppleMaterial
-map_Ka ../Apple/Color.jpg
-map_Kd ../Apple/Color.jpg
-map_norm ../Apple/Normal.jpg
-map_Pm ../Apple/Metalness.jpg
-map_Pr ../Apple/Roughness.jpg
+map_Ka ../Asset/Apple/Color.jpg
+map_Kd ../Asset/Apple/Color.jpg
+map_norm ../Asset/Apple/Normal.jpg
+map_Pm ../Asset/Apple/Metalness.jpg
+map_Pr ../Asset/Apple/Roughness.jpg
 d 1.000000
 illum 2
 
 newmtl SuzanneMaterial
-map_Ka ../Planks/Color.jpg
-map_Kd ../Planks/Color.jpg
-map_norm ../Planks/Normal.jpg
-map_Pm ../Planks/Metalness.jpg
-map_Pr ../Planks/Roughness.jpg
+map_Ka ../Asset/Planks/Color.jpg
+map_Kd ../Asset/Planks/Color.jpg
+map_norm ../Asset/Planks/Normal.jpg
+map_Pm ../Asset/Planks/Metalness.jpg
+map_Pr ../Asset/Planks/Roughness.jpg
 d 1.000000
 illum 3
 
 newmtl SphereMaterial
-map_Ka ../Metal/Color.jpg
-map_Kd ../Metal/Color.jpg
-map_norm ../Metal/Normal.jpg
-map_Pm ../Metal/Metalness.jpg
-map_Pr ../Metal/Roughness.jpg
+map_Ka ../Asset/Metal/Color.jpg
+map_Kd ../Asset/Metal/Color.jpg
+map_norm ../Asset/Metal/Normal.jpg
+map_Pm ../Asset/Metal/Metalness.jpg
+map_Pr ../Asset/Metal/Roughness.jpg
 d 1.000000
 illum 3
 
@@ -33,7 +33,7 @@ Ka 1.000000 0.500000 0.000000
 Kd 1.000000 0.500000 0.000000
 norm 0.5 0.5 1.0
 Pm 0.2
-Pr 0.5
+Pr 0.9
 d 1.000000
 illum 2
 

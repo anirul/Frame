@@ -1,7 +1,7 @@
 #pragma once
 
-#include <../ShaderGLLib/Window.h>
-#include "Types.h"
+#include "../ShaderGLLib/Window.h"
+#include "../ShaderGLLib/Device.h"
 
 class Draw : public sgl::DrawInterface
 {
@@ -16,5 +16,6 @@ public:
 	void Delete() override;
 
 private:
-	std::shared_ptr<Device> device_;
+	std::shared_ptr<sgl::Device> device_ = nullptr;
+	std::shared_ptr<sgl::Texture> final_texture_ = nullptr;
 };

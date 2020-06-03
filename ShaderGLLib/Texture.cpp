@@ -164,6 +164,7 @@ namespace sgl {
 		const std::string& name, 
 		const std::shared_ptr<sgl::Texture>& texture)
 	{
+		RemoveTexture(name);
 		auto ret = name_texture_map_.insert({ name, texture });
 		return ret.second;
 	}
@@ -177,6 +178,11 @@ namespace sgl {
 			throw std::runtime_error("No such texture: " + name);
 		}
 		return it->second;
+	}
+
+	bool TextureManager::HasTexture(const std::string& name) const
+	{
+		return name_texture_map_.find(name) != name_texture_map_.end();
 	}
 
 	bool TextureManager::RemoveTexture(const std::string& name)
@@ -207,6 +213,16 @@ namespace sgl {
 			}
 		}
 		throw std::runtime_error("No free slots!");
+	}
+
+	const std::vector<std::string> TextureManager::GetTexturesNames() const
+	{
+		std::vector<std::string> vec = {};
+		for (const auto& p : name_texture_map_)
+		{
+			vec.push_back(p.first);
+		}
+		return vec;
 	}
 
 	void TextureManager::DisableTexture(const std::string& name) const
@@ -404,6 +420,144 @@ namespace sgl {
 			GL_TEXTURE_WRAP_R,
 			GL_CLAMP_TO_EDGE);
 		error_.Display(__FILE__, __LINE__ - 4);
+	}
+
+	std::shared_ptr<sgl::Texture> TextureBrightness(
+		const std::shared_ptr<sgl::Texture>& texture)
+	{
+		const sgl::Error& error = sgl::Error::GetInstance();
+		sgl::Frame frame{};
+		sgl::Render render{};
+		auto size = texture->GetSize();
+		frame.BindAttach(render);
+		render.BindStorage(size);
+		auto pixel_element_size = texture->GetPixelElementSize();
+
+		auto texture_out = std::make_shared<sgl::Texture>(
+			std::pair{ size.first / 2, size.second / 2 },
+			pixel_element_size);
+
+		// Set the view port for rendering.
+		glViewport(0, 0, size.first / 2, size.second / 2);
+		error.Display(__FILE__, __LINE__ - 1);
+
+		// Clear the screen.
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		error.Display(__FILE__, __LINE__ - 1);
+
+		frame.BindTexture(*texture_out);
+
+		sgl::TextureManager texture_manager;
+		texture_manager.AddTexture("Display", texture);
+		auto program = sgl::CreateProgram("Brightness");
+		auto quad = sgl::CreateQuadMesh(program);
+		quad->SetTextures({ "Display" });
+		quad->Draw(texture_manager);
+
+		return texture_out;
+	}
+
+	std::shared_ptr<sgl::Texture> TextureGaussianBlur(
+		const std::shared_ptr<sgl::Texture>& texture)
+	{
+		const sgl::Error& error = sgl::Error::GetInstance();
+		sgl::Frame frame[2];
+		sgl::Render render{};
+		auto size = texture->GetSize();
+		frame[0].BindAttach(render);
+		frame[1].BindAttach(render);
+		render.BindStorage(size);
+		auto pixel_element_size = texture->GetPixelElementSize();
+
+		std::shared_ptr<sgl::Texture> texture_out[2] = {
+			std::make_shared<sgl::Texture>(
+				size,
+				pixel_element_size),
+			std::make_shared<sgl::Texture>(
+				size,
+				pixel_element_size)
+		};
+
+		// Set the view port for rendering.
+		glViewport(0, 0, size.first, size.second);
+		error.Display(__FILE__, __LINE__ - 1);
+
+		// Clear the screen.
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		error.Display(__FILE__, __LINE__ - 1);
+
+		frame[0].BindTexture(*texture_out[0]);
+		frame[1].BindTexture(*texture_out[1]);
+
+		auto program = sgl::CreateProgram("GaussianBlur");
+		auto quad = sgl::CreateQuadMesh(program);
+		program->Use();
+
+		bool horizontal = true;
+		bool first_iteration = true;
+		for (int i = 0; i < 10; ++i)
+		{
+			// Reset the texture manager.
+			sgl::TextureManager texture_manager;
+			program->UniformInt("horizontal", horizontal);
+			frame[horizontal].Bind();
+			texture_manager.AddTexture(
+				"Image",
+				(first_iteration) ? texture : texture_out[!horizontal]);
+			quad->SetTextures({ "Image" });
+			quad->Draw(texture_manager);
+			horizontal = !horizontal;
+			if (first_iteration) first_iteration = false;
+		}
+
+		return texture_out[!horizontal];
+	}
+
+	std::shared_ptr<sgl::Texture> TextureCombine(
+		const std::vector<std::shared_ptr<sgl::Texture>>& add_textures)
+	{
+		assert(add_textures.size() <= 16);
+		const sgl::Error& error = sgl::Error::GetInstance();
+		sgl::Frame frame{};
+		sgl::Render render{};
+		auto size = add_textures[0]->GetSize();
+		frame.BindAttach(render);
+		render.BindStorage(size);
+
+		auto texture_out = std::make_shared<sgl::Texture>(
+			size,
+			add_textures[0]->GetPixelElementSize());
+
+		// Set the view port for rendering.
+		glViewport(0, 0, size.first, size.second);
+		error.Display(__FILE__, __LINE__ - 1);
+
+		// Clear the screen.
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		error.Display(__FILE__, __LINE__ - 1);
+
+		frame.BindTexture(*texture_out);
+		frame.DrawBuffers(1);
+
+		sgl::TextureManager texture_manager;
+		auto program = sgl::CreateProgram("Combine");
+		auto quad = sgl::CreateQuadMesh(program);
+		int i = 0;
+		std::vector<std::string> vec = {};
+		for (const auto& texture : add_textures)
+		{
+			texture_manager.AddTexture("Texture" + std::to_string(i), texture);
+			vec.push_back("Texture" + std::to_string(i));
+			i++;
+		}
+		program->Use();
+		program->UniformInt(
+			"texture_max", 
+			static_cast<int>(add_textures.size()));
+		quad->SetTextures(vec);
+		quad->Draw(texture_manager);
+
+		return texture_out;
 	}
 
 	void FillProgramMultiTexture(

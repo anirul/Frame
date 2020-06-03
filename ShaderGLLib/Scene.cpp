@@ -85,7 +85,7 @@ namespace sgl {
 			auto mesh = std::make_shared<Mesh>(obj_iss, obj_name, program);
 			auto mesh_node = std::make_shared<SceneMesh>(mesh);
 			mesh_node->SetParent(root_node);
-			scene_tree.AddNode(mesh_node);
+			scene_tree.AddNode(mesh_node, root_node);
 			obj_text.clear();
 			obj_name.clear();
 		};
