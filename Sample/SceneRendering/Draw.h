@@ -15,6 +15,9 @@ public:
 	void RunDraw(const double dt) override;
 	void Delete() override;
 
+protected:
+	sgl::LightManager CreateLightManager() const;
+
 private:
 	std::shared_ptr<sgl::Device> device_ = nullptr;
 	std::shared_ptr<sgl::Texture> final_texture_ = nullptr;

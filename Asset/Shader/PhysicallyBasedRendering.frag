@@ -53,26 +53,15 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
 // ----------------------------------------------------------------------------
 void main()
 {
-#if 1
     // Surface come from textures.
-    vec3 albedo       = pow(texture(Color, vert_texcoord).rgb, vec3(2.2));
+    vec3 albedo       = texture(Color, vert_texcoord).rgb;
     float metallic    = texture(Metallic, vert_texcoord).r;
     float roughness   = texture(Roughness, vert_texcoord).r;
     float ao          = texture(AmbientOcclusion, vert_texcoord).r;
     vec3 normal       = texture(Normal, vert_texcoord).xyz;
     vec3 N            = getNormalFromMap(normal);
     vec3 irradiance   = texture(Irradiance, N).rgb;
-#else
-    // Red metallic surface.
-    vec3 albedo       = pow(vec3(0.5, 0.0, 0.0), vec3(2.2));
-    float metallic    = 1.0;
-    float roughness   = 0.2; // This has to be > 0.
-    float ao          = 1.0;
-    vec3 normal       = vec3(0.5, 0.5, 1.0);
-    vec3 N            = getNormalFromMap(normal);
-    vec3 irradiance   = vec3(0.0, 1.0, 0.0);
-#endif
-    
+
     vec3 V = normalize(camera_position - vert_world_position);
     vec3 R = reflect(-V, N);
 

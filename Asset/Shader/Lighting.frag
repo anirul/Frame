@@ -125,7 +125,7 @@ void main()
         // add to outgoing radiance Lo
         // note that we already multiplied the BRDF by the Fresnel (kS) so we
         // won't multiply by kS again
-        Lo += (kD * albedo / PI + specular) * radiance * NdotL;
+        Lo += max((kD * albedo / PI + specular) * radiance * NdotL, 0.0);
     }
 
 	frag_color = vec4(Lo, 1.0);
