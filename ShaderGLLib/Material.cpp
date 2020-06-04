@@ -76,11 +76,11 @@ namespace sgl {
 		}
 		if (!HasTexture("AmbientOcclusion"))
 		{
-			unsigned char single_pixel[3] = { 255, 255, 255 };
+			float single_pixel[3] = { 1.0f, 1.0f, 1.0f };
 			AddTexture("AmbientOcclusion", std::make_shared<Texture>(
 				std::pair{ 1, 1 },
-				&single_pixel,
-				sgl::PixelElementSize::BYTE));
+				single_pixel,
+				sgl::PixelElementSize::FLOAT));
 		}
 	}
 
@@ -144,7 +144,7 @@ namespace sgl {
 		const std::string& stream_name,
 		const std::string& element_name) const
 	{
-		float rgb[3] = { 0, 0, 0 };
+		float rgb[3] = { 0.f, 0.f, 0.f };
 		if (!(is >> rgb[0]))
 		{
 			throw std::runtime_error(
@@ -171,7 +171,7 @@ namespace sgl {
 		}
 		return std::make_shared<Texture>(
 			std::pair{ 1, 1 },
-			&rgb,
+			rgb,
 			PixelElementSize::FLOAT,
 			PixelStructure::RGB);
 	}
