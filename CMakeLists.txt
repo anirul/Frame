@@ -14,6 +14,30 @@ find_package(GTest CONFIG REQUIRED)
 
 add_library(ShaderGLLib
   STATIC
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/Brightness.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/Brightness.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/Combine.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/Combine.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/CubeMapDeferred.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/CubeMapDeferred.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/Display.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/Display.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/EquirectangularCubeMap.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/EquirectangularCubeMap.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/GaussianBlur.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/GaussianBlur.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/HighDynamicRange.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/HighDynamicRange.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/IntegrateBRDF.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/IntegrateBRDF.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/IrradianceCubeMap.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/IrradianceCubeMap.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/Lighting.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/Lighting.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/MonteCarloPrefilter.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/MonteCarloPrefilter.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/PhysicallyBasedRendering.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/PhysicallyBasedRendering.vert
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Buffer.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Buffer.h
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Camera.cpp
@@ -180,30 +204,6 @@ target_link_libraries(Simple
 
 add_executable(PhysicallyBasedRendering
   WIN32
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/Brightness.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/Brightness.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/Combine.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/Combine.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/CubeMapDeferred.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/CubeMapDeferred.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/Display.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/Display.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/EquirectangularCubeMap.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/EquirectangularCubeMap.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/GaussianBlur.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/GaussianBlur.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/HighDynamicRange.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/HighDynamicRange.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/IntegrateBRDF.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/IntegrateBRDF.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/IrradianceCubeMap.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/IrradianceCubeMap.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/Lighting.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/Lighting.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/MonteCarloPrefilter.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/MonteCarloPrefilter.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/PhysicallyBasedRendering.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/PhysicallyBasedRendering.vert
     ${PROJECT_SOURCE_DIR}/Sample/PhysicallyBasedRendering/Application.cpp
     ${PROJECT_SOURCE_DIR}/Sample/PhysicallyBasedRendering/Application.h
     ${PROJECT_SOURCE_DIR}/Sample/PhysicallyBasedRendering/Draw.cpp

@@ -72,11 +72,11 @@ namespace sgl {
 			{
 				AddTexture("Roughness", GetTextureFrom1Float(iss, name, dump));
 			}
-			// TODO(anirul) Implement the "d" and "illum" and all others.
+			// TODO(anirul): Implement the "d" and "illum" and all others.
 		}
 		if (!HasTexture("AmbientOcclusion"))
 		{
-			float single_pixel[3] = { 1.0f, 1.0f, 1.0f };
+			float single_pixel[3] = { 1.f, 1.f, 1.f };
 			AddTexture("AmbientOcclusion", std::make_shared<Texture>(
 				std::pair{ 1, 1 },
 				single_pixel,
@@ -181,7 +181,7 @@ namespace sgl {
 		const std::string& stream_name, 
 		const std::string& element_name) const
 	{
-		float grey[1] = { 0 };
+		float grey[1] = { 0.f };
 		if (!(is >> grey[0]))
 		{
 			throw std::runtime_error(
@@ -192,7 +192,7 @@ namespace sgl {
 		}
 		return std::make_shared<Texture>(
 			std::pair{ 1, 1 },
-			&grey,
+			grey,
 			PixelElementSize::FLOAT,
 			PixelStructure::GREY);
 	}
