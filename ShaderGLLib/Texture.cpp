@@ -513,7 +513,7 @@ namespace sgl {
 		return texture_out[!horizontal];
 	}
 
-	std::shared_ptr<sgl::Texture> TextureCombine(
+	std::shared_ptr<sgl::Texture> TextureAddition(
 		const std::vector<std::shared_ptr<sgl::Texture>>& add_textures)
 	{
 		assert(add_textures.size() <= 16);
@@ -540,8 +540,8 @@ namespace sgl {
 		frame.DrawBuffers(1);
 
 		sgl::TextureManager texture_manager;
-		auto program = sgl::CreateProgram("Combine");
-		auto quad = sgl::CreateQuadMesh(program);
+		static auto program = sgl::CreateProgram("VectorAddition");
+		static auto quad = sgl::CreateQuadMesh(program);
 		int i = 0;
 		std::vector<std::string> vec = {};
 		for (const auto& texture : add_textures)
@@ -554,6 +554,53 @@ namespace sgl {
 		program->UniformInt(
 			"texture_max", 
 			static_cast<int>(add_textures.size()));
+		quad->SetTextures(vec);
+		quad->Draw(texture_manager);
+
+		return texture_out;
+	}
+
+	std::shared_ptr<Texture> TextureMutliply(
+		const std::vector<std::shared_ptr<Texture>>& multiply_textures)
+	{
+		assert(multiply_textures.size() <= 16);
+		const sgl::Error& error = sgl::Error::GetInstance();
+		sgl::Frame frame{};
+		sgl::Render render{};
+		auto size = multiply_textures[0]->GetSize();
+		frame.BindAttach(render);
+		render.BindStorage(size);
+
+		auto texture_out = std::make_shared<sgl::Texture>(
+			size,
+			multiply_textures[0]->GetPixelElementSize());
+
+		// Set the view port for rendering.
+		glViewport(0, 0, size.first, size.second);
+		error.Display(__FILE__, __LINE__ - 1);
+
+		// Clear the screen.
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		error.Display(__FILE__, __LINE__ - 1);
+
+		frame.BindTexture(*texture_out);
+		frame.DrawBuffers(1);
+
+		sgl::TextureManager texture_manager;
+		static auto program = sgl::CreateProgram("VectorMultiply");
+		static auto quad = sgl::CreateQuadMesh(program);
+		int i = 0;
+		std::vector<std::string> vec = {};
+		for (const auto& texture : multiply_textures)
+		{
+			texture_manager.AddTexture("Texture" + std::to_string(i), texture);
+			vec.push_back("Texture" + std::to_string(i));
+			i++;
+		}
+		program->Use();
+		program->UniformInt(
+			"texture_max",
+			static_cast<int>(multiply_textures.size()));
 		quad->SetTextures(vec);
 		quad->Draw(texture_manager);
 

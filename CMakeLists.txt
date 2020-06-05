@@ -16,8 +16,6 @@ add_library(ShaderGLLib
   STATIC
     ${PROJECT_SOURCE_DIR}/Asset/Shader/Brightness.frag
     ${PROJECT_SOURCE_DIR}/Asset/Shader/Brightness.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/Combine.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/Combine.vert
     ${PROJECT_SOURCE_DIR}/Asset/Shader/CubeMapDeferred.frag
     ${PROJECT_SOURCE_DIR}/Asset/Shader/CubeMapDeferred.vert
     ${PROJECT_SOURCE_DIR}/Asset/Shader/Display.frag
@@ -38,6 +36,12 @@ add_library(ShaderGLLib
     ${PROJECT_SOURCE_DIR}/Asset/Shader/MonteCarloPrefilter.vert
     ${PROJECT_SOURCE_DIR}/Asset/Shader/PhysicallyBasedRendering.frag
     ${PROJECT_SOURCE_DIR}/Asset/Shader/PhysicallyBasedRendering.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/ScreenSpaceAmbientOcclusion.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/ScreenSpaceAmbientOcclusion.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/VectorAddition.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/VectorAddition.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/VectorMultiply.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/VectorMultiply.vert
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Buffer.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Buffer.h
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Camera.cpp

@@ -134,16 +134,20 @@ namespace sgl {
 	};
 
 	// Get the brightness from a texture (usually before HDR).
-	std::shared_ptr<sgl::Texture> TextureBrightness(
-		const std::shared_ptr<sgl::Texture>& texture);
+	std::shared_ptr<Texture> TextureBrightness(
+		const std::shared_ptr<Texture>& texture);
 
 	// Get the Gaussian blur of a texture.
-	std::shared_ptr<sgl::Texture> TextureGaussianBlur(
-		const std::shared_ptr<sgl::Texture>& texture);
+	std::shared_ptr<Texture> TextureGaussianBlur(
+		const std::shared_ptr<Texture>& texture);
 
-	// Combine a number of texture (maximum 16) into one.
-	std::shared_ptr<sgl::Texture> TextureCombine(
-		const std::vector<std::shared_ptr<sgl::Texture>>& add_textures);
+	// Vector addition a number of texture (maximum 16) into one.
+	std::shared_ptr<Texture> TextureAddition(
+		const std::vector<std::shared_ptr<Texture>>& add_textures);
+
+	// Vector multiply a number of texture (maximum 16) into one.
+	std::shared_ptr<Texture> TextureMutliply(
+		const std::vector<std::shared_ptr<Texture>>& multiply_textures);
 
 	// Fill multiple textures from a program.
 	//		- out_textures			: output textures (should be allocated).

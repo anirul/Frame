@@ -56,6 +56,7 @@ namespace sgl {
 		// Create programs.
 		pbr_program_ = CreateProgram("PhysicallyBasedRendering");
 		lighting_program_ = CreateProgram("Lighting");
+		ssao_program_ = CreateProgram("ScreenSpaceAmbientOcclusion");
 	}
 
 	void Device::Startup(const float fov /*= 65.0f*/)
@@ -135,7 +136,7 @@ namespace sgl {
 		quad->SetTextures({ "Ambient", "Normal", "MetalRoughAO", "Position" });
 		quad->Draw(texture_manager);
 
-		return TextureCombine(lighting_textures_);
+		return TextureAddition(lighting_textures_);
 	}
 
 	std::shared_ptr<sgl::Texture> Device::DrawBloom(
@@ -143,7 +144,7 @@ namespace sgl {
 	{
 		auto brightness = TextureBrightness(texture);
 		auto gaussian_blur = TextureGaussianBlur(brightness);
-		return TextureCombine({ texture, gaussian_blur });
+		return TextureAddition({ texture, gaussian_blur });
 	}
 
 	std::shared_ptr<sgl::Texture> Device::DrawHighDynamicRange(

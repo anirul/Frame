@@ -91,6 +91,7 @@ namespace sgl {
 	private:
 		std::shared_ptr<Program> pbr_program_ = nullptr;
 		std::shared_ptr<Program> lighting_program_ = nullptr;
+		std::shared_ptr<Program> ssao_program_ = nullptr;
 		std::vector<std::shared_ptr<Texture>> deferred_textures_ = {};
 		std::vector<std::shared_ptr<Texture>> lighting_textures_ = {};
 		std::shared_ptr<Texture> final_texture_ = nullptr;

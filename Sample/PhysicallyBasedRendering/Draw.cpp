@@ -55,7 +55,7 @@ void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 
 const std::shared_ptr<sgl::Texture>& Draw::GetDrawTexture() const
 {
-	// return lighting_textures_[0];
+	return deferred_textures_[0];
 	return final_texture_;
 }
 
@@ -87,7 +87,8 @@ void Draw::RunDraw(const double dt)
 	light_manager_->RegisterToProgram(lighting_program_);
 	// Make the lighting step.
 	lighting_textures_[1] = ComputeLighting(deferred_textures_);
-
+	final_texture_ = Combine(lighting_textures_);
+	return;
 	// Merge and add bloom.
 	final_texture_ = AddBloom(Combine(lighting_textures_));
 }
@@ -299,7 +300,7 @@ std::shared_ptr<sgl::Texture> Draw::Combine(
 	frame.DrawBuffers(1);
 
 	sgl::TextureManager texture_manager;
-	auto program = sgl::CreateProgram("Combine");
+	auto program = sgl::CreateProgram("VectorAddition");
 	auto quad = sgl::CreateQuadMesh(program);
 	int i = 0;
 	std::vector<std::string> vec = {};
