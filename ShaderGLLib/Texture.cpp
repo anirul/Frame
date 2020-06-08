@@ -648,12 +648,8 @@ namespace sgl {
 			in_texture->GetPixelElementSize());
 		TextureManager texture_manager;
 		texture_manager.AddTexture("Image", in_texture);
-		static auto program = [&exponent]()
-		{
-			auto program = CreateProgram("Blur");
-			program->UniformFloat("exponent", exponent);
-			return program;
-		}();
+		auto program = CreateProgram("Blur");
+		program->UniformFloat("exponent", exponent);
 		FillProgramMultiTexture(
 			std::vector<std::shared_ptr<Texture>>{ out_texture }, 
 			texture_manager, 
