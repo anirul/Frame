@@ -640,18 +640,25 @@ namespace sgl {
 	}
 
 	std::shared_ptr<Texture> TextureBlur(
-		const std::shared_ptr<Texture>& in_texture)
+		const std::shared_ptr<Texture>& in_texture,
+		const float exponent /*= 1.0f*/)
 	{
 		static auto out_texture = std::make_shared<Texture>(
 			in_texture->GetSize(),
 			in_texture->GetPixelElementSize());
 		TextureManager texture_manager;
 		texture_manager.AddTexture("Image", in_texture);
+		static auto program = [&exponent]()
+		{
+			auto program = CreateProgram("Blur");
+			program->UniformFloat("exponent", exponent);
+			return program;
+		}();
 		FillProgramMultiTexture(
 			std::vector<std::shared_ptr<Texture>>{ out_texture }, 
 			texture_manager, 
 			std::vector<std::string>{ "Image" }, 
-			CreateProgram("Blur"));
+			program);
 		return out_texture;
 	}
 

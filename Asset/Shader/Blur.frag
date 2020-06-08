@@ -6,6 +6,8 @@ layout (location = 0) out vec4 frag_color;
 
 uniform sampler2D Image;
 
+uniform float exponent;
+
 void main() 
 {
 	vec2 texel_size = 1.0 / vec2(textureSize(Image, 0));
@@ -19,8 +21,9 @@ void main()
 		}
 	}
 	result /= 16;
+	// Check that the value is > 0 to avoid buring in the pow.
 	result = max(vec3(0.0), result);
-	result = pow(result, vec3(4));
+	result = pow(result, vec3(exponent));
 	result = min(vec3(1.0), result);
 	frag_color = vec4(result, 1.0);
 }

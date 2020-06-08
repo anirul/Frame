@@ -9,22 +9,27 @@ void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 
 const std::shared_ptr<sgl::Texture>& Draw::GetDrawTexture() const
 {
-//  return device_->GetDeferred(1);
-//	return device_->GetView(1);
+//  return device_->GetDeferredTexture(1);
+//	return device_->GetViewTexture(0);
 //	return device_->GetNoiseTexture();
-//	return ssao_texture_;
+	return ssao_texture_;
 	return final_texture_;
 }
 
 void Draw::RunDraw(const double dt)
 {
+#define SSAO_ENABLE
 	device_->DrawDeferred(dt);
 	device_->DrawView(dt);
+#ifdef SSAO_ENABLE
 	ssao_texture_ = device_->DrawScreenSpaceAmbientOcclusion();
-	ssao_texture_ = sgl::TextureBlur(ssao_texture_);
+	ssao_texture_ = sgl::TextureBlur(ssao_texture_, 4.0);
+#endif
 	final_texture_ = device_->DrawLighting();
 	final_texture_ = device_->DrawBloom(final_texture_);
+#ifdef SSAO_ENABLE
 	final_texture_ = sgl::TextureMultiply({ final_texture_, ssao_texture_ });
+#endif
 	final_texture_ = device_->DrawHighDynamicRange(final_texture_);
 }
 

@@ -170,7 +170,8 @@ namespace sgl {
 
 	// Add blur to a texture.
 	std::shared_ptr<Texture> TextureBlur(
-		const std::shared_ptr<Texture>& in_texture);
+		const std::shared_ptr<Texture>& in_texture,
+		const float exponent = 1.0f);
 
 	// Get the Gaussian blur of a texture.
 	std::shared_ptr<Texture> TextureGaussianBlur(
