@@ -55,7 +55,6 @@ void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 
 const std::shared_ptr<sgl::Texture>& Draw::GetDrawTexture() const
 {
-	return deferred_textures_[0];
 	return final_texture_;
 }
 
@@ -75,7 +74,7 @@ void Draw::RunDraw(const double dt)
 	pbr_program_->UniformVector3(
 		"camera_position",
 		device_->GetCamera().GetPosition());
-	device_->DrawMultiTextures(deferred_textures_, dt);
+	device_->DrawMultiTextures(dt, deferred_textures_);
 
 	// Make the PBR deferred lighting step.
 	lighting_textures_[0] = deferred_textures_[0];
@@ -87,8 +86,6 @@ void Draw::RunDraw(const double dt)
 	light_manager_->RegisterToProgram(lighting_program_);
 	// Make the lighting step.
 	lighting_textures_[1] = ComputeLighting(deferred_textures_);
-	final_texture_ = Combine(lighting_textures_);
-	return;
 	// Merge and add bloom.
 	final_texture_ = AddBloom(Combine(lighting_textures_));
 }

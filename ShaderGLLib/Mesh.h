@@ -34,19 +34,15 @@ namespace sgl {
 	public:
 		// Set a material for this mesh.
 		void SetMaterial(const Material& material) { material_ = material; }
-		// TODO(anirul): Old way set a material list to be removed.
 		void SetTextures(std::initializer_list<std::string> values);
 		void SetTextures(const std::vector<std::string>& vec);
-		// Already set materials.
-		void Draw(
-			const glm::mat4& projection = glm::mat4(1.0f),
-			const glm::mat4& view = glm::mat4(1.0f),
-			const glm::mat4& model = glm::mat4(1.0f)) const;
 		void Draw(
 			const TextureManager& texture_manager,
 			const glm::mat4& projection = glm::mat4(1.0f),
 			const glm::mat4& view = glm::mat4(1.0f),
 			const glm::mat4& model = glm::mat4(1.0f)) const;
+		// Set the program for the mesh (it is supposed to be done at creation).
+		void SetProgram(const std::shared_ptr<Program>& program);
 
 	public:
 		const Buffer& PointBuffer() const { return point_buffer_; }
@@ -56,8 +52,9 @@ namespace sgl {
 		const size_t IndexSize() const { return index_size_; }
 		const std::shared_ptr<Program> GetProgram() { return program_; }
 		void ClearDepthBuffer(bool clear) { clear_depth_buffer_ = clear; }
+		bool IsClearDepthBuffer() const { return clear_depth_buffer_; }
 		const std::string GetMaterialName() const { return material_name_; }
-		
+
 	protected:
 		struct ObjFile {
 			// Minimum index element this is useful for scene OBJ.
@@ -73,8 +70,6 @@ namespace sgl {
 			// List of material to include (should only be one!).
 			std::string material = {};
 		};
-		// Set the program for the mesh (it is supposed to be done at creation).
-		void SetProgram(const std::shared_ptr<Program>& program);
 		// Load from OBJ throw an exception in case of error.
 		ObjFile LoadFromObj(std::istream& is, const std::string& name);
 		// Get a vector from a number of float.

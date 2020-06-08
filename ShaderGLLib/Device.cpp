@@ -2,11 +2,21 @@
 #include <stdexcept>
 #include <sstream>
 #include <fstream>
+#include <random>
+#include <cmath>
 #include <glm/gtc/matrix_transform.hpp>
 #include "Frame.h"
 #include "Render.h"
 
 namespace sgl {
+
+	namespace 
+	{
+		constexpr float lerp(float a, float b, float t) noexcept
+		{
+			return a + t * (b - a);
+		}
+	}
 
 	Device::Device(
 		void* gl_context, 
@@ -36,27 +46,93 @@ namespace sgl {
 
 		// Albedo.
 		deferred_textures_.emplace_back(
-			std::make_shared<sgl::Texture>(size, pixel_element_size_));
+			std::make_shared<Texture>(size, pixel_element_size_));
 		// Normal.
 		deferred_textures_.emplace_back(
-			std::make_shared<sgl::Texture>(size, pixel_element_size_));
+			std::make_shared<Texture>(size, pixel_element_size_));
 		// MetalicRoughAO.
 		deferred_textures_.emplace_back(
-			std::make_shared<sgl::Texture>(size, pixel_element_size_));
+			std::make_shared<Texture>(size, pixel_element_size_));
 		// Position.
 		deferred_textures_.emplace_back(
-			std::make_shared<sgl::Texture>(size, pixel_element_size_));
+			std::make_shared<Texture>(size, pixel_element_size_));
+
+		// ViewPosition.
+		view_textures_.emplace_back(
+			std::make_shared<Texture>(
+				size, 
+				sgl::PixelElementSize::HALF, 
+				sgl::PixelStructure::RGB_ALPHA));
+		view_textures_[0]->SetMagFilter(TextureFilter::NEAREST);
+		view_textures_[0]->SetMinFilter(TextureFilter::NEAREST);
+		view_textures_[0]->SetWrapS(TextureFilter::CLAMP_TO_EDGE);
+		view_textures_[0]->SetWrapT(TextureFilter::CLAMP_TO_EDGE);
+		// ViewNormal.
+		view_textures_.emplace_back(
+			std::make_shared<Texture>(
+				size, 
+				sgl::PixelElementSize::HALF,
+				sgl::PixelStructure::RGB_ALPHA));
+		view_textures_[1]->SetMagFilter(TextureFilter::NEAREST);
+		view_textures_[1]->SetMinFilter(TextureFilter::NEAREST);
+		// ViewAlbedo.
+		view_textures_.emplace_back(
+			std::make_shared<Texture>(
+				size, 
+				sgl::PixelElementSize::BYTE,
+				sgl::PixelStructure::RGB_ALPHA));
+		view_textures_[2]->SetMagFilter(TextureFilter::NEAREST);
+		view_textures_[2]->SetMinFilter(TextureFilter::NEAREST);
+		
+		// Noise and kernel.
+		std::default_random_engine generator;
+		std::uniform_real_distribution<GLfloat> random_length(-1.0, 1.0);
+		std::uniform_real_distribution<GLfloat> random_unit(0.0, 1.0);
+		for (unsigned int i = 0; i < 64; ++i)
+		{
+			glm::vec3 sample(
+				random_length(generator), 
+				random_length(generator),
+				random_unit(generator));
+			sample = glm::normalize(sample);
+			sample *= random_unit(generator);
+			float scale = static_cast<float>(i) / 64.0f;
+			// Scale sample s.t. they are more aligned tot he center of the
+			// kernel
+			scale = lerp(0.1f, 1.0f, scale * scale);
+			sample *= scale;
+			kernel_ssao_vec_.emplace_back(sample);
+		}
+		std::vector<glm::vec3> ssao_noise = {};
+		for (unsigned int i = 0; i < 16; ++i)
+		{
+			ssao_noise.emplace_back(
+				glm::vec3(
+					random_length(generator), 
+					random_length(generator), 
+					0.0f));
+		}
+		noise_texture_ = std::make_shared<Texture>(
+			std::pair{4, 4}, 
+			ssao_noise.data(),
+			sgl::PixelElementSize::FLOAT, 
+			sgl::PixelStructure::RGB);
+		noise_texture_->SetMagFilter(TextureFilter::NEAREST);
+		noise_texture_->SetMinFilter(TextureFilter::NEAREST);
+		noise_texture_->SetWrapS(TextureFilter::REPEAT);
+		noise_texture_->SetWrapT(TextureFilter::REPEAT);
 
 		// First texture (suppose to be the base color albedo).
 		lighting_textures_.emplace_back(nullptr);
 		// The second is the accumulation color.
 		lighting_textures_.emplace_back(
-			std::make_shared<sgl::Texture>(size, pixel_element_size_));
+			std::make_shared<Texture>(size, pixel_element_size_));
 
 		// Create programs.
 		pbr_program_ = CreateProgram("PhysicallyBasedRendering");
 		lighting_program_ = CreateProgram("Lighting");
 		ssao_program_ = CreateProgram("ScreenSpaceAmbientOcclusion");
+		view_program_ = CreateProgram("ViewPositionNormal");
 	}
 
 	void Device::Startup(const float fov /*= 65.0f*/)
@@ -87,7 +163,25 @@ namespace sgl {
 		pbr_program_->UniformVector3(
 			"camera_position",
 			GetCamera().GetPosition());
-		DrawMultiTextures(temp_textures, dt);
+		DrawMultiTextures(dt, temp_textures);
+	}
+
+	void Device::DrawView(
+		const double dt, 
+		const std::vector<std::shared_ptr<Texture>>& view_textures /*= {}*/)
+	{
+		std::vector<std::shared_ptr<Texture>> temp_textures;
+		if (view_textures.empty())
+		{
+			temp_textures = view_textures_;
+		}
+		else
+		{
+			temp_textures = view_textures;
+		}
+		view_program_->Use();
+		view_program_->UniformInt("inverted_normals", 0);
+		DrawMultiTextures(dt, temp_textures, view_program_);
 	}
 
 	std::shared_ptr<sgl::Texture> Device::DrawLighting(
@@ -139,6 +233,67 @@ namespace sgl {
 		return TextureAddition(lighting_textures_);
 	}
 
+	std::shared_ptr<Texture> Device::DrawScreenSpaceAmbientOcclusion(
+		const std::vector<std::shared_ptr<Texture>>& in_textures /*= {}*/)
+	{
+		std::vector<std::shared_ptr<Texture>> temp_textures;
+		if (in_textures.empty())
+		{
+			temp_textures = view_textures_;
+		}
+		else
+		{
+			temp_textures = in_textures;
+		}
+		sgl::Frame frame{};
+		sgl::Render render{};
+		auto size = temp_textures[0]->GetSize();
+		frame.BindAttach(render);
+		render.BindStorage(size);
+
+		// Set the view port for rendering.
+		glViewport(0, 0, size.first, size.second);
+		error_.Display(__FILE__, __LINE__ - 1);
+
+		// Clear the screen.
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		error_.Display(__FILE__, __LINE__ - 1);
+
+		static auto out_texture = std::make_shared<Texture>(
+			size, 
+			sgl::PixelElementSize::HALF);
+
+		frame.BindTexture(*out_texture);
+		frame.DrawBuffers(1);
+
+		// Set the screen space ambient occlusion uniforms.
+		ssao_program_->Use();
+		for (unsigned int i = 0; i < 64; ++i)
+		{
+			ssao_program_->UniformVector3(
+				"kernel[" + std::to_string(i) + "]",
+				kernel_ssao_vec_[i]);
+		}
+		ssao_program_->UniformVector2(
+			"noise_scale", 
+			glm::vec2(
+				static_cast<float>(size.first) / 4.0f, 
+				static_cast<float>(size.second) / 4.0f));
+		// Send the projection matrix.
+		ssao_program_->UniformMatrix("projection" , perspective_);
+
+		static auto quad = sgl::CreateQuadMesh(ssao_program_);
+
+		sgl::TextureManager texture_manager{};
+		texture_manager.AddTexture("ViewPosition", temp_textures[0]);
+		texture_manager.AddTexture("ViewNormal", temp_textures[1]);
+		texture_manager.AddTexture("Noise", noise_texture_);
+		quad->SetTextures({ "ViewPosition", "ViewNormal", "Noise" });
+		quad->Draw(texture_manager);
+
+		return out_texture;
+	}
+
 	std::shared_ptr<sgl::Texture> Device::DrawBloom(
 		const std::shared_ptr<Texture>& texture)
 	{
@@ -158,7 +313,7 @@ namespace sgl {
 		frame.BindAttach(render);
 		render.BindStorage(size);
 
-		auto texture_out = std::make_shared<sgl::Texture>(
+		static auto texture_out = std::make_shared<sgl::Texture>(
 			size,
 			pixel_element_size_);
 
@@ -202,13 +357,14 @@ namespace sgl {
 			size_, 
 			PixelElementSize::FLOAT, 
 			PixelStructure::RGB);
-		DrawMultiTextures({ texture }, dt);
+		DrawMultiTextures(dt, { texture });
 		return texture;
 	}
 
 	void Device::DrawMultiTextures(
+		const double dt, 
 		const std::vector<std::shared_ptr<Texture>>& out_textures, 
-		const double dt)
+		const std::shared_ptr<Program> program /*= nullptr*/)
 	{
 		if (out_textures.empty())
 		{
@@ -249,6 +405,11 @@ namespace sgl {
 				continue;
 			}
 
+			if (program)
+			{
+				if (mesh->IsClearDepthBuffer()) continue;
+			}
+
 			auto material_name = mesh->GetMaterialName();
 			if (materials_.find(material_name) != materials_.end())
 			{ 
@@ -257,12 +418,24 @@ namespace sgl {
 				mesh->SetTextures(material->GetTextures());
 			}
 
+			std::shared_ptr<Program> temp_program = nullptr;
+			if (program)
+			{
+				temp_program = mesh->GetProgram();
+				mesh->SetProgram(program);
+			}
+
 			// Draw the mesh.
 			mesh->Draw(
 				texture_manager_,
 				perspective_,
 				view_,
 				scene->GetLocalModel(dt));
+
+			if (temp_program)
+			{
+				mesh->SetProgram(temp_program);
+			}
 		}
 	}
 
@@ -399,6 +572,28 @@ namespace sgl {
 			pbr_program_,
 			obj_file);
 		materials_ = LoadMaterialFromMtlStream(mtl_ifs, mtl_file);
+	}
+
+	const std::shared_ptr<Texture>& Device::GetDeferredTexture(
+		const int i) const
+	{
+		return deferred_textures_.at(i);
+	}
+
+	const std::shared_ptr<Texture>& Device::GetViewTexture(const int i) const
+	{
+		return view_textures_.at(i);
+	}
+
+	const std::shared_ptr<Texture>& Device::GetLightingTexture(
+		const int i) const
+	{
+		return lighting_textures_.at(i);
+	}
+
+	const std::shared_ptr<Texture>& Device::GetNoiseTexture() const
+	{
+		return noise_texture_;
 	}
 
 } // End namespace sgl.

@@ -155,6 +155,86 @@ namespace sgl {
 		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
+	void Texture::SetMinFilter(TextureFilter texture_filter)
+	{
+		glTexParameteri(
+			GL_TEXTURE_2D, 
+			GL_TEXTURE_MIN_FILTER, 
+			static_cast<GLenum>(texture_filter));
+		error_.Display(__FILE__, __LINE__ - 4);
+	}
+
+	TextureFilter Texture::GetMinFilter() const
+	{
+		GLint filter;
+		glGetTexParameteriv(
+			GL_TEXTURE_2D,
+			GL_TEXTURE_MIN_FILTER,
+			&filter);
+		error_.Display(__FILE__, __LINE__ - 4);
+		return static_cast<TextureFilter>(filter);
+	}
+
+	void Texture::SetMagFilter(TextureFilter texture_filter)
+	{
+		glTexParameteri(
+			GL_TEXTURE_2D,
+			GL_TEXTURE_MAG_FILTER,
+			static_cast<GLenum>(texture_filter));
+		error_.Display(__FILE__, __LINE__ - 4);
+	}
+
+	sgl::TextureFilter Texture::GetMagFilter() const
+	{
+		GLint filter;
+		glGetTexParameteriv(
+			GL_TEXTURE_2D,
+			GL_TEXTURE_MAG_FILTER,
+			&filter);
+		error_.Display(__FILE__, __LINE__ - 4);
+		return static_cast<TextureFilter>(filter);
+	}
+
+	void Texture::SetWrapS(TextureFilter texture_filter)
+	{
+		glTexParameteri(
+			GL_TEXTURE_2D,
+			GL_TEXTURE_WRAP_S,
+			static_cast<GLenum>(texture_filter));
+		error_.Display(__FILE__, __LINE__ - 4);
+	}
+
+	sgl::TextureFilter Texture::GetWrapS() const
+	{
+		GLint filter;
+		glGetTexParameteriv(
+			GL_TEXTURE_2D,
+			GL_TEXTURE_WRAP_S,
+			&filter);
+		error_.Display(__FILE__, __LINE__ - 4);
+		return static_cast<TextureFilter>(filter);
+	}
+
+	void Texture::SetWrapT(TextureFilter texture_filter)
+	{
+		glTexParameteri(
+			GL_TEXTURE_2D,
+			GL_TEXTURE_WRAP_T,
+			static_cast<GLenum>(texture_filter));
+		error_.Display(__FILE__, __LINE__ - 4);
+	}
+
+	sgl::TextureFilter Texture::GetWrapT() const
+	{
+		GLint filter;
+		glGetTexParameteriv(
+			GL_TEXTURE_2D,
+			GL_TEXTURE_WRAP_T,
+			&filter);
+		error_.Display(__FILE__, __LINE__ - 4);
+		return static_cast<TextureFilter>(filter);
+	}
+
 	TextureManager::~TextureManager()
 	{
 		DisableAll();
@@ -395,6 +475,108 @@ namespace sgl {
 		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
+	void TextureCubeMap::SetMinFilter(TextureFilter texture_filter)
+	{
+		glTexParameteri(
+			GL_TEXTURE_CUBE_MAP,
+			GL_TEXTURE_MIN_FILTER,
+			static_cast<GLenum>(texture_filter));
+		error_.Display(__FILE__, __LINE__ - 4);
+	}
+
+	sgl::TextureFilter TextureCubeMap::GetMinFilter() const
+	{
+		GLint filter;
+		glGetTexParameteriv(
+			GL_TEXTURE_CUBE_MAP,
+			GL_TEXTURE_MIN_FILTER,
+			&filter);
+		error_.Display(__FILE__, __LINE__ - 4);
+		return static_cast<TextureFilter>(filter);
+	}
+
+	void TextureCubeMap::SetMagFilter(TextureFilter texture_filter)
+	{
+		glTexParameteri(
+			GL_TEXTURE_CUBE_MAP,
+			GL_TEXTURE_MAG_FILTER,
+			static_cast<GLenum>(texture_filter));
+		error_.Display(__FILE__, __LINE__ - 4);
+	}
+
+	sgl::TextureFilter TextureCubeMap::GetMagFilter() const
+	{
+		GLint filter;
+		glGetTexParameteriv(
+			GL_TEXTURE_CUBE_MAP,
+			GL_TEXTURE_MAG_FILTER,
+			&filter);
+		error_.Display(__FILE__, __LINE__ - 4);
+		return static_cast<TextureFilter>(filter);
+	}
+
+	void TextureCubeMap::SetWrapS(TextureFilter texture_filter)
+	{
+		glTexParameteri(
+			GL_TEXTURE_CUBE_MAP,
+			GL_TEXTURE_WRAP_S,
+			static_cast<GLenum>(texture_filter));
+		error_.Display(__FILE__, __LINE__ - 4);
+	}
+
+	sgl::TextureFilter TextureCubeMap::GetWrapS() const
+	{
+		GLint filter;
+		glGetTexParameteriv(
+			GL_TEXTURE_CUBE_MAP,
+			GL_TEXTURE_WRAP_S,
+			&filter);
+		error_.Display(__FILE__, __LINE__ - 4);
+		return static_cast<TextureFilter>(filter);
+
+	}
+
+	void TextureCubeMap::SetWrapT(TextureFilter texture_filter)
+	{
+		glTexParameteri(
+			GL_TEXTURE_CUBE_MAP,
+			GL_TEXTURE_WRAP_T,
+			static_cast<GLenum>(texture_filter));
+		error_.Display(__FILE__, __LINE__ - 4);
+	}
+
+	sgl::TextureFilter TextureCubeMap::GetWrapT() const
+	{
+		GLint filter;
+		glGetTexParameteriv(
+			GL_TEXTURE_CUBE_MAP,
+			GL_TEXTURE_WRAP_T,
+			&filter);
+		error_.Display(__FILE__, __LINE__ - 4);
+		return static_cast<TextureFilter>(filter);
+
+	}
+
+	void TextureCubeMap::SetWrapR(TextureFilter texture_filter)
+	{
+		glTexParameteri(
+			GL_TEXTURE_CUBE_MAP,
+			GL_TEXTURE_WRAP_R,
+			static_cast<GLenum>(texture_filter));
+		error_.Display(__FILE__, __LINE__ - 4);
+	}
+
+	sgl::TextureFilter TextureCubeMap::GetWrapR() const
+	{
+		GLint filter;
+		glGetTexParameteriv(
+			GL_TEXTURE_CUBE_MAP,
+			GL_TEXTURE_WRAP_R,
+			&filter);
+		error_.Display(__FILE__, __LINE__ - 4);
+		return static_cast<TextureFilter>(filter);
+	}
+
 	void TextureCubeMap::CreateTextureCubeMap()
 	{
 		glGenTextures(1, &texture_id_);
@@ -457,17 +639,33 @@ namespace sgl {
 		return texture_out;
 	}
 
-	std::shared_ptr<sgl::Texture> TextureGaussianBlur(
-		const std::shared_ptr<sgl::Texture>& texture)
+	std::shared_ptr<Texture> TextureBlur(
+		const std::shared_ptr<Texture>& in_texture)
+	{
+		static auto out_texture = std::make_shared<Texture>(
+			in_texture->GetSize(),
+			in_texture->GetPixelElementSize());
+		TextureManager texture_manager;
+		texture_manager.AddTexture("Image", in_texture);
+		FillProgramMultiTexture(
+			std::vector<std::shared_ptr<Texture>>{ out_texture }, 
+			texture_manager, 
+			std::vector<std::string>{ "Image" }, 
+			CreateProgram("Blur"));
+		return out_texture;
+	}
+
+	std::shared_ptr<Texture> TextureGaussianBlur(
+		const std::shared_ptr<Texture>& in_texture)
 	{
 		const sgl::Error& error = sgl::Error::GetInstance();
 		sgl::Frame frame[2];
 		sgl::Render render{};
-		auto size = texture->GetSize();
+		auto size = in_texture->GetSize();
 		frame[0].BindAttach(render);
 		frame[1].BindAttach(render);
 		render.BindStorage(size);
-		auto pixel_element_size = texture->GetPixelElementSize();
+		auto pixel_element_size = in_texture->GetPixelElementSize();
 
 		std::shared_ptr<sgl::Texture> texture_out[2] = {
 			std::make_shared<sgl::Texture>(
@@ -489,8 +687,8 @@ namespace sgl {
 		frame[0].BindTexture(*texture_out[0]);
 		frame[1].BindTexture(*texture_out[1]);
 
-		auto program = sgl::CreateProgram("GaussianBlur");
-		auto quad = sgl::CreateQuadMesh(program);
+		static auto program = CreateProgram("GaussianBlur");
+		static auto quad = CreateQuadMesh(program);
 		program->Use();
 
 		bool horizontal = true;
@@ -498,12 +696,12 @@ namespace sgl {
 		for (int i = 0; i < 10; ++i)
 		{
 			// Reset the texture manager.
-			sgl::TextureManager texture_manager;
+			TextureManager texture_manager;
 			program->UniformInt("horizontal", horizontal);
 			frame[horizontal].Bind();
 			texture_manager.AddTexture(
 				"Image",
-				(first_iteration) ? texture : texture_out[!horizontal]);
+				(first_iteration) ? in_texture : texture_out[!horizontal]);
 			quad->SetTextures({ "Image" });
 			quad->Draw(texture_manager);
 			horizontal = !horizontal;
@@ -560,7 +758,7 @@ namespace sgl {
 		return texture_out;
 	}
 
-	std::shared_ptr<Texture> TextureMutliply(
+	std::shared_ptr<Texture> TextureMultiply(
 		const std::vector<std::shared_ptr<Texture>>& multiply_textures)
 	{
 		assert(multiply_textures.size() <= 16);

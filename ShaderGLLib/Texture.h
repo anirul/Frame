@@ -15,6 +15,19 @@
 
 namespace sgl {
 
+	enum class TextureFilter 
+	{
+		NEAREST = GL_NEAREST,
+		LINEAR = GL_LINEAR,
+		NEAREST_MIPMAP_NEAREST = GL_NEAREST_MIPMAP_NEAREST,
+		LINEAR_MIPMAP_NEAREST = GL_LINEAR_MIPMAP_NEAREST,
+		NEAREST_MIPMAP_LINEAR = GL_NEAREST_MIPMAP_LINEAR,
+		LINEAR_MIPMAP_LINEAR = GL_LINEAR_MIPMAP_LINEAR,
+		CLAMP_TO_EDGE = GL_CLAMP_TO_EDGE,
+		MIRROR_REPEAT = GL_MIRRORED_REPEAT,
+		REPEAT = GL_REPEAT
+	};
+
 	class Texture 
 	{
 	public:
@@ -39,6 +52,14 @@ namespace sgl {
 		virtual void Bind(const unsigned int slot = 0) const;
 		virtual void UnBind() const;
 		virtual void BindEnableMipmap() const;
+		virtual void SetMinFilter(TextureFilter texture_filter);
+		virtual TextureFilter GetMinFilter() const;
+		virtual void SetMagFilter(TextureFilter texture_filter);
+		virtual TextureFilter GetMagFilter() const;
+		virtual void SetWrapS(TextureFilter texture_filter);
+		virtual TextureFilter GetWrapS() const;
+		virtual void SetWrapT(TextureFilter texture_filter);
+		virtual TextureFilter GetWrapT() const;
 
 	public:
 		const int GetId() const { return texture_id_; }
@@ -74,7 +95,7 @@ namespace sgl {
 	class TextureCubeMap : public Texture
 	{
 	public:
-		// Create an empty cubemap of the size size.
+		// Create an empty cube map of the size size.
 		TextureCubeMap(
 			const std::pair<std::uint32_t, std::uint32_t> size,
 			const PixelElementSize pixel_element_size = PixelElementSize::BYTE,
@@ -99,6 +120,16 @@ namespace sgl {
 		void Bind(const unsigned int slot = 0) const override;
 		void UnBind() const override;
 		void BindEnableMipmap() const override;
+		void SetMinFilter(TextureFilter texture_filter) override;
+		TextureFilter GetMinFilter() const override;
+		void SetMagFilter(TextureFilter texture_filter) override;
+		TextureFilter GetMagFilter() const override;
+		void SetWrapS(TextureFilter texture_filter) override;
+		TextureFilter GetWrapS() const override;
+		void SetWrapT(TextureFilter texture_filter) override;
+		TextureFilter GetWrapT() const override;
+		void SetWrapR(TextureFilter texture_filter);
+		TextureFilter GetWrapR() const;
 
 	protected:
 		// Create a cube map and assign it to the texture_id_.
@@ -137,6 +168,10 @@ namespace sgl {
 	std::shared_ptr<Texture> TextureBrightness(
 		const std::shared_ptr<Texture>& texture);
 
+	// Add blur to a texture.
+	std::shared_ptr<Texture> TextureBlur(
+		const std::shared_ptr<Texture>& in_texture);
+
 	// Get the Gaussian blur of a texture.
 	std::shared_ptr<Texture> TextureGaussianBlur(
 		const std::shared_ptr<Texture>& texture);
@@ -146,7 +181,7 @@ namespace sgl {
 		const std::vector<std::shared_ptr<Texture>>& add_textures);
 
 	// Vector multiply a number of texture (maximum 16) into one.
-	std::shared_ptr<Texture> TextureMutliply(
+	std::shared_ptr<Texture> TextureMultiply(
 		const std::vector<std::shared_ptr<Texture>>& multiply_textures);
 
 	// Fill multiple textures from a program.
