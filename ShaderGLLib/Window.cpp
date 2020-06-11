@@ -119,7 +119,8 @@ namespace sgl {
 			}
 
 			void SetInputInterface(
-				const std::shared_ptr<InputInterface>& input_interface) override
+				const std::shared_ptr<InputInterface>& input_interface) 
+				override
 			{
 				input_interface_ = input_interface;
 			}
@@ -160,7 +161,45 @@ namespace sgl {
 						return false;
 					}
 				}
+				if (input_interface_)
+				{
+					if (event.type == SDL_KEYDOWN)
+					{
+						input_interface_->KeyPressed(event.key.keysym.sym);
+					}
+					if (event.type == SDL_KEYUP)
+					{
+						input_interface_->KeyReleased(event.key.keysym.sym);
+					}
+					if (event.type == SDL_MOUSEMOTION)
+					{
+						input_interface_->MouseMoved(
+							glm::vec2(event.motion.x, event.motion.y),
+							glm::vec2(event.motion.xrel, event.motion.yrel));
+					}
+					if (event.type == SDL_MOUSEBUTTONDOWN)
+					{
+						input_interface_->MousePressed(
+							SDLButtonToChar(event.button.button));
+					}
+					if (event.type == SDL_MOUSEBUTTONUP)
+					{
+						input_interface_->MouseReleased(
+							SDLButtonToChar(event.button.button));
+					}
+				}
 				return true;
+			}
+
+			const char SDLButtonToChar(const Uint8 button) const 
+			{
+				char ret = 0;
+				if (button & SDL_BUTTON_LEFT) ret += 1;
+				if (button & SDL_BUTTON_RIGHT) ret += 2;
+				if (button & SDL_BUTTON_MIDDLE) ret += 4;
+				if (button & SDL_BUTTON_X1) ret += 8;
+				if (button & SDL_BUTTON_X2) ret += 16;
+				return ret;
 			}
 
 			void ErrorMessageDisplay(const std::string& message)

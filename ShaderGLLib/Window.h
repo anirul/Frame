@@ -11,7 +11,9 @@ namespace sgl {
 	{
 		virtual void KeyPressed(const char key) = 0;
 		virtual void KeyReleased(const char key) = 0;
-		virtual void MouseMoved(const glm::vec2 position) = 0;
+		virtual void MouseMoved(
+			const glm::vec2 position, 
+			const glm::vec2 relative) = 0;
 		virtual void MousePressed(const char button) = 0;
 		virtual void MouseReleased(const char button) = 0;
 	};
