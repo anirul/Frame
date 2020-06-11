@@ -6,6 +6,16 @@
 
 namespace sgl {
 
+	// This is the interface for input.
+	struct InputInterface
+	{
+		virtual void KeyPressed(const char key) = 0;
+		virtual void KeyReleased(const char key) = 0;
+		virtual void MouseMoved(const glm::vec2 position) = 0;
+		virtual void MousePressed(const char button) = 0;
+		virtual void MouseReleased(const char button) = 0;
+	};
+
 	// This is the structure that define what draw has to do.
 	struct DrawInterface 
 	{
@@ -26,6 +36,8 @@ namespace sgl {
 		virtual void Run() = 0;
 		virtual void SetDrawInterface(
 			const std::shared_ptr<DrawInterface>& draw_interface) = 0;
+		virtual void SetInputInterface(
+			const std::shared_ptr<InputInterface>& input_interface) = 0;
 		virtual void SetUniqueDevice(const std::shared_ptr<Device>& device) = 0;
 		virtual std::shared_ptr<Device> GetUniqueDevice() = 0;
 		virtual std::pair<std::uint32_t, std::uint32_t> GetSize() const = 0;

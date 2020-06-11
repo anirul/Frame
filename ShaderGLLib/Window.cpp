@@ -118,7 +118,14 @@ namespace sgl {
 				draw_interface_ = draw_interface;
 			}
 
-			void SetUniqueDevice(const std::shared_ptr<Device>& device) override
+			void SetInputInterface(
+				const std::shared_ptr<InputInterface>& input_interface) override
+			{
+				input_interface_ = input_interface;
+			}
+
+			void SetUniqueDevice(
+				const std::shared_ptr<Device>& device) override
 			{
 				device_ = device;
 			}
@@ -169,6 +176,7 @@ namespace sgl {
 			const std::pair<std::uint32_t, std::uint32_t> size_;
 			std::shared_ptr<sgl::Device> device_ = nullptr;
 			std::shared_ptr<DrawInterface> draw_interface_ = nullptr;
+			std::shared_ptr<InputInterface> input_interface_ = nullptr;
 			SDL_Window* sdl_window_ = nullptr;
 #if defined(_WIN32) || defined(_WIN64)
 			HWND hwnd_ = nullptr;
