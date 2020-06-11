@@ -12,8 +12,6 @@ uniform vec3 kernel[64];
 uniform vec2 noise_scale;
 uniform mat4 projection;
 
-// Parameters (you'd probably want to use them as uniforms to more easily tweak
-// the effect).
 const int kernel_size = 64;
 const float radius = 1;
 const float bias = 0.0025;

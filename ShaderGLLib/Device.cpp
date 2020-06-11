@@ -75,14 +75,6 @@ namespace sgl {
 				sgl::PixelStructure::RGB_ALPHA));
 		view_textures_[1]->SetMagFilter(TextureFilter::NEAREST);
 		view_textures_[1]->SetMinFilter(TextureFilter::NEAREST);
-		// ViewAlbedo.
-		view_textures_.emplace_back(
-			std::make_shared<Texture>(
-				size, 
-				sgl::PixelElementSize::BYTE,
-				sgl::PixelStructure::RGB_ALPHA));
-		view_textures_[2]->SetMagFilter(TextureFilter::NEAREST);
-		view_textures_[2]->SetMinFilter(TextureFilter::NEAREST);
 		
 		// Noise and kernel.
 		std::default_random_engine generator;
@@ -97,7 +89,7 @@ namespace sgl {
 			sample = glm::normalize(sample);
 			sample *= random_unit(generator);
 			float scale = static_cast<float>(i) / 64.0f;
-			// Scale sample s.t. they are more aligned tot he center of the
+			// Scale sample s.t. they are more aligned to the center of the
 			// kernel
 			scale = lerp(0.1f, 1.0f, scale * scale);
 			sample *= scale;
@@ -117,8 +109,8 @@ namespace sgl {
 			ssao_noise.data(),
 			sgl::PixelElementSize::FLOAT, 
 			sgl::PixelStructure::RGB);
-		noise_texture_->SetMagFilter(TextureFilter::NEAREST);
-		noise_texture_->SetMinFilter(TextureFilter::NEAREST);
+//		noise_texture_->SetMagFilter(TextureFilter::NEAREST);
+//		noise_texture_->SetMinFilter(TextureFilter::NEAREST);
 		noise_texture_->SetWrapS(TextureFilter::REPEAT);
 		noise_texture_->SetWrapT(TextureFilter::REPEAT);
 
