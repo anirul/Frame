@@ -27,7 +27,7 @@ namespace sgl {
 					throw std::runtime_error("Couldn't initialize SDL2.");
 				}
 				sdl_window_ = SDL_CreateWindow(
-					"Shader OpenGL",
+					"SDL OpenGL",
 					SDL_WINDOWPOS_CENTERED,
 					SDL_WINDOWPOS_CENTERED,
 					size_.first,

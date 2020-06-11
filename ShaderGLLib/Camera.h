@@ -19,6 +19,8 @@ namespace sgl {
 	public:
 		const glm::vec3 GetFront() const { return front_; }
 		const glm::vec3 GetPosition() const { return position_; }
+		const glm::vec3 GetRight() const { return right_; }
+		const glm::vec3 GetUp() const { return up_; }
 
 	protected:
 		void UpdateCameraVectors();
