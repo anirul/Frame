@@ -9,13 +9,14 @@ namespace sgl {
 	// This is the interface for input.
 	struct InputInterface
 	{
-		virtual void KeyPressed(const char key) = 0;
-		virtual void KeyReleased(const char key) = 0;
-		virtual void MouseMoved(
+		virtual bool KeyPressed(const char key, const double dt) = 0;
+		virtual bool KeyReleased(const char key, const double dt) = 0;
+		virtual bool MouseMoved(
 			const glm::vec2 position, 
-			const glm::vec2 relative) = 0;
-		virtual void MousePressed(const char button) = 0;
-		virtual void MouseReleased(const char button) = 0;
+			const glm::vec2 relative, 
+			const double dt) = 0;
+		virtual bool MousePressed(const char button, const double dt) = 0;
+		virtual bool MouseReleased(const char button, const double dt) = 0;
 	};
 
 	// This is the structure that define what draw has to do.

@@ -10,7 +10,7 @@ void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 const std::shared_ptr<sgl::Texture>& Draw::GetDrawTexture() const
 {
 //  return device_->GetDeferredTexture(1);
-//	return device_->GetViewTexture(0);
+//	return device_->GetViewTexture(1);
 //	return device_->GetNoiseTexture();
 //	return ssao_texture_;
 	return final_texture_;

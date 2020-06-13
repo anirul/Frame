@@ -9,13 +9,13 @@ public:
 	Input(const std::shared_ptr<sgl::Device>& device) : device_(device) {}
 
 public:
-	void KeyPressed(const char key) override;
-	void KeyReleased(const char key) override;
-	void MouseMoved(
+	bool KeyPressed(const char key, const double dt) override;
+	bool KeyReleased(const char key, const double dt) override;
+	bool MouseMoved(
 		const glm::vec2 position,
-		const glm::vec2 relative) override;
-	void MousePressed(const char button) override;
-	void MouseReleased(const char button) override;
+		const glm::vec2 relative, const double dt) override;
+	bool MousePressed(const char button, const double dt) override;
+	bool MouseReleased(const char button, const double dt) override;
 
 private:
 	std::shared_ptr<sgl::Device> device_;

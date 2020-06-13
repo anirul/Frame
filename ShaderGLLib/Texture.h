@@ -60,6 +60,7 @@ namespace sgl {
 		virtual TextureFilter GetWrapS() const;
 		virtual void SetWrapT(TextureFilter texture_filter);
 		virtual TextureFilter GetWrapT() const;
+		virtual void Clear(const glm::vec4& color) const;
 
 	public:
 		const int GetId() const { return texture_id_; }
@@ -130,6 +131,7 @@ namespace sgl {
 		TextureFilter GetWrapT() const override;
 		void SetWrapR(TextureFilter texture_filter);
 		TextureFilter GetWrapR() const;
+		void Clear(const glm::vec4& color) const override;
 
 	protected:
 		// Create a cube map and assign it to the texture_id_.

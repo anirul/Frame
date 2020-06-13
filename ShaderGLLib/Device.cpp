@@ -171,6 +171,10 @@ namespace sgl {
 		{
 			temp_textures = view_textures;
 		}
+		for (const auto& texture : temp_textures)
+		{
+			texture->Clear({ 0, 0, 0, 1 });
+		}
 		view_program_->Use();
 		view_program_->UniformInt("inverted_normals", 0);
 		DrawMultiTextures(dt, temp_textures, view_program_);
@@ -334,8 +338,8 @@ namespace sgl {
 
 	void Device::Display(const std::shared_ptr<Texture>& texture)
 	{
-		auto program = CreateProgram("Display");
-		auto quad = CreateQuadMesh(program);
+		static auto program = CreateProgram("Display");
+		static auto quad = CreateQuadMesh(program);
 		TextureManager texture_manager{};
 		texture_manager.AddTexture("Display", texture);
 		quad->SetTextures({ "Display" });
@@ -378,6 +382,8 @@ namespace sgl {
 		// Clear the screen.
 		glClearColor(.2f, 0.f, .2f, 1.0f);
 		error_.Display(__FILE__, __LINE__ - 1);
+
+
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		error_.Display(__FILE__, __LINE__ - 1);
 
@@ -392,11 +398,7 @@ namespace sgl {
 		for (const std::shared_ptr<Scene>& scene : scene_tree_)
 		{
 			const std::shared_ptr<Mesh>& mesh = scene->GetLocalMesh();
-			if (!mesh)
-			{
-				continue;
-			}
-
+			if (!mesh) continue;
 			if (program)
 			{
 				if (mesh->IsClearDepthBuffer()) continue;

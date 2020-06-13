@@ -78,9 +78,9 @@ namespace sgl {
 					std::chrono::duration<double> time = end - start;
 					// Process events
 					SDL_Event event;
-					if (SDL_PollEvent(&event))
+					while (SDL_PollEvent(&event))
 					{
-						if (!RunEvent(event))
+						if (!RunEvent(event, time.count()))
 						{
 							loop = false;
 							continue;
@@ -147,7 +147,7 @@ namespace sgl {
 			}
 
 		protected:
-			bool RunEvent(const SDL_Event& event)
+			bool RunEvent(const SDL_Event& event, const double dt)
 			{
 				if (event.type == SDL_QUIT)
 				{
@@ -165,27 +165,34 @@ namespace sgl {
 				{
 					if (event.type == SDL_KEYDOWN)
 					{
-						input_interface_->KeyPressed(event.key.keysym.sym);
+						return input_interface_->KeyPressed(
+							event.key.keysym.sym, 
+							dt);
 					}
 					if (event.type == SDL_KEYUP)
 					{
-						input_interface_->KeyReleased(event.key.keysym.sym);
+						return input_interface_->KeyReleased(
+							event.key.keysym.sym, 
+							dt);
 					}
 					if (event.type == SDL_MOUSEMOTION)
 					{
-						input_interface_->MouseMoved(
+						return input_interface_->MouseMoved(
 							glm::vec2(event.motion.x, event.motion.y),
-							glm::vec2(event.motion.xrel, event.motion.yrel));
+							glm::vec2(event.motion.xrel, event.motion.yrel),
+							dt);
 					}
 					if (event.type == SDL_MOUSEBUTTONDOWN)
 					{
-						input_interface_->MousePressed(
-							SDLButtonToChar(event.button.button));
+						return input_interface_->MousePressed(
+							SDLButtonToChar(event.button.button), 
+							dt);
 					}
 					if (event.type == SDL_MOUSEBUTTONUP)
 					{
-						input_interface_->MouseReleased(
-							SDLButtonToChar(event.button.button));
+						return input_interface_->MouseReleased(
+							SDLButtonToChar(event.button.button), 
+							dt);
 					}
 				}
 				return true;

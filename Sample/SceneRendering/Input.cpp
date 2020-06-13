@@ -1,8 +1,8 @@
 #include "Input.h"
 
-void Input::KeyPressed(const char key)
+bool Input::KeyPressed(const char key, const double dt)
 {
-	const float inc = 0.1f;
+	const float inc = 0.01f * static_cast<float>(dt);
 	auto camera = device_->GetCamera();
 	auto position = camera.GetPosition();
 	auto right = camera.GetRight();
@@ -26,18 +26,20 @@ void Input::KeyPressed(const char key)
 	}
 	camera.SetPosition(position);
 	device_->SetCamera(camera);
+	return true;
 }
 
-void Input::KeyReleased(const char key)
+bool Input::KeyReleased(const char key, const double dt)
 {
-
+	return true;
 }
 
-void Input::MouseMoved(
-	const glm::vec2 position,
-	const glm::vec2 relative)
+bool Input::MouseMoved(
+	const glm::vec2 position, 
+	const glm::vec2 relative, 
+	const double dt)
 {
-	const float inc = 0.01f;
+	const float inc = 0.0005f * static_cast<float>(dt);
 	auto camera = device_->GetCamera();
 	auto front = camera.GetFront();
 	auto right = camera.GetRight();
@@ -48,18 +50,20 @@ void Input::MouseMoved(
 	}
 	if (relative.y)
 	{
-		front += up * relative.y * inc;
+		front -= up * relative.y * inc;
 	}
 	camera.SetFront(front);
+	camera.SetUp({ 0, 1, 0 });
 	device_->SetCamera(camera);
+	return true;
 }
 
-void Input::MousePressed(const char button)
+bool Input::MousePressed(const char button, const double dt)
 {
-
+	return true;
 }
 
-void Input::MouseReleased(const char button)
+bool Input::MouseReleased(const char button, const double dt)
 {
-
+	return true;
 }

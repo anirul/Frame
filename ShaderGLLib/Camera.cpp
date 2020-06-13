@@ -32,6 +32,12 @@ namespace sgl {
 		UpdateCameraVectors();
 	}
 
+	void Camera::SetUp(const glm::vec3& vec)
+	{
+		up_ = vec;
+		UpdateCameraVectors();
+	}
+
 	void Camera::UpdateCameraVectors()
 	{
 		front_ = glm::normalize(front_);

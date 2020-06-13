@@ -15,6 +15,7 @@ namespace sgl {
 		const glm::mat4 GetLookAt() const;
 		void SetFront(const glm::vec3& vec);
 		void SetPosition(const glm::vec3& vec);
+		void SetUp(const glm::vec3& vec);
 
 	public:
 		const glm::vec3 GetFront() const { return front_; }
