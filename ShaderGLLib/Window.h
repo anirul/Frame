@@ -45,6 +45,7 @@ namespace sgl {
 		virtual std::shared_ptr<Device> GetUniqueDevice() = 0;
 		virtual std::pair<std::uint32_t, std::uint32_t> GetSize() const = 0;
 		virtual void* GetWindowContext() const = 0;
+		virtual void SetWindowTitle(const std::string& title) const = 0;
 	};
 
 	// Create an instance of the window in SDL using OpenGL.

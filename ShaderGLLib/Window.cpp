@@ -97,6 +97,10 @@ namespace sgl {
 						device_->Draw(time.count());
 					}
 
+					SetWindowTitle(
+						"SDL OpenGL - " + 
+						std::to_string(GetFPS(time.count())));
+
 					previous_count = time.count();
 					// TODO(anirul): Fix me to check which device this is.
 					if (device_)
@@ -144,6 +148,11 @@ namespace sgl {
 			void* GetWindowContext() const override
 			{
 				return sdl_window_;
+			}
+
+			void SetWindowTitle(const std::string& title) const override
+			{
+				SDL_SetWindowTitle(sdl_window_, title.c_str());
 			}
 
 		protected:
@@ -216,6 +225,14 @@ namespace sgl {
 #else
 				std::cerr << "OpenGL Error: " << message << std::endl;
 #endif
+			}
+
+			const double GetFPS(const double dt) const
+			{
+				static double previous_dt = 0.0;
+				double ret = dt - previous_dt;
+				previous_dt = dt;
+				return 1.0 / ret;
 			}
 
 		private:

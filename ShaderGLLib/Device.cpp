@@ -61,8 +61,7 @@ namespace sgl {
 		view_textures_.emplace_back(
 			std::make_shared<Texture>(
 				size, 
-				sgl::PixelElementSize::HALF, 
-				sgl::PixelStructure::RGB_ALPHA));
+				sgl::PixelElementSize::HALF));
 		view_textures_[0]->SetMagFilter(TextureFilter::NEAREST);
 		view_textures_[0]->SetMinFilter(TextureFilter::NEAREST);
 		view_textures_[0]->SetWrapS(TextureFilter::CLAMP_TO_EDGE);
@@ -71,8 +70,7 @@ namespace sgl {
 		view_textures_.emplace_back(
 			std::make_shared<Texture>(
 				size, 
-				sgl::PixelElementSize::HALF,
-				sgl::PixelStructure::RGB_ALPHA));
+				sgl::PixelElementSize::HALF));
 		view_textures_[1]->SetMagFilter(TextureFilter::NEAREST);
 		view_textures_[1]->SetMinFilter(TextureFilter::NEAREST);
 		
@@ -107,8 +105,8 @@ namespace sgl {
 		noise_texture_ = std::make_shared<Texture>(
 			std::pair{4, 4}, 
 			ssao_noise.data(),
-			sgl::PixelElementSize::FLOAT, 
-			sgl::PixelStructure::RGB);
+			sgl::PixelElementSize::HALF, 
+			sgl::PixelStructure::GREY_ALPHA);
 //		noise_texture_->SetMagFilter(TextureFilter::NEAREST);
 //		noise_texture_->SetMinFilter(TextureFilter::NEAREST);
 		noise_texture_->SetWrapS(TextureFilter::REPEAT);
@@ -199,8 +197,8 @@ namespace sgl {
 			"camera_position",
 			GetCamera().GetPosition());
 		light_manager_.RegisterToProgram(lighting_program_);
-		sgl::Frame frame{};
-		sgl::Render render{};
+		Frame frame{};
+		Render render{};
 		auto size = temp_textures[0]->GetSize();
 		frame.BindAttach(render);
 		render.BindStorage(size);
@@ -216,7 +214,7 @@ namespace sgl {
 		frame.BindTexture(*lighting_textures_[1]);
 		frame.DrawBuffers(1);
 
-		auto quad = sgl::CreateQuadMesh(lighting_program_);
+		static auto quad = sgl::CreateQuadMesh(lighting_program_);
 
 		sgl::TextureManager texture_manager{};
 		texture_manager.AddTexture("Ambient", temp_textures[0]);
@@ -241,8 +239,8 @@ namespace sgl {
 		{
 			temp_textures = in_textures;
 		}
-		sgl::Frame frame{};
-		sgl::Render render{};
+		Frame frame{};
+		Render render{};
 		auto size = temp_textures[0]->GetSize();
 		frame.BindAttach(render);
 		render.BindStorage(size);
@@ -303,8 +301,8 @@ namespace sgl {
 		const float exposure /*= 1.0f*/, 
 		const float gamma /*= 2.2f*/)
 	{
-		sgl::Frame frame{};
-		sgl::Render render{};
+		Frame frame{};
+		Render render{};
 		auto size = texture->GetSize();
 		frame.BindAttach(render);
 		render.BindStorage(size);
@@ -351,8 +349,7 @@ namespace sgl {
 	{
 		auto texture = std::make_shared<Texture>(
 			size_, 
-			PixelElementSize::FLOAT, 
-			PixelStructure::RGB);
+			pixel_element_size_);
 		DrawMultiTextures(dt, { texture });
 		return texture;
 	}
