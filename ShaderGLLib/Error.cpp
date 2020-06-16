@@ -50,9 +50,11 @@ namespace sgl {
 		const std::string& file /*= ""*/,
 		const int line /*= -1*/) const
 	{
+#ifdef _DEBUG
 		std::string error = GetLastError();
 		if (error.empty()) return;
 		CreateError(error, file, line);
+#endif
 	}
 
 	void Error::CreateError(

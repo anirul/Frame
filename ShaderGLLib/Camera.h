@@ -15,10 +15,13 @@ namespace sgl {
 		const glm::mat4 GetLookAt() const;
 		void SetFront(const glm::vec3& vec);
 		void SetPosition(const glm::vec3& vec);
+		void SetUp(const glm::vec3& vec);
 
 	public:
 		const glm::vec3 GetFront() const { return front_; }
 		const glm::vec3 GetPosition() const { return position_; }
+		const glm::vec3 GetRight() const { return right_; }
+		const glm::vec3 GetUp() const { return up_; }
 
 	protected:
 		void UpdateCameraVectors();

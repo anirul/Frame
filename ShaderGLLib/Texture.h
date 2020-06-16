@@ -12,6 +12,8 @@
 #include "../ShaderGLLib/Pixel.h"
 #include "../ShaderGLLib/Error.h"
 #include "../ShaderGLLib/Program.h"
+#include "../ShaderGLLib/Frame.h"
+#include "../ShaderGLLib/Render.h"
 
 namespace sgl {
 
@@ -60,6 +62,7 @@ namespace sgl {
 		virtual TextureFilter GetWrapS() const;
 		virtual void SetWrapT(TextureFilter texture_filter);
 		virtual TextureFilter GetWrapT() const;
+		virtual void Clear(const glm::vec4& color);
 
 	public:
 		const int GetId() const { return texture_id_; }
@@ -90,6 +93,8 @@ namespace sgl {
 		const PixelElementSize pixel_element_size_;
 		const PixelStructure pixel_structure_;
 		const Error& error_ = Error::GetInstance();
+		Frame frame_ = {};
+		Render render_ = {};
 	};
 
 	class TextureCubeMap : public Texture
@@ -130,6 +135,7 @@ namespace sgl {
 		TextureFilter GetWrapT() const override;
 		void SetWrapR(TextureFilter texture_filter);
 		TextureFilter GetWrapR() const;
+		void Clear(const glm::vec4& color) override;
 
 	protected:
 		// Create a cube map and assign it to the texture_id_.

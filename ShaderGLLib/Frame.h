@@ -2,10 +2,11 @@
 
 #include <memory>
 #include "../ShaderGLLib/Render.h"
-#include "../ShaderGLLib/Texture.h"
 #include "../ShaderGLLib/Error.h"
 
 namespace sgl {
+
+	class Texture;
 
 	enum class FrameTextureType
 	{

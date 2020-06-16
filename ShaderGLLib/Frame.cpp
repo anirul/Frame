@@ -2,6 +2,7 @@
 #include <stdexcept>
 #include <GL/glew.h>
 #include <cassert>
+#include "Texture.h"
 
 namespace sgl {
 

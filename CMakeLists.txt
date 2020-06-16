@@ -240,6 +240,8 @@ add_executable(SceneRendering
     ${PROJECT_SOURCE_DIR}/Sample/SceneRendering/Application.h
     ${PROJECT_SOURCE_DIR}/Sample/SceneRendering/Draw.cpp
     ${PROJECT_SOURCE_DIR}/Sample/SceneRendering/Draw.h
+    ${PROJECT_SOURCE_DIR}/Sample/SceneRendering/Input.cpp
+    ${PROJECT_SOURCE_DIR}/Sample/SceneRendering/Input.h
     ${PROJECT_SOURCE_DIR}/Sample/SceneRendering/main.cpp
 )
 

@@ -235,6 +235,17 @@ namespace sgl {
 		return static_cast<TextureFilter>(filter);
 	}
 
+	void Texture::Clear(const glm::vec4& color)
+	{
+		frame_.BindAttach(render_);
+		render_.BindStorage(size_);
+		frame_.BindTexture(*this);
+		frame_.DrawBuffers();
+		glClearColor(color.r, color.g, color.b, color.a);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		error_.Display(__FILE__, __LINE__ - 1);
+	}
+
 	TextureManager::~TextureManager()
 	{
 		DisableAll();
@@ -575,6 +586,17 @@ namespace sgl {
 			&filter);
 		error_.Display(__FILE__, __LINE__ - 4);
 		return static_cast<TextureFilter>(filter);
+	}
+
+	void TextureCubeMap::Clear(const glm::vec4& color)
+	{
+		frame_.BindAttach(render_);
+		render_.BindStorage(size_);
+		frame_.BindTexture(*this);
+		frame_.DrawBuffers();
+		glClearColor(color.r, color.g, color.b, color.a);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
 	void TextureCubeMap::CreateTextureCubeMap()

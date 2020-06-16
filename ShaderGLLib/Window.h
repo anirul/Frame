@@ -6,6 +6,19 @@
 
 namespace sgl {
 
+	// This is the interface for input.
+	struct InputInterface
+	{
+		virtual bool KeyPressed(const char key, const double dt) = 0;
+		virtual bool KeyReleased(const char key, const double dt) = 0;
+		virtual bool MouseMoved(
+			const glm::vec2 position, 
+			const glm::vec2 relative, 
+			const double dt) = 0;
+		virtual bool MousePressed(const char button, const double dt) = 0;
+		virtual bool MouseReleased(const char button, const double dt) = 0;
+	};
+
 	// This is the structure that define what draw has to do.
 	struct DrawInterface 
 	{
@@ -26,10 +39,13 @@ namespace sgl {
 		virtual void Run() = 0;
 		virtual void SetDrawInterface(
 			const std::shared_ptr<DrawInterface>& draw_interface) = 0;
+		virtual void SetInputInterface(
+			const std::shared_ptr<InputInterface>& input_interface) = 0;
 		virtual void SetUniqueDevice(const std::shared_ptr<Device>& device) = 0;
 		virtual std::shared_ptr<Device> GetUniqueDevice() = 0;
 		virtual std::pair<std::uint32_t, std::uint32_t> GetSize() const = 0;
 		virtual void* GetWindowContext() const = 0;
+		virtual void SetWindowTitle(const std::string& title) const = 0;
 	};
 
 	// Create an instance of the window in SDL using OpenGL.

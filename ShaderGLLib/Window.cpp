@@ -27,7 +27,7 @@ namespace sgl {
 					throw std::runtime_error("Couldn't initialize SDL2.");
 				}
 				sdl_window_ = SDL_CreateWindow(
-					"Shader OpenGL",
+					"SDL OpenGL",
 					SDL_WINDOWPOS_CENTERED,
 					SDL_WINDOWPOS_CENTERED,
 					size_.first,
@@ -78,9 +78,9 @@ namespace sgl {
 					std::chrono::duration<double> time = end - start;
 					// Process events
 					SDL_Event event;
-					if (SDL_PollEvent(&event))
+					while (SDL_PollEvent(&event))
 					{
-						if (!RunEvent(event))
+						if (!RunEvent(event, time.count()))
 						{
 							loop = false;
 							continue;
@@ -96,6 +96,10 @@ namespace sgl {
 					{
 						device_->Draw(time.count());
 					}
+
+					SetWindowTitle(
+						"SDL OpenGL - " + 
+						std::to_string(GetFPS(time.count())));
 
 					previous_count = time.count();
 					// TODO(anirul): Fix me to check which device this is.
@@ -118,7 +122,15 @@ namespace sgl {
 				draw_interface_ = draw_interface;
 			}
 
-			void SetUniqueDevice(const std::shared_ptr<Device>& device) override
+			void SetInputInterface(
+				const std::shared_ptr<InputInterface>& input_interface) 
+				override
+			{
+				input_interface_ = input_interface;
+			}
+
+			void SetUniqueDevice(
+				const std::shared_ptr<Device>& device) override
 			{
 				device_ = device;
 			}
@@ -138,8 +150,13 @@ namespace sgl {
 				return sdl_window_;
 			}
 
+			void SetWindowTitle(const std::string& title) const override
+			{
+				SDL_SetWindowTitle(sdl_window_, title.c_str());
+			}
+
 		protected:
-			bool RunEvent(const SDL_Event& event)
+			bool RunEvent(const SDL_Event& event, const double dt)
 			{
 				if (event.type == SDL_QUIT)
 				{
@@ -153,7 +170,52 @@ namespace sgl {
 						return false;
 					}
 				}
+				if (input_interface_)
+				{
+					if (event.type == SDL_KEYDOWN)
+					{
+						return input_interface_->KeyPressed(
+							event.key.keysym.sym, 
+							dt);
+					}
+					if (event.type == SDL_KEYUP)
+					{
+						return input_interface_->KeyReleased(
+							event.key.keysym.sym, 
+							dt);
+					}
+					if (event.type == SDL_MOUSEMOTION)
+					{
+						return input_interface_->MouseMoved(
+							glm::vec2(event.motion.x, event.motion.y),
+							glm::vec2(event.motion.xrel, event.motion.yrel),
+							dt);
+					}
+					if (event.type == SDL_MOUSEBUTTONDOWN)
+					{
+						return input_interface_->MousePressed(
+							SDLButtonToChar(event.button.button), 
+							dt);
+					}
+					if (event.type == SDL_MOUSEBUTTONUP)
+					{
+						return input_interface_->MouseReleased(
+							SDLButtonToChar(event.button.button), 
+							dt);
+					}
+				}
 				return true;
+			}
+
+			const char SDLButtonToChar(const Uint8 button) const 
+			{
+				char ret = 0;
+				if (button & SDL_BUTTON_LEFT) ret += 1;
+				if (button & SDL_BUTTON_RIGHT) ret += 2;
+				if (button & SDL_BUTTON_MIDDLE) ret += 4;
+				if (button & SDL_BUTTON_X1) ret += 8;
+				if (button & SDL_BUTTON_X2) ret += 16;
+				return ret;
 			}
 
 			void ErrorMessageDisplay(const std::string& message)
@@ -165,10 +227,19 @@ namespace sgl {
 #endif
 			}
 
+			const double GetFPS(const double dt) const
+			{
+				static double previous_dt = 0.0;
+				double ret = dt - previous_dt;
+				previous_dt = dt;
+				return 1.0 / ret;
+			}
+
 		private:
 			const std::pair<std::uint32_t, std::uint32_t> size_;
 			std::shared_ptr<sgl::Device> device_ = nullptr;
 			std::shared_ptr<DrawInterface> draw_interface_ = nullptr;
+			std::shared_ptr<InputInterface> input_interface_ = nullptr;
 			SDL_Window* sdl_window_ = nullptr;
 #if defined(_WIN32) || defined(_WIN64)
 			HWND hwnd_ = nullptr;
