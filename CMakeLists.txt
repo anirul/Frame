@@ -14,6 +14,38 @@ find_package(GTest CONFIG REQUIRED)
 
 add_library(ShaderGLLib
   STATIC
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/Blur.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/Blur.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/Brightness.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/Brightness.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/CubeMapDeferred.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/CubeMapDeferred.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/Display.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/Display.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/EquirectangularCubeMap.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/EquirectangularCubeMap.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/GaussianBlur.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/GaussianBlur.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/HighDynamicRange.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/HighDynamicRange.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/IntegrateBRDF.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/IntegrateBRDF.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/IrradianceCubeMap.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/IrradianceCubeMap.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/Lighting.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/Lighting.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/MonteCarloPrefilter.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/MonteCarloPrefilter.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/PhysicallyBasedRendering.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/PhysicallyBasedRendering.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/ScreenSpaceAmbientOcclusion.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/ScreenSpaceAmbientOcclusion.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/VectorAddition.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/VectorAddition.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/VectorMultiply.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/VectorMultiply.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/ViewPositionNormal.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/ViewPositionNormal.vert
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Buffer.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Buffer.h
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Camera.cpp
@@ -28,6 +60,8 @@ add_library(ShaderGLLib
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Image.h
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Light.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Light.h
+    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Material.cpp
+    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Material.h
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Mesh.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Mesh.h
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Pixel.cpp
@@ -178,30 +212,6 @@ target_link_libraries(Simple
 
 add_executable(PhysicallyBasedRendering
   WIN32
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/Brightness.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/Brightness.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/Combine.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/Combine.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/CubeMapDeferred.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/CubeMapDeferred.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/Display.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/Display.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/EquirectangularCubeMap.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/EquirectangularCubeMap.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/GaussianBlur.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/GaussianBlur.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/HighDynamicRange.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/HighDynamicRange.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/IntegrateBRDF.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/IntegrateBRDF.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/IrradianceCubeMap.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/IrradianceCubeMap.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/Lighting.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/Lighting.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/MonteCarloPrefilter.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/MonteCarloPrefilter.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/PhysicallyBasedRendering.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/PhysicallyBasedRendering.vert
     ${PROJECT_SOURCE_DIR}/Sample/PhysicallyBasedRendering/Application.cpp
     ${PROJECT_SOURCE_DIR}/Sample/PhysicallyBasedRendering/Application.h
     ${PROJECT_SOURCE_DIR}/Sample/PhysicallyBasedRendering/Draw.cpp
@@ -216,6 +226,29 @@ target_include_directories(PhysicallyBasedRendering
 )
 
 target_link_libraries(PhysicallyBasedRendering
+  PUBLIC
+    ShaderGLLib
+  PRIVATE
+    SDL2::SDL2
+    GLEW::GLEW
+    glm
+)
+
+add_executable(SceneRendering
+  WIN32
+    ${PROJECT_SOURCE_DIR}/Sample/SceneRendering/Application.cpp
+    ${PROJECT_SOURCE_DIR}/Sample/SceneRendering/Application.h
+    ${PROJECT_SOURCE_DIR}/Sample/SceneRendering/Draw.cpp
+    ${PROJECT_SOURCE_DIR}/Sample/SceneRendering/Draw.h
+    ${PROJECT_SOURCE_DIR}/Sample/SceneRendering/main.cpp
+)
+
+target_include_directories(SceneRendering
+  PUBLIC
+    ${PROJECT_SOURCE_DIR}/ShaderGLLib
+)
+
+target_link_libraries(SceneRendering
   PUBLIC
     ShaderGLLib
   PRIVATE

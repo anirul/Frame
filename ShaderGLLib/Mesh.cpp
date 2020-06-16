@@ -6,10 +6,14 @@
 
 namespace sgl {
 
-	Mesh::Mesh(const std::string& file, const std::shared_ptr<Program>& program)
+	Mesh::Mesh(
+		std::istream& is,
+		const std::string& name,
+		const std::shared_ptr<Program>& program)
 	{
 		SetProgram(program);
-		auto obj_file = LoadFromObj(file);
+		auto obj_file = LoadFromObj(is, name);
+		material_name_ = obj_file.material;
 		std::vector<float> points = {};
 		std::vector<float> normals = {};
 		std::vector<float> texcoords = {};
@@ -17,15 +21,18 @@ namespace sgl {
 		std::vector<std::array<float, 8>> vertices;
 		for (size_t i = 0; i < obj_file.indices.size(); ++i)
 		{
+			const size_t min_position = obj_file.min_position;
+			const size_t min_normal = obj_file.min_normal;
+			const size_t min_texture = obj_file.min_texture;
 			std::array<float, 8> v{};
-			v[0] = obj_file.positions[obj_file.indices[i][0]].x;
-			v[1] = obj_file.positions[obj_file.indices[i][0]].y;
-			v[2] = obj_file.positions[obj_file.indices[i][0]].z;
-			v[3] = obj_file.normals[obj_file.indices[i][2]].x;
-			v[4] = obj_file.normals[obj_file.indices[i][2]].y;
-			v[5] = obj_file.normals[obj_file.indices[i][2]].z;
-			v[6] = obj_file.textures[obj_file.indices[i][1]].x;
-			v[7] = obj_file.textures[obj_file.indices[i][1]].y;
+			v[0] = obj_file.positions[obj_file.indices[i][0] - min_position].x;
+			v[1] = obj_file.positions[obj_file.indices[i][0] - min_position].y;
+			v[2] = obj_file.positions[obj_file.indices[i][0] - min_position].z;
+			v[3] = obj_file.normals[obj_file.indices[i][2] - min_normal].x;
+			v[4] = obj_file.normals[obj_file.indices[i][2] - min_normal].y;
+			v[5] = obj_file.normals[obj_file.indices[i][2] - min_normal].z;
+			v[6] = obj_file.textures[obj_file.indices[i][1] - min_texture].x;
+			v[7] = obj_file.textures[obj_file.indices[i][1] - min_texture].y;
 			vertices.emplace_back(v);
 			indices.push_back(static_cast<unsigned int>(i));
 		}
@@ -80,7 +87,6 @@ namespace sgl {
 		}
 		program_ = program;
 	}
-
 
 	void Mesh::CreateMeshFromFlat(
 		const std::vector<float>& points,
@@ -186,32 +192,51 @@ namespace sgl {
 		}
 	}
 
-	sgl::Mesh::ObjFile Mesh::LoadFromObj(const std::string& file)
+	Mesh::ObjFile Mesh::LoadFromObj(
+		std::istream& is, 
+		const std::string& name)
 	{
-		sgl::Mesh::ObjFile obj_file{};
-		std::ifstream ifs;
-		ifs.open(file, std::ifstream::in);
-		if (!ifs.is_open())
-		{
-			throw std::runtime_error("Couldn't open file: " + file);
-		}
-		while (!ifs.eof()) 
+		Mesh::ObjFile obj_file{};
+		while (!is.eof()) 
 		{
 			std::string line = "";
-			if (!std::getline(ifs, line)) break;
+			if (!std::getline(is, line)) break;
 			if (line.empty()) continue;
 			std::istringstream iss(line);
 			std::string dump;
 			if (!(iss >> dump))
 			{
 				throw std::runtime_error(
-					"Error parsing file: " + file + " no token found.");
+					"Error parsing file: " + name + " no token found.");
 			}
 			if (dump.size() > 2)
 			{
-				if (dump == "mtllib") continue;
+				if (dump == "usemtl")
+				{
+					std::string material = "";
+					iss >> material;
+					if (material.empty())
+					{
+						throw std::runtime_error(
+							"Error parsing file: " + 
+							name + 
+							" cannot get material name.");
+					}
+					if (!obj_file.material.empty())
+					{
+						throw std::runtime_error(
+							"Error parsing file: " +
+							name +
+							" material was already defined as: " +
+							obj_file.material +
+							" is redefined as : " +
+							material);
+					}
+					obj_file.material = material;
+					continue;
+				}
 				throw std::runtime_error(
-					"Error parsing file: " + file + " token is too long.");
+					"Error parsing file: " + name + " token is too long.");
 			}
 			switch (dump[0]) {
 			case 'v':
@@ -223,57 +248,22 @@ namespace sgl {
 					case 'n':
 					{
 						assert(dump == "vn");
-						glm::vec3 v(0, 0, 0);
-						if (!(iss >> v.x))
-						{
-							throw std::runtime_error(
-								"Error parsing file : " + 
-								file + 
-								" no x found in vn.");
-						}
-						if (!(iss >> v.y))
-						{
-							throw std::runtime_error(
-								"Error parsing file : " +
-								file +
-								" no y found in vn.");
-						}
-						if (!(iss >> v.z))
-						{
-							throw std::runtime_error(
-								"Error parsing file : " +
-								file +
-								" no z found in vn.");
-						}
-						obj_file.normals.push_back(v);
+						obj_file.normals.push_back(
+							GetVec3From3Float(iss, name, dump));
 						break;
 					}
 					case 't':
 					{
 						assert(dump == "vt");
-						glm::vec2 v(0, 0);
-						if (!(iss >> v.x))
-						{
-							throw std::runtime_error(
-								"Error parsing file : " +
-								file +
-								" no x found in vt.");
-						}
-						if (!(iss >> v.y))
-						{
-							throw std::runtime_error(
-								"Error parsing file : " +
-								file +
-								" no y found in vt.");
-						}
-						obj_file.textures.push_back(v);
+						obj_file.textures.push_back(
+							Getvec2From2Float(iss, name, dump));
 						break;
 					}
 					default:
 					{
 						throw std::runtime_error(
 							"Error parsing file : " + 
-							file +
+							name +
 							" unknown command : " +
 							dump);
 					}
@@ -281,29 +271,8 @@ namespace sgl {
 				}
 				else
 				{
-					glm::vec3 v(0, 0, 0);
-					if (!(iss >> v.x))
-					{
-						throw std::runtime_error(
-							"Error parsing file : " +
-							file +
-							" no x found in v.");
-					}
-					if (!(iss >> v.y))
-					{
-						throw std::runtime_error(
-							"Error parsing file : " +
-							file +
-							" no y found in v.");
-					}
-					if (!(iss >> v.z))
-					{
-						throw std::runtime_error(
-							"Error parsing file : " +
-							file +
-							" no z found in v.");
-					}
-					obj_file.positions.push_back(v);
+					obj_file.positions.push_back(
+						GetVec3From3Float(iss, name, dump));
 				}
 			}
 			break;
@@ -313,7 +282,7 @@ namespace sgl {
 				{
 					throw std::runtime_error(
 						"Error parsing file : " +
-						file +
+						name +
 						" unknown command : " +
 						dump);
 				}
@@ -324,22 +293,44 @@ namespace sgl {
 					{
 						throw std::runtime_error(
 							"Error parsing file : " +
-							file +
+							name +
 							" missing inner part of a description.");
 					}
 					std::array<int, 3> vi;
 					std::istringstream viss(inner);
-					for (int& i : vi)
+					auto lambda_set_minimum = [&obj_file](int index, int value)
+					{
+						switch (index)
+						{
+							case 0:
+								obj_file.min_position = 
+									std::min(value, obj_file.min_position);
+								return;
+							case 1:
+								obj_file.min_texture =
+									std::min(value, obj_file.min_texture);
+								return;
+							case 2:
+								obj_file.min_normal = 
+									std::min(value, obj_file.min_normal);
+								return;
+						}
+						throw std::runtime_error(
+							"Invalid index should be (0 - 2) is: " + index);
+					};
+					for (int i = 0; i < 3; ++i)
 					{
 						std::string inner_val;
 						std::getline(viss, inner_val, '/');
 						if (!inner_val.empty())
 						{
-							i = atoi(inner_val.c_str()) - 1;
+							int val = atoi(inner_val.c_str()) - 1;
+							lambda_set_minimum(i, val);
+							vi[i] = val;
 						}
 						else
 						{
-							i = -1;
+							vi[i] = -1;
 						}
 					}
 					obj_file.indices.push_back(vi);
@@ -354,10 +345,68 @@ namespace sgl {
 		{
 			throw std::runtime_error(
 				"Error parsing file : " +
-				file +
+				name +
 				" indices are not triangles!");
 		}
 		return obj_file;
+	}
+
+	glm::vec3 Mesh::GetVec3From3Float(
+		std::istream& is, 
+		const std::string& stream_name, 
+		const std::string& element_name) const
+	{
+		glm::vec3 v3(0, 0, 0);
+		if (!(is >> v3.x))
+		{
+			throw std::runtime_error(
+				"Error parsing file : " +
+				stream_name +
+				" no x found in " +
+				element_name);
+		}
+		if (!(is >> v3.y))
+		{
+			throw std::runtime_error(
+				"Error parsing file : " +
+				stream_name +
+				" no y found in " +
+				element_name);
+		}
+		if (!(is >> v3.z))
+		{
+			throw std::runtime_error(
+				"Error parsing file : " +
+				stream_name +
+				" no z found in " +
+				element_name);
+		}
+		return v3;
+	}
+
+	glm::vec2 Mesh::Getvec2From2Float(
+		std::istream& is, 
+		const std::string& stream_name, 
+		const std::string& element_name) const
+	{
+		glm::vec2 v2(0, 0);
+		if (!(is >> v2.x))
+		{
+			throw std::runtime_error(
+				"Error parsing file : " +
+				stream_name +
+				" no x found in " +
+				element_name);
+		}
+		if (!(is >> v2.y))
+		{
+			throw std::runtime_error(
+				"Error parsing file : " +
+				stream_name +
+				" no y found in " +
+				element_name);
+		}
+		return v2;
 	}
 
 	std::shared_ptr<sgl::Mesh> CreateQuadMesh(
@@ -400,7 +449,19 @@ namespace sgl {
 	std::shared_ptr<sgl::Mesh> CreateCubeMesh(
 		const std::shared_ptr<Program>& program)
 	{
-		return std::make_shared<Mesh>("../Asset/Model/Cube.obj", program);
+		return CreateMeshFromObjFile("../Asset/Model/Cube.obj", program);
+	}
+
+	std::shared_ptr<sgl::Mesh> CreateMeshFromObjFile(
+		const std::string& file_path, 
+		const std::shared_ptr<Program>& program)
+	{
+		auto ifs = std::ifstream(file_path);
+		if (!ifs.is_open())
+		{
+			throw std::runtime_error("could not open file: " + file_path);
+		}
+		return std::make_shared<sgl::Mesh>(ifs, file_path, program);
 	}
 
 } // End namespace sgl.

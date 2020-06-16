@@ -15,6 +15,19 @@
 
 namespace sgl {
 
+	enum class TextureFilter 
+	{
+		NEAREST = GL_NEAREST,
+		LINEAR = GL_LINEAR,
+		NEAREST_MIPMAP_NEAREST = GL_NEAREST_MIPMAP_NEAREST,
+		LINEAR_MIPMAP_NEAREST = GL_LINEAR_MIPMAP_NEAREST,
+		NEAREST_MIPMAP_LINEAR = GL_NEAREST_MIPMAP_LINEAR,
+		LINEAR_MIPMAP_LINEAR = GL_LINEAR_MIPMAP_LINEAR,
+		CLAMP_TO_EDGE = GL_CLAMP_TO_EDGE,
+		MIRROR_REPEAT = GL_MIRRORED_REPEAT,
+		REPEAT = GL_REPEAT
+	};
+
 	class Texture 
 	{
 	public:
@@ -28,12 +41,25 @@ namespace sgl {
 			const std::string& file,
 			const PixelElementSize pixel_element_size = PixelElementSize::BYTE,
 			const PixelStructure pixel_structure = PixelStructure::RGB);
+		Texture(
+			const std::pair<std::uint32_t, std::uint32_t> size,
+			const void* data,
+			const PixelElementSize pixel_element_size = PixelElementSize::BYTE,
+			const PixelStructure pixel_structure = PixelStructure::RGB);
 		virtual ~Texture();
 
 	public:
 		virtual void Bind(const unsigned int slot = 0) const;
 		virtual void UnBind() const;
 		virtual void BindEnableMipmap() const;
+		virtual void SetMinFilter(TextureFilter texture_filter);
+		virtual TextureFilter GetMinFilter() const;
+		virtual void SetMagFilter(TextureFilter texture_filter);
+		virtual TextureFilter GetMagFilter() const;
+		virtual void SetWrapS(TextureFilter texture_filter);
+		virtual TextureFilter GetWrapS() const;
+		virtual void SetWrapT(TextureFilter texture_filter);
+		virtual TextureFilter GetWrapT() const;
 
 	public:
 		const int GetId() const { return texture_id_; }
@@ -69,7 +95,7 @@ namespace sgl {
 	class TextureCubeMap : public Texture
 	{
 	public:
-		// Create an empty cubemap of the size size.
+		// Create an empty cube map of the size size.
 		TextureCubeMap(
 			const std::pair<std::uint32_t, std::uint32_t> size,
 			const PixelElementSize pixel_element_size = PixelElementSize::BYTE,
@@ -94,6 +120,16 @@ namespace sgl {
 		void Bind(const unsigned int slot = 0) const override;
 		void UnBind() const override;
 		void BindEnableMipmap() const override;
+		void SetMinFilter(TextureFilter texture_filter) override;
+		TextureFilter GetMinFilter() const override;
+		void SetMagFilter(TextureFilter texture_filter) override;
+		TextureFilter GetMagFilter() const override;
+		void SetWrapS(TextureFilter texture_filter) override;
+		TextureFilter GetWrapS() const override;
+		void SetWrapT(TextureFilter texture_filter) override;
+		TextureFilter GetWrapT() const override;
+		void SetWrapR(TextureFilter texture_filter);
+		TextureFilter GetWrapR() const;
 
 	protected:
 		// Create a cube map and assign it to the texture_id_.
@@ -115,9 +151,11 @@ namespace sgl {
 			const std::shared_ptr<sgl::Texture>& texture);
 		const std::shared_ptr<sgl::Texture>& GetTexture(
 			const std::string& name) const;
+		bool HasTexture(const std::string& name) const;
 		bool RemoveTexture(const std::string& name);
 		// Return the binding slot of the texture (to be passed to the program).
 		const int EnableTexture(const std::string& name) const;
+		const std::vector<std::string> GetTexturesNames() const;
 		void DisableTexture(const std::string& name) const;
 		void DisableAll() const;
 
@@ -125,6 +163,27 @@ namespace sgl {
 		std::map<std::string, std::shared_ptr<Texture>> name_texture_map_;
 		mutable std::array<std::string, 32> name_array_;
 	};
+
+	// Get the brightness from a texture (usually before HDR).
+	std::shared_ptr<Texture> TextureBrightness(
+		const std::shared_ptr<Texture>& texture);
+
+	// Add blur to a texture.
+	std::shared_ptr<Texture> TextureBlur(
+		const std::shared_ptr<Texture>& in_texture,
+		const float exponent = 1.0f);
+
+	// Get the Gaussian blur of a texture.
+	std::shared_ptr<Texture> TextureGaussianBlur(
+		const std::shared_ptr<Texture>& texture);
+
+	// Vector addition a number of texture (maximum 16) into one.
+	std::shared_ptr<Texture> TextureAddition(
+		const std::vector<std::shared_ptr<Texture>>& add_textures);
+
+	// Vector multiply a number of texture (maximum 16) into one.
+	std::shared_ptr<Texture> TextureMultiply(
+		const std::vector<std::shared_ptr<Texture>>& multiply_textures);
 
 	// Fill multiple textures from a program.
 	//		- out_textures			: output textures (should be allocated).

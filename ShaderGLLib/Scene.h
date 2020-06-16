@@ -5,6 +5,7 @@
 #include <vector>
 #include <functional>
 #include "../ShaderGLLib/Mesh.h"
+#include "../ShaderGLLib/Material.h"
 
 namespace sgl {
 
@@ -82,5 +83,10 @@ namespace sgl {
 			const std::shared_ptr<Scene>& parent = nullptr);
 		const std::shared_ptr<Scene> GetRoot() const;
 	};
+
+	SceneTree LoadSceneFromObjStream(
+		std::istream& is, 
+		const std::shared_ptr<Program>& program,
+		const std::string& name);
 
 } // End namespace sgl.

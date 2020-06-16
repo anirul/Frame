@@ -59,7 +59,7 @@ void Draw::RunDraw(const double dt)
 	rot_y = glm::rotate(rot_y, dtf * -.1f, glm::vec3(0.f, 1.f, 0.f));
 	sgl::Camera cam(glm::vec3(position * rot_y), { 0.f, 0.f, 0.f });
 	device_->SetCamera(cam);
-	device_->DrawMultiTextures(out_textures_, dt);
+	device_->DrawMultiTextures(dt, out_textures_, nullptr);
 }
 
 void Draw::Delete() {}
@@ -74,7 +74,7 @@ std::shared_ptr<sgl::Mesh> Draw::CreateAppleMesh(
 	simple_program->UniformMatrix("model", device->GetModel());
 
 	// Mesh creation.
-	auto apple_mesh = std::make_shared<sgl::Mesh>(
+	auto apple_mesh = sgl::CreateMeshFromObjFile(
 		"../Asset/Model/Apple.obj",
 		simple_program);
 

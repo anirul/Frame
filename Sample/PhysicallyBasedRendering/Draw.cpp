@@ -55,7 +55,6 @@ void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 
 const std::shared_ptr<sgl::Texture>& Draw::GetDrawTexture() const
 {
-	// return lighting_textures_[0];
 	return final_texture_;
 }
 
@@ -75,7 +74,7 @@ void Draw::RunDraw(const double dt)
 	pbr_program_->UniformVector3(
 		"camera_position",
 		device_->GetCamera().GetPosition());
-	device_->DrawMultiTextures(deferred_textures_, dt);
+	device_->DrawMultiTextures(dt, deferred_textures_);
 
 	// Make the PBR deferred lighting step.
 	lighting_textures_[0] = deferred_textures_[0];
@@ -87,7 +86,6 @@ void Draw::RunDraw(const double dt)
 	light_manager_->RegisterToProgram(lighting_program_);
 	// Make the lighting step.
 	lighting_textures_[1] = ComputeLighting(deferred_textures_);
-
 	// Merge and add bloom.
 	final_texture_ = AddBloom(Combine(lighting_textures_));
 }
@@ -299,7 +297,7 @@ std::shared_ptr<sgl::Texture> Draw::Combine(
 	frame.DrawBuffers(1);
 
 	sgl::TextureManager texture_manager;
-	auto program = sgl::CreateProgram("Combine");
+	auto program = sgl::CreateProgram("VectorAddition");
 	auto quad = sgl::CreateQuadMesh(program);
 	int i = 0;
 	std::vector<std::string> vec = {};
@@ -448,7 +446,7 @@ std::shared_ptr<sgl::Mesh> Draw::CreatePhysicallyBasedRenderedMesh(
 	pbr_program_->UniformMatrix("model", device->GetModel());
 
 	// Mesh creation.
-	auto mesh = std::make_shared<sgl::Mesh>(
+	auto mesh = sgl::CreateMeshFromObjFile(
 		"../Asset/Model/" + 
 		types::draw_model_shape_map.at(draw_model_) + 
 		".obj",
