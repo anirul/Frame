@@ -57,7 +57,16 @@ You can just use the ```make``` command.
 
 ## Use
 
-You have 5 program that can be used:
+You have 6 program that can be used:
+
+### SceneRendering
+
+This is a complete scene rendering. It loads ```obj``` from the ```Asset/```
+directory directly into the 3D software. This render the scene using
+Physically Based Rendering, the parameters are fetch from ```mtl``` files.
+It also add Screen Space Ambient Occlusion and Bloom effect before rendering.
+
+![SceneRendering](https://github.com/anirul/ShaderGL/raw/master/Sample/SceneRendering.png "A Scene rendering made with ShaderGL.")
 
 ### ShaderGLTest
 
