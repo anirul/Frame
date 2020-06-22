@@ -2,7 +2,7 @@
 
 bool Input::KeyPressed(const char key, const double dt)
 {
-	const float inc = 0.01f * static_cast<float>(dt);
+	const float inc = 5.f * static_cast<float>(dt);
 	auto camera = device_->GetCamera();
 	auto position = camera.GetPosition();
 	auto right = camera.GetRight();
@@ -39,7 +39,7 @@ bool Input::MouseMoved(
 	const glm::vec2 relative, 
 	const double dt)
 {
-	const float inc = 0.0005f * static_cast<float>(dt);
+	const float inc = 0.1f * static_cast<float>(dt);
 	auto camera = device_->GetCamera();
 	auto front = camera.GetFront();
 	auto right = camera.GetRight();

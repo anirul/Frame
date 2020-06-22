@@ -16,13 +16,13 @@ public:
 	void Delete() override;
 
 protected:
-	std::shared_ptr<sgl::Mesh> CreateAppleMesh(
-		const std::shared_ptr<sgl::Device>& device) const;
+	std::shared_ptr<sgl::Mesh> CreateAppleMesh() const;
 	std::shared_ptr<sgl::Mesh> CreateCubeMapMesh(
-		const std::shared_ptr<sgl::Device>& device,
 		const std::shared_ptr<sgl::TextureCubeMap>& texture) const;
 
 private:
 	std::vector<std::shared_ptr<sgl::Texture>> out_textures_ = {};
 	std::shared_ptr<sgl::Device> device_ = nullptr;
+	std::shared_ptr<sgl::Mesh> cube_map_mesh_ = nullptr;
+	std::shared_ptr<sgl::Mesh> apple_mesh_ = nullptr;
 };

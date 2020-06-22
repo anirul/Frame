@@ -76,17 +76,20 @@ namespace sgl {
 					// Compute the time difference from previous frame.
 					auto end = std::chrono::system_clock::now();
 					std::chrono::duration<double> time = end - start;
-					// Process events
+					const double dt = GetFrameDt(time.count());
+					
+					// Process events.
 					SDL_Event event;
 					while (SDL_PollEvent(&event))
 					{
-						if (!RunEvent(event, time.count()))
+						if (!RunEvent(event, dt))
 						{
 							loop = false;
 							continue;
 						}
 					}
 
+					// Draw the Scene.
 					if (draw_interface_)
 					{
 						draw_interface_->RunDraw(time.count());
@@ -99,9 +102,10 @@ namespace sgl {
 
 					SetWindowTitle(
 						"SDL OpenGL - " + 
-						std::to_string(GetFPS(time.count())));
+						std::to_string(static_cast<int>(GetFPS(dt))));
 
 					previous_count = time.count();
+
 					// TODO(anirul): Fix me to check which device this is.
 					if (device_)
 					{
@@ -227,12 +231,18 @@ namespace sgl {
 #endif
 			}
 
+			// Can only be called ONCE per frame!
+			const double GetFrameDt(const double t) const
+			{
+				static double previous_t = 0.0;
+				double ret = t - previous_t;
+				previous_t = t;
+				return ret;
+			}
+
 			const double GetFPS(const double dt) const
 			{
-				static double previous_dt = 0.0;
-				double ret = dt - previous_dt;
-				previous_dt = dt;
-				return 1.0 / ret;
+				return 1.0 / dt;
 			}
 
 		private:
@@ -246,7 +256,7 @@ namespace sgl {
 #endif
 		};
 
-		void* InitOpenGLDevice(
+		void* InitSDLOpenGLDevice(
 			const std::shared_ptr<WindowInterface>& window)
 		{
 			std::pair<int, int> gl_version;
@@ -292,7 +302,7 @@ namespace sgl {
 		std::pair<std::uint32_t, std::uint32_t> size)
 	{
 		auto window = std::make_shared<SDLWindow>(size);
-		auto context = InitOpenGLDevice(window);
+		auto context = InitSDLOpenGLDevice(window);
 		if (!context) return nullptr;
 		window->SetUniqueDevice(std::make_shared<Device>(context, size));
 		return window;
