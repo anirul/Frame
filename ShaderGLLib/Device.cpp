@@ -397,8 +397,10 @@ namespace sgl {
 
 			auto material_name = mesh->GetMaterialName();
 			if (materials_.find(material_name) != materials_.end())
-			{ 
-				mesh->SetMaterial(materials_[material_name]);
+			{
+				std::shared_ptr<Material> mat = std::make_shared<Material>(
+					*materials_[material_name] + *material_);
+				mesh->SetMaterial(mat);
 			}
 
 			std::shared_ptr<Program> temp_program = nullptr;
