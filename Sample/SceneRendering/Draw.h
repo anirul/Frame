@@ -20,6 +20,5 @@ protected:
 
 private:
 	std::shared_ptr<sgl::Device> device_ = nullptr;
-	std::shared_ptr<sgl::Texture> final_texture_ = nullptr;
-	std::shared_ptr<sgl::Texture> ssao_texture_ = nullptr;
+	std::vector<std::shared_ptr<sgl::Texture>> textures_ = {};
 };

@@ -54,12 +54,13 @@ const std::shared_ptr<sgl::Texture>& Draw::GetDrawTexture() const
 void Draw::RunDraw(const double dt)
 {
 	float dtf = static_cast<float>(dt);
-	glm::vec4 position = { 0.f, 0.f, 2.f, 1.f };
+	glm::vec4 position = { 0.f, 0.f, 2.f, 0.f };
+	glm::vec4 front = { 0.f, 0.f, -1.f, 0.f };
 	glm::mat4 rot_y(1.0f);
 	rot_y = glm::rotate(rot_y, dtf * -.1f, glm::vec3(0.f, 1.f, 0.f));
-	sgl::Camera cam(glm::vec3(position * rot_y), { 0.f, 0.f, 0.f });
+	sgl::Camera cam(glm::vec3(position * rot_y), glm::vec3(front * rot_y));
 	device_->SetCamera(cam);
-	device_->DrawMultiTextures(dt, out_textures_);
+	device_->DrawMultiTextures(out_textures_, nullptr, dt);
 }
 
 void Draw::Delete() {}
@@ -78,13 +79,12 @@ std::shared_ptr<sgl::Mesh> Draw::CreateAppleMesh() const
 		simple_program);
 
 	// Create the texture and bind it to the mesh.
-	auto texture_manager = device_->GetTextureManager();
-	texture_manager.AddTexture(
+	auto material = std::make_shared<sgl::Material>();
+	material->AddTexture(
 		"Color",
 		std::make_shared<sgl::Texture>("../Asset/Apple/Color.jpg"));
-	apple_mesh->SetTextures({ "Color" });
-	device_->SetTextureManager(texture_manager);
-
+	apple_mesh->SetMaterial(material);
+	
 	return apple_mesh;
 }
 
@@ -99,10 +99,9 @@ std::shared_ptr<sgl::Mesh> Draw::CreateCubeMapMesh(
 	auto cube_mesh = sgl::CreateCubeMesh(cubemap_program);
 
 	// Get the texture manager.
-	auto texture_manager = device_->GetTextureManager();
-	texture_manager.AddTexture("Skybox", texture);
-	cube_mesh->SetTextures({ "Skybox" });
-	device_->SetTextureManager(texture_manager);
+	auto material = std::make_shared<sgl::Material>();
+	material->AddTexture("Skybox", texture);
+	cube_mesh->SetMaterial(material);
 
 	// Enable the cleaning of the depth.
 	cube_mesh->ClearDepthBuffer(true);

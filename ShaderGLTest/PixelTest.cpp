@@ -12,7 +12,7 @@ namespace test {
 			GL_UNSIGNED_SHORT,
 			sgl::ConvertToGLType(sgl::PixelElementSize::SHORT));
 		EXPECT_EQ(
-			GL_HALF_FLOAT,
+			GL_FLOAT,
 			sgl::ConvertToGLType(sgl::PixelElementSize::HALF));
 		EXPECT_EQ(
 			GL_FLOAT,

@@ -35,35 +35,36 @@ namespace sgl {
 		void Draw(const double dt);
 		// Draw to the deferred texture set.
 		void DrawDeferred(
-			const double dt,
-			const std::vector<std::shared_ptr<Texture>>& 
-				deferred_textures = {});
+			const std::vector<std::shared_ptr<Texture>>& out_textures,
+			const double dt);
 		void DrawView(
-			const double dt,
-			const std::vector<std::shared_ptr<Texture>>& view_textures = {});
+			const std::vector<std::shared_ptr<Texture>>& out_textures,
+			const double dt);
 		// Draw the lighting texture from either the inside deferred textures or
 		// from the provided deferred textures.
-		std::shared_ptr<Texture> DrawLighting(
+		void DrawLighting(
+			std::shared_ptr<Texture>& out_texture,
 			const std::vector<std::shared_ptr<Texture>>& in_textures = {});
 		// Create a screen space ambient occlusion from either the texture
 		// passed or the one from the physically based rendering path.
-		std::shared_ptr<Texture> DrawScreenSpaceAmbientOcclusion(
+		void DrawScreenSpaceAmbientOcclusion(
+			std::shared_ptr<Texture>& out_texture,
 			const std::vector<std::shared_ptr<Texture>>& in_textures = {});
 		// Add Bloom to the provided texture.
-		std::shared_ptr<Texture> DrawBloom(
+		void DrawBloom(
+			std::shared_ptr<Texture>& out_texture,
 			const std::shared_ptr<Texture>& texture);
 		// Add HDR to a texture (with associated gamma and exposure).
-		std::shared_ptr<Texture> DrawHighDynamicRange(
+		void DrawHighDynamicRange(
+			std::shared_ptr<Texture>& out_texture,
 			const std::shared_ptr<Texture>& texture,
 			const float exposure = 1.0f,
 			const float gamma = 2.2f);
-		// Draw to a texture.
-		std::shared_ptr<Texture> DrawTexture(const double dt);
 		// Draw to multiple textures.
 		void DrawMultiTextures(
-			const double dt,
 			const std::vector<std::shared_ptr<Texture>>& out_textures,
-			const std::shared_ptr<Program> program = nullptr);
+			const std::shared_ptr<Program> program = nullptr,
+			const double dt = 0.0);
 		void AddEnvironment(const std::string& environment_map);
 		// Display a texture to the display.
 		void Display(const std::shared_ptr<Texture>& texture);
@@ -83,11 +84,6 @@ namespace sgl {
 		{ 
 			scene_tree_ = scene_tree;
 		}
-		TextureManager GetTextureManager() { return texture_manager_; }
-		void SetTextureManager(const TextureManager& texture_manager)
-		{
-			texture_manager_ = texture_manager;
-		}
 		LightManager GetLightManager() const { return light_manager_; }
 		void SetLightManager(const LightManager& light_manager)
 		{
@@ -97,6 +93,7 @@ namespace sgl {
 		const glm::mat4 GetView() const { return view_; }
 		const glm::mat4 GetModel() const { return model_; }
 		void* GetDeviceContext() const { return gl_context_; }
+		const std::string GetType() const { return "OpenGL"; }
 
 	protected:
 		void SetupCamera();
@@ -113,9 +110,9 @@ namespace sgl {
 		std::vector<std::shared_ptr<Texture>> lighting_textures_ = {};
 		std::vector<std::shared_ptr<Texture>> view_textures_ = {};
 		std::shared_ptr<Texture> final_texture_ = nullptr;
+		std::shared_ptr<Material> material_ = nullptr;
 		std::map<std::string, std::shared_ptr<Material>> materials_ = {};
 		SceneTree scene_tree_ = {};
-		TextureManager texture_manager_ = {};
 		LightManager light_manager_ = {};
 		// Camera storage.
 		Camera camera_ = Camera({ 0.1f, 5.f, -7.f }, { -0.1f, -1.f, 2.f });

@@ -142,77 +142,50 @@ namespace sgl {
 		void CreateTextureCubeMap();
 	};
 
-	// This texture manager is there to hold texture to the mesh in order to be
-	// rendered. So you can have a single texture manager for a large set of
-	// meshes.
-	class TextureManager 
-	{
-	public:
-		TextureManager() = default;
-		virtual ~TextureManager();
-
-	public:
-		bool AddTexture(
-			const std::string& name, 
-			const std::shared_ptr<sgl::Texture>& texture);
-		const std::shared_ptr<sgl::Texture>& GetTexture(
-			const std::string& name) const;
-		bool HasTexture(const std::string& name) const;
-		bool RemoveTexture(const std::string& name);
-		// Return the binding slot of the texture (to be passed to the program).
-		const int EnableTexture(const std::string& name) const;
-		const std::vector<std::string> GetTexturesNames() const;
-		void DisableTexture(const std::string& name) const;
-		void DisableAll() const;
-
-	private:
-		std::map<std::string, std::shared_ptr<Texture>> name_texture_map_;
-		mutable std::array<std::string, 32> name_array_;
-	};
-
 	// Get the brightness from a texture (usually before HDR).
-	std::shared_ptr<Texture> TextureBrightness(
-		const std::shared_ptr<Texture>& texture);
+	void TextureBrightness(
+		std::shared_ptr<Texture>& out_texture,
+		const std::shared_ptr<Texture>& in_texture);
 
 	// Add blur to a texture.
-	std::shared_ptr<Texture> TextureBlur(
+	void TextureBlur(
+		std::shared_ptr<Texture>& out_texture,
 		const std::shared_ptr<Texture>& in_texture,
 		const float exponent = 1.0f);
 
 	// Get the Gaussian blur of a texture.
-	std::shared_ptr<Texture> TextureGaussianBlur(
-		const std::shared_ptr<Texture>& texture);
+	void TextureGaussianBlur(
+		std::shared_ptr<Texture>& out_texture,
+		const std::shared_ptr<Texture>& in_texture);
 
 	// Vector addition a number of texture (maximum 16) into one.
-	std::shared_ptr<Texture> TextureAddition(
+	void TextureAddition(
+		std::shared_ptr<Texture>& out_texture,
 		const std::vector<std::shared_ptr<Texture>>& add_textures);
 
 	// Vector multiply a number of texture (maximum 16) into one.
-	std::shared_ptr<Texture> TextureMultiply(
+	void TextureMultiply(
+		std::shared_ptr<Texture>& out_texture,
 		const std::vector<std::shared_ptr<Texture>>& multiply_textures);
 
 	// Fill multiple textures from a program.
 	//		- out_textures			: output textures (should be allocated).
-	//		- texture_manager		: input texture.
-	//		- texture_selected		: set of selected texture to be used.
+	//		- in_textures			: input textures (with associated string).
 	//		- program				: program to be used.
 	void FillProgramMultiTexture(
 		std::vector<std::shared_ptr<Texture>>& out_textures,
-		const TextureManager& texture_manager,
-		const std::vector<std::string>& texture_selected,
+		const std::map<std::string, std::shared_ptr<Texture>>& in_textures,
 		const std::shared_ptr<Program>& program);
 
 	// Fill multiple textures from a program.
 	//		- out_textures			: output textures (should be allocated).
-	//		- texture_manager		: input texture.
-	//		- texture_selected		: set of selected texture to be used.
+	//		- in_textures			: input textures (with associated string).
 	//		- program				: program to be used.
 	//		- mipmap				: level of mipmap (0 == 1).
 	//		- func					: a lambda that will be call per mipmap.
 	void FillProgramMultiTextureMipmap(
 		std::vector<std::shared_ptr<Texture>>& out_textures,
-		const TextureManager& texture_manager,
-		const std::vector<std::string>& texture_selected,
+		const std::map<std::string, std::shared_ptr<Texture>>& in_textures,
 		const std::shared_ptr<Program>& program,
 		const int mipmap,
 		const std::function<void(
@@ -222,26 +195,22 @@ namespace sgl {
 
 	// Fill multiple cube map texture from a program.
 	//		- out_textures			: output textures (should be allocated).
-	//		- texture_manager		: input texture.
-	//		- texture_selected		: set of selected texture to be used.
+	//		- in_textures			: input textures (with associated string).
 	//		- program				: program to be used.
 	void FillProgramMultiTextureCubeMap(
 		std::vector<std::shared_ptr<Texture>>& out_textures,
-		const TextureManager& texture_manager,
-		const std::vector<std::string>& texture_selected,
+		const std::map<std::string, std::shared_ptr<Texture>>& in_textures,
 		const std::shared_ptr<Program>& program);
 
 	// Fill multiple cube map texture from a program.
 	//		- out_textures			: output textures (should be allocated).
-	//		- texture_manager		: input texture.
-	//		- texture_selected		: set of selected texture to be used.
+	//		- in_textures			: input textures (with associated string).
 	//		- program				: program to be used.
 	//		- mipmap				: level of mipmap (0 == 1).
 	//		- func					: a lambda that will be call per mipmap.
 	void FillProgramMultiTextureCubeMapMipmap(
 		std::vector<std::shared_ptr<Texture>>& out_textures,
-		const TextureManager& texture_manager,
-		const std::vector<std::string>& texture_selected,
+		const std::map<std::string, std::shared_ptr<Texture>>& in_textures,
 		const std::shared_ptr<Program>& program,
 		const int mipmap,
 		const std::function<void(

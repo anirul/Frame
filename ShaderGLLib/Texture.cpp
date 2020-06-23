@@ -246,112 +246,6 @@ namespace sgl {
 		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
-	TextureManager::~TextureManager()
-	{
-		DisableAll();
-	}
-
-	bool TextureManager::AddTexture(
-		const std::string& name, 
-		const std::shared_ptr<sgl::Texture>& texture)
-	{
-		RemoveTexture(name);
-		auto ret = name_texture_map_.insert({ name, texture });
-		return ret.second;
-	}
-
-	const std::shared_ptr<sgl::Texture>& TextureManager::GetTexture(
-		const std::string& name) const
-	{
-		auto it = name_texture_map_.find(name);
-		if (it == name_texture_map_.end())
-		{
-			throw std::runtime_error("No such texture: " + name);
-		}
-		return it->second;
-	}
-
-	bool TextureManager::HasTexture(const std::string& name) const
-	{
-		return name_texture_map_.find(name) != name_texture_map_.end();
-	}
-
-	bool TextureManager::RemoveTexture(const std::string& name)
-	{
-		auto it = name_texture_map_.find(name);
-		if (it == name_texture_map_.end())
-		{
-			return false;
-		}
-		name_texture_map_.erase(it);
-		return true;
-	}
-
-	const int TextureManager::EnableTexture(const std::string& name) const
-	{
-		auto it1 = name_texture_map_.find(name);
-		if (it1 == name_texture_map_.end())
-		{
-			throw std::runtime_error("try to enable a texture: " + name);
-		}
-		for (int i = 0; i < name_array_.size(); ++i)
-		{
-			if (name_array_[i].empty())
-			{
-				name_array_[i] = name;
-				it1->second->Bind(i);
-				return i;
-			}
-		}
-		throw std::runtime_error("No free slots!");
-	}
-
-	const std::vector<std::string> TextureManager::GetTexturesNames() const
-	{
-		std::vector<std::string> vec = {};
-		for (const auto& p : name_texture_map_)
-		{
-			vec.push_back(p.first);
-		}
-		return vec;
-	}
-
-	void TextureManager::DisableTexture(const std::string& name) const
-	{
-		auto it1 = name_texture_map_.find(name);
-		if (it1 == name_texture_map_.end())
-		{
-			throw std::runtime_error("no texture named: " + name);
-		}
-		auto it2 = std::find_if(
-			name_array_.begin(),
-			name_array_.end(),
-			[name](const std::string& value)
-		{
-			return value == name;
-		});
-		if (it2 != name_array_.end())
-		{
-			*it2 = "";
-			it1->second->UnBind();
-		}
-		else
-		{
-			throw std::runtime_error("No slot bind to: " + name);
-		}
-	}
-
-	void TextureManager::DisableAll() const
-	{
-		for (int i = 0; i < 32; ++i)
-		{
-			if (!name_array_[i].empty())
-			{
-				DisableTexture(name_array_[i]);
-			}
-		}
-	}
-
 	TextureCubeMap::TextureCubeMap(
 		const std::array<std::string, 6>& cube_file,
 		const PixelElementSize pixel_element_size /*= PixelElementSize::BYTE*/,
@@ -387,7 +281,7 @@ namespace sgl {
 		const PixelStructure pixel_structure /*= PixelStructure::RGB*/) :
 		Texture(pixel_element_size, pixel_structure)
 	{
-		TextureManager texture_manager{};
+		auto material = std::make_shared<Material>();
 		Frame frame{};
 		Render render{};
 		size_ = size;
@@ -395,9 +289,7 @@ namespace sgl {
 			file_name,
 			pixel_element_size_,
 			pixel_structure_);
-		texture_manager.AddTexture(
-			"Equirectangular", 
-			equirectangular);
+		material->AddTexture("Equirectangular", equirectangular);
 		frame.BindAttach(render);
 		render.BindStorage(size_);
 		CreateTextureCubeMap();
@@ -420,7 +312,7 @@ namespace sgl {
 		auto program = CreateProgram("EquirectangularCubeMap");
 		program->UniformMatrix("projection", projection);
 		auto cube = CreateCubeMesh(program);
-		cube->SetTextures({ "Equirectangular" });
+		cube->SetMaterial(material);
 		glViewport(0, 0, size_.first, size_.second);
 		error_.Display(__FILE__, __LINE__ - 1);
 		int i = 0;
@@ -436,7 +328,7 @@ namespace sgl {
 			error_.Display(__FILE__, __LINE__ - 1);
 			// TODO(anirul): change this as the view is passed to the program
 			// and not the view passed as a projection.
-			cube->Draw(texture_manager, view);
+			cube->Draw(view);
 		}
 	}
 
@@ -626,20 +518,17 @@ namespace sgl {
 		error_.Display(__FILE__, __LINE__ - 4);
 	}
 
-	std::shared_ptr<sgl::Texture> TextureBrightness(
-		const std::shared_ptr<sgl::Texture>& texture)
+	void TextureBrightness(
+		std::shared_ptr<sgl::Texture>& out_texture,
+		const std::shared_ptr<sgl::Texture>& in_texture)
 	{
 		const sgl::Error& error = sgl::Error::GetInstance();
 		sgl::Frame frame{};
 		sgl::Render render{};
-		auto size = texture->GetSize();
+		auto size = in_texture->GetSize();
 		frame.BindAttach(render);
 		render.BindStorage(size);
-		auto pixel_element_size = texture->GetPixelElementSize();
-
-		auto texture_out = std::make_shared<sgl::Texture>(
-			std::pair{ size.first / 2, size.second / 2 },
-			pixel_element_size);
+		auto pixel_element_size = in_texture->GetPixelElementSize();
 
 		// Set the view port for rendering.
 		glViewport(0, 0, size.first / 2, size.second / 2);
@@ -649,39 +538,33 @@ namespace sgl {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		error.Display(__FILE__, __LINE__ - 1);
 
-		frame.BindTexture(*texture_out);
+		frame.BindTexture(*out_texture);
 
-		sgl::TextureManager texture_manager;
-		texture_manager.AddTexture("Display", texture);
+		auto material = std::make_shared<Material>();
+		material->AddTexture("Display", in_texture);
 		auto program = sgl::CreateProgram("Brightness");
 		auto quad = sgl::CreateQuadMesh(program);
-		quad->SetTextures({ "Display" });
-		quad->Draw(texture_manager);
-
-		return texture_out;
+		quad->SetMaterial(material);
+		quad->Draw();
 	}
 
-	std::shared_ptr<Texture> TextureBlur(
+	void TextureBlur(
+		std::shared_ptr<Texture>& out_texture,
 		const std::shared_ptr<Texture>& in_texture,
 		const float exponent /*= 1.0f*/)
 	{
-		static auto out_texture = std::make_shared<Texture>(
-			in_texture->GetSize(),
-			in_texture->GetPixelElementSize());
-		TextureManager texture_manager;
-		texture_manager.AddTexture("Image", in_texture);
 		static auto program = CreateProgram("Blur");
 		program->Use();
 		program->UniformFloat("exponent", exponent);
 		FillProgramMultiTexture(
 			std::vector<std::shared_ptr<Texture>>{ out_texture }, 
-			texture_manager, 
-			std::vector<std::string>{ "Image" }, 
+			std::map<std::string, std::shared_ptr<Texture>>{ 
+				{ "Image", in_texture }},
 			program);
-		return out_texture;
 	}
 
-	std::shared_ptr<Texture> TextureGaussianBlur(
+	void TextureGaussianBlur(
+		std::shared_ptr<Texture>& out_texture,
 		const std::shared_ptr<Texture>& in_texture)
 	{
 		const sgl::Error& error = sgl::Error::GetInstance();
@@ -722,22 +605,23 @@ namespace sgl {
 		for (int i = 0; i < 10; ++i)
 		{
 			// Reset the texture manager.
-			TextureManager texture_manager;
+			auto material = std::make_shared<Material>();
 			program->UniformInt("horizontal", horizontal);
 			frame[horizontal].Bind();
-			texture_manager.AddTexture(
+			material->AddTexture(
 				"Image",
 				(first_iteration) ? in_texture : texture_out[!horizontal]);
-			quad->SetTextures({ "Image" });
-			quad->Draw(texture_manager);
+			quad->SetMaterial(material);
+			quad->Draw();
 			horizontal = !horizontal;
 			if (first_iteration) first_iteration = false;
 		}
 
-		return texture_out[!horizontal];
+		out_texture = texture_out[!horizontal];
 	}
 
-	std::shared_ptr<sgl::Texture> TextureAddition(
+	void TextureAddition(
+		std::shared_ptr<sgl::Texture>& out_texture,
 		const std::vector<std::shared_ptr<sgl::Texture>>& add_textures)
 	{
 		assert(add_textures.size() <= 16);
@@ -748,10 +632,6 @@ namespace sgl {
 		frame.BindAttach(render);
 		render.BindStorage(size);
 
-		auto texture_out = std::make_shared<sgl::Texture>(
-			size,
-			add_textures[0]->GetPixelElementSize());
-
 		// Set the view port for rendering.
 		glViewport(0, 0, size.first, size.second);
 		error.Display(__FILE__, __LINE__ - 1);
@@ -760,17 +640,17 @@ namespace sgl {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		error.Display(__FILE__, __LINE__ - 1);
 
-		frame.BindTexture(*texture_out);
+		frame.BindTexture(*out_texture);
 		frame.DrawBuffers(1);
 
-		sgl::TextureManager texture_manager;
+		auto material = std::make_shared<Material>();
 		static auto program = sgl::CreateProgram("VectorAddition");
 		static auto quad = sgl::CreateQuadMesh(program);
 		int i = 0;
 		std::vector<std::string> vec = {};
 		for (const auto& texture : add_textures)
 		{
-			texture_manager.AddTexture("Texture" + std::to_string(i), texture);
+			material->AddTexture("Texture" + std::to_string(i), texture);
 			vec.push_back("Texture" + std::to_string(i));
 			i++;
 		}
@@ -778,13 +658,12 @@ namespace sgl {
 		program->UniformInt(
 			"texture_max", 
 			static_cast<int>(add_textures.size()));
-		quad->SetTextures(vec);
-		quad->Draw(texture_manager);
-
-		return texture_out;
+		quad->SetMaterial(material);
+		quad->Draw();
 	}
 
-	std::shared_ptr<Texture> TextureMultiply(
+	void TextureMultiply(
+		std::shared_ptr<Texture>& out_texture,
 		const std::vector<std::shared_ptr<Texture>>& multiply_textures)
 	{
 		assert(multiply_textures.size() <= 16);
@@ -795,10 +674,6 @@ namespace sgl {
 		frame.BindAttach(render);
 		render.BindStorage(size);
 
-		auto texture_out = std::make_shared<sgl::Texture>(
-			size,
-			multiply_textures[0]->GetPixelElementSize());
-
 		// Set the view port for rendering.
 		glViewport(0, 0, size.first, size.second);
 		error.Display(__FILE__, __LINE__ - 1);
@@ -807,17 +682,17 @@ namespace sgl {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		error.Display(__FILE__, __LINE__ - 1);
 
-		frame.BindTexture(*texture_out);
+		frame.BindTexture(*out_texture);
 		frame.DrawBuffers(1);
 
-		sgl::TextureManager texture_manager;
+		auto material = std::make_shared<Material>();
 		static auto program = sgl::CreateProgram("VectorMultiply");
 		static auto quad = sgl::CreateQuadMesh(program);
 		int i = 0;
 		std::vector<std::string> vec = {};
 		for (const auto& texture : multiply_textures)
 		{
-			texture_manager.AddTexture("Texture" + std::to_string(i), texture);
+			material->AddTexture("Texture" + std::to_string(i), texture);
 			vec.push_back("Texture" + std::to_string(i));
 			i++;
 		}
@@ -825,22 +700,18 @@ namespace sgl {
 		program->UniformInt(
 			"texture_max",
 			static_cast<int>(multiply_textures.size()));
-		quad->SetTextures(vec);
-		quad->Draw(texture_manager);
-
-		return texture_out;
+		quad->SetMaterial(material);
+		quad->Draw();
 	}
 
 	void FillProgramMultiTexture(
 		std::vector<std::shared_ptr<Texture>>& out_textures, 
-		const TextureManager& texture_manager, 
-		const std::vector<std::string>& texture_selected, 
+		const std::map<std::string, std::shared_ptr<Texture>>& in_textures,
 		const std::shared_ptr<Program>& program)
 	{
 		FillProgramMultiTextureMipmap(
 			out_textures,
-			texture_manager,
-			texture_selected,
+			in_textures,
 			program,
 			0,
 			[](const int, const std::shared_ptr<Program>&) {});
@@ -848,8 +719,7 @@ namespace sgl {
 
 	void FillProgramMultiTextureMipmap(
 		std::vector<std::shared_ptr<Texture>>& out_textures,
-		const TextureManager& texture_manager,
-		const std::vector<std::string>& texture_selected,
+		const std::map<std::string, std::shared_ptr<Texture>>& in_textures,
 		const std::shared_ptr<Program>& program,
 		const int mipmap,
 		const std::function<void(
@@ -878,7 +748,12 @@ namespace sgl {
 			0.1f,
 			10.0f);
 		auto quad = CreateQuadMesh(program);
-		quad->SetTextures(texture_selected);
+		auto material = std::make_shared<Material>();
+		for (const auto& p : in_textures)
+		{
+			material->AddTexture(p.first, p.second);
+		}
+		quad->SetMaterial(material);
 		std::pair<uint32_t, uint32_t> temporary_size = size;
 		for (int mipmap_level = 0; mipmap_level < max_mipmap; ++mipmap_level)
 		{
@@ -899,20 +774,18 @@ namespace sgl {
 			}
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			error.Display(__FILE__, __LINE__ - 1);
-			quad->Draw(texture_manager, projection);
+			quad->Draw(projection);
 		}
 	}
 
 	void FillProgramMultiTextureCubeMap(
 		std::vector<std::shared_ptr<Texture>>& out_textures, 
-		const TextureManager& texture_manager, 
-		const std::vector<std::string>& texture_selected, 
+		const std::map<std::string, std::shared_ptr<Texture>>& in_textures,
 		const std::shared_ptr<Program>& program)
 	{
 		FillProgramMultiTextureCubeMapMipmap(
 			out_textures,
-			texture_manager,
-			texture_selected,
+			in_textures,
 			program,
 			0,
 			[](const int, const std::shared_ptr<Program>&) {});
@@ -920,8 +793,7 @@ namespace sgl {
 
 	void FillProgramMultiTextureCubeMapMipmap(
 		std::vector<std::shared_ptr<Texture>>& out_textures,
-		const TextureManager& texture_manager,
-		const std::vector<std::string>& texture_selected,
+		const std::map<std::string, std::shared_ptr<Texture>>& in_textures,
 		const std::shared_ptr<Program>& program,
 		const int mipmap,
 		const std::function<void(
@@ -950,7 +822,12 @@ namespace sgl {
 			0.1f,
 			10.0f);
 		auto cube = CreateCubeMesh(program);
-		cube->SetTextures(texture_selected);
+		auto material = std::make_shared<Material>();
+		for (const auto& p : in_textures)
+		{
+			material->AddTexture(p.first, p.second);
+		}
+		cube->SetMaterial(material);
 		std::pair<std::uint32_t, std::uint32_t> temporary_size = { 0, 0 };
 		for (int mipmap_level = 0; mipmap_level < max_mipmap; ++mipmap_level)
 		{
@@ -977,7 +854,7 @@ namespace sgl {
 				cubemap_element++;
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 				error.Display(__FILE__, __LINE__ - 1);
-				cube->Draw(texture_manager, projection, view);
+				cube->Draw(projection, view);
 			}
 		}
 	}

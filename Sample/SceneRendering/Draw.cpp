@@ -2,30 +2,36 @@
 
 void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 {
-	final_texture_ = std::make_shared<sgl::Texture>(size);
-	ssao_texture_ = std::make_shared<sgl::Texture>(size);
+	textures_ = {
+		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF),
+		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF),
+		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF),
+		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF),
+		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF),
+		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF)
+	};
 	device_->SetLightManager(CreateLightManager());
 }
 
 const std::shared_ptr<sgl::Texture>& Draw::GetDrawTexture() const
 {
-//  return device_->GetDeferredTexture(1);
+	return device_->GetDeferredTexture(0);
 //	return device_->GetViewTexture(1);
 //	return device_->GetNoiseTexture();
 //	return ssao_texture_;
-	return final_texture_;
+	return textures_[5];
 }
 
 void Draw::RunDraw(const double dt)
 {
-	device_->DrawDeferred(dt);
-	device_->DrawView(dt);
-	ssao_texture_ = device_->DrawScreenSpaceAmbientOcclusion();
-	ssao_texture_ = sgl::TextureBlur(ssao_texture_, 4.0);
-	final_texture_ = device_->DrawLighting();
-	final_texture_ = device_->DrawBloom(final_texture_);
-	final_texture_ = sgl::TextureMultiply({ final_texture_, ssao_texture_ });
-	final_texture_ = device_->DrawHighDynamicRange(final_texture_);
+	device_->DrawDeferred({}, dt);
+	device_->DrawView({}, dt);
+	device_->DrawScreenSpaceAmbientOcclusion(textures_[0]);
+	sgl::TextureBlur(textures_[1], textures_[0], 4.0);
+	device_->DrawLighting(textures_[2]);
+	device_->DrawBloom(textures_[3], textures_[2]);
+	sgl::TextureMultiply(textures_[4], { textures_[3], textures_[0] });
+	device_->DrawHighDynamicRange(textures_[5], textures_[4]);
 }
 
 void Draw::Delete() {}

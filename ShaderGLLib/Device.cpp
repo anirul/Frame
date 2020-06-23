@@ -133,12 +133,16 @@ namespace sgl {
 
 	void Device::Draw(const double dt)
 	{
-		Display(DrawTexture(dt));
+		static auto out_texture = std::make_shared<Texture>(
+			size_, 
+			sgl::PixelElementSize::HALF);
+		DrawMultiTextures({ out_texture }, nullptr, dt);
+		Display(out_texture);
 	}
 
 	void Device::DrawDeferred(
-		const double dt, 
-		const std::vector<std::shared_ptr<Texture>>& out_textures /*= {}*/)
+		const std::vector<std::shared_ptr<Texture>>& out_textures,
+		const double dt)
 	{
 		std::vector<std::shared_ptr<Texture>> temp_textures;
 		if (out_textures.empty())
@@ -153,21 +157,21 @@ namespace sgl {
 		pbr_program_->UniformVector3(
 			"camera_position",
 			GetCamera().GetPosition());
-		DrawMultiTextures(dt, temp_textures);
+		DrawMultiTextures(temp_textures, nullptr, dt);
 	}
 
 	void Device::DrawView(
-		const double dt, 
-		const std::vector<std::shared_ptr<Texture>>& view_textures /*= {}*/)
+		const std::vector<std::shared_ptr<Texture>>& out_textures,
+		const double dt)
 	{
 		std::vector<std::shared_ptr<Texture>> temp_textures;
-		if (view_textures.empty())
+		if (out_textures.empty())
 		{
 			temp_textures = view_textures_;
 		}
 		else
 		{
-			temp_textures = view_textures;
+			temp_textures = out_textures;
 		}
 		for (const auto& texture : temp_textures)
 		{
@@ -175,10 +179,11 @@ namespace sgl {
 		}
 		view_program_->Use();
 		view_program_->UniformInt("inverted_normals", 0);
-		DrawMultiTextures(dt, temp_textures, view_program_);
+		DrawMultiTextures(temp_textures, view_program_, dt);
 	}
 
-	std::shared_ptr<sgl::Texture> Device::DrawLighting(
+	void Device::DrawLighting(
+		std::shared_ptr<Texture>& out_texture,
 		const std::vector<std::shared_ptr<Texture>>& in_textures /*= {}*/)
 	{
 		std::vector<std::shared_ptr<Texture>> temp_textures;
@@ -216,18 +221,20 @@ namespace sgl {
 
 		static auto quad = sgl::CreateQuadMesh(lighting_program_);
 
-		sgl::TextureManager texture_manager{};
-		texture_manager.AddTexture("Ambient", temp_textures[0]);
-		texture_manager.AddTexture("Normal", temp_textures[1]);
-		texture_manager.AddTexture("MetalRoughAO", temp_textures[2]);
-		texture_manager.AddTexture("Position", temp_textures[3]);
-		quad->SetTextures({ "Ambient", "Normal", "MetalRoughAO", "Position" });
-		quad->Draw(texture_manager);
+		std::shared_ptr<sgl::Material> material = 
+			std::make_shared<sgl::Material>();
+		material->AddTexture("Ambient", temp_textures[0]);
+		material->AddTexture("Normal", temp_textures[1]);
+		material->AddTexture("MetalRoughAO", temp_textures[2]);
+		material->AddTexture("Position", temp_textures[3]);
+		quad->SetMaterial(material);
+		quad->Draw();
 
-		return TextureAddition(lighting_textures_);
+		TextureAddition(out_texture, lighting_textures_);
 	}
 
-	std::shared_ptr<Texture> Device::DrawScreenSpaceAmbientOcclusion(
+	void Device::DrawScreenSpaceAmbientOcclusion(
+		std::shared_ptr<Texture>& out_texture,
 		const std::vector<std::shared_ptr<Texture>>& in_textures /*= {}*/)
 	{
 		std::vector<std::shared_ptr<Texture>> temp_textures;
@@ -253,10 +260,6 @@ namespace sgl {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		error_.Display(__FILE__, __LINE__ - 1);
 
-		static auto out_texture = std::make_shared<Texture>(
-			size, 
-			sgl::PixelElementSize::HALF);
-
 		frame.BindTexture(*out_texture);
 		frame.DrawBuffers(1);
 
@@ -278,38 +281,40 @@ namespace sgl {
 
 		static auto quad = sgl::CreateQuadMesh(ssao_program_);
 
-		sgl::TextureManager texture_manager{};
-		texture_manager.AddTexture("ViewPosition", temp_textures[0]);
-		texture_manager.AddTexture("ViewNormal", temp_textures[1]);
-		texture_manager.AddTexture("Noise", noise_texture_);
-		quad->SetTextures({ "ViewPosition", "ViewNormal", "Noise" });
-		quad->Draw(texture_manager);
-
-		return out_texture;
+		std::shared_ptr<sgl::Material> material = 
+			std::make_shared<sgl::Material>();
+		material->AddTexture("ViewPosition", temp_textures[0]);
+		material->AddTexture("ViewNormal", temp_textures[1]);
+		material->AddTexture("Noise", noise_texture_);
+		quad->SetMaterial(material);
+		quad->Draw();
 	}
 
-	std::shared_ptr<sgl::Texture> Device::DrawBloom(
-		const std::shared_ptr<Texture>& texture)
+	void Device::DrawBloom(
+		std::shared_ptr<sgl::Texture>& out_texture,
+		const std::shared_ptr<Texture>& in_texture)
 	{
-		auto brightness = TextureBrightness(texture);
-		auto gaussian_blur = TextureGaussianBlur(brightness);
-		return TextureAddition({ texture, gaussian_blur });
+		static std::shared_ptr<Texture> temp_texture = 
+			std::make_shared<Texture>(
+				out_texture->GetSize(), 
+				sgl::PixelElementSize::HALF);
+		out_texture->Clear({ 0.f, 0.f, 0.f, 1.f });
+		TextureBrightness(out_texture, in_texture);
+		TextureGaussianBlur(temp_texture, out_texture);
+		TextureAddition(out_texture, { in_texture, temp_texture });
 	}
 
-	std::shared_ptr<sgl::Texture> Device::DrawHighDynamicRange(
-		const std::shared_ptr<Texture>& texture, 
+	void Device::DrawHighDynamicRange(
+		std::shared_ptr<sgl::Texture>& out_texture,
+		const std::shared_ptr<Texture>& in_texture, 
 		const float exposure /*= 1.0f*/, 
 		const float gamma /*= 2.2f*/)
 	{
 		Frame frame{};
 		Render render{};
-		auto size = texture->GetSize();
+		auto size = in_texture->GetSize();
 		frame.BindAttach(render);
 		render.BindStorage(size);
-
-		static auto texture_out = std::make_shared<sgl::Texture>(
-			size,
-			pixel_element_size_);
 
 		// Set the view port for rendering.
 		glViewport(0, 0, size.first, size.second);
@@ -319,45 +324,34 @@ namespace sgl {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		error_.Display(__FILE__, __LINE__ - 1);
 
-		frame.BindTexture(*texture_out);
+		frame.BindTexture(*out_texture);
 		frame.DrawBuffers(1);
 
-		sgl::TextureManager texture_manager;
-		texture_manager.AddTexture("Display", texture);
+		auto material = std::make_shared<Material>();
+		material->AddTexture("Display", in_texture);
 		auto program = sgl::CreateProgram("HighDynamicRange");
 		program->UniformFloat("exposure", exposure);
 		program->UniformFloat("gamma", gamma);
 		auto quad = sgl::CreateQuadMesh(program);
-		quad->SetTextures({ "Display" });
-		quad->Draw(texture_manager);
-
-		return texture_out;
+		quad->SetMaterial(material);
+		quad->Draw();
 	}
 
 	void Device::Display(const std::shared_ptr<Texture>& texture)
 	{
 		static auto program = CreateProgram("Display");
 		static auto quad = CreateQuadMesh(program);
-		TextureManager texture_manager{};
-		texture_manager.AddTexture("Display", texture);
-		quad->SetTextures({ "Display" });
+		auto material = std::make_shared<Material>();
+		material->AddTexture("Display", texture);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		quad->Draw(texture_manager);
-	}
-
-	std::shared_ptr<Texture> Device::DrawTexture(const double dt)
-	{
-		auto texture = std::make_shared<Texture>(
-			size_, 
-			pixel_element_size_);
-		DrawMultiTextures(dt, { texture });
-		return texture;
+		quad->SetMaterial(material);
+		quad->Draw();
 	}
 
 	void Device::DrawMultiTextures(
-		const double dt, 
-		const std::vector<std::shared_ptr<Texture>>& out_textures, 
-		const std::shared_ptr<Program> program /*= nullptr*/)
+		const std::vector<std::shared_ptr<Texture>>& out_textures,
+		const std::shared_ptr<Program> program,
+		const double dt)
 	{
 		if (out_textures.empty())
 		{
@@ -404,9 +398,7 @@ namespace sgl {
 			auto material_name = mesh->GetMaterialName();
 			if (materials_.find(material_name) != materials_.end())
 			{ 
-				auto material = materials_[material_name];
-				material->UpdateTextureManager(texture_manager_);
-				mesh->SetTextures(material->GetTextures());
+				mesh->SetMaterial(materials_[material_name]);
 			}
 
 			std::shared_ptr<Program> temp_program = nullptr;
@@ -418,7 +410,6 @@ namespace sgl {
 
 			// Draw the mesh.
 			mesh->Draw(
-				texture_manager_,
 				perspective_,
 				view_,
 				scene->GetLocalModel(dt));
@@ -440,15 +431,15 @@ namespace sgl {
 		auto cubemap_program = CreateProgram("CubeMapDeferred");
 		cubemap_program->UniformMatrix("projection", GetProjection());
 		auto cube_mesh = CreateCubeMesh(cubemap_program);
-		texture_manager_.AddTexture("Skybox", texture);
-		cube_mesh->SetTextures({ "Skybox" });
+		material_ = std::make_shared<Material>();
+		material_->AddTexture("Skybox", texture);
 		cube_mesh->ClearDepthBuffer(true);
 		scene_tree_.AddNode(
 			std::make_shared<SceneMesh>(cube_mesh), 
 			scene_tree_.GetRoot());
 		
 		// Add the default texture to the texture manager.
-		texture_manager_.AddTexture("Environment", texture);
+		material_->AddTexture("Environment", texture);
 
 		// Create the Monte-Carlo prefilter.
 		auto monte_carlo_prefilter = std::make_shared<sgl::TextureCubeMap>(
@@ -456,8 +447,8 @@ namespace sgl {
 			sgl::PixelElementSize::FLOAT);
 		sgl::FillProgramMultiTextureCubeMapMipmap(
 			std::vector<std::shared_ptr<sgl::Texture>>{ monte_carlo_prefilter },
-			texture_manager_,
-			{ "Environment" },
+			std::map<std::string, std::shared_ptr<Texture>>{ 
+				{"Environment", material_->GetTexture("Environment") }},
 			sgl::CreateProgram("MonteCarloPrefilter"),
 			5,
 			[](const int mipmap, const std::shared_ptr<sgl::Program>& program)
@@ -465,7 +456,7 @@ namespace sgl {
 			float roughness = static_cast<float>(mipmap) / 4.0f;
 			program->UniformFloat("roughness", roughness);
 		});
-		texture_manager_.AddTexture(
+		material_->AddTexture(
 			"MonteCarloPrefilter", 
 			monte_carlo_prefilter);
 
@@ -475,21 +466,21 @@ namespace sgl {
 			pixel_element_size_);
 		sgl::FillProgramMultiTextureCubeMap(
 			std::vector<std::shared_ptr<sgl::Texture>>{ irradiance },
-			texture_manager_,
-			{ "Environment" },
+			std::map<std::string, std::shared_ptr<Texture>>{
+				{ "Environment", material_->GetTexture("Environment") }},
 			sgl::CreateProgram("IrradianceCubeMap"));
-		texture_manager_.AddTexture("Irradiance", irradiance);
+		material_->AddTexture("Irradiance", irradiance);
 
 		// Create the LUT BRDF.
 		auto integrate_brdf = std::make_shared<sgl::Texture>(
 			std::make_pair<std::uint32_t, std::uint32_t>(512, 512),
 			pixel_element_size_);
 		sgl::FillProgramMultiTexture(
-			std::vector<std::shared_ptr<sgl::Texture>>{ integrate_brdf },
-			texture_manager_,
-			{},
+			std::vector<std::shared_ptr<Texture>>{ integrate_brdf },
+			std::map<std::string, std::shared_ptr<Texture>>{
+				{ "Environment", material_->GetTexture("Environment") }},
 			sgl::CreateProgram("IntegrateBRDF"));
-		texture_manager_.AddTexture("IntegrateBRDF", integrate_brdf);
+		material_->AddTexture("IntegrateBRDF", integrate_brdf);
 	}
 
 	void Device::SetupCamera()
