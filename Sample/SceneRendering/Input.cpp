@@ -39,7 +39,7 @@ bool Input::MouseMoved(
 	const glm::vec2 relative, 
 	const double dt)
 {
-	const float inc = 0.1f * static_cast<float>(dt);
+	const float inc = 1.f * static_cast<float>(dt);
 	auto camera = device_->GetCamera();
 	auto front = camera.GetFront();
 	auto right = camera.GetRight();

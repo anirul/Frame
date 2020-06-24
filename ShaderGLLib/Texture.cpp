@@ -531,7 +531,8 @@ namespace sgl {
 		auto pixel_element_size = in_texture->GetPixelElementSize();
 
 		// Set the view port for rendering.
-		glViewport(0, 0, size.first / 2, size.second / 2);
+		// CHECKME(anirul): this should be / 2.
+		glViewport(0, 0, size.first, size.second);
 		error.Display(__FILE__, __LINE__ - 1);
 
 		// Clear the screen.

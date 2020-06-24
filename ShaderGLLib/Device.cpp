@@ -182,6 +182,8 @@ namespace sgl {
 		DrawMultiTextures(temp_textures, view_program_, dt);
 	}
 
+	// TODO(anirul):	change this returning the correct lighting texture 
+	//					rather than the addition of both.
 	void Device::DrawLighting(
 		std::shared_ptr<Texture>& out_texture,
 		const std::vector<std::shared_ptr<Texture>>& in_textures /*= {}*/)
@@ -195,6 +197,7 @@ namespace sgl {
 		{
 			temp_textures = in_textures;
 		}
+
 		// Make the PBR deferred lighting step.
 		lighting_textures_[0] = temp_textures[0];
 		lighting_program_->Use();
@@ -202,6 +205,8 @@ namespace sgl {
 			"camera_position",
 			GetCamera().GetPosition());
 		light_manager_.RegisterToProgram(lighting_program_);
+
+		// Rendering pipeline.
 		Frame frame{};
 		Render render{};
 		auto size = temp_textures[0]->GetSize();
@@ -221,8 +226,7 @@ namespace sgl {
 
 		static auto quad = sgl::CreateQuadMesh(lighting_program_);
 
-		std::shared_ptr<sgl::Material> material = 
-			std::make_shared<sgl::Material>();
+		auto material = std::make_shared<sgl::Material>();
 		material->AddTexture("Ambient", temp_textures[0]);
 		material->AddTexture("Normal", temp_textures[1]);
 		material->AddTexture("MetalRoughAO", temp_textures[2]);
@@ -402,6 +406,15 @@ namespace sgl {
 					*materials_[material_name] + *material_);
 				mesh->SetMaterial(mat);
 			}
+			else
+			{
+				// Special case this is suppose to be the environment map.
+				auto material = std::make_shared<Material>();
+				material->AddTexture(
+					"Environment", 
+					material_->GetTexture("Environment"));
+				mesh->SetMaterial(material);
+			}
 
 			std::shared_ptr<Program> temp_program = nullptr;
 			if (program)
@@ -443,7 +456,7 @@ namespace sgl {
 		// Add the default texture to the texture manager.
 		material_->AddTexture("Environment", texture);
 
-		// Create the Monte-Carlo prefilter.
+		// Create the Monte-Carlo filter.
 		auto monte_carlo_prefilter = std::make_shared<sgl::TextureCubeMap>(
 			std::make_pair<std::uint32_t, std::uint32_t>(128, 128),
 			sgl::PixelElementSize::FLOAT);
