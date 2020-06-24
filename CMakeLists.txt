@@ -103,6 +103,8 @@ add_executable(ShaderGLTest
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/LightTest.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/LightTest.h
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/main.cpp
+    ${PROJECT_SOURCE_DIR}/ShaderGLTest/MaterialTest.cpp
+    ${PROJECT_SOURCE_DIR}/ShaderGLTest/MaterialTest.h
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/MeshTest.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/MeshTest.h
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/PixelTest.cpp
@@ -202,30 +204,6 @@ target_include_directories(Simple
 )
 
 target_link_libraries(Simple
-  PUBLIC
-    ShaderGLLib
-  PRIVATE
-    SDL2::SDL2
-    GLEW::GLEW
-    glm
-)
-
-add_executable(PhysicallyBasedRendering
-  WIN32
-    ${PROJECT_SOURCE_DIR}/Sample/PhysicallyBasedRendering/Application.cpp
-    ${PROJECT_SOURCE_DIR}/Sample/PhysicallyBasedRendering/Application.h
-    ${PROJECT_SOURCE_DIR}/Sample/PhysicallyBasedRendering/Draw.cpp
-    ${PROJECT_SOURCE_DIR}/Sample/PhysicallyBasedRendering/Draw.h
-    ${PROJECT_SOURCE_DIR}/Sample/PhysicallyBasedRendering/Types.h
-    ${PROJECT_SOURCE_DIR}/Sample/PhysicallyBasedRendering/main.cpp
-)
-
-target_include_directories(PhysicallyBasedRendering
-  PUBLIC
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib
-)
-
-target_link_libraries(PhysicallyBasedRendering
   PUBLIC
     ShaderGLLib
   PRIVATE

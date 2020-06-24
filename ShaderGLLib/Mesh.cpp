@@ -67,18 +67,6 @@ namespace sgl {
 		glDeleteVertexArrays(1, &vertex_array_object_);
 	}
 
-	void Mesh::SetTextures(std::initializer_list<std::string> values)
-	{
-		textures_.clear();
-		textures_.assign(values.begin(), values.end());
-	}
-
-	void Mesh::SetTextures(const std::vector<std::string>& vec)
-	{
-		textures_.clear();
-		textures_.assign(vec.begin(), vec.end());
-	}
-
 	void Mesh::SetProgram(const std::shared_ptr<Program>& program)
 	{
 		if (!program)
@@ -147,22 +135,23 @@ namespace sgl {
 	}
 
 	void Mesh::Draw(
-		const sgl::TextureManager& texture_manager,
 		const glm::mat4& projection /*= glm::mat4(1.0f)*/,
 		const glm::mat4& view /*= glm::mat4(1.0f)*/,
 		const glm::mat4& model /*= glm::mat4(1.0f)*/) const
 	{
-		texture_manager.DisableAll();
-		if (!program_)
-		{
-			throw std::runtime_error("program is not set.");
-		}
+		if (material_) material_->DisableAll();
+		if (!program_) throw std::runtime_error("program is not set.");
 		program_->Use();
-		for (const auto& str : textures_)
+		if (material_)
 		{
-			program_->UniformInt(str, texture_manager.EnableTexture(str));
+			for (const auto& p : material_->GetMap())
+			{
+				program_->UniformInt(
+					p.first, 
+					material_->EnableTexture(p.first));
+			}
 		}
-
+		
 		glBindVertexArray(vertex_array_object_);
 		error_.Display(__FILE__, __LINE__ - 1);
 
@@ -183,7 +172,7 @@ namespace sgl {
 		glBindVertexArray(0);
 		error_.Display(__FILE__, __LINE__ - 1);
 
-		texture_manager.DisableAll();
+		if (material_) material_->DisableAll();
 
 		if (clear_depth_buffer_)
 		{

@@ -6,22 +6,39 @@
 
 namespace sgl {
 
-	// Specialized version of a texture manager.
-	class Material : public TextureManager
+	// This is the texture manager, it is suppose to be handling the textures
+	// for a single model (mesh).
+	class Material
 	{
 	public:
 		// Default constructor (this will do NOTHING!).
 		Material() = default;
 		Material(const Material&) = default;
+		virtual ~Material();
 		// Parse from a MTL file.
 		Material(std::istream& is, const std::string& name);
+		Material operator+(const Material& material);
+		Material& operator+=(const Material& material);
 
 	public:
-		// Suppose to return a list of string of the needed textures.
-		const std::vector<std::string> GetTextures() const;
-		// Update a texture manager with the texture contains in the material 
-		// and the Material with the texture manager missing texture.
-		void UpdateTextureManager(TextureManager& texture_manager);
+		// Texture management part.
+		bool AddTexture(
+			const std::string& name,
+			const std::shared_ptr<sgl::Texture>& texture);
+		const std::shared_ptr<sgl::Texture>& GetTexture(
+			const std::string& name) const;
+		bool HasTexture(const std::string& name) const;
+		bool RemoveTexture(const std::string& name);
+		// Return the binding slot of the texture (to be passed to the program).
+		const int EnableTexture(const std::string& name) const;
+		void DisableTexture(const std::string& name) const;
+		void DisableAll() const;
+
+	public:
+		const std::map<std::string, std::shared_ptr<Texture>>& GetMap() const
+		{
+			return name_texture_map_;
+		}
 
 	protected:
 		std::shared_ptr<Texture> GetTextureFromFile(
@@ -36,6 +53,10 @@ namespace sgl {
 			std::istream& is,
 			const std::string& stream_name,
 			const std::string& element_name) const;
+
+	private:
+		std::map<std::string, std::shared_ptr<Texture>> name_texture_map_ = {};
+		mutable std::array<std::string, 32> name_array_ = {};
 	};
 
 	// Load a texture set from a MTL file.

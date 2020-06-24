@@ -5,19 +5,6 @@
 
 namespace sgl {	
 
-	namespace {
-		const std::vector<std::string> texture_vec = {
-				"Color",
-				"Normal",
-				"Metallic",
-				"Roughness",
-				"AmbientOcclusion",
-				"MonteCarloPrefilter",
-				"Irradiance",
-				"IntegrateBRDF"
-		};
-	}
-
 	Material::Material(std::istream& is, const std::string& name)
 	{
 		while (!is.eof())
@@ -84,42 +71,20 @@ namespace sgl {
 		}
 	}
 
-	const std::vector<std::string> Material::GetTextures() const
+	Material Material::operator+(const Material& material)
 	{
-		for (const auto& str : texture_vec)
-		{
-			if (!HasTexture(str))
-			{
-				throw std::runtime_error("Couldn't get texture: " + str);
-			}
-		}
-		return texture_vec;
+		Material ret_material(*this);
+		ret_material += material;
+		return ret_material;
 	}
 
-	void Material::UpdateTextureManager(TextureManager& texture_manager)
+	Material& Material::operator+=(const Material& material)
 	{
-		for (const auto& str: texture_vec)
+		for (const auto& value : material.name_texture_map_)
 		{
-			if (!HasTexture(str))
-			{
-				if (texture_manager.HasTexture(str))
-				{
-					AddTexture(str, texture_manager.GetTexture(str));
-				}
-				else
-				{
-					throw std::runtime_error(
-						"Texture: " + str + 
-						" is neither in the material nor in the texture " +
-						"manager?");
-				}
-			}
+			name_texture_map_.insert({ value.first, value.second });
 		}
-		auto textures_names_vec  = GetTexturesNames();
-		for (const auto& str : textures_names_vec)
-		{
-			texture_manager.AddTexture(str, GetTexture(str));
-		}
+		return *this;
 	}
 
 	std::shared_ptr<sgl::Texture> Material::GetTextureFromFile(
@@ -195,6 +160,105 @@ namespace sgl {
 			grey,
 			PixelElementSize::FLOAT,
 			PixelStructure::GREY);
+	}
+
+	Material::~Material()
+	{
+		DisableAll();
+	}
+
+	bool Material::AddTexture(
+		const std::string& name,
+		const std::shared_ptr<sgl::Texture>& texture)
+	{
+		RemoveTexture(name);
+		auto ret = name_texture_map_.insert({ name, texture });
+		return ret.second;
+	}
+
+	const std::shared_ptr<sgl::Texture>& Material::GetTexture(
+		const std::string& name) const
+	{
+		auto it = name_texture_map_.find(name);
+		if (it == name_texture_map_.end())
+		{
+			throw std::runtime_error("No such texture: " + name);
+		}
+		return it->second;
+	}
+
+	bool Material::HasTexture(const std::string& name) const
+	{
+		return name_texture_map_.find(name) != name_texture_map_.end();
+	}
+
+	bool Material::RemoveTexture(const std::string& name)
+	{
+		// Check if present in the name texture map.
+		auto it = name_texture_map_.find(name);
+		if (it == name_texture_map_.end())
+		{
+			return false;
+		}
+
+		// Remove it.
+		name_texture_map_.erase(it);
+		return true;
+	}
+
+	const int Material::EnableTexture(const std::string& name) const
+	{
+		auto it1 = name_texture_map_.find(name);
+		if (it1 == name_texture_map_.end())
+		{
+			throw std::runtime_error("try to enable a texture: " + name);
+		}
+		for (int i = 0; i < name_array_.size(); ++i)
+		{
+			if (name_array_[i].empty())
+			{
+				name_array_[i] = name;
+				it1->second->Bind(i);
+				return i;
+			}
+		}
+		throw std::runtime_error("No free slots!");
+	}
+
+	void Material::DisableTexture(const std::string& name) const
+	{
+		auto it1 = name_texture_map_.find(name);
+		if (it1 == name_texture_map_.end())
+		{
+			throw std::runtime_error("no texture named: " + name);
+		}
+		auto it2 = std::find_if(
+			name_array_.begin(),
+			name_array_.end(),
+			[name](const std::string& value)
+		{
+			return value == name;
+		});
+		if (it2 != name_array_.end())
+		{
+			*it2 = "";
+			it1->second->UnBind();
+		}
+		else
+		{
+			throw std::runtime_error("No slot bind to: " + name);
+		}
+	}
+
+	void Material::DisableAll() const
+	{
+		for (int i = 0; i < 32; ++i)
+		{
+			if (!name_array_[i].empty())
+			{
+				DisableTexture(name_array_[i]);
+			}
+		}
 	}
 
 	std::map<std::string, std::shared_ptr<Material>> LoadMaterialFromMtlStream(

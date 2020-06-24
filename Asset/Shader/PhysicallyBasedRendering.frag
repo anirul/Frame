@@ -9,15 +9,14 @@ layout (location = 1) out vec4 frag_normal;
 layout (location = 2) out vec4 frag_mra;
 layout (location = 3) out vec4 frag_position;
 
-uniform sampler2D Color;
-uniform sampler2D Normal;
-uniform sampler2D Metallic;
-uniform sampler2D Roughness;
 uniform sampler2D AmbientOcclusion;
-
-uniform samplerCube MonteCarloPrefilter;
-uniform samplerCube Irradiance;
+uniform sampler2D Color;
 uniform sampler2D IntegrateBRDF;
+uniform samplerCube Irradiance;
+uniform sampler2D Metallic;
+uniform samplerCube MonteCarloPrefilter;
+uniform sampler2D Normal;
+uniform sampler2D Roughness;
 
 uniform vec3 camera_position;
 

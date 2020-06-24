@@ -68,30 +68,6 @@ namespace test {
 		EXPECT_NO_THROW(error_.Display());
 	}
 
-	TEST_F(TextureTest, CreateTextureManagerTest)
-	{
-		EXPECT_EQ(GLEW_OK, glewInit());
-		EXPECT_FALSE(texture_manager_);
-		texture_manager_ = std::make_shared<sgl::TextureManager>();
-		EXPECT_TRUE(texture_manager_);
-		EXPECT_NO_THROW(error_.Display());
-	}
-
-	TEST_F(TextureTest, AddRemoveTextureManagerTest)
-	{
-		EXPECT_EQ(GLEW_OK, glewInit());
-		ASSERT_FALSE(texture_manager_);
-		texture_manager_ = std::make_shared<sgl::TextureManager>();
-		ASSERT_TRUE(texture_manager_);
-		ASSERT_FALSE(texture_);
-		texture_ = std::make_shared<sgl::Texture>(
-			"../Asset/CubeMap/PositiveX.png");
-		ASSERT_TRUE(texture_);
-		EXPECT_TRUE(texture_manager_->AddTexture("texture1", texture_));
-		EXPECT_TRUE(texture_manager_->RemoveTexture("texture1"));
-		EXPECT_NO_THROW(error_.Display());
-	}
-
 	TEST_F(TextureTest, CreateIrradianceCubeMapTextureTest)
 	{
 		EXPECT_EQ(GLEW_OK, glewInit());
@@ -100,15 +76,12 @@ namespace test {
 		EXPECT_TRUE(cube_map);
 		EXPECT_NE(0, cube_map->GetId());
 		EXPECT_NO_THROW(error_.Display());
-		sgl::TextureManager texture_manager{};
-		texture_manager.AddTexture("Environment", cube_map);
 		auto irradiance = std::make_shared<sgl::TextureCubeMap>(
 			std::make_pair<std::uint32_t, std::uint32_t>(32, 32));
-		std::vector<std::shared_ptr<sgl::Texture>> vec{ irradiance };
 		FillProgramMultiTextureCubeMap(
-			vec,
-			texture_manager,
-			{ "Environment" },
+			std::vector<std::shared_ptr<sgl::Texture>>{ irradiance },
+			std::map<std::string, std::shared_ptr<sgl::Texture>>{
+				{ "Environment", cube_map } },
 			sgl::CreateProgram("IrradianceCubeMap"));
 		EXPECT_NE(0, irradiance->GetId());
 		std::pair<std::uint32_t, std::uint32_t> pair(32, 32);
