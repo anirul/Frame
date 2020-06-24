@@ -91,12 +91,3 @@ shading and the shadow.
 ![Simple](https://github.com/anirul/ShaderGL/raw/master/Sample/Simple.png "A rendering of an apple floating in the coulds.")
 
 This will draw a cube map and an apple (simple just albedo).
-
-### PhysicallyBasedRendering
-
-![PhysicallyBasedRendering](https://github.com/anirul/ShaderGL/raw/master/Sample/Sphere.png "A physically based rendering of a Sphere on an HDR background.")
-
-This is a full physically based rendering example this will use albedo, normal,
-metallic, roughness and ambient occlusion map. It will also make an irradiance 
-map to have the correct lighting and make a reflexion map to have the 
-reflectivity.
