@@ -3,6 +3,44 @@
 
 namespace sgl {
 
+	EffectClear::EffectClear(
+		const std::shared_ptr<Texture>& out_texture,
+		const glm::vec4 color) : color_(color)
+	{
+		out_material_.AddTexture("FragOut", out_texture);
+	}
+
+	void EffectClear::Startup(std::pair<std::uint32_t, std::uint32_t> size)
+	{
+		assert(size == out_material_.GetMap().at("FragOut")->GetSize());
+		size_ = size;
+		program_ = Program::CreateProgram("Clear");
+		program_->Use();
+		program_->UniformVector4("color", color_);
+		quad_ = CreateQuadMesh(program_);
+		quad_->ClearDepthBuffer(true);
+		frame_.AttachRender(render_);
+		render_.CreateStorage(size);
+	}
+
+	void EffectClear::Draw(const double dt /*= 0.0*/)
+	{
+		ScopedBind scoped_frame(frame_);
+
+		frame_.AttachTexture(*out_material_.GetMap().at("FragOut"));
+		frame_.DrawBuffers();
+
+		// Set the view port for rendering.
+		glViewport(0, 0, size_.first, size_.second);
+		error_.Display(__FILE__, __LINE__ - 1);
+
+		// Clear the screen.
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		error_.Display(__FILE__, __LINE__ - 1);
+
+		quad_->Draw();
+	}
+
 	EffectBrightness::EffectBrightness(
 		const std::shared_ptr<Texture>& out_texture, 
 		const std::shared_ptr<Texture>& in_texture)
@@ -14,32 +52,24 @@ namespace sgl {
 	void EffectBrightness::Startup(
 		std::pair<std::uint32_t, std::uint32_t> size)
 	{
-		assert(in_material_.GetMap().size() == 1);
-		assert(in_material_.GetMap().begin()->first == "Image");
-		assert(out_material_.GetMap().size() == 1);
 		assert(size == in_material_.GetMap().at("Image")->GetSize());
 		assert(size == out_material_.GetMap().at("FragOut")->GetSize());
 		size_ = size;
 		program_ = Program::CreateProgram("Brightness");
 		program_->Use();
+		frame_.AttachRender(render_);
 		quad_ = CreateQuadMesh(program_);
 		render_.CreateStorage(size_);
 	}
 
 	void EffectBrightness::Draw(const double dt /*= 0.0*/)
 	{
-		assert(in_material_.GetMap().size() == 1);
-		assert(in_material_.GetMap().begin()->first == "Image");
-		assert(out_material_.GetMap().size() == 1);
-		assert(out_material_.GetMap().begin()->first == "FragOut");
-
 		ScopedBind scoped_frame(frame_);
-		frame_.AttachRender(render_);
+
 		frame_.AttachTexture(*out_material_.GetMap().at("FragOut"));
 		frame_.DrawBuffers();
 
 		// Set the view port for rendering.
-		// CHECKME(anirul):	this should be / 2.
 		glViewport(0, 0, size_.first, size_.second);
 		error_.Display(__FILE__, __LINE__ - 1);
 
@@ -57,24 +87,17 @@ namespace sgl {
 		const float exponent) :
 		exponent_(exponent)
 	{
-		in_material_ = std::make_shared<Material>();
-		out_material_ = std::make_shared<Material>();
-		in_material_->AddTexture("Image", in_texture);
-		out_material_->AddTexture("FragOut", out_texture);
+		in_material_.AddTexture("Image", in_texture);
+		out_material_.AddTexture("FragOut", out_texture);
 	}
 
 	void EffectBlur::Startup(std::pair<std::uint32_t, std::uint32_t> size)
 	{
-		assert(in_material_->GetMap().size() == 1);
-		assert(in_material_->GetMap().begin()->first == "Image");
-		assert(out_material_->GetMap().size() == 1);
 		size_ = size;
-		frame_ = std::make_shared<Frame>();
-		render_ = std::make_shared<Render>();
-		ScopedBind scoped_frame(*frame_);
-		ScopedBind scoped_render(*render_);
-		frame_->AttachRender(*render_);
-		render_->CreateStorage(size_);
+		ScopedBind scoped_frame(frame_);
+		ScopedBind scoped_render(render_);
+		frame_.AttachRender(render_);
+		render_.CreateStorage(size_);
 		program_ = Program::CreateProgram("Blur");
 		program_->Use();
 		program_->UniformFloat("exponent", exponent_);
@@ -83,18 +106,16 @@ namespace sgl {
 
 	void EffectBlur::Draw(const double dt /*= 0.0*/)
 	{
-		assert(in_material_->GetMap().size() == 1);
-		assert(in_material_->GetMap().begin()->first == "Image");
-		assert(out_material_->GetMap().size() == 1);
-		ScopedBind scoped_frame(*frame_);
-		ScopedBind scoped_render(*render_);
-		render_->Bind();
+		ScopedBind scoped_frame(frame_);
+		ScopedBind scoped_render(render_);
+
 		glViewport(0, 0, size_.first, size_.second);
 		error_.Display(__FILE__, __LINE__ - 1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		error_.Display(__FILE__, __LINE__ - 1);
-		frame_->AttachTexture(*out_material_->GetMap().at("FragOut"));
-		frame_->DrawBuffers(1);
+
+		frame_.AttachTexture(*out_material_.GetMap().at("FragOut"));
+		frame_.DrawBuffers(1);
 		quad_->SetMaterial(in_material_);
 		quad_->Draw();
 	}
@@ -103,39 +124,31 @@ namespace sgl {
 		const std::shared_ptr<Texture>& out_texture, 
 		const std::shared_ptr<Texture>& in_texture)
 	{
-		in_material_ = std::make_shared<Material>();
-		out_material_ = std::make_shared<Material>();
-		in_material_->AddTexture("Image", in_texture);
-		out_material_->AddTexture("FragOut", out_texture);
+		in_material_.AddTexture("Image", in_texture);
+		out_material_.AddTexture("FragOut", out_texture);
 	}
 
 	void EffectGaussianBlur::Startup(
 		std::pair<std::uint32_t, std::uint32_t> size)
 	{
-		assert(in_material_->GetMap().size() == 1);
-		assert(in_material_->GetMap().begin()->first == "Image");
 		size_ = size;
-		frame_[0] = std::make_shared<Frame>();
-		frame_[1] = std::make_shared<Frame>();
-		render_ = std::make_shared<Render>();
-		frame_[0]->AttachRender(*render_);
-		frame_[1]->AttachRender(*render_);
+		ScopedBind scoped_render(render_);
+		frame_[0].AttachRender(render_);
+		frame_[1].AttachRender(render_);
 		temp_textures_[0] = 
 			std::make_shared<Texture>(size_, sgl::PixelElementSize::HALF);
 		temp_textures_[1] =
 			std::make_shared<Texture>(size_, sgl::PixelElementSize::HALF);
-		frame_[0]->AttachTexture(*temp_textures_[0]);
-		frame_[1]->AttachTexture(*temp_textures_[1]);
-		render_->CreateStorage(size_);
+		frame_[0].AttachTexture(*temp_textures_[0]);
+		frame_[1].AttachTexture(*temp_textures_[1]);
+		render_.CreateStorage(size_);
 		program_ = Program::CreateProgram("GaussianBlur");
 		quad_ = CreateQuadMesh(program_);
 	}
 
 	void EffectGaussianBlur::Draw(const double dt /*= 0.0*/)
 	{
-		assert(in_material_->GetMap().size() == 1);
-		assert(in_material_->GetMap().begin()->first == "Image");
-		ScopedBind scoped_render(*render_);
+		ScopedBind scoped_render(render_);
 
 		// Set the view port for rendering.
 		glViewport(0, 0, size_.first, size_.second);
@@ -154,11 +167,11 @@ namespace sgl {
 			// Reset the texture manager.
 			auto material = std::make_shared<Material>();
 			program_->UniformInt("horizontal", horizontal);
-			ScopedBind scoped_frame(*frame_[horizontal]);
+			ScopedBind scoped_frame(frame_[horizontal]);
 			material->AddTexture(
 				"Image",
 				(first_iteration) ? 
-					in_material_->GetMap().begin()->second : 
+					in_material_.GetMap().begin()->second : 
 					temp_textures_[!horizontal]);
 			quad_->SetMaterial(material);
 			quad_->Draw();
@@ -166,33 +179,28 @@ namespace sgl {
 			if (first_iteration) first_iteration = false;
 		}
 
-		out_material_->AddTexture("FragOut", temp_textures_[!horizontal]);
+		out_material_.AddTexture("FragOut", temp_textures_[!horizontal]);
 	}
 
 	EffectAddition::EffectAddition(
 		const std::shared_ptr<Texture>& out_texture, 
 		const std::vector<std::shared_ptr<Texture>>& in_textures)
 	{
-		in_material_ = std::make_shared<Material>();
-		out_material_ = std::make_shared<Material>();
 		for (int i = 0; i < in_textures.size(); ++i)
 		{
-			in_material_->AddTexture(
+			in_material_.AddTexture(
 				"Texture" + std::to_string(i), 
 				in_textures[i]);
 		}
-		out_material_->AddTexture("FragOut", out_texture);
+		out_material_.AddTexture("FragOut", out_texture);
 	}
 
 	void EffectAddition::Startup(std::pair<std::uint32_t, std::uint32_t> size)
 	{
-		assert(out_material_->GetMap().size() == 1);
-		assert(in_material_->GetMap().size() >= 2);
+		assert(in_material_.GetMap().size() >= 2);
 		size_ = size;
-		frame_ = std::make_shared<Frame>();
-		render_ = std::make_shared<Render>();
-		frame_->AttachRender(*render_);
-		render_->CreateStorage(size_);
+		frame_.AttachRender(render_);
+		render_.CreateStorage(size_);
 		program_ = Program::CreateProgram("VectorAddition");
 		program_->Use();
 		quad_ = CreateQuadMesh(program_);
@@ -200,20 +208,22 @@ namespace sgl {
 
 	void EffectAddition::Draw(const double dt /*= 0.0*/)
 	{
-		assert(out_material_->GetMap().size() == 1);
-		assert(in_material_->GetMap().size() >= 2);
-		ScopedBind scoped_frame(*frame_);
-		ScopedBind scoped_render(*render_);
+		assert(in_material_.GetMap().size() >= 2);
+
+		ScopedBind scoped_frame(frame_);
+		ScopedBind scoped_render(render_);
+
 		glViewport(0, 0, size_.first, size_.second);
 		error_.Display(__FILE__, __LINE__ - 1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		error_.Display(__FILE__, __LINE__ - 1);
-		frame_->AttachTexture(*out_material_->GetMap().begin()->second);
-		frame_->DrawBuffers(1);
+
+		frame_.AttachTexture(*out_material_.GetMap().begin()->second);
+		frame_.DrawBuffers(1);
 		program_->Use();
 		program_->UniformInt(
 			"texture_max",
-			static_cast<int>(in_material_->GetMap().size()));
+			static_cast<int>(in_material_.GetMap().size()));
 		quad_->SetMaterial(in_material_);
 		quad_->Draw();
 	}
@@ -222,26 +232,21 @@ namespace sgl {
 		const std::shared_ptr<Texture>& out_texture, 
 		const std::vector<std::shared_ptr<Texture>>& in_textures)
 	{
-		in_material_ = std::make_shared<Material>();
-		out_material_ = std::make_shared<Material>();
 		for (int i = 0; i < in_textures.size(); ++i)
 		{
-			in_material_->AddTexture(
+			in_material_.AddTexture(
 				"Texture" + std::to_string(i),
 				in_textures[i]);
 		}
-		out_material_->AddTexture("FragOut", out_texture);
+		out_material_.AddTexture("FragOut", out_texture);
 	}
 
 	void EffectMultiply::Startup(std::pair<std::uint32_t, std::uint32_t> size)
 	{
-		assert(out_material_->GetMap().size() == 1);
-		assert(in_material_->GetMap().size() >= 2);
+		assert(in_material_.GetMap().size() >= 2);
 		size_ = size;
-		frame_ = std::make_shared<Frame>();
-		render_ = std::make_shared<Render>();
-		frame_->AttachRender(*render_);
-		render_->CreateStorage(size_);
+		frame_.AttachRender(render_);
+		render_.CreateStorage(size_);
 		program_ = Program::CreateProgram("VectorMultiply");
 		program_->Use();
 		quad_ = CreateQuadMesh(program_);
@@ -249,20 +254,22 @@ namespace sgl {
 
 	void EffectMultiply::Draw(const double dt /*= 0.0*/)
 	{
-		assert(out_material_->GetMap().size() == 1);
-		assert(in_material_->GetMap().size() >= 2);
-		ScopedBind scoped_frame(*frame_);
-		ScopedBind scoped_render(*render_);
+		assert(in_material_.GetMap().size() >= 2);
+
+		ScopedBind scoped_frame(frame_);
+		ScopedBind scoped_render(render_);
+
 		glViewport(0, 0, size_.first, size_.second);
 		error_.Display(__FILE__, __LINE__ - 1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		error_.Display(__FILE__, __LINE__ - 1);
-		frame_->AttachTexture(*out_material_->GetMap().begin()->second);
-		frame_->DrawBuffers(1);
+
+		frame_.AttachTexture(*out_material_.GetMap().begin()->second);
+		frame_.DrawBuffers(1);
 		program_->Use();
 		program_->UniformInt(
 			"texture_max",
-			static_cast<int>(in_material_->GetMap().size()));
+			static_cast<int>(in_material_.GetMap().size()));
 		quad_->SetMaterial(in_material_);
 		quad_->Draw();
 	}

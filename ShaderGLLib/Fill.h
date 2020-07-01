@@ -1,8 +1,36 @@
 #pragma once
 
-#include "../ShaderGLLib/Device.h"
+#include <glm/glm.hpp>
+#include "../ShaderGLLib/Texture.h"
+#include "../shaderGLLib/Device.h"
 
 namespace sgl {
+
+	class EffectClear : public EffectInterface
+	{
+	public:
+		EffectClear(
+			const std::shared_ptr<Texture>& out_texture,
+			const glm::vec4 color);
+		virtual ~EffectClear() { Delete(); }
+	public:
+		void Startup(std::pair<std::uint32_t, std::uint32_t> size) override;
+		void Draw(const double dt = 0.0) override;
+		void Delete() override {}
+
+	public:
+		const std::string GetName() const override { return "Clear"; }
+
+	protected:
+		const Error& error_ = Error::GetInstance();
+		std::pair<std::uint32_t, std::uint32_t> size_ = { 0, 0 };
+		Material out_material_ = {};
+		Frame frame_ = {};
+		Render render_ = {};
+		const glm::vec4 color_;
+		std::shared_ptr<Program> program_ = nullptr;
+		std::shared_ptr<Mesh> quad_ = nullptr;
+	};
 
 	class EffectBrightness : public EffectInterface
 	{
@@ -51,10 +79,10 @@ namespace sgl {
 	protected:
 		const Error& error_ = Error::GetInstance();
 		std::pair<std::uint32_t, std::uint32_t> size_ = { 0, 0 };
-		std::shared_ptr<Material> out_material_ = nullptr;
-		std::shared_ptr<Material> in_material_ = nullptr;
-		std::shared_ptr<Frame> frame_ = nullptr;
-		std::shared_ptr<Render> render_ = nullptr;
+		Material out_material_ = {};
+		Material in_material_ = {};
+		Frame frame_ = {};
+		Render render_ = {};
 		std::shared_ptr<Program> program_ = nullptr;
 		std::shared_ptr<Mesh> quad_ = nullptr;
 		float exponent_ = 1.0f;
@@ -79,10 +107,10 @@ namespace sgl {
 	protected:
 		const Error& error_ = Error::GetInstance();
 		std::pair<std::uint32_t, std::uint32_t> size_ = { 0, 0 };
-		std::shared_ptr<Material> out_material_ = nullptr;
-		std::shared_ptr<Material> in_material_ = nullptr;
-		std::shared_ptr<Frame> frame_[2] = { nullptr, nullptr };
-		std::shared_ptr<Render> render_ = nullptr;
+		Material out_material_ = {};
+		Material in_material_ = {};
+		Frame frame_[2] = { {}, {} };
+		Render render_ = {};
 		std::shared_ptr<Program> program_ = nullptr;
 		std::shared_ptr<Mesh> quad_ = nullptr;
 		std::shared_ptr<Texture> temp_textures_[2] = { nullptr, nullptr };
@@ -107,10 +135,10 @@ namespace sgl {
 	protected:
 		const Error& error_ = Error::GetInstance();
 		std::pair<std::uint32_t, std::uint32_t> size_ = { 0, 0 };
-		std::shared_ptr<Material> out_material_ = nullptr;
-		std::shared_ptr<Material> in_material_ = nullptr;
-		std::shared_ptr<Frame> frame_ = nullptr;
-		std::shared_ptr<Render> render_ = nullptr;
+		Material out_material_ = {};
+		Material in_material_ = {};
+		Frame frame_ = {};
+		Render render_ = {};
 		std::shared_ptr<Program> program_ = nullptr;
 		std::shared_ptr<Mesh> quad_ = nullptr;
 	};
@@ -134,10 +162,10 @@ namespace sgl {
 	protected:
 		const Error& error_ = Error::GetInstance();
 		std::pair<std::uint32_t, std::uint32_t> size_ = { 0, 0 };
-		std::shared_ptr<Material> out_material_ = nullptr;
-		std::shared_ptr<Material> in_material_ = nullptr;
-		std::shared_ptr<Frame> frame_ = nullptr;
-		std::shared_ptr<Render> render_ = nullptr;
+		Material out_material_ = {};
+		Material in_material_ = {};
+		Frame frame_ = {};
+		Render render_ = {};
 		std::shared_ptr<Program> program_ = nullptr;
 		std::shared_ptr<Mesh> quad_ = nullptr;
 	};

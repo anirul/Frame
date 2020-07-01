@@ -2,10 +2,12 @@
 
 namespace sgl {
 
-	ScopedBind::ScopedBind(const BindLock& bind_locked) : 
-		bind_locked_(bind_locked)
+	ScopedBind::ScopedBind(
+		const BindLockInterface& bind_locked,
+		const unsigned int slot /*= 0*/) :
+			bind_locked_(bind_locked)
 	{
-		bind_locked_.Bind();
+		bind_locked_.Bind(slot);
 		bind_locked_.LockedBind();
 	}
 

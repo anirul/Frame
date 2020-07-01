@@ -2,10 +2,10 @@
 
 namespace sgl {
 
-	class BindLock 
+	class BindLockInterface 
 	{
 	public:
-		virtual void Bind() const = 0;
+		virtual void Bind(const unsigned int slot = 0) const = 0;
 		virtual void UnBind() const = 0;
 		virtual void LockedBind() const = 0;
 		virtual void UnlockedBind() const = 0;
@@ -14,11 +14,13 @@ namespace sgl {
 	class ScopedBind
 	{
 	public:
-		ScopedBind(const BindLock& bind_locked);
+		ScopedBind(
+			const BindLockInterface& bind_locked,
+			const unsigned int slot = 0);
 		virtual ~ScopedBind();
 
 	private:
-		const BindLock& bind_locked_;
+		const BindLockInterface& bind_locked_;
 	};
 
 } // End namespace sgl.

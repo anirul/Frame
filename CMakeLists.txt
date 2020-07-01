@@ -18,6 +18,8 @@ add_library(ShaderGLLib
     ${PROJECT_SOURCE_DIR}/Asset/Shader/Blur.vert
     ${PROJECT_SOURCE_DIR}/Asset/Shader/Brightness.frag
     ${PROJECT_SOURCE_DIR}/Asset/Shader/Brightness.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/Clear.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/Clear.vert
     ${PROJECT_SOURCE_DIR}/Asset/Shader/CubeMapDeferred.frag
     ${PROJECT_SOURCE_DIR}/Asset/Shader/CubeMapDeferred.vert
     ${PROJECT_SOURCE_DIR}/Asset/Shader/Display.frag

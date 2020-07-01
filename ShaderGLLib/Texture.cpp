@@ -136,6 +136,7 @@ namespace sgl {
 
 	void Texture::Bind(const unsigned int slot /*= 0*/) const
 	{
+		assert(slot < GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS);
 		glActiveTexture(GL_TEXTURE0 + slot);
 		error_.Display(__FILE__, __LINE__ - 1);
 		glBindTexture(GL_TEXTURE_2D, texture_id_);
@@ -350,6 +351,7 @@ namespace sgl {
 
 	void TextureCubeMap::Bind(const unsigned int slot /*= 0*/) const
 	{
+		assert(slot < GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS);
 		glActiveTexture(GL_TEXTURE0 + slot);
 		error_.Display(__FILE__, __LINE__ - 1);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, texture_id_);

@@ -18,8 +18,9 @@ namespace sgl {
 		glDeleteFramebuffers(1, &frame_id_);
 	}
 
-	void Frame::Bind() const
+	void Frame::Bind(const unsigned int slot /*= 0*/) const
 	{
+		assert(slot == 0);
 		if (locked_bind_) return;
 		glBindFramebuffer(GL_FRAMEBUFFER, frame_id_);
 		error_.Display(__FILE__, __LINE__ - 1);

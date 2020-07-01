@@ -7,14 +7,14 @@
 
 namespace sgl {
 
-	class Render : public BindLock
+	class Render : public BindLockInterface
 	{
 	public:
 		Render();
 		virtual ~Render();
 
 	public:
-		void Bind() const override;
+		void Bind(const unsigned int slot = 0) const override;
 		void UnBind() const override;
 		// /!\ This will bind and unbind!
 		void CreateStorage(

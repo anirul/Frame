@@ -15,8 +15,9 @@ namespace sgl {
 		glDeleteRenderbuffers(1, &render_id_);
 	}
 
-	void Render::Bind() const
+	void Render::Bind(const unsigned int slot /*= 0*/) const
 	{
+		assert(slot == 0);
 		if (locked_bind_) return;
 		glBindRenderbuffer(GL_RENDERBUFFER, render_id_);
 		error_.Display(__FILE__, __LINE__ - 1);

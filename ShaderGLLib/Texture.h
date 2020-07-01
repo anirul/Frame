@@ -14,6 +14,7 @@
 #include "../ShaderGLLib/Program.h"
 #include "../ShaderGLLib/Frame.h"
 #include "../ShaderGLLib/Render.h"
+#include "../ShaderGLLib/ScopedBind.h"
 
 namespace sgl {
 
@@ -30,7 +31,7 @@ namespace sgl {
 		REPEAT = GL_REPEAT
 	};
 
-	class Texture 
+	class Texture : public BindLockInterface
 	{
 	public:
 		// Create an empty texture of size size.
@@ -51,8 +52,8 @@ namespace sgl {
 		virtual ~Texture();
 
 	public:
-		virtual void Bind(const unsigned int slot = 0) const;
-		virtual void UnBind() const;
+		void Bind(const unsigned int slot = 0) const override;
+		void UnBind() const override;
 		virtual void BindEnableMipmap() const;
 		virtual void SetMinFilter(TextureFilter texture_filter);
 		virtual TextureFilter GetMinFilter() const;
@@ -85,6 +86,9 @@ namespace sgl {
 			const PixelStructure pixel_structure = PixelStructure::RGB) :
 			pixel_element_size_(pixel_element_size),
 			pixel_structure_(pixel_structure) {}
+		void LockedBind() const override { locked_bind_ = true; }
+		void UnlockedBind() const override { locked_bind_ = false; }
+		friend class ScopedBind;
 
 	protected:
 		unsigned int texture_id_ = 0;
@@ -92,6 +96,7 @@ namespace sgl {
 		const PixelElementSize pixel_element_size_;
 		const PixelStructure pixel_structure_;
 		const Error& error_ = Error::GetInstance();
+		mutable bool locked_bind_ = false;
 	};
 
 	class TextureCubeMap : public Texture

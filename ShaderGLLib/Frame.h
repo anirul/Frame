@@ -32,14 +32,14 @@ namespace sgl {
 		COLOR_ATTACHMENT7 = GL_COLOR_ATTACHMENT7,
 	};
 
-	class Frame : public BindLock
+	class Frame : public BindLockInterface
 	{
 	public:
 		Frame();
 		virtual ~Frame();
 
 	public:
-		void Bind() const override;
+		void Bind(const unsigned int slot = 0) const override;
 		void UnBind() const override;
 		// /!\ This will bind and unbind!
 		void AttachRender(const Render& render) const;
