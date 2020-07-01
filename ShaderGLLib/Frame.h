@@ -3,6 +3,7 @@
 #include <memory>
 #include "../ShaderGLLib/Render.h"
 #include "../ShaderGLLib/Error.h"
+#include "../ShaderGLLib/ScopedBind.h"
 
 namespace sgl {
 
@@ -31,17 +32,19 @@ namespace sgl {
 		COLOR_ATTACHMENT7 = GL_COLOR_ATTACHMENT7,
 	};
 
-	class Frame 
+	class Frame : public BindLock
 	{
 	public:
 		Frame();
 		virtual ~Frame();
 
 	public:
-		void Bind() const;
-		void UnBind() const;
-		void BindAttach(const Render& render) const;
-		void BindTexture(
+		void Bind() const override;
+		void UnBind() const override;
+		// /!\ This will bind and unbind!
+		void AttachRender(const Render& render) const;
+		// /!\ This will bind and unbind!
+		void AttachTexture(
 			const Texture& texture,
 			const FrameColorAttachment frame_color_attachment =
 				FrameColorAttachment::COLOR_ATTACHMENT0,
@@ -50,7 +53,12 @@ namespace sgl {
 				FrameTextureType::TEXTURE_2D) const;
 		static FrameColorAttachment GetFrameColorAttachment(const int i);
 		static FrameTextureType GetFrameTextureType(const int i);
+		// /!\ This will bind and unbind!
 		void DrawBuffers(const std::uint32_t size = 1);
+		// /!\ This will bind and unbind!
+		const std::pair<bool, std::string> GetError() const;
+		// /!\ This will bind and unbind!
+		const std::string GetStatus() const;
 
 	public:
 		const unsigned int GetId() const { return frame_id_; }
@@ -58,9 +66,13 @@ namespace sgl {
 	protected:
 		const int GetFrameTextureType(
 			const FrameTextureType frame_texture_type) const;
+		void LockedBind() const override { locked_bind_ = true; }
+		void UnlockedBind() const override { locked_bind_ = false; }
+		friend class ScopedBind;
 
-	protected:
+	private:
 		unsigned int frame_id_ = 0;
+		mutable bool locked_bind_ = false;
 		const Error& error_ = Error::GetInstance();
 	};
 

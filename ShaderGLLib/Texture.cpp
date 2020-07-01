@@ -235,17 +235,6 @@ namespace sgl {
 		return static_cast<TextureFilter>(filter);
 	}
 
-	void Texture::Clear(const glm::vec4& color)
-	{
-		frame_.BindAttach(render_);
-		render_.BindStorage(size_);
-		frame_.BindTexture(*this);
-		frame_.DrawBuffers();
-		glClearColor(color.r, color.g, color.b, color.a);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		error_.Display(__FILE__, __LINE__ - 1);
-	}
-
 	TextureCubeMap::TextureCubeMap(
 		const std::array<std::string, 6>& cube_file,
 		const PixelElementSize pixel_element_size /*= PixelElementSize::BYTE*/,
@@ -284,14 +273,16 @@ namespace sgl {
 		auto material = std::make_shared<Material>();
 		Frame frame{};
 		Render render{};
+		ScopedBind scoped_frame(frame);
+		ScopedBind scoped_render(render);
 		size_ = size;
 		auto equirectangular = std::make_shared<Texture>(
 			file_name,
 			pixel_element_size_,
 			pixel_structure_);
 		material->AddTexture("Equirectangular", equirectangular);
-		frame.BindAttach(render);
-		render.BindStorage(size_);
+		frame.AttachRender(render);
+		render.CreateStorage(size_);
 		CreateTextureCubeMap();
 		for (unsigned int i = 0; i < 6; ++i)
 		{
@@ -309,7 +300,7 @@ namespace sgl {
 		}
 		glm::mat4 projection =
 			glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
-		auto program = CreateProgram("EquirectangularCubeMap");
+		auto program = Program::CreateProgram("EquirectangularCubeMap");
 		program->UniformMatrix("projection", projection);
 		auto cube = CreateCubeMesh(program);
 		cube->SetMaterial(material);
@@ -318,7 +309,7 @@ namespace sgl {
 		int i = 0;
 		for (glm::mat4 view : views_cubemap)
 		{
-			frame.BindTexture(
+			frame.AttachTexture(
 				*this,
 				FrameColorAttachment::COLOR_ATTACHMENT0,
 				0,
@@ -480,17 +471,6 @@ namespace sgl {
 		return static_cast<TextureFilter>(filter);
 	}
 
-	void TextureCubeMap::Clear(const glm::vec4& color)
-	{
-		frame_.BindAttach(render_);
-		render_.BindStorage(size_);
-		frame_.BindTexture(*this);
-		frame_.DrawBuffers();
-		glClearColor(color.r, color.g, color.b, color.a);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		error_.Display(__FILE__, __LINE__ - 1);
-	}
-
 	void TextureCubeMap::CreateTextureCubeMap()
 	{
 		glGenTextures(1, &texture_id_);
@@ -525,9 +505,11 @@ namespace sgl {
 		const sgl::Error& error = sgl::Error::GetInstance();
 		sgl::Frame frame{};
 		sgl::Render render{};
+		ScopedBind scoped_frame(frame);
+		ScopedBind scoped_render(render);
 		auto size = in_texture->GetSize();
-		frame.BindAttach(render);
-		render.BindStorage(size);
+		frame.AttachRender(render);
+		render.CreateStorage(size);
 		auto pixel_element_size = in_texture->GetPixelElementSize();
 
 		// Set the view port for rendering.
@@ -539,11 +521,11 @@ namespace sgl {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		error.Display(__FILE__, __LINE__ - 1);
 
-		frame.BindTexture(*out_texture);
+		frame.AttachTexture(*out_texture);
 
 		auto material = std::make_shared<Material>();
 		material->AddTexture("Display", in_texture);
-		auto program = sgl::CreateProgram("Brightness");
+		auto program = Program::CreateProgram("Brightness");
 		auto quad = sgl::CreateQuadMesh(program);
 		quad->SetMaterial(material);
 		quad->Draw();
@@ -554,7 +536,7 @@ namespace sgl {
 		const std::shared_ptr<Texture>& in_texture,
 		const float exponent /*= 1.0f*/)
 	{
-		static auto program = CreateProgram("Blur");
+		static auto program = Program::CreateProgram("Blur");
 		program->Use();
 		program->UniformFloat("exponent", exponent);
 		FillProgramMultiTexture(
@@ -572,9 +554,9 @@ namespace sgl {
 		sgl::Frame frame[2];
 		sgl::Render render{};
 		auto size = in_texture->GetSize();
-		frame[0].BindAttach(render);
-		frame[1].BindAttach(render);
-		render.BindStorage(size);
+		frame[0].AttachRender(render);
+		frame[1].AttachRender(render);
+		render.CreateStorage(size);
 		auto pixel_element_size = in_texture->GetPixelElementSize();
 
 		std::shared_ptr<sgl::Texture> texture_out[2] = {
@@ -594,10 +576,10 @@ namespace sgl {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		error.Display(__FILE__, __LINE__ - 1);
 
-		frame[0].BindTexture(*texture_out[0]);
-		frame[1].BindTexture(*texture_out[1]);
+		frame[0].AttachTexture(*texture_out[0]);
+		frame[1].AttachTexture(*texture_out[1]);
 
-		static auto program = CreateProgram("GaussianBlur");
+		static auto program = Program::CreateProgram("GaussianBlur");
 		static auto quad = CreateQuadMesh(program);
 		program->Use();
 
@@ -608,7 +590,7 @@ namespace sgl {
 			// Reset the texture manager.
 			auto material = std::make_shared<Material>();
 			program->UniformInt("horizontal", horizontal);
-			frame[horizontal].Bind();
+			ScopedBind scoped_frame(frame[horizontal]);
 			material->AddTexture(
 				"Image",
 				(first_iteration) ? in_texture : texture_out[!horizontal]);
@@ -629,9 +611,11 @@ namespace sgl {
 		const sgl::Error& error = sgl::Error::GetInstance();
 		sgl::Frame frame{};
 		sgl::Render render{};
+		ScopedBind scoped_frame(frame);
+		ScopedBind scoped_render(render);
 		auto size = add_textures[0]->GetSize();
-		frame.BindAttach(render);
-		render.BindStorage(size);
+		frame.AttachRender(render);
+		render.CreateStorage(size);
 
 		// Set the view port for rendering.
 		glViewport(0, 0, size.first, size.second);
@@ -641,12 +625,12 @@ namespace sgl {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		error.Display(__FILE__, __LINE__ - 1);
 
-		frame.BindTexture(*out_texture);
+		frame.AttachTexture(*out_texture);
 		frame.DrawBuffers(1);
 
 		auto material = std::make_shared<Material>();
-		static auto program = sgl::CreateProgram("VectorAddition");
-		static auto quad = sgl::CreateQuadMesh(program);
+		static auto program = Program::CreateProgram("VectorAddition");
+		static auto quad = CreateQuadMesh(program);
 		int i = 0;
 		std::vector<std::string> vec = {};
 		for (const auto& texture : add_textures)
@@ -671,9 +655,11 @@ namespace sgl {
 		const sgl::Error& error = sgl::Error::GetInstance();
 		sgl::Frame frame{};
 		sgl::Render render{};
+		ScopedBind scoped_frame(frame);
+		ScopedBind scoped_render(render);
 		auto size = multiply_textures[0]->GetSize();
-		frame.BindAttach(render);
-		render.BindStorage(size);
+		frame.AttachRender(render);
+		render.CreateStorage(size);
 
 		// Set the view port for rendering.
 		glViewport(0, 0, size.first, size.second);
@@ -683,12 +669,12 @@ namespace sgl {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		error.Display(__FILE__, __LINE__ - 1);
 
-		frame.BindTexture(*out_texture);
+		frame.AttachTexture(*out_texture);
 		frame.DrawBuffers(1);
 
 		auto material = std::make_shared<Material>();
-		static auto program = sgl::CreateProgram("VectorMultiply");
-		static auto quad = sgl::CreateQuadMesh(program);
+		static auto program = Program::CreateProgram("VectorMultiply");
+		static auto quad = CreateQuadMesh(program);
 		int i = 0;
 		std::vector<std::string> vec = {};
 		for (const auto& texture : multiply_textures)
@@ -733,8 +719,10 @@ namespace sgl {
 		auto size = out_textures[0]->GetSize();
 		Frame frame{};
 		Render render{};
-		frame.BindAttach(render);
-		render.BindStorage(size);
+		ScopedBind scoped_frame(frame);
+		ScopedBind scoped_render(render);
+		frame.AttachRender(render);
+		render.CreateStorage(size);
 		frame.DrawBuffers(static_cast<std::uint32_t>(out_textures.size()));
 		int max_mipmap = (mipmap <= 0) ? 1 : mipmap;
 		if (max_mipmap > 1) {
@@ -768,7 +756,7 @@ namespace sgl {
 			error.Display(__FILE__, __LINE__ - 1);
 			for (int i = 0; i < out_textures.size(); ++i)
 			{
-				frame.BindTexture(
+				frame.AttachTexture(
 					*out_textures[i], 
 					Frame::GetFrameColorAttachment(i),
 					mipmap_level);
@@ -807,7 +795,9 @@ namespace sgl {
 		auto size = out_textures[0]->GetSize();
 		Frame frame{};
 		Render render{};
-		frame.BindAttach(render);
+		ScopedBind scoped_frame(frame);
+		ScopedBind scoped_render(render);
+		frame.AttachRender(render);
 		frame.DrawBuffers(static_cast<std::uint32_t>(out_textures.size()));
 		int max_mipmap = (mipmap <= 0) ? 1 : mipmap;
 		if (max_mipmap > 1) 
@@ -838,7 +828,7 @@ namespace sgl {
 				static_cast<std::uint32_t>(size.first * fact);
 			temporary_size.second =
 				static_cast<std::uint32_t>(size.second * fact);
-			render.BindStorage(temporary_size);
+			render.CreateStorage(temporary_size);
 			glViewport(0, 0, temporary_size.first, temporary_size.second);
 			error.Display(__FILE__, __LINE__ - 1);
 			int cubemap_element = 0;
@@ -846,7 +836,7 @@ namespace sgl {
 			{
 				for (int i = 0; i < out_textures.size(); ++i)
 				{
-					frame.BindTexture(
+					frame.AttachTexture(
 						*out_textures[i],
 						Frame::GetFrameColorAttachment(i),
 						mipmap_level,

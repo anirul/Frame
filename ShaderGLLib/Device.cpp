@@ -107,8 +107,6 @@ namespace sgl {
 			ssao_noise.data(),
 			sgl::PixelElementSize::HALF, 
 			sgl::PixelStructure::GREY_ALPHA);
-//		noise_texture_->SetMagFilter(TextureFilter::NEAREST);
-//		noise_texture_->SetMinFilter(TextureFilter::NEAREST);
 		noise_texture_->SetWrapS(TextureFilter::REPEAT);
 		noise_texture_->SetWrapT(TextureFilter::REPEAT);
 
@@ -119,16 +117,25 @@ namespace sgl {
 			std::make_shared<Texture>(size, pixel_element_size_));
 
 		// Create programs.
-		pbr_program_ = CreateProgram("PhysicallyBasedRendering");
-		lighting_program_ = CreateProgram("Lighting");
-		ssao_program_ = CreateProgram("ScreenSpaceAmbientOcclusion");
-		view_program_ = CreateProgram("ViewPositionNormal");
+		pbr_program_ = Program::CreateProgram("PhysicallyBasedRendering");
+		lighting_program_ = Program::CreateProgram("Lighting");
+		ssao_program_ = Program::CreateProgram("ScreenSpaceAmbientOcclusion");
+		view_program_ = Program::CreateProgram("ViewPositionNormal");
+	}
+
+	void Device::AddEffect(std::shared_ptr<EffectInterface>& effect)
+	{
+		effects_.push_back(effect);
 	}
 
 	void Device::Startup(const float fov /*= 65.0f*/)
 	{
 		fov_ = fov;
 		SetupCamera();
+		for (auto& effect : effects_)
+		{
+			effect->Startup(size_);
+		}
 	}
 
 	void Device::Draw(const double dt)
@@ -173,10 +180,6 @@ namespace sgl {
 		{
 			temp_textures = out_textures;
 		}
-		for (const auto& texture : temp_textures)
-		{
-			texture->Clear({ 0, 0, 0, 1 });
-		}
 		view_program_->Use();
 		view_program_->UniformInt("inverted_normals", 0);
 		DrawMultiTextures(temp_textures, view_program_, dt);
@@ -210,8 +213,8 @@ namespace sgl {
 		Frame frame{};
 		Render render{};
 		auto size = temp_textures[0]->GetSize();
-		frame.BindAttach(render);
-		render.BindStorage(size);
+		frame.AttachRender(render);
+		render.CreateStorage(size);
 
 		// Set the view port for rendering.
 		glViewport(0, 0, size.first, size.second);
@@ -221,7 +224,7 @@ namespace sgl {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		error_.Display(__FILE__, __LINE__ - 1);
 
-		frame.BindTexture(*lighting_textures_[1]);
+		frame.AttachTexture(*lighting_textures_[1]);
 		frame.DrawBuffers(1);
 
 		static auto quad = sgl::CreateQuadMesh(lighting_program_);
@@ -252,9 +255,10 @@ namespace sgl {
 		}
 		Frame frame{};
 		Render render{};
+		ScopedBind scoped_bind(frame);
 		auto size = temp_textures[0]->GetSize();
-		frame.BindAttach(render);
-		render.BindStorage(size);
+		frame.AttachRender(render);
+		render.CreateStorage(size);
 
 		// Set the view port for rendering.
 		glViewport(0, 0, size.first, size.second);
@@ -264,7 +268,7 @@ namespace sgl {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		error_.Display(__FILE__, __LINE__ - 1);
 
-		frame.BindTexture(*out_texture);
+		frame.AttachTexture(*out_texture);
 		frame.DrawBuffers(1);
 
 		// Set the screen space ambient occlusion uniforms.
@@ -302,7 +306,7 @@ namespace sgl {
 			std::make_shared<Texture>(
 				out_texture->GetSize(), 
 				sgl::PixelElementSize::HALF);
-		out_texture->Clear({ 0.f, 0.f, 0.f, 1.f });
+		// out_texture->Clear({ 0.f, 0.f, 0.f, 1.f });
 		TextureBrightness(out_texture, in_texture);
 		TextureGaussianBlur(temp_texture, out_texture);
 		TextureAddition(out_texture, { in_texture, temp_texture });
@@ -316,9 +320,10 @@ namespace sgl {
 	{
 		Frame frame{};
 		Render render{};
+		ScopedBind scoped_bind(frame);
 		auto size = in_texture->GetSize();
-		frame.BindAttach(render);
-		render.BindStorage(size);
+		frame.AttachRender(render);
+		render.CreateStorage(size);
 
 		// Set the view port for rendering.
 		glViewport(0, 0, size.first, size.second);
@@ -328,12 +333,12 @@ namespace sgl {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		error_.Display(__FILE__, __LINE__ - 1);
 
-		frame.BindTexture(*out_texture);
+		frame.AttachTexture(*out_texture);
 		frame.DrawBuffers(1);
 
 		auto material = std::make_shared<Material>();
 		material->AddTexture("Display", in_texture);
-		auto program = sgl::CreateProgram("HighDynamicRange");
+		auto program = Program::CreateProgram("HighDynamicRange");
 		program->UniformFloat("exposure", exposure);
 		program->UniformFloat("gamma", gamma);
 		auto quad = sgl::CreateQuadMesh(program);
@@ -343,7 +348,7 @@ namespace sgl {
 
 	void Device::Display(const std::shared_ptr<Texture>& texture)
 	{
-		static auto program = CreateProgram("Display");
+		static auto program = Program::CreateProgram("Display");
 		static auto quad = CreateQuadMesh(program);
 		auto material = std::make_shared<Material>();
 		material->AddTexture("Display", texture);
@@ -367,8 +372,9 @@ namespace sgl {
 
 		Frame frame{};
 		Render render{};
-		frame.BindAttach(render);
-		render.BindStorage(size_);
+		ScopedBind scoped_bind(frame);
+		frame.AttachRender(render);
+		render.CreateStorage(size_);
 
 		// Set the view port for rendering.
 		glViewport(0, 0, size_.first, size_.second);
@@ -385,7 +391,7 @@ namespace sgl {
 		int i = 0;
 		for (const auto& texture : out_textures)
 		{
-			frame.BindTexture(*texture, Frame::GetFrameColorAttachment(i));
+			frame.AttachTexture(*texture, Frame::GetFrameColorAttachment(i));
 			++i;
 		}
 		frame.DrawBuffers(static_cast<std::uint32_t>(out_textures.size()));
@@ -443,7 +449,7 @@ namespace sgl {
 			environment_map,
 			std::make_pair<std::uint32_t, std::uint32_t>(512, 512),
 			sgl::PixelElementSize::HALF);
-		auto cubemap_program = CreateProgram("CubeMapDeferred");
+		auto cubemap_program = Program::CreateProgram("CubeMapDeferred");
 		cubemap_program->UniformMatrix("projection", GetProjection());
 		auto cube_mesh = CreateCubeMesh(cubemap_program);
 		material_ = std::make_shared<Material>();
@@ -460,11 +466,11 @@ namespace sgl {
 		auto monte_carlo_prefilter = std::make_shared<sgl::TextureCubeMap>(
 			std::make_pair<std::uint32_t, std::uint32_t>(128, 128),
 			sgl::PixelElementSize::FLOAT);
-		sgl::FillProgramMultiTextureCubeMapMipmap(
+		FillProgramMultiTextureCubeMapMipmap(
 			std::vector<std::shared_ptr<sgl::Texture>>{ monte_carlo_prefilter },
 			std::map<std::string, std::shared_ptr<Texture>>{ 
 				{"Environment", material_->GetTexture("Environment") }},
-			sgl::CreateProgram("MonteCarloPrefilter"),
+			Program::CreateProgram("MonteCarloPrefilter"),
 			5,
 			[](const int mipmap, const std::shared_ptr<sgl::Program>& program)
 		{
@@ -479,22 +485,22 @@ namespace sgl {
 		auto irradiance = std::make_shared<sgl::TextureCubeMap>(
 			std::make_pair<std::uint32_t, std::uint32_t>(32, 32),
 			pixel_element_size_);
-		sgl::FillProgramMultiTextureCubeMap(
+		FillProgramMultiTextureCubeMap(
 			std::vector<std::shared_ptr<sgl::Texture>>{ irradiance },
 			std::map<std::string, std::shared_ptr<Texture>>{
 				{ "Environment", material_->GetTexture("Environment") }},
-			sgl::CreateProgram("IrradianceCubeMap"));
+			Program::CreateProgram("IrradianceCubeMap"));
 		material_->AddTexture("Irradiance", irradiance);
 
 		// Create the LUT BRDF.
 		auto integrate_brdf = std::make_shared<sgl::Texture>(
 			std::make_pair<std::uint32_t, std::uint32_t>(512, 512),
 			pixel_element_size_);
-		sgl::FillProgramMultiTexture(
+		FillProgramMultiTexture(
 			std::vector<std::shared_ptr<Texture>>{ integrate_brdf },
 			std::map<std::string, std::shared_ptr<Texture>>{
 				{ "Environment", material_->GetTexture("Environment") }},
-			sgl::CreateProgram("IntegrateBRDF"));
+			Program::CreateProgram("IntegrateBRDF"));
 		material_->AddTexture("IntegrateBRDF", integrate_brdf);
 	}
 

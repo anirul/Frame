@@ -2,6 +2,7 @@
 #include <stdexcept>
 #include <GL/glew.h>
 #include <cassert>
+#include <sstream>
 #include "Texture.h"
 
 namespace sgl {
@@ -19,17 +20,19 @@ namespace sgl {
 
 	void Frame::Bind() const
 	{
+		if (locked_bind_) return;
 		glBindFramebuffer(GL_FRAMEBUFFER, frame_id_);
 		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
 	void Frame::UnBind() const
 	{
+		if (locked_bind_) return;
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
-	void Frame::BindAttach(const Render& render) const
+	void Frame::AttachRender(const Render& render) const
 	{
 		Bind();
 		render.Bind();
@@ -39,9 +42,11 @@ namespace sgl {
 			GL_RENDERBUFFER, 
 			render.GetId());
 		error_.Display(__FILE__, __LINE__ - 5);
+		render.UnBind();
+		UnBind();
 	}
 
-	void Frame::BindTexture(
+	void Frame::AttachTexture(
 		const Texture& texture,
 		const FrameColorAttachment frame_color_attachment /*=
 			FrameColorAttachment::COLOR_ATTACHMENT0*/,
@@ -57,6 +62,7 @@ namespace sgl {
 			texture.GetId(),
 			mipmap);
 		error_.Display(__FILE__, __LINE__ - 6);
+		UnBind();
 	}
 
 	FrameColorAttachment Frame::GetFrameColorAttachment(const int i)
@@ -102,6 +108,7 @@ namespace sgl {
 
 	void Frame::DrawBuffers(const std::uint32_t size /*= 1*/)
 	{
+		Bind();
 		assert(size < 9);
 		std::vector<unsigned int> draw_buffer = {};
 		for (std::uint32_t i = 0; i < size; ++i)
@@ -113,6 +120,147 @@ namespace sgl {
 			static_cast<GLsizei>(draw_buffer.size()), 
 			draw_buffer.data());
 		error_.Display(__FILE__, __LINE__ - 3);
+		UnBind();
+	}
+
+	const std::pair<bool, std::string> Frame::GetError() const
+	{
+		Bind();
+		std::pair<bool, std::string> status_error;
+		GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+		UnBind();
+		switch (status)
+		{
+		case GL_FRAMEBUFFER_COMPLETE:
+			status_error.second = "no error";
+			status_error.first = true;
+			return status_error;
+		case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+			status_error.second = "[ERROR] : incomplete attachment.";
+			status_error.first = false;
+			return status_error;
+		case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+			status_error.second = "[ERROR] : missing attachment.";
+			status_error.first = false;
+			return status_error;
+		case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
+			status_error.second = "[ERROR] : incomplete draw buffer.";
+			status_error.first = false;
+			return status_error;
+		case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
+			status_error.second = "[ERROR] : incomplete read buffer.";
+			status_error.first = false;
+			return status_error;
+		case GL_FRAMEBUFFER_UNSUPPORTED:
+			status_error.second = "[ERROR] : unsupported.";
+			status_error.first = false;
+			return status_error;
+		default:
+			status_error.second = 
+				"[ERROR] : unknown(" + std::to_string(status) + ").";
+			status_error.first = false;
+			return status_error;
+		}
+	}
+
+	const std::string Frame::GetStatus() const
+	{
+		Bind();
+		std::stringstream ss;
+		ss << "===== FBO STATUS =====\n";
+		int color_buffer_count = 0;
+		glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &color_buffer_count);
+		ss << "color buffer count     : " << color_buffer_count << std::endl;
+		int multi_sample_count = 0;
+		glGetIntegerv(GL_MAX_SAMPLES, &multi_sample_count);
+		ss << "multi sample count     : " << multi_sample_count << std::endl;
+
+		int obj_type = 0;
+		int obj_id = 0;
+
+		// Take care of the attachment color.
+		for (int i = 0; i < color_buffer_count; ++i)
+		{
+			glGetFramebufferAttachmentParameteriv(
+				GL_FRAMEBUFFER,
+				GL_COLOR_ATTACHMENT0 + i,
+				GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE,
+				&obj_type);
+			if (obj_type != GL_NONE)
+			{
+				glGetFramebufferAttachmentParameteriv(
+					GL_FRAMEBUFFER,
+					GL_COLOR_ATTACHMENT0 + i,
+					GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME,
+					&obj_id);
+				ss << "color attachment       : (" << i << ")";
+				switch (obj_type)
+				{
+				case GL_TEXTURE:
+					ss << " GL_TEXTURE";
+					break;
+				case GL_RENDERBUFFER:
+					ss << " GL_RENDERBUFFER";
+					break;
+				}
+				ss << std::endl;
+			}
+		}
+
+		// Take care of the depth buffer.
+		glGetFramebufferAttachmentParameteriv(
+			GL_FRAMEBUFFER,
+			GL_DEPTH_ATTACHMENT,
+			GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE,
+			&obj_type);
+		if (obj_type != GL_NONE)
+		{
+			glGetFramebufferAttachmentParameteriv(
+				GL_FRAMEBUFFER,
+				GL_DEPTH_ATTACHMENT,
+				GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME,
+				&obj_id);
+			ss << "depth attachment       : ";
+			switch (obj_type)
+			{
+			case GL_TEXTURE:
+				ss << "GL_TEXTURE";
+				break;
+			case GL_RENDERBUFFER:
+				ss << "GL_RENDERBUFFER";
+				break;
+			}
+			ss << std::endl;
+		}
+
+		// Take care of the stencil buffer.
+		glGetFramebufferAttachmentParameteriv(
+			GL_FRAMEBUFFER,
+			GL_STENCIL_ATTACHMENT,
+			GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE,
+			&obj_type);
+		if (obj_type != GL_NONE)
+		{
+			glGetFramebufferAttachmentParameteriv(
+				GL_FRAMEBUFFER,
+				GL_STENCIL_ATTACHMENT,
+				GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME,
+				&obj_id);
+			ss << "stencil attachment     : ";
+			switch (obj_type)
+			{
+			case GL_TEXTURE:
+				ss << "GL_TEXTURE";
+				break;
+			case GL_RENDERBUFFER:
+				ss << "GL_RENDERBUFFER";
+				break;
+			}
+			ss << std::endl;
+		}
+
+		UnBind();
+		return ss.str();
 	}
 
 } // End namespace sgl.

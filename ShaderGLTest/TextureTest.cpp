@@ -82,7 +82,7 @@ namespace test {
 			std::vector<std::shared_ptr<sgl::Texture>>{ irradiance },
 			std::map<std::string, std::shared_ptr<sgl::Texture>>{
 				{ "Environment", cube_map } },
-			sgl::CreateProgram("IrradianceCubeMap"));
+			sgl::Program::CreateProgram("IrradianceCubeMap"));
 		EXPECT_NE(0, irradiance->GetId());
 		std::pair<std::uint32_t, std::uint32_t> pair(32, 32);
 		EXPECT_EQ(pair, irradiance->GetSize());

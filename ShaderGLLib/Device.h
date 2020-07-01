@@ -17,6 +17,24 @@
 
 namespace sgl {
 
+	// Definition of an effect interface.
+	struct EffectInterface
+	{
+		// You will be able to add stuff in the constructor of the derived
+		// class. Some thing like mesh, program, mipmap, textures and also
+		// functions.
+		// EffectInterface(<here come the stuff>);
+		// Startup the Effect this is where the effect is created (this will be
+		// called only once at the beginning).
+		virtual void Startup(std::pair<std::uint32_t, std::uint32_t> size) = 0;
+		// This is the draw interfaces.
+		virtual void Draw(const double dt = 0.0) = 0;
+		// Free everything.
+		virtual void Delete() = 0;
+		// Get the name of the effect.
+		virtual const std::string GetName() const = 0;
+	};
+
 	class Device
 	{
 	public:
@@ -26,6 +44,8 @@ namespace sgl {
 			const std::pair<std::uint32_t, std::uint32_t> size);
 
 	public:
+		// Pile up effect to be called before Startup.
+		void AddEffect(std::shared_ptr<EffectInterface>& effect);
 		// Startup the scene. Throw errors in case there is any, takes fov in 
 		// degrees.
 		void Startup(const float fov = 65.0f);
@@ -112,6 +132,7 @@ namespace sgl {
 		std::shared_ptr<Texture> final_texture_ = nullptr;
 		std::shared_ptr<Material> material_ = nullptr;
 		std::map<std::string, std::shared_ptr<Material>> materials_ = {};
+		std::vector<std::shared_ptr<EffectInterface>> effects_ = {};
 		SceneTree scene_tree_ = {};
 		LightManager light_manager_ = {};
 		// Camera storage.

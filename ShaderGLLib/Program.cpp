@@ -4,6 +4,37 @@
 
 namespace sgl {
 
+	std::shared_ptr<sgl::Program> Program::CreateProgram(
+		const std::string& name)
+	{
+		auto program = std::make_shared<sgl::Program>();
+		const auto& error = Error::GetInstance();
+		sgl::Shader vertex(sgl::ShaderType::VERTEX_SHADER);
+		sgl::Shader fragment(sgl::ShaderType::FRAGMENT_SHADER);
+		if (!vertex.LoadFromFile("../Asset/Shader/" + name + ".vert"))
+		{
+			error.CreateError(
+				vertex.GetErrorMessage(),
+				__FILE__,
+				__LINE__ - 5);
+		}
+		if (!fragment.LoadFromFile("../Asset/Shader/" + name + ".frag"))
+		{
+			error.CreateError(
+				fragment.GetErrorMessage(),
+				__FILE__,
+				__LINE__ - 5);
+		}
+		program->AddShader(vertex);
+		program->AddShader(fragment);
+		program->LinkShader();
+		program->Use();
+		program->UniformMatrix("projection", glm::mat4(1.0));
+		program->UniformMatrix("view", glm::mat4(1.0));
+		program->UniformMatrix("model", glm::mat4(1.0));
+		return program;
+	}
+
 	Program::Program()
 	{
 		program_id_ = glCreateProgram();
@@ -109,36 +140,6 @@ namespace sgl {
 			error_.Display(__FILE__, __LINE__ - 1);
 		}
 		return memoize_map_[name];
-	}
-
-	std::shared_ptr<Program> CreateProgram(const std::string& name)
-	{
-		auto program = std::make_shared<sgl::Program>();
-		const auto& error = Error::GetInstance();
-		sgl::Shader vertex(sgl::ShaderType::VERTEX_SHADER);
-		sgl::Shader fragment(sgl::ShaderType::FRAGMENT_SHADER);
-		if (!vertex.LoadFromFile("../Asset/Shader/" + name + ".vert"))
-		{
-			error.CreateError(
-				vertex.GetErrorMessage(), 
-				__FILE__, 
-				__LINE__ - 5);
-		}
-		if (!fragment.LoadFromFile("../Asset/Shader/" + name + ".frag"))
-		{
-			error.CreateError(
-				fragment.GetErrorMessage(), 
-				__FILE__, 
-				__LINE__ - 5);
-		}
-		program->AddShader(vertex);
-		program->AddShader(fragment);
-		program->LinkShader();
-		program->Use();
-		program->UniformMatrix("projection", glm::mat4(1.0));
-		program->UniformMatrix("view", glm::mat4(1.0));
-		program->UniformMatrix("model", glm::mat4(1.0));
-		return program;
 	}
 
 } // End namespace sgl.

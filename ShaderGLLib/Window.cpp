@@ -66,6 +66,8 @@ namespace sgl {
 				{
 					draw_interface_->Startup(size_);
 				}
+				// Has to be done after the draw startup.
+				device_->Startup();
 				// While Run return true continue.
 				bool loop = true;
 				double previous_count = 0.0f;

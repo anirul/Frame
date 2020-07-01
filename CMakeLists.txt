@@ -54,6 +54,8 @@ add_library(ShaderGLLib
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Device.h
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Error.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Error.h
+    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Fill.cpp
+    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Fill.h
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Frame.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Frame.h
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Image.cpp
@@ -72,6 +74,8 @@ add_library(ShaderGLLib
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Render.h
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Scene.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Scene.h
+    ${PROJECT_SOURCE_DIR}/ShaderGLLib/ScopedBind.cpp
+    ${PROJECT_SOURCE_DIR}/ShaderGLLib/ScopedBind.h
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Shader.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Shader.h
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Texture.cpp

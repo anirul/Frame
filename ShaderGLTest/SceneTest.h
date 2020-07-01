@@ -25,7 +25,7 @@ namespace test {
 		{
 			glm::mat4 identity(1.0f);
 			auto matrix_scene = std::make_shared<sgl::SceneMatrix>(identity);
-			auto program = sgl::CreateProgram("Simple");
+			auto program = sgl::Program::CreateProgram("Simple");
 
 			scene_tree_->AddNode(matrix_scene);
 			{

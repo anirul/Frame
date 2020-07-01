@@ -32,7 +32,7 @@ void Application::Run()
 std::shared_ptr<sgl::Mesh> Application::CreateBillboardMesh() const
 {
 	// Create the ray marching program.
-	auto ray_marshing_program = sgl::CreateProgram("JapaneseFlag");
+	auto ray_marshing_program = sgl::Program::CreateProgram("JapaneseFlag");
 	auto billboard_mesh = sgl::CreateQuadMesh(ray_marshing_program);
 	return billboard_mesh;
 }
