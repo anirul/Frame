@@ -6,32 +6,6 @@
 
 namespace sgl {
 
-	class EffectClear : public EffectInterface
-	{
-	public:
-		EffectClear(
-			const std::shared_ptr<Texture>& out_texture,
-			const glm::vec4 color);
-		virtual ~EffectClear() { Delete(); }
-	public:
-		void Startup(std::pair<std::uint32_t, std::uint32_t> size) override;
-		void Draw(const double dt = 0.0) override;
-		void Delete() override {}
-
-	public:
-		const std::string GetName() const override { return "Clear"; }
-
-	protected:
-		const Error& error_ = Error::GetInstance();
-		std::pair<std::uint32_t, std::uint32_t> size_ = { 0, 0 };
-		Material out_material_ = {};
-		Frame frame_ = {};
-		Render render_ = {};
-		const glm::vec4 color_;
-		std::shared_ptr<Program> program_ = nullptr;
-		std::shared_ptr<Mesh> quad_ = nullptr;
-	};
-
 	class EffectBrightness : public EffectInterface
 	{
 	public:

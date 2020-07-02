@@ -236,6 +236,25 @@ namespace sgl {
 		return static_cast<TextureFilter>(filter);
 	}
 
+	void Texture::Clear(const glm::vec4 color)
+	{
+		// First time this is called this will create a frame and a render.
+		if (!frame_)
+		{
+			frame_ = std::make_shared<Frame>();
+			render_ = std::make_shared<Render>();
+			render_->CreateStorage(size_);
+			frame_->AttachRender(*render_);
+		}
+		ScopedBind scoped_frame(*frame_);
+		frame_->AttachTexture(*this);
+		frame_->DrawBuffers(1);
+		glViewport(0, 0, size_.first, size_.second);
+		error_.Display(__FILE__, __LINE__ - 1);
+		GLfloat clearColor[4] = { color.r, color.g, color.b, color.a };
+		glClearBufferfv(GL_COLOR, 0, clearColor);
+	}
+
 	TextureCubeMap::TextureCubeMap(
 		const std::array<std::string, 6>& cube_file,
 		const PixelElementSize pixel_element_size /*= PixelElementSize::BYTE*/,

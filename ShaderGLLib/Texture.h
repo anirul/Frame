@@ -63,6 +63,7 @@ namespace sgl {
 		virtual TextureFilter GetWrapS() const;
 		virtual void SetWrapT(TextureFilter texture_filter);
 		virtual TextureFilter GetWrapT() const;
+		void Clear(const glm::vec4 color);
 
 	public:
 		const int GetId() const { return texture_id_; }
@@ -97,6 +98,8 @@ namespace sgl {
 		const PixelStructure pixel_structure_;
 		const Error& error_ = Error::GetInstance();
 		mutable bool locked_bind_ = false;
+		std::shared_ptr<Render> render_ = nullptr;
+		std::shared_ptr<Frame> frame_ = nullptr;
 	};
 
 	class TextureCubeMap : public Texture

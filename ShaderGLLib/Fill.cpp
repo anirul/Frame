@@ -3,44 +3,6 @@
 
 namespace sgl {
 
-	EffectClear::EffectClear(
-		const std::shared_ptr<Texture>& out_texture,
-		const glm::vec4 color) : color_(color)
-	{
-		out_material_.AddTexture("FragOut", out_texture);
-	}
-
-	void EffectClear::Startup(std::pair<std::uint32_t, std::uint32_t> size)
-	{
-		assert(size == out_material_.GetMap().at("FragOut")->GetSize());
-		size_ = size;
-		program_ = Program::CreateProgram("Clear");
-		program_->Use();
-		program_->UniformVector4("color", color_);
-		quad_ = CreateQuadMesh(program_);
-		quad_->ClearDepthBuffer(true);
-		frame_.AttachRender(render_);
-		render_.CreateStorage(size);
-	}
-
-	void EffectClear::Draw(const double dt /*= 0.0*/)
-	{
-		ScopedBind scoped_frame(frame_);
-
-		frame_.AttachTexture(*out_material_.GetMap().at("FragOut"));
-		frame_.DrawBuffers();
-
-		// Set the view port for rendering.
-		glViewport(0, 0, size_.first, size_.second);
-		error_.Display(__FILE__, __LINE__ - 1);
-
-		// Clear the screen.
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		error_.Display(__FILE__, __LINE__ - 1);
-
-		quad_->Draw();
-	}
-
 	EffectBrightness::EffectBrightness(
 		const std::shared_ptr<Texture>& out_texture, 
 		const std::shared_ptr<Texture>& in_texture)

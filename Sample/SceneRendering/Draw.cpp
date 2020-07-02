@@ -13,12 +13,6 @@ void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF)
 	};
 	device_->SetLightManager(CreateLightManager());
-	
-	// Initialize the Clear effect.
-	clear_ = std::make_shared<sgl::EffectClear>(
-		textures_[0],
-		glm::vec4{ 1.f });
-	device_->AddEffect(clear_);
 
 	// Initialize the Brightness effect.
 	brightness_ = std::make_shared<sgl::EffectBrightness>(
@@ -59,7 +53,7 @@ void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 const std::shared_ptr<sgl::Texture>& Draw::GetDrawTexture() const
 {
 //	return device_->GetDeferredTexture(0);
-//	return device_->GetViewTexture(1);
+//	return device_->GetViewTexture(0);
 //	return device_->GetNoiseTexture();
 //	return device_->GetLightingTexture(0);
 //	return ssao_texture_;
@@ -68,10 +62,15 @@ const std::shared_ptr<sgl::Texture>& Draw::GetDrawTexture() const
 
 void Draw::RunDraw(const double dt)
 {
+	for (auto texture : textures_)
+	{
+		texture->Clear(glm::vec4(1.f, 0.f, 0.f, 1.f));
+	}
+	device_->ClearView();
+	device_->ClearDeferred();
+	// Clear the GetViewTexture(0).
 	device_->DrawDeferred({}, dt);
 	device_->DrawView({}, dt);
-	// Clear the texture 0.
-	clear_->Draw(dt);
 	// Store pre-blured SSAO in texture 0.
 	device_->DrawScreenSpaceAmbientOcclusion(textures_[0]);
 	// Store lighting in texture 2.

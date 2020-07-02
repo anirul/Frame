@@ -442,6 +442,22 @@ namespace sgl {
 		}
 	}
 
+	void Device::ClearView()
+	{
+		for (auto texture : view_textures_)
+		{
+			texture->Clear(glm::vec4(0.f, 0.f, 0.f, 1.f));
+		}
+	}
+
+	void Device::ClearDeferred()
+	{
+		for (auto texture : deferred_textures_)
+		{
+			texture->Clear(glm::vec4(0.f, 0.f, 0.f, 1.f));
+		}
+	}
+
 	void Device::AddEnvironment(const std::string& environment_map)
 	{
 		// Create the skybox.

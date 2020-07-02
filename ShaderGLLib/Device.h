@@ -85,6 +85,10 @@ namespace sgl {
 			const std::vector<std::shared_ptr<Texture>>& out_textures,
 			const std::shared_ptr<Program> program = nullptr,
 			const double dt = 0.0);
+		// Clear the view textures.
+		void ClearView();
+		// Clear the deferred textures.
+		void ClearDeferred();
 		void AddEnvironment(const std::string& environment_map);
 		// Display a texture to the display.
 		void Display(const std::shared_ptr<Texture>& texture);
