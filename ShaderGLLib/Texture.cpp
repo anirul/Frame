@@ -245,10 +245,10 @@ namespace sgl {
 			render_ = std::make_shared<Render>();
 			render_->CreateStorage(size_);
 			frame_->AttachRender(*render_);
+			frame_->AttachTexture(*this);
+			frame_->DrawBuffers(1);
 		}
 		ScopedBind scoped_frame(*frame_);
-		frame_->AttachTexture(*this);
-		frame_->DrawBuffers(1);
 		glViewport(0, 0, size_.first, size_.second);
 		error_.Display(__FILE__, __LINE__ - 1);
 		GLfloat clearColor[4] = { color.r, color.g, color.b, color.a };

@@ -57,17 +57,13 @@ const std::shared_ptr<sgl::Texture>& Draw::GetDrawTexture() const
 //	return device_->GetNoiseTexture();
 //	return device_->GetLightingTexture(0);
 //	return ssao_texture_;
-	return textures_[0];
+	return textures_[6];
 }
 
 void Draw::RunDraw(const double dt)
 {
-	for (auto texture : textures_)
-	{
-		texture->Clear(glm::vec4(1.f, 0.f, 0.f, 1.f));
-	}
 	device_->ClearView();
-	device_->ClearDeferred();
+	// device_->ClearDeferred();
 	// Clear the GetViewTexture(0).
 	device_->DrawDeferred({}, dt);
 	device_->DrawView({}, dt);
