@@ -1,4 +1,7 @@
 #include "Draw.h"
+#include "../ShaderGLLib/EffectBlur.h"
+#include "../ShaderGLLib/EffectBrightness.h"
+#include "../ShaderGLLib/EffectMath.h"
 
 void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 {
@@ -57,7 +60,7 @@ const std::shared_ptr<sgl::Texture>& Draw::GetDrawTexture() const
 //	return device_->GetNoiseTexture();
 //	return device_->GetLightingTexture(0);
 //	return ssao_texture_;
-	return textures_[6];
+	return textures_[7];
 }
 
 void Draw::RunDraw(const double dt)
@@ -72,21 +75,21 @@ void Draw::RunDraw(const double dt)
 	// Store lighting in texture 2.
 	device_->DrawLighting(textures_[2]);
 	// Store SSAO in texture 1.
-	blur_->Draw(dt);
+	blur_->Draw();
 	// Store Bloom in texture 3.
-#if 1
 	// 2 -> 6
-	brightness_->Draw(dt);
+	brightness_->Draw();
 	// 6 -> 7
-	gaussian_blur_->Draw(dt);
-	// 2 + 7 -> 3
-	addition_->Draw(dt);
+#if 0
+	gaussian_blur_->Draw();
 #else
-	device_->DrawBloom(textures_[3], textures_[2]);
+	TextureGaussianBlur(textures_[7], textures_[6]);
 #endif
+	// 2 + 7 -> 3
+	addition_->Draw();
 	// Multiply Bloom and SSAO in texture 4.
 #if 1
-	multiply_->Draw(dt);
+	multiply_->Draw();
 #else
 	sgl::TextureMultiply(textures_[4], { textures_[3], textures_[1] });
 #endif
