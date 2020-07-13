@@ -6,13 +6,23 @@
 void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 {
 	textures_ = {
+		// 0 
 		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF),
+		// 1
 		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF),
+		// 2
 		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF),
+		// 3
 		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF),
+		// 4
 		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF),
+		// 5 
 		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF),
+		// 6
 		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF),
+		// 7
+		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF),
+		// 8
 		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF)
 	};
 	device_->SetLightManager(CreateLightManager());
@@ -31,17 +41,23 @@ void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 	device_->AddEffect(blur_);
 
 	// Initialize the Gaussian Blur effect.
-	gaussian_blur_ = std::make_shared<sgl::EffectGaussianBlur>(
+	gaussian_blur_horizontal_ = std::make_shared<sgl::EffectGaussianBlur>(
 		textures_[7],
-		textures_[6]);
-	device_->AddEffect(gaussian_blur_);
+		textures_[6],
+		true);
+	device_->AddEffect(gaussian_blur_horizontal_);
+	gaussian_blur_vertical_ = std::make_shared<sgl::EffectGaussianBlur>(
+		textures_[8],
+		textures_[7],
+		false);
+	device_->AddEffect(gaussian_blur_vertical_);
 
 	// Initialize the Addition effect.
 	addition_ = std::make_shared<sgl::EffectAddition>(
 		textures_[3],
 		std::vector<std::shared_ptr<sgl::Texture>>{ 
 			textures_[2], 
-			textures_[7] });
+			textures_[8] });
 	device_->AddEffect(addition_);
 
 	// Initialize the Multiply effect.
@@ -60,7 +76,7 @@ const std::shared_ptr<sgl::Texture>& Draw::GetDrawTexture() const
 //	return device_->GetNoiseTexture();
 //	return device_->GetLightingTexture(0);
 //	return ssao_texture_;
-	return textures_[7];
+	return textures_[value_ % textures_.size()];
 }
 
 void Draw::RunDraw(const double dt)
@@ -80,20 +96,14 @@ void Draw::RunDraw(const double dt)
 	// 2 -> 6
 	brightness_->Draw();
 	// 6 -> 7
-#if 0
-	gaussian_blur_->Draw();
-#else
-	TextureGaussianBlur(textures_[7], textures_[6]);
-#endif
-	// 2 + 7 -> 3
+	gaussian_blur_horizontal_->Draw();
+	// 7 -> 8
+	gaussian_blur_vertical_->Draw();
+	// 2 + 8 -> 3
 	addition_->Draw();
-	// Multiply Bloom and SSAO in texture 4.
-#if 1
+	// 3 -> 4 - Multiply Bloom and SSAO.
 	multiply_->Draw();
-#else
-	sgl::TextureMultiply(textures_[4], { textures_[3], textures_[1] });
-#endif
-	// Get the final texture in texture 5.
+	// 4 -> 5 - Get the final texture in texture 5.
 	device_->DrawHighDynamicRange(textures_[5], textures_[4]);
 }
 

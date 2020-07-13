@@ -298,20 +298,6 @@ namespace sgl {
 		quad->Draw();
 	}
 
-	void Device::DrawBloom(
-		std::shared_ptr<sgl::Texture>& out_texture,
-		const std::shared_ptr<Texture>& in_texture)
-	{
-		static std::shared_ptr<Texture> temp_texture = 
-			std::make_shared<Texture>(
-				out_texture->GetSize(), 
-				sgl::PixelElementSize::HALF);
-		// out_texture->Clear({ 0.f, 0.f, 0.f, 1.f });
-		TextureBrightness(out_texture, in_texture);
-		TextureGaussianBlur(temp_texture, out_texture);
-		TextureAddition(out_texture, { in_texture, temp_texture });
-	}
-
 	void Device::DrawHighDynamicRange(
 		std::shared_ptr<sgl::Texture>& out_texture,
 		const std::shared_ptr<Texture>& in_texture, 

@@ -24,6 +24,10 @@ bool Input::KeyPressed(const char key, const double dt)
 	{
 		position -= front * inc;
 	}
+	if (isdigit(key)) 
+	{
+		value_ = key - '0';
+	}
 	camera.SetPosition(position);
 	device_->SetCamera(camera);
 	return true;

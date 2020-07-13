@@ -1,4 +1,7 @@
 #pragma once
+#include <utility>
+#include <string>
+#include "../ShaderGLLib/Error.h"
 
 namespace sgl {
 
@@ -9,6 +12,10 @@ namespace sgl {
 		virtual void UnBind() const = 0;
 		virtual void LockedBind() const = 0;
 		virtual void UnlockedBind() const = 0;
+		virtual const std::pair<bool, std::string> GetError() const
+		{ 
+			return { true, ""};
+		}
 	};
 
 	class ScopedBind
@@ -20,6 +27,7 @@ namespace sgl {
 		virtual ~ScopedBind();
 
 	private:
+		const Error& error_ = Error::GetInstance();
 		const BindLockInterface& bind_locked_;
 	};
 

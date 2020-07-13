@@ -146,32 +146,6 @@ namespace sgl {
 		void CreateTextureCubeMap();
 	};
 
-	// Get the brightness from a texture (usually before HDR).
-	void TextureBrightness(
-		std::shared_ptr<Texture>& out_texture,
-		const std::shared_ptr<Texture>& in_texture);
-
-	// Add blur to a texture.
-	void TextureBlur(
-		std::shared_ptr<Texture>& out_texture,
-		const std::shared_ptr<Texture>& in_texture,
-		const float exponent = 1.0f);
-
-	// Get the Gaussian blur of a texture.
-	void TextureGaussianBlur(
-		std::shared_ptr<Texture>& out_texture,
-		const std::shared_ptr<Texture>& in_texture);
-
-	// Vector addition a number of texture (maximum 16) into one.
-	void TextureAddition(
-		std::shared_ptr<Texture>& out_texture,
-		const std::vector<std::shared_ptr<Texture>>& add_textures);
-
-	// Vector multiply a number of texture (maximum 16) into one.
-	void TextureMultiply(
-		std::shared_ptr<Texture>& out_texture,
-		const std::vector<std::shared_ptr<Texture>>& multiply_textures);
-
 	// Fill multiple textures from a program.
 	//		- out_textures			: output textures (should be allocated).
 	//		- in_textures			: input textures (with associated string).

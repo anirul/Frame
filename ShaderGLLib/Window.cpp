@@ -94,6 +94,8 @@ namespace sgl {
 					// Draw the Scene.
 					if (draw_interface_)
 					{
+						draw_interface_->SetValue(
+							input_interface_->GetValue());
 						draw_interface_->RunDraw(time.count());
 						device_->Display(draw_interface_->GetDrawTexture());
 					}

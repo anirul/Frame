@@ -70,10 +70,6 @@ namespace sgl {
 		void DrawScreenSpaceAmbientOcclusion(
 			std::shared_ptr<Texture>& out_texture,
 			const std::vector<std::shared_ptr<Texture>>& in_textures = {});
-		// Add Bloom to the provided texture.
-		void DrawBloom(
-			std::shared_ptr<Texture>& out_texture,
-			const std::shared_ptr<Texture>& texture);
 		// Add HDR to a texture (with associated gamma and exposure).
 		void DrawHighDynamicRange(
 			std::shared_ptr<Texture>& out_texture,

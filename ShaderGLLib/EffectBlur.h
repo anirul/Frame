@@ -39,8 +39,9 @@ namespace sgl {
 	{
 	public:
 		EffectGaussianBlur(
-			std::shared_ptr<Texture> out_texture,
-			const std::shared_ptr<Texture>& in_texture);
+			const std::shared_ptr<Texture>& out_texture,
+			const std::shared_ptr<Texture>& in_texture,
+			const bool horizontal);
 		virtual ~EffectGaussianBlur() { Delete(); }
 
 	public:
@@ -53,15 +54,14 @@ namespace sgl {
 
 	protected:
 		const Error& error_ = Error::GetInstance();
+		const bool horizontal_ = true;
 		std::pair<std::uint32_t, std::uint32_t> size_ = { 0, 0 };
-		const std::shared_ptr<Texture>& in_texture_;
-		std::shared_ptr<Texture> out_texture_;
-		std::shared_ptr<Texture> view_texture_ = nullptr;
-		Frame frame_[2] = { {}, {} };
+		Material out_material_ = {};
+		Material in_material_ = {}; 
+		Frame frame_ = {};
 		Render render_ = {};
 		std::shared_ptr<Program> program_ = nullptr;
 		std::shared_ptr<Mesh> quad_ = nullptr;
-		std::shared_ptr<Texture> temp_textures_[2] = { nullptr, nullptr };
 	};
 
 } // End namespace sgl.

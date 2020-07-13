@@ -16,6 +16,9 @@ public:
 	void RunDraw(const double dt) override;
 	void Delete() override;
 
+public:
+	void SetValue(const int val) override { value_ = val; }
+
 protected:
 	sgl::LightManager CreateLightManager() const;
 
@@ -25,7 +28,9 @@ private:
 	std::shared_ptr<sgl::EffectInterface> clear_ = nullptr;
 	std::shared_ptr<sgl::EffectInterface> brightness_ = nullptr;
 	std::shared_ptr<sgl::EffectInterface> blur_ = nullptr;
-	std::shared_ptr<sgl::EffectInterface> gaussian_blur_ = nullptr;
+	std::shared_ptr<sgl::EffectInterface> gaussian_blur_horizontal_ = nullptr;
+	std::shared_ptr<sgl::EffectInterface> gaussian_blur_vertical_ = nullptr;
 	std::shared_ptr<sgl::EffectInterface> addition_ = nullptr;
 	std::shared_ptr<sgl::EffectInterface> multiply_ = nullptr;
+	int value_ = 0;
 };
