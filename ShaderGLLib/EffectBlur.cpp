@@ -55,7 +55,7 @@ namespace sgl {
 	void EffectGaussianBlur::Startup(
 		std::pair<std::uint32_t, std::uint32_t> size)
 	{
-		size_ = size;
+		size_ = out_material_.GetTexture("FragOut")->GetSize();
 		ScopedBind scoped_frame(frame_);
 		ScopedBind scoped_render(render_);
 		frame_.AttachRender(render_);

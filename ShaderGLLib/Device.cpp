@@ -1,4 +1,5 @@
 #include "Device.h"
+#include "EffectMath.h"
 #include <stdexcept>
 #include <sstream>
 #include <fstream>
@@ -237,7 +238,11 @@ namespace sgl {
 		quad->SetMaterial(material);
 		quad->Draw();
 
-		TextureAddition(out_texture, lighting_textures_);
+		auto effect_addition = std::make_shared<EffectAddition>(
+			out_texture, 
+			lighting_textures_);
+		effect_addition->Startup(out_texture->GetSize());
+		effect_addition->Draw();
 	}
 
 	void Device::DrawScreenSpaceAmbientOcclusion(

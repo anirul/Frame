@@ -5,25 +5,27 @@
 
 void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 {
+	std::pair<std::uint32_t, std::uint32_t> size_2 = 
+		{ size.first / 2, size.second / 2 };
 	textures_ = {
-		// 0 
+		// 0 - Screen space ambient occlusion.
 		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF),
-		// 1
+		// 1 - SSAO + blur also darker.
 		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF),
-		// 2
+		// 2 - Lighting.
 		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF),
-		// 3
+		// 3 - Lighting + Bloom.
 		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF),
-		// 4
+		// 4 - Lighting + Bloom + SSAO.
 		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF),
-		// 5 
+		// 5 - Lighting + Bloom + SSAO + HDR.
 		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF),
-		// 6
+		// 6 - Brightness.
 		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF),
-		// 7
-		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF),
-		// 8
-		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF)
+		// 7 - Brightness + Gaussian Blur horizontal.
+		std::make_shared<sgl::Texture>(size_2, sgl::PixelElementSize::HALF),
+		// 8 - Brightness + Gaussian Blur full.
+		std::make_shared<sgl::Texture>(size_2, sgl::PixelElementSize::HALF)
 	};
 	device_->SetLightManager(CreateLightManager());
 
@@ -90,8 +92,9 @@ void Draw::RunDraw(const double dt)
 	device_->DrawScreenSpaceAmbientOcclusion(textures_[0]);
 	// Store lighting in texture 2.
 	device_->DrawLighting(textures_[2]);
-	// Store SSAO in texture 1.
+	// 0 -> 1 Store SSAO.
 	blur_->Draw();
+
 	// Store Bloom in texture 3.
 	// 2 -> 6
 	brightness_->Draw();
