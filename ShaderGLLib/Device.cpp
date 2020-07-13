@@ -8,6 +8,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "Frame.h"
 #include "Render.h"
+#include "Fill.h"
 
 namespace sgl {
 
