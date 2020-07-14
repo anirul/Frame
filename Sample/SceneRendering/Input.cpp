@@ -24,9 +24,15 @@ bool Input::KeyPressed(const char key, const double dt)
 	{
 		position -= front * inc;
 	}
-	if (isdigit(key)) 
+	// Should find a better way.
+	if (key == SDL_SCANCODE_KP_PLUS)
 	{
-		value_ = key - '0';
+		value_++;
+	}
+	// Same here.
+	if (key == SDL_SCANCODE_KP_MINUS)
+	{
+		if (value_ > 0)	value_--;
 	}
 	camera.SetPosition(position);
 	device_->SetCamera(camera);

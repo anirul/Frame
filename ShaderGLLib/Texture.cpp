@@ -251,8 +251,8 @@ namespace sgl {
 		ScopedBind scoped_frame(*frame_);
 		glViewport(0, 0, size_.first, size_.second);
 		error_.Display(__FILE__, __LINE__ - 1);
-		GLfloat clearColor[4] = { color.r, color.g, color.b, color.a };
-		glClearBufferfv(GL_COLOR, 0, clearColor);
+		GLfloat clear_color[4] = { color.r, color.g, color.b, color.a };
+		glClearBufferfv(GL_COLOR, 0, clear_color);
 	}
 
 	TextureCubeMap::TextureCubeMap(

@@ -63,28 +63,19 @@ namespace sgl {
 		// Draw the lighting texture from either the inside deferred textures or
 		// from the provided deferred textures.
 		void DrawLighting(
-			std::shared_ptr<Texture>& out_texture,
-			const std::vector<std::shared_ptr<Texture>>& in_textures = {});
+			const std::shared_ptr<Texture>& out_texture,
+			const std::vector<std::shared_ptr<Texture>>& in_textures);
 		// Create a screen space ambient occlusion from either the texture
 		// passed or the one from the physically based rendering path.
 		void DrawScreenSpaceAmbientOcclusion(
-			std::shared_ptr<Texture>& out_texture,
-			const std::vector<std::shared_ptr<Texture>>& in_textures = {});
-		// Add HDR to a texture (with associated gamma and exposure).
-		void DrawHighDynamicRange(
-			std::shared_ptr<Texture>& out_texture,
-			const std::shared_ptr<Texture>& texture,
-			const float exposure = 1.0f,
-			const float gamma = 2.2f);
+			const std::shared_ptr<Texture>& out_texture,
+			const std::vector<std::shared_ptr<Texture>>& in_textures);
 		// Draw to multiple textures.
 		void DrawMultiTextures(
 			const std::vector<std::shared_ptr<Texture>>& out_textures,
 			const std::shared_ptr<Program> program = nullptr,
 			const double dt = 0.0);
-		// Clear the view textures.
-		void ClearView();
-		// Clear the deferred textures.
-		void ClearDeferred();
+		// Add environment to the scene.
 		void AddEnvironment(const std::string& environment_map);
 		// Display a texture to the display.
 		void Display(const std::shared_ptr<Texture>& texture);
@@ -94,17 +85,16 @@ namespace sgl {
 		const std::shared_ptr<Texture>& GetDeferredTexture(const int i) const;
 		const std::shared_ptr<Texture>& GetViewTexture(const int i) const;
 		const std::shared_ptr<Texture>& GetLightingTexture(const int i) const;
-		const std::shared_ptr<Texture>& GetNoiseTexture() const;
 
 	public:
-		Camera GetCamera() const { return camera_; }
+		const Camera& GetCamera() const { return camera_; }
 		void SetCamera(const Camera& camera) { camera_ = camera; }
 		SceneTree GetSceneTree() const { return scene_tree_; }
 		void SetSceneTree(const SceneTree& scene_tree) 
 		{ 
 			scene_tree_ = scene_tree;
 		}
-		LightManager GetLightManager() const { return light_manager_; }
+		const LightManager& GetLightManager() const { return light_manager_; }
 		void SetLightManager(const LightManager& light_manager)
 		{
 			light_manager_ = light_manager;
@@ -120,16 +110,10 @@ namespace sgl {
 
 	private:
 		std::shared_ptr<Program> pbr_program_ = nullptr;
-		std::shared_ptr<Program> lighting_program_ = nullptr;
-		std::shared_ptr<Program> ssao_program_ = nullptr;
 		std::shared_ptr<Program> view_program_ = nullptr;
-		std::shared_ptr<Program> blur_program_ = nullptr;
-		std::shared_ptr<Texture> noise_texture_ = nullptr;
-		std::vector<glm::vec3> kernel_ssao_vec_ = {};
 		std::vector<std::shared_ptr<Texture>> deferred_textures_ = {};
 		std::vector<std::shared_ptr<Texture>> lighting_textures_ = {};
 		std::vector<std::shared_ptr<Texture>> view_textures_ = {};
-		std::shared_ptr<Texture> final_texture_ = nullptr;
 		std::shared_ptr<Material> material_ = nullptr;
 		std::map<std::string, std::shared_ptr<Material>> materials_ = {};
 		std::vector<std::shared_ptr<EffectInterface>> effects_ = {};

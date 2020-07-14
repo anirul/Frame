@@ -32,5 +32,9 @@ private:
 	std::shared_ptr<sgl::EffectInterface> gaussian_blur_vertical_ = nullptr;
 	std::shared_ptr<sgl::EffectInterface> addition_ = nullptr;
 	std::shared_ptr<sgl::EffectInterface> multiply_ = nullptr;
-	int value_ = 0;
+	std::shared_ptr<sgl::EffectInterface> high_dynamic_range_ = nullptr;
+	std::shared_ptr<sgl::EffectInterface> lighting_ = nullptr;
+	std::shared_ptr<sgl::EffectInterface> addition_lighting_ = nullptr;
+	std::shared_ptr<sgl::EffectInterface> ssao_ = nullptr;
+	int value_ = 5;
 };
