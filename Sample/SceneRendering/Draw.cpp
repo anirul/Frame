@@ -146,14 +146,9 @@ void Draw::RunDraw(const double dt)
 	device_->DrawView(
 		{ textures_[13], textures_[14] }, 
 		dt);
-	// Store pre-blured SSAO in texture 0.
-#if 0
-	device_->DrawScreenSpaceAmbientOcclusion(
-		textures_[0], 
-		{ textures_[13], textures_[14] });
-#else
+	// 13 14 -> 0 - Compute the Screen space ambient occlusion.
 	ssao_->Draw();
-#endif
+	// 0 -> 1 - Blur the Screen space ambient occlusion.
 	blur_->Draw();
 
 	// Store lighting in texture 2.

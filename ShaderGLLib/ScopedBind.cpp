@@ -15,8 +15,10 @@ namespace sgl {
 	{
 		bind_locked_.UnlockedBind();
 		bind_locked_.UnBind();
+#ifdef _DEBUG
 		auto ret = bind_locked_.GetError();
 		if (!ret.first) error_.CreateError(ret.second, __FILE__, __LINE__ -1);
+#endif
 	}
 
 } // End namespace sgl.
