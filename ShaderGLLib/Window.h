@@ -17,6 +17,7 @@ namespace sgl {
 			const double dt) = 0;
 		virtual bool MousePressed(const char button, const double dt) = 0;
 		virtual bool MouseReleased(const char button, const double dt) = 0;
+		virtual int GetValue() const { return 0; }
 	};
 
 	// This is the structure that define what draw has to do.
@@ -31,6 +32,8 @@ namespace sgl {
 		virtual const std::shared_ptr<Texture>& GetDrawTexture() const = 0;
 		// This is there to free optional buffers (if needed).
 		virtual void Delete() = 0;
+		// Set the value of the keyboard.
+		virtual void SetValue(const int val) {};
 	}; 
 
 	// Interface to a window.

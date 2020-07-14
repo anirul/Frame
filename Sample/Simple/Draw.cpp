@@ -68,7 +68,7 @@ void Draw::Delete() {}
 std::shared_ptr<sgl::Mesh> Draw::CreateAppleMesh() const
 {
 	// Create the physically based rendering program.
-	auto simple_program = sgl::CreateProgram("Simple");
+	auto simple_program = sgl::Program::CreateProgram("Simple");
 	simple_program->UniformMatrix("projection", device_->GetProjection());
 	simple_program->UniformMatrix("view", device_->GetView());
 	simple_program->UniformMatrix("model", device_->GetModel());
@@ -92,7 +92,7 @@ std::shared_ptr<sgl::Mesh> Draw::CreateCubeMapMesh(
 	const std::shared_ptr<sgl::TextureCubeMap>& texture) const
 {
 	// Create the cube map program.
-	auto cubemap_program = sgl::CreateProgram("CubeMap");
+	auto cubemap_program = sgl::Program::CreateProgram("CubeMap");
 	cubemap_program->UniformMatrix("projection", device_->GetProjection());
 
 	// Create the mesh for the cube.

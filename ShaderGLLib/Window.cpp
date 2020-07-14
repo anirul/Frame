@@ -66,6 +66,8 @@ namespace sgl {
 				{
 					draw_interface_->Startup(size_);
 				}
+				// Has to be done after the draw startup.
+				device_->Startup();
 				// While Run return true continue.
 				bool loop = true;
 				double previous_count = 0.0f;
@@ -92,6 +94,8 @@ namespace sgl {
 					// Draw the Scene.
 					if (draw_interface_)
 					{
+						draw_interface_->SetValue(
+							input_interface_->GetValue());
 						draw_interface_->RunDraw(time.count());
 						device_->Display(draw_interface_->GetDrawTexture());
 					}

@@ -28,7 +28,7 @@ namespace test {
 		frame_ = std::make_shared<sgl::Frame>();
 		EXPECT_TRUE(frame_);
 		sgl::Render render{};
-		frame_->BindAttach(render);
+		frame_->AttachRender(render);
 		EXPECT_NO_THROW(error_.Display());
 	}
 
@@ -39,10 +39,10 @@ namespace test {
 		frame_ = std::make_shared<sgl::Frame>();
 		EXPECT_TRUE(frame_);
 		sgl::Render render{};
-		frame_->BindAttach(render);
+		frame_->AttachRender(render);
 		EXPECT_NO_THROW(error_.Display());
 		sgl::Texture texture("../Asset/CubeMap/PositiveX.png");
-		frame_->BindTexture(texture);
+		frame_->AttachTexture(texture);
 		EXPECT_NO_THROW(error_.Display());
 	}
 

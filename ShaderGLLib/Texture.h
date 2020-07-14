@@ -14,6 +14,7 @@
 #include "../ShaderGLLib/Program.h"
 #include "../ShaderGLLib/Frame.h"
 #include "../ShaderGLLib/Render.h"
+#include "../ShaderGLLib/ScopedBind.h"
 
 namespace sgl {
 
@@ -30,7 +31,7 @@ namespace sgl {
 		REPEAT = GL_REPEAT
 	};
 
-	class Texture 
+	class Texture : public BindLockInterface
 	{
 	public:
 		// Create an empty texture of size size.
@@ -51,8 +52,8 @@ namespace sgl {
 		virtual ~Texture();
 
 	public:
-		virtual void Bind(const unsigned int slot = 0) const;
-		virtual void UnBind() const;
+		void Bind(const unsigned int slot = 0) const override;
+		void UnBind() const override;
 		virtual void BindEnableMipmap() const;
 		virtual void SetMinFilter(TextureFilter texture_filter);
 		virtual TextureFilter GetMinFilter() const;
@@ -62,7 +63,7 @@ namespace sgl {
 		virtual TextureFilter GetWrapS() const;
 		virtual void SetWrapT(TextureFilter texture_filter);
 		virtual TextureFilter GetWrapT() const;
-		virtual void Clear(const glm::vec4& color);
+		void Clear(const glm::vec4 color);
 
 	public:
 		const int GetId() const { return texture_id_; }
@@ -86,6 +87,9 @@ namespace sgl {
 			const PixelStructure pixel_structure = PixelStructure::RGB) :
 			pixel_element_size_(pixel_element_size),
 			pixel_structure_(pixel_structure) {}
+		void LockedBind() const override { locked_bind_ = true; }
+		void UnlockedBind() const override { locked_bind_ = false; }
+		friend class ScopedBind;
 
 	protected:
 		unsigned int texture_id_ = 0;
@@ -93,8 +97,9 @@ namespace sgl {
 		const PixelElementSize pixel_element_size_;
 		const PixelStructure pixel_structure_;
 		const Error& error_ = Error::GetInstance();
-		Frame frame_ = {};
-		Render render_ = {};
+		mutable bool locked_bind_ = false;
+		std::shared_ptr<Render> render_ = nullptr;
+		std::shared_ptr<Frame> frame_ = nullptr;
 	};
 
 	class TextureCubeMap : public Texture
@@ -135,87 +140,10 @@ namespace sgl {
 		TextureFilter GetWrapT() const override;
 		void SetWrapR(TextureFilter texture_filter);
 		TextureFilter GetWrapR() const;
-		void Clear(const glm::vec4& color) override;
 
 	protected:
 		// Create a cube map and assign it to the texture_id_.
 		void CreateTextureCubeMap();
 	};
-
-	// Get the brightness from a texture (usually before HDR).
-	void TextureBrightness(
-		std::shared_ptr<Texture>& out_texture,
-		const std::shared_ptr<Texture>& in_texture);
-
-	// Add blur to a texture.
-	void TextureBlur(
-		std::shared_ptr<Texture>& out_texture,
-		const std::shared_ptr<Texture>& in_texture,
-		const float exponent = 1.0f);
-
-	// Get the Gaussian blur of a texture.
-	void TextureGaussianBlur(
-		std::shared_ptr<Texture>& out_texture,
-		const std::shared_ptr<Texture>& in_texture);
-
-	// Vector addition a number of texture (maximum 16) into one.
-	void TextureAddition(
-		std::shared_ptr<Texture>& out_texture,
-		const std::vector<std::shared_ptr<Texture>>& add_textures);
-
-	// Vector multiply a number of texture (maximum 16) into one.
-	void TextureMultiply(
-		std::shared_ptr<Texture>& out_texture,
-		const std::vector<std::shared_ptr<Texture>>& multiply_textures);
-
-	// Fill multiple textures from a program.
-	//		- out_textures			: output textures (should be allocated).
-	//		- in_textures			: input textures (with associated string).
-	//		- program				: program to be used.
-	void FillProgramMultiTexture(
-		std::vector<std::shared_ptr<Texture>>& out_textures,
-		const std::map<std::string, std::shared_ptr<Texture>>& in_textures,
-		const std::shared_ptr<Program>& program);
-
-	// Fill multiple textures from a program.
-	//		- out_textures			: output textures (should be allocated).
-	//		- in_textures			: input textures (with associated string).
-	//		- program				: program to be used.
-	//		- mipmap				: level of mipmap (0 == 1).
-	//		- func					: a lambda that will be call per mipmap.
-	void FillProgramMultiTextureMipmap(
-		std::vector<std::shared_ptr<Texture>>& out_textures,
-		const std::map<std::string, std::shared_ptr<Texture>>& in_textures,
-		const std::shared_ptr<Program>& program,
-		const int mipmap,
-		const std::function<void(
-			const int mipmap,
-			const std::shared_ptr<sgl::Program>& program)> func =
-		[](const int, const std::shared_ptr<sgl::Program>&) {});
-
-	// Fill multiple cube map texture from a program.
-	//		- out_textures			: output textures (should be allocated).
-	//		- in_textures			: input textures (with associated string).
-	//		- program				: program to be used.
-	void FillProgramMultiTextureCubeMap(
-		std::vector<std::shared_ptr<Texture>>& out_textures,
-		const std::map<std::string, std::shared_ptr<Texture>>& in_textures,
-		const std::shared_ptr<Program>& program);
-
-	// Fill multiple cube map texture from a program.
-	//		- out_textures			: output textures (should be allocated).
-	//		- in_textures			: input textures (with associated string).
-	//		- program				: program to be used.
-	//		- mipmap				: level of mipmap (0 == 1).
-	//		- func					: a lambda that will be call per mipmap.
-	void FillProgramMultiTextureCubeMapMipmap(
-		std::vector<std::shared_ptr<Texture>>& out_textures,
-		const std::map<std::string, std::shared_ptr<Texture>>& in_textures,
-		const std::shared_ptr<Program>& program,
-		const int mipmap,
-		const std::function<void(
-			const int mipmap,
-			const std::shared_ptr<Program>& program)> func =
-				[](const int, const std::shared_ptr<Program>&) {});
 
 } // End namespace sgl.

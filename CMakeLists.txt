@@ -12,12 +12,14 @@ find_package(GLEW REQUIRED)
 find_package(glm CONFIG REQUIRED)
 find_package(GTest CONFIG REQUIRED)
 
-add_library(ShaderGLLib
-  STATIC
+add_custom_target(Shader
+  SOURCES
     ${PROJECT_SOURCE_DIR}/Asset/Shader/Blur.frag
     ${PROJECT_SOURCE_DIR}/Asset/Shader/Blur.vert
     ${PROJECT_SOURCE_DIR}/Asset/Shader/Brightness.frag
     ${PROJECT_SOURCE_DIR}/Asset/Shader/Brightness.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/CubeMap.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/CubeMap.vert
     ${PROJECT_SOURCE_DIR}/Asset/Shader/CubeMapDeferred.frag
     ${PROJECT_SOURCE_DIR}/Asset/Shader/CubeMapDeferred.vert
     ${PROJECT_SOURCE_DIR}/Asset/Shader/Display.frag
@@ -32,28 +34,52 @@ add_library(ShaderGLLib
     ${PROJECT_SOURCE_DIR}/Asset/Shader/IntegrateBRDF.vert
     ${PROJECT_SOURCE_DIR}/Asset/Shader/IrradianceCubeMap.frag
     ${PROJECT_SOURCE_DIR}/Asset/Shader/IrradianceCubeMap.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/JapaneseFlag.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/JapaneseFlag.vert
     ${PROJECT_SOURCE_DIR}/Asset/Shader/Lighting.frag
     ${PROJECT_SOURCE_DIR}/Asset/Shader/Lighting.vert
     ${PROJECT_SOURCE_DIR}/Asset/Shader/MonteCarloPrefilter.frag
     ${PROJECT_SOURCE_DIR}/Asset/Shader/MonteCarloPrefilter.vert
     ${PROJECT_SOURCE_DIR}/Asset/Shader/PhysicallyBasedRendering.frag
     ${PROJECT_SOURCE_DIR}/Asset/Shader/PhysicallyBasedRendering.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/RayMarching.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/RayMarching.vert
     ${PROJECT_SOURCE_DIR}/Asset/Shader/ScreenSpaceAmbientOcclusion.frag
     ${PROJECT_SOURCE_DIR}/Asset/Shader/ScreenSpaceAmbientOcclusion.vert
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/Simple.frag
+    ${PROJECT_SOURCE_DIR}/Asset/Shader/Simple.vert
     ${PROJECT_SOURCE_DIR}/Asset/Shader/VectorAddition.frag
     ${PROJECT_SOURCE_DIR}/Asset/Shader/VectorAddition.vert
     ${PROJECT_SOURCE_DIR}/Asset/Shader/VectorMultiply.frag
     ${PROJECT_SOURCE_DIR}/Asset/Shader/VectorMultiply.vert
     ${PROJECT_SOURCE_DIR}/Asset/Shader/ViewPositionNormal.frag
     ${PROJECT_SOURCE_DIR}/Asset/Shader/ViewPositionNormal.vert
+)
+
+add_library(ShaderGLLib
+  STATIC
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Buffer.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Buffer.h
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Camera.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Camera.h
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Device.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Device.h
+    ${PROJECT_SOURCE_DIR}/ShaderGLLib/EffectBlur.cpp
+    ${PROJECT_SOURCE_DIR}/ShaderGLLib/EffectBlur.h
+    ${PROJECT_SOURCE_DIR}/ShaderGLLib/EffectBrightness.cpp
+    ${PROJECT_SOURCE_DIR}/ShaderGLLib/EffectBrightness.h
+    ${PROJECT_SOURCE_DIR}/ShaderGLLib/EffectHighDynamicRange.cpp
+    ${PROJECT_SOURCE_DIR}/ShaderGLLib/EffectHighDynamicRange.h
+    ${PROJECT_SOURCE_DIR}/ShaderGLLib/EffectLighting.cpp
+    ${PROJECT_SOURCE_DIR}/ShaderGLLib/EffectLighting.h
+    ${PROJECT_SOURCE_DIR}/ShaderGLLib/EffectMath.cpp
+    ${PROJECT_SOURCE_DIR}/ShaderGLLib/EffectMath.h
+    ${PROJECT_SOURCE_DIR}/ShaderGLLib/EffectScreenSpaceAmbientOcclusion.cpp
+    ${PROJECT_SOURCE_DIR}/ShaderGLLib/EffectScreenSpaceAmbientOcclusion.h
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Error.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Error.h
+    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Fill.cpp
+    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Fill.h
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Frame.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Frame.h
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Image.cpp
@@ -72,6 +98,8 @@ add_library(ShaderGLLib
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Render.h
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Scene.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Scene.h
+    ${PROJECT_SOURCE_DIR}/ShaderGLLib/ScopedBind.cpp
+    ${PROJECT_SOURCE_DIR}/ShaderGLLib/ScopedBind.h
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Shader.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Shader.h
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Texture.cpp
@@ -141,8 +169,6 @@ target_link_libraries(ShaderGLTest
 
 add_executable(JapaneseFlag
   WIN32
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/JapaneseFlag.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/JapaneseFlag.vert
     ${PROJECT_SOURCE_DIR}/Sample/JapaneseFlag/Application.cpp
     ${PROJECT_SOURCE_DIR}/Sample/JapaneseFlag/Application.h
     ${PROJECT_SOURCE_DIR}/Sample/JapaneseFlag/main.cpp
@@ -164,8 +190,6 @@ target_link_libraries(JapaneseFlag
 
 add_executable(RayMarching
   WIN32
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/RayMarching.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/RayMarching.vert
     ${PROJECT_SOURCE_DIR}/Sample/RayMarching/Application.cpp
     ${PROJECT_SOURCE_DIR}/Sample/RayMarching/Application.h
     ${PROJECT_SOURCE_DIR}/Sample/RayMarching/main.cpp
@@ -187,10 +211,6 @@ target_link_libraries(RayMarching
 
 add_executable(Simple
   WIN32
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/CubeMap.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/CubeMap.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/Simple.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/Simple.vert
     ${PROJECT_SOURCE_DIR}/Sample/Simple/Application.cpp
     ${PROJECT_SOURCE_DIR}/Sample/Simple/Application.h
     ${PROJECT_SOURCE_DIR}/Sample/Simple/Draw.cpp

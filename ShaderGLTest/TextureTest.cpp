@@ -68,25 +68,4 @@ namespace test {
 		EXPECT_NO_THROW(error_.Display());
 	}
 
-	TEST_F(TextureTest, CreateIrradianceCubeMapTextureTest)
-	{
-		EXPECT_EQ(GLEW_OK, glewInit());
-		auto cube_map = std::make_shared<sgl::TextureCubeMap>(
-			"../Asset/CubeMap/Hamarikyu.hdr");
-		EXPECT_TRUE(cube_map);
-		EXPECT_NE(0, cube_map->GetId());
-		EXPECT_NO_THROW(error_.Display());
-		auto irradiance = std::make_shared<sgl::TextureCubeMap>(
-			std::make_pair<std::uint32_t, std::uint32_t>(32, 32));
-		FillProgramMultiTextureCubeMap(
-			std::vector<std::shared_ptr<sgl::Texture>>{ irradiance },
-			std::map<std::string, std::shared_ptr<sgl::Texture>>{
-				{ "Environment", cube_map } },
-			sgl::CreateProgram("IrradianceCubeMap"));
-		EXPECT_NE(0, irradiance->GetId());
-		std::pair<std::uint32_t, std::uint32_t> pair(32, 32);
-		EXPECT_EQ(pair, irradiance->GetSize());
-		EXPECT_NO_THROW(error_.Display());
-	}
-
 } // End namespace test.

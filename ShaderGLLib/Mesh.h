@@ -33,9 +33,14 @@ namespace sgl {
 
 	public:
 		// Set a material for this mesh.
-		void SetMaterial(const std::shared_ptr<Material>& material) 
+		void SetMaterial(const Material& material) 
 		{ 
-			material_ = material; 
+			material_ = std::make_shared<Material>(material);
+		}
+		// TODO(anirul): Should be removed.
+		void SetMaterial(const std::shared_ptr<Material>& material)
+		{
+			material_ = material;
 		}
 		void Draw(
 			const glm::mat4& projection = glm::mat4(1.0f),

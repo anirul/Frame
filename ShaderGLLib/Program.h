@@ -12,6 +12,15 @@ namespace sgl {
 
 	class Program {
 	public:
+		// Create a program from a string!
+		// Will load a program at location: 
+		// - "../Asset/<name>.vert"
+		// - "../Asset/<name>.frag"
+		// Also set the projection view and model to identity.
+		static std::shared_ptr<sgl::Program> CreateProgram(
+			const std::string& name);
+
+	public:
 		// Create the program.
 		Program();
 		// Destructor
@@ -52,17 +61,10 @@ namespace sgl {
 		const int GetMemoizeUniformLocation(const std::string& name) const;
 
 	private:
+		const Error& error_ = Error::GetInstance();
 		mutable std::map<std::string, int> memoize_map_ = {};
 		std::vector<unsigned int> attached_shaders_ = {};
 		int program_id_ = 0;
-		const Error& error_ = Error::GetInstance();
 	};
-
-	// Create a program from a string!
-	// Will load a program at location: 
-	// - "../Asset/<name>.vert"
-	// - "../Asset/<name>.frag"
-	// Also set the projection view and model to identity.
-	std::shared_ptr<sgl::Program> CreateProgram(const std::string& name);
 
 } // End namespace sgl.
