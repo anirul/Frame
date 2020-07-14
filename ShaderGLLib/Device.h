@@ -60,16 +60,6 @@ namespace sgl {
 		void DrawView(
 			const std::vector<std::shared_ptr<Texture>>& out_textures,
 			const double dt);
-		// Draw the lighting texture from either the inside deferred textures or
-		// from the provided deferred textures.
-		void DrawLighting(
-			const std::shared_ptr<Texture>& out_texture,
-			const std::vector<std::shared_ptr<Texture>>& in_textures);
-		// Create a screen space ambient occlusion from either the texture
-		// passed or the one from the physically based rendering path.
-		void DrawScreenSpaceAmbientOcclusion(
-			const std::shared_ptr<Texture>& out_texture,
-			const std::vector<std::shared_ptr<Texture>>& in_textures);
 		// Draw to multiple textures.
 		void DrawMultiTextures(
 			const std::vector<std::shared_ptr<Texture>>& out_textures,
