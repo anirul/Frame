@@ -10,6 +10,8 @@ void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 {
 	std::pair<std::uint32_t, std::uint32_t> size_2 = 
 		{ size.first / 2, size.second / 2 };
+	std::pair<std::uint32_t, std::uint32_t> size_4 =
+		{ size.first / 4, size.second / 4 };
 	// Texture storage.
 	textures_ = {
 		// 0 - Screen space ambient occlusion.
@@ -43,7 +45,11 @@ void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 		// 14 - View shader - Normal.
 		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF),
 		// 15 - Lighting (only the light part).
-		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF)
+		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF),
+		// 16 - Brightness + Gaussian Blur horizontal ( / 8 ).
+		std::make_shared<sgl::Texture>(size_4, sgl::PixelElementSize::HALF),
+		// 17 - Brightness + Gaussian Blur vertical ( / 8 ).
+		std::make_shared<sgl::Texture>(size_4, sgl::PixelElementSize::HALF)
 	};
 	// Set the texture filter for the view textures.
 	textures_[13]->SetMagFilter(sgl::TextureFilter::NEAREST);
@@ -52,6 +58,15 @@ void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 	textures_[13]->SetWrapT(sgl::TextureFilter::CLAMP_TO_EDGE);
 	textures_[14]->SetMagFilter(sgl::TextureFilter::NEAREST);
 	textures_[14]->SetMinFilter(sgl::TextureFilter::NEAREST);
+	// Set the texture filter for the Gaussian blur.
+	textures_[7]->SetMagFilter(sgl::TextureFilter::LINEAR);
+	textures_[7]->SetMinFilter(sgl::TextureFilter::LINEAR);
+	textures_[8]->SetMagFilter(sgl::TextureFilter::LINEAR);
+	textures_[8]->SetMinFilter(sgl::TextureFilter::LINEAR);
+	textures_[16]->SetMagFilter(sgl::TextureFilter::LINEAR);
+	textures_[16]->SetMinFilter(sgl::TextureFilter::LINEAR);
+	textures_[17]->SetMagFilter(sgl::TextureFilter::LINEAR);
+	textures_[17]->SetMinFilter(sgl::TextureFilter::LINEAR);
 
 	device_->SetLightManager(CreateLightManager());
 
@@ -68,24 +83,36 @@ void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 		2.f);
 	device_->AddEffect(blur_);
 
-	// Initialize the Gaussian Blur effect.
-	gaussian_blur_horizontal_ = std::make_shared<sgl::EffectGaussianBlur>(
+	// Initialize the Gaussian Blur effect ( / 2).
+	gaussian_blur_horizontal_2_ = std::make_shared<sgl::EffectGaussianBlur>(
 		textures_[7],
 		textures_[6],
 		true);
-	device_->AddEffect(gaussian_blur_horizontal_);
-	gaussian_blur_vertical_ = std::make_shared<sgl::EffectGaussianBlur>(
+	device_->AddEffect(gaussian_blur_horizontal_2_);
+	gaussian_blur_vertical_2_ = std::make_shared<sgl::EffectGaussianBlur>(
 		textures_[8],
 		textures_[7],
 		false);
-	device_->AddEffect(gaussian_blur_vertical_);
+	device_->AddEffect(gaussian_blur_vertical_2_);
+
+	// Initialize the Gaussian Blur effect ( / 8 ).
+	gaussian_blur_horizontal_4_ = std::make_shared<sgl::EffectGaussianBlur>(
+		textures_[16],
+		textures_[8],
+		true);
+	device_->AddEffect(gaussian_blur_horizontal_4_);
+	gaussian_blur_vertical_4_ = std::make_shared<sgl::EffectGaussianBlur>(
+		textures_[17],
+		textures_[16],
+		false);
+	device_->AddEffect(gaussian_blur_vertical_4_);
 
 	// Initialize the Addition effect.
 	addition_ = std::make_shared<sgl::EffectAddition>(
 		textures_[3],
 		std::vector<std::shared_ptr<sgl::Texture>>{ 
 			textures_[2], 
-			textures_[8] });
+			textures_[17] });
 	device_->AddEffect(addition_);
 
 	// Initialize the Multiply effect.
@@ -162,11 +189,15 @@ void Draw::RunDraw(const double dt)
 	// 2 -> 6
 	brightness_->Draw();
 	// 6 -> 7
-	gaussian_blur_horizontal_->Draw();
+	gaussian_blur_horizontal_2_->Draw();
 	// 7 -> 8
-	gaussian_blur_vertical_->Draw();
-	// 2 + 8 -> 3
+	gaussian_blur_vertical_2_->Draw();
+	// 8 -> 16
+	gaussian_blur_horizontal_4_->Draw();
+	// 16 -> 17
+	gaussian_blur_vertical_4_->Draw();
 
+	// 2 + 17 -> 3
 	addition_->Draw();
 	// 3 -> 4 - Multiply Bloom and SSAO.
 	multiply_->Draw();
