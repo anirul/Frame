@@ -1,10 +1,10 @@
 #include "Draw.h"
-#include "../ShaderGLLib/EffectBlur.h"
-#include "../ShaderGLLib/EffectBrightness.h"
-#include "../ShaderGLLib/EffectHighDynamicRange.h"
-#include "../ShaderGLLib/EffectLighting.h"
-#include "../ShaderGLLib/EffectMath.h"
-#include "../ShaderGLLib/EffectScreenSpaceAmbientOcclusion.h"
+#include "EffectBlur.h"
+#include "EffectBrightness.h"
+#include "EffectHighDynamicRange.h"
+#include "EffectLighting.h"
+#include "EffectMath.h"
+#include "EffectScreenSpaceAmbientOcclusion.h"
 
 void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 {
@@ -65,7 +65,7 @@ void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 	blur_ = std::make_shared<sgl::EffectBlur>(
 		textures_[1], 
 		textures_[0], 
-		4.f);
+		2.f);
 	device_->AddEffect(blur_);
 
 	// Initialize the Gaussian Blur effect.
@@ -138,6 +138,7 @@ const std::shared_ptr<sgl::Texture>& Draw::GetDrawTexture() const
 void Draw::RunDraw(const double dt)
 {
 	// Have to be cleaned.
+	textures_[13]->Clear(glm::vec4(0, 0, 0, 1));
 	textures_[14]->Clear(glm::vec4(0, 0, 0, 1));
 	// Do the deferred and view computation.
 	device_->DrawDeferred(
