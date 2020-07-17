@@ -28,10 +28,10 @@ private:
 	std::shared_ptr<sgl::EffectInterface> clear_ = nullptr;
 	std::shared_ptr<sgl::EffectInterface> brightness_ = nullptr;
 	std::shared_ptr<sgl::EffectInterface> blur_ = nullptr;
-	std::shared_ptr<sgl::EffectInterface> gaussian_blur_horizontal_2_ = nullptr;
-	std::shared_ptr<sgl::EffectInterface> gaussian_blur_vertical_2_ = nullptr;
-	std::shared_ptr<sgl::EffectInterface> gaussian_blur_horizontal_4_ = nullptr;
-	std::shared_ptr<sgl::EffectInterface> gaussian_blur_vertical_4_ = nullptr;
+	std::shared_ptr<sgl::EffectInterface> gaussian_blur_h2_ = nullptr;
+	std::shared_ptr<sgl::EffectInterface> gaussian_blur_v2_ = nullptr;
+	std::shared_ptr<sgl::EffectInterface> gaussian_blur_h4_ = nullptr;
+	std::shared_ptr<sgl::EffectInterface> gaussian_blur_v4_ = nullptr;
 	std::shared_ptr<sgl::EffectInterface> addition_ = nullptr;
 	std::shared_ptr<sgl::EffectInterface> multiply_ = nullptr;
 	std::shared_ptr<sgl::EffectInterface> high_dynamic_range_ = nullptr;

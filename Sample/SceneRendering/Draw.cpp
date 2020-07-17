@@ -84,28 +84,28 @@ void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 	device_->AddEffect(blur_);
 
 	// Initialize the Gaussian Blur effect ( / 2).
-	gaussian_blur_horizontal_2_ = std::make_shared<sgl::EffectGaussianBlur>(
+	gaussian_blur_h2_ = std::make_shared<sgl::EffectGaussianBlur>(
 		textures_[7],
 		textures_[6],
 		true);
-	device_->AddEffect(gaussian_blur_horizontal_2_);
-	gaussian_blur_vertical_2_ = std::make_shared<sgl::EffectGaussianBlur>(
+	device_->AddEffect(gaussian_blur_h2_);
+	gaussian_blur_v2_ = std::make_shared<sgl::EffectGaussianBlur>(
 		textures_[8],
 		textures_[7],
 		false);
-	device_->AddEffect(gaussian_blur_vertical_2_);
+	device_->AddEffect(gaussian_blur_v2_);
 
 	// Initialize the Gaussian Blur effect ( / 8 ).
-	gaussian_blur_horizontal_4_ = std::make_shared<sgl::EffectGaussianBlur>(
+	gaussian_blur_h4_ = std::make_shared<sgl::EffectGaussianBlur>(
 		textures_[16],
 		textures_[8],
 		true);
-	device_->AddEffect(gaussian_blur_horizontal_4_);
-	gaussian_blur_vertical_4_ = std::make_shared<sgl::EffectGaussianBlur>(
+	device_->AddEffect(gaussian_blur_h4_);
+	gaussian_blur_v4_ = std::make_shared<sgl::EffectGaussianBlur>(
 		textures_[17],
 		textures_[16],
 		false);
-	device_->AddEffect(gaussian_blur_vertical_4_);
+	device_->AddEffect(gaussian_blur_v4_);
 
 	// Initialize the Addition effect.
 	addition_ = std::make_shared<sgl::EffectAddition>(
@@ -189,13 +189,13 @@ void Draw::RunDraw(const double dt)
 	// 2 -> 6
 	brightness_->Draw();
 	// 6 -> 7
-	gaussian_blur_horizontal_2_->Draw();
+	gaussian_blur_h2_->Draw();
 	// 7 -> 8
-	gaussian_blur_vertical_2_->Draw();
+	gaussian_blur_v2_->Draw();
 	// 8 -> 16
-	gaussian_blur_horizontal_4_->Draw();
+	gaussian_blur_h4_->Draw();
 	// 16 -> 17
-	gaussian_blur_vertical_4_->Draw();
+	gaussian_blur_v4_->Draw();
 
 	// 2 + 17 -> 3
 	addition_->Draw();
