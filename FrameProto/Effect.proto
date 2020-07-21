@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+import "Uniform.proto";
+
+package frame.proto;
+
+// Description of a 2D effect.
+message Effect {
+	// Name of the effect.
+	string name = 1;
+	// Input textures.
+	repeated string input_textures_names = 2;
+	// Output textures.
+	repeated string output_textures_names = 3;
+	// Shader name (used to find the shader).
+	string shader = 4;
+	// Uniform parameters.
+	repeated Uniform parameters = 5;
+}

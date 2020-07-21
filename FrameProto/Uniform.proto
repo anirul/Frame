@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+import "Math.proto";
+
+package frame.proto;
+
+// This is the definition of an Uniform parameter.
+// These are parameters that are passed to the shader.
+message Uniform {
+	// Name of the uniform (should be the same as declared in the shader!).
+	string name = 1;
+	// Value of the uniform (same as before).
+	oneof value {
+		int32 integer = 2;
+		bool boolean = 3;
+		float real = 4;
+		// This is a vector of float!
+		Vector vector = 5;
+	}
+}

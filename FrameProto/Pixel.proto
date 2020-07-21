@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package frame.proto;
+
+message PixelElementSize {
+	enum Enum {
+		INVALID = 0;
+		BYTE    = 1;
+		SHORT   = 2;
+		HALF    = 3;
+		FLOAT   = 4;
+	}
+	Enum value = 1;
+}
+
+message PixelStructure {
+	enum Enum {
+		INVALID    = 0;
+		GREY       = 1;
+		GREY_ALPHA = 2;
+		RGB        = 3;
+		RGB_ALPHA  = 4;
+	}
+	Enum value = 1;
+}

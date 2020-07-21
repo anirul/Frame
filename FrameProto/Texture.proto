@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+import "Size.proto";
+import "Pixel.proto";
+
+package frame.proto;
+
+// Texture filter used in texture declaration.
+message TextureFilter{
+	enum Enum {
+		INVALID                = 0;
+		NEAREST                = 1;
+		LINEAR                 = 2;
+		NEAREST_MIPMAP_NEAREST = 3;
+		LINEAR_MIPMAP_NEAREST  = 4;
+		NEAREST_MIPMAP_LINEAR  = 5;
+		LINEAR_MIPMAP_LINEAR   = 6;
+		CLAMP_TO_EDGE          = 7;
+		MIRROR_REPEAT          = 8;
+		REPEAT                 = 9;
+	}
+	Enum value = 1;
+}
+
+message Texture {
+	// Name of the texture.
+	string name = 1;
+	// Size of the texture.
+	Size size = 2;
+	// Should it be a cleared texture?
+	bool clear = 3;
+
+	// Format of the texture.
+	PixelElementSize pixel_element_size = 10;
+	PixelStructure pixel_structure = 11;
+
+	// Filter for mirroring and texture sampling.
+	TextureFilter min_filter = 21;
+	TextureFilter mag_filter = 22;
+	TextureFilter wrap_s = 23;
+	TextureFilter wrap_t = 24;
+
+	// Pixel (if provided).
+	bytes pixels = 30;
+}

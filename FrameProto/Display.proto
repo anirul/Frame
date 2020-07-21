@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+import "Texture.proto";
+import "Effect.proto";
+
+package frame.proto;
+
+// Display effect on the screen.
+message Display {
+	// Input textures that are not counted (coming from the rendering).
+	repeated string in_textures = 1;
+	// Output textures to the screen.
+	repeated string out_textures = 2;
+	// Textures that are used.
+	repeated Texture textures = 10;
+	// Effects that are used.
+	repeated Effect effects = 11;
+}

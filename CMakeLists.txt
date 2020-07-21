@@ -7,12 +7,15 @@ set(CMAKE_CXX_STANDARD 17)
 
 project(ShaderGL)
 
+find_package(absl CONFIG REQUIRED)
+find_package(protobuf CONFIG REQUIRED)
+find_package(gRPC CONFIG REQUIRED)
 find_package(SDL2 CONFIG REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(glm CONFIG REQUIRED)
 find_package(GTest CONFIG REQUIRED)
 
-add_custom_target(Shader
+add_custom_target(ShaderGL
   SOURCES
     ${PROJECT_SOURCE_DIR}/Asset/Shader/Blur.frag
     ${PROJECT_SOURCE_DIR}/Asset/Shader/Blur.vert
@@ -54,6 +57,37 @@ add_custom_target(Shader
     ${PROJECT_SOURCE_DIR}/Asset/Shader/VectorMultiply.vert
     ${PROJECT_SOURCE_DIR}/Asset/Shader/ViewPositionNormal.frag
     ${PROJECT_SOURCE_DIR}/Asset/Shader/ViewPositionNormal.vert
+)
+
+add_library(FrameProto
+  STATIC
+    ${PROJECT_SOURCE_DIR}/FrameProto/Display.pb.cc
+    ${PROJECT_SOURCE_DIR}/FrameProto/Display.pb.h
+    ${PROJECT_SOURCE_DIR}/FrameProto/Display.proto
+    ${PROJECT_SOURCE_DIR}/FrameProto/Effect.pb.cc
+    ${PROJECT_SOURCE_DIR}/FrameProto/Effect.pb.h
+    ${PROJECT_SOURCE_DIR}/FrameProto/Effect.proto
+    ${PROJECT_SOURCE_DIR}/FrameProto/Math.pb.cc
+    ${PROJECT_SOURCE_DIR}/FrameProto/Math.pb.h
+    ${PROJECT_SOURCE_DIR}/FrameProto/Math.proto
+    ${PROJECT_SOURCE_DIR}/FrameProto/Pixel.pb.cc
+    ${PROJECT_SOURCE_DIR}/FrameProto/Pixel.pb.h
+    ${PROJECT_SOURCE_DIR}/FrameProto/Pixel.proto
+    ${PROJECT_SOURCE_DIR}/FrameProto/Size.pb.cc
+    ${PROJECT_SOURCE_DIR}/FrameProto/Size.pb.h
+    ${PROJECT_SOURCE_DIR}/FrameProto/Size.proto
+    ${PROJECT_SOURCE_DIR}/FrameProto/Texture.pb.cc
+    ${PROJECT_SOURCE_DIR}/FrameProto/Texture.pb.h
+    ${PROJECT_SOURCE_DIR}/FrameProto/Texture.proto
+    ${PROJECT_SOURCE_DIR}/FrameProto/Uniform.pb.cc
+    ${PROJECT_SOURCE_DIR}/FrameProto/Uniform.pb.h
+    ${PROJECT_SOURCE_DIR}/FrameProto/Uniform.proto
+)
+
+target_link_libraries(FrameProto 
+  PRIVATE
+    protobuf::libprotoc
+    protobuf::libprotobuf 
 )
 
 add_library(ShaderGLLib
