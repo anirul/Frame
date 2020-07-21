@@ -5,14 +5,30 @@ import "Effect.proto";
 
 package frame.proto;
 
+// Hard coded output from the deferred shading.
+message Deferred {
+	string out_albedo = 1;
+	string out_normal = 2;
+	string out_mra = 3;
+	string out_position = 4;
+}
+
+// Hard coded output from the view shading.
+message View {
+	string out_normal = 1;
+	string out_position = 2;
+}
+
 // Display effect on the screen.
 message Display {
-	// Input textures that are not counted (coming from the rendering).
-	repeated string in_textures = 1;
+	// Output from the defered shading (if available).
+	Deferred defered = 1;
+	// Output from the view shading (if available).
+	View view = 2;
 	// Output textures to the screen.
-	repeated string out_textures = 2;
+	repeated string out_textures = 10;
 	// Textures that are used.
-	repeated Texture textures = 10;
+	repeated Texture textures = 20;
 	// Effects that are used.
-	repeated Effect effects = 11;
+	repeated Effect effects = 21;
 }

@@ -49,7 +49,7 @@ struct TableStruct_Display_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxiliaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[1]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[3]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -58,18 +58,386 @@ struct TableStruct_Display_2eproto {
 extern const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_Display_2eproto;
 namespace frame {
 namespace proto {
+class Deferred;
+class DeferredDefaultTypeInternal;
+extern DeferredDefaultTypeInternal _Deferred_default_instance_;
 class Display;
 class DisplayDefaultTypeInternal;
 extern DisplayDefaultTypeInternal _Display_default_instance_;
+class View;
+class ViewDefaultTypeInternal;
+extern ViewDefaultTypeInternal _View_default_instance_;
 }  // namespace proto
 }  // namespace frame
 PROTOBUF_NAMESPACE_OPEN
+template<> ::frame::proto::Deferred* Arena::CreateMaybeMessage<::frame::proto::Deferred>(Arena*);
 template<> ::frame::proto::Display* Arena::CreateMaybeMessage<::frame::proto::Display>(Arena*);
+template<> ::frame::proto::View* Arena::CreateMaybeMessage<::frame::proto::View>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 namespace frame {
 namespace proto {
 
 // ===================================================================
+
+class Deferred PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:frame.proto.Deferred) */ {
+ public:
+  inline Deferred() : Deferred(nullptr) {};
+  virtual ~Deferred();
+
+  Deferred(const Deferred& from);
+  Deferred(Deferred&& from) noexcept
+    : Deferred() {
+    *this = ::std::move(from);
+  }
+
+  inline Deferred& operator=(const Deferred& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline Deferred& operator=(Deferred&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const Deferred& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const Deferred* internal_default_instance() {
+    return reinterpret_cast<const Deferred*>(
+               &_Deferred_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    0;
+
+  friend void swap(Deferred& a, Deferred& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(Deferred* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(Deferred* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline Deferred* New() const final {
+    return CreateMaybeMessage<Deferred>(nullptr);
+  }
+
+  Deferred* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<Deferred>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const Deferred& from);
+  void MergeFrom(const Deferred& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(Deferred* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "frame.proto.Deferred";
+  }
+  protected:
+  explicit Deferred(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_Display_2eproto);
+    return ::descriptor_table_Display_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kOutAlbedoFieldNumber = 1,
+    kOutNormalFieldNumber = 2,
+    kOutMraFieldNumber = 3,
+    kOutPositionFieldNumber = 4,
+  };
+  // string out_albedo = 1;
+  void clear_out_albedo();
+  const std::string& out_albedo() const;
+  void set_out_albedo(const std::string& value);
+  void set_out_albedo(std::string&& value);
+  void set_out_albedo(const char* value);
+  void set_out_albedo(const char* value, size_t size);
+  std::string* mutable_out_albedo();
+  std::string* release_out_albedo();
+  void set_allocated_out_albedo(std::string* out_albedo);
+  private:
+  const std::string& _internal_out_albedo() const;
+  void _internal_set_out_albedo(const std::string& value);
+  std::string* _internal_mutable_out_albedo();
+  public:
+
+  // string out_normal = 2;
+  void clear_out_normal();
+  const std::string& out_normal() const;
+  void set_out_normal(const std::string& value);
+  void set_out_normal(std::string&& value);
+  void set_out_normal(const char* value);
+  void set_out_normal(const char* value, size_t size);
+  std::string* mutable_out_normal();
+  std::string* release_out_normal();
+  void set_allocated_out_normal(std::string* out_normal);
+  private:
+  const std::string& _internal_out_normal() const;
+  void _internal_set_out_normal(const std::string& value);
+  std::string* _internal_mutable_out_normal();
+  public:
+
+  // string out_mra = 3;
+  void clear_out_mra();
+  const std::string& out_mra() const;
+  void set_out_mra(const std::string& value);
+  void set_out_mra(std::string&& value);
+  void set_out_mra(const char* value);
+  void set_out_mra(const char* value, size_t size);
+  std::string* mutable_out_mra();
+  std::string* release_out_mra();
+  void set_allocated_out_mra(std::string* out_mra);
+  private:
+  const std::string& _internal_out_mra() const;
+  void _internal_set_out_mra(const std::string& value);
+  std::string* _internal_mutable_out_mra();
+  public:
+
+  // string out_position = 4;
+  void clear_out_position();
+  const std::string& out_position() const;
+  void set_out_position(const std::string& value);
+  void set_out_position(std::string&& value);
+  void set_out_position(const char* value);
+  void set_out_position(const char* value, size_t size);
+  std::string* mutable_out_position();
+  std::string* release_out_position();
+  void set_allocated_out_position(std::string* out_position);
+  private:
+  const std::string& _internal_out_position() const;
+  void _internal_set_out_position(const std::string& value);
+  std::string* _internal_mutable_out_position();
+  public:
+
+  // @@protoc_insertion_point(class_scope:frame.proto.Deferred)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr out_albedo_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr out_normal_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr out_mra_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr out_position_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_Display_2eproto;
+};
+// -------------------------------------------------------------------
+
+class View PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:frame.proto.View) */ {
+ public:
+  inline View() : View(nullptr) {};
+  virtual ~View();
+
+  View(const View& from);
+  View(View&& from) noexcept
+    : View() {
+    *this = ::std::move(from);
+  }
+
+  inline View& operator=(const View& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline View& operator=(View&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const View& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const View* internal_default_instance() {
+    return reinterpret_cast<const View*>(
+               &_View_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    1;
+
+  friend void swap(View& a, View& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(View* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(View* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline View* New() const final {
+    return CreateMaybeMessage<View>(nullptr);
+  }
+
+  View* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<View>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const View& from);
+  void MergeFrom(const View& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(View* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "frame.proto.View";
+  }
+  protected:
+  explicit View(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_Display_2eproto);
+    return ::descriptor_table_Display_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kOutNormalFieldNumber = 1,
+    kOutPositionFieldNumber = 2,
+  };
+  // string out_normal = 1;
+  void clear_out_normal();
+  const std::string& out_normal() const;
+  void set_out_normal(const std::string& value);
+  void set_out_normal(std::string&& value);
+  void set_out_normal(const char* value);
+  void set_out_normal(const char* value, size_t size);
+  std::string* mutable_out_normal();
+  std::string* release_out_normal();
+  void set_allocated_out_normal(std::string* out_normal);
+  private:
+  const std::string& _internal_out_normal() const;
+  void _internal_set_out_normal(const std::string& value);
+  std::string* _internal_mutable_out_normal();
+  public:
+
+  // string out_position = 2;
+  void clear_out_position();
+  const std::string& out_position() const;
+  void set_out_position(const std::string& value);
+  void set_out_position(std::string&& value);
+  void set_out_position(const char* value);
+  void set_out_position(const char* value, size_t size);
+  std::string* mutable_out_position();
+  std::string* release_out_position();
+  void set_allocated_out_position(std::string* out_position);
+  private:
+  const std::string& _internal_out_position() const;
+  void _internal_set_out_position(const std::string& value);
+  std::string* _internal_mutable_out_position();
+  public:
+
+  // @@protoc_insertion_point(class_scope:frame.proto.View)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr out_normal_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr out_position_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_Display_2eproto;
+};
+// -------------------------------------------------------------------
 
 class Display PROTOBUF_FINAL :
     public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:frame.proto.Display) */ {
@@ -113,7 +481,7 @@ class Display PROTOBUF_FINAL :
                &_Display_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    0;
+    2;
 
   friend void swap(Display& a, Display& b) {
     a.Swap(&b);
@@ -184,36 +552,13 @@ class Display PROTOBUF_FINAL :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kInTexturesFieldNumber = 1,
-    kOutTexturesFieldNumber = 2,
-    kTexturesFieldNumber = 10,
-    kEffectsFieldNumber = 11,
+    kOutTexturesFieldNumber = 10,
+    kTexturesFieldNumber = 20,
+    kEffectsFieldNumber = 21,
+    kDeferedFieldNumber = 1,
+    kViewFieldNumber = 2,
   };
-  // repeated string in_textures = 1;
-  int in_textures_size() const;
-  private:
-  int _internal_in_textures_size() const;
-  public:
-  void clear_in_textures();
-  const std::string& in_textures(int index) const;
-  std::string* mutable_in_textures(int index);
-  void set_in_textures(int index, const std::string& value);
-  void set_in_textures(int index, std::string&& value);
-  void set_in_textures(int index, const char* value);
-  void set_in_textures(int index, const char* value, size_t size);
-  std::string* add_in_textures();
-  void add_in_textures(const std::string& value);
-  void add_in_textures(std::string&& value);
-  void add_in_textures(const char* value);
-  void add_in_textures(const char* value, size_t size);
-  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>& in_textures() const;
-  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>* mutable_in_textures();
-  private:
-  const std::string& _internal_in_textures(int index) const;
-  std::string* _internal_add_in_textures();
-  public:
-
-  // repeated string out_textures = 2;
+  // repeated string out_textures = 10;
   int out_textures_size() const;
   private:
   int _internal_out_textures_size() const;
@@ -237,7 +582,7 @@ class Display PROTOBUF_FINAL :
   std::string* _internal_add_out_textures();
   public:
 
-  // repeated .frame.proto.Texture textures = 10;
+  // repeated .frame.proto.Texture textures = 20;
   int textures_size() const;
   private:
   int _internal_textures_size() const;
@@ -255,7 +600,7 @@ class Display PROTOBUF_FINAL :
   const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Texture >&
       textures() const;
 
-  // repeated .frame.proto.Effect effects = 11;
+  // repeated .frame.proto.Effect effects = 21;
   int effects_size() const;
   private:
   int _internal_effects_size() const;
@@ -273,6 +618,42 @@ class Display PROTOBUF_FINAL :
   const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Effect >&
       effects() const;
 
+  // .frame.proto.Deferred defered = 1;
+  bool has_defered() const;
+  private:
+  bool _internal_has_defered() const;
+  public:
+  void clear_defered();
+  const ::frame::proto::Deferred& defered() const;
+  ::frame::proto::Deferred* release_defered();
+  ::frame::proto::Deferred* mutable_defered();
+  void set_allocated_defered(::frame::proto::Deferred* defered);
+  private:
+  const ::frame::proto::Deferred& _internal_defered() const;
+  ::frame::proto::Deferred* _internal_mutable_defered();
+  public:
+  void unsafe_arena_set_allocated_defered(
+      ::frame::proto::Deferred* defered);
+  ::frame::proto::Deferred* unsafe_arena_release_defered();
+
+  // .frame.proto.View view = 2;
+  bool has_view() const;
+  private:
+  bool _internal_has_view() const;
+  public:
+  void clear_view();
+  const ::frame::proto::View& view() const;
+  ::frame::proto::View* release_view();
+  ::frame::proto::View* mutable_view();
+  void set_allocated_view(::frame::proto::View* view);
+  private:
+  const ::frame::proto::View& _internal_view() const;
+  ::frame::proto::View* _internal_mutable_view();
+  public:
+  void unsafe_arena_set_allocated_view(
+      ::frame::proto::View* view);
+  ::frame::proto::View* unsafe_arena_release_view();
+
   // @@protoc_insertion_point(class_scope:frame.proto.Display)
  private:
   class _Internal;
@@ -280,10 +661,11 @@ class Display PROTOBUF_FINAL :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
-  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string> in_textures_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string> out_textures_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Texture > textures_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Effect > effects_;
+  ::frame::proto::Deferred* defered_;
+  ::frame::proto::View* view_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_Display_2eproto;
 };
@@ -296,83 +678,555 @@ class Display PROTOBUF_FINAL :
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif  // __GNUC__
+// Deferred
+
+// string out_albedo = 1;
+inline void Deferred::clear_out_albedo() {
+  out_albedo_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline const std::string& Deferred::out_albedo() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Deferred.out_albedo)
+  return _internal_out_albedo();
+}
+inline void Deferred::set_out_albedo(const std::string& value) {
+  _internal_set_out_albedo(value);
+  // @@protoc_insertion_point(field_set:frame.proto.Deferred.out_albedo)
+}
+inline std::string* Deferred::mutable_out_albedo() {
+  // @@protoc_insertion_point(field_mutable:frame.proto.Deferred.out_albedo)
+  return _internal_mutable_out_albedo();
+}
+inline const std::string& Deferred::_internal_out_albedo() const {
+  return out_albedo_.Get();
+}
+inline void Deferred::_internal_set_out_albedo(const std::string& value) {
+  
+  out_albedo_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
+}
+inline void Deferred::set_out_albedo(std::string&& value) {
+  
+  out_albedo_.Set(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
+  // @@protoc_insertion_point(field_set_rvalue:frame.proto.Deferred.out_albedo)
+}
+inline void Deferred::set_out_albedo(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  out_albedo_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+              GetArena());
+  // @@protoc_insertion_point(field_set_char:frame.proto.Deferred.out_albedo)
+}
+inline void Deferred::set_out_albedo(const char* value,
+    size_t size) {
+  
+  out_albedo_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArena());
+  // @@protoc_insertion_point(field_set_pointer:frame.proto.Deferred.out_albedo)
+}
+inline std::string* Deferred::_internal_mutable_out_albedo() {
+  
+  return out_albedo_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline std::string* Deferred::release_out_albedo() {
+  // @@protoc_insertion_point(field_release:frame.proto.Deferred.out_albedo)
+  return out_albedo_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline void Deferred::set_allocated_out_albedo(std::string* out_albedo) {
+  if (out_albedo != nullptr) {
+    
+  } else {
+    
+  }
+  out_albedo_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), out_albedo,
+      GetArena());
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.Deferred.out_albedo)
+}
+
+// string out_normal = 2;
+inline void Deferred::clear_out_normal() {
+  out_normal_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline const std::string& Deferred::out_normal() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Deferred.out_normal)
+  return _internal_out_normal();
+}
+inline void Deferred::set_out_normal(const std::string& value) {
+  _internal_set_out_normal(value);
+  // @@protoc_insertion_point(field_set:frame.proto.Deferred.out_normal)
+}
+inline std::string* Deferred::mutable_out_normal() {
+  // @@protoc_insertion_point(field_mutable:frame.proto.Deferred.out_normal)
+  return _internal_mutable_out_normal();
+}
+inline const std::string& Deferred::_internal_out_normal() const {
+  return out_normal_.Get();
+}
+inline void Deferred::_internal_set_out_normal(const std::string& value) {
+  
+  out_normal_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
+}
+inline void Deferred::set_out_normal(std::string&& value) {
+  
+  out_normal_.Set(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
+  // @@protoc_insertion_point(field_set_rvalue:frame.proto.Deferred.out_normal)
+}
+inline void Deferred::set_out_normal(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  out_normal_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+              GetArena());
+  // @@protoc_insertion_point(field_set_char:frame.proto.Deferred.out_normal)
+}
+inline void Deferred::set_out_normal(const char* value,
+    size_t size) {
+  
+  out_normal_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArena());
+  // @@protoc_insertion_point(field_set_pointer:frame.proto.Deferred.out_normal)
+}
+inline std::string* Deferred::_internal_mutable_out_normal() {
+  
+  return out_normal_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline std::string* Deferred::release_out_normal() {
+  // @@protoc_insertion_point(field_release:frame.proto.Deferred.out_normal)
+  return out_normal_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline void Deferred::set_allocated_out_normal(std::string* out_normal) {
+  if (out_normal != nullptr) {
+    
+  } else {
+    
+  }
+  out_normal_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), out_normal,
+      GetArena());
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.Deferred.out_normal)
+}
+
+// string out_mra = 3;
+inline void Deferred::clear_out_mra() {
+  out_mra_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline const std::string& Deferred::out_mra() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Deferred.out_mra)
+  return _internal_out_mra();
+}
+inline void Deferred::set_out_mra(const std::string& value) {
+  _internal_set_out_mra(value);
+  // @@protoc_insertion_point(field_set:frame.proto.Deferred.out_mra)
+}
+inline std::string* Deferred::mutable_out_mra() {
+  // @@protoc_insertion_point(field_mutable:frame.proto.Deferred.out_mra)
+  return _internal_mutable_out_mra();
+}
+inline const std::string& Deferred::_internal_out_mra() const {
+  return out_mra_.Get();
+}
+inline void Deferred::_internal_set_out_mra(const std::string& value) {
+  
+  out_mra_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
+}
+inline void Deferred::set_out_mra(std::string&& value) {
+  
+  out_mra_.Set(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
+  // @@protoc_insertion_point(field_set_rvalue:frame.proto.Deferred.out_mra)
+}
+inline void Deferred::set_out_mra(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  out_mra_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+              GetArena());
+  // @@protoc_insertion_point(field_set_char:frame.proto.Deferred.out_mra)
+}
+inline void Deferred::set_out_mra(const char* value,
+    size_t size) {
+  
+  out_mra_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArena());
+  // @@protoc_insertion_point(field_set_pointer:frame.proto.Deferred.out_mra)
+}
+inline std::string* Deferred::_internal_mutable_out_mra() {
+  
+  return out_mra_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline std::string* Deferred::release_out_mra() {
+  // @@protoc_insertion_point(field_release:frame.proto.Deferred.out_mra)
+  return out_mra_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline void Deferred::set_allocated_out_mra(std::string* out_mra) {
+  if (out_mra != nullptr) {
+    
+  } else {
+    
+  }
+  out_mra_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), out_mra,
+      GetArena());
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.Deferred.out_mra)
+}
+
+// string out_position = 4;
+inline void Deferred::clear_out_position() {
+  out_position_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline const std::string& Deferred::out_position() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Deferred.out_position)
+  return _internal_out_position();
+}
+inline void Deferred::set_out_position(const std::string& value) {
+  _internal_set_out_position(value);
+  // @@protoc_insertion_point(field_set:frame.proto.Deferred.out_position)
+}
+inline std::string* Deferred::mutable_out_position() {
+  // @@protoc_insertion_point(field_mutable:frame.proto.Deferred.out_position)
+  return _internal_mutable_out_position();
+}
+inline const std::string& Deferred::_internal_out_position() const {
+  return out_position_.Get();
+}
+inline void Deferred::_internal_set_out_position(const std::string& value) {
+  
+  out_position_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
+}
+inline void Deferred::set_out_position(std::string&& value) {
+  
+  out_position_.Set(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
+  // @@protoc_insertion_point(field_set_rvalue:frame.proto.Deferred.out_position)
+}
+inline void Deferred::set_out_position(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  out_position_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+              GetArena());
+  // @@protoc_insertion_point(field_set_char:frame.proto.Deferred.out_position)
+}
+inline void Deferred::set_out_position(const char* value,
+    size_t size) {
+  
+  out_position_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArena());
+  // @@protoc_insertion_point(field_set_pointer:frame.proto.Deferred.out_position)
+}
+inline std::string* Deferred::_internal_mutable_out_position() {
+  
+  return out_position_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline std::string* Deferred::release_out_position() {
+  // @@protoc_insertion_point(field_release:frame.proto.Deferred.out_position)
+  return out_position_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline void Deferred::set_allocated_out_position(std::string* out_position) {
+  if (out_position != nullptr) {
+    
+  } else {
+    
+  }
+  out_position_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), out_position,
+      GetArena());
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.Deferred.out_position)
+}
+
+// -------------------------------------------------------------------
+
+// View
+
+// string out_normal = 1;
+inline void View::clear_out_normal() {
+  out_normal_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline const std::string& View::out_normal() const {
+  // @@protoc_insertion_point(field_get:frame.proto.View.out_normal)
+  return _internal_out_normal();
+}
+inline void View::set_out_normal(const std::string& value) {
+  _internal_set_out_normal(value);
+  // @@protoc_insertion_point(field_set:frame.proto.View.out_normal)
+}
+inline std::string* View::mutable_out_normal() {
+  // @@protoc_insertion_point(field_mutable:frame.proto.View.out_normal)
+  return _internal_mutable_out_normal();
+}
+inline const std::string& View::_internal_out_normal() const {
+  return out_normal_.Get();
+}
+inline void View::_internal_set_out_normal(const std::string& value) {
+  
+  out_normal_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
+}
+inline void View::set_out_normal(std::string&& value) {
+  
+  out_normal_.Set(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
+  // @@protoc_insertion_point(field_set_rvalue:frame.proto.View.out_normal)
+}
+inline void View::set_out_normal(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  out_normal_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+              GetArena());
+  // @@protoc_insertion_point(field_set_char:frame.proto.View.out_normal)
+}
+inline void View::set_out_normal(const char* value,
+    size_t size) {
+  
+  out_normal_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArena());
+  // @@protoc_insertion_point(field_set_pointer:frame.proto.View.out_normal)
+}
+inline std::string* View::_internal_mutable_out_normal() {
+  
+  return out_normal_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline std::string* View::release_out_normal() {
+  // @@protoc_insertion_point(field_release:frame.proto.View.out_normal)
+  return out_normal_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline void View::set_allocated_out_normal(std::string* out_normal) {
+  if (out_normal != nullptr) {
+    
+  } else {
+    
+  }
+  out_normal_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), out_normal,
+      GetArena());
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.View.out_normal)
+}
+
+// string out_position = 2;
+inline void View::clear_out_position() {
+  out_position_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline const std::string& View::out_position() const {
+  // @@protoc_insertion_point(field_get:frame.proto.View.out_position)
+  return _internal_out_position();
+}
+inline void View::set_out_position(const std::string& value) {
+  _internal_set_out_position(value);
+  // @@protoc_insertion_point(field_set:frame.proto.View.out_position)
+}
+inline std::string* View::mutable_out_position() {
+  // @@protoc_insertion_point(field_mutable:frame.proto.View.out_position)
+  return _internal_mutable_out_position();
+}
+inline const std::string& View::_internal_out_position() const {
+  return out_position_.Get();
+}
+inline void View::_internal_set_out_position(const std::string& value) {
+  
+  out_position_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
+}
+inline void View::set_out_position(std::string&& value) {
+  
+  out_position_.Set(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
+  // @@protoc_insertion_point(field_set_rvalue:frame.proto.View.out_position)
+}
+inline void View::set_out_position(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  out_position_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+              GetArena());
+  // @@protoc_insertion_point(field_set_char:frame.proto.View.out_position)
+}
+inline void View::set_out_position(const char* value,
+    size_t size) {
+  
+  out_position_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArena());
+  // @@protoc_insertion_point(field_set_pointer:frame.proto.View.out_position)
+}
+inline std::string* View::_internal_mutable_out_position() {
+  
+  return out_position_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline std::string* View::release_out_position() {
+  // @@protoc_insertion_point(field_release:frame.proto.View.out_position)
+  return out_position_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline void View::set_allocated_out_position(std::string* out_position) {
+  if (out_position != nullptr) {
+    
+  } else {
+    
+  }
+  out_position_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), out_position,
+      GetArena());
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.View.out_position)
+}
+
+// -------------------------------------------------------------------
+
 // Display
 
-// repeated string in_textures = 1;
-inline int Display::_internal_in_textures_size() const {
-  return in_textures_.size();
+// .frame.proto.Deferred defered = 1;
+inline bool Display::_internal_has_defered() const {
+  return this != internal_default_instance() && defered_ != nullptr;
 }
-inline int Display::in_textures_size() const {
-  return _internal_in_textures_size();
+inline bool Display::has_defered() const {
+  return _internal_has_defered();
 }
-inline void Display::clear_in_textures() {
-  in_textures_.Clear();
+inline void Display::clear_defered() {
+  if (GetArena() == nullptr && defered_ != nullptr) {
+    delete defered_;
+  }
+  defered_ = nullptr;
 }
-inline std::string* Display::add_in_textures() {
-  // @@protoc_insertion_point(field_add_mutable:frame.proto.Display.in_textures)
-  return _internal_add_in_textures();
+inline const ::frame::proto::Deferred& Display::_internal_defered() const {
+  const ::frame::proto::Deferred* p = defered_;
+  return p != nullptr ? *p : *reinterpret_cast<const ::frame::proto::Deferred*>(
+      &::frame::proto::_Deferred_default_instance_);
 }
-inline const std::string& Display::_internal_in_textures(int index) const {
-  return in_textures_.Get(index);
+inline const ::frame::proto::Deferred& Display::defered() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Display.defered)
+  return _internal_defered();
 }
-inline const std::string& Display::in_textures(int index) const {
-  // @@protoc_insertion_point(field_get:frame.proto.Display.in_textures)
-  return _internal_in_textures(index);
+inline void Display::unsafe_arena_set_allocated_defered(
+    ::frame::proto::Deferred* defered) {
+  if (GetArena() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(defered_);
+  }
+  defered_ = defered;
+  if (defered) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.Display.defered)
 }
-inline std::string* Display::mutable_in_textures(int index) {
-  // @@protoc_insertion_point(field_mutable:frame.proto.Display.in_textures)
-  return in_textures_.Mutable(index);
+inline ::frame::proto::Deferred* Display::release_defered() {
+  
+  ::frame::proto::Deferred* temp = defered_;
+  defered_ = nullptr;
+  if (GetArena() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+  return temp;
 }
-inline void Display::set_in_textures(int index, const std::string& value) {
-  // @@protoc_insertion_point(field_set:frame.proto.Display.in_textures)
-  in_textures_.Mutable(index)->assign(value);
+inline ::frame::proto::Deferred* Display::unsafe_arena_release_defered() {
+  // @@protoc_insertion_point(field_release:frame.proto.Display.defered)
+  
+  ::frame::proto::Deferred* temp = defered_;
+  defered_ = nullptr;
+  return temp;
 }
-inline void Display::set_in_textures(int index, std::string&& value) {
-  // @@protoc_insertion_point(field_set:frame.proto.Display.in_textures)
-  in_textures_.Mutable(index)->assign(std::move(value));
+inline ::frame::proto::Deferred* Display::_internal_mutable_defered() {
+  
+  if (defered_ == nullptr) {
+    auto* p = CreateMaybeMessage<::frame::proto::Deferred>(GetArena());
+    defered_ = p;
+  }
+  return defered_;
 }
-inline void Display::set_in_textures(int index, const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  in_textures_.Mutable(index)->assign(value);
-  // @@protoc_insertion_point(field_set_char:frame.proto.Display.in_textures)
+inline ::frame::proto::Deferred* Display::mutable_defered() {
+  // @@protoc_insertion_point(field_mutable:frame.proto.Display.defered)
+  return _internal_mutable_defered();
 }
-inline void Display::set_in_textures(int index, const char* value, size_t size) {
-  in_textures_.Mutable(index)->assign(
-    reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_set_pointer:frame.proto.Display.in_textures)
-}
-inline std::string* Display::_internal_add_in_textures() {
-  return in_textures_.Add();
-}
-inline void Display::add_in_textures(const std::string& value) {
-  in_textures_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add:frame.proto.Display.in_textures)
-}
-inline void Display::add_in_textures(std::string&& value) {
-  in_textures_.Add(std::move(value));
-  // @@protoc_insertion_point(field_add:frame.proto.Display.in_textures)
-}
-inline void Display::add_in_textures(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  in_textures_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add_char:frame.proto.Display.in_textures)
-}
-inline void Display::add_in_textures(const char* value, size_t size) {
-  in_textures_.Add()->assign(reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_add_pointer:frame.proto.Display.in_textures)
-}
-inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>&
-Display::in_textures() const {
-  // @@protoc_insertion_point(field_list:frame.proto.Display.in_textures)
-  return in_textures_;
-}
-inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>*
-Display::mutable_in_textures() {
-  // @@protoc_insertion_point(field_mutable_list:frame.proto.Display.in_textures)
-  return &in_textures_;
+inline void Display::set_allocated_defered(::frame::proto::Deferred* defered) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  if (message_arena == nullptr) {
+    delete defered_;
+  }
+  if (defered) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(defered);
+    if (message_arena != submessage_arena) {
+      defered = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, defered, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  defered_ = defered;
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.Display.defered)
 }
 
-// repeated string out_textures = 2;
+// .frame.proto.View view = 2;
+inline bool Display::_internal_has_view() const {
+  return this != internal_default_instance() && view_ != nullptr;
+}
+inline bool Display::has_view() const {
+  return _internal_has_view();
+}
+inline void Display::clear_view() {
+  if (GetArena() == nullptr && view_ != nullptr) {
+    delete view_;
+  }
+  view_ = nullptr;
+}
+inline const ::frame::proto::View& Display::_internal_view() const {
+  const ::frame::proto::View* p = view_;
+  return p != nullptr ? *p : *reinterpret_cast<const ::frame::proto::View*>(
+      &::frame::proto::_View_default_instance_);
+}
+inline const ::frame::proto::View& Display::view() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Display.view)
+  return _internal_view();
+}
+inline void Display::unsafe_arena_set_allocated_view(
+    ::frame::proto::View* view) {
+  if (GetArena() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(view_);
+  }
+  view_ = view;
+  if (view) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.Display.view)
+}
+inline ::frame::proto::View* Display::release_view() {
+  
+  ::frame::proto::View* temp = view_;
+  view_ = nullptr;
+  if (GetArena() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+  return temp;
+}
+inline ::frame::proto::View* Display::unsafe_arena_release_view() {
+  // @@protoc_insertion_point(field_release:frame.proto.Display.view)
+  
+  ::frame::proto::View* temp = view_;
+  view_ = nullptr;
+  return temp;
+}
+inline ::frame::proto::View* Display::_internal_mutable_view() {
+  
+  if (view_ == nullptr) {
+    auto* p = CreateMaybeMessage<::frame::proto::View>(GetArena());
+    view_ = p;
+  }
+  return view_;
+}
+inline ::frame::proto::View* Display::mutable_view() {
+  // @@protoc_insertion_point(field_mutable:frame.proto.Display.view)
+  return _internal_mutable_view();
+}
+inline void Display::set_allocated_view(::frame::proto::View* view) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  if (message_arena == nullptr) {
+    delete view_;
+  }
+  if (view) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(view);
+    if (message_arena != submessage_arena) {
+      view = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, view, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  view_ = view;
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.Display.view)
+}
+
+// repeated string out_textures = 10;
 inline int Display::_internal_out_textures_size() const {
   return out_textures_.size();
 }
@@ -446,7 +1300,7 @@ Display::mutable_out_textures() {
   return &out_textures_;
 }
 
-// repeated .frame.proto.Texture textures = 10;
+// repeated .frame.proto.Texture textures = 20;
 inline int Display::_internal_textures_size() const {
   return textures_.size();
 }
@@ -482,7 +1336,7 @@ Display::textures() const {
   return textures_;
 }
 
-// repeated .frame.proto.Effect effects = 11;
+// repeated .frame.proto.Effect effects = 21;
 inline int Display::_internal_effects_size() const {
   return effects_.size();
 }
@@ -521,6 +1375,10 @@ Display::effects() const {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 
 // @@protoc_insertion_point(namespace_scope)
 
