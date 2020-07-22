@@ -38,7 +38,7 @@ namespace sgl {
 		Bind();
 		glRenderbufferStorage(
 			GL_RENDERBUFFER,
-			static_cast<int>(pixel_depth_component),
+			static_cast<int>(pixel_depth_component.value()),
 			size.first,
 			size.second);
 		error_.Display(__FILE__, __LINE__ - 5);

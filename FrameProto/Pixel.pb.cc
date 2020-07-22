@@ -24,8 +24,26 @@ class PixelStructureDefaultTypeInternal {
  public:
   ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<PixelStructure> _instance;
 } _PixelStructure_default_instance_;
+class PixelDepthComponentDefaultTypeInternal {
+ public:
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<PixelDepthComponent> _instance;
+} _PixelDepthComponent_default_instance_;
 }  // namespace proto
 }  // namespace frame
+static void InitDefaultsscc_info_PixelDepthComponent_Pixel_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::frame::proto::_PixelDepthComponent_default_instance_;
+    new (ptr) ::frame::proto::PixelDepthComponent();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::frame::proto::PixelDepthComponent::InitAsDefaultInstance();
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_PixelDepthComponent_Pixel_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_PixelDepthComponent_Pixel_2eproto}, {}};
+
 static void InitDefaultsscc_info_PixelElementSize_Pixel_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
@@ -54,8 +72,8 @@ static void InitDefaultsscc_info_PixelStructure_Pixel_2eproto() {
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_PixelStructure_Pixel_2eproto =
     {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_PixelStructure_Pixel_2eproto}, {}};
 
-static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_Pixel_2eproto[2];
-static const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* file_level_enum_descriptors_Pixel_2eproto[2];
+static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_Pixel_2eproto[3];
+static const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* file_level_enum_descriptors_Pixel_2eproto[3];
 static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_Pixel_2eproto = nullptr;
 
 const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_Pixel_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
@@ -71,15 +89,23 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_Pixel_2eproto::offsets[] PROTO
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::frame::proto::PixelStructure, value_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::frame::proto::PixelDepthComponent, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::frame::proto::PixelDepthComponent, value_),
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::frame::proto::PixelElementSize)},
   { 6, -1, sizeof(::frame::proto::PixelStructure)},
+  { 12, -1, sizeof(::frame::proto::PixelDepthComponent)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::frame::proto::_PixelElementSize_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::frame::proto::_PixelStructure_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::frame::proto::_PixelDepthComponent_default_instance_),
 };
 
 const char descriptor_table_protodef_Pixel_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
@@ -90,20 +116,26 @@ const char descriptor_table_protodef_Pixel_2eproto[] PROTOBUF_SECTION_VARIABLE(p
   "\004\"\210\001\n\016PixelStructure\022/\n\005value\030\001 \001(\0162 .fr"
   "ame.proto.PixelStructure.Enum\"E\n\004Enum\022\013\n"
   "\007INVALID\020\000\022\010\n\004GREY\020\001\022\016\n\nGREY_ALPHA\020\002\022\007\n\003"
-  "RGB\020\003\022\r\n\tRGB_ALPHA\020\004b\006proto3"
+  "RGB\020\003\022\r\n\tRGB_ALPHA\020\004\"\273\001\n\023PixelDepthCompo"
+  "nent\0224\n\005value\030\001 \001(\0162%.frame.proto.PixelD"
+  "epthComponent.Enum\"n\n\004Enum\022\013\n\007INVALID\020\000\022"
+  "\024\n\020DEPTH_COMPONENT8\020\001\022\025\n\021DEPTH_COMPONENT"
+  "16\020\002\022\025\n\021DEPTH_COMPONENT24\020\003\022\025\n\021DEPTH_COM"
+  "PONENT32\020\004b\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_Pixel_2eproto_deps[1] = {
 };
-static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_Pixel_2eproto_sccs[2] = {
+static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_Pixel_2eproto_sccs[3] = {
+  &scc_info_PixelDepthComponent_Pixel_2eproto.base,
   &scc_info_PixelElementSize_Pixel_2eproto.base,
   &scc_info_PixelStructure_Pixel_2eproto.base,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_Pixel_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_Pixel_2eproto = {
-  false, false, descriptor_table_protodef_Pixel_2eproto, "Pixel.proto", 308,
-  &descriptor_table_Pixel_2eproto_once, descriptor_table_Pixel_2eproto_sccs, descriptor_table_Pixel_2eproto_deps, 2, 0,
+  false, false, descriptor_table_protodef_Pixel_2eproto, "Pixel.proto", 498,
+  &descriptor_table_Pixel_2eproto_once, descriptor_table_Pixel_2eproto_sccs, descriptor_table_Pixel_2eproto_deps, 3, 0,
   schemas, file_default_instances, TableStruct_Pixel_2eproto::offsets,
-  file_level_metadata_Pixel_2eproto, 2, file_level_enum_descriptors_Pixel_2eproto, file_level_service_descriptors_Pixel_2eproto,
+  file_level_metadata_Pixel_2eproto, 3, file_level_enum_descriptors_Pixel_2eproto, file_level_service_descriptors_Pixel_2eproto,
 };
 
 // Force running AddDescriptors() at dynamic initialization time.
@@ -163,6 +195,33 @@ constexpr PixelStructure_Enum PixelStructure::RGB_ALPHA;
 constexpr PixelStructure_Enum PixelStructure::Enum_MIN;
 constexpr PixelStructure_Enum PixelStructure::Enum_MAX;
 constexpr int PixelStructure::Enum_ARRAYSIZE;
+#endif  // (__cplusplus < 201703) && (!defined(_MSC_VER) || _MSC_VER >= 1900)
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* PixelDepthComponent_Enum_descriptor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_Pixel_2eproto);
+  return file_level_enum_descriptors_Pixel_2eproto[2];
+}
+bool PixelDepthComponent_Enum_IsValid(int value) {
+  switch (value) {
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+      return true;
+    default:
+      return false;
+  }
+}
+
+#if (__cplusplus < 201703) && (!defined(_MSC_VER) || _MSC_VER >= 1900)
+constexpr PixelDepthComponent_Enum PixelDepthComponent::INVALID;
+constexpr PixelDepthComponent_Enum PixelDepthComponent::DEPTH_COMPONENT8;
+constexpr PixelDepthComponent_Enum PixelDepthComponent::DEPTH_COMPONENT16;
+constexpr PixelDepthComponent_Enum PixelDepthComponent::DEPTH_COMPONENT24;
+constexpr PixelDepthComponent_Enum PixelDepthComponent::DEPTH_COMPONENT32;
+constexpr PixelDepthComponent_Enum PixelDepthComponent::Enum_MIN;
+constexpr PixelDepthComponent_Enum PixelDepthComponent::Enum_MAX;
+constexpr int PixelDepthComponent::Enum_ARRAYSIZE;
 #endif  // (__cplusplus < 201703) && (!defined(_MSC_VER) || _MSC_VER >= 1900)
 
 // ===================================================================
@@ -561,6 +620,204 @@ void PixelStructure::InternalSwap(PixelStructure* other) {
 }
 
 
+// ===================================================================
+
+void PixelDepthComponent::InitAsDefaultInstance() {
+}
+class PixelDepthComponent::_Internal {
+ public:
+};
+
+PixelDepthComponent::PixelDepthComponent(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:frame.proto.PixelDepthComponent)
+}
+PixelDepthComponent::PixelDepthComponent(const PixelDepthComponent& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  value_ = from.value_;
+  // @@protoc_insertion_point(copy_constructor:frame.proto.PixelDepthComponent)
+}
+
+void PixelDepthComponent::SharedCtor() {
+  value_ = 0;
+}
+
+PixelDepthComponent::~PixelDepthComponent() {
+  // @@protoc_insertion_point(destructor:frame.proto.PixelDepthComponent)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void PixelDepthComponent::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
+}
+
+void PixelDepthComponent::ArenaDtor(void* object) {
+  PixelDepthComponent* _this = reinterpret_cast< PixelDepthComponent* >(object);
+  (void)_this;
+}
+void PixelDepthComponent::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void PixelDepthComponent::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const PixelDepthComponent& PixelDepthComponent::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_PixelDepthComponent_Pixel_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void PixelDepthComponent::Clear() {
+// @@protoc_insertion_point(message_clear_start:frame.proto.PixelDepthComponent)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  value_ = 0;
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* PixelDepthComponent::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+    switch (tag >> 3) {
+      // .frame.proto.PixelDepthComponent.Enum value = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+          ::PROTOBUF_NAMESPACE_ID::uint64 val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+          _internal_set_value(static_cast<::frame::proto::PixelDepthComponent_Enum>(val));
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* PixelDepthComponent::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:frame.proto.PixelDepthComponent)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // .frame.proto.PixelDepthComponent.Enum value = 1;
+  if (this->value() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteEnumToArray(
+      1, this->_internal_value(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:frame.proto.PixelDepthComponent)
+  return target;
+}
+
+size_t PixelDepthComponent::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:frame.proto.PixelDepthComponent)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // .frame.proto.PixelDepthComponent.Enum value = 1;
+  if (this->value() != 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::EnumSize(this->_internal_value());
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void PixelDepthComponent::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:frame.proto.PixelDepthComponent)
+  GOOGLE_DCHECK_NE(&from, this);
+  const PixelDepthComponent* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<PixelDepthComponent>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:frame.proto.PixelDepthComponent)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:frame.proto.PixelDepthComponent)
+    MergeFrom(*source);
+  }
+}
+
+void PixelDepthComponent::MergeFrom(const PixelDepthComponent& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:frame.proto.PixelDepthComponent)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.value() != 0) {
+    _internal_set_value(from._internal_value());
+  }
+}
+
+void PixelDepthComponent::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:frame.proto.PixelDepthComponent)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void PixelDepthComponent::CopyFrom(const PixelDepthComponent& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:frame.proto.PixelDepthComponent)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool PixelDepthComponent::IsInitialized() const {
+  return true;
+}
+
+void PixelDepthComponent::InternalSwap(PixelDepthComponent* other) {
+  using std::swap;
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  swap(value_, other->value_);
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata PixelDepthComponent::GetMetadata() const {
+  return GetMetadataStatic();
+}
+
+
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace proto
 }  // namespace frame
@@ -570,6 +827,9 @@ template<> PROTOBUF_NOINLINE ::frame::proto::PixelElementSize* Arena::CreateMayb
 }
 template<> PROTOBUF_NOINLINE ::frame::proto::PixelStructure* Arena::CreateMaybeMessage< ::frame::proto::PixelStructure >(Arena* arena) {
   return Arena::CreateMessageInternal< ::frame::proto::PixelStructure >(arena);
+}
+template<> PROTOBUF_NOINLINE ::frame::proto::PixelDepthComponent* Arena::CreateMaybeMessage< ::frame::proto::PixelDepthComponent >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::frame::proto::PixelDepthComponent >(arena);
 }
 PROTOBUF_NAMESPACE_CLOSE
 

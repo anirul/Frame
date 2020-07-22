@@ -121,7 +121,7 @@ namespace sgl {
 		void* gl_context_ = nullptr;
 		// Constants.
 		const std::pair<std::uint32_t, std::uint32_t> size_ = { 0, 0 };
-		const PixelElementSize pixel_element_size_ = PixelElementSize::HALF;
+		const PixelElementSize pixel_element_size_ = PixelElementSize_HALF();
 		// Error setup.
 		const Error& error_ = Error::GetInstance();
 	};

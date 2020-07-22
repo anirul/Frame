@@ -111,6 +111,41 @@ namespace sgl {
 		error_.Display(__FILE__, __LINE__ - 10);
 	}
 
+	Texture::Texture(const frame::proto::Texture& texture) :
+		pixel_element_size_(texture.pixel_element_size()),
+		pixel_structure_(texture.pixel_structure())
+	{
+		// Get the pixel element size.
+		if (texture.pixel_element_size().value() == 
+			frame::proto::PixelElementSize::INVALID)
+		{
+			error_.CreateError(
+				"Invalid pixel element size.", 
+				__FILE__, 
+				__LINE__ - 6);
+		}
+		if (texture.pixel_structure().value() == 
+			frame::proto::PixelStructure::INVALID)
+		{ 
+			error_.CreateError(
+				"Invalid pixel structure.",
+				__FILE__,
+				__LINE__ - 6);
+		}
+		CreateTexture();
+		glTexImage2D(
+			GL_TEXTURE_2D,
+			0,
+			sgl::ConvertToGLType(pixel_element_size_, pixel_structure_),
+			static_cast<GLsizei>(size_.first),
+			static_cast<GLsizei>(size_.second),
+			0,
+			sgl::ConvertToGLType(pixel_structure_),
+			sgl::ConvertToGLType(pixel_element_size_),
+			texture.pixels().empty() ? nullptr : texture.pixels().data());
+		
+	}
+
 	void Texture::CreateTexture()
 	{
 		glGenTextures(1, &texture_id_);
@@ -161,7 +196,7 @@ namespace sgl {
 		glTexParameteri(
 			GL_TEXTURE_2D, 
 			GL_TEXTURE_MIN_FILTER, 
-			static_cast<GLenum>(texture_filter));
+			ConvertToGLType(texture_filter));
 		error_.Display(__FILE__, __LINE__ - 4);
 	}
 
@@ -173,7 +208,7 @@ namespace sgl {
 			GL_TEXTURE_MIN_FILTER,
 			&filter);
 		error_.Display(__FILE__, __LINE__ - 4);
-		return static_cast<TextureFilter>(filter);
+		return ConvertFromGLType(filter);
 	}
 
 	void Texture::SetMagFilter(TextureFilter texture_filter)
@@ -181,7 +216,7 @@ namespace sgl {
 		glTexParameteri(
 			GL_TEXTURE_2D,
 			GL_TEXTURE_MAG_FILTER,
-			static_cast<GLenum>(texture_filter));
+			ConvertToGLType(texture_filter));
 		error_.Display(__FILE__, __LINE__ - 4);
 	}
 
@@ -193,7 +228,7 @@ namespace sgl {
 			GL_TEXTURE_MAG_FILTER,
 			&filter);
 		error_.Display(__FILE__, __LINE__ - 4);
-		return static_cast<TextureFilter>(filter);
+		return ConvertFromGLType(filter);
 	}
 
 	void Texture::SetWrapS(TextureFilter texture_filter)
@@ -201,7 +236,7 @@ namespace sgl {
 		glTexParameteri(
 			GL_TEXTURE_2D,
 			GL_TEXTURE_WRAP_S,
-			static_cast<GLenum>(texture_filter));
+			ConvertToGLType(texture_filter));
 		error_.Display(__FILE__, __LINE__ - 4);
 	}
 
@@ -213,7 +248,7 @@ namespace sgl {
 			GL_TEXTURE_WRAP_S,
 			&filter);
 		error_.Display(__FILE__, __LINE__ - 4);
-		return static_cast<TextureFilter>(filter);
+		return ConvertFromGLType(filter);
 	}
 
 	void Texture::SetWrapT(TextureFilter texture_filter)
@@ -221,7 +256,7 @@ namespace sgl {
 		glTexParameteri(
 			GL_TEXTURE_2D,
 			GL_TEXTURE_WRAP_T,
-			static_cast<GLenum>(texture_filter));
+			ConvertToGLType(texture_filter));
 		error_.Display(__FILE__, __LINE__ - 4);
 	}
 
@@ -233,7 +268,7 @@ namespace sgl {
 			GL_TEXTURE_WRAP_T,
 			&filter);
 		error_.Display(__FILE__, __LINE__ - 4);
-		return static_cast<TextureFilter>(filter);
+		return ConvertFromGLType(filter);
 	}
 
 	void Texture::Clear(const glm::vec4 color)
@@ -395,7 +430,7 @@ namespace sgl {
 		glTexParameteri(
 			GL_TEXTURE_CUBE_MAP,
 			GL_TEXTURE_MIN_FILTER,
-			static_cast<GLenum>(texture_filter));
+			ConvertToGLType(texture_filter));
 		error_.Display(__FILE__, __LINE__ - 4);
 	}
 
@@ -407,7 +442,7 @@ namespace sgl {
 			GL_TEXTURE_MIN_FILTER,
 			&filter);
 		error_.Display(__FILE__, __LINE__ - 4);
-		return static_cast<TextureFilter>(filter);
+		return ConvertFromGLType(filter);
 	}
 
 	void TextureCubeMap::SetMagFilter(TextureFilter texture_filter)
@@ -415,7 +450,7 @@ namespace sgl {
 		glTexParameteri(
 			GL_TEXTURE_CUBE_MAP,
 			GL_TEXTURE_MAG_FILTER,
-			static_cast<GLenum>(texture_filter));
+			ConvertToGLType(texture_filter));
 		error_.Display(__FILE__, __LINE__ - 4);
 	}
 
@@ -427,7 +462,7 @@ namespace sgl {
 			GL_TEXTURE_MAG_FILTER,
 			&filter);
 		error_.Display(__FILE__, __LINE__ - 4);
-		return static_cast<TextureFilter>(filter);
+		return ConvertFromGLType(filter);
 	}
 
 	void TextureCubeMap::SetWrapS(TextureFilter texture_filter)
@@ -435,7 +470,7 @@ namespace sgl {
 		glTexParameteri(
 			GL_TEXTURE_CUBE_MAP,
 			GL_TEXTURE_WRAP_S,
-			static_cast<GLenum>(texture_filter));
+			ConvertToGLType(texture_filter));
 		error_.Display(__FILE__, __LINE__ - 4);
 	}
 
@@ -447,7 +482,7 @@ namespace sgl {
 			GL_TEXTURE_WRAP_S,
 			&filter);
 		error_.Display(__FILE__, __LINE__ - 4);
-		return static_cast<TextureFilter>(filter);
+		return ConvertFromGLType(filter);
 
 	}
 
@@ -456,7 +491,7 @@ namespace sgl {
 		glTexParameteri(
 			GL_TEXTURE_CUBE_MAP,
 			GL_TEXTURE_WRAP_T,
-			static_cast<GLenum>(texture_filter));
+			ConvertToGLType(texture_filter));
 		error_.Display(__FILE__, __LINE__ - 4);
 	}
 
@@ -468,7 +503,7 @@ namespace sgl {
 			GL_TEXTURE_WRAP_T,
 			&filter);
 		error_.Display(__FILE__, __LINE__ - 4);
-		return static_cast<TextureFilter>(filter);
+		return ConvertFromGLType(filter);
 
 	}
 
@@ -477,7 +512,7 @@ namespace sgl {
 		glTexParameteri(
 			GL_TEXTURE_CUBE_MAP,
 			GL_TEXTURE_WRAP_R,
-			static_cast<GLenum>(texture_filter));
+			ConvertToGLType(texture_filter));
 		error_.Display(__FILE__, __LINE__ - 4);
 	}
 
@@ -489,7 +524,7 @@ namespace sgl {
 			GL_TEXTURE_WRAP_R,
 			&filter);
 		error_.Display(__FILE__, __LINE__ - 4);
-		return static_cast<TextureFilter>(filter);
+		return ConvertFromGLType(filter);
 	}
 
 	void TextureCubeMap::CreateTextureCubeMap()
@@ -517,6 +552,125 @@ namespace sgl {
 			GL_TEXTURE_WRAP_R,
 			GL_CLAMP_TO_EDGE);
 		error_.Display(__FILE__, __LINE__ - 4);
+	}
+
+	TextureFilter TextureFilter_NEAREST()
+	{
+		TextureFilter texture_filter{};
+		texture_filter.set_value(TextureFilter::NEAREST);
+		return texture_filter;
+	}
+
+	TextureFilter TextureFilter_LINEAR()
+	{
+		TextureFilter texture_filter{};
+		texture_filter.set_value(TextureFilter::LINEAR);
+		return texture_filter;
+	}
+
+	TextureFilter TextureFilter_NEAREST_MIPMAP_NEAREST()
+	{
+		TextureFilter texture_filter{};
+		texture_filter.set_value(TextureFilter::NEAREST_MIPMAP_NEAREST);
+		return texture_filter;
+	}
+
+	TextureFilter TextureFilter_LINEAR_MIPMAP_NEAREST()
+	{
+		TextureFilter texture_filter{};
+		texture_filter.set_value(TextureFilter::LINEAR_MIPMAP_NEAREST);
+		return texture_filter;
+	}
+
+	TextureFilter TextureFilter_NEAREST_MIPMAP_LINEAR()
+	{
+		TextureFilter texture_filter{};
+		texture_filter.set_value(TextureFilter::NEAREST_MIPMAP_LINEAR);
+		return texture_filter;
+	}
+
+	TextureFilter TextureFilter_LINEAR_MIPMAP_LINEAR()
+	{
+		TextureFilter texture_filter{};
+		texture_filter.set_value(TextureFilter::LINEAR_MIPMAP_LINEAR);
+		return texture_filter;
+	}
+
+	TextureFilter TextureFilter_CLAMP_TO_EDGE()
+	{
+		TextureFilter texture_filter{};
+		texture_filter.set_value(TextureFilter::CLAMP_TO_EDGE);
+		return texture_filter;
+	}
+
+	TextureFilter TextureFilter_MIRRORED_REPEAT()
+	{
+		TextureFilter texture_filter{};
+		texture_filter.set_value(TextureFilter::MIRRORED_REPEAT);
+		return texture_filter;
+	}
+
+	TextureFilter TextureFilter_REPEAT()
+	{
+		TextureFilter texture_filter{};
+		texture_filter.set_value(TextureFilter::REPEAT);
+		return texture_filter;
+	}
+
+	int ConvertToGLType(const TextureFilter& texture_filter)
+	{
+		switch (texture_filter.value())
+		{
+			case TextureFilter::NEAREST:
+				return GL_NEAREST;
+			case TextureFilter::LINEAR:
+				return GL_LINEAR;
+			case TextureFilter::NEAREST_MIPMAP_NEAREST:
+				return GL_NEAREST_MIPMAP_NEAREST;
+			case TextureFilter::LINEAR_MIPMAP_NEAREST:
+				return GL_LINEAR_MIPMAP_NEAREST;
+			case TextureFilter::NEAREST_MIPMAP_LINEAR:
+				return GL_NEAREST_MIPMAP_LINEAR;
+			case TextureFilter::LINEAR_MIPMAP_LINEAR:
+				return GL_LINEAR_MIPMAP_LINEAR;
+			case TextureFilter::CLAMP_TO_EDGE:
+				return GL_CLAMP_TO_EDGE;
+			case TextureFilter::MIRRORED_REPEAT:
+				return GL_MIRRORED_REPEAT;
+			case TextureFilter::REPEAT:
+				return GL_REPEAT;
+		}
+		throw
+			std::runtime_error(
+				"Invalid texture filter : " +
+				std::to_string(static_cast<int>(texture_filter.value())));
+	}
+
+	TextureFilter ConvertFromGLType(int gl_filter)
+	{
+		switch (gl_filter)
+		{
+		case GL_NEAREST:
+			return TextureFilter_NEAREST();
+		case GL_LINEAR:
+			return TextureFilter_LINEAR();
+		case GL_NEAREST_MIPMAP_NEAREST:
+			return TextureFilter_NEAREST_MIPMAP_NEAREST();
+		case GL_LINEAR_MIPMAP_NEAREST:
+			return TextureFilter_LINEAR_MIPMAP_NEAREST();
+		case GL_NEAREST_MIPMAP_LINEAR:
+			return TextureFilter_NEAREST_MIPMAP_LINEAR();
+		case GL_LINEAR_MIPMAP_LINEAR:
+			return TextureFilter_LINEAR_MIPMAP_LINEAR();
+		case GL_CLAMP_TO_EDGE:
+			return TextureFilter_CLAMP_TO_EDGE();
+		case GL_MIRRORED_REPEAT:
+			return TextureFilter_MIRRORED_REPEAT();
+		case GL_REPEAT:
+			return TextureFilter_REPEAT();
+		}
+		throw std::runtime_error(
+			"invalid texture filter : " + std::to_string(gl_filter));
 	}
 
 } // End namespace sgl.

@@ -6,7 +6,7 @@ import "Pixel.proto";
 package frame.proto;
 
 // Texture filter used in texture declaration.
-message TextureFilter{
+message TextureFilter {
 	enum Enum {
 		INVALID                = 0;
 		NEAREST                = 1;
@@ -16,7 +16,7 @@ message TextureFilter{
 		NEAREST_MIPMAP_LINEAR  = 5;
 		LINEAR_MIPMAP_LINEAR   = 6;
 		CLAMP_TO_EDGE          = 7;
-		MIRROR_REPEAT          = 8;
+		MIRRORED_REPEAT        = 8;
 		REPEAT                 = 9;
 	}
 	Enum value = 1;

@@ -15,21 +15,23 @@
 #include "../ShaderGLLib/Frame.h"
 #include "../ShaderGLLib/Render.h"
 #include "../ShaderGLLib/ScopedBind.h"
+#include "../FrameProto/Proto.h"
 
 namespace sgl {
 
-	enum class TextureFilter 
-	{
-		NEAREST = GL_NEAREST,
-		LINEAR = GL_LINEAR,
-		NEAREST_MIPMAP_NEAREST = GL_NEAREST_MIPMAP_NEAREST,
-		LINEAR_MIPMAP_NEAREST = GL_LINEAR_MIPMAP_NEAREST,
-		NEAREST_MIPMAP_LINEAR = GL_NEAREST_MIPMAP_LINEAR,
-		LINEAR_MIPMAP_LINEAR = GL_LINEAR_MIPMAP_LINEAR,
-		CLAMP_TO_EDGE = GL_CLAMP_TO_EDGE,
-		MIRROR_REPEAT = GL_MIRRORED_REPEAT,
-		REPEAT = GL_REPEAT
-	};
+	using TextureFilter = frame::proto::TextureFilter;
+	TextureFilter TextureFilter_NEAREST();
+	TextureFilter TextureFilter_LINEAR();
+	TextureFilter TextureFilter_NEAREST_MIPMAP_NEAREST();
+	TextureFilter TextureFilter_LINEAR_MIPMAP_NEAREST();
+	TextureFilter TextureFilter_NEAREST_MIPMAP_LINEAR();
+	TextureFilter TextureFilter_LINEAR_MIPMAP_LINEAR();
+	TextureFilter TextureFilter_CLAMP_TO_EDGE();
+	TextureFilter TextureFilter_MIRRORED_REPEAT();
+	TextureFilter TextureFilter_REPEAT();
+
+	int ConvertToGLType(const TextureFilter& texture_filter);
+	TextureFilter ConvertFromGLType(int gl_filter);
 
 	class Texture : public BindLockInterface
 	{
@@ -37,18 +39,21 @@ namespace sgl {
 		// Create an empty texture of size size.
 		Texture(
 			const std::pair<std::uint32_t, std::uint32_t> size,
-			const PixelElementSize pixel_element_size = PixelElementSize::BYTE,
-			const PixelStructure pixel_structure = PixelStructure::RGB);
+			const PixelElementSize pixel_element_size = PixelElementSize_BYTE(),
+			const PixelStructure pixel_structure = PixelStructure_RGB());
 		// Create a texture from a file.
 		Texture(
 			const std::string& file,
-			const PixelElementSize pixel_element_size = PixelElementSize::BYTE,
-			const PixelStructure pixel_structure = PixelStructure::RGB);
+			const PixelElementSize pixel_element_size = PixelElementSize_BYTE(),
+			const PixelStructure pixel_structure = PixelStructure_RGB());
+		// Create from a raw pointer.
 		Texture(
 			const std::pair<std::uint32_t, std::uint32_t> size,
 			const void* data,
-			const PixelElementSize pixel_element_size = PixelElementSize::BYTE,
-			const PixelStructure pixel_structure = PixelStructure::RGB);
+			const PixelElementSize pixel_element_size = PixelElementSize_BYTE(),
+			const PixelStructure pixel_structure = PixelStructure_RGB());
+		// Create from a proto.
+		Texture(const frame::proto::Texture& texture);
 		virtual ~Texture();
 
 	public:
@@ -83,8 +88,8 @@ namespace sgl {
 	protected:
 		void CreateTexture();
 		Texture(
-			const PixelElementSize pixel_element_size = PixelElementSize::BYTE,
-			const PixelStructure pixel_structure = PixelStructure::RGB) :
+			const PixelElementSize pixel_element_size = PixelElementSize_BYTE(),
+			const PixelStructure pixel_structure = PixelStructure_RGB()) :
 			pixel_element_size_(pixel_element_size),
 			pixel_structure_(pixel_structure) {}
 		void LockedBind() const override { locked_bind_ = true; }
@@ -108,14 +113,14 @@ namespace sgl {
 		// Create an empty cube map of the size size.
 		TextureCubeMap(
 			const std::pair<std::uint32_t, std::uint32_t> size,
-			const PixelElementSize pixel_element_size = PixelElementSize::BYTE,
-			const PixelStructure pixel_structure = PixelStructure::RGB);
+			const PixelElementSize pixel_element_size = PixelElementSize_BYTE(),
+			const PixelStructure pixel_structure = PixelStructure_RGB());
 		// Take a single texture and map it to a cube view.
 		TextureCubeMap(
 			const std::string& file_name,
 			const std::pair<std::uint32_t, std::uint32_t> size = { 512, 512 },
-			const PixelElementSize pixel_element_size = PixelElementSize::BYTE,
-			const PixelStructure pixel_structure = PixelStructure::RGB);
+			const PixelElementSize pixel_element_size = PixelElementSize_BYTE(),
+			const PixelStructure pixel_structure = PixelStructure_RGB());
 		// Take 6 texture to be mapped to the cube map, Order is:
 		// right, left - (positive X, negative X)
 		// top, bottom - (positive Y, negative Y)
@@ -123,8 +128,8 @@ namespace sgl {
 		// The size is equal to the size of an image (*6).
 		TextureCubeMap(
 			const std::array<std::string, 6>& cube_file,
-			const PixelElementSize pixel_element_size = PixelElementSize::BYTE,
-			const PixelStructure pixel_structure = PixelStructure::RGB);
+			const PixelElementSize pixel_element_size = PixelElementSize_BYTE(),
+			const PixelStructure pixel_structure = PixelStructure_RGB());
 
 	public:
 		void Bind(const unsigned int slot = 0) const override;

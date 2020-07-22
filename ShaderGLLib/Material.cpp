@@ -67,7 +67,7 @@ namespace sgl {
 			AddTexture("AmbientOcclusion", std::make_shared<Texture>(
 				std::pair{ 1, 1 },
 				single_pixel,
-				sgl::PixelElementSize::FLOAT));
+				sgl::PixelElementSize_FLOAT()));
 		}
 	}
 
@@ -137,8 +137,8 @@ namespace sgl {
 		return std::make_shared<Texture>(
 			std::pair{ 1, 1 },
 			rgb,
-			PixelElementSize::FLOAT,
-			PixelStructure::RGB);
+			PixelElementSize_FLOAT(),
+			PixelStructure_RGB());
 	}
 
 	std::shared_ptr<sgl::Texture> Material::GetTextureFrom1Float(
@@ -158,8 +158,8 @@ namespace sgl {
 		return std::make_shared<Texture>(
 			std::pair{ 1, 1 },
 			grey,
-			PixelElementSize::FLOAT,
-			PixelStructure::GREY);
+			PixelElementSize_FLOAT(),
+			PixelStructure_GREY());
 	}
 
 	Material::~Material()

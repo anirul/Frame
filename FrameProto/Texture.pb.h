@@ -83,7 +83,7 @@ enum TextureFilter_Enum : int {
   TextureFilter_Enum_NEAREST_MIPMAP_LINEAR = 5,
   TextureFilter_Enum_LINEAR_MIPMAP_LINEAR = 6,
   TextureFilter_Enum_CLAMP_TO_EDGE = 7,
-  TextureFilter_Enum_MIRROR_REPEAT = 8,
+  TextureFilter_Enum_MIRRORED_REPEAT = 8,
   TextureFilter_Enum_REPEAT = 9,
   TextureFilter_Enum_TextureFilter_Enum_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::min(),
   TextureFilter_Enum_TextureFilter_Enum_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::max()
@@ -236,8 +236,8 @@ class TextureFilter PROTOBUF_FINAL :
     TextureFilter_Enum_LINEAR_MIPMAP_LINEAR;
   static constexpr Enum CLAMP_TO_EDGE =
     TextureFilter_Enum_CLAMP_TO_EDGE;
-  static constexpr Enum MIRROR_REPEAT =
-    TextureFilter_Enum_MIRROR_REPEAT;
+  static constexpr Enum MIRRORED_REPEAT =
+    TextureFilter_Enum_MIRRORED_REPEAT;
   static constexpr Enum REPEAT =
     TextureFilter_Enum_REPEAT;
   static inline bool Enum_IsValid(int value) {

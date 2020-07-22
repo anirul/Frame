@@ -1,4 +1,7 @@
 #include "Draw.h"
+#include <fstream>
+#include "../FrameProto/Proto.h"
+// TODO remove this. 
 #include "EffectBlur.h"
 #include "EffectBrightness.h"
 #include "EffectHighDynamicRange.h"
@@ -8,6 +11,44 @@
 
 void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 {
+	// Open the Display.json file (in Asset/).
+	std::string file_name = "../Asset/Display.json";
+	std::ifstream ifs(file_name.c_str(), std::ios::in);
+	if (!ifs) error_.CreateError(
+		"Couldn't open file " + file_name, 
+		__FILE__, 
+		__LINE__ - 4);
+	// Create a display (empty for now).
+	frame::proto::Display display{};
+	// Get the content of the file.
+	std::string contents(std::istreambuf_iterator<char>(ifs), {});
+	// Set the options for the parsing.
+	google::protobuf::util::JsonParseOptions options{};
+	options.ignore_unknown_fields = true;
+	// Parse the json file.
+	auto status = google::protobuf::util::JsonStringToMessage(
+		contents,
+		&display,
+		options);
+	if (!status.ok()) error_.CreateError(
+		status.ToString(), 
+		__FILE__, 
+		__LINE__ - 7);
+	// TODO(anirul): change these for "error_" checks.
+	assert(display.out_textures_size() > 0);
+	assert(display.textures_size() > 0);
+	assert(display.effects_size() > 0);
+	// Create the textures.
+	std::for_each(
+		display.textures().begin(), 
+		display.textures().end(), 
+		[this](const frame::proto::Texture& texture)
+	{
+		texture_map_.emplace(
+			texture.name(), 
+			std::make_shared<sgl::Texture>(texture));
+	});
+
 	std::pair<std::uint32_t, std::uint32_t> size_2 = 
 		{ size.first / 2, size.second / 2 };
 	std::pair<std::uint32_t, std::uint32_t> size_4 =
@@ -15,58 +56,58 @@ void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 	// Texture storage.
 	textures_ = {
 		// 0 - Screen space ambient occlusion.
-		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF),
+		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize_HALF()),
 		// 1 - SSAO + blur also darker.
-		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF),
+		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize_HALF()),
 		// 2 - Lighting + ambient.
-		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF),
+		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize_HALF()),
 		// 3 - Lighting + Bloom.
-		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF),
+		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize_HALF()),
 		// 4 - Lighting + Bloom + SSAO.
-		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF),
+		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize_HALF()),
 		// 5 - Lighting + Bloom + SSAO + HDR.
-		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF),
+		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize_HALF()),
 		// 6 - Brightness.
-		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF),
+		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize_HALF()),
 		// 7 - Brightness + Gaussian Blur horizontal ( / 2).
-		std::make_shared<sgl::Texture>(size_2, sgl::PixelElementSize::HALF),
+		std::make_shared<sgl::Texture>(size_2, sgl::PixelElementSize_HALF()),
 		// 8 - Brightness + Gaussian Blur full ( / 2).
-		std::make_shared<sgl::Texture>(size_2, sgl::PixelElementSize::HALF),
+		std::make_shared<sgl::Texture>(size_2, sgl::PixelElementSize_HALF()),
 		// 9 - Deferred shader - Albedo.
-		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF),
+		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize_HALF()),
 		// 10 - Deferred shader - Normal.
-		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF),
+		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize_HALF()),
 		// 11 - Deferred shader - Metallic, roughness, ambient occlusion.
-		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF),
+		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize_HALF()),
 		// 12 - Deferred shader - Position.
-		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF),
+		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize_HALF()),
 		// 13 - View shader - Position.
-		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF),
+		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize_HALF()),
 		// 14 - View shader - Normal.
-		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF),
+		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize_HALF()),
 		// 15 - Lighting (only the light part).
-		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::HALF),
+		std::make_shared<sgl::Texture>(size, sgl::PixelElementSize_HALF()),
 		// 16 - Brightness + Gaussian Blur horizontal ( / 8 ).
-		std::make_shared<sgl::Texture>(size_4, sgl::PixelElementSize::HALF),
+		std::make_shared<sgl::Texture>(size_4, sgl::PixelElementSize_HALF()),
 		// 17 - Brightness + Gaussian Blur vertical ( / 8 ).
-		std::make_shared<sgl::Texture>(size_4, sgl::PixelElementSize::HALF)
+		std::make_shared<sgl::Texture>(size_4, sgl::PixelElementSize_HALF())
 	};
 	// Set the texture filter for the view textures.
-	textures_[13]->SetMagFilter(sgl::TextureFilter::NEAREST);
-	textures_[13]->SetMinFilter(sgl::TextureFilter::NEAREST);
-	textures_[13]->SetWrapS(sgl::TextureFilter::CLAMP_TO_EDGE);
-	textures_[13]->SetWrapT(sgl::TextureFilter::CLAMP_TO_EDGE);
-	textures_[14]->SetMagFilter(sgl::TextureFilter::NEAREST);
-	textures_[14]->SetMinFilter(sgl::TextureFilter::NEAREST);
+	textures_[13]->SetMagFilter(sgl::TextureFilter_NEAREST());
+	textures_[13]->SetMinFilter(sgl::TextureFilter_NEAREST());
+	textures_[13]->SetWrapS(sgl::TextureFilter_CLAMP_TO_EDGE());
+	textures_[13]->SetWrapT(sgl::TextureFilter_CLAMP_TO_EDGE());
+	textures_[14]->SetMagFilter(sgl::TextureFilter_NEAREST());
+	textures_[14]->SetMinFilter(sgl::TextureFilter_NEAREST());
 	// Set the texture filter for the Gaussian blur.
-	textures_[7]->SetMagFilter(sgl::TextureFilter::LINEAR);
-	textures_[7]->SetMinFilter(sgl::TextureFilter::LINEAR);
-	textures_[8]->SetMagFilter(sgl::TextureFilter::LINEAR);
-	textures_[8]->SetMinFilter(sgl::TextureFilter::LINEAR);
-	textures_[16]->SetMagFilter(sgl::TextureFilter::LINEAR);
-	textures_[16]->SetMinFilter(sgl::TextureFilter::LINEAR);
-	textures_[17]->SetMagFilter(sgl::TextureFilter::LINEAR);
-	textures_[17]->SetMinFilter(sgl::TextureFilter::LINEAR);
+	textures_[7]->SetMagFilter(sgl::TextureFilter_LINEAR());
+	textures_[7]->SetMinFilter(sgl::TextureFilter_LINEAR());
+	textures_[8]->SetMagFilter(sgl::TextureFilter_LINEAR());
+	textures_[8]->SetMinFilter(sgl::TextureFilter_LINEAR());
+	textures_[16]->SetMagFilter(sgl::TextureFilter_LINEAR());
+	textures_[16]->SetMinFilter(sgl::TextureFilter_LINEAR());
+	textures_[17]->SetMagFilter(sgl::TextureFilter_LINEAR());
+	textures_[17]->SetMinFilter(sgl::TextureFilter_LINEAR());
 
 	device_->SetLightManager(CreateLightManager());
 

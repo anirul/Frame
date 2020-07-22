@@ -44,8 +44,8 @@ namespace test {
 		image_ = 
 			std::make_shared<sgl::Image>(
 				"../Asset/Planks/Color.jpg", 
-				sgl::PixelElementSize::BYTE,
-				sgl::PixelStructure::RGB_ALPHA);
+				sgl::PixelElementSize_BYTE(),
+				sgl::PixelStructure_RGB_ALPHA());
 		EXPECT_TRUE(image_);
 		const std::uint8_t* pixel = (std::uint8_t*)(image_->Data());
 		for (int i = 0; i < image_->GetLength(); ++i)
@@ -73,11 +73,15 @@ namespace test {
 		image_ = 
 			std::make_shared<sgl::Image>(
 				"../Asset/CubeMap/Hamarikyu.hdr",
-				sgl::PixelElementSize::FLOAT,
-				sgl::PixelStructure::RGB_ALPHA);
+				sgl::PixelElementSize_FLOAT(),
+				sgl::PixelStructure_RGB_ALPHA());
 		EXPECT_TRUE(image_);
-		EXPECT_EQ(sgl::PixelElementSize::FLOAT, image_->GetPixelElementSize());
-		EXPECT_EQ(sgl::PixelStructure::RGB_ALPHA, image_->GetPixelStructure());
+		EXPECT_EQ(
+			sgl::PixelElementSize_FLOAT().value(), 
+			image_->GetPixelElementSize().value());
+		EXPECT_EQ(
+			sgl::PixelStructure_RGB_ALPHA().value(), 
+			image_->GetPixelStructure().value());
 		// Cast to the correct value.
 		const float* ptr = static_cast<const float*>(image_->Data());
 		for (int i = 0; i < image_->GetLength(); ++i)

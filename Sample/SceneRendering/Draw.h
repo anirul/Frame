@@ -23,7 +23,10 @@ protected:
 	sgl::LightManager CreateLightManager() const;
 
 private:
+	sgl::Error& error_ = sgl::Error::GetInstance();
 	std::shared_ptr<sgl::Device> device_ = nullptr;
+	std::map<std::string, std::shared_ptr<sgl::Texture>> texture_map_ = {};
+	// TODO(anirul): remove all this crap.
 	std::vector<std::shared_ptr<sgl::Texture>> textures_ = {};
 	std::shared_ptr<sgl::EffectInterface> clear_ = nullptr;
 	std::shared_ptr<sgl::EffectInterface> brightness_ = nullptr;

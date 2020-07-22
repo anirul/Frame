@@ -15,10 +15,10 @@ namespace sgl {
 		pixel_structure_(pixel_structure)
 	{
 		int channels;
-		int desired_channels = { static_cast<int>(pixel_structure) };
+		int desired_channels = { static_cast<int>(pixel_structure.value()) };
 		// This is in the case of OpenGL (for now the only case).
 		stbi_set_flip_vertically_on_load(true);
-		switch (pixel_element_size)
+		switch (pixel_element_size.value())
 		{
 		case PixelElementSize::BYTE :
 		{
@@ -59,7 +59,8 @@ namespace sgl {
 			throw
 				std::runtime_error(
 					"unsupported element size : " +
-					std::to_string(static_cast<int>(pixel_element_size_)));
+					std::to_string(
+						static_cast<int>(pixel_element_size_.value())));
 		}
 		if (!image_)
 		{

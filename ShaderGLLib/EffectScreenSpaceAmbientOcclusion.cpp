@@ -1,5 +1,5 @@
 #include "EffectScreenSpaceAmbientOcclusion.h"
-#include <assert.h>
+#include <cassert>
 #include <random>
 
 namespace sgl {
@@ -53,10 +53,10 @@ namespace sgl {
 		auto noise_texture = std::make_shared<Texture>(
 			std::pair{ 4, 4 },
 			ssao_noise.data(),
-			sgl::PixelElementSize::HALF,
-			sgl::PixelStructure::GREY_ALPHA);
-		noise_texture->SetWrapS(TextureFilter::REPEAT);
-		noise_texture->SetWrapT(TextureFilter::REPEAT);
+			sgl::PixelElementSize_HALF(),
+			sgl::PixelStructure_GREY_ALPHA());
+		noise_texture->SetWrapS(TextureFilter_REPEAT());
+		noise_texture->SetWrapT(TextureFilter_REPEAT());
 
 		// Add texture to the material.
 		in_material_.AddTexture("ViewPosition", in_textures[0]);

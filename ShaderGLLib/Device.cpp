@@ -62,7 +62,7 @@ namespace sgl {
 	{
 		static auto out_texture = std::make_shared<Texture>(
 			size_, 
-			sgl::PixelElementSize::HALF);
+			sgl::PixelElementSize_HALF());
 		DrawMultiTextures({ out_texture }, nullptr, dt);
 		Display(out_texture);
 	}
@@ -188,7 +188,7 @@ namespace sgl {
 		auto texture = std::make_shared<TextureCubeMap>(
 			environment_map,
 			std::make_pair<std::uint32_t, std::uint32_t>(512, 512),
-			sgl::PixelElementSize::HALF);
+			sgl::PixelElementSize_HALF());
 		auto cubemap_program = Program::CreateProgram("CubeMapDeferred");
 		cubemap_program->UniformMatrix("projection", GetProjection());
 		auto cube_mesh = CreateCubeMesh(cubemap_program);
@@ -205,7 +205,7 @@ namespace sgl {
 		// Create the Monte-Carlo filter.
 		auto monte_carlo_prefilter = std::make_shared<sgl::TextureCubeMap>(
 			std::make_pair<std::uint32_t, std::uint32_t>(128, 128),
-			sgl::PixelElementSize::FLOAT);
+			sgl::PixelElementSize_FLOAT());
 		FillProgramMultiTextureCubeMapMipmap(
 			std::vector<std::shared_ptr<sgl::Texture>>{ monte_carlo_prefilter },
 			std::map<std::string, std::shared_ptr<Texture>>{ 

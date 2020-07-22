@@ -48,7 +48,7 @@ struct TableStruct_Pixel_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxiliaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[2]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[3]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -57,6 +57,9 @@ struct TableStruct_Pixel_2eproto {
 extern const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_Pixel_2eproto;
 namespace frame {
 namespace proto {
+class PixelDepthComponent;
+class PixelDepthComponentDefaultTypeInternal;
+extern PixelDepthComponentDefaultTypeInternal _PixelDepthComponent_default_instance_;
 class PixelElementSize;
 class PixelElementSizeDefaultTypeInternal;
 extern PixelElementSizeDefaultTypeInternal _PixelElementSize_default_instance_;
@@ -66,6 +69,7 @@ extern PixelStructureDefaultTypeInternal _PixelStructure_default_instance_;
 }  // namespace proto
 }  // namespace frame
 PROTOBUF_NAMESPACE_OPEN
+template<> ::frame::proto::PixelDepthComponent* Arena::CreateMaybeMessage<::frame::proto::PixelDepthComponent>(Arena*);
 template<> ::frame::proto::PixelElementSize* Arena::CreateMaybeMessage<::frame::proto::PixelElementSize>(Arena*);
 template<> ::frame::proto::PixelStructure* Arena::CreateMaybeMessage<::frame::proto::PixelStructure>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
@@ -127,6 +131,34 @@ inline bool PixelStructure_Enum_Parse(
     ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, PixelStructure_Enum* value) {
   return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<PixelStructure_Enum>(
     PixelStructure_Enum_descriptor(), name, value);
+}
+enum PixelDepthComponent_Enum : int {
+  PixelDepthComponent_Enum_INVALID = 0,
+  PixelDepthComponent_Enum_DEPTH_COMPONENT8 = 1,
+  PixelDepthComponent_Enum_DEPTH_COMPONENT16 = 2,
+  PixelDepthComponent_Enum_DEPTH_COMPONENT24 = 3,
+  PixelDepthComponent_Enum_DEPTH_COMPONENT32 = 4,
+  PixelDepthComponent_Enum_PixelDepthComponent_Enum_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::min(),
+  PixelDepthComponent_Enum_PixelDepthComponent_Enum_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::max()
+};
+bool PixelDepthComponent_Enum_IsValid(int value);
+constexpr PixelDepthComponent_Enum PixelDepthComponent_Enum_Enum_MIN = PixelDepthComponent_Enum_INVALID;
+constexpr PixelDepthComponent_Enum PixelDepthComponent_Enum_Enum_MAX = PixelDepthComponent_Enum_DEPTH_COMPONENT32;
+constexpr int PixelDepthComponent_Enum_Enum_ARRAYSIZE = PixelDepthComponent_Enum_Enum_MAX + 1;
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* PixelDepthComponent_Enum_descriptor();
+template<typename T>
+inline const std::string& PixelDepthComponent_Enum_Name(T enum_t_value) {
+  static_assert(::std::is_same<T, PixelDepthComponent_Enum>::value ||
+    ::std::is_integral<T>::value,
+    "Incorrect type passed to function PixelDepthComponent_Enum_Name.");
+  return ::PROTOBUF_NAMESPACE_ID::internal::NameOfEnum(
+    PixelDepthComponent_Enum_descriptor(), enum_t_value);
+}
+inline bool PixelDepthComponent_Enum_Parse(
+    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, PixelDepthComponent_Enum* value) {
+  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<PixelDepthComponent_Enum>(
+    PixelDepthComponent_Enum_descriptor(), name, value);
 }
 // ===================================================================
 
@@ -474,6 +506,179 @@ class PixelStructure PROTOBUF_FINAL :
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_Pixel_2eproto;
 };
+// -------------------------------------------------------------------
+
+class PixelDepthComponent PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:frame.proto.PixelDepthComponent) */ {
+ public:
+  inline PixelDepthComponent() : PixelDepthComponent(nullptr) {};
+  virtual ~PixelDepthComponent();
+
+  PixelDepthComponent(const PixelDepthComponent& from);
+  PixelDepthComponent(PixelDepthComponent&& from) noexcept
+    : PixelDepthComponent() {
+    *this = ::std::move(from);
+  }
+
+  inline PixelDepthComponent& operator=(const PixelDepthComponent& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline PixelDepthComponent& operator=(PixelDepthComponent&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const PixelDepthComponent& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const PixelDepthComponent* internal_default_instance() {
+    return reinterpret_cast<const PixelDepthComponent*>(
+               &_PixelDepthComponent_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    2;
+
+  friend void swap(PixelDepthComponent& a, PixelDepthComponent& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(PixelDepthComponent* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(PixelDepthComponent* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline PixelDepthComponent* New() const final {
+    return CreateMaybeMessage<PixelDepthComponent>(nullptr);
+  }
+
+  PixelDepthComponent* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<PixelDepthComponent>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const PixelDepthComponent& from);
+  void MergeFrom(const PixelDepthComponent& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(PixelDepthComponent* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "frame.proto.PixelDepthComponent";
+  }
+  protected:
+  explicit PixelDepthComponent(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_Pixel_2eproto);
+    return ::descriptor_table_Pixel_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  typedef PixelDepthComponent_Enum Enum;
+  static constexpr Enum INVALID =
+    PixelDepthComponent_Enum_INVALID;
+  static constexpr Enum DEPTH_COMPONENT8 =
+    PixelDepthComponent_Enum_DEPTH_COMPONENT8;
+  static constexpr Enum DEPTH_COMPONENT16 =
+    PixelDepthComponent_Enum_DEPTH_COMPONENT16;
+  static constexpr Enum DEPTH_COMPONENT24 =
+    PixelDepthComponent_Enum_DEPTH_COMPONENT24;
+  static constexpr Enum DEPTH_COMPONENT32 =
+    PixelDepthComponent_Enum_DEPTH_COMPONENT32;
+  static inline bool Enum_IsValid(int value) {
+    return PixelDepthComponent_Enum_IsValid(value);
+  }
+  static constexpr Enum Enum_MIN =
+    PixelDepthComponent_Enum_Enum_MIN;
+  static constexpr Enum Enum_MAX =
+    PixelDepthComponent_Enum_Enum_MAX;
+  static constexpr int Enum_ARRAYSIZE =
+    PixelDepthComponent_Enum_Enum_ARRAYSIZE;
+  static inline const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor*
+  Enum_descriptor() {
+    return PixelDepthComponent_Enum_descriptor();
+  }
+  template<typename T>
+  static inline const std::string& Enum_Name(T enum_t_value) {
+    static_assert(::std::is_same<T, Enum>::value ||
+      ::std::is_integral<T>::value,
+      "Incorrect type passed to function Enum_Name.");
+    return PixelDepthComponent_Enum_Name(enum_t_value);
+  }
+  static inline bool Enum_Parse(::PROTOBUF_NAMESPACE_ID::ConstStringParam name,
+      Enum* value) {
+    return PixelDepthComponent_Enum_Parse(name, value);
+  }
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kValueFieldNumber = 1,
+  };
+  // .frame.proto.PixelDepthComponent.Enum value = 1;
+  void clear_value();
+  ::frame::proto::PixelDepthComponent_Enum value() const;
+  void set_value(::frame::proto::PixelDepthComponent_Enum value);
+  private:
+  ::frame::proto::PixelDepthComponent_Enum _internal_value() const;
+  void _internal_set_value(::frame::proto::PixelDepthComponent_Enum value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:frame.proto.PixelDepthComponent)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  int value_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_Pixel_2eproto;
+};
 // ===================================================================
 
 
@@ -529,9 +734,35 @@ inline void PixelStructure::set_value(::frame::proto::PixelStructure_Enum value)
   // @@protoc_insertion_point(field_set:frame.proto.PixelStructure.value)
 }
 
+// -------------------------------------------------------------------
+
+// PixelDepthComponent
+
+// .frame.proto.PixelDepthComponent.Enum value = 1;
+inline void PixelDepthComponent::clear_value() {
+  value_ = 0;
+}
+inline ::frame::proto::PixelDepthComponent_Enum PixelDepthComponent::_internal_value() const {
+  return static_cast< ::frame::proto::PixelDepthComponent_Enum >(value_);
+}
+inline ::frame::proto::PixelDepthComponent_Enum PixelDepthComponent::value() const {
+  // @@protoc_insertion_point(field_get:frame.proto.PixelDepthComponent.value)
+  return _internal_value();
+}
+inline void PixelDepthComponent::_internal_set_value(::frame::proto::PixelDepthComponent_Enum value) {
+  
+  value_ = value;
+}
+inline void PixelDepthComponent::set_value(::frame::proto::PixelDepthComponent_Enum value) {
+  _internal_set_value(value);
+  // @@protoc_insertion_point(field_set:frame.proto.PixelDepthComponent.value)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 
@@ -551,6 +782,11 @@ template <> struct is_proto_enum< ::frame::proto::PixelStructure_Enum> : ::std::
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::frame::proto::PixelStructure_Enum>() {
   return ::frame::proto::PixelStructure_Enum_descriptor();
+}
+template <> struct is_proto_enum< ::frame::proto::PixelDepthComponent_Enum> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::frame::proto::PixelDepthComponent_Enum>() {
+  return ::frame::proto::PixelDepthComponent_Enum_descriptor();
 }
 
 PROTOBUF_NAMESPACE_CLOSE

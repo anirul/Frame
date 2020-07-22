@@ -73,6 +73,7 @@ add_library(FrameProto
     ${PROJECT_SOURCE_DIR}/FrameProto/Pixel.pb.cc
     ${PROJECT_SOURCE_DIR}/FrameProto/Pixel.pb.h
     ${PROJECT_SOURCE_DIR}/FrameProto/Pixel.proto
+    ${PROJECT_SOURCE_DIR}/FrameProto/Proto.h
     ${PROJECT_SOURCE_DIR}/FrameProto/Size.pb.cc
     ${PROJECT_SOURCE_DIR}/FrameProto/Size.pb.h
     ${PROJECT_SOURCE_DIR}/FrameProto/Size.proto
@@ -142,8 +143,12 @@ add_library(ShaderGLLib
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Window.h
 )
 
-target_link_libraries(ShaderGLLib 
+target_link_libraries(ShaderGLLib
+  PUBLIC
+    FrameProto
   PRIVATE
+    protobuf::libprotoc
+    protobuf::libprotobuf 
     SDL2::SDL2
     GLEW::GLEW
     glm
@@ -193,7 +198,10 @@ target_include_directories(ShaderGLTest
 target_link_libraries(ShaderGLTest
   PUBLIC
     ShaderGLLib
+    FrameProto
   PRIVATE
+    protobuf::libprotoc
+    protobuf::libprotobuf 
     GTest::gtest
     GTest::gtest_main
     SDL2::SDL2
@@ -216,7 +224,10 @@ target_include_directories(JapaneseFlag
 target_link_libraries(JapaneseFlag
   PUBLIC
     ShaderGLLib
+    FrameProto
   PRIVATE
+    protobuf::libprotoc
+    protobuf::libprotobuf 
     SDL2::SDL2
     GLEW::GLEW
     glm
@@ -237,7 +248,10 @@ target_include_directories(RayMarching
 target_link_libraries(RayMarching
   PUBLIC
     ShaderGLLib
+    FrameProto
   PRIVATE
+    protobuf::libprotoc
+    protobuf::libprotobuf 
     SDL2::SDL2
     GLEW::GLEW
     glm
@@ -260,7 +274,10 @@ target_include_directories(Simple
 target_link_libraries(Simple
   PUBLIC
     ShaderGLLib
+    FrameProto
   PRIVATE
+    protobuf::libprotoc
+    protobuf::libprotobuf 
     SDL2::SDL2
     GLEW::GLEW
     glm
@@ -285,7 +302,10 @@ target_include_directories(SceneRendering
 target_link_libraries(SceneRendering
   PUBLIC
     ShaderGLLib
+    FrameProto
   PRIVATE
+    protobuf::libprotoc
+    protobuf::libprotobuf 
     SDL2::SDL2
     GLEW::GLEW
     glm

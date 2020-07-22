@@ -101,23 +101,24 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 
 const char descriptor_table_protodef_Texture_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
   "\n\rTexture.proto\022\013frame.proto\032\nSize.proto"
-  "\032\013Pixel.proto\"\214\002\n\rTextureFilter\022.\n\005value"
+  "\032\013Pixel.proto\"\216\002\n\rTextureFilter\022.\n\005value"
   "\030\001 \001(\0162\037.frame.proto.TextureFilter.Enum\""
-  "\312\001\n\004Enum\022\013\n\007INVALID\020\000\022\013\n\007NEAREST\020\001\022\n\n\006LI"
+  "\314\001\n\004Enum\022\013\n\007INVALID\020\000\022\013\n\007NEAREST\020\001\022\n\n\006LI"
   "NEAR\020\002\022\032\n\026NEAREST_MIPMAP_NEAREST\020\003\022\031\n\025LI"
   "NEAR_MIPMAP_NEAREST\020\004\022\031\n\025NEAREST_MIPMAP_"
   "LINEAR\020\005\022\030\n\024LINEAR_MIPMAP_LINEAR\020\006\022\021\n\rCL"
-  "AMP_TO_EDGE\020\007\022\021\n\rMIRROR_REPEAT\020\010\022\n\n\006REPE"
-  "AT\020\t\"\200\003\n\007Texture\022\014\n\004name\030\001 \001(\t\022\037\n\004size\030\002"
-  " \001(\0132\021.frame.proto.Size\022\r\n\005clear\030\003 \001(\010\0229"
-  "\n\022pixel_element_size\030\n \001(\0132\035.frame.proto"
-  ".PixelElementSize\0224\n\017pixel_structure\030\013 \001"
-  "(\0132\033.frame.proto.PixelStructure\022.\n\nmin_f"
-  "ilter\030\025 \001(\0132\032.frame.proto.TextureFilter\022"
-  ".\n\nmag_filter\030\026 \001(\0132\032.frame.proto.Textur"
-  "eFilter\022*\n\006wrap_s\030\027 \001(\0132\032.frame.proto.Te"
-  "xtureFilter\022*\n\006wrap_t\030\030 \001(\0132\032.frame.prot"
-  "o.TextureFilter\022\016\n\006pixels\030\036 \001(\014b\006proto3"
+  "AMP_TO_EDGE\020\007\022\023\n\017MIRRORED_REPEAT\020\010\022\n\n\006RE"
+  "PEAT\020\t\"\200\003\n\007Texture\022\014\n\004name\030\001 \001(\t\022\037\n\004size"
+  "\030\002 \001(\0132\021.frame.proto.Size\022\r\n\005clear\030\003 \001(\010"
+  "\0229\n\022pixel_element_size\030\n \001(\0132\035.frame.pro"
+  "to.PixelElementSize\0224\n\017pixel_structure\030\013"
+  " \001(\0132\033.frame.proto.PixelStructure\022.\n\nmin"
+  "_filter\030\025 \001(\0132\032.frame.proto.TextureFilte"
+  "r\022.\n\nmag_filter\030\026 \001(\0132\032.frame.proto.Text"
+  "ureFilter\022*\n\006wrap_s\030\027 \001(\0132\032.frame.proto."
+  "TextureFilter\022*\n\006wrap_t\030\030 \001(\0132\032.frame.pr"
+  "oto.TextureFilter\022\016\n\006pixels\030\036 \001(\014b\006proto"
+  "3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_Texture_2eproto_deps[2] = {
   &::descriptor_table_Pixel_2eproto,
@@ -129,7 +130,7 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_Tex
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_Texture_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_Texture_2eproto = {
-  false, false, descriptor_table_protodef_Texture_2eproto, "Texture.proto", 719,
+  false, false, descriptor_table_protodef_Texture_2eproto, "Texture.proto", 721,
   &descriptor_table_Texture_2eproto_once, descriptor_table_Texture_2eproto_sccs, descriptor_table_Texture_2eproto_deps, 2, 2,
   schemas, file_default_instances, TableStruct_Texture_2eproto::offsets,
   file_level_metadata_Texture_2eproto, 2, file_level_enum_descriptors_Texture_2eproto, file_level_service_descriptors_Texture_2eproto,
@@ -170,7 +171,7 @@ constexpr TextureFilter_Enum TextureFilter::LINEAR_MIPMAP_NEAREST;
 constexpr TextureFilter_Enum TextureFilter::NEAREST_MIPMAP_LINEAR;
 constexpr TextureFilter_Enum TextureFilter::LINEAR_MIPMAP_LINEAR;
 constexpr TextureFilter_Enum TextureFilter::CLAMP_TO_EDGE;
-constexpr TextureFilter_Enum TextureFilter::MIRROR_REPEAT;
+constexpr TextureFilter_Enum TextureFilter::MIRRORED_REPEAT;
 constexpr TextureFilter_Enum TextureFilter::REPEAT;
 constexpr TextureFilter_Enum TextureFilter::Enum_MIN;
 constexpr TextureFilter_Enum TextureFilter::Enum_MAX;

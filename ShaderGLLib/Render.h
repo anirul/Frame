@@ -20,7 +20,7 @@ namespace sgl {
 		void CreateStorage(
 			const std::pair<std::uint32_t, std::uint32_t> size,
 			const PixelDepthComponent pixel_depth_component =
-				PixelDepthComponent::DEPTH_COMPONENT24) const;
+				PixelDepthComponent_DEPTH_COMPONENT24()) const;
 
 	public:
 		const unsigned int GetId() const { return render_id_; }
