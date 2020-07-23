@@ -67,7 +67,7 @@ namespace sgl {
 		{
 			temporary_error = std::to_string(line) + "\n" + temporary_error;
 		}
-		if (!file.empty()) temporary_error = file + ":" + temporary_error;
+		if (!file.empty()) temporary_error = file + "\n" + temporary_error;
 		if (window_ptr_)
 		{
 #if defined(_WIN32) || defined(_WIN64)
