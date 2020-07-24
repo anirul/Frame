@@ -39,19 +39,22 @@ namespace sgl {
 		// Create an empty texture of size size.
 		Texture(
 			const std::pair<std::uint32_t, std::uint32_t> size,
-			const PixelElementSize pixel_element_size = PixelElementSize_BYTE(),
-			const PixelStructure pixel_structure = PixelStructure_RGB());
+			const PixelElementSize& pixel_element_size = 
+				PixelElementSize_BYTE(),
+			const PixelStructure& pixel_structure = PixelStructure_RGB());
 		// Create a texture from a file.
 		Texture(
 			const std::string& file,
-			const PixelElementSize pixel_element_size = PixelElementSize_BYTE(),
-			const PixelStructure pixel_structure = PixelStructure_RGB());
+			const PixelElementSize& pixel_element_size = 
+				PixelElementSize_BYTE(),
+			const PixelStructure& pixel_structure = PixelStructure_RGB());
 		// Create from a raw pointer.
 		Texture(
 			const std::pair<std::uint32_t, std::uint32_t> size,
 			const void* data,
-			const PixelElementSize pixel_element_size = PixelElementSize_BYTE(),
-			const PixelStructure pixel_structure = PixelStructure_RGB());
+			const PixelElementSize& pixel_element_size = 
+				PixelElementSize_BYTE(),
+			const PixelStructure& pixel_structure = PixelStructure_RGB());
 		// Create from a proto.
 		Texture(const frame::proto::Texture& texture);
 		virtual ~Texture();
@@ -60,13 +63,13 @@ namespace sgl {
 		void Bind(const unsigned int slot = 0) const override;
 		void UnBind() const override;
 		virtual void BindEnableMipmap() const;
-		virtual void SetMinFilter(TextureFilter texture_filter);
+		virtual void SetMinFilter(const TextureFilter& texture_filter);
 		virtual TextureFilter GetMinFilter() const;
-		virtual void SetMagFilter(TextureFilter texture_filter);
+		virtual void SetMagFilter(const TextureFilter& texture_filter);
 		virtual TextureFilter GetMagFilter() const;
-		virtual void SetWrapS(TextureFilter texture_filter);
+		virtual void SetWrapS(const TextureFilter& texture_filter);
 		virtual TextureFilter GetWrapS() const;
-		virtual void SetWrapT(TextureFilter texture_filter);
+		virtual void SetWrapT(const TextureFilter& texture_filter);
 		virtual TextureFilter GetWrapT() const;
 		void Clear(const glm::vec4 color);
 
@@ -88,8 +91,9 @@ namespace sgl {
 	protected:
 		void CreateTexture();
 		Texture(
-			const PixelElementSize pixel_element_size = PixelElementSize_BYTE(),
-			const PixelStructure pixel_structure = PixelStructure_RGB()) :
+			const PixelElementSize& pixel_element_size = 
+				PixelElementSize_BYTE(),
+			const PixelStructure& pixel_structure = PixelStructure_RGB()) :
 			pixel_element_size_(pixel_element_size),
 			pixel_structure_(pixel_structure) {}
 		void LockedBind() const override { locked_bind_ = true; }
@@ -113,14 +117,16 @@ namespace sgl {
 		// Create an empty cube map of the size size.
 		TextureCubeMap(
 			const std::pair<std::uint32_t, std::uint32_t> size,
-			const PixelElementSize pixel_element_size = PixelElementSize_BYTE(),
-			const PixelStructure pixel_structure = PixelStructure_RGB());
+			const PixelElementSize& pixel_element_size = 
+				PixelElementSize_BYTE(),
+			const PixelStructure& pixel_structure = PixelStructure_RGB());
 		// Take a single texture and map it to a cube view.
 		TextureCubeMap(
 			const std::string& file_name,
 			const std::pair<std::uint32_t, std::uint32_t> size = { 512, 512 },
-			const PixelElementSize pixel_element_size = PixelElementSize_BYTE(),
-			const PixelStructure pixel_structure = PixelStructure_RGB());
+			const PixelElementSize& pixel_element_size =
+				PixelElementSize_BYTE(),
+			const PixelStructure& pixel_structure = PixelStructure_RGB());
 		// Take 6 texture to be mapped to the cube map, Order is:
 		// right, left - (positive X, negative X)
 		// top, bottom - (positive Y, negative Y)
@@ -128,22 +134,23 @@ namespace sgl {
 		// The size is equal to the size of an image (*6).
 		TextureCubeMap(
 			const std::array<std::string, 6>& cube_file,
-			const PixelElementSize pixel_element_size = PixelElementSize_BYTE(),
-			const PixelStructure pixel_structure = PixelStructure_RGB());
+			const PixelElementSize& pixel_element_size = 
+				PixelElementSize_BYTE(),
+			const PixelStructure& pixel_structure = PixelStructure_RGB());
 
 	public:
 		void Bind(const unsigned int slot = 0) const override;
 		void UnBind() const override;
 		void BindEnableMipmap() const override;
-		void SetMinFilter(TextureFilter texture_filter) override;
+		void SetMinFilter(const TextureFilter& texture_filter) override;
 		TextureFilter GetMinFilter() const override;
-		void SetMagFilter(TextureFilter texture_filter) override;
+		void SetMagFilter(const TextureFilter& texture_filter) override;
 		TextureFilter GetMagFilter() const override;
-		void SetWrapS(TextureFilter texture_filter) override;
+		void SetWrapS(const TextureFilter& texture_filter) override;
 		TextureFilter GetWrapS() const override;
-		void SetWrapT(TextureFilter texture_filter) override;
+		void SetWrapT(const TextureFilter& texture_filter) override;
 		TextureFilter GetWrapT() const override;
-		void SetWrapR(TextureFilter texture_filter);
+		void SetWrapR(const TextureFilter& texture_filter);
 		TextureFilter GetWrapR() const;
 
 	protected:
