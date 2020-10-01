@@ -188,7 +188,8 @@ namespace sgl {
 		auto texture = std::make_shared<TextureCubeMap>(
 			environment_map,
 			std::make_pair<std::uint32_t, std::uint32_t>(512, 512),
-			sgl::PixelElementSize_HALF());
+			sgl::PixelElementSize_HALF(),
+			sgl::PixelStructure_RGB_ALPHA());
 		auto cubemap_program = Program::CreateProgram("CubeMapDeferred");
 		cubemap_program->UniformMatrix("projection", GetProjection());
 		auto cube_mesh = CreateCubeMesh(cubemap_program);

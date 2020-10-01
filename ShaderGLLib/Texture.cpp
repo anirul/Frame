@@ -70,7 +70,8 @@ namespace sgl {
 
 	Texture::Texture(
 		const std::pair<std::uint32_t, std::uint32_t> size, 
-		const PixelElementSize& pixel_element_size /*= PixelElementSize::BYTE*/, 
+		const PixelElementSize& pixel_element_size 
+			/*= PixelElementSize::BYTE*/, 
 		const PixelStructure& pixel_structure /*= PixelStructure::RGB*/) :
 		size_(size),
 		pixel_element_size_(pixel_element_size),
@@ -95,7 +96,8 @@ namespace sgl {
 	Texture::Texture(
 		const std::pair<std::uint32_t, std::uint32_t> size, 
 		const void* data, 
-		const PixelElementSize& pixel_element_size /*= PixelElementSize::BYTE*/, 
+		const PixelElementSize& pixel_element_size 
+			/*= PixelElementSize::BYTE*/, 
 		const PixelStructure& pixel_structure /*= PixelStructure::RGB*/) :
 		size_(size),
 		pixel_element_size_(pixel_element_size),
@@ -377,7 +379,7 @@ namespace sgl {
 		cube->SetMaterial(material);
 		CreateTextureCubeMap();
 		int i = 0;
-		for (glm::mat4 view : views_cubemap)
+		for (const glm::mat4& view : views_cubemap)
 		{
 			ScopedBind scoped_texture(*this);
 			glTexImage2D(
