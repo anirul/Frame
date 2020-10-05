@@ -372,6 +372,7 @@ namespace sgl {
 		frame.AttachRender(render);
 		render.CreateStorage(size_);
 		CreateTextureCubeMap();
+		Bind();
 		for (unsigned int i : {0, 1, 2, 3, 4, 5})
 		{
 			glTexImage2D(
@@ -386,6 +387,7 @@ namespace sgl {
 				nullptr);
 			error_.Display(__FILE__, __LINE__ - 10);
 		}
+		UnBind();
 		glm::mat4 projection =
 			glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
 		auto program = Program::CreateProgram("EquirectangularCubeMap");

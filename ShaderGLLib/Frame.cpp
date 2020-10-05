@@ -39,7 +39,7 @@ namespace sgl {
 		render.Bind();
 		glFramebufferRenderbuffer(
 			GL_FRAMEBUFFER, 
-			GL_DEPTH_ATTACHMENT, 
+			GL_COLOR_ATTACHMENT0,
 			GL_RENDERBUFFER, 
 			render.GetId());
 		error_.Display(__FILE__, __LINE__ - 5);
