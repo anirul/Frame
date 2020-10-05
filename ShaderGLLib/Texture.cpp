@@ -371,17 +371,9 @@ namespace sgl {
 		material->AddTexture("Equirectangular", equirectangular);
 		frame.AttachRender(render);
 		render.CreateStorage(size_);
-		glm::mat4 projection =
-			glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
-		auto program = Program::CreateProgram("EquirectangularCubeMap");
-		program->UniformMatrix("projection", projection);
-		auto cube = CreateCubeMesh(program);
-		cube->SetMaterial(material);
 		CreateTextureCubeMap();
-		int i = 0;
-		for (const glm::mat4& view : views_cubemap)
+		for (unsigned int i : {0, 1, 2, 3, 4, 5})
 		{
-			ScopedBind scoped_texture(*this);
 			glTexImage2D(
 				GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
 				0,
@@ -393,20 +385,29 @@ namespace sgl {
 				ConvertToGLType(pixel_element_size_),
 				nullptr);
 			error_.Display(__FILE__, __LINE__ - 10);
+		}
+		glm::mat4 projection =
+			glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
+		auto program = Program::CreateProgram("EquirectangularCubeMap");
+		program->UniformMatrix("projection", projection);
+		auto cube = CreateCubeMesh(program);
+		cube->SetMaterial(material);
+		glViewport(0, 0, size_.first, size_.second);
+		error_.Display(__FILE__, __LINE__ - 1);
+		int i = 0;
+		for (const glm::mat4& view : views_cubemap)
+		{
 			frame.AttachTexture(
 				*this,
 				FrameColorAttachment::COLOR_ATTACHMENT0,
 				0,
 				static_cast<FrameTextureType>(i));
-			frame.DrawBuffers(1);
-			glViewport(0, 0, size_.first, size_.second);
-			error_.Display(__FILE__, __LINE__ - 1);
+			i++;
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			error_.Display(__FILE__, __LINE__ - 1);
 			// TODO(anirul): change this as the view is passed to the program
 			// and not the view passed as a projection.
 			cube->Draw(view);
-			i++;
 		}
 	}
 

@@ -71,21 +71,24 @@ namespace sgl {
 	PixelDepthComponent PixelDepthComponent_DEPTH_COMPONENT16()
 	{
 		PixelDepthComponent pixel_depth_component{};
-		pixel_depth_component.set_value(PixelDepthComponent::DEPTH_COMPONENT16);
+		pixel_depth_component.set_value(
+			PixelDepthComponent::DEPTH_COMPONENT16);
 		return pixel_depth_component;
 	}
 
 	PixelDepthComponent PixelDepthComponent_DEPTH_COMPONENT24()
 	{
 		PixelDepthComponent pixel_depth_component{};
-		pixel_depth_component.set_value(PixelDepthComponent::DEPTH_COMPONENT24);
+		pixel_depth_component.set_value(
+			PixelDepthComponent::DEPTH_COMPONENT24);
 		return pixel_depth_component;
 	}
 
 	PixelDepthComponent PixelDepthComponent_DEPTH_COMPONENT32()
 	{
 		PixelDepthComponent pixel_depth_component{};
-		pixel_depth_component.set_value(PixelDepthComponent::DEPTH_COMPONENT32);
+		pixel_depth_component.set_value(
+			PixelDepthComponent::DEPTH_COMPONENT32);
 		return pixel_depth_component;
 	}
 
