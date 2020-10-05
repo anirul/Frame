@@ -1,0 +1,38 @@
+{
+  "out_textures": [
+    "screen"
+  ],
+  "textures": [
+    {
+      "name": "deferred_albedo",
+      "size": {
+        "x": "1920",
+        "y": "1080"
+      },
+      "clear": "true",
+      "pixel_element_size": {
+        "value": "HALF"
+      },
+      "pixel_structure": {
+        "value": "RGB"
+      },
+      "min_filter": {
+        "value": "LINEAR"
+      },
+      "mag_filter": {
+        "value": "LINEAR"
+      },
+      "wrap_s": {
+        "value": "CLAMP_TO_EDGE"
+      },
+      "wrap_t": {
+        "value": "CLAMP_TO_EDGE"
+      }
+    }
+  ],
+  "effects": [
+    {
+      "name": "Blur"
+    }
+  ]
+}

@@ -61,6 +61,7 @@ add_custom_target(ShaderGL
 
 add_library(FrameProto
   STATIC
+    ${PROJECT_SOURCE_DIR}/Asset/SceneRendering.json
     ${PROJECT_SOURCE_DIR}/FrameProto/Display.pb.cc
     ${PROJECT_SOURCE_DIR}/FrameProto/Display.pb.h
     ${PROJECT_SOURCE_DIR}/FrameProto/Display.proto

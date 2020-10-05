@@ -87,6 +87,7 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_Texture_2eproto::offsets[] PRO
   PROTOBUF_FIELD_OFFSET(::frame::proto::Texture, mag_filter_),
   PROTOBUF_FIELD_OFFSET(::frame::proto::Texture, wrap_s_),
   PROTOBUF_FIELD_OFFSET(::frame::proto::Texture, wrap_t_),
+  PROTOBUF_FIELD_OFFSET(::frame::proto::Texture, wrap_r_),
   PROTOBUF_FIELD_OFFSET(::frame::proto::Texture, pixels_),
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
@@ -108,7 +109,7 @@ const char descriptor_table_protodef_Texture_2eproto[] PROTOBUF_SECTION_VARIABLE
   "NEAR_MIPMAP_NEAREST\020\004\022\031\n\025NEAREST_MIPMAP_"
   "LINEAR\020\005\022\030\n\024LINEAR_MIPMAP_LINEAR\020\006\022\021\n\rCL"
   "AMP_TO_EDGE\020\007\022\023\n\017MIRRORED_REPEAT\020\010\022\n\n\006RE"
-  "PEAT\020\t\"\200\003\n\007Texture\022\014\n\004name\030\001 \001(\t\022\037\n\004size"
+  "PEAT\020\t\"\254\003\n\007Texture\022\014\n\004name\030\001 \001(\t\022\037\n\004size"
   "\030\002 \001(\0132\021.frame.proto.Size\022\r\n\005clear\030\003 \001(\010"
   "\0229\n\022pixel_element_size\030\n \001(\0132\035.frame.pro"
   "to.PixelElementSize\0224\n\017pixel_structure\030\013"
@@ -117,8 +118,9 @@ const char descriptor_table_protodef_Texture_2eproto[] PROTOBUF_SECTION_VARIABLE
   "r\022.\n\nmag_filter\030\026 \001(\0132\032.frame.proto.Text"
   "ureFilter\022*\n\006wrap_s\030\027 \001(\0132\032.frame.proto."
   "TextureFilter\022*\n\006wrap_t\030\030 \001(\0132\032.frame.pr"
-  "oto.TextureFilter\022\016\n\006pixels\030\036 \001(\014b\006proto"
-  "3"
+  "oto.TextureFilter\022*\n\006wrap_r\030\031 \001(\0132\032.fram"
+  "e.proto.TextureFilter\022\016\n\006pixels\030\036 \001(\014b\006p"
+  "roto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_Texture_2eproto_deps[2] = {
   &::descriptor_table_Pixel_2eproto,
@@ -130,7 +132,7 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_Tex
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_Texture_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_Texture_2eproto = {
-  false, false, descriptor_table_protodef_Texture_2eproto, "Texture.proto", 721,
+  false, false, descriptor_table_protodef_Texture_2eproto, "Texture.proto", 765,
   &descriptor_table_Texture_2eproto_once, descriptor_table_Texture_2eproto_sccs, descriptor_table_Texture_2eproto_deps, 2, 2,
   schemas, file_default_instances, TableStruct_Texture_2eproto::offsets,
   file_level_metadata_Texture_2eproto, 2, file_level_enum_descriptors_Texture_2eproto, file_level_service_descriptors_Texture_2eproto,
@@ -393,6 +395,8 @@ void Texture::InitAsDefaultInstance() {
       ::frame::proto::TextureFilter::internal_default_instance());
   ::frame::proto::_Texture_default_instance_._instance.get_mutable()->wrap_t_ = const_cast< ::frame::proto::TextureFilter*>(
       ::frame::proto::TextureFilter::internal_default_instance());
+  ::frame::proto::_Texture_default_instance_._instance.get_mutable()->wrap_r_ = const_cast< ::frame::proto::TextureFilter*>(
+      ::frame::proto::TextureFilter::internal_default_instance());
 }
 class Texture::_Internal {
  public:
@@ -403,6 +407,7 @@ class Texture::_Internal {
   static const ::frame::proto::TextureFilter& mag_filter(const Texture* msg);
   static const ::frame::proto::TextureFilter& wrap_s(const Texture* msg);
   static const ::frame::proto::TextureFilter& wrap_t(const Texture* msg);
+  static const ::frame::proto::TextureFilter& wrap_r(const Texture* msg);
 };
 
 const ::frame::proto::Size&
@@ -432,6 +437,10 @@ Texture::_Internal::wrap_s(const Texture* msg) {
 const ::frame::proto::TextureFilter&
 Texture::_Internal::wrap_t(const Texture* msg) {
   return *msg->wrap_t_;
+}
+const ::frame::proto::TextureFilter&
+Texture::_Internal::wrap_r(const Texture* msg) {
+  return *msg->wrap_r_;
 }
 void Texture::clear_size() {
   if (GetArena() == nullptr && size_ != nullptr) {
@@ -505,6 +514,11 @@ Texture::Texture(const Texture& from)
   } else {
     wrap_t_ = nullptr;
   }
+  if (from._internal_has_wrap_r()) {
+    wrap_r_ = new ::frame::proto::TextureFilter(*from.wrap_r_);
+  } else {
+    wrap_r_ = nullptr;
+  }
   clear_ = from.clear_;
   // @@protoc_insertion_point(copy_constructor:frame.proto.Texture)
 }
@@ -535,6 +549,7 @@ void Texture::SharedDtor() {
   if (this != internal_default_instance()) delete mag_filter_;
   if (this != internal_default_instance()) delete wrap_s_;
   if (this != internal_default_instance()) delete wrap_t_;
+  if (this != internal_default_instance()) delete wrap_r_;
 }
 
 void Texture::ArenaDtor(void* object) {
@@ -588,6 +603,10 @@ void Texture::Clear() {
     delete wrap_t_;
   }
   wrap_t_ = nullptr;
+  if (GetArena() == nullptr && wrap_r_ != nullptr) {
+    delete wrap_r_;
+  }
+  wrap_r_ = nullptr;
   clear_ = false;
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
@@ -662,6 +681,13 @@ const char* Texture::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::in
       case 24:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 194)) {
           ptr = ctx->ParseMessage(_internal_mutable_wrap_t(), ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // .frame.proto.TextureFilter wrap_r = 25;
+      case 25:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 202)) {
+          ptr = ctx->ParseMessage(_internal_mutable_wrap_r(), ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -773,6 +799,14 @@ failure:
         24, _Internal::wrap_t(this), target, stream);
   }
 
+  // .frame.proto.TextureFilter wrap_r = 25;
+  if (this->has_wrap_r()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        25, _Internal::wrap_r(this), target, stream);
+  }
+
   // bytes pixels = 30;
   if (this->pixels().size() > 0) {
     target = stream->WriteBytesMaybeAliased(
@@ -858,6 +892,13 @@ size_t Texture::ByteSizeLong() const {
         *wrap_t_);
   }
 
+  // .frame.proto.TextureFilter wrap_r = 25;
+  if (this->has_wrap_r()) {
+    total_size += 2 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+        *wrap_r_);
+  }
+
   // bool clear = 3;
   if (this->clear() != 0) {
     total_size += 1 + 1;
@@ -920,6 +961,9 @@ void Texture::MergeFrom(const Texture& from) {
   }
   if (from.has_wrap_t()) {
     _internal_mutable_wrap_t()->::frame::proto::TextureFilter::MergeFrom(from._internal_wrap_t());
+  }
+  if (from.has_wrap_r()) {
+    _internal_mutable_wrap_r()->::frame::proto::TextureFilter::MergeFrom(from._internal_wrap_r());
   }
   if (from.clear() != 0) {
     _internal_set_clear(from._internal_clear());

@@ -141,6 +141,24 @@ namespace sgl {
 				__LINE__ - 6);
 		}
 		CreateTexture();
+		if (texture.min_filter().value() != 
+			frame::proto::TextureFilter::INVALID)
+		{
+			SetMinFilter(texture.min_filter());
+		}
+		if (texture.mag_filter().value() != 
+			frame::proto::TextureFilter::INVALID)
+		{
+			SetMagFilter(texture.mag_filter());
+		}
+		if (texture.wrap_s().value() != frame::proto::TextureFilter::INVALID)
+		{
+			SetWrapS(texture.wrap_s());
+		}
+		if (texture.wrap_t().value() != frame::proto::TextureFilter::INVALID)
+		{
+			SetWrapT(texture.wrap_t());
+		}
 		Bind();
 		glTexImage2D(
 			GL_TEXTURE_2D,
@@ -153,7 +171,10 @@ namespace sgl {
 			sgl::ConvertToGLType(pixel_element_size_),
 			texture.pixels().empty() ? nullptr : texture.pixels().data());
 		UnBind();
-		// TODO(anirul): finish this shit.
+		if (texture.clear())
+		{
+			Clear(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+		}
 	}
 
 	void Texture::CreateTexture()
@@ -318,6 +339,7 @@ namespace sgl {
 		error_.Display(__FILE__, __LINE__ - 1);
 		GLfloat clear_color[4] = { color.r, color.g, color.b, color.a };
 		glClearBufferfv(GL_COLOR, 0, clear_color);
+		error_.Display(__FILE__, __LINE__ - 1);
 		UnBind();
 	}
 

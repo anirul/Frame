@@ -39,6 +39,7 @@ message Texture {
 	TextureFilter mag_filter = 22;
 	TextureFilter wrap_s = 23;
 	TextureFilter wrap_t = 24;
+	TextureFilter wrap_r = 25;
 
 	// Pixel (if provided).
 	bytes pixels = 30;

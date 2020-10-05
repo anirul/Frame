@@ -414,6 +414,7 @@ class Texture PROTOBUF_FINAL :
     kMagFilterFieldNumber = 22,
     kWrapSFieldNumber = 23,
     kWrapTFieldNumber = 24,
+    kWrapRFieldNumber = 25,
     kClearFieldNumber = 3,
   };
   // string name = 1;
@@ -574,6 +575,24 @@ class Texture PROTOBUF_FINAL :
       ::frame::proto::TextureFilter* wrap_t);
   ::frame::proto::TextureFilter* unsafe_arena_release_wrap_t();
 
+  // .frame.proto.TextureFilter wrap_r = 25;
+  bool has_wrap_r() const;
+  private:
+  bool _internal_has_wrap_r() const;
+  public:
+  void clear_wrap_r();
+  const ::frame::proto::TextureFilter& wrap_r() const;
+  ::frame::proto::TextureFilter* release_wrap_r();
+  ::frame::proto::TextureFilter* mutable_wrap_r();
+  void set_allocated_wrap_r(::frame::proto::TextureFilter* wrap_r);
+  private:
+  const ::frame::proto::TextureFilter& _internal_wrap_r() const;
+  ::frame::proto::TextureFilter* _internal_mutable_wrap_r();
+  public:
+  void unsafe_arena_set_allocated_wrap_r(
+      ::frame::proto::TextureFilter* wrap_r);
+  ::frame::proto::TextureFilter* unsafe_arena_release_wrap_r();
+
   // bool clear = 3;
   void clear_clear();
   bool clear() const;
@@ -599,6 +618,7 @@ class Texture PROTOBUF_FINAL :
   ::frame::proto::TextureFilter* mag_filter_;
   ::frame::proto::TextureFilter* wrap_s_;
   ::frame::proto::TextureFilter* wrap_t_;
+  ::frame::proto::TextureFilter* wrap_r_;
   bool clear_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_Texture_2eproto;
@@ -1281,6 +1301,89 @@ inline void Texture::set_allocated_wrap_t(::frame::proto::TextureFilter* wrap_t)
   }
   wrap_t_ = wrap_t;
   // @@protoc_insertion_point(field_set_allocated:frame.proto.Texture.wrap_t)
+}
+
+// .frame.proto.TextureFilter wrap_r = 25;
+inline bool Texture::_internal_has_wrap_r() const {
+  return this != internal_default_instance() && wrap_r_ != nullptr;
+}
+inline bool Texture::has_wrap_r() const {
+  return _internal_has_wrap_r();
+}
+inline void Texture::clear_wrap_r() {
+  if (GetArena() == nullptr && wrap_r_ != nullptr) {
+    delete wrap_r_;
+  }
+  wrap_r_ = nullptr;
+}
+inline const ::frame::proto::TextureFilter& Texture::_internal_wrap_r() const {
+  const ::frame::proto::TextureFilter* p = wrap_r_;
+  return p != nullptr ? *p : *reinterpret_cast<const ::frame::proto::TextureFilter*>(
+      &::frame::proto::_TextureFilter_default_instance_);
+}
+inline const ::frame::proto::TextureFilter& Texture::wrap_r() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Texture.wrap_r)
+  return _internal_wrap_r();
+}
+inline void Texture::unsafe_arena_set_allocated_wrap_r(
+    ::frame::proto::TextureFilter* wrap_r) {
+  if (GetArena() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(wrap_r_);
+  }
+  wrap_r_ = wrap_r;
+  if (wrap_r) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.Texture.wrap_r)
+}
+inline ::frame::proto::TextureFilter* Texture::release_wrap_r() {
+  
+  ::frame::proto::TextureFilter* temp = wrap_r_;
+  wrap_r_ = nullptr;
+  if (GetArena() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+  return temp;
+}
+inline ::frame::proto::TextureFilter* Texture::unsafe_arena_release_wrap_r() {
+  // @@protoc_insertion_point(field_release:frame.proto.Texture.wrap_r)
+  
+  ::frame::proto::TextureFilter* temp = wrap_r_;
+  wrap_r_ = nullptr;
+  return temp;
+}
+inline ::frame::proto::TextureFilter* Texture::_internal_mutable_wrap_r() {
+  
+  if (wrap_r_ == nullptr) {
+    auto* p = CreateMaybeMessage<::frame::proto::TextureFilter>(GetArena());
+    wrap_r_ = p;
+  }
+  return wrap_r_;
+}
+inline ::frame::proto::TextureFilter* Texture::mutable_wrap_r() {
+  // @@protoc_insertion_point(field_mutable:frame.proto.Texture.wrap_r)
+  return _internal_mutable_wrap_r();
+}
+inline void Texture::set_allocated_wrap_r(::frame::proto::TextureFilter* wrap_r) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  if (message_arena == nullptr) {
+    delete wrap_r_;
+  }
+  if (wrap_r) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(wrap_r);
+    if (message_arena != submessage_arena) {
+      wrap_r = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, wrap_r, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  wrap_r_ = wrap_r;
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.Texture.wrap_r)
 }
 
 // bytes pixels = 30;

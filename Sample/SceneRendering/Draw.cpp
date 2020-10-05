@@ -12,7 +12,7 @@
 void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 {
 	// Open the Display.json file (in Asset/).
-	std::string file_name = "../Asset/Display.json";
+	std::string file_name = "../Asset/SceneRendering.json";
 	std::ifstream ifs(file_name.c_str(), std::ios::in);
 	if (!ifs) error_.CreateError(
 		"Couldn't open file " + file_name, 
