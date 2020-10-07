@@ -22,4 +22,3 @@ void Application::Run()
 		std::make_shared<Input>(window_->GetUniqueDevice()));
 	window_->Run();
 }
-

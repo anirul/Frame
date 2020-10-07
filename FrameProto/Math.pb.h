@@ -47,7 +47,7 @@ struct TableStruct_Math_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxiliaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[1]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[13]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -56,36 +56,84 @@ struct TableStruct_Math_2eproto {
 extern const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_Math_2eproto;
 namespace frame {
 namespace proto {
-class Vector;
-class VectorDefaultTypeInternal;
-extern VectorDefaultTypeInternal _Vector_default_instance_;
+class Matrix3;
+class Matrix3DefaultTypeInternal;
+extern Matrix3DefaultTypeInternal _Matrix3_default_instance_;
+class Matrix4;
+class Matrix4DefaultTypeInternal;
+extern Matrix4DefaultTypeInternal _Matrix4_default_instance_;
+class MulitpleVector2;
+class MulitpleVector2DefaultTypeInternal;
+extern MulitpleVector2DefaultTypeInternal _MulitpleVector2_default_instance_;
+class MultipleInteger;
+class MultipleIntegerDefaultTypeInternal;
+extern MultipleIntegerDefaultTypeInternal _MultipleInteger_default_instance_;
+class MultipleMatrix3;
+class MultipleMatrix3DefaultTypeInternal;
+extern MultipleMatrix3DefaultTypeInternal _MultipleMatrix3_default_instance_;
+class MultipleMatrix4;
+class MultipleMatrix4DefaultTypeInternal;
+extern MultipleMatrix4DefaultTypeInternal _MultipleMatrix4_default_instance_;
+class MultipleReal;
+class MultipleRealDefaultTypeInternal;
+extern MultipleRealDefaultTypeInternal _MultipleReal_default_instance_;
+class MultipleVector3;
+class MultipleVector3DefaultTypeInternal;
+extern MultipleVector3DefaultTypeInternal _MultipleVector3_default_instance_;
+class MultipleVector4;
+class MultipleVector4DefaultTypeInternal;
+extern MultipleVector4DefaultTypeInternal _MultipleVector4_default_instance_;
+class MutlipleBoolean;
+class MutlipleBooleanDefaultTypeInternal;
+extern MutlipleBooleanDefaultTypeInternal _MutlipleBoolean_default_instance_;
+class Vector2;
+class Vector2DefaultTypeInternal;
+extern Vector2DefaultTypeInternal _Vector2_default_instance_;
+class Vector3;
+class Vector3DefaultTypeInternal;
+extern Vector3DefaultTypeInternal _Vector3_default_instance_;
+class Vector4;
+class Vector4DefaultTypeInternal;
+extern Vector4DefaultTypeInternal _Vector4_default_instance_;
 }  // namespace proto
 }  // namespace frame
 PROTOBUF_NAMESPACE_OPEN
-template<> ::frame::proto::Vector* Arena::CreateMaybeMessage<::frame::proto::Vector>(Arena*);
+template<> ::frame::proto::Matrix3* Arena::CreateMaybeMessage<::frame::proto::Matrix3>(Arena*);
+template<> ::frame::proto::Matrix4* Arena::CreateMaybeMessage<::frame::proto::Matrix4>(Arena*);
+template<> ::frame::proto::MulitpleVector2* Arena::CreateMaybeMessage<::frame::proto::MulitpleVector2>(Arena*);
+template<> ::frame::proto::MultipleInteger* Arena::CreateMaybeMessage<::frame::proto::MultipleInteger>(Arena*);
+template<> ::frame::proto::MultipleMatrix3* Arena::CreateMaybeMessage<::frame::proto::MultipleMatrix3>(Arena*);
+template<> ::frame::proto::MultipleMatrix4* Arena::CreateMaybeMessage<::frame::proto::MultipleMatrix4>(Arena*);
+template<> ::frame::proto::MultipleReal* Arena::CreateMaybeMessage<::frame::proto::MultipleReal>(Arena*);
+template<> ::frame::proto::MultipleVector3* Arena::CreateMaybeMessage<::frame::proto::MultipleVector3>(Arena*);
+template<> ::frame::proto::MultipleVector4* Arena::CreateMaybeMessage<::frame::proto::MultipleVector4>(Arena*);
+template<> ::frame::proto::MutlipleBoolean* Arena::CreateMaybeMessage<::frame::proto::MutlipleBoolean>(Arena*);
+template<> ::frame::proto::Vector2* Arena::CreateMaybeMessage<::frame::proto::Vector2>(Arena*);
+template<> ::frame::proto::Vector3* Arena::CreateMaybeMessage<::frame::proto::Vector3>(Arena*);
+template<> ::frame::proto::Vector4* Arena::CreateMaybeMessage<::frame::proto::Vector4>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 namespace frame {
 namespace proto {
 
 // ===================================================================
 
-class Vector PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:frame.proto.Vector) */ {
+class Vector2 PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:frame.proto.Vector2) */ {
  public:
-  inline Vector() : Vector(nullptr) {}
-  virtual ~Vector();
+  inline Vector2() : Vector2(nullptr) {}
+  virtual ~Vector2();
 
-  Vector(const Vector& from);
-  Vector(Vector&& from) noexcept
-    : Vector() {
+  Vector2(const Vector2& from);
+  Vector2(Vector2&& from) noexcept
+    : Vector2() {
     *this = ::std::move(from);
   }
 
-  inline Vector& operator=(const Vector& from) {
+  inline Vector2& operator=(const Vector2& from) {
     CopyFrom(from);
     return *this;
   }
-  inline Vector& operator=(Vector&& from) noexcept {
+  inline Vector2& operator=(Vector2&& from) noexcept {
     if (GetArena() == from.GetArena()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -103,20 +151,20 @@ class Vector PROTOBUF_FINAL :
   static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
     return GetMetadataStatic().reflection;
   }
-  static const Vector& default_instance();
+  static const Vector2& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const Vector* internal_default_instance() {
-    return reinterpret_cast<const Vector*>(
-               &_Vector_default_instance_);
+  static inline const Vector2* internal_default_instance() {
+    return reinterpret_cast<const Vector2*>(
+               &_Vector2_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     0;
 
-  friend void swap(Vector& a, Vector& b) {
+  friend void swap(Vector2& a, Vector2& b) {
     a.Swap(&b);
   }
-  inline void Swap(Vector* other) {
+  inline void Swap(Vector2* other) {
     if (other == this) return;
     if (GetArena() == other->GetArena()) {
       InternalSwap(other);
@@ -124,7 +172,7 @@ class Vector PROTOBUF_FINAL :
       ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
     }
   }
-  void UnsafeArenaSwap(Vector* other) {
+  void UnsafeArenaSwap(Vector2* other) {
     if (other == this) return;
     GOOGLE_DCHECK(GetArena() == other->GetArena());
     InternalSwap(other);
@@ -132,17 +180,17 @@ class Vector PROTOBUF_FINAL :
 
   // implements Message ----------------------------------------------
 
-  inline Vector* New() const final {
-    return CreateMaybeMessage<Vector>(nullptr);
+  inline Vector2* New() const final {
+    return CreateMaybeMessage<Vector2>(nullptr);
   }
 
-  Vector* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
-    return CreateMaybeMessage<Vector>(arena);
+  Vector2* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<Vector2>(arena);
   }
   void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
-  void CopyFrom(const Vector& from);
-  void MergeFrom(const Vector& from);
+  void CopyFrom(const Vector2& from);
+  void MergeFrom(const Vector2& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -156,13 +204,13 @@ class Vector PROTOBUF_FINAL :
   inline void SharedCtor();
   inline void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(Vector* other);
+  void InternalSwap(Vector2* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "frame.proto.Vector";
+    return "frame.proto.Vector2";
   }
   protected:
-  explicit Vector(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  explicit Vector2(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   private:
   static void ArenaDtor(void* object);
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
@@ -182,39 +230,2075 @@ class Vector PROTOBUF_FINAL :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kVecFieldNumber = 1,
+    kXFieldNumber = 1,
+    kYFieldNumber = 2,
   };
-  // repeated float vec = 1;
-  int vec_size() const;
+  // float x = 1;
+  void clear_x();
+  float x() const;
+  void set_x(float value);
   private:
-  int _internal_vec_size() const;
+  float _internal_x() const;
+  void _internal_set_x(float value);
   public:
-  void clear_vec();
-  private:
-  float _internal_vec(int index) const;
-  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
-      _internal_vec() const;
-  void _internal_add_vec(float value);
-  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
-      _internal_mutable_vec();
-  public:
-  float vec(int index) const;
-  void set_vec(int index, float value);
-  void add_vec(float value);
-  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
-      vec() const;
-  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
-      mutable_vec();
 
-  // @@protoc_insertion_point(class_scope:frame.proto.Vector)
+  // float y = 2;
+  void clear_y();
+  float y() const;
+  void set_y(float value);
+  private:
+  float _internal_y() const;
+  void _internal_set_y(float value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:frame.proto.Vector2)
  private:
   class _Internal;
 
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
-  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float > vec_;
-  mutable std::atomic<int> _vec_cached_byte_size_;
+  float x_;
+  float y_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_Math_2eproto;
+};
+// -------------------------------------------------------------------
+
+class Vector3 PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:frame.proto.Vector3) */ {
+ public:
+  inline Vector3() : Vector3(nullptr) {}
+  virtual ~Vector3();
+
+  Vector3(const Vector3& from);
+  Vector3(Vector3&& from) noexcept
+    : Vector3() {
+    *this = ::std::move(from);
+  }
+
+  inline Vector3& operator=(const Vector3& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline Vector3& operator=(Vector3&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const Vector3& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const Vector3* internal_default_instance() {
+    return reinterpret_cast<const Vector3*>(
+               &_Vector3_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    1;
+
+  friend void swap(Vector3& a, Vector3& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(Vector3* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(Vector3* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline Vector3* New() const final {
+    return CreateMaybeMessage<Vector3>(nullptr);
+  }
+
+  Vector3* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<Vector3>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const Vector3& from);
+  void MergeFrom(const Vector3& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(Vector3* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "frame.proto.Vector3";
+  }
+  protected:
+  explicit Vector3(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_Math_2eproto);
+    return ::descriptor_table_Math_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kXFieldNumber = 1,
+    kYFieldNumber = 2,
+    kZFieldNumber = 3,
+  };
+  // float x = 1;
+  void clear_x();
+  float x() const;
+  void set_x(float value);
+  private:
+  float _internal_x() const;
+  void _internal_set_x(float value);
+  public:
+
+  // float y = 2;
+  void clear_y();
+  float y() const;
+  void set_y(float value);
+  private:
+  float _internal_y() const;
+  void _internal_set_y(float value);
+  public:
+
+  // float z = 3;
+  void clear_z();
+  float z() const;
+  void set_z(float value);
+  private:
+  float _internal_z() const;
+  void _internal_set_z(float value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:frame.proto.Vector3)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  float x_;
+  float y_;
+  float z_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_Math_2eproto;
+};
+// -------------------------------------------------------------------
+
+class Vector4 PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:frame.proto.Vector4) */ {
+ public:
+  inline Vector4() : Vector4(nullptr) {}
+  virtual ~Vector4();
+
+  Vector4(const Vector4& from);
+  Vector4(Vector4&& from) noexcept
+    : Vector4() {
+    *this = ::std::move(from);
+  }
+
+  inline Vector4& operator=(const Vector4& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline Vector4& operator=(Vector4&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const Vector4& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const Vector4* internal_default_instance() {
+    return reinterpret_cast<const Vector4*>(
+               &_Vector4_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    2;
+
+  friend void swap(Vector4& a, Vector4& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(Vector4* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(Vector4* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline Vector4* New() const final {
+    return CreateMaybeMessage<Vector4>(nullptr);
+  }
+
+  Vector4* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<Vector4>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const Vector4& from);
+  void MergeFrom(const Vector4& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(Vector4* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "frame.proto.Vector4";
+  }
+  protected:
+  explicit Vector4(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_Math_2eproto);
+    return ::descriptor_table_Math_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kXFieldNumber = 1,
+    kYFieldNumber = 2,
+    kZFieldNumber = 3,
+    kWFieldNumber = 4,
+  };
+  // float x = 1;
+  void clear_x();
+  float x() const;
+  void set_x(float value);
+  private:
+  float _internal_x() const;
+  void _internal_set_x(float value);
+  public:
+
+  // float y = 2;
+  void clear_y();
+  float y() const;
+  void set_y(float value);
+  private:
+  float _internal_y() const;
+  void _internal_set_y(float value);
+  public:
+
+  // float z = 3;
+  void clear_z();
+  float z() const;
+  void set_z(float value);
+  private:
+  float _internal_z() const;
+  void _internal_set_z(float value);
+  public:
+
+  // float w = 4;
+  void clear_w();
+  float w() const;
+  void set_w(float value);
+  private:
+  float _internal_w() const;
+  void _internal_set_w(float value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:frame.proto.Vector4)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  float x_;
+  float y_;
+  float z_;
+  float w_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_Math_2eproto;
+};
+// -------------------------------------------------------------------
+
+class Matrix3 PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:frame.proto.Matrix3) */ {
+ public:
+  inline Matrix3() : Matrix3(nullptr) {}
+  virtual ~Matrix3();
+
+  Matrix3(const Matrix3& from);
+  Matrix3(Matrix3&& from) noexcept
+    : Matrix3() {
+    *this = ::std::move(from);
+  }
+
+  inline Matrix3& operator=(const Matrix3& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline Matrix3& operator=(Matrix3&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const Matrix3& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const Matrix3* internal_default_instance() {
+    return reinterpret_cast<const Matrix3*>(
+               &_Matrix3_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    3;
+
+  friend void swap(Matrix3& a, Matrix3& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(Matrix3* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(Matrix3* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline Matrix3* New() const final {
+    return CreateMaybeMessage<Matrix3>(nullptr);
+  }
+
+  Matrix3* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<Matrix3>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const Matrix3& from);
+  void MergeFrom(const Matrix3& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(Matrix3* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "frame.proto.Matrix3";
+  }
+  protected:
+  explicit Matrix3(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_Math_2eproto);
+    return ::descriptor_table_Math_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kM33FieldNumber = 33,
+    kM11FieldNumber = 11,
+    kM12FieldNumber = 12,
+    kM13FieldNumber = 13,
+    kM21FieldNumber = 21,
+    kM22FieldNumber = 22,
+    kM23FieldNumber = 23,
+    kM31FieldNumber = 31,
+    kM32FieldNumber = 32,
+  };
+  // float m33 = 33;
+  void clear_m33();
+  float m33() const;
+  void set_m33(float value);
+  private:
+  float _internal_m33() const;
+  void _internal_set_m33(float value);
+  public:
+
+  // float m11 = 11;
+  void clear_m11();
+  float m11() const;
+  void set_m11(float value);
+  private:
+  float _internal_m11() const;
+  void _internal_set_m11(float value);
+  public:
+
+  // float m12 = 12;
+  void clear_m12();
+  float m12() const;
+  void set_m12(float value);
+  private:
+  float _internal_m12() const;
+  void _internal_set_m12(float value);
+  public:
+
+  // float m13 = 13;
+  void clear_m13();
+  float m13() const;
+  void set_m13(float value);
+  private:
+  float _internal_m13() const;
+  void _internal_set_m13(float value);
+  public:
+
+  // float m21 = 21;
+  void clear_m21();
+  float m21() const;
+  void set_m21(float value);
+  private:
+  float _internal_m21() const;
+  void _internal_set_m21(float value);
+  public:
+
+  // float m22 = 22;
+  void clear_m22();
+  float m22() const;
+  void set_m22(float value);
+  private:
+  float _internal_m22() const;
+  void _internal_set_m22(float value);
+  public:
+
+  // float m23 = 23;
+  void clear_m23();
+  float m23() const;
+  void set_m23(float value);
+  private:
+  float _internal_m23() const;
+  void _internal_set_m23(float value);
+  public:
+
+  // float m31 = 31;
+  void clear_m31();
+  float m31() const;
+  void set_m31(float value);
+  private:
+  float _internal_m31() const;
+  void _internal_set_m31(float value);
+  public:
+
+  // float m32 = 32;
+  void clear_m32();
+  float m32() const;
+  void set_m32(float value);
+  private:
+  float _internal_m32() const;
+  void _internal_set_m32(float value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:frame.proto.Matrix3)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  float m33_;
+  float m11_;
+  float m12_;
+  float m13_;
+  float m21_;
+  float m22_;
+  float m23_;
+  float m31_;
+  float m32_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_Math_2eproto;
+};
+// -------------------------------------------------------------------
+
+class Matrix4 PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:frame.proto.Matrix4) */ {
+ public:
+  inline Matrix4() : Matrix4(nullptr) {}
+  virtual ~Matrix4();
+
+  Matrix4(const Matrix4& from);
+  Matrix4(Matrix4&& from) noexcept
+    : Matrix4() {
+    *this = ::std::move(from);
+  }
+
+  inline Matrix4& operator=(const Matrix4& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline Matrix4& operator=(Matrix4&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const Matrix4& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const Matrix4* internal_default_instance() {
+    return reinterpret_cast<const Matrix4*>(
+               &_Matrix4_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    4;
+
+  friend void swap(Matrix4& a, Matrix4& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(Matrix4* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(Matrix4* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline Matrix4* New() const final {
+    return CreateMaybeMessage<Matrix4>(nullptr);
+  }
+
+  Matrix4* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<Matrix4>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const Matrix4& from);
+  void MergeFrom(const Matrix4& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(Matrix4* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "frame.proto.Matrix4";
+  }
+  protected:
+  explicit Matrix4(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_Math_2eproto);
+    return ::descriptor_table_Math_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kM11FieldNumber = 11,
+    kM12FieldNumber = 12,
+    kM13FieldNumber = 13,
+    kM14FieldNumber = 14,
+    kM21FieldNumber = 21,
+    kM22FieldNumber = 22,
+    kM23FieldNumber = 23,
+    kM24FieldNumber = 24,
+    kM31FieldNumber = 31,
+    kM32FieldNumber = 32,
+    kM33FieldNumber = 33,
+    kM34FieldNumber = 34,
+    kM41FieldNumber = 41,
+    kM42FieldNumber = 42,
+    kM43FieldNumber = 43,
+    kM44FieldNumber = 44,
+  };
+  // float m11 = 11;
+  void clear_m11();
+  float m11() const;
+  void set_m11(float value);
+  private:
+  float _internal_m11() const;
+  void _internal_set_m11(float value);
+  public:
+
+  // float m12 = 12;
+  void clear_m12();
+  float m12() const;
+  void set_m12(float value);
+  private:
+  float _internal_m12() const;
+  void _internal_set_m12(float value);
+  public:
+
+  // float m13 = 13;
+  void clear_m13();
+  float m13() const;
+  void set_m13(float value);
+  private:
+  float _internal_m13() const;
+  void _internal_set_m13(float value);
+  public:
+
+  // float m14 = 14;
+  void clear_m14();
+  float m14() const;
+  void set_m14(float value);
+  private:
+  float _internal_m14() const;
+  void _internal_set_m14(float value);
+  public:
+
+  // float m21 = 21;
+  void clear_m21();
+  float m21() const;
+  void set_m21(float value);
+  private:
+  float _internal_m21() const;
+  void _internal_set_m21(float value);
+  public:
+
+  // float m22 = 22;
+  void clear_m22();
+  float m22() const;
+  void set_m22(float value);
+  private:
+  float _internal_m22() const;
+  void _internal_set_m22(float value);
+  public:
+
+  // float m23 = 23;
+  void clear_m23();
+  float m23() const;
+  void set_m23(float value);
+  private:
+  float _internal_m23() const;
+  void _internal_set_m23(float value);
+  public:
+
+  // float m24 = 24;
+  void clear_m24();
+  float m24() const;
+  void set_m24(float value);
+  private:
+  float _internal_m24() const;
+  void _internal_set_m24(float value);
+  public:
+
+  // float m31 = 31;
+  void clear_m31();
+  float m31() const;
+  void set_m31(float value);
+  private:
+  float _internal_m31() const;
+  void _internal_set_m31(float value);
+  public:
+
+  // float m32 = 32;
+  void clear_m32();
+  float m32() const;
+  void set_m32(float value);
+  private:
+  float _internal_m32() const;
+  void _internal_set_m32(float value);
+  public:
+
+  // float m33 = 33;
+  void clear_m33();
+  float m33() const;
+  void set_m33(float value);
+  private:
+  float _internal_m33() const;
+  void _internal_set_m33(float value);
+  public:
+
+  // float m34 = 34;
+  void clear_m34();
+  float m34() const;
+  void set_m34(float value);
+  private:
+  float _internal_m34() const;
+  void _internal_set_m34(float value);
+  public:
+
+  // float m41 = 41;
+  void clear_m41();
+  float m41() const;
+  void set_m41(float value);
+  private:
+  float _internal_m41() const;
+  void _internal_set_m41(float value);
+  public:
+
+  // float m42 = 42;
+  void clear_m42();
+  float m42() const;
+  void set_m42(float value);
+  private:
+  float _internal_m42() const;
+  void _internal_set_m42(float value);
+  public:
+
+  // float m43 = 43;
+  void clear_m43();
+  float m43() const;
+  void set_m43(float value);
+  private:
+  float _internal_m43() const;
+  void _internal_set_m43(float value);
+  public:
+
+  // float m44 = 44;
+  void clear_m44();
+  float m44() const;
+  void set_m44(float value);
+  private:
+  float _internal_m44() const;
+  void _internal_set_m44(float value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:frame.proto.Matrix4)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  float m11_;
+  float m12_;
+  float m13_;
+  float m14_;
+  float m21_;
+  float m22_;
+  float m23_;
+  float m24_;
+  float m31_;
+  float m32_;
+  float m33_;
+  float m34_;
+  float m41_;
+  float m42_;
+  float m43_;
+  float m44_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_Math_2eproto;
+};
+// -------------------------------------------------------------------
+
+class MultipleInteger PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:frame.proto.MultipleInteger) */ {
+ public:
+  inline MultipleInteger() : MultipleInteger(nullptr) {}
+  virtual ~MultipleInteger();
+
+  MultipleInteger(const MultipleInteger& from);
+  MultipleInteger(MultipleInteger&& from) noexcept
+    : MultipleInteger() {
+    *this = ::std::move(from);
+  }
+
+  inline MultipleInteger& operator=(const MultipleInteger& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline MultipleInteger& operator=(MultipleInteger&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const MultipleInteger& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const MultipleInteger* internal_default_instance() {
+    return reinterpret_cast<const MultipleInteger*>(
+               &_MultipleInteger_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    5;
+
+  friend void swap(MultipleInteger& a, MultipleInteger& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(MultipleInteger* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(MultipleInteger* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline MultipleInteger* New() const final {
+    return CreateMaybeMessage<MultipleInteger>(nullptr);
+  }
+
+  MultipleInteger* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<MultipleInteger>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const MultipleInteger& from);
+  void MergeFrom(const MultipleInteger& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(MultipleInteger* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "frame.proto.MultipleInteger";
+  }
+  protected:
+  explicit MultipleInteger(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_Math_2eproto);
+    return ::descriptor_table_Math_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kValuesFieldNumber = 1,
+  };
+  // repeated int32 values = 1;
+  int values_size() const;
+  private:
+  int _internal_values_size() const;
+  public:
+  void clear_values();
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_values(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
+      _internal_values() const;
+  void _internal_add_values(::PROTOBUF_NAMESPACE_ID::int32 value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
+      _internal_mutable_values();
+  public:
+  ::PROTOBUF_NAMESPACE_ID::int32 values(int index) const;
+  void set_values(int index, ::PROTOBUF_NAMESPACE_ID::int32 value);
+  void add_values(::PROTOBUF_NAMESPACE_ID::int32 value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
+      values() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
+      mutable_values();
+
+  // @@protoc_insertion_point(class_scope:frame.proto.MultipleInteger)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 > values_;
+  mutable std::atomic<int> _values_cached_byte_size_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_Math_2eproto;
+};
+// -------------------------------------------------------------------
+
+class MutlipleBoolean PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:frame.proto.MutlipleBoolean) */ {
+ public:
+  inline MutlipleBoolean() : MutlipleBoolean(nullptr) {}
+  virtual ~MutlipleBoolean();
+
+  MutlipleBoolean(const MutlipleBoolean& from);
+  MutlipleBoolean(MutlipleBoolean&& from) noexcept
+    : MutlipleBoolean() {
+    *this = ::std::move(from);
+  }
+
+  inline MutlipleBoolean& operator=(const MutlipleBoolean& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline MutlipleBoolean& operator=(MutlipleBoolean&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const MutlipleBoolean& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const MutlipleBoolean* internal_default_instance() {
+    return reinterpret_cast<const MutlipleBoolean*>(
+               &_MutlipleBoolean_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    6;
+
+  friend void swap(MutlipleBoolean& a, MutlipleBoolean& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(MutlipleBoolean* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(MutlipleBoolean* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline MutlipleBoolean* New() const final {
+    return CreateMaybeMessage<MutlipleBoolean>(nullptr);
+  }
+
+  MutlipleBoolean* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<MutlipleBoolean>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const MutlipleBoolean& from);
+  void MergeFrom(const MutlipleBoolean& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(MutlipleBoolean* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "frame.proto.MutlipleBoolean";
+  }
+  protected:
+  explicit MutlipleBoolean(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_Math_2eproto);
+    return ::descriptor_table_Math_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kValuesFieldNumber = 1,
+  };
+  // repeated bool values = 1;
+  int values_size() const;
+  private:
+  int _internal_values_size() const;
+  public:
+  void clear_values();
+  private:
+  bool _internal_values(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< bool >&
+      _internal_values() const;
+  void _internal_add_values(bool value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< bool >*
+      _internal_mutable_values();
+  public:
+  bool values(int index) const;
+  void set_values(int index, bool value);
+  void add_values(bool value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< bool >&
+      values() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< bool >*
+      mutable_values();
+
+  // @@protoc_insertion_point(class_scope:frame.proto.MutlipleBoolean)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< bool > values_;
+  mutable std::atomic<int> _values_cached_byte_size_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_Math_2eproto;
+};
+// -------------------------------------------------------------------
+
+class MultipleReal PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:frame.proto.MultipleReal) */ {
+ public:
+  inline MultipleReal() : MultipleReal(nullptr) {}
+  virtual ~MultipleReal();
+
+  MultipleReal(const MultipleReal& from);
+  MultipleReal(MultipleReal&& from) noexcept
+    : MultipleReal() {
+    *this = ::std::move(from);
+  }
+
+  inline MultipleReal& operator=(const MultipleReal& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline MultipleReal& operator=(MultipleReal&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const MultipleReal& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const MultipleReal* internal_default_instance() {
+    return reinterpret_cast<const MultipleReal*>(
+               &_MultipleReal_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    7;
+
+  friend void swap(MultipleReal& a, MultipleReal& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(MultipleReal* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(MultipleReal* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline MultipleReal* New() const final {
+    return CreateMaybeMessage<MultipleReal>(nullptr);
+  }
+
+  MultipleReal* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<MultipleReal>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const MultipleReal& from);
+  void MergeFrom(const MultipleReal& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(MultipleReal* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "frame.proto.MultipleReal";
+  }
+  protected:
+  explicit MultipleReal(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_Math_2eproto);
+    return ::descriptor_table_Math_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kValuesFieldNumber = 1,
+  };
+  // repeated float values = 1;
+  int values_size() const;
+  private:
+  int _internal_values_size() const;
+  public:
+  void clear_values();
+  private:
+  float _internal_values(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+      _internal_values() const;
+  void _internal_add_values(float value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+      _internal_mutable_values();
+  public:
+  float values(int index) const;
+  void set_values(int index, float value);
+  void add_values(float value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+      values() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+      mutable_values();
+
+  // @@protoc_insertion_point(class_scope:frame.proto.MultipleReal)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float > values_;
+  mutable std::atomic<int> _values_cached_byte_size_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_Math_2eproto;
+};
+// -------------------------------------------------------------------
+
+class MulitpleVector2 PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:frame.proto.MulitpleVector2) */ {
+ public:
+  inline MulitpleVector2() : MulitpleVector2(nullptr) {}
+  virtual ~MulitpleVector2();
+
+  MulitpleVector2(const MulitpleVector2& from);
+  MulitpleVector2(MulitpleVector2&& from) noexcept
+    : MulitpleVector2() {
+    *this = ::std::move(from);
+  }
+
+  inline MulitpleVector2& operator=(const MulitpleVector2& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline MulitpleVector2& operator=(MulitpleVector2&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const MulitpleVector2& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const MulitpleVector2* internal_default_instance() {
+    return reinterpret_cast<const MulitpleVector2*>(
+               &_MulitpleVector2_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    8;
+
+  friend void swap(MulitpleVector2& a, MulitpleVector2& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(MulitpleVector2* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(MulitpleVector2* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline MulitpleVector2* New() const final {
+    return CreateMaybeMessage<MulitpleVector2>(nullptr);
+  }
+
+  MulitpleVector2* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<MulitpleVector2>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const MulitpleVector2& from);
+  void MergeFrom(const MulitpleVector2& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(MulitpleVector2* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "frame.proto.MulitpleVector2";
+  }
+  protected:
+  explicit MulitpleVector2(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_Math_2eproto);
+    return ::descriptor_table_Math_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kValuesFieldNumber = 1,
+  };
+  // repeated .frame.proto.Vector2 values = 1;
+  int values_size() const;
+  private:
+  int _internal_values_size() const;
+  public:
+  void clear_values();
+  ::frame::proto::Vector2* mutable_values(int index);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Vector2 >*
+      mutable_values();
+  private:
+  const ::frame::proto::Vector2& _internal_values(int index) const;
+  ::frame::proto::Vector2* _internal_add_values();
+  public:
+  const ::frame::proto::Vector2& values(int index) const;
+  ::frame::proto::Vector2* add_values();
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Vector2 >&
+      values() const;
+
+  // @@protoc_insertion_point(class_scope:frame.proto.MulitpleVector2)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Vector2 > values_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_Math_2eproto;
+};
+// -------------------------------------------------------------------
+
+class MultipleVector3 PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:frame.proto.MultipleVector3) */ {
+ public:
+  inline MultipleVector3() : MultipleVector3(nullptr) {}
+  virtual ~MultipleVector3();
+
+  MultipleVector3(const MultipleVector3& from);
+  MultipleVector3(MultipleVector3&& from) noexcept
+    : MultipleVector3() {
+    *this = ::std::move(from);
+  }
+
+  inline MultipleVector3& operator=(const MultipleVector3& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline MultipleVector3& operator=(MultipleVector3&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const MultipleVector3& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const MultipleVector3* internal_default_instance() {
+    return reinterpret_cast<const MultipleVector3*>(
+               &_MultipleVector3_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    9;
+
+  friend void swap(MultipleVector3& a, MultipleVector3& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(MultipleVector3* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(MultipleVector3* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline MultipleVector3* New() const final {
+    return CreateMaybeMessage<MultipleVector3>(nullptr);
+  }
+
+  MultipleVector3* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<MultipleVector3>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const MultipleVector3& from);
+  void MergeFrom(const MultipleVector3& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(MultipleVector3* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "frame.proto.MultipleVector3";
+  }
+  protected:
+  explicit MultipleVector3(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_Math_2eproto);
+    return ::descriptor_table_Math_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kValuesFieldNumber = 1,
+  };
+  // repeated .frame.proto.Vector3 values = 1;
+  int values_size() const;
+  private:
+  int _internal_values_size() const;
+  public:
+  void clear_values();
+  ::frame::proto::Vector3* mutable_values(int index);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Vector3 >*
+      mutable_values();
+  private:
+  const ::frame::proto::Vector3& _internal_values(int index) const;
+  ::frame::proto::Vector3* _internal_add_values();
+  public:
+  const ::frame::proto::Vector3& values(int index) const;
+  ::frame::proto::Vector3* add_values();
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Vector3 >&
+      values() const;
+
+  // @@protoc_insertion_point(class_scope:frame.proto.MultipleVector3)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Vector3 > values_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_Math_2eproto;
+};
+// -------------------------------------------------------------------
+
+class MultipleVector4 PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:frame.proto.MultipleVector4) */ {
+ public:
+  inline MultipleVector4() : MultipleVector4(nullptr) {}
+  virtual ~MultipleVector4();
+
+  MultipleVector4(const MultipleVector4& from);
+  MultipleVector4(MultipleVector4&& from) noexcept
+    : MultipleVector4() {
+    *this = ::std::move(from);
+  }
+
+  inline MultipleVector4& operator=(const MultipleVector4& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline MultipleVector4& operator=(MultipleVector4&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const MultipleVector4& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const MultipleVector4* internal_default_instance() {
+    return reinterpret_cast<const MultipleVector4*>(
+               &_MultipleVector4_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    10;
+
+  friend void swap(MultipleVector4& a, MultipleVector4& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(MultipleVector4* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(MultipleVector4* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline MultipleVector4* New() const final {
+    return CreateMaybeMessage<MultipleVector4>(nullptr);
+  }
+
+  MultipleVector4* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<MultipleVector4>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const MultipleVector4& from);
+  void MergeFrom(const MultipleVector4& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(MultipleVector4* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "frame.proto.MultipleVector4";
+  }
+  protected:
+  explicit MultipleVector4(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_Math_2eproto);
+    return ::descriptor_table_Math_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kValuesFieldNumber = 1,
+  };
+  // repeated .frame.proto.Vector4 values = 1;
+  int values_size() const;
+  private:
+  int _internal_values_size() const;
+  public:
+  void clear_values();
+  ::frame::proto::Vector4* mutable_values(int index);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Vector4 >*
+      mutable_values();
+  private:
+  const ::frame::proto::Vector4& _internal_values(int index) const;
+  ::frame::proto::Vector4* _internal_add_values();
+  public:
+  const ::frame::proto::Vector4& values(int index) const;
+  ::frame::proto::Vector4* add_values();
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Vector4 >&
+      values() const;
+
+  // @@protoc_insertion_point(class_scope:frame.proto.MultipleVector4)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Vector4 > values_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_Math_2eproto;
+};
+// -------------------------------------------------------------------
+
+class MultipleMatrix3 PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:frame.proto.MultipleMatrix3) */ {
+ public:
+  inline MultipleMatrix3() : MultipleMatrix3(nullptr) {}
+  virtual ~MultipleMatrix3();
+
+  MultipleMatrix3(const MultipleMatrix3& from);
+  MultipleMatrix3(MultipleMatrix3&& from) noexcept
+    : MultipleMatrix3() {
+    *this = ::std::move(from);
+  }
+
+  inline MultipleMatrix3& operator=(const MultipleMatrix3& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline MultipleMatrix3& operator=(MultipleMatrix3&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const MultipleMatrix3& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const MultipleMatrix3* internal_default_instance() {
+    return reinterpret_cast<const MultipleMatrix3*>(
+               &_MultipleMatrix3_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    11;
+
+  friend void swap(MultipleMatrix3& a, MultipleMatrix3& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(MultipleMatrix3* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(MultipleMatrix3* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline MultipleMatrix3* New() const final {
+    return CreateMaybeMessage<MultipleMatrix3>(nullptr);
+  }
+
+  MultipleMatrix3* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<MultipleMatrix3>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const MultipleMatrix3& from);
+  void MergeFrom(const MultipleMatrix3& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(MultipleMatrix3* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "frame.proto.MultipleMatrix3";
+  }
+  protected:
+  explicit MultipleMatrix3(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_Math_2eproto);
+    return ::descriptor_table_Math_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kValuesFieldNumber = 1,
+  };
+  // repeated .frame.proto.Matrix3 values = 1;
+  int values_size() const;
+  private:
+  int _internal_values_size() const;
+  public:
+  void clear_values();
+  ::frame::proto::Matrix3* mutable_values(int index);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Matrix3 >*
+      mutable_values();
+  private:
+  const ::frame::proto::Matrix3& _internal_values(int index) const;
+  ::frame::proto::Matrix3* _internal_add_values();
+  public:
+  const ::frame::proto::Matrix3& values(int index) const;
+  ::frame::proto::Matrix3* add_values();
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Matrix3 >&
+      values() const;
+
+  // @@protoc_insertion_point(class_scope:frame.proto.MultipleMatrix3)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Matrix3 > values_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_Math_2eproto;
+};
+// -------------------------------------------------------------------
+
+class MultipleMatrix4 PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:frame.proto.MultipleMatrix4) */ {
+ public:
+  inline MultipleMatrix4() : MultipleMatrix4(nullptr) {}
+  virtual ~MultipleMatrix4();
+
+  MultipleMatrix4(const MultipleMatrix4& from);
+  MultipleMatrix4(MultipleMatrix4&& from) noexcept
+    : MultipleMatrix4() {
+    *this = ::std::move(from);
+  }
+
+  inline MultipleMatrix4& operator=(const MultipleMatrix4& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline MultipleMatrix4& operator=(MultipleMatrix4&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const MultipleMatrix4& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const MultipleMatrix4* internal_default_instance() {
+    return reinterpret_cast<const MultipleMatrix4*>(
+               &_MultipleMatrix4_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    12;
+
+  friend void swap(MultipleMatrix4& a, MultipleMatrix4& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(MultipleMatrix4* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(MultipleMatrix4* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline MultipleMatrix4* New() const final {
+    return CreateMaybeMessage<MultipleMatrix4>(nullptr);
+  }
+
+  MultipleMatrix4* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<MultipleMatrix4>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const MultipleMatrix4& from);
+  void MergeFrom(const MultipleMatrix4& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(MultipleMatrix4* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "frame.proto.MultipleMatrix4";
+  }
+  protected:
+  explicit MultipleMatrix4(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_Math_2eproto);
+    return ::descriptor_table_Math_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kValuesFieldNumber = 1,
+  };
+  // repeated .frame.proto.Matrix4 values = 1;
+  int values_size() const;
+  private:
+  int _internal_values_size() const;
+  public:
+  void clear_values();
+  ::frame::proto::Matrix4* mutable_values(int index);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Matrix4 >*
+      mutable_values();
+  private:
+  const ::frame::proto::Matrix4& _internal_values(int index) const;
+  ::frame::proto::Matrix4* _internal_add_values();
+  public:
+  const ::frame::proto::Matrix4& values(int index) const;
+  ::frame::proto::Matrix4* add_values();
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Matrix4 >&
+      values() const;
+
+  // @@protoc_insertion_point(class_scope:frame.proto.MultipleMatrix4)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Matrix4 > values_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_Math_2eproto;
 };
@@ -227,58 +2311,1099 @@ class Vector PROTOBUF_FINAL :
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif  // __GNUC__
-// Vector
+// Vector2
 
-// repeated float vec = 1;
-inline int Vector::_internal_vec_size() const {
-  return vec_.size();
+// float x = 1;
+inline void Vector2::clear_x() {
+  x_ = 0;
 }
-inline int Vector::vec_size() const {
-  return _internal_vec_size();
+inline float Vector2::_internal_x() const {
+  return x_;
 }
-inline void Vector::clear_vec() {
-  vec_.Clear();
+inline float Vector2::x() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Vector2.x)
+  return _internal_x();
 }
-inline float Vector::_internal_vec(int index) const {
-  return vec_.Get(index);
+inline void Vector2::_internal_set_x(float value) {
+  
+  x_ = value;
 }
-inline float Vector::vec(int index) const {
-  // @@protoc_insertion_point(field_get:frame.proto.Vector.vec)
-  return _internal_vec(index);
+inline void Vector2::set_x(float value) {
+  _internal_set_x(value);
+  // @@protoc_insertion_point(field_set:frame.proto.Vector2.x)
 }
-inline void Vector::set_vec(int index, float value) {
-  vec_.Set(index, value);
-  // @@protoc_insertion_point(field_set:frame.proto.Vector.vec)
+
+// float y = 2;
+inline void Vector2::clear_y() {
+  y_ = 0;
 }
-inline void Vector::_internal_add_vec(float value) {
-  vec_.Add(value);
+inline float Vector2::_internal_y() const {
+  return y_;
 }
-inline void Vector::add_vec(float value) {
-  _internal_add_vec(value);
-  // @@protoc_insertion_point(field_add:frame.proto.Vector.vec)
+inline float Vector2::y() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Vector2.y)
+  return _internal_y();
+}
+inline void Vector2::_internal_set_y(float value) {
+  
+  y_ = value;
+}
+inline void Vector2::set_y(float value) {
+  _internal_set_y(value);
+  // @@protoc_insertion_point(field_set:frame.proto.Vector2.y)
+}
+
+// -------------------------------------------------------------------
+
+// Vector3
+
+// float x = 1;
+inline void Vector3::clear_x() {
+  x_ = 0;
+}
+inline float Vector3::_internal_x() const {
+  return x_;
+}
+inline float Vector3::x() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Vector3.x)
+  return _internal_x();
+}
+inline void Vector3::_internal_set_x(float value) {
+  
+  x_ = value;
+}
+inline void Vector3::set_x(float value) {
+  _internal_set_x(value);
+  // @@protoc_insertion_point(field_set:frame.proto.Vector3.x)
+}
+
+// float y = 2;
+inline void Vector3::clear_y() {
+  y_ = 0;
+}
+inline float Vector3::_internal_y() const {
+  return y_;
+}
+inline float Vector3::y() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Vector3.y)
+  return _internal_y();
+}
+inline void Vector3::_internal_set_y(float value) {
+  
+  y_ = value;
+}
+inline void Vector3::set_y(float value) {
+  _internal_set_y(value);
+  // @@protoc_insertion_point(field_set:frame.proto.Vector3.y)
+}
+
+// float z = 3;
+inline void Vector3::clear_z() {
+  z_ = 0;
+}
+inline float Vector3::_internal_z() const {
+  return z_;
+}
+inline float Vector3::z() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Vector3.z)
+  return _internal_z();
+}
+inline void Vector3::_internal_set_z(float value) {
+  
+  z_ = value;
+}
+inline void Vector3::set_z(float value) {
+  _internal_set_z(value);
+  // @@protoc_insertion_point(field_set:frame.proto.Vector3.z)
+}
+
+// -------------------------------------------------------------------
+
+// Vector4
+
+// float x = 1;
+inline void Vector4::clear_x() {
+  x_ = 0;
+}
+inline float Vector4::_internal_x() const {
+  return x_;
+}
+inline float Vector4::x() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Vector4.x)
+  return _internal_x();
+}
+inline void Vector4::_internal_set_x(float value) {
+  
+  x_ = value;
+}
+inline void Vector4::set_x(float value) {
+  _internal_set_x(value);
+  // @@protoc_insertion_point(field_set:frame.proto.Vector4.x)
+}
+
+// float y = 2;
+inline void Vector4::clear_y() {
+  y_ = 0;
+}
+inline float Vector4::_internal_y() const {
+  return y_;
+}
+inline float Vector4::y() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Vector4.y)
+  return _internal_y();
+}
+inline void Vector4::_internal_set_y(float value) {
+  
+  y_ = value;
+}
+inline void Vector4::set_y(float value) {
+  _internal_set_y(value);
+  // @@protoc_insertion_point(field_set:frame.proto.Vector4.y)
+}
+
+// float z = 3;
+inline void Vector4::clear_z() {
+  z_ = 0;
+}
+inline float Vector4::_internal_z() const {
+  return z_;
+}
+inline float Vector4::z() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Vector4.z)
+  return _internal_z();
+}
+inline void Vector4::_internal_set_z(float value) {
+  
+  z_ = value;
+}
+inline void Vector4::set_z(float value) {
+  _internal_set_z(value);
+  // @@protoc_insertion_point(field_set:frame.proto.Vector4.z)
+}
+
+// float w = 4;
+inline void Vector4::clear_w() {
+  w_ = 0;
+}
+inline float Vector4::_internal_w() const {
+  return w_;
+}
+inline float Vector4::w() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Vector4.w)
+  return _internal_w();
+}
+inline void Vector4::_internal_set_w(float value) {
+  
+  w_ = value;
+}
+inline void Vector4::set_w(float value) {
+  _internal_set_w(value);
+  // @@protoc_insertion_point(field_set:frame.proto.Vector4.w)
+}
+
+// -------------------------------------------------------------------
+
+// Matrix3
+
+// float m11 = 11;
+inline void Matrix3::clear_m11() {
+  m11_ = 0;
+}
+inline float Matrix3::_internal_m11() const {
+  return m11_;
+}
+inline float Matrix3::m11() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Matrix3.m11)
+  return _internal_m11();
+}
+inline void Matrix3::_internal_set_m11(float value) {
+  
+  m11_ = value;
+}
+inline void Matrix3::set_m11(float value) {
+  _internal_set_m11(value);
+  // @@protoc_insertion_point(field_set:frame.proto.Matrix3.m11)
+}
+
+// float m12 = 12;
+inline void Matrix3::clear_m12() {
+  m12_ = 0;
+}
+inline float Matrix3::_internal_m12() const {
+  return m12_;
+}
+inline float Matrix3::m12() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Matrix3.m12)
+  return _internal_m12();
+}
+inline void Matrix3::_internal_set_m12(float value) {
+  
+  m12_ = value;
+}
+inline void Matrix3::set_m12(float value) {
+  _internal_set_m12(value);
+  // @@protoc_insertion_point(field_set:frame.proto.Matrix3.m12)
+}
+
+// float m13 = 13;
+inline void Matrix3::clear_m13() {
+  m13_ = 0;
+}
+inline float Matrix3::_internal_m13() const {
+  return m13_;
+}
+inline float Matrix3::m13() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Matrix3.m13)
+  return _internal_m13();
+}
+inline void Matrix3::_internal_set_m13(float value) {
+  
+  m13_ = value;
+}
+inline void Matrix3::set_m13(float value) {
+  _internal_set_m13(value);
+  // @@protoc_insertion_point(field_set:frame.proto.Matrix3.m13)
+}
+
+// float m21 = 21;
+inline void Matrix3::clear_m21() {
+  m21_ = 0;
+}
+inline float Matrix3::_internal_m21() const {
+  return m21_;
+}
+inline float Matrix3::m21() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Matrix3.m21)
+  return _internal_m21();
+}
+inline void Matrix3::_internal_set_m21(float value) {
+  
+  m21_ = value;
+}
+inline void Matrix3::set_m21(float value) {
+  _internal_set_m21(value);
+  // @@protoc_insertion_point(field_set:frame.proto.Matrix3.m21)
+}
+
+// float m22 = 22;
+inline void Matrix3::clear_m22() {
+  m22_ = 0;
+}
+inline float Matrix3::_internal_m22() const {
+  return m22_;
+}
+inline float Matrix3::m22() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Matrix3.m22)
+  return _internal_m22();
+}
+inline void Matrix3::_internal_set_m22(float value) {
+  
+  m22_ = value;
+}
+inline void Matrix3::set_m22(float value) {
+  _internal_set_m22(value);
+  // @@protoc_insertion_point(field_set:frame.proto.Matrix3.m22)
+}
+
+// float m23 = 23;
+inline void Matrix3::clear_m23() {
+  m23_ = 0;
+}
+inline float Matrix3::_internal_m23() const {
+  return m23_;
+}
+inline float Matrix3::m23() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Matrix3.m23)
+  return _internal_m23();
+}
+inline void Matrix3::_internal_set_m23(float value) {
+  
+  m23_ = value;
+}
+inline void Matrix3::set_m23(float value) {
+  _internal_set_m23(value);
+  // @@protoc_insertion_point(field_set:frame.proto.Matrix3.m23)
+}
+
+// float m31 = 31;
+inline void Matrix3::clear_m31() {
+  m31_ = 0;
+}
+inline float Matrix3::_internal_m31() const {
+  return m31_;
+}
+inline float Matrix3::m31() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Matrix3.m31)
+  return _internal_m31();
+}
+inline void Matrix3::_internal_set_m31(float value) {
+  
+  m31_ = value;
+}
+inline void Matrix3::set_m31(float value) {
+  _internal_set_m31(value);
+  // @@protoc_insertion_point(field_set:frame.proto.Matrix3.m31)
+}
+
+// float m32 = 32;
+inline void Matrix3::clear_m32() {
+  m32_ = 0;
+}
+inline float Matrix3::_internal_m32() const {
+  return m32_;
+}
+inline float Matrix3::m32() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Matrix3.m32)
+  return _internal_m32();
+}
+inline void Matrix3::_internal_set_m32(float value) {
+  
+  m32_ = value;
+}
+inline void Matrix3::set_m32(float value) {
+  _internal_set_m32(value);
+  // @@protoc_insertion_point(field_set:frame.proto.Matrix3.m32)
+}
+
+// float m33 = 33;
+inline void Matrix3::clear_m33() {
+  m33_ = 0;
+}
+inline float Matrix3::_internal_m33() const {
+  return m33_;
+}
+inline float Matrix3::m33() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Matrix3.m33)
+  return _internal_m33();
+}
+inline void Matrix3::_internal_set_m33(float value) {
+  
+  m33_ = value;
+}
+inline void Matrix3::set_m33(float value) {
+  _internal_set_m33(value);
+  // @@protoc_insertion_point(field_set:frame.proto.Matrix3.m33)
+}
+
+// -------------------------------------------------------------------
+
+// Matrix4
+
+// float m11 = 11;
+inline void Matrix4::clear_m11() {
+  m11_ = 0;
+}
+inline float Matrix4::_internal_m11() const {
+  return m11_;
+}
+inline float Matrix4::m11() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Matrix4.m11)
+  return _internal_m11();
+}
+inline void Matrix4::_internal_set_m11(float value) {
+  
+  m11_ = value;
+}
+inline void Matrix4::set_m11(float value) {
+  _internal_set_m11(value);
+  // @@protoc_insertion_point(field_set:frame.proto.Matrix4.m11)
+}
+
+// float m12 = 12;
+inline void Matrix4::clear_m12() {
+  m12_ = 0;
+}
+inline float Matrix4::_internal_m12() const {
+  return m12_;
+}
+inline float Matrix4::m12() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Matrix4.m12)
+  return _internal_m12();
+}
+inline void Matrix4::_internal_set_m12(float value) {
+  
+  m12_ = value;
+}
+inline void Matrix4::set_m12(float value) {
+  _internal_set_m12(value);
+  // @@protoc_insertion_point(field_set:frame.proto.Matrix4.m12)
+}
+
+// float m13 = 13;
+inline void Matrix4::clear_m13() {
+  m13_ = 0;
+}
+inline float Matrix4::_internal_m13() const {
+  return m13_;
+}
+inline float Matrix4::m13() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Matrix4.m13)
+  return _internal_m13();
+}
+inline void Matrix4::_internal_set_m13(float value) {
+  
+  m13_ = value;
+}
+inline void Matrix4::set_m13(float value) {
+  _internal_set_m13(value);
+  // @@protoc_insertion_point(field_set:frame.proto.Matrix4.m13)
+}
+
+// float m14 = 14;
+inline void Matrix4::clear_m14() {
+  m14_ = 0;
+}
+inline float Matrix4::_internal_m14() const {
+  return m14_;
+}
+inline float Matrix4::m14() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Matrix4.m14)
+  return _internal_m14();
+}
+inline void Matrix4::_internal_set_m14(float value) {
+  
+  m14_ = value;
+}
+inline void Matrix4::set_m14(float value) {
+  _internal_set_m14(value);
+  // @@protoc_insertion_point(field_set:frame.proto.Matrix4.m14)
+}
+
+// float m21 = 21;
+inline void Matrix4::clear_m21() {
+  m21_ = 0;
+}
+inline float Matrix4::_internal_m21() const {
+  return m21_;
+}
+inline float Matrix4::m21() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Matrix4.m21)
+  return _internal_m21();
+}
+inline void Matrix4::_internal_set_m21(float value) {
+  
+  m21_ = value;
+}
+inline void Matrix4::set_m21(float value) {
+  _internal_set_m21(value);
+  // @@protoc_insertion_point(field_set:frame.proto.Matrix4.m21)
+}
+
+// float m22 = 22;
+inline void Matrix4::clear_m22() {
+  m22_ = 0;
+}
+inline float Matrix4::_internal_m22() const {
+  return m22_;
+}
+inline float Matrix4::m22() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Matrix4.m22)
+  return _internal_m22();
+}
+inline void Matrix4::_internal_set_m22(float value) {
+  
+  m22_ = value;
+}
+inline void Matrix4::set_m22(float value) {
+  _internal_set_m22(value);
+  // @@protoc_insertion_point(field_set:frame.proto.Matrix4.m22)
+}
+
+// float m23 = 23;
+inline void Matrix4::clear_m23() {
+  m23_ = 0;
+}
+inline float Matrix4::_internal_m23() const {
+  return m23_;
+}
+inline float Matrix4::m23() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Matrix4.m23)
+  return _internal_m23();
+}
+inline void Matrix4::_internal_set_m23(float value) {
+  
+  m23_ = value;
+}
+inline void Matrix4::set_m23(float value) {
+  _internal_set_m23(value);
+  // @@protoc_insertion_point(field_set:frame.proto.Matrix4.m23)
+}
+
+// float m24 = 24;
+inline void Matrix4::clear_m24() {
+  m24_ = 0;
+}
+inline float Matrix4::_internal_m24() const {
+  return m24_;
+}
+inline float Matrix4::m24() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Matrix4.m24)
+  return _internal_m24();
+}
+inline void Matrix4::_internal_set_m24(float value) {
+  
+  m24_ = value;
+}
+inline void Matrix4::set_m24(float value) {
+  _internal_set_m24(value);
+  // @@protoc_insertion_point(field_set:frame.proto.Matrix4.m24)
+}
+
+// float m31 = 31;
+inline void Matrix4::clear_m31() {
+  m31_ = 0;
+}
+inline float Matrix4::_internal_m31() const {
+  return m31_;
+}
+inline float Matrix4::m31() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Matrix4.m31)
+  return _internal_m31();
+}
+inline void Matrix4::_internal_set_m31(float value) {
+  
+  m31_ = value;
+}
+inline void Matrix4::set_m31(float value) {
+  _internal_set_m31(value);
+  // @@protoc_insertion_point(field_set:frame.proto.Matrix4.m31)
+}
+
+// float m32 = 32;
+inline void Matrix4::clear_m32() {
+  m32_ = 0;
+}
+inline float Matrix4::_internal_m32() const {
+  return m32_;
+}
+inline float Matrix4::m32() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Matrix4.m32)
+  return _internal_m32();
+}
+inline void Matrix4::_internal_set_m32(float value) {
+  
+  m32_ = value;
+}
+inline void Matrix4::set_m32(float value) {
+  _internal_set_m32(value);
+  // @@protoc_insertion_point(field_set:frame.proto.Matrix4.m32)
+}
+
+// float m33 = 33;
+inline void Matrix4::clear_m33() {
+  m33_ = 0;
+}
+inline float Matrix4::_internal_m33() const {
+  return m33_;
+}
+inline float Matrix4::m33() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Matrix4.m33)
+  return _internal_m33();
+}
+inline void Matrix4::_internal_set_m33(float value) {
+  
+  m33_ = value;
+}
+inline void Matrix4::set_m33(float value) {
+  _internal_set_m33(value);
+  // @@protoc_insertion_point(field_set:frame.proto.Matrix4.m33)
+}
+
+// float m34 = 34;
+inline void Matrix4::clear_m34() {
+  m34_ = 0;
+}
+inline float Matrix4::_internal_m34() const {
+  return m34_;
+}
+inline float Matrix4::m34() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Matrix4.m34)
+  return _internal_m34();
+}
+inline void Matrix4::_internal_set_m34(float value) {
+  
+  m34_ = value;
+}
+inline void Matrix4::set_m34(float value) {
+  _internal_set_m34(value);
+  // @@protoc_insertion_point(field_set:frame.proto.Matrix4.m34)
+}
+
+// float m41 = 41;
+inline void Matrix4::clear_m41() {
+  m41_ = 0;
+}
+inline float Matrix4::_internal_m41() const {
+  return m41_;
+}
+inline float Matrix4::m41() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Matrix4.m41)
+  return _internal_m41();
+}
+inline void Matrix4::_internal_set_m41(float value) {
+  
+  m41_ = value;
+}
+inline void Matrix4::set_m41(float value) {
+  _internal_set_m41(value);
+  // @@protoc_insertion_point(field_set:frame.proto.Matrix4.m41)
+}
+
+// float m42 = 42;
+inline void Matrix4::clear_m42() {
+  m42_ = 0;
+}
+inline float Matrix4::_internal_m42() const {
+  return m42_;
+}
+inline float Matrix4::m42() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Matrix4.m42)
+  return _internal_m42();
+}
+inline void Matrix4::_internal_set_m42(float value) {
+  
+  m42_ = value;
+}
+inline void Matrix4::set_m42(float value) {
+  _internal_set_m42(value);
+  // @@protoc_insertion_point(field_set:frame.proto.Matrix4.m42)
+}
+
+// float m43 = 43;
+inline void Matrix4::clear_m43() {
+  m43_ = 0;
+}
+inline float Matrix4::_internal_m43() const {
+  return m43_;
+}
+inline float Matrix4::m43() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Matrix4.m43)
+  return _internal_m43();
+}
+inline void Matrix4::_internal_set_m43(float value) {
+  
+  m43_ = value;
+}
+inline void Matrix4::set_m43(float value) {
+  _internal_set_m43(value);
+  // @@protoc_insertion_point(field_set:frame.proto.Matrix4.m43)
+}
+
+// float m44 = 44;
+inline void Matrix4::clear_m44() {
+  m44_ = 0;
+}
+inline float Matrix4::_internal_m44() const {
+  return m44_;
+}
+inline float Matrix4::m44() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Matrix4.m44)
+  return _internal_m44();
+}
+inline void Matrix4::_internal_set_m44(float value) {
+  
+  m44_ = value;
+}
+inline void Matrix4::set_m44(float value) {
+  _internal_set_m44(value);
+  // @@protoc_insertion_point(field_set:frame.proto.Matrix4.m44)
+}
+
+// -------------------------------------------------------------------
+
+// MultipleInteger
+
+// repeated int32 values = 1;
+inline int MultipleInteger::_internal_values_size() const {
+  return values_.size();
+}
+inline int MultipleInteger::values_size() const {
+  return _internal_values_size();
+}
+inline void MultipleInteger::clear_values() {
+  values_.Clear();
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 MultipleInteger::_internal_values(int index) const {
+  return values_.Get(index);
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 MultipleInteger::values(int index) const {
+  // @@protoc_insertion_point(field_get:frame.proto.MultipleInteger.values)
+  return _internal_values(index);
+}
+inline void MultipleInteger::set_values(int index, ::PROTOBUF_NAMESPACE_ID::int32 value) {
+  values_.Set(index, value);
+  // @@protoc_insertion_point(field_set:frame.proto.MultipleInteger.values)
+}
+inline void MultipleInteger::_internal_add_values(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  values_.Add(value);
+}
+inline void MultipleInteger::add_values(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_add_values(value);
+  // @@protoc_insertion_point(field_add:frame.proto.MultipleInteger.values)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
+MultipleInteger::_internal_values() const {
+  return values_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
+MultipleInteger::values() const {
+  // @@protoc_insertion_point(field_list:frame.proto.MultipleInteger.values)
+  return _internal_values();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
+MultipleInteger::_internal_mutable_values() {
+  return &values_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
+MultipleInteger::mutable_values() {
+  // @@protoc_insertion_point(field_mutable_list:frame.proto.MultipleInteger.values)
+  return _internal_mutable_values();
+}
+
+// -------------------------------------------------------------------
+
+// MutlipleBoolean
+
+// repeated bool values = 1;
+inline int MutlipleBoolean::_internal_values_size() const {
+  return values_.size();
+}
+inline int MutlipleBoolean::values_size() const {
+  return _internal_values_size();
+}
+inline void MutlipleBoolean::clear_values() {
+  values_.Clear();
+}
+inline bool MutlipleBoolean::_internal_values(int index) const {
+  return values_.Get(index);
+}
+inline bool MutlipleBoolean::values(int index) const {
+  // @@protoc_insertion_point(field_get:frame.proto.MutlipleBoolean.values)
+  return _internal_values(index);
+}
+inline void MutlipleBoolean::set_values(int index, bool value) {
+  values_.Set(index, value);
+  // @@protoc_insertion_point(field_set:frame.proto.MutlipleBoolean.values)
+}
+inline void MutlipleBoolean::_internal_add_values(bool value) {
+  values_.Add(value);
+}
+inline void MutlipleBoolean::add_values(bool value) {
+  _internal_add_values(value);
+  // @@protoc_insertion_point(field_add:frame.proto.MutlipleBoolean.values)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< bool >&
+MutlipleBoolean::_internal_values() const {
+  return values_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< bool >&
+MutlipleBoolean::values() const {
+  // @@protoc_insertion_point(field_list:frame.proto.MutlipleBoolean.values)
+  return _internal_values();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< bool >*
+MutlipleBoolean::_internal_mutable_values() {
+  return &values_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< bool >*
+MutlipleBoolean::mutable_values() {
+  // @@protoc_insertion_point(field_mutable_list:frame.proto.MutlipleBoolean.values)
+  return _internal_mutable_values();
+}
+
+// -------------------------------------------------------------------
+
+// MultipleReal
+
+// repeated float values = 1;
+inline int MultipleReal::_internal_values_size() const {
+  return values_.size();
+}
+inline int MultipleReal::values_size() const {
+  return _internal_values_size();
+}
+inline void MultipleReal::clear_values() {
+  values_.Clear();
+}
+inline float MultipleReal::_internal_values(int index) const {
+  return values_.Get(index);
+}
+inline float MultipleReal::values(int index) const {
+  // @@protoc_insertion_point(field_get:frame.proto.MultipleReal.values)
+  return _internal_values(index);
+}
+inline void MultipleReal::set_values(int index, float value) {
+  values_.Set(index, value);
+  // @@protoc_insertion_point(field_set:frame.proto.MultipleReal.values)
+}
+inline void MultipleReal::_internal_add_values(float value) {
+  values_.Add(value);
+}
+inline void MultipleReal::add_values(float value) {
+  _internal_add_values(value);
+  // @@protoc_insertion_point(field_add:frame.proto.MultipleReal.values)
 }
 inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
-Vector::_internal_vec() const {
-  return vec_;
+MultipleReal::_internal_values() const {
+  return values_;
 }
 inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
-Vector::vec() const {
-  // @@protoc_insertion_point(field_list:frame.proto.Vector.vec)
-  return _internal_vec();
+MultipleReal::values() const {
+  // @@protoc_insertion_point(field_list:frame.proto.MultipleReal.values)
+  return _internal_values();
 }
 inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
-Vector::_internal_mutable_vec() {
-  return &vec_;
+MultipleReal::_internal_mutable_values() {
+  return &values_;
 }
 inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
-Vector::mutable_vec() {
-  // @@protoc_insertion_point(field_mutable_list:frame.proto.Vector.vec)
-  return _internal_mutable_vec();
+MultipleReal::mutable_values() {
+  // @@protoc_insertion_point(field_mutable_list:frame.proto.MultipleReal.values)
+  return _internal_mutable_values();
+}
+
+// -------------------------------------------------------------------
+
+// MulitpleVector2
+
+// repeated .frame.proto.Vector2 values = 1;
+inline int MulitpleVector2::_internal_values_size() const {
+  return values_.size();
+}
+inline int MulitpleVector2::values_size() const {
+  return _internal_values_size();
+}
+inline void MulitpleVector2::clear_values() {
+  values_.Clear();
+}
+inline ::frame::proto::Vector2* MulitpleVector2::mutable_values(int index) {
+  // @@protoc_insertion_point(field_mutable:frame.proto.MulitpleVector2.values)
+  return values_.Mutable(index);
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Vector2 >*
+MulitpleVector2::mutable_values() {
+  // @@protoc_insertion_point(field_mutable_list:frame.proto.MulitpleVector2.values)
+  return &values_;
+}
+inline const ::frame::proto::Vector2& MulitpleVector2::_internal_values(int index) const {
+  return values_.Get(index);
+}
+inline const ::frame::proto::Vector2& MulitpleVector2::values(int index) const {
+  // @@protoc_insertion_point(field_get:frame.proto.MulitpleVector2.values)
+  return _internal_values(index);
+}
+inline ::frame::proto::Vector2* MulitpleVector2::_internal_add_values() {
+  return values_.Add();
+}
+inline ::frame::proto::Vector2* MulitpleVector2::add_values() {
+  // @@protoc_insertion_point(field_add:frame.proto.MulitpleVector2.values)
+  return _internal_add_values();
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Vector2 >&
+MulitpleVector2::values() const {
+  // @@protoc_insertion_point(field_list:frame.proto.MulitpleVector2.values)
+  return values_;
+}
+
+// -------------------------------------------------------------------
+
+// MultipleVector3
+
+// repeated .frame.proto.Vector3 values = 1;
+inline int MultipleVector3::_internal_values_size() const {
+  return values_.size();
+}
+inline int MultipleVector3::values_size() const {
+  return _internal_values_size();
+}
+inline void MultipleVector3::clear_values() {
+  values_.Clear();
+}
+inline ::frame::proto::Vector3* MultipleVector3::mutable_values(int index) {
+  // @@protoc_insertion_point(field_mutable:frame.proto.MultipleVector3.values)
+  return values_.Mutable(index);
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Vector3 >*
+MultipleVector3::mutable_values() {
+  // @@protoc_insertion_point(field_mutable_list:frame.proto.MultipleVector3.values)
+  return &values_;
+}
+inline const ::frame::proto::Vector3& MultipleVector3::_internal_values(int index) const {
+  return values_.Get(index);
+}
+inline const ::frame::proto::Vector3& MultipleVector3::values(int index) const {
+  // @@protoc_insertion_point(field_get:frame.proto.MultipleVector3.values)
+  return _internal_values(index);
+}
+inline ::frame::proto::Vector3* MultipleVector3::_internal_add_values() {
+  return values_.Add();
+}
+inline ::frame::proto::Vector3* MultipleVector3::add_values() {
+  // @@protoc_insertion_point(field_add:frame.proto.MultipleVector3.values)
+  return _internal_add_values();
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Vector3 >&
+MultipleVector3::values() const {
+  // @@protoc_insertion_point(field_list:frame.proto.MultipleVector3.values)
+  return values_;
+}
+
+// -------------------------------------------------------------------
+
+// MultipleVector4
+
+// repeated .frame.proto.Vector4 values = 1;
+inline int MultipleVector4::_internal_values_size() const {
+  return values_.size();
+}
+inline int MultipleVector4::values_size() const {
+  return _internal_values_size();
+}
+inline void MultipleVector4::clear_values() {
+  values_.Clear();
+}
+inline ::frame::proto::Vector4* MultipleVector4::mutable_values(int index) {
+  // @@protoc_insertion_point(field_mutable:frame.proto.MultipleVector4.values)
+  return values_.Mutable(index);
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Vector4 >*
+MultipleVector4::mutable_values() {
+  // @@protoc_insertion_point(field_mutable_list:frame.proto.MultipleVector4.values)
+  return &values_;
+}
+inline const ::frame::proto::Vector4& MultipleVector4::_internal_values(int index) const {
+  return values_.Get(index);
+}
+inline const ::frame::proto::Vector4& MultipleVector4::values(int index) const {
+  // @@protoc_insertion_point(field_get:frame.proto.MultipleVector4.values)
+  return _internal_values(index);
+}
+inline ::frame::proto::Vector4* MultipleVector4::_internal_add_values() {
+  return values_.Add();
+}
+inline ::frame::proto::Vector4* MultipleVector4::add_values() {
+  // @@protoc_insertion_point(field_add:frame.proto.MultipleVector4.values)
+  return _internal_add_values();
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Vector4 >&
+MultipleVector4::values() const {
+  // @@protoc_insertion_point(field_list:frame.proto.MultipleVector4.values)
+  return values_;
+}
+
+// -------------------------------------------------------------------
+
+// MultipleMatrix3
+
+// repeated .frame.proto.Matrix3 values = 1;
+inline int MultipleMatrix3::_internal_values_size() const {
+  return values_.size();
+}
+inline int MultipleMatrix3::values_size() const {
+  return _internal_values_size();
+}
+inline void MultipleMatrix3::clear_values() {
+  values_.Clear();
+}
+inline ::frame::proto::Matrix3* MultipleMatrix3::mutable_values(int index) {
+  // @@protoc_insertion_point(field_mutable:frame.proto.MultipleMatrix3.values)
+  return values_.Mutable(index);
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Matrix3 >*
+MultipleMatrix3::mutable_values() {
+  // @@protoc_insertion_point(field_mutable_list:frame.proto.MultipleMatrix3.values)
+  return &values_;
+}
+inline const ::frame::proto::Matrix3& MultipleMatrix3::_internal_values(int index) const {
+  return values_.Get(index);
+}
+inline const ::frame::proto::Matrix3& MultipleMatrix3::values(int index) const {
+  // @@protoc_insertion_point(field_get:frame.proto.MultipleMatrix3.values)
+  return _internal_values(index);
+}
+inline ::frame::proto::Matrix3* MultipleMatrix3::_internal_add_values() {
+  return values_.Add();
+}
+inline ::frame::proto::Matrix3* MultipleMatrix3::add_values() {
+  // @@protoc_insertion_point(field_add:frame.proto.MultipleMatrix3.values)
+  return _internal_add_values();
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Matrix3 >&
+MultipleMatrix3::values() const {
+  // @@protoc_insertion_point(field_list:frame.proto.MultipleMatrix3.values)
+  return values_;
+}
+
+// -------------------------------------------------------------------
+
+// MultipleMatrix4
+
+// repeated .frame.proto.Matrix4 values = 1;
+inline int MultipleMatrix4::_internal_values_size() const {
+  return values_.size();
+}
+inline int MultipleMatrix4::values_size() const {
+  return _internal_values_size();
+}
+inline void MultipleMatrix4::clear_values() {
+  values_.Clear();
+}
+inline ::frame::proto::Matrix4* MultipleMatrix4::mutable_values(int index) {
+  // @@protoc_insertion_point(field_mutable:frame.proto.MultipleMatrix4.values)
+  return values_.Mutable(index);
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Matrix4 >*
+MultipleMatrix4::mutable_values() {
+  // @@protoc_insertion_point(field_mutable_list:frame.proto.MultipleMatrix4.values)
+  return &values_;
+}
+inline const ::frame::proto::Matrix4& MultipleMatrix4::_internal_values(int index) const {
+  return values_.Get(index);
+}
+inline const ::frame::proto::Matrix4& MultipleMatrix4::values(int index) const {
+  // @@protoc_insertion_point(field_get:frame.proto.MultipleMatrix4.values)
+  return _internal_values(index);
+}
+inline ::frame::proto::Matrix4* MultipleMatrix4::_internal_add_values() {
+  return values_.Add();
+}
+inline ::frame::proto::Matrix4* MultipleMatrix4::add_values() {
+  // @@protoc_insertion_point(field_add:frame.proto.MultipleMatrix4.values)
+  return _internal_add_values();
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Matrix4 >&
+MultipleMatrix4::values() const {
+  // @@protoc_insertion_point(field_list:frame.proto.MultipleMatrix4.values)
+  return values_;
 }
 
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 
 // @@protoc_insertion_point(namespace_scope)
 

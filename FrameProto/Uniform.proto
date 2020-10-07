@@ -7,6 +7,17 @@ package frame.proto;
 // This is the definition of an Uniform parameter.
 // These are parameters that are passed to the shader.
 message Uniform {
+	enum UniformEnum {
+		INVALID = 0;
+		PROJECTION_MAT4 = 10;
+		PROJECTION_INV_MAT4 = 11;
+		VIEW_MAT4 = 20;
+		VIEW_INV_MAT4 = 21;
+		MODEL_MAT4 = 30;
+		MODEL_INV_MAT4 = 31;
+		CAMERA_POSITION_VEC3 = 40;
+		CAMERA_DIRECTION_VEC3 = 41;
+	}
 	// Name of the uniform (should be the same as declared in the shader!).
 	string name = 1;
 	// Value of the uniform (same as before).
@@ -14,7 +25,22 @@ message Uniform {
 		int32 integer = 2;
 		bool boolean = 3;
 		float real = 4;
-		// This is a vector of float!
-		Vector vector = 5;
+		// This value come from outside, this could be projection or camera.
+		// it will be set acording to the type of the enum.
+		UniformEnum enum = 10;
+		// Vectors and Matrices.
+		Vector2 vec2 = 20;
+		Vector3 vec3 = 21;
+		Vector4 vec4 = 22;
+		Matrix3 mat3 = 30;
+		Matrix4 mat4 = 31;
+		MultipleInteger integers = 40;
+		MutlipleBoolean bools = 41;
+		MultipleReal reals = 42;
+		MulitpleVector2 vec2s = 50;
+		MultipleVector3 vec3s = 51;
+		MultipleVector4 vec4s = 52;
+		MultipleMatrix3 mat3s = 53;
+		MultipleMatrix4 mat4s = 54;
 	}
 }

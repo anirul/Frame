@@ -14,7 +14,19 @@
 #include <google/protobuf/wire_format.h>
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
-extern PROTOBUF_INTERNAL_EXPORT_Math_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Vector_Math_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_Math_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Matrix3_Math_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_Math_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Matrix4_Math_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_Math_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_MulitpleVector2_Math_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_Math_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_MultipleInteger_Math_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_Math_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_MultipleMatrix3_Math_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_Math_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_MultipleMatrix4_Math_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_Math_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_MultipleReal_Math_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_Math_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_MultipleVector3_Math_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_Math_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_MultipleVector4_Math_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_Math_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_MutlipleBoolean_Math_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_Math_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Vector2_Math_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_Math_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Vector3_Math_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_Math_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Vector4_Math_2eproto;
 namespace frame {
 namespace proto {
 class UniformDefaultTypeInternal {
@@ -23,7 +35,20 @@ class UniformDefaultTypeInternal {
   ::PROTOBUF_NAMESPACE_ID::int32 integer_;
   bool boolean_;
   float real_;
-  const ::frame::proto::Vector* vector_;
+  int enum__;
+  const ::frame::proto::Vector2* vec2_;
+  const ::frame::proto::Vector3* vec3_;
+  const ::frame::proto::Vector4* vec4_;
+  const ::frame::proto::Matrix3* mat3_;
+  const ::frame::proto::Matrix4* mat4_;
+  const ::frame::proto::MultipleInteger* integers_;
+  const ::frame::proto::MutlipleBoolean* bools_;
+  const ::frame::proto::MultipleReal* reals_;
+  const ::frame::proto::MulitpleVector2* vec2s_;
+  const ::frame::proto::MultipleVector3* vec3s_;
+  const ::frame::proto::MultipleVector4* vec4s_;
+  const ::frame::proto::MultipleMatrix3* mat3s_;
+  const ::frame::proto::MultipleMatrix4* mat4s_;
 } _Uniform_default_instance_;
 }  // namespace proto
 }  // namespace frame
@@ -38,12 +63,24 @@ static void InitDefaultsscc_info_Uniform_Uniform_2eproto() {
   ::frame::proto::Uniform::InitAsDefaultInstance();
 }
 
-::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_Uniform_Uniform_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 1, 0, InitDefaultsscc_info_Uniform_Uniform_2eproto}, {
-      &scc_info_Vector_Math_2eproto.base,}};
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<13> scc_info_Uniform_Uniform_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 13, 0, InitDefaultsscc_info_Uniform_Uniform_2eproto}, {
+      &scc_info_Vector2_Math_2eproto.base,
+      &scc_info_Vector3_Math_2eproto.base,
+      &scc_info_Vector4_Math_2eproto.base,
+      &scc_info_Matrix3_Math_2eproto.base,
+      &scc_info_Matrix4_Math_2eproto.base,
+      &scc_info_MultipleInteger_Math_2eproto.base,
+      &scc_info_MutlipleBoolean_Math_2eproto.base,
+      &scc_info_MultipleReal_Math_2eproto.base,
+      &scc_info_MulitpleVector2_Math_2eproto.base,
+      &scc_info_MultipleVector3_Math_2eproto.base,
+      &scc_info_MultipleVector4_Math_2eproto.base,
+      &scc_info_MultipleMatrix3_Math_2eproto.base,
+      &scc_info_MultipleMatrix4_Math_2eproto.base,}};
 
 static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_Uniform_2eproto[1];
-static constexpr ::PROTOBUF_NAMESPACE_ID::EnumDescriptor const** file_level_enum_descriptors_Uniform_2eproto = nullptr;
+static const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* file_level_enum_descriptors_Uniform_2eproto[1];
 static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_Uniform_2eproto = nullptr;
 
 const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_Uniform_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
@@ -56,7 +93,20 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_Uniform_2eproto::offsets[] PRO
   offsetof(::frame::proto::UniformDefaultTypeInternal, integer_),
   offsetof(::frame::proto::UniformDefaultTypeInternal, boolean_),
   offsetof(::frame::proto::UniformDefaultTypeInternal, real_),
-  offsetof(::frame::proto::UniformDefaultTypeInternal, vector_),
+  offsetof(::frame::proto::UniformDefaultTypeInternal, enum__),
+  offsetof(::frame::proto::UniformDefaultTypeInternal, vec2_),
+  offsetof(::frame::proto::UniformDefaultTypeInternal, vec3_),
+  offsetof(::frame::proto::UniformDefaultTypeInternal, vec4_),
+  offsetof(::frame::proto::UniformDefaultTypeInternal, mat3_),
+  offsetof(::frame::proto::UniformDefaultTypeInternal, mat4_),
+  offsetof(::frame::proto::UniformDefaultTypeInternal, integers_),
+  offsetof(::frame::proto::UniformDefaultTypeInternal, bools_),
+  offsetof(::frame::proto::UniformDefaultTypeInternal, reals_),
+  offsetof(::frame::proto::UniformDefaultTypeInternal, vec2s_),
+  offsetof(::frame::proto::UniformDefaultTypeInternal, vec3s_),
+  offsetof(::frame::proto::UniformDefaultTypeInternal, vec4s_),
+  offsetof(::frame::proto::UniformDefaultTypeInternal, mat3s_),
+  offsetof(::frame::proto::UniformDefaultTypeInternal, mat4s_),
   PROTOBUF_FIELD_OFFSET(::frame::proto::Uniform, value_),
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
@@ -69,10 +119,29 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 
 const char descriptor_table_protodef_Uniform_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
   "\n\rUniform.proto\022\013frame.proto\032\nMath.proto"
-  "\"}\n\007Uniform\022\014\n\004name\030\001 \001(\t\022\021\n\007integer\030\002 \001"
-  "(\005H\000\022\021\n\007boolean\030\003 \001(\010H\000\022\016\n\004real\030\004 \001(\002H\000\022"
-  "%\n\006vector\030\005 \001(\0132\023.frame.proto.VectorH\000B\007"
-  "\n\005valueb\006proto3"
+  "\"\204\007\n\007Uniform\022\014\n\004name\030\001 \001(\t\022\021\n\007integer\030\002 "
+  "\001(\005H\000\022\021\n\007boolean\030\003 \001(\010H\000\022\016\n\004real\030\004 \001(\002H\000"
+  "\0220\n\004enum\030\n \001(\0162 .frame.proto.Uniform.Uni"
+  "formEnumH\000\022$\n\004vec2\030\024 \001(\0132\024.frame.proto.V"
+  "ector2H\000\022$\n\004vec3\030\025 \001(\0132\024.frame.proto.Vec"
+  "tor3H\000\022$\n\004vec4\030\026 \001(\0132\024.frame.proto.Vecto"
+  "r4H\000\022$\n\004mat3\030\036 \001(\0132\024.frame.proto.Matrix3"
+  "H\000\022$\n\004mat4\030\037 \001(\0132\024.frame.proto.Matrix4H\000"
+  "\0220\n\010integers\030( \001(\0132\034.frame.proto.Multipl"
+  "eIntegerH\000\022-\n\005bools\030) \001(\0132\034.frame.proto."
+  "MutlipleBooleanH\000\022*\n\005reals\030* \001(\0132\031.frame"
+  ".proto.MultipleRealH\000\022-\n\005vec2s\0302 \001(\0132\034.f"
+  "rame.proto.MulitpleVector2H\000\022-\n\005vec3s\0303 "
+  "\001(\0132\034.frame.proto.MultipleVector3H\000\022-\n\005v"
+  "ec4s\0304 \001(\0132\034.frame.proto.MultipleVector4"
+  "H\000\022-\n\005mat3s\0305 \001(\0132\034.frame.proto.Multiple"
+  "Matrix3H\000\022-\n\005mat4s\0306 \001(\0132\034.frame.proto.M"
+  "ultipleMatrix4H\000\"\303\001\n\013UniformEnum\022\013\n\007INVA"
+  "LID\020\000\022\023\n\017PROJECTION_MAT4\020\n\022\027\n\023PROJECTION"
+  "_INV_MAT4\020\013\022\r\n\tVIEW_MAT4\020\024\022\021\n\rVIEW_INV_M"
+  "AT4\020\025\022\016\n\nMODEL_MAT4\020\036\022\022\n\016MODEL_INV_MAT4\020"
+  "\037\022\030\n\024CAMERA_POSITION_VEC3\020(\022\031\n\025CAMERA_DI"
+  "RECTION_VEC3\020)B\007\n\005valueb\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_Uniform_2eproto_deps[1] = {
   &::descriptor_table_Math_2eproto,
@@ -82,7 +151,7 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_Uni
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_Uniform_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_Uniform_2eproto = {
-  false, false, descriptor_table_protodef_Uniform_2eproto, "Uniform.proto", 175,
+  false, false, descriptor_table_protodef_Uniform_2eproto, "Uniform.proto", 951,
   &descriptor_table_Uniform_2eproto_once, descriptor_table_Uniform_2eproto_sccs, descriptor_table_Uniform_2eproto_deps, 1, 1,
   schemas, file_default_instances, TableStruct_Uniform_2eproto::offsets,
   file_level_metadata_Uniform_2eproto, 1, file_level_enum_descriptors_Uniform_2eproto, file_level_service_descriptors_Uniform_2eproto,
@@ -92,6 +161,41 @@ const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_Unifor
 static bool dynamic_init_dummy_Uniform_2eproto = (static_cast<void>(::PROTOBUF_NAMESPACE_ID::internal::AddDescriptors(&descriptor_table_Uniform_2eproto)), true);
 namespace frame {
 namespace proto {
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* Uniform_UniformEnum_descriptor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_Uniform_2eproto);
+  return file_level_enum_descriptors_Uniform_2eproto[0];
+}
+bool Uniform_UniformEnum_IsValid(int value) {
+  switch (value) {
+    case 0:
+    case 10:
+    case 11:
+    case 20:
+    case 21:
+    case 30:
+    case 31:
+    case 40:
+    case 41:
+      return true;
+    default:
+      return false;
+  }
+}
+
+#if (__cplusplus < 201703) && (!defined(_MSC_VER) || _MSC_VER >= 1900)
+constexpr Uniform_UniformEnum Uniform::INVALID;
+constexpr Uniform_UniformEnum Uniform::PROJECTION_MAT4;
+constexpr Uniform_UniformEnum Uniform::PROJECTION_INV_MAT4;
+constexpr Uniform_UniformEnum Uniform::VIEW_MAT4;
+constexpr Uniform_UniformEnum Uniform::VIEW_INV_MAT4;
+constexpr Uniform_UniformEnum Uniform::MODEL_MAT4;
+constexpr Uniform_UniformEnum Uniform::MODEL_INV_MAT4;
+constexpr Uniform_UniformEnum Uniform::CAMERA_POSITION_VEC3;
+constexpr Uniform_UniformEnum Uniform::CAMERA_DIRECTION_VEC3;
+constexpr Uniform_UniformEnum Uniform::UniformEnum_MIN;
+constexpr Uniform_UniformEnum Uniform::UniformEnum_MAX;
+constexpr int Uniform::UniformEnum_ARRAYSIZE;
+#endif  // (__cplusplus < 201703) && (!defined(_MSC_VER) || _MSC_VER >= 1900)
 
 // ===================================================================
 
@@ -99,37 +203,398 @@ void Uniform::InitAsDefaultInstance() {
   ::frame::proto::_Uniform_default_instance_.integer_ = 0;
   ::frame::proto::_Uniform_default_instance_.boolean_ = false;
   ::frame::proto::_Uniform_default_instance_.real_ = 0;
-  ::frame::proto::_Uniform_default_instance_.vector_ = const_cast< ::frame::proto::Vector*>(
-      ::frame::proto::Vector::internal_default_instance());
+  ::frame::proto::_Uniform_default_instance_.enum__ = 0;
+  ::frame::proto::_Uniform_default_instance_.vec2_ = const_cast< ::frame::proto::Vector2*>(
+      ::frame::proto::Vector2::internal_default_instance());
+  ::frame::proto::_Uniform_default_instance_.vec3_ = const_cast< ::frame::proto::Vector3*>(
+      ::frame::proto::Vector3::internal_default_instance());
+  ::frame::proto::_Uniform_default_instance_.vec4_ = const_cast< ::frame::proto::Vector4*>(
+      ::frame::proto::Vector4::internal_default_instance());
+  ::frame::proto::_Uniform_default_instance_.mat3_ = const_cast< ::frame::proto::Matrix3*>(
+      ::frame::proto::Matrix3::internal_default_instance());
+  ::frame::proto::_Uniform_default_instance_.mat4_ = const_cast< ::frame::proto::Matrix4*>(
+      ::frame::proto::Matrix4::internal_default_instance());
+  ::frame::proto::_Uniform_default_instance_.integers_ = const_cast< ::frame::proto::MultipleInteger*>(
+      ::frame::proto::MultipleInteger::internal_default_instance());
+  ::frame::proto::_Uniform_default_instance_.bools_ = const_cast< ::frame::proto::MutlipleBoolean*>(
+      ::frame::proto::MutlipleBoolean::internal_default_instance());
+  ::frame::proto::_Uniform_default_instance_.reals_ = const_cast< ::frame::proto::MultipleReal*>(
+      ::frame::proto::MultipleReal::internal_default_instance());
+  ::frame::proto::_Uniform_default_instance_.vec2s_ = const_cast< ::frame::proto::MulitpleVector2*>(
+      ::frame::proto::MulitpleVector2::internal_default_instance());
+  ::frame::proto::_Uniform_default_instance_.vec3s_ = const_cast< ::frame::proto::MultipleVector3*>(
+      ::frame::proto::MultipleVector3::internal_default_instance());
+  ::frame::proto::_Uniform_default_instance_.vec4s_ = const_cast< ::frame::proto::MultipleVector4*>(
+      ::frame::proto::MultipleVector4::internal_default_instance());
+  ::frame::proto::_Uniform_default_instance_.mat3s_ = const_cast< ::frame::proto::MultipleMatrix3*>(
+      ::frame::proto::MultipleMatrix3::internal_default_instance());
+  ::frame::proto::_Uniform_default_instance_.mat4s_ = const_cast< ::frame::proto::MultipleMatrix4*>(
+      ::frame::proto::MultipleMatrix4::internal_default_instance());
 }
 class Uniform::_Internal {
  public:
-  static const ::frame::proto::Vector& vector(const Uniform* msg);
+  static const ::frame::proto::Vector2& vec2(const Uniform* msg);
+  static const ::frame::proto::Vector3& vec3(const Uniform* msg);
+  static const ::frame::proto::Vector4& vec4(const Uniform* msg);
+  static const ::frame::proto::Matrix3& mat3(const Uniform* msg);
+  static const ::frame::proto::Matrix4& mat4(const Uniform* msg);
+  static const ::frame::proto::MultipleInteger& integers(const Uniform* msg);
+  static const ::frame::proto::MutlipleBoolean& bools(const Uniform* msg);
+  static const ::frame::proto::MultipleReal& reals(const Uniform* msg);
+  static const ::frame::proto::MulitpleVector2& vec2s(const Uniform* msg);
+  static const ::frame::proto::MultipleVector3& vec3s(const Uniform* msg);
+  static const ::frame::proto::MultipleVector4& vec4s(const Uniform* msg);
+  static const ::frame::proto::MultipleMatrix3& mat3s(const Uniform* msg);
+  static const ::frame::proto::MultipleMatrix4& mat4s(const Uniform* msg);
 };
 
-const ::frame::proto::Vector&
-Uniform::_Internal::vector(const Uniform* msg) {
-  return *msg->value_.vector_;
+const ::frame::proto::Vector2&
+Uniform::_Internal::vec2(const Uniform* msg) {
+  return *msg->value_.vec2_;
 }
-void Uniform::set_allocated_vector(::frame::proto::Vector* vector) {
+const ::frame::proto::Vector3&
+Uniform::_Internal::vec3(const Uniform* msg) {
+  return *msg->value_.vec3_;
+}
+const ::frame::proto::Vector4&
+Uniform::_Internal::vec4(const Uniform* msg) {
+  return *msg->value_.vec4_;
+}
+const ::frame::proto::Matrix3&
+Uniform::_Internal::mat3(const Uniform* msg) {
+  return *msg->value_.mat3_;
+}
+const ::frame::proto::Matrix4&
+Uniform::_Internal::mat4(const Uniform* msg) {
+  return *msg->value_.mat4_;
+}
+const ::frame::proto::MultipleInteger&
+Uniform::_Internal::integers(const Uniform* msg) {
+  return *msg->value_.integers_;
+}
+const ::frame::proto::MutlipleBoolean&
+Uniform::_Internal::bools(const Uniform* msg) {
+  return *msg->value_.bools_;
+}
+const ::frame::proto::MultipleReal&
+Uniform::_Internal::reals(const Uniform* msg) {
+  return *msg->value_.reals_;
+}
+const ::frame::proto::MulitpleVector2&
+Uniform::_Internal::vec2s(const Uniform* msg) {
+  return *msg->value_.vec2s_;
+}
+const ::frame::proto::MultipleVector3&
+Uniform::_Internal::vec3s(const Uniform* msg) {
+  return *msg->value_.vec3s_;
+}
+const ::frame::proto::MultipleVector4&
+Uniform::_Internal::vec4s(const Uniform* msg) {
+  return *msg->value_.vec4s_;
+}
+const ::frame::proto::MultipleMatrix3&
+Uniform::_Internal::mat3s(const Uniform* msg) {
+  return *msg->value_.mat3s_;
+}
+const ::frame::proto::MultipleMatrix4&
+Uniform::_Internal::mat4s(const Uniform* msg) {
+  return *msg->value_.mat4s_;
+}
+void Uniform::set_allocated_vec2(::frame::proto::Vector2* vec2) {
   ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
   clear_value();
-  if (vector) {
+  if (vec2) {
     ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
-      reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(vector)->GetArena();
+      reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(vec2)->GetArena();
     if (message_arena != submessage_arena) {
-      vector = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
-          message_arena, vector, submessage_arena);
+      vec2 = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, vec2, submessage_arena);
     }
-    set_has_vector();
-    value_.vector_ = vector;
+    set_has_vec2();
+    value_.vec2_ = vec2;
   }
-  // @@protoc_insertion_point(field_set_allocated:frame.proto.Uniform.vector)
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.Uniform.vec2)
 }
-void Uniform::clear_vector() {
-  if (_internal_has_vector()) {
+void Uniform::clear_vec2() {
+  if (_internal_has_vec2()) {
     if (GetArena() == nullptr) {
-      delete value_.vector_;
+      delete value_.vec2_;
+    }
+    clear_has_value();
+  }
+}
+void Uniform::set_allocated_vec3(::frame::proto::Vector3* vec3) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  clear_value();
+  if (vec3) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(vec3)->GetArena();
+    if (message_arena != submessage_arena) {
+      vec3 = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, vec3, submessage_arena);
+    }
+    set_has_vec3();
+    value_.vec3_ = vec3;
+  }
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.Uniform.vec3)
+}
+void Uniform::clear_vec3() {
+  if (_internal_has_vec3()) {
+    if (GetArena() == nullptr) {
+      delete value_.vec3_;
+    }
+    clear_has_value();
+  }
+}
+void Uniform::set_allocated_vec4(::frame::proto::Vector4* vec4) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  clear_value();
+  if (vec4) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(vec4)->GetArena();
+    if (message_arena != submessage_arena) {
+      vec4 = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, vec4, submessage_arena);
+    }
+    set_has_vec4();
+    value_.vec4_ = vec4;
+  }
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.Uniform.vec4)
+}
+void Uniform::clear_vec4() {
+  if (_internal_has_vec4()) {
+    if (GetArena() == nullptr) {
+      delete value_.vec4_;
+    }
+    clear_has_value();
+  }
+}
+void Uniform::set_allocated_mat3(::frame::proto::Matrix3* mat3) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  clear_value();
+  if (mat3) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(mat3)->GetArena();
+    if (message_arena != submessage_arena) {
+      mat3 = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, mat3, submessage_arena);
+    }
+    set_has_mat3();
+    value_.mat3_ = mat3;
+  }
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.Uniform.mat3)
+}
+void Uniform::clear_mat3() {
+  if (_internal_has_mat3()) {
+    if (GetArena() == nullptr) {
+      delete value_.mat3_;
+    }
+    clear_has_value();
+  }
+}
+void Uniform::set_allocated_mat4(::frame::proto::Matrix4* mat4) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  clear_value();
+  if (mat4) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(mat4)->GetArena();
+    if (message_arena != submessage_arena) {
+      mat4 = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, mat4, submessage_arena);
+    }
+    set_has_mat4();
+    value_.mat4_ = mat4;
+  }
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.Uniform.mat4)
+}
+void Uniform::clear_mat4() {
+  if (_internal_has_mat4()) {
+    if (GetArena() == nullptr) {
+      delete value_.mat4_;
+    }
+    clear_has_value();
+  }
+}
+void Uniform::set_allocated_integers(::frame::proto::MultipleInteger* integers) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  clear_value();
+  if (integers) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(integers)->GetArena();
+    if (message_arena != submessage_arena) {
+      integers = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, integers, submessage_arena);
+    }
+    set_has_integers();
+    value_.integers_ = integers;
+  }
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.Uniform.integers)
+}
+void Uniform::clear_integers() {
+  if (_internal_has_integers()) {
+    if (GetArena() == nullptr) {
+      delete value_.integers_;
+    }
+    clear_has_value();
+  }
+}
+void Uniform::set_allocated_bools(::frame::proto::MutlipleBoolean* bools) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  clear_value();
+  if (bools) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(bools)->GetArena();
+    if (message_arena != submessage_arena) {
+      bools = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, bools, submessage_arena);
+    }
+    set_has_bools();
+    value_.bools_ = bools;
+  }
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.Uniform.bools)
+}
+void Uniform::clear_bools() {
+  if (_internal_has_bools()) {
+    if (GetArena() == nullptr) {
+      delete value_.bools_;
+    }
+    clear_has_value();
+  }
+}
+void Uniform::set_allocated_reals(::frame::proto::MultipleReal* reals) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  clear_value();
+  if (reals) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(reals)->GetArena();
+    if (message_arena != submessage_arena) {
+      reals = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, reals, submessage_arena);
+    }
+    set_has_reals();
+    value_.reals_ = reals;
+  }
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.Uniform.reals)
+}
+void Uniform::clear_reals() {
+  if (_internal_has_reals()) {
+    if (GetArena() == nullptr) {
+      delete value_.reals_;
+    }
+    clear_has_value();
+  }
+}
+void Uniform::set_allocated_vec2s(::frame::proto::MulitpleVector2* vec2s) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  clear_value();
+  if (vec2s) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(vec2s)->GetArena();
+    if (message_arena != submessage_arena) {
+      vec2s = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, vec2s, submessage_arena);
+    }
+    set_has_vec2s();
+    value_.vec2s_ = vec2s;
+  }
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.Uniform.vec2s)
+}
+void Uniform::clear_vec2s() {
+  if (_internal_has_vec2s()) {
+    if (GetArena() == nullptr) {
+      delete value_.vec2s_;
+    }
+    clear_has_value();
+  }
+}
+void Uniform::set_allocated_vec3s(::frame::proto::MultipleVector3* vec3s) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  clear_value();
+  if (vec3s) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(vec3s)->GetArena();
+    if (message_arena != submessage_arena) {
+      vec3s = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, vec3s, submessage_arena);
+    }
+    set_has_vec3s();
+    value_.vec3s_ = vec3s;
+  }
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.Uniform.vec3s)
+}
+void Uniform::clear_vec3s() {
+  if (_internal_has_vec3s()) {
+    if (GetArena() == nullptr) {
+      delete value_.vec3s_;
+    }
+    clear_has_value();
+  }
+}
+void Uniform::set_allocated_vec4s(::frame::proto::MultipleVector4* vec4s) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  clear_value();
+  if (vec4s) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(vec4s)->GetArena();
+    if (message_arena != submessage_arena) {
+      vec4s = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, vec4s, submessage_arena);
+    }
+    set_has_vec4s();
+    value_.vec4s_ = vec4s;
+  }
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.Uniform.vec4s)
+}
+void Uniform::clear_vec4s() {
+  if (_internal_has_vec4s()) {
+    if (GetArena() == nullptr) {
+      delete value_.vec4s_;
+    }
+    clear_has_value();
+  }
+}
+void Uniform::set_allocated_mat3s(::frame::proto::MultipleMatrix3* mat3s) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  clear_value();
+  if (mat3s) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(mat3s)->GetArena();
+    if (message_arena != submessage_arena) {
+      mat3s = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, mat3s, submessage_arena);
+    }
+    set_has_mat3s();
+    value_.mat3s_ = mat3s;
+  }
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.Uniform.mat3s)
+}
+void Uniform::clear_mat3s() {
+  if (_internal_has_mat3s()) {
+    if (GetArena() == nullptr) {
+      delete value_.mat3s_;
+    }
+    clear_has_value();
+  }
+}
+void Uniform::set_allocated_mat4s(::frame::proto::MultipleMatrix4* mat4s) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  clear_value();
+  if (mat4s) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(mat4s)->GetArena();
+    if (message_arena != submessage_arena) {
+      mat4s = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, mat4s, submessage_arena);
+    }
+    set_has_mat4s();
+    value_.mat4s_ = mat4s;
+  }
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.Uniform.mat4s)
+}
+void Uniform::clear_mat4s() {
+  if (_internal_has_mat4s()) {
+    if (GetArena() == nullptr) {
+      delete value_.mat4s_;
     }
     clear_has_value();
   }
@@ -162,8 +627,60 @@ Uniform::Uniform(const Uniform& from)
       _internal_set_real(from._internal_real());
       break;
     }
-    case kVector: {
-      _internal_mutable_vector()->::frame::proto::Vector::MergeFrom(from._internal_vector());
+    case kEnum: {
+      _internal_set_enum_(from._internal_enum_());
+      break;
+    }
+    case kVec2: {
+      _internal_mutable_vec2()->::frame::proto::Vector2::MergeFrom(from._internal_vec2());
+      break;
+    }
+    case kVec3: {
+      _internal_mutable_vec3()->::frame::proto::Vector3::MergeFrom(from._internal_vec3());
+      break;
+    }
+    case kVec4: {
+      _internal_mutable_vec4()->::frame::proto::Vector4::MergeFrom(from._internal_vec4());
+      break;
+    }
+    case kMat3: {
+      _internal_mutable_mat3()->::frame::proto::Matrix3::MergeFrom(from._internal_mat3());
+      break;
+    }
+    case kMat4: {
+      _internal_mutable_mat4()->::frame::proto::Matrix4::MergeFrom(from._internal_mat4());
+      break;
+    }
+    case kIntegers: {
+      _internal_mutable_integers()->::frame::proto::MultipleInteger::MergeFrom(from._internal_integers());
+      break;
+    }
+    case kBools: {
+      _internal_mutable_bools()->::frame::proto::MutlipleBoolean::MergeFrom(from._internal_bools());
+      break;
+    }
+    case kReals: {
+      _internal_mutable_reals()->::frame::proto::MultipleReal::MergeFrom(from._internal_reals());
+      break;
+    }
+    case kVec2S: {
+      _internal_mutable_vec2s()->::frame::proto::MulitpleVector2::MergeFrom(from._internal_vec2s());
+      break;
+    }
+    case kVec3S: {
+      _internal_mutable_vec3s()->::frame::proto::MultipleVector3::MergeFrom(from._internal_vec3s());
+      break;
+    }
+    case kVec4S: {
+      _internal_mutable_vec4s()->::frame::proto::MultipleVector4::MergeFrom(from._internal_vec4s());
+      break;
+    }
+    case kMat3S: {
+      _internal_mutable_mat3s()->::frame::proto::MultipleMatrix3::MergeFrom(from._internal_mat3s());
+      break;
+    }
+    case kMat4S: {
+      _internal_mutable_mat4s()->::frame::proto::MultipleMatrix4::MergeFrom(from._internal_mat4s());
       break;
     }
     case VALUE_NOT_SET: {
@@ -223,9 +740,85 @@ void Uniform::clear_value() {
       // No need to clear
       break;
     }
-    case kVector: {
+    case kEnum: {
+      // No need to clear
+      break;
+    }
+    case kVec2: {
       if (GetArena() == nullptr) {
-        delete value_.vector_;
+        delete value_.vec2_;
+      }
+      break;
+    }
+    case kVec3: {
+      if (GetArena() == nullptr) {
+        delete value_.vec3_;
+      }
+      break;
+    }
+    case kVec4: {
+      if (GetArena() == nullptr) {
+        delete value_.vec4_;
+      }
+      break;
+    }
+    case kMat3: {
+      if (GetArena() == nullptr) {
+        delete value_.mat3_;
+      }
+      break;
+    }
+    case kMat4: {
+      if (GetArena() == nullptr) {
+        delete value_.mat4_;
+      }
+      break;
+    }
+    case kIntegers: {
+      if (GetArena() == nullptr) {
+        delete value_.integers_;
+      }
+      break;
+    }
+    case kBools: {
+      if (GetArena() == nullptr) {
+        delete value_.bools_;
+      }
+      break;
+    }
+    case kReals: {
+      if (GetArena() == nullptr) {
+        delete value_.reals_;
+      }
+      break;
+    }
+    case kVec2S: {
+      if (GetArena() == nullptr) {
+        delete value_.vec2s_;
+      }
+      break;
+    }
+    case kVec3S: {
+      if (GetArena() == nullptr) {
+        delete value_.vec3s_;
+      }
+      break;
+    }
+    case kVec4S: {
+      if (GetArena() == nullptr) {
+        delete value_.vec4s_;
+      }
+      break;
+    }
+    case kMat3S: {
+      if (GetArena() == nullptr) {
+        delete value_.mat3s_;
+      }
+      break;
+    }
+    case kMat4S: {
+      if (GetArena() == nullptr) {
+        delete value_.mat4s_;
       }
       break;
     }
@@ -286,10 +879,102 @@ const char* Uniform::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::in
           ptr += sizeof(float);
         } else goto handle_unusual;
         continue;
-      // .frame.proto.Vector vector = 5;
-      case 5:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 42)) {
-          ptr = ctx->ParseMessage(_internal_mutable_vector(), ptr);
+      // .frame.proto.Uniform.UniformEnum enum = 10;
+      case 10:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 80)) {
+          ::PROTOBUF_NAMESPACE_ID::uint64 val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+          _internal_set_enum_(static_cast<::frame::proto::Uniform_UniformEnum>(val));
+        } else goto handle_unusual;
+        continue;
+      // .frame.proto.Vector2 vec2 = 20;
+      case 20:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 162)) {
+          ptr = ctx->ParseMessage(_internal_mutable_vec2(), ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // .frame.proto.Vector3 vec3 = 21;
+      case 21:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 170)) {
+          ptr = ctx->ParseMessage(_internal_mutable_vec3(), ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // .frame.proto.Vector4 vec4 = 22;
+      case 22:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 178)) {
+          ptr = ctx->ParseMessage(_internal_mutable_vec4(), ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // .frame.proto.Matrix3 mat3 = 30;
+      case 30:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 242)) {
+          ptr = ctx->ParseMessage(_internal_mutable_mat3(), ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // .frame.proto.Matrix4 mat4 = 31;
+      case 31:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 250)) {
+          ptr = ctx->ParseMessage(_internal_mutable_mat4(), ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // .frame.proto.MultipleInteger integers = 40;
+      case 40:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 66)) {
+          ptr = ctx->ParseMessage(_internal_mutable_integers(), ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // .frame.proto.MutlipleBoolean bools = 41;
+      case 41:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 74)) {
+          ptr = ctx->ParseMessage(_internal_mutable_bools(), ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // .frame.proto.MultipleReal reals = 42;
+      case 42:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 82)) {
+          ptr = ctx->ParseMessage(_internal_mutable_reals(), ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // .frame.proto.MulitpleVector2 vec2s = 50;
+      case 50:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 146)) {
+          ptr = ctx->ParseMessage(_internal_mutable_vec2s(), ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // .frame.proto.MultipleVector3 vec3s = 51;
+      case 51:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 154)) {
+          ptr = ctx->ParseMessage(_internal_mutable_vec3s(), ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // .frame.proto.MultipleVector4 vec4s = 52;
+      case 52:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 162)) {
+          ptr = ctx->ParseMessage(_internal_mutable_vec4s(), ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // .frame.proto.MultipleMatrix3 mat3s = 53;
+      case 53:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 170)) {
+          ptr = ctx->ParseMessage(_internal_mutable_mat3s(), ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // .frame.proto.MultipleMatrix4 mat4s = 54;
+      case 54:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 178)) {
+          ptr = ctx->ParseMessage(_internal_mutable_mat4s(), ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -349,12 +1034,115 @@ failure:
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(4, this->_internal_real(), target);
   }
 
-  // .frame.proto.Vector vector = 5;
-  if (_internal_has_vector()) {
+  // .frame.proto.Uniform.UniformEnum enum = 10;
+  if (_internal_has_enum_()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteEnumToArray(
+      10, this->_internal_enum_(), target);
+  }
+
+  // .frame.proto.Vector2 vec2 = 20;
+  if (_internal_has_vec2()) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
       InternalWriteMessage(
-        5, _Internal::vector(this), target, stream);
+        20, _Internal::vec2(this), target, stream);
+  }
+
+  // .frame.proto.Vector3 vec3 = 21;
+  if (_internal_has_vec3()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        21, _Internal::vec3(this), target, stream);
+  }
+
+  // .frame.proto.Vector4 vec4 = 22;
+  if (_internal_has_vec4()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        22, _Internal::vec4(this), target, stream);
+  }
+
+  // .frame.proto.Matrix3 mat3 = 30;
+  if (_internal_has_mat3()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        30, _Internal::mat3(this), target, stream);
+  }
+
+  // .frame.proto.Matrix4 mat4 = 31;
+  if (_internal_has_mat4()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        31, _Internal::mat4(this), target, stream);
+  }
+
+  // .frame.proto.MultipleInteger integers = 40;
+  if (_internal_has_integers()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        40, _Internal::integers(this), target, stream);
+  }
+
+  // .frame.proto.MutlipleBoolean bools = 41;
+  if (_internal_has_bools()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        41, _Internal::bools(this), target, stream);
+  }
+
+  // .frame.proto.MultipleReal reals = 42;
+  if (_internal_has_reals()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        42, _Internal::reals(this), target, stream);
+  }
+
+  // .frame.proto.MulitpleVector2 vec2s = 50;
+  if (_internal_has_vec2s()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        50, _Internal::vec2s(this), target, stream);
+  }
+
+  // .frame.proto.MultipleVector3 vec3s = 51;
+  if (_internal_has_vec3s()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        51, _Internal::vec3s(this), target, stream);
+  }
+
+  // .frame.proto.MultipleVector4 vec4s = 52;
+  if (_internal_has_vec4s()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        52, _Internal::vec4s(this), target, stream);
+  }
+
+  // .frame.proto.MultipleMatrix3 mat3s = 53;
+  if (_internal_has_mat3s()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        53, _Internal::mat3s(this), target, stream);
+  }
+
+  // .frame.proto.MultipleMatrix4 mat4s = 54;
+  if (_internal_has_mat4s()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        54, _Internal::mat4s(this), target, stream);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -398,11 +1186,101 @@ size_t Uniform::ByteSizeLong() const {
       total_size += 1 + 4;
       break;
     }
-    // .frame.proto.Vector vector = 5;
-    case kVector: {
+    // .frame.proto.Uniform.UniformEnum enum = 10;
+    case kEnum: {
       total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::EnumSize(this->_internal_enum_());
+      break;
+    }
+    // .frame.proto.Vector2 vec2 = 20;
+    case kVec2: {
+      total_size += 2 +
         ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
-          *value_.vector_);
+          *value_.vec2_);
+      break;
+    }
+    // .frame.proto.Vector3 vec3 = 21;
+    case kVec3: {
+      total_size += 2 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+          *value_.vec3_);
+      break;
+    }
+    // .frame.proto.Vector4 vec4 = 22;
+    case kVec4: {
+      total_size += 2 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+          *value_.vec4_);
+      break;
+    }
+    // .frame.proto.Matrix3 mat3 = 30;
+    case kMat3: {
+      total_size += 2 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+          *value_.mat3_);
+      break;
+    }
+    // .frame.proto.Matrix4 mat4 = 31;
+    case kMat4: {
+      total_size += 2 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+          *value_.mat4_);
+      break;
+    }
+    // .frame.proto.MultipleInteger integers = 40;
+    case kIntegers: {
+      total_size += 2 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+          *value_.integers_);
+      break;
+    }
+    // .frame.proto.MutlipleBoolean bools = 41;
+    case kBools: {
+      total_size += 2 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+          *value_.bools_);
+      break;
+    }
+    // .frame.proto.MultipleReal reals = 42;
+    case kReals: {
+      total_size += 2 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+          *value_.reals_);
+      break;
+    }
+    // .frame.proto.MulitpleVector2 vec2s = 50;
+    case kVec2S: {
+      total_size += 2 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+          *value_.vec2s_);
+      break;
+    }
+    // .frame.proto.MultipleVector3 vec3s = 51;
+    case kVec3S: {
+      total_size += 2 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+          *value_.vec3s_);
+      break;
+    }
+    // .frame.proto.MultipleVector4 vec4s = 52;
+    case kVec4S: {
+      total_size += 2 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+          *value_.vec4s_);
+      break;
+    }
+    // .frame.proto.MultipleMatrix3 mat3s = 53;
+    case kMat3S: {
+      total_size += 2 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+          *value_.mat3s_);
+      break;
+    }
+    // .frame.proto.MultipleMatrix4 mat4s = 54;
+    case kMat4S: {
+      total_size += 2 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+          *value_.mat4s_);
       break;
     }
     case VALUE_NOT_SET: {
@@ -456,8 +1334,60 @@ void Uniform::MergeFrom(const Uniform& from) {
       _internal_set_real(from._internal_real());
       break;
     }
-    case kVector: {
-      _internal_mutable_vector()->::frame::proto::Vector::MergeFrom(from._internal_vector());
+    case kEnum: {
+      _internal_set_enum_(from._internal_enum_());
+      break;
+    }
+    case kVec2: {
+      _internal_mutable_vec2()->::frame::proto::Vector2::MergeFrom(from._internal_vec2());
+      break;
+    }
+    case kVec3: {
+      _internal_mutable_vec3()->::frame::proto::Vector3::MergeFrom(from._internal_vec3());
+      break;
+    }
+    case kVec4: {
+      _internal_mutable_vec4()->::frame::proto::Vector4::MergeFrom(from._internal_vec4());
+      break;
+    }
+    case kMat3: {
+      _internal_mutable_mat3()->::frame::proto::Matrix3::MergeFrom(from._internal_mat3());
+      break;
+    }
+    case kMat4: {
+      _internal_mutable_mat4()->::frame::proto::Matrix4::MergeFrom(from._internal_mat4());
+      break;
+    }
+    case kIntegers: {
+      _internal_mutable_integers()->::frame::proto::MultipleInteger::MergeFrom(from._internal_integers());
+      break;
+    }
+    case kBools: {
+      _internal_mutable_bools()->::frame::proto::MutlipleBoolean::MergeFrom(from._internal_bools());
+      break;
+    }
+    case kReals: {
+      _internal_mutable_reals()->::frame::proto::MultipleReal::MergeFrom(from._internal_reals());
+      break;
+    }
+    case kVec2S: {
+      _internal_mutable_vec2s()->::frame::proto::MulitpleVector2::MergeFrom(from._internal_vec2s());
+      break;
+    }
+    case kVec3S: {
+      _internal_mutable_vec3s()->::frame::proto::MultipleVector3::MergeFrom(from._internal_vec3s());
+      break;
+    }
+    case kVec4S: {
+      _internal_mutable_vec4s()->::frame::proto::MultipleVector4::MergeFrom(from._internal_vec4s());
+      break;
+    }
+    case kMat3S: {
+      _internal_mutable_mat3s()->::frame::proto::MultipleMatrix3::MergeFrom(from._internal_mat3s());
+      break;
+    }
+    case kMat4S: {
+      _internal_mutable_mat4s()->::frame::proto::MultipleMatrix4::MergeFrom(from._internal_mat4s());
       break;
     }
     case VALUE_NOT_SET: {

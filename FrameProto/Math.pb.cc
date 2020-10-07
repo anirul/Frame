@@ -14,63 +14,447 @@
 #include <google/protobuf/wire_format.h>
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
+extern PROTOBUF_INTERNAL_EXPORT_Math_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Matrix3_Math_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_Math_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Matrix4_Math_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_Math_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Vector2_Math_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_Math_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Vector3_Math_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_Math_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Vector4_Math_2eproto;
 namespace frame {
 namespace proto {
-class VectorDefaultTypeInternal {
+class Vector2DefaultTypeInternal {
  public:
-  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<Vector> _instance;
-} _Vector_default_instance_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<Vector2> _instance;
+} _Vector2_default_instance_;
+class Vector3DefaultTypeInternal {
+ public:
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<Vector3> _instance;
+} _Vector3_default_instance_;
+class Vector4DefaultTypeInternal {
+ public:
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<Vector4> _instance;
+} _Vector4_default_instance_;
+class Matrix3DefaultTypeInternal {
+ public:
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<Matrix3> _instance;
+} _Matrix3_default_instance_;
+class Matrix4DefaultTypeInternal {
+ public:
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<Matrix4> _instance;
+} _Matrix4_default_instance_;
+class MultipleIntegerDefaultTypeInternal {
+ public:
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<MultipleInteger> _instance;
+} _MultipleInteger_default_instance_;
+class MutlipleBooleanDefaultTypeInternal {
+ public:
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<MutlipleBoolean> _instance;
+} _MutlipleBoolean_default_instance_;
+class MultipleRealDefaultTypeInternal {
+ public:
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<MultipleReal> _instance;
+} _MultipleReal_default_instance_;
+class MulitpleVector2DefaultTypeInternal {
+ public:
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<MulitpleVector2> _instance;
+} _MulitpleVector2_default_instance_;
+class MultipleVector3DefaultTypeInternal {
+ public:
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<MultipleVector3> _instance;
+} _MultipleVector3_default_instance_;
+class MultipleVector4DefaultTypeInternal {
+ public:
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<MultipleVector4> _instance;
+} _MultipleVector4_default_instance_;
+class MultipleMatrix3DefaultTypeInternal {
+ public:
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<MultipleMatrix3> _instance;
+} _MultipleMatrix3_default_instance_;
+class MultipleMatrix4DefaultTypeInternal {
+ public:
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<MultipleMatrix4> _instance;
+} _MultipleMatrix4_default_instance_;
 }  // namespace proto
 }  // namespace frame
-static void InitDefaultsscc_info_Vector_Math_2eproto() {
+static void InitDefaultsscc_info_Matrix3_Math_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   {
-    void* ptr = &::frame::proto::_Vector_default_instance_;
-    new (ptr) ::frame::proto::Vector();
+    void* ptr = &::frame::proto::_Matrix3_default_instance_;
+    new (ptr) ::frame::proto::Matrix3();
     ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
   }
-  ::frame::proto::Vector::InitAsDefaultInstance();
+  ::frame::proto::Matrix3::InitAsDefaultInstance();
 }
 
-::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Vector_Math_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_Vector_Math_2eproto}, {}};
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Matrix3_Math_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_Matrix3_Math_2eproto}, {}};
 
-static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_Math_2eproto[1];
+static void InitDefaultsscc_info_Matrix4_Math_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::frame::proto::_Matrix4_default_instance_;
+    new (ptr) ::frame::proto::Matrix4();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::frame::proto::Matrix4::InitAsDefaultInstance();
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Matrix4_Math_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_Matrix4_Math_2eproto}, {}};
+
+static void InitDefaultsscc_info_MulitpleVector2_Math_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::frame::proto::_MulitpleVector2_default_instance_;
+    new (ptr) ::frame::proto::MulitpleVector2();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::frame::proto::MulitpleVector2::InitAsDefaultInstance();
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_MulitpleVector2_Math_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 1, 0, InitDefaultsscc_info_MulitpleVector2_Math_2eproto}, {
+      &scc_info_Vector2_Math_2eproto.base,}};
+
+static void InitDefaultsscc_info_MultipleInteger_Math_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::frame::proto::_MultipleInteger_default_instance_;
+    new (ptr) ::frame::proto::MultipleInteger();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::frame::proto::MultipleInteger::InitAsDefaultInstance();
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_MultipleInteger_Math_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_MultipleInteger_Math_2eproto}, {}};
+
+static void InitDefaultsscc_info_MultipleMatrix3_Math_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::frame::proto::_MultipleMatrix3_default_instance_;
+    new (ptr) ::frame::proto::MultipleMatrix3();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::frame::proto::MultipleMatrix3::InitAsDefaultInstance();
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_MultipleMatrix3_Math_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 1, 0, InitDefaultsscc_info_MultipleMatrix3_Math_2eproto}, {
+      &scc_info_Matrix3_Math_2eproto.base,}};
+
+static void InitDefaultsscc_info_MultipleMatrix4_Math_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::frame::proto::_MultipleMatrix4_default_instance_;
+    new (ptr) ::frame::proto::MultipleMatrix4();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::frame::proto::MultipleMatrix4::InitAsDefaultInstance();
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_MultipleMatrix4_Math_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 1, 0, InitDefaultsscc_info_MultipleMatrix4_Math_2eproto}, {
+      &scc_info_Matrix4_Math_2eproto.base,}};
+
+static void InitDefaultsscc_info_MultipleReal_Math_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::frame::proto::_MultipleReal_default_instance_;
+    new (ptr) ::frame::proto::MultipleReal();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::frame::proto::MultipleReal::InitAsDefaultInstance();
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_MultipleReal_Math_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_MultipleReal_Math_2eproto}, {}};
+
+static void InitDefaultsscc_info_MultipleVector3_Math_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::frame::proto::_MultipleVector3_default_instance_;
+    new (ptr) ::frame::proto::MultipleVector3();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::frame::proto::MultipleVector3::InitAsDefaultInstance();
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_MultipleVector3_Math_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 1, 0, InitDefaultsscc_info_MultipleVector3_Math_2eproto}, {
+      &scc_info_Vector3_Math_2eproto.base,}};
+
+static void InitDefaultsscc_info_MultipleVector4_Math_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::frame::proto::_MultipleVector4_default_instance_;
+    new (ptr) ::frame::proto::MultipleVector4();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::frame::proto::MultipleVector4::InitAsDefaultInstance();
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_MultipleVector4_Math_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 1, 0, InitDefaultsscc_info_MultipleVector4_Math_2eproto}, {
+      &scc_info_Vector4_Math_2eproto.base,}};
+
+static void InitDefaultsscc_info_MutlipleBoolean_Math_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::frame::proto::_MutlipleBoolean_default_instance_;
+    new (ptr) ::frame::proto::MutlipleBoolean();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::frame::proto::MutlipleBoolean::InitAsDefaultInstance();
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_MutlipleBoolean_Math_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_MutlipleBoolean_Math_2eproto}, {}};
+
+static void InitDefaultsscc_info_Vector2_Math_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::frame::proto::_Vector2_default_instance_;
+    new (ptr) ::frame::proto::Vector2();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::frame::proto::Vector2::InitAsDefaultInstance();
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Vector2_Math_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_Vector2_Math_2eproto}, {}};
+
+static void InitDefaultsscc_info_Vector3_Math_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::frame::proto::_Vector3_default_instance_;
+    new (ptr) ::frame::proto::Vector3();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::frame::proto::Vector3::InitAsDefaultInstance();
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Vector3_Math_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_Vector3_Math_2eproto}, {}};
+
+static void InitDefaultsscc_info_Vector4_Math_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::frame::proto::_Vector4_default_instance_;
+    new (ptr) ::frame::proto::Vector4();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::frame::proto::Vector4::InitAsDefaultInstance();
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Vector4_Math_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_Vector4_Math_2eproto}, {}};
+
+static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_Math_2eproto[13];
 static constexpr ::PROTOBUF_NAMESPACE_ID::EnumDescriptor const** file_level_enum_descriptors_Math_2eproto = nullptr;
 static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_Math_2eproto = nullptr;
 
 const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_Math_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::frame::proto::Vector, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::frame::proto::Vector2, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::frame::proto::Vector, vec_),
+  PROTOBUF_FIELD_OFFSET(::frame::proto::Vector2, x_),
+  PROTOBUF_FIELD_OFFSET(::frame::proto::Vector2, y_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::frame::proto::Vector3, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::frame::proto::Vector3, x_),
+  PROTOBUF_FIELD_OFFSET(::frame::proto::Vector3, y_),
+  PROTOBUF_FIELD_OFFSET(::frame::proto::Vector3, z_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::frame::proto::Vector4, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::frame::proto::Vector4, x_),
+  PROTOBUF_FIELD_OFFSET(::frame::proto::Vector4, y_),
+  PROTOBUF_FIELD_OFFSET(::frame::proto::Vector4, z_),
+  PROTOBUF_FIELD_OFFSET(::frame::proto::Vector4, w_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::frame::proto::Matrix3, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::frame::proto::Matrix3, m11_),
+  PROTOBUF_FIELD_OFFSET(::frame::proto::Matrix3, m12_),
+  PROTOBUF_FIELD_OFFSET(::frame::proto::Matrix3, m13_),
+  PROTOBUF_FIELD_OFFSET(::frame::proto::Matrix3, m21_),
+  PROTOBUF_FIELD_OFFSET(::frame::proto::Matrix3, m22_),
+  PROTOBUF_FIELD_OFFSET(::frame::proto::Matrix3, m23_),
+  PROTOBUF_FIELD_OFFSET(::frame::proto::Matrix3, m31_),
+  PROTOBUF_FIELD_OFFSET(::frame::proto::Matrix3, m32_),
+  PROTOBUF_FIELD_OFFSET(::frame::proto::Matrix3, m33_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::frame::proto::Matrix4, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::frame::proto::Matrix4, m11_),
+  PROTOBUF_FIELD_OFFSET(::frame::proto::Matrix4, m12_),
+  PROTOBUF_FIELD_OFFSET(::frame::proto::Matrix4, m13_),
+  PROTOBUF_FIELD_OFFSET(::frame::proto::Matrix4, m14_),
+  PROTOBUF_FIELD_OFFSET(::frame::proto::Matrix4, m21_),
+  PROTOBUF_FIELD_OFFSET(::frame::proto::Matrix4, m22_),
+  PROTOBUF_FIELD_OFFSET(::frame::proto::Matrix4, m23_),
+  PROTOBUF_FIELD_OFFSET(::frame::proto::Matrix4, m24_),
+  PROTOBUF_FIELD_OFFSET(::frame::proto::Matrix4, m31_),
+  PROTOBUF_FIELD_OFFSET(::frame::proto::Matrix4, m32_),
+  PROTOBUF_FIELD_OFFSET(::frame::proto::Matrix4, m33_),
+  PROTOBUF_FIELD_OFFSET(::frame::proto::Matrix4, m34_),
+  PROTOBUF_FIELD_OFFSET(::frame::proto::Matrix4, m41_),
+  PROTOBUF_FIELD_OFFSET(::frame::proto::Matrix4, m42_),
+  PROTOBUF_FIELD_OFFSET(::frame::proto::Matrix4, m43_),
+  PROTOBUF_FIELD_OFFSET(::frame::proto::Matrix4, m44_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::frame::proto::MultipleInteger, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::frame::proto::MultipleInteger, values_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::frame::proto::MutlipleBoolean, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::frame::proto::MutlipleBoolean, values_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::frame::proto::MultipleReal, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::frame::proto::MultipleReal, values_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::frame::proto::MulitpleVector2, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::frame::proto::MulitpleVector2, values_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::frame::proto::MultipleVector3, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::frame::proto::MultipleVector3, values_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::frame::proto::MultipleVector4, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::frame::proto::MultipleVector4, values_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::frame::proto::MultipleMatrix3, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::frame::proto::MultipleMatrix3, values_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::frame::proto::MultipleMatrix4, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::frame::proto::MultipleMatrix4, values_),
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, -1, sizeof(::frame::proto::Vector)},
+  { 0, -1, sizeof(::frame::proto::Vector2)},
+  { 7, -1, sizeof(::frame::proto::Vector3)},
+  { 15, -1, sizeof(::frame::proto::Vector4)},
+  { 24, -1, sizeof(::frame::proto::Matrix3)},
+  { 38, -1, sizeof(::frame::proto::Matrix4)},
+  { 59, -1, sizeof(::frame::proto::MultipleInteger)},
+  { 65, -1, sizeof(::frame::proto::MutlipleBoolean)},
+  { 71, -1, sizeof(::frame::proto::MultipleReal)},
+  { 77, -1, sizeof(::frame::proto::MulitpleVector2)},
+  { 83, -1, sizeof(::frame::proto::MultipleVector3)},
+  { 89, -1, sizeof(::frame::proto::MultipleVector4)},
+  { 95, -1, sizeof(::frame::proto::MultipleMatrix3)},
+  { 101, -1, sizeof(::frame::proto::MultipleMatrix4)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
-  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::frame::proto::_Vector_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::frame::proto::_Vector2_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::frame::proto::_Vector3_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::frame::proto::_Vector4_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::frame::proto::_Matrix3_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::frame::proto::_Matrix4_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::frame::proto::_MultipleInteger_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::frame::proto::_MutlipleBoolean_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::frame::proto::_MultipleReal_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::frame::proto::_MulitpleVector2_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::frame::proto::_MultipleVector3_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::frame::proto::_MultipleVector4_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::frame::proto::_MultipleMatrix3_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::frame::proto::_MultipleMatrix4_default_instance_),
 };
 
 const char descriptor_table_protodef_Math_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\nMath.proto\022\013frame.proto\"\025\n\006Vector\022\013\n\003v"
-  "ec\030\001 \003(\002b\006proto3"
+  "\n\nMath.proto\022\013frame.proto\"\037\n\007Vector2\022\t\n\001"
+  "x\030\001 \001(\002\022\t\n\001y\030\002 \001(\002\"*\n\007Vector3\022\t\n\001x\030\001 \001(\002"
+  "\022\t\n\001y\030\002 \001(\002\022\t\n\001z\030\003 \001(\002\"5\n\007Vector4\022\t\n\001x\030\001"
+  " \001(\002\022\t\n\001y\030\002 \001(\002\022\t\n\001z\030\003 \001(\002\022\t\n\001w\030\004 \001(\002\"~\n"
+  "\007Matrix3\022\013\n\003m11\030\013 \001(\002\022\013\n\003m12\030\014 \001(\002\022\013\n\003m1"
+  "3\030\r \001(\002\022\013\n\003m21\030\025 \001(\002\022\013\n\003m22\030\026 \001(\002\022\013\n\003m23"
+  "\030\027 \001(\002\022\013\n\003m31\030\037 \001(\002\022\013\n\003m32\030  \001(\002\022\013\n\003m33\030"
+  "! \001(\002\"\331\001\n\007Matrix4\022\013\n\003m11\030\013 \001(\002\022\013\n\003m12\030\014 "
+  "\001(\002\022\013\n\003m13\030\r \001(\002\022\013\n\003m14\030\016 \001(\002\022\013\n\003m21\030\025 \001"
+  "(\002\022\013\n\003m22\030\026 \001(\002\022\013\n\003m23\030\027 \001(\002\022\013\n\003m24\030\030 \001("
+  "\002\022\013\n\003m31\030\037 \001(\002\022\013\n\003m32\030  \001(\002\022\013\n\003m33\030! \001(\002"
+  "\022\013\n\003m34\030\" \001(\002\022\013\n\003m41\030) \001(\002\022\013\n\003m42\030* \001(\002\022"
+  "\013\n\003m43\030+ \001(\002\022\013\n\003m44\030, \001(\002\"!\n\017MultipleInt"
+  "eger\022\016\n\006values\030\001 \003(\005\"!\n\017MutlipleBoolean\022"
+  "\016\n\006values\030\001 \003(\010\"\036\n\014MultipleReal\022\016\n\006value"
+  "s\030\001 \003(\002\"7\n\017MulitpleVector2\022$\n\006values\030\001 \003"
+  "(\0132\024.frame.proto.Vector2\"7\n\017MultipleVect"
+  "or3\022$\n\006values\030\001 \003(\0132\024.frame.proto.Vector"
+  "3\"7\n\017MultipleVector4\022$\n\006values\030\001 \003(\0132\024.f"
+  "rame.proto.Vector4\"7\n\017MultipleMatrix3\022$\n"
+  "\006values\030\001 \003(\0132\024.frame.proto.Matrix3\"7\n\017M"
+  "ultipleMatrix4\022$\n\006values\030\001 \003(\0132\024.frame.p"
+  "roto.Matrix4b\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_Math_2eproto_deps[1] = {
 };
-static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_Math_2eproto_sccs[1] = {
-  &scc_info_Vector_Math_2eproto.base,
+static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_Math_2eproto_sccs[13] = {
+  &scc_info_Matrix3_Math_2eproto.base,
+  &scc_info_Matrix4_Math_2eproto.base,
+  &scc_info_MulitpleVector2_Math_2eproto.base,
+  &scc_info_MultipleInteger_Math_2eproto.base,
+  &scc_info_MultipleMatrix3_Math_2eproto.base,
+  &scc_info_MultipleMatrix4_Math_2eproto.base,
+  &scc_info_MultipleReal_Math_2eproto.base,
+  &scc_info_MultipleVector3_Math_2eproto.base,
+  &scc_info_MultipleVector4_Math_2eproto.base,
+  &scc_info_MutlipleBoolean_Math_2eproto.base,
+  &scc_info_Vector2_Math_2eproto.base,
+  &scc_info_Vector3_Math_2eproto.base,
+  &scc_info_Vector4_Math_2eproto.base,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_Math_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_Math_2eproto = {
-  false, false, descriptor_table_protodef_Math_2eproto, "Math.proto", 56,
-  &descriptor_table_Math_2eproto_once, descriptor_table_Math_2eproto_sccs, descriptor_table_Math_2eproto_deps, 1, 0,
+  false, false, descriptor_table_protodef_Math_2eproto, "Math.proto", 900,
+  &descriptor_table_Math_2eproto_once, descriptor_table_Math_2eproto_sccs, descriptor_table_Math_2eproto_deps, 13, 0,
   schemas, file_default_instances, TableStruct_Math_2eproto::offsets,
-  file_level_metadata_Math_2eproto, 1, file_level_enum_descriptors_Math_2eproto, file_level_service_descriptors_Math_2eproto,
+  file_level_metadata_Math_2eproto, 13, file_level_enum_descriptors_Math_2eproto, file_level_service_descriptors_Math_2eproto,
 };
 
 // Force running AddDescriptors() at dynamic initialization time.
@@ -80,65 +464,71 @@ namespace proto {
 
 // ===================================================================
 
-void Vector::InitAsDefaultInstance() {
+void Vector2::InitAsDefaultInstance() {
 }
-class Vector::_Internal {
+class Vector2::_Internal {
  public:
 };
 
-Vector::Vector(::PROTOBUF_NAMESPACE_ID::Arena* arena)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena),
-  vec_(arena) {
+Vector2::Vector2(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
   SharedCtor();
   RegisterArenaDtor(arena);
-  // @@protoc_insertion_point(arena_constructor:frame.proto.Vector)
+  // @@protoc_insertion_point(arena_constructor:frame.proto.Vector2)
 }
-Vector::Vector(const Vector& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message(),
-      vec_(from.vec_) {
+Vector2::Vector2(const Vector2& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  // @@protoc_insertion_point(copy_constructor:frame.proto.Vector)
+  ::memcpy(&x_, &from.x_,
+    static_cast<size_t>(reinterpret_cast<char*>(&y_) -
+    reinterpret_cast<char*>(&x_)) + sizeof(y_));
+  // @@protoc_insertion_point(copy_constructor:frame.proto.Vector2)
 }
 
-void Vector::SharedCtor() {
+void Vector2::SharedCtor() {
+  ::memset(&x_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&y_) -
+      reinterpret_cast<char*>(&x_)) + sizeof(y_));
 }
 
-Vector::~Vector() {
-  // @@protoc_insertion_point(destructor:frame.proto.Vector)
+Vector2::~Vector2() {
+  // @@protoc_insertion_point(destructor:frame.proto.Vector2)
   SharedDtor();
   _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-void Vector::SharedDtor() {
+void Vector2::SharedDtor() {
   GOOGLE_DCHECK(GetArena() == nullptr);
 }
 
-void Vector::ArenaDtor(void* object) {
-  Vector* _this = reinterpret_cast< Vector* >(object);
+void Vector2::ArenaDtor(void* object) {
+  Vector2* _this = reinterpret_cast< Vector2* >(object);
   (void)_this;
 }
-void Vector::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+void Vector2::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
 }
-void Vector::SetCachedSize(int size) const {
+void Vector2::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
-const Vector& Vector::default_instance() {
-  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_Vector_Math_2eproto.base);
+const Vector2& Vector2::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_Vector2_Math_2eproto.base);
   return *internal_default_instance();
 }
 
 
-void Vector::Clear() {
-// @@protoc_insertion_point(message_clear_start:frame.proto.Vector)
+void Vector2::Clear() {
+// @@protoc_insertion_point(message_clear_start:frame.proto.Vector2)
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  vec_.Clear();
+  ::memset(&x_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&y_) -
+      reinterpret_cast<char*>(&x_)) + sizeof(y_));
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-const char* Vector::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+const char* Vector2::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
   while (!ctx->Done(&ptr)) {
@@ -146,13 +536,17 @@ const char* Vector::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::int
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     CHK_(ptr);
     switch (tag >> 3) {
-      // repeated float vec = 1;
+      // float x = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
-          ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedFloatParser(_internal_mutable_vec(), ptr, ctx);
-          CHK_(ptr);
-        } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 13) {
-          _internal_add_vec(::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr));
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 13)) {
+          x_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float y = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 21)) {
+          y_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
           ptr += sizeof(float);
         } else goto handle_unusual;
         continue;
@@ -178,44 +572,1677 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* Vector::_InternalSerialize(
+::PROTOBUF_NAMESPACE_ID::uint8* Vector2::_InternalSerialize(
     ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
-  // @@protoc_insertion_point(serialize_to_array_start:frame.proto.Vector)
+  // @@protoc_insertion_point(serialize_to_array_start:frame.proto.Vector2)
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // repeated float vec = 1;
-  if (this->_internal_vec_size() > 0) {
-    target = stream->WriteFixedPacked(1, _internal_vec(), target);
+  // float x = 1;
+  if (!(this->x() <= 0 && this->x() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(1, this->_internal_x(), target);
+  }
+
+  // float y = 2;
+  if (!(this->y() <= 0 && this->y() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(2, this->_internal_y(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:frame.proto.Vector)
+  // @@protoc_insertion_point(serialize_to_array_end:frame.proto.Vector2)
   return target;
 }
 
-size_t Vector::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:frame.proto.Vector)
+size_t Vector2::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:frame.proto.Vector2)
   size_t total_size = 0;
 
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // repeated float vec = 1;
+  // float x = 1;
+  if (!(this->x() <= 0 && this->x() >= 0)) {
+    total_size += 1 + 4;
+  }
+
+  // float y = 2;
+  if (!(this->y() <= 0 && this->y() >= 0)) {
+    total_size += 1 + 4;
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void Vector2::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:frame.proto.Vector2)
+  GOOGLE_DCHECK_NE(&from, this);
+  const Vector2* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<Vector2>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:frame.proto.Vector2)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:frame.proto.Vector2)
+    MergeFrom(*source);
+  }
+}
+
+void Vector2::MergeFrom(const Vector2& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:frame.proto.Vector2)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (!(from.x() <= 0 && from.x() >= 0)) {
+    _internal_set_x(from._internal_x());
+  }
+  if (!(from.y() <= 0 && from.y() >= 0)) {
+    _internal_set_y(from._internal_y());
+  }
+}
+
+void Vector2::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:frame.proto.Vector2)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void Vector2::CopyFrom(const Vector2& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:frame.proto.Vector2)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool Vector2::IsInitialized() const {
+  return true;
+}
+
+void Vector2::InternalSwap(Vector2* other) {
+  using std::swap;
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(Vector2, y_)
+      + sizeof(Vector2::y_)
+      - PROTOBUF_FIELD_OFFSET(Vector2, x_)>(
+          reinterpret_cast<char*>(&x_),
+          reinterpret_cast<char*>(&other->x_));
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata Vector2::GetMetadata() const {
+  return GetMetadataStatic();
+}
+
+
+// ===================================================================
+
+void Vector3::InitAsDefaultInstance() {
+}
+class Vector3::_Internal {
+ public:
+};
+
+Vector3::Vector3(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:frame.proto.Vector3)
+}
+Vector3::Vector3(const Vector3& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::memcpy(&x_, &from.x_,
+    static_cast<size_t>(reinterpret_cast<char*>(&z_) -
+    reinterpret_cast<char*>(&x_)) + sizeof(z_));
+  // @@protoc_insertion_point(copy_constructor:frame.proto.Vector3)
+}
+
+void Vector3::SharedCtor() {
+  ::memset(&x_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&z_) -
+      reinterpret_cast<char*>(&x_)) + sizeof(z_));
+}
+
+Vector3::~Vector3() {
+  // @@protoc_insertion_point(destructor:frame.proto.Vector3)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void Vector3::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
+}
+
+void Vector3::ArenaDtor(void* object) {
+  Vector3* _this = reinterpret_cast< Vector3* >(object);
+  (void)_this;
+}
+void Vector3::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void Vector3::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const Vector3& Vector3::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_Vector3_Math_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void Vector3::Clear() {
+// @@protoc_insertion_point(message_clear_start:frame.proto.Vector3)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  ::memset(&x_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&z_) -
+      reinterpret_cast<char*>(&x_)) + sizeof(z_));
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* Vector3::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+    switch (tag >> 3) {
+      // float x = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 13)) {
+          x_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float y = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 21)) {
+          y_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float z = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 29)) {
+          z_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* Vector3::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:frame.proto.Vector3)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // float x = 1;
+  if (!(this->x() <= 0 && this->x() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(1, this->_internal_x(), target);
+  }
+
+  // float y = 2;
+  if (!(this->y() <= 0 && this->y() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(2, this->_internal_y(), target);
+  }
+
+  // float z = 3;
+  if (!(this->z() <= 0 && this->z() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(3, this->_internal_z(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:frame.proto.Vector3)
+  return target;
+}
+
+size_t Vector3::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:frame.proto.Vector3)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // float x = 1;
+  if (!(this->x() <= 0 && this->x() >= 0)) {
+    total_size += 1 + 4;
+  }
+
+  // float y = 2;
+  if (!(this->y() <= 0 && this->y() >= 0)) {
+    total_size += 1 + 4;
+  }
+
+  // float z = 3;
+  if (!(this->z() <= 0 && this->z() >= 0)) {
+    total_size += 1 + 4;
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void Vector3::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:frame.proto.Vector3)
+  GOOGLE_DCHECK_NE(&from, this);
+  const Vector3* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<Vector3>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:frame.proto.Vector3)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:frame.proto.Vector3)
+    MergeFrom(*source);
+  }
+}
+
+void Vector3::MergeFrom(const Vector3& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:frame.proto.Vector3)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (!(from.x() <= 0 && from.x() >= 0)) {
+    _internal_set_x(from._internal_x());
+  }
+  if (!(from.y() <= 0 && from.y() >= 0)) {
+    _internal_set_y(from._internal_y());
+  }
+  if (!(from.z() <= 0 && from.z() >= 0)) {
+    _internal_set_z(from._internal_z());
+  }
+}
+
+void Vector3::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:frame.proto.Vector3)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void Vector3::CopyFrom(const Vector3& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:frame.proto.Vector3)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool Vector3::IsInitialized() const {
+  return true;
+}
+
+void Vector3::InternalSwap(Vector3* other) {
+  using std::swap;
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(Vector3, z_)
+      + sizeof(Vector3::z_)
+      - PROTOBUF_FIELD_OFFSET(Vector3, x_)>(
+          reinterpret_cast<char*>(&x_),
+          reinterpret_cast<char*>(&other->x_));
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata Vector3::GetMetadata() const {
+  return GetMetadataStatic();
+}
+
+
+// ===================================================================
+
+void Vector4::InitAsDefaultInstance() {
+}
+class Vector4::_Internal {
+ public:
+};
+
+Vector4::Vector4(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:frame.proto.Vector4)
+}
+Vector4::Vector4(const Vector4& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::memcpy(&x_, &from.x_,
+    static_cast<size_t>(reinterpret_cast<char*>(&w_) -
+    reinterpret_cast<char*>(&x_)) + sizeof(w_));
+  // @@protoc_insertion_point(copy_constructor:frame.proto.Vector4)
+}
+
+void Vector4::SharedCtor() {
+  ::memset(&x_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&w_) -
+      reinterpret_cast<char*>(&x_)) + sizeof(w_));
+}
+
+Vector4::~Vector4() {
+  // @@protoc_insertion_point(destructor:frame.proto.Vector4)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void Vector4::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
+}
+
+void Vector4::ArenaDtor(void* object) {
+  Vector4* _this = reinterpret_cast< Vector4* >(object);
+  (void)_this;
+}
+void Vector4::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void Vector4::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const Vector4& Vector4::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_Vector4_Math_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void Vector4::Clear() {
+// @@protoc_insertion_point(message_clear_start:frame.proto.Vector4)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  ::memset(&x_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&w_) -
+      reinterpret_cast<char*>(&x_)) + sizeof(w_));
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* Vector4::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+    switch (tag >> 3) {
+      // float x = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 13)) {
+          x_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float y = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 21)) {
+          y_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float z = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 29)) {
+          z_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float w = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 37)) {
+          w_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* Vector4::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:frame.proto.Vector4)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // float x = 1;
+  if (!(this->x() <= 0 && this->x() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(1, this->_internal_x(), target);
+  }
+
+  // float y = 2;
+  if (!(this->y() <= 0 && this->y() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(2, this->_internal_y(), target);
+  }
+
+  // float z = 3;
+  if (!(this->z() <= 0 && this->z() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(3, this->_internal_z(), target);
+  }
+
+  // float w = 4;
+  if (!(this->w() <= 0 && this->w() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(4, this->_internal_w(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:frame.proto.Vector4)
+  return target;
+}
+
+size_t Vector4::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:frame.proto.Vector4)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // float x = 1;
+  if (!(this->x() <= 0 && this->x() >= 0)) {
+    total_size += 1 + 4;
+  }
+
+  // float y = 2;
+  if (!(this->y() <= 0 && this->y() >= 0)) {
+    total_size += 1 + 4;
+  }
+
+  // float z = 3;
+  if (!(this->z() <= 0 && this->z() >= 0)) {
+    total_size += 1 + 4;
+  }
+
+  // float w = 4;
+  if (!(this->w() <= 0 && this->w() >= 0)) {
+    total_size += 1 + 4;
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void Vector4::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:frame.proto.Vector4)
+  GOOGLE_DCHECK_NE(&from, this);
+  const Vector4* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<Vector4>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:frame.proto.Vector4)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:frame.proto.Vector4)
+    MergeFrom(*source);
+  }
+}
+
+void Vector4::MergeFrom(const Vector4& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:frame.proto.Vector4)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (!(from.x() <= 0 && from.x() >= 0)) {
+    _internal_set_x(from._internal_x());
+  }
+  if (!(from.y() <= 0 && from.y() >= 0)) {
+    _internal_set_y(from._internal_y());
+  }
+  if (!(from.z() <= 0 && from.z() >= 0)) {
+    _internal_set_z(from._internal_z());
+  }
+  if (!(from.w() <= 0 && from.w() >= 0)) {
+    _internal_set_w(from._internal_w());
+  }
+}
+
+void Vector4::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:frame.proto.Vector4)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void Vector4::CopyFrom(const Vector4& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:frame.proto.Vector4)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool Vector4::IsInitialized() const {
+  return true;
+}
+
+void Vector4::InternalSwap(Vector4* other) {
+  using std::swap;
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(Vector4, w_)
+      + sizeof(Vector4::w_)
+      - PROTOBUF_FIELD_OFFSET(Vector4, x_)>(
+          reinterpret_cast<char*>(&x_),
+          reinterpret_cast<char*>(&other->x_));
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata Vector4::GetMetadata() const {
+  return GetMetadataStatic();
+}
+
+
+// ===================================================================
+
+void Matrix3::InitAsDefaultInstance() {
+}
+class Matrix3::_Internal {
+ public:
+};
+
+Matrix3::Matrix3(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:frame.proto.Matrix3)
+}
+Matrix3::Matrix3(const Matrix3& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::memcpy(&m33_, &from.m33_,
+    static_cast<size_t>(reinterpret_cast<char*>(&m32_) -
+    reinterpret_cast<char*>(&m33_)) + sizeof(m32_));
+  // @@protoc_insertion_point(copy_constructor:frame.proto.Matrix3)
+}
+
+void Matrix3::SharedCtor() {
+  ::memset(&m33_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&m32_) -
+      reinterpret_cast<char*>(&m33_)) + sizeof(m32_));
+}
+
+Matrix3::~Matrix3() {
+  // @@protoc_insertion_point(destructor:frame.proto.Matrix3)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void Matrix3::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
+}
+
+void Matrix3::ArenaDtor(void* object) {
+  Matrix3* _this = reinterpret_cast< Matrix3* >(object);
+  (void)_this;
+}
+void Matrix3::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void Matrix3::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const Matrix3& Matrix3::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_Matrix3_Math_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void Matrix3::Clear() {
+// @@protoc_insertion_point(message_clear_start:frame.proto.Matrix3)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  ::memset(&m33_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&m32_) -
+      reinterpret_cast<char*>(&m33_)) + sizeof(m32_));
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* Matrix3::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+    switch (tag >> 3) {
+      // float m11 = 11;
+      case 11:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 93)) {
+          m11_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float m12 = 12;
+      case 12:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 101)) {
+          m12_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float m13 = 13;
+      case 13:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 109)) {
+          m13_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float m21 = 21;
+      case 21:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 173)) {
+          m21_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float m22 = 22;
+      case 22:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 181)) {
+          m22_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float m23 = 23;
+      case 23:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 189)) {
+          m23_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float m31 = 31;
+      case 31:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 253)) {
+          m31_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float m32 = 32;
+      case 32:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 5)) {
+          m32_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float m33 = 33;
+      case 33:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 13)) {
+          m33_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* Matrix3::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:frame.proto.Matrix3)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // float m11 = 11;
+  if (!(this->m11() <= 0 && this->m11() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(11, this->_internal_m11(), target);
+  }
+
+  // float m12 = 12;
+  if (!(this->m12() <= 0 && this->m12() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(12, this->_internal_m12(), target);
+  }
+
+  // float m13 = 13;
+  if (!(this->m13() <= 0 && this->m13() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(13, this->_internal_m13(), target);
+  }
+
+  // float m21 = 21;
+  if (!(this->m21() <= 0 && this->m21() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(21, this->_internal_m21(), target);
+  }
+
+  // float m22 = 22;
+  if (!(this->m22() <= 0 && this->m22() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(22, this->_internal_m22(), target);
+  }
+
+  // float m23 = 23;
+  if (!(this->m23() <= 0 && this->m23() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(23, this->_internal_m23(), target);
+  }
+
+  // float m31 = 31;
+  if (!(this->m31() <= 0 && this->m31() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(31, this->_internal_m31(), target);
+  }
+
+  // float m32 = 32;
+  if (!(this->m32() <= 0 && this->m32() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(32, this->_internal_m32(), target);
+  }
+
+  // float m33 = 33;
+  if (!(this->m33() <= 0 && this->m33() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(33, this->_internal_m33(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:frame.proto.Matrix3)
+  return target;
+}
+
+size_t Matrix3::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:frame.proto.Matrix3)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // float m33 = 33;
+  if (!(this->m33() <= 0 && this->m33() >= 0)) {
+    total_size += 2 + 4;
+  }
+
+  // float m11 = 11;
+  if (!(this->m11() <= 0 && this->m11() >= 0)) {
+    total_size += 1 + 4;
+  }
+
+  // float m12 = 12;
+  if (!(this->m12() <= 0 && this->m12() >= 0)) {
+    total_size += 1 + 4;
+  }
+
+  // float m13 = 13;
+  if (!(this->m13() <= 0 && this->m13() >= 0)) {
+    total_size += 1 + 4;
+  }
+
+  // float m21 = 21;
+  if (!(this->m21() <= 0 && this->m21() >= 0)) {
+    total_size += 2 + 4;
+  }
+
+  // float m22 = 22;
+  if (!(this->m22() <= 0 && this->m22() >= 0)) {
+    total_size += 2 + 4;
+  }
+
+  // float m23 = 23;
+  if (!(this->m23() <= 0 && this->m23() >= 0)) {
+    total_size += 2 + 4;
+  }
+
+  // float m31 = 31;
+  if (!(this->m31() <= 0 && this->m31() >= 0)) {
+    total_size += 2 + 4;
+  }
+
+  // float m32 = 32;
+  if (!(this->m32() <= 0 && this->m32() >= 0)) {
+    total_size += 2 + 4;
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void Matrix3::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:frame.proto.Matrix3)
+  GOOGLE_DCHECK_NE(&from, this);
+  const Matrix3* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<Matrix3>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:frame.proto.Matrix3)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:frame.proto.Matrix3)
+    MergeFrom(*source);
+  }
+}
+
+void Matrix3::MergeFrom(const Matrix3& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:frame.proto.Matrix3)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (!(from.m33() <= 0 && from.m33() >= 0)) {
+    _internal_set_m33(from._internal_m33());
+  }
+  if (!(from.m11() <= 0 && from.m11() >= 0)) {
+    _internal_set_m11(from._internal_m11());
+  }
+  if (!(from.m12() <= 0 && from.m12() >= 0)) {
+    _internal_set_m12(from._internal_m12());
+  }
+  if (!(from.m13() <= 0 && from.m13() >= 0)) {
+    _internal_set_m13(from._internal_m13());
+  }
+  if (!(from.m21() <= 0 && from.m21() >= 0)) {
+    _internal_set_m21(from._internal_m21());
+  }
+  if (!(from.m22() <= 0 && from.m22() >= 0)) {
+    _internal_set_m22(from._internal_m22());
+  }
+  if (!(from.m23() <= 0 && from.m23() >= 0)) {
+    _internal_set_m23(from._internal_m23());
+  }
+  if (!(from.m31() <= 0 && from.m31() >= 0)) {
+    _internal_set_m31(from._internal_m31());
+  }
+  if (!(from.m32() <= 0 && from.m32() >= 0)) {
+    _internal_set_m32(from._internal_m32());
+  }
+}
+
+void Matrix3::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:frame.proto.Matrix3)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void Matrix3::CopyFrom(const Matrix3& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:frame.proto.Matrix3)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool Matrix3::IsInitialized() const {
+  return true;
+}
+
+void Matrix3::InternalSwap(Matrix3* other) {
+  using std::swap;
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(Matrix3, m32_)
+      + sizeof(Matrix3::m32_)
+      - PROTOBUF_FIELD_OFFSET(Matrix3, m33_)>(
+          reinterpret_cast<char*>(&m33_),
+          reinterpret_cast<char*>(&other->m33_));
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata Matrix3::GetMetadata() const {
+  return GetMetadataStatic();
+}
+
+
+// ===================================================================
+
+void Matrix4::InitAsDefaultInstance() {
+}
+class Matrix4::_Internal {
+ public:
+};
+
+Matrix4::Matrix4(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:frame.proto.Matrix4)
+}
+Matrix4::Matrix4(const Matrix4& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::memcpy(&m11_, &from.m11_,
+    static_cast<size_t>(reinterpret_cast<char*>(&m44_) -
+    reinterpret_cast<char*>(&m11_)) + sizeof(m44_));
+  // @@protoc_insertion_point(copy_constructor:frame.proto.Matrix4)
+}
+
+void Matrix4::SharedCtor() {
+  ::memset(&m11_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&m44_) -
+      reinterpret_cast<char*>(&m11_)) + sizeof(m44_));
+}
+
+Matrix4::~Matrix4() {
+  // @@protoc_insertion_point(destructor:frame.proto.Matrix4)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void Matrix4::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
+}
+
+void Matrix4::ArenaDtor(void* object) {
+  Matrix4* _this = reinterpret_cast< Matrix4* >(object);
+  (void)_this;
+}
+void Matrix4::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void Matrix4::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const Matrix4& Matrix4::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_Matrix4_Math_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void Matrix4::Clear() {
+// @@protoc_insertion_point(message_clear_start:frame.proto.Matrix4)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  ::memset(&m11_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&m44_) -
+      reinterpret_cast<char*>(&m11_)) + sizeof(m44_));
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* Matrix4::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+    switch (tag >> 3) {
+      // float m11 = 11;
+      case 11:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 93)) {
+          m11_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float m12 = 12;
+      case 12:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 101)) {
+          m12_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float m13 = 13;
+      case 13:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 109)) {
+          m13_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float m14 = 14;
+      case 14:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 117)) {
+          m14_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float m21 = 21;
+      case 21:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 173)) {
+          m21_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float m22 = 22;
+      case 22:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 181)) {
+          m22_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float m23 = 23;
+      case 23:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 189)) {
+          m23_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float m24 = 24;
+      case 24:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 197)) {
+          m24_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float m31 = 31;
+      case 31:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 253)) {
+          m31_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float m32 = 32;
+      case 32:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 5)) {
+          m32_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float m33 = 33;
+      case 33:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 13)) {
+          m33_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float m34 = 34;
+      case 34:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 21)) {
+          m34_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float m41 = 41;
+      case 41:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 77)) {
+          m41_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float m42 = 42;
+      case 42:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 85)) {
+          m42_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float m43 = 43;
+      case 43:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 93)) {
+          m43_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float m44 = 44;
+      case 44:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 101)) {
+          m44_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* Matrix4::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:frame.proto.Matrix4)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // float m11 = 11;
+  if (!(this->m11() <= 0 && this->m11() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(11, this->_internal_m11(), target);
+  }
+
+  // float m12 = 12;
+  if (!(this->m12() <= 0 && this->m12() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(12, this->_internal_m12(), target);
+  }
+
+  // float m13 = 13;
+  if (!(this->m13() <= 0 && this->m13() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(13, this->_internal_m13(), target);
+  }
+
+  // float m14 = 14;
+  if (!(this->m14() <= 0 && this->m14() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(14, this->_internal_m14(), target);
+  }
+
+  // float m21 = 21;
+  if (!(this->m21() <= 0 && this->m21() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(21, this->_internal_m21(), target);
+  }
+
+  // float m22 = 22;
+  if (!(this->m22() <= 0 && this->m22() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(22, this->_internal_m22(), target);
+  }
+
+  // float m23 = 23;
+  if (!(this->m23() <= 0 && this->m23() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(23, this->_internal_m23(), target);
+  }
+
+  // float m24 = 24;
+  if (!(this->m24() <= 0 && this->m24() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(24, this->_internal_m24(), target);
+  }
+
+  // float m31 = 31;
+  if (!(this->m31() <= 0 && this->m31() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(31, this->_internal_m31(), target);
+  }
+
+  // float m32 = 32;
+  if (!(this->m32() <= 0 && this->m32() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(32, this->_internal_m32(), target);
+  }
+
+  // float m33 = 33;
+  if (!(this->m33() <= 0 && this->m33() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(33, this->_internal_m33(), target);
+  }
+
+  // float m34 = 34;
+  if (!(this->m34() <= 0 && this->m34() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(34, this->_internal_m34(), target);
+  }
+
+  // float m41 = 41;
+  if (!(this->m41() <= 0 && this->m41() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(41, this->_internal_m41(), target);
+  }
+
+  // float m42 = 42;
+  if (!(this->m42() <= 0 && this->m42() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(42, this->_internal_m42(), target);
+  }
+
+  // float m43 = 43;
+  if (!(this->m43() <= 0 && this->m43() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(43, this->_internal_m43(), target);
+  }
+
+  // float m44 = 44;
+  if (!(this->m44() <= 0 && this->m44() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(44, this->_internal_m44(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:frame.proto.Matrix4)
+  return target;
+}
+
+size_t Matrix4::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:frame.proto.Matrix4)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // float m11 = 11;
+  if (!(this->m11() <= 0 && this->m11() >= 0)) {
+    total_size += 1 + 4;
+  }
+
+  // float m12 = 12;
+  if (!(this->m12() <= 0 && this->m12() >= 0)) {
+    total_size += 1 + 4;
+  }
+
+  // float m13 = 13;
+  if (!(this->m13() <= 0 && this->m13() >= 0)) {
+    total_size += 1 + 4;
+  }
+
+  // float m14 = 14;
+  if (!(this->m14() <= 0 && this->m14() >= 0)) {
+    total_size += 1 + 4;
+  }
+
+  // float m21 = 21;
+  if (!(this->m21() <= 0 && this->m21() >= 0)) {
+    total_size += 2 + 4;
+  }
+
+  // float m22 = 22;
+  if (!(this->m22() <= 0 && this->m22() >= 0)) {
+    total_size += 2 + 4;
+  }
+
+  // float m23 = 23;
+  if (!(this->m23() <= 0 && this->m23() >= 0)) {
+    total_size += 2 + 4;
+  }
+
+  // float m24 = 24;
+  if (!(this->m24() <= 0 && this->m24() >= 0)) {
+    total_size += 2 + 4;
+  }
+
+  // float m31 = 31;
+  if (!(this->m31() <= 0 && this->m31() >= 0)) {
+    total_size += 2 + 4;
+  }
+
+  // float m32 = 32;
+  if (!(this->m32() <= 0 && this->m32() >= 0)) {
+    total_size += 2 + 4;
+  }
+
+  // float m33 = 33;
+  if (!(this->m33() <= 0 && this->m33() >= 0)) {
+    total_size += 2 + 4;
+  }
+
+  // float m34 = 34;
+  if (!(this->m34() <= 0 && this->m34() >= 0)) {
+    total_size += 2 + 4;
+  }
+
+  // float m41 = 41;
+  if (!(this->m41() <= 0 && this->m41() >= 0)) {
+    total_size += 2 + 4;
+  }
+
+  // float m42 = 42;
+  if (!(this->m42() <= 0 && this->m42() >= 0)) {
+    total_size += 2 + 4;
+  }
+
+  // float m43 = 43;
+  if (!(this->m43() <= 0 && this->m43() >= 0)) {
+    total_size += 2 + 4;
+  }
+
+  // float m44 = 44;
+  if (!(this->m44() <= 0 && this->m44() >= 0)) {
+    total_size += 2 + 4;
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void Matrix4::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:frame.proto.Matrix4)
+  GOOGLE_DCHECK_NE(&from, this);
+  const Matrix4* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<Matrix4>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:frame.proto.Matrix4)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:frame.proto.Matrix4)
+    MergeFrom(*source);
+  }
+}
+
+void Matrix4::MergeFrom(const Matrix4& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:frame.proto.Matrix4)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (!(from.m11() <= 0 && from.m11() >= 0)) {
+    _internal_set_m11(from._internal_m11());
+  }
+  if (!(from.m12() <= 0 && from.m12() >= 0)) {
+    _internal_set_m12(from._internal_m12());
+  }
+  if (!(from.m13() <= 0 && from.m13() >= 0)) {
+    _internal_set_m13(from._internal_m13());
+  }
+  if (!(from.m14() <= 0 && from.m14() >= 0)) {
+    _internal_set_m14(from._internal_m14());
+  }
+  if (!(from.m21() <= 0 && from.m21() >= 0)) {
+    _internal_set_m21(from._internal_m21());
+  }
+  if (!(from.m22() <= 0 && from.m22() >= 0)) {
+    _internal_set_m22(from._internal_m22());
+  }
+  if (!(from.m23() <= 0 && from.m23() >= 0)) {
+    _internal_set_m23(from._internal_m23());
+  }
+  if (!(from.m24() <= 0 && from.m24() >= 0)) {
+    _internal_set_m24(from._internal_m24());
+  }
+  if (!(from.m31() <= 0 && from.m31() >= 0)) {
+    _internal_set_m31(from._internal_m31());
+  }
+  if (!(from.m32() <= 0 && from.m32() >= 0)) {
+    _internal_set_m32(from._internal_m32());
+  }
+  if (!(from.m33() <= 0 && from.m33() >= 0)) {
+    _internal_set_m33(from._internal_m33());
+  }
+  if (!(from.m34() <= 0 && from.m34() >= 0)) {
+    _internal_set_m34(from._internal_m34());
+  }
+  if (!(from.m41() <= 0 && from.m41() >= 0)) {
+    _internal_set_m41(from._internal_m41());
+  }
+  if (!(from.m42() <= 0 && from.m42() >= 0)) {
+    _internal_set_m42(from._internal_m42());
+  }
+  if (!(from.m43() <= 0 && from.m43() >= 0)) {
+    _internal_set_m43(from._internal_m43());
+  }
+  if (!(from.m44() <= 0 && from.m44() >= 0)) {
+    _internal_set_m44(from._internal_m44());
+  }
+}
+
+void Matrix4::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:frame.proto.Matrix4)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void Matrix4::CopyFrom(const Matrix4& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:frame.proto.Matrix4)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool Matrix4::IsInitialized() const {
+  return true;
+}
+
+void Matrix4::InternalSwap(Matrix4* other) {
+  using std::swap;
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(Matrix4, m44_)
+      + sizeof(Matrix4::m44_)
+      - PROTOBUF_FIELD_OFFSET(Matrix4, m11_)>(
+          reinterpret_cast<char*>(&m11_),
+          reinterpret_cast<char*>(&other->m11_));
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata Matrix4::GetMetadata() const {
+  return GetMetadataStatic();
+}
+
+
+// ===================================================================
+
+void MultipleInteger::InitAsDefaultInstance() {
+}
+class MultipleInteger::_Internal {
+ public:
+};
+
+MultipleInteger::MultipleInteger(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena),
+  values_(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:frame.proto.MultipleInteger)
+}
+MultipleInteger::MultipleInteger(const MultipleInteger& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message(),
+      values_(from.values_) {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  // @@protoc_insertion_point(copy_constructor:frame.proto.MultipleInteger)
+}
+
+void MultipleInteger::SharedCtor() {
+}
+
+MultipleInteger::~MultipleInteger() {
+  // @@protoc_insertion_point(destructor:frame.proto.MultipleInteger)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void MultipleInteger::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
+}
+
+void MultipleInteger::ArenaDtor(void* object) {
+  MultipleInteger* _this = reinterpret_cast< MultipleInteger* >(object);
+  (void)_this;
+}
+void MultipleInteger::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void MultipleInteger::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const MultipleInteger& MultipleInteger::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_MultipleInteger_Math_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void MultipleInteger::Clear() {
+// @@protoc_insertion_point(message_clear_start:frame.proto.MultipleInteger)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  values_.Clear();
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* MultipleInteger::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+    switch (tag >> 3) {
+      // repeated int32 values = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedInt32Parser(_internal_mutable_values(), ptr, ctx);
+          CHK_(ptr);
+        } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8) {
+          _internal_add_values(::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr));
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* MultipleInteger::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:frame.proto.MultipleInteger)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // repeated int32 values = 1;
   {
-    unsigned int count = static_cast<unsigned int>(this->_internal_vec_size());
-    size_t data_size = 4UL * count;
+    int byte_size = _values_cached_byte_size_.load(std::memory_order_relaxed);
+    if (byte_size > 0) {
+      target = stream->WriteInt32Packed(
+          1, _internal_values(), byte_size, target);
+    }
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:frame.proto.MultipleInteger)
+  return target;
+}
+
+size_t MultipleInteger::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:frame.proto.MultipleInteger)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // repeated int32 values = 1;
+  {
+    size_t data_size = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      Int32Size(this->values_);
     if (data_size > 0) {
       total_size += 1 +
         ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
             static_cast<::PROTOBUF_NAMESPACE_ID::int32>(data_size));
     }
     int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(data_size);
-    _vec_cached_byte_size_.store(cached_size,
+    _values_cached_byte_size_.store(cached_size,
                                     std::memory_order_relaxed);
     total_size += data_size;
   }
@@ -229,56 +2256,1481 @@ size_t Vector::ByteSizeLong() const {
   return total_size;
 }
 
-void Vector::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:frame.proto.Vector)
+void MultipleInteger::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:frame.proto.MultipleInteger)
   GOOGLE_DCHECK_NE(&from, this);
-  const Vector* source =
-      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<Vector>(
+  const MultipleInteger* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<MultipleInteger>(
           &from);
   if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:frame.proto.Vector)
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:frame.proto.MultipleInteger)
     ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
   } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:frame.proto.Vector)
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:frame.proto.MultipleInteger)
     MergeFrom(*source);
   }
 }
 
-void Vector::MergeFrom(const Vector& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:frame.proto.Vector)
+void MultipleInteger::MergeFrom(const MultipleInteger& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:frame.proto.MultipleInteger)
   GOOGLE_DCHECK_NE(&from, this);
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  vec_.MergeFrom(from.vec_);
+  values_.MergeFrom(from.values_);
 }
 
-void Vector::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:frame.proto.Vector)
+void MultipleInteger::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:frame.proto.MultipleInteger)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-void Vector::CopyFrom(const Vector& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:frame.proto.Vector)
+void MultipleInteger::CopyFrom(const MultipleInteger& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:frame.proto.MultipleInteger)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-bool Vector::IsInitialized() const {
+bool MultipleInteger::IsInitialized() const {
   return true;
 }
 
-void Vector::InternalSwap(Vector* other) {
+void MultipleInteger::InternalSwap(MultipleInteger* other) {
   using std::swap;
   _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
-  vec_.InternalSwap(&other->vec_);
+  values_.InternalSwap(&other->values_);
 }
 
-::PROTOBUF_NAMESPACE_ID::Metadata Vector::GetMetadata() const {
+::PROTOBUF_NAMESPACE_ID::Metadata MultipleInteger::GetMetadata() const {
+  return GetMetadataStatic();
+}
+
+
+// ===================================================================
+
+void MutlipleBoolean::InitAsDefaultInstance() {
+}
+class MutlipleBoolean::_Internal {
+ public:
+};
+
+MutlipleBoolean::MutlipleBoolean(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena),
+  values_(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:frame.proto.MutlipleBoolean)
+}
+MutlipleBoolean::MutlipleBoolean(const MutlipleBoolean& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message(),
+      values_(from.values_) {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  // @@protoc_insertion_point(copy_constructor:frame.proto.MutlipleBoolean)
+}
+
+void MutlipleBoolean::SharedCtor() {
+}
+
+MutlipleBoolean::~MutlipleBoolean() {
+  // @@protoc_insertion_point(destructor:frame.proto.MutlipleBoolean)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void MutlipleBoolean::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
+}
+
+void MutlipleBoolean::ArenaDtor(void* object) {
+  MutlipleBoolean* _this = reinterpret_cast< MutlipleBoolean* >(object);
+  (void)_this;
+}
+void MutlipleBoolean::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void MutlipleBoolean::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const MutlipleBoolean& MutlipleBoolean::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_MutlipleBoolean_Math_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void MutlipleBoolean::Clear() {
+// @@protoc_insertion_point(message_clear_start:frame.proto.MutlipleBoolean)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  values_.Clear();
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* MutlipleBoolean::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+    switch (tag >> 3) {
+      // repeated bool values = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedBoolParser(_internal_mutable_values(), ptr, ctx);
+          CHK_(ptr);
+        } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8) {
+          _internal_add_values(::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr));
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* MutlipleBoolean::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:frame.proto.MutlipleBoolean)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // repeated bool values = 1;
+  if (this->_internal_values_size() > 0) {
+    target = stream->WriteFixedPacked(1, _internal_values(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:frame.proto.MutlipleBoolean)
+  return target;
+}
+
+size_t MutlipleBoolean::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:frame.proto.MutlipleBoolean)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // repeated bool values = 1;
+  {
+    unsigned int count = static_cast<unsigned int>(this->_internal_values_size());
+    size_t data_size = 1UL * count;
+    if (data_size > 0) {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+            static_cast<::PROTOBUF_NAMESPACE_ID::int32>(data_size));
+    }
+    int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(data_size);
+    _values_cached_byte_size_.store(cached_size,
+                                    std::memory_order_relaxed);
+    total_size += data_size;
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void MutlipleBoolean::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:frame.proto.MutlipleBoolean)
+  GOOGLE_DCHECK_NE(&from, this);
+  const MutlipleBoolean* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<MutlipleBoolean>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:frame.proto.MutlipleBoolean)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:frame.proto.MutlipleBoolean)
+    MergeFrom(*source);
+  }
+}
+
+void MutlipleBoolean::MergeFrom(const MutlipleBoolean& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:frame.proto.MutlipleBoolean)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  values_.MergeFrom(from.values_);
+}
+
+void MutlipleBoolean::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:frame.proto.MutlipleBoolean)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void MutlipleBoolean::CopyFrom(const MutlipleBoolean& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:frame.proto.MutlipleBoolean)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool MutlipleBoolean::IsInitialized() const {
+  return true;
+}
+
+void MutlipleBoolean::InternalSwap(MutlipleBoolean* other) {
+  using std::swap;
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  values_.InternalSwap(&other->values_);
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata MutlipleBoolean::GetMetadata() const {
+  return GetMetadataStatic();
+}
+
+
+// ===================================================================
+
+void MultipleReal::InitAsDefaultInstance() {
+}
+class MultipleReal::_Internal {
+ public:
+};
+
+MultipleReal::MultipleReal(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena),
+  values_(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:frame.proto.MultipleReal)
+}
+MultipleReal::MultipleReal(const MultipleReal& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message(),
+      values_(from.values_) {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  // @@protoc_insertion_point(copy_constructor:frame.proto.MultipleReal)
+}
+
+void MultipleReal::SharedCtor() {
+}
+
+MultipleReal::~MultipleReal() {
+  // @@protoc_insertion_point(destructor:frame.proto.MultipleReal)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void MultipleReal::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
+}
+
+void MultipleReal::ArenaDtor(void* object) {
+  MultipleReal* _this = reinterpret_cast< MultipleReal* >(object);
+  (void)_this;
+}
+void MultipleReal::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void MultipleReal::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const MultipleReal& MultipleReal::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_MultipleReal_Math_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void MultipleReal::Clear() {
+// @@protoc_insertion_point(message_clear_start:frame.proto.MultipleReal)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  values_.Clear();
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* MultipleReal::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+    switch (tag >> 3) {
+      // repeated float values = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedFloatParser(_internal_mutable_values(), ptr, ctx);
+          CHK_(ptr);
+        } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 13) {
+          _internal_add_values(::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr));
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* MultipleReal::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:frame.proto.MultipleReal)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // repeated float values = 1;
+  if (this->_internal_values_size() > 0) {
+    target = stream->WriteFixedPacked(1, _internal_values(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:frame.proto.MultipleReal)
+  return target;
+}
+
+size_t MultipleReal::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:frame.proto.MultipleReal)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // repeated float values = 1;
+  {
+    unsigned int count = static_cast<unsigned int>(this->_internal_values_size());
+    size_t data_size = 4UL * count;
+    if (data_size > 0) {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+            static_cast<::PROTOBUF_NAMESPACE_ID::int32>(data_size));
+    }
+    int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(data_size);
+    _values_cached_byte_size_.store(cached_size,
+                                    std::memory_order_relaxed);
+    total_size += data_size;
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void MultipleReal::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:frame.proto.MultipleReal)
+  GOOGLE_DCHECK_NE(&from, this);
+  const MultipleReal* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<MultipleReal>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:frame.proto.MultipleReal)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:frame.proto.MultipleReal)
+    MergeFrom(*source);
+  }
+}
+
+void MultipleReal::MergeFrom(const MultipleReal& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:frame.proto.MultipleReal)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  values_.MergeFrom(from.values_);
+}
+
+void MultipleReal::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:frame.proto.MultipleReal)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void MultipleReal::CopyFrom(const MultipleReal& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:frame.proto.MultipleReal)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool MultipleReal::IsInitialized() const {
+  return true;
+}
+
+void MultipleReal::InternalSwap(MultipleReal* other) {
+  using std::swap;
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  values_.InternalSwap(&other->values_);
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata MultipleReal::GetMetadata() const {
+  return GetMetadataStatic();
+}
+
+
+// ===================================================================
+
+void MulitpleVector2::InitAsDefaultInstance() {
+}
+class MulitpleVector2::_Internal {
+ public:
+};
+
+MulitpleVector2::MulitpleVector2(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena),
+  values_(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:frame.proto.MulitpleVector2)
+}
+MulitpleVector2::MulitpleVector2(const MulitpleVector2& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message(),
+      values_(from.values_) {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  // @@protoc_insertion_point(copy_constructor:frame.proto.MulitpleVector2)
+}
+
+void MulitpleVector2::SharedCtor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_MulitpleVector2_Math_2eproto.base);
+}
+
+MulitpleVector2::~MulitpleVector2() {
+  // @@protoc_insertion_point(destructor:frame.proto.MulitpleVector2)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void MulitpleVector2::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
+}
+
+void MulitpleVector2::ArenaDtor(void* object) {
+  MulitpleVector2* _this = reinterpret_cast< MulitpleVector2* >(object);
+  (void)_this;
+}
+void MulitpleVector2::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void MulitpleVector2::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const MulitpleVector2& MulitpleVector2::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_MulitpleVector2_Math_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void MulitpleVector2::Clear() {
+// @@protoc_insertion_point(message_clear_start:frame.proto.MulitpleVector2)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  values_.Clear();
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* MulitpleVector2::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+    switch (tag >> 3) {
+      // repeated .frame.proto.Vector2 values = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            ptr = ctx->ParseMessage(_internal_add_values(), ptr);
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<10>(ptr));
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* MulitpleVector2::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:frame.proto.MulitpleVector2)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // repeated .frame.proto.Vector2 values = 1;
+  for (unsigned int i = 0,
+      n = static_cast<unsigned int>(this->_internal_values_size()); i < n; i++) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(1, this->_internal_values(i), target, stream);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:frame.proto.MulitpleVector2)
+  return target;
+}
+
+size_t MulitpleVector2::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:frame.proto.MulitpleVector2)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // repeated .frame.proto.Vector2 values = 1;
+  total_size += 1UL * this->_internal_values_size();
+  for (const auto& msg : this->values_) {
+    total_size +=
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void MulitpleVector2::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:frame.proto.MulitpleVector2)
+  GOOGLE_DCHECK_NE(&from, this);
+  const MulitpleVector2* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<MulitpleVector2>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:frame.proto.MulitpleVector2)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:frame.proto.MulitpleVector2)
+    MergeFrom(*source);
+  }
+}
+
+void MulitpleVector2::MergeFrom(const MulitpleVector2& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:frame.proto.MulitpleVector2)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  values_.MergeFrom(from.values_);
+}
+
+void MulitpleVector2::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:frame.proto.MulitpleVector2)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void MulitpleVector2::CopyFrom(const MulitpleVector2& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:frame.proto.MulitpleVector2)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool MulitpleVector2::IsInitialized() const {
+  return true;
+}
+
+void MulitpleVector2::InternalSwap(MulitpleVector2* other) {
+  using std::swap;
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  values_.InternalSwap(&other->values_);
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata MulitpleVector2::GetMetadata() const {
+  return GetMetadataStatic();
+}
+
+
+// ===================================================================
+
+void MultipleVector3::InitAsDefaultInstance() {
+}
+class MultipleVector3::_Internal {
+ public:
+};
+
+MultipleVector3::MultipleVector3(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena),
+  values_(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:frame.proto.MultipleVector3)
+}
+MultipleVector3::MultipleVector3(const MultipleVector3& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message(),
+      values_(from.values_) {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  // @@protoc_insertion_point(copy_constructor:frame.proto.MultipleVector3)
+}
+
+void MultipleVector3::SharedCtor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_MultipleVector3_Math_2eproto.base);
+}
+
+MultipleVector3::~MultipleVector3() {
+  // @@protoc_insertion_point(destructor:frame.proto.MultipleVector3)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void MultipleVector3::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
+}
+
+void MultipleVector3::ArenaDtor(void* object) {
+  MultipleVector3* _this = reinterpret_cast< MultipleVector3* >(object);
+  (void)_this;
+}
+void MultipleVector3::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void MultipleVector3::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const MultipleVector3& MultipleVector3::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_MultipleVector3_Math_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void MultipleVector3::Clear() {
+// @@protoc_insertion_point(message_clear_start:frame.proto.MultipleVector3)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  values_.Clear();
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* MultipleVector3::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+    switch (tag >> 3) {
+      // repeated .frame.proto.Vector3 values = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            ptr = ctx->ParseMessage(_internal_add_values(), ptr);
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<10>(ptr));
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* MultipleVector3::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:frame.proto.MultipleVector3)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // repeated .frame.proto.Vector3 values = 1;
+  for (unsigned int i = 0,
+      n = static_cast<unsigned int>(this->_internal_values_size()); i < n; i++) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(1, this->_internal_values(i), target, stream);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:frame.proto.MultipleVector3)
+  return target;
+}
+
+size_t MultipleVector3::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:frame.proto.MultipleVector3)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // repeated .frame.proto.Vector3 values = 1;
+  total_size += 1UL * this->_internal_values_size();
+  for (const auto& msg : this->values_) {
+    total_size +=
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void MultipleVector3::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:frame.proto.MultipleVector3)
+  GOOGLE_DCHECK_NE(&from, this);
+  const MultipleVector3* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<MultipleVector3>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:frame.proto.MultipleVector3)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:frame.proto.MultipleVector3)
+    MergeFrom(*source);
+  }
+}
+
+void MultipleVector3::MergeFrom(const MultipleVector3& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:frame.proto.MultipleVector3)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  values_.MergeFrom(from.values_);
+}
+
+void MultipleVector3::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:frame.proto.MultipleVector3)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void MultipleVector3::CopyFrom(const MultipleVector3& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:frame.proto.MultipleVector3)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool MultipleVector3::IsInitialized() const {
+  return true;
+}
+
+void MultipleVector3::InternalSwap(MultipleVector3* other) {
+  using std::swap;
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  values_.InternalSwap(&other->values_);
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata MultipleVector3::GetMetadata() const {
+  return GetMetadataStatic();
+}
+
+
+// ===================================================================
+
+void MultipleVector4::InitAsDefaultInstance() {
+}
+class MultipleVector4::_Internal {
+ public:
+};
+
+MultipleVector4::MultipleVector4(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena),
+  values_(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:frame.proto.MultipleVector4)
+}
+MultipleVector4::MultipleVector4(const MultipleVector4& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message(),
+      values_(from.values_) {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  // @@protoc_insertion_point(copy_constructor:frame.proto.MultipleVector4)
+}
+
+void MultipleVector4::SharedCtor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_MultipleVector4_Math_2eproto.base);
+}
+
+MultipleVector4::~MultipleVector4() {
+  // @@protoc_insertion_point(destructor:frame.proto.MultipleVector4)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void MultipleVector4::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
+}
+
+void MultipleVector4::ArenaDtor(void* object) {
+  MultipleVector4* _this = reinterpret_cast< MultipleVector4* >(object);
+  (void)_this;
+}
+void MultipleVector4::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void MultipleVector4::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const MultipleVector4& MultipleVector4::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_MultipleVector4_Math_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void MultipleVector4::Clear() {
+// @@protoc_insertion_point(message_clear_start:frame.proto.MultipleVector4)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  values_.Clear();
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* MultipleVector4::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+    switch (tag >> 3) {
+      // repeated .frame.proto.Vector4 values = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            ptr = ctx->ParseMessage(_internal_add_values(), ptr);
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<10>(ptr));
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* MultipleVector4::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:frame.proto.MultipleVector4)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // repeated .frame.proto.Vector4 values = 1;
+  for (unsigned int i = 0,
+      n = static_cast<unsigned int>(this->_internal_values_size()); i < n; i++) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(1, this->_internal_values(i), target, stream);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:frame.proto.MultipleVector4)
+  return target;
+}
+
+size_t MultipleVector4::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:frame.proto.MultipleVector4)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // repeated .frame.proto.Vector4 values = 1;
+  total_size += 1UL * this->_internal_values_size();
+  for (const auto& msg : this->values_) {
+    total_size +=
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void MultipleVector4::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:frame.proto.MultipleVector4)
+  GOOGLE_DCHECK_NE(&from, this);
+  const MultipleVector4* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<MultipleVector4>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:frame.proto.MultipleVector4)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:frame.proto.MultipleVector4)
+    MergeFrom(*source);
+  }
+}
+
+void MultipleVector4::MergeFrom(const MultipleVector4& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:frame.proto.MultipleVector4)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  values_.MergeFrom(from.values_);
+}
+
+void MultipleVector4::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:frame.proto.MultipleVector4)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void MultipleVector4::CopyFrom(const MultipleVector4& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:frame.proto.MultipleVector4)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool MultipleVector4::IsInitialized() const {
+  return true;
+}
+
+void MultipleVector4::InternalSwap(MultipleVector4* other) {
+  using std::swap;
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  values_.InternalSwap(&other->values_);
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata MultipleVector4::GetMetadata() const {
+  return GetMetadataStatic();
+}
+
+
+// ===================================================================
+
+void MultipleMatrix3::InitAsDefaultInstance() {
+}
+class MultipleMatrix3::_Internal {
+ public:
+};
+
+MultipleMatrix3::MultipleMatrix3(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena),
+  values_(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:frame.proto.MultipleMatrix3)
+}
+MultipleMatrix3::MultipleMatrix3(const MultipleMatrix3& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message(),
+      values_(from.values_) {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  // @@protoc_insertion_point(copy_constructor:frame.proto.MultipleMatrix3)
+}
+
+void MultipleMatrix3::SharedCtor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_MultipleMatrix3_Math_2eproto.base);
+}
+
+MultipleMatrix3::~MultipleMatrix3() {
+  // @@protoc_insertion_point(destructor:frame.proto.MultipleMatrix3)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void MultipleMatrix3::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
+}
+
+void MultipleMatrix3::ArenaDtor(void* object) {
+  MultipleMatrix3* _this = reinterpret_cast< MultipleMatrix3* >(object);
+  (void)_this;
+}
+void MultipleMatrix3::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void MultipleMatrix3::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const MultipleMatrix3& MultipleMatrix3::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_MultipleMatrix3_Math_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void MultipleMatrix3::Clear() {
+// @@protoc_insertion_point(message_clear_start:frame.proto.MultipleMatrix3)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  values_.Clear();
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* MultipleMatrix3::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+    switch (tag >> 3) {
+      // repeated .frame.proto.Matrix3 values = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            ptr = ctx->ParseMessage(_internal_add_values(), ptr);
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<10>(ptr));
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* MultipleMatrix3::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:frame.proto.MultipleMatrix3)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // repeated .frame.proto.Matrix3 values = 1;
+  for (unsigned int i = 0,
+      n = static_cast<unsigned int>(this->_internal_values_size()); i < n; i++) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(1, this->_internal_values(i), target, stream);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:frame.proto.MultipleMatrix3)
+  return target;
+}
+
+size_t MultipleMatrix3::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:frame.proto.MultipleMatrix3)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // repeated .frame.proto.Matrix3 values = 1;
+  total_size += 1UL * this->_internal_values_size();
+  for (const auto& msg : this->values_) {
+    total_size +=
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void MultipleMatrix3::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:frame.proto.MultipleMatrix3)
+  GOOGLE_DCHECK_NE(&from, this);
+  const MultipleMatrix3* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<MultipleMatrix3>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:frame.proto.MultipleMatrix3)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:frame.proto.MultipleMatrix3)
+    MergeFrom(*source);
+  }
+}
+
+void MultipleMatrix3::MergeFrom(const MultipleMatrix3& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:frame.proto.MultipleMatrix3)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  values_.MergeFrom(from.values_);
+}
+
+void MultipleMatrix3::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:frame.proto.MultipleMatrix3)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void MultipleMatrix3::CopyFrom(const MultipleMatrix3& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:frame.proto.MultipleMatrix3)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool MultipleMatrix3::IsInitialized() const {
+  return true;
+}
+
+void MultipleMatrix3::InternalSwap(MultipleMatrix3* other) {
+  using std::swap;
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  values_.InternalSwap(&other->values_);
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata MultipleMatrix3::GetMetadata() const {
+  return GetMetadataStatic();
+}
+
+
+// ===================================================================
+
+void MultipleMatrix4::InitAsDefaultInstance() {
+}
+class MultipleMatrix4::_Internal {
+ public:
+};
+
+MultipleMatrix4::MultipleMatrix4(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena),
+  values_(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:frame.proto.MultipleMatrix4)
+}
+MultipleMatrix4::MultipleMatrix4(const MultipleMatrix4& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message(),
+      values_(from.values_) {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  // @@protoc_insertion_point(copy_constructor:frame.proto.MultipleMatrix4)
+}
+
+void MultipleMatrix4::SharedCtor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_MultipleMatrix4_Math_2eproto.base);
+}
+
+MultipleMatrix4::~MultipleMatrix4() {
+  // @@protoc_insertion_point(destructor:frame.proto.MultipleMatrix4)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void MultipleMatrix4::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
+}
+
+void MultipleMatrix4::ArenaDtor(void* object) {
+  MultipleMatrix4* _this = reinterpret_cast< MultipleMatrix4* >(object);
+  (void)_this;
+}
+void MultipleMatrix4::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void MultipleMatrix4::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const MultipleMatrix4& MultipleMatrix4::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_MultipleMatrix4_Math_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void MultipleMatrix4::Clear() {
+// @@protoc_insertion_point(message_clear_start:frame.proto.MultipleMatrix4)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  values_.Clear();
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* MultipleMatrix4::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+    switch (tag >> 3) {
+      // repeated .frame.proto.Matrix4 values = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            ptr = ctx->ParseMessage(_internal_add_values(), ptr);
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<10>(ptr));
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* MultipleMatrix4::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:frame.proto.MultipleMatrix4)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // repeated .frame.proto.Matrix4 values = 1;
+  for (unsigned int i = 0,
+      n = static_cast<unsigned int>(this->_internal_values_size()); i < n; i++) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(1, this->_internal_values(i), target, stream);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:frame.proto.MultipleMatrix4)
+  return target;
+}
+
+size_t MultipleMatrix4::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:frame.proto.MultipleMatrix4)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // repeated .frame.proto.Matrix4 values = 1;
+  total_size += 1UL * this->_internal_values_size();
+  for (const auto& msg : this->values_) {
+    total_size +=
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void MultipleMatrix4::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:frame.proto.MultipleMatrix4)
+  GOOGLE_DCHECK_NE(&from, this);
+  const MultipleMatrix4* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<MultipleMatrix4>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:frame.proto.MultipleMatrix4)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:frame.proto.MultipleMatrix4)
+    MergeFrom(*source);
+  }
+}
+
+void MultipleMatrix4::MergeFrom(const MultipleMatrix4& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:frame.proto.MultipleMatrix4)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  values_.MergeFrom(from.values_);
+}
+
+void MultipleMatrix4::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:frame.proto.MultipleMatrix4)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void MultipleMatrix4::CopyFrom(const MultipleMatrix4& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:frame.proto.MultipleMatrix4)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool MultipleMatrix4::IsInitialized() const {
+  return true;
+}
+
+void MultipleMatrix4::InternalSwap(MultipleMatrix4* other) {
+  using std::swap;
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  values_.InternalSwap(&other->values_);
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata MultipleMatrix4::GetMetadata() const {
   return GetMetadataStatic();
 }
 
@@ -287,8 +3739,44 @@ void Vector::InternalSwap(Vector* other) {
 }  // namespace proto
 }  // namespace frame
 PROTOBUF_NAMESPACE_OPEN
-template<> PROTOBUF_NOINLINE ::frame::proto::Vector* Arena::CreateMaybeMessage< ::frame::proto::Vector >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::frame::proto::Vector >(arena);
+template<> PROTOBUF_NOINLINE ::frame::proto::Vector2* Arena::CreateMaybeMessage< ::frame::proto::Vector2 >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::frame::proto::Vector2 >(arena);
+}
+template<> PROTOBUF_NOINLINE ::frame::proto::Vector3* Arena::CreateMaybeMessage< ::frame::proto::Vector3 >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::frame::proto::Vector3 >(arena);
+}
+template<> PROTOBUF_NOINLINE ::frame::proto::Vector4* Arena::CreateMaybeMessage< ::frame::proto::Vector4 >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::frame::proto::Vector4 >(arena);
+}
+template<> PROTOBUF_NOINLINE ::frame::proto::Matrix3* Arena::CreateMaybeMessage< ::frame::proto::Matrix3 >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::frame::proto::Matrix3 >(arena);
+}
+template<> PROTOBUF_NOINLINE ::frame::proto::Matrix4* Arena::CreateMaybeMessage< ::frame::proto::Matrix4 >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::frame::proto::Matrix4 >(arena);
+}
+template<> PROTOBUF_NOINLINE ::frame::proto::MultipleInteger* Arena::CreateMaybeMessage< ::frame::proto::MultipleInteger >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::frame::proto::MultipleInteger >(arena);
+}
+template<> PROTOBUF_NOINLINE ::frame::proto::MutlipleBoolean* Arena::CreateMaybeMessage< ::frame::proto::MutlipleBoolean >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::frame::proto::MutlipleBoolean >(arena);
+}
+template<> PROTOBUF_NOINLINE ::frame::proto::MultipleReal* Arena::CreateMaybeMessage< ::frame::proto::MultipleReal >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::frame::proto::MultipleReal >(arena);
+}
+template<> PROTOBUF_NOINLINE ::frame::proto::MulitpleVector2* Arena::CreateMaybeMessage< ::frame::proto::MulitpleVector2 >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::frame::proto::MulitpleVector2 >(arena);
+}
+template<> PROTOBUF_NOINLINE ::frame::proto::MultipleVector3* Arena::CreateMaybeMessage< ::frame::proto::MultipleVector3 >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::frame::proto::MultipleVector3 >(arena);
+}
+template<> PROTOBUF_NOINLINE ::frame::proto::MultipleVector4* Arena::CreateMaybeMessage< ::frame::proto::MultipleVector4 >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::frame::proto::MultipleVector4 >(arena);
+}
+template<> PROTOBUF_NOINLINE ::frame::proto::MultipleMatrix3* Arena::CreateMaybeMessage< ::frame::proto::MultipleMatrix3 >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::frame::proto::MultipleMatrix3 >(arena);
+}
+template<> PROTOBUF_NOINLINE ::frame::proto::MultipleMatrix4* Arena::CreateMaybeMessage< ::frame::proto::MultipleMatrix4 >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::frame::proto::MultipleMatrix4 >(arena);
 }
 PROTOBUF_NAMESPACE_CLOSE
 

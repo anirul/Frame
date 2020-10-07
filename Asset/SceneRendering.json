@@ -5,10 +5,248 @@
     "out_mra": "deferred_mra",
     "out_position": "deferred_position"
   },
+  "view": {
+    "out_normal": "view_normal",
+    "out_position": "view_position"
+  },
   "out_textures": [
-    "screen"
+    ""
   ],
   "textures": [
+    {
+      "name": "screen_space_ambiant_occlusion",
+      "size": {
+        "x": "-1",
+        "y": "-1"
+      },
+      "clear": "true",
+      "pixel_element_size": {
+        "value": "HALF"
+      },
+      "pixel_structure": {
+        "value": "RGB"
+      },
+      "min_filter": {
+        "value": "LINEAR"
+      },
+      "mag_filter": {
+        "value": "LINEAR"
+      },
+      "wrap_s": {
+        "value": "CLAMP_TO_EDGE"
+      },
+      "wrap_t": {
+        "value": "CLAMP_TO_EDGE"
+      }
+    },
+    {
+      "name": "ssao_blur",
+      "size": {
+        "x": "-1",
+        "y": "-1"
+      },
+      "clear": "true",
+      "pixel_element_size": {
+        "value": "HALF"
+      },
+      "pixel_structure": {
+        "value": "RGB"
+      },
+      "min_filter": {
+        "value": "LINEAR"
+      },
+      "mag_filter": {
+        "value": "LINEAR"
+      },
+      "wrap_s": {
+        "value": "CLAMP_TO_EDGE"
+      },
+      "wrap_t": {
+        "value": "CLAMP_TO_EDGE"
+      }
+    },
+    {
+      "name": "lighting_ambiant",
+      "size": {
+        "x": "-1",
+        "y": "-1"
+      },
+      "clear": "true",
+      "pixel_element_size": {
+        "value": "HALF"
+      },
+      "pixel_structure": {
+        "value": "RGB"
+      },
+      "min_filter": {
+        "value": "LINEAR"
+      },
+      "mag_filter": {
+        "value": "LINEAR"
+      },
+      "wrap_s": {
+        "value": "CLAMP_TO_EDGE"
+      },
+      "wrap_t": {
+        "value": "CLAMP_TO_EDGE"
+      }
+    },
+    {
+      "name": "lighting_bloom",
+      "size": {
+        "x": "-1",
+        "y": "-1"
+      },
+      "clear": "true",
+      "pixel_element_size": {
+        "value": "HALF"
+      },
+      "pixel_structure": {
+        "value": "RGB"
+      },
+      "min_filter": {
+        "value": "LINEAR"
+      },
+      "mag_filter": {
+        "value": "LINEAR"
+      },
+      "wrap_s": {
+        "value": "CLAMP_TO_EDGE"
+      },
+      "wrap_t": {
+        "value": "CLAMP_TO_EDGE"
+      }
+    },
+    {
+      "name": "lighting_bloom_ssao",
+      "size": {
+        "x": "-1",
+        "y": "-1"
+      },
+      "clear": "true",
+      "pixel_element_size": {
+        "value": "HALF"
+      },
+      "pixel_structure": {
+        "value": "RGB"
+      },
+      "min_filter": {
+        "value": "LINEAR"
+      },
+      "mag_filter": {
+        "value": "LINEAR"
+      },
+      "wrap_s": {
+        "value": "CLAMP_TO_EDGE"
+      },
+      "wrap_t": {
+        "value": "CLAMP_TO_EDGE"
+      }
+    },
+    {
+      "name": "lighting_bloom_ssao_hdr",
+      "size": {
+        "x": "-1",
+        "y": "-1"
+      },
+      "clear": "true",
+      "pixel_element_size": {
+        "value": "HALF"
+      },
+      "pixel_structure": {
+        "value": "RGB"
+      },
+      "min_filter": {
+        "value": "LINEAR"
+      },
+      "mag_filter": {
+        "value": "LINEAR"
+      },
+      "wrap_s": {
+        "value": "CLAMP_TO_EDGE"
+      },
+      "wrap_t": {
+        "value": "CLAMP_TO_EDGE"
+      }
+    },
+    {
+      "name": "brightness",
+      "size": {
+        "x": "-1",
+        "y": "-1"
+      },
+      "clear": "true",
+      "pixel_element_size": {
+        "value": "HALF"
+      },
+      "pixel_structure": {
+        "value": "RGB"
+      },
+      "min_filter": {
+        "value": "LINEAR"
+      },
+      "mag_filter": {
+        "value": "LINEAR"
+      },
+      "wrap_s": {
+        "value": "CLAMP_TO_EDGE"
+      },
+      "wrap_t": {
+        "value": "CLAMP_TO_EDGE"
+      }
+    },
+    {
+      "name": "brightness_gaussian_blur_horizontal_2",
+      "size": {
+        "x": "-2",
+        "y": "-2"
+      },
+      "clear": "true",
+      "pixel_element_size": {
+        "value": "HALF"
+      },
+      "pixel_structure": {
+        "value": "RGB"
+      },
+      "min_filter": {
+        "value": "LINEAR"
+      },
+      "mag_filter": {
+        "value": "LINEAR"
+      },
+      "wrap_s": {
+        "value": "CLAMP_TO_EDGE"
+      },
+      "wrap_t": {
+        "value": "CLAMP_TO_EDGE"
+      }
+    },
+    {
+      "name": "brightness_gaussian_blur_vertical_2",
+      "size": {
+        "x": "-2",
+        "y": "-2"
+      },
+      "clear": "true",
+      "pixel_element_size": {
+        "value": "HALF"
+      },
+      "pixel_structure": {
+        "value": "RGB"
+      },
+      "min_filter": {
+        "value": "LINEAR"
+      },
+      "mag_filter": {
+        "value": "LINEAR"
+      },
+      "wrap_s": {
+        "value": "CLAMP_TO_EDGE"
+      },
+      "wrap_t": {
+        "value": "CLAMP_TO_EDGE"
+      }
+    },
     {
       "name": "deferred_albedo",
       "size": {
@@ -62,7 +300,7 @@
       }
     },
     {
-      "name": "deferred_mra",
+      "name": "deferred_mrao",
       "size": {
         "x": "-1",
         "y": "-1"
@@ -112,11 +350,404 @@
       "wrap_t": {
         "value": "CLAMP_TO_EDGE"
       }
+    },
+    {
+      "name": "view_position",
+      "size": {
+        "x": "-1",
+        "y": "-1"
+      },
+      "clear": "true",
+      "pixel_element_size": {
+        "value": "HALF"
+      },
+      "pixel_structure": {
+        "value": "RGB"
+      },
+      "min_filter": {
+        "value": "NEAREST"
+      },
+      "mag_filter": {
+        "value": "NEAREST"
+      },
+      "wrap_s": {
+        "value": "CLAMP_TO_EDGE"
+      },
+      "wrap_t": {
+        "value": "CLAMP_TO_EDGE"
+      }
+    },
+    {
+      "name": "view_normal",
+      "size": {
+        "x": "-1",
+        "y": "-1"
+      },
+      "clear": "true",
+      "pixel_element_size": {
+        "value": "HALF"
+      },
+      "pixel_structure": {
+        "value": "RGB"
+      },
+      "min_filter": {
+        "value": "NEAREST"
+      },
+      "mag_filter": {
+        "value": "NEAREST"
+      },
+      "wrap_s": {
+        "value": "CLAMP_TO_EDGE"
+      },
+      "wrap_t": {
+        "value": "CLAMP_TO_EDGE"
+      }
+    },
+    {
+      "name": "lighting",
+      "size": {
+        "x": "-1",
+        "y": "-1"
+      },
+      "clear": "true",
+      "pixel_element_size": {
+        "value": "HALF"
+      },
+      "pixel_structure": {
+        "value": "RGB"
+      },
+      "min_filter": {
+        "value": "LINEAR"
+      },
+      "mag_filter": {
+        "value": "LINEAR"
+      },
+      "wrap_s": {
+        "value": "CLAMP_TO_EDGE"
+      },
+      "wrap_t": {
+        "value": "CLAMP_TO_EDGE"
+      }
+    },
+    {
+      "name": "brightness_gaussian_blur_horizontal_4",
+      "size": {
+        "x": "-4",
+        "y": "-4"
+      },
+      "clear": "true",
+      "pixel_element_size": {
+        "value": "HALF"
+      },
+      "pixel_structure": {
+        "value": "RGB"
+      },
+      "min_filter": {
+        "value": "LINEAR"
+      },
+      "mag_filter": {
+        "value": "LINEAR"
+      },
+      "wrap_s": {
+        "value": "CLAMP_TO_EDGE"
+      },
+      "wrap_t": {
+        "value": "CLAMP_TO_EDGE"
+      }
+    },
+    {
+      "name": "brightness_gaussian_blur_vertical_4",
+      "size": {
+        "x": "-4",
+        "y": "-4"
+      },
+      "clear": "true",
+      "pixel_element_size": {
+        "value": "HALF"
+      },
+      "pixel_structure": {
+        "value": "RGB"
+      },
+      "min_filter": {
+        "value": "LINEAR"
+      },
+      "mag_filter": {
+        "value": "LINEAR"
+      },
+      "wrap_s": {
+        "value": "CLAMP_TO_EDGE"
+      },
+      "wrap_t": {
+        "value": "CLAMP_TO_EDGE"
+      }
     }
   ],
   "effects": [
     {
-      "name": "Blur"
+      "name": "blur",
+      "input_texture_names": [
+        "screen_space_ambiant_occlusion"
+      ],
+      "output_texture_names": [
+        "ssao_blur"
+      ],
+      "shader": "Blur",
+      "parameters": [
+        {
+          "name": "exponent",
+          "value": {
+            "real": "2.f"
+          }
+        }
+      ]
+    },
+    {
+      "name": "brightness",
+      "input_texture_names": [
+        "lighting_ambiant"
+      ],
+      "output_texture_names": [
+        "brightness"
+      ],
+      "shader": "Brightness"
+    },
+    {
+      "name": "gaussian_blur_h2",
+      "input_texture_name": [
+        "brightness"
+      ],
+      "output_texture_names": [
+        "brightness_gaussian_blur_horizontal_2"
+      ],
+      "shader": "GaussianBlur",
+      "parameters": [
+        {
+          "name": "horizontal",
+          "value": {
+            "boolean": "true"
+          }
+        }
+      ]
+    },
+    {
+      "name": "gaussian_blur_v2",
+      "input_texture_name": [
+        "brightness_gaussian_blur_horizontal_2"
+      ],
+      "output_texture_names": [
+        "brightness_gaussian_blur_vertical_2"
+      ],
+      "shader": "GaussianBlur",
+      "parameters": [
+        {
+          "name": "horizontal",
+          "value": {
+            "boolean": "false"
+          }
+        }
+      ]
+    },
+    {
+      "name": "gaussian_blur_h4",
+      "input_texture_name": [
+        "brightness_gaussian_blur_vertical_2"
+      ],
+      "output_texture_names": [
+        "brightness_gaussian_blur_horizontal_4"
+      ],
+      "shader": "GaussianBlur",
+      "parameters": [
+        {
+          "name": "horizontal",
+          "value": {
+            "boolean": "true"
+          }
+        }
+      ]
+    },
+    {
+      "name": "gaussian_blur_h4",
+      "input_texture_name": [
+        "brightness_gaussian_blur_horizontal_4"
+      ],
+      "output_texture_names": [
+        "brightness_gaussian_blur_vertical_4"
+      ],
+      "shader": "GaussianBlur",
+      "parameters": [
+        {
+          "name": "horizontal",
+          "value": {
+            "boolean": "false"
+          }
+        }
+      ]
+    },
+    {
+      "name": "addition_bloom",
+      "input_texture_name": [
+        "lighting_ambiant",
+        "brightness_gaussian_blur_vertical_4"
+      ],
+      "output_texture_names": [
+        "lighting_bloom"
+      ],
+      "shader": "VectorAddition",
+      "parameters": [
+        {
+          "name": "texture_max",
+          "value": {
+            "integer": 2
+          }
+        }
+      ]
+    },
+    {
+      "name": "multiply",
+      "input_texture_name": [
+        "lighting_bloom",
+        "ssao_blur"
+      ],
+      "output_texture_names": [
+        "lighting_bloom_ssao"
+      ],
+      "shader": "VectorMultiply",
+      "parameters": [
+        {
+          "name": "texture_max",
+          "value": {
+            "integer": 2
+          }
+        }
+      ]
+    },
+    {
+      "name": "lighting",
+      "input_texture_name": [
+        "deferred_albedo",
+        "deferred_normal",
+        "deferred_mra",
+        "deferred_point"
+      ],
+      "output_texture_names": [
+        "lighting"
+      ],
+      "shader": "Lighting",
+      "parameters": [
+        {
+          "name": "camera_position",
+          "value": {
+            "enum": "CAMERA_POSITION_VEC3"
+          }
+        },
+        {
+          "name": "light_position",
+          "value": {
+            "vec3s": {
+              "values": [
+                {
+                  "x": "5.0f",
+                  "y": "5.0f",
+                  "z": "5.0f"
+                },
+                {
+                  "x": "-5.0f",
+                  "y": "5.0f",
+                  "z": "5.0f"
+                },
+                {
+                  "x": "5.0f",
+                  "y": "5.0f",
+                  "z": "-5.0f"
+                },
+                {
+                  "x": "-5.0f",
+                  "y": "5.0f",
+                  "z": "-5.0f"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "light_color",
+          "value": {
+            "vec3s": {
+              "values": [
+                {
+                  "x": "100.0f",
+                  "y": "100.0f",
+                  "z": "100.0f"
+                },
+                {
+
+                  "x": "100.0f",
+                  "y": "100.0f",
+                  "z": "100.0f"
+                },
+                {
+                  "x": "100.0f",
+                  "y": "100.0f",
+                  "z": "100.0f"
+                },
+                {
+                  "x": "100.0f",
+                  "y": "100.0f",
+                  "z": "100.0f"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "light_max",
+          "value": {
+            "integer": 4
+          }
+        }
+      ]
+    },
+    {
+      "name": "addition_lighting",
+      "input_texture_name": [
+        "deferred_albedo",
+        "lighting"
+      ],
+      "output_texture_names": [
+        "lighting_ambiant"
+      ],
+      "shader": "VectorAddition",
+      "parameters": [
+        {
+          "name": "texture_max",
+          "value": {
+            "integer": 2
+          }
+        }
+      ]
+    },
+    {
+      "name": "screen_space_ambiant_occlusion",
+      "input_texture_name": [
+        "view_position",
+        "view_normal"
+      ],
+      "output_texture_names": [
+        "screen_space_ambiant_occlusion"
+      ],
+      "shader": "ScreenSpaceAmbiantOcclusion",
+      "parameters": [
+        {
+          "name": "kernel",
+          "value": {
+            "vec3s": {
+              "values": [
+                // TODO fill me up!
+              ]
+            }
+          }
+        }
+      ]
     }
   ]
 }
