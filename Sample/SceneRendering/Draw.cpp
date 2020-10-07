@@ -42,12 +42,21 @@ void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 	std::for_each(
 		display.textures().begin(), 
 		display.textures().end(), 
-		[this](const frame::proto::Texture& texture)
-	{
-		texture_map_.emplace(
-			texture.name(), 
-			std::make_shared<sgl::Texture>(texture));
-	});
+		[this, size](const frame::proto::Texture& texture)
+		{
+			texture_map_.emplace(
+				texture.name(), 
+				std::make_shared<sgl::Texture>(texture, size));
+		});
+#ifdef _DEBUG
+	std::for_each(
+		texture_map_.begin(),
+		texture_map_.end(),
+		[this](const auto& name_texture_pair)
+		{
+			// TODO: Output logs (on screen with IMGUI).
+		});
+#endif
 
 	std::pair<std::uint32_t, std::uint32_t> size_2 = 
 		{ size.first / 2, size.second / 2 };

@@ -56,7 +56,10 @@ namespace sgl {
 				PixelElementSize_BYTE(),
 			const PixelStructure& pixel_structure = PixelStructure_RGB());
 		// Create from a proto.
-		Texture(const frame::proto::Texture& texture);
+		// the size is the preferred size of the screen.
+		Texture(
+			const frame::proto::Texture& texture, 
+			const std::pair<std::uint32_t, std::uint32_t> size);
 		virtual ~Texture();
 
 	public:

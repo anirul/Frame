@@ -119,46 +119,45 @@ namespace sgl {
 		UnBind();
 	}
 
-	Texture::Texture(const frame::proto::Texture& texture) :
+	Texture::Texture(
+		const frame::proto::Texture& texture,
+		const std::pair<std::uint32_t, std::uint32_t> size) :
+		size_(size),
 		pixel_element_size_(texture.pixel_element_size()),
 		pixel_structure_(texture.pixel_structure())
 	{
 		// Get the pixel element size.
 		if (texture.pixel_element_size().value() == 
 			frame::proto::PixelElementSize::INVALID)
-		{
 			error_.CreateError(
 				"Invalid pixel element size.", 
 				__FILE__, 
 				__LINE__ - 6);
-		}
 		if (texture.pixel_structure().value() == 
 			frame::proto::PixelStructure::INVALID)
-		{ 
 			error_.CreateError(
 				"Invalid pixel structure.",
 				__FILE__,
 				__LINE__ - 6);
-		}
 		CreateTexture();
 		if (texture.min_filter().value() != 
 			frame::proto::TextureFilter::INVALID)
-		{
 			SetMinFilter(texture.min_filter());
-		}
 		if (texture.mag_filter().value() != 
 			frame::proto::TextureFilter::INVALID)
-		{
 			SetMagFilter(texture.mag_filter());
-		}
 		if (texture.wrap_s().value() != frame::proto::TextureFilter::INVALID)
-		{
 			SetWrapS(texture.wrap_s());
-		}
 		if (texture.wrap_t().value() != frame::proto::TextureFilter::INVALID)
-		{
 			SetWrapT(texture.wrap_t());
-		}
+		if (texture.size().x() < 0)
+			size_.first /= std::abs(texture.size().x());
+		else
+			size_.first = texture.size().x();
+		if (texture.size().y() < 0)
+			size_.second /= std::abs(texture.size().y());
+		else
+			size_.second = texture.size().y();
 		Bind();
 		glTexImage2D(
 			GL_TEXTURE_2D,
@@ -171,10 +170,11 @@ namespace sgl {
 			sgl::ConvertToGLType(pixel_element_size_),
 			texture.pixels().empty() ? nullptr : texture.pixels().data());
 		UnBind();
-		if (texture.clear())
-		{
-			Clear(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
-		}
+		// CHECKME: This should be at every frame not in the constructor.
+		if (texture.clear() && 
+			texture.size().x() != 0 && 
+			texture.size().y() != 0)
+			Clear(glm::uvec4(0.0f, 0.0f, 0.0f, 1.0f));
 	}
 
 	void Texture::CreateTexture()

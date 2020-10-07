@@ -1,4 +1,10 @@
 {
+  "deferred": {
+    "out_albedo": "deferred_albedo",
+    "out_normal": "deferred_normal",
+    "out_mra": "deferred_mra",
+    "out_position": "deferred_position"
+  },
   "out_textures": [
     "screen"
   ],
@@ -6,8 +12,86 @@
     {
       "name": "deferred_albedo",
       "size": {
-        "x": "1920",
-        "y": "1080"
+        "x": "-1",
+        "y": "-1"
+      },
+      "clear": "true",
+      "pixel_element_size": {
+        "value": "HALF"
+      },
+      "pixel_structure": {
+        "value": "RGB"
+      },
+      "min_filter": {
+        "value": "LINEAR"
+      },
+      "mag_filter": {
+        "value": "LINEAR"
+      },
+      "wrap_s": {
+        "value": "CLAMP_TO_EDGE"
+      },
+      "wrap_t": {
+        "value": "CLAMP_TO_EDGE"
+      }
+    },
+    {
+      "name": "deferred_normal",
+      "size": {
+        "x": "-1",
+        "y": "-1"
+      },
+      "clear": "true",
+      "pixel_element_size": {
+        "value": "HALF"
+      },
+      "pixel_structure": {
+        "value": "RGB"
+      },
+      "min_filter": {
+        "value": "LINEAR"
+      },
+      "mag_filter": {
+        "value": "LINEAR"
+      },
+      "wrap_s": {
+        "value": "CLAMP_TO_EDGE"
+      },
+      "wrap_t": {
+        "value": "CLAMP_TO_EDGE"
+      }
+    },
+    {
+      "name": "deferred_mra",
+      "size": {
+        "x": "-1",
+        "y": "-1"
+      },
+      "clear": "true",
+      "pixel_element_size": {
+        "value": "HALF"
+      },
+      "pixel_structure": {
+        "value": "RGB"
+      },
+      "min_filter": {
+        "value": "LINEAR"
+      },
+      "mag_filter": {
+        "value": "LINEAR"
+      },
+      "wrap_s": {
+        "value": "CLAMP_TO_EDGE"
+      },
+      "wrap_t": {
+        "value": "CLAMP_TO_EDGE"
+      }
+    },
+    {
+      "name": "deferred_position",
+      "size": {
+        "x": "-1",
+        "y": "-1"
       },
       "clear": "true",
       "pixel_element_size": {
