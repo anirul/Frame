@@ -28,7 +28,7 @@ namespace sgl {
 
 	public:
 		// Pile up effect to be called before Startup.
-		void AddEffect(std::shared_ptr<EffectInterface>& effect);
+		void AddEffect(std::shared_ptr<Effect>& effect);
 		// Startup the scene. Throw errors in case there is any, takes fov in 
 		// degrees.
 		void Startup(const float fov = 65.0f);
