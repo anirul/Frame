@@ -10,7 +10,7 @@
     "out_position": "view_position"
   },
   "out_textures": [
-    ""
+    "deferred_albedo"
   ],
   "textures": [
     {

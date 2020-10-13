@@ -140,15 +140,14 @@ namespace sgl {
 				__FILE__,
 				__LINE__ - 6);
 		CreateTexture();
-		if (texture.min_filter().value() != 
-			frame::proto::TextureFilter::INVALID)
+		constexpr auto INVALID_TEXTURE = frame::proto::TextureFilter::INVALID;
+		if (texture.min_filter().value() != INVALID_TEXTURE)
 			SetMinFilter(texture.min_filter());
-		if (texture.mag_filter().value() != 
-			frame::proto::TextureFilter::INVALID)
+		if (texture.mag_filter().value() != INVALID_TEXTURE)
 			SetMagFilter(texture.mag_filter());
-		if (texture.wrap_s().value() != frame::proto::TextureFilter::INVALID)
+		if (texture.wrap_s().value() != INVALID_TEXTURE)
 			SetWrapS(texture.wrap_s());
-		if (texture.wrap_t().value() != frame::proto::TextureFilter::INVALID)
+		if (texture.wrap_t().value() != INVALID_TEXTURE)
 			SetWrapT(texture.wrap_t());
 		if (texture.size().x() < 0)
 			size_.first /= std::abs(texture.size().x());
