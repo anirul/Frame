@@ -100,18 +100,8 @@ add_library(ShaderGLLib
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Camera.h
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Device.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Device.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/EffectBlur.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/EffectBlur.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/EffectBrightness.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/EffectBrightness.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/EffectHighDynamicRange.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/EffectHighDynamicRange.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/EffectLighting.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/EffectLighting.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/EffectMath.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/EffectMath.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/EffectScreenSpaceAmbientOcclusion.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/EffectScreenSpaceAmbientOcclusion.h
+    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Effect.cpp
+    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Effect.h
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Error.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Error.h
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Fill.cpp
