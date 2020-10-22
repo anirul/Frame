@@ -143,7 +143,7 @@ class Uniform PROTOBUF_FINAL :
     kInteger = 2,
     kBoolean = 3,
     kReal = 4,
-    kEnum = 10,
+    kUniformEnum = 10,
     kVec2 = 20,
     kVec3 = 21,
     kVec4 = 22,
@@ -285,7 +285,7 @@ class Uniform PROTOBUF_FINAL :
     kIntegerFieldNumber = 2,
     kBooleanFieldNumber = 3,
     kRealFieldNumber = 4,
-    kEnumFieldNumber = 10,
+    kUniformEnumFieldNumber = 10,
     kVec2FieldNumber = 20,
     kVec3FieldNumber = 21,
     kVec4FieldNumber = 22,
@@ -352,16 +352,16 @@ class Uniform PROTOBUF_FINAL :
   void _internal_set_real(float value);
   public:
 
-  // .frame.proto.Uniform.UniformEnum enum = 10;
+  // .frame.proto.Uniform.UniformEnum uniform_enum = 10;
   private:
-  bool _internal_has_enum_() const;
+  bool _internal_has_uniform_enum() const;
   public:
-  void clear_enum_();
-  ::frame::proto::Uniform_UniformEnum enum_() const;
-  void set_enum_(::frame::proto::Uniform_UniformEnum value);
+  void clear_uniform_enum();
+  ::frame::proto::Uniform_UniformEnum uniform_enum() const;
+  void set_uniform_enum(::frame::proto::Uniform_UniformEnum value);
   private:
-  ::frame::proto::Uniform_UniformEnum _internal_enum_() const;
-  void _internal_set_enum_(::frame::proto::Uniform_UniformEnum value);
+  ::frame::proto::Uniform_UniformEnum _internal_uniform_enum() const;
+  void _internal_set_uniform_enum(::frame::proto::Uniform_UniformEnum value);
   public:
 
   // .frame.proto.Vector2 vec2 = 20;
@@ -606,7 +606,7 @@ class Uniform PROTOBUF_FINAL :
   void set_has_integer();
   void set_has_boolean();
   void set_has_real();
-  void set_has_enum_();
+  void set_has_uniform_enum();
   void set_has_vec2();
   void set_has_vec3();
   void set_has_vec4();
@@ -633,7 +633,7 @@ class Uniform PROTOBUF_FINAL :
     ::PROTOBUF_NAMESPACE_ID::int32 integer_;
     bool boolean_;
     float real_;
-    int enum__;
+    int uniform_enum_;
     ::frame::proto::Vector2* vec2_;
     ::frame::proto::Vector3* vec3_;
     ::frame::proto::Vector4* vec4_;
@@ -831,39 +831,39 @@ inline void Uniform::set_real(float value) {
   // @@protoc_insertion_point(field_set:frame.proto.Uniform.real)
 }
 
-// .frame.proto.Uniform.UniformEnum enum = 10;
-inline bool Uniform::_internal_has_enum_() const {
-  return value_case() == kEnum;
+// .frame.proto.Uniform.UniformEnum uniform_enum = 10;
+inline bool Uniform::_internal_has_uniform_enum() const {
+  return value_case() == kUniformEnum;
 }
-inline void Uniform::set_has_enum_() {
-  _oneof_case_[0] = kEnum;
+inline void Uniform::set_has_uniform_enum() {
+  _oneof_case_[0] = kUniformEnum;
 }
-inline void Uniform::clear_enum_() {
-  if (_internal_has_enum_()) {
-    value_.enum__ = 0;
+inline void Uniform::clear_uniform_enum() {
+  if (_internal_has_uniform_enum()) {
+    value_.uniform_enum_ = 0;
     clear_has_value();
   }
 }
-inline ::frame::proto::Uniform_UniformEnum Uniform::_internal_enum_() const {
-  if (_internal_has_enum_()) {
-    return static_cast< ::frame::proto::Uniform_UniformEnum >(value_.enum__);
+inline ::frame::proto::Uniform_UniformEnum Uniform::_internal_uniform_enum() const {
+  if (_internal_has_uniform_enum()) {
+    return static_cast< ::frame::proto::Uniform_UniformEnum >(value_.uniform_enum_);
   }
   return static_cast< ::frame::proto::Uniform_UniformEnum >(0);
 }
-inline ::frame::proto::Uniform_UniformEnum Uniform::enum_() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Uniform.enum)
-  return _internal_enum_();
+inline ::frame::proto::Uniform_UniformEnum Uniform::uniform_enum() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Uniform.uniform_enum)
+  return _internal_uniform_enum();
 }
-inline void Uniform::_internal_set_enum_(::frame::proto::Uniform_UniformEnum value) {
-  if (!_internal_has_enum_()) {
+inline void Uniform::_internal_set_uniform_enum(::frame::proto::Uniform_UniformEnum value) {
+  if (!_internal_has_uniform_enum()) {
     clear_value();
-    set_has_enum_();
+    set_has_uniform_enum();
   }
-  value_.enum__ = value;
+  value_.uniform_enum_ = value;
 }
-inline void Uniform::set_enum_(::frame::proto::Uniform_UniformEnum value) {
-  // @@protoc_insertion_point(field_set:frame.proto.Uniform.enum)
-  _internal_set_enum_(value);
+inline void Uniform::set_uniform_enum(::frame::proto::Uniform_UniformEnum value) {
+  // @@protoc_insertion_point(field_set:frame.proto.Uniform.uniform_enum)
+  _internal_set_uniform_enum(value);
 }
 
 // .frame.proto.Vector2 vec2 = 20;

@@ -27,7 +27,7 @@ message Uniform {
 		float real = 4;
 		// This value come from outside, this could be projection or camera.
 		// it will be set acording to the type of the enum.
-		UniformEnum enum = 10;
+		UniformEnum uniform_enum = 10;
 		// Vectors and Matrices.
 		Vector2 vec2 = 20;
 		Vector3 vec3 = 21;

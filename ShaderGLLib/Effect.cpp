@@ -44,9 +44,85 @@ namespace sgl {
 					program_->UniformFloat(uniform.name(), uniform.real());
 					break;
 				}
-				case frame::proto::Uniform::kEnum:
+				case frame::proto::Uniform::kUniformEnum:
 				{
-					// TODO(anirul): Parse the enum.
+					switch (uniform.uniform_enum())
+					{
+						case frame::proto::Uniform::UniformEnum::
+						Uniform_UniformEnum_PROJECTION_MAT4:
+						{
+							// TODO change this for the correct matrix
+							program_->UniformMatrix(
+								"projection", 
+								glm::mat4(1.0));
+							break;
+						}
+						case frame::proto::Uniform::UniformEnum::
+						Uniform_UniformEnum_PROJECTION_INV_MAT4:
+						{
+							// TODO change this for the correct matrix
+							program_->UniformMatrix(
+								"projection_inv",
+								glm::mat4(1.0));
+							break;
+						}
+						case frame::proto::Uniform::UniformEnum::
+						Uniform_UniformEnum_VIEW_MAT4:
+						{
+							// TODO change this for the correct matrix
+							program_->UniformMatrix(
+								"view",
+								glm::mat4(1.0));
+							break;
+						}
+						case frame::proto::Uniform::UniformEnum::
+						Uniform_UniformEnum_VIEW_INV_MAT4:
+						{
+							// TODO change this for the correct matrix
+							program_->UniformMatrix(
+								"view_inv",
+								glm::mat4(1.0));
+							break;
+						}
+						case frame::proto::Uniform::UniformEnum::
+						Uniform_UniformEnum_MODEL_MAT4:
+						{
+							// TODO change this for the correct matrix
+							program_->UniformMatrix(
+								"model",
+								glm::mat4(1.0));
+							break;
+						}
+						case frame::proto::Uniform::UniformEnum::
+						Uniform_UniformEnum_MODEL_INV_MAT4:
+						{
+							// TODO change this for the correct matrix
+							program_->UniformMatrix(
+								"model_inv",
+								glm::mat4(1.0));
+							break;
+						}
+						case frame::proto::Uniform::UniformEnum::
+						Uniform_UniformEnum_CAMERA_POSITION_VEC3:
+						{
+							// TODO change this for the correct vector
+							program_->UniformVector3(
+								"camera_position",
+								glm::vec3(0.0));
+							break;
+						}
+						case frame::proto::Uniform::UniformEnum::
+						Uniform_UniformEnum_CAMERA_DIRECTION_VEC3:
+						{
+							// TODO change this for the correct vector
+							program_->UniformVector3(
+								"camera_position",
+								glm::vec3(0.0));
+							break;
+						}
+						default:
+							throw std::runtime_error("Unknown case.");
+					}
 					break;
 				}
 				case frame::proto::Uniform::kVec2:

@@ -35,7 +35,7 @@ class UniformDefaultTypeInternal {
   ::PROTOBUF_NAMESPACE_ID::int32 integer_;
   bool boolean_;
   float real_;
-  int enum__;
+  int uniform_enum_;
   const ::frame::proto::Vector2* vec2_;
   const ::frame::proto::Vector3* vec3_;
   const ::frame::proto::Vector4* vec4_;
@@ -93,7 +93,7 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_Uniform_2eproto::offsets[] PRO
   offsetof(::frame::proto::UniformDefaultTypeInternal, integer_),
   offsetof(::frame::proto::UniformDefaultTypeInternal, boolean_),
   offsetof(::frame::proto::UniformDefaultTypeInternal, real_),
-  offsetof(::frame::proto::UniformDefaultTypeInternal, enum__),
+  offsetof(::frame::proto::UniformDefaultTypeInternal, uniform_enum_),
   offsetof(::frame::proto::UniformDefaultTypeInternal, vec2_),
   offsetof(::frame::proto::UniformDefaultTypeInternal, vec3_),
   offsetof(::frame::proto::UniformDefaultTypeInternal, vec4_),
@@ -119,29 +119,29 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 
 const char descriptor_table_protodef_Uniform_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
   "\n\rUniform.proto\022\013frame.proto\032\nMath.proto"
-  "\"\204\007\n\007Uniform\022\014\n\004name\030\001 \001(\t\022\021\n\007integer\030\002 "
+  "\"\214\007\n\007Uniform\022\014\n\004name\030\001 \001(\t\022\021\n\007integer\030\002 "
   "\001(\005H\000\022\021\n\007boolean\030\003 \001(\010H\000\022\016\n\004real\030\004 \001(\002H\000"
-  "\0220\n\004enum\030\n \001(\0162 .frame.proto.Uniform.Uni"
-  "formEnumH\000\022$\n\004vec2\030\024 \001(\0132\024.frame.proto.V"
-  "ector2H\000\022$\n\004vec3\030\025 \001(\0132\024.frame.proto.Vec"
-  "tor3H\000\022$\n\004vec4\030\026 \001(\0132\024.frame.proto.Vecto"
-  "r4H\000\022$\n\004mat3\030\036 \001(\0132\024.frame.proto.Matrix3"
-  "H\000\022$\n\004mat4\030\037 \001(\0132\024.frame.proto.Matrix4H\000"
-  "\0220\n\010integers\030( \001(\0132\034.frame.proto.Multipl"
-  "eIntegerH\000\022-\n\005bools\030) \001(\0132\034.frame.proto."
-  "MutlipleBooleanH\000\022*\n\005reals\030* \001(\0132\031.frame"
-  ".proto.MultipleRealH\000\022-\n\005vec2s\0302 \001(\0132\034.f"
-  "rame.proto.MulitpleVector2H\000\022-\n\005vec3s\0303 "
-  "\001(\0132\034.frame.proto.MultipleVector3H\000\022-\n\005v"
-  "ec4s\0304 \001(\0132\034.frame.proto.MultipleVector4"
-  "H\000\022-\n\005mat3s\0305 \001(\0132\034.frame.proto.Multiple"
-  "Matrix3H\000\022-\n\005mat4s\0306 \001(\0132\034.frame.proto.M"
-  "ultipleMatrix4H\000\"\303\001\n\013UniformEnum\022\013\n\007INVA"
-  "LID\020\000\022\023\n\017PROJECTION_MAT4\020\n\022\027\n\023PROJECTION"
-  "_INV_MAT4\020\013\022\r\n\tVIEW_MAT4\020\024\022\021\n\rVIEW_INV_M"
-  "AT4\020\025\022\016\n\nMODEL_MAT4\020\036\022\022\n\016MODEL_INV_MAT4\020"
-  "\037\022\030\n\024CAMERA_POSITION_VEC3\020(\022\031\n\025CAMERA_DI"
-  "RECTION_VEC3\020)B\007\n\005valueb\006proto3"
+  "\0228\n\014uniform_enum\030\n \001(\0162 .frame.proto.Uni"
+  "form.UniformEnumH\000\022$\n\004vec2\030\024 \001(\0132\024.frame"
+  ".proto.Vector2H\000\022$\n\004vec3\030\025 \001(\0132\024.frame.p"
+  "roto.Vector3H\000\022$\n\004vec4\030\026 \001(\0132\024.frame.pro"
+  "to.Vector4H\000\022$\n\004mat3\030\036 \001(\0132\024.frame.proto"
+  ".Matrix3H\000\022$\n\004mat4\030\037 \001(\0132\024.frame.proto.M"
+  "atrix4H\000\0220\n\010integers\030( \001(\0132\034.frame.proto"
+  ".MultipleIntegerH\000\022-\n\005bools\030) \001(\0132\034.fram"
+  "e.proto.MutlipleBooleanH\000\022*\n\005reals\030* \001(\013"
+  "2\031.frame.proto.MultipleRealH\000\022-\n\005vec2s\0302"
+  " \001(\0132\034.frame.proto.MulitpleVector2H\000\022-\n\005"
+  "vec3s\0303 \001(\0132\034.frame.proto.MultipleVector"
+  "3H\000\022-\n\005vec4s\0304 \001(\0132\034.frame.proto.Multipl"
+  "eVector4H\000\022-\n\005mat3s\0305 \001(\0132\034.frame.proto."
+  "MultipleMatrix3H\000\022-\n\005mat4s\0306 \001(\0132\034.frame"
+  ".proto.MultipleMatrix4H\000\"\303\001\n\013UniformEnum"
+  "\022\013\n\007INVALID\020\000\022\023\n\017PROJECTION_MAT4\020\n\022\027\n\023PR"
+  "OJECTION_INV_MAT4\020\013\022\r\n\tVIEW_MAT4\020\024\022\021\n\rVI"
+  "EW_INV_MAT4\020\025\022\016\n\nMODEL_MAT4\020\036\022\022\n\016MODEL_I"
+  "NV_MAT4\020\037\022\030\n\024CAMERA_POSITION_VEC3\020(\022\031\n\025C"
+  "AMERA_DIRECTION_VEC3\020)B\007\n\005valueb\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_Uniform_2eproto_deps[1] = {
   &::descriptor_table_Math_2eproto,
@@ -151,7 +151,7 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_Uni
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_Uniform_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_Uniform_2eproto = {
-  false, false, descriptor_table_protodef_Uniform_2eproto, "Uniform.proto", 951,
+  false, false, descriptor_table_protodef_Uniform_2eproto, "Uniform.proto", 959,
   &descriptor_table_Uniform_2eproto_once, descriptor_table_Uniform_2eproto_sccs, descriptor_table_Uniform_2eproto_deps, 1, 1,
   schemas, file_default_instances, TableStruct_Uniform_2eproto::offsets,
   file_level_metadata_Uniform_2eproto, 1, file_level_enum_descriptors_Uniform_2eproto, file_level_service_descriptors_Uniform_2eproto,
@@ -203,7 +203,7 @@ void Uniform::InitAsDefaultInstance() {
   ::frame::proto::_Uniform_default_instance_.integer_ = 0;
   ::frame::proto::_Uniform_default_instance_.boolean_ = false;
   ::frame::proto::_Uniform_default_instance_.real_ = 0;
-  ::frame::proto::_Uniform_default_instance_.enum__ = 0;
+  ::frame::proto::_Uniform_default_instance_.uniform_enum_ = 0;
   ::frame::proto::_Uniform_default_instance_.vec2_ = const_cast< ::frame::proto::Vector2*>(
       ::frame::proto::Vector2::internal_default_instance());
   ::frame::proto::_Uniform_default_instance_.vec3_ = const_cast< ::frame::proto::Vector3*>(
@@ -627,8 +627,8 @@ Uniform::Uniform(const Uniform& from)
       _internal_set_real(from._internal_real());
       break;
     }
-    case kEnum: {
-      _internal_set_enum_(from._internal_enum_());
+    case kUniformEnum: {
+      _internal_set_uniform_enum(from._internal_uniform_enum());
       break;
     }
     case kVec2: {
@@ -740,7 +740,7 @@ void Uniform::clear_value() {
       // No need to clear
       break;
     }
-    case kEnum: {
+    case kUniformEnum: {
       // No need to clear
       break;
     }
@@ -879,12 +879,12 @@ const char* Uniform::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::in
           ptr += sizeof(float);
         } else goto handle_unusual;
         continue;
-      // .frame.proto.Uniform.UniformEnum enum = 10;
+      // .frame.proto.Uniform.UniformEnum uniform_enum = 10;
       case 10:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 80)) {
           ::PROTOBUF_NAMESPACE_ID::uint64 val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
-          _internal_set_enum_(static_cast<::frame::proto::Uniform_UniformEnum>(val));
+          _internal_set_uniform_enum(static_cast<::frame::proto::Uniform_UniformEnum>(val));
         } else goto handle_unusual;
         continue;
       // .frame.proto.Vector2 vec2 = 20;
@@ -1034,11 +1034,11 @@ failure:
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(4, this->_internal_real(), target);
   }
 
-  // .frame.proto.Uniform.UniformEnum enum = 10;
-  if (_internal_has_enum_()) {
+  // .frame.proto.Uniform.UniformEnum uniform_enum = 10;
+  if (_internal_has_uniform_enum()) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteEnumToArray(
-      10, this->_internal_enum_(), target);
+      10, this->_internal_uniform_enum(), target);
   }
 
   // .frame.proto.Vector2 vec2 = 20;
@@ -1186,10 +1186,10 @@ size_t Uniform::ByteSizeLong() const {
       total_size += 1 + 4;
       break;
     }
-    // .frame.proto.Uniform.UniformEnum enum = 10;
-    case kEnum: {
+    // .frame.proto.Uniform.UniformEnum uniform_enum = 10;
+    case kUniformEnum: {
       total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::EnumSize(this->_internal_enum_());
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::EnumSize(this->_internal_uniform_enum());
       break;
     }
     // .frame.proto.Vector2 vec2 = 20;
@@ -1334,8 +1334,8 @@ void Uniform::MergeFrom(const Uniform& from) {
       _internal_set_real(from._internal_real());
       break;
     }
-    case kEnum: {
-      _internal_set_enum_(from._internal_enum_());
+    case kUniformEnum: {
+      _internal_set_uniform_enum(from._internal_uniform_enum());
       break;
     }
     case kVec2: {

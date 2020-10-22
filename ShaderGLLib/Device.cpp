@@ -1,5 +1,4 @@
 #include "Device.h"
-#include "EffectMath.h"
 #include <stdexcept>
 #include <sstream>
 #include <fstream>
@@ -43,7 +42,7 @@ namespace sgl {
 		view_program_ = Program::CreateProgram("ViewPositionNormal");
 	}
 
-	void Device::AddEffect(std::shared_ptr<EffectInterface>& effect)
+	void Device::AddEffect(std::shared_ptr<Effect>& effect)
 	{
 		effects_.push_back(effect);
 	}
