@@ -2,11 +2,13 @@
 
 #include <glm/glm.hpp>
 #include "../FrameProto/Proto.h"
+#include "../ShaderGLLib/Camera.h"
 #include "../ShaderGLLib/Error.h"
 #include "../ShaderGLLib/Material.h"
 #include "../ShaderGLLib/Mesh.h"
 #include "../ShaderGLLib/Program.h"
 #include "../ShaderGLLib/Texture.h"
+#include "../ShaderGLLib/Uniform.h"
 
 namespace sgl {
 
@@ -22,7 +24,9 @@ namespace sgl {
 	public:
 		// Startup the Effect this is where the effect is created (this will be
 		// called only once at the beginning).
-		void Startup(std::pair<std::uint32_t, std::uint32_t> size);
+		void Startup(
+			const std::pair<std::uint32_t, std::uint32_t> size,
+			const UniformInterface& uniform_interface);
 		// This is the draw interfaces.
 		void Draw(const double dt = 0.0);
 		// Free everything.

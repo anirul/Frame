@@ -98,6 +98,8 @@ add_library(ShaderGLLib
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Buffer.h
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Camera.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Camera.h
+    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Convert.cpp
+    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Convert.h
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Device.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Device.h
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Effect.cpp
@@ -130,6 +132,7 @@ add_library(ShaderGLLib
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Shader.h
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Texture.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Texture.h
+    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Uniform.h
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Window.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Window.h
 )

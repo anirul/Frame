@@ -146,7 +146,7 @@ namespace sgl {
 		{
 			for (const auto& p : material_->GetMap())
 			{
-				program_->UniformInt(
+				program_->Uniform(
 					p.first, 
 					material_->EnableTexture(p.first));
 			}
@@ -156,9 +156,9 @@ namespace sgl {
 		error_.Display(__FILE__, __LINE__ - 1);
 
 		// Push updated matrices.
-		program_->UniformMatrix("projection", projection);
-		program_->UniformMatrix("view", view);
-		program_->UniformMatrix("model", model);
+		program_->Uniform("projection", projection);
+		program_->Uniform("view", view);
+		program_->Uniform("model", model);
 
 		index_buffer_.Bind();
 		glDrawElements(

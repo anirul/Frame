@@ -14,15 +14,15 @@ namespace sgl {
 		int i = 0;
 		for (const auto& light : lights_)
 		{
-			program->UniformVector3(
+			program->Uniform(
 				"light_position[" + std::to_string(i) + "]", 
 				lights_[i]->GetVector());
-			program->UniformVector3(
+			program->Uniform(
 				"light_color[" + std::to_string(i) + "]",
 				lights_[i]->GetColorIntensity());
 			++i;
 		}
-		program->UniformInt("light_max", static_cast<int>(lights_.size()));
+		program->Uniform("light_max", static_cast<int>(lights_.size()));
 	}
 
 } // End namespace sgl.

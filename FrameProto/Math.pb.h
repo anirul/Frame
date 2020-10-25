@@ -47,7 +47,7 @@ struct TableStruct_Math_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxiliaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[13]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[11]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -56,84 +56,76 @@ struct TableStruct_Math_2eproto {
 extern const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_Math_2eproto;
 namespace frame {
 namespace proto {
-class Matrix3;
-class Matrix3DefaultTypeInternal;
-extern Matrix3DefaultTypeInternal _Matrix3_default_instance_;
-class Matrix4;
-class Matrix4DefaultTypeInternal;
-extern Matrix4DefaultTypeInternal _Matrix4_default_instance_;
-class MulitpleVector2;
-class MulitpleVector2DefaultTypeInternal;
-extern MulitpleVector2DefaultTypeInternal _MulitpleVector2_default_instance_;
-class MultipleInteger;
-class MultipleIntegerDefaultTypeInternal;
-extern MultipleIntegerDefaultTypeInternal _MultipleInteger_default_instance_;
-class MultipleMatrix3;
-class MultipleMatrix3DefaultTypeInternal;
-extern MultipleMatrix3DefaultTypeInternal _MultipleMatrix3_default_instance_;
-class MultipleMatrix4;
-class MultipleMatrix4DefaultTypeInternal;
-extern MultipleMatrix4DefaultTypeInternal _MultipleMatrix4_default_instance_;
-class MultipleReal;
-class MultipleRealDefaultTypeInternal;
-extern MultipleRealDefaultTypeInternal _MultipleReal_default_instance_;
-class MultipleVector3;
-class MultipleVector3DefaultTypeInternal;
-extern MultipleVector3DefaultTypeInternal _MultipleVector3_default_instance_;
-class MultipleVector4;
-class MultipleVector4DefaultTypeInternal;
-extern MultipleVector4DefaultTypeInternal _MultipleVector4_default_instance_;
-class MutlipleBoolean;
-class MutlipleBooleanDefaultTypeInternal;
-extern MutlipleBooleanDefaultTypeInternal _MutlipleBoolean_default_instance_;
-class Vector2;
-class Vector2DefaultTypeInternal;
-extern Vector2DefaultTypeInternal _Vector2_default_instance_;
-class Vector3;
-class Vector3DefaultTypeInternal;
-extern Vector3DefaultTypeInternal _Vector3_default_instance_;
-class Vector4;
-class Vector4DefaultTypeInternal;
-extern Vector4DefaultTypeInternal _Vector4_default_instance_;
+class UniformBools;
+class UniformBoolsDefaultTypeInternal;
+extern UniformBoolsDefaultTypeInternal _UniformBools_default_instance_;
+class UniformFloats;
+class UniformFloatsDefaultTypeInternal;
+extern UniformFloatsDefaultTypeInternal _UniformFloats_default_instance_;
+class UniformInts;
+class UniformIntsDefaultTypeInternal;
+extern UniformIntsDefaultTypeInternal _UniformInts_default_instance_;
+class UniformMatrix4;
+class UniformMatrix4DefaultTypeInternal;
+extern UniformMatrix4DefaultTypeInternal _UniformMatrix4_default_instance_;
+class UniformMatrix4s;
+class UniformMatrix4sDefaultTypeInternal;
+extern UniformMatrix4sDefaultTypeInternal _UniformMatrix4s_default_instance_;
+class UniformVector2;
+class UniformVector2DefaultTypeInternal;
+extern UniformVector2DefaultTypeInternal _UniformVector2_default_instance_;
+class UniformVector2s;
+class UniformVector2sDefaultTypeInternal;
+extern UniformVector2sDefaultTypeInternal _UniformVector2s_default_instance_;
+class UniformVector3;
+class UniformVector3DefaultTypeInternal;
+extern UniformVector3DefaultTypeInternal _UniformVector3_default_instance_;
+class UniformVector3s;
+class UniformVector3sDefaultTypeInternal;
+extern UniformVector3sDefaultTypeInternal _UniformVector3s_default_instance_;
+class UniformVector4;
+class UniformVector4DefaultTypeInternal;
+extern UniformVector4DefaultTypeInternal _UniformVector4_default_instance_;
+class UniformVector4s;
+class UniformVector4sDefaultTypeInternal;
+extern UniformVector4sDefaultTypeInternal _UniformVector4s_default_instance_;
 }  // namespace proto
 }  // namespace frame
 PROTOBUF_NAMESPACE_OPEN
-template<> ::frame::proto::Matrix3* Arena::CreateMaybeMessage<::frame::proto::Matrix3>(Arena*);
-template<> ::frame::proto::Matrix4* Arena::CreateMaybeMessage<::frame::proto::Matrix4>(Arena*);
-template<> ::frame::proto::MulitpleVector2* Arena::CreateMaybeMessage<::frame::proto::MulitpleVector2>(Arena*);
-template<> ::frame::proto::MultipleInteger* Arena::CreateMaybeMessage<::frame::proto::MultipleInteger>(Arena*);
-template<> ::frame::proto::MultipleMatrix3* Arena::CreateMaybeMessage<::frame::proto::MultipleMatrix3>(Arena*);
-template<> ::frame::proto::MultipleMatrix4* Arena::CreateMaybeMessage<::frame::proto::MultipleMatrix4>(Arena*);
-template<> ::frame::proto::MultipleReal* Arena::CreateMaybeMessage<::frame::proto::MultipleReal>(Arena*);
-template<> ::frame::proto::MultipleVector3* Arena::CreateMaybeMessage<::frame::proto::MultipleVector3>(Arena*);
-template<> ::frame::proto::MultipleVector4* Arena::CreateMaybeMessage<::frame::proto::MultipleVector4>(Arena*);
-template<> ::frame::proto::MutlipleBoolean* Arena::CreateMaybeMessage<::frame::proto::MutlipleBoolean>(Arena*);
-template<> ::frame::proto::Vector2* Arena::CreateMaybeMessage<::frame::proto::Vector2>(Arena*);
-template<> ::frame::proto::Vector3* Arena::CreateMaybeMessage<::frame::proto::Vector3>(Arena*);
-template<> ::frame::proto::Vector4* Arena::CreateMaybeMessage<::frame::proto::Vector4>(Arena*);
+template<> ::frame::proto::UniformBools* Arena::CreateMaybeMessage<::frame::proto::UniformBools>(Arena*);
+template<> ::frame::proto::UniformFloats* Arena::CreateMaybeMessage<::frame::proto::UniformFloats>(Arena*);
+template<> ::frame::proto::UniformInts* Arena::CreateMaybeMessage<::frame::proto::UniformInts>(Arena*);
+template<> ::frame::proto::UniformMatrix4* Arena::CreateMaybeMessage<::frame::proto::UniformMatrix4>(Arena*);
+template<> ::frame::proto::UniformMatrix4s* Arena::CreateMaybeMessage<::frame::proto::UniformMatrix4s>(Arena*);
+template<> ::frame::proto::UniformVector2* Arena::CreateMaybeMessage<::frame::proto::UniformVector2>(Arena*);
+template<> ::frame::proto::UniformVector2s* Arena::CreateMaybeMessage<::frame::proto::UniformVector2s>(Arena*);
+template<> ::frame::proto::UniformVector3* Arena::CreateMaybeMessage<::frame::proto::UniformVector3>(Arena*);
+template<> ::frame::proto::UniformVector3s* Arena::CreateMaybeMessage<::frame::proto::UniformVector3s>(Arena*);
+template<> ::frame::proto::UniformVector4* Arena::CreateMaybeMessage<::frame::proto::UniformVector4>(Arena*);
+template<> ::frame::proto::UniformVector4s* Arena::CreateMaybeMessage<::frame::proto::UniformVector4s>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 namespace frame {
 namespace proto {
 
 // ===================================================================
 
-class Vector2 PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:frame.proto.Vector2) */ {
+class UniformVector2 PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:frame.proto.UniformVector2) */ {
  public:
-  inline Vector2() : Vector2(nullptr) {}
-  virtual ~Vector2();
+  inline UniformVector2() : UniformVector2(nullptr) {}
+  virtual ~UniformVector2();
 
-  Vector2(const Vector2& from);
-  Vector2(Vector2&& from) noexcept
-    : Vector2() {
+  UniformVector2(const UniformVector2& from);
+  UniformVector2(UniformVector2&& from) noexcept
+    : UniformVector2() {
     *this = ::std::move(from);
   }
 
-  inline Vector2& operator=(const Vector2& from) {
+  inline UniformVector2& operator=(const UniformVector2& from) {
     CopyFrom(from);
     return *this;
   }
-  inline Vector2& operator=(Vector2&& from) noexcept {
+  inline UniformVector2& operator=(UniformVector2&& from) noexcept {
     if (GetArena() == from.GetArena()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -151,20 +143,20 @@ class Vector2 PROTOBUF_FINAL :
   static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
     return GetMetadataStatic().reflection;
   }
-  static const Vector2& default_instance();
+  static const UniformVector2& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const Vector2* internal_default_instance() {
-    return reinterpret_cast<const Vector2*>(
-               &_Vector2_default_instance_);
+  static inline const UniformVector2* internal_default_instance() {
+    return reinterpret_cast<const UniformVector2*>(
+               &_UniformVector2_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     0;
 
-  friend void swap(Vector2& a, Vector2& b) {
+  friend void swap(UniformVector2& a, UniformVector2& b) {
     a.Swap(&b);
   }
-  inline void Swap(Vector2* other) {
+  inline void Swap(UniformVector2* other) {
     if (other == this) return;
     if (GetArena() == other->GetArena()) {
       InternalSwap(other);
@@ -172,7 +164,7 @@ class Vector2 PROTOBUF_FINAL :
       ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
     }
   }
-  void UnsafeArenaSwap(Vector2* other) {
+  void UnsafeArenaSwap(UniformVector2* other) {
     if (other == this) return;
     GOOGLE_DCHECK(GetArena() == other->GetArena());
     InternalSwap(other);
@@ -180,17 +172,17 @@ class Vector2 PROTOBUF_FINAL :
 
   // implements Message ----------------------------------------------
 
-  inline Vector2* New() const final {
-    return CreateMaybeMessage<Vector2>(nullptr);
+  inline UniformVector2* New() const final {
+    return CreateMaybeMessage<UniformVector2>(nullptr);
   }
 
-  Vector2* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
-    return CreateMaybeMessage<Vector2>(arena);
+  UniformVector2* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<UniformVector2>(arena);
   }
   void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
-  void CopyFrom(const Vector2& from);
-  void MergeFrom(const Vector2& from);
+  void CopyFrom(const UniformVector2& from);
+  void MergeFrom(const UniformVector2& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -204,13 +196,13 @@ class Vector2 PROTOBUF_FINAL :
   inline void SharedCtor();
   inline void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(Vector2* other);
+  void InternalSwap(UniformVector2* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "frame.proto.Vector2";
+    return "frame.proto.UniformVector2";
   }
   protected:
-  explicit Vector2(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  explicit UniformVector2(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   private:
   static void ArenaDtor(void* object);
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
@@ -251,7 +243,7 @@ class Vector2 PROTOBUF_FINAL :
   void _internal_set_y(float value);
   public:
 
-  // @@protoc_insertion_point(class_scope:frame.proto.Vector2)
+  // @@protoc_insertion_point(class_scope:frame.proto.UniformVector2)
  private:
   class _Internal;
 
@@ -265,23 +257,23 @@ class Vector2 PROTOBUF_FINAL :
 };
 // -------------------------------------------------------------------
 
-class Vector3 PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:frame.proto.Vector3) */ {
+class UniformVector3 PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:frame.proto.UniformVector3) */ {
  public:
-  inline Vector3() : Vector3(nullptr) {}
-  virtual ~Vector3();
+  inline UniformVector3() : UniformVector3(nullptr) {}
+  virtual ~UniformVector3();
 
-  Vector3(const Vector3& from);
-  Vector3(Vector3&& from) noexcept
-    : Vector3() {
+  UniformVector3(const UniformVector3& from);
+  UniformVector3(UniformVector3&& from) noexcept
+    : UniformVector3() {
     *this = ::std::move(from);
   }
 
-  inline Vector3& operator=(const Vector3& from) {
+  inline UniformVector3& operator=(const UniformVector3& from) {
     CopyFrom(from);
     return *this;
   }
-  inline Vector3& operator=(Vector3&& from) noexcept {
+  inline UniformVector3& operator=(UniformVector3&& from) noexcept {
     if (GetArena() == from.GetArena()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -299,20 +291,20 @@ class Vector3 PROTOBUF_FINAL :
   static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
     return GetMetadataStatic().reflection;
   }
-  static const Vector3& default_instance();
+  static const UniformVector3& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const Vector3* internal_default_instance() {
-    return reinterpret_cast<const Vector3*>(
-               &_Vector3_default_instance_);
+  static inline const UniformVector3* internal_default_instance() {
+    return reinterpret_cast<const UniformVector3*>(
+               &_UniformVector3_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     1;
 
-  friend void swap(Vector3& a, Vector3& b) {
+  friend void swap(UniformVector3& a, UniformVector3& b) {
     a.Swap(&b);
   }
-  inline void Swap(Vector3* other) {
+  inline void Swap(UniformVector3* other) {
     if (other == this) return;
     if (GetArena() == other->GetArena()) {
       InternalSwap(other);
@@ -320,7 +312,7 @@ class Vector3 PROTOBUF_FINAL :
       ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
     }
   }
-  void UnsafeArenaSwap(Vector3* other) {
+  void UnsafeArenaSwap(UniformVector3* other) {
     if (other == this) return;
     GOOGLE_DCHECK(GetArena() == other->GetArena());
     InternalSwap(other);
@@ -328,17 +320,17 @@ class Vector3 PROTOBUF_FINAL :
 
   // implements Message ----------------------------------------------
 
-  inline Vector3* New() const final {
-    return CreateMaybeMessage<Vector3>(nullptr);
+  inline UniformVector3* New() const final {
+    return CreateMaybeMessage<UniformVector3>(nullptr);
   }
 
-  Vector3* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
-    return CreateMaybeMessage<Vector3>(arena);
+  UniformVector3* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<UniformVector3>(arena);
   }
   void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
-  void CopyFrom(const Vector3& from);
-  void MergeFrom(const Vector3& from);
+  void CopyFrom(const UniformVector3& from);
+  void MergeFrom(const UniformVector3& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -352,13 +344,13 @@ class Vector3 PROTOBUF_FINAL :
   inline void SharedCtor();
   inline void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(Vector3* other);
+  void InternalSwap(UniformVector3* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "frame.proto.Vector3";
+    return "frame.proto.UniformVector3";
   }
   protected:
-  explicit Vector3(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  explicit UniformVector3(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   private:
   static void ArenaDtor(void* object);
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
@@ -409,7 +401,7 @@ class Vector3 PROTOBUF_FINAL :
   void _internal_set_z(float value);
   public:
 
-  // @@protoc_insertion_point(class_scope:frame.proto.Vector3)
+  // @@protoc_insertion_point(class_scope:frame.proto.UniformVector3)
  private:
   class _Internal;
 
@@ -424,23 +416,23 @@ class Vector3 PROTOBUF_FINAL :
 };
 // -------------------------------------------------------------------
 
-class Vector4 PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:frame.proto.Vector4) */ {
+class UniformVector4 PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:frame.proto.UniformVector4) */ {
  public:
-  inline Vector4() : Vector4(nullptr) {}
-  virtual ~Vector4();
+  inline UniformVector4() : UniformVector4(nullptr) {}
+  virtual ~UniformVector4();
 
-  Vector4(const Vector4& from);
-  Vector4(Vector4&& from) noexcept
-    : Vector4() {
+  UniformVector4(const UniformVector4& from);
+  UniformVector4(UniformVector4&& from) noexcept
+    : UniformVector4() {
     *this = ::std::move(from);
   }
 
-  inline Vector4& operator=(const Vector4& from) {
+  inline UniformVector4& operator=(const UniformVector4& from) {
     CopyFrom(from);
     return *this;
   }
-  inline Vector4& operator=(Vector4&& from) noexcept {
+  inline UniformVector4& operator=(UniformVector4&& from) noexcept {
     if (GetArena() == from.GetArena()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -458,20 +450,20 @@ class Vector4 PROTOBUF_FINAL :
   static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
     return GetMetadataStatic().reflection;
   }
-  static const Vector4& default_instance();
+  static const UniformVector4& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const Vector4* internal_default_instance() {
-    return reinterpret_cast<const Vector4*>(
-               &_Vector4_default_instance_);
+  static inline const UniformVector4* internal_default_instance() {
+    return reinterpret_cast<const UniformVector4*>(
+               &_UniformVector4_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     2;
 
-  friend void swap(Vector4& a, Vector4& b) {
+  friend void swap(UniformVector4& a, UniformVector4& b) {
     a.Swap(&b);
   }
-  inline void Swap(Vector4* other) {
+  inline void Swap(UniformVector4* other) {
     if (other == this) return;
     if (GetArena() == other->GetArena()) {
       InternalSwap(other);
@@ -479,7 +471,7 @@ class Vector4 PROTOBUF_FINAL :
       ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
     }
   }
-  void UnsafeArenaSwap(Vector4* other) {
+  void UnsafeArenaSwap(UniformVector4* other) {
     if (other == this) return;
     GOOGLE_DCHECK(GetArena() == other->GetArena());
     InternalSwap(other);
@@ -487,17 +479,17 @@ class Vector4 PROTOBUF_FINAL :
 
   // implements Message ----------------------------------------------
 
-  inline Vector4* New() const final {
-    return CreateMaybeMessage<Vector4>(nullptr);
+  inline UniformVector4* New() const final {
+    return CreateMaybeMessage<UniformVector4>(nullptr);
   }
 
-  Vector4* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
-    return CreateMaybeMessage<Vector4>(arena);
+  UniformVector4* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<UniformVector4>(arena);
   }
   void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
-  void CopyFrom(const Vector4& from);
-  void MergeFrom(const Vector4& from);
+  void CopyFrom(const UniformVector4& from);
+  void MergeFrom(const UniformVector4& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -511,13 +503,13 @@ class Vector4 PROTOBUF_FINAL :
   inline void SharedCtor();
   inline void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(Vector4* other);
+  void InternalSwap(UniformVector4* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "frame.proto.Vector4";
+    return "frame.proto.UniformVector4";
   }
   protected:
-  explicit Vector4(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  explicit UniformVector4(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   private:
   static void ArenaDtor(void* object);
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
@@ -578,7 +570,7 @@ class Vector4 PROTOBUF_FINAL :
   void _internal_set_w(float value);
   public:
 
-  // @@protoc_insertion_point(class_scope:frame.proto.Vector4)
+  // @@protoc_insertion_point(class_scope:frame.proto.UniformVector4)
  private:
   class _Internal;
 
@@ -594,23 +586,23 @@ class Vector4 PROTOBUF_FINAL :
 };
 // -------------------------------------------------------------------
 
-class Matrix3 PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:frame.proto.Matrix3) */ {
+class UniformMatrix4 PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:frame.proto.UniformMatrix4) */ {
  public:
-  inline Matrix3() : Matrix3(nullptr) {}
-  virtual ~Matrix3();
+  inline UniformMatrix4() : UniformMatrix4(nullptr) {}
+  virtual ~UniformMatrix4();
 
-  Matrix3(const Matrix3& from);
-  Matrix3(Matrix3&& from) noexcept
-    : Matrix3() {
+  UniformMatrix4(const UniformMatrix4& from);
+  UniformMatrix4(UniformMatrix4&& from) noexcept
+    : UniformMatrix4() {
     *this = ::std::move(from);
   }
 
-  inline Matrix3& operator=(const Matrix3& from) {
+  inline UniformMatrix4& operator=(const UniformMatrix4& from) {
     CopyFrom(from);
     return *this;
   }
-  inline Matrix3& operator=(Matrix3&& from) noexcept {
+  inline UniformMatrix4& operator=(UniformMatrix4&& from) noexcept {
     if (GetArena() == from.GetArena()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -628,20 +620,20 @@ class Matrix3 PROTOBUF_FINAL :
   static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
     return GetMetadataStatic().reflection;
   }
-  static const Matrix3& default_instance();
+  static const UniformMatrix4& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const Matrix3* internal_default_instance() {
-    return reinterpret_cast<const Matrix3*>(
-               &_Matrix3_default_instance_);
+  static inline const UniformMatrix4* internal_default_instance() {
+    return reinterpret_cast<const UniformMatrix4*>(
+               &_UniformMatrix4_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     3;
 
-  friend void swap(Matrix3& a, Matrix3& b) {
+  friend void swap(UniformMatrix4& a, UniformMatrix4& b) {
     a.Swap(&b);
   }
-  inline void Swap(Matrix3* other) {
+  inline void Swap(UniformMatrix4* other) {
     if (other == this) return;
     if (GetArena() == other->GetArena()) {
       InternalSwap(other);
@@ -649,7 +641,7 @@ class Matrix3 PROTOBUF_FINAL :
       ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
     }
   }
-  void UnsafeArenaSwap(Matrix3* other) {
+  void UnsafeArenaSwap(UniformMatrix4* other) {
     if (other == this) return;
     GOOGLE_DCHECK(GetArena() == other->GetArena());
     InternalSwap(other);
@@ -657,17 +649,17 @@ class Matrix3 PROTOBUF_FINAL :
 
   // implements Message ----------------------------------------------
 
-  inline Matrix3* New() const final {
-    return CreateMaybeMessage<Matrix3>(nullptr);
+  inline UniformMatrix4* New() const final {
+    return CreateMaybeMessage<UniformMatrix4>(nullptr);
   }
 
-  Matrix3* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
-    return CreateMaybeMessage<Matrix3>(arena);
+  UniformMatrix4* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<UniformMatrix4>(arena);
   }
   void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
-  void CopyFrom(const Matrix3& from);
-  void MergeFrom(const Matrix3& from);
+  void CopyFrom(const UniformMatrix4& from);
+  void MergeFrom(const UniformMatrix4& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -681,238 +673,13 @@ class Matrix3 PROTOBUF_FINAL :
   inline void SharedCtor();
   inline void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(Matrix3* other);
+  void InternalSwap(UniformMatrix4* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "frame.proto.Matrix3";
+    return "frame.proto.UniformMatrix4";
   }
   protected:
-  explicit Matrix3(::PROTOBUF_NAMESPACE_ID::Arena* arena);
-  private:
-  static void ArenaDtor(void* object);
-  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
-  public:
-
-  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
-  private:
-  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
-    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_Math_2eproto);
-    return ::descriptor_table_Math_2eproto.file_level_metadata[kIndexInFileMessages];
-  }
-
-  public:
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  enum : int {
-    kM33FieldNumber = 33,
-    kM11FieldNumber = 11,
-    kM12FieldNumber = 12,
-    kM13FieldNumber = 13,
-    kM21FieldNumber = 21,
-    kM22FieldNumber = 22,
-    kM23FieldNumber = 23,
-    kM31FieldNumber = 31,
-    kM32FieldNumber = 32,
-  };
-  // float m33 = 33;
-  void clear_m33();
-  float m33() const;
-  void set_m33(float value);
-  private:
-  float _internal_m33() const;
-  void _internal_set_m33(float value);
-  public:
-
-  // float m11 = 11;
-  void clear_m11();
-  float m11() const;
-  void set_m11(float value);
-  private:
-  float _internal_m11() const;
-  void _internal_set_m11(float value);
-  public:
-
-  // float m12 = 12;
-  void clear_m12();
-  float m12() const;
-  void set_m12(float value);
-  private:
-  float _internal_m12() const;
-  void _internal_set_m12(float value);
-  public:
-
-  // float m13 = 13;
-  void clear_m13();
-  float m13() const;
-  void set_m13(float value);
-  private:
-  float _internal_m13() const;
-  void _internal_set_m13(float value);
-  public:
-
-  // float m21 = 21;
-  void clear_m21();
-  float m21() const;
-  void set_m21(float value);
-  private:
-  float _internal_m21() const;
-  void _internal_set_m21(float value);
-  public:
-
-  // float m22 = 22;
-  void clear_m22();
-  float m22() const;
-  void set_m22(float value);
-  private:
-  float _internal_m22() const;
-  void _internal_set_m22(float value);
-  public:
-
-  // float m23 = 23;
-  void clear_m23();
-  float m23() const;
-  void set_m23(float value);
-  private:
-  float _internal_m23() const;
-  void _internal_set_m23(float value);
-  public:
-
-  // float m31 = 31;
-  void clear_m31();
-  float m31() const;
-  void set_m31(float value);
-  private:
-  float _internal_m31() const;
-  void _internal_set_m31(float value);
-  public:
-
-  // float m32 = 32;
-  void clear_m32();
-  float m32() const;
-  void set_m32(float value);
-  private:
-  float _internal_m32() const;
-  void _internal_set_m32(float value);
-  public:
-
-  // @@protoc_insertion_point(class_scope:frame.proto.Matrix3)
- private:
-  class _Internal;
-
-  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
-  typedef void InternalArenaConstructable_;
-  typedef void DestructorSkippable_;
-  float m33_;
-  float m11_;
-  float m12_;
-  float m13_;
-  float m21_;
-  float m22_;
-  float m23_;
-  float m31_;
-  float m32_;
-  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
-  friend struct ::TableStruct_Math_2eproto;
-};
-// -------------------------------------------------------------------
-
-class Matrix4 PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:frame.proto.Matrix4) */ {
- public:
-  inline Matrix4() : Matrix4(nullptr) {}
-  virtual ~Matrix4();
-
-  Matrix4(const Matrix4& from);
-  Matrix4(Matrix4&& from) noexcept
-    : Matrix4() {
-    *this = ::std::move(from);
-  }
-
-  inline Matrix4& operator=(const Matrix4& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  inline Matrix4& operator=(Matrix4&& from) noexcept {
-    if (GetArena() == from.GetArena()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-
-  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
-    return GetDescriptor();
-  }
-  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
-    return GetMetadataStatic().descriptor;
-  }
-  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
-    return GetMetadataStatic().reflection;
-  }
-  static const Matrix4& default_instance();
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const Matrix4* internal_default_instance() {
-    return reinterpret_cast<const Matrix4*>(
-               &_Matrix4_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    4;
-
-  friend void swap(Matrix4& a, Matrix4& b) {
-    a.Swap(&b);
-  }
-  inline void Swap(Matrix4* other) {
-    if (other == this) return;
-    if (GetArena() == other->GetArena()) {
-      InternalSwap(other);
-    } else {
-      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
-    }
-  }
-  void UnsafeArenaSwap(Matrix4* other) {
-    if (other == this) return;
-    GOOGLE_DCHECK(GetArena() == other->GetArena());
-    InternalSwap(other);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline Matrix4* New() const final {
-    return CreateMaybeMessage<Matrix4>(nullptr);
-  }
-
-  Matrix4* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
-    return CreateMaybeMessage<Matrix4>(arena);
-  }
-  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
-  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
-  void CopyFrom(const Matrix4& from);
-  void MergeFrom(const Matrix4& from);
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
-  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
-      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  inline void SharedCtor();
-  inline void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(Matrix4* other);
-  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
-  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "frame.proto.Matrix4";
-  }
-  protected:
-  explicit Matrix4(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  explicit UniformMatrix4(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   private:
   static void ArenaDtor(void* object);
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
@@ -1093,7 +860,7 @@ class Matrix4 PROTOBUF_FINAL :
   void _internal_set_m44(float value);
   public:
 
-  // @@protoc_insertion_point(class_scope:frame.proto.Matrix4)
+  // @@protoc_insertion_point(class_scope:frame.proto.UniformMatrix4)
  private:
   class _Internal;
 
@@ -1121,23 +888,23 @@ class Matrix4 PROTOBUF_FINAL :
 };
 // -------------------------------------------------------------------
 
-class MultipleInteger PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:frame.proto.MultipleInteger) */ {
+class UniformInts PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:frame.proto.UniformInts) */ {
  public:
-  inline MultipleInteger() : MultipleInteger(nullptr) {}
-  virtual ~MultipleInteger();
+  inline UniformInts() : UniformInts(nullptr) {}
+  virtual ~UniformInts();
 
-  MultipleInteger(const MultipleInteger& from);
-  MultipleInteger(MultipleInteger&& from) noexcept
-    : MultipleInteger() {
+  UniformInts(const UniformInts& from);
+  UniformInts(UniformInts&& from) noexcept
+    : UniformInts() {
     *this = ::std::move(from);
   }
 
-  inline MultipleInteger& operator=(const MultipleInteger& from) {
+  inline UniformInts& operator=(const UniformInts& from) {
     CopyFrom(from);
     return *this;
   }
-  inline MultipleInteger& operator=(MultipleInteger&& from) noexcept {
+  inline UniformInts& operator=(UniformInts&& from) noexcept {
     if (GetArena() == from.GetArena()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -1155,20 +922,20 @@ class MultipleInteger PROTOBUF_FINAL :
   static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
     return GetMetadataStatic().reflection;
   }
-  static const MultipleInteger& default_instance();
+  static const UniformInts& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const MultipleInteger* internal_default_instance() {
-    return reinterpret_cast<const MultipleInteger*>(
-               &_MultipleInteger_default_instance_);
+  static inline const UniformInts* internal_default_instance() {
+    return reinterpret_cast<const UniformInts*>(
+               &_UniformInts_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    5;
+    4;
 
-  friend void swap(MultipleInteger& a, MultipleInteger& b) {
+  friend void swap(UniformInts& a, UniformInts& b) {
     a.Swap(&b);
   }
-  inline void Swap(MultipleInteger* other) {
+  inline void Swap(UniformInts* other) {
     if (other == this) return;
     if (GetArena() == other->GetArena()) {
       InternalSwap(other);
@@ -1176,7 +943,7 @@ class MultipleInteger PROTOBUF_FINAL :
       ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
     }
   }
-  void UnsafeArenaSwap(MultipleInteger* other) {
+  void UnsafeArenaSwap(UniformInts* other) {
     if (other == this) return;
     GOOGLE_DCHECK(GetArena() == other->GetArena());
     InternalSwap(other);
@@ -1184,17 +951,17 @@ class MultipleInteger PROTOBUF_FINAL :
 
   // implements Message ----------------------------------------------
 
-  inline MultipleInteger* New() const final {
-    return CreateMaybeMessage<MultipleInteger>(nullptr);
+  inline UniformInts* New() const final {
+    return CreateMaybeMessage<UniformInts>(nullptr);
   }
 
-  MultipleInteger* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
-    return CreateMaybeMessage<MultipleInteger>(arena);
+  UniformInts* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<UniformInts>(arena);
   }
   void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
-  void CopyFrom(const MultipleInteger& from);
-  void MergeFrom(const MultipleInteger& from);
+  void CopyFrom(const UniformInts& from);
+  void MergeFrom(const UniformInts& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -1208,13 +975,13 @@ class MultipleInteger PROTOBUF_FINAL :
   inline void SharedCtor();
   inline void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(MultipleInteger* other);
+  void InternalSwap(UniformInts* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "frame.proto.MultipleInteger";
+    return "frame.proto.UniformInts";
   }
   protected:
-  explicit MultipleInteger(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  explicit UniformInts(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   private:
   static void ArenaDtor(void* object);
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
@@ -1258,7 +1025,7 @@ class MultipleInteger PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
       mutable_values();
 
-  // @@protoc_insertion_point(class_scope:frame.proto.MultipleInteger)
+  // @@protoc_insertion_point(class_scope:frame.proto.UniformInts)
  private:
   class _Internal;
 
@@ -1272,23 +1039,23 @@ class MultipleInteger PROTOBUF_FINAL :
 };
 // -------------------------------------------------------------------
 
-class MutlipleBoolean PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:frame.proto.MutlipleBoolean) */ {
+class UniformBools PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:frame.proto.UniformBools) */ {
  public:
-  inline MutlipleBoolean() : MutlipleBoolean(nullptr) {}
-  virtual ~MutlipleBoolean();
+  inline UniformBools() : UniformBools(nullptr) {}
+  virtual ~UniformBools();
 
-  MutlipleBoolean(const MutlipleBoolean& from);
-  MutlipleBoolean(MutlipleBoolean&& from) noexcept
-    : MutlipleBoolean() {
+  UniformBools(const UniformBools& from);
+  UniformBools(UniformBools&& from) noexcept
+    : UniformBools() {
     *this = ::std::move(from);
   }
 
-  inline MutlipleBoolean& operator=(const MutlipleBoolean& from) {
+  inline UniformBools& operator=(const UniformBools& from) {
     CopyFrom(from);
     return *this;
   }
-  inline MutlipleBoolean& operator=(MutlipleBoolean&& from) noexcept {
+  inline UniformBools& operator=(UniformBools&& from) noexcept {
     if (GetArena() == from.GetArena()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -1306,20 +1073,20 @@ class MutlipleBoolean PROTOBUF_FINAL :
   static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
     return GetMetadataStatic().reflection;
   }
-  static const MutlipleBoolean& default_instance();
+  static const UniformBools& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const MutlipleBoolean* internal_default_instance() {
-    return reinterpret_cast<const MutlipleBoolean*>(
-               &_MutlipleBoolean_default_instance_);
+  static inline const UniformBools* internal_default_instance() {
+    return reinterpret_cast<const UniformBools*>(
+               &_UniformBools_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    6;
+    5;
 
-  friend void swap(MutlipleBoolean& a, MutlipleBoolean& b) {
+  friend void swap(UniformBools& a, UniformBools& b) {
     a.Swap(&b);
   }
-  inline void Swap(MutlipleBoolean* other) {
+  inline void Swap(UniformBools* other) {
     if (other == this) return;
     if (GetArena() == other->GetArena()) {
       InternalSwap(other);
@@ -1327,7 +1094,7 @@ class MutlipleBoolean PROTOBUF_FINAL :
       ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
     }
   }
-  void UnsafeArenaSwap(MutlipleBoolean* other) {
+  void UnsafeArenaSwap(UniformBools* other) {
     if (other == this) return;
     GOOGLE_DCHECK(GetArena() == other->GetArena());
     InternalSwap(other);
@@ -1335,17 +1102,17 @@ class MutlipleBoolean PROTOBUF_FINAL :
 
   // implements Message ----------------------------------------------
 
-  inline MutlipleBoolean* New() const final {
-    return CreateMaybeMessage<MutlipleBoolean>(nullptr);
+  inline UniformBools* New() const final {
+    return CreateMaybeMessage<UniformBools>(nullptr);
   }
 
-  MutlipleBoolean* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
-    return CreateMaybeMessage<MutlipleBoolean>(arena);
+  UniformBools* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<UniformBools>(arena);
   }
   void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
-  void CopyFrom(const MutlipleBoolean& from);
-  void MergeFrom(const MutlipleBoolean& from);
+  void CopyFrom(const UniformBools& from);
+  void MergeFrom(const UniformBools& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -1359,13 +1126,13 @@ class MutlipleBoolean PROTOBUF_FINAL :
   inline void SharedCtor();
   inline void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(MutlipleBoolean* other);
+  void InternalSwap(UniformBools* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "frame.proto.MutlipleBoolean";
+    return "frame.proto.UniformBools";
   }
   protected:
-  explicit MutlipleBoolean(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  explicit UniformBools(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   private:
   static void ArenaDtor(void* object);
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
@@ -1409,7 +1176,7 @@ class MutlipleBoolean PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< bool >*
       mutable_values();
 
-  // @@protoc_insertion_point(class_scope:frame.proto.MutlipleBoolean)
+  // @@protoc_insertion_point(class_scope:frame.proto.UniformBools)
  private:
   class _Internal;
 
@@ -1423,23 +1190,23 @@ class MutlipleBoolean PROTOBUF_FINAL :
 };
 // -------------------------------------------------------------------
 
-class MultipleReal PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:frame.proto.MultipleReal) */ {
+class UniformFloats PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:frame.proto.UniformFloats) */ {
  public:
-  inline MultipleReal() : MultipleReal(nullptr) {}
-  virtual ~MultipleReal();
+  inline UniformFloats() : UniformFloats(nullptr) {}
+  virtual ~UniformFloats();
 
-  MultipleReal(const MultipleReal& from);
-  MultipleReal(MultipleReal&& from) noexcept
-    : MultipleReal() {
+  UniformFloats(const UniformFloats& from);
+  UniformFloats(UniformFloats&& from) noexcept
+    : UniformFloats() {
     *this = ::std::move(from);
   }
 
-  inline MultipleReal& operator=(const MultipleReal& from) {
+  inline UniformFloats& operator=(const UniformFloats& from) {
     CopyFrom(from);
     return *this;
   }
-  inline MultipleReal& operator=(MultipleReal&& from) noexcept {
+  inline UniformFloats& operator=(UniformFloats&& from) noexcept {
     if (GetArena() == from.GetArena()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -1457,20 +1224,20 @@ class MultipleReal PROTOBUF_FINAL :
   static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
     return GetMetadataStatic().reflection;
   }
-  static const MultipleReal& default_instance();
+  static const UniformFloats& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const MultipleReal* internal_default_instance() {
-    return reinterpret_cast<const MultipleReal*>(
-               &_MultipleReal_default_instance_);
+  static inline const UniformFloats* internal_default_instance() {
+    return reinterpret_cast<const UniformFloats*>(
+               &_UniformFloats_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    7;
+    6;
 
-  friend void swap(MultipleReal& a, MultipleReal& b) {
+  friend void swap(UniformFloats& a, UniformFloats& b) {
     a.Swap(&b);
   }
-  inline void Swap(MultipleReal* other) {
+  inline void Swap(UniformFloats* other) {
     if (other == this) return;
     if (GetArena() == other->GetArena()) {
       InternalSwap(other);
@@ -1478,7 +1245,7 @@ class MultipleReal PROTOBUF_FINAL :
       ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
     }
   }
-  void UnsafeArenaSwap(MultipleReal* other) {
+  void UnsafeArenaSwap(UniformFloats* other) {
     if (other == this) return;
     GOOGLE_DCHECK(GetArena() == other->GetArena());
     InternalSwap(other);
@@ -1486,17 +1253,17 @@ class MultipleReal PROTOBUF_FINAL :
 
   // implements Message ----------------------------------------------
 
-  inline MultipleReal* New() const final {
-    return CreateMaybeMessage<MultipleReal>(nullptr);
+  inline UniformFloats* New() const final {
+    return CreateMaybeMessage<UniformFloats>(nullptr);
   }
 
-  MultipleReal* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
-    return CreateMaybeMessage<MultipleReal>(arena);
+  UniformFloats* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<UniformFloats>(arena);
   }
   void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
-  void CopyFrom(const MultipleReal& from);
-  void MergeFrom(const MultipleReal& from);
+  void CopyFrom(const UniformFloats& from);
+  void MergeFrom(const UniformFloats& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -1510,13 +1277,13 @@ class MultipleReal PROTOBUF_FINAL :
   inline void SharedCtor();
   inline void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(MultipleReal* other);
+  void InternalSwap(UniformFloats* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "frame.proto.MultipleReal";
+    return "frame.proto.UniformFloats";
   }
   protected:
-  explicit MultipleReal(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  explicit UniformFloats(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   private:
   static void ArenaDtor(void* object);
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
@@ -1560,7 +1327,7 @@ class MultipleReal PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
       mutable_values();
 
-  // @@protoc_insertion_point(class_scope:frame.proto.MultipleReal)
+  // @@protoc_insertion_point(class_scope:frame.proto.UniformFloats)
  private:
   class _Internal;
 
@@ -1574,23 +1341,23 @@ class MultipleReal PROTOBUF_FINAL :
 };
 // -------------------------------------------------------------------
 
-class MulitpleVector2 PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:frame.proto.MulitpleVector2) */ {
+class UniformVector2s PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:frame.proto.UniformVector2s) */ {
  public:
-  inline MulitpleVector2() : MulitpleVector2(nullptr) {}
-  virtual ~MulitpleVector2();
+  inline UniformVector2s() : UniformVector2s(nullptr) {}
+  virtual ~UniformVector2s();
 
-  MulitpleVector2(const MulitpleVector2& from);
-  MulitpleVector2(MulitpleVector2&& from) noexcept
-    : MulitpleVector2() {
+  UniformVector2s(const UniformVector2s& from);
+  UniformVector2s(UniformVector2s&& from) noexcept
+    : UniformVector2s() {
     *this = ::std::move(from);
   }
 
-  inline MulitpleVector2& operator=(const MulitpleVector2& from) {
+  inline UniformVector2s& operator=(const UniformVector2s& from) {
     CopyFrom(from);
     return *this;
   }
-  inline MulitpleVector2& operator=(MulitpleVector2&& from) noexcept {
+  inline UniformVector2s& operator=(UniformVector2s&& from) noexcept {
     if (GetArena() == from.GetArena()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -1608,20 +1375,166 @@ class MulitpleVector2 PROTOBUF_FINAL :
   static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
     return GetMetadataStatic().reflection;
   }
-  static const MulitpleVector2& default_instance();
+  static const UniformVector2s& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const MulitpleVector2* internal_default_instance() {
-    return reinterpret_cast<const MulitpleVector2*>(
-               &_MulitpleVector2_default_instance_);
+  static inline const UniformVector2s* internal_default_instance() {
+    return reinterpret_cast<const UniformVector2s*>(
+               &_UniformVector2s_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    7;
+
+  friend void swap(UniformVector2s& a, UniformVector2s& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(UniformVector2s* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(UniformVector2s* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline UniformVector2s* New() const final {
+    return CreateMaybeMessage<UniformVector2s>(nullptr);
+  }
+
+  UniformVector2s* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<UniformVector2s>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const UniformVector2s& from);
+  void MergeFrom(const UniformVector2s& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(UniformVector2s* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "frame.proto.UniformVector2s";
+  }
+  protected:
+  explicit UniformVector2s(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_Math_2eproto);
+    return ::descriptor_table_Math_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kValuesFieldNumber = 1,
+  };
+  // repeated .frame.proto.UniformVector2 values = 1;
+  int values_size() const;
+  private:
+  int _internal_values_size() const;
+  public:
+  void clear_values();
+  ::frame::proto::UniformVector2* mutable_values(int index);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::UniformVector2 >*
+      mutable_values();
+  private:
+  const ::frame::proto::UniformVector2& _internal_values(int index) const;
+  ::frame::proto::UniformVector2* _internal_add_values();
+  public:
+  const ::frame::proto::UniformVector2& values(int index) const;
+  ::frame::proto::UniformVector2* add_values();
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::UniformVector2 >&
+      values() const;
+
+  // @@protoc_insertion_point(class_scope:frame.proto.UniformVector2s)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::UniformVector2 > values_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_Math_2eproto;
+};
+// -------------------------------------------------------------------
+
+class UniformVector3s PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:frame.proto.UniformVector3s) */ {
+ public:
+  inline UniformVector3s() : UniformVector3s(nullptr) {}
+  virtual ~UniformVector3s();
+
+  UniformVector3s(const UniformVector3s& from);
+  UniformVector3s(UniformVector3s&& from) noexcept
+    : UniformVector3s() {
+    *this = ::std::move(from);
+  }
+
+  inline UniformVector3s& operator=(const UniformVector3s& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline UniformVector3s& operator=(UniformVector3s&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const UniformVector3s& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const UniformVector3s* internal_default_instance() {
+    return reinterpret_cast<const UniformVector3s*>(
+               &_UniformVector3s_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     8;
 
-  friend void swap(MulitpleVector2& a, MulitpleVector2& b) {
+  friend void swap(UniformVector3s& a, UniformVector3s& b) {
     a.Swap(&b);
   }
-  inline void Swap(MulitpleVector2* other) {
+  inline void Swap(UniformVector3s* other) {
     if (other == this) return;
     if (GetArena() == other->GetArena()) {
       InternalSwap(other);
@@ -1629,7 +1542,7 @@ class MulitpleVector2 PROTOBUF_FINAL :
       ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
     }
   }
-  void UnsafeArenaSwap(MulitpleVector2* other) {
+  void UnsafeArenaSwap(UniformVector3s* other) {
     if (other == this) return;
     GOOGLE_DCHECK(GetArena() == other->GetArena());
     InternalSwap(other);
@@ -1637,17 +1550,17 @@ class MulitpleVector2 PROTOBUF_FINAL :
 
   // implements Message ----------------------------------------------
 
-  inline MulitpleVector2* New() const final {
-    return CreateMaybeMessage<MulitpleVector2>(nullptr);
+  inline UniformVector3s* New() const final {
+    return CreateMaybeMessage<UniformVector3s>(nullptr);
   }
 
-  MulitpleVector2* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
-    return CreateMaybeMessage<MulitpleVector2>(arena);
+  UniformVector3s* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<UniformVector3s>(arena);
   }
   void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
-  void CopyFrom(const MulitpleVector2& from);
-  void MergeFrom(const MulitpleVector2& from);
+  void CopyFrom(const UniformVector3s& from);
+  void MergeFrom(const UniformVector3s& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -1661,13 +1574,13 @@ class MulitpleVector2 PROTOBUF_FINAL :
   inline void SharedCtor();
   inline void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(MulitpleVector2* other);
+  void InternalSwap(UniformVector3s* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "frame.proto.MulitpleVector2";
+    return "frame.proto.UniformVector3s";
   }
   protected:
-  explicit MulitpleVector2(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  explicit UniformVector3s(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   private:
   static void ArenaDtor(void* object);
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
@@ -1689,54 +1602,54 @@ class MulitpleVector2 PROTOBUF_FINAL :
   enum : int {
     kValuesFieldNumber = 1,
   };
-  // repeated .frame.proto.Vector2 values = 1;
+  // repeated .frame.proto.UniformVector3 values = 1;
   int values_size() const;
   private:
   int _internal_values_size() const;
   public:
   void clear_values();
-  ::frame::proto::Vector2* mutable_values(int index);
-  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Vector2 >*
+  ::frame::proto::UniformVector3* mutable_values(int index);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::UniformVector3 >*
       mutable_values();
   private:
-  const ::frame::proto::Vector2& _internal_values(int index) const;
-  ::frame::proto::Vector2* _internal_add_values();
+  const ::frame::proto::UniformVector3& _internal_values(int index) const;
+  ::frame::proto::UniformVector3* _internal_add_values();
   public:
-  const ::frame::proto::Vector2& values(int index) const;
-  ::frame::proto::Vector2* add_values();
-  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Vector2 >&
+  const ::frame::proto::UniformVector3& values(int index) const;
+  ::frame::proto::UniformVector3* add_values();
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::UniformVector3 >&
       values() const;
 
-  // @@protoc_insertion_point(class_scope:frame.proto.MulitpleVector2)
+  // @@protoc_insertion_point(class_scope:frame.proto.UniformVector3s)
  private:
   class _Internal;
 
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
-  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Vector2 > values_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::UniformVector3 > values_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_Math_2eproto;
 };
 // -------------------------------------------------------------------
 
-class MultipleVector3 PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:frame.proto.MultipleVector3) */ {
+class UniformVector4s PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:frame.proto.UniformVector4s) */ {
  public:
-  inline MultipleVector3() : MultipleVector3(nullptr) {}
-  virtual ~MultipleVector3();
+  inline UniformVector4s() : UniformVector4s(nullptr) {}
+  virtual ~UniformVector4s();
 
-  MultipleVector3(const MultipleVector3& from);
-  MultipleVector3(MultipleVector3&& from) noexcept
-    : MultipleVector3() {
+  UniformVector4s(const UniformVector4s& from);
+  UniformVector4s(UniformVector4s&& from) noexcept
+    : UniformVector4s() {
     *this = ::std::move(from);
   }
 
-  inline MultipleVector3& operator=(const MultipleVector3& from) {
+  inline UniformVector4s& operator=(const UniformVector4s& from) {
     CopyFrom(from);
     return *this;
   }
-  inline MultipleVector3& operator=(MultipleVector3&& from) noexcept {
+  inline UniformVector4s& operator=(UniformVector4s&& from) noexcept {
     if (GetArena() == from.GetArena()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -1754,20 +1667,20 @@ class MultipleVector3 PROTOBUF_FINAL :
   static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
     return GetMetadataStatic().reflection;
   }
-  static const MultipleVector3& default_instance();
+  static const UniformVector4s& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const MultipleVector3* internal_default_instance() {
-    return reinterpret_cast<const MultipleVector3*>(
-               &_MultipleVector3_default_instance_);
+  static inline const UniformVector4s* internal_default_instance() {
+    return reinterpret_cast<const UniformVector4s*>(
+               &_UniformVector4s_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     9;
 
-  friend void swap(MultipleVector3& a, MultipleVector3& b) {
+  friend void swap(UniformVector4s& a, UniformVector4s& b) {
     a.Swap(&b);
   }
-  inline void Swap(MultipleVector3* other) {
+  inline void Swap(UniformVector4s* other) {
     if (other == this) return;
     if (GetArena() == other->GetArena()) {
       InternalSwap(other);
@@ -1775,7 +1688,7 @@ class MultipleVector3 PROTOBUF_FINAL :
       ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
     }
   }
-  void UnsafeArenaSwap(MultipleVector3* other) {
+  void UnsafeArenaSwap(UniformVector4s* other) {
     if (other == this) return;
     GOOGLE_DCHECK(GetArena() == other->GetArena());
     InternalSwap(other);
@@ -1783,17 +1696,17 @@ class MultipleVector3 PROTOBUF_FINAL :
 
   // implements Message ----------------------------------------------
 
-  inline MultipleVector3* New() const final {
-    return CreateMaybeMessage<MultipleVector3>(nullptr);
+  inline UniformVector4s* New() const final {
+    return CreateMaybeMessage<UniformVector4s>(nullptr);
   }
 
-  MultipleVector3* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
-    return CreateMaybeMessage<MultipleVector3>(arena);
+  UniformVector4s* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<UniformVector4s>(arena);
   }
   void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
-  void CopyFrom(const MultipleVector3& from);
-  void MergeFrom(const MultipleVector3& from);
+  void CopyFrom(const UniformVector4s& from);
+  void MergeFrom(const UniformVector4s& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -1807,13 +1720,13 @@ class MultipleVector3 PROTOBUF_FINAL :
   inline void SharedCtor();
   inline void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(MultipleVector3* other);
+  void InternalSwap(UniformVector4s* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "frame.proto.MultipleVector3";
+    return "frame.proto.UniformVector4s";
   }
   protected:
-  explicit MultipleVector3(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  explicit UniformVector4s(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   private:
   static void ArenaDtor(void* object);
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
@@ -1835,54 +1748,54 @@ class MultipleVector3 PROTOBUF_FINAL :
   enum : int {
     kValuesFieldNumber = 1,
   };
-  // repeated .frame.proto.Vector3 values = 1;
+  // repeated .frame.proto.UniformVector4 values = 1;
   int values_size() const;
   private:
   int _internal_values_size() const;
   public:
   void clear_values();
-  ::frame::proto::Vector3* mutable_values(int index);
-  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Vector3 >*
+  ::frame::proto::UniformVector4* mutable_values(int index);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::UniformVector4 >*
       mutable_values();
   private:
-  const ::frame::proto::Vector3& _internal_values(int index) const;
-  ::frame::proto::Vector3* _internal_add_values();
+  const ::frame::proto::UniformVector4& _internal_values(int index) const;
+  ::frame::proto::UniformVector4* _internal_add_values();
   public:
-  const ::frame::proto::Vector3& values(int index) const;
-  ::frame::proto::Vector3* add_values();
-  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Vector3 >&
+  const ::frame::proto::UniformVector4& values(int index) const;
+  ::frame::proto::UniformVector4* add_values();
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::UniformVector4 >&
       values() const;
 
-  // @@protoc_insertion_point(class_scope:frame.proto.MultipleVector3)
+  // @@protoc_insertion_point(class_scope:frame.proto.UniformVector4s)
  private:
   class _Internal;
 
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
-  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Vector3 > values_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::UniformVector4 > values_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_Math_2eproto;
 };
 // -------------------------------------------------------------------
 
-class MultipleVector4 PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:frame.proto.MultipleVector4) */ {
+class UniformMatrix4s PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:frame.proto.UniformMatrix4s) */ {
  public:
-  inline MultipleVector4() : MultipleVector4(nullptr) {}
-  virtual ~MultipleVector4();
+  inline UniformMatrix4s() : UniformMatrix4s(nullptr) {}
+  virtual ~UniformMatrix4s();
 
-  MultipleVector4(const MultipleVector4& from);
-  MultipleVector4(MultipleVector4&& from) noexcept
-    : MultipleVector4() {
+  UniformMatrix4s(const UniformMatrix4s& from);
+  UniformMatrix4s(UniformMatrix4s&& from) noexcept
+    : UniformMatrix4s() {
     *this = ::std::move(from);
   }
 
-  inline MultipleVector4& operator=(const MultipleVector4& from) {
+  inline UniformMatrix4s& operator=(const UniformMatrix4s& from) {
     CopyFrom(from);
     return *this;
   }
-  inline MultipleVector4& operator=(MultipleVector4&& from) noexcept {
+  inline UniformMatrix4s& operator=(UniformMatrix4s&& from) noexcept {
     if (GetArena() == from.GetArena()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -1900,20 +1813,20 @@ class MultipleVector4 PROTOBUF_FINAL :
   static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
     return GetMetadataStatic().reflection;
   }
-  static const MultipleVector4& default_instance();
+  static const UniformMatrix4s& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const MultipleVector4* internal_default_instance() {
-    return reinterpret_cast<const MultipleVector4*>(
-               &_MultipleVector4_default_instance_);
+  static inline const UniformMatrix4s* internal_default_instance() {
+    return reinterpret_cast<const UniformMatrix4s*>(
+               &_UniformMatrix4s_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     10;
 
-  friend void swap(MultipleVector4& a, MultipleVector4& b) {
+  friend void swap(UniformMatrix4s& a, UniformMatrix4s& b) {
     a.Swap(&b);
   }
-  inline void Swap(MultipleVector4* other) {
+  inline void Swap(UniformMatrix4s* other) {
     if (other == this) return;
     if (GetArena() == other->GetArena()) {
       InternalSwap(other);
@@ -1921,7 +1834,7 @@ class MultipleVector4 PROTOBUF_FINAL :
       ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
     }
   }
-  void UnsafeArenaSwap(MultipleVector4* other) {
+  void UnsafeArenaSwap(UniformMatrix4s* other) {
     if (other == this) return;
     GOOGLE_DCHECK(GetArena() == other->GetArena());
     InternalSwap(other);
@@ -1929,17 +1842,17 @@ class MultipleVector4 PROTOBUF_FINAL :
 
   // implements Message ----------------------------------------------
 
-  inline MultipleVector4* New() const final {
-    return CreateMaybeMessage<MultipleVector4>(nullptr);
+  inline UniformMatrix4s* New() const final {
+    return CreateMaybeMessage<UniformMatrix4s>(nullptr);
   }
 
-  MultipleVector4* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
-    return CreateMaybeMessage<MultipleVector4>(arena);
+  UniformMatrix4s* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<UniformMatrix4s>(arena);
   }
   void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
-  void CopyFrom(const MultipleVector4& from);
-  void MergeFrom(const MultipleVector4& from);
+  void CopyFrom(const UniformMatrix4s& from);
+  void MergeFrom(const UniformMatrix4s& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -1953,13 +1866,13 @@ class MultipleVector4 PROTOBUF_FINAL :
   inline void SharedCtor();
   inline void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(MultipleVector4* other);
+  void InternalSwap(UniformMatrix4s* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "frame.proto.MultipleVector4";
+    return "frame.proto.UniformMatrix4s";
   }
   protected:
-  explicit MultipleVector4(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  explicit UniformMatrix4s(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   private:
   static void ArenaDtor(void* object);
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
@@ -1981,324 +1894,32 @@ class MultipleVector4 PROTOBUF_FINAL :
   enum : int {
     kValuesFieldNumber = 1,
   };
-  // repeated .frame.proto.Vector4 values = 1;
+  // repeated .frame.proto.UniformMatrix4 values = 1;
   int values_size() const;
   private:
   int _internal_values_size() const;
   public:
   void clear_values();
-  ::frame::proto::Vector4* mutable_values(int index);
-  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Vector4 >*
+  ::frame::proto::UniformMatrix4* mutable_values(int index);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::UniformMatrix4 >*
       mutable_values();
   private:
-  const ::frame::proto::Vector4& _internal_values(int index) const;
-  ::frame::proto::Vector4* _internal_add_values();
+  const ::frame::proto::UniformMatrix4& _internal_values(int index) const;
+  ::frame::proto::UniformMatrix4* _internal_add_values();
   public:
-  const ::frame::proto::Vector4& values(int index) const;
-  ::frame::proto::Vector4* add_values();
-  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Vector4 >&
+  const ::frame::proto::UniformMatrix4& values(int index) const;
+  ::frame::proto::UniformMatrix4* add_values();
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::UniformMatrix4 >&
       values() const;
 
-  // @@protoc_insertion_point(class_scope:frame.proto.MultipleVector4)
+  // @@protoc_insertion_point(class_scope:frame.proto.UniformMatrix4s)
  private:
   class _Internal;
 
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
-  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Vector4 > values_;
-  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
-  friend struct ::TableStruct_Math_2eproto;
-};
-// -------------------------------------------------------------------
-
-class MultipleMatrix3 PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:frame.proto.MultipleMatrix3) */ {
- public:
-  inline MultipleMatrix3() : MultipleMatrix3(nullptr) {}
-  virtual ~MultipleMatrix3();
-
-  MultipleMatrix3(const MultipleMatrix3& from);
-  MultipleMatrix3(MultipleMatrix3&& from) noexcept
-    : MultipleMatrix3() {
-    *this = ::std::move(from);
-  }
-
-  inline MultipleMatrix3& operator=(const MultipleMatrix3& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  inline MultipleMatrix3& operator=(MultipleMatrix3&& from) noexcept {
-    if (GetArena() == from.GetArena()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-
-  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
-    return GetDescriptor();
-  }
-  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
-    return GetMetadataStatic().descriptor;
-  }
-  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
-    return GetMetadataStatic().reflection;
-  }
-  static const MultipleMatrix3& default_instance();
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const MultipleMatrix3* internal_default_instance() {
-    return reinterpret_cast<const MultipleMatrix3*>(
-               &_MultipleMatrix3_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    11;
-
-  friend void swap(MultipleMatrix3& a, MultipleMatrix3& b) {
-    a.Swap(&b);
-  }
-  inline void Swap(MultipleMatrix3* other) {
-    if (other == this) return;
-    if (GetArena() == other->GetArena()) {
-      InternalSwap(other);
-    } else {
-      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
-    }
-  }
-  void UnsafeArenaSwap(MultipleMatrix3* other) {
-    if (other == this) return;
-    GOOGLE_DCHECK(GetArena() == other->GetArena());
-    InternalSwap(other);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline MultipleMatrix3* New() const final {
-    return CreateMaybeMessage<MultipleMatrix3>(nullptr);
-  }
-
-  MultipleMatrix3* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
-    return CreateMaybeMessage<MultipleMatrix3>(arena);
-  }
-  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
-  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
-  void CopyFrom(const MultipleMatrix3& from);
-  void MergeFrom(const MultipleMatrix3& from);
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
-  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
-      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  inline void SharedCtor();
-  inline void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(MultipleMatrix3* other);
-  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
-  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "frame.proto.MultipleMatrix3";
-  }
-  protected:
-  explicit MultipleMatrix3(::PROTOBUF_NAMESPACE_ID::Arena* arena);
-  private:
-  static void ArenaDtor(void* object);
-  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
-  public:
-
-  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
-  private:
-  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
-    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_Math_2eproto);
-    return ::descriptor_table_Math_2eproto.file_level_metadata[kIndexInFileMessages];
-  }
-
-  public:
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  enum : int {
-    kValuesFieldNumber = 1,
-  };
-  // repeated .frame.proto.Matrix3 values = 1;
-  int values_size() const;
-  private:
-  int _internal_values_size() const;
-  public:
-  void clear_values();
-  ::frame::proto::Matrix3* mutable_values(int index);
-  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Matrix3 >*
-      mutable_values();
-  private:
-  const ::frame::proto::Matrix3& _internal_values(int index) const;
-  ::frame::proto::Matrix3* _internal_add_values();
-  public:
-  const ::frame::proto::Matrix3& values(int index) const;
-  ::frame::proto::Matrix3* add_values();
-  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Matrix3 >&
-      values() const;
-
-  // @@protoc_insertion_point(class_scope:frame.proto.MultipleMatrix3)
- private:
-  class _Internal;
-
-  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
-  typedef void InternalArenaConstructable_;
-  typedef void DestructorSkippable_;
-  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Matrix3 > values_;
-  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
-  friend struct ::TableStruct_Math_2eproto;
-};
-// -------------------------------------------------------------------
-
-class MultipleMatrix4 PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:frame.proto.MultipleMatrix4) */ {
- public:
-  inline MultipleMatrix4() : MultipleMatrix4(nullptr) {}
-  virtual ~MultipleMatrix4();
-
-  MultipleMatrix4(const MultipleMatrix4& from);
-  MultipleMatrix4(MultipleMatrix4&& from) noexcept
-    : MultipleMatrix4() {
-    *this = ::std::move(from);
-  }
-
-  inline MultipleMatrix4& operator=(const MultipleMatrix4& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  inline MultipleMatrix4& operator=(MultipleMatrix4&& from) noexcept {
-    if (GetArena() == from.GetArena()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-
-  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
-    return GetDescriptor();
-  }
-  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
-    return GetMetadataStatic().descriptor;
-  }
-  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
-    return GetMetadataStatic().reflection;
-  }
-  static const MultipleMatrix4& default_instance();
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const MultipleMatrix4* internal_default_instance() {
-    return reinterpret_cast<const MultipleMatrix4*>(
-               &_MultipleMatrix4_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    12;
-
-  friend void swap(MultipleMatrix4& a, MultipleMatrix4& b) {
-    a.Swap(&b);
-  }
-  inline void Swap(MultipleMatrix4* other) {
-    if (other == this) return;
-    if (GetArena() == other->GetArena()) {
-      InternalSwap(other);
-    } else {
-      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
-    }
-  }
-  void UnsafeArenaSwap(MultipleMatrix4* other) {
-    if (other == this) return;
-    GOOGLE_DCHECK(GetArena() == other->GetArena());
-    InternalSwap(other);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline MultipleMatrix4* New() const final {
-    return CreateMaybeMessage<MultipleMatrix4>(nullptr);
-  }
-
-  MultipleMatrix4* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
-    return CreateMaybeMessage<MultipleMatrix4>(arena);
-  }
-  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
-  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
-  void CopyFrom(const MultipleMatrix4& from);
-  void MergeFrom(const MultipleMatrix4& from);
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
-  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
-      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  inline void SharedCtor();
-  inline void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(MultipleMatrix4* other);
-  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
-  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "frame.proto.MultipleMatrix4";
-  }
-  protected:
-  explicit MultipleMatrix4(::PROTOBUF_NAMESPACE_ID::Arena* arena);
-  private:
-  static void ArenaDtor(void* object);
-  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
-  public:
-
-  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
-  private:
-  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
-    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_Math_2eproto);
-    return ::descriptor_table_Math_2eproto.file_level_metadata[kIndexInFileMessages];
-  }
-
-  public:
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  enum : int {
-    kValuesFieldNumber = 1,
-  };
-  // repeated .frame.proto.Matrix4 values = 1;
-  int values_size() const;
-  private:
-  int _internal_values_size() const;
-  public:
-  void clear_values();
-  ::frame::proto::Matrix4* mutable_values(int index);
-  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Matrix4 >*
-      mutable_values();
-  private:
-  const ::frame::proto::Matrix4& _internal_values(int index) const;
-  ::frame::proto::Matrix4* _internal_add_values();
-  public:
-  const ::frame::proto::Matrix4& values(int index) const;
-  ::frame::proto::Matrix4* add_values();
-  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Matrix4 >&
-      values() const;
-
-  // @@protoc_insertion_point(class_scope:frame.proto.MultipleMatrix4)
- private:
-  class _Internal;
-
-  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
-  typedef void InternalArenaConstructable_;
-  typedef void DestructorSkippable_;
-  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Matrix4 > values_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::UniformMatrix4 > values_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_Math_2eproto;
 };
@@ -2311,1079 +1932,848 @@ class MultipleMatrix4 PROTOBUF_FINAL :
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif  // __GNUC__
-// Vector2
+// UniformVector2
 
 // float x = 1;
-inline void Vector2::clear_x() {
+inline void UniformVector2::clear_x() {
   x_ = 0;
 }
-inline float Vector2::_internal_x() const {
+inline float UniformVector2::_internal_x() const {
   return x_;
 }
-inline float Vector2::x() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Vector2.x)
+inline float UniformVector2::x() const {
+  // @@protoc_insertion_point(field_get:frame.proto.UniformVector2.x)
   return _internal_x();
 }
-inline void Vector2::_internal_set_x(float value) {
+inline void UniformVector2::_internal_set_x(float value) {
   
   x_ = value;
 }
-inline void Vector2::set_x(float value) {
+inline void UniformVector2::set_x(float value) {
   _internal_set_x(value);
-  // @@protoc_insertion_point(field_set:frame.proto.Vector2.x)
+  // @@protoc_insertion_point(field_set:frame.proto.UniformVector2.x)
 }
 
 // float y = 2;
-inline void Vector2::clear_y() {
+inline void UniformVector2::clear_y() {
   y_ = 0;
 }
-inline float Vector2::_internal_y() const {
+inline float UniformVector2::_internal_y() const {
   return y_;
 }
-inline float Vector2::y() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Vector2.y)
+inline float UniformVector2::y() const {
+  // @@protoc_insertion_point(field_get:frame.proto.UniformVector2.y)
   return _internal_y();
 }
-inline void Vector2::_internal_set_y(float value) {
+inline void UniformVector2::_internal_set_y(float value) {
   
   y_ = value;
 }
-inline void Vector2::set_y(float value) {
+inline void UniformVector2::set_y(float value) {
   _internal_set_y(value);
-  // @@protoc_insertion_point(field_set:frame.proto.Vector2.y)
+  // @@protoc_insertion_point(field_set:frame.proto.UniformVector2.y)
 }
 
 // -------------------------------------------------------------------
 
-// Vector3
+// UniformVector3
 
 // float x = 1;
-inline void Vector3::clear_x() {
+inline void UniformVector3::clear_x() {
   x_ = 0;
 }
-inline float Vector3::_internal_x() const {
+inline float UniformVector3::_internal_x() const {
   return x_;
 }
-inline float Vector3::x() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Vector3.x)
+inline float UniformVector3::x() const {
+  // @@protoc_insertion_point(field_get:frame.proto.UniformVector3.x)
   return _internal_x();
 }
-inline void Vector3::_internal_set_x(float value) {
+inline void UniformVector3::_internal_set_x(float value) {
   
   x_ = value;
 }
-inline void Vector3::set_x(float value) {
+inline void UniformVector3::set_x(float value) {
   _internal_set_x(value);
-  // @@protoc_insertion_point(field_set:frame.proto.Vector3.x)
+  // @@protoc_insertion_point(field_set:frame.proto.UniformVector3.x)
 }
 
 // float y = 2;
-inline void Vector3::clear_y() {
+inline void UniformVector3::clear_y() {
   y_ = 0;
 }
-inline float Vector3::_internal_y() const {
+inline float UniformVector3::_internal_y() const {
   return y_;
 }
-inline float Vector3::y() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Vector3.y)
+inline float UniformVector3::y() const {
+  // @@protoc_insertion_point(field_get:frame.proto.UniformVector3.y)
   return _internal_y();
 }
-inline void Vector3::_internal_set_y(float value) {
+inline void UniformVector3::_internal_set_y(float value) {
   
   y_ = value;
 }
-inline void Vector3::set_y(float value) {
+inline void UniformVector3::set_y(float value) {
   _internal_set_y(value);
-  // @@protoc_insertion_point(field_set:frame.proto.Vector3.y)
+  // @@protoc_insertion_point(field_set:frame.proto.UniformVector3.y)
 }
 
 // float z = 3;
-inline void Vector3::clear_z() {
+inline void UniformVector3::clear_z() {
   z_ = 0;
 }
-inline float Vector3::_internal_z() const {
+inline float UniformVector3::_internal_z() const {
   return z_;
 }
-inline float Vector3::z() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Vector3.z)
+inline float UniformVector3::z() const {
+  // @@protoc_insertion_point(field_get:frame.proto.UniformVector3.z)
   return _internal_z();
 }
-inline void Vector3::_internal_set_z(float value) {
+inline void UniformVector3::_internal_set_z(float value) {
   
   z_ = value;
 }
-inline void Vector3::set_z(float value) {
+inline void UniformVector3::set_z(float value) {
   _internal_set_z(value);
-  // @@protoc_insertion_point(field_set:frame.proto.Vector3.z)
+  // @@protoc_insertion_point(field_set:frame.proto.UniformVector3.z)
 }
 
 // -------------------------------------------------------------------
 
-// Vector4
+// UniformVector4
 
 // float x = 1;
-inline void Vector4::clear_x() {
+inline void UniformVector4::clear_x() {
   x_ = 0;
 }
-inline float Vector4::_internal_x() const {
+inline float UniformVector4::_internal_x() const {
   return x_;
 }
-inline float Vector4::x() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Vector4.x)
+inline float UniformVector4::x() const {
+  // @@protoc_insertion_point(field_get:frame.proto.UniformVector4.x)
   return _internal_x();
 }
-inline void Vector4::_internal_set_x(float value) {
+inline void UniformVector4::_internal_set_x(float value) {
   
   x_ = value;
 }
-inline void Vector4::set_x(float value) {
+inline void UniformVector4::set_x(float value) {
   _internal_set_x(value);
-  // @@protoc_insertion_point(field_set:frame.proto.Vector4.x)
+  // @@protoc_insertion_point(field_set:frame.proto.UniformVector4.x)
 }
 
 // float y = 2;
-inline void Vector4::clear_y() {
+inline void UniformVector4::clear_y() {
   y_ = 0;
 }
-inline float Vector4::_internal_y() const {
+inline float UniformVector4::_internal_y() const {
   return y_;
 }
-inline float Vector4::y() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Vector4.y)
+inline float UniformVector4::y() const {
+  // @@protoc_insertion_point(field_get:frame.proto.UniformVector4.y)
   return _internal_y();
 }
-inline void Vector4::_internal_set_y(float value) {
+inline void UniformVector4::_internal_set_y(float value) {
   
   y_ = value;
 }
-inline void Vector4::set_y(float value) {
+inline void UniformVector4::set_y(float value) {
   _internal_set_y(value);
-  // @@protoc_insertion_point(field_set:frame.proto.Vector4.y)
+  // @@protoc_insertion_point(field_set:frame.proto.UniformVector4.y)
 }
 
 // float z = 3;
-inline void Vector4::clear_z() {
+inline void UniformVector4::clear_z() {
   z_ = 0;
 }
-inline float Vector4::_internal_z() const {
+inline float UniformVector4::_internal_z() const {
   return z_;
 }
-inline float Vector4::z() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Vector4.z)
+inline float UniformVector4::z() const {
+  // @@protoc_insertion_point(field_get:frame.proto.UniformVector4.z)
   return _internal_z();
 }
-inline void Vector4::_internal_set_z(float value) {
+inline void UniformVector4::_internal_set_z(float value) {
   
   z_ = value;
 }
-inline void Vector4::set_z(float value) {
+inline void UniformVector4::set_z(float value) {
   _internal_set_z(value);
-  // @@protoc_insertion_point(field_set:frame.proto.Vector4.z)
+  // @@protoc_insertion_point(field_set:frame.proto.UniformVector4.z)
 }
 
 // float w = 4;
-inline void Vector4::clear_w() {
+inline void UniformVector4::clear_w() {
   w_ = 0;
 }
-inline float Vector4::_internal_w() const {
+inline float UniformVector4::_internal_w() const {
   return w_;
 }
-inline float Vector4::w() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Vector4.w)
+inline float UniformVector4::w() const {
+  // @@protoc_insertion_point(field_get:frame.proto.UniformVector4.w)
   return _internal_w();
 }
-inline void Vector4::_internal_set_w(float value) {
+inline void UniformVector4::_internal_set_w(float value) {
   
   w_ = value;
 }
-inline void Vector4::set_w(float value) {
+inline void UniformVector4::set_w(float value) {
   _internal_set_w(value);
-  // @@protoc_insertion_point(field_set:frame.proto.Vector4.w)
+  // @@protoc_insertion_point(field_set:frame.proto.UniformVector4.w)
 }
 
 // -------------------------------------------------------------------
 
-// Matrix3
+// UniformMatrix4
 
 // float m11 = 11;
-inline void Matrix3::clear_m11() {
+inline void UniformMatrix4::clear_m11() {
   m11_ = 0;
 }
-inline float Matrix3::_internal_m11() const {
+inline float UniformMatrix4::_internal_m11() const {
   return m11_;
 }
-inline float Matrix3::m11() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Matrix3.m11)
+inline float UniformMatrix4::m11() const {
+  // @@protoc_insertion_point(field_get:frame.proto.UniformMatrix4.m11)
   return _internal_m11();
 }
-inline void Matrix3::_internal_set_m11(float value) {
+inline void UniformMatrix4::_internal_set_m11(float value) {
   
   m11_ = value;
 }
-inline void Matrix3::set_m11(float value) {
+inline void UniformMatrix4::set_m11(float value) {
   _internal_set_m11(value);
-  // @@protoc_insertion_point(field_set:frame.proto.Matrix3.m11)
+  // @@protoc_insertion_point(field_set:frame.proto.UniformMatrix4.m11)
 }
 
 // float m12 = 12;
-inline void Matrix3::clear_m12() {
+inline void UniformMatrix4::clear_m12() {
   m12_ = 0;
 }
-inline float Matrix3::_internal_m12() const {
+inline float UniformMatrix4::_internal_m12() const {
   return m12_;
 }
-inline float Matrix3::m12() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Matrix3.m12)
+inline float UniformMatrix4::m12() const {
+  // @@protoc_insertion_point(field_get:frame.proto.UniformMatrix4.m12)
   return _internal_m12();
 }
-inline void Matrix3::_internal_set_m12(float value) {
+inline void UniformMatrix4::_internal_set_m12(float value) {
   
   m12_ = value;
 }
-inline void Matrix3::set_m12(float value) {
+inline void UniformMatrix4::set_m12(float value) {
   _internal_set_m12(value);
-  // @@protoc_insertion_point(field_set:frame.proto.Matrix3.m12)
+  // @@protoc_insertion_point(field_set:frame.proto.UniformMatrix4.m12)
 }
 
 // float m13 = 13;
-inline void Matrix3::clear_m13() {
+inline void UniformMatrix4::clear_m13() {
   m13_ = 0;
 }
-inline float Matrix3::_internal_m13() const {
+inline float UniformMatrix4::_internal_m13() const {
   return m13_;
 }
-inline float Matrix3::m13() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Matrix3.m13)
+inline float UniformMatrix4::m13() const {
+  // @@protoc_insertion_point(field_get:frame.proto.UniformMatrix4.m13)
   return _internal_m13();
 }
-inline void Matrix3::_internal_set_m13(float value) {
+inline void UniformMatrix4::_internal_set_m13(float value) {
   
   m13_ = value;
 }
-inline void Matrix3::set_m13(float value) {
+inline void UniformMatrix4::set_m13(float value) {
   _internal_set_m13(value);
-  // @@protoc_insertion_point(field_set:frame.proto.Matrix3.m13)
-}
-
-// float m21 = 21;
-inline void Matrix3::clear_m21() {
-  m21_ = 0;
-}
-inline float Matrix3::_internal_m21() const {
-  return m21_;
-}
-inline float Matrix3::m21() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Matrix3.m21)
-  return _internal_m21();
-}
-inline void Matrix3::_internal_set_m21(float value) {
-  
-  m21_ = value;
-}
-inline void Matrix3::set_m21(float value) {
-  _internal_set_m21(value);
-  // @@protoc_insertion_point(field_set:frame.proto.Matrix3.m21)
-}
-
-// float m22 = 22;
-inline void Matrix3::clear_m22() {
-  m22_ = 0;
-}
-inline float Matrix3::_internal_m22() const {
-  return m22_;
-}
-inline float Matrix3::m22() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Matrix3.m22)
-  return _internal_m22();
-}
-inline void Matrix3::_internal_set_m22(float value) {
-  
-  m22_ = value;
-}
-inline void Matrix3::set_m22(float value) {
-  _internal_set_m22(value);
-  // @@protoc_insertion_point(field_set:frame.proto.Matrix3.m22)
-}
-
-// float m23 = 23;
-inline void Matrix3::clear_m23() {
-  m23_ = 0;
-}
-inline float Matrix3::_internal_m23() const {
-  return m23_;
-}
-inline float Matrix3::m23() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Matrix3.m23)
-  return _internal_m23();
-}
-inline void Matrix3::_internal_set_m23(float value) {
-  
-  m23_ = value;
-}
-inline void Matrix3::set_m23(float value) {
-  _internal_set_m23(value);
-  // @@protoc_insertion_point(field_set:frame.proto.Matrix3.m23)
-}
-
-// float m31 = 31;
-inline void Matrix3::clear_m31() {
-  m31_ = 0;
-}
-inline float Matrix3::_internal_m31() const {
-  return m31_;
-}
-inline float Matrix3::m31() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Matrix3.m31)
-  return _internal_m31();
-}
-inline void Matrix3::_internal_set_m31(float value) {
-  
-  m31_ = value;
-}
-inline void Matrix3::set_m31(float value) {
-  _internal_set_m31(value);
-  // @@protoc_insertion_point(field_set:frame.proto.Matrix3.m31)
-}
-
-// float m32 = 32;
-inline void Matrix3::clear_m32() {
-  m32_ = 0;
-}
-inline float Matrix3::_internal_m32() const {
-  return m32_;
-}
-inline float Matrix3::m32() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Matrix3.m32)
-  return _internal_m32();
-}
-inline void Matrix3::_internal_set_m32(float value) {
-  
-  m32_ = value;
-}
-inline void Matrix3::set_m32(float value) {
-  _internal_set_m32(value);
-  // @@protoc_insertion_point(field_set:frame.proto.Matrix3.m32)
-}
-
-// float m33 = 33;
-inline void Matrix3::clear_m33() {
-  m33_ = 0;
-}
-inline float Matrix3::_internal_m33() const {
-  return m33_;
-}
-inline float Matrix3::m33() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Matrix3.m33)
-  return _internal_m33();
-}
-inline void Matrix3::_internal_set_m33(float value) {
-  
-  m33_ = value;
-}
-inline void Matrix3::set_m33(float value) {
-  _internal_set_m33(value);
-  // @@protoc_insertion_point(field_set:frame.proto.Matrix3.m33)
-}
-
-// -------------------------------------------------------------------
-
-// Matrix4
-
-// float m11 = 11;
-inline void Matrix4::clear_m11() {
-  m11_ = 0;
-}
-inline float Matrix4::_internal_m11() const {
-  return m11_;
-}
-inline float Matrix4::m11() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Matrix4.m11)
-  return _internal_m11();
-}
-inline void Matrix4::_internal_set_m11(float value) {
-  
-  m11_ = value;
-}
-inline void Matrix4::set_m11(float value) {
-  _internal_set_m11(value);
-  // @@protoc_insertion_point(field_set:frame.proto.Matrix4.m11)
-}
-
-// float m12 = 12;
-inline void Matrix4::clear_m12() {
-  m12_ = 0;
-}
-inline float Matrix4::_internal_m12() const {
-  return m12_;
-}
-inline float Matrix4::m12() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Matrix4.m12)
-  return _internal_m12();
-}
-inline void Matrix4::_internal_set_m12(float value) {
-  
-  m12_ = value;
-}
-inline void Matrix4::set_m12(float value) {
-  _internal_set_m12(value);
-  // @@protoc_insertion_point(field_set:frame.proto.Matrix4.m12)
-}
-
-// float m13 = 13;
-inline void Matrix4::clear_m13() {
-  m13_ = 0;
-}
-inline float Matrix4::_internal_m13() const {
-  return m13_;
-}
-inline float Matrix4::m13() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Matrix4.m13)
-  return _internal_m13();
-}
-inline void Matrix4::_internal_set_m13(float value) {
-  
-  m13_ = value;
-}
-inline void Matrix4::set_m13(float value) {
-  _internal_set_m13(value);
-  // @@protoc_insertion_point(field_set:frame.proto.Matrix4.m13)
+  // @@protoc_insertion_point(field_set:frame.proto.UniformMatrix4.m13)
 }
 
 // float m14 = 14;
-inline void Matrix4::clear_m14() {
+inline void UniformMatrix4::clear_m14() {
   m14_ = 0;
 }
-inline float Matrix4::_internal_m14() const {
+inline float UniformMatrix4::_internal_m14() const {
   return m14_;
 }
-inline float Matrix4::m14() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Matrix4.m14)
+inline float UniformMatrix4::m14() const {
+  // @@protoc_insertion_point(field_get:frame.proto.UniformMatrix4.m14)
   return _internal_m14();
 }
-inline void Matrix4::_internal_set_m14(float value) {
+inline void UniformMatrix4::_internal_set_m14(float value) {
   
   m14_ = value;
 }
-inline void Matrix4::set_m14(float value) {
+inline void UniformMatrix4::set_m14(float value) {
   _internal_set_m14(value);
-  // @@protoc_insertion_point(field_set:frame.proto.Matrix4.m14)
+  // @@protoc_insertion_point(field_set:frame.proto.UniformMatrix4.m14)
 }
 
 // float m21 = 21;
-inline void Matrix4::clear_m21() {
+inline void UniformMatrix4::clear_m21() {
   m21_ = 0;
 }
-inline float Matrix4::_internal_m21() const {
+inline float UniformMatrix4::_internal_m21() const {
   return m21_;
 }
-inline float Matrix4::m21() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Matrix4.m21)
+inline float UniformMatrix4::m21() const {
+  // @@protoc_insertion_point(field_get:frame.proto.UniformMatrix4.m21)
   return _internal_m21();
 }
-inline void Matrix4::_internal_set_m21(float value) {
+inline void UniformMatrix4::_internal_set_m21(float value) {
   
   m21_ = value;
 }
-inline void Matrix4::set_m21(float value) {
+inline void UniformMatrix4::set_m21(float value) {
   _internal_set_m21(value);
-  // @@protoc_insertion_point(field_set:frame.proto.Matrix4.m21)
+  // @@protoc_insertion_point(field_set:frame.proto.UniformMatrix4.m21)
 }
 
 // float m22 = 22;
-inline void Matrix4::clear_m22() {
+inline void UniformMatrix4::clear_m22() {
   m22_ = 0;
 }
-inline float Matrix4::_internal_m22() const {
+inline float UniformMatrix4::_internal_m22() const {
   return m22_;
 }
-inline float Matrix4::m22() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Matrix4.m22)
+inline float UniformMatrix4::m22() const {
+  // @@protoc_insertion_point(field_get:frame.proto.UniformMatrix4.m22)
   return _internal_m22();
 }
-inline void Matrix4::_internal_set_m22(float value) {
+inline void UniformMatrix4::_internal_set_m22(float value) {
   
   m22_ = value;
 }
-inline void Matrix4::set_m22(float value) {
+inline void UniformMatrix4::set_m22(float value) {
   _internal_set_m22(value);
-  // @@protoc_insertion_point(field_set:frame.proto.Matrix4.m22)
+  // @@protoc_insertion_point(field_set:frame.proto.UniformMatrix4.m22)
 }
 
 // float m23 = 23;
-inline void Matrix4::clear_m23() {
+inline void UniformMatrix4::clear_m23() {
   m23_ = 0;
 }
-inline float Matrix4::_internal_m23() const {
+inline float UniformMatrix4::_internal_m23() const {
   return m23_;
 }
-inline float Matrix4::m23() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Matrix4.m23)
+inline float UniformMatrix4::m23() const {
+  // @@protoc_insertion_point(field_get:frame.proto.UniformMatrix4.m23)
   return _internal_m23();
 }
-inline void Matrix4::_internal_set_m23(float value) {
+inline void UniformMatrix4::_internal_set_m23(float value) {
   
   m23_ = value;
 }
-inline void Matrix4::set_m23(float value) {
+inline void UniformMatrix4::set_m23(float value) {
   _internal_set_m23(value);
-  // @@protoc_insertion_point(field_set:frame.proto.Matrix4.m23)
+  // @@protoc_insertion_point(field_set:frame.proto.UniformMatrix4.m23)
 }
 
 // float m24 = 24;
-inline void Matrix4::clear_m24() {
+inline void UniformMatrix4::clear_m24() {
   m24_ = 0;
 }
-inline float Matrix4::_internal_m24() const {
+inline float UniformMatrix4::_internal_m24() const {
   return m24_;
 }
-inline float Matrix4::m24() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Matrix4.m24)
+inline float UniformMatrix4::m24() const {
+  // @@protoc_insertion_point(field_get:frame.proto.UniformMatrix4.m24)
   return _internal_m24();
 }
-inline void Matrix4::_internal_set_m24(float value) {
+inline void UniformMatrix4::_internal_set_m24(float value) {
   
   m24_ = value;
 }
-inline void Matrix4::set_m24(float value) {
+inline void UniformMatrix4::set_m24(float value) {
   _internal_set_m24(value);
-  // @@protoc_insertion_point(field_set:frame.proto.Matrix4.m24)
+  // @@protoc_insertion_point(field_set:frame.proto.UniformMatrix4.m24)
 }
 
 // float m31 = 31;
-inline void Matrix4::clear_m31() {
+inline void UniformMatrix4::clear_m31() {
   m31_ = 0;
 }
-inline float Matrix4::_internal_m31() const {
+inline float UniformMatrix4::_internal_m31() const {
   return m31_;
 }
-inline float Matrix4::m31() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Matrix4.m31)
+inline float UniformMatrix4::m31() const {
+  // @@protoc_insertion_point(field_get:frame.proto.UniformMatrix4.m31)
   return _internal_m31();
 }
-inline void Matrix4::_internal_set_m31(float value) {
+inline void UniformMatrix4::_internal_set_m31(float value) {
   
   m31_ = value;
 }
-inline void Matrix4::set_m31(float value) {
+inline void UniformMatrix4::set_m31(float value) {
   _internal_set_m31(value);
-  // @@protoc_insertion_point(field_set:frame.proto.Matrix4.m31)
+  // @@protoc_insertion_point(field_set:frame.proto.UniformMatrix4.m31)
 }
 
 // float m32 = 32;
-inline void Matrix4::clear_m32() {
+inline void UniformMatrix4::clear_m32() {
   m32_ = 0;
 }
-inline float Matrix4::_internal_m32() const {
+inline float UniformMatrix4::_internal_m32() const {
   return m32_;
 }
-inline float Matrix4::m32() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Matrix4.m32)
+inline float UniformMatrix4::m32() const {
+  // @@protoc_insertion_point(field_get:frame.proto.UniformMatrix4.m32)
   return _internal_m32();
 }
-inline void Matrix4::_internal_set_m32(float value) {
+inline void UniformMatrix4::_internal_set_m32(float value) {
   
   m32_ = value;
 }
-inline void Matrix4::set_m32(float value) {
+inline void UniformMatrix4::set_m32(float value) {
   _internal_set_m32(value);
-  // @@protoc_insertion_point(field_set:frame.proto.Matrix4.m32)
+  // @@protoc_insertion_point(field_set:frame.proto.UniformMatrix4.m32)
 }
 
 // float m33 = 33;
-inline void Matrix4::clear_m33() {
+inline void UniformMatrix4::clear_m33() {
   m33_ = 0;
 }
-inline float Matrix4::_internal_m33() const {
+inline float UniformMatrix4::_internal_m33() const {
   return m33_;
 }
-inline float Matrix4::m33() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Matrix4.m33)
+inline float UniformMatrix4::m33() const {
+  // @@protoc_insertion_point(field_get:frame.proto.UniformMatrix4.m33)
   return _internal_m33();
 }
-inline void Matrix4::_internal_set_m33(float value) {
+inline void UniformMatrix4::_internal_set_m33(float value) {
   
   m33_ = value;
 }
-inline void Matrix4::set_m33(float value) {
+inline void UniformMatrix4::set_m33(float value) {
   _internal_set_m33(value);
-  // @@protoc_insertion_point(field_set:frame.proto.Matrix4.m33)
+  // @@protoc_insertion_point(field_set:frame.proto.UniformMatrix4.m33)
 }
 
 // float m34 = 34;
-inline void Matrix4::clear_m34() {
+inline void UniformMatrix4::clear_m34() {
   m34_ = 0;
 }
-inline float Matrix4::_internal_m34() const {
+inline float UniformMatrix4::_internal_m34() const {
   return m34_;
 }
-inline float Matrix4::m34() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Matrix4.m34)
+inline float UniformMatrix4::m34() const {
+  // @@protoc_insertion_point(field_get:frame.proto.UniformMatrix4.m34)
   return _internal_m34();
 }
-inline void Matrix4::_internal_set_m34(float value) {
+inline void UniformMatrix4::_internal_set_m34(float value) {
   
   m34_ = value;
 }
-inline void Matrix4::set_m34(float value) {
+inline void UniformMatrix4::set_m34(float value) {
   _internal_set_m34(value);
-  // @@protoc_insertion_point(field_set:frame.proto.Matrix4.m34)
+  // @@protoc_insertion_point(field_set:frame.proto.UniformMatrix4.m34)
 }
 
 // float m41 = 41;
-inline void Matrix4::clear_m41() {
+inline void UniformMatrix4::clear_m41() {
   m41_ = 0;
 }
-inline float Matrix4::_internal_m41() const {
+inline float UniformMatrix4::_internal_m41() const {
   return m41_;
 }
-inline float Matrix4::m41() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Matrix4.m41)
+inline float UniformMatrix4::m41() const {
+  // @@protoc_insertion_point(field_get:frame.proto.UniformMatrix4.m41)
   return _internal_m41();
 }
-inline void Matrix4::_internal_set_m41(float value) {
+inline void UniformMatrix4::_internal_set_m41(float value) {
   
   m41_ = value;
 }
-inline void Matrix4::set_m41(float value) {
+inline void UniformMatrix4::set_m41(float value) {
   _internal_set_m41(value);
-  // @@protoc_insertion_point(field_set:frame.proto.Matrix4.m41)
+  // @@protoc_insertion_point(field_set:frame.proto.UniformMatrix4.m41)
 }
 
 // float m42 = 42;
-inline void Matrix4::clear_m42() {
+inline void UniformMatrix4::clear_m42() {
   m42_ = 0;
 }
-inline float Matrix4::_internal_m42() const {
+inline float UniformMatrix4::_internal_m42() const {
   return m42_;
 }
-inline float Matrix4::m42() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Matrix4.m42)
+inline float UniformMatrix4::m42() const {
+  // @@protoc_insertion_point(field_get:frame.proto.UniformMatrix4.m42)
   return _internal_m42();
 }
-inline void Matrix4::_internal_set_m42(float value) {
+inline void UniformMatrix4::_internal_set_m42(float value) {
   
   m42_ = value;
 }
-inline void Matrix4::set_m42(float value) {
+inline void UniformMatrix4::set_m42(float value) {
   _internal_set_m42(value);
-  // @@protoc_insertion_point(field_set:frame.proto.Matrix4.m42)
+  // @@protoc_insertion_point(field_set:frame.proto.UniformMatrix4.m42)
 }
 
 // float m43 = 43;
-inline void Matrix4::clear_m43() {
+inline void UniformMatrix4::clear_m43() {
   m43_ = 0;
 }
-inline float Matrix4::_internal_m43() const {
+inline float UniformMatrix4::_internal_m43() const {
   return m43_;
 }
-inline float Matrix4::m43() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Matrix4.m43)
+inline float UniformMatrix4::m43() const {
+  // @@protoc_insertion_point(field_get:frame.proto.UniformMatrix4.m43)
   return _internal_m43();
 }
-inline void Matrix4::_internal_set_m43(float value) {
+inline void UniformMatrix4::_internal_set_m43(float value) {
   
   m43_ = value;
 }
-inline void Matrix4::set_m43(float value) {
+inline void UniformMatrix4::set_m43(float value) {
   _internal_set_m43(value);
-  // @@protoc_insertion_point(field_set:frame.proto.Matrix4.m43)
+  // @@protoc_insertion_point(field_set:frame.proto.UniformMatrix4.m43)
 }
 
 // float m44 = 44;
-inline void Matrix4::clear_m44() {
+inline void UniformMatrix4::clear_m44() {
   m44_ = 0;
 }
-inline float Matrix4::_internal_m44() const {
+inline float UniformMatrix4::_internal_m44() const {
   return m44_;
 }
-inline float Matrix4::m44() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Matrix4.m44)
+inline float UniformMatrix4::m44() const {
+  // @@protoc_insertion_point(field_get:frame.proto.UniformMatrix4.m44)
   return _internal_m44();
 }
-inline void Matrix4::_internal_set_m44(float value) {
+inline void UniformMatrix4::_internal_set_m44(float value) {
   
   m44_ = value;
 }
-inline void Matrix4::set_m44(float value) {
+inline void UniformMatrix4::set_m44(float value) {
   _internal_set_m44(value);
-  // @@protoc_insertion_point(field_set:frame.proto.Matrix4.m44)
+  // @@protoc_insertion_point(field_set:frame.proto.UniformMatrix4.m44)
 }
 
 // -------------------------------------------------------------------
 
-// MultipleInteger
+// UniformInts
 
 // repeated int32 values = 1;
-inline int MultipleInteger::_internal_values_size() const {
+inline int UniformInts::_internal_values_size() const {
   return values_.size();
 }
-inline int MultipleInteger::values_size() const {
+inline int UniformInts::values_size() const {
   return _internal_values_size();
 }
-inline void MultipleInteger::clear_values() {
+inline void UniformInts::clear_values() {
   values_.Clear();
 }
-inline ::PROTOBUF_NAMESPACE_ID::int32 MultipleInteger::_internal_values(int index) const {
+inline ::PROTOBUF_NAMESPACE_ID::int32 UniformInts::_internal_values(int index) const {
   return values_.Get(index);
 }
-inline ::PROTOBUF_NAMESPACE_ID::int32 MultipleInteger::values(int index) const {
-  // @@protoc_insertion_point(field_get:frame.proto.MultipleInteger.values)
+inline ::PROTOBUF_NAMESPACE_ID::int32 UniformInts::values(int index) const {
+  // @@protoc_insertion_point(field_get:frame.proto.UniformInts.values)
   return _internal_values(index);
 }
-inline void MultipleInteger::set_values(int index, ::PROTOBUF_NAMESPACE_ID::int32 value) {
+inline void UniformInts::set_values(int index, ::PROTOBUF_NAMESPACE_ID::int32 value) {
   values_.Set(index, value);
-  // @@protoc_insertion_point(field_set:frame.proto.MultipleInteger.values)
+  // @@protoc_insertion_point(field_set:frame.proto.UniformInts.values)
 }
-inline void MultipleInteger::_internal_add_values(::PROTOBUF_NAMESPACE_ID::int32 value) {
+inline void UniformInts::_internal_add_values(::PROTOBUF_NAMESPACE_ID::int32 value) {
   values_.Add(value);
 }
-inline void MultipleInteger::add_values(::PROTOBUF_NAMESPACE_ID::int32 value) {
+inline void UniformInts::add_values(::PROTOBUF_NAMESPACE_ID::int32 value) {
   _internal_add_values(value);
-  // @@protoc_insertion_point(field_add:frame.proto.MultipleInteger.values)
+  // @@protoc_insertion_point(field_add:frame.proto.UniformInts.values)
 }
 inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
-MultipleInteger::_internal_values() const {
+UniformInts::_internal_values() const {
   return values_;
 }
 inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
-MultipleInteger::values() const {
-  // @@protoc_insertion_point(field_list:frame.proto.MultipleInteger.values)
+UniformInts::values() const {
+  // @@protoc_insertion_point(field_list:frame.proto.UniformInts.values)
   return _internal_values();
 }
 inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
-MultipleInteger::_internal_mutable_values() {
+UniformInts::_internal_mutable_values() {
   return &values_;
 }
 inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
-MultipleInteger::mutable_values() {
-  // @@protoc_insertion_point(field_mutable_list:frame.proto.MultipleInteger.values)
+UniformInts::mutable_values() {
+  // @@protoc_insertion_point(field_mutable_list:frame.proto.UniformInts.values)
   return _internal_mutable_values();
 }
 
 // -------------------------------------------------------------------
 
-// MutlipleBoolean
+// UniformBools
 
 // repeated bool values = 1;
-inline int MutlipleBoolean::_internal_values_size() const {
+inline int UniformBools::_internal_values_size() const {
   return values_.size();
 }
-inline int MutlipleBoolean::values_size() const {
+inline int UniformBools::values_size() const {
   return _internal_values_size();
 }
-inline void MutlipleBoolean::clear_values() {
+inline void UniformBools::clear_values() {
   values_.Clear();
 }
-inline bool MutlipleBoolean::_internal_values(int index) const {
+inline bool UniformBools::_internal_values(int index) const {
   return values_.Get(index);
 }
-inline bool MutlipleBoolean::values(int index) const {
-  // @@protoc_insertion_point(field_get:frame.proto.MutlipleBoolean.values)
+inline bool UniformBools::values(int index) const {
+  // @@protoc_insertion_point(field_get:frame.proto.UniformBools.values)
   return _internal_values(index);
 }
-inline void MutlipleBoolean::set_values(int index, bool value) {
+inline void UniformBools::set_values(int index, bool value) {
   values_.Set(index, value);
-  // @@protoc_insertion_point(field_set:frame.proto.MutlipleBoolean.values)
+  // @@protoc_insertion_point(field_set:frame.proto.UniformBools.values)
 }
-inline void MutlipleBoolean::_internal_add_values(bool value) {
+inline void UniformBools::_internal_add_values(bool value) {
   values_.Add(value);
 }
-inline void MutlipleBoolean::add_values(bool value) {
+inline void UniformBools::add_values(bool value) {
   _internal_add_values(value);
-  // @@protoc_insertion_point(field_add:frame.proto.MutlipleBoolean.values)
+  // @@protoc_insertion_point(field_add:frame.proto.UniformBools.values)
 }
 inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< bool >&
-MutlipleBoolean::_internal_values() const {
+UniformBools::_internal_values() const {
   return values_;
 }
 inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< bool >&
-MutlipleBoolean::values() const {
-  // @@protoc_insertion_point(field_list:frame.proto.MutlipleBoolean.values)
+UniformBools::values() const {
+  // @@protoc_insertion_point(field_list:frame.proto.UniformBools.values)
   return _internal_values();
 }
 inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< bool >*
-MutlipleBoolean::_internal_mutable_values() {
+UniformBools::_internal_mutable_values() {
   return &values_;
 }
 inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< bool >*
-MutlipleBoolean::mutable_values() {
-  // @@protoc_insertion_point(field_mutable_list:frame.proto.MutlipleBoolean.values)
+UniformBools::mutable_values() {
+  // @@protoc_insertion_point(field_mutable_list:frame.proto.UniformBools.values)
   return _internal_mutable_values();
 }
 
 // -------------------------------------------------------------------
 
-// MultipleReal
+// UniformFloats
 
 // repeated float values = 1;
-inline int MultipleReal::_internal_values_size() const {
+inline int UniformFloats::_internal_values_size() const {
   return values_.size();
 }
-inline int MultipleReal::values_size() const {
+inline int UniformFloats::values_size() const {
   return _internal_values_size();
 }
-inline void MultipleReal::clear_values() {
+inline void UniformFloats::clear_values() {
   values_.Clear();
 }
-inline float MultipleReal::_internal_values(int index) const {
+inline float UniformFloats::_internal_values(int index) const {
   return values_.Get(index);
 }
-inline float MultipleReal::values(int index) const {
-  // @@protoc_insertion_point(field_get:frame.proto.MultipleReal.values)
+inline float UniformFloats::values(int index) const {
+  // @@protoc_insertion_point(field_get:frame.proto.UniformFloats.values)
   return _internal_values(index);
 }
-inline void MultipleReal::set_values(int index, float value) {
+inline void UniformFloats::set_values(int index, float value) {
   values_.Set(index, value);
-  // @@protoc_insertion_point(field_set:frame.proto.MultipleReal.values)
+  // @@protoc_insertion_point(field_set:frame.proto.UniformFloats.values)
 }
-inline void MultipleReal::_internal_add_values(float value) {
+inline void UniformFloats::_internal_add_values(float value) {
   values_.Add(value);
 }
-inline void MultipleReal::add_values(float value) {
+inline void UniformFloats::add_values(float value) {
   _internal_add_values(value);
-  // @@protoc_insertion_point(field_add:frame.proto.MultipleReal.values)
+  // @@protoc_insertion_point(field_add:frame.proto.UniformFloats.values)
 }
 inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
-MultipleReal::_internal_values() const {
+UniformFloats::_internal_values() const {
   return values_;
 }
 inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
-MultipleReal::values() const {
-  // @@protoc_insertion_point(field_list:frame.proto.MultipleReal.values)
+UniformFloats::values() const {
+  // @@protoc_insertion_point(field_list:frame.proto.UniformFloats.values)
   return _internal_values();
 }
 inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
-MultipleReal::_internal_mutable_values() {
+UniformFloats::_internal_mutable_values() {
   return &values_;
 }
 inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
-MultipleReal::mutable_values() {
-  // @@protoc_insertion_point(field_mutable_list:frame.proto.MultipleReal.values)
+UniformFloats::mutable_values() {
+  // @@protoc_insertion_point(field_mutable_list:frame.proto.UniformFloats.values)
   return _internal_mutable_values();
 }
 
 // -------------------------------------------------------------------
 
-// MulitpleVector2
+// UniformVector2s
 
-// repeated .frame.proto.Vector2 values = 1;
-inline int MulitpleVector2::_internal_values_size() const {
+// repeated .frame.proto.UniformVector2 values = 1;
+inline int UniformVector2s::_internal_values_size() const {
   return values_.size();
 }
-inline int MulitpleVector2::values_size() const {
+inline int UniformVector2s::values_size() const {
   return _internal_values_size();
 }
-inline void MulitpleVector2::clear_values() {
+inline void UniformVector2s::clear_values() {
   values_.Clear();
 }
-inline ::frame::proto::Vector2* MulitpleVector2::mutable_values(int index) {
-  // @@protoc_insertion_point(field_mutable:frame.proto.MulitpleVector2.values)
+inline ::frame::proto::UniformVector2* UniformVector2s::mutable_values(int index) {
+  // @@protoc_insertion_point(field_mutable:frame.proto.UniformVector2s.values)
   return values_.Mutable(index);
 }
-inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Vector2 >*
-MulitpleVector2::mutable_values() {
-  // @@protoc_insertion_point(field_mutable_list:frame.proto.MulitpleVector2.values)
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::UniformVector2 >*
+UniformVector2s::mutable_values() {
+  // @@protoc_insertion_point(field_mutable_list:frame.proto.UniformVector2s.values)
   return &values_;
 }
-inline const ::frame::proto::Vector2& MulitpleVector2::_internal_values(int index) const {
+inline const ::frame::proto::UniformVector2& UniformVector2s::_internal_values(int index) const {
   return values_.Get(index);
 }
-inline const ::frame::proto::Vector2& MulitpleVector2::values(int index) const {
-  // @@protoc_insertion_point(field_get:frame.proto.MulitpleVector2.values)
+inline const ::frame::proto::UniformVector2& UniformVector2s::values(int index) const {
+  // @@protoc_insertion_point(field_get:frame.proto.UniformVector2s.values)
   return _internal_values(index);
 }
-inline ::frame::proto::Vector2* MulitpleVector2::_internal_add_values() {
+inline ::frame::proto::UniformVector2* UniformVector2s::_internal_add_values() {
   return values_.Add();
 }
-inline ::frame::proto::Vector2* MulitpleVector2::add_values() {
-  // @@protoc_insertion_point(field_add:frame.proto.MulitpleVector2.values)
+inline ::frame::proto::UniformVector2* UniformVector2s::add_values() {
+  // @@protoc_insertion_point(field_add:frame.proto.UniformVector2s.values)
   return _internal_add_values();
 }
-inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Vector2 >&
-MulitpleVector2::values() const {
-  // @@protoc_insertion_point(field_list:frame.proto.MulitpleVector2.values)
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::UniformVector2 >&
+UniformVector2s::values() const {
+  // @@protoc_insertion_point(field_list:frame.proto.UniformVector2s.values)
   return values_;
 }
 
 // -------------------------------------------------------------------
 
-// MultipleVector3
+// UniformVector3s
 
-// repeated .frame.proto.Vector3 values = 1;
-inline int MultipleVector3::_internal_values_size() const {
+// repeated .frame.proto.UniformVector3 values = 1;
+inline int UniformVector3s::_internal_values_size() const {
   return values_.size();
 }
-inline int MultipleVector3::values_size() const {
+inline int UniformVector3s::values_size() const {
   return _internal_values_size();
 }
-inline void MultipleVector3::clear_values() {
+inline void UniformVector3s::clear_values() {
   values_.Clear();
 }
-inline ::frame::proto::Vector3* MultipleVector3::mutable_values(int index) {
-  // @@protoc_insertion_point(field_mutable:frame.proto.MultipleVector3.values)
+inline ::frame::proto::UniformVector3* UniformVector3s::mutable_values(int index) {
+  // @@protoc_insertion_point(field_mutable:frame.proto.UniformVector3s.values)
   return values_.Mutable(index);
 }
-inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Vector3 >*
-MultipleVector3::mutable_values() {
-  // @@protoc_insertion_point(field_mutable_list:frame.proto.MultipleVector3.values)
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::UniformVector3 >*
+UniformVector3s::mutable_values() {
+  // @@protoc_insertion_point(field_mutable_list:frame.proto.UniformVector3s.values)
   return &values_;
 }
-inline const ::frame::proto::Vector3& MultipleVector3::_internal_values(int index) const {
+inline const ::frame::proto::UniformVector3& UniformVector3s::_internal_values(int index) const {
   return values_.Get(index);
 }
-inline const ::frame::proto::Vector3& MultipleVector3::values(int index) const {
-  // @@protoc_insertion_point(field_get:frame.proto.MultipleVector3.values)
+inline const ::frame::proto::UniformVector3& UniformVector3s::values(int index) const {
+  // @@protoc_insertion_point(field_get:frame.proto.UniformVector3s.values)
   return _internal_values(index);
 }
-inline ::frame::proto::Vector3* MultipleVector3::_internal_add_values() {
+inline ::frame::proto::UniformVector3* UniformVector3s::_internal_add_values() {
   return values_.Add();
 }
-inline ::frame::proto::Vector3* MultipleVector3::add_values() {
-  // @@protoc_insertion_point(field_add:frame.proto.MultipleVector3.values)
+inline ::frame::proto::UniformVector3* UniformVector3s::add_values() {
+  // @@protoc_insertion_point(field_add:frame.proto.UniformVector3s.values)
   return _internal_add_values();
 }
-inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Vector3 >&
-MultipleVector3::values() const {
-  // @@protoc_insertion_point(field_list:frame.proto.MultipleVector3.values)
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::UniformVector3 >&
+UniformVector3s::values() const {
+  // @@protoc_insertion_point(field_list:frame.proto.UniformVector3s.values)
   return values_;
 }
 
 // -------------------------------------------------------------------
 
-// MultipleVector4
+// UniformVector4s
 
-// repeated .frame.proto.Vector4 values = 1;
-inline int MultipleVector4::_internal_values_size() const {
+// repeated .frame.proto.UniformVector4 values = 1;
+inline int UniformVector4s::_internal_values_size() const {
   return values_.size();
 }
-inline int MultipleVector4::values_size() const {
+inline int UniformVector4s::values_size() const {
   return _internal_values_size();
 }
-inline void MultipleVector4::clear_values() {
+inline void UniformVector4s::clear_values() {
   values_.Clear();
 }
-inline ::frame::proto::Vector4* MultipleVector4::mutable_values(int index) {
-  // @@protoc_insertion_point(field_mutable:frame.proto.MultipleVector4.values)
+inline ::frame::proto::UniformVector4* UniformVector4s::mutable_values(int index) {
+  // @@protoc_insertion_point(field_mutable:frame.proto.UniformVector4s.values)
   return values_.Mutable(index);
 }
-inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Vector4 >*
-MultipleVector4::mutable_values() {
-  // @@protoc_insertion_point(field_mutable_list:frame.proto.MultipleVector4.values)
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::UniformVector4 >*
+UniformVector4s::mutable_values() {
+  // @@protoc_insertion_point(field_mutable_list:frame.proto.UniformVector4s.values)
   return &values_;
 }
-inline const ::frame::proto::Vector4& MultipleVector4::_internal_values(int index) const {
+inline const ::frame::proto::UniformVector4& UniformVector4s::_internal_values(int index) const {
   return values_.Get(index);
 }
-inline const ::frame::proto::Vector4& MultipleVector4::values(int index) const {
-  // @@protoc_insertion_point(field_get:frame.proto.MultipleVector4.values)
+inline const ::frame::proto::UniformVector4& UniformVector4s::values(int index) const {
+  // @@protoc_insertion_point(field_get:frame.proto.UniformVector4s.values)
   return _internal_values(index);
 }
-inline ::frame::proto::Vector4* MultipleVector4::_internal_add_values() {
+inline ::frame::proto::UniformVector4* UniformVector4s::_internal_add_values() {
   return values_.Add();
 }
-inline ::frame::proto::Vector4* MultipleVector4::add_values() {
-  // @@protoc_insertion_point(field_add:frame.proto.MultipleVector4.values)
+inline ::frame::proto::UniformVector4* UniformVector4s::add_values() {
+  // @@protoc_insertion_point(field_add:frame.proto.UniformVector4s.values)
   return _internal_add_values();
 }
-inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Vector4 >&
-MultipleVector4::values() const {
-  // @@protoc_insertion_point(field_list:frame.proto.MultipleVector4.values)
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::UniformVector4 >&
+UniformVector4s::values() const {
+  // @@protoc_insertion_point(field_list:frame.proto.UniformVector4s.values)
   return values_;
 }
 
 // -------------------------------------------------------------------
 
-// MultipleMatrix3
+// UniformMatrix4s
 
-// repeated .frame.proto.Matrix3 values = 1;
-inline int MultipleMatrix3::_internal_values_size() const {
+// repeated .frame.proto.UniformMatrix4 values = 1;
+inline int UniformMatrix4s::_internal_values_size() const {
   return values_.size();
 }
-inline int MultipleMatrix3::values_size() const {
+inline int UniformMatrix4s::values_size() const {
   return _internal_values_size();
 }
-inline void MultipleMatrix3::clear_values() {
+inline void UniformMatrix4s::clear_values() {
   values_.Clear();
 }
-inline ::frame::proto::Matrix3* MultipleMatrix3::mutable_values(int index) {
-  // @@protoc_insertion_point(field_mutable:frame.proto.MultipleMatrix3.values)
+inline ::frame::proto::UniformMatrix4* UniformMatrix4s::mutable_values(int index) {
+  // @@protoc_insertion_point(field_mutable:frame.proto.UniformMatrix4s.values)
   return values_.Mutable(index);
 }
-inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Matrix3 >*
-MultipleMatrix3::mutable_values() {
-  // @@protoc_insertion_point(field_mutable_list:frame.proto.MultipleMatrix3.values)
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::UniformMatrix4 >*
+UniformMatrix4s::mutable_values() {
+  // @@protoc_insertion_point(field_mutable_list:frame.proto.UniformMatrix4s.values)
   return &values_;
 }
-inline const ::frame::proto::Matrix3& MultipleMatrix3::_internal_values(int index) const {
+inline const ::frame::proto::UniformMatrix4& UniformMatrix4s::_internal_values(int index) const {
   return values_.Get(index);
 }
-inline const ::frame::proto::Matrix3& MultipleMatrix3::values(int index) const {
-  // @@protoc_insertion_point(field_get:frame.proto.MultipleMatrix3.values)
+inline const ::frame::proto::UniformMatrix4& UniformMatrix4s::values(int index) const {
+  // @@protoc_insertion_point(field_get:frame.proto.UniformMatrix4s.values)
   return _internal_values(index);
 }
-inline ::frame::proto::Matrix3* MultipleMatrix3::_internal_add_values() {
+inline ::frame::proto::UniformMatrix4* UniformMatrix4s::_internal_add_values() {
   return values_.Add();
 }
-inline ::frame::proto::Matrix3* MultipleMatrix3::add_values() {
-  // @@protoc_insertion_point(field_add:frame.proto.MultipleMatrix3.values)
+inline ::frame::proto::UniformMatrix4* UniformMatrix4s::add_values() {
+  // @@protoc_insertion_point(field_add:frame.proto.UniformMatrix4s.values)
   return _internal_add_values();
 }
-inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Matrix3 >&
-MultipleMatrix3::values() const {
-  // @@protoc_insertion_point(field_list:frame.proto.MultipleMatrix3.values)
-  return values_;
-}
-
-// -------------------------------------------------------------------
-
-// MultipleMatrix4
-
-// repeated .frame.proto.Matrix4 values = 1;
-inline int MultipleMatrix4::_internal_values_size() const {
-  return values_.size();
-}
-inline int MultipleMatrix4::values_size() const {
-  return _internal_values_size();
-}
-inline void MultipleMatrix4::clear_values() {
-  values_.Clear();
-}
-inline ::frame::proto::Matrix4* MultipleMatrix4::mutable_values(int index) {
-  // @@protoc_insertion_point(field_mutable:frame.proto.MultipleMatrix4.values)
-  return values_.Mutable(index);
-}
-inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Matrix4 >*
-MultipleMatrix4::mutable_values() {
-  // @@protoc_insertion_point(field_mutable_list:frame.proto.MultipleMatrix4.values)
-  return &values_;
-}
-inline const ::frame::proto::Matrix4& MultipleMatrix4::_internal_values(int index) const {
-  return values_.Get(index);
-}
-inline const ::frame::proto::Matrix4& MultipleMatrix4::values(int index) const {
-  // @@protoc_insertion_point(field_get:frame.proto.MultipleMatrix4.values)
-  return _internal_values(index);
-}
-inline ::frame::proto::Matrix4* MultipleMatrix4::_internal_add_values() {
-  return values_.Add();
-}
-inline ::frame::proto::Matrix4* MultipleMatrix4::add_values() {
-  // @@protoc_insertion_point(field_add:frame.proto.MultipleMatrix4.values)
-  return _internal_add_values();
-}
-inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::Matrix4 >&
-MultipleMatrix4::values() const {
-  // @@protoc_insertion_point(field_list:frame.proto.MultipleMatrix4.values)
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::frame::proto::UniformMatrix4 >&
+UniformMatrix4s::values() const {
+  // @@protoc_insertion_point(field_list:frame.proto.UniformMatrix4s.values)
   return values_;
 }
 
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
-// -------------------------------------------------------------------
-
-// -------------------------------------------------------------------
-
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

@@ -69,9 +69,9 @@ std::shared_ptr<sgl::Mesh> Draw::CreateAppleMesh() const
 {
 	// Create the physically based rendering program.
 	auto simple_program = sgl::Program::CreateProgram("Simple");
-	simple_program->UniformMatrix("projection", device_->GetProjection());
-	simple_program->UniformMatrix("view", device_->GetView());
-	simple_program->UniformMatrix("model", device_->GetModel());
+	simple_program->Uniform("projection", device_->GetProjection());
+	simple_program->Uniform("view", device_->GetView());
+	simple_program->Uniform("model", device_->GetModel());
 
 	// Mesh creation.
 	auto apple_mesh = sgl::CreateMeshFromObjFile(
@@ -93,7 +93,7 @@ std::shared_ptr<sgl::Mesh> Draw::CreateCubeMapMesh(
 {
 	// Create the cube map program.
 	auto cubemap_program = sgl::Program::CreateProgram("CubeMap");
-	cubemap_program->UniformMatrix("projection", device_->GetProjection());
+	cubemap_program->Uniform("projection", device_->GetProjection());
 
 	// Create the mesh for the cube.
 	auto cube_mesh = sgl::CreateCubeMesh(cubemap_program);

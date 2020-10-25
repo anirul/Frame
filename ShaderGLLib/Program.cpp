@@ -29,9 +29,9 @@ namespace sgl {
 		program->AddShader(fragment);
 		program->LinkShader();
 		program->Use();
-		program->UniformMatrix("projection", glm::mat4(1.0));
-		program->UniformMatrix("view", glm::mat4(1.0));
-		program->UniformMatrix("model", glm::mat4(1.0));
+		program->Uniform("projection", glm::mat4(1.0));
+		program->Uniform("view", glm::mat4(1.0));
+		program->Uniform("model", glm::mat4(1.0));
 		return program;
 	}
 
@@ -70,25 +70,25 @@ namespace sgl {
 		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
-	void Program::UniformBool(const std::string& name, bool value) const
+	void Program::Uniform(const std::string& name, bool value) const
 	{
 		glUniform1i(GetMemoizeUniformLocation(name), (int)value);
 		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
-	void Program::UniformInt(const std::string& name, int value) const
+	void Program::Uniform(const std::string& name, int value) const
 	{
 		glUniform1i(GetMemoizeUniformLocation(name), value);
 		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
-	void Program::UniformFloat(const std::string& name, float value) const
+	void Program::Uniform(const std::string& name, float value) const
 	{
 		glUniform1f(GetMemoizeUniformLocation(name), value);
 		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
-	void Program::UniformVector2(
+	void Program::Uniform(
 		const std::string& name, 
 		const glm::vec2& vec2) const
 	{
@@ -96,7 +96,7 @@ namespace sgl {
 		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
-	void Program::UniformVector3(
+	void Program::Uniform(
 		const std::string& name, 
 		const glm::vec3& vec3) const
 	{
@@ -104,7 +104,7 @@ namespace sgl {
 		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
-	void Program::UniformVector4(
+	void Program::Uniform(
 		const std::string& name, 
 		const glm::vec4& vec4) const
 	{
@@ -117,7 +117,7 @@ namespace sgl {
 		error_.Display(__FILE__, __LINE__ - 6);
 	}
 
-	void Program::UniformMatrix(
+	void Program::Uniform(
 		const std::string& name, 
 		const glm::mat4& mat,
 		const bool transpose /*= false*/) const

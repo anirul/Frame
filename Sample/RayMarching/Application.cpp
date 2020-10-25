@@ -17,7 +17,7 @@ void Application::Startup()
 		[billboard_program](const double dt) -> glm::mat4
 	{
 		billboard_program->Use();
-		billboard_program->UniformFloat("Time", static_cast<float>(dt));
+		billboard_program->Uniform("Time", static_cast<float>(dt));
 		return glm::mat4(1.0);
 	});
 	scene_tree.AddNode(root);

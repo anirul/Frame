@@ -412,7 +412,7 @@ namespace sgl {
 		glm::mat4 projection =
 			glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
 		auto program = Program::CreateProgram("EquirectangularCubeMap");
-		program->UniformMatrix("projection", projection);
+		program->Uniform("projection", projection);
 		auto cube = CreateCubeMesh(program);
 		cube->SetMaterial(material);
 		glViewport(0, 0, size_.first, size_.second);

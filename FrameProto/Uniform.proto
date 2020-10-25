@@ -22,25 +22,23 @@ message Uniform {
 	string name = 1;
 	// Value of the uniform (same as before).
 	oneof value {
-		int32 integer = 2;
-		bool boolean = 3;
-		float real = 4;
+		int32 uniform_int = 2;
+		bool uniform_bool = 3;
+		float uniform_float = 4;
 		// This value come from outside, this could be projection or camera.
 		// it will be set acording to the type of the enum.
 		UniformEnum uniform_enum = 10;
 		// Vectors and Matrices.
-		Vector2 vec2 = 20;
-		Vector3 vec3 = 21;
-		Vector4 vec4 = 22;
-		Matrix3 mat3 = 30;
-		Matrix4 mat4 = 31;
-		MultipleInteger integers = 40;
-		MutlipleBoolean bools = 41;
-		MultipleReal reals = 42;
-		MulitpleVector2 vec2s = 50;
-		MultipleVector3 vec3s = 51;
-		MultipleVector4 vec4s = 52;
-		MultipleMatrix3 mat3s = 53;
-		MultipleMatrix4 mat4s = 54;
+		UniformVector2 uniform_vec2 = 20;
+		UniformVector3 uniform_vec3 = 21;
+		UniformVector4 uniform_vec4 = 22;
+		UniformMatrix4 uniform_mat4 = 31;
+		UniformInts uniform_ints = 40;
+		UniformBools uniform_bools = 41;
+		UniformFloats uniform_floats = 42;
+		UniformVector2s uniform_vec2s = 50;
+		UniformVector3s uniform_vec3s = 51;
+		UniformVector4s uniform_vec4s = 52;
+		UniformMatrix4s uniform_mat4s = 54;
 	}
 }

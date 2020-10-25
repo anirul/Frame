@@ -53,7 +53,7 @@ namespace sgl {
 		SetupCamera();
 		for (auto& effect : effects_)
 		{
-			effect->Startup(size_);
+			effect->Startup(size_, *this);
 		}
 	}
 
@@ -72,7 +72,7 @@ namespace sgl {
 	{
 		assert(out_textures.size() == 4);
 		pbr_program_->Use();
-		pbr_program_->UniformVector3(
+		pbr_program_->Uniform(
 			"camera_position",
 			GetCamera().GetPosition());
 		DrawMultiTextures(out_textures, nullptr, dt);
@@ -84,7 +84,7 @@ namespace sgl {
 	{
 		assert(out_textures.size() == 2);
 		view_program_->Use();
-		view_program_->UniformInt("inverted_normals", 0);
+		view_program_->Uniform("inverted_normals", 0);
 		DrawMultiTextures(out_textures, view_program_, dt);
 	}
 
@@ -190,7 +190,7 @@ namespace sgl {
 			sgl::PixelElementSize_HALF(),
 			sgl::PixelStructure_RGB_ALPHA());
 		auto cubemap_program = Program::CreateProgram("CubeMapDeferred");
-		cubemap_program->UniformMatrix("projection", GetProjection());
+		cubemap_program->Uniform("projection", GetProjection());
 		auto cube_mesh = CreateCubeMesh(cubemap_program);
 		material_ = std::make_shared<Material>();
 		material_->AddTexture("Skybox", texture);
@@ -215,7 +215,7 @@ namespace sgl {
 			[](const int mipmap, const std::shared_ptr<sgl::Program>& program)
 		{
 			float roughness = static_cast<float>(mipmap) / 4.0f;
-			program->UniformFloat("roughness", roughness);
+			program->Uniform("roughness", roughness);
 		});
 		material_->AddTexture(
 			"MonteCarloPrefilter", 

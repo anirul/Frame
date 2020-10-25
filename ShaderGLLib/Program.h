@@ -34,25 +34,25 @@ namespace sgl {
 		// Use the program.
 		void Use() const;
 		// Create a uniform from a string and a bool.
-		void UniformBool(const std::string& name, bool value) const;
+		void Uniform(const std::string& name, bool value) const;
 		// Create a uniform from a string and an int.
-		void UniformInt(const std::string& name, int value) const;
+		void Uniform(const std::string& name, int value) const;
 		// Create a uniform from a string and a float.
-		void UniformFloat(const std::string& name, float value) const;
+		void Uniform(const std::string& name, float value) const;
 		// Create a uniform from a string and a vector2.
-		void UniformVector2(
+		void Uniform(
 			const std::string& name, 
 			const glm::vec2& vec2) const;
 		// Create a uniform from a string and a vector3.
-		void UniformVector3(
+		void Uniform(
 			const std::string& name,
 			const glm::vec3& vec3) const;
 		// Create a uniform from a string and a vector4.
-		void UniformVector4(
+		void Uniform(
 			const std::string& name,
 			const glm::vec4& vec4) const;
 		// Create a uniform from a string and a matrix.
-		void UniformMatrix(
+		void Uniform(
 			const std::string& name,
 			const glm::mat4& mat,
 			const bool flip = false) const;

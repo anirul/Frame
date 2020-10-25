@@ -15,10 +15,11 @@
 #include "../ShaderGLLib/Camera.h"
 #include "../ShaderGLLib/Light.h"
 #include "../ShaderGLLib/Material.h"
+#include "../ShaderGLLib/Uniform.h"
 
 namespace sgl {
 
-	class Device
+	class Device : public UniformInterface
 	{
 	public:
 		// This will initialize the GL context and make the GLEW init.
@@ -60,7 +61,7 @@ namespace sgl {
 		const std::shared_ptr<Texture>& GetLightingTexture(const int i) const;
 
 	public:
-		const Camera& GetCamera() const { return camera_; }
+		const Camera& GetCamera() const final { return camera_; }
 		void SetCamera(const Camera& camera) { camera_ = camera; }
 		SceneTree GetSceneTree() const { return scene_tree_; }
 		void SetSceneTree(const SceneTree& scene_tree) 
@@ -72,9 +73,9 @@ namespace sgl {
 		{
 			light_manager_ = light_manager;
 		}
-		const glm::mat4 GetProjection() const { return perspective_; }
-		const glm::mat4 GetView() const { return view_; }
-		const glm::mat4 GetModel() const { return model_; }
+		const glm::mat4 GetProjection() const final { return perspective_; }
+		const glm::mat4 GetView() const final { return view_; }
+		const glm::mat4 GetModel() const final { return model_; }
 		void* GetDeviceContext() const { return gl_context_; }
 		const std::string GetType() const { return "OpenGL"; }
 

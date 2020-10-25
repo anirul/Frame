@@ -5,43 +5,28 @@ package frame.proto;
 // Float vector (support both vecX type and matX type).
 // size -> type
 // 2    -> vec2
-message Vector2 {
+message UniformVector2 {
 	float x = 1;
 	float y = 2;
 }
 
 // 3    -> vec3
-message Vector3 {
+message UniformVector3 {
 	float x = 1;
 	float y = 2;
 	float z = 3;
 }
 
 // 4    -> vec4
-message Vector4 {
+message UniformVector4 {
 	float x = 1;
 	float y = 2;
 	float z = 3;
 	float w = 4;
 }
 
-// 9    -> mat3
-message Matrix3 {
-	float m11 = 11;
-	float m12 = 12;
-	float m13 = 13;
-
-	float m21 = 21;
-	float m22 = 22;
-	float m23 = 23;
-
-	float m31 = 31;
-	float m32 = 32;
-	float m33 = 33;
-}
-
 // 16   -> mat4
-message Matrix4 {
+message UniformMatrix4 {
 	float m11 = 11;
 	float m12 = 12;
 	float m13 = 13;
@@ -63,34 +48,30 @@ message Matrix4 {
 	float m44 = 44;
 }
 
-message MultipleInteger {
+message UniformInts {
 	repeated int32 values = 1;
 }
 
-message	MutlipleBoolean {
+message	UniformBools {
 	repeated bool values = 1;
 }
 
-message MultipleReal {
+message UniformFloats {
 	repeated float values = 1;
 }
 
-message MulitpleVector2 {
-	repeated Vector2 values = 1;
+message UniformVector2s {
+	repeated UniformVector2 values = 1;
 }
 
-message MultipleVector3 {
-	repeated Vector3 values = 1;
+message UniformVector3s {
+	repeated UniformVector3 values = 1;
 }
 
-message MultipleVector4 {
-	repeated Vector4 values = 1;
+message UniformVector4s {
+	repeated UniformVector4 values = 1;
 }
 
-message MultipleMatrix3 {
-	repeated Matrix3 values = 1;
-}
-
-message MultipleMatrix4 {
-	repeated Matrix4 values = 1;
+message UniformMatrix4s {
+	repeated UniformMatrix4 values = 1;
 }

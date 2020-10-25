@@ -14,7 +14,7 @@
 #include <google/protobuf/wire_format.h>
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
-extern PROTOBUF_INTERNAL_EXPORT_Uniform_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<13> scc_info_Uniform_Uniform_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_Uniform_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<11> scc_info_Uniform_Uniform_2eproto;
 namespace frame {
 namespace proto {
 class EffectDefaultTypeInternal {

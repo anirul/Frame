@@ -140,23 +140,21 @@ class Uniform PROTOBUF_FINAL :
   static const Uniform& default_instance();
 
   enum ValueCase {
-    kInteger = 2,
-    kBoolean = 3,
-    kReal = 4,
+    kUniformInt = 2,
+    kUniformBool = 3,
+    kUniformFloat = 4,
     kUniformEnum = 10,
-    kVec2 = 20,
-    kVec3 = 21,
-    kVec4 = 22,
-    kMat3 = 30,
-    kMat4 = 31,
-    kIntegers = 40,
-    kBools = 41,
-    kReals = 42,
-    kVec2S = 50,
-    kVec3S = 51,
-    kVec4S = 52,
-    kMat3S = 53,
-    kMat4S = 54,
+    kUniformVec2 = 20,
+    kUniformVec3 = 21,
+    kUniformVec4 = 22,
+    kUniformMat4 = 31,
+    kUniformInts = 40,
+    kUniformBools = 41,
+    kUniformFloats = 42,
+    kUniformVec2S = 50,
+    kUniformVec3S = 51,
+    kUniformVec4S = 52,
+    kUniformMat4S = 54,
     VALUE_NOT_SET = 0,
   };
 
@@ -282,23 +280,21 @@ class Uniform PROTOBUF_FINAL :
 
   enum : int {
     kNameFieldNumber = 1,
-    kIntegerFieldNumber = 2,
-    kBooleanFieldNumber = 3,
-    kRealFieldNumber = 4,
+    kUniformIntFieldNumber = 2,
+    kUniformBoolFieldNumber = 3,
+    kUniformFloatFieldNumber = 4,
     kUniformEnumFieldNumber = 10,
-    kVec2FieldNumber = 20,
-    kVec3FieldNumber = 21,
-    kVec4FieldNumber = 22,
-    kMat3FieldNumber = 30,
-    kMat4FieldNumber = 31,
-    kIntegersFieldNumber = 40,
-    kBoolsFieldNumber = 41,
-    kRealsFieldNumber = 42,
-    kVec2SFieldNumber = 50,
-    kVec3SFieldNumber = 51,
-    kVec4SFieldNumber = 52,
-    kMat3SFieldNumber = 53,
-    kMat4SFieldNumber = 54,
+    kUniformVec2FieldNumber = 20,
+    kUniformVec3FieldNumber = 21,
+    kUniformVec4FieldNumber = 22,
+    kUniformMat4FieldNumber = 31,
+    kUniformIntsFieldNumber = 40,
+    kUniformBoolsFieldNumber = 41,
+    kUniformFloatsFieldNumber = 42,
+    kUniformVec2SFieldNumber = 50,
+    kUniformVec3SFieldNumber = 51,
+    kUniformVec4SFieldNumber = 52,
+    kUniformMat4SFieldNumber = 54,
   };
   // string name = 1;
   void clear_name();
@@ -316,40 +312,40 @@ class Uniform PROTOBUF_FINAL :
   std::string* _internal_mutable_name();
   public:
 
-  // int32 integer = 2;
+  // int32 uniform_int = 2;
   private:
-  bool _internal_has_integer() const;
+  bool _internal_has_uniform_int() const;
   public:
-  void clear_integer();
-  ::PROTOBUF_NAMESPACE_ID::int32 integer() const;
-  void set_integer(::PROTOBUF_NAMESPACE_ID::int32 value);
+  void clear_uniform_int();
+  ::PROTOBUF_NAMESPACE_ID::int32 uniform_int() const;
+  void set_uniform_int(::PROTOBUF_NAMESPACE_ID::int32 value);
   private:
-  ::PROTOBUF_NAMESPACE_ID::int32 _internal_integer() const;
-  void _internal_set_integer(::PROTOBUF_NAMESPACE_ID::int32 value);
-  public:
-
-  // bool boolean = 3;
-  private:
-  bool _internal_has_boolean() const;
-  public:
-  void clear_boolean();
-  bool boolean() const;
-  void set_boolean(bool value);
-  private:
-  bool _internal_boolean() const;
-  void _internal_set_boolean(bool value);
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_uniform_int() const;
+  void _internal_set_uniform_int(::PROTOBUF_NAMESPACE_ID::int32 value);
   public:
 
-  // float real = 4;
+  // bool uniform_bool = 3;
   private:
-  bool _internal_has_real() const;
+  bool _internal_has_uniform_bool() const;
   public:
-  void clear_real();
-  float real() const;
-  void set_real(float value);
+  void clear_uniform_bool();
+  bool uniform_bool() const;
+  void set_uniform_bool(bool value);
   private:
-  float _internal_real() const;
-  void _internal_set_real(float value);
+  bool _internal_uniform_bool() const;
+  void _internal_set_uniform_bool(bool value);
+  public:
+
+  // float uniform_float = 4;
+  private:
+  bool _internal_has_uniform_float() const;
+  public:
+  void clear_uniform_float();
+  float uniform_float() const;
+  void set_uniform_float(float value);
+  private:
+  float _internal_uniform_float() const;
+  void _internal_set_uniform_float(float value);
   public:
 
   // .frame.proto.Uniform.UniformEnum uniform_enum = 10;
@@ -364,262 +360,224 @@ class Uniform PROTOBUF_FINAL :
   void _internal_set_uniform_enum(::frame::proto::Uniform_UniformEnum value);
   public:
 
-  // .frame.proto.Vector2 vec2 = 20;
-  bool has_vec2() const;
+  // .frame.proto.UniformVector2 uniform_vec2 = 20;
+  bool has_uniform_vec2() const;
   private:
-  bool _internal_has_vec2() const;
+  bool _internal_has_uniform_vec2() const;
   public:
-  void clear_vec2();
-  const ::frame::proto::Vector2& vec2() const;
-  ::frame::proto::Vector2* release_vec2();
-  ::frame::proto::Vector2* mutable_vec2();
-  void set_allocated_vec2(::frame::proto::Vector2* vec2);
+  void clear_uniform_vec2();
+  const ::frame::proto::UniformVector2& uniform_vec2() const;
+  ::frame::proto::UniformVector2* release_uniform_vec2();
+  ::frame::proto::UniformVector2* mutable_uniform_vec2();
+  void set_allocated_uniform_vec2(::frame::proto::UniformVector2* uniform_vec2);
   private:
-  const ::frame::proto::Vector2& _internal_vec2() const;
-  ::frame::proto::Vector2* _internal_mutable_vec2();
+  const ::frame::proto::UniformVector2& _internal_uniform_vec2() const;
+  ::frame::proto::UniformVector2* _internal_mutable_uniform_vec2();
   public:
-  void unsafe_arena_set_allocated_vec2(
-      ::frame::proto::Vector2* vec2);
-  ::frame::proto::Vector2* unsafe_arena_release_vec2();
+  void unsafe_arena_set_allocated_uniform_vec2(
+      ::frame::proto::UniformVector2* uniform_vec2);
+  ::frame::proto::UniformVector2* unsafe_arena_release_uniform_vec2();
 
-  // .frame.proto.Vector3 vec3 = 21;
-  bool has_vec3() const;
+  // .frame.proto.UniformVector3 uniform_vec3 = 21;
+  bool has_uniform_vec3() const;
   private:
-  bool _internal_has_vec3() const;
+  bool _internal_has_uniform_vec3() const;
   public:
-  void clear_vec3();
-  const ::frame::proto::Vector3& vec3() const;
-  ::frame::proto::Vector3* release_vec3();
-  ::frame::proto::Vector3* mutable_vec3();
-  void set_allocated_vec3(::frame::proto::Vector3* vec3);
+  void clear_uniform_vec3();
+  const ::frame::proto::UniformVector3& uniform_vec3() const;
+  ::frame::proto::UniformVector3* release_uniform_vec3();
+  ::frame::proto::UniformVector3* mutable_uniform_vec3();
+  void set_allocated_uniform_vec3(::frame::proto::UniformVector3* uniform_vec3);
   private:
-  const ::frame::proto::Vector3& _internal_vec3() const;
-  ::frame::proto::Vector3* _internal_mutable_vec3();
+  const ::frame::proto::UniformVector3& _internal_uniform_vec3() const;
+  ::frame::proto::UniformVector3* _internal_mutable_uniform_vec3();
   public:
-  void unsafe_arena_set_allocated_vec3(
-      ::frame::proto::Vector3* vec3);
-  ::frame::proto::Vector3* unsafe_arena_release_vec3();
+  void unsafe_arena_set_allocated_uniform_vec3(
+      ::frame::proto::UniformVector3* uniform_vec3);
+  ::frame::proto::UniformVector3* unsafe_arena_release_uniform_vec3();
 
-  // .frame.proto.Vector4 vec4 = 22;
-  bool has_vec4() const;
+  // .frame.proto.UniformVector4 uniform_vec4 = 22;
+  bool has_uniform_vec4() const;
   private:
-  bool _internal_has_vec4() const;
+  bool _internal_has_uniform_vec4() const;
   public:
-  void clear_vec4();
-  const ::frame::proto::Vector4& vec4() const;
-  ::frame::proto::Vector4* release_vec4();
-  ::frame::proto::Vector4* mutable_vec4();
-  void set_allocated_vec4(::frame::proto::Vector4* vec4);
+  void clear_uniform_vec4();
+  const ::frame::proto::UniformVector4& uniform_vec4() const;
+  ::frame::proto::UniformVector4* release_uniform_vec4();
+  ::frame::proto::UniformVector4* mutable_uniform_vec4();
+  void set_allocated_uniform_vec4(::frame::proto::UniformVector4* uniform_vec4);
   private:
-  const ::frame::proto::Vector4& _internal_vec4() const;
-  ::frame::proto::Vector4* _internal_mutable_vec4();
+  const ::frame::proto::UniformVector4& _internal_uniform_vec4() const;
+  ::frame::proto::UniformVector4* _internal_mutable_uniform_vec4();
   public:
-  void unsafe_arena_set_allocated_vec4(
-      ::frame::proto::Vector4* vec4);
-  ::frame::proto::Vector4* unsafe_arena_release_vec4();
+  void unsafe_arena_set_allocated_uniform_vec4(
+      ::frame::proto::UniformVector4* uniform_vec4);
+  ::frame::proto::UniformVector4* unsafe_arena_release_uniform_vec4();
 
-  // .frame.proto.Matrix3 mat3 = 30;
-  bool has_mat3() const;
+  // .frame.proto.UniformMatrix4 uniform_mat4 = 31;
+  bool has_uniform_mat4() const;
   private:
-  bool _internal_has_mat3() const;
+  bool _internal_has_uniform_mat4() const;
   public:
-  void clear_mat3();
-  const ::frame::proto::Matrix3& mat3() const;
-  ::frame::proto::Matrix3* release_mat3();
-  ::frame::proto::Matrix3* mutable_mat3();
-  void set_allocated_mat3(::frame::proto::Matrix3* mat3);
+  void clear_uniform_mat4();
+  const ::frame::proto::UniformMatrix4& uniform_mat4() const;
+  ::frame::proto::UniformMatrix4* release_uniform_mat4();
+  ::frame::proto::UniformMatrix4* mutable_uniform_mat4();
+  void set_allocated_uniform_mat4(::frame::proto::UniformMatrix4* uniform_mat4);
   private:
-  const ::frame::proto::Matrix3& _internal_mat3() const;
-  ::frame::proto::Matrix3* _internal_mutable_mat3();
+  const ::frame::proto::UniformMatrix4& _internal_uniform_mat4() const;
+  ::frame::proto::UniformMatrix4* _internal_mutable_uniform_mat4();
   public:
-  void unsafe_arena_set_allocated_mat3(
-      ::frame::proto::Matrix3* mat3);
-  ::frame::proto::Matrix3* unsafe_arena_release_mat3();
+  void unsafe_arena_set_allocated_uniform_mat4(
+      ::frame::proto::UniformMatrix4* uniform_mat4);
+  ::frame::proto::UniformMatrix4* unsafe_arena_release_uniform_mat4();
 
-  // .frame.proto.Matrix4 mat4 = 31;
-  bool has_mat4() const;
+  // .frame.proto.UniformInts uniform_ints = 40;
+  bool has_uniform_ints() const;
   private:
-  bool _internal_has_mat4() const;
+  bool _internal_has_uniform_ints() const;
   public:
-  void clear_mat4();
-  const ::frame::proto::Matrix4& mat4() const;
-  ::frame::proto::Matrix4* release_mat4();
-  ::frame::proto::Matrix4* mutable_mat4();
-  void set_allocated_mat4(::frame::proto::Matrix4* mat4);
+  void clear_uniform_ints();
+  const ::frame::proto::UniformInts& uniform_ints() const;
+  ::frame::proto::UniformInts* release_uniform_ints();
+  ::frame::proto::UniformInts* mutable_uniform_ints();
+  void set_allocated_uniform_ints(::frame::proto::UniformInts* uniform_ints);
   private:
-  const ::frame::proto::Matrix4& _internal_mat4() const;
-  ::frame::proto::Matrix4* _internal_mutable_mat4();
+  const ::frame::proto::UniformInts& _internal_uniform_ints() const;
+  ::frame::proto::UniformInts* _internal_mutable_uniform_ints();
   public:
-  void unsafe_arena_set_allocated_mat4(
-      ::frame::proto::Matrix4* mat4);
-  ::frame::proto::Matrix4* unsafe_arena_release_mat4();
+  void unsafe_arena_set_allocated_uniform_ints(
+      ::frame::proto::UniformInts* uniform_ints);
+  ::frame::proto::UniformInts* unsafe_arena_release_uniform_ints();
 
-  // .frame.proto.MultipleInteger integers = 40;
-  bool has_integers() const;
+  // .frame.proto.UniformBools uniform_bools = 41;
+  bool has_uniform_bools() const;
   private:
-  bool _internal_has_integers() const;
+  bool _internal_has_uniform_bools() const;
   public:
-  void clear_integers();
-  const ::frame::proto::MultipleInteger& integers() const;
-  ::frame::proto::MultipleInteger* release_integers();
-  ::frame::proto::MultipleInteger* mutable_integers();
-  void set_allocated_integers(::frame::proto::MultipleInteger* integers);
+  void clear_uniform_bools();
+  const ::frame::proto::UniformBools& uniform_bools() const;
+  ::frame::proto::UniformBools* release_uniform_bools();
+  ::frame::proto::UniformBools* mutable_uniform_bools();
+  void set_allocated_uniform_bools(::frame::proto::UniformBools* uniform_bools);
   private:
-  const ::frame::proto::MultipleInteger& _internal_integers() const;
-  ::frame::proto::MultipleInteger* _internal_mutable_integers();
+  const ::frame::proto::UniformBools& _internal_uniform_bools() const;
+  ::frame::proto::UniformBools* _internal_mutable_uniform_bools();
   public:
-  void unsafe_arena_set_allocated_integers(
-      ::frame::proto::MultipleInteger* integers);
-  ::frame::proto::MultipleInteger* unsafe_arena_release_integers();
+  void unsafe_arena_set_allocated_uniform_bools(
+      ::frame::proto::UniformBools* uniform_bools);
+  ::frame::proto::UniformBools* unsafe_arena_release_uniform_bools();
 
-  // .frame.proto.MutlipleBoolean bools = 41;
-  bool has_bools() const;
+  // .frame.proto.UniformFloats uniform_floats = 42;
+  bool has_uniform_floats() const;
   private:
-  bool _internal_has_bools() const;
+  bool _internal_has_uniform_floats() const;
   public:
-  void clear_bools();
-  const ::frame::proto::MutlipleBoolean& bools() const;
-  ::frame::proto::MutlipleBoolean* release_bools();
-  ::frame::proto::MutlipleBoolean* mutable_bools();
-  void set_allocated_bools(::frame::proto::MutlipleBoolean* bools);
+  void clear_uniform_floats();
+  const ::frame::proto::UniformFloats& uniform_floats() const;
+  ::frame::proto::UniformFloats* release_uniform_floats();
+  ::frame::proto::UniformFloats* mutable_uniform_floats();
+  void set_allocated_uniform_floats(::frame::proto::UniformFloats* uniform_floats);
   private:
-  const ::frame::proto::MutlipleBoolean& _internal_bools() const;
-  ::frame::proto::MutlipleBoolean* _internal_mutable_bools();
+  const ::frame::proto::UniformFloats& _internal_uniform_floats() const;
+  ::frame::proto::UniformFloats* _internal_mutable_uniform_floats();
   public:
-  void unsafe_arena_set_allocated_bools(
-      ::frame::proto::MutlipleBoolean* bools);
-  ::frame::proto::MutlipleBoolean* unsafe_arena_release_bools();
+  void unsafe_arena_set_allocated_uniform_floats(
+      ::frame::proto::UniformFloats* uniform_floats);
+  ::frame::proto::UniformFloats* unsafe_arena_release_uniform_floats();
 
-  // .frame.proto.MultipleReal reals = 42;
-  bool has_reals() const;
+  // .frame.proto.UniformVector2s uniform_vec2s = 50;
+  bool has_uniform_vec2s() const;
   private:
-  bool _internal_has_reals() const;
+  bool _internal_has_uniform_vec2s() const;
   public:
-  void clear_reals();
-  const ::frame::proto::MultipleReal& reals() const;
-  ::frame::proto::MultipleReal* release_reals();
-  ::frame::proto::MultipleReal* mutable_reals();
-  void set_allocated_reals(::frame::proto::MultipleReal* reals);
+  void clear_uniform_vec2s();
+  const ::frame::proto::UniformVector2s& uniform_vec2s() const;
+  ::frame::proto::UniformVector2s* release_uniform_vec2s();
+  ::frame::proto::UniformVector2s* mutable_uniform_vec2s();
+  void set_allocated_uniform_vec2s(::frame::proto::UniformVector2s* uniform_vec2s);
   private:
-  const ::frame::proto::MultipleReal& _internal_reals() const;
-  ::frame::proto::MultipleReal* _internal_mutable_reals();
+  const ::frame::proto::UniformVector2s& _internal_uniform_vec2s() const;
+  ::frame::proto::UniformVector2s* _internal_mutable_uniform_vec2s();
   public:
-  void unsafe_arena_set_allocated_reals(
-      ::frame::proto::MultipleReal* reals);
-  ::frame::proto::MultipleReal* unsafe_arena_release_reals();
+  void unsafe_arena_set_allocated_uniform_vec2s(
+      ::frame::proto::UniformVector2s* uniform_vec2s);
+  ::frame::proto::UniformVector2s* unsafe_arena_release_uniform_vec2s();
 
-  // .frame.proto.MulitpleVector2 vec2s = 50;
-  bool has_vec2s() const;
+  // .frame.proto.UniformVector3s uniform_vec3s = 51;
+  bool has_uniform_vec3s() const;
   private:
-  bool _internal_has_vec2s() const;
+  bool _internal_has_uniform_vec3s() const;
   public:
-  void clear_vec2s();
-  const ::frame::proto::MulitpleVector2& vec2s() const;
-  ::frame::proto::MulitpleVector2* release_vec2s();
-  ::frame::proto::MulitpleVector2* mutable_vec2s();
-  void set_allocated_vec2s(::frame::proto::MulitpleVector2* vec2s);
+  void clear_uniform_vec3s();
+  const ::frame::proto::UniformVector3s& uniform_vec3s() const;
+  ::frame::proto::UniformVector3s* release_uniform_vec3s();
+  ::frame::proto::UniformVector3s* mutable_uniform_vec3s();
+  void set_allocated_uniform_vec3s(::frame::proto::UniformVector3s* uniform_vec3s);
   private:
-  const ::frame::proto::MulitpleVector2& _internal_vec2s() const;
-  ::frame::proto::MulitpleVector2* _internal_mutable_vec2s();
+  const ::frame::proto::UniformVector3s& _internal_uniform_vec3s() const;
+  ::frame::proto::UniformVector3s* _internal_mutable_uniform_vec3s();
   public:
-  void unsafe_arena_set_allocated_vec2s(
-      ::frame::proto::MulitpleVector2* vec2s);
-  ::frame::proto::MulitpleVector2* unsafe_arena_release_vec2s();
+  void unsafe_arena_set_allocated_uniform_vec3s(
+      ::frame::proto::UniformVector3s* uniform_vec3s);
+  ::frame::proto::UniformVector3s* unsafe_arena_release_uniform_vec3s();
 
-  // .frame.proto.MultipleVector3 vec3s = 51;
-  bool has_vec3s() const;
+  // .frame.proto.UniformVector4s uniform_vec4s = 52;
+  bool has_uniform_vec4s() const;
   private:
-  bool _internal_has_vec3s() const;
+  bool _internal_has_uniform_vec4s() const;
   public:
-  void clear_vec3s();
-  const ::frame::proto::MultipleVector3& vec3s() const;
-  ::frame::proto::MultipleVector3* release_vec3s();
-  ::frame::proto::MultipleVector3* mutable_vec3s();
-  void set_allocated_vec3s(::frame::proto::MultipleVector3* vec3s);
+  void clear_uniform_vec4s();
+  const ::frame::proto::UniformVector4s& uniform_vec4s() const;
+  ::frame::proto::UniformVector4s* release_uniform_vec4s();
+  ::frame::proto::UniformVector4s* mutable_uniform_vec4s();
+  void set_allocated_uniform_vec4s(::frame::proto::UniformVector4s* uniform_vec4s);
   private:
-  const ::frame::proto::MultipleVector3& _internal_vec3s() const;
-  ::frame::proto::MultipleVector3* _internal_mutable_vec3s();
+  const ::frame::proto::UniformVector4s& _internal_uniform_vec4s() const;
+  ::frame::proto::UniformVector4s* _internal_mutable_uniform_vec4s();
   public:
-  void unsafe_arena_set_allocated_vec3s(
-      ::frame::proto::MultipleVector3* vec3s);
-  ::frame::proto::MultipleVector3* unsafe_arena_release_vec3s();
+  void unsafe_arena_set_allocated_uniform_vec4s(
+      ::frame::proto::UniformVector4s* uniform_vec4s);
+  ::frame::proto::UniformVector4s* unsafe_arena_release_uniform_vec4s();
 
-  // .frame.proto.MultipleVector4 vec4s = 52;
-  bool has_vec4s() const;
+  // .frame.proto.UniformMatrix4s uniform_mat4s = 54;
+  bool has_uniform_mat4s() const;
   private:
-  bool _internal_has_vec4s() const;
+  bool _internal_has_uniform_mat4s() const;
   public:
-  void clear_vec4s();
-  const ::frame::proto::MultipleVector4& vec4s() const;
-  ::frame::proto::MultipleVector4* release_vec4s();
-  ::frame::proto::MultipleVector4* mutable_vec4s();
-  void set_allocated_vec4s(::frame::proto::MultipleVector4* vec4s);
+  void clear_uniform_mat4s();
+  const ::frame::proto::UniformMatrix4s& uniform_mat4s() const;
+  ::frame::proto::UniformMatrix4s* release_uniform_mat4s();
+  ::frame::proto::UniformMatrix4s* mutable_uniform_mat4s();
+  void set_allocated_uniform_mat4s(::frame::proto::UniformMatrix4s* uniform_mat4s);
   private:
-  const ::frame::proto::MultipleVector4& _internal_vec4s() const;
-  ::frame::proto::MultipleVector4* _internal_mutable_vec4s();
+  const ::frame::proto::UniformMatrix4s& _internal_uniform_mat4s() const;
+  ::frame::proto::UniformMatrix4s* _internal_mutable_uniform_mat4s();
   public:
-  void unsafe_arena_set_allocated_vec4s(
-      ::frame::proto::MultipleVector4* vec4s);
-  ::frame::proto::MultipleVector4* unsafe_arena_release_vec4s();
-
-  // .frame.proto.MultipleMatrix3 mat3s = 53;
-  bool has_mat3s() const;
-  private:
-  bool _internal_has_mat3s() const;
-  public:
-  void clear_mat3s();
-  const ::frame::proto::MultipleMatrix3& mat3s() const;
-  ::frame::proto::MultipleMatrix3* release_mat3s();
-  ::frame::proto::MultipleMatrix3* mutable_mat3s();
-  void set_allocated_mat3s(::frame::proto::MultipleMatrix3* mat3s);
-  private:
-  const ::frame::proto::MultipleMatrix3& _internal_mat3s() const;
-  ::frame::proto::MultipleMatrix3* _internal_mutable_mat3s();
-  public:
-  void unsafe_arena_set_allocated_mat3s(
-      ::frame::proto::MultipleMatrix3* mat3s);
-  ::frame::proto::MultipleMatrix3* unsafe_arena_release_mat3s();
-
-  // .frame.proto.MultipleMatrix4 mat4s = 54;
-  bool has_mat4s() const;
-  private:
-  bool _internal_has_mat4s() const;
-  public:
-  void clear_mat4s();
-  const ::frame::proto::MultipleMatrix4& mat4s() const;
-  ::frame::proto::MultipleMatrix4* release_mat4s();
-  ::frame::proto::MultipleMatrix4* mutable_mat4s();
-  void set_allocated_mat4s(::frame::proto::MultipleMatrix4* mat4s);
-  private:
-  const ::frame::proto::MultipleMatrix4& _internal_mat4s() const;
-  ::frame::proto::MultipleMatrix4* _internal_mutable_mat4s();
-  public:
-  void unsafe_arena_set_allocated_mat4s(
-      ::frame::proto::MultipleMatrix4* mat4s);
-  ::frame::proto::MultipleMatrix4* unsafe_arena_release_mat4s();
+  void unsafe_arena_set_allocated_uniform_mat4s(
+      ::frame::proto::UniformMatrix4s* uniform_mat4s);
+  ::frame::proto::UniformMatrix4s* unsafe_arena_release_uniform_mat4s();
 
   void clear_value();
   ValueCase value_case() const;
   // @@protoc_insertion_point(class_scope:frame.proto.Uniform)
  private:
   class _Internal;
-  void set_has_integer();
-  void set_has_boolean();
-  void set_has_real();
+  void set_has_uniform_int();
+  void set_has_uniform_bool();
+  void set_has_uniform_float();
   void set_has_uniform_enum();
-  void set_has_vec2();
-  void set_has_vec3();
-  void set_has_vec4();
-  void set_has_mat3();
-  void set_has_mat4();
-  void set_has_integers();
-  void set_has_bools();
-  void set_has_reals();
-  void set_has_vec2s();
-  void set_has_vec3s();
-  void set_has_vec4s();
-  void set_has_mat3s();
-  void set_has_mat4s();
+  void set_has_uniform_vec2();
+  void set_has_uniform_vec3();
+  void set_has_uniform_vec4();
+  void set_has_uniform_mat4();
+  void set_has_uniform_ints();
+  void set_has_uniform_bools();
+  void set_has_uniform_floats();
+  void set_has_uniform_vec2s();
+  void set_has_uniform_vec3s();
+  void set_has_uniform_vec4s();
+  void set_has_uniform_mat4s();
 
   inline bool has_value() const;
   inline void clear_has_value();
@@ -630,23 +588,21 @@ class Uniform PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr name_;
   union ValueUnion {
     ValueUnion() {}
-    ::PROTOBUF_NAMESPACE_ID::int32 integer_;
-    bool boolean_;
-    float real_;
+    ::PROTOBUF_NAMESPACE_ID::int32 uniform_int_;
+    bool uniform_bool_;
+    float uniform_float_;
     int uniform_enum_;
-    ::frame::proto::Vector2* vec2_;
-    ::frame::proto::Vector3* vec3_;
-    ::frame::proto::Vector4* vec4_;
-    ::frame::proto::Matrix3* mat3_;
-    ::frame::proto::Matrix4* mat4_;
-    ::frame::proto::MultipleInteger* integers_;
-    ::frame::proto::MutlipleBoolean* bools_;
-    ::frame::proto::MultipleReal* reals_;
-    ::frame::proto::MulitpleVector2* vec2s_;
-    ::frame::proto::MultipleVector3* vec3s_;
-    ::frame::proto::MultipleVector4* vec4s_;
-    ::frame::proto::MultipleMatrix3* mat3s_;
-    ::frame::proto::MultipleMatrix4* mat4s_;
+    ::frame::proto::UniformVector2* uniform_vec2_;
+    ::frame::proto::UniformVector3* uniform_vec3_;
+    ::frame::proto::UniformVector4* uniform_vec4_;
+    ::frame::proto::UniformMatrix4* uniform_mat4_;
+    ::frame::proto::UniformInts* uniform_ints_;
+    ::frame::proto::UniformBools* uniform_bools_;
+    ::frame::proto::UniformFloats* uniform_floats_;
+    ::frame::proto::UniformVector2s* uniform_vec2s_;
+    ::frame::proto::UniformVector3s* uniform_vec3s_;
+    ::frame::proto::UniformVector4s* uniform_vec4s_;
+    ::frame::proto::UniformMatrix4s* uniform_mat4s_;
   } value_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::uint32 _oneof_case_[1];
@@ -726,109 +682,109 @@ inline void Uniform::set_allocated_name(std::string* name) {
   // @@protoc_insertion_point(field_set_allocated:frame.proto.Uniform.name)
 }
 
-// int32 integer = 2;
-inline bool Uniform::_internal_has_integer() const {
-  return value_case() == kInteger;
+// int32 uniform_int = 2;
+inline bool Uniform::_internal_has_uniform_int() const {
+  return value_case() == kUniformInt;
 }
-inline void Uniform::set_has_integer() {
-  _oneof_case_[0] = kInteger;
+inline void Uniform::set_has_uniform_int() {
+  _oneof_case_[0] = kUniformInt;
 }
-inline void Uniform::clear_integer() {
-  if (_internal_has_integer()) {
-    value_.integer_ = 0;
+inline void Uniform::clear_uniform_int() {
+  if (_internal_has_uniform_int()) {
+    value_.uniform_int_ = 0;
     clear_has_value();
   }
 }
-inline ::PROTOBUF_NAMESPACE_ID::int32 Uniform::_internal_integer() const {
-  if (_internal_has_integer()) {
-    return value_.integer_;
+inline ::PROTOBUF_NAMESPACE_ID::int32 Uniform::_internal_uniform_int() const {
+  if (_internal_has_uniform_int()) {
+    return value_.uniform_int_;
   }
   return 0;
 }
-inline void Uniform::_internal_set_integer(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  if (!_internal_has_integer()) {
+inline void Uniform::_internal_set_uniform_int(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  if (!_internal_has_uniform_int()) {
     clear_value();
-    set_has_integer();
+    set_has_uniform_int();
   }
-  value_.integer_ = value;
+  value_.uniform_int_ = value;
 }
-inline ::PROTOBUF_NAMESPACE_ID::int32 Uniform::integer() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Uniform.integer)
-  return _internal_integer();
+inline ::PROTOBUF_NAMESPACE_ID::int32 Uniform::uniform_int() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Uniform.uniform_int)
+  return _internal_uniform_int();
 }
-inline void Uniform::set_integer(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  _internal_set_integer(value);
-  // @@protoc_insertion_point(field_set:frame.proto.Uniform.integer)
+inline void Uniform::set_uniform_int(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_uniform_int(value);
+  // @@protoc_insertion_point(field_set:frame.proto.Uniform.uniform_int)
 }
 
-// bool boolean = 3;
-inline bool Uniform::_internal_has_boolean() const {
-  return value_case() == kBoolean;
+// bool uniform_bool = 3;
+inline bool Uniform::_internal_has_uniform_bool() const {
+  return value_case() == kUniformBool;
 }
-inline void Uniform::set_has_boolean() {
-  _oneof_case_[0] = kBoolean;
+inline void Uniform::set_has_uniform_bool() {
+  _oneof_case_[0] = kUniformBool;
 }
-inline void Uniform::clear_boolean() {
-  if (_internal_has_boolean()) {
-    value_.boolean_ = false;
+inline void Uniform::clear_uniform_bool() {
+  if (_internal_has_uniform_bool()) {
+    value_.uniform_bool_ = false;
     clear_has_value();
   }
 }
-inline bool Uniform::_internal_boolean() const {
-  if (_internal_has_boolean()) {
-    return value_.boolean_;
+inline bool Uniform::_internal_uniform_bool() const {
+  if (_internal_has_uniform_bool()) {
+    return value_.uniform_bool_;
   }
   return false;
 }
-inline void Uniform::_internal_set_boolean(bool value) {
-  if (!_internal_has_boolean()) {
+inline void Uniform::_internal_set_uniform_bool(bool value) {
+  if (!_internal_has_uniform_bool()) {
     clear_value();
-    set_has_boolean();
+    set_has_uniform_bool();
   }
-  value_.boolean_ = value;
+  value_.uniform_bool_ = value;
 }
-inline bool Uniform::boolean() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Uniform.boolean)
-  return _internal_boolean();
+inline bool Uniform::uniform_bool() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Uniform.uniform_bool)
+  return _internal_uniform_bool();
 }
-inline void Uniform::set_boolean(bool value) {
-  _internal_set_boolean(value);
-  // @@protoc_insertion_point(field_set:frame.proto.Uniform.boolean)
+inline void Uniform::set_uniform_bool(bool value) {
+  _internal_set_uniform_bool(value);
+  // @@protoc_insertion_point(field_set:frame.proto.Uniform.uniform_bool)
 }
 
-// float real = 4;
-inline bool Uniform::_internal_has_real() const {
-  return value_case() == kReal;
+// float uniform_float = 4;
+inline bool Uniform::_internal_has_uniform_float() const {
+  return value_case() == kUniformFloat;
 }
-inline void Uniform::set_has_real() {
-  _oneof_case_[0] = kReal;
+inline void Uniform::set_has_uniform_float() {
+  _oneof_case_[0] = kUniformFloat;
 }
-inline void Uniform::clear_real() {
-  if (_internal_has_real()) {
-    value_.real_ = 0;
+inline void Uniform::clear_uniform_float() {
+  if (_internal_has_uniform_float()) {
+    value_.uniform_float_ = 0;
     clear_has_value();
   }
 }
-inline float Uniform::_internal_real() const {
-  if (_internal_has_real()) {
-    return value_.real_;
+inline float Uniform::_internal_uniform_float() const {
+  if (_internal_has_uniform_float()) {
+    return value_.uniform_float_;
   }
   return 0;
 }
-inline void Uniform::_internal_set_real(float value) {
-  if (!_internal_has_real()) {
+inline void Uniform::_internal_set_uniform_float(float value) {
+  if (!_internal_has_uniform_float()) {
     clear_value();
-    set_has_real();
+    set_has_uniform_float();
   }
-  value_.real_ = value;
+  value_.uniform_float_ = value;
 }
-inline float Uniform::real() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Uniform.real)
-  return _internal_real();
+inline float Uniform::uniform_float() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Uniform.uniform_float)
+  return _internal_uniform_float();
 }
-inline void Uniform::set_real(float value) {
-  _internal_set_real(value);
-  // @@protoc_insertion_point(field_set:frame.proto.Uniform.real)
+inline void Uniform::set_uniform_float(float value) {
+  _internal_set_uniform_float(value);
+  // @@protoc_insertion_point(field_set:frame.proto.Uniform.uniform_float)
 }
 
 // .frame.proto.Uniform.UniformEnum uniform_enum = 10;
@@ -866,849 +822,719 @@ inline void Uniform::set_uniform_enum(::frame::proto::Uniform_UniformEnum value)
   _internal_set_uniform_enum(value);
 }
 
-// .frame.proto.Vector2 vec2 = 20;
-inline bool Uniform::_internal_has_vec2() const {
-  return value_case() == kVec2;
+// .frame.proto.UniformVector2 uniform_vec2 = 20;
+inline bool Uniform::_internal_has_uniform_vec2() const {
+  return value_case() == kUniformVec2;
 }
-inline bool Uniform::has_vec2() const {
-  return _internal_has_vec2();
+inline bool Uniform::has_uniform_vec2() const {
+  return _internal_has_uniform_vec2();
 }
-inline void Uniform::set_has_vec2() {
-  _oneof_case_[0] = kVec2;
+inline void Uniform::set_has_uniform_vec2() {
+  _oneof_case_[0] = kUniformVec2;
 }
-inline ::frame::proto::Vector2* Uniform::release_vec2() {
-  // @@protoc_insertion_point(field_release:frame.proto.Uniform.vec2)
-  if (_internal_has_vec2()) {
+inline ::frame::proto::UniformVector2* Uniform::release_uniform_vec2() {
+  // @@protoc_insertion_point(field_release:frame.proto.Uniform.uniform_vec2)
+  if (_internal_has_uniform_vec2()) {
     clear_has_value();
-      ::frame::proto::Vector2* temp = value_.vec2_;
+      ::frame::proto::UniformVector2* temp = value_.uniform_vec2_;
     if (GetArena() != nullptr) {
       temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
     }
-    value_.vec2_ = nullptr;
+    value_.uniform_vec2_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline const ::frame::proto::Vector2& Uniform::_internal_vec2() const {
-  return _internal_has_vec2()
-      ? *value_.vec2_
-      : *reinterpret_cast< ::frame::proto::Vector2*>(&::frame::proto::_Vector2_default_instance_);
+inline const ::frame::proto::UniformVector2& Uniform::_internal_uniform_vec2() const {
+  return _internal_has_uniform_vec2()
+      ? *value_.uniform_vec2_
+      : *reinterpret_cast< ::frame::proto::UniformVector2*>(&::frame::proto::_UniformVector2_default_instance_);
 }
-inline const ::frame::proto::Vector2& Uniform::vec2() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Uniform.vec2)
-  return _internal_vec2();
+inline const ::frame::proto::UniformVector2& Uniform::uniform_vec2() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Uniform.uniform_vec2)
+  return _internal_uniform_vec2();
 }
-inline ::frame::proto::Vector2* Uniform::unsafe_arena_release_vec2() {
-  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.Uniform.vec2)
-  if (_internal_has_vec2()) {
+inline ::frame::proto::UniformVector2* Uniform::unsafe_arena_release_uniform_vec2() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.Uniform.uniform_vec2)
+  if (_internal_has_uniform_vec2()) {
     clear_has_value();
-    ::frame::proto::Vector2* temp = value_.vec2_;
-    value_.vec2_ = nullptr;
+    ::frame::proto::UniformVector2* temp = value_.uniform_vec2_;
+    value_.uniform_vec2_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline void Uniform::unsafe_arena_set_allocated_vec2(::frame::proto::Vector2* vec2) {
+inline void Uniform::unsafe_arena_set_allocated_uniform_vec2(::frame::proto::UniformVector2* uniform_vec2) {
   clear_value();
-  if (vec2) {
-    set_has_vec2();
-    value_.vec2_ = vec2;
+  if (uniform_vec2) {
+    set_has_uniform_vec2();
+    value_.uniform_vec2_ = uniform_vec2;
   }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.Uniform.vec2)
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.Uniform.uniform_vec2)
 }
-inline ::frame::proto::Vector2* Uniform::_internal_mutable_vec2() {
-  if (!_internal_has_vec2()) {
+inline ::frame::proto::UniformVector2* Uniform::_internal_mutable_uniform_vec2() {
+  if (!_internal_has_uniform_vec2()) {
     clear_value();
-    set_has_vec2();
-    value_.vec2_ = CreateMaybeMessage< ::frame::proto::Vector2 >(GetArena());
+    set_has_uniform_vec2();
+    value_.uniform_vec2_ = CreateMaybeMessage< ::frame::proto::UniformVector2 >(GetArena());
   }
-  return value_.vec2_;
+  return value_.uniform_vec2_;
 }
-inline ::frame::proto::Vector2* Uniform::mutable_vec2() {
-  // @@protoc_insertion_point(field_mutable:frame.proto.Uniform.vec2)
-  return _internal_mutable_vec2();
+inline ::frame::proto::UniformVector2* Uniform::mutable_uniform_vec2() {
+  // @@protoc_insertion_point(field_mutable:frame.proto.Uniform.uniform_vec2)
+  return _internal_mutable_uniform_vec2();
 }
 
-// .frame.proto.Vector3 vec3 = 21;
-inline bool Uniform::_internal_has_vec3() const {
-  return value_case() == kVec3;
+// .frame.proto.UniformVector3 uniform_vec3 = 21;
+inline bool Uniform::_internal_has_uniform_vec3() const {
+  return value_case() == kUniformVec3;
 }
-inline bool Uniform::has_vec3() const {
-  return _internal_has_vec3();
+inline bool Uniform::has_uniform_vec3() const {
+  return _internal_has_uniform_vec3();
 }
-inline void Uniform::set_has_vec3() {
-  _oneof_case_[0] = kVec3;
+inline void Uniform::set_has_uniform_vec3() {
+  _oneof_case_[0] = kUniformVec3;
 }
-inline ::frame::proto::Vector3* Uniform::release_vec3() {
-  // @@protoc_insertion_point(field_release:frame.proto.Uniform.vec3)
-  if (_internal_has_vec3()) {
+inline ::frame::proto::UniformVector3* Uniform::release_uniform_vec3() {
+  // @@protoc_insertion_point(field_release:frame.proto.Uniform.uniform_vec3)
+  if (_internal_has_uniform_vec3()) {
     clear_has_value();
-      ::frame::proto::Vector3* temp = value_.vec3_;
+      ::frame::proto::UniformVector3* temp = value_.uniform_vec3_;
     if (GetArena() != nullptr) {
       temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
     }
-    value_.vec3_ = nullptr;
+    value_.uniform_vec3_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline const ::frame::proto::Vector3& Uniform::_internal_vec3() const {
-  return _internal_has_vec3()
-      ? *value_.vec3_
-      : *reinterpret_cast< ::frame::proto::Vector3*>(&::frame::proto::_Vector3_default_instance_);
+inline const ::frame::proto::UniformVector3& Uniform::_internal_uniform_vec3() const {
+  return _internal_has_uniform_vec3()
+      ? *value_.uniform_vec3_
+      : *reinterpret_cast< ::frame::proto::UniformVector3*>(&::frame::proto::_UniformVector3_default_instance_);
 }
-inline const ::frame::proto::Vector3& Uniform::vec3() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Uniform.vec3)
-  return _internal_vec3();
+inline const ::frame::proto::UniformVector3& Uniform::uniform_vec3() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Uniform.uniform_vec3)
+  return _internal_uniform_vec3();
 }
-inline ::frame::proto::Vector3* Uniform::unsafe_arena_release_vec3() {
-  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.Uniform.vec3)
-  if (_internal_has_vec3()) {
+inline ::frame::proto::UniformVector3* Uniform::unsafe_arena_release_uniform_vec3() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.Uniform.uniform_vec3)
+  if (_internal_has_uniform_vec3()) {
     clear_has_value();
-    ::frame::proto::Vector3* temp = value_.vec3_;
-    value_.vec3_ = nullptr;
+    ::frame::proto::UniformVector3* temp = value_.uniform_vec3_;
+    value_.uniform_vec3_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline void Uniform::unsafe_arena_set_allocated_vec3(::frame::proto::Vector3* vec3) {
+inline void Uniform::unsafe_arena_set_allocated_uniform_vec3(::frame::proto::UniformVector3* uniform_vec3) {
   clear_value();
-  if (vec3) {
-    set_has_vec3();
-    value_.vec3_ = vec3;
+  if (uniform_vec3) {
+    set_has_uniform_vec3();
+    value_.uniform_vec3_ = uniform_vec3;
   }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.Uniform.vec3)
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.Uniform.uniform_vec3)
 }
-inline ::frame::proto::Vector3* Uniform::_internal_mutable_vec3() {
-  if (!_internal_has_vec3()) {
+inline ::frame::proto::UniformVector3* Uniform::_internal_mutable_uniform_vec3() {
+  if (!_internal_has_uniform_vec3()) {
     clear_value();
-    set_has_vec3();
-    value_.vec3_ = CreateMaybeMessage< ::frame::proto::Vector3 >(GetArena());
+    set_has_uniform_vec3();
+    value_.uniform_vec3_ = CreateMaybeMessage< ::frame::proto::UniformVector3 >(GetArena());
   }
-  return value_.vec3_;
+  return value_.uniform_vec3_;
 }
-inline ::frame::proto::Vector3* Uniform::mutable_vec3() {
-  // @@protoc_insertion_point(field_mutable:frame.proto.Uniform.vec3)
-  return _internal_mutable_vec3();
+inline ::frame::proto::UniformVector3* Uniform::mutable_uniform_vec3() {
+  // @@protoc_insertion_point(field_mutable:frame.proto.Uniform.uniform_vec3)
+  return _internal_mutable_uniform_vec3();
 }
 
-// .frame.proto.Vector4 vec4 = 22;
-inline bool Uniform::_internal_has_vec4() const {
-  return value_case() == kVec4;
+// .frame.proto.UniformVector4 uniform_vec4 = 22;
+inline bool Uniform::_internal_has_uniform_vec4() const {
+  return value_case() == kUniformVec4;
 }
-inline bool Uniform::has_vec4() const {
-  return _internal_has_vec4();
+inline bool Uniform::has_uniform_vec4() const {
+  return _internal_has_uniform_vec4();
 }
-inline void Uniform::set_has_vec4() {
-  _oneof_case_[0] = kVec4;
+inline void Uniform::set_has_uniform_vec4() {
+  _oneof_case_[0] = kUniformVec4;
 }
-inline ::frame::proto::Vector4* Uniform::release_vec4() {
-  // @@protoc_insertion_point(field_release:frame.proto.Uniform.vec4)
-  if (_internal_has_vec4()) {
+inline ::frame::proto::UniformVector4* Uniform::release_uniform_vec4() {
+  // @@protoc_insertion_point(field_release:frame.proto.Uniform.uniform_vec4)
+  if (_internal_has_uniform_vec4()) {
     clear_has_value();
-      ::frame::proto::Vector4* temp = value_.vec4_;
+      ::frame::proto::UniformVector4* temp = value_.uniform_vec4_;
     if (GetArena() != nullptr) {
       temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
     }
-    value_.vec4_ = nullptr;
+    value_.uniform_vec4_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline const ::frame::proto::Vector4& Uniform::_internal_vec4() const {
-  return _internal_has_vec4()
-      ? *value_.vec4_
-      : *reinterpret_cast< ::frame::proto::Vector4*>(&::frame::proto::_Vector4_default_instance_);
+inline const ::frame::proto::UniformVector4& Uniform::_internal_uniform_vec4() const {
+  return _internal_has_uniform_vec4()
+      ? *value_.uniform_vec4_
+      : *reinterpret_cast< ::frame::proto::UniformVector4*>(&::frame::proto::_UniformVector4_default_instance_);
 }
-inline const ::frame::proto::Vector4& Uniform::vec4() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Uniform.vec4)
-  return _internal_vec4();
+inline const ::frame::proto::UniformVector4& Uniform::uniform_vec4() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Uniform.uniform_vec4)
+  return _internal_uniform_vec4();
 }
-inline ::frame::proto::Vector4* Uniform::unsafe_arena_release_vec4() {
-  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.Uniform.vec4)
-  if (_internal_has_vec4()) {
+inline ::frame::proto::UniformVector4* Uniform::unsafe_arena_release_uniform_vec4() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.Uniform.uniform_vec4)
+  if (_internal_has_uniform_vec4()) {
     clear_has_value();
-    ::frame::proto::Vector4* temp = value_.vec4_;
-    value_.vec4_ = nullptr;
+    ::frame::proto::UniformVector4* temp = value_.uniform_vec4_;
+    value_.uniform_vec4_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline void Uniform::unsafe_arena_set_allocated_vec4(::frame::proto::Vector4* vec4) {
+inline void Uniform::unsafe_arena_set_allocated_uniform_vec4(::frame::proto::UniformVector4* uniform_vec4) {
   clear_value();
-  if (vec4) {
-    set_has_vec4();
-    value_.vec4_ = vec4;
+  if (uniform_vec4) {
+    set_has_uniform_vec4();
+    value_.uniform_vec4_ = uniform_vec4;
   }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.Uniform.vec4)
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.Uniform.uniform_vec4)
 }
-inline ::frame::proto::Vector4* Uniform::_internal_mutable_vec4() {
-  if (!_internal_has_vec4()) {
+inline ::frame::proto::UniformVector4* Uniform::_internal_mutable_uniform_vec4() {
+  if (!_internal_has_uniform_vec4()) {
     clear_value();
-    set_has_vec4();
-    value_.vec4_ = CreateMaybeMessage< ::frame::proto::Vector4 >(GetArena());
+    set_has_uniform_vec4();
+    value_.uniform_vec4_ = CreateMaybeMessage< ::frame::proto::UniformVector4 >(GetArena());
   }
-  return value_.vec4_;
+  return value_.uniform_vec4_;
 }
-inline ::frame::proto::Vector4* Uniform::mutable_vec4() {
-  // @@protoc_insertion_point(field_mutable:frame.proto.Uniform.vec4)
-  return _internal_mutable_vec4();
+inline ::frame::proto::UniformVector4* Uniform::mutable_uniform_vec4() {
+  // @@protoc_insertion_point(field_mutable:frame.proto.Uniform.uniform_vec4)
+  return _internal_mutable_uniform_vec4();
 }
 
-// .frame.proto.Matrix3 mat3 = 30;
-inline bool Uniform::_internal_has_mat3() const {
-  return value_case() == kMat3;
+// .frame.proto.UniformMatrix4 uniform_mat4 = 31;
+inline bool Uniform::_internal_has_uniform_mat4() const {
+  return value_case() == kUniformMat4;
 }
-inline bool Uniform::has_mat3() const {
-  return _internal_has_mat3();
+inline bool Uniform::has_uniform_mat4() const {
+  return _internal_has_uniform_mat4();
 }
-inline void Uniform::set_has_mat3() {
-  _oneof_case_[0] = kMat3;
+inline void Uniform::set_has_uniform_mat4() {
+  _oneof_case_[0] = kUniformMat4;
 }
-inline ::frame::proto::Matrix3* Uniform::release_mat3() {
-  // @@protoc_insertion_point(field_release:frame.proto.Uniform.mat3)
-  if (_internal_has_mat3()) {
+inline ::frame::proto::UniformMatrix4* Uniform::release_uniform_mat4() {
+  // @@protoc_insertion_point(field_release:frame.proto.Uniform.uniform_mat4)
+  if (_internal_has_uniform_mat4()) {
     clear_has_value();
-      ::frame::proto::Matrix3* temp = value_.mat3_;
+      ::frame::proto::UniformMatrix4* temp = value_.uniform_mat4_;
     if (GetArena() != nullptr) {
       temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
     }
-    value_.mat3_ = nullptr;
+    value_.uniform_mat4_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline const ::frame::proto::Matrix3& Uniform::_internal_mat3() const {
-  return _internal_has_mat3()
-      ? *value_.mat3_
-      : *reinterpret_cast< ::frame::proto::Matrix3*>(&::frame::proto::_Matrix3_default_instance_);
+inline const ::frame::proto::UniformMatrix4& Uniform::_internal_uniform_mat4() const {
+  return _internal_has_uniform_mat4()
+      ? *value_.uniform_mat4_
+      : *reinterpret_cast< ::frame::proto::UniformMatrix4*>(&::frame::proto::_UniformMatrix4_default_instance_);
 }
-inline const ::frame::proto::Matrix3& Uniform::mat3() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Uniform.mat3)
-  return _internal_mat3();
+inline const ::frame::proto::UniformMatrix4& Uniform::uniform_mat4() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Uniform.uniform_mat4)
+  return _internal_uniform_mat4();
 }
-inline ::frame::proto::Matrix3* Uniform::unsafe_arena_release_mat3() {
-  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.Uniform.mat3)
-  if (_internal_has_mat3()) {
+inline ::frame::proto::UniformMatrix4* Uniform::unsafe_arena_release_uniform_mat4() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.Uniform.uniform_mat4)
+  if (_internal_has_uniform_mat4()) {
     clear_has_value();
-    ::frame::proto::Matrix3* temp = value_.mat3_;
-    value_.mat3_ = nullptr;
+    ::frame::proto::UniformMatrix4* temp = value_.uniform_mat4_;
+    value_.uniform_mat4_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline void Uniform::unsafe_arena_set_allocated_mat3(::frame::proto::Matrix3* mat3) {
+inline void Uniform::unsafe_arena_set_allocated_uniform_mat4(::frame::proto::UniformMatrix4* uniform_mat4) {
   clear_value();
-  if (mat3) {
-    set_has_mat3();
-    value_.mat3_ = mat3;
+  if (uniform_mat4) {
+    set_has_uniform_mat4();
+    value_.uniform_mat4_ = uniform_mat4;
   }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.Uniform.mat3)
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.Uniform.uniform_mat4)
 }
-inline ::frame::proto::Matrix3* Uniform::_internal_mutable_mat3() {
-  if (!_internal_has_mat3()) {
+inline ::frame::proto::UniformMatrix4* Uniform::_internal_mutable_uniform_mat4() {
+  if (!_internal_has_uniform_mat4()) {
     clear_value();
-    set_has_mat3();
-    value_.mat3_ = CreateMaybeMessage< ::frame::proto::Matrix3 >(GetArena());
+    set_has_uniform_mat4();
+    value_.uniform_mat4_ = CreateMaybeMessage< ::frame::proto::UniformMatrix4 >(GetArena());
   }
-  return value_.mat3_;
+  return value_.uniform_mat4_;
 }
-inline ::frame::proto::Matrix3* Uniform::mutable_mat3() {
-  // @@protoc_insertion_point(field_mutable:frame.proto.Uniform.mat3)
-  return _internal_mutable_mat3();
+inline ::frame::proto::UniformMatrix4* Uniform::mutable_uniform_mat4() {
+  // @@protoc_insertion_point(field_mutable:frame.proto.Uniform.uniform_mat4)
+  return _internal_mutable_uniform_mat4();
 }
 
-// .frame.proto.Matrix4 mat4 = 31;
-inline bool Uniform::_internal_has_mat4() const {
-  return value_case() == kMat4;
+// .frame.proto.UniformInts uniform_ints = 40;
+inline bool Uniform::_internal_has_uniform_ints() const {
+  return value_case() == kUniformInts;
 }
-inline bool Uniform::has_mat4() const {
-  return _internal_has_mat4();
+inline bool Uniform::has_uniform_ints() const {
+  return _internal_has_uniform_ints();
 }
-inline void Uniform::set_has_mat4() {
-  _oneof_case_[0] = kMat4;
+inline void Uniform::set_has_uniform_ints() {
+  _oneof_case_[0] = kUniformInts;
 }
-inline ::frame::proto::Matrix4* Uniform::release_mat4() {
-  // @@protoc_insertion_point(field_release:frame.proto.Uniform.mat4)
-  if (_internal_has_mat4()) {
+inline ::frame::proto::UniformInts* Uniform::release_uniform_ints() {
+  // @@protoc_insertion_point(field_release:frame.proto.Uniform.uniform_ints)
+  if (_internal_has_uniform_ints()) {
     clear_has_value();
-      ::frame::proto::Matrix4* temp = value_.mat4_;
+      ::frame::proto::UniformInts* temp = value_.uniform_ints_;
     if (GetArena() != nullptr) {
       temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
     }
-    value_.mat4_ = nullptr;
+    value_.uniform_ints_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline const ::frame::proto::Matrix4& Uniform::_internal_mat4() const {
-  return _internal_has_mat4()
-      ? *value_.mat4_
-      : *reinterpret_cast< ::frame::proto::Matrix4*>(&::frame::proto::_Matrix4_default_instance_);
+inline const ::frame::proto::UniformInts& Uniform::_internal_uniform_ints() const {
+  return _internal_has_uniform_ints()
+      ? *value_.uniform_ints_
+      : *reinterpret_cast< ::frame::proto::UniformInts*>(&::frame::proto::_UniformInts_default_instance_);
 }
-inline const ::frame::proto::Matrix4& Uniform::mat4() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Uniform.mat4)
-  return _internal_mat4();
+inline const ::frame::proto::UniformInts& Uniform::uniform_ints() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Uniform.uniform_ints)
+  return _internal_uniform_ints();
 }
-inline ::frame::proto::Matrix4* Uniform::unsafe_arena_release_mat4() {
-  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.Uniform.mat4)
-  if (_internal_has_mat4()) {
+inline ::frame::proto::UniformInts* Uniform::unsafe_arena_release_uniform_ints() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.Uniform.uniform_ints)
+  if (_internal_has_uniform_ints()) {
     clear_has_value();
-    ::frame::proto::Matrix4* temp = value_.mat4_;
-    value_.mat4_ = nullptr;
+    ::frame::proto::UniformInts* temp = value_.uniform_ints_;
+    value_.uniform_ints_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline void Uniform::unsafe_arena_set_allocated_mat4(::frame::proto::Matrix4* mat4) {
+inline void Uniform::unsafe_arena_set_allocated_uniform_ints(::frame::proto::UniformInts* uniform_ints) {
   clear_value();
-  if (mat4) {
-    set_has_mat4();
-    value_.mat4_ = mat4;
+  if (uniform_ints) {
+    set_has_uniform_ints();
+    value_.uniform_ints_ = uniform_ints;
   }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.Uniform.mat4)
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.Uniform.uniform_ints)
 }
-inline ::frame::proto::Matrix4* Uniform::_internal_mutable_mat4() {
-  if (!_internal_has_mat4()) {
+inline ::frame::proto::UniformInts* Uniform::_internal_mutable_uniform_ints() {
+  if (!_internal_has_uniform_ints()) {
     clear_value();
-    set_has_mat4();
-    value_.mat4_ = CreateMaybeMessage< ::frame::proto::Matrix4 >(GetArena());
+    set_has_uniform_ints();
+    value_.uniform_ints_ = CreateMaybeMessage< ::frame::proto::UniformInts >(GetArena());
   }
-  return value_.mat4_;
+  return value_.uniform_ints_;
 }
-inline ::frame::proto::Matrix4* Uniform::mutable_mat4() {
-  // @@protoc_insertion_point(field_mutable:frame.proto.Uniform.mat4)
-  return _internal_mutable_mat4();
+inline ::frame::proto::UniformInts* Uniform::mutable_uniform_ints() {
+  // @@protoc_insertion_point(field_mutable:frame.proto.Uniform.uniform_ints)
+  return _internal_mutable_uniform_ints();
 }
 
-// .frame.proto.MultipleInteger integers = 40;
-inline bool Uniform::_internal_has_integers() const {
-  return value_case() == kIntegers;
+// .frame.proto.UniformBools uniform_bools = 41;
+inline bool Uniform::_internal_has_uniform_bools() const {
+  return value_case() == kUniformBools;
 }
-inline bool Uniform::has_integers() const {
-  return _internal_has_integers();
+inline bool Uniform::has_uniform_bools() const {
+  return _internal_has_uniform_bools();
 }
-inline void Uniform::set_has_integers() {
-  _oneof_case_[0] = kIntegers;
+inline void Uniform::set_has_uniform_bools() {
+  _oneof_case_[0] = kUniformBools;
 }
-inline ::frame::proto::MultipleInteger* Uniform::release_integers() {
-  // @@protoc_insertion_point(field_release:frame.proto.Uniform.integers)
-  if (_internal_has_integers()) {
+inline ::frame::proto::UniformBools* Uniform::release_uniform_bools() {
+  // @@protoc_insertion_point(field_release:frame.proto.Uniform.uniform_bools)
+  if (_internal_has_uniform_bools()) {
     clear_has_value();
-      ::frame::proto::MultipleInteger* temp = value_.integers_;
+      ::frame::proto::UniformBools* temp = value_.uniform_bools_;
     if (GetArena() != nullptr) {
       temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
     }
-    value_.integers_ = nullptr;
+    value_.uniform_bools_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline const ::frame::proto::MultipleInteger& Uniform::_internal_integers() const {
-  return _internal_has_integers()
-      ? *value_.integers_
-      : *reinterpret_cast< ::frame::proto::MultipleInteger*>(&::frame::proto::_MultipleInteger_default_instance_);
+inline const ::frame::proto::UniformBools& Uniform::_internal_uniform_bools() const {
+  return _internal_has_uniform_bools()
+      ? *value_.uniform_bools_
+      : *reinterpret_cast< ::frame::proto::UniformBools*>(&::frame::proto::_UniformBools_default_instance_);
 }
-inline const ::frame::proto::MultipleInteger& Uniform::integers() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Uniform.integers)
-  return _internal_integers();
+inline const ::frame::proto::UniformBools& Uniform::uniform_bools() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Uniform.uniform_bools)
+  return _internal_uniform_bools();
 }
-inline ::frame::proto::MultipleInteger* Uniform::unsafe_arena_release_integers() {
-  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.Uniform.integers)
-  if (_internal_has_integers()) {
+inline ::frame::proto::UniformBools* Uniform::unsafe_arena_release_uniform_bools() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.Uniform.uniform_bools)
+  if (_internal_has_uniform_bools()) {
     clear_has_value();
-    ::frame::proto::MultipleInteger* temp = value_.integers_;
-    value_.integers_ = nullptr;
+    ::frame::proto::UniformBools* temp = value_.uniform_bools_;
+    value_.uniform_bools_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline void Uniform::unsafe_arena_set_allocated_integers(::frame::proto::MultipleInteger* integers) {
+inline void Uniform::unsafe_arena_set_allocated_uniform_bools(::frame::proto::UniformBools* uniform_bools) {
   clear_value();
-  if (integers) {
-    set_has_integers();
-    value_.integers_ = integers;
+  if (uniform_bools) {
+    set_has_uniform_bools();
+    value_.uniform_bools_ = uniform_bools;
   }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.Uniform.integers)
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.Uniform.uniform_bools)
 }
-inline ::frame::proto::MultipleInteger* Uniform::_internal_mutable_integers() {
-  if (!_internal_has_integers()) {
+inline ::frame::proto::UniformBools* Uniform::_internal_mutable_uniform_bools() {
+  if (!_internal_has_uniform_bools()) {
     clear_value();
-    set_has_integers();
-    value_.integers_ = CreateMaybeMessage< ::frame::proto::MultipleInteger >(GetArena());
+    set_has_uniform_bools();
+    value_.uniform_bools_ = CreateMaybeMessage< ::frame::proto::UniformBools >(GetArena());
   }
-  return value_.integers_;
+  return value_.uniform_bools_;
 }
-inline ::frame::proto::MultipleInteger* Uniform::mutable_integers() {
-  // @@protoc_insertion_point(field_mutable:frame.proto.Uniform.integers)
-  return _internal_mutable_integers();
+inline ::frame::proto::UniformBools* Uniform::mutable_uniform_bools() {
+  // @@protoc_insertion_point(field_mutable:frame.proto.Uniform.uniform_bools)
+  return _internal_mutable_uniform_bools();
 }
 
-// .frame.proto.MutlipleBoolean bools = 41;
-inline bool Uniform::_internal_has_bools() const {
-  return value_case() == kBools;
+// .frame.proto.UniformFloats uniform_floats = 42;
+inline bool Uniform::_internal_has_uniform_floats() const {
+  return value_case() == kUniformFloats;
 }
-inline bool Uniform::has_bools() const {
-  return _internal_has_bools();
+inline bool Uniform::has_uniform_floats() const {
+  return _internal_has_uniform_floats();
 }
-inline void Uniform::set_has_bools() {
-  _oneof_case_[0] = kBools;
+inline void Uniform::set_has_uniform_floats() {
+  _oneof_case_[0] = kUniformFloats;
 }
-inline ::frame::proto::MutlipleBoolean* Uniform::release_bools() {
-  // @@protoc_insertion_point(field_release:frame.proto.Uniform.bools)
-  if (_internal_has_bools()) {
+inline ::frame::proto::UniformFloats* Uniform::release_uniform_floats() {
+  // @@protoc_insertion_point(field_release:frame.proto.Uniform.uniform_floats)
+  if (_internal_has_uniform_floats()) {
     clear_has_value();
-      ::frame::proto::MutlipleBoolean* temp = value_.bools_;
+      ::frame::proto::UniformFloats* temp = value_.uniform_floats_;
     if (GetArena() != nullptr) {
       temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
     }
-    value_.bools_ = nullptr;
+    value_.uniform_floats_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline const ::frame::proto::MutlipleBoolean& Uniform::_internal_bools() const {
-  return _internal_has_bools()
-      ? *value_.bools_
-      : *reinterpret_cast< ::frame::proto::MutlipleBoolean*>(&::frame::proto::_MutlipleBoolean_default_instance_);
+inline const ::frame::proto::UniformFloats& Uniform::_internal_uniform_floats() const {
+  return _internal_has_uniform_floats()
+      ? *value_.uniform_floats_
+      : *reinterpret_cast< ::frame::proto::UniformFloats*>(&::frame::proto::_UniformFloats_default_instance_);
 }
-inline const ::frame::proto::MutlipleBoolean& Uniform::bools() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Uniform.bools)
-  return _internal_bools();
+inline const ::frame::proto::UniformFloats& Uniform::uniform_floats() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Uniform.uniform_floats)
+  return _internal_uniform_floats();
 }
-inline ::frame::proto::MutlipleBoolean* Uniform::unsafe_arena_release_bools() {
-  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.Uniform.bools)
-  if (_internal_has_bools()) {
+inline ::frame::proto::UniformFloats* Uniform::unsafe_arena_release_uniform_floats() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.Uniform.uniform_floats)
+  if (_internal_has_uniform_floats()) {
     clear_has_value();
-    ::frame::proto::MutlipleBoolean* temp = value_.bools_;
-    value_.bools_ = nullptr;
+    ::frame::proto::UniformFloats* temp = value_.uniform_floats_;
+    value_.uniform_floats_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline void Uniform::unsafe_arena_set_allocated_bools(::frame::proto::MutlipleBoolean* bools) {
+inline void Uniform::unsafe_arena_set_allocated_uniform_floats(::frame::proto::UniformFloats* uniform_floats) {
   clear_value();
-  if (bools) {
-    set_has_bools();
-    value_.bools_ = bools;
+  if (uniform_floats) {
+    set_has_uniform_floats();
+    value_.uniform_floats_ = uniform_floats;
   }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.Uniform.bools)
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.Uniform.uniform_floats)
 }
-inline ::frame::proto::MutlipleBoolean* Uniform::_internal_mutable_bools() {
-  if (!_internal_has_bools()) {
+inline ::frame::proto::UniformFloats* Uniform::_internal_mutable_uniform_floats() {
+  if (!_internal_has_uniform_floats()) {
     clear_value();
-    set_has_bools();
-    value_.bools_ = CreateMaybeMessage< ::frame::proto::MutlipleBoolean >(GetArena());
+    set_has_uniform_floats();
+    value_.uniform_floats_ = CreateMaybeMessage< ::frame::proto::UniformFloats >(GetArena());
   }
-  return value_.bools_;
+  return value_.uniform_floats_;
 }
-inline ::frame::proto::MutlipleBoolean* Uniform::mutable_bools() {
-  // @@protoc_insertion_point(field_mutable:frame.proto.Uniform.bools)
-  return _internal_mutable_bools();
+inline ::frame::proto::UniformFloats* Uniform::mutable_uniform_floats() {
+  // @@protoc_insertion_point(field_mutable:frame.proto.Uniform.uniform_floats)
+  return _internal_mutable_uniform_floats();
 }
 
-// .frame.proto.MultipleReal reals = 42;
-inline bool Uniform::_internal_has_reals() const {
-  return value_case() == kReals;
+// .frame.proto.UniformVector2s uniform_vec2s = 50;
+inline bool Uniform::_internal_has_uniform_vec2s() const {
+  return value_case() == kUniformVec2S;
 }
-inline bool Uniform::has_reals() const {
-  return _internal_has_reals();
+inline bool Uniform::has_uniform_vec2s() const {
+  return _internal_has_uniform_vec2s();
 }
-inline void Uniform::set_has_reals() {
-  _oneof_case_[0] = kReals;
+inline void Uniform::set_has_uniform_vec2s() {
+  _oneof_case_[0] = kUniformVec2S;
 }
-inline ::frame::proto::MultipleReal* Uniform::release_reals() {
-  // @@protoc_insertion_point(field_release:frame.proto.Uniform.reals)
-  if (_internal_has_reals()) {
+inline ::frame::proto::UniformVector2s* Uniform::release_uniform_vec2s() {
+  // @@protoc_insertion_point(field_release:frame.proto.Uniform.uniform_vec2s)
+  if (_internal_has_uniform_vec2s()) {
     clear_has_value();
-      ::frame::proto::MultipleReal* temp = value_.reals_;
+      ::frame::proto::UniformVector2s* temp = value_.uniform_vec2s_;
     if (GetArena() != nullptr) {
       temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
     }
-    value_.reals_ = nullptr;
+    value_.uniform_vec2s_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline const ::frame::proto::MultipleReal& Uniform::_internal_reals() const {
-  return _internal_has_reals()
-      ? *value_.reals_
-      : *reinterpret_cast< ::frame::proto::MultipleReal*>(&::frame::proto::_MultipleReal_default_instance_);
+inline const ::frame::proto::UniformVector2s& Uniform::_internal_uniform_vec2s() const {
+  return _internal_has_uniform_vec2s()
+      ? *value_.uniform_vec2s_
+      : *reinterpret_cast< ::frame::proto::UniformVector2s*>(&::frame::proto::_UniformVector2s_default_instance_);
 }
-inline const ::frame::proto::MultipleReal& Uniform::reals() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Uniform.reals)
-  return _internal_reals();
+inline const ::frame::proto::UniformVector2s& Uniform::uniform_vec2s() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Uniform.uniform_vec2s)
+  return _internal_uniform_vec2s();
 }
-inline ::frame::proto::MultipleReal* Uniform::unsafe_arena_release_reals() {
-  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.Uniform.reals)
-  if (_internal_has_reals()) {
+inline ::frame::proto::UniformVector2s* Uniform::unsafe_arena_release_uniform_vec2s() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.Uniform.uniform_vec2s)
+  if (_internal_has_uniform_vec2s()) {
     clear_has_value();
-    ::frame::proto::MultipleReal* temp = value_.reals_;
-    value_.reals_ = nullptr;
+    ::frame::proto::UniformVector2s* temp = value_.uniform_vec2s_;
+    value_.uniform_vec2s_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline void Uniform::unsafe_arena_set_allocated_reals(::frame::proto::MultipleReal* reals) {
+inline void Uniform::unsafe_arena_set_allocated_uniform_vec2s(::frame::proto::UniformVector2s* uniform_vec2s) {
   clear_value();
-  if (reals) {
-    set_has_reals();
-    value_.reals_ = reals;
+  if (uniform_vec2s) {
+    set_has_uniform_vec2s();
+    value_.uniform_vec2s_ = uniform_vec2s;
   }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.Uniform.reals)
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.Uniform.uniform_vec2s)
 }
-inline ::frame::proto::MultipleReal* Uniform::_internal_mutable_reals() {
-  if (!_internal_has_reals()) {
+inline ::frame::proto::UniformVector2s* Uniform::_internal_mutable_uniform_vec2s() {
+  if (!_internal_has_uniform_vec2s()) {
     clear_value();
-    set_has_reals();
-    value_.reals_ = CreateMaybeMessage< ::frame::proto::MultipleReal >(GetArena());
+    set_has_uniform_vec2s();
+    value_.uniform_vec2s_ = CreateMaybeMessage< ::frame::proto::UniformVector2s >(GetArena());
   }
-  return value_.reals_;
+  return value_.uniform_vec2s_;
 }
-inline ::frame::proto::MultipleReal* Uniform::mutable_reals() {
-  // @@protoc_insertion_point(field_mutable:frame.proto.Uniform.reals)
-  return _internal_mutable_reals();
+inline ::frame::proto::UniformVector2s* Uniform::mutable_uniform_vec2s() {
+  // @@protoc_insertion_point(field_mutable:frame.proto.Uniform.uniform_vec2s)
+  return _internal_mutable_uniform_vec2s();
 }
 
-// .frame.proto.MulitpleVector2 vec2s = 50;
-inline bool Uniform::_internal_has_vec2s() const {
-  return value_case() == kVec2S;
+// .frame.proto.UniformVector3s uniform_vec3s = 51;
+inline bool Uniform::_internal_has_uniform_vec3s() const {
+  return value_case() == kUniformVec3S;
 }
-inline bool Uniform::has_vec2s() const {
-  return _internal_has_vec2s();
+inline bool Uniform::has_uniform_vec3s() const {
+  return _internal_has_uniform_vec3s();
 }
-inline void Uniform::set_has_vec2s() {
-  _oneof_case_[0] = kVec2S;
+inline void Uniform::set_has_uniform_vec3s() {
+  _oneof_case_[0] = kUniformVec3S;
 }
-inline ::frame::proto::MulitpleVector2* Uniform::release_vec2s() {
-  // @@protoc_insertion_point(field_release:frame.proto.Uniform.vec2s)
-  if (_internal_has_vec2s()) {
+inline ::frame::proto::UniformVector3s* Uniform::release_uniform_vec3s() {
+  // @@protoc_insertion_point(field_release:frame.proto.Uniform.uniform_vec3s)
+  if (_internal_has_uniform_vec3s()) {
     clear_has_value();
-      ::frame::proto::MulitpleVector2* temp = value_.vec2s_;
+      ::frame::proto::UniformVector3s* temp = value_.uniform_vec3s_;
     if (GetArena() != nullptr) {
       temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
     }
-    value_.vec2s_ = nullptr;
+    value_.uniform_vec3s_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline const ::frame::proto::MulitpleVector2& Uniform::_internal_vec2s() const {
-  return _internal_has_vec2s()
-      ? *value_.vec2s_
-      : *reinterpret_cast< ::frame::proto::MulitpleVector2*>(&::frame::proto::_MulitpleVector2_default_instance_);
+inline const ::frame::proto::UniformVector3s& Uniform::_internal_uniform_vec3s() const {
+  return _internal_has_uniform_vec3s()
+      ? *value_.uniform_vec3s_
+      : *reinterpret_cast< ::frame::proto::UniformVector3s*>(&::frame::proto::_UniformVector3s_default_instance_);
 }
-inline const ::frame::proto::MulitpleVector2& Uniform::vec2s() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Uniform.vec2s)
-  return _internal_vec2s();
+inline const ::frame::proto::UniformVector3s& Uniform::uniform_vec3s() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Uniform.uniform_vec3s)
+  return _internal_uniform_vec3s();
 }
-inline ::frame::proto::MulitpleVector2* Uniform::unsafe_arena_release_vec2s() {
-  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.Uniform.vec2s)
-  if (_internal_has_vec2s()) {
+inline ::frame::proto::UniformVector3s* Uniform::unsafe_arena_release_uniform_vec3s() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.Uniform.uniform_vec3s)
+  if (_internal_has_uniform_vec3s()) {
     clear_has_value();
-    ::frame::proto::MulitpleVector2* temp = value_.vec2s_;
-    value_.vec2s_ = nullptr;
+    ::frame::proto::UniformVector3s* temp = value_.uniform_vec3s_;
+    value_.uniform_vec3s_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline void Uniform::unsafe_arena_set_allocated_vec2s(::frame::proto::MulitpleVector2* vec2s) {
+inline void Uniform::unsafe_arena_set_allocated_uniform_vec3s(::frame::proto::UniformVector3s* uniform_vec3s) {
   clear_value();
-  if (vec2s) {
-    set_has_vec2s();
-    value_.vec2s_ = vec2s;
+  if (uniform_vec3s) {
+    set_has_uniform_vec3s();
+    value_.uniform_vec3s_ = uniform_vec3s;
   }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.Uniform.vec2s)
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.Uniform.uniform_vec3s)
 }
-inline ::frame::proto::MulitpleVector2* Uniform::_internal_mutable_vec2s() {
-  if (!_internal_has_vec2s()) {
+inline ::frame::proto::UniformVector3s* Uniform::_internal_mutable_uniform_vec3s() {
+  if (!_internal_has_uniform_vec3s()) {
     clear_value();
-    set_has_vec2s();
-    value_.vec2s_ = CreateMaybeMessage< ::frame::proto::MulitpleVector2 >(GetArena());
+    set_has_uniform_vec3s();
+    value_.uniform_vec3s_ = CreateMaybeMessage< ::frame::proto::UniformVector3s >(GetArena());
   }
-  return value_.vec2s_;
+  return value_.uniform_vec3s_;
 }
-inline ::frame::proto::MulitpleVector2* Uniform::mutable_vec2s() {
-  // @@protoc_insertion_point(field_mutable:frame.proto.Uniform.vec2s)
-  return _internal_mutable_vec2s();
+inline ::frame::proto::UniformVector3s* Uniform::mutable_uniform_vec3s() {
+  // @@protoc_insertion_point(field_mutable:frame.proto.Uniform.uniform_vec3s)
+  return _internal_mutable_uniform_vec3s();
 }
 
-// .frame.proto.MultipleVector3 vec3s = 51;
-inline bool Uniform::_internal_has_vec3s() const {
-  return value_case() == kVec3S;
+// .frame.proto.UniformVector4s uniform_vec4s = 52;
+inline bool Uniform::_internal_has_uniform_vec4s() const {
+  return value_case() == kUniformVec4S;
 }
-inline bool Uniform::has_vec3s() const {
-  return _internal_has_vec3s();
+inline bool Uniform::has_uniform_vec4s() const {
+  return _internal_has_uniform_vec4s();
 }
-inline void Uniform::set_has_vec3s() {
-  _oneof_case_[0] = kVec3S;
+inline void Uniform::set_has_uniform_vec4s() {
+  _oneof_case_[0] = kUniformVec4S;
 }
-inline ::frame::proto::MultipleVector3* Uniform::release_vec3s() {
-  // @@protoc_insertion_point(field_release:frame.proto.Uniform.vec3s)
-  if (_internal_has_vec3s()) {
+inline ::frame::proto::UniformVector4s* Uniform::release_uniform_vec4s() {
+  // @@protoc_insertion_point(field_release:frame.proto.Uniform.uniform_vec4s)
+  if (_internal_has_uniform_vec4s()) {
     clear_has_value();
-      ::frame::proto::MultipleVector3* temp = value_.vec3s_;
+      ::frame::proto::UniformVector4s* temp = value_.uniform_vec4s_;
     if (GetArena() != nullptr) {
       temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
     }
-    value_.vec3s_ = nullptr;
+    value_.uniform_vec4s_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline const ::frame::proto::MultipleVector3& Uniform::_internal_vec3s() const {
-  return _internal_has_vec3s()
-      ? *value_.vec3s_
-      : *reinterpret_cast< ::frame::proto::MultipleVector3*>(&::frame::proto::_MultipleVector3_default_instance_);
+inline const ::frame::proto::UniformVector4s& Uniform::_internal_uniform_vec4s() const {
+  return _internal_has_uniform_vec4s()
+      ? *value_.uniform_vec4s_
+      : *reinterpret_cast< ::frame::proto::UniformVector4s*>(&::frame::proto::_UniformVector4s_default_instance_);
 }
-inline const ::frame::proto::MultipleVector3& Uniform::vec3s() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Uniform.vec3s)
-  return _internal_vec3s();
+inline const ::frame::proto::UniformVector4s& Uniform::uniform_vec4s() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Uniform.uniform_vec4s)
+  return _internal_uniform_vec4s();
 }
-inline ::frame::proto::MultipleVector3* Uniform::unsafe_arena_release_vec3s() {
-  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.Uniform.vec3s)
-  if (_internal_has_vec3s()) {
+inline ::frame::proto::UniformVector4s* Uniform::unsafe_arena_release_uniform_vec4s() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.Uniform.uniform_vec4s)
+  if (_internal_has_uniform_vec4s()) {
     clear_has_value();
-    ::frame::proto::MultipleVector3* temp = value_.vec3s_;
-    value_.vec3s_ = nullptr;
+    ::frame::proto::UniformVector4s* temp = value_.uniform_vec4s_;
+    value_.uniform_vec4s_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline void Uniform::unsafe_arena_set_allocated_vec3s(::frame::proto::MultipleVector3* vec3s) {
+inline void Uniform::unsafe_arena_set_allocated_uniform_vec4s(::frame::proto::UniformVector4s* uniform_vec4s) {
   clear_value();
-  if (vec3s) {
-    set_has_vec3s();
-    value_.vec3s_ = vec3s;
+  if (uniform_vec4s) {
+    set_has_uniform_vec4s();
+    value_.uniform_vec4s_ = uniform_vec4s;
   }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.Uniform.vec3s)
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.Uniform.uniform_vec4s)
 }
-inline ::frame::proto::MultipleVector3* Uniform::_internal_mutable_vec3s() {
-  if (!_internal_has_vec3s()) {
+inline ::frame::proto::UniformVector4s* Uniform::_internal_mutable_uniform_vec4s() {
+  if (!_internal_has_uniform_vec4s()) {
     clear_value();
-    set_has_vec3s();
-    value_.vec3s_ = CreateMaybeMessage< ::frame::proto::MultipleVector3 >(GetArena());
+    set_has_uniform_vec4s();
+    value_.uniform_vec4s_ = CreateMaybeMessage< ::frame::proto::UniformVector4s >(GetArena());
   }
-  return value_.vec3s_;
+  return value_.uniform_vec4s_;
 }
-inline ::frame::proto::MultipleVector3* Uniform::mutable_vec3s() {
-  // @@protoc_insertion_point(field_mutable:frame.proto.Uniform.vec3s)
-  return _internal_mutable_vec3s();
+inline ::frame::proto::UniformVector4s* Uniform::mutable_uniform_vec4s() {
+  // @@protoc_insertion_point(field_mutable:frame.proto.Uniform.uniform_vec4s)
+  return _internal_mutable_uniform_vec4s();
 }
 
-// .frame.proto.MultipleVector4 vec4s = 52;
-inline bool Uniform::_internal_has_vec4s() const {
-  return value_case() == kVec4S;
+// .frame.proto.UniformMatrix4s uniform_mat4s = 54;
+inline bool Uniform::_internal_has_uniform_mat4s() const {
+  return value_case() == kUniformMat4S;
 }
-inline bool Uniform::has_vec4s() const {
-  return _internal_has_vec4s();
+inline bool Uniform::has_uniform_mat4s() const {
+  return _internal_has_uniform_mat4s();
 }
-inline void Uniform::set_has_vec4s() {
-  _oneof_case_[0] = kVec4S;
+inline void Uniform::set_has_uniform_mat4s() {
+  _oneof_case_[0] = kUniformMat4S;
 }
-inline ::frame::proto::MultipleVector4* Uniform::release_vec4s() {
-  // @@protoc_insertion_point(field_release:frame.proto.Uniform.vec4s)
-  if (_internal_has_vec4s()) {
+inline ::frame::proto::UniformMatrix4s* Uniform::release_uniform_mat4s() {
+  // @@protoc_insertion_point(field_release:frame.proto.Uniform.uniform_mat4s)
+  if (_internal_has_uniform_mat4s()) {
     clear_has_value();
-      ::frame::proto::MultipleVector4* temp = value_.vec4s_;
+      ::frame::proto::UniformMatrix4s* temp = value_.uniform_mat4s_;
     if (GetArena() != nullptr) {
       temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
     }
-    value_.vec4s_ = nullptr;
+    value_.uniform_mat4s_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline const ::frame::proto::MultipleVector4& Uniform::_internal_vec4s() const {
-  return _internal_has_vec4s()
-      ? *value_.vec4s_
-      : *reinterpret_cast< ::frame::proto::MultipleVector4*>(&::frame::proto::_MultipleVector4_default_instance_);
+inline const ::frame::proto::UniformMatrix4s& Uniform::_internal_uniform_mat4s() const {
+  return _internal_has_uniform_mat4s()
+      ? *value_.uniform_mat4s_
+      : *reinterpret_cast< ::frame::proto::UniformMatrix4s*>(&::frame::proto::_UniformMatrix4s_default_instance_);
 }
-inline const ::frame::proto::MultipleVector4& Uniform::vec4s() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Uniform.vec4s)
-  return _internal_vec4s();
+inline const ::frame::proto::UniformMatrix4s& Uniform::uniform_mat4s() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Uniform.uniform_mat4s)
+  return _internal_uniform_mat4s();
 }
-inline ::frame::proto::MultipleVector4* Uniform::unsafe_arena_release_vec4s() {
-  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.Uniform.vec4s)
-  if (_internal_has_vec4s()) {
+inline ::frame::proto::UniformMatrix4s* Uniform::unsafe_arena_release_uniform_mat4s() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.Uniform.uniform_mat4s)
+  if (_internal_has_uniform_mat4s()) {
     clear_has_value();
-    ::frame::proto::MultipleVector4* temp = value_.vec4s_;
-    value_.vec4s_ = nullptr;
+    ::frame::proto::UniformMatrix4s* temp = value_.uniform_mat4s_;
+    value_.uniform_mat4s_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline void Uniform::unsafe_arena_set_allocated_vec4s(::frame::proto::MultipleVector4* vec4s) {
+inline void Uniform::unsafe_arena_set_allocated_uniform_mat4s(::frame::proto::UniformMatrix4s* uniform_mat4s) {
   clear_value();
-  if (vec4s) {
-    set_has_vec4s();
-    value_.vec4s_ = vec4s;
+  if (uniform_mat4s) {
+    set_has_uniform_mat4s();
+    value_.uniform_mat4s_ = uniform_mat4s;
   }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.Uniform.vec4s)
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.Uniform.uniform_mat4s)
 }
-inline ::frame::proto::MultipleVector4* Uniform::_internal_mutable_vec4s() {
-  if (!_internal_has_vec4s()) {
+inline ::frame::proto::UniformMatrix4s* Uniform::_internal_mutable_uniform_mat4s() {
+  if (!_internal_has_uniform_mat4s()) {
     clear_value();
-    set_has_vec4s();
-    value_.vec4s_ = CreateMaybeMessage< ::frame::proto::MultipleVector4 >(GetArena());
+    set_has_uniform_mat4s();
+    value_.uniform_mat4s_ = CreateMaybeMessage< ::frame::proto::UniformMatrix4s >(GetArena());
   }
-  return value_.vec4s_;
+  return value_.uniform_mat4s_;
 }
-inline ::frame::proto::MultipleVector4* Uniform::mutable_vec4s() {
-  // @@protoc_insertion_point(field_mutable:frame.proto.Uniform.vec4s)
-  return _internal_mutable_vec4s();
-}
-
-// .frame.proto.MultipleMatrix3 mat3s = 53;
-inline bool Uniform::_internal_has_mat3s() const {
-  return value_case() == kMat3S;
-}
-inline bool Uniform::has_mat3s() const {
-  return _internal_has_mat3s();
-}
-inline void Uniform::set_has_mat3s() {
-  _oneof_case_[0] = kMat3S;
-}
-inline ::frame::proto::MultipleMatrix3* Uniform::release_mat3s() {
-  // @@protoc_insertion_point(field_release:frame.proto.Uniform.mat3s)
-  if (_internal_has_mat3s()) {
-    clear_has_value();
-      ::frame::proto::MultipleMatrix3* temp = value_.mat3s_;
-    if (GetArena() != nullptr) {
-      temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
-    }
-    value_.mat3s_ = nullptr;
-    return temp;
-  } else {
-    return nullptr;
-  }
-}
-inline const ::frame::proto::MultipleMatrix3& Uniform::_internal_mat3s() const {
-  return _internal_has_mat3s()
-      ? *value_.mat3s_
-      : *reinterpret_cast< ::frame::proto::MultipleMatrix3*>(&::frame::proto::_MultipleMatrix3_default_instance_);
-}
-inline const ::frame::proto::MultipleMatrix3& Uniform::mat3s() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Uniform.mat3s)
-  return _internal_mat3s();
-}
-inline ::frame::proto::MultipleMatrix3* Uniform::unsafe_arena_release_mat3s() {
-  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.Uniform.mat3s)
-  if (_internal_has_mat3s()) {
-    clear_has_value();
-    ::frame::proto::MultipleMatrix3* temp = value_.mat3s_;
-    value_.mat3s_ = nullptr;
-    return temp;
-  } else {
-    return nullptr;
-  }
-}
-inline void Uniform::unsafe_arena_set_allocated_mat3s(::frame::proto::MultipleMatrix3* mat3s) {
-  clear_value();
-  if (mat3s) {
-    set_has_mat3s();
-    value_.mat3s_ = mat3s;
-  }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.Uniform.mat3s)
-}
-inline ::frame::proto::MultipleMatrix3* Uniform::_internal_mutable_mat3s() {
-  if (!_internal_has_mat3s()) {
-    clear_value();
-    set_has_mat3s();
-    value_.mat3s_ = CreateMaybeMessage< ::frame::proto::MultipleMatrix3 >(GetArena());
-  }
-  return value_.mat3s_;
-}
-inline ::frame::proto::MultipleMatrix3* Uniform::mutable_mat3s() {
-  // @@protoc_insertion_point(field_mutable:frame.proto.Uniform.mat3s)
-  return _internal_mutable_mat3s();
-}
-
-// .frame.proto.MultipleMatrix4 mat4s = 54;
-inline bool Uniform::_internal_has_mat4s() const {
-  return value_case() == kMat4S;
-}
-inline bool Uniform::has_mat4s() const {
-  return _internal_has_mat4s();
-}
-inline void Uniform::set_has_mat4s() {
-  _oneof_case_[0] = kMat4S;
-}
-inline ::frame::proto::MultipleMatrix4* Uniform::release_mat4s() {
-  // @@protoc_insertion_point(field_release:frame.proto.Uniform.mat4s)
-  if (_internal_has_mat4s()) {
-    clear_has_value();
-      ::frame::proto::MultipleMatrix4* temp = value_.mat4s_;
-    if (GetArena() != nullptr) {
-      temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
-    }
-    value_.mat4s_ = nullptr;
-    return temp;
-  } else {
-    return nullptr;
-  }
-}
-inline const ::frame::proto::MultipleMatrix4& Uniform::_internal_mat4s() const {
-  return _internal_has_mat4s()
-      ? *value_.mat4s_
-      : *reinterpret_cast< ::frame::proto::MultipleMatrix4*>(&::frame::proto::_MultipleMatrix4_default_instance_);
-}
-inline const ::frame::proto::MultipleMatrix4& Uniform::mat4s() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Uniform.mat4s)
-  return _internal_mat4s();
-}
-inline ::frame::proto::MultipleMatrix4* Uniform::unsafe_arena_release_mat4s() {
-  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.Uniform.mat4s)
-  if (_internal_has_mat4s()) {
-    clear_has_value();
-    ::frame::proto::MultipleMatrix4* temp = value_.mat4s_;
-    value_.mat4s_ = nullptr;
-    return temp;
-  } else {
-    return nullptr;
-  }
-}
-inline void Uniform::unsafe_arena_set_allocated_mat4s(::frame::proto::MultipleMatrix4* mat4s) {
-  clear_value();
-  if (mat4s) {
-    set_has_mat4s();
-    value_.mat4s_ = mat4s;
-  }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.Uniform.mat4s)
-}
-inline ::frame::proto::MultipleMatrix4* Uniform::_internal_mutable_mat4s() {
-  if (!_internal_has_mat4s()) {
-    clear_value();
-    set_has_mat4s();
-    value_.mat4s_ = CreateMaybeMessage< ::frame::proto::MultipleMatrix4 >(GetArena());
-  }
-  return value_.mat4s_;
-}
-inline ::frame::proto::MultipleMatrix4* Uniform::mutable_mat4s() {
-  // @@protoc_insertion_point(field_mutable:frame.proto.Uniform.mat4s)
-  return _internal_mutable_mat4s();
+inline ::frame::proto::UniformMatrix4s* Uniform::mutable_uniform_mat4s() {
+  // @@protoc_insertion_point(field_mutable:frame.proto.Uniform.uniform_mat4s)
+  return _internal_mutable_uniform_mat4s();
 }
 
 inline bool Uniform::has_value() const {
