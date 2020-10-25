@@ -4,6 +4,7 @@
 #include "../FrameProto/Proto.h"
 #include "../ShaderGLLib/Camera.h"
 #include "../ShaderGLLib/Error.h"
+#include "../ShaderGLLib/Logger.h"
 #include "../ShaderGLLib/Material.h"
 #include "../ShaderGLLib/Mesh.h"
 #include "../ShaderGLLib/Program.h"
@@ -35,7 +36,8 @@ namespace sgl {
 		const std::string& GetName() const;
 
 	private:
-		const Error& error_ = Error::GetInstance();
+		Error& error_ = Error::GetInstance();
+		Logger& logger_ = Logger::GetInstance();
 		std::string name_;
 		std::string shader_name_;
 		std::pair<std::uint32_t, std::uint32_t> size_ = { 0, 0 };

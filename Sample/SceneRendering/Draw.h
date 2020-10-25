@@ -1,8 +1,9 @@
 #pragma once
 
-#include "../ShaderGLLib/Window.h"
 #include "../ShaderGLLib/Device.h"
 #include "../ShaderGLLib/Fill.h"
+#include "../ShaderGLLib/Logger.h"
+#include "../ShaderGLLib/Window.h"
 
 class Draw : public sgl::DrawInterface
 {
@@ -16,14 +17,10 @@ public:
 	void RunDraw(const double dt) override;
 	void Delete() override;
 
-public:
-	void SetValue(const int val) override { value_ = val; }
-
-protected:
-	sgl::LightManager CreateLightManager() const;
-
 private:
 	sgl::Error& error_ = sgl::Error::GetInstance();
+	sgl::Logger& logger_ = sgl::Logger::GetInstance();
 	std::shared_ptr<sgl::Device> device_ = nullptr;
+	std::string preferred_texture_ = "";
 	std::map<std::string, std::shared_ptr<sgl::Texture>> texture_map_ = {};
 };

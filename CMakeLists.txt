@@ -14,6 +14,7 @@ find_package(SDL2 CONFIG REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(glm CONFIG REQUIRED)
 find_package(GTest CONFIG REQUIRED)
+find_package(spdlog CONFIG REQUIRED)
 
 add_custom_target(ShaderGL
   SOURCES
@@ -89,7 +90,8 @@ add_library(FrameProto
 target_link_libraries(FrameProto 
   PRIVATE
     protobuf::libprotoc
-    protobuf::libprotobuf 
+    protobuf::libprotobuf
+    spdlog::spdlog
 )
 
 add_library(ShaderGLLib
@@ -114,6 +116,8 @@ add_library(ShaderGLLib
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Image.h
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Light.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Light.h
+    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Logger.cpp
+    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Logger.h
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Material.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Material.h
     ${PROJECT_SOURCE_DIR}/ShaderGLLib/Mesh.cpp
@@ -146,6 +150,7 @@ target_link_libraries(ShaderGLLib
     SDL2::SDL2
     GLEW::GLEW
     glm
+    spdlog::spdlog
 )
 
 add_executable(ShaderGLTest
@@ -201,6 +206,7 @@ target_link_libraries(ShaderGLTest
     SDL2::SDL2
     GLEW::GLEW
     glm
+    spdlog::spdlog
 )
 
 add_executable(JapaneseFlag
@@ -225,6 +231,7 @@ target_link_libraries(JapaneseFlag
     SDL2::SDL2
     GLEW::GLEW
     glm
+    spdlog::spdlog
 )
 
 add_executable(RayMarching
@@ -249,6 +256,7 @@ target_link_libraries(RayMarching
     SDL2::SDL2
     GLEW::GLEW
     glm
+    spdlog::spdlog
 )
 
 add_executable(Simple
@@ -275,6 +283,7 @@ target_link_libraries(Simple
     SDL2::SDL2
     GLEW::GLEW
     glm
+    spdlog::spdlog
 )
 
 add_executable(SceneRendering
@@ -303,4 +312,5 @@ target_link_libraries(SceneRendering
     SDL2::SDL2
     GLEW::GLEW
     glm
+    spdlog::spdlog
 )
