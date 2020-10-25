@@ -23,4 +23,5 @@ private:
 	std::shared_ptr<sgl::Device> device_ = nullptr;
 	std::string preferred_texture_ = "";
 	std::map<std::string, std::shared_ptr<sgl::Texture>> texture_map_ = {};
+	std::map<std::string, std::shared_ptr<sgl::Effect>> effect_map_ = {};
 };

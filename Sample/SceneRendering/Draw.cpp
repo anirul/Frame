@@ -39,9 +39,25 @@ void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 			texture.name(), 
 			std::make_shared<sgl::Texture>(texture, size));
 #ifdef _DEBUG
-		logger_->info("loading texture: {}.", texture.name());
+		const auto texture_size = texture_map_[texture.name()]->GetSize();
+		logger_->info(
+			"loading texture: {} ({}-{}).", 
+			texture.name(), 
+			texture_size.first, 
+			texture_size.second);
 #endif
 	}
+	preferred_texture_ = *display.out_textures().begin();
+	for (const auto& effect : display.effects())
+	{
+		effect_map_.emplace(
+			effect.name(),
+			std::make_shared<sgl::Effect>(effect, texture_map_));
+#ifdef _DEBUG
+		logger_->info("loading effect: {}.", effect.name());
+#endif
+	}
+	logger_->info("setting preferred texture to: {}", preferred_texture_);
 }
 
 const std::shared_ptr<sgl::Texture>& Draw::GetDrawTexture() const
@@ -52,15 +68,20 @@ const std::shared_ptr<sgl::Texture>& Draw::GetDrawTexture() const
 void Draw::RunDraw(const double dt)
 {
 	// Have to be cleaned.
-	// textures_[13]->Clear(glm::vec4(0, 0, 0, 1));
-	// textures_[14]->Clear(glm::vec4(0, 0, 0, 1));
+	texture_map_["view_position"]->Clear(glm::vec4(0, 0, 0, 1));
+	texture_map_["view_normal"]->Clear(glm::vec4(0, 0, 0, 1));
 	// Do the deferred and view computation.
-	// device_->DrawDeferred(
-	//	{ textures_[9], textures_[10], textures_[11], textures_[12] }, 
-	//	dt);
-	// device_->DrawView(
-	//	{ textures_[13], textures_[14] }, 
-	//	dt);
+	device_->DrawDeferred(
+		{	
+			texture_map_["deferred_albedo"], 
+			texture_map_["deferred_normal"], 
+			texture_map_["deferred_mrao"], 
+			texture_map_["deferred_position"] 
+		}, 
+		dt);
+	device_->DrawView(
+		{ texture_map_["view_position"], texture_map_["view_normal"] }, 
+		dt);
 	// 13 14 -> 0 - Compute the Screen space ambient occlusion.
 	// ssao_->Draw();
 	// 0 -> 1 - Blur the Screen space ambient occlusion.
