@@ -61,7 +61,7 @@ namespace sgl {
 		const std::shared_ptr<Texture>& GetLightingTexture(const int i) const;
 
 	public:
-		const Camera& GetCamera() const final { return camera_; }
+		const Camera GetCamera() const final { return camera_; }
 		void SetCamera(const Camera& camera) { camera_ = camera; }
 		SceneTree GetSceneTree() const { return scene_tree_; }
 		void SetSceneTree(const SceneTree& scene_tree) 

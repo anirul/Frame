@@ -62,7 +62,6 @@ add_custom_target(ShaderGL
 
 add_library(FrameProto
   STATIC
-    ${PROJECT_SOURCE_DIR}/Asset/SceneRendering.json
     ${PROJECT_SOURCE_DIR}/FrameProto/Display.pb.cc
     ${PROJECT_SOURCE_DIR}/FrameProto/Display.pb.h
     ${PROJECT_SOURCE_DIR}/FrameProto/Display.proto
@@ -158,6 +157,8 @@ add_executable(ShaderGLTest
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/BufferTest.h
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/CameraTest.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/CameraTest.h
+    ${PROJECT_SOURCE_DIR}/ShaderGLTest/ConvertTest.cpp
+    ${PROJECT_SOURCE_DIR}/ShaderGLTest/ConvertTest.h
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/DeviceTest.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/DeviceTest.h
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/ErrorTest.cpp
@@ -288,6 +289,7 @@ target_link_libraries(Simple
 
 add_executable(SceneRendering
   WIN32
+    ${PROJECT_SOURCE_DIR}/Asset/SceneRendering.json
     ${PROJECT_SOURCE_DIR}/Sample/SceneRendering/Application.cpp
     ${PROJECT_SOURCE_DIR}/Sample/SceneRendering/Application.h
     ${PROJECT_SOURCE_DIR}/Sample/SceneRendering/Draw.cpp
