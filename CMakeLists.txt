@@ -2,6 +2,25 @@ cmake_minimum_required(VERSION 3.14)
 
 if(WIN32)
     add_compile_options("/std:c++latest")
+    # This is there to link static in case there is a -static in the variable.
+    if(${VCPKG_TARGET_TRIPLET} MATCHES "-static")
+        string(REPLACE 
+            "/MD" "/MT" 
+            CMAKE_CXX_FLAGS 
+            ${CMAKE_CXX_FLAGS})
+        string(REPLACE 
+            "/MD" "/MT" 
+            CMAKE_CXX_FLAGS_DEBUG 
+            ${CMAKE_CXX_FLAGS_DEBUG})
+        string(REPLACE 
+            "/MD" "/MT" 
+            CMAKE_CXX_FLAGS_RELEASE 
+            ${CMAKE_CXX_FLAGS_RELEASE})
+        string(REPLACE 
+            "/MD" "/MT" 
+            CMAKE_CXX_FLAGS_MINSIZEREL 
+            ${CMAKE_CXX_FLAGS_MINSIZEREL})
+    endif(${VCPKG_TARGET_TRIPLET} MATCHES "-static")
 endif(WIN32)
 set(CMAKE_CXX_STANDARD 17)
 
@@ -15,6 +34,8 @@ find_package(GLEW REQUIRED)
 find_package(glm CONFIG REQUIRED)
 find_package(GTest CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
+
+enable_testing()
 
 add_custom_target(ShaderGL
   SOURCES
@@ -176,6 +197,7 @@ add_executable(ShaderGLTest
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/MeshTest.h
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/PixelTest.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/PixelTest.h
+    ${PROJECT_SOURCE_DIR}/ShaderGLTest/ProgramMock.h
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/ProgramTest.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/ProgramTest.h
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/RenderTest.cpp
@@ -186,6 +208,7 @@ add_executable(ShaderGLTest
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/ShaderTest.h
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/TextureTest.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/TextureTest.h
+    ${PROJECT_SOURCE_DIR}/ShaderGLTest/UniformMock.h
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/WindowTest.cpp
     ${PROJECT_SOURCE_DIR}/ShaderGLTest/WindowTest.h
 )
@@ -202,6 +225,7 @@ target_link_libraries(ShaderGLTest
   PRIVATE
     protobuf::libprotoc
     protobuf::libprotobuf 
+    GTest::gmock
     GTest::gtest
     GTest::gtest_main
     SDL2::SDL2

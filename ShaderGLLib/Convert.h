@@ -21,34 +21,18 @@ namespace sgl {
 	glm::vec3 ParseUniform(const frame::proto::UniformVector3& uniform_vec3);
 	glm::vec4 ParseUniform(const frame::proto::UniformVector4& uniform_vec4);
 	glm::mat4 ParseUniform(const frame::proto::UniformMatrix4& uniform_mat4);
-	
+
 	// Specialization into vector types.
 	template<typename T, typename U>
 	void ParseUniformVec(
-		const std::string& name, 
-		const U& uniform_vec, 
-		Program& program)
+		const std::string& name,
+		const U& uniform_vec,
+		const ProgramInterface& program_interface)
 	{
 		std::uint32_t counter = 0;
 		for (const T& uniform_val : uniform_vec.values())
 		{
-			program.Uniform(
-				name +'[' + std::to_string(counter++) + ']', 
-				ParseUniform(uniform_val));
-		}
-	}
-
-	// More complex vector type.
-	template<typename T, typename V, typename U>
-	void ParseUniformVec(
-		const std::string& name,
-		const U& uniform_vec, 
-		Program& program)
-	{
-		std::uint32_t counter = 0;
-		for (const V& uniform_val : uniform_vec.values())
-		{
-			program.Uniform(
+			program_interface.Uniform(
 				name + '[' + std::to_string(counter++) + ']',
 				ParseUniform(uniform_val));
 		}
@@ -58,12 +42,12 @@ namespace sgl {
 	void RegisterUniformFromProto(
 		const frame::proto::Uniform& uniform, 
 		const UniformInterface& uniform_interface,
-		Program& program);
+		const ProgramInterface& program_interface);
 
 	// Register the uniform enum in the program.
 	void RegisterUniformEnumFromProto(
 		const frame::proto::Uniform::UniformEnum& uniform_enum,
 		const UniformInterface& uniform_interface,
-		Program& program);
+		const ProgramInterface& program_interface);
 
 }

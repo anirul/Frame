@@ -48,23 +48,29 @@ namespace sgl {
 	void RegisterUniformFromProto(
 		const frame::proto::Uniform& uniform, 
 		const UniformInterface& uniform_interface, 
-		Program& program)
+		const ProgramInterface& program_interface)
 	{
 		switch (uniform.value_case())
 		{
 			case frame::proto::Uniform::kUniformInt:
 			{
-				program.Uniform(uniform.name(), uniform.uniform_int());
+				program_interface.Uniform(
+					uniform.name(), 
+					uniform.uniform_int());
 				return;
 			}
 			case frame::proto::Uniform::kUniformBool:
 			{
-				program.Uniform(uniform.name(), uniform.uniform_bool());
+				program_interface.Uniform(
+					uniform.name(), 
+					uniform.uniform_bool());
 				return;
 			}
 			case frame::proto::Uniform::kUniformFloat:
 			{
-				program.Uniform(uniform.name(), uniform.uniform_float());
+				program_interface.Uniform(
+					uniform.name(), 
+					uniform.uniform_float());
 				return;
 			}
 			case frame::proto::Uniform::kUniformEnum:
@@ -72,33 +78,33 @@ namespace sgl {
 				RegisterUniformEnumFromProto(
 					uniform.uniform_enum(), 
 					uniform_interface, 
-					program);
+					program_interface);
 				return;
 			}
 			case frame::proto::Uniform::kUniformVec2:
 			{
-				program.Uniform(
+				program_interface.Uniform(
 					uniform.name(),
 					ParseUniform(uniform.uniform_vec2()));
 				return;
 			}
 			case frame::proto::Uniform::kUniformVec3:
 			{
-				program.Uniform(
+				program_interface.Uniform(
 					uniform.name(),
 					ParseUniform(uniform.uniform_vec3()));
 				return;
 			}
 			case frame::proto::Uniform::kUniformVec4:
 			{
-				program.Uniform(
+				program_interface.Uniform(
 					uniform.name(),
 					ParseUniform(uniform.uniform_vec4()));
 				return;
 			}
 			case frame::proto::Uniform::kUniformMat4:
 			{
-				program.Uniform(
+				program_interface.Uniform(
 					uniform.name(),
 					ParseUniform(uniform.uniform_mat4()));
 				return;
@@ -108,7 +114,7 @@ namespace sgl {
 				ParseUniformVec<std::int32_t>(
 					uniform.name(),
 					uniform.uniform_ints(), 
-					program);
+					program_interface);
 				return;
 			}
 			case frame::proto::Uniform::kUniformBools:
@@ -116,7 +122,7 @@ namespace sgl {
 				ParseUniformVec<bool>(
 					uniform.name(),
 					uniform.uniform_bools(), 
-					program);
+					program_interface);
 				return;
 			}
 			case frame::proto::Uniform::kUniformFloats:
@@ -124,51 +130,39 @@ namespace sgl {
 				ParseUniformVec<float>(
 					uniform.name(),
 					uniform.uniform_floats(), 
-					program);
+					program_interface);
 				return;
 			}
 			case frame::proto::Uniform::kUniformVec2S:
 			{
-				ParseUniformVec<
-					glm::vec2, 
-					frame::proto::UniformVector2,
-					frame::proto::UniformVector2s>(
+				ParseUniformVec<frame::proto::UniformVector2>(
 						uniform.name(),
 						uniform.uniform_vec2s(), 
-						program);
+						program_interface);
 				return;
 			}
 			case frame::proto::Uniform::kUniformVec3S:
 			{
-				ParseUniformVec<
-					glm::vec3, 
-					frame::proto::UniformVector3,
-					frame::proto::UniformVector3s>(
+				ParseUniformVec<frame::proto::UniformVector3>(
 						uniform.name(),
 						uniform.uniform_vec3s(), 
-						program);
+						program_interface);
 				return;
 			}
 			case frame::proto::Uniform::kUniformVec4S:
 			{
-				ParseUniformVec<
-					glm::vec4, 
-					frame::proto::UniformVector4,
-					frame::proto::UniformVector4s>(
+				ParseUniformVec<frame::proto::UniformVector4>(
 						uniform.name(),
 						uniform.uniform_vec4s(), 
-						program);
+						program_interface);
 				return;
 			}
 			case frame::proto::Uniform::kUniformMat4S:
 			{
-				ParseUniformVec<
-					glm::mat4, 
-					frame::proto::UniformMatrix4,
-					frame::proto::UniformMatrix4s>(
+				ParseUniformVec<frame::proto::UniformMatrix4>(
 						uniform.name(),
 						uniform.uniform_mat4s(), 
-						program);
+						program_interface);
 				return;
 			}
 			default:
@@ -180,14 +174,14 @@ namespace sgl {
 	void RegisterUniformEnumFromProto(
 		const frame::proto::Uniform::UniformEnum& uniform_enum, 
 		const UniformInterface& uniform_interface, 
-		Program& program)
+		const ProgramInterface& program_interface)
 	{
 		switch (uniform_enum)
 		{
 			case frame::proto::Uniform::UniformEnum::
 			Uniform_UniformEnum_PROJECTION_MAT4:
 			{
-				program.Uniform(
+				program_interface.Uniform(
 					"projection",
 					uniform_interface.GetProjection());
 				break;
@@ -195,7 +189,7 @@ namespace sgl {
 			case frame::proto::Uniform::UniformEnum::
 			Uniform_UniformEnum_PROJECTION_INV_MAT4:
 			{
-				program.Uniform(
+				program_interface.Uniform(
 					"projection_inv",
 					glm::inverse(uniform_interface.GetProjection()));
 				break;
@@ -203,7 +197,7 @@ namespace sgl {
 			case frame::proto::Uniform::UniformEnum::
 			Uniform_UniformEnum_VIEW_MAT4:
 			{
-				program.Uniform(
+				program_interface.Uniform(
 					"view",
 					uniform_interface.GetView());
 				break;
@@ -211,7 +205,7 @@ namespace sgl {
 			case frame::proto::Uniform::UniformEnum::
 			Uniform_UniformEnum_VIEW_INV_MAT4:
 			{
-				program.Uniform(
+				program_interface.Uniform(
 					"view_inv",
 					glm::inverse(uniform_interface.GetView()));
 				break;
@@ -219,7 +213,7 @@ namespace sgl {
 			case frame::proto::Uniform::UniformEnum::
 			Uniform_UniformEnum_MODEL_MAT4:
 			{
-				program.Uniform(
+				program_interface.Uniform(
 					"model",
 					uniform_interface.GetModel());
 				break;
@@ -227,7 +221,7 @@ namespace sgl {
 			case frame::proto::Uniform::UniformEnum::
 			Uniform_UniformEnum_MODEL_INV_MAT4:
 			{
-				program.Uniform(
+				program_interface.Uniform(
 					"model_inv",
 					glm::inverse(uniform_interface.GetModel()));
 				break;
@@ -235,7 +229,7 @@ namespace sgl {
 			case frame::proto::Uniform::UniformEnum::
 			Uniform_UniformEnum_CAMERA_POSITION_VEC3:
 			{
-				program.Uniform(
+				program_interface.Uniform(
 					"camera_position",
 					uniform_interface.GetCamera().GetPosition());
 				break;
@@ -243,10 +237,10 @@ namespace sgl {
 			case frame::proto::Uniform::UniformEnum::
 			Uniform_UniformEnum_CAMERA_DIRECTION_VEC3:
 			{
-				// TODO change this for the correct vector
-				program.Uniform(
-					"camera_position",
-					uniform_interface.GetCamera().GetFront());
+				const Camera& cam = uniform_interface.GetCamera();
+				program_interface.Uniform(
+					"camera_direction",
+					cam.GetFront() - cam.GetPosition());
 				break;
 			}
 			default:

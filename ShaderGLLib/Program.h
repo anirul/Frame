@@ -10,7 +10,38 @@
 
 namespace sgl {
 
-	class Program {
+	struct ProgramInterface
+	{
+		virtual ~ProgramInterface() = default;
+		// Use the program.
+		virtual void Use() const = 0;
+		// Create a uniform from a string and a bool.
+		virtual void Uniform(const std::string& name, bool value) const = 0;
+		// Create a uniform from a string and an int.
+		virtual void Uniform(const std::string& name, int value) const = 0;
+		// Create a uniform from a string and a float.
+		virtual void Uniform(const std::string& name, float value) const = 0;
+		// Create a uniform from a string and a vector2.
+		virtual void Uniform(
+			const std::string& name,
+			const glm::vec2& vec2) const = 0;
+		// Create a uniform from a string and a vector3.
+		virtual void Uniform(
+			const std::string& name,
+			const glm::vec3& vec3) const = 0;
+		// Create a uniform from a string and a vector4.
+		virtual void Uniform(
+			const std::string& name,
+			const glm::vec4& vec4) const = 0;
+		// Create a uniform from a string and a matrix.
+		virtual void Uniform(
+			const std::string& name,
+			const glm::mat4& mat,
+			const bool flip = false) const = 0;
+	};
+
+	class Program : public ProgramInterface
+	{
 	public:
 		// Create a program from a string!
 		// Will load a program at location: 
@@ -32,30 +63,30 @@ namespace sgl {
 		// Link shaders to a program.
 		void LinkShader();
 		// Use the program.
-		void Use() const;
+		void Use() const override;
 		// Create a uniform from a string and a bool.
-		void Uniform(const std::string& name, bool value) const;
+		void Uniform(const std::string& name, bool value) const override;
 		// Create a uniform from a string and an int.
-		void Uniform(const std::string& name, int value) const;
+		void Uniform(const std::string& name, int value) const override;
 		// Create a uniform from a string and a float.
-		void Uniform(const std::string& name, float value) const;
+		void Uniform(const std::string& name, float value) const override;
 		// Create a uniform from a string and a vector2.
 		void Uniform(
 			const std::string& name, 
-			const glm::vec2& vec2) const;
+			const glm::vec2& vec2) const override;
 		// Create a uniform from a string and a vector3.
 		void Uniform(
 			const std::string& name,
-			const glm::vec3& vec3) const;
+			const glm::vec3& vec3) const override;
 		// Create a uniform from a string and a vector4.
 		void Uniform(
 			const std::string& name,
-			const glm::vec4& vec4) const;
+			const glm::vec4& vec4) const override;
 		// Create a uniform from a string and a matrix.
 		void Uniform(
 			const std::string& name,
 			const glm::mat4& mat,
-			const bool flip = false) const;
+			const bool flip = false) const override;
 
 	protected:
 		const int GetMemoizeUniformLocation(const std::string& name) const;
