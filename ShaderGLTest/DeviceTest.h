@@ -6,7 +6,7 @@
 
 namespace test {
 
-	class DeviceTest : public testing::Test
+	class DeviceTest : public ::testing::Test
 	{
 	public:
 		DeviceTest()

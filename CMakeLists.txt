@@ -5,21 +5,30 @@ if(WIN32)
     # This is there to link static in case there is a -static in the variable.
     if(${VCPKG_TARGET_TRIPLET} MATCHES "-static")
         string(REPLACE 
-            "/MD" "/MT" 
+            "/MD"
+            "/MT" 
             CMAKE_CXX_FLAGS 
             ${CMAKE_CXX_FLAGS})
         string(REPLACE 
-            "/MD" "/MT" 
+            "/MD"
+            "/MT" 
             CMAKE_CXX_FLAGS_DEBUG 
             ${CMAKE_CXX_FLAGS_DEBUG})
         string(REPLACE 
-            "/MD" "/MT" 
+            "/MD"
+            "/MT" 
             CMAKE_CXX_FLAGS_RELEASE 
             ${CMAKE_CXX_FLAGS_RELEASE})
         string(REPLACE 
-            "/MD" "/MT" 
+            "/MD"
+            "/MT" 
             CMAKE_CXX_FLAGS_MINSIZEREL 
             ${CMAKE_CXX_FLAGS_MINSIZEREL})
+        string(REPLACE 
+            "/MD"
+            "/MT" 
+            CMAKE_CXX_FLAGS_MINSIZEREL 
+            ${CMAKE_CXX_FLAGS_RELWITHDEBINFO})
     endif(${VCPKG_TARGET_TRIPLET} MATCHES "-static")
 endif(WIN32)
 set(CMAKE_CXX_STANDARD 17)
@@ -34,77 +43,78 @@ find_package(GLEW REQUIRED)
 find_package(glm CONFIG REQUIRED)
 find_package(GTest CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
+find_path(STB_INCLUDE_DIRS "stb.h")
 
 enable_testing()
 
 add_custom_target(ShaderGL
   SOURCES
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/Blur.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/Blur.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/Brightness.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/Brightness.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/CubeMap.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/CubeMap.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/CubeMapDeferred.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/CubeMapDeferred.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/Display.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/Display.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/EquirectangularCubeMap.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/EquirectangularCubeMap.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/GaussianBlur.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/GaussianBlur.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/HighDynamicRange.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/HighDynamicRange.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/IntegrateBRDF.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/IntegrateBRDF.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/IrradianceCubeMap.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/IrradianceCubeMap.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/JapaneseFlag.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/JapaneseFlag.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/Lighting.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/Lighting.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/MonteCarloPrefilter.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/MonteCarloPrefilter.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/PhysicallyBasedRendering.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/PhysicallyBasedRendering.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/RayMarching.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/RayMarching.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/ScreenSpaceAmbientOcclusion.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/ScreenSpaceAmbientOcclusion.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/Simple.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/Simple.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/VectorAddition.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/VectorAddition.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/VectorMultiply.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/VectorMultiply.vert
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/ViewPositionNormal.frag
-    ${PROJECT_SOURCE_DIR}/Asset/Shader/ViewPositionNormal.vert
+    Asset/Shader/Blur.frag
+    Asset/Shader/Blur.vert
+    Asset/Shader/Brightness.frag
+    Asset/Shader/Brightness.vert
+    Asset/Shader/CubeMap.frag
+    Asset/Shader/CubeMap.vert
+    Asset/Shader/CubeMapDeferred.frag
+    Asset/Shader/CubeMapDeferred.vert
+    Asset/Shader/Display.frag
+    Asset/Shader/Display.vert
+    Asset/Shader/EquirectangularCubeMap.frag
+    Asset/Shader/EquirectangularCubeMap.vert
+    Asset/Shader/GaussianBlur.frag
+    Asset/Shader/GaussianBlur.vert
+    Asset/Shader/HighDynamicRange.frag
+    Asset/Shader/HighDynamicRange.vert
+    Asset/Shader/IntegrateBRDF.frag
+    Asset/Shader/IntegrateBRDF.vert
+    Asset/Shader/IrradianceCubeMap.frag
+    Asset/Shader/IrradianceCubeMap.vert
+    Asset/Shader/JapaneseFlag.frag
+    Asset/Shader/JapaneseFlag.vert
+    Asset/Shader/Lighting.frag
+    Asset/Shader/Lighting.vert
+    Asset/Shader/MonteCarloPrefilter.frag
+    Asset/Shader/MonteCarloPrefilter.vert
+    Asset/Shader/PhysicallyBasedRendering.frag
+    Asset/Shader/PhysicallyBasedRendering.vert
+    Asset/Shader/RayMarching.frag
+    Asset/Shader/RayMarching.vert
+    Asset/Shader/ScreenSpaceAmbientOcclusion.frag
+    Asset/Shader/ScreenSpaceAmbientOcclusion.vert
+    Asset/Shader/Simple.frag
+    Asset/Shader/Simple.vert
+    Asset/Shader/VectorAddition.frag
+    Asset/Shader/VectorAddition.vert
+    Asset/Shader/VectorMultiply.frag
+    Asset/Shader/VectorMultiply.vert
+    Asset/Shader/ViewPositionNormal.frag
+    Asset/Shader/ViewPositionNormal.vert
 )
 
 add_library(FrameProto
   STATIC
-    ${PROJECT_SOURCE_DIR}/FrameProto/Display.pb.cc
-    ${PROJECT_SOURCE_DIR}/FrameProto/Display.pb.h
-    ${PROJECT_SOURCE_DIR}/FrameProto/Display.proto
-    ${PROJECT_SOURCE_DIR}/FrameProto/Effect.pb.cc
-    ${PROJECT_SOURCE_DIR}/FrameProto/Effect.pb.h
-    ${PROJECT_SOURCE_DIR}/FrameProto/Effect.proto
-    ${PROJECT_SOURCE_DIR}/FrameProto/Math.pb.cc
-    ${PROJECT_SOURCE_DIR}/FrameProto/Math.pb.h
-    ${PROJECT_SOURCE_DIR}/FrameProto/Math.proto
-    ${PROJECT_SOURCE_DIR}/FrameProto/Pixel.pb.cc
-    ${PROJECT_SOURCE_DIR}/FrameProto/Pixel.pb.h
-    ${PROJECT_SOURCE_DIR}/FrameProto/Pixel.proto
-    ${PROJECT_SOURCE_DIR}/FrameProto/Proto.h
-    ${PROJECT_SOURCE_DIR}/FrameProto/Size.pb.cc
-    ${PROJECT_SOURCE_DIR}/FrameProto/Size.pb.h
-    ${PROJECT_SOURCE_DIR}/FrameProto/Size.proto
-    ${PROJECT_SOURCE_DIR}/FrameProto/Texture.pb.cc
-    ${PROJECT_SOURCE_DIR}/FrameProto/Texture.pb.h
-    ${PROJECT_SOURCE_DIR}/FrameProto/Texture.proto
-    ${PROJECT_SOURCE_DIR}/FrameProto/Uniform.pb.cc
-    ${PROJECT_SOURCE_DIR}/FrameProto/Uniform.pb.h
-    ${PROJECT_SOURCE_DIR}/FrameProto/Uniform.proto
+    FrameProto/Display.pb.cc
+    FrameProto/Display.pb.h
+    FrameProto/Display.proto
+    FrameProto/Effect.pb.cc
+    FrameProto/Effect.pb.h
+    FrameProto/Effect.proto
+    FrameProto/Math.pb.cc
+    FrameProto/Math.pb.h
+    FrameProto/Math.proto
+    FrameProto/Pixel.pb.cc
+    FrameProto/Pixel.pb.h
+    FrameProto/Pixel.proto
+    FrameProto/Proto.h
+    FrameProto/Size.pb.cc
+    FrameProto/Size.pb.h
+    FrameProto/Size.proto
+    FrameProto/Texture.pb.cc
+    FrameProto/Texture.pb.h
+    FrameProto/Texture.proto
+    FrameProto/Uniform.pb.cc
+    FrameProto/Uniform.pb.h
+    FrameProto/Uniform.proto
 )
 
 target_link_libraries(FrameProto 
@@ -116,49 +126,49 @@ target_link_libraries(FrameProto
 
 add_library(ShaderGLLib
   STATIC
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Buffer.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Buffer.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Camera.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Camera.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Convert.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Convert.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Device.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Device.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Effect.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Effect.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Error.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Error.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Fill.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Fill.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Frame.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Frame.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Image.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Image.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Light.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Light.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Logger.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Logger.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Material.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Material.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Mesh.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Mesh.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Pixel.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Pixel.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Program.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Program.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Render.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Render.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Scene.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Scene.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/ScopedBind.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/ScopedBind.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Shader.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Shader.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Texture.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Texture.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Uniform.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Window.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib/Window.h
+    ShaderGLLib/Buffer.cpp
+    ShaderGLLib/Buffer.h
+    ShaderGLLib/Camera.cpp
+    ShaderGLLib/Camera.h
+    ShaderGLLib/Convert.cpp
+    ShaderGLLib/Convert.h
+    ShaderGLLib/Device.cpp
+    ShaderGLLib/Device.h
+    ShaderGLLib/Effect.cpp
+    ShaderGLLib/Effect.h
+    ShaderGLLib/Error.cpp
+    ShaderGLLib/Error.h
+    ShaderGLLib/Fill.cpp
+    ShaderGLLib/Fill.h
+    ShaderGLLib/Frame.cpp
+    ShaderGLLib/Frame.h
+    ShaderGLLib/Image.cpp
+    ShaderGLLib/Image.h
+    ShaderGLLib/Light.cpp
+    ShaderGLLib/Light.h
+    ShaderGLLib/Logger.cpp
+    ShaderGLLib/Logger.h
+    ShaderGLLib/Material.cpp
+    ShaderGLLib/Material.h
+    ShaderGLLib/Mesh.cpp
+    ShaderGLLib/Mesh.h
+    ShaderGLLib/Pixel.cpp
+    ShaderGLLib/Pixel.h
+    ShaderGLLib/Program.cpp
+    ShaderGLLib/Program.h
+    ShaderGLLib/Render.cpp
+    ShaderGLLib/Render.h
+    ShaderGLLib/Scene.cpp
+    ShaderGLLib/Scene.h
+    ShaderGLLib/ScopedBind.cpp
+    ShaderGLLib/ScopedBind.h
+    ShaderGLLib/Shader.cpp
+    ShaderGLLib/Shader.h
+    ShaderGLLib/Texture.cpp
+    ShaderGLLib/Texture.h
+    ShaderGLLib/Uniform.h
+    ShaderGLLib/Window.cpp
+    ShaderGLLib/Window.h
 )
 
 target_link_libraries(ShaderGLLib
@@ -174,48 +184,50 @@ target_link_libraries(ShaderGLLib
 )
 
 add_executable(ShaderGLTest
-    ${PROJECT_SOURCE_DIR}/ShaderGLTest/BufferTest.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLTest/BufferTest.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLTest/CameraTest.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLTest/CameraTest.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLTest/ConvertTest.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLTest/ConvertTest.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLTest/DeviceTest.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLTest/DeviceTest.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLTest/ErrorTest.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLTest/ErrorTest.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLTest/FrameTest.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLTest/FrameTest.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLTest/ImageTest.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLTest/ImageTest.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLTest/LightTest.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLTest/LightTest.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLTest/main.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLTest/MaterialTest.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLTest/MaterialTest.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLTest/MeshTest.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLTest/MeshTest.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLTest/PixelTest.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLTest/PixelTest.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLTest/ProgramMock.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLTest/ProgramTest.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLTest/ProgramTest.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLTest/RenderTest.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLTest/RenderTest.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLTest/SceneTest.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLTest/SceneTest.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLTest/ShaderTest.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLTest/ShaderTest.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLTest/TextureTest.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLTest/TextureTest.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLTest/UniformMock.h
-    ${PROJECT_SOURCE_DIR}/ShaderGLTest/WindowTest.cpp
-    ${PROJECT_SOURCE_DIR}/ShaderGLTest/WindowTest.h
+    ShaderGLTest/BufferTest.cpp
+    ShaderGLTest/BufferTest.h
+    ShaderGLTest/CameraTest.cpp
+    ShaderGLTest/CameraTest.h
+    ShaderGLTest/ConvertTest.cpp
+    ShaderGLTest/ConvertTest.h
+    ShaderGLTest/DeviceTest.cpp
+    ShaderGLTest/DeviceTest.h
+    ShaderGLTest/EffectTest.cpp
+    ShaderGLTest/EffectTest.h
+    ShaderGLTest/ErrorTest.cpp
+    ShaderGLTest/ErrorTest.h
+    ShaderGLTest/FrameTest.cpp
+    ShaderGLTest/FrameTest.h
+    ShaderGLTest/ImageTest.cpp
+    ShaderGLTest/ImageTest.h
+    ShaderGLTest/LightTest.cpp
+    ShaderGLTest/LightTest.h
+    ShaderGLTest/main.cpp
+    ShaderGLTest/MaterialTest.cpp
+    ShaderGLTest/MaterialTest.h
+    ShaderGLTest/MeshTest.cpp
+    ShaderGLTest/MeshTest.h
+    ShaderGLTest/PixelTest.cpp
+    ShaderGLTest/PixelTest.h
+    ShaderGLTest/ProgramMock.h
+    ShaderGLTest/ProgramTest.cpp
+    ShaderGLTest/ProgramTest.h
+    ShaderGLTest/RenderTest.cpp
+    ShaderGLTest/RenderTest.h
+    ShaderGLTest/SceneTest.cpp
+    ShaderGLTest/SceneTest.h
+    ShaderGLTest/ShaderTest.cpp
+    ShaderGLTest/ShaderTest.h
+    ShaderGLTest/TextureTest.cpp
+    ShaderGLTest/TextureTest.h
+    ShaderGLTest/UniformMock.h
+    ShaderGLTest/WindowTest.cpp
+    ShaderGLTest/WindowTest.h
 )
 
 target_include_directories(ShaderGLTest
   PUBLIC
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib
+    ShaderGLLib
 )
 
 target_link_libraries(ShaderGLTest
@@ -236,14 +248,14 @@ target_link_libraries(ShaderGLTest
 
 add_executable(JapaneseFlag
   WIN32
-    ${PROJECT_SOURCE_DIR}/Sample/JapaneseFlag/Application.cpp
-    ${PROJECT_SOURCE_DIR}/Sample/JapaneseFlag/Application.h
-    ${PROJECT_SOURCE_DIR}/Sample/JapaneseFlag/main.cpp
+    Sample/JapaneseFlag/Application.cpp
+    Sample/JapaneseFlag/Application.h
+    Sample/JapaneseFlag/main.cpp
 )
 
 target_include_directories(JapaneseFlag
   PUBLIC
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib
+    ShaderGLLib
 )
 
 target_link_libraries(JapaneseFlag
@@ -261,14 +273,14 @@ target_link_libraries(JapaneseFlag
 
 add_executable(RayMarching
   WIN32
-    ${PROJECT_SOURCE_DIR}/Sample/RayMarching/Application.cpp
-    ${PROJECT_SOURCE_DIR}/Sample/RayMarching/Application.h
-    ${PROJECT_SOURCE_DIR}/Sample/RayMarching/main.cpp
+    Sample/RayMarching/Application.cpp
+    Sample/RayMarching/Application.h
+    Sample/RayMarching/main.cpp
 )
 
 target_include_directories(RayMarching
   PUBLIC
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib
+    ShaderGLLib
 )
 
 target_link_libraries(RayMarching
@@ -286,16 +298,16 @@ target_link_libraries(RayMarching
 
 add_executable(Simple
   WIN32
-    ${PROJECT_SOURCE_DIR}/Sample/Simple/Application.cpp
-    ${PROJECT_SOURCE_DIR}/Sample/Simple/Application.h
-    ${PROJECT_SOURCE_DIR}/Sample/Simple/Draw.cpp
-    ${PROJECT_SOURCE_DIR}/Sample/Simple/Draw.h
-    ${PROJECT_SOURCE_DIR}/Sample/Simple/main.cpp
+    Sample/Simple/Application.cpp
+    Sample/Simple/Application.h
+    Sample/Simple/Draw.cpp
+    Sample/Simple/Draw.h
+    Sample/Simple/main.cpp
 )
 
 target_include_directories(Simple
   PUBLIC
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib
+    ShaderGLLib
 )
 
 target_link_libraries(Simple
@@ -313,19 +325,19 @@ target_link_libraries(Simple
 
 add_executable(SceneRendering
   WIN32
-    ${PROJECT_SOURCE_DIR}/Asset/SceneRendering.json
-    ${PROJECT_SOURCE_DIR}/Sample/SceneRendering/Application.cpp
-    ${PROJECT_SOURCE_DIR}/Sample/SceneRendering/Application.h
-    ${PROJECT_SOURCE_DIR}/Sample/SceneRendering/Draw.cpp
-    ${PROJECT_SOURCE_DIR}/Sample/SceneRendering/Draw.h
-    ${PROJECT_SOURCE_DIR}/Sample/SceneRendering/Input.cpp
-    ${PROJECT_SOURCE_DIR}/Sample/SceneRendering/Input.h
-    ${PROJECT_SOURCE_DIR}/Sample/SceneRendering/main.cpp
+    Asset/SceneRendering.json
+    Sample/SceneRendering/Application.cpp
+    Sample/SceneRendering/Application.h
+    Sample/SceneRendering/Draw.cpp
+    Sample/SceneRendering/Draw.h
+    Sample/SceneRendering/Input.cpp
+    Sample/SceneRendering/Input.h
+    Sample/SceneRendering/main.cpp
 )
 
 target_include_directories(SceneRendering
   PUBLIC
-    ${PROJECT_SOURCE_DIR}/ShaderGLLib
+    ShaderGLLib
 )
 
 target_link_libraries(SceneRendering
