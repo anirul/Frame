@@ -91,14 +91,15 @@ namespace test {
 			sgl::PixelElementSize_HALF();
 		*texture_proto.mutable_pixel_structure() = sgl::PixelStructure_RGB();
 		frame::proto::Size size_proto{};
-		size_proto.set_x(-1);
-		size_proto.set_y(-1);
+		size_proto.set_x(-2);
+		size_proto.set_y(-2);
 		*texture_proto.mutable_size() = size_proto;
 		EXPECT_FALSE(texture_);
 		EXPECT_NO_THROW(texture_ = 
 			std::make_shared<sgl::Texture>(texture_proto, size));
 		EXPECT_TRUE(texture_);
-		EXPECT_EQ(size, texture_->GetSize());
+		std::pair<std::uint32_t, std::uint32_t> test_size = { 256, 256 };
+		EXPECT_EQ(test_size, texture_->GetSize());
 	}
 
 	TEST_F(TextureTest, CreateTextureFromProtoWrongSizeTest)

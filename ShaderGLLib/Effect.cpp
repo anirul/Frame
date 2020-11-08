@@ -49,11 +49,4 @@ namespace sgl {
 		quad_->Draw();
 	}
 
-	void Effect::Delete() {}
-
-	const std::string& Effect::GetName() const
-	{
-		return name_;
-	}
-
 } // End namespace sgl.

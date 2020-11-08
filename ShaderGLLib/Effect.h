@@ -31,10 +31,10 @@ namespace sgl {
 			const UniformInterface& uniform_interface);
 		// This is the draw interfaces.
 		void Draw(const double dt = 0.0);
-		// Free everything.
-		void Delete();
+
+	public:
 		// Get the name of the effect.
-		const std::string& GetName() const;
+		const std::string& GetName() const { return name_; }
 
 	private:
 		Error& error_ = Error::GetInstance();
