@@ -45,8 +45,6 @@ find_package(GTest CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_path(STB_INCLUDE_DIRS "stb.h")
 
-enable_testing()
-
 add_custom_target(ShaderGL
   SOURCES
     Asset/Shader/Blur.frag
@@ -93,29 +91,18 @@ add_custom_target(ShaderGL
 
 add_library(FrameProto
   STATIC
-    FrameProto/Display.pb.cc
-    FrameProto/Display.pb.h
     FrameProto/Display.proto
-    FrameProto/Effect.pb.cc
-    FrameProto/Effect.pb.h
     FrameProto/Effect.proto
-    FrameProto/Math.pb.cc
-    FrameProto/Math.pb.h
     FrameProto/Math.proto
-    FrameProto/Pixel.pb.cc
-    FrameProto/Pixel.pb.h
     FrameProto/Pixel.proto
     FrameProto/Proto.h
-    FrameProto/Size.pb.cc
-    FrameProto/Size.pb.h
     FrameProto/Size.proto
-    FrameProto/Texture.pb.cc
-    FrameProto/Texture.pb.h
     FrameProto/Texture.proto
-    FrameProto/Uniform.pb.cc
-    FrameProto/Uniform.pb.h
     FrameProto/Uniform.proto
 )
+
+set(APPEND_PATH "${protobuf_DIR}/../../include/")
+protobuf_generate(APPEND_PATH TARGET FrameProto)
 
 target_link_libraries(FrameProto 
   PRIVATE

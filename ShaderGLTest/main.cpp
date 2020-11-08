@@ -3,6 +3,7 @@
 #include "CameraTest.h"
 #include "ConvertTest.h"
 #include "DeviceTest.h"
+#include "EffectTest.h"
 #include "ErrorTest.h"
 #include "FrameTest.h"
 #include "ImageTest.h"
