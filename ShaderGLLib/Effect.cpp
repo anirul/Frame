@@ -5,13 +5,14 @@ namespace sgl {
 
 	Effect::Effect(
 		const frame::proto::Effect& effect_proto,
-		std::map<std::string, std::shared_ptr<Texture>>& name_texture_map)
+		const std::map<std::string, std::shared_ptr<Texture>>& 
+			name_texture_map)
 	{
 		name_ = effect_proto.name();
 		for (const auto& name : effect_proto.input_textures_names())
-			in_material_.AddTexture(name, name_texture_map[name]);
+			in_material_.AddTexture(name, name_texture_map.at(name));
 		for (const auto& name : effect_proto.output_textures_names())
-			out_material_.AddTexture(name, name_texture_map[name]);
+			out_material_.AddTexture(name, name_texture_map.at(name));
 		shader_name_ = effect_proto.shader();
 		uniforms_ = std::vector<frame::proto::Uniform>{
 			effect_proto.parameters().begin(), 

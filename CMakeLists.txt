@@ -1,5 +1,19 @@
 cmake_minimum_required(VERSION 3.14)
 
+set(CMAKE_CXX_STANDARD 17)
+
+project(ShaderGL)
+
+find_package(absl CONFIG REQUIRED)
+find_package(protobuf CONFIG REQUIRED)
+find_package(gRPC CONFIG REQUIRED)
+find_package(SDL2 CONFIG REQUIRED)
+find_package(GLEW REQUIRED)
+find_package(glm CONFIG REQUIRED)
+find_package(GTest CONFIG REQUIRED)
+find_package(spdlog CONFIG REQUIRED)
+find_path(STB_INCLUDE_DIRS "stb.h")
+
 if(WIN32)
     add_compile_options("/std:c++latest")
     # This is there to link static in case there is a -static in the variable.
@@ -27,23 +41,10 @@ if(WIN32)
         string(REPLACE 
             "/MD"
             "/MT" 
-            CMAKE_CXX_FLAGS_MINSIZEREL 
+            CMAKE_CXX_FLAGS_RELWITHDEBINFO
             ${CMAKE_CXX_FLAGS_RELWITHDEBINFO})
     endif(${VCPKG_TARGET_TRIPLET} MATCHES "-static")
 endif(WIN32)
-set(CMAKE_CXX_STANDARD 17)
-
-project(ShaderGL)
-
-find_package(absl CONFIG REQUIRED)
-find_package(protobuf CONFIG REQUIRED)
-find_package(gRPC CONFIG REQUIRED)
-find_package(SDL2 CONFIG REQUIRED)
-find_package(GLEW REQUIRED)
-find_package(glm CONFIG REQUIRED)
-find_package(GTest CONFIG REQUIRED)
-find_package(spdlog CONFIG REQUIRED)
-find_path(STB_INCLUDE_DIRS "stb.h")
 
 add_custom_target(ShaderGL
   SOURCES
@@ -101,7 +102,11 @@ add_library(FrameProto
     FrameProto/Uniform.proto
 )
 
-set(APPEND_PATH "${protobuf_DIR}/../../include/")
+target_include_directories(FrameProto PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+# I really don't know where the additional path are...
+#  - APPEND_PATH is not?
+#  - CMAKE_PREFIX_PATH doesn't work? 
+#  - "${protobuf_DIR}/../../include/" <- this is the path to be added?
 protobuf_generate(APPEND_PATH TARGET FrameProto)
 
 target_link_libraries(FrameProto 

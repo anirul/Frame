@@ -20,7 +20,8 @@ namespace sgl {
 		// functions.
 		Effect(
 			const frame::proto::Effect& effect_proto,
-			std::map<std::string, std::shared_ptr<Texture>>& name_texture_map);
+			const std::map<std::string, std::shared_ptr<Texture>>& 
+				name_texture_map);
 
 	public:
 		// Startup the Effect this is where the effect is created (this will be
