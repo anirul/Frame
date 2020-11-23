@@ -88,7 +88,7 @@ namespace sgl {
 		std::vector<std::shared_ptr<Texture>> deferred_textures_ = {};
 		std::vector<std::shared_ptr<Texture>> lighting_textures_ = {};
 		std::vector<std::shared_ptr<Texture>> view_textures_ = {};
-		std::shared_ptr<Material> material_ = nullptr;
+		std::shared_ptr<Material> environment_material_ = nullptr;
 		std::map<std::string, std::shared_ptr<Material>> materials_ = {};
 		std::vector<std::shared_ptr<Effect>> effects_ = {};
 		SceneTree scene_tree_ = {};

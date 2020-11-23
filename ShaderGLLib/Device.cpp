@@ -148,16 +148,16 @@ namespace sgl {
 			if (materials_.find(material_name) != materials_.end())
 			{
 				std::shared_ptr<Material> mat = std::make_shared<Material>(
-					*materials_[material_name] + *material_);
+					*materials_[material_name] + *environment_material_);
 				mesh->SetMaterial(mat);
 			}
-			else
+			else if (environment_material_)
 			{
 				// Special case this is suppose to be the environment map.
 				auto material = std::make_shared<Material>();
 				material->AddTexture(
 					"Environment", 
-					material_->GetTexture("Environment"));
+					environment_material_->GetTexture("Environment"));
 				mesh->SetMaterial(material);
 			}
 
@@ -192,15 +192,15 @@ namespace sgl {
 		auto cubemap_program = Program::CreateProgram("CubeMapDeferred");
 		cubemap_program->Uniform("projection", GetProjection());
 		auto cube_mesh = CreateCubeMesh(cubemap_program);
-		material_ = std::make_shared<Material>();
-		material_->AddTexture("Skybox", texture);
+		environment_material_ = std::make_shared<Material>();
+		environment_material_->AddTexture("Skybox", texture);
 		cube_mesh->ClearDepthBuffer(true);
 		scene_tree_.AddNode(
 			std::make_shared<SceneMesh>(cube_mesh), 
 			scene_tree_.GetRoot());
 		
 		// Add the default texture to the texture manager.
-		material_->AddTexture("Environment", texture);
+		environment_material_->AddTexture("Environment", texture);
 
 		// Create the Monte-Carlo filter.
 		auto monte_carlo_prefilter = std::make_shared<sgl::TextureCubeMap>(
@@ -209,7 +209,7 @@ namespace sgl {
 		FillProgramMultiTextureCubeMapMipmap(
 			std::vector<std::shared_ptr<sgl::Texture>>{ monte_carlo_prefilter },
 			std::map<std::string, std::shared_ptr<Texture>>{ 
-				{"Environment", material_->GetTexture("Environment") }},
+				{"Environment", environment_material_->GetTexture("Environment") }},
 			Program::CreateProgram("MonteCarloPrefilter"),
 			5,
 			[](const int mipmap, const std::shared_ptr<sgl::Program>& program)
@@ -217,7 +217,7 @@ namespace sgl {
 			float roughness = static_cast<float>(mipmap) / 4.0f;
 			program->Uniform("roughness", roughness);
 		});
-		material_->AddTexture(
+		environment_material_->AddTexture(
 			"MonteCarloPrefilter", 
 			monte_carlo_prefilter);
 
@@ -228,9 +228,9 @@ namespace sgl {
 		FillProgramMultiTextureCubeMap(
 			std::vector<std::shared_ptr<sgl::Texture>>{ irradiance },
 			std::map<std::string, std::shared_ptr<Texture>>{
-				{ "Environment", material_->GetTexture("Environment") }},
+				{ "Environment", environment_material_->GetTexture("Environment") }},
 			Program::CreateProgram("IrradianceCubeMap"));
-		material_->AddTexture("Irradiance", irradiance);
+		environment_material_->AddTexture("Irradiance", irradiance);
 
 		// Create the LUT BRDF.
 		auto integrate_brdf = std::make_shared<sgl::Texture>(
@@ -239,9 +239,9 @@ namespace sgl {
 		FillProgramMultiTexture(
 			std::vector<std::shared_ptr<Texture>>{ integrate_brdf },
 			std::map<std::string, std::shared_ptr<Texture>>{
-				{ "Environment", material_->GetTexture("Environment") }},
+				{ "Environment", environment_material_->GetTexture("Environment") }},
 			Program::CreateProgram("IntegrateBRDF"));
-		material_->AddTexture("IntegrateBRDF", integrate_brdf);
+		environment_material_->AddTexture("IntegrateBRDF", integrate_brdf);
 	}
 
 	void Device::SetupCamera()
