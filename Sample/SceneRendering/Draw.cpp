@@ -112,5 +112,3 @@ void Draw::RunDraw(const double dt)
 	// 4 -> 5 - Get the final texture in texture 5.
 	// high_dynamic_range_->Draw();
 }
-
-void Draw::Delete() {}

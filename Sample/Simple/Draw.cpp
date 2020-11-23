@@ -63,8 +63,6 @@ void Draw::RunDraw(const double dt)
 	device_->DrawMultiTextures(out_textures_, nullptr, dt);
 }
 
-void Draw::Delete() {}
-
 std::shared_ptr<sgl::Mesh> Draw::CreateAppleMesh() const
 {
 	// Create the physically based rendering program.

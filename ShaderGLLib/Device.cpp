@@ -75,7 +75,7 @@ namespace sgl {
 		pbr_program_->Uniform(
 			"camera_position",
 			GetCamera().GetPosition());
-		DrawMultiTextures(out_textures, nullptr, dt);
+		DrawMultiTextures(out_textures, pbr_program_, dt);
 	}
 
 	void Device::DrawView(
@@ -147,8 +147,9 @@ namespace sgl {
 			auto material_name = mesh->GetMaterialName();
 			if (materials_.find(material_name) != materials_.end())
 			{
-				std::shared_ptr<Material> mat = std::make_shared<Material>(
-					*materials_[material_name] + *environment_material_);
+				std::shared_ptr<Material> mat = 
+					std::make_shared<Material>(*materials_[material_name]);
+				if (environment_material_) *mat += *environment_material_;
 				mesh->SetMaterial(mat);
 			}
 			else if (environment_material_)
