@@ -14,7 +14,8 @@ namespace sgl {
 		for (const auto& name : effect_proto.output_textures_names())
 			out_material_.AddTexture(name, name_texture_map.at(name));
 		shader_name_ = effect_proto.shader();
-		uniforms_ = std::vector<frame::proto::Uniform>{
+		uniforms_ = std::vector<frame::proto::Uniform>
+		{
 			effect_proto.parameters().begin(), 
 			effect_proto.parameters().end() 
 		};

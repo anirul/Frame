@@ -15,7 +15,9 @@ find_package(spdlog CONFIG REQUIRED)
 find_path(STB_INCLUDE_DIRS "stb.h")
 
 if(WIN32)
+    # Standard MSVC flags.
     add_compile_options("/std:c++latest")
+    add_compile_options("/D _WIN32_WINNT=0x0A00")
     # This is there to link static in case there is a -static in the variable.
     if(${VCPKG_TARGET_TRIPLET} MATCHES "-static")
         string(REPLACE 
@@ -103,17 +105,13 @@ add_library(FrameProto
 )
 
 target_include_directories(FrameProto PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-# I really don't know where the additional path are...
-#  - APPEND_PATH is not?
-#  - CMAKE_PREFIX_PATH doesn't work? 
-#  - "${protobuf_DIR}/../../include/" <- this is the path to be added?
+# I still doesn't know how to pass the path correctly to the generate.
 protobuf_generate(APPEND_PATH TARGET FrameProto)
 
 target_link_libraries(FrameProto 
-  PRIVATE
+  PUBLIC
     protobuf::libprotoc
     protobuf::libprotobuf
-    spdlog::spdlog
 )
 
 add_library(ShaderGLLib
@@ -166,9 +164,6 @@ add_library(ShaderGLLib
 target_link_libraries(ShaderGLLib
   PUBLIC
     FrameProto
-  PRIVATE
-    protobuf::libprotoc
-    protobuf::libprotobuf 
     SDL2::SDL2
     GLEW::GLEW
     glm
@@ -226,16 +221,9 @@ target_link_libraries(ShaderGLTest
   PUBLIC
     ShaderGLLib
     FrameProto
-  PRIVATE
-    protobuf::libprotoc
-    protobuf::libprotobuf 
     GTest::gmock
     GTest::gtest
     GTest::gtest_main
-    SDL2::SDL2
-    GLEW::GLEW
-    glm
-    spdlog::spdlog
 )
 
 add_executable(JapaneseFlag
@@ -254,13 +242,6 @@ target_link_libraries(JapaneseFlag
   PUBLIC
     ShaderGLLib
     FrameProto
-  PRIVATE
-    protobuf::libprotoc
-    protobuf::libprotobuf 
-    SDL2::SDL2
-    GLEW::GLEW
-    glm
-    spdlog::spdlog
 )
 
 add_executable(RayMarching
@@ -279,13 +260,6 @@ target_link_libraries(RayMarching
   PUBLIC
     ShaderGLLib
     FrameProto
-  PRIVATE
-    protobuf::libprotoc
-    protobuf::libprotobuf 
-    SDL2::SDL2
-    GLEW::GLEW
-    glm
-    spdlog::spdlog
 )
 
 add_executable(Simple
@@ -306,13 +280,6 @@ target_link_libraries(Simple
   PUBLIC
     ShaderGLLib
     FrameProto
-  PRIVATE
-    protobuf::libprotoc
-    protobuf::libprotobuf 
-    SDL2::SDL2
-    GLEW::GLEW
-    glm
-    spdlog::spdlog
 )
 
 add_executable(SceneRendering
@@ -336,11 +303,4 @@ target_link_libraries(SceneRendering
   PUBLIC
     ShaderGLLib
     FrameProto
-  PRIVATE
-    protobuf::libprotoc
-    protobuf::libprotobuf 
-    SDL2::SDL2
-    GLEW::GLEW
-    glm
-    spdlog::spdlog
 )
