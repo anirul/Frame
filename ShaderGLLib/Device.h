@@ -6,8 +6,8 @@
 #include <functional>
 #include <optional>
 #include <SDL2/SDL.h>
-#include "Program.h"
-#include "Texture.h"
+#include "../ShaderGLLib/Program.h"
+#include "../ShaderGLLib/Texture.h"
 #include "../ShaderGLLib/Buffer.h"
 #include "../ShaderGLLib/Effect.h"
 #include "../ShaderGLLib/Mesh.h"
@@ -41,6 +41,7 @@ namespace sgl {
 		void DrawDeferred(
 			const std::vector<std::shared_ptr<Texture>>& out_textures,
 			const double dt);
+		// Draw the view texture set.
 		void DrawView(
 			const std::vector<std::shared_ptr<Texture>>& out_textures,
 			const double dt);
@@ -83,14 +84,16 @@ namespace sgl {
 		void SetupCamera();
 
 	private:
+		std::shared_ptr<Frame> frame_ = nullptr;
+		std::shared_ptr<Render> render_ = nullptr;
 		std::shared_ptr<Program> pbr_program_ = nullptr;
 		std::shared_ptr<Program> view_program_ = nullptr;
+		std::shared_ptr<Material> environment_material_ = nullptr;
 		std::vector<std::shared_ptr<Texture>> deferred_textures_ = {};
 		std::vector<std::shared_ptr<Texture>> lighting_textures_ = {};
 		std::vector<std::shared_ptr<Texture>> view_textures_ = {};
-		std::shared_ptr<Material> environment_material_ = nullptr;
-		std::map<std::string, std::shared_ptr<Material>> materials_ = {};
 		std::vector<std::shared_ptr<Effect>> effects_ = {};
+		std::map<std::string, std::shared_ptr<Material>> materials_ = {};
 		SceneTree scene_tree_ = {};
 		LightManager light_manager_ = {};
 		// Camera storage.

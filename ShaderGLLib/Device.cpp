@@ -23,6 +23,14 @@ namespace sgl {
 			throw std::runtime_error("couldn't initialize GLEW");
 		}
 
+		// This should maintain the culling to none.
+		// FIXME(anirul): Change this as to be working!
+		glDisable(GL_CULL_FACE);
+		error_.Display(__FILE__, __LINE__ - 1);
+		// glCullFace(GL_BACK);
+		// error_.Display(__FILE__, __LINE__ - 1);
+		// glFrontFace(GL_CW);
+		// error_.Display(__FILE__, __LINE__ - 1);
 		// Enable blending to 1 - source alpha.
 		glEnable(GL_BLEND);
 		error_.Display(__FILE__, __LINE__ - 1);
@@ -40,6 +48,10 @@ namespace sgl {
 		// Create programs.
 		pbr_program_ = Program::CreateProgram("PhysicallyBasedRendering");
 		view_program_ = Program::CreateProgram("ViewPositionNormal");
+
+		// Create a frame buffer and a render buffer.
+		frame_ = std::make_shared<Frame>();
+		render_ = std::make_shared<Render>();
 	}
 
 	void Device::AddEffect(std::shared_ptr<Effect>& effect)
@@ -72,6 +84,7 @@ namespace sgl {
 	{
 		assert(out_textures.size() == 4);
 		pbr_program_->Use();
+		// This should be changed to update from the proto part.
 		pbr_program_->Uniform(
 			"camera_position",
 			GetCamera().GetPosition());
@@ -109,11 +122,9 @@ namespace sgl {
 		// Setup the camera.
 		SetupCamera();
 
-		Frame frame{};
-		Render render{};
-		ScopedBind scoped_bind(frame);
-		frame.AttachRender(render);
-		render.CreateStorage(size_);
+		ScopedBind scoped_bind(*frame_);
+		frame_->AttachRender(*render_);
+		render_->CreateStorage(size_);
 
 		// Set the view port for rendering.
 		glViewport(0, 0, size_.first, size_.second);
@@ -130,10 +141,10 @@ namespace sgl {
 		int i = 0;
 		for (const auto& texture : out_textures)
 		{
-			frame.AttachTexture(*texture, Frame::GetFrameColorAttachment(i));
+			frame_->AttachTexture(*texture, Frame::GetFrameColorAttachment(i));
 			++i;
 		}
-		frame.DrawBuffers(static_cast<std::uint32_t>(out_textures.size()));
+		frame_->DrawBuffers(static_cast<std::uint32_t>(out_textures.size()));
 
 		for (const std::shared_ptr<Scene>& scene : scene_tree_)
 		{
@@ -228,8 +239,11 @@ namespace sgl {
 			pixel_element_size_);
 		FillProgramMultiTextureCubeMap(
 			std::vector<std::shared_ptr<sgl::Texture>>{ irradiance },
-			std::map<std::string, std::shared_ptr<Texture>>{
-				{ "Environment", environment_material_->GetTexture("Environment") }},
+			std::map<std::string, std::shared_ptr<Texture>>
+				{{ 
+					"Environment", 
+					environment_material_->GetTexture("Environment") 
+				}},
 			Program::CreateProgram("IrradianceCubeMap"));
 		environment_material_->AddTexture("Irradiance", irradiance);
 
@@ -239,8 +253,11 @@ namespace sgl {
 			pixel_element_size_);
 		FillProgramMultiTexture(
 			std::vector<std::shared_ptr<Texture>>{ integrate_brdf },
-			std::map<std::string, std::shared_ptr<Texture>>{
-				{ "Environment", environment_material_->GetTexture("Environment") }},
+			std::map<std::string, std::shared_ptr<Texture>>
+				{{ 
+					"Environment", 
+					environment_material_->GetTexture("Environment") 
+				}},
 			Program::CreateProgram("IntegrateBRDF"));
 		environment_material_->AddTexture("IntegrateBRDF", integrate_brdf);
 	}
