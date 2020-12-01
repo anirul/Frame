@@ -6,7 +6,7 @@
 class Input : public sgl::InputInterface
 {
 public:
-	Input(const std::shared_ptr<sgl::Device>& device) : device_(device) {}
+	Input(const std::shared_ptr<sgl::Device> device) : device_(device) {}
 
 public:
 	bool KeyPressed(const char key, const double dt) override;

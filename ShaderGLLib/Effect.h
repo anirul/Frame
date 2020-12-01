@@ -46,7 +46,7 @@ namespace sgl {
 		Material in_material_ = {};
 		Frame frame_ = {};
 		Render render_ = {};
-		std::shared_ptr<Program> program_ = nullptr;
+		std::shared_ptr<ProgramInterface> program_ = nullptr;
 		std::shared_ptr<Mesh> quad_ = nullptr;
 		std::vector<frame::proto::Uniform> uniforms_{};
 	};

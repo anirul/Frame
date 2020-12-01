@@ -11,17 +11,19 @@ public:
 
 public:
 	void Startup(const std::pair<std::uint32_t, std::uint32_t> size) override;
-	const std::shared_ptr<sgl::Texture>& GetDrawTexture() const override;
+	const std::shared_ptr<sgl::Texture> GetDrawTexture() const override;
 	void RunDraw(const double dt) override;
 
 protected:
-	std::shared_ptr<sgl::Mesh> CreateAppleMesh() const;
+	std::shared_ptr<sgl::Mesh> CreateAppleMesh();
 	std::shared_ptr<sgl::Mesh> CreateCubeMapMesh(
-		const std::shared_ptr<sgl::TextureCubeMap>& texture) const;
+		const std::shared_ptr<sgl::TextureCubeMap>& texture);
 
 private:
 	std::vector<std::shared_ptr<sgl::Texture>> out_textures_ = {};
 	std::shared_ptr<sgl::Device> device_ = nullptr;
 	std::shared_ptr<sgl::Mesh> cube_map_mesh_ = nullptr;
 	std::shared_ptr<sgl::Mesh> apple_mesh_ = nullptr;
+	std::shared_ptr<sgl::ProgramInterface> simple_program_ = nullptr;
+	std::shared_ptr<sgl::ProgramInterface> cubemap_program_ = nullptr;
 };

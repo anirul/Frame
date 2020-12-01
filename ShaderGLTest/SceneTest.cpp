@@ -15,10 +15,8 @@ namespace test {
 	{
 		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(scene_);
-		auto program = sgl::Program::CreateProgram("Simple");
-		auto mesh = sgl::CreateMeshFromObjFile(
-			"../Asset/Model/Cube.obj", 
-			program);
+		auto program = sgl::CreateProgram("Simple");
+		auto mesh = sgl::CreateMeshFromObjFile("../Asset/Model/Cube.obj");
 		scene_ = std::make_shared<sgl::SceneMesh>(mesh);
 		EXPECT_TRUE(scene_);
 	}
@@ -33,7 +31,7 @@ namespace test {
 		PopulateTree();
 		unsigned int count_mesh = 0;
 		unsigned int count_matrix = 0;
-		for (const auto& scene : *scene_tree_)
+		for (const auto& scene : scene_tree_->GetSceneVector())
 		{
 			const auto& mesh = scene->GetLocalMesh();
 			if (mesh)
@@ -47,7 +45,7 @@ namespace test {
 		}
 		EXPECT_EQ(2, count_mesh);
 		EXPECT_EQ(2, count_matrix);
-		EXPECT_EQ(4, scene_tree_->size());
+		EXPECT_EQ(4, scene_tree_->GetSceneVector().size());
 	}
 
 } // End namespace test.

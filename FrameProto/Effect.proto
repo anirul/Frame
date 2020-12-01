@@ -6,14 +6,25 @@ package frame.proto;
 
 // Description of a 2D effect.
 message Effect {
+	// Input Type this is the type of input of the effect.
+	enum InputEnum {
+		INVALID = 0;
+		TEXTURE_2D = 1;
+		TEXTURE_3D = 2;
+		SCENE = 3;
+	}
 	// Name of the effect.
 	string name = 1;
+	// Input type.
+	InputEnum intput_type = 2;
 	// Input textures.
-	repeated string input_textures_names = 2;
+	repeated string input_textures_names = 10;
 	// Output textures.
-	repeated string output_textures_names = 3;
+	repeated string output_textures_names = 11;
+	// Input Scenes.
+	string input_scene = 12;
 	// Shader name (used to find the shader).
-	string shader = 4;
+	string shader = 20;
 	// Uniform parameters.
-	repeated Uniform parameters = 5;
+	repeated Uniform parameters = 21;
 }

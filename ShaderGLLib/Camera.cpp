@@ -5,9 +5,9 @@
 namespace sgl {
 
 	Camera::Camera(
-		const glm::vec3& position /*= { 0.f, 0.f, 0.f }*/, 
-		const glm::vec3& front /*= { 0.f, 0.f, 1.f }*/, 
-		const glm::vec3& up /*= { 0.f, 1.f, 0.f }*/) :
+		const glm::vec3 position /*= { 0.f, 0.f, 0.f }*/, 
+		const glm::vec3 front /*= { 0.f, 0.f, 1.f }*/, 
+		const glm::vec3 up /*= { 0.f, 1.f, 0.f }*/) :
 		position_(position),
 		front_(front),
 		up_(up)
@@ -20,19 +20,19 @@ namespace sgl {
 		return glm::lookAt(position_, front_ + position_, up_);
 	}
 
-	void Camera::SetFront(const glm::vec3& vec)
+	void Camera::SetFront(const glm::vec3 vec)
 	{
 		front_ = vec;
 		UpdateCameraVectors();
 	}
 
-	void Camera::SetPosition(const glm::vec3& vec)
+	void Camera::SetPosition(const glm::vec3 vec)
 	{
 		position_ = vec;
 		UpdateCameraVectors();
 	}
 
-	void Camera::SetUp(const glm::vec3& vec)
+	void Camera::SetUp(const glm::vec3 vec)
 	{
 		up_ = vec;
 		UpdateCameraVectors();

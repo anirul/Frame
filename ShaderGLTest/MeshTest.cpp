@@ -7,8 +7,8 @@ namespace test {
 		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(mesh_);
 		EXPECT_TRUE(window_);
-		auto program = sgl::Program::CreateProgram("Simple");
-		mesh_ = CreateMeshFromObjFile("../Asset/Model/Cube.obj", program);
+		auto program = sgl::CreateProgram("Simple");
+		mesh_ = sgl::CreateMeshFromObjFile("../Asset/Model/Cube.obj");
 		EXPECT_NE(0, mesh_->PointBuffer().GetId());
 		EXPECT_NE(0, mesh_->NormalBuffer().GetId());
 		EXPECT_NE(0, mesh_->TextureBuffer().GetId());
@@ -23,10 +23,8 @@ namespace test {
 		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(mesh_);
 		EXPECT_TRUE(window_);
-		auto program = sgl::Program::CreateProgram("Simple");
-		mesh_ = sgl::CreateMeshFromObjFile(
-			"../Asset/Model/Torus.obj", 
-			program);
+		auto program = sgl::CreateProgram("Simple");
+		mesh_ = sgl::CreateMeshFromObjFile("../Asset/Model/Torus.obj");
 		EXPECT_NE(0, mesh_->PointBuffer().GetId());
 		EXPECT_NE(0, mesh_->NormalBuffer().GetId());
 		EXPECT_NE(0, mesh_->TextureBuffer().GetId());

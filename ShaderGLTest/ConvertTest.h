@@ -16,7 +16,7 @@ namespace test {
 			const std::string& name);
 		void TestParseUniformEnumVectorFromProto(
 			frame::proto::Uniform::UniformEnum uniform_enum,
-			const glm::vec3& compare_vec3,
+			const glm::vec3 compare_vec3,
 			const std::string& name);
 	};
 

@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+import "Math.proto";
+
+package frame.proto;
+
+// Scene is a tentative way to load meshes.
+// For now it only load them from obj, mtl files.
+
+message SceneMatrix {
+	// This is the name of the scene matrix.
+	string name = 1;
+	// Give the name of the parent (if present).
+	string parent = 2;
+	// Matrix.
+	UniformMatrix4 matrix = 3;
+}
+
+message SceneMesh {
+	// This is the name of the mesh.
+	string name = 1;
+	// Give the name of the parent (if present).
+	string parent = 2;
+	// Where the file is loaded from.
+	string file_name = 10;
+}
+
+// Scene definition.
+message Scene {
+	// This is the name of the scene.
+	string name = 1;
+	// This defined witch is the root of the scene tree.
+	string root_node = 10;
+	// This is a list of scene matrices.
+	repeated SceneMatrix scene_matrices = 11;
+	// This is a list of scene meshes.
+	repeated SceneMesh scene_meshes = 12;
+}

@@ -99,13 +99,15 @@ add_library(FrameProto
     FrameProto/Math.proto
     FrameProto/Pixel.proto
     FrameProto/Proto.h
+    FrameProto/Scene.proto
     FrameProto/Size.proto
     FrameProto/Texture.proto
     FrameProto/Uniform.proto
 )
 
 target_include_directories(FrameProto PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-# I still doesn't know how to pass the path correctly to the generate.
+# I still doesn't know how to pass the path correctly to the generate in case
+# there is any external include.
 protobuf_generate(APPEND_PATH TARGET FrameProto)
 
 target_link_libraries(FrameProto 
@@ -248,6 +250,8 @@ add_executable(RayMarching
   WIN32
     Sample/RayMarching/Application.cpp
     Sample/RayMarching/Application.h
+    Sample/RayMarching/Draw.cpp
+    Sample/RayMarching/Draw.h
     Sample/RayMarching/main.cpp
 )
 
@@ -264,6 +268,7 @@ target_link_libraries(RayMarching
 
 add_executable(Simple
   WIN32
+    Asset/Simple.json
     Sample/Simple/Application.cpp
     Sample/Simple/Application.h
     Sample/Simple/Draw.cpp

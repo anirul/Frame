@@ -411,9 +411,10 @@ namespace sgl {
 		UnBind();
 		glm::mat4 projection =
 			glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
-		auto program = Program::CreateProgram("EquirectangularCubeMap");
+		auto program = CreateProgram("EquirectangularCubeMap");
+		program->Use();
 		program->Uniform("projection", projection);
-		auto cube = CreateCubeMesh(program);
+		auto cube = CreateCubeMesh();
 		cube->SetMaterial(material);
 		glViewport(0, 0, size_.first, size_.second);
 		error_.Display(__FILE__, __LINE__ - 1);
@@ -430,7 +431,7 @@ namespace sgl {
 			error_.Display(__FILE__, __LINE__ - 1);
 			// TODO(anirul): change this as the view is passed to the program
 			// and not the view passed as a projection.
-			cube->Draw(view);
+			cube->Draw(program, view);
 		}
 	}
 

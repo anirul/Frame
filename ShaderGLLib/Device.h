@@ -29,31 +29,35 @@ namespace sgl {
 
 	public:
 		// Pile up effect to be called before Startup.
-		void AddEffect(std::shared_ptr<Effect>& effect);
+		void AddEffect(std::shared_ptr<Effect> effect);
 		// Startup the scene. Throw errors in case there is any, takes fov in 
 		// degrees.
 		void Startup(const float fov = 65.0f);
 		// Draw what is on the scene.
 		// Take the total time from the beginning of the program to now as a
 		// const double parameter.
-		void Draw(const double dt);
+		void Draw(
+			const std::shared_ptr<ProgramInterface> program,
+			const double dt);
 		// Draw to the deferred texture set.
 		void DrawDeferred(
+			const std::shared_ptr<ProgramInterface> program,
 			const std::vector<std::shared_ptr<Texture>>& out_textures,
 			const double dt);
 		// Draw the view texture set.
 		void DrawView(
+			const std::shared_ptr<ProgramInterface> program,
 			const std::vector<std::shared_ptr<Texture>>& out_textures,
 			const double dt);
 		// Draw to multiple textures.
 		void DrawMultiTextures(
+			const std::shared_ptr<ProgramInterface> program,
 			const std::vector<std::shared_ptr<Texture>>& out_textures,
-			const std::shared_ptr<Program> program = nullptr,
-			const double dt = 0.0);
+			const double dt);
 		// Add environment to the scene.
 		void AddEnvironment(const std::string& environment_map);
 		// Display a texture to the display.
-		void Display(const std::shared_ptr<Texture>& texture);
+		void Display(const std::shared_ptr<Texture> texture);
 		// Load scene from an OBJ file.
 		void LoadSceneFromObjFile(const std::string& obj_file);
 		// Debug access to the internals of device.
@@ -86,8 +90,8 @@ namespace sgl {
 	private:
 		std::shared_ptr<Frame> frame_ = nullptr;
 		std::shared_ptr<Render> render_ = nullptr;
-		std::shared_ptr<Program> pbr_program_ = nullptr;
-		std::shared_ptr<Program> view_program_ = nullptr;
+		std::shared_ptr<ProgramInterface> pbr_program_ = nullptr;
+		std::shared_ptr<ProgramInterface> view_program_ = nullptr;
 		std::shared_ptr<Material> environment_material_ = nullptr;
 		std::vector<std::shared_ptr<Texture>> deferred_textures_ = {};
 		std::vector<std::shared_ptr<Texture>> lighting_textures_ = {};

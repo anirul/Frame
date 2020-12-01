@@ -8,10 +8,8 @@ namespace sgl {
 
 	Mesh::Mesh(
 		std::istream& is,
-		const std::string& name,
-		const std::shared_ptr<Program>& program)
+		const std::string& name)
 	{
-		SetProgram(program);
 		auto obj_file = LoadFromObj(is, name);
 		material_name_ = obj_file.material;
 		std::vector<float> points = {};
@@ -55,25 +53,14 @@ namespace sgl {
 		const std::vector<float>& points,
 		const std::vector<float>& normals,
 		const std::vector<float>& texcoords,
-		const std::vector<std::int32_t>& indices,
-		const std::shared_ptr<Program>& program)
+		const std::vector<std::int32_t>& indices)
 	{
-		SetProgram(program);
 		CreateMeshFromFlat(points, normals, texcoords, indices);
 	}
 
 	Mesh::~Mesh()
 	{
 		glDeleteVertexArrays(1, &vertex_array_object_);
-	}
-
-	void Mesh::SetProgram(const std::shared_ptr<Program>& program)
-	{
-		if (!program)
-		{
-			throw std::runtime_error("no program set.");
-		}
-		program_ = program;
 	}
 
 	void Mesh::CreateMeshFromFlat(
@@ -135,18 +122,19 @@ namespace sgl {
 	}
 
 	void Mesh::Draw(
-		const glm::mat4& projection /*= glm::mat4(1.0f)*/,
-		const glm::mat4& view /*= glm::mat4(1.0f)*/,
-		const glm::mat4& model /*= glm::mat4(1.0f)*/) const
+		const std::shared_ptr<ProgramInterface> program,
+		const glm::mat4 projection /*= glm::mat4(1.0f)*/,
+		const glm::mat4 view /*= glm::mat4(1.0f)*/,
+		const glm::mat4 model /*= glm::mat4(1.0f)*/) const
 	{
 		if (material_) material_->DisableAll();
-		if (!program_) throw std::runtime_error("program is not set.");
-		program_->Use();
+		if (!program) throw std::runtime_error("program is not set.");
+		program->Use();
 		if (material_)
 		{
 			for (const auto& p : material_->GetMap())
 			{
-				program_->Uniform(
+				program->Uniform(
 					p.first, 
 					material_->EnableTexture(p.first));
 			}
@@ -156,9 +144,9 @@ namespace sgl {
 		error_.Display(__FILE__, __LINE__ - 1);
 
 		// Push updated matrices.
-		program_->Uniform("projection", projection);
-		program_->Uniform("view", view);
-		program_->Uniform("model", model);
+		program->Uniform("projection", projection);
+		program->Uniform("view", view);
+		program->Uniform("model", model);
 
 		index_buffer_.Bind();
 		glDrawElements(
@@ -285,7 +273,7 @@ namespace sgl {
 							name +
 							" missing inner part of a description.");
 					}
-					std::array<int, 3> vi;
+					std::array<int, 3> vi = { 0, 0, 0 };
 					std::istringstream viss(inner);
 					auto lambda_set_minimum = [&obj_file](int index, int value)
 					{
@@ -398,8 +386,7 @@ namespace sgl {
 		return v2;
 	}
 
-	std::shared_ptr<sgl::Mesh> CreateQuadMesh(
-		const std::shared_ptr<Program>& program)
+	std::shared_ptr<sgl::Mesh> CreateQuadMesh()
 	{
 		std::vector<float> points =
 		{
@@ -431,26 +418,23 @@ namespace sgl {
 			points, 
 			normals, 
 			texcoords, 
-			indices, 
-			program);
+			indices);
 	}
 
-	std::shared_ptr<sgl::Mesh> CreateCubeMesh(
-		const std::shared_ptr<Program>& program)
+	std::shared_ptr<sgl::Mesh> CreateCubeMesh()
 	{
-		return CreateMeshFromObjFile("../Asset/Model/Cube.obj", program);
+		return CreateMeshFromObjFile("../Asset/Model/Cube.obj");
 	}
 
 	std::shared_ptr<sgl::Mesh> CreateMeshFromObjFile(
-		const std::string& file_path, 
-		const std::shared_ptr<Program>& program)
+		const std::string& file_path)
 	{
 		auto ifs = std::ifstream(file_path);
 		if (!ifs.is_open())
 		{
 			throw std::runtime_error("could not open file: " + file_path);
 		}
-		return std::make_shared<sgl::Mesh>(ifs, file_path, program);
+		return std::make_shared<sgl::Mesh>(ifs, file_path);
 	}
 
 } // End namespace sgl.

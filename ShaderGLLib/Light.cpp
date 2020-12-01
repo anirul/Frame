@@ -4,7 +4,7 @@
 namespace sgl {
 
 	void LightManager::RegisterToProgram(
-		const std::shared_ptr<Program>& program) const
+		const std::shared_ptr<Program> program) const
 	{
 		if (lights_.size() > 32)
 		{

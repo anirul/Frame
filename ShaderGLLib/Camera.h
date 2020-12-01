@@ -7,15 +7,15 @@ namespace sgl {
 	class Camera {
 	public:
 		Camera(
-			const glm::vec3& position = { 0.f, 0.f, 0.f },
-			const glm::vec3& front = { 0.f, 0.f, -1.f },
-			const glm::vec3& up = { 0.f, 1.f, 0.f });
+			const glm::vec3 position = { 0.f, 0.f, 0.f },
+			const glm::vec3 front = { 0.f, 0.f, -1.f },
+			const glm::vec3 up = { 0.f, 1.f, 0.f });
 
 	public:
 		const glm::mat4 GetLookAt() const;
-		void SetFront(const glm::vec3& vec);
-		void SetPosition(const glm::vec3& vec);
-		void SetUp(const glm::vec3& vec);
+		void SetFront(const glm::vec3 vec);
+		void SetPosition(const glm::vec3 vec);
+		void SetUp(const glm::vec3 vec);
 
 	public:
 		const glm::vec3 GetFront() const { return front_; }

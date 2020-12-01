@@ -37,25 +37,25 @@ namespace sgl {
 	void FillProgramMultiTexture(
 		std::vector<std::shared_ptr<Texture>>& out_textures,
 		const std::map<std::string, std::shared_ptr<Texture>>& in_textures,
-		const std::shared_ptr<Program>& program)
+		const std::shared_ptr<ProgramInterface> program)
 	{
 		FillProgramMultiTextureMipmap(
 			out_textures,
 			in_textures,
 			program,
 			0,
-			[](const int, const std::shared_ptr<Program>&) {});
+			[](const int, const std::shared_ptr<ProgramInterface>) {});
 	}
 
 	void FillProgramMultiTextureMipmap(
 		std::vector<std::shared_ptr<Texture>>& out_textures,
 		const std::map<std::string, std::shared_ptr<Texture>>& in_textures,
-		const std::shared_ptr<Program>& program,
+		const std::shared_ptr<ProgramInterface> program,
 		const int mipmap,
 		const std::function<void(
 			const int mipmap,
-			const std::shared_ptr<Program>& program)> func /*=
-				[](const int, const std::shared_ptr<sgl::Program>&) {}*/)
+			const std::shared_ptr<ProgramInterface> program)> func /*=
+		[](const int, const std::shared_ptr<sgl::ProgramInterface>) {}*/)
 	{
 		auto& error = Error::GetInstance();
 		assert(out_textures.size());
@@ -79,7 +79,7 @@ namespace sgl {
 			1.0f,
 			0.1f,
 			10.0f);
-		auto quad = CreateQuadMesh(program);
+		auto quad = CreateQuadMesh();
 		auto material = std::make_shared<Material>();
 		for (const auto& p : in_textures)
 		{
@@ -106,32 +106,32 @@ namespace sgl {
 			}
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			error.Display(__FILE__, __LINE__ - 1);
-			quad->Draw(projection);
+			quad->Draw(program, projection);
 		}
 	}
 
 	void FillProgramMultiTextureCubeMap(
 		std::vector<std::shared_ptr<Texture>>& out_textures,
 		const std::map<std::string, std::shared_ptr<Texture>>& in_textures,
-		const std::shared_ptr<Program>& program)
+		const std::shared_ptr<ProgramInterface> program)
 	{
 		FillProgramMultiTextureCubeMapMipmap(
 			out_textures,
 			in_textures,
 			program,
 			0,
-			[](const int, const std::shared_ptr<Program>&) {});
+			[](const int, const std::shared_ptr<ProgramInterface>) {});
 	}
 
 	void FillProgramMultiTextureCubeMapMipmap(
 		std::vector<std::shared_ptr<Texture>>& out_textures,
 		const std::map<std::string, std::shared_ptr<Texture>>& in_textures,
-		const std::shared_ptr<Program>& program,
+		const std::shared_ptr<ProgramInterface> program,
 		const int mipmap,
 		const std::function<void(
 			const int mipmap,
-			const std::shared_ptr<sgl::Program>& program)> func /*=
-				[](const int, const std::shared_ptr<sgl::Program>&) {}*/)
+			const std::shared_ptr<sgl::ProgramInterface> program)> func /*=
+		[](const int, const std::shared_ptr<sgl::ProgramInterface>) {}*/)
 	{
 		auto& error = Error::GetInstance();
 		assert(out_textures.size());
@@ -155,7 +155,7 @@ namespace sgl {
 			1.0f,
 			0.1f,
 			10.0f);
-		auto cube = CreateCubeMesh(program);
+		auto cube = CreateCubeMesh();
 		auto material = std::make_shared<Material>();
 		for (const auto& p : in_textures)
 		{
@@ -175,7 +175,7 @@ namespace sgl {
 			glViewport(0, 0, temporary_size.first, temporary_size.second);
 			error.Display(__FILE__, __LINE__ - 1);
 			int cubemap_element = 0;
-			for (glm::mat4 view : views_cubemap)
+			for (const auto& view : views_cubemap)
 			{
 				for (int i = 0; i < out_textures.size(); ++i)
 				{
@@ -188,7 +188,7 @@ namespace sgl {
 				cubemap_element++;
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 				error.Display(__FILE__, __LINE__ - 1);
-				cube->Draw(projection, view);
+				cube->Draw(program, projection, view);
 			}
 		}
 	}

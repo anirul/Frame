@@ -24,8 +24,8 @@ namespace sgl {
 	{
 	public:
 		LightPoint(
-			const glm::vec3& position, 
-			const glm::vec3& color_intensity) :
+			const glm::vec3 position, 
+			const glm::vec3 color_intensity) :
 			position_(position), 
 			color_intensity_(color_intensity) {}
 
@@ -49,8 +49,8 @@ namespace sgl {
 	{
 	public:
 		LightDirectional(
-			const glm::vec3& direction,
-			const glm::vec3& color_intensity) :
+			const glm::vec3 direction,
+			const glm::vec3 color_intensity) :
 			direction_(direction),
 			color_intensity_(color_intensity) {}
 
@@ -77,20 +77,20 @@ namespace sgl {
 		LightManager& operator=(const LightManager& light_manager) = default;
 
 	public:
-		void AddLight(const std::shared_ptr<LightInterface>& light) 
+		void AddLight(const std::shared_ptr<LightInterface> light) 
 		{ 
 			lights_.push_back(light); 
 		}
 		void RemoveAllLights() { lights_.clear(); }
 		const std::size_t GetLightCount() const { return lights_.size(); }
-		const std::shared_ptr<LightInterface>& GetLight(int i) const 
+		const std::shared_ptr<LightInterface> GetLight(int i) const 
 		{ 
 			return lights_.at(i);
 		}
 
 	public:
 		void RegisterToProgram(
-			const std::shared_ptr<Program>& program) const;
+			const std::shared_ptr<Program> program) const;
 
 	protected:
 		std::vector<std::shared_ptr<LightInterface>> lights_;

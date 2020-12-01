@@ -1,34 +1,19 @@
 syntax = "proto3";
 
-import "Texture.proto";
 import "Effect.proto";
+import "Scene.proto";
+import "Texture.proto";
 
 package frame.proto;
 
-// Hard coded output from the deferred shading.
-message Deferred {
-	string out_albedo = 1;
-	string out_normal = 2;
-	string out_mra = 3;
-	string out_position = 4;
-}
-
-// Hard coded output from the view shading.
-message View {
-	string out_normal = 1;
-	string out_position = 2;
-}
-
 // Display effect on the screen.
 message Display {
-	// Output from the defered shading (if available).
-	Deferred defered = 1;
-	// Output from the view shading (if available).
-	View view = 2;
 	// Output textures to the screen.
-	repeated string out_textures = 10;
+	repeated string out_textures = 1;
 	// Textures that are used.
-	repeated Texture textures = 20;
+	repeated Texture textures = 2;
 	// Effects that are used.
-	repeated Effect effects = 21;
+	repeated Effect effects = 3;
+	// Scene loader.
+	repeated Scene scenes = 4;
 }

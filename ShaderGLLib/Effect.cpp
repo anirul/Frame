@@ -28,11 +28,11 @@ namespace sgl {
 		size_ = size;
 		frame_.AttachRender(render_);
 		render_.CreateStorage(size_);
-		program_ = Program::CreateProgram(shader_name_);
+		program_ = CreateProgram(shader_name_);
 		program_->Use();
 		for (const frame::proto::Uniform& uniform : uniforms_)
 			RegisterUniformFromProto(uniform, uniform_interface, *program_);
-		quad_ = CreateQuadMesh(program_);
+		quad_ = CreateQuadMesh();
 		for (const auto& texture : out_material_.GetMap())
 			frame_.AttachTexture(*texture.second);
 		frame_.DrawBuffers(
@@ -47,7 +47,7 @@ namespace sgl {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		error_.Display(__FILE__, __LINE__ - 1);
 		quad_->SetMaterial(in_material_);
-		quad_->Draw();
+		quad_->Draw(program_);
 	}
 
 } // End namespace sgl.

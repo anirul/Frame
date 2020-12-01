@@ -60,7 +60,7 @@ void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 	logger_->info("setting preferred texture to: {}", preferred_texture_);
 }
 
-const std::shared_ptr<sgl::Texture>& Draw::GetDrawTexture() const
+const std::shared_ptr<sgl::Texture> Draw::GetDrawTexture() const
 {
 	return texture_map_.at(preferred_texture_);
 }
@@ -72,6 +72,7 @@ void Draw::RunDraw(const double dt)
 	texture_map_["view_normal"]->Clear(glm::vec4(0, 0, 0, 1));
 	// Do the deferred and view computation.
 	device_->DrawDeferred(
+		nullptr,
 		{	
 			texture_map_["deferred_albedo"], 
 			texture_map_["deferred_normal"], 
@@ -80,6 +81,7 @@ void Draw::RunDraw(const double dt)
 		}, 
 		dt);
 	device_->DrawView(
+		nullptr,
 		{ texture_map_["view_position"], texture_map_["view_normal"] }, 
 		dt);
 	// 13 14 -> 0 - Compute the Screen space ambient occlusion.

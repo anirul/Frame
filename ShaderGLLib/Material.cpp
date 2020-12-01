@@ -169,14 +169,14 @@ namespace sgl {
 
 	bool Material::AddTexture(
 		const std::string& name,
-		const std::shared_ptr<sgl::Texture>& texture)
+		const std::shared_ptr<sgl::Texture> texture)
 	{
 		RemoveTexture(name);
 		auto ret = name_texture_map_.insert({ name, texture });
 		return ret.second;
 	}
 
-	const std::shared_ptr<sgl::Texture>& Material::GetTexture(
+	const std::shared_ptr<sgl::Texture> Material::GetTexture(
 		const std::string& name) const
 	{
 		auto it = name_texture_map_.find(name);

@@ -13,6 +13,7 @@
 #include "Effect.pb.h"
 #include "Math.pb.h"
 #include "Pixel.pb.h"
+#include "Scene.pb.h"
 #include "Size.pb.h"
 #include "Texture.pb.h"
 #include "Uniform.pb.h"

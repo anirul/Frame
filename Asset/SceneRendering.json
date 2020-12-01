@@ -1,14 +1,4 @@
 {
-  "deferred": {
-    "out_albedo": "deferred_albedo",
-    "out_normal": "deferred_normal",
-    "out_mra": "deferred_mra",
-    "out_position": "deferred_position"
-  },
-  "view": {
-    "out_normal": "view_normal",
-    "out_position": "view_position"
-  },
   "out_textures": [
     "deferred_albedo"
   ],
@@ -484,7 +474,86 @@
   ],
   "effects": [
     {
+      "name": "deferred",
+      "input_type": "SCENE",
+      "input_scene": "scene",
+      "input_texture_names": [
+        // TODO(anirul): This is where the input material textures should go.
+        // TODO(anirul): This should be done via the material loader.
+      ],
+      "output_texture_names": [
+        "deferred_albedo",
+        "deferred_normal",
+        "deferred_mra",
+        "deferred_position"
+      ],
+      "shader": "PhysicallyBasedRendering",
+      "parameters": [
+        {
+          "name": "projection",
+          "value": {
+            "enum": "PROJECTION_MAT4"
+          }
+        },
+        {
+          "name": "view",
+          "value": {
+            "enum": "VIEW_MAT4"
+          }
+        },
+        {
+          "name": "model",
+          "value": {
+            "enum": "MODEL_MAT4"
+          }
+        },
+        {
+          "name": "camera_position",
+          "value": {
+            "enum": "CAMERA_POSITION_VEC3"
+          }
+        }
+      ]
+    },
+    {
+      "name": "view",
+      "input_type": "SCENE",
+      "input_scene": "scene",
+      "output_textures_names": [
+        "view_position",
+        "view_normal"
+      ],
+      "shader": "ViewPositionNormal",
+      "parameters": [
+        {
+          "name": "inverted_normals",
+          "value": {
+            "boolean": "false"
+          }
+        },
+        {
+          "name": "projection",
+          "value": {
+            "enum": "PROJECTION_MAT4"
+          }
+        },
+        {
+          "name": "view",
+          "value": {
+            "enum": "VIEW_MAT4"
+          }
+        },
+        {
+          "name": "model",
+          "value": {
+            "enum": "MODEL_MAT4"
+          }
+        }
+      ]
+    },
+    {
       "name": "blur",
+      "input_type": "TEXTURE_2D",
       "input_texture_names": [
         "screen_space_ambiant_occlusion"
       ],
@@ -503,6 +572,7 @@
     },
     {
       "name": "brightness",
+      "input_type": "TEXTURE_2D",
       "input_texture_names": [
         "lighting_ambiant"
       ],
@@ -513,6 +583,7 @@
     },
     {
       "name": "gaussian_blur_h2",
+      "input_type": "TEXTURE_2D",
       "input_texture_name": [
         "brightness"
       ],
@@ -531,6 +602,7 @@
     },
     {
       "name": "gaussian_blur_v2",
+      "input_type": "TEXTURE_2D",
       "input_texture_name": [
         "brightness_gaussian_blur_horizontal_2"
       ],
@@ -549,6 +621,7 @@
     },
     {
       "name": "gaussian_blur_h4",
+      "input_type": "TEXTURE_2D",
       "input_texture_name": [
         "brightness_gaussian_blur_vertical_2"
       ],
@@ -567,6 +640,7 @@
     },
     {
       "name": "gaussian_blur_h4",
+      "input_type": "TEXTURE_2D",
       "input_texture_name": [
         "brightness_gaussian_blur_horizontal_4"
       ],
@@ -585,6 +659,7 @@
     },
     {
       "name": "addition_bloom",
+      "input_type": "TEXTURE_2D",
       "input_texture_name": [
         "lighting_ambiant",
         "brightness_gaussian_blur_vertical_4"
@@ -604,6 +679,7 @@
     },
     {
       "name": "multiply",
+      "input_type": "TEXTURE_2D",
       "input_texture_name": [
         "lighting_bloom",
         "ssao_blur"
@@ -623,6 +699,7 @@
     },
     {
       "name": "lighting",
+      "input_type": "TEXTURE_2D",
       "input_texture_name": [
         "deferred_albedo",
         "deferred_normal",
@@ -709,6 +786,7 @@
     },
     {
       "name": "addition_lighting",
+      "input_type": "TEXTURE_2D",
       "input_texture_name": [
         "deferred_albedo",
         "lighting"
@@ -728,6 +806,7 @@
     },
     {
       "name": "screen_space_ambiant_occlusion",
+      "input_type": "TEXTURE_2D",
       "input_texture_name": [
         "view_position",
         "view_normal"

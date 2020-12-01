@@ -3,7 +3,7 @@
 #include "Draw.h"
 #include "Input.h"
 
-Application::Application(const std::shared_ptr<sgl::WindowInterface>& window) :
+Application::Application(const std::shared_ptr<sgl::WindowInterface> window) :
 	window_(window) {}
 
 void Application::Startup() 

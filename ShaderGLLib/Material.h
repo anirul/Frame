@@ -24,8 +24,8 @@ namespace sgl {
 		// Texture management part.
 		bool AddTexture(
 			const std::string& name,
-			const std::shared_ptr<sgl::Texture>& texture);
-		const std::shared_ptr<sgl::Texture>& GetTexture(
+			const std::shared_ptr<sgl::Texture> texture);
+		const std::shared_ptr<sgl::Texture> GetTexture(
 			const std::string& name) const;
 		bool HasTexture(const std::string& name) const;
 		bool RemoveTexture(const std::string& name);

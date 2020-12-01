@@ -99,7 +99,8 @@ namespace sgl {
 					}
 					else
 					{
-						device_->Draw(time.count());
+						throw std::runtime_error(
+							"You need a draw interface now!");
 					}
 
 					SetWindowTitle(
@@ -118,20 +119,20 @@ namespace sgl {
 			}
 
 			void SetDrawInterface(
-				const std::shared_ptr<DrawInterface>& draw_interface) override
+				const std::shared_ptr<DrawInterface> draw_interface) override
 			{
 				draw_interface_ = draw_interface;
 			}
 
 			void SetInputInterface(
-				const std::shared_ptr<InputInterface>& input_interface) 
+				const std::shared_ptr<InputInterface> input_interface) 
 				override
 			{
 				input_interface_ = input_interface;
 			}
 
 			void SetUniqueDevice(
-				const std::shared_ptr<Device>& device) override
+				const std::shared_ptr<Device> device) override
 			{
 				device_ = device;
 			}

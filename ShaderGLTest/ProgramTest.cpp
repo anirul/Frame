@@ -56,7 +56,7 @@ namespace test {
 		EXPECT_EQ(GLEW_OK, glewInit());
 		sgl::Error::SetWindowPtr(nullptr);
 		EXPECT_FALSE(program_);
-		program_ = sgl::Program::CreateProgram("CubeMap");
+		program_ = sgl::CreateProgram("CubeMap");
 		EXPECT_TRUE(program_);
 	}
 
@@ -65,7 +65,7 @@ namespace test {
 		EXPECT_EQ(GLEW_OK, glewInit());
 		sgl::Error::SetWindowPtr(nullptr);
 		EXPECT_FALSE(program_);
-		program_ = sgl::Program::CreateProgram("EquirectangularCubeMap");
+		program_ = sgl::CreateProgram("EquirectangularCubeMap");
 		EXPECT_TRUE(program_);
 	}
 
@@ -74,7 +74,7 @@ namespace test {
 		EXPECT_EQ(GLEW_OK, glewInit());
 		sgl::Error::SetWindowPtr(nullptr);
 		EXPECT_FALSE(program_);
-		program_ = sgl::Program::CreateProgram("PhysicallyBasedRendering");
+		program_ = sgl::CreateProgram("PhysicallyBasedRendering");
 		EXPECT_TRUE(program_);
 	}
 
@@ -83,7 +83,7 @@ namespace test {
 		EXPECT_EQ(GLEW_OK, glewInit());
 		sgl::Error::SetWindowPtr(nullptr);
 		EXPECT_FALSE(program_);
-		program_ = sgl::Program::CreateProgram("Simple");
+		program_ = sgl::CreateProgram("Simple");
 		EXPECT_TRUE(program_);
 	}
 

@@ -46,15 +46,15 @@ namespace sgl {
 		error_.Display(__FILE__, __LINE__ - 1);
 
 		// Create programs.
-		pbr_program_ = Program::CreateProgram("PhysicallyBasedRendering");
-		view_program_ = Program::CreateProgram("ViewPositionNormal");
+		pbr_program_ = CreateProgram("PhysicallyBasedRendering");
+		view_program_ = CreateProgram("ViewPositionNormal");
 
 		// Create a frame buffer and a render buffer.
 		frame_ = std::make_shared<Frame>();
 		render_ = std::make_shared<Render>();
 	}
 
-	void Device::AddEffect(std::shared_ptr<Effect>& effect)
+	void Device::AddEffect(std::shared_ptr<Effect> effect)
 	{
 		effects_.push_back(effect);
 	}
@@ -69,52 +69,47 @@ namespace sgl {
 		}
 	}
 
-	void Device::Draw(const double dt)
+	void Device::Draw(
+		const std::shared_ptr<ProgramInterface> program, 
+		const double dt)
 	{
 		static auto out_texture = std::make_shared<Texture>(
 			size_, 
 			sgl::PixelElementSize_HALF());
-		DrawMultiTextures({ out_texture }, nullptr, dt);
+		DrawMultiTextures(program, { out_texture }, dt);
 		Display(out_texture);
 	}
 
 	void Device::DrawDeferred(
+		const std::shared_ptr<ProgramInterface> program,
 		const std::vector<std::shared_ptr<Texture>>& out_textures,
 		const double dt)
 	{
+		// FIXME(anirul): use the program and not the one in device.
 		assert(out_textures.size() == 4);
 		pbr_program_->Use();
 		// This should be changed to update from the proto part.
 		pbr_program_->Uniform(
 			"camera_position",
 			GetCamera().GetPosition());
-		DrawMultiTextures(out_textures, pbr_program_, dt);
+		DrawMultiTextures(pbr_program_, out_textures, dt);
 	}
 
 	void Device::DrawView(
+		const std::shared_ptr<ProgramInterface> program,
 		const std::vector<std::shared_ptr<Texture>>& out_textures,
 		const double dt)
 	{
+		// FIXME(anirul): use the program and not the one in device.
 		assert(out_textures.size() == 2);
 		view_program_->Use();
 		view_program_->Uniform("inverted_normals", 0);
-		DrawMultiTextures(out_textures, view_program_, dt);
-	}
-
-	void Device::Display(const std::shared_ptr<Texture>& texture)
-	{
-		static auto program = Program::CreateProgram("Display");
-		static auto quad = CreateQuadMesh(program);
-		auto material = std::make_shared<Material>();
-		material->AddTexture("Display", texture);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		quad->SetMaterial(material);
-		quad->Draw();
+		DrawMultiTextures(view_program_, out_textures, dt);
 	}
 
 	void Device::DrawMultiTextures(
+		const std::shared_ptr<ProgramInterface> program,
 		const std::vector<std::shared_ptr<Texture>>& out_textures,
-		const std::shared_ptr<Program> program,
 		const double dt)
 	{
 		assert(!out_textures.empty());
@@ -146,14 +141,11 @@ namespace sgl {
 		}
 		frame_->DrawBuffers(static_cast<std::uint32_t>(out_textures.size()));
 
-		for (const std::shared_ptr<Scene>& scene : scene_tree_)
+		for (const auto& scene : scene_tree_.GetSceneVector())
 		{
 			const std::shared_ptr<Mesh>& mesh = scene->GetLocalMesh();
 			if (!mesh) continue;
-			if (program)
-			{
-				if (mesh->IsClearDepthBuffer()) continue;
-			}
+			if (mesh->IsClearDepthBuffer()) continue;
 
 			auto material_name = mesh->GetMaterialName();
 			if (materials_.find(material_name) != materials_.end())
@@ -173,24 +165,24 @@ namespace sgl {
 				mesh->SetMaterial(material);
 			}
 
-			std::shared_ptr<Program> temp_program = nullptr;
-			if (program)
-			{
-				temp_program = mesh->GetProgram();
-				mesh->SetProgram(program);
-			}
-
 			// Draw the mesh.
 			mesh->Draw(
+				program,
 				perspective_,
 				view_,
 				scene->GetLocalModel(dt));
-
-			if (temp_program)
-			{
-				mesh->SetProgram(temp_program);
-			}
 		}
+	}
+
+	void Device::Display(const std::shared_ptr<Texture> texture)
+	{
+		static auto program = CreateProgram("Display");
+		static auto quad = CreateQuadMesh();
+		auto material = std::make_shared<Material>();
+		material->AddTexture("Display", texture);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		quad->SetMaterial(material);
+		quad->Draw(program);
 	}
 
 	void Device::AddEnvironment(const std::string& environment_map)
@@ -201,9 +193,9 @@ namespace sgl {
 			std::make_pair<std::uint32_t, std::uint32_t>(512, 512),
 			sgl::PixelElementSize_HALF(),
 			sgl::PixelStructure_RGB_ALPHA());
-		auto cubemap_program = Program::CreateProgram("CubeMapDeferred");
+		auto cubemap_program = CreateProgram("CubeMapDeferred");
 		cubemap_program->Uniform("projection", GetProjection());
-		auto cube_mesh = CreateCubeMesh(cubemap_program);
+		auto cube_mesh = CreateCubeMesh();
 		environment_material_ = std::make_shared<Material>();
 		environment_material_->AddTexture("Skybox", texture);
 		cube_mesh->ClearDepthBuffer(true);
@@ -220,15 +212,20 @@ namespace sgl {
 			sgl::PixelElementSize_FLOAT());
 		FillProgramMultiTextureCubeMapMipmap(
 			std::vector<std::shared_ptr<sgl::Texture>>{ monte_carlo_prefilter },
-			std::map<std::string, std::shared_ptr<Texture>>{ 
-				{"Environment", environment_material_->GetTexture("Environment") }},
-			Program::CreateProgram("MonteCarloPrefilter"),
+			std::map<std::string, std::shared_ptr<Texture>>
+			{{
+				"Environment", 
+				environment_material_->GetTexture("Environment") 
+			}},
+			CreateProgram("MonteCarloPrefilter"),
 			5,
-			[](const int mipmap, const std::shared_ptr<sgl::Program>& program)
-		{
-			float roughness = static_cast<float>(mipmap) / 4.0f;
-			program->Uniform("roughness", roughness);
-		});
+			[](
+				const int mipmap, 
+				const std::shared_ptr<sgl::ProgramInterface> program)
+			{
+				float roughness = static_cast<float>(mipmap) / 4.0f;
+				program->Uniform("roughness", roughness);
+			});
 		environment_material_->AddTexture(
 			"MonteCarloPrefilter", 
 			monte_carlo_prefilter);
@@ -244,7 +241,7 @@ namespace sgl {
 					"Environment", 
 					environment_material_->GetTexture("Environment") 
 				}},
-			Program::CreateProgram("IrradianceCubeMap"));
+			CreateProgram("IrradianceCubeMap"));
 		environment_material_->AddTexture("Irradiance", irradiance);
 
 		// Create the LUT BRDF.
@@ -258,12 +255,13 @@ namespace sgl {
 					"Environment", 
 					environment_material_->GetTexture("Environment") 
 				}},
-			Program::CreateProgram("IntegrateBRDF"));
+			CreateProgram("IntegrateBRDF"));
 		environment_material_->AddTexture("IntegrateBRDF", integrate_brdf);
 	}
 
 	void Device::SetupCamera()
 	{
+		// TODO(anirul): Move me to the camera.
 		// Set the perspective matrix.
 		const float aspect =
 			static_cast<float>(size_.first) / static_cast<float>(size_.second);

@@ -20,15 +20,13 @@ namespace sgl {
 		// Open a mesh from a OBJ stream.
 		Mesh(
 			std::istream& is, 
-			const std::string& name, 
-			const std::shared_ptr<Program>& program);
+			const std::string& name);
 		// Create a mesh from a set of vectors.
 		Mesh(
 			const std::vector<float>& points,
 			const std::vector<float>& normals,
 			const std::vector<float>& texcoords,
-			const std::vector<std::int32_t>& indices,
-			const std::shared_ptr<Program>& program);
+			const std::vector<std::int32_t>& indices);
 		virtual ~Mesh();
 
 	public:
@@ -38,16 +36,15 @@ namespace sgl {
 			material_ = std::make_shared<Material>(material);
 		}
 		// TODO(anirul): Should be removed.
-		void SetMaterial(const std::shared_ptr<Material>& material)
+		void SetMaterial(const std::shared_ptr<Material> material)
 		{
 			material_ = material;
 		}
 		void Draw(
-			const glm::mat4& projection = glm::mat4(1.0f),
-			const glm::mat4& view = glm::mat4(1.0f),
-			const glm::mat4& model = glm::mat4(1.0f)) const;
-		// Set the program for the mesh (it is supposed to be done at creation).
-		void SetProgram(const std::shared_ptr<Program>& program);
+			const std::shared_ptr<ProgramInterface> program,
+			const glm::mat4 projection = glm::mat4(1.0f),
+			const glm::mat4 view = glm::mat4(1.0f),
+			const glm::mat4 model = glm::mat4(1.0f)) const;
 
 	public:
 		const Buffer& PointBuffer() const { return point_buffer_; }
@@ -55,7 +52,6 @@ namespace sgl {
 		const Buffer& TextureBuffer() const { return texture_buffer_; }
 		const Buffer& IndexBuffer() const { return index_buffer_; }
 		const size_t IndexSize() const { return index_size_; }
-		const std::shared_ptr<Program> GetProgram() { return program_; }
 		void ClearDepthBuffer(bool clear) { clear_depth_buffer_ = clear; }
 		bool IsClearDepthBuffer() const { return clear_depth_buffer_; }
 		const std::string GetMaterialName() const { return material_name_; }
@@ -94,7 +90,7 @@ namespace sgl {
 
 	protected:
 		bool clear_depth_buffer_ = false;
-		std::shared_ptr<Program> program_ = nullptr;
+		std::shared_ptr<ProgramInterface> program_ = nullptr;
 		Buffer point_buffer_ = {};
 		Buffer normal_buffer_ = {};
 		Buffer texture_buffer_ = {};
@@ -107,16 +103,12 @@ namespace sgl {
 	};
 
 	// Create a Quad Mesh that is on the edge of the screen.
-	std::shared_ptr<Mesh> CreateQuadMesh(
-		const std::shared_ptr<Program>& program);
+	std::shared_ptr<Mesh> CreateQuadMesh();
 
 	// Create a Cube Mesh that correspond to a cube map.
-	std::shared_ptr<Mesh> CreateCubeMesh(
-		const std::shared_ptr<Program>& program);
+	std::shared_ptr<Mesh> CreateCubeMesh();
 
 	// Create a new OBJ file from a file.
-	std::shared_ptr<Mesh> CreateMeshFromObjFile(
-		const std::string& file_path,
-		const std::shared_ptr<Program>& program);
+	std::shared_ptr<Mesh> CreateMeshFromObjFile(const std::string& file_path);
 
 } // End namespace sgl.

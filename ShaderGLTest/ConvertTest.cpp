@@ -163,7 +163,7 @@ namespace test {
 				program_mock,
 				Uniform(
 					name,
-					TypedEq<const glm::mat4&>(glm::mat4(1.0f)),
+					TypedEq<glm::mat4>(glm::mat4(1.0f)),
 					false))
 				.Times(Exactly(1));
 		}
@@ -217,7 +217,7 @@ namespace test {
 
 	void ConvertTest::TestParseUniformEnumVectorFromProto(
 		frame::proto::Uniform::UniformEnum uniform_enum,
-		const glm::vec3& compare_vec3,
+		const glm::vec3 compare_vec3,
 		const std::string& name)
 	{
 		StrictMock<ProgramMock> program_mock{};
@@ -230,7 +230,7 @@ namespace test {
 				program_mock,
 				Uniform(
 					name,
-					TypedEq<const glm::vec3&>(compare_vec3)))
+					TypedEq<glm::vec3>(compare_vec3)))
 				.Times(Exactly(1));
 		}
 		sgl::RegisterUniformEnumFromProto(

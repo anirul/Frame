@@ -42,18 +42,23 @@ namespace sgl {
 		return mesh_;
 	}
 
-	void SceneTree::AddNode(
-		const std::shared_ptr<Scene>& node, 
-		const std::shared_ptr<Scene>& parent /*= nullptr*/)
+	SceneTree::SceneTree(const frame::proto::Scene& proto)
 	{
-		node->SetParent(parent);
-		push_back(node);
+		assert(false);
 	}
 
-	const std::shared_ptr<Scene> SceneTree::GetRoot() const
+	void SceneTree::AddNode(
+		const SceneInterface::Ptr node, 
+		const SceneInterface::Ptr parent /*= nullptr*/)
 	{
-		std::shared_ptr<Scene> ret;
-		for (const auto& scene : *this)
+		node->SetParent(parent);
+		scene_.push_back(node);
+	}
+
+	const SceneInterface::Ptr SceneTree::GetRoot() const
+	{
+		std::shared_ptr<SceneInterface> ret = nullptr;
+		for (const auto& scene : scene_)
 		{
 			if (!scene->GetParent())
 			{
@@ -69,7 +74,7 @@ namespace sgl {
 
 	SceneTree LoadSceneFromObjStream(
 		std::istream& is,
-		const std::shared_ptr<Program>& program,
+		const std::shared_ptr<ProgramInterface> program,
 		const std::string& name) 
 	{
 		auto root_node = std::make_shared<SceneMatrix>(glm::mat4(1.0f));
@@ -82,7 +87,7 @@ namespace sgl {
 			[&obj_text, &obj_name, &scene_tree, &root_node, &program]() 
 		{
 			std::istringstream obj_iss(obj_text);
-			auto mesh = std::make_shared<Mesh>(obj_iss, obj_name, program);
+			auto mesh = std::make_shared<Mesh>(obj_iss, obj_name);
 			auto mesh_node = std::make_shared<SceneMesh>(mesh);
 			mesh_node->SetParent(root_node);
 			scene_tree.AddNode(mesh_node, root_node);

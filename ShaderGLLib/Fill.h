@@ -13,7 +13,7 @@ namespace sgl {
 	void FillProgramMultiTexture(
 		std::vector<std::shared_ptr<Texture>>& out_textures,
 		const std::map<std::string, std::shared_ptr<Texture>>& in_textures,
-		const std::shared_ptr<Program>& program);
+		const std::shared_ptr<ProgramInterface> program);
 
 	// Fill multiple textures from a program.
 	//		- out_textures			: output textures (should be allocated).
@@ -24,12 +24,12 @@ namespace sgl {
 	void FillProgramMultiTextureMipmap(
 		std::vector<std::shared_ptr<Texture>>& out_textures,
 		const std::map<std::string, std::shared_ptr<Texture>>& in_textures,
-		const std::shared_ptr<Program>& program,
+		const std::shared_ptr<ProgramInterface> program,
 		const int mipmap,
 		const std::function<void(
 			const int mipmap,
-			const std::shared_ptr<sgl::Program>& program)> func =
-		[](const int, const std::shared_ptr<sgl::Program>&) {});
+			const std::shared_ptr<sgl::ProgramInterface> program)> func =
+		[](const int, const std::shared_ptr<sgl::ProgramInterface>) {});
 
 	// Fill multiple cube map texture from a program.
 	//		- out_textures			: output textures (should be allocated).
@@ -38,7 +38,7 @@ namespace sgl {
 	void FillProgramMultiTextureCubeMap(
 		std::vector<std::shared_ptr<Texture>>& out_textures,
 		const std::map<std::string, std::shared_ptr<Texture>>& in_textures,
-		const std::shared_ptr<Program>& program);
+		const std::shared_ptr<ProgramInterface> program);
 
 	// Fill multiple cube map texture from a program.
 	//		- out_textures			: output textures (should be allocated).
@@ -49,11 +49,11 @@ namespace sgl {
 	void FillProgramMultiTextureCubeMapMipmap(
 		std::vector<std::shared_ptr<Texture>>& out_textures,
 		const std::map<std::string, std::shared_ptr<Texture>>& in_textures,
-		const std::shared_ptr<Program>& program,
+		const std::shared_ptr<ProgramInterface> program,
 		const int mipmap,
 		const std::function<void(
 			const int mipmap,
-			const std::shared_ptr<Program>& program)> func =
-		[](const int, const std::shared_ptr<Program>&) {});
+			const std::shared_ptr<ProgramInterface> program)> func =
+		[](const int, const std::shared_ptr<ProgramInterface>) {});
 
 } // End namespace sgl.

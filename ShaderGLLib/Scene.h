@@ -9,17 +9,31 @@
 
 namespace sgl {
 
-	struct Scene 
+	// Interface to visit the scene tree.
+	class SceneInterface
 	{
-		virtual void SetParent(const std::shared_ptr<Scene>& parent) = 0;
-		virtual const std::shared_ptr<Scene>& GetParent() const = 0;
+	public:
+		// Redefinition for shortening.
+		using Ptr = std::shared_ptr<SceneInterface>;
+		using PtrVec = std::vector<std::shared_ptr<SceneInterface>>;
+		// Get the local model of current node.
 		virtual const glm::mat4 GetLocalModel(const double dt) const = 0;
+		// Get the local mesh of current node.
 		virtual const std::shared_ptr<Mesh> GetLocalMesh() const = 0;
-		virtual bool IsLeaf() const = 0;
-		virtual bool IsRoot() const = 0;
+
+	public:
+		// Return true if this is the root node (no parents).
+		bool IsRoot() const { return !GetParent(); }
+		// Get the parent of a node.
+		const Ptr GetParent() const { return parent_; }
+		// Set the parent of a node.
+		void SetParent(Ptr parent) { parent_ = parent; }
+
+	protected:
+		Ptr parent_;
 	};
 
-	class SceneMatrix : public Scene 
+	class SceneMatrix : public SceneInterface
 	{
 	public:
 		SceneMatrix(const glm::mat4& matrix) : matrix_(matrix) {}
@@ -30,26 +44,13 @@ namespace sgl {
 		const glm::mat4 GetLocalModel(const double dt) const override;
 		const std::shared_ptr<Mesh> GetLocalMesh() const override;
 
-	public:
-		void SetParent(const std::shared_ptr<Scene>& parent) override
-		{
-			parent_ = parent;
-		}
-		const std::shared_ptr<Scene>& GetParent() const override 
-		{ 
-			return parent_; 
-		}
-		bool IsLeaf() const override { return false; }
-		bool IsRoot() const override { return !parent_; }
-
 	private:
 		glm::mat4 matrix_ = {};
-		std::shared_ptr<Scene> parent_ = nullptr;
 		std::function<glm::mat4(const double)> func_ = 
 			[this](const double) { return matrix_; };
 	};
 
-	class SceneMesh : public Scene
+	class SceneMesh : public SceneInterface
 	{
 	public:
 		SceneMesh(std::shared_ptr<sgl::Mesh> mesh) : mesh_(mesh) {}
@@ -58,35 +59,37 @@ namespace sgl {
 		const glm::mat4 GetLocalModel(const double dt) const override;
 		const std::shared_ptr<Mesh> GetLocalMesh() const override; 
 
-	public:
-		void SetParent(const std::shared_ptr<Scene>& parent) override
-		{
-			parent_ = parent;
-		}
-		const std::shared_ptr<Scene>& GetParent() const override
-		{
-			return parent_;
-		}
-		bool IsLeaf() const override { return true; }
-		bool IsRoot() const override { return !parent_; }
-
 	private:
 		std::shared_ptr<sgl::Mesh> mesh_ = nullptr;
-		std::shared_ptr<Scene> parent_ = nullptr;
 	};
 
-	class SceneTree : public std::vector<std::shared_ptr<Scene>>
+	class SceneTree
 	{
 	public:
+		// Create a default empty scene tree. 
+		SceneTree() = default;
+		// Create a scene tree from a proto file.
+		SceneTree(const frame::proto::Scene& proto);
+
+	public:
+		const SceneInterface::PtrVec GetSceneVector() const { return scene_; }
+
+	public:
+		// Add a node to the scene tree.
 		void AddNode(
-			const std::shared_ptr<Scene>& node, 
-			const std::shared_ptr<Scene>& parent = nullptr);
-		const std::shared_ptr<Scene> GetRoot() const;
+			const SceneInterface::Ptr node, 
+			const SceneInterface::Ptr parent = nullptr);
+		// Get the root of the scene tree.
+		const SceneInterface::Ptr GetRoot() const;
+
+	protected:
+		// Contain the scene.
+		SceneInterface::PtrVec scene_;
 	};
 
 	SceneTree LoadSceneFromObjStream(
 		std::istream& is, 
-		const std::shared_ptr<Program>& program,
+		const std::shared_ptr<ProgramInterface> program,
 		const std::string& name);
 
 } // End namespace sgl.

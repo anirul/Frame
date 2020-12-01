@@ -4,7 +4,7 @@
 
 namespace sgl {
 
-	std::shared_ptr<sgl::Program> Program::CreateProgram(
+	std::shared_ptr<sgl::ProgramInterface> CreateProgram(
 		const std::string& name)
 	{
 		auto program = std::make_shared<sgl::Program>();
@@ -90,7 +90,7 @@ namespace sgl {
 
 	void Program::Uniform(
 		const std::string& name, 
-		const glm::vec2& vec2) const
+		const glm::vec2 vec2) const
 	{
 		glUniform2f(GetMemoizeUniformLocation(name), vec2.x, vec2.y);
 		error_.Display(__FILE__, __LINE__ - 1);
@@ -98,7 +98,7 @@ namespace sgl {
 
 	void Program::Uniform(
 		const std::string& name, 
-		const glm::vec3& vec3) const
+		const glm::vec3 vec3) const
 	{
 		glUniform3f(GetMemoizeUniformLocation(name), vec3.x, vec3.y, vec3.z);
 		error_.Display(__FILE__, __LINE__ - 1);
@@ -106,7 +106,7 @@ namespace sgl {
 
 	void Program::Uniform(
 		const std::string& name, 
-		const glm::vec4& vec4) const
+		const glm::vec4 vec4) const
 	{
 		glUniform4f(
 			GetMemoizeUniformLocation(name),
@@ -119,7 +119,7 @@ namespace sgl {
 
 	void Program::Uniform(
 		const std::string& name, 
-		const glm::mat4& mat,
+		const glm::mat4 mat,
 		const bool transpose /*= false*/) const
 	{
 		glUniformMatrix4fv(
