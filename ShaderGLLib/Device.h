@@ -115,6 +115,7 @@ namespace sgl {
 		const PixelElementSize pixel_element_size_ = PixelElementSize_HALF();
 		// Error setup.
 		const Error& error_ = Error::GetInstance();
+		const Logger& logger_ = Logger::GetInstance();
 	};
 
 } // End namespace sgl.

@@ -1,12 +1,17 @@
 #include "Program.h"
 #include <stdexcept>
 #include "Error.h"
+#include "Logger.h"
 
 namespace sgl {
 
 	std::shared_ptr<sgl::ProgramInterface> CreateProgram(
 		const std::string& name)
 	{
+#ifdef _DEBUG
+		Logger logger = Logger::GetInstance();
+		logger->info("Creating program \"{}\"", name);
+#endif // _DEBUG
 		auto program = std::make_shared<sgl::Program>();
 		const auto& error = Error::GetInstance();
 		sgl::Shader vertex(sgl::ShaderType::VERTEX_SHADER);
@@ -32,6 +37,9 @@ namespace sgl {
 		program->Uniform("projection", glm::mat4(1.0));
 		program->Uniform("view", glm::mat4(1.0));
 		program->Uniform("model", glm::mat4(1.0));
+#ifdef _DEBUG
+		logger->info("with pointer := {}", static_cast<void*>(program.get()));
+#endif // _DEBUG
 		return program;
 	}
 

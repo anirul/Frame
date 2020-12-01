@@ -16,7 +16,7 @@ namespace sgl {
 
 	public:
 		static Logger& GetInstance();
-		std::shared_ptr<spdlog::logger> operator->();
+		const std::shared_ptr<spdlog::logger> operator->() const;
 
 	private:
 		std::shared_ptr<spdlog::logger> logger_ptr_ = nullptr;

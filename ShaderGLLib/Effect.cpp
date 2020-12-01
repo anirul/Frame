@@ -26,8 +26,8 @@ namespace sgl {
 		const UniformInterface& uniform_interface)
 	{
 		size_ = size;
-		frame_.AttachRender(render_);
 		render_.CreateStorage(size_);
+		frame_.AttachRender(render_);
 		program_ = CreateProgram(shader_name_);
 		program_->Use();
 		for (const frame::proto::Uniform& uniform : uniforms_)

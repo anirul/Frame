@@ -8,10 +8,7 @@ namespace sgl {
 		logger_ptr_->info("start logging!");
 	}
 
-	Logger::~Logger()
-	{
-		logger_ptr_->info("end logging!");
-	}
+	Logger::~Logger() {}
 
 	sgl::Logger& Logger::GetInstance()
 	{
@@ -19,7 +16,7 @@ namespace sgl {
 		return logger_;
 	}
 
-	std::shared_ptr<spdlog::logger> Logger::operator->()
+	const std::shared_ptr<spdlog::logger> Logger::operator->() const
 	{
 		return logger_ptr_;
 	}

@@ -9,10 +9,7 @@ namespace test {
 	class MeshTest : public testing::Test
 	{
 	public:
-		MeshTest()
-		{
-			window_ = sgl::CreateSDLOpenGL({ 320, 200 });
-		}
+		MeshTest() { window_ = sgl::CreateSDLOpenGL({ 320, 200 }); }
 
 	protected:
 		std::shared_ptr<sgl::WindowInterface> window_ = nullptr;

@@ -92,10 +92,10 @@ namespace sgl {
 	};
 
 	// Create a program from a string!
-		// Will load a program at location: 
-		// - "../Asset/<name>.vert"
-		// - "../Asset/<name>.frag"
-		// Also set the projection view and model to identity.
+	// Will load a program at location: 
+	// - "../Asset/<name>.vert"
+	// - "../Asset/<name>.frag"
+	// Also set the projection view and model to identity.
 	std::shared_ptr<sgl::ProgramInterface> CreateProgram(
 		const std::string& name);
 

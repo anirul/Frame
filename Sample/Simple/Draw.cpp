@@ -71,6 +71,7 @@ void Draw::RunDraw(const double dt)
 	simple_program_->Uniform("model", device_->GetModel());
 	// Draw the apple.
 	// CHECKME(anirul): Shouldn't we first render the skybox?
+	device_->DrawMultiTextures(cubemap_program_, out_textures_, dt);
 	device_->DrawMultiTextures(simple_program_, out_textures_, dt);
 }
 
@@ -80,7 +81,7 @@ std::shared_ptr<sgl::Mesh> Draw::CreateAppleMesh()
 	simple_program_ = sgl::CreateProgram("Simple");
 
 	// Mesh creation.
-	auto apple_mesh = sgl::CreateMeshFromObjFile("../Asset/Model/Torus.obj");
+	auto apple_mesh = sgl::CreateMeshFromObjFile("../Asset/Model/Apple.obj");
 
 	// Create the texture and bind it to the mesh.
 	auto material = std::make_shared<sgl::Material>();

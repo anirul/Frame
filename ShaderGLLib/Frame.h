@@ -3,6 +3,7 @@
 #include <memory>
 #include "../ShaderGLLib/Render.h"
 #include "../ShaderGLLib/Error.h"
+#include "../ShaderGLLib/Logger.h"
 #include "../ShaderGLLib/ScopedBind.h"
 
 namespace sgl {
@@ -74,6 +75,7 @@ namespace sgl {
 		unsigned int frame_id_ = 0;
 		mutable bool locked_bind_ = false;
 		const Error& error_ = Error::GetInstance();
+		const Logger& logger_ = Logger::GetInstance();
 	};
 
 } // End namespace sgl.

@@ -390,8 +390,8 @@ namespace sgl {
 			pixel_element_size_,
 			pixel_structure_);
 		material->AddTexture("Equirectangular", equirectangular);
-		frame.AttachRender(render);
 		render.CreateStorage(size_);
+		frame.AttachRender(render);
 		CreateTextureCubeMap();
 		Bind();
 		for (unsigned int i : {0, 1, 2, 3, 4, 5})

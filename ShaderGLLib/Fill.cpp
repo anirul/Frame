@@ -64,8 +64,8 @@ namespace sgl {
 		Render render{};
 		ScopedBind scoped_frame(frame);
 		ScopedBind scoped_render(render);
-		frame.AttachRender(render);
 		render.CreateStorage(size);
+		frame.AttachRender(render);
 		frame.DrawBuffers(static_cast<std::uint32_t>(out_textures.size()));
 		int max_mipmap = (mipmap <= 0) ? 1 : mipmap;
 		if (max_mipmap > 1) {
@@ -172,6 +172,7 @@ namespace sgl {
 			temporary_size.second =
 				static_cast<std::uint32_t>(size.second * fact);
 			render.CreateStorage(temporary_size);
+			frame.AttachRender(render);
 			glViewport(0, 0, temporary_size.first, temporary_size.second);
 			error.Display(__FILE__, __LINE__ - 1);
 			int cubemap_element = 0;

@@ -117,9 +117,16 @@ namespace sgl {
 		// Setup the camera.
 		SetupCamera();
 
-		ScopedBind scoped_bind(*frame_);
-		frame_->AttachRender(*render_);
+		ScopedBind scoped_bind_frame(*frame_);
+		ScopedBind scoped_bind_render(*render_);
 		render_->CreateStorage(size_);
+		frame_->AttachRender(*render_);
+
+#ifdef _DEBUG
+		GLboolean bool_array[1] = { GL_FALSE };
+		glGetBooleanv(GL_DEPTH_TEST, bool_array);
+		logger_->warn("GL_DEPTH_TEST := {}", bool_array[0]);
+#endif // _DEBUG
 
 		// Set the view port for rendering.
 		glViewport(0, 0, size_.first, size_.second);
