@@ -163,8 +163,7 @@ namespace test {
 				program_mock,
 				Uniform(
 					name,
-					TypedEq<glm::mat4>(glm::mat4(1.0f)),
-					false))
+					TypedEq<glm::mat4>(glm::mat4(1.0f))))
 				.Times(Exactly(1));
 		}
 		sgl::RegisterUniformEnumFromProto(

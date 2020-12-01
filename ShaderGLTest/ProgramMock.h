@@ -44,7 +44,7 @@ namespace test {
 		MOCK_METHOD(
 			void,
 			Uniform,
-			(const std::string& name, const glm::mat4 mat4, const bool flip),
+			(const std::string& name, const glm::mat4 mat4),
 			(const, override));
 	};
 

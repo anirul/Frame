@@ -40,8 +40,7 @@ namespace sgl {
 		// Create a uniform from a string and a matrix.
 		virtual void Uniform(
 			const std::string& name,
-			const glm::mat4 mat,
-			const bool flip = false) const = 0;
+			const glm::mat4 mat) const = 0;
 	};
 
 	class Program : public ProgramInterface
@@ -80,8 +79,7 @@ namespace sgl {
 		// Create a uniform from a string and a matrix.
 		void Uniform(
 			const std::string& name,
-			const glm::mat4 mat,
-			const bool flip = false) const override;
+			const glm::mat4 mat) const override;
 
 	protected:
 		const int GetMemoizeUniformLocation(const std::string& name) const;

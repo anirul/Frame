@@ -119,13 +119,12 @@ namespace sgl {
 
 	void Program::Uniform(
 		const std::string& name, 
-		const glm::mat4 mat,
-		const bool transpose /*= false*/) const
+		const glm::mat4 mat) const
 	{
 		glUniformMatrix4fv(
 			GetMemoizeUniformLocation(name),
 			1, 
-			transpose ? GL_TRUE : GL_FALSE,
+			GL_FALSE,
 			&mat[0][0]);
 		error_.Display(__FILE__, __LINE__ - 5);
 	}
