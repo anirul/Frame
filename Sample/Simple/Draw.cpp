@@ -49,7 +49,7 @@ void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 
 const std::shared_ptr<sgl::Texture> Draw::GetDrawTexture() const
 {
-	return out_textures_[1];
+	return out_textures_[0];
 }
 
 void Draw::RunDraw(const double dt)

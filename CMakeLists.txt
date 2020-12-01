@@ -230,14 +230,17 @@ target_link_libraries(ShaderGLTest
 
 add_executable(JapaneseFlag
   WIN32
-    Sample/JapaneseFlag/Application.cpp
-    Sample/JapaneseFlag/Application.h
-    Sample/JapaneseFlag/main.cpp
+    Sample/Common/Application.cpp
+    Sample/Common/Application.h
+    Sample/Common/main.cpp
+    Sample/JapaneseFlag/Draw.cpp
+    Sample/JapaneseFlag/Draw.h
 )
 
 target_include_directories(JapaneseFlag
   PUBLIC
     ShaderGLLib
+    Sample/JapaneseFlag
 )
 
 target_link_libraries(JapaneseFlag
@@ -248,16 +251,17 @@ target_link_libraries(JapaneseFlag
 
 add_executable(RayMarching
   WIN32
-    Sample/RayMarching/Application.cpp
-    Sample/RayMarching/Application.h
+    Sample/Common/Application.cpp
+    Sample/Common/Application.h
+    Sample/Common/main.cpp
     Sample/RayMarching/Draw.cpp
     Sample/RayMarching/Draw.h
-    Sample/RayMarching/main.cpp
 )
 
 target_include_directories(RayMarching
   PUBLIC
     ShaderGLLib
+    Sample/RayMarching
 )
 
 target_link_libraries(RayMarching
@@ -269,16 +273,17 @@ target_link_libraries(RayMarching
 add_executable(Simple
   WIN32
     Asset/Simple.json
-    Sample/Simple/Application.cpp
-    Sample/Simple/Application.h
+    Sample/Common/Application.cpp
+    Sample/Common/Application.h
+    Sample/Common/main.cpp
     Sample/Simple/Draw.cpp
     Sample/Simple/Draw.h
-    Sample/Simple/main.cpp
 )
 
 target_include_directories(Simple
   PUBLIC
     ShaderGLLib
+    Sample/Simple
 )
 
 target_link_libraries(Simple
@@ -290,18 +295,19 @@ target_link_libraries(Simple
 add_executable(SceneRendering
   WIN32
     Asset/SceneRendering.json
+    Sample/SceneRendering/main.cpp
     Sample/SceneRendering/Application.cpp
     Sample/SceneRendering/Application.h
     Sample/SceneRendering/Draw.cpp
     Sample/SceneRendering/Draw.h
     Sample/SceneRendering/Input.cpp
     Sample/SceneRendering/Input.h
-    Sample/SceneRendering/main.cpp
 )
 
 target_include_directories(SceneRendering
   PUBLIC
     ShaderGLLib
+    Sample/SceneRendering
 )
 
 target_link_libraries(SceneRendering
