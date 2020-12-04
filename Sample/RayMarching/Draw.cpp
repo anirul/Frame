@@ -14,7 +14,7 @@ void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 	billboard->SetName("billboard");
 	billboard->SetParentName("root");
 	scene_tree.AddNode(billboard);
-	device_->SetSceneTree(scene_tree);
+	// device_->SetSceneTree(scene_tree);
 	out_texture_ = std::make_shared<sgl::Texture>(size);
 }
 

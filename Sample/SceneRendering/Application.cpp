@@ -9,7 +9,7 @@ Application::Application(const std::shared_ptr<sgl::WindowInterface> window) :
 void Application::Startup() 
 {
 	auto device = window_->GetUniqueDevice();
-	device->Startup();
+	// device->Startup();
 	device->LoadSceneFromObjFile("../Asset/Model/Scene.obj");
 	device->AddEnvironment("../Asset/CubeMap/Shiodome.hdr");
 }

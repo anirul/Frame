@@ -187,10 +187,16 @@ namespace sgl {
 	private:
 		// Contain the scene.
 		std::map<std::string, SceneInterface::Ptr> scene_map_;
+		// Name of the scene.
+		std::string name_;
+		// Name of the root node.
+		std::string root_node_name_;
 		// Store the default camera node.
 		std::string camera_name_;
 	};
 
-	SceneTree LoadSceneFromObjStream(std::istream& is, const std::string& name);
+	std::shared_ptr<SceneTree> LoadSceneFromObjStream(
+		std::istream& is, 
+		const std::string& name);
 
 } // End namespace sgl.

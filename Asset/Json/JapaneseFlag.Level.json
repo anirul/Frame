@@ -2,7 +2,8 @@
   "level_name": "JapaneseFlag",
   "default_texture_name": "billboard",
   "default_camera_name": "camera",
+  "default_scene_name": "scene",
   "texture_file": "JapaneseFlag.Texture.json",
-  "effect_file": "JapanseFlag.Effect.json",
+  "effect_file": "JapaneseFlag.Effect.json",
   "scene_file": "JapaneseFlag.Scene.json"
 }

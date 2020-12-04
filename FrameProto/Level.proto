@@ -19,3 +19,8 @@ message Level {
 	// This file will contain the scene that are needed.
 	string scene_file = 22;
 }
+
+// File description for levels (for now only one).
+message LevelFile {
+	repeated Level levels = 1;
+}

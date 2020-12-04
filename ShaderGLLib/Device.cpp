@@ -50,20 +50,59 @@ namespace sgl {
 		render_ = std::make_shared<Render>();
 	}
 
-	void Device::AddEffect(std::shared_ptr<Effect> effect)
+	void Device::Startup(
+		const frame::proto::Level& proto_level,
+		const frame::proto::EffectFile& proto_effect_file,
+		const frame::proto::SceneFile& proto_scene_file,
+		const frame::proto::TextureFile& proto_texture_file)
 	{
-		effects_.push_back(effect);
-	}
+		// Load other files.
+		if (proto_level.default_scene_name().empty())
+			throw std::runtime_error("should have a default scene name.");
+		if (proto_level.default_texture_name().empty())
+			throw std::runtime_error("should have a default texture name.");
+		if (proto_level.default_camera_name().empty())
+			throw std::runtime_error("should have a default camera name.");
 
-	void Device::Startup()
-	{
-		// FIXME(anirul): Maybe should set a default camera or fix the
-		// FIXME(anirul): exception.
-		fov_ = scene_tree_.GetDefaultCamera().GetFovDegrees();
-		SetupCamera();
-		for (auto& effect : effects_)
+		// Load scenes from proto.
+		frame::proto::SceneTree proto_scene_tree;
+		for (const auto& proto : proto_scene_file.scene_trees())
 		{
-			effect->Startup(size_, shared_from_this(), CreateQuadMesh());
+			if (proto.name() == proto_level.default_scene_name())
+				proto_scene_tree = proto;
+		}
+		scene_tree_ = std::make_shared<SceneTree>(proto_scene_tree);
+		scene_tree_->SetDefaultCamera(proto_level.default_camera_name());
+
+		// Load textures from proto.
+		for (const auto& proto_texture : proto_texture_file.textures())
+		{
+			auto texture = std::make_shared<sgl::Texture>(proto_texture, size_);
+			texture_map_.insert({ proto_texture.name(), texture });
+		}
+		out_texture_name_ = proto_level.default_texture_name();
+		if (texture_map_.find(proto_level.default_texture_name()) ==
+			texture_map_.end())
+		{
+			throw std::runtime_error(
+				"no default texture is loaded: " +
+				proto_level.default_texture_name());
+		}
+
+		// Load effects from proto.
+		for (const auto& proto_effect : proto_effect_file.effects())
+		{
+			auto effect = 
+				std::make_shared<sgl::Effect>(proto_effect, texture_map_);
+			effect_map_.insert({ proto_effect.name(), effect });
+		}
+
+		SetupCamera();
+
+		// Startup effects.
+		for (auto& effect_pair : effect_map_)
+		{
+			effect_pair.second->Startup(size_, shared_from_this());
 		}
 	}
 
@@ -103,7 +142,7 @@ namespace sgl {
 		}
 		frame_->DrawBuffers(static_cast<std::uint32_t>(out_textures.size()));
 
-		for (const auto& pair : scene_tree_.GetSceneMap())
+		for (const auto& pair : scene_tree_->GetSceneMap())
 		{
 			const auto& scene = pair.second;
 			const std::shared_ptr<Mesh>& mesh = scene->GetLocalMesh();
@@ -111,10 +150,10 @@ namespace sgl {
 			if (mesh->IsClearDepthBuffer()) continue;
 
 			auto material_name = mesh->GetMaterialName();
-			if (materials_.find(material_name) != materials_.end())
+			if (material_map_.find(material_name) != material_map_.end())
 			{
 				std::shared_ptr<Material> mat = 
-					std::make_shared<Material>(*materials_[material_name]);
+					std::make_shared<Material>(*material_map_[material_name]);
 				if (environment_material_) *mat += *environment_material_;
 				mesh->SetMaterial(mat);
 			}
@@ -136,18 +175,18 @@ namespace sgl {
 				scene->GetLocalModel(
 					[this](const std::string& name) 
 					{
-						return scene_tree_.GetSceneByName(name);
+						return scene_tree_->GetSceneByName(name);
 					}, 
 					dt));
 		}
 	}
 
-	void Device::Display(const std::shared_ptr<Texture> texture)
+	void Device::Display()
 	{
 		static auto program = CreateProgram("Display");
 		static auto quad = CreateQuadMesh();
 		auto material = std::make_shared<Material>();
-		material->AddTexture("Display", texture);
+		material->AddTexture("Display", texture_map_.at(out_texture_name_));
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		quad->SetMaterial(material);
 		quad->Draw(program);
@@ -167,7 +206,7 @@ namespace sgl {
 		environment_material_ = std::make_shared<Material>();
 		environment_material_->AddTexture("Skybox", texture);
 		cube_mesh->ClearDepthBuffer(true);
-		scene_tree_.AddNode(std::make_shared<SceneStaticMesh>(cube_mesh));
+		scene_tree_->AddNode(std::make_shared<SceneStaticMesh>(cube_mesh));
 		
 		// Add the default texture to the texture manager.
 		environment_material_->AddTexture("Environment", texture);
@@ -227,27 +266,15 @@ namespace sgl {
 
 	void Device::SetupCamera()
 	{
-		// TODO(anirul): Move me to the camera.
-		// Set the perspective matrix.
-		const float aspect =
-			static_cast<float>(size_.first) / static_cast<float>(size_.second);
-		perspective_ = glm::perspective(
-			glm::radians(fov_),
-			aspect,
-			0.1f,
-			100.0f);
-
-		// Set the camera.
-		view_ = scene_tree_.GetDefaultCamera().ComputeView();
+		const auto& camera = scene_tree_->GetDefaultCamera();
+		perspective_ = camera.ComputeProjection(size_);
+		view_ = camera.ComputeView();
 	}
 
 	void Device::LoadSceneFromObjFile(const std::string& obj_file)
 	{
 		if (obj_file.empty())
-		{
-			throw std::runtime_error(
-				"Error invalid file name: " + obj_file);
-		}
+			throw std::runtime_error("Error invalid file name: " + obj_file);
 		std::string mtl_file = "";
 		std::string mtl_path = obj_file;
 		while (mtl_path.back() != '/' && mtl_path.back() != '\\')
@@ -256,10 +283,7 @@ namespace sgl {
 		}
 		std::ifstream obj_ifs(obj_file);
 		if (!obj_ifs.is_open())
-		{
-			throw std::runtime_error(
-				"Could not open file: " + obj_file);
-		}
+			throw std::runtime_error("Could not open file: " + obj_file);
 		std::string obj_content = "";
 		while (!obj_ifs.eof())
 		{
@@ -269,18 +293,12 @@ namespace sgl {
 			std::istringstream iss(line);
 			std::string dump;
 			if (!(iss >> dump))
-			{
-				throw std::runtime_error(
-					"Error parsing file: " + obj_file);
-			}
+				throw std::runtime_error("Error parsing file: " + obj_file);
 			if (dump[0] == '#') continue;
 			if (dump == "mtllib")
 			{
 				if (!(iss >> mtl_file))
-				{
-					throw std::runtime_error(
-						"Error parsing file: " + obj_file);
-				}
+					throw std::runtime_error("Error parsing file: " + obj_file);
 				mtl_file = mtl_path + mtl_file;
 				continue;
 			}
@@ -288,19 +306,16 @@ namespace sgl {
 		}
 		std::ifstream mtl_ifs(mtl_file);
 		if (!mtl_ifs.is_open())
-		{
-			throw std::runtime_error(
-				"Error cannot open file: " + mtl_file);
-		}
+			throw std::runtime_error("Error cannot open file: " + mtl_file);
 		scene_tree_ = LoadSceneFromObjStream(
 			std::istringstream(obj_content),
 			obj_file);
-		materials_ = LoadMaterialFromMtlStream(mtl_ifs, mtl_file);
+		material_map_ = LoadMaterialFromMtlStream(mtl_ifs, mtl_file);
 	}
 
 	const Camera& Device::GetCamera() const
 	{
-		return scene_tree_.GetDefaultCamera();
+		return scene_tree_->GetDefaultCamera();
 	}
 
 } // End namespace sgl.

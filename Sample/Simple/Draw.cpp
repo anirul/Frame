@@ -37,7 +37,7 @@ void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 		apple_mesh->SetParentName("scene_matrix");
 		scene_tree.AddNode(apple_mesh);
 	}
-	device_->SetSceneTree(scene_tree);
+	// device_->SetSceneTree(scene_tree);
 
 	out_textures_.emplace_back(std::make_shared<sgl::Texture>(size));
 	out_textures_.emplace_back(std::make_shared<sgl::Texture>(size));

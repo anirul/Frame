@@ -15,6 +15,12 @@ namespace test {
 		}
 
 	protected:
+		frame::proto::Level GetLevel() const;
+		frame::proto::EffectFile GetEffectFile() const;
+		frame::proto::SceneFile GetSceneFile() const;
+		frame::proto::TextureFile GetTextureFile() const;
+
+	protected:
 		std::shared_ptr<sgl::WindowInterface> window_ = nullptr;
 		std::shared_ptr<sgl::Device> device_ = nullptr;
 	};

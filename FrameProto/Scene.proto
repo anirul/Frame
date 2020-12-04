@@ -47,6 +47,8 @@ message SceneCamera {
 	UniformVector3 target = 4;
 	// Up vector of the camera.
 	UniformVector3 up = 5;
+	// Fov in degrees.
+	float fov_degrees = 6;
 }
 
 // Light

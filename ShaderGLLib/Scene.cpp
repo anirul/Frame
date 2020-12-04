@@ -69,6 +69,8 @@ namespace sgl {
 	SceneStaticMesh::SceneStaticMesh(
 		const frame::proto::SceneStaticMesh& proto_static_mesh)
 	{
+		SetName(proto_static_mesh.name());
+		SetParentName(proto_static_mesh.parent());
 		assert(false);
 	}
 
@@ -88,7 +90,76 @@ namespace sgl {
 
 	SceneTree::SceneTree(const frame::proto::SceneTree& proto_tree)
 	{
-		assert(false);
+		name_ = proto_tree.name();
+		root_node_name_ = proto_tree.root_node();
+		if (root_node_name_.empty())
+			throw std::runtime_error("cannot have an empty root node.");
+		// Add scene matrices to the list.
+		for (const auto& proto_matrix : proto_tree.scene_matrices())
+		{
+			scene_map_.insert(
+				{ 
+					proto_matrix.name(), 
+					std::make_shared<SceneMatrix>(proto_matrix) 
+				});
+		}
+		// Add scene static meshes to the list.
+		for (const auto& proto_static_mesh : proto_tree.scene_static_meshes())
+		{
+			scene_map_.insert(
+				{
+					proto_static_mesh.name(),
+					std::make_shared<SceneStaticMesh>(proto_static_mesh)
+				});
+		}
+		// Add cameras to the list.
+		for (const auto& proto_camera : proto_tree.scene_cameras())
+		{
+			scene_map_.insert(
+				{
+					proto_camera.name(),
+					std::make_shared<SceneCamera>(proto_camera)
+				});
+		}
+		// Add lights on the list.
+		for (const auto& proto_light : proto_tree.scene_lights())
+		{
+			scene_map_.insert(
+				{
+					proto_light.name(),
+					std::make_shared<SceneLight>(proto_light)
+				});
+		}
+		// Check the root node is in the list.
+		if (scene_map_.find(root_node_name_) == scene_map_.end())
+		{
+			throw std::runtime_error(
+				"root node: " + root_node_name_ + " is not found!");
+		}
+		// Check we are all grounded to root node name!
+		for (const auto& scene_pair : scene_map_)
+		{
+			// This is the root node so it should be ok!
+			if (scene_pair.first == root_node_name_) continue;
+			auto scene_node = scene_pair.second;
+			std::uint32_t i = 0;
+			while(true)
+			{
+				// Update the scene node.
+				scene_node = scene_map_.at(scene_node->GetParentName());
+				// Found the root node.
+				if (scene_node->GetName() == root_node_name_) break;
+				// End up in a trap!
+				if (scene_node->GetName() == "")
+				{
+					throw std::runtime_error("Malformed scene tree!");
+				}
+				if (i++ > 0xffff)
+				{
+					throw std::runtime_error("Probably malformed scene tree.");
+				}
+			}
+		}
 	}
 
 	const std::map<std::string, sgl::SceneInterface::Ptr> 
@@ -149,13 +220,13 @@ namespace sgl {
 		throw std::runtime_error("no camera in the scene.");
 	}
 
-	SceneTree LoadSceneFromObjStream(
+	std::shared_ptr<SceneTree> LoadSceneFromObjStream(
 		std::istream& is,
 		const std::string& name) 
 	{
 		auto root_node = std::make_shared<SceneMatrix>(glm::mat4(1.0f));
-		SceneTree scene_tree = {};
-		scene_tree.AddNode(root_node);
+		auto scene_tree = std::make_shared<SceneTree>();
+		scene_tree->AddNode(root_node);
 		// Open the OBJ file.
 		std::string obj_text = "";
 		std::string obj_name = "";
@@ -168,7 +239,7 @@ namespace sgl {
 			const auto& root_name = root_node->GetName();
 			mesh_node->SetName(obj_name);
 			mesh_node->SetParentName(root_name);
-			scene_tree.AddNode(mesh_node);
+			scene_tree->AddNode(mesh_node);
 			obj_text.clear();
 			obj_name.clear();
 		};
@@ -211,9 +282,15 @@ namespace sgl {
 		return scene_tree;
 	}
 
-	SceneCamera::SceneCamera(const frame::proto::SceneCamera& proto_camera)
+	SceneCamera::SceneCamera(const frame::proto::SceneCamera& proto_camera) :
+		camera_(
+			ParseUniform(proto_camera.position()),
+			ParseUniform(proto_camera.target()),
+			ParseUniform(proto_camera.up()),
+			proto_camera.fov_degrees())	
 	{
-		assert(false);
+		SetName(proto_camera.name());
+		SetParentName(proto_camera.parent());
 	}
 
 	const glm::mat4 SceneCamera::GetLocalModel(
@@ -232,6 +309,8 @@ namespace sgl {
 
 	SceneLight::SceneLight(const frame::proto::SceneLight& proto_light)
 	{
+		SetName(proto_light.name());
+		SetParentName(proto_light.parent());
 		assert(false);
 	}
 

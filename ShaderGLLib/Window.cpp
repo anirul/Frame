@@ -64,10 +64,9 @@ namespace sgl {
 				// FIXME(anirul): May crash in case you resize the window.
 				if (draw_interface_)
 				{
+					// This will call the device startup.
 					draw_interface_->Startup(size_);
 				}
-				// Has to be done after the draw startup.
-				device_->Startup();
 				// While Run return true continue.
 				bool loop = true;
 				double previous_count = 0.0f;
@@ -95,7 +94,7 @@ namespace sgl {
 					if (draw_interface_)
 					{
 						draw_interface_->RunDraw(time.count());
-						device_->Display(draw_interface_->GetDrawTexture());
+						device_->Display();
 					}
 					else
 					{

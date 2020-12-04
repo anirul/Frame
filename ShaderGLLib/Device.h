@@ -30,10 +30,12 @@ namespace sgl {
 			const std::pair<std::uint32_t, std::uint32_t> size);
 
 	public:
-		// Pile up effect to be called before Startup.
-		void AddEffect(std::shared_ptr<Effect> effect);
 		// Startup the scene.
-		void Startup();
+		void Startup(
+			const frame::proto::Level& proto_level,
+			const frame::proto::EffectFile& proto_effect_file, 
+			const frame::proto::SceneFile& proto_scene_file,
+			const frame::proto::TextureFile& proto_texture_file);
 		// Draw to multiple textures.
 		// Take the total time from the beginning of the program to now as a
 		// const double parameter.
@@ -41,25 +43,21 @@ namespace sgl {
 			const std::shared_ptr<ProgramInterface> program,
 			const std::vector<std::shared_ptr<Texture>>& out_textures,
 			const double dt);
+		// CHECKME(anirul): Is it really needed?
 		// Add environment to the scene.
 		void AddEnvironment(const std::string& environment_map);
-		// Display a texture to the display.
-		void Display(const std::shared_ptr<Texture> texture);
+		// Display the output texture to the display.
+		void Display();
 		// Load scene from an OBJ file.
 		void LoadSceneFromObjFile(const std::string& obj_file);
 
 	public:
-		SceneTree GetSceneTree() const { return scene_tree_; }
-		void SetSceneTree(const SceneTree& scene_tree) 
-		{ 
-			scene_tree_ = scene_tree;
-		}
 		const glm::mat4 GetProjection() const final { return perspective_; }
 		const glm::mat4 GetView() const final { return view_; }
 		const glm::mat4 GetModel() const final { return model_; }
 		const double GetDeltaTime() const final { return dt_; }
 		const Camera& GetCamera() const final;
-		Camera& GetCamera() { return scene_tree_.GetDefaultCamera(); }
+		Camera& GetCamera() { return scene_tree_->GetDefaultCamera(); }
 		void* GetDeviceContext() const { return gl_context_; }
 		const std::string GetType() const { return "OpenGL"; }
 
@@ -69,16 +67,19 @@ namespace sgl {
 	private:
 		std::shared_ptr<Frame> frame_ = nullptr;
 		std::shared_ptr<Render> render_ = nullptr;
+		// CHECKME(anirul): Is it really needed?
 		std::shared_ptr<Material> environment_material_ = nullptr;
-		std::vector<std::shared_ptr<Effect>> effects_ = {};
-		std::map<std::string, std::shared_ptr<Material>> materials_ = {};
-		SceneTree scene_tree_ = {};
+		std::map<std::string, std::shared_ptr<Effect>> effect_map_ = {};
+		std::map<std::string, std::shared_ptr<Material>> material_map_ = {};
+		std::map<std::string, std::shared_ptr<Texture>> texture_map_ = {};
+		std::shared_ptr<SceneTree> scene_tree_ = nullptr;
+		// Output texture (to the screen).
+		std::string out_texture_name_ = "";
 		// PVM matrices.
 		glm::mat4 perspective_ = glm::mat4(1.0f);
 		glm::mat4 view_ = glm::mat4(1.0f);
 		glm::mat4 model_ = glm::mat4(1.0f);
-		// Field of view (in degrees).
-		float fov_ = 65.f;
+		// Save dt locally per frame.
 		double dt_ = 0.0f;
 		// Open GL context.
 		void* gl_context_ = nullptr;
