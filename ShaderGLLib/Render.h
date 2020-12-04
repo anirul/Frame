@@ -19,9 +19,7 @@ namespace sgl {
 		void UnBind() const override;
 		// /!\ This will bind and unbind!
 		void CreateStorage(
-			const std::pair<std::uint32_t, std::uint32_t> size,
-			const PixelDepthComponent pixel_depth_component =
-				PixelDepthComponent_DEPTH_COMPONENT24()) const;
+			const std::pair<std::uint32_t, std::uint32_t> size) const;
 
 	public:
 		const unsigned int GetId() const { return render_id_; }

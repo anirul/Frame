@@ -45,6 +45,15 @@ namespace sgl {
 			uniform_mat4.m44());
 	}
 
+	glm::quat ParseUniform(const frame::proto::UniformQuaternion& uniform_quat)
+	{
+		return glm::quat(
+			uniform_quat.w(),
+			uniform_quat.x(),
+			uniform_quat.y(),
+			uniform_quat.z());
+	}
+
 	void RegisterUniformFromProto(
 		const frame::proto::Uniform& uniform, 
 		const UniformInterface& uniform_interface, 

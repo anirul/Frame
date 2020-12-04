@@ -29,6 +29,10 @@ message Texture {
 	Size size = 2;
 	// Should it be a cleared texture?
 	bool clear = 3;
+	// Should we use mipmap?
+	bool mipmap = 4;
+	// Should it be a cubemap?
+	bool cubemap = 5;
 
 	// Format of the texture.
 	PixelElementSize pixel_element_size = 10;
@@ -43,4 +47,17 @@ message Texture {
 
 	// Pixel (if provided).
 	bytes pixels = 30;
+
+	// Load from a file.
+	string file_name = 40;
+
+	// Load from files.
+	// This is suppose to represent the 6 face of a cube map.
+	repeated string file_names = 41;
+}
+
+// Texture file.
+message TextureFile {
+	// Contain many textures.
+	repeated Texture textures = 1;
 }

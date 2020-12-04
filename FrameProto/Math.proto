@@ -25,6 +25,14 @@ message UniformVector4 {
 	float w = 4;
 }
 
+// 4	-> Quat
+message UniformQuaternion {
+	float w = 1;
+	float x = 2;
+	float y = 3;
+	float z = 4;
+}
+
 // 16   -> mat4
 message UniformMatrix4 {
 	float m11 = 11;
@@ -70,6 +78,10 @@ message UniformVector3s {
 
 message UniformVector4s {
 	repeated UniformVector4 values = 1;
+}
+
+message UniformQuaternions {
+	repeated UniformQuaternion values = 1;
 }
 
 message UniformMatrix4s {

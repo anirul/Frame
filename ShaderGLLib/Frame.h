@@ -10,7 +10,7 @@ namespace sgl {
 
 	class Texture;
 
-	enum class FrameTextureType
+	enum class FrameTextureType : std::int32_t
 	{
 		TEXTURE_2D = -1,
 		CUBE_MAP_POSITIVE_X = 0,
@@ -21,7 +21,7 @@ namespace sgl {
 		CUBE_MAP_NEGATIVE_Z = 5,
 	};
 
-	enum class FrameColorAttachment
+	enum class FrameColorAttachment : std::int32_t
 	{
 		COLOR_ATTACHMENT0 = GL_COLOR_ATTACHMENT0,
 		COLOR_ATTACHMENT1 = GL_COLOR_ATTACHMENT1,
@@ -67,8 +67,12 @@ namespace sgl {
 	protected:
 		const int GetFrameTextureType(
 			const FrameTextureType frame_texture_type) const;
+
+	protected:
 		void LockedBind() const override { locked_bind_ = true; }
 		void UnlockedBind() const override { locked_bind_ = false; }
+
+	protected:
 		friend class ScopedBind;
 
 	private:

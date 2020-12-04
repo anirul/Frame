@@ -5,19 +5,34 @@
 #include <fstream>
 #include <sstream>
 #include "Material.h"
+#include "Convert.h"
 
 namespace sgl {
 
-	const glm::mat4 SceneMatrix::GetLocalModel(const double dt) const
+	SceneMatrix::SceneMatrix(const frame::proto::SceneMatrix& proto_matrix)
 	{
-		if (parent_)
+		if (proto_matrix.name().empty()) 
 		{
-			return parent_->GetLocalModel(dt) * func_(dt);
+			throw std::runtime_error("scene matrix should have a name.");
 		}
-		else
+		SetName(proto_matrix.name());
+		SetParentName(proto_matrix.parent());
+		matrix_ = ParseUniform(proto_matrix.matrix());
+		euler_ = ParseUniform(proto_matrix.euler());
+		quaternion_ = ParseUniform(proto_matrix.quaternion());
+	}
+
+	const glm::mat4 SceneMatrix::GetLocalModel(
+		std::function<Ptr(const std::string&)> func,
+		const double dt) const
+	{
+		if (!GetParentName().empty())
 		{
-			return func_(dt);
+			return 
+				func(GetParentName())->GetLocalModel(func, dt) * 
+				ComputeLocalRotation(dt);
 		}
+		return ComputeLocalRotation(dt);
 	}
 
 	const std::shared_ptr<sgl::Mesh> SceneMatrix::GetLocalMesh() const
@@ -25,56 +40,117 @@ namespace sgl {
 		return nullptr;
 	}
 
-	const glm::mat4 SceneMesh::GetLocalModel(const double dt) const
+	glm::mat4 SceneMatrix::ComputeLocalRotation(const double dt) const
 	{
-		if (parent_)
+		// Check if we have a valid quaternion.
+		if (quaternion_ != glm::quat(1, 0, 0, 0) &&
+			quaternion_ != glm::quat(0, 0, 0, 0))
 		{
-			return parent_->GetLocalModel(dt);
+			// Return the matrix multiplied by the rotation of the quaternion.
+			return
+				matrix_ *
+				glm::toMat4(
+					glm::mix(
+						glm::quat(1, 0, 0, 0), 
+						quaternion_, 
+						static_cast<float>(dt)));
 		}
-		else
+		// Check if euler angler are valid (not 0).
+		if (euler_ != glm::vec3(0.f, 0.f, 0.f))
 		{
-			return glm::mat4(1.0f);
+			return 
+				matrix_ * 
+				glm::toMat4(glm::quat(euler_ * static_cast<float>(dt)));
 		}
+		// Nothing to do return the basic matrix.
+		return matrix_;
 	}
 
-	const std::shared_ptr<sgl::Mesh> SceneMesh::GetLocalMesh() const
-	{
-		return mesh_;
-	}
-
-	SceneTree::SceneTree(const frame::proto::Scene& proto)
+	SceneStaticMesh::SceneStaticMesh(
+		const frame::proto::SceneStaticMesh& proto_static_mesh)
 	{
 		assert(false);
 	}
 
-	void SceneTree::AddNode(
-		const SceneInterface::Ptr node, 
-		const SceneInterface::Ptr parent /*= nullptr*/)
+	const glm::mat4 SceneStaticMesh::GetLocalModel(
+		std::function<Ptr(const std::string&)> func,
+		const double dt) const
 	{
-		node->SetParent(parent);
-		scene_.push_back(node);
+		if (!GetParentName().empty()) 
+			return func(GetParentName())->GetLocalModel(func, dt);
+		return glm::mat4(1.0f);
+	}
+
+	const std::shared_ptr<sgl::Mesh> SceneStaticMesh::GetLocalMesh() const
+	{
+		return mesh_;
+	}
+
+	SceneTree::SceneTree(const frame::proto::SceneTree& proto_tree)
+	{
+		assert(false);
+	}
+
+	const std::map<std::string, sgl::SceneInterface::Ptr> 
+	SceneTree::GetSceneMap() const
+	{
+		return scene_map_;
+	}
+
+	const sgl::SceneInterface::Ptr SceneTree::GetSceneByName(
+		const std::string& name) const
+	{
+		return scene_map_.at(name);
+	}
+
+	void SceneTree::AddNode(const SceneInterface::Ptr node)
+	{
+		scene_map_.insert({ node->GetName(), node });
 	}
 
 	const SceneInterface::Ptr SceneTree::GetRoot() const
 	{
-		std::shared_ptr<SceneInterface> ret = nullptr;
-		for (const auto& scene : scene_)
+		SceneInterface::Ptr ret = nullptr;
+		for (const auto& pair : scene_map_)
 		{
-			if (!scene->GetParent())
+			const auto& scene = pair.second;
+			if (scene->GetParentName().empty())
 			{
 				if (ret)
-				{
 					throw std::runtime_error("More than one root?");
-				}
 				ret = scene;
 			}
 		}
 		return ret;
 	}
 
+	void SceneTree::SetDefaultCamera(const std::string& camera_name)
+	{
+		camera_name_ = camera_name;
+	}
+
+	Camera& SceneTree::GetDefaultCamera()
+	{
+		auto ptr = GetSceneByName(camera_name_);
+		if (ptr)
+		{
+			return dynamic_cast<SceneCamera*>(ptr.get())->GetCamera();
+		}
+		throw std::runtime_error("no camera in the scene.");
+	}
+
+	const sgl::Camera& SceneTree::GetDefaultCamera() const
+	{
+		auto ptr = GetSceneByName(camera_name_);
+		if (ptr)
+		{
+			return dynamic_cast<SceneCamera*>(ptr.get())->GetCamera();
+		}
+		throw std::runtime_error("no camera in the scene.");
+	}
+
 	SceneTree LoadSceneFromObjStream(
 		std::istream& is,
-		const std::shared_ptr<ProgramInterface> program,
 		const std::string& name) 
 	{
 		auto root_node = std::make_shared<SceneMatrix>(glm::mat4(1.0f));
@@ -84,13 +160,15 @@ namespace sgl {
 		std::string obj_text = "";
 		std::string obj_name = "";
 		auto lambda_create_mesh = 
-			[&obj_text, &obj_name, &scene_tree, &root_node, &program]() 
+			[&obj_text, &obj_name, &scene_tree, &root_node]() 
 		{
 			std::istringstream obj_iss(obj_text);
 			auto mesh = std::make_shared<Mesh>(obj_iss, obj_name);
-			auto mesh_node = std::make_shared<SceneMesh>(mesh);
-			mesh_node->SetParent(root_node);
-			scene_tree.AddNode(mesh_node, root_node);
+			auto mesh_node = std::make_shared<SceneStaticMesh>(mesh);
+			const auto& root_name = root_node->GetName();
+			mesh_node->SetName(obj_name);
+			mesh_node->SetParentName(root_name);
+			scene_tree.AddNode(mesh_node);
 			obj_text.clear();
 			obj_name.clear();
 		};
@@ -131,6 +209,79 @@ namespace sgl {
 		if (!obj_text.empty() && !obj_name.empty())
 			lambda_create_mesh();
 		return scene_tree;
+	}
+
+	SceneCamera::SceneCamera(const frame::proto::SceneCamera& proto_camera)
+	{
+		assert(false);
+	}
+
+	const glm::mat4 SceneCamera::GetLocalModel(
+		std::function<Ptr(const std::string&)> func,
+		const double dt) const
+	{
+		if (!GetParentName().empty())
+			return func(GetParentName())->GetLocalModel(func, dt);
+		return glm::mat4(1.0f);
+	}
+
+	const std::shared_ptr<sgl::Mesh> SceneCamera::GetLocalMesh() const
+	{
+		return nullptr;
+	}
+
+	SceneLight::SceneLight(const frame::proto::SceneLight& proto_light)
+	{
+		assert(false);
+	}
+
+	SceneLight::SceneLight(
+		const frame::proto::SceneLight::LightEnum light_type, 
+		const glm::vec3 position_or_direction, 
+		const glm::vec3 color) :
+		light_type_(light_type),
+		color_(color)
+	{
+		if (light_type_ == frame::proto::SceneLight::POINT)
+		{
+			position_ = position_or_direction;
+		}
+		else if (light_type_ == frame::proto::SceneLight::DIRECTIONAL)
+		{
+			direction_ = position_or_direction;
+		}
+		else
+		{
+			std::string value = std::to_string(static_cast<int>(light_type));
+			throw std::runtime_error("illegal light(" + value + ")");
+		}
+	}
+
+	SceneLight::SceneLight(
+		const glm::vec3 position, 
+		const glm::vec3 direction, 
+		const glm::vec3 color, 
+		const float dot_inner_limit, 
+		const float dot_outer_limit) :
+		light_type_(frame::proto::SceneLight::SPOT),
+		position_(position),
+		direction_(direction),
+		color_(color),
+		dot_inner_limit_(dot_inner_limit),
+		dot_outer_limit_(dot_outer_limit) {}
+
+	const glm::mat4 SceneLight::GetLocalModel(
+		std::function<Ptr(const std::string&)> func,
+		const double dt) const
+	{
+		if (!GetParentName().empty())
+			return func(GetParentName())->GetLocalModel(func, dt);
+		return glm::mat4(1.0f);
+	}
+
+	const std::shared_ptr<sgl::Mesh> SceneLight::GetLocalMesh() const
+	{
+		return nullptr;
 	}
 
 } // End namespace sgl.

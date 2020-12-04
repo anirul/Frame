@@ -7,10 +7,14 @@ void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 	// Pack it into a Scene object.
 	sgl::SceneTree scene_tree{};
 	auto root = std::make_shared<sgl::SceneMatrix>(glm::mat4(1.0));
+	root->SetName("root");
 	scene_tree.AddNode(root);
-	scene_tree.AddNode(std::make_shared<sgl::SceneMesh>(billboard_mesh), root);
+	auto billboard = 
+		std::make_shared<sgl::SceneStaticMesh>(billboard_mesh);
+	billboard->SetName("billboard");
+	billboard->SetParentName("root");
+	scene_tree.AddNode(billboard);
 	device_->SetSceneTree(scene_tree);
-
 	out_texture_ = std::make_shared<sgl::Texture>(size);
 }
 

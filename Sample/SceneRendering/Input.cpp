@@ -3,7 +3,7 @@
 bool Input::KeyPressed(const char key, const double dt)
 {
 	const float inc = 5.f * static_cast<float>(dt);
-	auto camera = device_->GetCamera();
+	auto& camera = device_->GetCamera();
 	auto position = camera.GetPosition();
 	auto right = camera.GetRight();
 	auto up = camera.GetUp();
@@ -25,7 +25,6 @@ bool Input::KeyPressed(const char key, const double dt)
 		position -= front * inc;
 	}
 	camera.SetPosition(position);
-	device_->SetCamera(camera);
 	return true;
 }
 
@@ -54,7 +53,6 @@ bool Input::MouseMoved(
 	}
 	camera.SetFront(front);
 	camera.SetUp({ 0, 1, 0 });
-	device_->SetCamera(camera);
 	return true;
 }
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <glm/gtx/quaternion.hpp>
 #include "../FrameProto/Proto.h"
 #include "../ShaderGLLib/Program.h"
 #include "../ShaderGLLib/Uniform.h"
@@ -21,6 +22,7 @@ namespace sgl {
 	glm::vec3 ParseUniform(const frame::proto::UniformVector3& uniform_vec3);
 	glm::vec4 ParseUniform(const frame::proto::UniformVector4& uniform_vec4);
 	glm::mat4 ParseUniform(const frame::proto::UniformMatrix4& uniform_mat4);
+	glm::quat ParseUniform(const frame::proto::UniformQuaternion& uniform_quat);
 
 	// Specialization into vector types.
 	template<typename T, typename U>

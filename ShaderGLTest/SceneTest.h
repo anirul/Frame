@@ -26,27 +26,30 @@ namespace test {
 			glm::mat4 identity(1.0f);
 			auto matrix_scene = std::make_shared<sgl::SceneMatrix>(identity);
 			auto program = sgl::CreateProgram("Simple");
-
+			matrix_scene->SetName("matrix_scene");
 			scene_tree_->AddNode(matrix_scene);
 			{
-				auto mesh = sgl::CreateMeshFromObjFile(
+				auto cube_mesh = sgl::CreateMeshFromObjFile(
 					"../Asset/Model/Cube.obj");
-				scene_tree_->AddNode(
-					std::make_shared<sgl::SceneMesh>(mesh),
-					matrix_scene);
+				auto cube = std::make_shared<sgl::SceneStaticMesh>(cube_mesh);
+				cube->SetName("cube");
+				cube->SetParentName("matrix_scene");
+				scene_tree_->AddNode(cube);
 			}
 			{
-				glm::mat4 disp(1.0);
-				disp = glm::translate(disp, glm::vec3(10.0, 10.0, 10.));
-				auto disp_scene =
-					std::make_shared<sgl::SceneMatrix>(disp);
-				scene_tree_->AddNode(disp_scene, matrix_scene);
+				glm::mat4 disp_mat(1.0);
+				disp_mat = glm::translate(disp_mat, glm::vec3(10.0, 10.0, 10.));
+				auto disp =	std::make_shared<sgl::SceneMatrix>(disp_mat);
+				disp->SetName("disp");
+				disp->SetParentName("matrix_scene");
+				scene_tree_->AddNode(disp);
 				{
 					auto mesh = sgl::CreateMeshFromObjFile(
 						"../Asset/Model/Torus.obj");
-					scene_tree_->AddNode(
-						std::make_shared<sgl::SceneMesh>(mesh),
-						disp_scene);
+					auto torus = std::make_shared<sgl::SceneStaticMesh>(mesh);
+					torus->SetName("torus");
+					torus->SetParentName("disp");
+					scene_tree_->AddNode(torus);
 				}
 			}
 		}

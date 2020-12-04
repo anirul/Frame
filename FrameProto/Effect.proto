@@ -28,3 +28,9 @@ message Effect {
 	// Uniform parameters.
 	repeated Uniform parameters = 21;
 }
+
+// Description of an effect file.
+message EffectFile {
+	// Contain many effects.
+	repeated Effect effects = 1;
+}

@@ -21,6 +21,16 @@ namespace test {
 		EXPECT_NO_THROW(error_.Display());
 	}
 
+	TEST_F(FrameTest, BindAttachErrorFrameTest)
+	{
+		EXPECT_EQ(GLEW_OK, glewInit());
+		EXPECT_FALSE(frame_);
+		frame_ = std::make_shared<sgl::Frame>();
+		EXPECT_TRUE(frame_);
+		sgl::Render render{};
+		EXPECT_THROW(frame_->AttachRender(render), std::exception);
+	}
+
 	TEST_F(FrameTest, BindAttachFrameTest)
 	{
 		EXPECT_EQ(GLEW_OK, glewInit());
@@ -28,6 +38,7 @@ namespace test {
 		frame_ = std::make_shared<sgl::Frame>();
 		EXPECT_TRUE(frame_);
 		sgl::Render render{};
+		render.CreateStorage({ 1, 1 });
 		frame_->AttachRender(render);
 		EXPECT_NO_THROW(error_.Display());
 	}
@@ -39,6 +50,7 @@ namespace test {
 		frame_ = std::make_shared<sgl::Frame>();
 		EXPECT_TRUE(frame_);
 		sgl::Render render{};
+		render.CreateStorage({ 1, 1 });
 		frame_->AttachRender(render);
 		EXPECT_NO_THROW(error_.Display());
 		sgl::Texture texture("../Asset/CubeMap/PositiveX.png");

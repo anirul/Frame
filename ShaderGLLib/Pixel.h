@@ -20,13 +20,6 @@ namespace sgl {
 	PixelStructure PixelStructure_RGB();
 	PixelStructure PixelStructure_RGB_ALPHA();
 	bool operator==(const PixelStructure& l, const PixelStructure& r);
-
-	using PixelDepthComponent = frame::proto::PixelDepthComponent;
-	PixelDepthComponent PixelDepthComponent_DEPTH_COMPONENT8();
-	PixelDepthComponent PixelDepthComponent_DEPTH_COMPONENT16();
-	PixelDepthComponent PixelDepthComponent_DEPTH_COMPONENT24();
-	PixelDepthComponent PixelDepthComponent_DEPTH_COMPONENT32();
-	bool operator==(const PixelDepthComponent& l, const PixelDepthComponent& r);
 	
 	// Get the GL_FLOAT and GL_UNSIGNED_BYTE.
 	int ConvertToGLType(
@@ -38,8 +31,5 @@ namespace sgl {
 	int ConvertToGLType(
 		const PixelElementSize& pixel_element_size, 
 		const PixelStructure& pixel_structure);
-	// Get the pixel depth component.
-	int ConvertToGLType(
-		const PixelDepthComponent& pixel_depth_component);
 
 } // End namespace sgl.

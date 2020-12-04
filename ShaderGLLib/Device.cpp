@@ -45,10 +45,6 @@ namespace sgl {
 		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 		error_.Display(__FILE__, __LINE__ - 1);
 
-		// Create programs.
-		pbr_program_ = CreateProgram("PhysicallyBasedRendering");
-		view_program_ = CreateProgram("ViewPositionNormal");
-
 		// Create a frame buffer and a render buffer.
 		frame_ = std::make_shared<Frame>();
 		render_ = std::make_shared<Render>();
@@ -59,52 +55,16 @@ namespace sgl {
 		effects_.push_back(effect);
 	}
 
-	void Device::Startup(const float fov /*= 65.0f*/)
+	void Device::Startup()
 	{
-		fov_ = fov;
+		// FIXME(anirul): Maybe should set a default camera or fix the
+		// FIXME(anirul): exception.
+		fov_ = scene_tree_.GetDefaultCamera().GetFovDegrees();
 		SetupCamera();
 		for (auto& effect : effects_)
 		{
-			effect->Startup(size_, *this);
+			effect->Startup(size_, shared_from_this(), CreateQuadMesh());
 		}
-	}
-
-	void Device::Draw(
-		const std::shared_ptr<ProgramInterface> program, 
-		const double dt)
-	{
-		static auto out_texture = std::make_shared<Texture>(
-			size_, 
-			sgl::PixelElementSize_HALF());
-		DrawMultiTextures(program, { out_texture }, dt);
-		Display(out_texture);
-	}
-
-	void Device::DrawDeferred(
-		const std::shared_ptr<ProgramInterface> program,
-		const std::vector<std::shared_ptr<Texture>>& out_textures,
-		const double dt)
-	{
-		// FIXME(anirul): use the program and not the one in device.
-		assert(out_textures.size() == 4);
-		pbr_program_->Use();
-		// This should be changed to update from the proto part.
-		pbr_program_->Uniform(
-			"camera_position",
-			GetCamera().GetPosition());
-		DrawMultiTextures(pbr_program_, out_textures, dt);
-	}
-
-	void Device::DrawView(
-		const std::shared_ptr<ProgramInterface> program,
-		const std::vector<std::shared_ptr<Texture>>& out_textures,
-		const double dt)
-	{
-		// FIXME(anirul): use the program and not the one in device.
-		assert(out_textures.size() == 2);
-		view_program_->Use();
-		view_program_->Uniform("inverted_normals", 0);
-		DrawMultiTextures(view_program_, out_textures, dt);
 	}
 
 	void Device::DrawMultiTextures(
@@ -112,6 +72,7 @@ namespace sgl {
 		const std::vector<std::shared_ptr<Texture>>& out_textures,
 		const double dt)
 	{
+		dt_ = dt;
 		assert(!out_textures.empty());
 
 		// Setup the camera.
@@ -121,12 +82,6 @@ namespace sgl {
 		ScopedBind scoped_bind_render(*render_);
 		render_->CreateStorage(size_);
 		frame_->AttachRender(*render_);
-
-#ifdef _DEBUG
-		GLboolean bool_array[1] = { GL_FALSE };
-		glGetBooleanv(GL_DEPTH_TEST, bool_array);
-		logger_->warn("GL_DEPTH_TEST := {}", bool_array[0]);
-#endif // _DEBUG
 
 		// Set the view port for rendering.
 		glViewport(0, 0, size_.first, size_.second);
@@ -148,8 +103,9 @@ namespace sgl {
 		}
 		frame_->DrawBuffers(static_cast<std::uint32_t>(out_textures.size()));
 
-		for (const auto& scene : scene_tree_.GetSceneVector())
+		for (const auto& pair : scene_tree_.GetSceneMap())
 		{
+			const auto& scene = pair.second;
 			const std::shared_ptr<Mesh>& mesh = scene->GetLocalMesh();
 			if (!mesh) continue;
 			if (mesh->IsClearDepthBuffer()) continue;
@@ -177,7 +133,12 @@ namespace sgl {
 				program,
 				perspective_,
 				view_,
-				scene->GetLocalModel(dt));
+				scene->GetLocalModel(
+					[this](const std::string& name) 
+					{
+						return scene_tree_.GetSceneByName(name);
+					}, 
+					dt));
 		}
 	}
 
@@ -206,9 +167,7 @@ namespace sgl {
 		environment_material_ = std::make_shared<Material>();
 		environment_material_->AddTexture("Skybox", texture);
 		cube_mesh->ClearDepthBuffer(true);
-		scene_tree_.AddNode(
-			std::make_shared<SceneMesh>(cube_mesh), 
-			scene_tree_.GetRoot());
+		scene_tree_.AddNode(std::make_shared<SceneStaticMesh>(cube_mesh));
 		
 		// Add the default texture to the texture manager.
 		environment_material_->AddTexture("Environment", texture);
@@ -279,7 +238,7 @@ namespace sgl {
 			100.0f);
 
 		// Set the camera.
-		view_ = camera_.GetLookAt();
+		view_ = scene_tree_.GetDefaultCamera().ComputeView();
 	}
 
 	void Device::LoadSceneFromObjFile(const std::string& obj_file)
@@ -335,26 +294,13 @@ namespace sgl {
 		}
 		scene_tree_ = LoadSceneFromObjStream(
 			std::istringstream(obj_content),
-			pbr_program_,
 			obj_file);
 		materials_ = LoadMaterialFromMtlStream(mtl_ifs, mtl_file);
 	}
 
-	const std::shared_ptr<Texture>& Device::GetDeferredTexture(
-		const int i) const
+	const Camera& Device::GetCamera() const
 	{
-		return deferred_textures_.at(i);
-	}
-
-	const std::shared_ptr<Texture>& Device::GetViewTexture(const int i) const
-	{
-		return view_textures_.at(i);
-	}
-
-	const std::shared_ptr<Texture>& Device::GetLightingTexture(
-		const int i) const
-	{
-		return lighting_textures_.at(i);
+		return scene_tree_.GetDefaultCamera();
 	}
 
 } // End namespace sgl.

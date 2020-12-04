@@ -461,6 +461,14 @@ namespace sgl {
 		UnBind();
 	}
 
+	TextureCubeMap::TextureCubeMap(
+		const frame::proto::Texture& texture, 
+		const std::pair<std::uint32_t, std::uint32_t> size)
+	{
+		// TODO(anirul): Implement me!
+		assert(false);
+	}
+
 	void TextureCubeMap::Bind(const unsigned int slot /*= 0*/) const
 	{
 		assert(slot < GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS);

@@ -9,10 +9,11 @@ namespace sgl {
 	struct UniformInterface
 	{
 		virtual ~UniformInterface() = default;
-		virtual const Camera GetCamera() const = 0;
+		virtual const Camera& GetCamera() const = 0;
 		virtual const glm::mat4 GetProjection() const = 0;
 		virtual const glm::mat4 GetView() const = 0;
 		virtual const glm::mat4 GetModel() const = 0;
+		virtual const double GetDeltaTime() const = 0;
 	};
 
 }

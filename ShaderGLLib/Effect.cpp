@@ -23,16 +23,15 @@ namespace sgl {
 
 	void Effect::Startup(
 		const std::pair<std::uint32_t, std::uint32_t> size,
-		const UniformInterface& uniform_interface)
+		const std::shared_ptr<UniformInterface> uniform_interface,
+		const std::shared_ptr<Mesh> mesh)
 	{
+		uniform_interface_ = uniform_interface;
 		size_ = size;
 		render_.CreateStorage(size_);
 		frame_.AttachRender(render_);
 		program_ = CreateProgram(shader_name_);
-		program_->Use();
-		for (const frame::proto::Uniform& uniform : uniforms_)
-			RegisterUniformFromProto(uniform, uniform_interface, *program_);
-		quad_ = CreateQuadMesh();
+		mesh_ = mesh;
 		for (const auto& texture : out_material_.GetMap())
 			frame_.AttachTexture(*texture.second);
 		frame_.DrawBuffers(
@@ -41,13 +40,21 @@ namespace sgl {
 
 	void Effect::Draw(const double dt /*= 0.0*/)
 	{
+		program_->Use();
+		for (const frame::proto::Uniform& uniform : uniforms_)
+			RegisterUniformFromProto(uniform, *uniform_interface_, *program_);
 		ScopedBind scoped_frame(frame_);
 		glViewport(0, 0, size_.first, size_.second);
 		error_.Display(__FILE__, __LINE__ - 1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		error_.Display(__FILE__, __LINE__ - 1);
-		quad_->SetMaterial(in_material_);
-		quad_->Draw(program_);
+		mesh_->SetMaterial(in_material_);
+		mesh_->Draw(program_);
+	}
+
+	const std::shared_ptr<sgl::ProgramInterface> Effect::GetProgram() const
+	{
+		return program_;
 	}
 
 } // End namespace sgl.

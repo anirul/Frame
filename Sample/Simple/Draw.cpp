@@ -17,29 +17,25 @@ void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 		auto scene_root = std::make_shared<sgl::SceneMatrix>(glm::mat4(
 			1.f, 0.f, 0.f, 0.f,
 			// TODO(anirul): Why is this inverted?
-			0.f, -1.f, 0.f, 0.f,
+			0.f, 1.f, 0.f, 0.f,
 			0.f, 0.f, 1.f, 0.f,
 			0.f, 0.f, 0.f, 1.f));
+		scene_root->SetName("scene_root");
 		scene_tree.AddNode(scene_root);
-		scene_tree.AddNode(
-			std::make_shared<sgl::SceneMesh>(cube_map_mesh_),
-			scene_root);
+		auto cube_map = std::make_shared<sgl::SceneStaticMesh>(cube_map_mesh_);
+		cube_map->SetName("cube_map");
+		cube_map->SetParentName("scene_root");
+		scene_tree.AddNode(cube_map);
 		auto scene_matrix = std::make_shared<sgl::SceneMatrix>(
-			[](const double dt) -> glm::mat4
-		{
-			glm::mat4 r_x(1.0f);
-			glm::mat4 r_y(1.0f);
-			glm::mat4 r_z(1.0f);
-			const auto dtf = static_cast<float>(dt);
-			r_x = glm::rotate(r_x, dtf * .1f, glm::vec3(1.0f, 0.0f, 0.0f));
-			r_y = glm::rotate(r_y, dtf * .0f, glm::vec3(0.0f, 1.0f, 0.0f));
-			r_z = glm::rotate(r_z, dtf * .2f, glm::vec3(0.0f, 0.0f, 1.0f));
-			return r_x * r_y * r_z;
-		});
-		scene_tree.AddNode(scene_matrix, scene_root);
-		scene_tree.AddNode(
-			std::make_shared<sgl::SceneMesh>(apple_mesh_),
-			scene_matrix);
+			glm::mat4(1.f), 
+			glm::quat(.9998096f, .0087261f, .0174522f, 0.f));
+		scene_matrix->SetName("scene_matrix");
+		scene_matrix->SetParentName("scene_root");
+		scene_tree.AddNode(scene_matrix);
+		auto apple_mesh = std::make_shared<sgl::SceneStaticMesh>(apple_mesh_);
+		apple_mesh->SetName("apple_mesh");
+		apple_mesh->SetParentName("scene_matrix");
+		scene_tree.AddNode(apple_mesh);
 	}
 	device_->SetSceneTree(scene_tree);
 
@@ -55,12 +51,7 @@ const std::shared_ptr<sgl::Texture> Draw::GetDrawTexture() const
 void Draw::RunDraw(const double dt)
 {
 	float dtf = static_cast<float>(dt);
-	glm::vec4 position = { 0.f, 0.f, 2.f, 0.f };
-	glm::vec4 front = { 0.f, 0.f, -1.f, 0.f };
-	glm::mat4 rot_y(1.0f);
-	rot_y = glm::rotate(rot_y, dtf * -.1f, glm::vec3(0.f, 1.f, 0.f));
-	sgl::Camera cam(glm::vec3(position * rot_y), glm::vec3(front * rot_y));
-	device_->SetCamera(cam);
+	// Rotating of the camera should come from the scene proto.
 	// Set the uniform for the cubemap program.
 	cubemap_program_->Use();
 	cubemap_program_->Uniform("projection", device_->GetProjection());

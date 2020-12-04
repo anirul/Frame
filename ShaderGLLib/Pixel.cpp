@@ -61,42 +61,6 @@ namespace sgl {
 		return pixel_structure;
 	}
 
-	PixelDepthComponent PixelDepthComponent_DEPTH_COMPONENT8()
-	{
-		PixelDepthComponent pixel_depth_component{};
-		pixel_depth_component.set_value(PixelDepthComponent::DEPTH_COMPONENT8);
-		return pixel_depth_component;
-	}
-
-	PixelDepthComponent PixelDepthComponent_DEPTH_COMPONENT16()
-	{
-		PixelDepthComponent pixel_depth_component{};
-		pixel_depth_component.set_value(
-			PixelDepthComponent::DEPTH_COMPONENT16);
-		return pixel_depth_component;
-	}
-
-	PixelDepthComponent PixelDepthComponent_DEPTH_COMPONENT24()
-	{
-		PixelDepthComponent pixel_depth_component{};
-		pixel_depth_component.set_value(
-			PixelDepthComponent::DEPTH_COMPONENT24);
-		return pixel_depth_component;
-	}
-
-	PixelDepthComponent PixelDepthComponent_DEPTH_COMPONENT32()
-	{
-		PixelDepthComponent pixel_depth_component{};
-		pixel_depth_component.set_value(
-			PixelDepthComponent::DEPTH_COMPONENT32);
-		return pixel_depth_component;
-	}
-
-	bool operator==(const PixelDepthComponent& l, const PixelDepthComponent& r)
-	{
-		return l.value() == r.value();
-	}
-
 	bool operator==(const PixelStructure& l, const PixelStructure& r)
 	{
 		return l.value() == r.value();
@@ -208,26 +172,6 @@ namespace sgl {
 				std::to_string(static_cast<int>(pixel_structure.value())) +
 				" or element size : " +
 				std::to_string(static_cast<int>(pixel_element_size.value())));
-	}
-
-	int ConvertToGLType(const PixelDepthComponent& pixel_depth_component)
-	{
-		switch (pixel_depth_component.value())
-		{
-			case PixelDepthComponent::DEPTH_COMPONENT8:
-				return GL_DEPTH_COMPONENT;
-			case PixelDepthComponent::DEPTH_COMPONENT16:
-				return GL_DEPTH_COMPONENT16;
-			case PixelDepthComponent::DEPTH_COMPONENT24:
-				return GL_DEPTH_COMPONENT24;
-			case PixelDepthComponent::DEPTH_COMPONENT32:
-				return GL_DEPTH_COMPONENT32;
-		}
-		throw
-			std::runtime_error(
-				"unknown depth component : " + 
-				std::to_string(
-					static_cast<int>(pixel_depth_component.value())));
 	}
 
 } // End namespace sgl.

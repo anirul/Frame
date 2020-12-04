@@ -8,6 +8,7 @@ namespace test {
 	using ::testing::AtLeast;
 	using ::testing::Exactly;
 	using ::testing::Return;
+	using ::testing::ReturnRef;
 	using ::testing::StrictMock;
 	using ::testing::TypedEq;
 
@@ -224,7 +225,7 @@ namespace test {
 		{
 			EXPECT_CALL(uniform_mock, GetCamera())
 				.Times(Exactly(1))
-				.WillOnce(Return(sgl::Camera{}));
+				.WillOnce(ReturnRef(sgl::Camera{}));
 			EXPECT_CALL(
 				program_mock,
 				Uniform(

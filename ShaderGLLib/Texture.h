@@ -140,6 +140,11 @@ namespace sgl {
 			const PixelElementSize& pixel_element_size = 
 				PixelElementSize_BYTE(),
 			const PixelStructure& pixel_structure = PixelStructure_RGB());
+		// Create from a proto.
+		// the size is the preferred size of the screen.
+		TextureCubeMap(
+			const frame::proto::Texture& texture,
+			const std::pair<std::uint32_t, std::uint32_t> size);
 
 	public:
 		void Bind(const unsigned int slot = 0) const override;

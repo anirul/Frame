@@ -17,7 +17,7 @@ namespace test {
 		EXPECT_FALSE(scene_);
 		auto program = sgl::CreateProgram("Simple");
 		auto mesh = sgl::CreateMeshFromObjFile("../Asset/Model/Cube.obj");
-		scene_ = std::make_shared<sgl::SceneMesh>(mesh);
+		scene_ = std::make_shared<sgl::SceneStaticMesh>(mesh);
 		EXPECT_TRUE(scene_);
 	}
 
@@ -31,8 +31,9 @@ namespace test {
 		PopulateTree();
 		unsigned int count_mesh = 0;
 		unsigned int count_matrix = 0;
-		for (const auto& scene : scene_tree_->GetSceneVector())
+		for (const auto& pair : scene_tree_->GetSceneMap())
 		{
+			const auto& scene = pair.second;
 			const auto& mesh = scene->GetLocalMesh();
 			if (mesh)
 			{
@@ -45,7 +46,7 @@ namespace test {
 		}
 		EXPECT_EQ(2, count_mesh);
 		EXPECT_EQ(2, count_matrix);
-		EXPECT_EQ(4, scene_tree_->GetSceneVector().size());
+		EXPECT_EQ(4, scene_tree_->GetSceneMap().size());
 	}
 
 } // End namespace test.

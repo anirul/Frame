@@ -11,16 +11,10 @@ namespace sgl {
 	{
 		glGenFramebuffers(1, &frame_id_);
 		error_.Display(__FILE__, __LINE__ - 1);
-#ifdef _DEBUG
-		logger_->info("create a new FRAME_BUFFER {}", frame_id_);
-#endif // _DEBUG
 	}
 
 	Frame::~Frame()
 	{
-#ifdef _DEBUG
-		logger_->info("deleted a FRAME_BUFFER {}", frame_id_);
-#endif // _DEBUG
 		glDeleteFramebuffers(1, &frame_id_);
 	}
 
@@ -30,17 +24,11 @@ namespace sgl {
 		if (locked_bind_) return;
 		glBindFramebuffer(GL_FRAMEBUFFER, frame_id_);
 		error_.Display(__FILE__, __LINE__ - 1);
-#ifdef _DEBUG
-		logger_->info("Binded FRAME_BUFFER {}    FB VVVV", frame_id_);
-#endif
 	}
 
 	void Frame::UnBind() const
 	{
 		if (locked_bind_) return;
-#ifdef _DEBUG
-		logger_->info("UnBinded FRAME_BUFFER {}  FB ^^^^", frame_id_);
-#endif
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		error_.Display(__FILE__, __LINE__ - 1);
 	}
@@ -51,24 +39,19 @@ namespace sgl {
 		render.Bind();
 		glFramebufferRenderbuffer(
 			GL_FRAMEBUFFER, 
-//			GL_COLOR_ATTACHMENT0,
 			GL_DEPTH_STENCIL_ATTACHMENT,
 			GL_RENDERBUFFER, 
 			render.GetId());
 		error_.Display(__FILE__, __LINE__ - 5);
-		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		auto status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+		if (status != GL_FRAMEBUFFER_COMPLETE)
 		{
+			auto error_pair = GetError();
 			error_.CreateError(
-				"frame buffer is not completed?", 
+				"frame buffer is not completed: " + error_pair.second, 
 				__FILE__, 
 				__LINE__ - 4);
 		}
-#ifdef _DEBUG
-		logger_->info(
-			"Attach FRAME_BUFFER {} to RENDER_BUFFER {} ",
-			frame_id_,
-			render.GetId());
-#endif // _DEBUG
 		render.UnBind();
 		UnBind();
 	}
@@ -89,13 +72,6 @@ namespace sgl {
 			texture.GetId(),
 			mipmap);
 		error_.Display(__FILE__, __LINE__ - 6);
-#ifdef _DEBUG
-		logger_->info(
-			"Attach TEXTURE {} to FRAME_BUFFER {} on {}",
-			texture.GetId(),
-			frame_id_,
-			frame_color_attachment);
-#endif // _DEBUG
 		UnBind();
 	}
 
@@ -292,7 +268,6 @@ namespace sgl {
 			}
 			ss << std::endl;
 		}
-
 		UnBind();
 		return ss.str();
 	}

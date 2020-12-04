@@ -6,29 +6,30 @@
 void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 {
 	// Open the Display.json file (in Asset/).
-	std::string file_name = "../Asset/SceneRendering.json";
-	std::ifstream ifs(file_name.c_str(), std::ios::in);
-	if (!ifs) error_.CreateError(
-		"Couldn't open file " + file_name, 
+	std::string level_file_name = "../Asset/SceneRendering.Level.json";
+	std::ifstream ifs_level(level_file_name.c_str(), std::ios::in);
+	if (!ifs_level) error_.CreateError(
+		"Couldn't open file " + level_file_name, 
 		__FILE__, 
 		__LINE__ - 4);
 	// Create a display (empty for now).
-	frame::proto::Display display{};
+	frame::proto::Level level{};
 	// Get the content of the file.
-	std::string contents(std::istreambuf_iterator<char>(ifs), {});
+	std::string contents(std::istreambuf_iterator<char>(ifs_level), {});
 	// Set the options for the parsing.
 	google::protobuf::util::JsonParseOptions options{};
 	options.ignore_unknown_fields = true;
 	// Parse the json file.
 	auto status = google::protobuf::util::JsonStringToMessage(
 		contents,
-		&display,
+		&level,
 		options);
 	if (!status.ok()) error_.CreateError(
 		status.ToString(), 
 		__FILE__, 
 		__LINE__ - 7);
-	// TODO(anirul): change these for "error_" checks.
+	assert(false);
+/*	// TODO(anirul): change these for "error_" checks.
 	assert(display.out_textures_size() > 0);
 	assert(display.textures_size() > 0);
 	assert(display.effects_size() > 0);
@@ -57,7 +58,7 @@ void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 		logger_->info("loading effect: {}.", effect.name());
 #endif
 	}
-	logger_->info("setting preferred texture to: {}", preferred_texture_);
+	logger_->info("setting preferred texture to: {}", preferred_texture_);*/
 }
 
 const std::shared_ptr<sgl::Texture> Draw::GetDrawTexture() const
@@ -71,6 +72,7 @@ void Draw::RunDraw(const double dt)
 	texture_map_["view_position"]->Clear(glm::vec4(0, 0, 0, 1));
 	texture_map_["view_normal"]->Clear(glm::vec4(0, 0, 0, 1));
 	// Do the deferred and view computation.
+/*
 	device_->DrawDeferred(
 		nullptr,
 		{	
@@ -84,6 +86,7 @@ void Draw::RunDraw(const double dt)
 		nullptr,
 		{ texture_map_["view_position"], texture_map_["view_normal"] }, 
 		dt);
+*/
 	// 13 14 -> 0 - Compute the Screen space ambient occlusion.
 	// ssao_->Draw();
 	// 0 -> 1 - Blur the Screen space ambient occlusion.

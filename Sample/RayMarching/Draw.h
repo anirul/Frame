@@ -17,6 +17,8 @@ private:
 	std::shared_ptr<sgl::Mesh> Draw::CreateBillboardMesh();
 
 private:
+	sgl::Error& error_ = sgl::Error::GetInstance();
+	sgl::Logger& logger_ = sgl::Logger::GetInstance();
 	std::shared_ptr<sgl::Texture> out_texture_ = nullptr;
 	std::shared_ptr<sgl::ProgramInterface> program_ = nullptr;
 	std::shared_ptr<sgl::Device> device_ = nullptr;

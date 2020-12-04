@@ -61,7 +61,7 @@ namespace sgl {
 
 			void Run() override
 			{
-				// FIXME(anirul): will crash in case you resize the window.
+				// FIXME(anirul): May crash in case you resize the window.
 				if (draw_interface_)
 				{
 					draw_interface_->Startup(size_);

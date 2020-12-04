@@ -94,8 +94,8 @@ add_custom_target(ShaderGL
 
 add_library(FrameProto
   STATIC
-    FrameProto/Display.proto
     FrameProto/Effect.proto
+    FrameProto/Level.proto
     FrameProto/Math.proto
     FrameProto/Pixel.proto
     FrameProto/Proto.h
@@ -230,11 +230,17 @@ target_link_libraries(ShaderGLTest
 
 add_executable(JapaneseFlag
   WIN32
+    Asset/Json/JapaneseFLag.Effect.json
+    Asset/Json/JapaneseFlag.Level.json
+    Asset/Json/JapaneseFlag.Scene.json
+    Asset/Json/JapaneseFLag.Texture.json
     Sample/Common/Application.cpp
     Sample/Common/Application.h
     Sample/Common/main.cpp
-    Sample/JapaneseFlag/Draw.cpp
-    Sample/JapaneseFlag/Draw.h
+    Sample/Common/Draw.cpp
+    Sample/Common/Draw.h
+    Sample/JapaneseFlag/Name.cpp
+    Sample/JapaneseFlag/Name.h
 )
 
 target_include_directories(JapaneseFlag
@@ -251,6 +257,10 @@ target_link_libraries(JapaneseFlag
 
 add_executable(RayMarching
   WIN32
+    Asset/Json/RayMarching.Effect.json
+    Asset/Json/RayMarching.Level.json
+    Asset/Json/RayMarching.Scene.json
+    Asset/Json/RayMarching.Texture.json
     Sample/Common/Application.cpp
     Sample/Common/Application.h
     Sample/Common/main.cpp
@@ -272,7 +282,10 @@ target_link_libraries(RayMarching
 
 add_executable(Simple
   WIN32
-    Asset/Simple.json
+    Asset/Json/Simple.Effect.json
+    Asset/Json/Simple.Level.json
+    Asset/Json/Simple.Scene.json
+    Asset/Json/Simple.Texture.json
     Sample/Common/Application.cpp
     Sample/Common/Application.h
     Sample/Common/main.cpp
@@ -294,7 +307,10 @@ target_link_libraries(Simple
 
 add_executable(SceneRendering
   WIN32
-    Asset/SceneRendering.json
+    Asset/Json/SceneRendering.Effect.json
+    Asset/Json/SceneRendering.Level.json
+    Asset/Json/SceneRendering.Scene.json
+    Asset/Json/SceneRendering.Texture.json
     Sample/SceneRendering/main.cpp
     Sample/SceneRendering/Application.cpp
     Sample/SceneRendering/Application.h

@@ -28,9 +28,11 @@ namespace sgl {
 		// called only once at the beginning).
 		void Startup(
 			const std::pair<std::uint32_t, std::uint32_t> size,
-			const UniformInterface& uniform_interface);
+			const std::shared_ptr<UniformInterface> uniform_interface,
+			const std::shared_ptr<Mesh> mesh = CreateQuadMesh());
 		// This is the draw interfaces.
 		void Draw(const double dt = 0.0);
+		const std::shared_ptr<ProgramInterface> GetProgram() const;
 
 	public:
 		// Get the name of the effect.
@@ -46,8 +48,9 @@ namespace sgl {
 		Material in_material_ = {};
 		Frame frame_ = {};
 		Render render_ = {};
+		std::shared_ptr<UniformInterface> uniform_interface_ = nullptr;
 		std::shared_ptr<ProgramInterface> program_ = nullptr;
-		std::shared_ptr<Mesh> quad_ = nullptr;
+		std::shared_ptr<Mesh> mesh_ = nullptr;
 		std::vector<frame::proto::Uniform> uniforms_{};
 	};
 

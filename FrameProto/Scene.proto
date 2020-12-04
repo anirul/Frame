@@ -4,9 +4,12 @@ import "Math.proto";
 
 package frame.proto;
 
-// Scene is a tentative way to load meshes.
-// For now it only load them from obj, mtl files.
+// Scene is a way to load meshes.
+// For now it only load them from obj, mtl files but ths will be able to load
+// from fbx files as soon as we switch to this assimp library. This will add
+// skeleton animation so a new type of mesh.
 
+// Matrix
 message SceneMatrix {
 	// This is the name of the scene matrix.
 	string name = 1;
@@ -14,19 +17,75 @@ message SceneMatrix {
 	string parent = 2;
 	// Matrix.
 	UniformMatrix4 matrix = 3;
+	// Optional euler multiplication of the dt to the matrix.
+	UniformVector3 euler = 4;
+	// Optional quaternion multiplication of the dt to the matrix.
+	UniformQuaternion quaternion = 5;
 }
 
-message SceneMesh {
+// Static Mesh.
+message SceneStaticMesh {
 	// This is the name of the mesh.
 	string name = 1;
 	// Give the name of the parent (if present).
 	string parent = 2;
 	// Where the file is loaded from.
 	string file_name = 10;
+	// Effect applied to the mesh.
+	string effect = 11;
+}
+
+// Camera
+message SceneCamera {
+	// This is the name of the camera.
+	string name = 1;
+	// Give the name of the parent (if present).
+	string parent = 2;
+	// Position of the camera in space.
+	UniformVector3 position = 3;
+	// Target where the camera is looking.
+	UniformVector3 target = 4;
+	// Up vector of the camera.
+	UniformVector3 up = 5;
+}
+
+// Light
+message SceneLight {
+	// This is the name of the light.
+	string name = 1;
+	// Give the name of the parent (if present).
+	string parent = 2;
+	
+	// Light type this is what the light can be.
+	enum LightEnum {
+		INVALID = 0;
+		AMBIENT = 1;
+		POINT = 2;
+		DIRECTIONAL = 3;
+		SPOT = 4;
+	}
+	// The light type of this light.
+	LightEnum light_type = 10;
+	
+	// Position of the light.
+	// not considered in case this is  AMBIENT, DIRECTIONAL.
+	UniformVector3 position = 20;
+	// Direction of the light 
+	// not considered in case this is AMBIENT, POINT.
+	UniformVector3 direction = 21;
+	// Dot inner limit for spot light.
+	// not considered in cast this is AMBIENT, POINT, DIRECTIONAL.
+	float dot_inner_limit = 22;
+	// Dot outer limit for spot light.
+	// not considered in cast this is AMBIENT, POINT, DIRECTIONAL.
+	float dot_outer_limit = 23;
+
+	// Color of the light.
+	UniformVector3 color = 30;
 }
 
 // Scene definition.
-message Scene {
+message SceneTree {
 	// This is the name of the scene.
 	string name = 1;
 	// This defined witch is the root of the scene tree.
@@ -34,5 +93,15 @@ message Scene {
 	// This is a list of scene matrices.
 	repeated SceneMatrix scene_matrices = 11;
 	// This is a list of scene meshes.
-	repeated SceneMesh scene_meshes = 12;
+	repeated SceneStaticMesh scene_static_meshes = 12;
+	// This is the camera scene node.
+	repeated SceneCamera scene_cameras = 13;
+	// This is the node for the lights.
+	repeated SceneLight scene_lights = 14;
+}
+
+// Scene file.
+message SceneFile {
+	// Contain many scene trees.
+	repeated SceneTree scene_trees = 1;
 }

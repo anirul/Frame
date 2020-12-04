@@ -14,10 +14,10 @@ public:
 	void RunDraw(const double dt) override;
 
 private:
-	std::shared_ptr<sgl::Mesh> Draw::CreateBillboardMesh();
-
-private:
-	std::shared_ptr<sgl::Texture> out_texture_ = nullptr;
-	std::shared_ptr<sgl::ProgramInterface> program_ = nullptr;
+	sgl::Error& error_ = sgl::Error::GetInstance();
+	sgl::Logger& logger_ = sgl::Logger::GetInstance();
 	std::shared_ptr<sgl::Device> device_ = nullptr;
+	std::string out_texture_ = "";
+	std::map<std::string, std::shared_ptr<sgl::Texture>> texture_map_ = {};
+	std::map<std::string, std::shared_ptr<sgl::Effect>> effect_map_ = {};
 };

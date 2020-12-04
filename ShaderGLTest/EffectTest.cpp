@@ -35,9 +35,9 @@ namespace test {
 		EXPECT_NO_THROW(effect_ptr = 
 			std::make_shared<sgl::Effect>(effect_proto, empty_map));
 		EXPECT_TRUE(effect_ptr);
-		StrictMock<UniformMock> uniform_mock{};
+		auto uniform_mock_ptr = std::make_shared<StrictMock<UniformMock>>();
 		std::pair<std::uint32_t, std::uint32_t> size = { 32, 32 };
-		EXPECT_NO_THROW(effect_ptr->Startup(size, uniform_mock));
+		EXPECT_NO_THROW(effect_ptr->Startup(size, uniform_mock_ptr));
 	}
 
 	TEST_F(EffectTest, EffectFullTest)
@@ -68,9 +68,9 @@ namespace test {
 		EXPECT_NO_THROW(effect_ptr =
 			std::make_shared<sgl::Effect>(effect_proto, in_out_map));
 		EXPECT_TRUE(effect_ptr);
-		StrictMock<UniformMock> uniform_mock{};
+		auto uniform_mock_ptr = std::make_shared<StrictMock<UniformMock>>();
 		std::pair<std::uint32_t, std::uint32_t> size = { 32, 32 };
-		EXPECT_NO_THROW(effect_ptr->Startup(size, uniform_mock));
+		EXPECT_NO_THROW(effect_ptr->Startup(size, uniform_mock_ptr));
 		EXPECT_NO_THROW(effect_ptr->Draw());
 	}
 
