@@ -25,17 +25,7 @@ void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 		proto_texture_file);
 }
 
-void Draw::RunDraw(const double dt)
-{
-	for (auto pair : effect_map_)
-	{
-		auto effect = pair.second;
-		device_->DrawMultiTextures(
-			effect->GetProgram(), 
-			{ texture_map_.at(out_texture_) }, 
-			dt);
-	}
-}
+void Draw::RunDraw(const double dt) {}
 
 const std::shared_ptr<sgl::Texture> Draw::GetDrawTexture() const
 {

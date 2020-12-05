@@ -25,12 +25,11 @@ namespace test {
 		EXPECT_FALSE(device_);
 		EXPECT_TRUE(window_);
 		device_ = window_->GetUniqueDevice();
-		EXPECT_NO_THROW(
-			device_->Startup(
-				GetLevel(), 
-				GetEffectFile(), 
-				GetSceneFile(), 
-				GetTextureFile()));
+		device_->Startup(
+			GetLevel(), 
+			GetEffectFile(), 
+			GetSceneFile(), 
+			GetTextureFile());
 		EXPECT_TRUE(device_);
 	}
 
@@ -40,7 +39,7 @@ namespace test {
 		level.set_level_name("test");
 		level.set_default_camera_name("camera");
 		level.set_default_scene_name("scene");
-		level.set_default_texture_name("output");
+		level.set_default_texture_name("texture");
 		return level;
 	}
 
@@ -50,9 +49,9 @@ namespace test {
 		frame::proto::Effect effect{};
 		{
 			effect.set_name("effect");
-			effect.set_intput_type(frame::proto::Effect::SCENE);
+			effect.set_render_type(frame::proto::Effect::SCENE);
 			effect.set_shader("Blur");
-			effect.add_output_textures_names("output");
+			effect.add_output_textures_names("texture");
 		}
 		*effect_file.add_effects() = effect;
 		return effect_file;
@@ -63,6 +62,7 @@ namespace test {
 		frame::proto::SceneFile scene_file{};
 		frame::proto::SceneTree scene_tree{};
 		{
+			scene_tree.set_name("scene");
 			frame::proto::SceneMatrix scene_matrix{};
 			{
 				scene_matrix.set_name("root");
@@ -71,6 +71,7 @@ namespace test {
 			frame::proto::SceneCamera scene_camera{};
 			{
 				scene_camera.set_name("camera");
+				scene_camera.set_parent("root");
 			}
 			*scene_tree.add_scene_cameras() = scene_camera;
 			scene_tree.set_root_node("root");
@@ -85,6 +86,10 @@ namespace test {
 		frame::proto::Texture texture{};
 		{
 			texture.set_name("texture");
+			texture.mutable_pixel_element_size()->set_value(
+				frame::proto::PixelElementSize::HALF);
+			texture.mutable_pixel_structure()->set_value(
+				frame::proto::PixelStructure::RGB);
 		}
 		*texture_file.add_textures() = texture;
 		return texture_file;

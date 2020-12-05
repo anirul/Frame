@@ -10,12 +10,14 @@ namespace test {
 	TEST_F(EffectTest, ParseConstructorEffectTest)
 	{
 		frame::proto::Effect effect_proto;
+		effect_proto.set_shader("Blur");
 		EXPECT_NO_THROW(sgl::Effect effect(effect_proto, {}));
 	}
 
 	TEST_F(EffectTest, CheckNameEffectTest)
 	{
 		frame::proto::Effect effect_proto;
+		effect_proto.set_shader("Blur");
 		effect_proto.set_name("test");
 		sgl::Effect effect(effect_proto, {});
 		EXPECT_EQ("test", effect.GetName());
@@ -71,7 +73,7 @@ namespace test {
 		auto uniform_mock_ptr = std::make_shared<StrictMock<UniformMock>>();
 		std::pair<std::uint32_t, std::uint32_t> size = { 32, 32 };
 		EXPECT_NO_THROW(effect_ptr->Startup(size, uniform_mock_ptr));
-		EXPECT_NO_THROW(effect_ptr->Draw());
+		EXPECT_NO_THROW(effect_ptr->Draw(sgl::CreateQuadMesh()));
 	}
 
 } // End namespace test.

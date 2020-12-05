@@ -81,8 +81,7 @@ namespace sgl {
 			texture_map_.insert({ proto_texture.name(), texture });
 		}
 		out_texture_name_ = proto_level.default_texture_name();
-		if (texture_map_.find(proto_level.default_texture_name()) ==
-			texture_map_.end())
+		if (texture_map_.find(out_texture_name_) ==	texture_map_.end())
 		{
 			throw std::runtime_error(
 				"no default texture is loaded: " +
@@ -104,6 +103,9 @@ namespace sgl {
 		{
 			effect_pair.second->Startup(size_, shared_from_this());
 		}
+
+		cube_ = CreateCubeMesh();
+		quad_ = CreateQuadMesh();
 	}
 
 	void Device::DrawMultiTextures(
@@ -183,6 +185,16 @@ namespace sgl {
 
 	void Device::Display()
 	{
+		for (const auto& name_effect_pair : effect_map_)
+		{
+			const auto effect = name_effect_pair.second;
+			if (effect->GetRenderType() == frame::proto::Effect::INVALID)
+				throw std::runtime_error("INVALID effect?");
+			if (effect->GetRenderType() == frame::proto::Effect::TEXTURE_2D)
+				effect->Draw(quad_, dt_);
+			if (effect->GetRenderType() == frame::proto::Effect::TEXTURE_3D)
+				effect->Draw(cube_, dt_);
+		}
 		static auto program = CreateProgram("Display");
 		static auto quad = CreateQuadMesh();
 		auto material = std::make_shared<Material>();

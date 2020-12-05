@@ -7,7 +7,7 @@ package frame.proto;
 // Description of a 2D effect.
 message Effect {
 	// Input Type this is the type of input of the effect.
-	enum InputEnum {
+	enum RenderEnum {
 		INVALID = 0;
 		TEXTURE_2D = 1;
 		TEXTURE_3D = 2;
@@ -16,7 +16,7 @@ message Effect {
 	// Name of the effect.
 	string name = 1;
 	// Input type.
-	InputEnum intput_type = 2;
+	RenderEnum render_type = 2;
 	// Input textures.
 	repeated string input_textures_names = 10;
 	// Output textures.

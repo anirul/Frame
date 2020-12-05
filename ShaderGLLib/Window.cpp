@@ -90,17 +90,12 @@ namespace sgl {
 						}
 					}
 
-					// Draw the Scene.
+					// Draw the Scene not used?
 					if (draw_interface_)
 					{
 						draw_interface_->RunDraw(time.count());
-						device_->Display();
 					}
-					else
-					{
-						throw std::runtime_error(
-							"You need a draw interface now!");
-					}
+					device_->Display();
 
 					SetWindowTitle(
 						"SDL OpenGL - " + 
