@@ -3,24 +3,26 @@ syntax = "proto3";
 package frame.proto;
 
 // Level this describe the level loading of the app.
+// Next 8
 message Level {
 	// Level name.
 	string level_name = 1;
 	// default texture name, this is the texture that will be shown.
-	string default_texture_name = 10;
+	string default_texture_name = 2;
 	// default scene name this is the default scene that will be shown.
-	string default_scene_name = 11;
+	string default_scene_name = 3;
 	// default camera name this is the default camera.
-	string default_camera_name = 12;
+	string default_camera_name = 4;
 	// This file will contain the textures that are needed.
-	string texture_file = 20;
+	string texture_file = 5;
 	// This file will contain the effects that are needed.
-	string effect_file = 21;
+	string effect_file = 6;
 	// This file will contain the scene that are needed.
-	string scene_file = 22;
+	string scene_file = 7;
 }
 
 // File description for levels (for now only one).
+// Next 2
 message LevelFile {
 	repeated Level levels = 1;
 }

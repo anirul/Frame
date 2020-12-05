@@ -7,6 +7,7 @@ package frame.proto;
 //  - (-1) -> size of the screen.
 //  - (-2) -> size of the screen / 2.
 //  - (-?) -> size of the screen / ?.
+// Next 3
 message Size {
 	int32 x = 1;
 	int32 y = 2;

@@ -1,4 +1,5 @@
 #include "Convert.h"
+#include "Logger.h"
 
 namespace sgl {
 
@@ -59,7 +60,7 @@ namespace sgl {
 		const UniformInterface& uniform_interface, 
 		const ProgramInterface& program_interface)
 	{
-		switch (uniform.value_case())
+		switch (uniform.value_oneof_case())
 		{
 			case frame::proto::Uniform::kUniformInt:
 			{
@@ -85,6 +86,7 @@ namespace sgl {
 			case frame::proto::Uniform::kUniformEnum:
 			{
 				RegisterUniformEnumFromProto(
+					uniform.name(),
 					uniform.uniform_enum(), 
 					uniform_interface, 
 					program_interface);
@@ -176,80 +178,84 @@ namespace sgl {
 			}
 			default:
 				throw std::runtime_error("Unknown case : in uniform parsing!");
-
 		}
 	}
 
 	void RegisterUniformEnumFromProto(
+		const std::string& name,
 		const frame::proto::Uniform::UniformEnum& uniform_enum, 
 		const UniformInterface& uniform_interface, 
 		const ProgramInterface& program_interface)
 	{
 		switch (uniform_enum)
 		{
-			case frame::proto::Uniform::UniformEnum::
-			Uniform_UniformEnum_PROJECTION_MAT4:
+			case frame::proto::Uniform::PROJECTION_MAT4:
 			{
 				program_interface.Uniform(
-					"projection",
+					name,
 					uniform_interface.GetProjection());
 				break;
 			}
-			case frame::proto::Uniform::UniformEnum::
-			Uniform_UniformEnum_PROJECTION_INV_MAT4:
+			case frame::proto::Uniform::PROJECTION_INV_MAT4:
 			{
 				program_interface.Uniform(
-					"projection_inv",
+					name,
 					glm::inverse(uniform_interface.GetProjection()));
 				break;
 			}
-			case frame::proto::Uniform::UniformEnum::
-			Uniform_UniformEnum_VIEW_MAT4:
+			case frame::proto::Uniform::VIEW_MAT4:
 			{
 				program_interface.Uniform(
-					"view",
+					name,
 					uniform_interface.GetView());
 				break;
 			}
-			case frame::proto::Uniform::UniformEnum::
-			Uniform_UniformEnum_VIEW_INV_MAT4:
+			case frame::proto::Uniform::VIEW_INV_MAT4:
 			{
 				program_interface.Uniform(
-					"view_inv",
+					name,
 					glm::inverse(uniform_interface.GetView()));
 				break;
 			}
-			case frame::proto::Uniform::UniformEnum::
-			Uniform_UniformEnum_MODEL_MAT4:
+			case frame::proto::Uniform::MODEL_MAT4:
 			{
 				program_interface.Uniform(
-					"model",
+					name,
 					uniform_interface.GetModel());
 				break;
 			}
-			case frame::proto::Uniform::UniformEnum::
-			Uniform_UniformEnum_MODEL_INV_MAT4:
+			case frame::proto::Uniform::MODEL_INV_MAT4:
 			{
 				program_interface.Uniform(
-					"model_inv",
+					name,
 					glm::inverse(uniform_interface.GetModel()));
 				break;
 			}
-			case frame::proto::Uniform::UniformEnum::
-			Uniform_UniformEnum_CAMERA_POSITION_VEC3:
+			case frame::proto::Uniform::CAMERA_POSITION_VEC3:
 			{
 				program_interface.Uniform(
-					"camera_position",
+					name,
 					uniform_interface.GetCamera().GetPosition());
 				break;
 			}
-			case frame::proto::Uniform::UniformEnum::
-			Uniform_UniformEnum_CAMERA_DIRECTION_VEC3:
+			case frame::proto::Uniform::CAMERA_DIRECTION_VEC3:
 			{
 				const Camera& cam = uniform_interface.GetCamera();
 				program_interface.Uniform(
-					"camera_direction",
+					name,
 					cam.GetFront() - cam.GetPosition());
+				break;
+			}
+			case frame::proto::Uniform::FLOAT_TIME_S:
+			{
+				static Logger& logger_ = Logger::GetInstance();
+				logger_->info(
+					"set {} := {}", 
+					name,
+					static_cast<float>(uniform_interface.GetDeltaTime()));
+				program_interface.Uniform(
+					name,
+					static_cast<float>(uniform_interface.GetDeltaTime()));
 				break;
 			}
 			default:

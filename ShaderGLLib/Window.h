@@ -33,8 +33,6 @@ namespace sgl {
 			const std::pair<std::uint32_t, std::uint32_t> size) = 0;
 		// This should call the DrawMultiTextures or any draw from the device.
 		virtual void RunDraw(const double dt) = 0;
-		// Should get the output buffer.
-		virtual const std::shared_ptr<Texture> GetDrawTexture() const = 0;
 	}; 
 
 	// Interface to a window this is specific to a platform (see Windows, SDL, 

@@ -26,8 +26,3 @@ void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 }
 
 void Draw::RunDraw(const double dt) {}
-
-const std::shared_ptr<sgl::Texture> Draw::GetDrawTexture() const
-{
-	return texture_map_.at(out_texture_);
-}

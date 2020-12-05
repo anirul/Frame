@@ -183,8 +183,9 @@ namespace sgl {
 		}
 	}
 
-	void Device::Display()
+	void Device::Display(const double dt)
 	{
+		dt_ = dt;
 		for (const auto& name_effect_pair : effect_map_)
 		{
 			const auto effect = name_effect_pair.second;

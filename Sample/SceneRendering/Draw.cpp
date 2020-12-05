@@ -61,11 +61,6 @@ void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 	logger_->info("setting preferred texture to: {}", preferred_texture_);*/
 }
 
-const std::shared_ptr<sgl::Texture> Draw::GetDrawTexture() const
-{
-	return texture_map_.at(preferred_texture_);
-}
-
 void Draw::RunDraw(const double dt)
 {
 	// Have to be cleaned.

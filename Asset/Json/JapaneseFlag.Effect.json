@@ -1,8 +1,8 @@
 {
   "effects": [
     {
-      "name": "JapaneseFlag",
-      "input_type": "TEXTURE_2D",
+      "name": "JapaneseFlagEffect",
+      "render_type": "TEXTURE_2D",
       "output_textures_names": "billboard",
       "shader": "JapaneseFlag"
     }

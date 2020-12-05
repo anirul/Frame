@@ -47,7 +47,7 @@ namespace sgl {
 		// Add environment to the scene.
 		void AddEnvironment(const std::string& environment_map);
 		// Display the output texture to the display.
-		void Display();
+		void Display(const double dt);
 		// Load scene from an OBJ file.
 		void LoadSceneFromObjFile(const std::string& obj_file);
 

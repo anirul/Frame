@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package frame.proto;
 
+// Next 2
 message PixelElementSize {
 	enum Enum {
 		INVALID				= 0;
@@ -13,6 +14,7 @@ message PixelElementSize {
 	Enum value = 1;
 }
 
+// Next 2
 message PixelStructure {
 	enum Enum {
 		INVALID				= 0;
@@ -24,6 +26,7 @@ message PixelStructure {
 	Enum value = 1;
 }
 
+// Next 2
 message PixelDepthComponent {
 	enum Enum {
 		INVALID				= 0;

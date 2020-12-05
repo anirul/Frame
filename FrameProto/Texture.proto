@@ -6,6 +6,7 @@ import "Pixel.proto";
 package frame.proto;
 
 // Texture filter used in texture declaration.
+// Next 2
 message TextureFilter {
 	enum Enum {
 		INVALID                = 0;
@@ -22,6 +23,7 @@ message TextureFilter {
 	Enum value = 1;
 }
 
+// Next 16
 message Texture {
 	// Name of the texture.
 	string name = 1;
@@ -35,28 +37,29 @@ message Texture {
 	bool cubemap = 5;
 
 	// Format of the texture.
-	PixelElementSize pixel_element_size = 10;
-	PixelStructure pixel_structure = 11;
+	PixelElementSize pixel_element_size = 6;
+	PixelStructure pixel_structure = 7;
 
 	// Filter for mirroring and texture sampling.
-	TextureFilter min_filter = 21;
-	TextureFilter mag_filter = 22;
-	TextureFilter wrap_s = 23;
-	TextureFilter wrap_t = 24;
-	TextureFilter wrap_r = 25;
+	TextureFilter min_filter = 8;
+	TextureFilter mag_filter = 9;
+	TextureFilter wrap_s = 10;
+	TextureFilter wrap_t = 11;
+	TextureFilter wrap_r = 12;
 
 	// Pixel (if provided).
-	bytes pixels = 30;
+	bytes pixels = 13;
 
 	// Load from a file.
-	string file_name = 40;
+	string file_name = 14;
 
 	// Load from files.
 	// This is suppose to represent the 6 face of a cube map.
-	repeated string file_names = 41;
+	repeated string file_names = 15;
 }
 
 // Texture file.
+// Next 2
 message TextureFile {
 	// Contain many textures.
 	repeated Texture textures = 1;

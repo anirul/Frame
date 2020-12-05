@@ -124,6 +124,7 @@ namespace test {
 		StrictMock<UniformMock> uniform_mock{};
 		EXPECT_THROW(
 			sgl::RegisterUniformEnumFromProto(
+				"test",
 				uniform_enum, 
 				uniform_mock, 
 				program_mock),
@@ -168,6 +169,7 @@ namespace test {
 				.Times(Exactly(1));
 		}
 		sgl::RegisterUniformEnumFromProto(
+			"test",
 			uniform_enum,
 			uniform_mock,
 			program_mock);
@@ -234,6 +236,7 @@ namespace test {
 				.Times(Exactly(1));
 		}
 		sgl::RegisterUniformEnumFromProto(
+			"test",
 			uniform_enum,
 			uniform_mock,
 			program_mock);

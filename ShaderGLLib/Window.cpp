@@ -95,7 +95,7 @@ namespace sgl {
 					{
 						draw_interface_->RunDraw(time.count());
 					}
-					device_->Display();
+					device_->Display(time.count());
 
 					SetWindowTitle(
 						"SDL OpenGL - " + 

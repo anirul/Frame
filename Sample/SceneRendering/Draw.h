@@ -13,7 +13,6 @@ public:
 
 public:
 	void Startup(const std::pair<std::uint32_t, std::uint32_t> size) override;
-	const std::shared_ptr<sgl::Texture> GetDrawTexture() const override;
 	void RunDraw(const double dt) override;
 
 private:

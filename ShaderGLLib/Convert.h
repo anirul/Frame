@@ -48,6 +48,7 @@ namespace sgl {
 
 	// Register the uniform enum in the program.
 	void RegisterUniformEnumFromProto(
+		const std::string& name,
 		const frame::proto::Uniform::UniformEnum& uniform_enum,
 		const UniformInterface& uniform_interface,
 		const ProgramInterface& program_interface);
