@@ -4,7 +4,7 @@
       "name": "JapaneseFlagEffect",
       "render_input_type": "NONE",
       "render_output_type": "TEXTURE_2D",
-      "output_textures_names": "billboard",
+      "output_texture_names": "billboard",
       "shader": "JapaneseFlag"
     }
   ]

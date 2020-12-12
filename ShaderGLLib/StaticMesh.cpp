@@ -89,7 +89,7 @@ namespace sgl {
 			indices.size() * sizeof(std::int32_t),
 			indices.data());
 
-		// Get the size of the indices.
+		// Get the size of the indices (primitive count not triangles).
 		index_size_ = static_cast<GLsizei>(indices.size());
 
 		// Create a new vertex array (to render the mesh).
@@ -122,10 +122,7 @@ namespace sgl {
 	}
 
 	void StaticMesh::Draw(
-		const std::shared_ptr<ProgramInterface> program,
-		const glm::mat4 projection /*= glm::mat4(1.0f)*/,
-		const glm::mat4 view /*= glm::mat4(1.0f)*/,
-		const glm::mat4 model /*= glm::mat4(1.0f)*/) const
+		const std::shared_ptr<ProgramInterface> program) const
 	{
 		if (material_) material_->DisableAll();
 		if (!program) throw std::runtime_error("program is not set.");
@@ -142,11 +139,6 @@ namespace sgl {
 		
 		glBindVertexArray(vertex_array_object_);
 		error_.Display(__FILE__, __LINE__ - 1);
-
-		// Push updated matrices.
-		program->Uniform("projection", projection);
-		program->Uniform("view", view);
-		program->Uniform("model", model);
 
 		index_buffer_.Bind();
 		glDrawElements(

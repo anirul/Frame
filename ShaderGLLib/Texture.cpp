@@ -547,9 +547,13 @@ namespace sgl {
 			i++;
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			error_.Display(__FILE__, __LINE__ - 1);
-			// TODO(anirul): change this as the view is passed to the program
-			// and not the view passed as a projection.
-			cube->Draw(program, view);
+			// CHECKME(anirul): Not sure about this.
+			program->Use();
+			program->Uniform("projection", view);
+			program->Uniform("view", glm::mat4(1.0f));
+			program->Uniform("model", glm::mat4(1.0f));
+			// Draw!
+			cube->Draw(program);
 		}
 	}
 

@@ -179,17 +179,20 @@ namespace sgl {
 				mesh->SetMaterial(material);
 			}
 
-			// Draw the mesh.
-			mesh->Draw(
-				program,
-				perspective_,
-				view_,
+			program->Use();
+			program->Uniform("projection", perspective_);
+			program->Uniform("view", view_);
+			program->Uniform(
+				"model", 
 				scene->GetLocalModel(
-					[this](const std::string& name) 
-					{
-						return scene_tree_->GetSceneByName(name);
-					}, 
-					dt));
+				[this](const std::string& name)
+				{
+					return scene_tree_->GetSceneByName(name);
+				},
+				dt));
+
+			// Draw the mesh.
+			mesh->Draw(program);
 		}
 	}
 

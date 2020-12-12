@@ -106,7 +106,13 @@ namespace sgl {
 			}
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			error.Display(__FILE__, __LINE__ - 1);
-			quad->Draw(program, projection);
+
+			program->Use();
+			program->Uniform("projection", projection);
+			program->Uniform("view", glm::mat4(1.0f));
+			program->Uniform("model", glm::mat4(1.0f));
+
+			quad->Draw(program);
 		}
 	}
 
@@ -189,7 +195,13 @@ namespace sgl {
 				cubemap_element++;
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 				error.Display(__FILE__, __LINE__ - 1);
-				cube->Draw(program, projection, view);
+
+				program->Use();
+				program->Uniform("projection", projection);
+				program->Uniform("view", view);
+				program->Uniform("model", glm::mat4(1.0f));
+
+				cube->Draw(program);
 			}
 		}
 	}

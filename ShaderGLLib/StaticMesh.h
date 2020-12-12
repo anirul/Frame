@@ -30,6 +30,9 @@ namespace sgl {
 		virtual ~StaticMesh();
 
 	public:
+		void Draw(const std::shared_ptr<ProgramInterface> program) const;
+
+	public:
 		// Set a material for this mesh.
 		void SetMaterial(const Material& material) 
 		{ 
@@ -40,13 +43,6 @@ namespace sgl {
 		{
 			material_ = material;
 		}
-		void Draw(
-			const std::shared_ptr<ProgramInterface> program,
-			const glm::mat4 projection = glm::mat4(1.0f),
-			const glm::mat4 view = glm::mat4(1.0f),
-			const glm::mat4 model = glm::mat4(1.0f)) const;
-
-	public:
 		const Buffer& PointBuffer() const { return point_buffer_; }
 		const Buffer& NormalBuffer() const { return normal_buffer_; }
 		const Buffer& TextureBuffer() const { return texture_buffer_; }

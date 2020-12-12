@@ -4,7 +4,7 @@ in vec2 vert_texcoord;
 
 layout(location = 0) out vec4 frag_color;
 
-uniform float float_time_s;
+uniform float time_s;
 
 const vec2 resolution = vec2(640, 480);
 
@@ -45,7 +45,7 @@ vec4 RayMarching(vec3 ray_origin, vec3 ray_direction)
 vec3 LightPosition()
 {
 	vec3 light_position = vec3(0, 5, 6);
-	light_position.xz += vec2(sin(float_time_s), cos(float_time_s) * 2);
+	light_position.xz += vec2(sin(time_s), cos(time_s) * 2);
 	return light_position;
 }
 
