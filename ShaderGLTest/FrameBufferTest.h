@@ -2,22 +2,22 @@
 
 #include <gtest/gtest.h>
 #include "../ShaderGLLib/Window.h"
-#include "../ShaderGLLib/Render.h"
+#include "../ShaderGLLib/FrameBuffer.h"
 #include "../ShaderGLLib/Error.h"
 
 namespace test {
 
-	class RenderTest : public testing::Test
+	class FrameBufferTest : public testing::Test 
 	{
 	public:
-		RenderTest()
+		FrameBufferTest() 
 		{
 			window_ = sgl::CreateSDLOpenGL({ 320, 200 });
 			error_.SetWindowPtr(nullptr);
 		}
 
 	protected:
-		std::shared_ptr<sgl::Render> render_ = nullptr;
+		std::shared_ptr<sgl::FrameBuffer> frame_ = nullptr;
 		std::shared_ptr<sgl::WindowInterface> window_ = nullptr;
 		sgl::Error& error_ = sgl::Error::GetInstance();
 	};

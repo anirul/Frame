@@ -136,8 +136,8 @@ add_library(ShaderGLLib
     ShaderGLLib/Error.h
     ShaderGLLib/Fill.cpp
     ShaderGLLib/Fill.h
-    ShaderGLLib/Frame.cpp
-    ShaderGLLib/Frame.h
+    ShaderGLLib/FrameBuffer.cpp
+    ShaderGLLib/FrameBuffer.h
     ShaderGLLib/Image.cpp
     ShaderGLLib/Image.h
     ShaderGLLib/Light.cpp
@@ -152,8 +152,8 @@ add_library(ShaderGLLib
     ShaderGLLib/Pixel.h
     ShaderGLLib/Program.cpp
     ShaderGLLib/Program.h
-    ShaderGLLib/Render.cpp
-    ShaderGLLib/Render.h
+    ShaderGLLib/RenderBuffer.cpp
+    ShaderGLLib/RenderBuffer.h
     ShaderGLLib/Scene.cpp
     ShaderGLLib/Scene.h
     ShaderGLLib/ScopedBind.cpp
@@ -189,8 +189,8 @@ add_executable(ShaderGLTest
     ShaderGLTest/EffectTest.h
     ShaderGLTest/ErrorTest.cpp
     ShaderGLTest/ErrorTest.h
-    ShaderGLTest/FrameTest.cpp
-    ShaderGLTest/FrameTest.h
+    ShaderGLTest/FrameBufferTest.cpp
+    ShaderGLTest/FrameBufferTest.h
     ShaderGLTest/ImageTest.cpp
     ShaderGLTest/ImageTest.h
     ShaderGLTest/LightTest.cpp
@@ -205,8 +205,8 @@ add_executable(ShaderGLTest
     ShaderGLTest/ProgramMock.h
     ShaderGLTest/ProgramTest.cpp
     ShaderGLTest/ProgramTest.h
-    ShaderGLTest/RenderTest.cpp
-    ShaderGLTest/RenderTest.h
+    ShaderGLTest/RenderBufferTest.cpp
+    ShaderGLTest/RenderBufferTest.h
     ShaderGLTest/SceneTest.cpp
     ShaderGLTest/SceneTest.h
     ShaderGLTest/ShaderTest.cpp

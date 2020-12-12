@@ -65,8 +65,8 @@ namespace sgl {
 		void SetupCamera();
 
 	private:
-		std::shared_ptr<Frame> frame_ = nullptr;
-		std::shared_ptr<Render> render_ = nullptr;
+		std::shared_ptr<FrameBuffer> frame_ = nullptr;
+		std::shared_ptr<RenderBuffer> render_ = nullptr;
 		// CHECKME(anirul): Is it really needed?
 		std::shared_ptr<Material> environment_material_ = nullptr;
 		std::map<std::string, std::shared_ptr<Effect>> effect_map_ = {};

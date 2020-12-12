@@ -60,8 +60,8 @@ namespace sgl {
 		auto& error = Error::GetInstance();
 		assert(out_textures.size());
 		auto size = out_textures[0]->GetSize();
-		Frame frame{};
-		Render render{};
+		FrameBuffer frame{};
+		RenderBuffer render{};
 		ScopedBind scoped_frame(frame);
 		ScopedBind scoped_render(render);
 		render.CreateStorage(size);
@@ -101,7 +101,7 @@ namespace sgl {
 			{
 				frame.AttachTexture(
 					*out_textures[i],
-					Frame::GetFrameColorAttachment(i),
+					FrameBuffer::GetFrameColorAttachment(i),
 					mipmap_level);
 			}
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -142,8 +142,8 @@ namespace sgl {
 		auto& error = Error::GetInstance();
 		assert(out_textures.size());
 		auto size = out_textures[0]->GetSize();
-		Frame frame{};
-		Render render{};
+		FrameBuffer frame{};
+		RenderBuffer render{};
 		ScopedBind scoped_frame(frame);
 		ScopedBind scoped_render(render);
 		frame.AttachRender(render);
@@ -188,9 +188,9 @@ namespace sgl {
 				{
 					frame.AttachTexture(
 						*out_textures[i],
-						Frame::GetFrameColorAttachment(i),
+						FrameBuffer::GetFrameColorAttachment(i),
 						mipmap_level,
-						Frame::GetFrameTextureType(cubemap_element));
+						FrameBuffer::GetFrameTextureType(cubemap_element));
 				}
 				cubemap_element++;
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

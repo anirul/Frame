@@ -5,8 +5,8 @@
 #include <random>
 #include <cmath>
 #include <glm/gtc/matrix_transform.hpp>
-#include "Frame.h"
-#include "Render.h"
+#include "FrameBuffer.h"
+#include "RenderBuffer.h"
 #include "Fill.h"
 
 namespace sgl {
@@ -46,8 +46,8 @@ namespace sgl {
 		error_.Display(__FILE__, __LINE__ - 1);
 
 		// Create a frame buffer and a render buffer.
-		frame_ = std::make_shared<Frame>();
-		render_ = std::make_shared<Render>();
+		frame_ = std::make_shared<FrameBuffer>();
+		render_ = std::make_shared<RenderBuffer>();
 	}
 
 	void Device::Startup(
@@ -149,7 +149,7 @@ namespace sgl {
 		int i = 0;
 		for (const auto& texture : out_textures)
 		{
-			frame_->AttachTexture(*texture, Frame::GetFrameColorAttachment(i));
+			frame_->AttachTexture(*texture, FrameBuffer::GetFrameColorAttachment(i));
 			++i;
 		}
 		frame_->DrawBuffers(static_cast<std::uint32_t>(out_textures.size()));

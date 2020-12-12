@@ -8,11 +8,11 @@
 
 namespace sgl {
 
-	class Render : public BindLockInterface
+	class RenderBuffer : public BindLockInterface
 	{
 	public:
-		Render();
-		virtual ~Render();
+		RenderBuffer();
+		virtual ~RenderBuffer();
 
 	public:
 		void Bind(const unsigned int slot = 0) const override;

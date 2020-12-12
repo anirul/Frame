@@ -12,8 +12,8 @@
 #include "../ShaderGLLib/Pixel.h"
 #include "../ShaderGLLib/Error.h"
 #include "../ShaderGLLib/Program.h"
-#include "../ShaderGLLib/Frame.h"
-#include "../ShaderGLLib/Render.h"
+#include "../ShaderGLLib/FrameBuffer.h"
+#include "../ShaderGLLib/RenderBuffer.h"
 #include "../ShaderGLLib/ScopedBind.h"
 #include "../FrameProto/Proto.h"
 
@@ -109,8 +109,8 @@ namespace sgl {
 		const PixelStructure pixel_structure_;
 		const Error& error_ = Error::GetInstance();
 		mutable bool locked_bind_ = false;
-		std::shared_ptr<Render> render_ = nullptr;
-		std::shared_ptr<Frame> frame_ = nullptr;
+		std::shared_ptr<RenderBuffer> render_ = nullptr;
+		std::shared_ptr<FrameBuffer> frame_ = nullptr;
 	};
 
 	class TextureCubeMap : public Texture

@@ -58,8 +58,8 @@ namespace sgl {
 		std::pair<std::uint32_t, std::uint32_t> size_ = { 0, 0 };
 		Material out_material_ = {};
 		Material in_material_ = {};
-		Frame frame_ = {};
-		Render render_ = {};
+		FrameBuffer frame_ = {};
+		RenderBuffer render_ = {};
 		std::shared_ptr<UniformInterface> uniform_interface_ = nullptr;
 		std::shared_ptr<ProgramInterface> program_ = nullptr;
 		std::vector<frame::proto::Uniform> uniforms_{};

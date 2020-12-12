@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include "../ShaderGLLib/Render.h"
+#include "../ShaderGLLib/RenderBuffer.h"
 #include "../ShaderGLLib/Error.h"
 #include "../ShaderGLLib/Logger.h"
 #include "../ShaderGLLib/ScopedBind.h"
@@ -33,17 +33,17 @@ namespace sgl {
 		COLOR_ATTACHMENT7 = GL_COLOR_ATTACHMENT7,
 	};
 
-	class Frame : public BindLockInterface
+	class FrameBuffer : public BindLockInterface
 	{
 	public:
-		Frame();
-		virtual ~Frame();
+		FrameBuffer();
+		virtual ~FrameBuffer();
 
 	public:
 		void Bind(const unsigned int slot = 0) const override;
 		void UnBind() const override;
 		// /!\ This will bind and unbind!
-		void AttachRender(const Render& render) const;
+		void AttachRender(const RenderBuffer& render) const;
 		// /!\ This will bind and unbind!
 		void AttachTexture(
 			const Texture& texture,

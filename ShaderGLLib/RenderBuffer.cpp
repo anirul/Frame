@@ -1,22 +1,22 @@
-#include "Render.h"
+#include "RenderBuffer.h"
 #include <stdexcept>
 #include <GL/glew.h>
 #include "Pixel.h"
 
 namespace sgl {
 
-	Render::Render()
+	RenderBuffer::RenderBuffer()
 	{
 		glGenRenderbuffers(1, &render_id_);
 		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
-	Render::~Render()
+	RenderBuffer::~RenderBuffer()
 	{
 		glDeleteRenderbuffers(1, &render_id_);
 	}
 
-	void Render::Bind(const unsigned int slot /*= 0*/) const
+	void RenderBuffer::Bind(const unsigned int slot /*= 0*/) const
 	{
 		assert(slot == 0);
 		if (locked_bind_) return;
@@ -24,14 +24,14 @@ namespace sgl {
 		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
-	void Render::UnBind() const
+	void RenderBuffer::UnBind() const
 	{
 		if (locked_bind_) return;
 		glBindRenderbuffer(GL_RENDERBUFFER, 0);
 		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
-	void Render::CreateStorage(
+	void RenderBuffer::CreateStorage(
 		const std::pair<std::uint32_t, std::uint32_t> size) const
 	{
 		Bind();

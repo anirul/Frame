@@ -5,7 +5,7 @@
 #include "DeviceTest.h"
 #include "EffectTest.h"
 #include "ErrorTest.h"
-#include "FrameTest.h"
+#include "FrameBufferTest.h"
 #include "ImageTest.h"
 #include "LightTest.h"
 #include "StaticMeshTest.h"

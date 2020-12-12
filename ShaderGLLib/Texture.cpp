@@ -6,8 +6,8 @@
 #include <cassert>
 #include "Convert.h"
 #include "Image.h"
-#include "Frame.h"
-#include "Render.h"
+#include "FrameBuffer.h"
+#include "RenderBuffer.h"
 #include "Program.h"
 #include "StaticMesh.h"
 
@@ -328,8 +328,8 @@ namespace sgl {
 		Bind();
 		if (!frame_)
 		{
-			frame_ = std::make_shared<Frame>();
-			render_ = std::make_shared<Render>();
+			frame_ = std::make_shared<FrameBuffer>();
+			render_ = std::make_shared<RenderBuffer>();
 			render_->CreateStorage(size_);
 			frame_->AttachRender(*render_);
 			frame_->AttachTexture(*this);
@@ -498,8 +498,8 @@ namespace sgl {
 		const PixelStructure& pixel_structure)
 	{
 		auto material = std::make_shared<Material>();
-		Frame frame{};
-		Render render{};
+		FrameBuffer frame{};
+		RenderBuffer render{};
 		ScopedBind scoped_frame(frame);
 		ScopedBind scoped_render(render);
 		size_ = size;

@@ -1,4 +1,4 @@
-#include "Frame.h"
+#include "FrameBuffer.h"
 #include <stdexcept>
 #include <GL/glew.h>
 #include <cassert>
@@ -7,18 +7,18 @@
 
 namespace sgl {
 
-	Frame::Frame()
+	FrameBuffer::FrameBuffer()
 	{
 		glGenFramebuffers(1, &frame_id_);
 		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
-	Frame::~Frame()
+	FrameBuffer::~FrameBuffer()
 	{
 		glDeleteFramebuffers(1, &frame_id_);
 	}
 
-	void Frame::Bind(const unsigned int slot /*= 0*/) const
+	void FrameBuffer::Bind(const unsigned int slot /*= 0*/) const
 	{
 		assert(slot == 0);
 		if (locked_bind_) return;
@@ -26,14 +26,14 @@ namespace sgl {
 		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
-	void Frame::UnBind() const
+	void FrameBuffer::UnBind() const
 	{
 		if (locked_bind_) return;
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
-	void Frame::AttachRender(const Render& render) const
+	void FrameBuffer::AttachRender(const RenderBuffer& render) const
 	{
 		Bind();
 		render.Bind();
@@ -56,7 +56,7 @@ namespace sgl {
 		UnBind();
 	}
 
-	void Frame::AttachTexture(
+	void FrameBuffer::AttachTexture(
 		const Texture& texture,
 		const FrameColorAttachment frame_color_attachment /*=
 			FrameColorAttachment::COLOR_ATTACHMENT0*/,
@@ -75,7 +75,7 @@ namespace sgl {
 		UnBind();
 	}
 
-	FrameColorAttachment Frame::GetFrameColorAttachment(const int i)
+	FrameColorAttachment FrameBuffer::GetFrameColorAttachment(const int i)
 	{
 		switch (i)
 		{
@@ -100,7 +100,7 @@ namespace sgl {
 		}
 	}
 
-	const int Frame::GetFrameTextureType(
+	const int FrameBuffer::GetFrameTextureType(
 		const FrameTextureType frame_texture_type) const
 	{
 		int value = static_cast<int>(frame_texture_type);
@@ -111,12 +111,12 @@ namespace sgl {
 		return GL_TEXTURE_2D;
 	}
 
-	FrameTextureType Frame::GetFrameTextureType(const int i)
+	FrameTextureType FrameBuffer::GetFrameTextureType(const int i)
 	{
 		return static_cast<FrameTextureType>(i);
 	}
 
-	void Frame::DrawBuffers(const std::uint32_t size /*= 1*/)
+	void FrameBuffer::DrawBuffers(const std::uint32_t size /*= 1*/)
 	{
 		Bind();
 		assert(size < 9);
@@ -124,7 +124,7 @@ namespace sgl {
 		for (std::uint32_t i = 0; i < size; ++i)
 		{
 			draw_buffer.emplace_back(
-				static_cast<unsigned int>(Frame::GetFrameColorAttachment(i)));
+				static_cast<unsigned int>(FrameBuffer::GetFrameColorAttachment(i)));
 		}
 		glDrawBuffers(
 			static_cast<GLsizei>(draw_buffer.size()), 
@@ -133,7 +133,7 @@ namespace sgl {
 		UnBind();
 	}
 
-	const std::pair<bool, std::string> Frame::GetError() const
+	const std::pair<bool, std::string> FrameBuffer::GetError() const
 	{
 		Bind();
 		std::pair<bool, std::string> status_error;
@@ -173,7 +173,7 @@ namespace sgl {
 		}
 	}
 
-	const std::string Frame::GetStatus() const
+	const std::string FrameBuffer::GetStatus() const
 	{
 		Bind();
 		std::stringstream ss;
