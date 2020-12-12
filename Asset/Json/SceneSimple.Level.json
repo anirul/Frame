@@ -1,0 +1,9 @@
+{
+  "level_name": "SceneSimple",
+  "default_texture_name": "albedo",
+  "default_camera_name": "camera",
+  "default_scene_name": "scene",
+  "texture_file": "SceneSimple.Texture.json",
+  "effect_file": "SceneSimple.Effect.json",
+  "scene_file": "SceneSimple.Scene.json"
+}

@@ -1,0 +1,55 @@
+{
+  "effects": [
+    {
+      "name": "CubeMap",
+      "render_input_type": "TEXTURE_3D",
+      "render_output_type": "TEXTURE_2D",
+      "input_texture_names": [
+        "skybox"
+      ],
+      "output_texture_names": [
+        "background"
+      ],
+      "shader": "CubeMap",
+      "parameters": [
+        {
+          "name": "projection",
+          "uniform_enum": "PROJECTION_MAT4"
+        },
+        {
+          "name": "view",
+          "uniform_enum": "VIEW_MAT4"
+        },
+        {
+          "name": "model",
+          "uniform_enum": "MODEL_MAT4"
+        }
+      ]
+    },
+    {
+      "name": "apple",
+      "render_input_type": "SCENE",
+      "render_output_type": "TEXTURE_2D",
+      "input_scene": "scene",
+      "output_texture_names": [
+        "albedo",
+        "zbuffer"
+      ],
+      "shader": "SceneSimple",
+      "parameters": [
+        {
+          "name": "projection",
+          "uniform_enum": "PROJECTION_MAT4"
+        },
+        {
+          "name": "view",
+          "uniform_enum": "VIEW_MAT4"
+        },
+        {
+          "name": "model",
+          "uniform_enum": "MODEL_MAT4"
+        }
+      ]
+    }
+  ]
+}

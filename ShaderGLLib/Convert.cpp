@@ -263,4 +263,12 @@ namespace sgl {
 		}
 	}
 
+	std::pair<std::uint32_t, std::uint32_t> ParseSizeInt(
+		const frame::proto::Size size)
+	{
+		return std::make_pair<std::uint32_t, std::uint32_t>(
+			static_cast<std::uint32_t>(size.x()), 
+			static_cast<std::uint32_t>(size.y()));
+	}
+
 } // End namespace sgl.

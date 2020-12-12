@@ -49,9 +49,10 @@ namespace test {
 		frame::proto::Effect effect{};
 		{
 			effect.set_name("effect");
-			effect.set_render_type(frame::proto::Effect::SCENE);
+			effect.set_render_input_type(frame::proto::Effect::SCENE);
+			effect.set_render_output_type(frame::proto::Effect::TEXTURE_2D);
 			effect.set_shader("Blur");
-			effect.add_output_textures_names("texture");
+			effect.add_output_texture_names("texture");
 		}
 		*effect_file.add_effects() = effect;
 		return effect_file;

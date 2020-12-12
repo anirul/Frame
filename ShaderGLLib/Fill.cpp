@@ -79,7 +79,7 @@ namespace sgl {
 			1.0f,
 			0.1f,
 			10.0f);
-		auto quad = CreateQuadMesh();
+		auto quad = CreateQuadStaticMesh();
 		auto material = std::make_shared<Material>();
 		for (const auto& p : in_textures)
 		{
@@ -155,7 +155,7 @@ namespace sgl {
 			1.0f,
 			0.1f,
 			10.0f);
-		auto cube = CreateCubeMesh();
+		auto cube = CreateCubeStaticMesh();
 		auto material = std::make_shared<Material>();
 		for (const auto& p : in_textures)
 		{

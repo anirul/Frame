@@ -9,9 +9,35 @@ namespace sgl {
 			name_texture_map)
 	{
 		name_ = proto_effect.name();
-		for (const auto& name : proto_effect.input_textures_names())
+		if ((proto_effect.render_input_type() == 
+				frame::proto::Effect::TEXTURE_2D) ||
+			(proto_effect.render_input_type() ==
+				frame::proto::Effect::TEXTURE_3D))
+		{
+			if (proto_effect.input_texture_names().size() == 0)
+			{
+				std::string error = 
+					"Effect :[" + proto_effect.name() + 
+					"] should have at least 1 texture in.";
+				throw std::runtime_error(error);
+			}
+		}
+		for (const auto& name : proto_effect.input_texture_names())
 			in_material_.AddTexture(name, name_texture_map.at(name));
-		for (const auto& name : proto_effect.output_textures_names())
+		if ((proto_effect.render_output_type() ==
+				frame::proto::Effect::TEXTURE_2D) ||
+			(proto_effect.render_output_type() ==
+				frame::proto::Effect::TEXTURE_3D))
+		{
+			if (proto_effect.output_texture_names().size() == 0)
+			{
+				std::string error =
+					"Effect :[" + proto_effect.name() +
+					"] should have at least 1 texture out.";
+				throw std::runtime_error(error);
+			}
+		}
+		for (const auto& name : proto_effect.output_texture_names())
 			out_material_.AddTexture(name, name_texture_map.at(name));
 		program_ = CreateProgram(proto_effect.shader());
 		uniforms_ = std::vector<frame::proto::Uniform>
@@ -19,7 +45,8 @@ namespace sgl {
 			proto_effect.parameters().begin(),
 			proto_effect.parameters().end()
 		};
-		render_type_ = proto_effect.render_type();
+		render_input_type_ = proto_effect.render_input_type();
+		render_output_type_ = proto_effect.render_output_type();
 	}
 
 	void Effect::Startup(
@@ -37,7 +64,7 @@ namespace sgl {
 	}
 
 	void Effect::Draw(
-		const std::shared_ptr<Mesh> mesh, 
+		const std::shared_ptr<StaticMesh> mesh, 
 		const double dt /*= 0.0*/)  const
 	{
 		program_->Use();

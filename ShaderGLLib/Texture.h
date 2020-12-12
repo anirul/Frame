@@ -56,9 +56,8 @@ namespace sgl {
 				PixelElementSize_BYTE(),
 			const PixelStructure& pixel_structure = PixelStructure_RGB());
 		// Create from a proto.
-		// the size is the preferred size of the screen.
 		Texture(
-			const frame::proto::Texture& texture, 
+			const frame::proto::Texture& proto_texture, 
 			const std::pair<std::uint32_t, std::uint32_t> size);
 		virtual ~Texture();
 
@@ -147,6 +146,20 @@ namespace sgl {
 			const std::pair<std::uint32_t, std::uint32_t> size);
 
 	public:
+		// Inside constructors to be called from proto and normal constructor.
+		void InitCubeMap(
+			const std::pair<std::uint32_t, std::uint32_t> size,
+			const PixelElementSize& pixel_element_size,
+			const PixelStructure& pixel_structure);
+		void InitCubeMapFromSixFiles(
+			const std::array<std::string, 6> file_names,
+			const PixelElementSize pixel_element_size,
+			const PixelStructure pixel_structure);
+		void InitCubeMapFromFile(
+			const std::string& file_name,
+			const std::pair<std::uint32_t, std::uint32_t> size,
+			const PixelElementSize& pixel_element_size,
+			const PixelStructure& pixel_structure);
 		void Bind(const unsigned int slot = 0) const override;
 		void UnBind() const override;
 		void BindEnableMipmap() const override;

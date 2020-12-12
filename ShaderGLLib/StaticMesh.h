@@ -14,20 +14,20 @@
 
 namespace sgl {
 
-	class Mesh
+	class StaticMesh
 	{
 	public:
 		// Open a mesh from a OBJ stream.
-		Mesh(
+		StaticMesh(
 			std::istream& is, 
 			const std::string& name);
 		// Create a mesh from a set of vectors.
-		Mesh(
+		StaticMesh(
 			const std::vector<float>& points,
 			const std::vector<float>& normals,
 			const std::vector<float>& texcoords,
 			const std::vector<std::int32_t>& indices);
-		virtual ~Mesh();
+		virtual ~StaticMesh();
 
 	public:
 		// Set a material for this mesh.
@@ -103,12 +103,13 @@ namespace sgl {
 	};
 
 	// Create a Quad Mesh that is on the edge of the screen.
-	std::shared_ptr<Mesh> CreateQuadMesh();
+	std::shared_ptr<StaticMesh> CreateQuadStaticMesh();
 
 	// Create a Cube Mesh that correspond to a cube map.
-	std::shared_ptr<Mesh> CreateCubeMesh();
+	std::shared_ptr<StaticMesh> CreateCubeStaticMesh();
 
 	// Create a new OBJ file from a file.
-	std::shared_ptr<Mesh> CreateMeshFromObjFile(const std::string& file_path);
+	std::shared_ptr<StaticMesh> CreateStaticMeshFromObjFile(
+		const std::string& file_path);
 
 } // End namespace sgl.

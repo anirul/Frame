@@ -24,6 +24,7 @@ namespace sgl {
 		virtual bool MouseReleased(const char button, const double dt) = 0;
 	};
 
+	// Is this really needed?
 	// This is the structure that define what draw has to do this is specific
 	// to a drawing interface (see DirectX, OpenGL, Metal, etc...).
 	struct DrawInterface 
@@ -55,7 +56,7 @@ namespace sgl {
 		// Get the size of the window (useful to make a buffer).
 		virtual std::pair<std::uint32_t, std::uint32_t> GetSize() const = 0;
 		// Return the context to the window (this is a void* as this can be a
-		// OpenGL context or a DirectX device).
+		// Windows HWND, a Linux window or ?).
 		virtual void* GetWindowContext() const = 0;
 		// Set the window title (the name of the window).
 		virtual void SetWindowTitle(const std::string& title) const = 0;

@@ -1,97 +1,5 @@
 {
-  "out_textures": [
-    "forward_albedo",
-    "forward_zbuffer"
-  ],
-  "out_scene": "scene",
-  "out_camera": "camera",
-  "textures": [
-    {
-      "name": "forward_albedo",
-      "size": {
-        "x": "-1",
-        "y": "-1"
-      },
-      "clear": "true",
-      "pixel_element_size": {
-        "value": "HALF"
-      },
-      "pixel_structure": {
-        "value": "RGB"
-      },
-      "min_filter": {
-        "value": "LINEAR"
-      },
-      "mag_filter": {
-        "value": "LINEAR"
-      },
-      "warp_s": {
-        "value": "CLAMP_TO_EDGE"
-      },
-      "wrap_t": {
-        "value": "CLAMP_TO_EDGE"
-      }
-    },
-    {
-      "name": "forward_zbuffer",
-      "size": {
-        "x": "-1",
-        "y": "-1"
-      },
-      "clear": "true",
-      "pixel_element_size": {
-        "value": "HALF"
-      },
-      "pixel_structure": {
-        "value": "RGB"
-      },
-      "min_filter": {
-        "value": "LINEAR"
-      },
-      "mag_filter": {
-        "value": "LINEAR"
-      },
-      "warp_s": {
-        "value": "CLAMP_TO_EDGE"
-      },
-      "wrap_t": {
-        "value": "CLAMP_TO_EDGE"
-      }
-    }
-  ],
-  "effects": [
-    {
-      "name": "simple",
-      "input_type": "SCENE",
-      "input_scene": "scene",
-      "output_texture_names": [
-        "forward_albedo",
-        "forward_zbuffer"
-      ],
-      "shader": "Simple",
-      "parameters": [
-        {
-          "name": "projection",
-          "value": {
-            "enum": "PROJECTION_MAT4"
-          }
-        },
-        {
-          "name": "view",
-          "value": {
-            "enum": "VIEW_MAT4"
-          }
-        },
-        {
-          "name": "model",
-          "value": {
-            "enum": "MODEL_MAT4"
-          }
-        }
-      ]
-    }
-  ],
-  "scenes": [
+  "scene_trees": [
     {
       "name": "scene",
       "root_node": "root",
@@ -170,7 +78,7 @@
         {
           "name": "sun",
           "parent": "root",
-          "light_enum": "POINT",
+          "light_type": "POINT",
           "position": {
             "x": "-1.0",
             "y": "1.0",

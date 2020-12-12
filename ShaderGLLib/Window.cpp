@@ -281,7 +281,6 @@ namespace sgl {
 			SDL_GL_GetAttribute(
 				SDL_GL_CONTEXT_MINOR_VERSION,
 				&gl_version.second);
-			SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 			// Vsync off.
 			SDL_GL_SetSwapInterval(0);
 

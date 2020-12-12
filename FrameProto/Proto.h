@@ -29,7 +29,7 @@ T LoadProtoFromJsonFile(const std::string& file_name)
 	T proto{};
 	std::string contents(std::istreambuf_iterator<char>(ifs_level), {});
 	google::protobuf::util::JsonParseOptions options{};
-	options.ignore_unknown_fields = true;
+	options.ignore_unknown_fields = false;
 	auto status = google::protobuf::util::JsonStringToMessage(
 		contents,
 		&proto,

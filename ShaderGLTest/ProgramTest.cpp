@@ -20,11 +20,12 @@ namespace test {
 		program_ = std::make_shared<sgl::Program>();
 		EXPECT_TRUE(program_);
 		sgl::Shader vertex_shader(sgl::ShaderType::VERTEX_SHADER);
-		EXPECT_TRUE(vertex_shader.LoadFromFile("../Asset/Shader/Simple.vert"));
+		EXPECT_TRUE(
+			vertex_shader.LoadFromFile("../Asset/Shader/SceneSimple.vert"));
 		program_->AddShader(vertex_shader);
 		sgl::Shader fragment_shader(sgl::ShaderType::FRAGMENT_SHADER);
 		EXPECT_TRUE(
-			fragment_shader.LoadFromFile("../Asset/Shader/Simple.frag"));
+			fragment_shader.LoadFromFile("../Asset/Shader/SceneSimple.frag"));
 		program_->AddShader(fragment_shader);
 	}
 
@@ -83,7 +84,7 @@ namespace test {
 		EXPECT_EQ(GLEW_OK, glewInit());
 		sgl::Error::SetWindowPtr(nullptr);
 		EXPECT_FALSE(program_);
-		program_ = sgl::CreateProgram("Simple");
+		program_ = sgl::CreateProgram("SceneSimple");
 		EXPECT_TRUE(program_);
 	}
 

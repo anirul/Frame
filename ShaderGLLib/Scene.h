@@ -5,7 +5,7 @@
 #include <vector>
 #include <functional>
 #include <glm/gtx/quaternion.hpp>
-#include "../ShaderGLLib/Mesh.h"
+#include "../ShaderGLLib/StaticMesh.h"
 #include "../ShaderGLLib/Material.h"
 #include "../ShaderGLLib/Camera.h"
 
@@ -27,7 +27,7 @@ namespace sgl {
 			std::function<Ptr(const std::string&)> func, 
 			double dt) const = 0;
 		// Get the local mesh of current node.
-		virtual const std::shared_ptr<Mesh> GetLocalMesh() const = 0;
+		virtual const std::shared_ptr<StaticMesh> GetLocalMesh() const = 0;
 
 	public:
 		// Return true if this is the root node (no parents).
@@ -60,7 +60,7 @@ namespace sgl {
 		const glm::mat4 GetLocalModel(
 			std::function<Ptr(const std::string&)> func, 
 			const double dt) const override;
-		const std::shared_ptr<Mesh> GetLocalMesh() const override;
+		const std::shared_ptr<StaticMesh> GetLocalMesh() const override;
 
 	protected:
 		glm::mat4 ComputeLocalRotation(const double dt) const;
@@ -74,17 +74,17 @@ namespace sgl {
 	class SceneStaticMesh : public SceneInterface
 	{
 	public:
-		SceneStaticMesh(std::shared_ptr<sgl::Mesh> mesh) : mesh_(mesh) {}
+		SceneStaticMesh(std::shared_ptr<StaticMesh> mesh) : mesh_(mesh) {}
 		SceneStaticMesh(const frame::proto::SceneStaticMesh& proto_static_mesh);
 
 	public:
 		const glm::mat4 GetLocalModel(
 			std::function<Ptr(const std::string&)> func, 
 			const double dt) const override;
-		const std::shared_ptr<Mesh> GetLocalMesh() const override; 
+		const std::shared_ptr<StaticMesh> GetLocalMesh() const override; 
 
 	private:
-		std::shared_ptr<Mesh> mesh_ = nullptr;
+		std::shared_ptr<StaticMesh> mesh_ = nullptr;
 	};
 
 	class SceneCamera : public SceneInterface
@@ -102,7 +102,7 @@ namespace sgl {
 		const glm::mat4 GetLocalModel(
 			std::function<Ptr(const std::string&)> func, 
 			const double dt) const override;
-		const std::shared_ptr<Mesh> GetLocalMesh() const override;
+		const std::shared_ptr<StaticMesh> GetLocalMesh() const override;
 
 	public:
 		Camera& GetCamera() { return camera_; }
@@ -137,7 +137,7 @@ namespace sgl {
 		const glm::mat4 GetLocalModel(
 			std::function<Ptr(const std::string&)> func, 
 			const double dt) const override;
-		const std::shared_ptr<Mesh> GetLocalMesh() const override;
+		const std::shared_ptr<StaticMesh> GetLocalMesh() const override;
 
 	public:
 		const frame::proto::SceneLight::LightEnum GetType() const 

@@ -35,7 +35,7 @@ namespace test {
 		ASSERT_FALSE(shader_);
 		shader_ = std::make_shared<sgl::Shader>(sgl::ShaderType::VERTEX_SHADER);
 		ASSERT_TRUE(shader_);
-		EXPECT_TRUE(shader_->LoadFromFile("../Asset/Shader/Simple.vert"));
+		EXPECT_TRUE(shader_->LoadFromFile("../Asset/Shader/SceneSimple.vert"));
 		EXPECT_NE(0, shader_->GetId());
 	}
 
@@ -46,7 +46,7 @@ namespace test {
 		shader_ = 
 			std::make_shared<sgl::Shader>(sgl::ShaderType::FRAGMENT_SHADER);
 		ASSERT_TRUE(shader_);
-		EXPECT_TRUE(shader_->LoadFromFile("../Asset/Shader/Simple.frag"));
+		EXPECT_TRUE(shader_->LoadFromFile("../Asset/Shader/SceneSimple.frag"));
 		EXPECT_NE(0, shader_->GetId());
 	}
 

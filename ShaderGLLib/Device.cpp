@@ -77,7 +77,17 @@ namespace sgl {
 		// Load textures from proto.
 		for (const auto& proto_texture : proto_texture_file.textures())
 		{
-			auto texture = std::make_shared<sgl::Texture>(proto_texture, size_);
+			std::shared_ptr<Texture> texture = nullptr;
+			if (proto_texture.cubemap())
+			{
+				texture = std::make_shared<TextureCubeMap>(
+					proto_texture, 
+					size_);
+			}
+			else
+			{
+				texture = std::make_shared<Texture>(proto_texture, size_);
+			}
 			texture_map_.insert({ proto_texture.name(), texture });
 		}
 		out_texture_name_ = proto_level.default_texture_name();
@@ -104,8 +114,8 @@ namespace sgl {
 			effect_pair.second->Startup(size_, shared_from_this());
 		}
 
-		cube_ = CreateCubeMesh();
-		quad_ = CreateQuadMesh();
+		cube_ = CreateCubeStaticMesh();
+		quad_ = CreateQuadStaticMesh();
 	}
 
 	void Device::DrawMultiTextures(
@@ -147,7 +157,7 @@ namespace sgl {
 		for (const auto& pair : scene_tree_->GetSceneMap())
 		{
 			const auto& scene = pair.second;
-			const std::shared_ptr<Mesh>& mesh = scene->GetLocalMesh();
+			const std::shared_ptr<StaticMesh>& mesh = scene->GetLocalMesh();
 			if (!mesh) continue;
 			if (mesh->IsClearDepthBuffer()) continue;
 
@@ -189,15 +199,31 @@ namespace sgl {
 		for (const auto& name_effect_pair : effect_map_)
 		{
 			const auto effect = name_effect_pair.second;
-			if (effect->GetRenderType() == frame::proto::Effect::INVALID)
-				throw std::runtime_error("INVALID effect?");
-			if (effect->GetRenderType() == frame::proto::Effect::TEXTURE_2D)
-				effect->Draw(quad_, dt_);
-			if (effect->GetRenderType() == frame::proto::Effect::TEXTURE_3D)
-				effect->Draw(cube_, dt_);
+			switch (effect->GetRenderOutputType())
+			{
+				case frame::proto::Effect::TEXTURE_2D:
+				{
+					effect->Draw(quad_, dt_);
+					break;
+				}
+				case frame::proto::Effect::TEXTURE_3D:
+				{
+					effect->Draw(cube_, dt_);
+					break;
+				}
+				case frame::proto::Effect::SCENE:
+				{
+					throw std::runtime_error(
+						"Scene output not implemented yet!");
+				}
+				case frame::proto::Effect::INVALID:
+					[[fallthrough]];
+				default:
+					throw std::runtime_error("INVALID effect?");
+			}
 		}
 		static auto program = CreateProgram("Display");
-		static auto quad = CreateQuadMesh();
+		static auto quad = CreateQuadStaticMesh();
 		auto material = std::make_shared<Material>();
 		material->AddTexture("Display", texture_map_.at(out_texture_name_));
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -215,7 +241,7 @@ namespace sgl {
 			sgl::PixelStructure_RGB_ALPHA());
 		auto cubemap_program = CreateProgram("CubeMapDeferred");
 		cubemap_program->Uniform("projection", GetProjection());
-		auto cube_mesh = CreateCubeMesh();
+		auto cube_mesh = CreateCubeStaticMesh();
 		environment_material_ = std::make_shared<Material>();
 		environment_material_->AddTexture("Skybox", texture);
 		cube_mesh->ClearDepthBuffer(true);

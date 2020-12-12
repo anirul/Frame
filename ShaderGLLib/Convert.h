@@ -53,4 +53,8 @@ namespace sgl {
 		const UniformInterface& uniform_interface,
 		const ProgramInterface& program_interface);
 
+	// Convert frame proto size into pair.
+	std::pair<std::uint32_t, std::uint32_t> ParseSizeInt(
+		const frame::proto::Size size);
+
 }

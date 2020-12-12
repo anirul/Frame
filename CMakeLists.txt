@@ -82,8 +82,8 @@ add_custom_target(ShaderGL
     Asset/Shader/RayMarching.vert
     Asset/Shader/ScreenSpaceAmbientOcclusion.frag
     Asset/Shader/ScreenSpaceAmbientOcclusion.vert
-    Asset/Shader/Simple.frag
-    Asset/Shader/Simple.vert
+    Asset/Shader/SceneSimple.frag
+    Asset/Shader/SceneSimple.vert
     Asset/Shader/VectorAddition.frag
     Asset/Shader/VectorAddition.vert
     Asset/Shader/VectorMultiply.frag
@@ -146,8 +146,8 @@ add_library(ShaderGLLib
     ShaderGLLib/Logger.h
     ShaderGLLib/Material.cpp
     ShaderGLLib/Material.h
-    ShaderGLLib/Mesh.cpp
-    ShaderGLLib/Mesh.h
+    ShaderGLLib/StaticMesh.cpp
+    ShaderGLLib/StaticMesh.h
     ShaderGLLib/Pixel.cpp
     ShaderGLLib/Pixel.h
     ShaderGLLib/Program.cpp
@@ -198,8 +198,8 @@ add_executable(ShaderGLTest
     ShaderGLTest/main.cpp
     ShaderGLTest/MaterialTest.cpp
     ShaderGLTest/MaterialTest.h
-    ShaderGLTest/MeshTest.cpp
-    ShaderGLTest/MeshTest.h
+    ShaderGLTest/StaticMeshTest.cpp
+    ShaderGLTest/StaticMeshTest.h
     ShaderGLTest/PixelTest.cpp
     ShaderGLTest/PixelTest.h
     ShaderGLTest/ProgramMock.h
@@ -286,26 +286,28 @@ target_link_libraries(RayMarching
     FrameProto
 )
 
-add_executable(Simple
+add_executable(SceneSimple
   WIN32
-    Asset/Json/Simple.Effect.json
-    Asset/Json/Simple.Level.json
-    Asset/Json/Simple.Scene.json
-    Asset/Json/Simple.Texture.json
+    Asset/Json/SceneSimple.Effect.json
+    Asset/Json/SceneSimple.Level.json
+    Asset/Json/SceneSimple.Scene.json
+    Asset/Json/SceneSimple.Texture.json
     Sample/Common/Application.cpp
     Sample/Common/Application.h
     Sample/Common/main.cpp
-    Sample/Simple/Draw.cpp
-    Sample/Simple/Draw.h
+    Sample/Common/Draw.cpp
+    Sample/Common/Draw.h
+    Sample/SceneSimple/Name.cpp
+    Sample/SceneSimple/Name.h
 )
 
-target_include_directories(Simple
+target_include_directories(SceneSimple
   PUBLIC
     ShaderGLLib
-    Sample/Simple
+    Sample/SceneSimple
 )
 
-target_link_libraries(Simple
+target_link_libraries(SceneSimple
   PUBLIC
     ShaderGLLib
     FrameProto

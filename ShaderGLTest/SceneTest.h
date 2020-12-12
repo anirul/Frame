@@ -25,11 +25,11 @@ namespace test {
 		{
 			glm::mat4 identity(1.0f);
 			auto matrix_scene = std::make_shared<sgl::SceneMatrix>(identity);
-			auto program = sgl::CreateProgram("Simple");
+			auto program = sgl::CreateProgram("SceneSimple");
 			matrix_scene->SetName("matrix_scene");
 			scene_tree_->AddNode(matrix_scene);
 			{
-				auto cube_mesh = sgl::CreateMeshFromObjFile(
+				auto cube_mesh = sgl::CreateStaticMeshFromObjFile(
 					"../Asset/Model/Cube.obj");
 				auto cube = std::make_shared<sgl::SceneStaticMesh>(cube_mesh);
 				cube->SetName("cube");
@@ -44,7 +44,7 @@ namespace test {
 				disp->SetParentName("matrix_scene");
 				scene_tree_->AddNode(disp);
 				{
-					auto mesh = sgl::CreateMeshFromObjFile(
+					auto mesh = sgl::CreateStaticMeshFromObjFile(
 						"../Asset/Model/Torus.obj");
 					auto torus = std::make_shared<sgl::SceneStaticMesh>(mesh);
 					torus->SetName("torus");

@@ -179,42 +179,42 @@ namespace test {
 	{
 		TestParseUniformEnumMatrixFromProto(
 			frame::proto::Uniform::PROJECTION_MAT4, 
-			"projection");
+			"test");
 	}
 
 	TEST_F(ConvertTest, ParseUniformEnumProjectionInvFromProtoTest)
 	{
 		TestParseUniformEnumMatrixFromProto(
 			frame::proto::Uniform::PROJECTION_INV_MAT4,
-			"projection_inv");
+			"test");
 	}
 
 	TEST_F(ConvertTest, ParseUniformEnumViewFromProtoTest)
 	{
 		TestParseUniformEnumMatrixFromProto(
 			frame::proto::Uniform::VIEW_MAT4,
-			"view");
+			"test");
 	}
 
 	TEST_F(ConvertTest, ParseUniformEnumViewInvFromProtoTest)
 	{
 		TestParseUniformEnumMatrixFromProto(
 			frame::proto::Uniform::VIEW_INV_MAT4,
-			"view_inv");
+			"test");
 	}
 
 	TEST_F(ConvertTest, ParseUniformEnumModelFromProtoTest)
 	{
 		TestParseUniformEnumMatrixFromProto(
 			frame::proto::Uniform::MODEL_MAT4,
-			"model");
+			"test");
 	}
 
 	TEST_F(ConvertTest, ParseUniformEnumModelInvFromProtoTest)
 	{
 		TestParseUniformEnumMatrixFromProto(
 			frame::proto::Uniform::MODEL_INV_MAT4,
-			"model_inv");
+			"test");
 	}
 
 	void ConvertTest::TestParseUniformEnumVectorFromProto(
@@ -247,7 +247,7 @@ namespace test {
 		TestParseUniformEnumVectorFromProto(
 			frame::proto::Uniform::CAMERA_POSITION_VEC3,
 			glm::vec3(0, 0, 0),
-			"camera_position");
+			"test");
 	}
 
 	TEST_F(ConvertTest, ParseUniformEnumCameraDirFromProtoTest)
@@ -255,7 +255,7 @@ namespace test {
 		TestParseUniformEnumVectorFromProto(
 			frame::proto::Uniform::CAMERA_DIRECTION_VEC3,
 			glm::vec3(0, 0, -1),
-			"camera_direction");
+			"test");
 	}
 
 } // End namespace test.

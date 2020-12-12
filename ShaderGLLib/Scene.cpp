@@ -35,7 +35,7 @@ namespace sgl {
 		return ComputeLocalRotation(dt);
 	}
 
-	const std::shared_ptr<sgl::Mesh> SceneMatrix::GetLocalMesh() const
+	const std::shared_ptr<sgl::StaticMesh> SceneMatrix::GetLocalMesh() const
 	{
 		return nullptr;
 	}
@@ -71,7 +71,7 @@ namespace sgl {
 	{
 		SetName(proto_static_mesh.name());
 		SetParentName(proto_static_mesh.parent());
-		assert(false);
+		mesh_ = CreateStaticMeshFromObjFile(proto_static_mesh.file_name());
 	}
 
 	const glm::mat4 SceneStaticMesh::GetLocalModel(
@@ -83,7 +83,7 @@ namespace sgl {
 		return glm::mat4(1.0f);
 	}
 
-	const std::shared_ptr<sgl::Mesh> SceneStaticMesh::GetLocalMesh() const
+	const std::shared_ptr<sgl::StaticMesh> SceneStaticMesh::GetLocalMesh() const
 	{
 		return mesh_;
 	}
@@ -234,7 +234,7 @@ namespace sgl {
 			[&obj_text, &obj_name, &scene_tree, &root_node]() 
 		{
 			std::istringstream obj_iss(obj_text);
-			auto mesh = std::make_shared<Mesh>(obj_iss, obj_name);
+			auto mesh = std::make_shared<StaticMesh>(obj_iss, obj_name);
 			auto mesh_node = std::make_shared<SceneStaticMesh>(mesh);
 			const auto& root_name = root_node->GetName();
 			mesh_node->SetName(obj_name);
@@ -302,7 +302,7 @@ namespace sgl {
 		return glm::mat4(1.0f);
 	}
 
-	const std::shared_ptr<sgl::Mesh> SceneCamera::GetLocalMesh() const
+	const std::shared_ptr<sgl::StaticMesh> SceneCamera::GetLocalMesh() const
 	{
 		return nullptr;
 	}
@@ -311,7 +311,12 @@ namespace sgl {
 	{
 		SetName(proto_light.name());
 		SetParentName(proto_light.parent());
-		assert(false);
+		light_type_ = proto_light.light_type();
+		position_ = ParseUniform(proto_light.position());
+		direction_ = ParseUniform(proto_light.direction());
+		color_ = ParseUniform(proto_light.color());
+		dot_inner_limit_ = proto_light.dot_inner_limit();
+		dot_outer_limit_ = proto_light.dot_outer_limit();
 	}
 
 	SceneLight::SceneLight(
@@ -358,7 +363,7 @@ namespace sgl {
 		return glm::mat4(1.0f);
 	}
 
-	const std::shared_ptr<sgl::Mesh> SceneLight::GetLocalMesh() const
+	const std::shared_ptr<sgl::StaticMesh> SceneLight::GetLocalMesh() const
 	{
 		return nullptr;
 	}

@@ -8,7 +8,7 @@
 #include "FrameTest.h"
 #include "ImageTest.h"
 #include "LightTest.h"
-#include "MeshTest.h"
+#include "StaticMeshTest.h"
 #include "PixelTest.h"
 #include "ProgramTest.h"
 #include "SceneTest.h"

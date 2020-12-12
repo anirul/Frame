@@ -10,7 +10,7 @@
 #include "../ShaderGLLib/Texture.h"
 #include "../ShaderGLLib/Buffer.h"
 #include "../ShaderGLLib/Effect.h"
-#include "../ShaderGLLib/Mesh.h"
+#include "../ShaderGLLib/StaticMesh.h"
 #include "../ShaderGLLib/Scene.h"
 #include "../ShaderGLLib/Camera.h"
 #include "../ShaderGLLib/Light.h"
@@ -87,8 +87,8 @@ namespace sgl {
 		const std::pair<std::uint32_t, std::uint32_t> size_ = { 0, 0 };
 		const PixelElementSize pixel_element_size_ = PixelElementSize_HALF();
 		// Cached quad and cube objects.
-		std::shared_ptr<Mesh> quad_ = nullptr;
-		std::shared_ptr<Mesh> cube_ = nullptr;
+		std::shared_ptr<StaticMesh> quad_ = nullptr;
+		std::shared_ptr<StaticMesh> cube_ = nullptr;
 		// Error setup.
 		const Error& error_ = Error::GetInstance();
 		const Logger& logger_ = Logger::GetInstance();

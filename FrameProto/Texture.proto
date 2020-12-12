@@ -23,14 +23,15 @@ message TextureFilter {
 	Enum value = 1;
 }
 
-// Next 16
+// Next 17
 message Texture {
 	// Name of the texture.
 	string name = 1;
 	// Size of the texture.
 	Size size = 2;
 	// Should it be a cleared texture?
-	bool clear = 3;
+	bool clear_z = 3;
+	bool clear_color = 16;
 	// Should we use mipmap?
 	bool mipmap = 4;
 	// Should it be a cubemap?

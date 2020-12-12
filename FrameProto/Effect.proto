@@ -5,23 +5,26 @@ import "Uniform.proto";
 package frame.proto;
 
 // Description of a 2D effect.
-// Next 8
+// Next 9
 message Effect {
 	// Input Type this is the type of input of the effect.
 	enum RenderEnum {
 		INVALID = 0;
-		TEXTURE_2D = 1;
-		TEXTURE_3D = 2;
-		SCENE = 3;
+		NONE = 1;
+		TEXTURE_2D = 2;
+		TEXTURE_3D = 3;
+		SCENE = 4;
 	}
 	// Name of the effect.
 	string name = 1;
-	// Input type.
-	RenderEnum render_type = 2;
+	// Render input type.
+	RenderEnum render_input_type = 2;
+	// Render output type.
+	RenderEnum render_output_type = 8;
 	// Input textures.
-	repeated string input_textures_names = 3;
+	repeated string input_texture_names = 3;
 	// Output textures.
-	repeated string output_textures_names = 4;
+	repeated string output_texture_names = 4;
 	// Input Scenes.
 	string input_scene = 5;
 	// Shader name (used to find the shader).

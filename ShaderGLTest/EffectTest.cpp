@@ -65,15 +65,15 @@ namespace test {
 					std::make_pair<std::uint32_t, std::uint32_t>(32, 32))
 			},
 		};
-		*effect_proto.add_input_textures_names() = "Image";
-		*effect_proto.add_output_textures_names() = "frag_color";
+		*effect_proto.add_input_texture_names() = "Image";
+		*effect_proto.add_output_texture_names() = "frag_color";
 		EXPECT_NO_THROW(effect_ptr =
 			std::make_shared<sgl::Effect>(effect_proto, in_out_map));
 		EXPECT_TRUE(effect_ptr);
 		auto uniform_mock_ptr = std::make_shared<StrictMock<UniformMock>>();
 		std::pair<std::uint32_t, std::uint32_t> size = { 32, 32 };
 		EXPECT_NO_THROW(effect_ptr->Startup(size, uniform_mock_ptr));
-		EXPECT_NO_THROW(effect_ptr->Draw(sgl::CreateQuadMesh()));
+		EXPECT_NO_THROW(effect_ptr->Draw(sgl::CreateQuadStaticMesh()));
 	}
 
 } // End namespace test.

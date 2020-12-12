@@ -6,7 +6,7 @@
 #include "../ShaderGLLib/Error.h"
 #include "../ShaderGLLib/Logger.h"
 #include "../ShaderGLLib/Material.h"
-#include "../ShaderGLLib/Mesh.h"
+#include "../ShaderGLLib/StaticMesh.h"
 #include "../ShaderGLLib/Program.h"
 #include "../ShaderGLLib/Texture.h"
 #include "../ShaderGLLib/Uniform.h"
@@ -31,19 +31,25 @@ namespace sgl {
 			const std::shared_ptr<UniformInterface> uniform_interface);
 		// This is the draw interfaces.
 		void Draw(
-			const std::shared_ptr<Mesh> mesh, 
+			const std::shared_ptr<StaticMesh> mesh, 
 			const double dt = 0.0) const;
 
 	public:
 		// Get the name of the effect.
 		const std::string& GetName() const { return name_; }
-		const frame::proto::Effect::RenderEnum GetRenderType() const 
+		const frame::proto::Effect::RenderEnum GetRenderInputType() const 
 		{
-			return render_type_;
+			return render_input_type_;
+		}
+		const frame::proto::Effect::RenderEnum GetRenderOutputType() const
+		{
+			return render_output_type_;
 		}
 
 	private:
-		frame::proto::Effect::RenderEnum render_type_ = 
+		frame::proto::Effect::RenderEnum render_input_type_ = 
+			frame::proto::Effect::INVALID;
+		frame::proto::Effect::RenderEnum render_output_type_ =
 			frame::proto::Effect::INVALID;
 		Error& error_ = Error::GetInstance();
 		Logger& logger_ = Logger::GetInstance();

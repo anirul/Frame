@@ -1,4 +1,4 @@
-#include "Mesh.h"
+#include "StaticMesh.h"
 #include <iterator>
 #include <fstream>
 #include <sstream>
@@ -6,7 +6,7 @@
 
 namespace sgl {
 
-	Mesh::Mesh(
+	StaticMesh::StaticMesh(
 		std::istream& is,
 		const std::string& name)
 	{
@@ -49,7 +49,7 @@ namespace sgl {
 	}
 
 	
-	Mesh::Mesh(
+	StaticMesh::StaticMesh(
 		const std::vector<float>& points,
 		const std::vector<float>& normals,
 		const std::vector<float>& texcoords,
@@ -58,12 +58,12 @@ namespace sgl {
 		CreateMeshFromFlat(points, normals, texcoords, indices);
 	}
 
-	Mesh::~Mesh()
+	StaticMesh::~StaticMesh()
 	{
 		glDeleteVertexArrays(1, &vertex_array_object_);
 	}
 
-	void Mesh::CreateMeshFromFlat(
+	void StaticMesh::CreateMeshFromFlat(
 		const std::vector<float>& points,
 		const std::vector<float>& normals,
 		const std::vector<float>& texcoords,
@@ -121,7 +121,7 @@ namespace sgl {
 		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
-	void Mesh::Draw(
+	void StaticMesh::Draw(
 		const std::shared_ptr<ProgramInterface> program,
 		const glm::mat4 projection /*= glm::mat4(1.0f)*/,
 		const glm::mat4 view /*= glm::mat4(1.0f)*/,
@@ -169,11 +169,11 @@ namespace sgl {
 		}
 	}
 
-	Mesh::ObjFile Mesh::LoadFromObj(
+	StaticMesh::ObjFile StaticMesh::LoadFromObj(
 		std::istream& is, 
 		const std::string& name)
 	{
-		Mesh::ObjFile obj_file{};
+		StaticMesh::ObjFile obj_file{};
 		while (!is.eof()) 
 		{
 			std::string line = "";
@@ -328,7 +328,7 @@ namespace sgl {
 		return obj_file;
 	}
 
-	glm::vec3 Mesh::GetVec3From3Float(
+	glm::vec3 StaticMesh::GetVec3From3Float(
 		std::istream& is, 
 		const std::string& stream_name, 
 		const std::string& element_name) const
@@ -361,7 +361,7 @@ namespace sgl {
 		return v3;
 	}
 
-	glm::vec2 Mesh::Getvec2From2Float(
+	glm::vec2 StaticMesh::Getvec2From2Float(
 		std::istream& is, 
 		const std::string& stream_name, 
 		const std::string& element_name) const
@@ -386,7 +386,7 @@ namespace sgl {
 		return v2;
 	}
 
-	std::shared_ptr<sgl::Mesh> CreateQuadMesh()
+	std::shared_ptr<sgl::StaticMesh> CreateQuadStaticMesh()
 	{
 		std::vector<float> points =
 		{
@@ -414,19 +414,19 @@ namespace sgl {
 			0, 1, 2,
 			1, 3, 2,
 		};
-		return std::make_shared<Mesh>(
+		return std::make_shared<StaticMesh>(
 			points, 
 			normals, 
 			texcoords, 
 			indices);
 	}
 
-	std::shared_ptr<sgl::Mesh> CreateCubeMesh()
+	std::shared_ptr<sgl::StaticMesh> CreateCubeStaticMesh()
 	{
-		return CreateMeshFromObjFile("../Asset/Model/Cube.obj");
+		return CreateStaticMeshFromObjFile("../Asset/Model/Cube.obj");
 	}
 
-	std::shared_ptr<sgl::Mesh> CreateMeshFromObjFile(
+	std::shared_ptr<sgl::StaticMesh> CreateStaticMeshFromObjFile(
 		const std::string& file_path)
 	{
 		auto ifs = std::ifstream(file_path);
@@ -434,7 +434,7 @@ namespace sgl {
 		{
 			throw std::runtime_error("could not open file: " + file_path);
 		}
-		return std::make_shared<sgl::Mesh>(ifs, file_path);
+		return std::make_shared<sgl::StaticMesh>(ifs, file_path);
 	}
 
 } // End namespace sgl.
