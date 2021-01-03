@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14)
 
 set(CMAKE_CXX_STANDARD 17)
 
-project(ShaderGL)
+project(Frame)
 
 find_package(absl CONFIG REQUIRED)
 find_package(protobuf CONFIG REQUIRED)
@@ -48,56 +48,100 @@ if(WIN32)
     endif(${VCPKG_TARGET_TRIPLET} MATCHES "-static")
 endif(WIN32)
 
-add_custom_target(ShaderGL
+add_custom_target(OpenGLShader
   SOURCES
-    Asset/Shader/Blur.frag
-    Asset/Shader/Blur.vert
-    Asset/Shader/Brightness.frag
-    Asset/Shader/Brightness.vert
-    Asset/Shader/CubeMap.frag
-    Asset/Shader/CubeMap.vert
-    Asset/Shader/CubeMapDeferred.frag
-    Asset/Shader/CubeMapDeferred.vert
-    Asset/Shader/Display.frag
-    Asset/Shader/Display.vert
-    Asset/Shader/EquirectangularCubeMap.frag
-    Asset/Shader/EquirectangularCubeMap.vert
-    Asset/Shader/GaussianBlur.frag
-    Asset/Shader/GaussianBlur.vert
-    Asset/Shader/HighDynamicRange.frag
-    Asset/Shader/HighDynamicRange.vert
-    Asset/Shader/IntegrateBRDF.frag
-    Asset/Shader/IntegrateBRDF.vert
-    Asset/Shader/IrradianceCubeMap.frag
-    Asset/Shader/IrradianceCubeMap.vert
-    Asset/Shader/JapaneseFlag.frag
-    Asset/Shader/JapaneseFlag.vert
-    Asset/Shader/Lighting.frag
-    Asset/Shader/Lighting.vert
-    Asset/Shader/MonteCarloPrefilter.frag
-    Asset/Shader/MonteCarloPrefilter.vert
-    Asset/Shader/PhysicallyBasedRendering.frag
-    Asset/Shader/PhysicallyBasedRendering.vert
-    Asset/Shader/RayMarching.frag
-    Asset/Shader/RayMarching.vert
-    Asset/Shader/ScreenSpaceAmbientOcclusion.frag
-    Asset/Shader/ScreenSpaceAmbientOcclusion.vert
-    Asset/Shader/SceneSimple.frag
-    Asset/Shader/SceneSimple.vert
-    Asset/Shader/VectorAddition.frag
-    Asset/Shader/VectorAddition.vert
-    Asset/Shader/VectorMultiply.frag
-    Asset/Shader/VectorMultiply.vert
-    Asset/Shader/ViewPositionNormal.frag
-    Asset/Shader/ViewPositionNormal.vert
+    Asset/Shader/OpenGL/Blur.frag
+    Asset/Shader/OpenGL/Blur.vert
+    Asset/Shader/OpenGL/Brightness.frag
+    Asset/Shader/OpenGL/Brightness.vert
+    Asset/Shader/OpenGL/CubeMap.frag
+    Asset/Shader/OpenGL/CubeMap.vert
+    Asset/Shader/OpenGL/CubeMapDeferred.frag
+    Asset/Shader/OpenGL/CubeMapDeferred.vert
+    Asset/Shader/OpenGL/Display.frag
+    Asset/Shader/OpenGL/Display.vert
+    Asset/Shader/OpenGL/EquirectangularCubeMap.frag
+    Asset/Shader/OpenGL/EquirectangularCubeMap.vert
+    Asset/Shader/OpenGL/GaussianBlur.frag
+    Asset/Shader/OpenGL/GaussianBlur.vert
+    Asset/Shader/OpenGL/HighDynamicRange.frag
+    Asset/Shader/OpenGL/HighDynamicRange.vert
+    Asset/Shader/OpenGL/IntegrateBRDF.frag
+    Asset/Shader/OpenGL/IntegrateBRDF.vert
+    Asset/Shader/OpenGL/IrradianceCubeMap.frag
+    Asset/Shader/OpenGL/IrradianceCubeMap.vert
+    Asset/Shader/OpenGL/JapaneseFlag.frag
+    Asset/Shader/OpenGL/JapaneseFlag.vert
+    Asset/Shader/OpenGL/Lighting.frag
+    Asset/Shader/OpenGL/Lighting.vert
+    Asset/Shader/OpenGL/MonteCarloPrefilter.frag
+    Asset/Shader/OpenGL/MonteCarloPrefilter.vert
+    Asset/Shader/OpenGL/PhysicallyBasedRendering.frag
+    Asset/Shader/OpenGL/PhysicallyBasedRendering.vert
+    Asset/Shader/OpenGL/RayMarching.frag
+    Asset/Shader/OpenGL/RayMarching.vert
+    Asset/Shader/OpenGL/ScreenSpaceAmbientOcclusion.frag
+    Asset/Shader/OpenGL/ScreenSpaceAmbientOcclusion.vert
+    Asset/Shader/OpenGL/SceneSimple.frag
+    Asset/Shader/OpenGL/SceneSimple.vert
+    Asset/Shader/OpenGL/VectorAddition.frag
+    Asset/Shader/OpenGL/VectorAddition.vert
+    Asset/Shader/OpenGL/VectorMultiply.frag
+    Asset/Shader/OpenGL/VectorMultiply.vert
+    Asset/Shader/OpenGL/ViewPositionNormal.frag
+    Asset/Shader/OpenGL/ViewPositionNormal.vert
+)
+
+add_library(Frame
+  STATIC
+    Frame/BindInterface.h
+    Frame/BufferInterface.h
+    Frame/CameraInterface.h
+    Frame/DeviceInterface.h
+    Frame/DrawInterface.h
+    Frame/Error.cpp
+    Frame/Error.h
+    Frame/Frame.h
+    Frame/InputInterface.h
+    Frame/LevelBase.h
+    Frame/LevelInterface.h
+    Frame/LightInterface.h
+    Frame/Logger.cpp
+    Frame/Logger.h
+    Frame/MaterialInterface.h
+    Frame/ProgramInterface.h
+    Frame/SceneNodeInterface.h
+    Frame/SceneTreeInterface.h
+    Frame/StaticMeshInterface.h
+    Frame/TextureInterface.h
+    Frame/UniformInterface.h
+    Frame/Window.cpp
+    Frame/Window.h
+    Frame/WindowInterface.h
+)
+
+target_include_directories(Frame
+  PUBLIC
+    ${CMAKE_CURRENT_BINARY_DIR}
+)
+
+target_link_libraries(Frame
+  PUBLIC
+    SDL2::SDL2
+    spdlog::spdlog
 )
 
 add_library(FrameProto
   STATIC
-    FrameProto/Effect.proto
+    FrameProto/Convert.cpp
+    FrameProto/Convert.h
+    FrameProto/LevelOpenGL.h
     FrameProto/Level.proto
+    FrameProto/Material.proto
     FrameProto/Math.proto
     FrameProto/Pixel.proto
+    FrameProto/Program.proto
+    FrameProto/Proto.cpp
     FrameProto/Proto.h
     FrameProto/Scene.proto
     FrameProto/Size.proto
@@ -120,110 +164,98 @@ target_link_libraries(FrameProto
     protobuf::libprotobuf
 )
 
-add_library(ShaderGLLib
+add_library(OpenGLLib
   STATIC
-    ShaderGLLib/Buffer.cpp
-    ShaderGLLib/Buffer.h
-    ShaderGLLib/Camera.cpp
-    ShaderGLLib/Camera.h
-    ShaderGLLib/Convert.cpp
-    ShaderGLLib/Convert.h
-    ShaderGLLib/Device.cpp
-    ShaderGLLib/Device.h
-    ShaderGLLib/Effect.cpp
-    ShaderGLLib/Effect.h
-    ShaderGLLib/Error.cpp
-    ShaderGLLib/Error.h
-    ShaderGLLib/Fill.cpp
-    ShaderGLLib/Fill.h
-    ShaderGLLib/FrameBuffer.cpp
-    ShaderGLLib/FrameBuffer.h
-    ShaderGLLib/Image.cpp
-    ShaderGLLib/Image.h
-    ShaderGLLib/Light.cpp
-    ShaderGLLib/Light.h
-    ShaderGLLib/Logger.cpp
-    ShaderGLLib/Logger.h
-    ShaderGLLib/Material.cpp
-    ShaderGLLib/Material.h
-    ShaderGLLib/StaticMesh.cpp
-    ShaderGLLib/StaticMesh.h
-    ShaderGLLib/Pixel.cpp
-    ShaderGLLib/Pixel.h
-    ShaderGLLib/Program.cpp
-    ShaderGLLib/Program.h
-    ShaderGLLib/RenderBuffer.cpp
-    ShaderGLLib/RenderBuffer.h
-    ShaderGLLib/Scene.cpp
-    ShaderGLLib/Scene.h
-    ShaderGLLib/ScopedBind.cpp
-    ShaderGLLib/ScopedBind.h
-    ShaderGLLib/Shader.cpp
-    ShaderGLLib/Shader.h
-    ShaderGLLib/Texture.cpp
-    ShaderGLLib/Texture.h
-    ShaderGLLib/Uniform.h
-    ShaderGLLib/Window.cpp
-    ShaderGLLib/Window.h
+    OpenGLLib/Buffer.cpp
+    OpenGLLib/Buffer.h
+    OpenGLLib/Camera.cpp
+    OpenGLLib/Camera.h
+    OpenGLLib/Device.cpp
+    OpenGLLib/Device.h
+    OpenGLLib/Fill.cpp
+    OpenGLLib/Fill.h
+    OpenGLLib/FrameBuffer.cpp
+    OpenGLLib/FrameBuffer.h
+    OpenGLLib/Image.cpp
+    OpenGLLib/Image.h
+    OpenGLLib/Light.cpp
+    OpenGLLib/Light.h
+    OpenGLLib/Material.cpp
+    OpenGLLib/Material.h
+    OpenGLLib/StaticMesh.cpp
+    OpenGLLib/StaticMesh.h
+    OpenGLLib/Pixel.cpp
+    OpenGLLib/Pixel.h
+    OpenGLLib/Program.cpp
+    OpenGLLib/Program.h
+    OpenGLLib/RenderBuffer.cpp
+    OpenGLLib/RenderBuffer.h
+    OpenGLLib/Rendering.cpp
+    OpenGLLib/Rendering.h
+    OpenGLLib/Scene.cpp
+    OpenGLLib/Scene.h
+    OpenGLLib/ScopedBind.cpp
+    OpenGLLib/ScopedBind.h
+    OpenGLLib/Shader.cpp
+    OpenGLLib/Shader.h
+    OpenGLLib/Texture.cpp
+    OpenGLLib/Texture.h
 )
 
-target_link_libraries(ShaderGLLib
+target_link_libraries(OpenGLLib
   PUBLIC
+    Frame
     FrameProto
-    SDL2::SDL2
     GLEW::GLEW
     glm
-    spdlog::spdlog
 )
 
-add_executable(ShaderGLTest
-    ShaderGLTest/BufferTest.cpp
-    ShaderGLTest/BufferTest.h
-    ShaderGLTest/CameraTest.cpp
-    ShaderGLTest/CameraTest.h
-    ShaderGLTest/ConvertTest.cpp
-    ShaderGLTest/ConvertTest.h
-    ShaderGLTest/DeviceTest.cpp
-    ShaderGLTest/DeviceTest.h
-    ShaderGLTest/EffectTest.cpp
-    ShaderGLTest/EffectTest.h
-    ShaderGLTest/ErrorTest.cpp
-    ShaderGLTest/ErrorTest.h
-    ShaderGLTest/FrameBufferTest.cpp
-    ShaderGLTest/FrameBufferTest.h
-    ShaderGLTest/ImageTest.cpp
-    ShaderGLTest/ImageTest.h
-    ShaderGLTest/LightTest.cpp
-    ShaderGLTest/LightTest.h
-    ShaderGLTest/main.cpp
-    ShaderGLTest/MaterialTest.cpp
-    ShaderGLTest/MaterialTest.h
-    ShaderGLTest/StaticMeshTest.cpp
-    ShaderGLTest/StaticMeshTest.h
-    ShaderGLTest/PixelTest.cpp
-    ShaderGLTest/PixelTest.h
-    ShaderGLTest/ProgramMock.h
-    ShaderGLTest/ProgramTest.cpp
-    ShaderGLTest/ProgramTest.h
-    ShaderGLTest/RenderBufferTest.cpp
-    ShaderGLTest/RenderBufferTest.h
-    ShaderGLTest/SceneTest.cpp
-    ShaderGLTest/SceneTest.h
-    ShaderGLTest/ShaderTest.cpp
-    ShaderGLTest/ShaderTest.h
-    ShaderGLTest/TextureTest.cpp
-    ShaderGLTest/TextureTest.h
-    ShaderGLTest/UniformMock.h
-    ShaderGLTest/WindowTest.cpp
-    ShaderGLTest/WindowTest.h
+add_executable(OpenGLTest
+    OpenGLTest/BufferTest.cpp
+    OpenGLTest/BufferTest.h
+    OpenGLTest/CameraTest.cpp
+    OpenGLTest/CameraTest.h
+    OpenGLTest/ConvertTest.cpp
+    OpenGLTest/ConvertTest.h
+    OpenGLTest/DeviceTest.cpp
+    OpenGLTest/DeviceTest.h
+    OpenGLTest/ErrorTest.cpp
+    OpenGLTest/ErrorTest.h
+    OpenGLTest/FrameBufferTest.cpp
+    OpenGLTest/FrameBufferTest.h
+    OpenGLTest/ImageTest.cpp
+    OpenGLTest/ImageTest.h
+    OpenGLTest/LightTest.cpp
+    OpenGLTest/LightTest.h
+    OpenGLTest/main.cpp
+    OpenGLTest/MaterialTest.cpp
+    OpenGLTest/MaterialTest.h
+    OpenGLTest/StaticMeshTest.cpp
+    OpenGLTest/StaticMeshTest.h
+    OpenGLTest/PixelTest.cpp
+    OpenGLTest/PixelTest.h
+    OpenGLTest/ProgramMock.h
+    OpenGLTest/ProgramTest.cpp
+    OpenGLTest/ProgramTest.h
+    OpenGLTest/RenderBufferTest.cpp
+    OpenGLTest/RenderBufferTest.h
+    OpenGLTest/SceneTest.cpp
+    OpenGLTest/SceneTest.h
+    OpenGLTest/ShaderTest.cpp
+    OpenGLTest/ShaderTest.h
+    OpenGLTest/TextureTest.cpp
+    OpenGLTest/TextureTest.h
+    OpenGLTest/UniformMock.h
+    OpenGLTest/WindowTest.cpp
+    OpenGLTest/WindowTest.h
 )
 
-target_include_directories(ShaderGLTest
+target_include_directories(OpenGLTest
   PUBLIC
     ShaderGLLib
 )
 
-target_link_libraries(ShaderGLTest
+target_link_libraries(OpenGLTest
   PUBLIC
     ShaderGLLib
     FrameProto
@@ -234,7 +266,7 @@ target_link_libraries(ShaderGLTest
 
 add_executable(JapaneseFlag
   WIN32
-    Asset/Json/JapaneseFLag.Effect.json
+    Asset/Json/JapaneseFLag.Program.json
     Asset/Json/JapaneseFlag.Level.json
     Asset/Json/JapaneseFlag.Scene.json
     Asset/Json/JapaneseFLag.Texture.json
@@ -249,19 +281,19 @@ add_executable(JapaneseFlag
 
 target_include_directories(JapaneseFlag
   PUBLIC
-    ShaderGLLib
     Sample/JapaneseFlag
 )
 
 target_link_libraries(JapaneseFlag
   PUBLIC
-    ShaderGLLib
+    Frame
+    OpenGLLib
     FrameProto
 )
 
 add_executable(RayMarching
   WIN32
-    Asset/Json/RayMarching.Effect.json
+    Asset/Json/RayMarching.Program.json
     Asset/Json/RayMarching.Level.json
     Asset/Json/RayMarching.Scene.json
     Asset/Json/RayMarching.Texture.json
@@ -276,19 +308,19 @@ add_executable(RayMarching
 
 target_include_directories(RayMarching
   PUBLIC
-    ShaderGLLib
     Sample/RayMarching
 )
 
 target_link_libraries(RayMarching
   PUBLIC
-    ShaderGLLib
+    Frame
+    OpenGLLib
     FrameProto
 )
 
 add_executable(SceneSimple
   WIN32
-    Asset/Json/SceneSimple.Effect.json
+    Asset/Json/SceneSimple.Program.json
     Asset/Json/SceneSimple.Level.json
     Asset/Json/SceneSimple.Scene.json
     Asset/Json/SceneSimple.Texture.json
@@ -303,19 +335,19 @@ add_executable(SceneSimple
 
 target_include_directories(SceneSimple
   PUBLIC
-    ShaderGLLib
     Sample/SceneSimple
 )
 
 target_link_libraries(SceneSimple
   PUBLIC
-    ShaderGLLib
+    Frame
+    OpenGLLib
     FrameProto
 )
 
 add_executable(SceneRendering
   WIN32
-    Asset/Json/SceneRendering.Effect.json
+    Asset/Json/SceneRendering.Program.json
     Asset/Json/SceneRendering.Level.json
     Asset/Json/SceneRendering.Scene.json
     Asset/Json/SceneRendering.Texture.json
@@ -330,12 +362,12 @@ add_executable(SceneRendering
 
 target_include_directories(SceneRendering
   PUBLIC
-    ShaderGLLib
+    OpenGLLib
     Sample/SceneRendering
 )
 
 target_link_libraries(SceneRendering
   PUBLIC
-    ShaderGLLib
+    OpenGLLib
     FrameProto
 )

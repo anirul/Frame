@@ -5,10 +5,11 @@ import "Pixel.proto";
 
 package frame.proto;
 
-// Texture filter used in texture declaration.
-// Next 2
-message TextureFilter {
-	enum Enum {
+// Texture
+// Next 17
+message Texture {
+	// TextureFilterEnum
+	enum TextureFilterEnum {
 		INVALID                = 0;
 		NEAREST                = 1;
 		LINEAR                 = 2;
@@ -20,11 +21,6 @@ message TextureFilter {
 		MIRRORED_REPEAT        = 8;
 		REPEAT                 = 9;
 	}
-	Enum value = 1;
-}
-
-// Next 17
-message Texture {
 	// Name of the texture.
 	string name = 1;
 	// Size of the texture.
@@ -42,11 +38,11 @@ message Texture {
 	PixelStructure pixel_structure = 7;
 
 	// Filter for mirroring and texture sampling.
-	TextureFilter min_filter = 8;
-	TextureFilter mag_filter = 9;
-	TextureFilter wrap_s = 10;
-	TextureFilter wrap_t = 11;
-	TextureFilter wrap_r = 12;
+	TextureFilterEnum min_filter = 8;
+	TextureFilterEnum mag_filter = 9;
+	TextureFilterEnum wrap_s = 10;
+	TextureFilterEnum wrap_t = 11;
+	TextureFilterEnum wrap_r = 12;
 
 	// Pixel (if provided).
 	bytes pixels = 13;

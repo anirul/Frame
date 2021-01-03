@@ -11,7 +11,7 @@ void Application::Startup()
 	auto device = window_->GetUniqueDevice();
 	// device->Startup();
 	device->LoadSceneFromObjFile("../Asset/Model/Scene.obj");
-	device->AddEnvironment("../Asset/CubeMap/Shiodome.hdr");
+//	device->AddEnvironment("../Asset/CubeMap/Shiodome.hdr");
 }
 
 void Application::Run()

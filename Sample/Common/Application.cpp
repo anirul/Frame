@@ -2,7 +2,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "Draw.h"
 
-Application::Application(const std::shared_ptr<sgl::WindowInterface>& window) :
+Application::Application(
+	const std::shared_ptr<frame::WindowInterface>& window) :
 	window_(window) {}
 
 void Application::Startup()

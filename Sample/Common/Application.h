@@ -1,16 +1,16 @@
 #pragma once
 
 #include <memory>
-#include "../ShaderGLLib/Window.h"
-#include "../ShaderGLLib/Texture.h"
+#include "../Frame/Window.h"
+#include "../OpenGLLib/Texture.h"
 
 class Application
 {
 public:
-	Application(const std::shared_ptr<sgl::WindowInterface>& window);
+	Application(const std::shared_ptr<frame::WindowInterface>& window);
 	void Startup();
 	void Run();
 
 protected:
-	std::shared_ptr<sgl::WindowInterface> window_;
+	std::shared_ptr<frame::WindowInterface> window_;
 };

@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package frame.proto;
+
+// Material
+// Next 4
+message Material {
+	// Name of the material.
+	string name = 1;
+	// Reference name of the effect.
+	string effect_name = 2;
+	// Reference name of the texture names.
+	repeated string texture_names = 3;
+}
+
+// File description of the materials description.
+// Next 2
+message MaterialFile {
+	// Contain many materials.
+	repeated Material materials = 1;
+}
