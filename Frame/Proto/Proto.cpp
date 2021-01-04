@@ -1,7 +1,7 @@
 #include "Proto.h"
-#include "../Frame/LevelBase.h"
-#include "../FrameProto/LevelOpenGL.h"
-#include "../OpenGLLib/Scene.h"
+#include "Frame/LevelBase.h"
+#include "Frame/OpenGL/Scene.h"
+#include "Frame/Proto/LevelOpenGL.h"
 
 namespace frame::proto {
 

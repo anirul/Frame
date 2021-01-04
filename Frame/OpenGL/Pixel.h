@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <GL/glew.h>
 #include <glm/glm.hpp>
-#include "../FrameProto/Proto.h"
+#include "Frame/Proto/Proto.h"
 
 namespace frame::opengl {
 

@@ -9,7 +9,7 @@
 #include <SDL_syswm.h>
 #include <GL/glew.h>
 #include "Error.h"
-#include "../OpenGLLib/Device.h"
+#include "../Frame/OpenGL/Device.h"
 
 namespace frame {
 

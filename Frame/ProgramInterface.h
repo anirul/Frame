@@ -1,12 +1,22 @@
 #pragma once
 
 #include <string>
+#include <vector>
 #include <glm/glm.hpp>
 
 namespace frame {
 
 	struct ProgramInterface
 	{
+		// Set & get input texture id.
+		virtual void AddInputTextureId(std::uint64_t id) = 0;
+		virtual std::vector<std::uint64_t>& GetInputTextureIds() const = 0;
+		// Set & get output texture id.
+		virtual void AddOutputTextureId(std::uint64_t id) = 0;
+		virtual std::vector<std::uint64_t>& GetOutputTextureIds() const = 0;
+		// Remove and check texture id.
+		virtual void RemoveTextureId(std::uint64_t id) = 0;
+		virtual bool HasTextureId(std::uint64_t id) const = 0;
 		// Link shaders to a program.
 		virtual void LinkShader() = 0;
 		// Use the program.

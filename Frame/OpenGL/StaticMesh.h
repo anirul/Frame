@@ -1,16 +1,16 @@
 #pragma once
 
-#include <vector>
-#include <string>
-#include <memory>
-#include <optional>
 #include <array>
 #include <initializer_list>
-#include "../Frame/Error.h"
-#include "../OpenGLLib/Buffer.h"
-#include "../OpenGLLib/Program.h"
-#include "../OpenGLLib/Texture.h"
-#include "../OpenGLLib/Material.h"
+#include <memory>
+#include <optional>
+#include <string>
+#include <vector>
+#include "Frame/Error.h"
+#include "Frame/OpenGL/Buffer.h"
+#include "Frame/OpenGL/Material.h"
+#include "Frame/OpenGL/Program.h"
+#include "Frame/OpenGL/Texture.h"
 
 namespace frame::opengl {
 

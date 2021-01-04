@@ -1,10 +1,11 @@
 #pragma once
 
-#include "../Frame/Level.h"
-#include "../OpenGLLib/Scene.h"
-#include "../OpenGLLib/Texture.h"
-#include "../OpenGLLib/Material.h"
-#include "../OpenGLLib/Program.h"
+#include "Frame/LevelBase.h"
+#include "Frame/OpenGL/Scene.h"
+#include "Frame/OpenGL/Texture.h"
+#include "Frame/OpenGL/Material.h"
+#include "Frame/ProgramInterface.h"
+#include "Frame/Proto/ParseProgram.h"
 
 namespace frame::proto {
 
@@ -73,7 +74,7 @@ namespace frame::proto {
 			for (const auto& proto_program : proto_program_file.programs())
 			{
 				std::shared_ptr<ProgramInterface> program =
-					std::make_shared<opengl::Program>(proto_program);
+					proto::ParseProgramOpenGL(proto_program);
 				std::uint64_t id = GetProgramNewId();
 				id_program_map_.insert({ id, program });
 				name_id_map_.insert({ proto_program.name(), id });

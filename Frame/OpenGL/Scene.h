@@ -5,11 +5,11 @@
 #include <vector>
 #include <functional>
 #include <glm/gtx/quaternion.hpp>
-#include "../Frame/SceneNodeInterface.h"
-#include "../Frame/SceneTreeInterface.h"
-#include "../OpenGLLib/StaticMesh.h"
-#include "../OpenGLLib/Material.h"
-#include "../OpenGLLib/Camera.h"
+#include "Frame/OpenGL/StaticMesh.h"
+#include "Frame/OpenGL/Material.h"
+#include "Frame/OpenGL/Camera.h"
+#include "Frame/SceneNodeInterface.h"
+#include "Frame/SceneTreeInterface.h"
 
 namespace frame::opengl {
 

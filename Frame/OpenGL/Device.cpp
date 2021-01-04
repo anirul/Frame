@@ -53,10 +53,14 @@ namespace frame::opengl {
 
 	void Device::Startup(const std::shared_ptr<frame::LevelInterface> level)
 	{
+		// Copy level into the local area.
 		level_ = level;
-
+		// Preprocess the level to have a direct rendering.
+		AddToRenderProgram(
+			GetProgramIdTextureId(level_->GetDefaultOutputTextureId()));
+		// Setup camera.
 		SetupCamera();
-
+		// Create a default cube and quad for rendering.
 		cube_ = CreateCubeStaticMesh();
 		quad_ = CreateQuadStaticMesh();
 	}
@@ -64,11 +68,23 @@ namespace frame::opengl {
 	void Device::Cleanup()
 	{
 		level_ = nullptr;
+		program_render_.clear();
 	}
 
 	void Device::Display(const double dt)
 	{
 		dt_ = dt;
+		for (const auto& id_program : level_->GetProgramMap())
+		{
+			logger_->info(
+				"Display {} program.", 
+				level_->GetNameFromId(id_program.first));
+			for (const auto& id : id_program.second->GetOutputTextureIds())
+			{
+
+			}
+
+		}
 		std::vector<std::shared_ptr<Effect>> mesh_effects;
 		for (const auto& name_effect : effect_map_)
 		{
@@ -183,6 +199,77 @@ namespace frame::opengl {
 			std::istringstream(obj_content),
 			obj_file);
 		material_map_ = LoadMaterialFromMtlStream(mtl_ifs, mtl_file);
+	}
+
+	std::uint64_t Device::GetProgramIdTextureId(std::uint64_t texture_id) const
+	{
+		std::uint64_t program_id = 0;
+		// Go through all programs.
+		for (const auto& id_program : level_->GetProgramMap())
+		{
+			for (const auto& output_texture_id : 
+				id_program.second->GetOutputTextureIds())
+			{
+				if (texture_id == output_texture_id)
+				{
+					if (program_id)
+					{
+						throw std::runtime_error(
+							"Texture : " + level_->GetNameFromId(texture_id)
+							+ "[" + std::to_string(texture_id) + "]" +
+							" cannot be output of more than one program.");
+					}
+					program_id = id_program.first;
+				}
+			}
+		}
+		// Check found anything.
+		if (program_id == 0)
+		{
+			throw std::runtime_error(
+				"no program id that output texture: " + 
+				level_->GetNameFromId(texture_id) +
+				"[" + std::to_string(texture_id) + "].");
+		}
+		return program_id;
+	}
+
+	void Device::AddToRenderProgram(std::uint64_t program_id)
+	{
+		std::vector<std::uint64_t> texture_ids = {};
+		const auto& program = level_->GetProgramMap().at(program_id);
+		texture_ids = program->GetInputTextureIds();
+		std::sort(texture_ids.begin(), texture_ids.end());
+		std::vector<std::uint64_t> program_ids = {};
+		for (const auto& id_program : level_->GetProgramMap())
+		{
+			std::vector<std::uint64_t> output_texture_ids = {};
+			output_texture_ids = id_program.second->GetOutputTextureIds();
+			std::sort(output_texture_ids.begin(), output_texture_ids.end());
+			std::vector<std::uint64_t> intersection = {};
+			std::set_intersection(
+				output_texture_ids.cbegin(),
+				output_texture_ids.cend(),
+				texture_ids.cbegin(),
+				texture_ids.cend(),
+				std::back_inserter(intersection));
+			if (intersection.size() > 0)
+			{
+				program_ids.push_back(id_program.first);
+				std::vector<std::uint64_t> difference = {};
+				std::set_difference(
+					output_texture_ids.cbegin(),
+					output_texture_ids.cend(),
+					texture_ids.cbegin(), 
+					texture_ids.cend(),
+					std::back_inserter(difference));
+				texture_ids = difference;
+			}
+		}
+		for (const auto& id : program_ids) {
+			AddToRenderProgram(id);
+		}
+		program_render_.push_back(program_id);
 	}
 
 } // End namespace frame::opengl.

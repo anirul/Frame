@@ -1,23 +1,23 @@
 #pragma once
 
-#include <memory>
-#include <map>
 #include <array>
 #include <functional>
+#include <map>
+#include <memory>
 #include <optional>
 #include <SDL2/SDL.h>
-#include "../Frame/DeviceInterface.h"
-#include "../Frame/Error.h"
-#include "../Frame/Logger.h"
-#include "../Frame/UniformInterface.h"
-#include "../OpenGLLib/Program.h"
-#include "../OpenGLLib/Texture.h"
-#include "../OpenGLLib/Buffer.h"
-#include "../OpenGLLib/StaticMesh.h"
-#include "../OpenGLLib/Scene.h"
-#include "../OpenGLLib/Camera.h"
-#include "../OpenGLLib/Light.h"
-#include "../OpenGLLib/Material.h"
+#include "Frame/DeviceInterface.h"
+#include "Frame/Error.h"
+#include "Frame/Logger.h"
+#include "Frame/UniformInterface.h"
+#include "Frame/OpenGL/Program.h"
+#include "Frame/OpenGL/Texture.h"
+#include "Frame/OpenGL/Buffer.h"
+#include "Frame/OpenGL/StaticMesh.h"
+#include "Frame/OpenGL/Scene.h"
+#include "Frame/OpenGL/Camera.h"
+#include "Frame/OpenGL/Light.h"
+#include "Frame/OpenGL/Material.h"
 
 namespace frame::opengl {
 
@@ -60,12 +60,18 @@ namespace frame::opengl {
 
 	protected:
 		void SetupCamera();
+		std::uint64_t GetProgramIdTextureId(std::uint64_t texture_id) const;
+		void AddToRenderProgram(std::uint64_t program_id);
 
 	private:
 		std::shared_ptr<FrameBuffer> frame_ = nullptr;
 		std::shared_ptr<RenderBuffer> render_ = nullptr;
 		// Map of current stored level.
 		std::shared_ptr<LevelInterface> level_ = nullptr;
+		// Order of program to be rendered (fixed by input output).
+		// The order is relevant and this should also be a set as program
+		// should only be referred once.
+		std::vector<std::uint64_t> program_render_ = {};
 		// Output texture (to the screen).
 		std::string out_texture_name_ = "";
 		// PVM matrices.

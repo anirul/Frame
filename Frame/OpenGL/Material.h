@@ -3,8 +3,8 @@
 #include <iostream>
 #include <set>
 #include <string>
-#include "../Frame/MaterialInterface.h"
-#include "../OpenGLLib/Texture.h"
+#include "Frame/MaterialInterface.h"
+#include "Frame/OpenGL/Texture.h"
 
 namespace frame::opengl {
 

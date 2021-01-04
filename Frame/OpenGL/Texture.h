@@ -9,13 +9,13 @@
 #include <array>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include "../Frame/Error.h"
-#include "../FrameProto/Proto.h"
-#include "../OpenGLLib/Pixel.h"
-#include "../OpenGLLib/Program.h"
-#include "../OpenGLLib/FrameBuffer.h"
-#include "../OpenGLLib/RenderBuffer.h"
-#include "../OpenGLLib/ScopedBind.h"
+#include "Frame/Error.h"
+#include "Frame/OpenGL/Pixel.h"
+#include "Frame/OpenGL/Program.h"
+#include "Frame/OpenGL/FrameBuffer.h"
+#include "Frame/OpenGL/RenderBuffer.h"
+#include "Frame/OpenGL/ScopedBind.h"
+#include "Frame/Proto/Proto.h"
 
 namespace frame::opengl {
 

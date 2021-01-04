@@ -1,7 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
-#include "../OpenGLLib/Program.h"
+#include "Frame/OpenGL/Program.h"
 
 namespace frame::opengl {
 

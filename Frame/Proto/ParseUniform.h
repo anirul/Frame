@@ -2,9 +2,9 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtx/quaternion.hpp>
-#include "../FrameProto/Proto.h"
-#include "../Frame/ProgramInterface.h"
-#include "../Frame/UniformInterface.h"
+#include "Frame/ProgramInterface.h"
+#include "Frame/Proto/Proto.h"
+#include "Frame/UniformInterface.h"
 
 namespace frame::proto {
 

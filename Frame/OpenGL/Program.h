@@ -5,10 +5,10 @@
 #include <memory>
 #include <vector>
 #include <glm/glm.hpp>
-#include "../Frame/Error.h"
-#include "../Frame/ProgramInterface.h"
-#include "../OpenGLLib/Shader.h"
-#include "../FrameProto/Proto.h"
+#include "Frame/Error.h"
+#include "Frame/OpenGL/Shader.h"
+#include "Frame/ProgramInterface.h"
+#include "Frame/Proto/Proto.h"
 
 namespace frame::opengl {
 
@@ -17,8 +17,6 @@ namespace frame::opengl {
 	public:
 		// Create the program.
 		Program();
-		// From a proto.
-		Program(const frame::proto::Program& proto_program);
 		// Destructor
 		virtual ~Program();
 

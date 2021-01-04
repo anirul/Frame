@@ -4,7 +4,7 @@
 #include <memory>
 #include <utility>
 #include "../Frame/LevelInterface.h"
-#include "../FrameProto/Proto.h"
+#include "../Frame/Proto/Proto.h"
 
 namespace frame {
 
@@ -28,7 +28,7 @@ namespace frame {
 		const std::unordered_map<
 			std::uint64_t,
 			std::shared_ptr<ProgramInterface>>&
-			GetEffectMap() const override
+			GetProgramMap() const override
 		{
 			return id_program_map_;
 		}
@@ -60,6 +60,14 @@ namespace frame {
 		std::string GetNameFromId(std::uint64_t id) const override
 		{
 			return id_name_map_.at(id);
+		}
+		std::uint64_t GetDefaultOutputTextureId() const override
+		{
+			return GetIdFromName(default_texture_name_);
+		}
+		std::uint64_t GetDefaultScneeId() const override
+		{
+			return GetIdFromName(default_scene_name_);
 		}
 
 	protected:

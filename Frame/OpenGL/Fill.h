@@ -1,8 +1,8 @@
 #pragma once
 
 #include <glm/glm.hpp>
-#include "../OpenGLLib/Texture.h"
-#include "../OpenGLLib/Device.h"
+#include "Frame/ProgramInterface.h"
+#include "Frame/TextureInterface.h"
 
 namespace frame::opengl {
 
@@ -11,8 +11,9 @@ namespace frame::opengl {
 	//		- in_textures			: input textures (with associated string).
 	//		- program				: program to be used.
 	void FillProgramMultiTexture(
-		std::vector<std::shared_ptr<Texture>>& out_textures,
-		const std::map<std::string, std::shared_ptr<Texture>>& in_textures,
+		std::vector<std::shared_ptr<TextureInterface>>& out_textures,
+		const std::map<std::string, std::shared_ptr<TextureInterface>>& 
+			in_textures,
 		const std::shared_ptr<ProgramInterface> program);
 
 	// Fill multiple textures from a program.
@@ -22,8 +23,9 @@ namespace frame::opengl {
 	//		- mipmap				: level of mipmap (0 == 1).
 	//		- func					: a lambda that will be call per mipmap.
 	void FillProgramMultiTextureMipmap(
-		std::vector<std::shared_ptr<Texture>>& out_textures,
-		const std::map<std::string, std::shared_ptr<Texture>>& in_textures,
+		std::vector<std::shared_ptr<TextureInterface>>& out_textures,
+		const std::map<std::string, std::shared_ptr<TextureInterface>>& 
+			in_textures,
 		const std::shared_ptr<ProgramInterface> program,
 		const int mipmap,
 		const std::function<void(
@@ -36,8 +38,9 @@ namespace frame::opengl {
 	//		- in_textures			: input textures (with associated string).
 	//		- program				: program to be used.
 	void FillProgramMultiTextureCubeMap(
-		std::vector<std::shared_ptr<Texture>>& out_textures,
-		const std::map<std::string, std::shared_ptr<Texture>>& in_textures,
+		std::vector<std::shared_ptr<TextureInterface>>& out_textures,
+		const std::map<std::string, std::shared_ptr<TextureInterface>>& 
+			in_textures,
 		const std::shared_ptr<ProgramInterface> program);
 
 	// Fill multiple cube map texture from a program.
@@ -47,8 +50,9 @@ namespace frame::opengl {
 	//		- mipmap				: level of mipmap (0 == 1).
 	//		- func					: a lambda that will be call per mipmap.
 	void FillProgramMultiTextureCubeMapMipmap(
-		std::vector<std::shared_ptr<Texture>>& out_textures,
-		const std::map<std::string, std::shared_ptr<Texture>>& in_textures,
+		std::vector<std::shared_ptr<TextureInterface>>& out_textures,
+		const std::map<std::string, std::shared_ptr<TextureInterface>>& 
+			in_textures,
 		const std::shared_ptr<ProgramInterface> program,
 		const int mipmap,
 		const std::function<void(

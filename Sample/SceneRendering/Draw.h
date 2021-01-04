@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../ShaderGLLib/Device.h"
-#include "../ShaderGLLib/Fill.h"
-#include "../ShaderGLLib/Logger.h"
-#include "../ShaderGLLib/Window.h"
+#include "../Frame/Logger.h"
+#include "../Frame/OpenGL/Device.h"
+#include "../Frame/OpenGL/Fill.h"
+#include "../Frame/Window.h"
 
 class Draw : public sgl::DrawInterface
 {

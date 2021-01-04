@@ -21,7 +21,7 @@
 #include "Uniform.pb.h"
 // Include the json parser.
 #include <google/protobuf/util/json_util.h>
-#include "../Frame/LevelInterface.h"
+#include "Frame/LevelInterface.h"
 
 namespace frame::proto {
 

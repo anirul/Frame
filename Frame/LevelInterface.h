@@ -24,7 +24,7 @@ namespace frame {
 			std::unordered_map<
 				std::uint64_t,
 				std::shared_ptr<ProgramInterface>>&
-			GetEffectMap() const = 0;
+			GetProgramMap() const = 0;
 		virtual const
 			std::unordered_map<
 				std::uint64_t,
@@ -42,6 +42,8 @@ namespace frame {
 			GetStaticMeshMap() const = 0;
 		virtual std::uint64_t GetIdFromName(const std::string& name) const = 0;
 		virtual std::string GetNameFromId(const std::uint64_t id) const = 0;
+		virtual std::uint64_t GetDefaultOutputTextureId() const = 0;
+		virtual std::uint64_t GetDefaultScneeId() const = 0;
 	};
 
 } // End namespace frame.

@@ -1,10 +1,10 @@
 #pragma once
 
 #include <utility>
-#include "../Frame/Error.h"
-#include "../Frame/Logger.h"
-#include "../OpenGLLib/Pixel.h"
-#include "../OpenGLLib/ScopedBind.h"
+#include "Frame/Error.h"
+#include "Frame/Logger.h"
+#include "Frame/OpenGL/Pixel.h"
+#include "Frame/OpenGL/ScopedBind.h"
 
 namespace frame::opengl {
 
