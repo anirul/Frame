@@ -1,0 +1,34 @@
+#pragma once
+
+#include <glm/glm.hpp>
+#include "Frame/Camera.h"
+#include "Frame/SceneNodeInterface.h"
+
+namespace frame {
+
+	class SceneCamera : public SceneNodeInterface
+	{
+	public:
+		SceneCamera(
+			const glm::vec3 position = glm::vec3{ 0.f, 0.f, 0.f },
+			const glm::vec3 target = glm::vec3{ 0.f, 0.f, -1.f },
+			const glm::vec3 up = glm::vec3{ 0.f, 1.f, 0.f },
+			const float fov_degrees = 65.0f) :
+			camera_(std::make_shared<Camera>(position, target, up, fov_degrees))
+		{}
+
+	public:
+		const glm::mat4 GetLocalModel(const double dt) const override;
+
+	public:
+		std::shared_ptr<CameraInterface> GetCamera() { return camera_; }
+		const std::shared_ptr<CameraInterface> GetCamera() const 
+		{ 
+			return camera_; 
+		}
+
+	private:
+		std::shared_ptr<CameraInterface> camera_ = nullptr;
+	};
+
+} // End namespace frame.

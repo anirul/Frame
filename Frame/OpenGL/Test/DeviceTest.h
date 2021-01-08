@@ -1,10 +1,10 @@
 #pragma once
 
 #include <gtest/gtest.h>
-#include "../Frame/Window.h"
-#include "../Frame/DeviceInterface.h"
-#include "../FrameProto/Proto.h"
-#include "../OpenGLLib/Device.h"
+#include "Frame/Window.h"
+#include "Frame/DeviceInterface.h"
+#include "Frame/Proto/Proto.h"
+#include "Frame/OpenGL/Device.h"
 
 namespace test {
 

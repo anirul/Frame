@@ -22,7 +22,7 @@ namespace frame::opengl {
 			const std::pair<std::uint32_t, std::uint32_t> size) const;
 
 	public:
-		const unsigned int GetId() const { return render_id_; }
+		unsigned int GetId() const { return render_id_; }
 
 	protected:
 		void LockedBind() const override { locked_bind_ = true; }

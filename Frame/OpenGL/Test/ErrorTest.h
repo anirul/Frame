@@ -1,7 +1,7 @@
 #pragma once
 
 #include <gtest/gtest.h>
-#include "../Frame/Error.h"
+#include "Frame/Error.h"
 
 namespace test {
 

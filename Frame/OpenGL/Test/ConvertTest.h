@@ -1,8 +1,8 @@
 #pragma once
 
 #include <gtest/gtest.h>
-#include "../FrameProto/Proto.h"
-#include "../FrameProto/Convert.h"
+#include "Frame/Proto/Proto.h"
+#include "Frame/Proto/ParseUniform.h"
 
 namespace test {
 

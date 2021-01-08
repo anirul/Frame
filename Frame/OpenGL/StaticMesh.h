@@ -11,81 +11,69 @@
 #include "Frame/OpenGL/Material.h"
 #include "Frame/OpenGL/Program.h"
 #include "Frame/OpenGL/Texture.h"
+#include "Frame/StaticMeshInterface.h"
 
 namespace frame::opengl {
 
 	class StaticMesh : public StaticMeshInterface
 	{
 	public:
-		// Open a mesh from a OBJ stream.
-		StaticMesh(
-			std::istream& is, 
-			const std::string& name);
 		// Create a mesh from a set of vectors.
 		StaticMesh(
-			const std::vector<float>& points,
-			const std::vector<float>& normals,
-			const std::vector<float>& texcoords,
-			const std::vector<std::int32_t>& indices);
+			const std::shared_ptr<LevelInterface> level,
+			std::uint64_t point_buffer_id,
+			std::uint64_t normal_buffer_id,
+			std::uint64_t texture_buffer_id,
+			std::uint64_t index_buffer_id);
 		virtual ~StaticMesh();
 
 	public:
-		void Draw(const std::shared_ptr<ProgramInterface> program) const;
+		void SetMaterialId(std::uint64_t id) override
+		{ 
+			material_id_ = id; 
+		}
+		std::uint64_t GetMaterialId() const override
+		{ 
+			return material_id_; 
+		}
+		std::uint64_t GetPointBufferId() const override
+		{ 
+			return point_buffer_id_; 
+		}
+		std::uint64_t GetNormalBufferId() const override 
+		{ 
+			return normal_buffer_id_; 
+		}
+		std::uint64_t GetTextureBufferId() const override 
+		{ 
+			return texture_buffer_id_; 
+		}
+		std::uint64_t GetIndexBufferId() const  override 
+		{ 
+			return index_buffer_id_; 
+		}
+		std::size_t GetIndexSize() const override
+		{
+			return level_->GetBufferMap().at(index_buffer_id_)->GetSize();
+		}
+		void LockedBind() const override { locked_bind_ = true; }
+		void UnlockedBind() const override { locked_bind_ = false; }
+		unsigned int GetId() const override { return vertex_array_object_; }
 
 	public:
-		// Set a material for this mesh.
-		void SetMaterial(const Material& material) 
-		{ 
-			material_ = std::make_shared<Material>(material);
-		}
-		const Buffer& PointBuffer() const { return point_buffer_; }
-		const Buffer& NormalBuffer() const { return normal_buffer_; }
-		const Buffer& TextureBuffer() const { return texture_buffer_; }
-		const Buffer& IndexBuffer() const { return index_buffer_; }
-		const size_t IndexSize() const { return index_size_; }
-		void ClearDepthBuffer(bool clear) { clear_depth_buffer_ = clear; }
-		bool IsClearDepthBuffer() const { return clear_depth_buffer_; }
-		const std::string GetMaterialName() const { return material_name_; }
-
-	protected:
-		struct ObjFile {
-			// Minimum index element this is useful for scene OBJ.
-			int min_position = std::numeric_limits<int>::max();
-			int min_normal = std::numeric_limits<int>::max();
-			int min_texture = std::numeric_limits<int>::max();
-			// Position, normal and texture coordinates.
-			std::vector<glm::vec3> positions;
-			std::vector<glm::vec3> normals;
-			std::vector<glm::vec2> textures;
-			// Indices you should subtract the min_element.
-			std::vector<std::array<int, 3>> indices;
-			// List of material to include (should only be one!).
-			std::string material = {};
-		};
-		// Load from OBJ throw an exception in case of error.
-		ObjFile LoadFromObj(std::istream& is, const std::string& name);
-		// Get a vector from a number of float.
-		glm::vec3 GetVec3From3Float(
-			std::istream& is,
-			const std::string& stream_name,
-			const std::string& element_name) const;
-		glm::vec2 GetVec2From2Float(
-			std::istream& is,
-			const std::string& stream_name,
-			const std::string& element_name) const;
-		void CreateMeshFromFlat(
-			const std::vector<float>& points,
-			const std::vector<float>& normals,
-			const std::vector<float>& texcoords,
-			const std::vector<std::int32_t>& indices);
+		void Bind(const unsigned int slot = 0) const override;
+		void UnBind() const override;
 
 	protected:
 		bool clear_depth_buffer_ = false;
+		mutable bool locked_bind_ = false;
+		std::shared_ptr<LevelInterface> level_ = nullptr;
 		std::shared_ptr<ProgramInterface> program_ = nullptr;
-		Buffer point_buffer_ = {};
-		Buffer normal_buffer_ = {};
-		Buffer texture_buffer_ = {};
-		Buffer index_buffer_ =	{ BufferType::ELEMENT_ARRAY_BUFFER };
+		std::uint64_t material_id_ = 0;
+		std::uint64_t point_buffer_id_ = 0;
+		std::uint64_t normal_buffer_id_ = 0;
+		std::uint64_t texture_buffer_id_ = 0;
+		std::uint64_t index_buffer_id_ = 0;
 		std::shared_ptr<MaterialInterface> material_ = nullptr;
 		size_t index_size_ = 0;
 		unsigned int vertex_array_object_ = 0;
@@ -93,14 +81,11 @@ namespace frame::opengl {
 		std::string material_name_ = "";
 	};
 
-	// Create a Quad Mesh that is on the edge of the screen.
-	std::shared_ptr<StaticMeshInterface> CreateQuadStaticMesh();
-
-	// Create a Cube Mesh that correspond to a cube map.
-	std::shared_ptr<StaticMeshInterface> CreateCubeStaticMesh();
-
-	// Create a new OBJ file from a file.
-	std::shared_ptr<StaticMeshInterface> CreateStaticMeshFromObjFile(
-		const std::string& file_path);
+	// Create a quad static mesh.
+	std::shared_ptr<StaticMeshInterface> CreateQuadStaticMesh(
+		std::shared_ptr<LevelInterface> level);
+	// Create a cube static mesh.
+	std::shared_ptr<StaticMeshInterface> CreateCubeStaticMesh(
+		std::shared_ptr<LevelInterface> level);
 
 } // End namespace frame::opengl.

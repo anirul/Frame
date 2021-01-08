@@ -1,7 +1,7 @@
 #pragma once
 
 #include <gtest/gtest.h>
-#include "../Frame/CameraInterface.h"
+#include "Frame/CameraInterface.h"
 
 namespace test {
 

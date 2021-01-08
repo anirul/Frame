@@ -1,8 +1,8 @@
 #pragma once
 
 #include <memory>
-#include "../Frame/Window.h"
-#include "../Frame/OpenGL/Texture.h"
+#include "Frame/Window.h"
+#include "Frame/OpenGL/Texture.h"
 
 class Application
 {

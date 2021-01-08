@@ -4,7 +4,7 @@
 #include <glm/glm.hpp>
 #include "../Frame/CameraInterface.h"
 
-namespace frame::opengl {
+namespace frame {
 
 	class Camera : public CameraInterface 
 	{
@@ -52,4 +52,4 @@ namespace frame::opengl {
 		float fov_rad_ = glm::radians(65.0f);
 	};
 
-}	// End namespace frame::opengl.
+}	// End namespace frame.

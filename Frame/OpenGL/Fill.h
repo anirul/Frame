@@ -1,31 +1,29 @@
 #pragma once
 
+#include <functional>
+#include <map>
+#include <memory>
 #include <glm/glm.hpp>
+#include "Frame/LevelInterface.h"
 #include "Frame/ProgramInterface.h"
 #include "Frame/TextureInterface.h"
 
 namespace frame::opengl {
 
 	// Fill multiple textures from a program.
-	//		- out_textures			: output textures (should be allocated).
-	//		- in_textures			: input textures (with associated string).
+	//		- level					: structure that contain textures.
 	//		- program				: program to be used.
 	void FillProgramMultiTexture(
-		std::vector<std::shared_ptr<TextureInterface>>& out_textures,
-		const std::map<std::string, std::shared_ptr<TextureInterface>>& 
-			in_textures,
+		const std::shared_ptr<LevelInterface> level,
 		const std::shared_ptr<ProgramInterface> program);
 
 	// Fill multiple textures from a program.
-	//		- out_textures			: output textures (should be allocated).
-	//		- in_textures			: input textures (with associated string).
+	//		- level					: structure that contain textures.
 	//		- program				: program to be used.
 	//		- mipmap				: level of mipmap (0 == 1).
 	//		- func					: a lambda that will be call per mipmap.
 	void FillProgramMultiTextureMipmap(
-		std::vector<std::shared_ptr<TextureInterface>>& out_textures,
-		const std::map<std::string, std::shared_ptr<TextureInterface>>& 
-			in_textures,
+		const std::shared_ptr<LevelInterface> level,
 		const std::shared_ptr<ProgramInterface> program,
 		const int mipmap,
 		const std::function<void(
@@ -34,25 +32,19 @@ namespace frame::opengl {
 		[](const int, const std::shared_ptr<ProgramInterface>) {});
 
 	// Fill multiple cube map texture from a program.
-	//		- out_textures			: output textures (should be allocated).
-	//		- in_textures			: input textures (with associated string).
+	//		- level					: structure that contain textures.
 	//		- program				: program to be used.
 	void FillProgramMultiTextureCubeMap(
-		std::vector<std::shared_ptr<TextureInterface>>& out_textures,
-		const std::map<std::string, std::shared_ptr<TextureInterface>>& 
-			in_textures,
+		const std::shared_ptr<LevelInterface> level,
 		const std::shared_ptr<ProgramInterface> program);
 
 	// Fill multiple cube map texture from a program.
-	//		- out_textures			: output textures (should be allocated).
-	//		- in_textures			: input textures (with associated string).
+	//		- level					: structure that contain textures.
 	//		- program				: program to be used.
 	//		- mipmap				: level of mipmap (0 == 1).
 	//		- func					: a lambda that will be call per mipmap.
 	void FillProgramMultiTextureCubeMapMipmap(
-		std::vector<std::shared_ptr<TextureInterface>>& out_textures,
-		const std::map<std::string, std::shared_ptr<TextureInterface>>& 
-			in_textures,
+		const std::shared_ptr<LevelInterface> level,
 		const std::shared_ptr<ProgramInterface> program,
 		const int mipmap,
 		const std::function<void(

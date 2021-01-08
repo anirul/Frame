@@ -1,9 +1,9 @@
 #pragma once
 
 #include <gtest/gtest.h>
-#include "../Frame/Error.h"
-#include "../Frame/Window.h"
-#include "../OpenGLLib/FrameBuffer.h"
+#include "Frame/Error.h"
+#include "Frame/Window.h"
+#include "Frame/OpenGL/FrameBuffer.h"
 
 namespace test {
 

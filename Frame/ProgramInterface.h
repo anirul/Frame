@@ -9,11 +9,16 @@ namespace frame {
 	struct ProgramInterface
 	{
 		// Set & get input texture id.
-		virtual void AddInputTextureId(std::uint64_t id) = 0;
-		virtual std::vector<std::uint64_t>& GetInputTextureIds() const = 0;
+		virtual void AddInputTextureId(std::uint64_t texture_id) = 0;
+		virtual const std::vector<std::uint64_t>& GetInputTextureIds(
+			) const = 0;
 		// Set & get output texture id.
-		virtual void AddOutputTextureId(std::uint64_t id) = 0;
-		virtual std::vector<std::uint64_t>& GetOutputTextureIds() const = 0;
+		virtual void AddOutputTextureId(std::uint64_t texture_id) = 0;
+		virtual const std::vector<std::uint64_t>& GetOutputTextureIds(
+			) const = 0;
+		// Set the scene to a program.
+		virtual void SetSceneTreeId(std::uint64_t scene_id) = 0;
+		virtual std::uint64_t GetSceneTreeId() const = 0;
 		// Remove and check texture id.
 		virtual void RemoveTextureId(std::uint64_t id) = 0;
 		virtual bool HasTextureId(std::uint64_t id) const = 0;

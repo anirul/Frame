@@ -5,68 +5,72 @@
 
 namespace frame::opengl {
 
-	PixelElementSize PixelElementSize_BYTE()
+	frame::proto::PixelElementSize PixelElementSize_BYTE()
 	{
-		PixelElementSize pixel_element_size{};
-		pixel_element_size.set_value(PixelElementSize::BYTE);
+		frame::proto::PixelElementSize pixel_element_size{};
+		pixel_element_size.set_value(frame::proto::PixelElementSize::BYTE);
 		return pixel_element_size;
 	}
 
-	PixelElementSize PixelElementSize_SHORT()
+	frame::proto::PixelElementSize PixelElementSize_SHORT()
 	{
-		PixelElementSize pixel_element_size{};
-		pixel_element_size.set_value(PixelElementSize::SHORT);
+		frame::proto::PixelElementSize pixel_element_size{};
+		pixel_element_size.set_value(frame::proto::PixelElementSize::SHORT);
 		return pixel_element_size;
 	}
 
-	PixelElementSize PixelElementSize_HALF()
+	frame::proto::PixelElementSize PixelElementSize_HALF()
 	{
-		PixelElementSize pixel_element_size{};
-		pixel_element_size.set_value(PixelElementSize::HALF);
+		frame::proto::PixelElementSize pixel_element_size{};
+		pixel_element_size.set_value(frame::proto::PixelElementSize::HALF);
 		return pixel_element_size;
 	}
 
-	PixelElementSize PixelElementSize_FLOAT()
+	frame::proto::PixelElementSize PixelElementSize_FLOAT()
 	{
-		PixelElementSize pixel_element_size{};
-		pixel_element_size.set_value(PixelElementSize::FLOAT);
+		frame::proto::PixelElementSize pixel_element_size{};
+		pixel_element_size.set_value(frame::proto::PixelElementSize::FLOAT);
 		return pixel_element_size;
 	}
 
-	PixelStructure PixelStructure_GREY()
+	frame::proto::PixelStructure PixelStructure_GREY()
 	{
-		PixelStructure pixel_structure{};
-		pixel_structure.set_value(PixelStructure::GREY);
+		frame::proto::PixelStructure pixel_structure{};
+		pixel_structure.set_value(frame::proto::PixelStructure::GREY);
 		return pixel_structure;
 	}
 
-	PixelStructure PixelStructure_GREY_ALPHA()
+	frame::proto::PixelStructure PixelStructure_GREY_ALPHA()
 	{
-		PixelStructure pixel_structure{};
-		pixel_structure.set_value(PixelStructure::GREY_ALPHA);
+		frame::proto::PixelStructure pixel_structure{};
+		pixel_structure.set_value(frame::proto::PixelStructure::GREY_ALPHA);
 		return pixel_structure;
 	}
 
-	PixelStructure PixelStructure_RGB()
+	frame::proto::PixelStructure PixelStructure_RGB()
 	{
-		PixelStructure pixel_structure{};
-		pixel_structure.set_value(PixelStructure::RGB);
+		frame::proto::PixelStructure pixel_structure{};
+		pixel_structure.set_value(frame::proto::PixelStructure::RGB);
 		return pixel_structure;
 	}
 
-	PixelStructure PixelStructure_RGB_ALPHA()
+	frame::proto::PixelStructure PixelStructure_RGB_ALPHA()
 	{
-		PixelStructure pixel_structure{};
-		pixel_structure.set_value(PixelStructure::RGB_ALPHA);
+		frame::proto::PixelStructure pixel_structure{};
+		pixel_structure.set_value(frame::proto::PixelStructure::RGB_ALPHA);
 		return pixel_structure;
 	}
 
-	bool operator==(const PixelStructure& l, const PixelStructure& r)
+	bool operator==(
+		const frame::proto::PixelStructure& l, 
+		const frame::proto::PixelStructure& r)
 	{
 		return l.value() == r.value();
 	}
 
-	bool operator==(const PixelElementSize& l, const PixelElementSize& r)
+	bool operator==(
+		const frame::proto::PixelElementSize& l, 
+		const frame::proto::PixelElementSize& r)
 	{
 		return l.value() == r.value();
 	}

@@ -2,14 +2,15 @@
 
 #include <memory>
 #include <unordered_map>
-#include "../Frame/TextureInterface.h"
-#include "../Frame/SceneTreeInterface.h"
-#include "../Frame/ProgramInterface.h"
-#include "../Frame/MaterialInterface.h"
-#include "../Frame/BufferInterface.h"
-#include "../Frame/StaticMeshInterface.h"
 
 namespace frame {
+
+	struct SceneTreeInterface;
+	struct TextureInterface;
+	struct ProgramInterface;
+	struct MaterialInterface;
+	struct BufferInterface;
+	struct StaticMeshInterface;
 
 	struct LevelInterface
 	{

@@ -6,7 +6,7 @@ namespace test {
 	{
 		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(material_);
-		material_ = std::make_shared<sgl::Material>();
+		material_ = std::make_shared<frame::Material>();
 		EXPECT_TRUE(material_);
 		EXPECT_NO_THROW(error_.Display());
 	}

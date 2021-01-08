@@ -2,7 +2,7 @@
 #include <cmath>
 #include <glm/gtc/matrix_transform.hpp>
 
-namespace frame::opengl {
+namespace frame {
 
 	Camera::Camera(
 		const glm::vec3 position /*= { 0.f, 0.f, 0.f }*/, 
@@ -58,4 +58,4 @@ namespace frame::opengl {
 		up_ = glm::normalize(glm::cross(right_, front_));
 	}
 
-}	// End namespace frame::opengl.
+}	// End namespace frame.

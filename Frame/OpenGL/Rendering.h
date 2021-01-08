@@ -1,8 +1,8 @@
 #pragma once
 
 #include <memory>
-#include "../Frame/ProgramInterface.h"
-#include "../Frame/StaticMeshInterface.h"
+#include "Frame/ProgramInterface.h"
+#include "Frame/StaticMeshInterface.h"
 
 namespace frame::opengl {
 

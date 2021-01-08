@@ -1,7 +1,7 @@
 #include "Draw.h"
 #include <fstream>
 #include <spdlog/spdlog.h>
-#include "../FrameProto/Proto.h"
+#include "Frame/Proto/Proto.h"
 
 void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 {

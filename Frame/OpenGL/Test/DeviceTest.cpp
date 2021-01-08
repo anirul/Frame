@@ -16,6 +16,7 @@ namespace test {
 		EXPECT_TRUE(window_);
 		device_ = window_->GetUniqueDevice();
 		auto level = LoadLevelFromProto(
+			std::make_pair<std::uint32_t, std::uint32_t>(32, 32),
 			GetLevel(),
 			GetProgramFile(),
 			GetSceneFile(), 

@@ -24,9 +24,10 @@ namespace frame {
 		// Set the default camera node.
 		virtual void SetDefaultCamera(const std::string& camera_name) = 0;
 		// Get a pointer to the default camera.
-		virtual CameraInterface& GetDefaultCamera() = 0;
+		virtual std::shared_ptr<CameraInterface> GetDefaultCamera() = 0;
 		// Same but const.
-		virtual const CameraInterface& GetDefaultCamera() const = 0;
+		virtual const std::shared_ptr<CameraInterface> GetDefaultCamera(
+			) const = 0;
 	};
 
 } // End namespace frame.

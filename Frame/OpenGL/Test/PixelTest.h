@@ -1,7 +1,7 @@
 #pragma once
 
 #include <gtest/gtest.h>
-#include "../ShaderGLLib/Pixel.h"
+#include "Frame/OpenGL/Pixel.h"
 
 namespace test {
 

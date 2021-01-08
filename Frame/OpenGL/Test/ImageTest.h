@@ -1,7 +1,7 @@
 #pragma once
 
 #include <gtest/gtest.h>
-#include "../ShaderGLLib/Image.h"
+#include "Frame/ShaderGLLib/Image.h"
 
 namespace test {
 

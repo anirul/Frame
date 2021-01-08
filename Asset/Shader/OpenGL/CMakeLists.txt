@@ -1,0 +1,45 @@
+# Asset Shader OpenGL.
+
+add_custom_target(AssetShaderOpenGL
+  SOURCES
+    Blur.frag
+    Blur.vert
+    Brightness.frag
+    Brightness.vert
+    CubeMap.frag
+    CubeMap.vert
+    CubeMapDeferred.frag
+    CubeMapDeferred.vert
+    Display.frag
+    Display.vert
+    EquirectangularCubeMap.frag
+    EquirectangularCubeMap.vert
+    GaussianBlur.frag
+    GaussianBlur.vert
+    HighDynamicRange.frag
+    HighDynamicRange.vert
+    IntegrateBRDF.frag
+    IntegrateBRDF.vert
+    IrradianceCubeMap.frag
+    IrradianceCubeMap.vert
+    JapaneseFlag.frag
+    JapaneseFlag.vert
+    Lighting.frag
+    Lighting.vert
+    MonteCarloPrefilter.frag
+    MonteCarloPrefilter.vert
+    PhysicallyBasedRendering.frag
+    PhysicallyBasedRendering.vert
+    RayMarching.frag
+    RayMarching.vert
+    ScreenSpaceAmbientOcclusion.frag
+    ScreenSpaceAmbientOcclusion.vert
+    SceneSimple.frag
+    SceneSimple.vert
+    VectorAddition.frag
+    VectorAddition.vert
+    VectorMultiply.frag
+    VectorMultiply.vert
+    ViewPositionNormal.frag
+    ViewPositionNormal.vert
+)

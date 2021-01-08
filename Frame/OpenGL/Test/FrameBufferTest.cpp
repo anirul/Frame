@@ -1,4 +1,5 @@
 #include "FrameBufferTest.h"
+#include "Frame/OpenGL/Texture.h"
 
 namespace test {
 
@@ -6,7 +7,7 @@ namespace test {
 	{
 		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(frame_);
-		frame_ = std::make_shared<sgl::FrameBuffer>();
+		frame_ = std::make_shared<frame::opengl::FrameBuffer>();
 		EXPECT_TRUE(frame_);
 		EXPECT_NO_THROW(error_.Display());
 	}
@@ -15,7 +16,7 @@ namespace test {
 	{
 		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(frame_);
-		frame_ = std::make_shared<sgl::FrameBuffer>();
+		frame_ = std::make_shared<frame::opengl::FrameBuffer>();
 		EXPECT_TRUE(frame_);
 		EXPECT_NE(0, frame_->GetId());
 		EXPECT_NO_THROW(error_.Display());
@@ -25,9 +26,9 @@ namespace test {
 	{
 		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(frame_);
-		frame_ = std::make_shared<sgl::FrameBuffer>();
+		frame_ = std::make_shared<frame::opengl::FrameBuffer>();
 		EXPECT_TRUE(frame_);
-		sgl::RenderBuffer render{};
+		frame::opengl::RenderBuffer render{};
 		EXPECT_THROW(frame_->AttachRender(render), std::exception);
 	}
 
@@ -35,9 +36,9 @@ namespace test {
 	{
 		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(frame_);
-		frame_ = std::make_shared<sgl::FrameBuffer>();
+		frame_ = std::make_shared<frame::opengl::FrameBuffer>();
 		EXPECT_TRUE(frame_);
-		sgl::RenderBuffer render{};
+		frame::opengl::RenderBuffer render{};
 		render.CreateStorage({ 1, 1 });
 		frame_->AttachRender(render);
 		EXPECT_NO_THROW(error_.Display());
@@ -47,13 +48,14 @@ namespace test {
 	{
 		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(frame_);
-		frame_ = std::make_shared<sgl::FrameBuffer>();
+		frame_ = std::make_shared<frame::opengl::FrameBuffer>();
 		EXPECT_TRUE(frame_);
-		sgl::RenderBuffer render{};
+		frame::opengl::RenderBuffer render{};
 		render.CreateStorage({ 1, 1 });
 		frame_->AttachRender(render);
 		EXPECT_NO_THROW(error_.Display());
-		sgl::Texture texture("../Asset/CubeMap/PositiveX.png");
+		auto texture = std::make_shared<frame::opengl::Texture>(
+			std::make_pair(8, 8));
 		frame_->AttachTexture(texture);
 		EXPECT_NO_THROW(error_.Display());
 	}

@@ -1,7 +1,15 @@
 #include "Fill.h"
+#include <array>
 #include <assert.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include "Frame/Error.h"
+#include "Frame/OpenGL/FrameBuffer.h"
+#include "Frame/OpenGL/RenderBuffer.h"
+#include "Frame/OpenGL/Rendering.h"
+#include "Frame/OpenGL/StaticMesh.h"
 
-namespace sgl {
+namespace frame::opengl {
 
 	namespace {
 		// Get the 6 view for the cube map.
@@ -35,21 +43,18 @@ namespace sgl {
 	}
 
 	void FillProgramMultiTexture(
-		std::vector<std::shared_ptr<Texture>>& out_textures,
-		const std::map<std::string, std::shared_ptr<Texture>>& in_textures,
+		const std::shared_ptr<LevelInterface> level,
 		const std::shared_ptr<ProgramInterface> program)
 	{
 		FillProgramMultiTextureMipmap(
-			out_textures,
-			in_textures,
+			level,
 			program,
 			0,
 			[](const int, const std::shared_ptr<ProgramInterface>) {});
 	}
 
 	void FillProgramMultiTextureMipmap(
-		std::vector<std::shared_ptr<Texture>>& out_textures,
-		const std::map<std::string, std::shared_ptr<Texture>>& in_textures,
+		const std::shared_ptr<LevelInterface> level,
 		const std::shared_ptr<ProgramInterface> program,
 		const int mipmap,
 		const std::function<void(
@@ -58,20 +63,24 @@ namespace sgl {
 		[](const int, const std::shared_ptr<sgl::ProgramInterface>) {}*/)
 	{
 		auto& error = Error::GetInstance();
-		assert(out_textures.size());
-		auto size = out_textures[0]->GetSize();
+		assert(program->GetOutputTextureIds().size());
+		auto texture_out_ids = program->GetOutputTextureIds();
+		auto texture_ref = level->GetTextureMap().at(*texture_out_ids.cbegin());
+		auto size = texture_ref->GetSize();
 		FrameBuffer frame{};
 		RenderBuffer render{};
 		ScopedBind scoped_frame(frame);
 		ScopedBind scoped_render(render);
 		render.CreateStorage(size);
 		frame.AttachRender(render);
-		frame.DrawBuffers(static_cast<std::uint32_t>(out_textures.size()));
+		frame.DrawBuffers(static_cast<std::uint32_t>(texture_out_ids.size()));
 		int max_mipmap = (mipmap <= 0) ? 1 : mipmap;
 		if (max_mipmap > 1) {
-			for (const auto& texture : out_textures)
+			for (const auto& texture_id : texture_out_ids)
 			{
-				texture->BindEnableMipmap();
+				auto texture = level->GetTextureMap().at(texture_id);
+				texture->Bind();
+				texture->EnableMipmap();
 			}
 		}
 		glm::mat4 projection = glm::perspective(
@@ -79,13 +88,6 @@ namespace sgl {
 			1.0f,
 			0.1f,
 			10.0f);
-		auto quad = CreateQuadStaticMesh();
-		auto material = std::make_shared<Material>();
-		for (const auto& p : in_textures)
-		{
-			material->AddTexture(p.first, p.second);
-		}
-		quad->SetMaterial(material);
 		std::pair<uint32_t, uint32_t> temporary_size = size;
 		for (int mipmap_level = 0; mipmap_level < max_mipmap; ++mipmap_level)
 		{
@@ -97,63 +99,64 @@ namespace sgl {
 				static_cast<std::uint32_t>(size.second * fact);
 			glViewport(0, 0, temporary_size.first, temporary_size.second);
 			error.Display(__FILE__, __LINE__ - 1);
-			for (int i = 0; i < out_textures.size(); ++i)
+			int i = 0;
+			for (const auto& texture_id : program->GetOutputTextureIds())
 			{
 				frame.AttachTexture(
-					*out_textures[i],
+					level->GetTextureMap().at(texture_id),
 					FrameBuffer::GetFrameColorAttachment(i),
 					mipmap_level);
 			}
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			error.Display(__FILE__, __LINE__ - 1);
 
-			program->Use();
-			program->Uniform("projection", projection);
-			program->Uniform("view", glm::mat4(1.0f));
-			program->Uniform("model", glm::mat4(1.0f));
-
-			quad->Draw(program);
+			RenderingTexture(
+				projection, 
+				glm::mat4(1.0f),
+				glm::mat4(1.0f),
+				program);
 		}
 	}
 
 	void FillProgramMultiTextureCubeMap(
-		std::vector<std::shared_ptr<Texture>>& out_textures,
-		const std::map<std::string, std::shared_ptr<Texture>>& in_textures,
+		const std::shared_ptr<LevelInterface> level,
 		const std::shared_ptr<ProgramInterface> program)
 	{
 		FillProgramMultiTextureCubeMapMipmap(
-			out_textures,
-			in_textures,
+			level,
 			program,
 			0,
 			[](const int, const std::shared_ptr<ProgramInterface>) {});
 	}
 
 	void FillProgramMultiTextureCubeMapMipmap(
-		std::vector<std::shared_ptr<Texture>>& out_textures,
-		const std::map<std::string, std::shared_ptr<Texture>>& in_textures,
+		const std::shared_ptr<LevelInterface> level,
 		const std::shared_ptr<ProgramInterface> program,
 		const int mipmap,
 		const std::function<void(
 			const int mipmap,
-			const std::shared_ptr<sgl::ProgramInterface> program)> func /*=
+			const std::shared_ptr<ProgramInterface> program)> func /*=
 		[](const int, const std::shared_ptr<sgl::ProgramInterface>) {}*/)
 	{
 		auto& error = Error::GetInstance();
-		assert(out_textures.size());
-		auto size = out_textures[0]->GetSize();
+		assert(program->GetOutputTextureIds().size());
+		auto texture_out_ids = program->GetOutputTextureIds();
+		auto texture_ref = level->GetTextureMap().at(*texture_out_ids.cbegin());
+		auto size = texture_ref->GetSize();
 		FrameBuffer frame{};
 		RenderBuffer render{};
 		ScopedBind scoped_frame(frame);
 		ScopedBind scoped_render(render);
 		frame.AttachRender(render);
-		frame.DrawBuffers(static_cast<std::uint32_t>(out_textures.size()));
+		frame.DrawBuffers(static_cast<std::uint32_t>(texture_out_ids.size()));
 		int max_mipmap = (mipmap <= 0) ? 1 : mipmap;
 		if (max_mipmap > 1)
 		{
-			for (const auto& texture : out_textures)
+			for (const auto& texture_id : texture_out_ids)
 			{
-				texture->BindEnableMipmap();
+				auto texture = level->GetTextureMap().at(texture_id);
+				texture->Bind();
+				texture->EnableMipmap();
 			}
 		}
 		glm::mat4 projection = glm::perspective(
@@ -161,13 +164,6 @@ namespace sgl {
 			1.0f,
 			0.1f,
 			10.0f);
-		auto cube = CreateCubeStaticMesh();
-		auto material = std::make_shared<Material>();
-		for (const auto& p : in_textures)
-		{
-			material->AddTexture(p.first, p.second);
-		}
-		cube->SetMaterial(material);
 		std::pair<std::uint32_t, std::uint32_t> temporary_size = { 0, 0 };
 		for (int mipmap_level = 0; mipmap_level < max_mipmap; ++mipmap_level)
 		{
@@ -184,26 +180,25 @@ namespace sgl {
 			int cubemap_element = 0;
 			for (const auto& view : views_cubemap)
 			{
-				for (int i = 0; i < out_textures.size(); ++i)
+				int i = 0;
+				for (const auto& texture_id : program->GetOutputTextureIds())
 				{
 					frame.AttachTexture(
-						*out_textures[i],
+						level->GetTextureMap().at(texture_id),
 						FrameBuffer::GetFrameColorAttachment(i),
-						mipmap_level,
-						FrameBuffer::GetFrameTextureType(cubemap_element));
+						mipmap_level);
 				}
 				cubemap_element++;
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 				error.Display(__FILE__, __LINE__ - 1);
 
-				program->Use();
-				program->Uniform("projection", projection);
-				program->Uniform("view", view);
-				program->Uniform("model", glm::mat4(1.0f));
-
-				cube->Draw(program);
+				RenderingTextureCubeMap(
+					projection,
+					view,
+					glm::mat4(1.0f),
+					program);
 			}
 		}
 	}
 
-} // End namespace sgl.
+} // End namespace frame::opengl.

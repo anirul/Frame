@@ -3,7 +3,7 @@
 #include <GL/glew.h>
 #include "Pixel.h"
 
-namespace sgl {
+namespace frame::opengl {
 
 	RenderBuffer::RenderBuffer()
 	{
@@ -44,4 +44,4 @@ namespace sgl {
 		UnBind();
 	}
 
-} // End namespace sgl.
+} // End namespace frame::opengl.

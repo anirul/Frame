@@ -5,15 +5,17 @@
 
 namespace frame::opengl {
 
-	enum class ShaderType {
+	enum class ShaderEnum 
+	{
 		VERTEX_SHADER = GL_VERTEX_SHADER,
 		FRAGMENT_SHADER = GL_FRAGMENT_SHADER,
 		GEOMETRY_SHADER = GL_GEOMETRY_SHADER,
 	};
 
-	class Shader {
+	class Shader 
+	{
 	public:
-		Shader(const ShaderType type) : type_(type) {}
+		Shader(const ShaderEnum type) : type_(type) {}
 		virtual ~Shader();
 
 	public:
@@ -27,7 +29,7 @@ namespace frame::opengl {
 	private:
 		bool created_ = false;
 		unsigned int id_ = 0;
-		ShaderType type_ = ShaderType::VERTEX_SHADER;
+		ShaderEnum type_ = ShaderEnum::VERTEX_SHADER;
 		std::string error_message_;
 	};
 

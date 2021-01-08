@@ -2,7 +2,7 @@
 #include <fstream>
 #include <iostream>
 
-namespace sgl {
+namespace frame::opengl {
 
 	Shader::~Shader()
 	{
@@ -47,4 +47,4 @@ namespace sgl {
 		return LoadFromSource(str);
 	}
 
-}	// End namespace sgl.
+}	// End namespace frame::opengl.

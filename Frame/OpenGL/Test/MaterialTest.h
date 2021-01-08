@@ -1,10 +1,11 @@
 #pragma once
 
 #include <gtest/gtest.h>
-#include "../ShaderGLLib/Window.h"
-#include "../ShaderGLLib/Texture.h"
-#include "../ShaderGLLib/Material.h"
-#include "../ShaderGLLib/Error.h"
+#include "Frame/Error.h"
+#include "Frame/MaterialInterface.h"
+#include "Frame/OpenGL/Material.h"
+#include "Frame/OpenGL/Texture.h"
+#include "Frame/Window.h"
 
 namespace test {
 
@@ -13,14 +14,14 @@ namespace test {
 	public:
 		MaterialTest()
 		{
-			window_ = sgl::CreateSDLOpenGL({ 320, 200 });
+			window_ = frame::CreateSDLOpenGL({ 320, 200 });
 			error_.SetWindowPtr(nullptr);
 		}
 
 	protected:
-		std::shared_ptr<sgl::WindowInterface> window_ = nullptr;
-		sgl::Error& error_ = sgl::Error::GetInstance();
-		std::shared_ptr<sgl::Material> material_ = nullptr;
+		std::shared_ptr<frame::WindowInterface> window_ = nullptr;
+		frame::Error& error_ = frame::Error::GetInstance();
+		std::shared_ptr<frame::MaterialInterface> material_ = nullptr;
 	};
 
 } // End namespace test.

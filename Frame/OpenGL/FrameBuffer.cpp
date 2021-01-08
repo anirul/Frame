@@ -5,7 +5,7 @@
 #include <sstream>
 #include "Texture.h"
 
-namespace sgl {
+namespace frame::opengl {
 
 	FrameBuffer::FrameBuffer()
 	{
@@ -57,7 +57,7 @@ namespace sgl {
 	}
 
 	void FrameBuffer::AttachTexture(
-		const Texture& texture,
+		const std::shared_ptr<TextureInterface> texture,
 		const FrameColorAttachment frame_color_attachment /*=
 			FrameColorAttachment::COLOR_ATTACHMENT0*/,
 		const int mipmap /*= 0*/,
@@ -69,7 +69,7 @@ namespace sgl {
 			GL_FRAMEBUFFER,
 			static_cast<GLenum>(frame_color_attachment),
 			GetFrameTextureType(frame_texture_type),
-			texture.GetId(),
+			texture->GetId(),
 			mipmap);
 		error_.Display(__FILE__, __LINE__ - 6);
 		UnBind();
@@ -124,7 +124,8 @@ namespace sgl {
 		for (std::uint32_t i = 0; i < size; ++i)
 		{
 			draw_buffer.emplace_back(
-				static_cast<unsigned int>(FrameBuffer::GetFrameColorAttachment(i)));
+				static_cast<unsigned int>(
+					FrameBuffer::GetFrameColorAttachment(i)));
 		}
 		glDrawBuffers(
 			static_cast<GLsizei>(draw_buffer.size()), 
@@ -272,4 +273,4 @@ namespace sgl {
 		return ss.str();
 	}
 
-} // End namespace sgl.
+} // End namespace frame::opengl.

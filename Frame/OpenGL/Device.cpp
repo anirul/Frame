@@ -51,6 +51,11 @@ namespace frame::opengl {
 		render_ = std::make_shared<RenderBuffer>();
 	}
 
+	Device::~Device() 
+	{
+		Cleanup();
+	}
+
 	void Device::Startup(const std::shared_ptr<frame::LevelInterface> level)
 	{
 		// Copy level into the local area.
@@ -61,144 +66,55 @@ namespace frame::opengl {
 		// Setup camera.
 		SetupCamera();
 		// Create a default cube and quad for rendering.
-		cube_ = CreateCubeStaticMesh();
-		quad_ = CreateQuadStaticMesh();
+		cube_ = CreateCubeStaticMesh(level_);
+		quad_ = CreateQuadStaticMesh(level_);
 	}
 
 	void Device::Cleanup()
 	{
-		level_ = nullptr;
 		program_render_.clear();
+		quad_ = nullptr;
+		cube_ = nullptr;
+		level_ = nullptr;
 	}
 
 	void Device::Display(const double dt)
 	{
 		dt_ = dt;
-		for (const auto& id_program : level_->GetProgramMap())
+		for (const auto& program_id : program_render_)
 		{
 			logger_->info(
-				"Display {} program.", 
-				level_->GetNameFromId(id_program.first));
-			for (const auto& id : id_program.second->GetOutputTextureIds())
+				"Display {}[{}] program.", 
+				level_->GetNameFromId(program_id),
+				program_id);
+			auto program = level_->GetProgramMap().at(program_id);
+			if (program->GetSceneTreeId())
 			{
-
+				auto mesh = 
+					level_->GetStaticMeshMap().at(program->GetSceneTreeId());
+				RenderingStaticMesh(
+					perspective_,
+					view_,
+					model_,
+					mesh,
+					program);
 			}
-
-		}
-		std::vector<std::shared_ptr<Effect>> mesh_effects;
-		for (const auto& name_effect : effect_map_)
-		{
-			logger_->info("Display {} effect.", name_effect.first);
-			if (name_effect.second->GetRenderInputType() == 
-				frame::proto::Effect::SCENE)
-			{ 
-				logger_->info(
-					"\tDisplay {} effect is a mesh effect",
-					name_effect.first);
-				mesh_effects.push_back(name_effect.second);
-			}
-			else if (name_effect.second->GetRenderInputType() == 
-				frame::proto::Effect::TEXTURE_2D)
+			else
 			{
 				RenderingTexture(
 					perspective_,
 					view_,
 					model_,
-					name_effect.second);
-			}
-			else if (name_effect.second->GetRenderInputType() ==
-				frame::proto::Effect::TEXTURE_3D)
-			{
-				RenderingTextureCubeMap(
-					perspective_,
-					view_,
-					model_,
-					name_effect.second);
-			}
-			else
-			{
-				throw std::runtime_error(
-					"rendering " + 
-					std::to_string(name_effect.second->GetRenderInputType()) + 
-					" not implemented yet.");
+					program);
 			}
 		}
-		// Go through the scene and render all meshes.
-		for (const auto& name_scene_interface : scene_tree_->GetSceneMap())
-		{
-			logger_->info(
-				"Display {} is being drawn.", 
-				name_scene_interface.first);
-			if (name_scene_interface.second->GetLocalMesh())
-			{
-				for (const auto& mesh_effect : mesh_effects)
-				{
-					RenderingStaticMesh(
-						perspective_,
-						view_,
-						name_scene_interface.second->GetLocalModel(dt_),
-						name_scene_interface.second->GetLocalMesh(),
-						mesh_effect);
-				}
-			}
-		}
-		// Finally display it to the screen.
-		static auto program = CreateProgram("Display");
-		static auto quad = CreateQuadStaticMesh();
-		auto material = std::make_shared<Material>();
-		material->AddTexture("Display", texture_map_.at(out_texture_name_));
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		quad->SetMaterial(material);
-		quad->Draw(program);
 	}
 
 	void Device::SetupCamera()
 	{
-		const auto& camera = scene_tree_->GetDefaultCamera();
-		perspective_ = camera.ComputeProjection(size_);
-		view_ = camera.ComputeView();
-	}
-
-	void Device::LoadSceneFromObjFile(const std::string& obj_file)
-	{
-		if (obj_file.empty())
-			throw std::runtime_error("Error invalid file name: " + obj_file);
-		std::string mtl_file = "";
-		std::string mtl_path = obj_file;
-		while (mtl_path.back() != '/' && mtl_path.back() != '\\')
-		{
-			mtl_path.pop_back();
-		}
-		std::ifstream obj_ifs(obj_file);
-		if (!obj_ifs.is_open())
-			throw std::runtime_error("Could not open file: " + obj_file);
-		std::string obj_content = "";
-		while (!obj_ifs.eof())
-		{
-			std::string line = "";
-			if (!std::getline(obj_ifs, line)) break;
-			if (line.empty()) continue;
-			std::istringstream iss(line);
-			std::string dump;
-			if (!(iss >> dump))
-				throw std::runtime_error("Error parsing file: " + obj_file);
-			if (dump[0] == '#') continue;
-			if (dump == "mtllib")
-			{
-				if (!(iss >> mtl_file))
-					throw std::runtime_error("Error parsing file: " + obj_file);
-				mtl_file = mtl_path + mtl_file;
-				continue;
-			}
-			obj_content += line + "\n";
-		}
-		std::ifstream mtl_ifs(mtl_file);
-		if (!mtl_ifs.is_open())
-			throw std::runtime_error("Error cannot open file: " + mtl_file);
-		scene_tree_ = LoadSceneFromObjStream(
-			std::istringstream(obj_content),
-			obj_file);
-		material_map_ = LoadMaterialFromMtlStream(mtl_ifs, mtl_file);
+		const auto camera = level_->GetSceneTree()->GetDefaultCamera();
+		perspective_ = camera->ComputeProjection(size_);
+		view_ = camera->ComputeView();
 	}
 
 	std::uint64_t Device::GetProgramIdTextureId(std::uint64_t texture_id) const

@@ -1,7 +1,8 @@
 #pragma once
 
 #include <memory>
-#include "../Frame/LevelInterface.h"
+#include "Frame/LevelInterface.h"
+#include "Frame/CameraInterface.h"
 
 namespace frame {
 
@@ -15,6 +16,7 @@ namespace frame {
 		virtual void Display(const double dt) = 0;
 		virtual void* GetDeviceContext() const = 0;
 		virtual const std::string GetTypeString() const = 0;
+		virtual const std::shared_ptr<CameraInterface> GetCamera() const = 0;
 	};
 
 } // End namespace frame.

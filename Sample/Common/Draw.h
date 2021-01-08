@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../Frame/DeviceInterface.h"
-#include "../Frame/DrawInterface.h"
-#include "../Frame/Error.h"
-#include "../Frame/Logger.h"
-#include "../Frame/Window.h"
+#include "Frame/DeviceInterface.h"
+#include "Frame/DrawInterface.h"
+#include "Frame/Error.h"
+#include "Frame/Logger.h"
+#include "Frame/Window.h"
 
 class Draw : public frame::DrawInterface
 {

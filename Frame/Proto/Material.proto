@@ -7,10 +7,10 @@ package frame.proto;
 message Material {
 	// Name of the material.
 	string name = 1;
-	// Reference name of the effect.
-	string effect_name = 2;
 	// Reference name of the texture names.
 	repeated string texture_names = 3;
+	// Reference to the name inside the material.
+	repeated string inner_names = 4;
 }
 
 // File description of the materials description.

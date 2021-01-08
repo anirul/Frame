@@ -1,7 +1,8 @@
 #pragma once
 #include <utility>
 #include <string>
-#include "../Frame/Error.h"
+#include "Frame/BindInterface.h"
+#include "Frame/Error.h"
 
 namespace frame::opengl {
 

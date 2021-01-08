@@ -1,12 +1,12 @@
 #pragma once
 
 #include <GL/glew.h>
-#include "../Frame/Error.h"
-#include "../Frame/BufferInterface.h"
+#include "Frame/Error.h"
+#include "Frame/BufferInterface.h"
 
 namespace frame::opengl {
 
-	enum class BufferType
+	enum class BufferType : std::uint16_t
 	{
 		ARRAY_BUFFER				= GL_ARRAY_BUFFER,
 		ATOMIC_COUNTER_BUFFER		= GL_ATOMIC_COUNTER_BUFFER,
@@ -24,7 +24,7 @@ namespace frame::opengl {
 		UNIFORM_BUFFER				= GL_UNIFORM_BUFFER,
 	};
 
-	enum class BufferUsage
+	enum class BufferUsage : std::uint16_t
 	{
 		STREAM_DRAW					= GL_STREAM_DRAW, 
 		STREAM_READ					= GL_STREAM_READ, 
@@ -44,16 +44,18 @@ namespace frame::opengl {
 			const BufferType buffer_type = BufferType::ARRAY_BUFFER, 
 			const BufferUsage buffer_usage = BufferUsage::STATIC_DRAW);
 		virtual ~Buffer();
-		void Copy(const size_t size, const void* data = nullptr) const override;
+		void Copy(
+			const std::size_t size, 
+			const void* data = nullptr) const override;
 		void Bind(const unsigned int slot = 0) const override;
 		void UnBind() const override;
 		void LockedBind() const override { locked_bind_ = true; }
 		void UnlockedBind() const override { locked_bind_ = false; }
-
-	public:
-		const unsigned int GetId() const override { return buffer_object_; }
+		unsigned int GetId() const override { return buffer_object_; }
+		std::size_t GetSize() const override { return size_; }
 
 	private:
+		mutable std::size_t size_ = 0;
 		mutable bool locked_bind_ = false;
 		const BufferType buffer_type_;
 		const BufferUsage buffer_usage_;

@@ -46,7 +46,7 @@ namespace frame::opengl {
 		void AttachRender(const RenderBuffer& render) const;
 		// /!\ This will bind and unbind!
 		void AttachTexture(
-			const Texture& texture,
+			const std::shared_ptr<TextureInterface> texture,
 			const FrameColorAttachment frame_color_attachment =
 				FrameColorAttachment::COLOR_ATTACHMENT0,
 			const int mipmap = 0,
@@ -62,15 +62,13 @@ namespace frame::opengl {
 		const std::string GetStatus() const;
 
 	public:
-		const unsigned int GetId() const { return frame_id_; }
+		unsigned int GetId() const { return frame_id_; }
+		void LockedBind() const override { locked_bind_ = true; }
+		void UnlockedBind() const override { locked_bind_ = false; }
 
 	protected:
 		const int GetFrameTextureType(
 			const FrameTextureType frame_texture_type) const;
-
-	protected:
-		void LockedBind() const override { locked_bind_ = true; }
-		void UnlockedBind() const override { locked_bind_ = false; }
 
 	protected:
 		friend class ScopedBind;

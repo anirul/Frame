@@ -235,15 +235,15 @@ namespace frame::proto {
 			{
 				program_interface.Uniform(
 					name,
-					uniform_interface.GetCamera().GetPosition());
+					uniform_interface.GetCameraPosition());
 				break;
 			}
 			case Uniform::CAMERA_DIRECTION_VEC3:
 			{
-				const CameraInterface& cam = uniform_interface.GetCamera();
 				program_interface.Uniform(
 					name,
-					cam.GetFront() - cam.GetPosition());
+					uniform_interface.GetCameraFront() - 
+						uniform_interface.GetCameraPosition());
 				break;
 			}
 			case Uniform::FLOAT_TIME_S:

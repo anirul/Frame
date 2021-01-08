@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../Frame/DeviceInterface.h"
-#include "../Frame/Window.h"
+#include "Frame/DeviceInterface.h"
+#include "Frame/Window.h"
 
 class Input : public frame::InputInterface
 {

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <gtest/gtest.h>
-#include "../ShaderGLLib/Light.h"
+#include "Frame/OpenGL/Light.h"
 
 namespace test {
 
@@ -11,8 +11,8 @@ namespace test {
 		LightTest() = default;
 
 	protected:
-		std::shared_ptr<sgl::LightInterface> light_ = nullptr;
-		std::shared_ptr<sgl::LightManager> light_manager_ = nullptr;
+		std::shared_ptr<frame::opengl::LightInterface> light_ = nullptr;
+		std::shared_ptr<frame::opengl::LightManager> light_manager_ = nullptr;
 	};
 
 } // End namespace test.

@@ -1,7 +1,7 @@
 #include "ConvertTest.h"
 #include "UniformMock.h"
 #include "ProgramMock.h"
-#include "../Frame/CameraInterface.h"
+#include "Frame/CameraInterface.h"
 
 namespace test {
 
@@ -234,7 +234,7 @@ namespace test {
 		StrictMock<ProgramMock> program_mock{};
 		StrictMock<UniformMock> uniform_mock{};
 		{
-			EXPECT_CALL(uniform_mock, GetCamera())
+			EXPECT_CALL(uniform_mock, GetCameraPosition())
 				.Times(Exactly(1));
 			EXPECT_CALL(
 				program_mock,

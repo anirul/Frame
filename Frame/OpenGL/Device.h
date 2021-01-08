@@ -6,6 +6,7 @@
 #include <memory>
 #include <optional>
 #include <SDL2/SDL.h>
+#include "Frame/Camera.h"
 #include "Frame/DeviceInterface.h"
 #include "Frame/Error.h"
 #include "Frame/Logger.h"
@@ -14,10 +15,9 @@
 #include "Frame/OpenGL/Texture.h"
 #include "Frame/OpenGL/Buffer.h"
 #include "Frame/OpenGL/StaticMesh.h"
-#include "Frame/OpenGL/Scene.h"
-#include "Frame/OpenGL/Camera.h"
 #include "Frame/OpenGL/Light.h"
 #include "Frame/OpenGL/Material.h"
+#include "Frame/SceneTree.h"
 
 namespace frame::opengl {
 
@@ -31,6 +31,7 @@ namespace frame::opengl {
 		Device(
 			void* gl_context, 
 			const std::pair<std::uint32_t, std::uint32_t> size);
+		virtual ~Device();
 
 	public:
 		// Startup the scene.
@@ -46,14 +47,26 @@ namespace frame::opengl {
 		const glm::mat4 GetProjection() const final { return perspective_; }
 		const glm::mat4 GetView() const final { return view_; }
 		const glm::mat4 GetModel() const final { return model_; }
+		const glm::vec3 GetCameraPosition() const final
+		{
+			return level_->GetSceneTree()->GetDefaultCamera()->GetPosition();
+		}
+		const glm::vec3 GetCameraFront() const final
+		{
+			return level_->GetSceneTree()->GetDefaultCamera()->GetFront();
+		}
+		const glm::vec3 GetCameraRight() const final
+		{
+			return level_->GetSceneTree()->GetDefaultCamera()->GetRight();
+		}
+		const glm::vec3 GetCameraUp() const final
+		{
+			return level_->GetSceneTree()->GetDefaultCamera()->GetUp();
+		}
 		const double GetDeltaTime() const final { return dt_; }
-		const CameraInterface& GetCamera() const final
+		const std::shared_ptr<CameraInterface> GetCamera() const 
 		{
 			return level_->GetSceneTree()->GetDefaultCamera();
-		}
-		CameraInterface& GetCamera() 
-		{ 
-			return level_->GetSceneTree()->GetDefaultCamera(); 
 		}
 		void* GetDeviceContext() const { return gl_context_; }
 		const std::string GetTypeString() const { return "OpenGL"; }
@@ -84,7 +97,8 @@ namespace frame::opengl {
 		void* gl_context_ = nullptr;
 		// Constants.
 		const std::pair<std::uint32_t, std::uint32_t> size_ = { 0, 0 };
-		const PixelElementSize pixel_element_size_ = PixelElementSize_HALF();
+		const proto::PixelElementSize pixel_element_size_ = 
+			PixelElementSize_HALF();
 		// Cached quad and cube objects.
 		std::shared_ptr<StaticMeshInterface> quad_ = nullptr;
 		std::shared_ptr<StaticMeshInterface> cube_ = nullptr;

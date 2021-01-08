@@ -4,14 +4,12 @@
 #include <stdexcept>
 #include <GL/glew.h>
 #include <cassert>
-#include "Convert.h"
-#include "Image.h"
 #include "FrameBuffer.h"
 #include "RenderBuffer.h"
 #include "Program.h"
 #include "StaticMesh.h"
 
-namespace sgl {
+namespace frame::opengl {
 
 	namespace {
 		// Get the 6 view for the cube map.
@@ -45,35 +43,11 @@ namespace sgl {
 	}
 
 	Texture::Texture(
-		const std::string& file, 
-		const PixelElementSize& pixel_element_size /*= PixelElementSize::BYTE*/, 
-		const PixelStructure& pixel_structure /*= PixelStructure::RGB*/) :
-		pixel_element_size_(pixel_element_size),
-		pixel_structure_(pixel_structure)
-	{
-		sgl::Image img(file, pixel_element_size_, pixel_structure_);
-		size_ = img.GetSize();
-		CreateTexture();
-		Bind();
-		glTexImage2D(
-			GL_TEXTURE_2D,
-			0,
-			sgl::ConvertToGLType(pixel_element_size_, pixel_structure_),
-			static_cast<GLsizei>(size_.first),
-			static_cast<GLsizei>(size_.second),
-			0,
-			sgl::ConvertToGLType(pixel_structure_),
-			sgl::ConvertToGLType(pixel_element_size_),
-			img.Data());
-		error_.Display(__FILE__, __LINE__ - 10);
-		UnBind();
-	}
-
-	Texture::Texture(
 		const std::pair<std::uint32_t, std::uint32_t> size, 
-		const PixelElementSize& pixel_element_size 
+		const proto::PixelElementSize& pixel_element_size 
 			/*= PixelElementSize::BYTE*/, 
-		const PixelStructure& pixel_structure /*= PixelStructure::RGB*/) :
+		const proto::PixelStructure& pixel_structure 
+			/*= PixelStructure::RGB*/) :
 		size_(size),
 		pixel_element_size_(pixel_element_size),
 		pixel_structure_(pixel_structure)
@@ -83,12 +57,12 @@ namespace sgl {
 		glTexImage2D(
 			GL_TEXTURE_2D,
 			0,
-			sgl::ConvertToGLType(pixel_element_size_, pixel_structure_),
+			opengl::ConvertToGLType(pixel_element_size_, pixel_structure_),
 			static_cast<GLsizei>(size_.first),
 			static_cast<GLsizei>(size_.second),
 			0,
-			sgl::ConvertToGLType(pixel_structure_),
-			sgl::ConvertToGLType(pixel_element_size_),
+			opengl::ConvertToGLType(pixel_structure_),
+			opengl::ConvertToGLType(pixel_element_size_),
 			nullptr);
 		error_.Display(__FILE__, __LINE__ - 10);
 		UnBind();
@@ -97,9 +71,10 @@ namespace sgl {
 	Texture::Texture(
 		const std::pair<std::uint32_t, std::uint32_t> size, 
 		const void* data, 
-		const PixelElementSize& pixel_element_size 
+		const proto::PixelElementSize& pixel_element_size
 			/*= PixelElementSize::BYTE*/, 
-		const PixelStructure& pixel_structure /*= PixelStructure::RGB*/) :
+		const proto::PixelStructure& pixel_structure 
+			/*= PixelStructure::RGB*/) :
 		size_(size),
 		pixel_element_size_(pixel_element_size),
 		pixel_structure_(pixel_structure)
@@ -109,72 +84,14 @@ namespace sgl {
 		glTexImage2D(
 			GL_TEXTURE_2D,
 			0,
-			sgl::ConvertToGLType(pixel_element_size_, pixel_structure_),
+			opengl::ConvertToGLType(pixel_element_size_, pixel_structure_),
 			static_cast<GLsizei>(size_.first),
 			static_cast<GLsizei>(size_.second),
 			0,
-			sgl::ConvertToGLType(pixel_structure_),
-			sgl::ConvertToGLType(pixel_element_size_),
+			opengl::ConvertToGLType(pixel_structure_),
+			opengl::ConvertToGLType(pixel_element_size_),
 			data);
 		error_.Display(__FILE__, __LINE__ - 10);
-		UnBind();
-	}
-
-	Texture::Texture(
-		const frame::proto::Texture& proto_texture,
-		const std::pair<std::uint32_t, std::uint32_t> size) :
-		size_(size),
-		pixel_element_size_(proto_texture.pixel_element_size()),
-		pixel_structure_(proto_texture.pixel_structure())
-	{
-		// Get the pixel element size.
-		constexpr auto INVALID_ELEMENT_SIZE = 
-			frame::proto::PixelElementSize::INVALID;
-		if (proto_texture.pixel_element_size().value() == INVALID_ELEMENT_SIZE)
-		{
-			error_.CreateError(
-				"Invalid pixel element size.", 
-				__FILE__, 
-				__LINE__ - 7);
-		}
-		if (proto_texture.pixel_structure().value() == INVALID_ELEMENT_SIZE)
-		{
-			error_.CreateError(
-				"Invalid pixel structure.",
-				__FILE__,
-				__LINE__ - 7);
-		}
-		CreateTexture();
-		constexpr auto INVALID_TEXTURE = frame::proto::Texture::INVALID;
-		if (proto_texture.min_filter() != INVALID_TEXTURE)
-			SetMinFilter(proto_texture.min_filter());
-		if (proto_texture.mag_filter() != INVALID_TEXTURE)
-			SetMagFilter(proto_texture.mag_filter());
-		if (proto_texture.wrap_s() != INVALID_TEXTURE)
-			SetWrapS(proto_texture.wrap_s());
-		if (proto_texture.wrap_t() != INVALID_TEXTURE)
-			SetWrapT(proto_texture.wrap_t());
-		if (proto_texture.size().x() < 0)
-			size_.first /= std::abs(proto_texture.size().x());
-		else
-			size_.first = proto_texture.size().x();
-		if (proto_texture.size().y() < 0)
-			size_.second /= std::abs(proto_texture.size().y());
-		else
-			size_.second = proto_texture.size().y();
-		Bind();
-		glTexImage2D(
-			GL_TEXTURE_2D,
-			0,
-			sgl::ConvertToGLType(pixel_element_size_, pixel_structure_),
-			static_cast<GLsizei>(size_.first),
-			static_cast<GLsizei>(size_.second),
-			0,
-			sgl::ConvertToGLType(pixel_structure_),
-			sgl::ConvertToGLType(pixel_element_size_),
-			proto_texture.pixels().empty() ? 
-				nullptr : 
-				proto_texture.pixels().data());
 		UnBind();
 	}
 
@@ -218,15 +135,13 @@ namespace sgl {
 		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
-	void Texture::BindEnableMipmap() const
+	void Texture::EnableMipmap() const
 	{
-		Bind();
 		glGenerateMipmap(GL_TEXTURE_2D);
 		error_.Display(__FILE__, __LINE__ - 1);
-		UnBind();
 	}
 
-	void Texture::SetMinFilter(const TextureFilter texture_filter)
+	void Texture::SetMinFilter(const TextureFilterEnum texture_filter)
 	{
 		Bind();
 		glTexParameteri(
@@ -237,7 +152,7 @@ namespace sgl {
 		UnBind();
 	}
 
-	Texture::TextureFilter Texture::GetMinFilter() const
+	TextureInterface::TextureFilterEnum Texture::GetMinFilter() const
 	{
 		GLint filter;
 		Bind();
@@ -250,7 +165,7 @@ namespace sgl {
 		return ConvertFromGLType(filter);
 	}
 
-	void Texture::SetMagFilter(const TextureFilter texture_filter)
+	void Texture::SetMagFilter(const TextureFilterEnum texture_filter)
 	{
 		Bind();
 		glTexParameteri(
@@ -261,7 +176,7 @@ namespace sgl {
 		error_.Display(__FILE__, __LINE__ - 4);
 	}
 
-	Texture::TextureFilter Texture::GetMagFilter() const
+	TextureInterface::TextureFilterEnum Texture::GetMagFilter() const
 	{
 		GLint filter;
 		Bind();
@@ -274,7 +189,7 @@ namespace sgl {
 		return ConvertFromGLType(filter);
 	}
 
-	void Texture::SetWrapS(const TextureFilter texture_filter)
+	void Texture::SetWrapS(const TextureFilterEnum texture_filter)
 	{
 		Bind();
 		glTexParameteri(
@@ -285,7 +200,7 @@ namespace sgl {
 		UnBind();
 	}
 
-	Texture::TextureFilter Texture::GetWrapS() const
+	TextureInterface::TextureFilterEnum Texture::GetWrapS() const
 	{
 		GLint filter;
 		Bind();
@@ -298,7 +213,7 @@ namespace sgl {
 		return ConvertFromGLType(filter);
 	}
 
-	void Texture::SetWrapT(const TextureFilter texture_filter)
+	void Texture::SetWrapT(const TextureFilterEnum texture_filter)
 	{
 		Bind();
 		glTexParameteri(
@@ -309,7 +224,7 @@ namespace sgl {
 		UnBind();
 	}
 
-	Texture::TextureFilter Texture::GetWrapT() const
+	TextureInterface::TextureFilterEnum Texture::GetWrapT() const
 	{
 		GLint filter;
 		Bind();
@@ -332,7 +247,7 @@ namespace sgl {
 			render_ = std::make_shared<RenderBuffer>();
 			render_->CreateStorage(size_);
 			frame_->AttachRender(*render_);
-			frame_->AttachTexture(*this);
+			frame_->AttachTexture(shared_from_this());
 			frame_->DrawBuffers(1);
 		}
 		ScopedBind scoped_frame(*frame_);
@@ -345,102 +260,20 @@ namespace sgl {
 	}
 
 	TextureCubeMap::TextureCubeMap(
-		const std::array<std::string, 6>& cube_file,
-		const PixelElementSize& pixel_element_size /*= PixelElementSize::BYTE*/,
-		const PixelStructure& pixel_structure /*= PixelStructure::RGB*/) :
-		Texture(pixel_element_size, pixel_structure)
-	{
-		InitCubeMapFromSixFiles(cube_file, pixel_element_size, pixel_structure);
-	}
-
-	TextureCubeMap::TextureCubeMap(
-		const std::string& file_name, 
-		const std::pair<std::uint32_t, std::uint32_t> size,
-		const PixelElementSize& pixel_element_size, 
-		const PixelStructure& pixel_structure) :
-		Texture(pixel_element_size, pixel_structure)
-	{
-		InitCubeMapFromFile(
-			file_name, 
-			size, 
-			pixel_element_size, 
-			pixel_structure);
-	}
-
-	TextureCubeMap::TextureCubeMap(
 		const std::pair<std::uint32_t, std::uint32_t> size, 
-		const PixelElementSize& pixel_element_size /*= PixelElementSize::BYTE*/, 
-		const PixelStructure& pixel_structure /*= PixelStructure::RGB*/) :
+		const proto::PixelElementSize& pixel_element_size 
+			/*= PixelElementSize::BYTE*/, 
+		const proto::PixelStructure& pixel_structure 
+			/*= PixelStructure::RGB*/) :
 		Texture(pixel_element_size, pixel_structure)
 	{
 		InitCubeMap(size, pixel_element_size, pixel_structure);
 	}
 
-	TextureCubeMap::TextureCubeMap(
-		const frame::proto::Texture& proto_texture,
-		const std::pair<std::uint32_t, std::uint32_t> size)
-	{
-		if (!proto_texture.file_name().empty())
-		{
-			if (proto_texture.size().x() < 0)
-				size_.first /= std::abs(proto_texture.size().x());
-			else
-				size_.first = proto_texture.size().x();
-			if (proto_texture.size().y() < 0)
-				size_.second /= std::abs(proto_texture.size().y());
-			else
-				size_.second = proto_texture.size().y();
-			InitCubeMapFromFile(
-				proto_texture.file_name(),
-				ParseSizeInt(proto_texture.size()),
-				proto_texture.pixel_element_size(),
-				proto_texture.pixel_structure());
-		}
-		else if (proto_texture.file_names().size() != 0)
-		{
-			assert(proto_texture.file_names().size() == 6);
-			std::array<std::string, 6> file_names;
-			int i = 0;
-			for (const auto& str : proto_texture.file_names())
-			{
-				file_names[i] = str;
-				i++;
-			}
-			InitCubeMapFromSixFiles(
-				file_names,
-				proto_texture.pixel_element_size(),
-				proto_texture.pixel_structure());
-		}
-		else
-		{
-			if (proto_texture.size().x() < 0)
-				size_.first /= std::abs(proto_texture.size().x());
-			else
-				size_.first = proto_texture.size().x();
-			if (proto_texture.size().y() < 0)
-				size_.second /= std::abs(proto_texture.size().y());
-			else
-				size_.second = proto_texture.size().y();
-			InitCubeMap(
-				ParseSizeInt(proto_texture.size()), 
-				proto_texture.pixel_element_size(), 
-				proto_texture.pixel_structure());
-		}
-		constexpr auto INVALID_TEXTURE = frame::proto::Texture::INVALID;
-		if (proto_texture.min_filter() != INVALID_TEXTURE)
-			SetMinFilter(proto_texture.min_filter());
-		if (proto_texture.mag_filter() != INVALID_TEXTURE)
-			SetMagFilter(proto_texture.mag_filter());
-		if (proto_texture.wrap_s() != INVALID_TEXTURE)
-			SetWrapS(proto_texture.wrap_s());
-		if (proto_texture.wrap_t() != INVALID_TEXTURE)
-			SetWrapT(proto_texture.wrap_t());
-	}
-
 	void TextureCubeMap::InitCubeMap(
 		const std::pair<std::uint32_t, std::uint32_t> size, 
-		const PixelElementSize& pixel_element_size, 
-		const PixelStructure& pixel_structure)
+		const proto::PixelElementSize& pixel_element_size, 
+		const proto::PixelStructure& pixel_structure)
 	{
 		size_ = size;
 		CreateTextureCubeMap();
@@ -450,111 +283,16 @@ namespace sgl {
 			glTexImage2D(
 				GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
 				0,
-				::sgl::ConvertToGLType(pixel_element_size_, pixel_structure_),
+				opengl::ConvertToGLType(pixel_element_size_, pixel_structure_),
 				static_cast<GLsizei>(size_.first),
 				static_cast<GLsizei>(size_.second),
 				0,
-				::sgl::ConvertToGLType(pixel_structure_),
-				::sgl::ConvertToGLType(pixel_element_size_),
+				opengl::ConvertToGLType(pixel_structure_),
+				opengl::ConvertToGLType(pixel_element_size_),
 				nullptr);
 			error_.Display(__FILE__, __LINE__ - 10);
 		}
 		UnBind();
-	}
-
-	void TextureCubeMap::InitCubeMapFromSixFiles(
-		const std::array<std::string, 6> file_names, 
-		const PixelElementSize pixel_element_size, 
-		const PixelStructure pixel_structure)
-	{
-		CreateTextureCubeMap();
-		Bind();
-		for (const int i : {0, 1, 2, 3, 4, 5})
-		{
-			sgl::Image image(
-				file_names[i],
-				pixel_element_size_,
-				pixel_structure_);
-			auto size = image.GetSize();
-			glTexImage2D(
-				GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-				0,
-				sgl::ConvertToGLType(pixel_element_size_, pixel_structure_),
-				static_cast<GLsizei>(size.first),
-				static_cast<GLsizei>(size.second),
-				0,
-				sgl::ConvertToGLType(pixel_structure_),
-				sgl::ConvertToGLType(pixel_element_size_),
-				image.Data());
-			error_.Display(__FILE__, __LINE__ - 10);
-		}
-		UnBind();
-	}
-
-	void TextureCubeMap::InitCubeMapFromFile(
-		const std::string& file_name, 
-		const std::pair<std::uint32_t, std::uint32_t> size, 
-		const PixelElementSize& pixel_element_size, 
-		const PixelStructure& pixel_structure)
-	{
-		auto material = std::make_shared<Material>();
-		FrameBuffer frame{};
-		RenderBuffer render{};
-		ScopedBind scoped_frame(frame);
-		ScopedBind scoped_render(render);
-		size_ = size;
-		auto equirectangular = std::make_shared<Texture>(
-			file_name,
-			pixel_element_size_,
-			pixel_structure_);
-		material->AddTexture("Equirectangular", equirectangular);
-		render.CreateStorage(size_);
-		frame.AttachRender(render);
-		CreateTextureCubeMap();
-		Bind();
-		for (unsigned int i : {0, 1, 2, 3, 4, 5})
-		{
-			glTexImage2D(
-				GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-				0,
-				::sgl::ConvertToGLType(pixel_element_size_, pixel_structure_),
-				static_cast<GLsizei>(size_.first),
-				static_cast<GLsizei>(size_.second),
-				0,
-				::sgl::ConvertToGLType(pixel_structure_),
-				::sgl::ConvertToGLType(pixel_element_size_),
-				nullptr);
-			error_.Display(__FILE__, __LINE__ - 10);
-		}
-		UnBind();
-		glm::mat4 projection =
-			glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
-		auto program = CreateProgram("EquirectangularCubeMap");
-		program->Use();
-		program->Uniform("projection", projection);
-		auto cube = CreateCubeStaticMesh();
-		cube->SetMaterial(material);
-		glViewport(0, 0, size_.first, size_.second);
-		error_.Display(__FILE__, __LINE__ - 1);
-		int i = 0;
-		for (const glm::mat4& view : views_cubemap)
-		{
-			frame.AttachTexture(
-				*this,
-				FrameColorAttachment::COLOR_ATTACHMENT0,
-				0,
-				static_cast<FrameTextureType>(i));
-			i++;
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			error_.Display(__FILE__, __LINE__ - 1);
-			// CHECKME(anirul): Not sure about this.
-			program->Use();
-			program->Uniform("projection", view);
-			program->Uniform("view", glm::mat4(1.0f));
-			program->Uniform("model", glm::mat4(1.0f));
-			// Draw!
-			cube->Draw(program);
-		}
 	}
 
 	void TextureCubeMap::Bind(const unsigned int slot /*= 0*/) const
@@ -574,15 +312,13 @@ namespace sgl {
 		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
-	void TextureCubeMap::BindEnableMipmap() const
+	void TextureCubeMap::EnableMipmap() const
 	{
-		Bind();
 		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 		error_.Display(__FILE__, __LINE__ - 1);
-		UnBind();
 	}
 
-	void TextureCubeMap::SetMinFilter(const TextureFilter texture_filter)
+	void TextureCubeMap::SetMinFilter(const TextureFilterEnum texture_filter)
 	{
 		Bind();
 		glTexParameteri(
@@ -593,7 +329,7 @@ namespace sgl {
 		UnBind();
 	}
 
-	Texture::TextureFilter TextureCubeMap::GetMinFilter() const
+	TextureInterface::TextureFilterEnum TextureCubeMap::GetMinFilter() const
 	{
 		GLint filter;
 		Bind();
@@ -606,7 +342,7 @@ namespace sgl {
 		return ConvertFromGLType(filter);
 	}
 
-	void TextureCubeMap::SetMagFilter(const TextureFilter texture_filter)
+	void TextureCubeMap::SetMagFilter(const TextureFilterEnum texture_filter)
 	{
 		Bind();
 		glTexParameteri(
@@ -617,7 +353,7 @@ namespace sgl {
 		UnBind();
 	}
 
-	Texture::TextureFilter TextureCubeMap::GetMagFilter() const
+	TextureInterface::TextureFilterEnum TextureCubeMap::GetMagFilter() const
 	{
 		GLint filter;
 		Bind();
@@ -630,7 +366,7 @@ namespace sgl {
 		return ConvertFromGLType(filter);
 	}
 
-	void TextureCubeMap::SetWrapS(const TextureFilter texture_filter)
+	void TextureCubeMap::SetWrapS(const TextureFilterEnum texture_filter)
 	{
 		Bind();
 		glTexParameteri(
@@ -641,7 +377,7 @@ namespace sgl {
 		error_.Display(__FILE__, __LINE__ - 4);
 	}
 
-	Texture::TextureFilter TextureCubeMap::GetWrapS() const
+	TextureInterface::TextureFilterEnum TextureCubeMap::GetWrapS() const
 	{
 		GLint filter;
 		Bind();
@@ -655,7 +391,7 @@ namespace sgl {
 
 	}
 
-	void TextureCubeMap::SetWrapT(const TextureFilter texture_filter)
+	void TextureCubeMap::SetWrapT(const TextureFilterEnum texture_filter)
 	{
 		Bind();
 		glTexParameteri(
@@ -666,7 +402,7 @@ namespace sgl {
 		UnBind();
 	}
 
-	Texture::TextureFilter TextureCubeMap::GetWrapT() const
+	TextureInterface::TextureFilterEnum TextureCubeMap::GetWrapT() const
 	{
 		GLint filter;
 		Bind();
@@ -680,7 +416,7 @@ namespace sgl {
 
 	}
 
-	void TextureCubeMap::SetWrapR(const TextureFilter texture_filter)
+	void TextureCubeMap::SetWrapR(const TextureFilterEnum texture_filter)
 	{
 		Bind();
 		glTexParameteri(
@@ -691,7 +427,7 @@ namespace sgl {
 		UnBind();
 	}
 
-	Texture::TextureFilter TextureCubeMap::GetWrapR() const
+	TextureInterface::TextureFilterEnum TextureCubeMap::GetWrapR() const
 	{
 		GLint filter;
 		Bind();
@@ -731,7 +467,7 @@ namespace sgl {
 		UnBind();
 	}
 
-	int Texture::ConvertToGLType(const TextureFilter texture_filter) const
+	int Texture::ConvertToGLType(const TextureFilterEnum texture_filter) const
 	{
 		switch (texture_filter)
 		{
@@ -762,7 +498,8 @@ namespace sgl {
 		}
 	}
 
-	Texture::TextureFilter Texture::ConvertFromGLType(int gl_filter) const
+	TextureInterface::TextureFilterEnum Texture::ConvertFromGLType(
+		int gl_filter) const
 	{
 		switch (gl_filter)
 		{
@@ -789,79 +526,4 @@ namespace sgl {
 			"invalid texture filter : " + std::to_string(gl_filter));
 	}
 
-	std::shared_ptr<sgl::Texture> LoadTextureFromFile(
-		std::istream& is,
-		const std::string& stream_name,
-		const std::string& element_name)
-	{
-		std::string file_name;
-		if (!(is >> file_name))
-		{
-			throw std::runtime_error(
-				"Error parsing file: " +
-				stream_name +
-				" no file name at " +
-				element_name);
-		}
-		return std::make_shared<Texture>(file_name);
-	}
-
-	std::shared_ptr<sgl::Texture> LoadTextureFrom3Float(
-		std::istream& is,
-		const std::string& stream_name,
-		const std::string& element_name)
-	{
-		float rgb[3] = { 0.f, 0.f, 0.f };
-		if (!(is >> rgb[0]))
-		{
-			throw std::runtime_error(
-				"Error parsing file: " +
-				stream_name +
-				" could not get the r value for " +
-				element_name);
-		}
-		if (!(is >> rgb[1]))
-		{
-			throw std::runtime_error(
-				"Error parsing file: " +
-				stream_name +
-				" could not get the g value for " +
-				element_name);
-		}
-		if (!(is >> rgb[2]))
-		{
-			throw std::runtime_error(
-				"Error parsing file: " +
-				stream_name +
-				" could not get the b value for " +
-				element_name);
-		}
-		return std::make_shared<Texture>(
-			std::pair{ 1, 1 },
-			rgb,
-			PixelElementSize_FLOAT(),
-			PixelStructure_RGB());
-	}
-
-	std::shared_ptr<sgl::Texture> LoadTextureFrom1Float(
-		std::istream& is,
-		const std::string& stream_name,
-		const std::string& element_name)
-	{
-		float grey[1] = { 0.f };
-		if (!(is >> grey[0]))
-		{
-			throw std::runtime_error(
-				"Error parsing file: " +
-				stream_name +
-				" could not get the r value for " +
-				element_name);
-		}
-		return std::make_shared<Texture>(
-			std::pair{ 1, 1 },
-			grey,
-			PixelElementSize_FLOAT(),
-			PixelStructure_GREY());
-	}
-
-} // End namespace sgl.
+} // End namespace frame::opengl.

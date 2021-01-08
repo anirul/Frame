@@ -1,7 +1,7 @@
 #include "Light.h"
 #include <stdexcept>
 
-namespace sgl {
+namespace frame::opengl {
 
 	void LightManager::RegisterToProgram(
 		const std::shared_ptr<Program> program) const

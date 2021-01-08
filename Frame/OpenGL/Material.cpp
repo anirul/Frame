@@ -1,256 +1,104 @@
 #include "Material.h"
 #include <sstream>
 #include <cassert>
-#include "Image.h"
 
 namespace frame::opengl {
 
-	Material::Material(std::istream& is, const std::string& name)
-	{
-		while (!is.eof())
-		{
-			std::string line = "";
-			if (!std::getline(is, line)) break;
-			if (line.empty()) continue;
-			std::istringstream iss(line);
-			std::string dump;
-			if (!(iss >> dump))
-			{
-				throw std::runtime_error(
-					"Error parsing file: " + name + " no token found.");
-			}
-			if (dump == "map_Ka") 
-			{
-				AddTexture("Color", LoadTextureFromFile(iss, name, dump));
-			}
-			if (dump == "Ka")
-			{
-				AddTexture("Color", LoadTextureFrom3Float(iss, name, dump));
-			}
-			if (dump == "map_Kd")
-			{
-				AddTexture("Color", LoadTextureFromFile(iss, name, dump));
-			}
-			if (dump == "Kd")
-			{
-				AddTexture("Color", LoadTextureFrom3Float(iss, name, dump));
-			}
-			if (dump == "map_norm")
-			{
-				AddTexture("Normal", LoadTextureFromFile(iss, name, dump));
-			}
-			if (dump == "norm")
-			{
-				AddTexture("Normal", LoadTextureFrom3Float(iss, name, dump));
-			}
-			if (dump == "map_Pm")
-			{
-				AddTexture("Metallic", LoadTextureFromFile(iss, name, dump));
-			}
-			if (dump == "Pm")
-			{
-				AddTexture("Metallic", LoadTextureFrom1Float(iss, name, dump));
-			}
-			if (dump == "map_Pr")
-			{
-				AddTexture("Roughness", LoadTextureFromFile(iss, name, dump));
-			}
-			if (dump == "Pr")
-			{
-				AddTexture("Roughness", LoadTextureFrom1Float(iss, name, dump));
-			}
-			// TODO(anirul): Implement the "d" and "illum" and all others.
-		}
-		if (!HasTexture("AmbientOcclusion"))
-		{
-			float single_pixel[3] = { 1.f, 1.f, 1.f };
-			AddTexture("AmbientOcclusion", std::make_shared<Texture>(
-				std::pair{ 1, 1 },
-				single_pixel,
-				sgl::PixelElementSize_FLOAT()));
-		}
-	}
-
-	Material::Material(const frame::proto::Material& material)
-	{
-		effect_name_ = material.effect_name();
-		for (const auto& texture_name : material.texture_names())
-			AddTexture(texture_name);
-	}
-
-	Material Material::operator+(const Material& material)
-	{
-		Material ret_material(*this);
-		ret_material += material;
-		return ret_material;
-	}
-
-	Material& Material::operator+=(const Material& material)
-	{
-		for (const auto& texture_name : material.GetTextureNames())
-		{
-			AddTexture(texture_name);
-		}
-		return *this;
-	}
-
 	Material::~Material()
 	{
-		for (const auto& name : name_array_)
-		{
-			if (!name.empty())
-			{
-				throw std::runtime_error(
-					"Material [" + name + "] has not been freed!");
-			}
-		}
+		DisableAll();
 	}
 
-	bool Material::AddTexture(const std::string& name)
+	bool Material::AddTextureId(std::uint64_t id, const std::string& name)
 	{
-		RemoveTexture(name);
-		auto ret = texture_names_.insert(name);
-		return ret.second;
+		RemoveTextureId(id);
+		return id_name_map_.insert({ id, name }).second;
 	}
 
-	bool Material::HasTexture(const std::string& name) const
+	bool Material::HasTextureId(std::uint64_t id) const
 	{
-		return texture_names_.find(name) != texture_names_.end();
+		auto it = id_name_map_.find(id);
+		return it != id_name_map_.end();
 	}
 
-	bool Material::RemoveTexture(const std::string& name)
+	bool Material::RemoveTextureId(std::uint64_t id)
 	{
-		// Check if present in the name texture map.
-		auto it = texture_names_.find(name);
-		if (it == texture_names_.end())
-		{
-			return false;
-		}
-
-		// Remove it.
-		texture_names_.erase(it);
+		if (!HasTextureId(id)) return false;
+		auto it = id_name_map_.find(id);
+		id_name_map_.erase(it);
 		return true;
 	}
 
-	const int Material::EnableTexture(
-		const std::string& name, 
-		const std::shared_ptr<TextureInterface>& texture) const
+	const std::pair<std::string, int> Material::EnableTextureId(
+		std::uint64_t id) const
 	{
-		auto it1 = texture_names_.find(name);
-		if (it1 == texture_names_.end())
+		// Check it exist.
+		if (!HasTextureId(id))
+			throw std::runtime_error("No texture id: " + std::to_string(id));
+		// Check it is not already enabled.
+		for (const auto& i : id_array_)
 		{
-			throw std::runtime_error("try to enable a texture: " + name);
-		}
-		for (int i = 0; i < name_array_.size(); ++i)
-		{
-			if (name_array_[i].empty())
+			if (i == id)
 			{
-				name_array_[i] = name;
-				texture->Bind(i);
-				return i;
+				throw std::runtime_error("Already in?");
 			}
 		}
+		// Assign it.
+		for (int i = 0; i < id_array_.size(); ++i)
+		{
+			if (id_array_[i] == 0)
+			{
+				id_array_[i] = id;
+				auto texture = level_->GetTextureMap().at(id);
+				texture->Bind(i);
+				return { id_name_map_.at(id), i };
+			}
+		}
+		// No free slots.
 		throw std::runtime_error("No free slots!");
 	}
 
-	void Material::DisableTexture(
-		const std::string& name,
-		const std::shared_ptr<TextureInterface>& texture) const
+	void Material::DisableTextureId(std::uint64_t id) const
 	{
-		auto it1 = texture_names_.find(name);
-		if (it1 == texture_names_.end())
+		// Check if exist.
+		if (!HasTextureId(id))
+			throw std::runtime_error("No texture id: " + std::to_string(id));
+		// Disable it.
+		for (auto& i : id_array_)
 		{
-			throw std::runtime_error("no texture named: " + name);
+			if (i == id)
+			{
+				i = 0;
+				auto texture = level_->GetTextureMap().at(id);
+				texture->UnBind();
+				return;
+			}
 		}
-		auto it2 = std::find_if(
-			name_array_.begin(),
-			name_array_.end(),
-			[name](const std::string& value)
-		{
-			return value == name;
-		});
-		if (it2 != name_array_.end())
-		{
-			*it2 = "";
-			texture->UnBind();
-		}
-		else
-		{
-			throw std::runtime_error("No slot bind to: " + name);
-		}
+		// Error not found in the enable array.
+		throw std::runtime_error(
+			"Texture id: " + std::to_string(id) + 
+			" was not bind to any slots.");
 	}
 
-	void Material::DisableAll(
-		const std::map<std::string, std::shared_ptr<TextureInterface>>& 
-			texture_map) const
+	void Material::DisableAll() const
 	{
 		for (int i = 0; i < 32; ++i)
 		{
-			if (!name_array_[i].empty())
+			if (id_array_[i])
 			{
-				auto it = texture_map.find(name_array_[i]);
-				if (it == texture_map.cend())
-				{
-					throw std::runtime_error(
-						"could not find texture: " + name_array_[i]);
-				}
-				DisableTexture(it->first, it->second);
+				DisableTextureId(id_array_[i]);
 			}
 		}
 	}
 
-	std::map<std::string, std::shared_ptr<Material>> LoadMaterialFromMtlStream(
-		std::istream& is, 
-		const std::string& name)
+	const std::vector<std::uint64_t> Material::GetIds() const
 	{
-		std::map<std::string, std::shared_ptr<Material>> material_map{};
-		std::string mtl_part = "";
-		std::string name_extended = "";
-		std::string mtl_name = "";
-		auto lambda_create_material = 
-			[&material_map, &mtl_part, &name_extended, &mtl_name]()
+		std::vector<std::uint64_t> vec;
+		for (const auto& p : id_name_map_)
 		{
-			assert(!mtl_name.empty());
-			material_map.emplace(
-				mtl_name,
-				std::make_shared<Material>(
-					std::istringstream(mtl_part),
-					name_extended));
-			mtl_part.clear();
-		};
-		while (!is.eof())
-		{
-			std::string line = "";
-			if (!std::getline(is, line)) break;
-			if (line.empty()) continue;
-			if (line[0] == '#') continue;
-			std::istringstream iss(line);
-			std::string dump;
-			if (!(iss >> dump))
-			{
-				throw std::runtime_error(
-					"Error parsing file: " + name + " no token found.");
-			}
-			if (dump == "newmtl")
-			{
-				if (!mtl_part.empty() && !mtl_name.empty()) 
-				{
-					lambda_create_material();
-				}
-				if (!(iss >> mtl_name))
-				{
-					throw std::runtime_error(
-						"Material should have name: " + name);
-				}
-				name_extended = name + ":" + mtl_name;
-			}
-			else
-			{
-				mtl_part += line + "\n";
-			}
+			vec.push_back(p.first);
 		}
-		if (!mtl_part.empty() && !mtl_name.empty()) lambda_create_material();
-		return material_map;
+		return vec;
 	}
 
 } // End namespace frame::opengl.

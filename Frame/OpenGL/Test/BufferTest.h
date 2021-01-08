@@ -1,8 +1,8 @@
 #pragma once
 
 #include <gtest/gtest.h>
-#include "../Frame/Window.h"
-#include "../Frame/BufferInterface.h"
+#include "Frame/Window.h"
+#include "Frame/BufferInterface.h"
 
 namespace test {
 

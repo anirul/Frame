@@ -1,6 +1,6 @@
 #include "Draw.h"
 #include <fstream>
-#include "../FrameProto/Proto.h"
+#include "Frame/Proto/Proto.h"
 #include "Name.h"
 
 void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)

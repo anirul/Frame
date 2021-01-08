@@ -1,14 +1,14 @@
 #pragma once
 
-#include "../Frame/Logger.h"
-#include "../Frame/OpenGL/Device.h"
-#include "../Frame/OpenGL/Fill.h"
-#include "../Frame/Window.h"
+#include "Frame/Logger.h"
+#include "Frame/OpenGL/Device.h"
+#include "Frame/OpenGL/Fill.h"
+#include "Frame/Window.h"
 
-class Draw : public sgl::DrawInterface
+class Draw : public frame::DrawInterface
 {
 public:
-	Draw(const std::shared_ptr<sgl::Device> device) :
+	Draw(const std::shared_ptr<frame::DeviceInterface> device) :
 		device_(device) {}
 
 public:
@@ -16,10 +16,12 @@ public:
 	void RunDraw(const double dt) override;
 
 private:
-	sgl::Error& error_ = sgl::Error::GetInstance();
-	sgl::Logger& logger_ = sgl::Logger::GetInstance();
-	std::shared_ptr<sgl::Device> device_ = nullptr;
+	frame::Error& error_ = frame::Error::GetInstance();
+	frame::Logger& logger_ = frame::Logger::GetInstance();
+	std::shared_ptr<frame::DeviceInterface> device_ = nullptr;
 	std::string preferred_texture_ = "";
-	std::map<std::string, std::shared_ptr<sgl::Texture>> texture_map_ = {};
-	std::map<std::string, std::shared_ptr<sgl::Effect>> effect_map_ = {};
+	std::map<std::string, std::shared_ptr<frame::TextureInterface>> 
+		texture_map_ = {};
+	std::map<std::string, std::shared_ptr<frame::ProgramInterface>> 
+		program_map_ = {};
 };

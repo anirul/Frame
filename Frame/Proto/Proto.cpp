@@ -1,11 +1,11 @@
 #include "Proto.h"
 #include "Frame/LevelBase.h"
-#include "Frame/OpenGL/Scene.h"
-#include "Frame/Proto/LevelOpenGL.h"
+#include "Frame/SceneTree.h"
+#include "Frame/Proto/ParseLevel.h"
 
 namespace frame::proto {
 
-	std::shared_ptr<frame::LevelInterface> LoadLevelFromProto(
+	std::shared_ptr<LevelInterface> LoadLevelFromProto(
 		const std::pair<std::int32_t, std::int32_t> size,
 		const Level& proto_level, 
 		const ProgramFile& proto_program_file, 
@@ -13,7 +13,7 @@ namespace frame::proto {
 		const TextureFile& proto_texture_file, 
 		const MaterialFile& proto_material_file)
 	{
-		return std::make_shared<frame::proto::LevelOpenGL>(
+		return proto::ParseLevelOpenGL(
 			size,
 			proto_level, 
 			proto_program_file,

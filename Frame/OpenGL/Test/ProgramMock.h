@@ -1,13 +1,29 @@
 #pragma once
 
 #include <gmock/gmock.h>
-#include "../Frame/ProgramInterface.h"
+#include "Frame/ProgramInterface.h"
 
 namespace test {
 
 	class ProgramMock : public frame::ProgramInterface
 	{
 	public:
+		MOCK_METHOD(void, AddInputTextureId, (std::uint64_t), (override));
+		MOCK_METHOD(
+			const std::vector<std::uint64_t>&, 
+			GetInputTextureIds,
+			(), 
+			(const, override));
+		MOCK_METHOD(void , AddOutputTextureId, (std::uint64_t), (override));
+		MOCK_METHOD(
+			const std::vector<std::uint64_t>&,
+			GetOutputTextureIds,
+			(),
+			(const, override));
+		MOCK_METHOD(void, SetSceneTreeId, (std::uint64_t), (override));
+		MOCK_METHOD(std::uint64_t, GetSceneTreeId, (), (const, override));
+		MOCK_METHOD(void, RemoveTextureId, (std::uint64_t), (override));
+		MOCK_METHOD(bool, HasTextureId, (std::uint64_t), (const, override));
 		MOCK_METHOD(void, LinkShader, (), (override));
 		MOCK_METHOD(void, Use, (), (const, override));
 		MOCK_METHOD(

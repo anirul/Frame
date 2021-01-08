@@ -1,6 +1,6 @@
 #include "ErrorTest.h"
 #include <gl/glew.h>
-#include "../Frame/Window.h"
+#include "Frame/Window.h"
 
 namespace test {
 

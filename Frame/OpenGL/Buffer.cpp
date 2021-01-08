@@ -35,9 +35,10 @@ namespace frame::opengl {
 	}
 
 	void Buffer::Copy(
-		const size_t size, 
+		const std::size_t size, 
 		const void* data /*= nullptr*/) const
 	{
+		size_ = size;
 		glBufferData(
 			static_cast<GLenum>(buffer_type_),
 			size,
