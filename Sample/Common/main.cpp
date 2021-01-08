@@ -8,8 +8,8 @@
 #endif
 
 #include "Application.h"
-#include "../Frame/Error.h"
-#include "../Frame/Window.h"
+#include "Frame/Error.h"
+#include "Frame/Window.h"
 
 #if defined(_WIN32) || defined(_WIN64)
 int WINAPI WinMain(
