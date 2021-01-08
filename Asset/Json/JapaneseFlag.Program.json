@@ -1,0 +1,9 @@
+{
+  "programs": [
+    {
+      "name": "JapaneseFlagEffect",
+      "output_texture_names": "billboard",
+      "shader": "JapaneseFlag"
+    }
+  ]
+}

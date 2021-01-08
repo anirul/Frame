@@ -1,12 +1,13 @@
 #pragma once
 
-#include "../ShaderGLLib/Window.h"
-#include "../ShaderGLLib/Device.h"
+#include "Frame/DeviceInterface.h"
+#include "Frame/Window.h"
 
-class Input : public sgl::InputInterface
+class Input : public frame::InputInterface
 {
 public:
-	Input(const std::shared_ptr<sgl::Device>& device) : device_(device) {}
+	Input(const std::shared_ptr<frame::DeviceInterface> device) : 
+		device_(device) {}
 
 public:
 	bool KeyPressed(const char key, const double dt) override;
@@ -17,9 +18,7 @@ public:
 		const double dt) override;
 	bool MousePressed(const char button, const double dt) override;
 	bool MouseReleased(const char button, const double dt) override;
-	int GetValue() const override { return value_; }
 
 private:
-	std::shared_ptr<sgl::Device> device_;
-	int value_ = 5;
+	std::shared_ptr<frame::DeviceInterface> device_;
 };

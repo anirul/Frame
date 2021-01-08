@@ -1,0 +1,55 @@
+# Frame OpenGL Test.
+
+add_executable(FrameOpenGLTest
+    BufferTest.cpp
+    BufferTest.h
+    CameraTest.cpp
+    CameraTest.h
+    ConvertTest.cpp
+    ConvertTest.h
+    DeviceTest.cpp
+    DeviceTest.h
+    ErrorTest.cpp
+    ErrorTest.h
+    FrameBufferTest.cpp
+    FrameBufferTest.h
+    LightTest.cpp
+    LightTest.h
+    main.cpp
+    MaterialTest.cpp
+    MaterialTest.h
+    StaticMeshTest.cpp
+    StaticMeshTest.h
+    PixelTest.cpp
+    PixelTest.h
+    ProgramMock.h
+    ProgramTest.cpp
+    ProgramTest.h
+    RenderBufferTest.cpp
+    RenderBufferTest.h
+    SceneTest.cpp
+    SceneTest.h
+    ShaderTest.cpp
+    ShaderTest.h
+    TextureTest.cpp
+    TextureTest.h
+    UniformMock.h
+    WindowTest.cpp
+    WindowTest.h
+)
+
+target_include_directories(FrameOpenGLTest
+  PUBLIC
+    ${CMAKE_SOURCE_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR}
+    FrameOpenGL
+)
+
+target_link_libraries(FrameOpenGLTest
+  PUBLIC
+    FrameOpenGL
+    FrameProto
+    GTest::gmock
+    GTest::gtest
+    GTest::gtest_main
+)

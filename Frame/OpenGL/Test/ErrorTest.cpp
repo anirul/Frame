@@ -1,0 +1,20 @@
+#include "ErrorTest.h"
+#include <gl/glew.h>
+#include "Frame/Window.h"
+
+namespace test {
+
+	TEST_F(ErrorTest, ThrowErrorTest)
+	{
+		auto window = frame::CreateSDLOpenGL({ 320, 200 });
+		// Disable the message box error reporting.
+		error_.SetWindowPtr(nullptr);
+		EXPECT_TRUE(window);
+		EXPECT_EQ(GLEW_OK, glewInit());
+		EXPECT_NO_THROW(error_.Display());
+		unsigned int texture;
+		glCreateTextures(GL_TEXTURE_2D, -1, &texture);
+		EXPECT_THROW(error_.Display(), std::runtime_error);
+	}
+
+} // End namespace test.

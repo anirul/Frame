@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+import "Math.proto";
+
+package frame.proto;
+
+// This is the definition of an Uniform parameter.
+// These are parameters that are passed to the shader.
+// Next 19
+message Uniform {
+	enum UniformEnum {
+		INVALID = 0;
+		PROJECTION_MAT4 = 1;
+		PROJECTION_INV_MAT4 = 2;
+		VIEW_MAT4 = 3;
+		VIEW_INV_MAT4 = 4;
+		MODEL_MAT4 = 5;
+		MODEL_INV_MAT4 = 6;
+		CAMERA_POSITION_VEC3 = 7;
+		CAMERA_DIRECTION_VEC3 = 8;
+		FLOAT_TIME_S = 9;
+	}
+	// Name of the uniform (should be the same as declared in the shader!).
+	string name = 1;
+	// Value of the uniform (same as before).
+	oneof value_oneof {
+		int32 uniform_int = 2;
+		bool uniform_bool = 3;
+		float uniform_float = 4;
+		// This value come from outside, this could be projection or camera.
+		// it will be set acording to the type of the enum.
+		UniformEnum uniform_enum = 5;
+		// Vectors and Matrices.
+		UniformVector2 uniform_vec2 = 6;
+		UniformVector3 uniform_vec3 = 7;
+		UniformVector4 uniform_vec4 = 8;
+		UniformQuaternion uniform_quat = 9;
+		UniformMatrix4 uniform_mat4 = 10;
+		UniformInts uniform_ints = 11;
+		UniformBools uniform_bools = 12;
+		UniformFloats uniform_floats = 13;
+		UniformVector2s uniform_vec2s = 14;
+		UniformVector3s uniform_vec3s = 15;
+		UniformVector4s uniform_vec4s = 16;
+		UniformQuaternions uniform_quats = 17;
+		UniformMatrix4s uniform_mat4s = 18;
+	}
+}

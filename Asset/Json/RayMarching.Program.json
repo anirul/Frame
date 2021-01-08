@@ -1,0 +1,17 @@
+{
+  "effects": [
+    {
+      "name": "RayMarchingEffect",
+      "render_input_type": "NONE",
+      "render_output_type": "TEXTURE_2D",
+      "output_texture_names": "billboard",
+      "shader": "RayMarching",
+      "parameters": [
+        {
+          "name": "time_s",
+          "uniform_enum": "FLOAT_TIME_S"
+        }
+      ]
+    }
+  ]
+}

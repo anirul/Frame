@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+import "Size.proto";
+import "Pixel.proto";
+
+package frame.proto;
+
+// Texture
+// Next 17
+message Texture {
+	// TextureFilterEnum
+	enum TextureFilterEnum {
+		INVALID                = 0;
+		NEAREST                = 1;
+		LINEAR                 = 2;
+		NEAREST_MIPMAP_NEAREST = 3;
+		LINEAR_MIPMAP_NEAREST  = 4;
+		NEAREST_MIPMAP_LINEAR  = 5;
+		LINEAR_MIPMAP_LINEAR   = 6;
+		CLAMP_TO_EDGE          = 7;
+		MIRRORED_REPEAT        = 8;
+		REPEAT                 = 9;
+	}
+	// Name of the texture.
+	string name = 1;
+	// Size of the texture.
+	Size size = 2;
+	// Should it be a cleared texture?
+	bool clear_z = 3;
+	bool clear_color = 16;
+	// Should we use mipmap?
+	bool mipmap = 4;
+	// Should it be a cubemap?
+	bool cubemap = 5;
+
+	// Format of the texture.
+	PixelElementSize pixel_element_size = 6;
+	PixelStructure pixel_structure = 7;
+
+	// Filter for mirroring and texture sampling.
+	TextureFilterEnum min_filter = 8;
+	TextureFilterEnum mag_filter = 9;
+	TextureFilterEnum wrap_s = 10;
+	TextureFilterEnum wrap_t = 11;
+	TextureFilterEnum wrap_r = 12;
+
+	// Pixel (if provided).
+	bytes pixels = 13;
+
+	// Load from a file.
+	string file_name = 14;
+
+	// Load from files.
+	// This is suppose to represent the 6 face of a cube map.
+	repeated string file_names = 15;
+}
+
+// Texture file.
+// Next 2
+message TextureFile {
+	// Contain many textures.
+	repeated Texture textures = 1;
+}

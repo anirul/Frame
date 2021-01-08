@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package frame.proto;
+
+// Size exprimed in pixels, in case this is negative this is a representation
+// of the maximum divided by the absolute part.
+//  - (-1) -> size of the screen.
+//  - (-2) -> size of the screen / 2.
+//  - (-?) -> size of the screen / ?.
+// Next 3
+message Size {
+	int32 x = 1;
+	int32 y = 2;
+}

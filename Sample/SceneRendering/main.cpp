@@ -1,14 +1,12 @@
 #include <iostream>
 #include <vector>
 #include <utility>
-
 #if defined(_WIN32) || defined(_WIN64)
 #define WINDOWS_LEAN_AND_MEAN
 #include <windows.h>
 #endif
-
 #include "Application.h"
-#include "../ShaderGLLib/Window.h"
+#include "Frame/Window.h"
 
 #if defined(_WIN32) || defined(_WIN64)
 int WINAPI WinMain(
@@ -22,13 +20,13 @@ int main(int ac, char** av)
 {
 	try
 	{
-		Application app(sgl::CreateSDLOpenGL({ 1280, 720 }));
+		Application app(frame::CreateSDLOpenGL({ 1280, 720 }));
 		app.Startup();
 		app.Run();
 	}
 	catch (std::exception ex)
 	{
-		if (!sgl::Error::GetInstance().AlreadyRaized())
+		if (!frame::Error::GetInstance().AlreadyRaized())
 		{
 #if defined(_WIN32) || defined(_WIN64)
 			MessageBox(nullptr, ex.what(), "Exception", MB_ICONEXCLAMATION);

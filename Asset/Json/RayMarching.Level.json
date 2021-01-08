@@ -1,0 +1,9 @@
+{
+  "level_name": "RayMarching",
+  "default_texture_name": "billboard",
+  "default_camera_name": "camera",
+  "default_scene_name": "scene",
+  "texture_file": "RayMarching.Texture.json",
+  "effect_file": "RayMarching.Effect.json",
+  "scene_file": "RayMarching.Scene.json"
+}

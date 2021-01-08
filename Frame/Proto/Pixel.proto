@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package frame.proto;
+
+// Next 2
+message PixelElementSize {
+	enum Enum {
+		INVALID				= 0;
+		BYTE				= 1;
+		SHORT				= 2;
+		HALF				= 3;
+		FLOAT				= 4;
+	}
+	Enum value = 1;
+}
+
+// Next 2
+message PixelStructure {
+	enum Enum {
+		INVALID				= 0;
+		GREY				= 1;
+		GREY_ALPHA			= 2;
+		RGB					= 3;
+		RGB_ALPHA			= 4;
+	}
+	Enum value = 1;
+}
+
+// Next 2
+message PixelDepthComponent {
+	enum Enum {
+		INVALID				= 0;
+		DEPTH_COMPONENT8	= 1;
+		DEPTH_COMPONENT16	= 2;
+		DEPTH_COMPONENT24	= 3;
+		DEPTH_COMPONENT32	= 4;
+	}
+	Enum value = 1;
+}
