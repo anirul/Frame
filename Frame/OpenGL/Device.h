@@ -40,8 +40,6 @@ namespace frame::opengl {
 		void Cleanup() override;
 		// Display the output texture to the display.
 		void Display(const double dt) override;
-		// Load scene from an OBJ file.
-		void LoadSceneFromObjFile(const std::string& obj_file);
 
 	public:
 		const glm::mat4 GetProjection() const final { return perspective_; }
@@ -98,7 +96,7 @@ namespace frame::opengl {
 		// Constants.
 		const std::pair<std::uint32_t, std::uint32_t> size_ = { 0, 0 };
 		const proto::PixelElementSize pixel_element_size_ = 
-			PixelElementSize_HALF();
+			proto::PixelElementSize_HALF();
 		// Cached quad and cube objects.
 		std::shared_ptr<StaticMeshInterface> quad_ = nullptr;
 		std::shared_ptr<StaticMeshInterface> cube_ = nullptr;

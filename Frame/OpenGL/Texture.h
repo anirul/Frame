@@ -15,6 +15,7 @@
 #include "Frame/OpenGL/FrameBuffer.h"
 #include "Frame/OpenGL/RenderBuffer.h"
 #include "Frame/OpenGL/ScopedBind.h"
+#include "Frame/Proto/ParsePixel.h"
 #include "Frame/Proto/Proto.h"
 #include "Frame/TextureInterface.h"
 
@@ -28,18 +29,18 @@ namespace frame::opengl {
 		// Create an empty texture of size size.
 		Texture(
 			const std::pair<std::uint32_t, std::uint32_t> size,
-			const frame::proto::PixelElementSize& pixel_element_size = 
-				PixelElementSize_BYTE(),
-			const frame::proto::PixelStructure& pixel_structure = 
-				PixelStructure_RGB());
+			const proto::PixelElementSize& pixel_element_size = 
+				proto::PixelElementSize_BYTE(),
+			const proto::PixelStructure& pixel_structure = 
+				proto::PixelStructure_RGB());
 		// Create from a raw pointer.
 		Texture(
 			const std::pair<std::uint32_t, std::uint32_t> size,
 			const void* data,
-			const frame::proto::PixelElementSize& pixel_element_size =
-				PixelElementSize_BYTE(),
-			const frame::proto::PixelStructure& pixel_structure = 
-				PixelStructure_RGB());
+			const proto::PixelElementSize& pixel_element_size =
+				proto::PixelElementSize_BYTE(),
+			const proto::PixelStructure& pixel_structure = 
+				proto::PixelStructure_RGB());
 		// Create from a proto.
 		virtual ~Texture();
 
@@ -84,10 +85,10 @@ namespace frame::opengl {
 	protected:
 		void CreateTexture();
 		Texture(
-			const frame::proto::PixelElementSize& pixel_element_size =
-				PixelElementSize_BYTE(),
-			const frame::proto::PixelStructure& pixel_structure = 
-				PixelStructure_RGB()) :
+			const proto::PixelElementSize& pixel_element_size =
+				proto::PixelElementSize_BYTE(),
+			const proto::PixelStructure& pixel_structure = 
+				proto::PixelStructure_RGB()) :
 			pixel_element_size_(pixel_element_size),
 			pixel_structure_(pixel_structure) {}
 		void LockedBind() const override { locked_bind_ = true; }
@@ -97,8 +98,8 @@ namespace frame::opengl {
 	protected:
 		unsigned int texture_id_ = 0;
 		std::pair<std::uint32_t, std::uint32_t> size_ = { 0, 0 };
-		const frame::proto::PixelElementSize pixel_element_size_;
-		const frame::proto::PixelStructure pixel_structure_;
+		const proto::PixelElementSize pixel_element_size_;
+		const proto::PixelStructure pixel_structure_;
 		const Error& error_ = Error::GetInstance();
 		mutable bool locked_bind_ = false;
 		std::shared_ptr<RenderBuffer> render_ = nullptr;
@@ -111,18 +112,18 @@ namespace frame::opengl {
 		// Create an empty cube map of the size size.
 		TextureCubeMap(
 			const std::pair<std::uint32_t, std::uint32_t> size,
-			const frame::proto::PixelElementSize& pixel_element_size =
-				PixelElementSize_BYTE(),
-			const frame::proto::PixelStructure& pixel_structure = 
-				PixelStructure_RGB());
+			const proto::PixelElementSize& pixel_element_size =
+				proto::PixelElementSize_BYTE(),
+			const proto::PixelStructure& pixel_structure = 
+				proto::PixelStructure_RGB());
 		// Create from a ray pointer.
 		TextureCubeMap(
 			const std::pair<std::uint32_t, std::uint32_t> size,
 			const void* data,
-			const frame::proto::PixelElementSize& pixel_element_size =
-				PixelElementSize_BYTE(),
-			const frame::proto::PixelStructure& pixel_structure = 
-				PixelStructure_RGB());
+			const proto::PixelElementSize& pixel_element_size =
+				proto::PixelElementSize_BYTE(),
+			const proto::PixelStructure& pixel_structure = 
+				proto::PixelStructure_RGB());
 		// Create from 6 pointer to be mapped to the cube map, Order is:
 		// right, left - (positive X, negative X)
 		// top, bottom - (positive Y, negative Y)
@@ -130,17 +131,17 @@ namespace frame::opengl {
 		// The size is equal to the size of an image (*6).
 		TextureCubeMap(
 			const std::array<void*, 6>& cube_data,
-			const frame::proto::PixelElementSize& pixel_element_size =
-				PixelElementSize_BYTE(),
-			const frame::proto::PixelStructure& pixel_structure = 
-				PixelStructure_RGB());
+			const proto::PixelElementSize& pixel_element_size =
+				proto::PixelElementSize_BYTE(),
+			const proto::PixelStructure& pixel_structure = 
+				proto::PixelStructure_RGB());
 
 	public:
 		// Inside constructors to be called from proto and normal constructor.
 		void InitCubeMap(
 			const std::pair<std::uint32_t, std::uint32_t> size,
-			const frame::proto::PixelElementSize& pixel_element_size,
-			const frame::proto::PixelStructure& pixel_structure);
+			const proto::PixelElementSize& pixel_element_size,
+			const proto::PixelStructure& pixel_structure);
 
 	public:
 		void Bind(const unsigned int slot = 0) const override;

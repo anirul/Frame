@@ -3,8 +3,11 @@
 #include <gtest/gtest.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include "../ShaderGLLib/Window.h"
-#include "../ShaderGLLib/Scene.h"
+#include "Frame/File/LoadStaticMesh.h"
+#include "Frame/Window.h"
+#include "Frame/SceneMatrix.h"
+#include "Frame/SceneTree.h"
+#include "Frame/SceneStaticMesh.h"
 
 namespace test {
 
@@ -14,7 +17,7 @@ namespace test {
 		// OpenGL is needed as this is used by mesh.
 		SceneTest()
 		{
-			window_ = sgl::CreateSDLOpenGL({ 320, 200 });
+			window_ = frame::CreateSDLOpenGL({ 320, 200 });
 		}
 		// Populate the tree with:
 		//	    Matrix (contain identity)
@@ -24,14 +27,14 @@ namespace test {
 		void PopulateTree()
 		{
 			glm::mat4 identity(1.0f);
-			auto matrix_scene = std::make_shared<sgl::SceneMatrix>(identity);
-			auto program = sgl::CreateProgram("SceneSimple");
+			auto matrix_scene = std::make_shared<frame::SceneMatrix>(identity);
+			auto program = frame::opengl::CreateProgram("SceneSimple");
 			matrix_scene->SetName("matrix_scene");
 			scene_tree_->AddNode(matrix_scene);
 			{
-				auto cube_mesh = sgl::CreateStaticMeshFromObjFile(
+				auto cube_mesh = frame::file::LoadStaticMeshFromFileOpenGL(
 					"../Asset/Model/Cube.obj");
-				auto cube = std::make_shared<sgl::SceneStaticMesh>(cube_mesh);
+				auto cube = std::make_shared<frame::SceneStaticMesh>(cube_mesh);
 				cube->SetName("cube");
 				cube->SetParentName("matrix_scene");
 				scene_tree_->AddNode(cube);
@@ -39,14 +42,14 @@ namespace test {
 			{
 				glm::mat4 disp_mat(1.0);
 				disp_mat = glm::translate(disp_mat, glm::vec3(10.0, 10.0, 10.));
-				auto disp =	std::make_shared<sgl::SceneMatrix>(disp_mat);
+				auto disp =	std::make_shared<frame::SceneMatrix>(disp_mat);
 				disp->SetName("disp");
 				disp->SetParentName("matrix_scene");
 				scene_tree_->AddNode(disp);
 				{
-					auto mesh = sgl::CreateStaticMeshFromObjFile(
+					auto mesh = frame::file::LoadStaticMeshFromFileOpenGL(
 						"../Asset/Model/Torus.obj");
-					auto torus = std::make_shared<sgl::SceneStaticMesh>(mesh);
+					auto torus = std::make_shared<frame::SceneStaticMesh>(mesh);
 					torus->SetName("torus");
 					torus->SetParentName("disp");
 					scene_tree_->AddNode(torus);
@@ -55,9 +58,9 @@ namespace test {
 		}
 
 	protected:
-		std::shared_ptr<sgl::WindowInterface> window_ = nullptr;
-		std::shared_ptr<sgl::SceneInterface> scene_ = nullptr;
-		std::shared_ptr<sgl::SceneTree> scene_tree_ = nullptr;
+		std::shared_ptr<frame::WindowInterface> window_ = nullptr;
+		std::shared_ptr<frame::SceneNodeInterface> scene_ = nullptr;
+		std::shared_ptr<frame::SceneTree> scene_tree_ = nullptr;
 	};
 
 } // End namespace test.

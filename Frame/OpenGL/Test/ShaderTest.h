@@ -1,8 +1,8 @@
 #pragma once
 
 #include <gtest/gtest.h>
-#include "../ShaderGLLib/Window.h"
-#include "../ShaderGLLib/Shader.h"
+#include "Frame/Window.h"
+#include "Frame/OpenGL/Shader.h"
 
 namespace test {
 
@@ -11,12 +11,12 @@ namespace test {
 	public:
 		ShaderTest()
 		{
-			window_ = sgl::CreateSDLOpenGL({ 320, 200 });
+			window_ = frame::CreateSDLOpenGL({ 320, 200 });
 		}
 
 	protected:
-		std::shared_ptr<sgl::WindowInterface> window_ = nullptr;
-		std::shared_ptr<sgl::Shader> shader_ = nullptr;
+		std::shared_ptr<frame::WindowInterface> window_ = nullptr;
+		std::shared_ptr<frame::opengl::Shader> shader_ = nullptr;
 	};
 
 } // End namespace test.

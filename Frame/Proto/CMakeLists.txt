@@ -4,6 +4,8 @@ add_library(FrameProto
   STATIC
     ParseMaterial.cpp
     ParseMaterial.h
+    ParsePixel.cpp
+    ParsePixel.h
     ParseProgram.cpp
     ParseProgram.h
     ParseSceneTree.cpp
@@ -39,6 +41,7 @@ protobuf_generate(APPEND_PATH TARGET FrameProto)
 
 target_link_libraries(FrameProto 
   PUBLIC
+    Frame
     protobuf::libprotoc
     protobuf::libprotobuf
 )

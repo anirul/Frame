@@ -18,6 +18,6 @@ target_include_directories(SampleCommon
 target_link_libraries(SampleCommon
   PUBLIC
 	Frame
-	SDL2::SDL2
-	spdlog::spdlog
+	FrameProto
+	FrameOpenGL
 )

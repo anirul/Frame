@@ -47,6 +47,7 @@ target_include_directories(FrameOpenGLTest
 
 target_link_libraries(FrameOpenGLTest
   PUBLIC
+    Frame
     FrameOpenGL
     FrameProto
     GTest::gmock

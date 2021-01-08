@@ -51,8 +51,10 @@ target_link_libraries(Frame
     FrameProto
     SDL2::SDL2
     spdlog::spdlog
+    glm
 )
 
+add_subdirectory(File)
 add_subdirectory(OpenGL)
 add_subdirectory(Proto)
 add_subdirectory(Test)

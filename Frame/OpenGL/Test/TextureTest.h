@@ -1,9 +1,9 @@
 #pragma once
 
 #include <gtest/gtest.h>
-#include "../ShaderGLLib/Window.h"
-#include "../ShaderGLLib/Texture.h"
-#include "../ShaderGLLib/Error.h"
+#include "Frame/Error.h"
+#include "Frame/TextureInterface.h"
+#include "Frame/Window.h"
 
 namespace test {
 
@@ -12,14 +12,14 @@ namespace test {
 	public:
 		TextureTest()
 		{
-			window_ = sgl::CreateSDLOpenGL({ 320, 200 });
+			window_ = frame::CreateSDLOpenGL({ 320, 200 });
 			error_.SetWindowPtr(nullptr);
 		}
 
 	protected:
-		std::shared_ptr<sgl::WindowInterface> window_ = nullptr;
-		sgl::Error& error_ = sgl::Error::GetInstance();
-		std::shared_ptr<sgl::Texture> texture_ = nullptr;
+		std::shared_ptr<frame::WindowInterface> window_ = nullptr;
+		frame::Error& error_ = frame::Error::GetInstance();
+		std::shared_ptr<frame::TextureInterface> texture_ = nullptr;
 	};
 
 } // End namespace test.

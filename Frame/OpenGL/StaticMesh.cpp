@@ -63,4 +63,16 @@ namespace frame::opengl {
 		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
+	std::shared_ptr<frame::StaticMeshInterface> CreateQuadStaticMesh(
+		std::shared_ptr<LevelInterface> level)
+	{
+		throw std::runtime_error("Not implemented!");
+	}
+
+	std::shared_ptr<frame::StaticMeshInterface> CreateCubeStaticMesh(
+		std::shared_ptr<LevelInterface> level)
+	{
+		throw std::runtime_error("Not implemented!");
+	}
+
 } // End namespace frame::opengl.

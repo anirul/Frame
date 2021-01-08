@@ -1,3 +1,4 @@
+# Frame OpenGL.
 
 add_library(FrameOpenGL
   STATIC
@@ -42,7 +43,6 @@ target_link_libraries(FrameOpenGL
     Frame
     FrameProto
     GLEW::GLEW
-    glm
 )
 
 add_subdirectory(Test)

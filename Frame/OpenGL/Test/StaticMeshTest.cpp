@@ -7,7 +7,7 @@ namespace test {
 		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(static_mesh_);
 		EXPECT_TRUE(window_);
-		auto program = sgl::CreateProgram("SceneSimple");
+		auto program = frame::opengl::CreateProgram("SceneSimple");
 		static_mesh_ = sgl::CreateStaticMeshFromObjFile(
 			"../Asset/Model/Cube.obj");
 		EXPECT_NE(0, static_mesh_->PointBuffer().GetId());
