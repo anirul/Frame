@@ -1,7 +1,7 @@
-# ShaderGL
+# Frame
 
-Simple shader GL example. It take models in obj forms and images that can be
-read by stb (jpg, png, hdr,...).
+3D engine example it use OpenGL and soon it will be using Vulkan. It take 
+models in obj forms and images that can be read by stb (jpg, png, hdr,...).
 
 ## Install
 
