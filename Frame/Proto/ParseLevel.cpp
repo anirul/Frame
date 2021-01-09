@@ -42,7 +42,7 @@ namespace frame::proto {
 				if (proto.name() == default_scene_name_)
 					proto_scene_tree = proto;
 			}
-			scene_tree_ = ParseSceneTreeOpenGL(proto_scene_tree);
+			AddSceneTree(ParseSceneTreeOpenGL(proto_scene_tree));
 			scene_tree_->SetDefaultCamera(default_camera_name_);
 
 			// Load textures from proto.
@@ -54,11 +54,7 @@ namespace frame::proto {
 					texture = proto::ParseCubeMapTexture(proto_texture, size);
 				else
 					texture = proto::ParseTexture(proto_texture, size);
-				std::uint64_t id = GetTextureNewId();
-				id_texture_map_.insert({ id, texture });
-				name_id_map_.insert({ proto_texture.name(), id });
-				id_name_map_.insert({ id, proto_texture.name() });
-				name_id_textures.insert({ proto_texture.name(), id });
+				AddTexture(proto_texture.name(), texture);
 			}
 
 			// Check the default texture is in.
@@ -73,10 +69,7 @@ namespace frame::proto {
 			{
 				std::shared_ptr<ProgramInterface> program =
 					proto::ParseProgramOpenGL(proto_program, name_id_textures);
-				std::uint64_t id = GetProgramNewId();
-				id_program_map_.insert({ id, program });
-				name_id_map_.insert({ proto_program.name(), id });
-				id_name_map_.insert({ id, proto_program.name() });
+				AddProgram(proto_program.name(), program);
 			}
 
 			// Load material from proto.
@@ -86,10 +79,7 @@ namespace frame::proto {
 					proto::ParseMaterialOpenGL(
 						proto_material,
 						shared_from_this());
-				std::uint64_t id = GetMaterialNewId();
-				id_material_map_.insert({ id, material });
-				name_id_map_.insert({ proto_material.name(), id });
-				id_name_map_.insert({ id, proto_material.name() });
+				AddMaterial(proto_material.name(), material);
 			}
 		}
 	};

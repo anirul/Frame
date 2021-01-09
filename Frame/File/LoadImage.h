@@ -21,7 +21,10 @@ namespace frame::file {
 		virtual ~Image();
 
 	public:
-		const std::pair<int, int> GetSize() const { return size_; }
+		const std::pair<std::uint32_t, std::uint32_t> GetSize() const 
+		{ 
+			return size_; 
+		}
 		const int GetLength() const { return size_.first * size_.second; }
 		const void* Data() const {	return image_; }
 		const proto::PixelElementSize GetPixelElementSize() const
@@ -34,7 +37,7 @@ namespace frame::file {
 		}
 
 	private:
-		std::pair<int, int> size_ = { 0, 0 };
+		std::pair<std::uint32_t, std::uint32_t> size_ = { 0, 0 };
 		void* image_ = nullptr;
 		const proto::PixelElementSize pixel_element_size_;
 		const proto::PixelStructure pixel_structure_;

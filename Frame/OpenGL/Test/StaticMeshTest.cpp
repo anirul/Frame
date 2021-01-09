@@ -1,4 +1,6 @@
 #include "StaticMeshTest.h"
+#include "Frame/File/LoadStaticMesh.h"
+#include "Frame/LevelBase.h"
 
 namespace test {
 
@@ -7,15 +9,19 @@ namespace test {
 		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(static_mesh_);
 		EXPECT_TRUE(window_);
-		auto program = frame::opengl::CreateProgram("SceneSimple");
-		static_mesh_ = sgl::CreateStaticMeshFromObjFile(
+		auto level = std::make_shared<frame::LevelBase>();
+		static_mesh_ = frame::file::LoadStaticMeshFromFileOpenGL(
+			level,
 			"../Asset/Model/Cube.obj");
-		EXPECT_NE(0, static_mesh_->PointBuffer().GetId());
-		EXPECT_NE(0, static_mesh_->NormalBuffer().GetId());
-		EXPECT_NE(0, static_mesh_->TextureBuffer().GetId());
-		EXPECT_NE(0, static_mesh_->IndexBuffer().GetId());
-		EXPECT_LE(18, static_mesh_->IndexSize());
-		EXPECT_GE(36, static_mesh_->IndexSize());
+		EXPECT_NE(0, static_mesh_->GetMaterialId());
+		EXPECT_NE(0, static_mesh_->GetPointBufferId());
+		EXPECT_NE(0, static_mesh_->GetNormalBufferId());
+		EXPECT_NE(0, static_mesh_->GetTextureBufferId());
+		EXPECT_NE(0, static_mesh_->GetIndexBufferId());
+		auto id = static_mesh_->GetIndexBufferId();
+		auto index_buffer = level->GetBufferMap().at(id);
+		EXPECT_LE(18, index_buffer->GetSize());
+		EXPECT_GE(36, index_buffer->GetSize());
 		EXPECT_TRUE(static_mesh_);
 	}
 
@@ -24,15 +30,19 @@ namespace test {
 		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(static_mesh_);
 		EXPECT_TRUE(window_);
-		auto program = sgl::CreateProgram("SceneSimple");
-		static_mesh_ = sgl::CreateStaticMeshFromObjFile(
+		auto level = std::make_shared<frame::LevelBase>();
+		static_mesh_ = frame::file::LoadStaticMeshFromFileOpenGL(
+			level,
 			"../Asset/Model/Torus.obj");
-		EXPECT_NE(0, static_mesh_->PointBuffer().GetId());
-		EXPECT_NE(0, static_mesh_->NormalBuffer().GetId());
-		EXPECT_NE(0, static_mesh_->TextureBuffer().GetId());
-		EXPECT_NE(0, static_mesh_->IndexBuffer().GetId());
-		EXPECT_LE(3456, static_mesh_->IndexSize());
-		EXPECT_GE(6912, static_mesh_->IndexSize());
+		EXPECT_NE(0, static_mesh_->GetMaterialId());
+		EXPECT_NE(0, static_mesh_->GetPointBufferId());
+		EXPECT_NE(0, static_mesh_->GetNormalBufferId());
+		EXPECT_NE(0, static_mesh_->GetTextureBufferId());
+		EXPECT_NE(0, static_mesh_->GetIndexBufferId());
+		auto id = static_mesh_->GetIndexBufferId();
+		auto index_buffer = level->GetBufferMap().at(id);
+		EXPECT_LE(3456, index_buffer->GetSize());
+		EXPECT_GE(6912, index_buffer->GetSize());
 		EXPECT_TRUE(static_mesh_);
 	}
 

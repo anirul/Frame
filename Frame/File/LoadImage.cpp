@@ -2,8 +2,10 @@
 #include <algorithm>
 #include <fstream>
 #include <vector>
+#include <set>
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
+#include "Frame/OpenGL/Texture.h"
 
 namespace frame::file {
 
@@ -19,6 +21,7 @@ namespace frame::file {
 		int desired_channels = { static_cast<int>(pixel_structure.value()) };
 		// This is in the case of OpenGL (for now the only case).
 		stbi_set_flip_vertically_on_load(true);
+		std::pair<int, int> size = { 0, 0 };
 		switch (pixel_element_size.value())
 		{
 		case proto::PixelElementSize::BYTE :
@@ -26,8 +29,8 @@ namespace frame::file {
 			image_ =
 				stbi_load(
 					file.c_str(),
-					&size_.first,
-					&size_.second,
+					&size.first,
+					&size.second,
 					&channels,
 					desired_channels);
 			break;
@@ -37,8 +40,8 @@ namespace frame::file {
 			image_ =
 				stbi_load_16(
 					file.c_str(),
-					&size_.first,
-					&size_.second,
+					&size.first,
+					&size.second,
 					&channels,
 					desired_channels);
 			break;
@@ -50,8 +53,8 @@ namespace frame::file {
 			image_ =
 				stbi_loadf(
 					file.c_str(),
-					&size_.first,
-					&size_.second,
+					&size.first,
+					&size.second,
 					&channels,
 					desired_channels);
 			break;
@@ -67,11 +70,20 @@ namespace frame::file {
 		{
 			throw std::runtime_error("unsupported file: " + file);
 		}
+		size_ = size;
 	}
 
 	Image::~Image()
 	{
 		stbi_image_free(image_);
+	}
+
+	namespace {
+
+		std::set<std::string> basic_byte_extention = { "jpeg", "jpg" };
+		std::set<std::string> basic_rgba_extention = { "png" };
+		std::set<std::string> cube_map_half_extention = { "hdr", "dds" };
+
 	}
 
 	std::shared_ptr<frame::TextureInterface> LoadTextureFromFileOpenGL(
@@ -81,7 +93,26 @@ namespace frame::file {
 		const proto::PixelStructure pixel_structure 
 			/*= proto::PixelStructure_RGB()*/)
 	{
-		throw std::runtime_error("Not implemented!");
+		std::shared_ptr<TextureInterface> texture = nullptr;
+		Image image(file, pixel_element_size, pixel_structure);
+		std::string extention = file.substr(file.find_last_of(".") + 1);
+		if (cube_map_half_extention.count(extention))
+		{
+			texture = std::make_shared<frame::opengl::TextureCubeMap>(
+				image.GetSize(),
+				image.Data(),
+				pixel_element_size,
+				pixel_structure);
+		}
+		else
+		{
+			texture = std::make_shared<frame::opengl::Texture>(
+				image.GetSize(),
+				image.Data(),
+				pixel_element_size,
+				pixel_structure);
+		}
+		return texture;
 	}
 
 } // End namespace frame::file.

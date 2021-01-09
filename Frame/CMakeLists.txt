@@ -13,6 +13,7 @@ add_library(Frame
     Error.h
     Frame.h
     InputInterface.h
+    LevelBase.cpp
     LevelBase.h
     LevelInterface.h
     LightInterface.h

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <gtest/gtest.h>
-#include "../ShaderGLLib/Window.h"
+#include "Frame/WindowInterface.h"
 
 namespace test {
 
@@ -11,7 +11,7 @@ namespace test {
 		WindowTest() = default;
 
 	protected:
-		std::shared_ptr<sgl::WindowInterface> window_ = nullptr;
+		std::shared_ptr<frame::WindowInterface> window_ = nullptr;
 	};
 
 } // End namespace test.

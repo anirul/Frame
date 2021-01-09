@@ -10,7 +10,7 @@ namespace frame {
 
 	class LevelBase : public LevelInterface
 	{
-	protected:
+	public:
 		LevelBase() = default;
 
 	public:
@@ -69,6 +69,25 @@ namespace frame {
 		{
 			return GetIdFromName(default_scene_name_);
 		}
+
+	public:
+		void AddSceneTree(
+			std::shared_ptr<SceneTreeInterface> scene_tree) override;
+		std::uint64_t AddTexture(
+			const std::string& name,
+			std::shared_ptr<TextureInterface> texture) override;
+		std::uint64_t AddProgram(
+			const std::string& name,
+			std::shared_ptr<ProgramInterface> program) override;
+		std::uint64_t AddMaterial(
+			const std::string& name,
+			std::shared_ptr<MaterialInterface> material) override;
+		std::uint64_t AddBuffer(
+			const std::string& name,
+			std::shared_ptr<BufferInterface> buffer) override;
+		std::uint64_t AddStaticMesh(
+			const std::string& name,
+			std::shared_ptr<StaticMeshInterface> static_mesh) override;
 
 	protected:
 		std::uint64_t GetTextureNewId() const

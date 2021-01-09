@@ -17,8 +17,8 @@ namespace test {
 		}
 
 	protected:
-		std::shared_ptr<frame::WindowInterface> window_ = nullptr;
 		frame::Error& error_ = frame::Error::GetInstance();
+		std::shared_ptr<frame::WindowInterface> window_ = nullptr;
 		std::shared_ptr<frame::TextureInterface> texture_ = nullptr;
 	};
 
