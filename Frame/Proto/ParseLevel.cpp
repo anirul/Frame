@@ -43,7 +43,6 @@ namespace frame::proto {
 					proto_scene_tree = proto;
 			}
 			AddSceneTree(ParseSceneTreeOpenGL(proto_scene_tree));
-			scene_tree_->SetDefaultCamera(default_camera_name_);
 
 			// Load textures from proto.
 			std::map<std::string, std::uint64_t> name_id_textures;

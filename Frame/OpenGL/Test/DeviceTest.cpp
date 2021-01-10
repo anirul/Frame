@@ -66,7 +66,7 @@ namespace test {
 				scene_camera.set_parent("root");
 			}
 			*scene_tree.add_scene_cameras() = scene_camera;
-			scene_tree.set_root_node("root");
+			scene_tree.set_default_root_name("root");
 		}
 		*scene_tree_file.add_scene_trees() = scene_tree;
 		return scene_tree_file;

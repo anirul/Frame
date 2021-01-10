@@ -8,7 +8,7 @@ namespace frame {
 	{
 	public:
 		// Create a default empty scene tree. 
-		SceneTree() = default;
+		SceneTree(const std::string name) :	name_(name) {}
 
 	public:
 		// Return a map of scene names and scene components.
@@ -23,7 +23,9 @@ namespace frame {
 		// Get the root of the scene tree.
 		const SceneNodeInterface::Ptr GetRoot() const override;
 		// Set the default camera node.
-		void SetDefaultCamera(const std::string& camera_name) override;
+		void SetDefaultCameraName(const std::string& camera_name) override;
+		// Set the default root node.
+		void SetDefaultRootName(const std::string& root_name) override;
 		// Get a pointer to the default camera.
 		std::shared_ptr<CameraInterface> GetDefaultCamera() override;
 		// Same but const version.

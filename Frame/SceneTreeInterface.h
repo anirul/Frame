@@ -21,8 +21,10 @@ namespace frame {
 		virtual void AddNode(const SceneNodeInterface::Ptr node) = 0;
 		// Get the root of the scene tree.
 		virtual const SceneNodeInterface::Ptr GetRoot() const = 0;
-		// Set the default camera node.
-		virtual void SetDefaultCamera(const std::string& camera_name) = 0;
+		// Set default camera node name.
+		virtual void SetDefaultCameraName(const std::string& camera_name) = 0;
+		// Set default root node name.
+		virtual void SetDefaultRootName(const std::string& root_name) = 0;
 		// Get a pointer to the default camera.
 		virtual std::shared_ptr<CameraInterface> GetDefaultCamera() = 0;
 		// Same but const.

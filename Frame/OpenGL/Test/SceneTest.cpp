@@ -30,7 +30,7 @@ namespace test {
 		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(scene_tree_);
 		auto level = std::make_shared<frame::LevelBase>();
-		scene_tree_ = std::make_shared<frame::SceneTree>();
+		scene_tree_ = std::make_shared<frame::SceneTree>("test");
 		EXPECT_TRUE(scene_tree_);
 		PopulateTree(level);
 		unsigned int count_mesh = 0;

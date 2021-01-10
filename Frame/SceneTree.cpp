@@ -40,14 +40,28 @@ namespace frame {
 			{
 				if (ret) throw std::runtime_error("More than one root?");
 				ret = scene;
+				if (root_node_name_ != pair.first)
+				{
+					throw std::runtime_error(
+						"Incorrect root node (" + 
+						root_node_name_ + 
+						" != " + 
+						pair.first +
+						").");
+				}
 			}
 		}
 		return ret;
 	}
 
-	void SceneTree::SetDefaultCamera(const std::string& camera_name)
+	void SceneTree::SetDefaultCameraName(const std::string& camera_name)
 	{
 		camera_name_ = camera_name;
+	}
+
+	void SceneTree::SetDefaultRootName(const std::string& root_name)
+	{
+		root_node_name_ = root_name;
 	}
 
 	std::shared_ptr<CameraInterface> SceneTree::GetDefaultCamera()
@@ -64,7 +78,8 @@ namespace frame {
 
 	const std::shared_ptr<CameraInterface> SceneTree::GetDefaultCamera() const
 	{
-		const std::shared_ptr<SceneNodeInterface> ptr = GetSceneByName(camera_name_);
+		const std::shared_ptr<SceneNodeInterface> ptr = 
+			GetSceneByName(camera_name_);
 		const std::shared_ptr<SceneCamera> scene_camera =
 			std::dynamic_pointer_cast<SceneCamera>(ptr);
 		if (scene_camera)

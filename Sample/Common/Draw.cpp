@@ -17,9 +17,12 @@ void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 	auto proto_scene_tree_file =
 		frame::proto::LoadProtoFromJsonFile<frame::proto::SceneTreeFile>(
 			name_->GetGlobalPath() + proto_level.scene_tree_file());
-	auto proto_material_file =
+	frame::proto::MaterialFile proto_material_file = {};
+	if (!proto_level.material_file().empty())
+	{
 		frame::proto::LoadProtoFromJsonFile<frame::proto::MaterialFile>(
 			name_->GetGlobalPath() + proto_level.material_file());
+	}
 
 	// Load level from proto files.
 	auto level = frame::proto::LoadLevelFromProto(
