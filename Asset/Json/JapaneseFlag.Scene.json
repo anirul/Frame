@@ -2,7 +2,7 @@
   "scene_trees": [
     {
       "name": "scene",
-      "root_node": "root",
+      "default_root_name": "root",
       "scene_matrices": [
         {
           "name": "root",
