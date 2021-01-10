@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 #include "Frame/Window.h"
-#include "Frame/OpenGL/StaticMesh.h"
+#include "Frame/StaticMeshInterface.h"
 
 namespace test {
 
@@ -13,7 +13,7 @@ namespace test {
 
 	protected:
 		std::shared_ptr<frame::WindowInterface> window_ = nullptr;
-		std::shared_ptr<frame::opengl::StaticMesh> static_mesh_ = nullptr;
+		std::shared_ptr<frame::StaticMeshInterface> static_mesh_ = nullptr;
 	};
 
 } // End namespace test.

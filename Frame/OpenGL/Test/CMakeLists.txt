@@ -5,8 +5,6 @@ add_executable(FrameOpenGLTest
     BufferTest.h
     CameraTest.cpp
     CameraTest.h
-    ConvertTest.cpp
-    ConvertTest.h
     DeviceTest.cpp
     DeviceTest.h
     ErrorTest.cpp
@@ -48,6 +46,7 @@ target_include_directories(FrameOpenGLTest
 target_link_libraries(FrameOpenGLTest
   PUBLIC
     Frame
+    FrameFile
     FrameOpenGL
     FrameProto
     GTest::gmock

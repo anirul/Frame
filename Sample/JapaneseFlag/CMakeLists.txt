@@ -6,8 +6,8 @@ add_executable(JapaneseFlag
     ../../Asset/Json/JapaneseFlag.Level.json
     ../../Asset/Json/JapaneseFlag.Scene.json
     ../../Asset/Json/JapaneseFLag.Texture.json
-    Name.cpp
     Name.h
+    main.cpp
 )
 
 target_include_directories(JapaneseFlag

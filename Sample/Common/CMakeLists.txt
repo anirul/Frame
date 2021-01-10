@@ -6,7 +6,7 @@ add_library(SampleCommon
 	Application.h
 	Draw.cpp
 	Draw.h
-	main.cpp
+	NameInterface.h
 )
 
 target_include_directories(SampleCommon

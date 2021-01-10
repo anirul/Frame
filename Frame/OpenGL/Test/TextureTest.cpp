@@ -1,4 +1,7 @@
 #include "TextureTest.h"
+#include <GL/glew.h>
+#include "Frame/File/LoadImage.h"
+#include "Frame/Proto/ParseTexture.h"
 
 namespace test {
 
@@ -7,7 +10,7 @@ namespace test {
 		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(texture_);
 		EXPECT_NO_THROW(
-			texture_ = std::make_shared<sgl::Texture>(
+			texture_ = frame::file::LoadTextureFromFileOpenGL(
 				"../Asset/CubeMap/PositiveX.png"));
 		EXPECT_TRUE(texture_);
 		EXPECT_NO_THROW(error_.Display());
@@ -18,7 +21,7 @@ namespace test {
 		EXPECT_EQ(GLEW_OK, glewInit());
 		ASSERT_FALSE(texture_);
 		EXPECT_NO_THROW(
-			texture_ = std::make_shared<sgl::Texture>(
+			texture_ = frame::file::LoadTextureFromFileOpenGL(
 				"../Asset/CubeMap/PositiveX.png"));
 		ASSERT_TRUE(texture_);
 		EXPECT_NE(0, texture_->GetId());
@@ -32,9 +35,9 @@ namespace test {
 		EXPECT_EQ(GLEW_OK, glewInit());
 		ASSERT_FALSE(texture_);
 		EXPECT_NO_THROW(
-			texture_ = std::make_shared<sgl::Texture>(
+			texture_ = frame::file::LoadTextureFromFileOpenGL(
 					"../Asset/CubeMap/Hamarikyu.hdr",
-					sgl::PixelElementSize_HALF()));
+					frame::proto::PixelElementSize_HALF()));
 		ASSERT_TRUE(texture_);
 		EXPECT_NE(0, texture_->GetId());
 		auto pair = std::make_pair<std::uint32_t, std::uint32_t>(3200, 1600);
@@ -47,7 +50,7 @@ namespace test {
 		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(texture_);
 		EXPECT_NO_THROW(
-			texture_ = std::make_shared<sgl::TextureCubeMap>(
+			texture_ = frame::file::LoadCubeMapTextureFromFilesOpenGL(
 				std::array<std::string, 6>{
 					"../Asset/CubeMap/PositiveX.png",
 					"../Asset/CubeMap/NegativeX.png",
@@ -65,8 +68,9 @@ namespace test {
 		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(texture_);
 		EXPECT_NO_THROW(
-			texture_ = std::make_shared<sgl::TextureCubeMap>(
-				"../Asset/CubeMap/Hamarikyu.hdr"));
+			texture_ = frame::file::LoadCubeMapTextureFromFileOpenGL(
+				"../Asset/CubeMap/Hamarikyu.hdr",
+				frame::proto::PixelElementSize_HALF()));
 		EXPECT_TRUE(texture_);
 		EXPECT_NE(0, texture_->GetId());
 		EXPECT_NO_THROW(error_.Display());
@@ -78,7 +82,7 @@ namespace test {
 		std::pair<std::uint32_t, std::uint32_t> size = { 512, 512 };
 		EXPECT_FALSE(texture_);
 		EXPECT_THROW(
-			texture_ = std::make_shared<sgl::Texture>(texture_proto, size), 
+			texture_ = frame::proto::ParseTexture(texture_proto, size),
 			std::exception);
 	}
 
@@ -88,15 +92,16 @@ namespace test {
 		frame::proto::Texture texture_proto;
 		std::pair<std::uint32_t, std::uint32_t> size = { 512, 512 };
 		*texture_proto.mutable_pixel_element_size() = 
-			sgl::PixelElementSize_HALF();
-		*texture_proto.mutable_pixel_structure() = sgl::PixelStructure_RGB();
+			frame::proto::PixelElementSize_HALF();
+		*texture_proto.mutable_pixel_structure() = 
+			frame::proto::PixelStructure_RGB();
 		frame::proto::Size size_proto{};
 		size_proto.set_x(-2);
 		size_proto.set_y(-2);
 		*texture_proto.mutable_size() = size_proto;
 		EXPECT_FALSE(texture_);
 		EXPECT_NO_THROW(texture_ = 
-			std::make_shared<sgl::Texture>(texture_proto, size));
+			frame::proto::ParseTexture(texture_proto, size));
 		EXPECT_TRUE(texture_);
 		std::pair<std::uint32_t, std::uint32_t> test_size = { 256, 256 };
 		EXPECT_EQ(test_size, texture_->GetSize());
@@ -107,15 +112,16 @@ namespace test {
 		frame::proto::Texture texture_proto;
 		std::pair<std::uint32_t, std::uint32_t> size = { 512, 512 };
 		*texture_proto.mutable_pixel_element_size() =
-			sgl::PixelElementSize_HALF();
-		*texture_proto.mutable_pixel_structure() = sgl::PixelStructure_RGB();
+			frame::proto::PixelElementSize_HALF();
+		*texture_proto.mutable_pixel_structure() = 
+			frame::proto::PixelStructure_RGB();
 		frame::proto::Size size_proto{};
 		size_proto.set_x(16);
 		size_proto.set_y(16);
 		*texture_proto.mutable_size() = size_proto;
 		EXPECT_FALSE(texture_);
 		EXPECT_NO_THROW(texture_ =
-			std::make_shared<sgl::Texture>(texture_proto, size));
+			frame::proto::ParseTexture(texture_proto, size));
 		EXPECT_TRUE(texture_);
 		EXPECT_NE(size, texture_->GetSize());
 		std::pair<std::uint32_t, std::uint32_t> test_size = { 16, 16 };

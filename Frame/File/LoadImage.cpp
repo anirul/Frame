@@ -115,4 +115,24 @@ namespace frame::file {
 		return texture;
 	}
 
+	std::shared_ptr<frame::TextureInterface> LoadCubeMapTextureFromFileOpenGL(
+		const std::string& file, 
+		const proto::PixelElementSize pixel_element_size 
+			/*= proto::PixelElementSize_BYTE()*/, 
+		const proto::PixelStructure pixel_structure 
+			/*= proto::PixelStructure_RGB()*/)
+	{
+		throw std::runtime_error("Not implemented!");
+	}
+
+	std::shared_ptr<frame::TextureInterface> LoadCubeMapTextureFromFilesOpenGL(
+		const std::array<std::string, 6> files, 
+		const proto::PixelElementSize pixel_element_size 
+			/*= proto::PixelElementSize_BYTE()*/, 
+		const proto::PixelStructure pixel_structure 
+			/*= proto::PixelStructure_RGB()*/)
+	{
+		throw std::runtime_error("Not implemented!");
+	}
+
 } // End namespace frame::file.

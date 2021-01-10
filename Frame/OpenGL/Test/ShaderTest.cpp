@@ -6,7 +6,8 @@ namespace test {
 	{
 		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(shader_);
-		shader_ = std::make_shared<sgl::Shader>(sgl::ShaderType::VERTEX_SHADER);
+		shader_ = std::make_shared<frame::opengl::Shader>(
+			frame::opengl::ShaderEnum::VERTEX_SHADER);
 		EXPECT_TRUE(shader_);
 	}
 
@@ -14,8 +15,8 @@ namespace test {
 	{
 		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(shader_);
-		shader_ = 
-			std::make_shared<sgl::Shader>(sgl::ShaderType::FRAGMENT_SHADER);
+		shader_ = std::make_shared<frame::opengl::Shader>(
+			frame::opengl::ShaderEnum::FRAGMENT_SHADER);
 		EXPECT_TRUE(shader_);
 	}
 
@@ -23,8 +24,8 @@ namespace test {
 	{
 		ASSERT_EQ(GLEW_OK, glewInit());
 		ASSERT_FALSE(shader_);
-		shader_ = 
-			std::make_shared<sgl::Shader>(sgl::ShaderType::FRAGMENT_SHADER);
+		shader_ = std::make_shared<frame::opengl::Shader>(
+			frame::opengl::ShaderEnum::FRAGMENT_SHADER);
 		ASSERT_TRUE(shader_);
 		EXPECT_FALSE(shader_->LoadFromSource("false"));
 	}
@@ -33,7 +34,8 @@ namespace test {
 	{
 		ASSERT_EQ(GLEW_OK, glewInit());
 		ASSERT_FALSE(shader_);
-		shader_ = std::make_shared<sgl::Shader>(sgl::ShaderType::VERTEX_SHADER);
+		shader_ = std::make_shared<frame::opengl::Shader>(
+			frame::opengl::ShaderEnum::VERTEX_SHADER);
 		ASSERT_TRUE(shader_);
 		EXPECT_TRUE(shader_->LoadFromFile("../Asset/Shader/SceneSimple.vert"));
 		EXPECT_NE(0, shader_->GetId());
@@ -43,8 +45,8 @@ namespace test {
 	{
 		ASSERT_EQ(GLEW_OK, glewInit());
 		ASSERT_FALSE(shader_);
-		shader_ = 
-			std::make_shared<sgl::Shader>(sgl::ShaderType::FRAGMENT_SHADER);
+		shader_ = std::make_shared<frame::opengl::Shader>(
+			frame::opengl::ShaderEnum::FRAGMENT_SHADER);
 		ASSERT_TRUE(shader_);
 		EXPECT_TRUE(shader_->LoadFromFile("../Asset/Shader/SceneSimple.frag"));
 		EXPECT_NE(0, shader_->GetId());

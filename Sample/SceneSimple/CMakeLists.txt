@@ -6,8 +6,8 @@ add_executable(SceneSimple
     ../../Asset/Json/SceneSimple.Level.json
     ../../Asset/Json/SceneSimple.Scene.json
     ../../Asset/Json/SceneSimple.Texture.json
-    Name.cpp
     Name.h
+    main.cpp
 )
 
 target_include_directories(SceneSimple

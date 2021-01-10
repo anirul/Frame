@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 #include "BufferTest.h"
 #include "CameraTest.h"
-#include "ConvertTest.h"
 #include "DeviceTest.h"
 #include "ErrorTest.h"
 #include "FrameBufferTest.h"

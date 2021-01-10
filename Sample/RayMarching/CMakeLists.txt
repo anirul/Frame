@@ -6,8 +6,8 @@ add_executable(RayMarching
     ../../Asset/Json/RayMarching.Level.json
     ../../Asset/Json/RayMarching.Scene.json
     ../../Asset/Json/RayMarching.Texture.json
-    Name.cpp
     Name.h
+    main.cpp
 )
 
 target_include_directories(RayMarching

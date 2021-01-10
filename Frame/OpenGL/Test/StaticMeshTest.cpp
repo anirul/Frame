@@ -1,4 +1,6 @@
 #include "StaticMeshTest.h"
+#include <GL/glew.h>
+#include "Frame/BufferInterface.h"
 #include "Frame/File/LoadStaticMesh.h"
 #include "Frame/LevelBase.h"
 

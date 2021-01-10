@@ -1,9 +1,9 @@
 #pragma once
 
 #include <gtest/gtest.h>
-#include "../ShaderGLLib/Window.h"
-#include "../ShaderGLLib/RenderBuffer.h"
-#include "../ShaderGLLib/Error.h"
+#include "Frame/Error.h"
+#include "Frame/OpenGL/RenderBuffer.h"
+#include "Frame/Window.h"
 
 namespace test {
 
@@ -12,14 +12,14 @@ namespace test {
 	public:
 		RenderBufferTest()
 		{
-			window_ = sgl::CreateSDLOpenGL({ 320, 200 });
+			window_ = frame::CreateSDLOpenGL({ 320, 200 });
 			error_.SetWindowPtr(nullptr);
 		}
 
 	protected:
-		std::shared_ptr<sgl::RenderBuffer> render_ = nullptr;
-		std::shared_ptr<sgl::WindowInterface> window_ = nullptr;
-		sgl::Error& error_ = sgl::Error::GetInstance();
+		std::shared_ptr<frame::opengl::RenderBuffer> render_ = nullptr;
+		std::shared_ptr<frame::WindowInterface> window_ = nullptr;
+		frame::Error& error_ = frame::Error::GetInstance();
 	};
 
 } // End namespace test.

@@ -137,13 +137,6 @@ namespace frame::opengl {
 				proto::PixelStructure_RGB());
 
 	public:
-		// Inside constructors to be called from proto and normal constructor.
-		void InitCubeMap(
-			const std::pair<std::uint32_t, std::uint32_t> size,
-			const proto::PixelElementSize& pixel_element_size,
-			const proto::PixelStructure& pixel_structure);
-
-	public:
 		void Bind(const unsigned int slot = 0) const override;
 		void UnBind() const override;
 		void EnableMipmap() const override;

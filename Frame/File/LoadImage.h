@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <vector>
 #include <string>
 #include <memory>
@@ -45,6 +46,20 @@ namespace frame::file {
 
 	std::shared_ptr<TextureInterface> LoadTextureFromFileOpenGL(
 		const std::string& file,
+		const proto::PixelElementSize pixel_element_size =
+			proto::PixelElementSize_BYTE(),
+		const proto::PixelStructure pixel_structure =
+			proto::PixelStructure_RGB());
+
+	std::shared_ptr<TextureInterface> LoadCubeMapTextureFromFileOpenGL(
+		const std::string& file,
+		const proto::PixelElementSize pixel_element_size =
+			proto::PixelElementSize_BYTE(),
+		const proto::PixelStructure pixel_structure =
+			proto::PixelStructure_RGB());
+
+	std::shared_ptr<TextureInterface> LoadCubeMapTextureFromFilesOpenGL(
+		const std::array<std::string, 6> files,
 		const proto::PixelElementSize pixel_element_size =
 			proto::PixelElementSize_BYTE(),
 		const proto::PixelStructure pixel_structure =

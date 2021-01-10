@@ -267,14 +267,6 @@ namespace frame::opengl {
 			/*= PixelStructure::RGB*/) :
 		Texture(pixel_element_size, pixel_structure)
 	{
-		InitCubeMap(size, pixel_element_size, pixel_structure);
-	}
-
-	void TextureCubeMap::InitCubeMap(
-		const std::pair<std::uint32_t, std::uint32_t> size, 
-		const proto::PixelElementSize& pixel_element_size, 
-		const proto::PixelStructure& pixel_structure)
-	{
 		size_ = size;
 		CreateTextureCubeMap();
 		Bind();
@@ -293,6 +285,27 @@ namespace frame::opengl {
 			error_.Display(__FILE__, __LINE__ - 10);
 		}
 		UnBind();
+	}
+
+	TextureCubeMap::TextureCubeMap(
+		const std::pair<std::uint32_t, std::uint32_t> size,
+		const void* data,
+		const proto::PixelElementSize& pixel_element_size /*=
+			proto::PixelElementSize_BYTE()*/,
+		const proto::PixelStructure& pixel_structure /*=
+			proto::PixelStructure_RGB()*/)
+	{
+		throw std::runtime_error("Not implemented!");
+	}
+
+	TextureCubeMap::TextureCubeMap(
+		const std::array<void*, 6>& cube_data,
+		const proto::PixelElementSize& pixel_element_size /*=
+			proto::PixelElementSize_BYTE()*/,
+		const proto::PixelStructure& pixel_structure /*=
+			proto::PixelStructure_RGB()*/)
+	{
+		throw std::runtime_error("Not implemented!");
 	}
 
 	void TextureCubeMap::Bind(const unsigned int slot /*= 0*/) const

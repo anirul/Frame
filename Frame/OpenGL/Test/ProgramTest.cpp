@@ -1,5 +1,5 @@
 #include "ProgramTest.h"
-#include "../ShaderGLLib/Error.h"
+#include "Frame/Error.h"
 
 namespace test {
 

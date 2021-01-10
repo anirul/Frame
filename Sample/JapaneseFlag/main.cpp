@@ -7,9 +7,10 @@
 #include <windows.h>
 #endif
 
-#include "Application.h"
 #include "Frame/Error.h"
 #include "Frame/Window.h"
+#include "Sample/Common/Application.h"
+#include "Sample/JapaneseFlag/Name.h"
 
 #if defined(_WIN32) || defined(_WIN64)
 int WINAPI WinMain(
@@ -23,7 +24,9 @@ int main(int ac, char** av)
 {
 	try
 	{
-		Application app(frame::CreateSDLOpenGL({ 640, 480 }));
+		Application app(
+			std::make_shared<Name>(), 
+			frame::CreateSDLOpenGL({ 640, 480 }));
 		app.Startup();
 		app.Run();
 	}

@@ -1,4 +1,5 @@
 #include "SceneTest.h"
+#include "Frame/LevelBase.h"
 
 namespace test {
 
@@ -7,7 +8,7 @@ namespace test {
 		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(scene_);
 		glm::mat4 test(1.0f);
-		scene_ = std::make_shared<sgl::SceneMatrix>(test);
+		scene_ = std::make_shared<frame::SceneMatrix>(test);
 		EXPECT_TRUE(scene_);
 	}
 
@@ -15,9 +16,11 @@ namespace test {
 	{
 		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(scene_);
-		auto program = sgl::CreateProgram("SceneSimple");
-		auto mesh = sgl::CreateStaticMeshFromObjFile("../Asset/Model/Cube.obj");
-		scene_ = std::make_shared<sgl::SceneStaticMesh>(mesh);
+		auto level = std::make_shared<frame::LevelBase>();
+		auto mesh = frame::file::LoadStaticMeshFromFileOpenGL(
+			level,
+			"../Asset/Model/Cube.obj");
+		scene_ = std::make_shared<frame::SceneStaticMesh>(mesh);
 		EXPECT_TRUE(scene_);
 	}
 
@@ -26,9 +29,10 @@ namespace test {
 	{
 		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(scene_tree_);
-		scene_tree_ = std::make_shared<sgl::SceneTree>();
+		auto level = std::make_shared<frame::LevelBase>();
+		scene_tree_ = std::make_shared<frame::SceneTree>();
 		EXPECT_TRUE(scene_tree_);
-		PopulateTree();
+		PopulateTree(level);
 		unsigned int count_mesh = 0;
 		unsigned int count_matrix = 0;
 		for (const auto& pair : scene_tree_->GetSceneMap())

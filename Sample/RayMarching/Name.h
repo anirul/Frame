@@ -1,9 +1,15 @@
 #pragma once
 
-#include <string>
+#include "Sample/Common/NameInterface.h"
 
 // This is a class to hold global parameters.
-struct Name {
-	static const std::string GetGlobalPath();
-	static const std::string GetLevelFileName();
+class Name : public NameInterface
+{
+public:
+	const std::string& GetGlobalPath() const override { return global_path_; }
+	const std::string& GetLevelFileName() const override { return level_file_; }
+
+private:
+	std::string global_path_ = "../Asset/Json/";
+	std::string level_file_ = "RayMarching.Level.json";
 };
