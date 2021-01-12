@@ -9,7 +9,10 @@ namespace test {
 		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(material_);
 		auto level = std::make_shared<frame::LevelBase>();
-		material_ = std::make_shared<frame::opengl::Material>(level);
+		auto material = std::make_shared<frame::opengl::Material>();
+		material->SetLevel(level);
+		material_ = std::dynamic_pointer_cast<frame::MaterialInterface>(
+			material);
 		EXPECT_TRUE(material_);
 		EXPECT_NO_THROW(error_.Display());
 	}
@@ -18,7 +21,10 @@ namespace test {
 	{
 		EXPECT_FALSE(material_);
 		auto level = std::make_shared<frame::LevelBase>();
-		material_ = std::make_shared<frame::opengl::Material>(level);
+		auto material = std::make_shared<frame::opengl::Material>();
+		material->SetLevel(level);
+		material_ = std::dynamic_pointer_cast<frame::MaterialInterface>(
+			material);
 		EXPECT_TRUE(material_);
 		auto texture1 = frame::file::LoadTextureFromFileOpenGL(
 			"../Asset/CubeMap/PositiveX.png");

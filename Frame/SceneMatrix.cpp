@@ -24,27 +24,6 @@ namespace frame {
 
 	glm::mat4 SceneMatrix::ComputeLocalRotation(const double dt) const
 	{
-		// Check if we have a valid quaternion.
-		if (quaternion_ != glm::quat(1, 0, 0, 0) &&
-			quaternion_ != glm::quat(0, 0, 0, 0))
-		{
-			// Return the matrix multiplied by the rotation of the quaternion.
-			return
-				matrix_ *
-				glm::toMat4(
-					glm::mix(
-						glm::quat(1, 0, 0, 0),
-						quaternion_,
-						static_cast<float>(dt)));
-		}
-		// Check if euler angler are valid (not 0).
-		if (euler_ != glm::vec3(0.f, 0.f, 0.f))
-		{
-			return
-				matrix_ *
-				glm::toMat4(glm::quat(euler_ * static_cast<float>(dt)));
-		}
-		// Nothing to do return the basic matrix.
 		return matrix_;
 	}
 

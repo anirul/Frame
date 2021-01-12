@@ -15,11 +15,12 @@ namespace frame::opengl {
 	class Material : public MaterialInterface
 	{
 	public:
-		Material(const std::shared_ptr<LevelInterface> level) : 
-			level_(level) {}
+		Material() = default;
 		virtual ~Material();
 
 	public:
+		// This will set the level interface into the material, this is needed!
+		void SetLevel(std::shared_ptr<LevelInterface> level);
 		// Texture management part.
 		bool AddTextureId(std::uint64_t id, const std::string& name) override;
 		bool HasTextureId(std::uint64_t id) const override;

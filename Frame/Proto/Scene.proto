@@ -18,10 +18,6 @@ message SceneMatrix {
 	string parent = 2;
 	// Matrix.
 	UniformMatrix4 matrix = 3;
-	// Optional euler multiplication of the dt to the matrix.
-	UniformVector3 euler = 4;
-	// Optional quaternion multiplication of the dt to the matrix.
-	UniformQuaternion quaternion = 5;
 }
 
 // Static Mesh.

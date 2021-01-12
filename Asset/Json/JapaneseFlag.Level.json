@@ -1,8 +1,6 @@
 {
   "name": "JapaneseFlag",
   "default_texture_name": "billboard",
-  "default_camera_name": "camera",
-  "default_scene_name": "scene",
   "texture_file": "JapaneseFlag.Texture.json",
   "program_file": "JapaneseFlag.Program.json",
   "scene_tree_file": "JapaneseFlag.Scene.json"

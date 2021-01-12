@@ -31,7 +31,6 @@ namespace test {
 	{
 		frame::proto::Level level{};
 		level.set_name("test");
-		level.set_default_camera_name("camera");
 		level.set_default_texture_name("texture");
 		return level;
 	}

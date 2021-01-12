@@ -9,6 +9,11 @@ namespace frame::opengl {
 		DisableAll();
 	}
 
+	void Material::SetLevel(std::shared_ptr<LevelInterface> level)
+	{
+		level_ = level;
+	}
+
 	bool Material::AddTextureId(std::uint64_t id, const std::string& name)
 	{
 		RemoveTextureId(id);
@@ -32,6 +37,9 @@ namespace frame::opengl {
 	const std::pair<std::string, int> Material::EnableTextureId(
 		std::uint64_t id) const
 	{
+		// Check Level exist.
+		if (!level_)
+			throw std::runtime_error("There is no level.");
 		// Check it exist.
 		if (!HasTextureId(id))
 			throw std::runtime_error("No texture id: " + std::to_string(id));
@@ -60,6 +68,9 @@ namespace frame::opengl {
 
 	void Material::DisableTextureId(std::uint64_t id) const
 	{
+		// Check Level exist.
+		if (!level_)
+			throw std::runtime_error("There is no level.");
 		// Check if exist.
 		if (!HasTextureId(id))
 			throw std::runtime_error("No texture id: " + std::to_string(id));
@@ -82,6 +93,9 @@ namespace frame::opengl {
 
 	void Material::DisableAll() const
 	{
+		// Check Level exist.
+		if (!level_)
+			throw std::runtime_error("There is no level.");
 		for (int i = 0; i < 32; ++i)
 		{
 			if (id_array_[i])

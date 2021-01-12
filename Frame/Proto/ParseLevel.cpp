@@ -10,9 +10,7 @@
 
 namespace frame::proto {
 
-	class LevelOpenGL :
-		public LevelBase,
-		public std::enable_shared_from_this<LevelOpenGL>
+	class LevelOpenGL :	public LevelBase
 	{
 	public:
 		LevelOpenGL(
@@ -25,14 +23,11 @@ namespace frame::proto {
 		{
 			name_ = proto_level.name();
 			default_texture_name_ = proto_level.default_texture_name();
-			default_camera_name_ = proto_level.default_camera_name();
 			if (default_texture_name_.empty())
 				throw std::runtime_error("should have a default texture.");
-			if (default_camera_name_.empty())
-				throw std::runtime_error("should have a default camera.");
 
 			// Load scenes from proto.
-			ParseSceneTreeFileOpenGL(proto_scene_tree_file, shared_from_this());
+			ParseSceneTreeFile(proto_scene_tree_file, this);
 
 			// Load textures from proto.
 			std::map<std::string, std::uint64_t> name_id_textures;
@@ -66,9 +61,7 @@ namespace frame::proto {
 			for (const auto& proto_material : proto_material_file.materials())
 			{
 				std::shared_ptr<MaterialInterface> material =
-					proto::ParseMaterialOpenGL(
-						proto_material,
-						shared_from_this());
+					proto::ParseMaterialOpenGL(proto_material, this);
 				AddMaterial(proto_material.name(), material);
 			}
 		}

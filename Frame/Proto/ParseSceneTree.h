@@ -6,8 +6,8 @@
 
 namespace frame::proto {
 
-	void ParseSceneTreeFileOpenGL(
+	void ParseSceneTreeFile(
 		const frame::proto::SceneTreeFile& proto_scene_tree_file,
-		const std::shared_ptr<LevelInterface> level);
+		LevelInterface* level);
 
 } // End namespace frame::proto.
