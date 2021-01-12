@@ -17,7 +17,7 @@
 #include "Frame/OpenGL/StaticMesh.h"
 #include "Frame/OpenGL/Light.h"
 #include "Frame/OpenGL/Material.h"
-#include "Frame/SceneTree.h"
+#include "Frame/SceneCamera.h"
 
 namespace frame::opengl {
 
@@ -40,32 +40,18 @@ namespace frame::opengl {
 		void Cleanup() override;
 		// Display the output texture to the display.
 		void Display(const double dt) override;
+		// Some implementation from in heritage.
+		const glm::vec3 GetCameraFront() const final;
+		const glm::vec3 GetCameraRight() const final;
+		const glm::vec3 GetCameraUp() const final;
+		const double GetDeltaTime() const final { return dt_; }
+		const std::shared_ptr<CameraInterface> GetCamera() const;
 
 	public:
 		const glm::mat4 GetProjection() const final { return perspective_; }
 		const glm::mat4 GetView() const final { return view_; }
 		const glm::mat4 GetModel() const final { return model_; }
-		const glm::vec3 GetCameraPosition() const final
-		{
-			return level_->GetSceneTree()->GetDefaultCamera()->GetPosition();
-		}
-		const glm::vec3 GetCameraFront() const final
-		{
-			return level_->GetSceneTree()->GetDefaultCamera()->GetFront();
-		}
-		const glm::vec3 GetCameraRight() const final
-		{
-			return level_->GetSceneTree()->GetDefaultCamera()->GetRight();
-		}
-		const glm::vec3 GetCameraUp() const final
-		{
-			return level_->GetSceneTree()->GetDefaultCamera()->GetUp();
-		}
-		const double GetDeltaTime() const final { return dt_; }
-		const std::shared_ptr<CameraInterface> GetCamera() const 
-		{
-			return level_->GetSceneTree()->GetDefaultCamera();
-		}
+		const glm::vec3 GetCameraPosition() const final;
 		void* GetDeviceContext() const { return gl_context_; }
 		const std::string GetTypeString() const { return "OpenGL"; }
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include "Frame/MaterialInterface.h"
+#include "Frame/LevelInterface.h"
 #include "Frame/Proto/Proto.h"
 
 namespace frame::proto {

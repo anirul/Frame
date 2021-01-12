@@ -7,7 +7,6 @@
 #include "Frame/Proto/ParseProgram.h"
 #include "Frame/Proto/ParseSceneTree.h"
 #include "Frame/Proto/ParseTexture.h"
-#include "Frame/SceneTree.h"
 
 namespace frame::proto {
 
@@ -26,23 +25,14 @@ namespace frame::proto {
 		{
 			name_ = proto_level.name();
 			default_texture_name_ = proto_level.default_texture_name();
-			default_scene_name_ = proto_level.default_scene_name();
 			default_camera_name_ = proto_level.default_camera_name();
-			if (default_scene_name_.empty())
-				throw std::runtime_error("should have a default scene name.");
 			if (default_texture_name_.empty())
 				throw std::runtime_error("should have a default texture.");
 			if (default_camera_name_.empty())
 				throw std::runtime_error("should have a default camera.");
 
 			// Load scenes from proto.
-			frame::proto::SceneTree proto_scene_tree;
-			for (const auto& proto : proto_scene_tree_file.scene_trees())
-			{
-				if (proto.name() == default_scene_name_)
-					proto_scene_tree = proto;
-			}
-			AddSceneTree(ParseSceneTreeOpenGL(proto_scene_tree));
+			ParseSceneTreeFileOpenGL(proto_scene_tree_file, shared_from_this());
 
 			// Load textures from proto.
 			std::map<std::string, std::uint64_t> name_id_textures;
@@ -50,9 +40,9 @@ namespace frame::proto {
 			{
 				std::shared_ptr<TextureInterface> texture = nullptr;
 				if (proto_texture.cubemap())
-					texture = proto::ParseCubeMapTexture(proto_texture, size);
+					texture = ParseCubeMapTexture(proto_texture, size);
 				else
-					texture = proto::ParseTexture(proto_texture, size);
+					texture = ParseTexture(proto_texture, size);
 				AddTexture(proto_texture.name(), texture);
 			}
 
@@ -66,8 +56,9 @@ namespace frame::proto {
 			// Load programs from proto.
 			for (const auto& proto_program : proto_program_file.programs())
 			{
-				std::shared_ptr<ProgramInterface> program =
-					proto::ParseProgramOpenGL(proto_program, name_id_textures);
+				auto program = ParseProgramOpenGL(
+					proto_program, 
+					name_id_textures);
 				AddProgram(proto_program.name(), program);
 			}
 

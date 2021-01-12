@@ -112,7 +112,10 @@ namespace frame::opengl {
 
 	void Device::SetupCamera()
 	{
-		const auto camera = level_->GetSceneTree()->GetDefaultCamera();
+		auto id = level_->GetDefaultCameraId();
+		const auto scene_camera = std::dynamic_pointer_cast<SceneCamera>(
+			level_->GetSceneNodeMap().at(id));
+		const auto camera = scene_camera->GetCamera();
 		perspective_ = camera->ComputeProjection(size_);
 		view_ = camera->ComputeView();
 	}
@@ -186,6 +189,46 @@ namespace frame::opengl {
 			AddToRenderProgram(id);
 		}
 		program_render_.push_back(program_id);
+	}
+
+	const glm::vec3 Device::GetCameraPosition() const
+	{
+		auto id = level_->GetDefaultCameraId();
+		auto scene_camera = std::dynamic_pointer_cast<SceneCamera>(
+			level_->GetSceneNodeMap().at(id));
+		return scene_camera->GetCamera()->GetPosition();
+	}
+
+	const glm::vec3 Device::GetCameraFront() const
+	{
+		auto id = level_->GetDefaultCameraId();
+		auto scene_camera = std::dynamic_pointer_cast<SceneCamera>(
+			level_->GetSceneNodeMap().at(id));
+		return scene_camera->GetCamera()->GetFront();
+	}
+
+	const glm::vec3 Device::GetCameraRight() const
+	{
+		auto id = level_->GetDefaultCameraId();
+		auto scene_camera = std::dynamic_pointer_cast<SceneCamera>(
+			level_->GetSceneNodeMap().at(id));
+		return scene_camera->GetCamera()->GetRight();
+	}
+
+	const glm::vec3 Device::GetCameraUp() const
+	{
+		auto id = level_->GetDefaultCameraId();
+		auto scene_camera = std::dynamic_pointer_cast<SceneCamera>(
+			level_->GetSceneNodeMap().at(id));
+		return scene_camera->GetCamera()->GetUp();
+	}
+
+	const std::shared_ptr<frame::CameraInterface> Device::GetCamera() const
+	{
+		auto id = level_->GetDefaultCameraId();
+		auto scene_camera = std::dynamic_pointer_cast<SceneCamera>(
+			level_->GetSceneNodeMap().at(id));
+		return scene_camera->GetCamera();
 	}
 
 } // End namespace frame::opengl.

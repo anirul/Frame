@@ -8,7 +8,6 @@
 #include "StaticMeshTest.h"
 #include "PixelTest.h"
 #include "ProgramTest.h"
-#include "SceneTest.h"
 #include "ShaderTest.h"
 #include "TextureTest.h"
 #include "WindowTest.h"

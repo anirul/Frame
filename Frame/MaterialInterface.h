@@ -2,9 +2,8 @@
 
 #include <cstdint>
 #include <memory>
+#include <string>
 #include <vector>
-#include "Frame/TextureInterface.h"
-#include "Frame/ProgramInterface.h"
 
 namespace frame {
 

@@ -1,6 +1,6 @@
 #include "Draw.h"
 #include <fstream>
-#include "Frame/Proto/Proto.h"
+#include "Frame/Proto/ParseLevel.h"
 
 void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 {
@@ -25,7 +25,7 @@ void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 	}
 
 	// Load level from proto files.
-	auto level = frame::proto::LoadLevelFromProto(
+	auto level = frame::proto::ParseLevelOpenGL(
 		size_,
 		proto_level, 
 		proto_program_file, 

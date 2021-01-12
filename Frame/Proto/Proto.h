@@ -21,7 +21,9 @@
 #include "Uniform.pb.h"
 // Include the json parser.
 #include <google/protobuf/util/json_util.h>
-#include "Frame/LevelInterface.h"
+#if defined(_WIN32) || defined(_WIN64)
+#pragma warning(pop)
+#endif
 
 namespace frame::proto {
 
@@ -52,16 +54,4 @@ namespace frame::proto {
 		return proto;
 	}
 
-	std::shared_ptr<LevelInterface> LoadLevelFromProto(
-		const std::pair<std::int32_t, std::int32_t> size,
-		const frame::proto::Level& proto_level,
-		const ProgramFile& proto_program_file,
-		const SceneTreeFile& proto_scene_tree_file,
-		const TextureFile& proto_texture_file,
-		const MaterialFile& proto_material_file);
-
 } // End namespace frame::proto.
-
-#if defined(_WIN32) || defined(_WIN64)
-#pragma warning(pop)
-#endif

@@ -1,4 +1,5 @@
 #include "ParseMaterial.h"
+#include "Frame/LevelInterface.h"
 #include "Frame/OpenGL/Material.h"
 
 namespace frame::proto {

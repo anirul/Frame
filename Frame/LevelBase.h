@@ -3,8 +3,9 @@
 #include <cinttypes>
 #include <memory>
 #include <utility>
-#include "../Frame/LevelInterface.h"
-#include "../Frame/Proto/Proto.h"
+#include "Frame/LevelInterface.h"
+#include "Frame/Proto/Proto.h"
+#include "Frame/SceneNodeInterface.h"
 
 namespace frame {
 
@@ -14,9 +15,12 @@ namespace frame {
 		LevelBase() = default;
 
 	public:
-		const std::shared_ptr<SceneTreeInterface> GetSceneTree() const override
+		const std::unordered_map<
+			std::uint64_t,
+			std::shared_ptr<SceneNodeInterface>>&
+			GetSceneNodeMap() const override
 		{
-			return scene_tree_;
+			return id_scene_node_map_;
 		}
 		const std::unordered_map<
 			std::uint64_t,
@@ -65,14 +69,27 @@ namespace frame {
 		{
 			return GetIdFromName(default_texture_name_);
 		}
-		std::uint64_t GetDefaultScneeId() const override
+		void SetDefaultCameraName(const std::string& name) override
 		{
-			return GetIdFromName(default_scene_name_);
+			default_camera_name_ = name;
+		}
+		std::uint64_t GetDefaultRootSceneNodeId() const override
+		{
+			return GetIdFromName(default_root_scene_node_name_);
+		}
+		void SetDefaultRootSceneNodeName(const std::string& name) override
+		{
+			default_root_scene_node_name_ = name;
+		}
+		std::uint64_t GetDefaultCameraId() const override
+		{
+			return GetIdFromName(default_camera_name_);
 		}
 
 	public:
-		void AddSceneTree(
-			std::shared_ptr<SceneTreeInterface> scene_tree) override;
+		std::uint64_t AddSceneNode(
+			const std::string& name,
+			std::shared_ptr<SceneNodeInterface> scene_node) override;
 		std::uint64_t AddTexture(
 			const std::string& name,
 			std::shared_ptr<TextureInterface> texture) override;
@@ -110,14 +127,20 @@ namespace frame {
 		{
 			return next_id_maker_++;
 		}
+		std::uint64_t GetSceneNodeNewId() const
+		{
+			return next_id_maker_++;
+		}
 
 	protected:
 		mutable std::uint64_t next_id_maker_ = 1;
 		std::string name_ = "";
 		std::string default_texture_name_ = "";
-		std::string default_scene_name_ = "";
+		std::string default_root_scene_node_name_ = "";
 		std::string default_camera_name_ = "";
-		std::shared_ptr<SceneTreeInterface> scene_tree_ = nullptr;
+		std::unordered_set<std::string> string_set_ = {};
+		std::unordered_map<std::uint64_t, std::shared_ptr<SceneNodeInterface>>
+			id_scene_node_map_ = {};
 		std::unordered_map<std::uint64_t, std::shared_ptr<TextureInterface>>
 			id_texture_map_ = {};
 		std::unordered_map<std::uint64_t, std::shared_ptr<ProgramInterface>>

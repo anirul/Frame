@@ -5,10 +5,9 @@
 #include "Frame/Logger.h"
 #include "Frame/OpenGL/RenderBuffer.h"
 #include "Frame/OpenGL/ScopedBind.h"
+#include "Frame/TextureInterface.h"
 
 namespace frame::opengl {
-
-	class Texture;
 
 	enum class FrameTextureType : std::int32_t
 	{

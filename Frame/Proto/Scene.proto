@@ -93,14 +93,12 @@ message SceneLight {
 }
 
 // Scene definition.
-// Next 8
-message SceneTree {
-	// This is the name of the scene.
-	string name = 1;
+// Next 7
+message SceneTreeFile {
 	// This defined witch is the root of the scene tree (not really needed).
-	string default_root_name = 2;
+	string default_root_name = 1;
 	// This is the default camera node name.
-	string default_camera_name = 7;
+	string default_camera_name = 2;
 	// This is a list of scene matrices.
 	repeated SceneMatrix scene_matrices = 3;
 	// This is a list of scene meshes.
@@ -109,11 +107,4 @@ message SceneTree {
 	repeated SceneCamera scene_cameras = 5;
 	// This is the node for the lights.
 	repeated SceneLight scene_lights = 6;
-}
-
-// Scene file.
-// Next 2
-message SceneTreeFile {
-	// Contain many scene trees.
-	repeated SceneTree scene_trees = 1;
 }

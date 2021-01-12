@@ -2,17 +2,28 @@
 
 namespace frame {
 
-	void LevelBase::AddSceneTree(
-		std::shared_ptr<SceneTreeInterface> scene_tree)
+	std::uint64_t LevelBase::AddSceneNode(
+		const std::string& name, 
+		std::shared_ptr<SceneNodeInterface> scene_node)
 	{
-		scene_tree_ = scene_tree;
+		if (string_set_.count(name))
+			throw std::runtime_error("Name: " + name + " is already in!");
+		std::uint64_t id = GetSceneNodeNewId();
+		string_set_.insert(name);
+		id_scene_node_map_.insert({ id, scene_node });
+		id_name_map_.insert({ id, name });
+		name_id_map_.insert({ name, id });
+		return id;
 	}
 
 	std::uint64_t LevelBase::AddTexture(
 		const std::string& name,
 		std::shared_ptr<TextureInterface> texture)
 	{
+		if (string_set_.count(name))
+			throw std::runtime_error("Name: " + name + " is already in!");
 		std::uint64_t id = GetTextureNewId();
+		string_set_.insert(name);
 		id_texture_map_.insert({ id, texture });
 		id_name_map_.insert({ id, name });
 		name_id_map_.insert({ name, id });
@@ -23,6 +34,8 @@ namespace frame {
 		const std::string& name,
 		std::shared_ptr<ProgramInterface> program)
 	{
+		if (string_set_.count(name))
+			throw std::runtime_error("Name: " + name + " is already in!");
 		std::uint64_t id = GetProgramNewId();
 		id_program_map_.insert({ id, program });
 		id_name_map_.insert({ id, name });
@@ -34,6 +47,8 @@ namespace frame {
 		const std::string& name,
 		std::shared_ptr<MaterialInterface> material)
 	{
+		if (string_set_.count(name))
+			throw std::runtime_error("Name: " + name + " is already in!");
 		std::uint64_t id = GetMaterialNewId();
 		id_material_map_.insert({ id, material });
 		id_name_map_.insert({ id, name });
@@ -45,6 +60,8 @@ namespace frame {
 		const std::string& name,
 		std::shared_ptr<BufferInterface> buffer)
 	{
+		if (string_set_.count(name))
+			throw std::runtime_error("Name: " + name + " is already in!");
 		std::uint64_t id = GetBufferNewId();
 		id_buffer_map_.insert({ id, buffer });
 		id_name_map_.insert({ id, name });
@@ -56,6 +73,8 @@ namespace frame {
 		const std::string& name,
 		std::shared_ptr<StaticMeshInterface> static_mesh)
 	{
+		if (string_set_.count(name))
+			throw std::runtime_error("Name: " + name + " is already in!");
 		std::uint64_t id = GetStaticMeshNewId();
 		id_static_mesh_map_.insert({ id, static_mesh });
 		id_name_map_.insert({ id, name });

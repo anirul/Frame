@@ -1,8 +1,7 @@
-#include "Frame/Proto/ParseSceneTree.h"
+#include "ParseSceneTree.h"
 #include "Frame/SceneCamera.h"
 #include "Frame/SceneLight.h"
 #include "Frame/SceneMatrix.h"
-#include "Frame/SceneTree.h"
 #include "Frame/SceneStaticMesh.h"
 
 namespace frame::proto {
@@ -10,14 +9,14 @@ namespace frame::proto {
 	std::shared_ptr<SceneMatrix> ParseSceneMatrixOpenGL(
 		const frame::proto::SceneMatrix& proto_scene_matrix)
 	{
-		throw std::runtime_error("implement me!");
+		throw std::runtime_error("Implement me!");
 		return nullptr;
 	}
 
 	std::shared_ptr<SceneStaticMesh> ParseSceneStaticMeshOpenGL(
 		const frame::proto::SceneStaticMesh& proto_scene_static_mesh)
 	{
-		throw std::runtime_error("implement me!");
+		throw std::runtime_error("Implement me!");
 		return nullptr;
 	}
 
@@ -31,48 +30,47 @@ namespace frame::proto {
 	std::shared_ptr<SceneLight> ParseSceneLightOpenGL(
 		const frame::proto::SceneLight& proto_scene_light)
 	{
-		throw std::runtime_error("implement me!");
+		throw std::runtime_error("Implement me!");
 		return nullptr;
 	}
 
-	std::shared_ptr<SceneTreeInterface> ParseSceneTreeOpenGL(
-		const frame::proto::SceneTree& proto_scene_tree)
+	void ParseSceneTreeFileOpenGL(
+		const SceneTreeFile& proto_scene_tree_file, 
+		std::shared_ptr<LevelInterface> level)
 	{
-		auto scene_tree = std::make_shared<frame::SceneTree>(
-			proto_scene_tree.name());
-		scene_tree->SetDefaultCameraName(
-			proto_scene_tree.default_camera_name());
-		scene_tree->SetDefaultRootName(proto_scene_tree.default_root_name());
-		for (const auto& proto_matrix : proto_scene_tree.scene_matrices())
+		level->SetDefaultCameraName(
+			proto_scene_tree_file.default_camera_name());
+		level->SetDefaultRootSceneNodeName(
+			proto_scene_tree_file.default_root_name());
+		for (const auto& proto_matrix : proto_scene_tree_file.scene_matrices())
 		{
-			SceneNodeInterface::Ptr ptr = 
+			SceneNodeInterface::Ptr ptr =
 				std::dynamic_pointer_cast<SceneNodeInterface>(
 					ParseSceneMatrixOpenGL(proto_matrix));
-			scene_tree->AddNode(ptr);
+			level->AddSceneNode(ptr->GetName(), ptr);
 		}
-		for (const auto& proto_static_mesh : 
-			proto_scene_tree.scene_static_meshes())
+		for (const auto& proto_static_mesh :
+			proto_scene_tree_file.scene_static_meshes())
 		{
 			SceneNodeInterface::Ptr ptr =
 				std::dynamic_pointer_cast<SceneNodeInterface>(
 					ParseSceneStaticMeshOpenGL(proto_static_mesh));
-			scene_tree->AddNode(ptr);
+			level->AddSceneNode(ptr->GetName(), ptr);
 		}
-		for (const auto& proto_camera : proto_scene_tree.scene_cameras())
+		for (const auto& proto_camera : proto_scene_tree_file.scene_cameras())
 		{
 			SceneNodeInterface::Ptr ptr =
 				std::dynamic_pointer_cast<SceneNodeInterface>(
 					ParseSceneCameraOpenGL(proto_camera));
-			scene_tree->AddNode(ptr);
+			level->AddSceneNode(ptr->GetName(), ptr);
 		}
-		for (const auto& proto_light : proto_scene_tree.scene_lights())
+		for (const auto& proto_light : proto_scene_tree_file.scene_lights())
 		{
 			SceneNodeInterface::Ptr ptr =
 				std::dynamic_pointer_cast<SceneNodeInterface>(
 					ParseSceneLightOpenGL(proto_light));
-			scene_tree->AddNode(ptr);
+			level->AddSceneNode(ptr->GetName(), ptr);
 		}
-		return scene_tree;
 	}
 
 } // End namespace frame::proto.

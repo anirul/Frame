@@ -28,9 +28,6 @@ add_library(Frame
     SceneMatrix.cpp
     SceneMatrix.h
     SceneNodeInterface.h
-    SceneTree.cpp
-    SceneTree.h
-    SceneTreeInterface.h
     SceneStaticMesh.cpp
     SceneStaticMesh.h
     StaticMeshInterface.h

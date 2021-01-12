@@ -3,6 +3,7 @@
 #include <iostream>
 #include <set>
 #include <string>
+#include "Frame/LevelInterface.h"
 #include "Frame/MaterialInterface.h"
 #include "Frame/OpenGL/Texture.h"
 
