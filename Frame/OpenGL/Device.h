@@ -21,10 +21,7 @@
 
 namespace frame::opengl {
 
-	class Device : 
-		public DeviceInterface,
-		public UniformInterface, 
-		public std::enable_shared_from_this<Device>
+	class Device : public DeviceInterface, public UniformInterface
 	{
 	public:
 		// This will initialize the GL context and make the GLEW init.
@@ -34,6 +31,7 @@ namespace frame::opengl {
 		virtual ~Device();
 
 	public:
+		const std::shared_ptr<CameraInterface> GetCamera() const;
 		// Startup the scene.
 		void Startup(const std::shared_ptr<LevelInterface> level) override;
 		// Cleanup the mess.
@@ -44,14 +42,13 @@ namespace frame::opengl {
 		const glm::vec3 GetCameraFront() const final;
 		const glm::vec3 GetCameraRight() const final;
 		const glm::vec3 GetCameraUp() const final;
-		const double GetDeltaTime() const final { return dt_; }
-		const std::shared_ptr<CameraInterface> GetCamera() const;
+		const glm::vec3 GetCameraPosition() const final;
 
 	public:
+		const double GetDeltaTime() const final { return dt_; }
 		const glm::mat4 GetProjection() const final { return perspective_; }
 		const glm::mat4 GetView() const final { return view_; }
 		const glm::mat4 GetModel() const final { return model_; }
-		const glm::vec3 GetCameraPosition() const final;
 		void* GetDeviceContext() const { return gl_context_; }
 		const std::string GetTypeString() const { return "OpenGL"; }
 

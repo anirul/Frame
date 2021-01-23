@@ -78,11 +78,12 @@ namespace frame::opengl {
 		std::uint64_t scene_tree_id_ = 0;
 	};
 
-	// Create a program from a string!
-	// Will load a program at location: 
-	// - "../Asset/Shader/OpenGL/<name>.vert"
-	// - "../Asset/Shader/OpenGL/<name>.frag"
-	// Also set the projection view and model to identity.
-	std::shared_ptr<ProgramInterface> CreateProgram(const std::string& name);
+	// Create a program from two streams:
+	// - vertex shader code;
+	// - pixel shader code.
+	// Also set the matrix for projection/view/model to I.
+	std::shared_ptr<ProgramInterface> CreateProgram(
+		std::istream& vertex_shader_code,
+		std::istream& pixel_shader_code);
 
 } // End namespace frame::opengl.

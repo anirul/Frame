@@ -15,7 +15,6 @@ namespace frame::opengl {
 	bool Shader::LoadFromSource(const std::string& source)
 	{
 		id_ = glCreateShader(static_cast<unsigned int>(type_));
-		created_ = true;
 		const char* c_source = source.c_str();
 		glShaderSource(id_, 1, &c_source, nullptr);
 		glCompileShader(id_);
@@ -31,20 +30,9 @@ namespace frame::opengl {
 			created_ = false;
 			return false;
 		}
+		created_ = true;
 		error_message_ = "";
 		return true;
-	}
-
-	bool Shader::LoadFromFile(const std::string& path)
-	{
-		std::ifstream ifs;
-		ifs.open(path, std::ios::in);
-		if (!ifs.is_open()) {
-			error_message_ = "Could not open file: " + path;
-			return false;
-		}
-		std::string str(std::istreambuf_iterator<char>(ifs), {});
-		return LoadFromSource(str);
 	}
 
 }	// End namespace frame::opengl.

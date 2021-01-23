@@ -25,12 +25,12 @@ namespace test {
 		frame::opengl::Shader vertex_shader(
 			frame::opengl::ShaderEnum::VERTEX_SHADER);
 		EXPECT_TRUE(
-			vertex_shader.LoadFromFile("../Asset/Shader/SceneSimple.vert"));
+			vertex_shader.LoadFromSource(GetVertexSource()));
 		program_ptr->AddShader(vertex_shader);
 		frame::opengl::Shader fragment_shader(
 			frame::opengl::ShaderEnum::FRAGMENT_SHADER);
 		EXPECT_TRUE(
-			fragment_shader.LoadFromFile("../Asset/Shader/SceneSimple.frag"));
+			fragment_shader.LoadFromSource(GetFragmentSource()));
 		program_ptr->AddShader(fragment_shader);
 	}
 

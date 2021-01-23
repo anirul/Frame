@@ -6,24 +6,31 @@
 namespace frame::opengl {
 
 	std::shared_ptr<ProgramInterface> CreateProgram(
-		const std::string& name)
+		std::istream& vertex_shader_code,
+		std::istream& pixel_shader_code)
 	{
+		std::string vertex_source(
+			std::istreambuf_iterator<char>(vertex_shader_code), 
+			{});
+		std::string pixel_source(
+			std::istreambuf_iterator<char>(pixel_shader_code),
+			{});
 #ifdef _DEBUG
 		auto& logger = Logger::GetInstance();
-		logger->info("Creating program \"{}\"", name);
+		logger->info("Creating program");
 #endif // _DEBUG
 		auto program = std::make_shared<Program>();
 		const auto& error = Error::GetInstance();
 		Shader vertex(ShaderEnum::VERTEX_SHADER);
 		Shader fragment(ShaderEnum::FRAGMENT_SHADER);
-		if (!vertex.LoadFromFile("../Asset/Shader/OpenGL/" + name + ".vert"))
+		if (!vertex.LoadFromSource(vertex_source))
 		{
 			error.CreateError(
 				vertex.GetErrorMessage(),
 				__FILE__,
 				__LINE__ - 5);
 		}
-		if (!fragment.LoadFromFile("../Asset/Shader/OpenGL/" + name + ".frag"))
+		if (!fragment.LoadFromSource(pixel_source))
 		{
 			error.CreateError(
 				fragment.GetErrorMessage(),

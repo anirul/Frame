@@ -20,7 +20,6 @@ namespace frame::opengl {
 
 	public:
 		bool LoadFromSource(const std::string& source);
-		bool LoadFromFile(const std::string& path);
 
 	public:
 		unsigned int GetId() const { return id_; }
