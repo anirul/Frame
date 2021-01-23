@@ -13,6 +13,8 @@ namespace test {
 		{
 			window_ = frame::CreateSDLOpenGL({ 320, 200 });
 		}
+		const std::string& GetVertexSource() const;
+		const std::string& GetFragmentSource() const;
 
 	protected:
 		std::shared_ptr<frame::WindowInterface> window_ = nullptr;

@@ -47,14 +47,12 @@ namespace test {
 		frame::opengl::Shader vertex_shader(
 			frame::opengl::ShaderEnum::VERTEX_SHADER);
 		EXPECT_TRUE(
-			vertex_shader.LoadFromFile(
-				"../Asset/Shader/PhysicallyBasedRendering.vert"));
+			vertex_shader.LoadFromSource(GetVertexSource()));
 		program_ptr->AddShader(vertex_shader);
 		frame::opengl::Shader fragment_shader(
 			frame::opengl::ShaderEnum::FRAGMENT_SHADER);
 		EXPECT_TRUE(
-			fragment_shader.LoadFromFile(
-				"../Asset/Shader/PhysicallyBasedRendering.frag"));
+			fragment_shader.LoadFromSource(GetFragmentSource()));
 		program_ptr->AddShader(fragment_shader);
 		program_->LinkShader();
 		program_->Use();
@@ -62,40 +60,69 @@ namespace test {
 
 	// TODO(anirul): add uniform tests!
 
-	TEST_F(ProgramTest, CreateCubeMapProgramProgramTest)
-	{
-		EXPECT_EQ(GLEW_OK, glewInit());
-		frame::Error::SetWindowPtr(nullptr);
-		EXPECT_FALSE(program_);
-		program_ = frame::opengl::CreateProgram("CubeMap");
-		EXPECT_TRUE(program_);
-	}
-
-	TEST_F(ProgramTest, CreateEquirectangulareCubeMapProgramTest)
-	{
-		EXPECT_EQ(GLEW_OK, glewInit());
-		frame::Error::SetWindowPtr(nullptr);
-		EXPECT_FALSE(program_);
-		program_ = frame::opengl::CreateProgram("EquirectangularCubeMap");
-		EXPECT_TRUE(program_);
-	}
-
-	TEST_F(ProgramTest, CreatePhysicallyBasedRenderingProgramProgramTest)
-	{
-		EXPECT_EQ(GLEW_OK, glewInit());
-		frame::Error::SetWindowPtr(nullptr);
-		EXPECT_FALSE(program_);
-		program_ = frame::opengl::CreateProgram("PhysicallyBasedRendering");
-		EXPECT_TRUE(program_);
-	}
-
 	TEST_F(ProgramTest, CreateSimpleProgramProgramTest)
 	{
 		EXPECT_EQ(GLEW_OK, glewInit());
 		frame::Error::SetWindowPtr(nullptr);
 		EXPECT_FALSE(program_);
-		program_ = frame::opengl::CreateProgram("SceneSimple");
+		program_ = frame::opengl::CreateProgram();
 		EXPECT_TRUE(program_);
+	}
+
+	const std::string& ProgramTest::GetVertexSource() const
+	{
+		return R"vert(
+#version 330 core
+
+layout(location = 0) in vec3 in_position;
+layout(location = 1) in vec3 in_normal;
+layout(location = 2) in vec2 in_texcoord;
+
+out vec3 vert_normal;
+out vec3 vert_position;
+out vec2 vert_texcoord;
+
+uniform mat4 projection;
+uniform mat4 view;
+uniform mat4 model;
+
+void main()
+{
+	vert_normal = normalize(vec3(model * vec4(in_normal, 1.0)));
+	vert_texcoord = in_texcoord;
+	mat4 pvm = projection * view * model;
+	vert_position = (pvm * vec4(in_position, 1.0)).xyz;
+	gl_Position = pvm * vec4(in_position, 1.0);
+}
+		)vert";
+	}
+
+	const std::string& ProgramTest::GetFragmentSource() const
+	{
+		return R"frag(
+#version 330 core
+
+in vec3 vert_normal;
+in vec2 vert_texcoord;
+in vec3 vert_position;
+
+layout(location = 0) out vec4 frag_color;
+layout(location = 1) out vec4 frag_zbuffer;
+
+uniform sampler2D Color;
+
+const vec3 light_position = vec3(-1.0, 1.0, 1.0);
+
+void main()
+{
+	float shade = clamp(dot(light_position, vert_normal), 0, 1);
+	vec3 color = vec3(texture(Color, vert_texcoord));
+	frag_color = vec4(shade * color, 1.0);
+	// Create a Z buffer value.
+	float z_value = vert_position.z / 8;
+	frag_zbuffer = vec4(z_value, z_value, z_value, 1.0);
+}
+		)frag";
 	}
 
 } // End namespace test.
