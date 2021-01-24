@@ -18,7 +18,7 @@ namespace test {
 		device_ = window_->GetUniqueDevice();
 		auto level = frame::proto::ParseLevelOpenGL(
 			std::make_pair<std::uint32_t, std::uint32_t>(32, 32),
-			"../../Asset/",
+			"../../../../Asset/",
 			GetLevel(),
 			GetProgramFile(),
 			GetSceneFile(), 
@@ -65,6 +65,7 @@ namespace test {
 			}
 			*scene_tree_file.add_scene_cameras() = scene_camera;
 			scene_tree_file.set_default_root_name("root");
+			scene_tree_file.set_default_camera_name("camera");
 		}
 		return scene_tree_file;
 	}

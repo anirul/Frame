@@ -29,6 +29,9 @@ namespace frame::proto {
 
 			// Load scenes from proto.
 			ParseSceneTreeFile(proto_scene_tree_file, this);
+			default_camera_name_ = proto_scene_tree_file.default_camera_name();
+			if (default_camera_name_.empty())
+				throw std::runtime_error("should have a default camera name.");
 
 			// Load textures from proto.
 			std::map<std::string, std::uint64_t> name_id_textures;
@@ -39,7 +42,8 @@ namespace frame::proto {
 					texture = ParseCubeMapTexture(proto_texture, size);
 				else
 					texture = ParseTexture(proto_texture, size);
-				AddTexture(proto_texture.name(), texture);
+				auto texture_id = AddTexture(proto_texture.name(), texture);
+				name_id_textures.insert({ proto_texture.name(), texture_id });
 			}
 
 			// Check the default texture is in.

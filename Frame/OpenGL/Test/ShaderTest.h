@@ -9,10 +9,11 @@ namespace test {
 	class ShaderTest : public testing::Test
 	{
 	public:
-		ShaderTest()
-		{
-			window_ = frame::CreateSDLOpenGL({ 320, 200 });
-		}
+		ShaderTest() { window_ = frame::CreateSDLOpenGL({ 320, 200 }); }
+
+	public:
+		const std::string GetVertexSource() const;
+		const std::string GetFragmentSource() const;
 
 	protected:
 		std::shared_ptr<frame::WindowInterface> window_ = nullptr;

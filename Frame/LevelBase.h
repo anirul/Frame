@@ -83,6 +83,7 @@ namespace frame {
 		}
 		std::uint64_t GetDefaultCameraId() const override
 		{
+			assert(!default_camera_name_.empty());
 			return GetIdFromName(default_camera_name_);
 		}
 

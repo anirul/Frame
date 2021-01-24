@@ -65,11 +65,13 @@ namespace test {
 		EXPECT_EQ(GLEW_OK, glewInit());
 		frame::Error::SetWindowPtr(nullptr);
 		EXPECT_FALSE(program_);
-		program_ = frame::opengl::CreateProgram();
+		std::istringstream iss_vertex(GetVertexSource());
+		std::istringstream iss_fragment(GetFragmentSource());
+		program_ = frame::opengl::CreateProgram(iss_vertex, iss_fragment);
 		EXPECT_TRUE(program_);
 	}
 
-	const std::string& ProgramTest::GetVertexSource() const
+	const std::string ProgramTest::GetVertexSource() const
 	{
 		return R"vert(
 #version 330 core
@@ -97,7 +99,7 @@ void main()
 		)vert";
 	}
 
-	const std::string& ProgramTest::GetFragmentSource() const
+	const std::string ProgramTest::GetFragmentSource() const
 	{
 		return R"frag(
 #version 330 core

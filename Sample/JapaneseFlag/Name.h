@@ -10,6 +10,6 @@ public:
 	const std::string& GetLevelFileName() const override { return level_file_; }
 
 private:
-	std::string global_path_ = "../../../Asset/Json/";
-	std::string level_file_ = "JapaneseFlag.Level.json"; 
+	std::string global_path_ = "../../../Asset/";
+	std::string level_file_ = "Json/JapaneseFlag.Level.json"; 
 };
