@@ -20,7 +20,8 @@ cd vcpkg
 
 Then you will need to install the following packages:
 
-- absl
+- abseil
+- assimp
 - protobuf
 - gRPC
 - SDL2
@@ -28,6 +29,7 @@ Then you will need to install the following packages:
 - glm
 - GTest
 - spdlog
+- stb
 
 To install use the command line in the repository of vcpkg something like:
 
