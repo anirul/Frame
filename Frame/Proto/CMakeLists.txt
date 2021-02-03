@@ -42,6 +42,7 @@ protobuf_generate(APPEND_PATH TARGET FrameProto)
 target_link_libraries(FrameProto 
   PUBLIC
     Frame
+    FrameOpenGL
     protobuf::libprotoc
     protobuf::libprotobuf
 )

@@ -1,6 +1,6 @@
 #include "PixelTest.h"
 #include <GL/glew.h>
-#include "Frame/proto/ParsePixel.h"
+#include "Frame/Proto/ParsePixel.h"
 
 namespace test {
 

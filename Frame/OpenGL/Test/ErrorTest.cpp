@@ -1,5 +1,5 @@
 #include "ErrorTest.h"
-#include <gl/glew.h>
+#include <GL/glew.h>
 #include "Frame/Window.h"
 
 namespace test {

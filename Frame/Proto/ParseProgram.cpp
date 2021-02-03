@@ -26,7 +26,7 @@ namespace frame::proto {
 				fmt::format("Couldn't open file {}", shader_name + ".frag");
 			error.CreateError(error_str, __FILE__, __LINE__);
 		}
-		auto program = frame::opengl::CreateProgram(ifs_vertex, ifs_pixel);
+		auto program = opengl::CreateProgram(ifs_vertex, ifs_pixel);
 		for (const auto& texture_name : proto_program.input_texture_names())
 		{
 			program->AddInputTextureId(name_id_textures.at(texture_name));

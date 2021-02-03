@@ -1,6 +1,13 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.13)
 
 set(CMAKE_CXX_STANDARD 17)
+
+if(UNIX AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+    if(NOT DEFINED VCPKG_TARGET_TRIPLET)
+        set(VCPKG_TARGET_TRIPLET x64-linux)
+    endif()
+    include("~/Documents/GitHub/vcpkg/scripts/buildsystems/vcpkg.cmake")
+endif()
 
 project(Frame)
 

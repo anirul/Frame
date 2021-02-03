@@ -1,7 +1,7 @@
+#pragma once
 // This is just an helpfull header that include all the protos.
 
-#pragma once
-
+#include <fstream>
 // This is there to avoid most of the warnings.
 #if defined(_WIN32) || defined(_WIN64)
 #pragma warning(push)
@@ -35,7 +35,7 @@ namespace frame::proto {
 			return T{};
 		// Try to open it.
 		std::ifstream ifs_level(file_name.c_str(), std::ios::in);
-		if (!ifs_level)
+		if (!ifs_level.is_open())
 			throw std::runtime_error("Couldn't open file: " + file_name);
 		T proto{};
 		std::string contents(std::istreambuf_iterator<char>(ifs_level), {});

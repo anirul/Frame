@@ -82,7 +82,7 @@ namespace frame::opengl {
 	// - vertex shader code;
 	// - pixel shader code.
 	// Also set the matrix for projection/view/model to I.
-	std::shared_ptr<ProgramInterface> CreateProgram(
+	std::shared_ptr<frame::ProgramInterface> CreateProgram(
 		std::istream& vertex_shader_code,
 		std::istream& pixel_shader_code);
 

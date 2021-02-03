@@ -12,6 +12,8 @@ namespace frame::proto {
 		// Get the pixel element size.
 		constexpr auto INVALID_ELEMENT_SIZE =
 			frame::proto::PixelElementSize::INVALID;
+		constexpr auto INVALID_STRUCTURE =
+			frame::proto::PixelStructure::INVALID;
 		if (proto_texture.pixel_element_size().value() == INVALID_ELEMENT_SIZE)
 		{
 			error.CreateError(
@@ -19,7 +21,7 @@ namespace frame::proto {
 				__FILE__,
 				__LINE__ - 7);
 		}
-		if (proto_texture.pixel_structure().value() == INVALID_ELEMENT_SIZE)
+		if (proto_texture.pixel_structure().value() == INVALID_STRUCTURE)
 		{
 			error.CreateError(
 				"Invalid pixel structure.",
@@ -71,6 +73,8 @@ namespace frame::proto {
 		// Get the pixel element size.
 		constexpr auto INVALID_ELEMENT_SIZE =
 			frame::proto::PixelElementSize::INVALID;
+		constexpr auto INVALID_STRUCTURE =
+			frame::proto::PixelStructure::INVALID;
 		if (proto_texture.pixel_element_size().value() == INVALID_ELEMENT_SIZE)
 		{
 			error.CreateError(
@@ -78,7 +82,7 @@ namespace frame::proto {
 				__FILE__,
 				__LINE__ - 7);
 		}
-		if (proto_texture.pixel_structure().value() == INVALID_ELEMENT_SIZE)
+		if (proto_texture.pixel_structure().value() == INVALID_STRUCTURE)
 		{
 			error.CreateError(
 				"Invalid pixel structure.",
