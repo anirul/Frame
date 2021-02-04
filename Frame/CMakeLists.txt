@@ -44,16 +44,19 @@ target_include_directories(Frame
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
+# Why??? this works and you also need to change:
+# > export MESA_GL_VERSION_OVERRIDE=3.3
+# on linux for it to run.
 if(UNIX)
-    set(SDL_LIB SDL2)
+    set(SDL2_LIBRARY SDL2)
 else()
-    set(SDL_LIB SDL2::SDL2)
+    set(SDL2_LIBRARY SDL2::SDL2)
 endif()
 
 target_link_libraries(Frame
   PUBLIC
     FrameProto
-    ${SDL_LIB}
+    ${SDL2_LIBRARY}
     spdlog::spdlog
     glm
 )

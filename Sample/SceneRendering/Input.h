@@ -18,6 +18,7 @@ public:
 		const double dt) override;
 	bool MousePressed(const char button, const double dt) override;
 	bool MouseReleased(const char button, const double dt) override;
+	void NextFrame() override;
 
 private:
 	std::shared_ptr<frame::DeviceInterface> device_;

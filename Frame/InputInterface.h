@@ -20,6 +20,8 @@ namespace frame {
 		virtual bool MousePressed(const char button, const double dt) = 0;
 		// Mouse release (used for mouse buttons).
 		virtual bool MouseReleased(const char button, const double dt) = 0;
+		// Validate the next frame.
+		virtual void NextFrame() = 0;
 	};
 
 } // End namespace frame.

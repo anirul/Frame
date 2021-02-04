@@ -65,3 +65,8 @@ bool Input::MouseReleased(const char button, const double dt)
 {
 	return true;
 }
+
+void Input::NextFrame()
+{
+	throw std::runtime_error("Not implemented yet!");
+}
