@@ -6,7 +6,7 @@
 #include <utility>
 #include <sstream>
 #include <SDL2/SDL.h>
-#include <SDL_syswm.h>
+#include <SDL2/SDL_syswm.h>
 #include <GL/glew.h>
 #include "Error.h"
 #include "../Frame/OpenGL/Device.h"

@@ -44,10 +44,16 @@ target_include_directories(Frame
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
+if(UNIX)
+    set(SDL_LIB SDL2)
+else()
+    set(SDL_LIB SDL2::SDL2)
+endif()
+
 target_link_libraries(Frame
   PUBLIC
     FrameProto
-    SDL2::SDL2
+    ${SDL_LIB}
     spdlog::spdlog
     glm
 )
