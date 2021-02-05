@@ -1,6 +1,7 @@
 #include "StaticMeshTest.h"
 #include <GL/glew.h>
 #include "Frame/BufferInterface.h"
+#include "Frame/File/FileSystem.h"
 #include "Frame/File/LoadStaticMesh.h"
 #include "Frame/LevelBase.h"
 
@@ -14,7 +15,7 @@ namespace test {
 		auto level = std::make_shared<frame::LevelBase>();
 		static_mesh_ = frame::file::LoadStaticMeshFromFileOpenGL(
 			level,
-			"../Asset/Model/Cube.obj");
+			frame::file::FindPath("Asset") + "/Model/Cube.obj");
 		EXPECT_NE(0, static_mesh_->GetMaterialId());
 		EXPECT_NE(0, static_mesh_->GetPointBufferId());
 		EXPECT_NE(0, static_mesh_->GetNormalBufferId());

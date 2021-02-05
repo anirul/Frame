@@ -6,7 +6,7 @@
 #include "Frame/MaterialInterface.h"
 #include "Frame/BufferInterface.h"
 #include "Frame/StaticMeshInterface.h"
-#include "Frame/SceneNodeInterface.h"
+#include "Frame/NodeInterface.h"
 #include "Frame/TextureInterface.h"
 
 namespace frame {
@@ -16,7 +16,7 @@ namespace frame {
 		// Get maps from the store.
 		virtual const std::unordered_map<
 			std::uint64_t,
-			std::shared_ptr<SceneNodeInterface>>&
+			std::shared_ptr<NodeInterface>>&
 			GetSceneNodeMap() const = 0;
 		virtual const std::unordered_map<
 			std::uint64_t, 
@@ -49,7 +49,7 @@ namespace frame {
 		// Add element to the store.
 		virtual std::uint64_t AddSceneNode(
 			const std::string& name,
-			std::shared_ptr<SceneNodeInterface> scene_node) = 0;
+			std::shared_ptr<NodeInterface> scene_node) = 0;
 		virtual std::uint64_t AddTexture(
 			const std::string& name,
 			std::shared_ptr<TextureInterface> texture) = 0;

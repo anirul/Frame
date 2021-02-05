@@ -10,12 +10,12 @@
 namespace frame {
 
 	// Interface to visit the scene node.
-	class SceneNodeInterface
+	class NodeInterface
 	{
 	public:
 		// Redefinition for shortening.
-		using Ptr = std::shared_ptr<SceneNodeInterface>;
-		using PtrVec = std::vector<std::shared_ptr<SceneNodeInterface>>;
+		using Ptr = std::shared_ptr<NodeInterface>;
+		using PtrVec = std::vector<std::shared_ptr<NodeInterface>>;
 
 	public:
 		// Get the local model of current node.

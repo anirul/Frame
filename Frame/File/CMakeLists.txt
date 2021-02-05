@@ -6,6 +6,8 @@ add_library(FrameFile
 	LoadImage.h
 	LoadStaticMesh.cpp
 	LoadStaticMesh.h
+    FileSystem.cpp
+    FileSystem.h
 )
 
 target_include_directories(FrameFile
@@ -23,3 +25,5 @@ target_link_libraries(FrameFile
 	FrameOpenGL
 	assimp::assimp
 )
+
+add_subdirectory(Test)

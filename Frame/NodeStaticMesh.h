@@ -1,14 +1,14 @@
 #pragma once
 
 #include <memory>
-#include "Frame/SceneNodeInterface.h"
+#include "Frame/NodeInterface.h"
 
 namespace frame {
 
-	class SceneStaticMesh : public SceneNodeInterface
+	class NodeStaticMesh : public NodeInterface
 	{
 	public:
-		SceneStaticMesh(std::shared_ptr<StaticMeshInterface> mesh) :
+		NodeStaticMesh(std::shared_ptr<StaticMeshInterface> mesh) :
 			mesh_(mesh) {}
 
 	public:

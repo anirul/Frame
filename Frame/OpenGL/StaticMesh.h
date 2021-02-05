@@ -82,10 +82,8 @@ namespace frame::opengl {
 	};
 
 	// Create a quad static mesh.
-	std::shared_ptr<StaticMeshInterface> CreateQuadStaticMesh(
-		std::shared_ptr<LevelInterface> level);
+	std::uint64_t CreateQuadStaticMesh(std::shared_ptr<LevelInterface> level);
 	// Create a cube static mesh.
-	std::shared_ptr<StaticMeshInterface> CreateCubeStaticMesh(
-		std::shared_ptr<LevelInterface> level);
+	std::uint64_t CreateCubeStaticMesh(std::shared_ptr<LevelInterface> level);
 
 } // End namespace frame::opengl.

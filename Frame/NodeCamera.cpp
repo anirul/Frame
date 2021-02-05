@@ -1,13 +1,13 @@
-#include "SceneCamera.h"
+#include "NodeCamera.h"
 #include <stdexcept>
 
 namespace frame {
 
-	const glm::mat4 SceneCamera::GetLocalModel(const double dt) const
+	const glm::mat4 NodeCamera::GetLocalModel(const double dt) const
 	{
 		if (!GetParentName().empty())
 		{
-			SceneNodeInterface::Ptr parent_node = func_(GetParentName());
+			NodeInterface::Ptr parent_node = func_(GetParentName());
 			if (!parent_node)
 			{
 				throw std::runtime_error(

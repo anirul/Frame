@@ -90,6 +90,8 @@ namespace frame {
 							loop = false;
 						}
 					}
+					if (input_interface_)
+						input_interface_->NextFrame();
 
 					// Draw the Scene not used?
 					if (draw_interface_)

@@ -10,7 +10,7 @@
 #include "../Frame/LightInterface.h"
 #include "../Frame/MaterialInterface.h"
 #include "../Frame/ProgramInterface.h"
-#include "../Frame/SceneNodeInterface.h"
+#include "../Frame/NodeInterface.h"
 #include "../Frame/SceneTreeInterface.h"
 #include "../Frame/TextureInterface.h"
 #include "../Frame/UniformInterface.h"

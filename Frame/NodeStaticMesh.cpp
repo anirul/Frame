@@ -1,13 +1,13 @@
-#include "SceneStaticMesh.h"
+#include "NodeStaticMesh.h"
 #include <stdexcept>
 
 namespace frame {
 
-	const glm::mat4 SceneStaticMesh::GetLocalModel(const double dt) const
+	const glm::mat4 NodeStaticMesh::GetLocalModel(const double dt) const
 	{
 		if (!GetParentName().empty())
 		{
-			SceneNodeInterface::Ptr parent_node = func_(GetParentName());
+			NodeInterface::Ptr parent_node = func_(GetParentName());
 			if (!parent_node)
 			{
 				throw std::runtime_error(
@@ -21,7 +21,7 @@ namespace frame {
 	}
 
 	const std::shared_ptr<StaticMeshInterface>
-		SceneStaticMesh::GetLocalMesh() const
+		NodeStaticMesh::GetLocalMesh() const
 	{
 		return mesh_;
 	}

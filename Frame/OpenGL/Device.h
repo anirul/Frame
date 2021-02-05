@@ -17,7 +17,7 @@
 #include "Frame/OpenGL/StaticMesh.h"
 #include "Frame/OpenGL/Light.h"
 #include "Frame/OpenGL/Material.h"
-#include "Frame/SceneCamera.h"
+#include "Frame/NodeCamera.h"
 
 namespace frame::opengl {
 
@@ -81,8 +81,8 @@ namespace frame::opengl {
 		const proto::PixelElementSize pixel_element_size_ = 
 			proto::PixelElementSize_HALF();
 		// Cached quad and cube objects.
-		std::shared_ptr<StaticMeshInterface> quad_ = nullptr;
-		std::shared_ptr<StaticMeshInterface> cube_ = nullptr;
+		std::uint64_t quad_id_ = {};
+		std::uint64_t cube_id_ = {};
 		// Error setup.
 		const Error& error_ = Error::GetInstance();
 		const Logger& logger_ = Logger::GetInstance();

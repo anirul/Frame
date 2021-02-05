@@ -2,14 +2,14 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtx/quaternion.hpp>
-#include "Frame/SceneNodeInterface.h"
+#include "Frame/NodeInterface.h"
 
 namespace frame {
 
-	class SceneMatrix : public SceneNodeInterface
+	class NodeMatrix : public NodeInterface
 	{
 	public:
-		SceneMatrix(const glm::mat4 matrix) : matrix_(matrix) {}
+		NodeMatrix(const glm::mat4 matrix) : matrix_(matrix) {}
 
 	public:
 		const glm::mat4 GetLocalModel(const double dt) const override;

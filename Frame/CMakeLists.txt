@@ -21,15 +21,15 @@ add_library(Frame
     Logger.h
     MaterialInterface.h
     ProgramInterface.h
-    SceneCamera.cpp
-    SceneCamera.h
-    SceneLight.cpp
-    SceneLight.h
-    SceneMatrix.cpp
-    SceneMatrix.h
-    SceneNodeInterface.h
-    SceneStaticMesh.cpp
-    SceneStaticMesh.h
+    NodeCamera.cpp
+    NodeCamera.h
+    NodeLight.cpp
+    NodeLight.h
+    NodeMatrix.cpp
+    NodeMatrix.h
+    NodeInterface.h
+    NodeStaticMesh.cpp
+    NodeStaticMesh.h
     StaticMeshInterface.h
     TextureInterface.h
     UniformInterface.h

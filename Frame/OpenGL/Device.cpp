@@ -66,15 +66,13 @@ namespace frame::opengl {
 		// Setup camera.
 		SetupCamera();
 		// Create a default cube and quad for rendering.
-		cube_ = CreateCubeStaticMesh(level_);
-		quad_ = CreateQuadStaticMesh(level_);
+		cube_id_ = CreateCubeStaticMesh(level_);
+		quad_id_ = CreateQuadStaticMesh(level_);
 	}
 
 	void Device::Cleanup()
 	{
 		program_render_.clear();
-		quad_ = nullptr;
-		cube_ = nullptr;
 		level_ = nullptr;
 	}
 
@@ -113,7 +111,7 @@ namespace frame::opengl {
 	void Device::SetupCamera()
 	{
 		auto id = level_->GetDefaultCameraId();
-		const auto scene_camera = std::dynamic_pointer_cast<SceneCamera>(
+		const auto scene_camera = std::dynamic_pointer_cast<NodeCamera>(
 			level_->GetSceneNodeMap().at(id));
 		const auto camera = scene_camera->GetCamera();
 		perspective_ = camera->ComputeProjection(size_);
@@ -194,7 +192,7 @@ namespace frame::opengl {
 	const glm::vec3 Device::GetCameraPosition() const
 	{
 		auto id = level_->GetDefaultCameraId();
-		auto scene_camera = std::dynamic_pointer_cast<SceneCamera>(
+		auto scene_camera = std::dynamic_pointer_cast<NodeCamera>(
 			level_->GetSceneNodeMap().at(id));
 		return scene_camera->GetCamera()->GetPosition();
 	}
@@ -202,7 +200,7 @@ namespace frame::opengl {
 	const glm::vec3 Device::GetCameraFront() const
 	{
 		auto id = level_->GetDefaultCameraId();
-		auto scene_camera = std::dynamic_pointer_cast<SceneCamera>(
+		auto scene_camera = std::dynamic_pointer_cast<NodeCamera>(
 			level_->GetSceneNodeMap().at(id));
 		return scene_camera->GetCamera()->GetFront();
 	}
@@ -210,7 +208,7 @@ namespace frame::opengl {
 	const glm::vec3 Device::GetCameraRight() const
 	{
 		auto id = level_->GetDefaultCameraId();
-		auto scene_camera = std::dynamic_pointer_cast<SceneCamera>(
+		auto scene_camera = std::dynamic_pointer_cast<NodeCamera>(
 			level_->GetSceneNodeMap().at(id));
 		return scene_camera->GetCamera()->GetRight();
 	}
@@ -218,7 +216,7 @@ namespace frame::opengl {
 	const glm::vec3 Device::GetCameraUp() const
 	{
 		auto id = level_->GetDefaultCameraId();
-		auto scene_camera = std::dynamic_pointer_cast<SceneCamera>(
+		auto scene_camera = std::dynamic_pointer_cast<NodeCamera>(
 			level_->GetSceneNodeMap().at(id));
 		return scene_camera->GetCamera()->GetUp();
 	}
@@ -226,7 +224,7 @@ namespace frame::opengl {
 	const std::shared_ptr<frame::CameraInterface> Device::GetCamera() const
 	{
 		auto id = level_->GetDefaultCameraId();
-		auto scene_camera = std::dynamic_pointer_cast<SceneCamera>(
+		auto scene_camera = std::dynamic_pointer_cast<NodeCamera>(
 			level_->GetSceneNodeMap().at(id));
 		return scene_camera->GetCamera();
 	}

@@ -5,7 +5,7 @@
 #include <utility>
 #include "Frame/LevelInterface.h"
 #include "Frame/Proto/Proto.h"
-#include "Frame/SceneNodeInterface.h"
+#include "Frame/NodeInterface.h"
 
 namespace frame {
 
@@ -17,7 +17,7 @@ namespace frame {
 	public:
 		const std::unordered_map<
 			std::uint64_t,
-			std::shared_ptr<SceneNodeInterface>>&
+			std::shared_ptr<NodeInterface>>&
 			GetSceneNodeMap() const override
 		{
 			return id_scene_node_map_;
@@ -90,7 +90,7 @@ namespace frame {
 	public:
 		std::uint64_t AddSceneNode(
 			const std::string& name,
-			std::shared_ptr<SceneNodeInterface> scene_node) override;
+			std::shared_ptr<NodeInterface> scene_node) override;
 		std::uint64_t AddTexture(
 			const std::string& name,
 			std::shared_ptr<TextureInterface> texture) override;
@@ -140,7 +140,7 @@ namespace frame {
 		std::string default_root_scene_node_name_ = "";
 		std::string default_camera_name_ = "";
 		std::unordered_set<std::string> string_set_ = {};
-		std::unordered_map<std::uint64_t, std::shared_ptr<SceneNodeInterface>>
+		std::unordered_map<std::uint64_t, std::shared_ptr<NodeInterface>>
 			id_scene_node_map_ = {};
 		std::unordered_map<std::uint64_t, std::shared_ptr<TextureInterface>>
 			id_texture_map_ = {};

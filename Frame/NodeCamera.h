@@ -2,14 +2,14 @@
 
 #include <glm/glm.hpp>
 #include "Frame/Camera.h"
-#include "Frame/SceneNodeInterface.h"
+#include "Frame/NodeInterface.h"
 
 namespace frame {
 
-	class SceneCamera : public SceneNodeInterface
+	class NodeCamera : public NodeInterface
 	{
 	public:
-		SceneCamera(
+		NodeCamera(
 			const glm::vec3 position = glm::vec3{ 0.f, 0.f, 0.f },
 			const glm::vec3 target = glm::vec3{ 0.f, 0.f, -1.f },
 			const glm::vec3 up = glm::vec3{ 0.f, 1.f, 0.f },

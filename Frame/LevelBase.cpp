@@ -4,7 +4,7 @@ namespace frame {
 
 	std::uint64_t LevelBase::AddSceneNode(
 		const std::string& name, 
-		std::shared_ptr<SceneNodeInterface> scene_node)
+		std::shared_ptr<NodeInterface> scene_node)
 	{
 		if (string_set_.count(name))
 			throw std::runtime_error("Name: " + name + " is already in!");

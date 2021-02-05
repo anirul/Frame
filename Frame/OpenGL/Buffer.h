@@ -6,7 +6,7 @@
 
 namespace frame::opengl {
 
-	enum class BufferType : std::uint16_t
+	enum class BufferTypeEnum : std::uint16_t
 	{
 		ARRAY_BUFFER				= GL_ARRAY_BUFFER,
 		ATOMIC_COUNTER_BUFFER		= GL_ATOMIC_COUNTER_BUFFER,
@@ -24,7 +24,7 @@ namespace frame::opengl {
 		UNIFORM_BUFFER				= GL_UNIFORM_BUFFER,
 	};
 
-	enum class BufferUsage : std::uint16_t
+	enum class BufferUsageEnum : std::uint16_t
 	{
 		STREAM_DRAW					= GL_STREAM_DRAW, 
 		STREAM_READ					= GL_STREAM_READ, 
@@ -41,8 +41,8 @@ namespace frame::opengl {
 	{
 	public:
 		Buffer(
-			const BufferType buffer_type = BufferType::ARRAY_BUFFER, 
-			const BufferUsage buffer_usage = BufferUsage::STATIC_DRAW);
+			const BufferTypeEnum buffer_type = BufferTypeEnum::ARRAY_BUFFER, 
+			const BufferUsageEnum buffer_usage = BufferUsageEnum::STATIC_DRAW);
 		virtual ~Buffer();
 		void Copy(
 			const std::size_t size, 
@@ -57,8 +57,8 @@ namespace frame::opengl {
 	private:
 		mutable std::size_t size_ = 0;
 		mutable bool locked_bind_ = false;
-		const BufferType buffer_type_;
-		const BufferUsage buffer_usage_;
+		const BufferTypeEnum buffer_type_;
+		const BufferUsageEnum buffer_usage_;
 		unsigned int buffer_object_ = 0;
 		const Error& error_ = Error::GetInstance();
 	};

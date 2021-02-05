@@ -6,8 +6,8 @@ namespace frame::opengl {
 
 
 	Buffer::Buffer(
-		const BufferType buffer_type /*= BufferType::ARRAY_BUFFER*/, 
-		const BufferUsage buffer_usage /*= BufferUsage::STATIC_DRAW*/) :
+		const BufferTypeEnum buffer_type /*= BufferTypeEnum::ARRAY_BUFFER*/, 
+		const BufferUsageEnum buffer_usage /*= BufferUsageEnum::STATIC_DRAW*/) :
 		buffer_type_(buffer_type),
 		buffer_usage_(buffer_usage)
 	{
