@@ -3,12 +3,8 @@
 add_executable(FrameOpenGLTest
     BufferTest.cpp
     BufferTest.h
-    CameraTest.cpp
-    CameraTest.h
     DeviceTest.cpp
     DeviceTest.h
-    ErrorTest.cpp
-    ErrorTest.h
     FrameBufferTest.cpp
     FrameBufferTest.h
     LightTest.cpp
@@ -30,8 +26,6 @@ add_executable(FrameOpenGLTest
     TextureTest.cpp
     TextureTest.h
     UniformMock.h
-    WindowTest.cpp
-    WindowTest.h
 )
 
 target_include_directories(FrameOpenGLTest
