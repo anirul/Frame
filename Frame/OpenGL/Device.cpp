@@ -79,33 +79,10 @@ namespace frame::opengl {
 	void Device::Display(const double dt)
 	{
 		dt_ = dt;
-		for (const auto& program_id : program_render_)
-		{
-			logger_->info(
-				"Display {}[{}] program.", 
-				level_->GetNameFromId(program_id),
-				program_id);
-			auto program = level_->GetProgramMap().at(program_id);
-			if (program->GetSceneTreeId())
-			{
-				auto mesh = 
-					level_->GetStaticMeshMap().at(program->GetSceneTreeId());
-				RenderingStaticMesh(
-					perspective_,
-					view_,
-					model_,
-					mesh,
-					program);
-			}
-			else
-			{
-				RenderingTexture(
-					perspective_,
-					view_,
-					model_,
-					program);
-			}
-		}
+		rendering_.SetPerspective(perspective_);
+		rendering_.SetView(view_);
+		rendering_.SetModel(model_);
+		rendering_.DisplayLevel(level_, dt);
 	}
 
 	void Device::SetupCamera()

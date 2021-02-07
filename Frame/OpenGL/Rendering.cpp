@@ -3,30 +3,21 @@
 
 namespace frame::opengl {
 
-	void RenderingStaticMesh(
-		const glm::mat4 perspective, 
-		const glm::mat4 view, 
-		const glm::mat4 model, 
-		const std::shared_ptr<StaticMeshInterface> mesh, 
-		const std::shared_ptr<ProgramInterface> program)
+	void Rendering::DisplayLevel(
+		const std::shared_ptr<LevelInterface>& level, 
+		const double dt)
 	{
 		throw std::runtime_error("Not implemented!");
 	}
 
-	void RenderingTexture(
-		const glm::mat4 perspective, 
-		const glm::mat4 view, 
-		const glm::mat4 model, 
-		const std::shared_ptr<ProgramInterface> program)
+	void Rendering::DisplayTexture(
+		const std::shared_ptr<ProgramInterface>& program)
 	{
 		throw std::runtime_error("Not implemented!");
 	}
 
-	void RenderingTextureCubeMap(
-		const glm::mat4 perspective, 
-		const glm::mat4 view, 
-		const glm::mat4 model, 
-		const std::shared_ptr<ProgramInterface> program)
+	void Rendering::DisplayCubeMap(
+		const std::shared_ptr<ProgramInterface>& program)
 	{
 		throw std::runtime_error("Not implemented!");
 	}

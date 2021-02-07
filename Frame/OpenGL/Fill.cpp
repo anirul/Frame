@@ -109,12 +109,9 @@ namespace frame::opengl {
 			}
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			error.Display(__FILE__, __LINE__ - 1);
-
-			RenderingTexture(
-				projection, 
-				glm::mat4(1.0f),
-				glm::mat4(1.0f),
-				program);
+			Rendering rendering{};
+			rendering.SetPerspective(projection);
+			rendering.DisplayTexture(program);
 		}
 	}
 
@@ -191,12 +188,10 @@ namespace frame::opengl {
 				cubemap_element++;
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 				error.Display(__FILE__, __LINE__ - 1);
-
-				RenderingTextureCubeMap(
-					projection,
-					view,
-					glm::mat4(1.0f),
-					program);
+				Rendering rendering{};
+				rendering.SetPerspective(projection);
+				rendering.SetView(view);
+				rendering.DisplayCubeMap(program);
 			}
 		}
 	}
