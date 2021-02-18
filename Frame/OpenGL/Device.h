@@ -32,7 +32,7 @@ namespace frame::opengl {
 		virtual ~Device();
 
 	public:
-		const std::shared_ptr<CameraInterface> GetCamera() const;
+		const std::shared_ptr<CameraInterface> GetCamera() const override;
 		// Startup the scene.
 		void Startup(const std::shared_ptr<LevelInterface> level) override;
 		// Cleanup the mess.
@@ -50,8 +50,8 @@ namespace frame::opengl {
 		const glm::mat4 GetProjection() const final { return perspective_; }
 		const glm::mat4 GetView() const final { return view_; }
 		const glm::mat4 GetModel() const final { return model_; }
-		void* GetDeviceContext() const { return gl_context_; }
-		const std::string GetTypeString() const { return "OpenGL"; }
+		void* GetDeviceContext() const final { return gl_context_; }
+		const std::string GetTypeString() const final { return "OpenGL"; }
 
 	protected:
 		void SetupCamera();

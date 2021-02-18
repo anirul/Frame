@@ -56,14 +56,14 @@ namespace frame::opengl {
 		// /!\ This will bind and unbind!
 		void DrawBuffers(const std::uint32_t size = 1);
 		// /!\ This will bind and unbind!
-		const std::pair<bool, std::string> GetError() const;
+		const std::pair<bool, std::string> GetError() const final;
 		// /!\ This will bind and unbind!
 		const std::string GetStatus() const;
 
 	public:
-		unsigned int GetId() const { return frame_id_; }
-		void LockedBind() const override { locked_bind_ = true; }
-		void UnlockedBind() const override { locked_bind_ = false; }
+		unsigned int GetId() const final { return frame_id_; }
+		void LockedBind() const final { locked_bind_ = true; }
+		void UnlockedBind() const final { locked_bind_ = false; }
 
 	protected:
 		const int GetFrameTextureType(

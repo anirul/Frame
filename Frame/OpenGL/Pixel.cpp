@@ -18,11 +18,13 @@ namespace frame::opengl {
 			return GL_FLOAT; // Not half float.
 		case frame::proto::PixelElementSize::FLOAT:
 			return GL_FLOAT;
+		default:
+			throw
+				std::runtime_error(
+					"unknown element size : " +
+					std::to_string(
+						static_cast<int>(pixel_element_size.value())));	
 		}
-		throw
-			std::runtime_error(
-				"unknown element size : " +
-				std::to_string(static_cast<int>(pixel_element_size.value())));
 	}
 
 	int ConvertToGLType(
@@ -38,11 +40,12 @@ namespace frame::opengl {
 			return GL_RGB;
 		case frame::proto::PixelStructure::RGB_ALPHA:
 			return GL_RGBA;
+		default:
+			throw
+				std::runtime_error(
+					"unknown structure : " +
+					std::to_string(static_cast<int>(pixel_structure.value())));
 		}
-		throw
-			std::runtime_error(
-				"unknown structure : " +
-				std::to_string(static_cast<int>(pixel_structure.value())));
 	}
 
 	int ConvertToGLType(
@@ -62,6 +65,15 @@ namespace frame::opengl {
 				return GL_RGB8;
 			case frame::proto::PixelStructure::RGB_ALPHA:
 				return GL_RGBA8;
+			default:
+				throw
+					std::runtime_error(
+						"unknown structure : " +
+						std::to_string(
+							static_cast<int>(pixel_structure.value())) +
+						" or element size : " +
+						std::to_string(
+							static_cast<int>(pixel_element_size.value())));
 			}
 		case frame::proto::PixelElementSize::SHORT:
 			switch (pixel_structure.value())
@@ -74,6 +86,15 @@ namespace frame::opengl {
 				return GL_RGB16;
 			case frame::proto::PixelStructure::RGB_ALPHA:
 				return GL_RGBA16;
+			default:
+				throw
+					std::runtime_error(
+						"unknown structure : " +
+						std::to_string(
+							static_cast<int>(pixel_structure.value())) +
+						" or element size : " +
+						std::to_string(
+							static_cast<int>(pixel_element_size.value())));
 			}
 		case frame::proto::PixelElementSize::HALF:
 			switch (pixel_structure.value())
@@ -86,6 +107,15 @@ namespace frame::opengl {
 				return GL_RGB16F;
 			case frame::proto::PixelStructure::RGB_ALPHA:
 				return GL_RGBA16F;
+			default:
+				throw
+					std::runtime_error(
+						"unknown structure : " +
+						std::to_string(
+							static_cast<int>(pixel_structure.value())) +
+						" or element size : " +
+						std::to_string(
+							static_cast<int>(pixel_element_size.value())));
 			}
 		case frame::proto::PixelElementSize::FLOAT:
 			switch (pixel_structure.value())
@@ -98,14 +128,26 @@ namespace frame::opengl {
 				return GL_RGB32F;
 			case frame::proto::PixelStructure::RGB_ALPHA:
 				return GL_RGBA32F;
+			default:
+				throw
+					std::runtime_error(
+						"unknown structure : " +
+						std::to_string(
+							static_cast<int>(pixel_structure.value())) +
+						" or element size : " +
+						std::to_string(
+							static_cast<int>(pixel_element_size.value())));
 			}
+		default:
+			throw
+				std::runtime_error(
+					"unknown structure : " +
+					std::to_string(
+						static_cast<int>(pixel_structure.value())) +
+					" or element size : " +
+					std::to_string(
+						static_cast<int>(pixel_element_size.value())));
 		}
-		throw
-			std::runtime_error(
-				"unknown structure : " +
-				std::to_string(static_cast<int>(pixel_structure.value())) +
-				" or element size : " +
-				std::to_string(static_cast<int>(pixel_element_size.value())));
 	}
 
 } // End namespace frame::opengl.

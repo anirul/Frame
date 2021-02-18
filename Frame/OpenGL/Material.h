@@ -26,7 +26,7 @@ namespace frame::opengl {
 		bool HasTextureId(std::uint64_t id) const override;
 		bool RemoveTextureId(std::uint64_t id) override;
 		// Return the list of texture ids.
-		const std::vector<std::uint64_t> GetIds() const;
+		const std::vector<std::uint64_t> GetIds() const final;
 		// Return the name and the binding slot of a texture (to be passed to
 		// the program).
 		const std::pair<std::string, int> EnableTextureId(
