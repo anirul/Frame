@@ -9,6 +9,7 @@ add_library(Frame
     CameraInterface.h
     DeviceInterface.h
     DrawInterface.h
+    EntityId.h
     Error.cpp
     Error.h
     Frame.h

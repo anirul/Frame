@@ -4,9 +4,22 @@ import "Uniform.proto";
 
 package frame.proto;
 
+// This is the description of a Scene type this will define witch rendering
+// technique will be used with the current program.
+// Next 2
+message SceneType {
+	enum Enum {
+		NONE			= 0;
+		TEXTURE_2D		= 1;
+		TEXTURE_3D		= 2;
+		SCENE			= 3;
+	}
+	Enum value = 1;
+}
+
 // Description of an effect that can be used as a 2D effect on a rendering or
 // as a shader for material.
-// Next 9
+// Next 10
 message Program {
 	// Name of the effect.
 	string name = 1;
@@ -14,6 +27,9 @@ message Program {
 	repeated string input_texture_names = 3;
 	// Output texture names.
 	repeated string output_texture_names = 4;
+	// Input Scene type.
+	// In case you select 'SCENE' you'll have to set the input_scene_name.
+	SceneType input_scene_type = 9;
 	// Input Scenes name.
 	string input_scene_name = 5;
 	// Shader name (used to find the shader).

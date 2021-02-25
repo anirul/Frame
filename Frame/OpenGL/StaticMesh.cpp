@@ -8,35 +8,35 @@
 namespace frame::opengl {
 
 	StaticMesh::StaticMesh(
-		const std::shared_ptr<LevelInterface> level,
-		std::uint64_t point_buffer_id,
-		std::uint64_t normal_buffer_id,
-		std::uint64_t texture_buffer_id,
-		std::uint64_t index_buffer_id)
+		LevelInterface* level,
+		EntityId point_buffer_id,
+		EntityId normal_buffer_id,
+		EntityId texture_buffer_id,
+		EntityId index_buffer_id)
 	{
 		// Get a local copy of the pointer.
-		level_ = level;
 		point_buffer_id_ = point_buffer_id;
 		normal_buffer_id_ = normal_buffer_id;
 		texture_buffer_id_ = texture_buffer_id;
 		index_buffer_id_ = index_buffer_id;
+		index_size_ = level->GetBufferMap().at(index_buffer_id)->GetSize();
 
 		// Create a new vertex array (to render the mesh).
 		glGenVertexArrays(1, &vertex_array_object_);
 		error_.Display(__FILE__, __LINE__ - 1);
 		glBindVertexArray(vertex_array_object_);
 		error_.Display(__FILE__, __LINE__ - 1);
-		level_->GetBufferMap().at(point_buffer_id_)->Bind();
+		level->GetBufferMap().at(point_buffer_id_)->Bind();
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 		error_.Display(__FILE__, __LINE__ - 1);
-		level_->GetBufferMap().at(point_buffer_id_)->UnBind();
-		level_->GetBufferMap().at(normal_buffer_id_)->Bind();
+		level->GetBufferMap().at(point_buffer_id_)->UnBind();
+		level->GetBufferMap().at(normal_buffer_id_)->Bind();
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 		error_.Display(__FILE__, __LINE__ - 1);
-		level_->GetBufferMap().at(texture_buffer_id_)->Bind();
+		level->GetBufferMap().at(texture_buffer_id_)->Bind();
 		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
 		error_.Display(__FILE__, __LINE__ - 1);
-		level_->GetBufferMap().at(texture_buffer_id_)->UnBind();
+		level->GetBufferMap().at(texture_buffer_id_)->UnBind();
 
 		// Enable vertex attrib array.
 		glEnableVertexAttribArray(0);
@@ -68,7 +68,7 @@ namespace frame::opengl {
 		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
-	std::uint64_t CreateQuadStaticMesh(std::shared_ptr<LevelInterface> level)
+	EntityId CreateQuadStaticMesh(LevelInterface* level)
 	{
 		std::array<float, 12> points =
 		{
@@ -138,7 +138,7 @@ namespace frame::opengl {
 		return id;
 	}
 
-	std::uint64_t CreateCubeStaticMesh(std::shared_ptr<LevelInterface> level)
+	EntityId CreateCubeStaticMesh(LevelInterface* level)
 	{
 		std::array<float, 18 * 6> points =
 		{

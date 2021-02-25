@@ -6,6 +6,7 @@
         "x": "-1",
         "y": "-1"
       },
+      "cubemap": "false",
       "pixel_element_size": {
         "value": "HALF"
       },

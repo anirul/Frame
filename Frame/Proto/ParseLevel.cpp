@@ -2,6 +2,7 @@
 #include "Frame/LevelBase.h"
 #include "Frame/OpenGL/Texture.h"
 #include "Frame/OpenGL/Material.h"
+#include "Frame/OpenGL/StaticMesh.h"
 #include "Frame/ProgramInterface.h"
 #include "Frame/Proto/ParseMaterial.h"
 #include "Frame/Proto/ParseProgram.h"
@@ -33,8 +34,11 @@ namespace frame::proto {
 			if (default_camera_name_.empty())
 				throw std::runtime_error("should have a default camera name.");
 
+			// Include the default cube and quad.
+			cube_id_ = opengl::CreateCubeStaticMesh(this);
+			quad_id_ = opengl::CreateQuadStaticMesh(this);
+
 			// Load textures from proto.
-			std::map<std::string, std::uint64_t> name_id_textures;
 			for (const auto& proto_texture : proto_texture_file.textures())
 			{
 				std::shared_ptr<TextureInterface> texture = nullptr;
@@ -43,7 +47,6 @@ namespace frame::proto {
 				else
 					texture = ParseTexture(proto_texture, size);
 				auto texture_id = AddTexture(proto_texture.name(), texture);
-				name_id_textures.insert({ proto_texture.name(), texture_id });
 			}
 
 			// Check the default texture is in.
@@ -59,7 +62,7 @@ namespace frame::proto {
 				auto program = ParseProgramOpenGL(
 					proto_program, 
 					default_path,
-					name_id_textures);
+					this);
 				AddProgram(proto_program.name(), program);
 			}
 
@@ -67,10 +70,17 @@ namespace frame::proto {
 			for (const auto& proto_material : proto_material_file.materials())
 			{
 				std::shared_ptr<MaterialInterface> material =
-					proto::ParseMaterialOpenGL(proto_material, this);
+					ParseMaterialOpenGL(proto_material, this);
 				AddMaterial(proto_material.name(), material);
 			}
 		}
+
+		EntityId GetDefaultQuadSceneId() const { return quad_id_; }
+		EntityId GetDefaultCubeSceneId() const { return cube_id_; }
+
+	private:
+		EntityId quad_id_ = 0;
+		EntityId cube_id_ = 0;
 	};
 
 	std::shared_ptr<LevelInterface> ParseLevelOpenGL(

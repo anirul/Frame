@@ -1,4 +1,5 @@
 #include "DeviceTest.h"
+#include "Frame/File/FileSystem.h"
 #include "Frame/Proto/ParseLevel.h"
 
 namespace test {
@@ -18,7 +19,7 @@ namespace test {
 		device_ = window_->GetUniqueDevice();
 		auto level = frame::proto::ParseLevelOpenGL(
 			std::make_pair<std::uint32_t, std::uint32_t>(32, 32),
-			"../../../../Asset/",
+			frame::file::FindPath("Asset"),
 			GetLevel(),
 			GetProgramFile(),
 			GetSceneFile(), 

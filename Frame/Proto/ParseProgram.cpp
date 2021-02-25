@@ -7,7 +7,7 @@ namespace frame::proto {
 	std::shared_ptr<frame::ProgramInterface> ParseProgramOpenGL(
 		const Program& proto_program,
 		const std::string& default_path,
-		const std::map<std::string, std::uint64_t>& name_id_textures)
+		const LevelInterface* level)
 	{
 		Error& error = Error::GetInstance();
 		std::string shader_name = 
@@ -29,11 +29,47 @@ namespace frame::proto {
 		auto program = opengl::CreateProgram(ifs_vertex, ifs_pixel);
 		for (const auto& texture_name : proto_program.input_texture_names())
 		{
-			program->AddInputTextureId(name_id_textures.at(texture_name));
+			EntityId texture_id = level->GetIdFromName(texture_name);
+			// Check this is a texture.
+			(void)level->GetTextureMap().at(texture_id);
+			program->AddInputTextureId(texture_id);
 		}
 		for (const auto& texture_name : proto_program.output_texture_names())
 		{
-			program->AddOutputTextureId(name_id_textures.at(texture_name));
+			EntityId texture_id = level->GetIdFromName(texture_name);
+			// Check this is a texture.
+			(void)level->GetTextureMap().at(texture_id);
+			program->AddOutputTextureId(texture_id);
+		}
+		switch (proto_program.input_scene_type().value())
+		{
+		case SceneType::TEXTURE_2D:
+		{
+			EntityId quad_id = level->GetDefaultQuadSceneId();
+			program->SetSceneTreeId(quad_id);
+			break;
+		}
+		case SceneType::TEXTURE_3D:
+		{
+			EntityId cube_id = level->GetDefaultCubeSceneId();
+			program->SetSceneTreeId(cube_id);
+			break;
+		}
+		case SceneType::SCENE:
+		{
+			EntityId scene_id = 
+				level->GetIdFromName(proto_program.input_scene_name());
+			(void)level->GetSceneNodeMap().at(scene_id);
+			program->SetSceneTreeId(scene_id);
+			break;
+		}
+		case SceneType::NONE:
+			break;
+		default:
+			throw std::runtime_error(
+				fmt::format(
+					"No way {}?", 
+					proto_program.input_scene_type().value()));
 		}
 		return program;
 	}

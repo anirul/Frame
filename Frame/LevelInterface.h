@@ -2,12 +2,13 @@
 
 #include <memory>
 #include <unordered_map>
-#include "Frame/ProgramInterface.h"
-#include "Frame/MaterialInterface.h"
+#include "Frame/EntityId.h"
 #include "Frame/BufferInterface.h"
 #include "Frame/StaticMeshInterface.h"
 #include "Frame/NodeInterface.h"
 #include "Frame/TextureInterface.h"
+#include "Frame/ProgramInterface.h"
+#include "Frame/MaterialInterface.h"
 
 namespace frame {
 
@@ -15,54 +16,56 @@ namespace frame {
 	{
 		// Get maps from the store.
 		virtual const std::unordered_map<
-			std::uint64_t,
+			EntityId,
 			std::shared_ptr<NodeInterface>>&
 			GetSceneNodeMap() const = 0;
 		virtual const std::unordered_map<
-			std::uint64_t, 
+			EntityId,
 			std::shared_ptr<TextureInterface>>&
 			GetTextureMap() const = 0;
 		virtual const std::unordered_map<
-			std::uint64_t,
+			EntityId,
 			std::shared_ptr<ProgramInterface>>&
 			GetProgramMap() const = 0;
 		virtual const std::unordered_map<
-			std::uint64_t,
+			EntityId,
 			std::shared_ptr<MaterialInterface>>&
 			GetMaterialMap() const = 0;
 		virtual const std::unordered_map<
-			std::uint64_t,
+			EntityId,
 			std::shared_ptr<BufferInterface>>&
 			GetBufferMap() const = 0;
 		virtual const std::unordered_map<
-			std::uint64_t,
+			EntityId,
 			std::shared_ptr<StaticMeshInterface>>&
 			GetStaticMeshMap() const = 0;
 		// Get element id and name from the store.
-		virtual std::uint64_t GetIdFromName(const std::string& name) const = 0;
-		virtual std::string GetNameFromId(const std::uint64_t id) const = 0;
-		virtual std::uint64_t GetDefaultOutputTextureId() const = 0;
+		virtual EntityId GetIdFromName(const std::string& name) const = 0;
+		virtual std::string GetNameFromId(const EntityId id) const = 0;
+		virtual EntityId GetDefaultOutputTextureId() const = 0;
 		virtual void SetDefaultRootSceneNodeName(const std::string& name) = 0;
-		virtual std::uint64_t GetDefaultRootSceneNodeId() const = 0;
+		virtual EntityId GetDefaultRootSceneNodeId() const = 0;
 		virtual void SetDefaultCameraName(const std::string& name) = 0;
-		virtual std::uint64_t GetDefaultCameraId() const = 0;
+		virtual EntityId GetDefaultCameraId() const = 0;
+		virtual EntityId GetDefaultQuadSceneId() const = 0;
+		virtual EntityId GetDefaultCubeSceneId() const = 0;
 		// Add element to the store.
-		virtual std::uint64_t AddSceneNode(
+		virtual EntityId AddSceneNode(
 			const std::string& name,
 			std::shared_ptr<NodeInterface> scene_node) = 0;
-		virtual std::uint64_t AddTexture(
+		virtual EntityId AddTexture(
 			const std::string& name,
 			std::shared_ptr<TextureInterface> texture) = 0;
-		virtual std::uint64_t AddProgram(
+		virtual EntityId AddProgram(
 			const std::string& name,
 			std::shared_ptr<ProgramInterface> program) = 0;
-		virtual std::uint64_t AddMaterial(
+		virtual EntityId AddMaterial(
 			const std::string& name,
 			std::shared_ptr<MaterialInterface> material) = 0;
-		virtual std::uint64_t AddBuffer(
+		virtual EntityId AddBuffer(
 			const std::string& name,
 			std::shared_ptr<BufferInterface> buffer) = 0;
-		virtual std::uint64_t AddStaticMesh(
+		virtual EntityId AddStaticMesh(
 			const std::string& name,
 			std::shared_ptr<StaticMeshInterface> static_mesh) = 0;
 	};

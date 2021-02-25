@@ -13,24 +13,29 @@ namespace frame::opengl {
 
 	public:
 		// Set the default matrices.
-		void SetPerspective(const glm::mat4& perspective) 
+		void SetPerspective(glm::mat4 perspective) 
 		{ 
-			perspective_ = perspective; 
+			perspective_ = std::move(perspective); 
 		}
-		void SetView(const glm::mat4& view) { view_ = view; }
-		void SetModel(const glm::mat4& model) { model_ = model; }
+		void SetView(glm::mat4 view) { view_ = std::move(view); }
+		void SetModel(glm::mat4 model) { model_ = std::move(model); }
 
 	public:
-		// Render a level.
-		void DisplayLevel(
-			const std::shared_ptr<LevelInterface>& level, 
-			const double dt);
-		// Render to a texture.
-		void DisplayTexture(const std::shared_ptr<ProgramInterface>& program);
-		// Render to a cube map.
-		void DisplayCubeMap(const std::shared_ptr<ProgramInterface>& program);
+		// Render to a texture at a dt time.
+		void DisplayTexture(
+			std::weak_ptr<ProgramInterface> program, 
+			const double dt = 0.0);
+		// Render to a cube map at a dt time.
+		void DisplayCubeMap(
+			std::weak_ptr<ProgramInterface> program,
+			const double dt = 0.0);
+		// Render to a mesh at a dt time.
+		void DisplayMesh(
+			std::weak_ptr<ProgramInterface> program,
+			std::weak_ptr<StaticMeshInterface> static_mesh,
+			const double dt = 0.0);
 
-	protected:
+	private:
 		glm::mat4 perspective_ = glm::mat4(1.0f);
 		glm::mat4 view_ = glm::mat4(1.0f);
 		glm::mat4 model_ = glm::mat4(1.0f);

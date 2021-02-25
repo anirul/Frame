@@ -2,7 +2,6 @@
 
 #include <memory>
 #include <glm/glm.hpp>
-#include "../Frame/CameraInterface.h"
 
 namespace frame {
 

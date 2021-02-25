@@ -45,10 +45,6 @@ namespace frame::opengl {
 		// Enable seamless cube map.
 		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 		error_.Display(__FILE__, __LINE__ - 1);
-
-		// Create a frame buffer and a render buffer.
-		frame_ = std::make_shared<FrameBuffer>();
-		render_ = std::make_shared<RenderBuffer>();
 	}
 
 	Device::~Device() 
@@ -65,24 +61,24 @@ namespace frame::opengl {
 			GetProgramIdTextureId(level_->GetDefaultOutputTextureId()));
 		// Setup camera.
 		SetupCamera();
-		// Create a default cube and quad for rendering.
-		cube_id_ = CreateCubeStaticMesh(level_);
-		quad_id_ = CreateQuadStaticMesh(level_);
+		rendering_ = std::make_unique<Rendering>();
 	}
 
 	void Device::Cleanup()
 	{
-		program_render_.clear();
 		level_ = nullptr;
 	}
 
 	void Device::Display(const double dt)
 	{
 		dt_ = dt;
-		rendering_.SetPerspective(perspective_);
-		rendering_.SetView(view_);
-		rendering_.SetModel(model_);
-		rendering_.DisplayLevel(level_, dt);
+		rendering_->SetPerspective(perspective_);
+		rendering_->SetView(view_);
+		rendering_->SetModel(model_);
+		for (const auto& program_id : program_render_)
+		{
+				
+		}
 	}
 
 	void Device::SetupCamera()
@@ -95,9 +91,9 @@ namespace frame::opengl {
 		view_ = camera->ComputeView();
 	}
 
-	std::uint64_t Device::GetProgramIdTextureId(std::uint64_t texture_id) const
+	EntityId Device::GetProgramIdTextureId(EntityId texture_id) const
 	{
-		std::uint64_t program_id = 0;
+		EntityId program_id = 0;
 		// Go through all programs.
 		for (const auto& id_program : level_->GetProgramMap())
 		{
@@ -128,19 +124,19 @@ namespace frame::opengl {
 		return program_id;
 	}
 
-	void Device::AddToRenderProgram(std::uint64_t program_id)
+	void Device::AddToRenderProgram(EntityId program_id)
 	{
-		std::vector<std::uint64_t> texture_ids = {};
+		std::vector<EntityId> texture_ids = {};
 		const auto& program = level_->GetProgramMap().at(program_id);
 		texture_ids = program->GetInputTextureIds();
 		std::sort(texture_ids.begin(), texture_ids.end());
-		std::vector<std::uint64_t> program_ids = {};
+		std::vector<EntityId> program_ids = {};
 		for (const auto& id_program : level_->GetProgramMap())
 		{
-			std::vector<std::uint64_t> output_texture_ids = {};
+			std::vector<EntityId> output_texture_ids = {};
 			output_texture_ids = id_program.second->GetOutputTextureIds();
 			std::sort(output_texture_ids.begin(), output_texture_ids.end());
-			std::vector<std::uint64_t> intersection = {};
+			std::vector<EntityId> intersection = {};
 			std::set_intersection(
 				output_texture_ids.cbegin(),
 				output_texture_ids.cend(),
@@ -150,7 +146,7 @@ namespace frame::opengl {
 			if (intersection.size() > 0)
 			{
 				program_ids.push_back(id_program.first);
-				std::vector<std::uint64_t> difference = {};
+				std::vector<EntityId> difference = {};
 				std::set_difference(
 					output_texture_ids.cbegin(),
 					output_texture_ids.cend(),
@@ -160,7 +156,8 @@ namespace frame::opengl {
 				texture_ids = difference;
 			}
 		}
-		for (const auto& id : program_ids) {
+		for (const auto& id : program_ids) 
+		{
 			AddToRenderProgram(id);
 		}
 		program_render_.push_back(program_id);

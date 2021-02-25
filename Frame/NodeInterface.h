@@ -10,7 +10,7 @@
 namespace frame {
 
 	// Interface to visit the scene node.
-	class NodeInterface
+	struct NodeInterface
 	{
 	public:
 		// Redefinition for shortening.

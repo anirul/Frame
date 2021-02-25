@@ -75,7 +75,8 @@ namespace frame::opengl {
 		frame.AttachRender(render);
 		frame.DrawBuffers(static_cast<std::uint32_t>(texture_out_ids.size()));
 		int max_mipmap = (mipmap <= 0) ? 1 : mipmap;
-		if (max_mipmap > 1) {
+		if (max_mipmap > 1) 
+		{
 			for (const auto& texture_id : texture_out_ids)
 			{
 				auto texture = level->GetTextureMap().at(texture_id);

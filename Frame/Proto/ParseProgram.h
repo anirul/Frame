@@ -2,6 +2,7 @@
 
 #include <memory>
 #include "Frame/Proto/Proto.h"
+#include "Frame/LevelInterface.h"
 #include "Frame/ProgramInterface.h"
 
 namespace frame::proto {
@@ -9,6 +10,6 @@ namespace frame::proto {
 	std::shared_ptr<ProgramInterface> ParseProgramOpenGL(
 		const frame::proto::Program& proto_program,
 		const std::string& default_path,
-		const std::map<std::string, std::uint64_t>& name_id_textures);
+		const LevelInterface* level);
 
 } // End namespace frame::proto.

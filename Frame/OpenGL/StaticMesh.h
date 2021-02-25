@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include "Frame/Error.h"
+#include "Frame/LevelInterface.h"
 #include "Frame/OpenGL/Buffer.h"
 #include "Frame/OpenGL/Material.h"
 #include "Frame/OpenGL/Program.h"
@@ -20,41 +21,41 @@ namespace frame::opengl {
 	public:
 		// Create a mesh from a set of vectors.
 		StaticMesh(
-			const std::shared_ptr<LevelInterface> level,
-			std::uint64_t point_buffer_id,
-			std::uint64_t normal_buffer_id,
-			std::uint64_t texture_buffer_id,
-			std::uint64_t index_buffer_id);
+			LevelInterface* level,
+			EntityId point_buffer_id,
+			EntityId normal_buffer_id,
+			EntityId texture_buffer_id,
+			EntityId index_buffer_id);
 		virtual ~StaticMesh();
 
 	public:
-		void SetMaterialId(std::uint64_t id) override
+		void SetMaterialId(EntityId id) override
 		{ 
 			material_id_ = id; 
 		}
-		std::uint64_t GetMaterialId() const override
+		EntityId GetMaterialId() const override
 		{ 
 			return material_id_; 
 		}
-		std::uint64_t GetPointBufferId() const override
+		EntityId GetPointBufferId() const override
 		{ 
 			return point_buffer_id_; 
 		}
-		std::uint64_t GetNormalBufferId() const override 
+		EntityId GetNormalBufferId() const override 
 		{ 
 			return normal_buffer_id_; 
 		}
-		std::uint64_t GetTextureBufferId() const override 
+		EntityId GetTextureBufferId() const override 
 		{ 
 			return texture_buffer_id_; 
 		}
-		std::uint64_t GetIndexBufferId() const  override 
+		EntityId GetIndexBufferId() const  override 
 		{ 
 			return index_buffer_id_; 
 		}
 		std::size_t GetIndexSize() const override
 		{
-			return level_->GetBufferMap().at(index_buffer_id_)->GetSize();
+			return index_size_;
 		}
 		void LockedBind() const override { locked_bind_ = true; }
 		void UnlockedBind() const override { locked_bind_ = false; }
@@ -67,14 +68,11 @@ namespace frame::opengl {
 	protected:
 		bool clear_depth_buffer_ = false;
 		mutable bool locked_bind_ = false;
-		std::shared_ptr<LevelInterface> level_ = nullptr;
-		std::shared_ptr<ProgramInterface> program_ = nullptr;
-		std::uint64_t material_id_ = 0;
-		std::uint64_t point_buffer_id_ = 0;
-		std::uint64_t normal_buffer_id_ = 0;
-		std::uint64_t texture_buffer_id_ = 0;
-		std::uint64_t index_buffer_id_ = 0;
-		std::shared_ptr<MaterialInterface> material_ = nullptr;
+		EntityId material_id_ = 0;
+		EntityId point_buffer_id_ = 0;
+		EntityId normal_buffer_id_ = 0;
+		EntityId texture_buffer_id_ = 0;
+		EntityId index_buffer_id_ = 0;
 		size_t index_size_ = 0;
 		unsigned int vertex_array_object_ = 0;
 		const Error& error_ = Error::GetInstance();
@@ -82,8 +80,8 @@ namespace frame::opengl {
 	};
 
 	// Create a quad static mesh.
-	std::uint64_t CreateQuadStaticMesh(std::shared_ptr<LevelInterface> level);
+	EntityId CreateQuadStaticMesh(LevelInterface* level);
 	// Create a cube static mesh.
-	std::uint64_t CreateCubeStaticMesh(std::shared_ptr<LevelInterface> level);
+	EntityId CreateCubeStaticMesh(LevelInterface* level);
 
 } // End namespace frame::opengl.

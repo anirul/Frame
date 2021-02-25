@@ -3,14 +3,12 @@
 #include <memory>
 #include <string>
 #include <utility>
-#include "../Frame/DrawInterface.h"
-#include "../Frame/DeviceInterface.h"
-#include "../Frame/InputInterface.h"
+#include "Frame/Frame.h"
 
 namespace frame {
 
 	// Interface to a window this is specific to a platform (see Windows, SDL, 
-		// Linux, OSX, iOS, etc...).
+	// Linux, OSX, iOS, etc...).
 	struct WindowInterface
 	{
 		// Run the windows interface this will take the current thread.

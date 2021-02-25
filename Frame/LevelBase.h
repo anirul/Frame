@@ -4,8 +4,6 @@
 #include <memory>
 #include <utility>
 #include "Frame/LevelInterface.h"
-#include "Frame/Proto/Proto.h"
-#include "Frame/NodeInterface.h"
 
 namespace frame {
 
@@ -15,57 +13,52 @@ namespace frame {
 		LevelBase() = default;
 
 	public:
-		const std::unordered_map<
-			std::uint64_t,
-			std::shared_ptr<NodeInterface>>&
+		// Has to be implemented in the driver class.
+		EntityId GetDefaultQuadSceneId() const override { return 0; }
+		EntityId GetDefaultCubeSceneId() const override { return 0; }
+
+	public:
+		const std::unordered_map<EntityId, std::shared_ptr<NodeInterface>>&
 			GetSceneNodeMap() const override
 		{
 			return id_scene_node_map_;
 		}
-		const std::unordered_map<
-			std::uint64_t,
-			std::shared_ptr<TextureInterface>>&
+		const std::unordered_map<EntityId, std::shared_ptr<TextureInterface>>&
 			GetTextureMap() const override
 		{
 			return id_texture_map_;
 		}
-		const std::unordered_map<
-			std::uint64_t,
-			std::shared_ptr<ProgramInterface>>&
+		const std::unordered_map<EntityId, std::shared_ptr<ProgramInterface>>&
 			GetProgramMap() const override
 		{
 			return id_program_map_;
 		}
-		const std::unordered_map<
-			std::uint64_t,
-			std::shared_ptr<MaterialInterface>>&
+		const std::unordered_map<EntityId, std::shared_ptr<MaterialInterface>>&
 			GetMaterialMap() const override
 		{
 			return id_material_map_;
 		}
-		const std::unordered_map<
-			std::uint64_t,
-			std::shared_ptr<BufferInterface>>&
+		const std::unordered_map<EntityId, std::shared_ptr<BufferInterface>>&
 			GetBufferMap() const override
 		{
 			return id_buffer_map_;
 		}
 		const std::unordered_map<
-			std::uint64_t,
+			EntityId, 
 			std::shared_ptr<StaticMeshInterface>>&
 			GetStaticMeshMap() const override
 		{
 			return id_static_mesh_map_;
 		}
-		std::uint64_t GetIdFromName(const std::string& name) const override
+		EntityId GetIdFromName(const std::string& name) const override
 		{
 			return name_id_map_.at(name);
 		}
-		std::string GetNameFromId(std::uint64_t id) const override
+		std::string GetNameFromId(EntityId id) const override
 		{
 			return id_name_map_.at(id);
 		}
-		std::uint64_t GetDefaultOutputTextureId() const override
+		EntityId GetDefaultOutputTextureId() const override
 		{
 			return GetIdFromName(default_texture_name_);
 		}
@@ -73,7 +66,7 @@ namespace frame {
 		{
 			default_camera_name_ = name;
 		}
-		std::uint64_t GetDefaultRootSceneNodeId() const override
+		EntityId GetDefaultRootSceneNodeId() const override
 		{
 			return GetIdFromName(default_root_scene_node_name_);
 		}
@@ -81,79 +74,79 @@ namespace frame {
 		{
 			default_root_scene_node_name_ = name;
 		}
-		std::uint64_t GetDefaultCameraId() const override
+		EntityId GetDefaultCameraId() const override
 		{
 			assert(!default_camera_name_.empty());
 			return GetIdFromName(default_camera_name_);
 		}
 
 	public:
-		std::uint64_t AddSceneNode(
+		EntityId AddSceneNode(
 			const std::string& name,
 			std::shared_ptr<NodeInterface> scene_node) override;
-		std::uint64_t AddTexture(
+		EntityId AddTexture(
 			const std::string& name,
 			std::shared_ptr<TextureInterface> texture) override;
-		std::uint64_t AddProgram(
+		EntityId AddProgram(
 			const std::string& name,
 			std::shared_ptr<ProgramInterface> program) override;
-		std::uint64_t AddMaterial(
+		EntityId AddMaterial(
 			const std::string& name,
 			std::shared_ptr<MaterialInterface> material) override;
-		std::uint64_t AddBuffer(
+		EntityId AddBuffer(
 			const std::string& name,
 			std::shared_ptr<BufferInterface> buffer) override;
-		std::uint64_t AddStaticMesh(
+		EntityId AddStaticMesh(
 			const std::string& name,
 			std::shared_ptr<StaticMeshInterface> static_mesh) override;
 
 	protected:
-		std::uint64_t GetTextureNewId() const
+		EntityId GetTextureNewId() const
 		{
 			return next_id_maker_++;
 		}
-		std::uint64_t GetProgramNewId() const
+		EntityId GetProgramNewId() const
 		{
 			return next_id_maker_++;
 		}
-		std::uint64_t GetMaterialNewId() const
+		EntityId GetMaterialNewId() const
 		{
 			return next_id_maker_++;
 		}
-		std::uint64_t GetBufferNewId() const
+		EntityId GetBufferNewId() const
 		{
 			return next_id_maker_++;
 		}
-		std::uint64_t GetStaticMeshNewId() const
+		EntityId GetStaticMeshNewId() const
 		{
 			return next_id_maker_++;
 		}
-		std::uint64_t GetSceneNodeNewId() const
+		EntityId GetSceneNodeNewId() const
 		{
 			return next_id_maker_++;
 		}
 
 	protected:
-		mutable std::uint64_t next_id_maker_ = 1;
+		mutable EntityId next_id_maker_ = 1;
 		std::string name_ = "";
 		std::string default_texture_name_ = "";
 		std::string default_root_scene_node_name_ = "";
 		std::string default_camera_name_ = "";
 		std::unordered_set<std::string> string_set_ = {};
-		std::unordered_map<std::uint64_t, std::shared_ptr<NodeInterface>>
+		std::unordered_map<EntityId, std::shared_ptr<NodeInterface>>
 			id_scene_node_map_ = {};
-		std::unordered_map<std::uint64_t, std::shared_ptr<TextureInterface>>
+		std::unordered_map<EntityId, std::shared_ptr<TextureInterface>>
 			id_texture_map_ = {};
-		std::unordered_map<std::uint64_t, std::shared_ptr<ProgramInterface>>
+		std::unordered_map<EntityId, std::shared_ptr<ProgramInterface>>
 			id_program_map_ = {};
-		std::unordered_map<std::uint64_t, std::shared_ptr<MaterialInterface>>
+		std::unordered_map<EntityId, std::shared_ptr<MaterialInterface>>
 			id_material_map_ = {};
-		std::unordered_map<std::uint64_t, std::shared_ptr<BufferInterface>>
+		std::unordered_map<EntityId, std::shared_ptr<BufferInterface>>
 			id_buffer_map_ = {};
-		std::unordered_map<std::uint64_t, std::shared_ptr<StaticMeshInterface>>
+		std::unordered_map<EntityId, std::shared_ptr<StaticMeshInterface>>
 			id_static_mesh_map_ = {};
-		std::unordered_map<std::string, std::uint64_t> name_id_map_ = {};
-		std::unordered_map<std::uint64_t, std::string> id_name_map_ = {};
+		std::unordered_map<std::string, EntityId> name_id_map_ = {};
+		std::unordered_map<EntityId, std::string> id_name_map_ = {};
 	};
 
 } // End namespace frame.

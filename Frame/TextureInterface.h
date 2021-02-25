@@ -33,6 +33,7 @@ namespace frame {
 			throw std::runtime_error("Not implemented!");
 		}
 		virtual void Clear(const glm::vec4 color) = 0;
+		virtual bool IsCubeMap() const = 0;
 	};
 
 } // End namespace frame.

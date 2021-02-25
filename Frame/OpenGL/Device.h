@@ -55,18 +55,16 @@ namespace frame::opengl {
 
 	protected:
 		void SetupCamera();
-		std::uint64_t GetProgramIdTextureId(std::uint64_t texture_id) const;
-		void AddToRenderProgram(std::uint64_t program_id);
+		EntityId GetProgramIdTextureId(EntityId texture_id) const;
+		void AddToRenderProgram(EntityId program_id);
 
 	private:
-		std::shared_ptr<FrameBuffer> frame_ = nullptr;
-		std::shared_ptr<RenderBuffer> render_ = nullptr;
 		// Map of current stored level.
 		std::shared_ptr<LevelInterface> level_ = nullptr;
 		// Order of program to be rendered (fixed by input output).
 		// The order is relevant and this should also be a set as program
 		// should only be referred once.
-		std::vector<std::uint64_t> program_render_ = {};
+		std::vector<EntityId> program_render_ = {};
 		// Output texture (to the screen).
 		std::string out_texture_name_ = "";
 		// PVM matrices.
@@ -81,10 +79,8 @@ namespace frame::opengl {
 		const std::pair<std::uint32_t, std::uint32_t> size_ = { 0, 0 };
 		const proto::PixelElementSize pixel_element_size_ = 
 			proto::PixelElementSize_HALF();
-		// Cached quad and cube objects.
-		std::uint64_t quad_id_ = {};
-		std::uint64_t cube_id_ = {};
-		Rendering rendering_ = {};
+		// Rendering pipeline.
+		std::unique_ptr<Rendering> rendering_ = nullptr;
 		// Error setup.
 		const Error& error_ = Error::GetInstance();
 		const Logger& logger_ = Logger::GetInstance();
