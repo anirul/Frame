@@ -131,7 +131,8 @@ namespace frame::opengl {
 		// front, back - (positive Z, negative Z)
 		// The size is equal to the size of an image (*6).
 		TextureCubeMap(
-			const std::array<void*, 6>& cube_data,
+			const std::pair<std::uint32_t, std::uint32_t> size,
+			const std::array<void*, 6> cube_data,
 			const proto::PixelElementSize& pixel_element_size =
 				proto::PixelElementSize_BYTE(),
 			const proto::PixelStructure& pixel_structure = 
@@ -157,7 +158,10 @@ namespace frame::opengl {
 
 	protected:
 		// Create a cube map and assign it to the texture_id_.
-		void CreateTextureCubeMap();
+		void CreateTextureCubeMap(
+			const std::pair<std::uint32_t, std::uint32_t> size,
+			const std::array<void*, 6> cube_map = 
+				{ nullptr, nullptr, nullptr, nullptr, nullptr, nullptr });
 	};
 
 } // End namespace frame::opengl.

@@ -47,8 +47,11 @@ namespace frame {
 		virtual EntityId GetDefaultRootSceneNodeId() const = 0;
 		virtual void SetDefaultCameraName(const std::string& name) = 0;
 		virtual EntityId GetDefaultCameraId() const = 0;
+		// Get & Set the default quad and cube.
 		virtual EntityId GetDefaultQuadSceneId() const = 0;
+		virtual void SetDefaultQuadSceneId(EntityId id) = 0;
 		virtual EntityId GetDefaultCubeSceneId() const = 0;
+		virtual void SetDefaultCubeSceneId(EntityId id) = 0;
 		// Add element to the store.
 		virtual EntityId AddSceneNode(
 			const std::string& name,

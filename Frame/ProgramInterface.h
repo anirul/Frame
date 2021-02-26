@@ -10,19 +10,17 @@ namespace frame {
 	struct ProgramInterface
 	{
 		// Set & get input texture id.
-		virtual void AddInputTextureId(EntityId texture_id) = 0;
-		virtual const std::vector<EntityId>& 
-			GetInputTextureIds() const = 0;
+		virtual void AddInputTextureId(EntityId id) = 0;
+		virtual void RemoveInputTextureId(EntityId id) = 0;
+		virtual const std::vector<EntityId>	GetInputTextureIds() const = 0;
 		// Set & get output texture id.
-		virtual void AddOutputTextureId(EntityId texture_id) = 0;
-		virtual const std::vector<EntityId>& 
-			GetOutputTextureIds() const = 0;
-		// Set the scene to a program.
-		virtual void SetSceneTreeId(EntityId scene_id) = 0;
-		virtual EntityId GetSceneTreeId() const = 0;
-		// Remove and check texture id.
-		virtual void RemoveTextureId(EntityId id) = 0;
-		virtual bool HasTextureId(EntityId id) const = 0;
+		virtual void AddOutputTextureId(EntityId id) = 0;
+		virtual void RemoveOutputTextureId(EntityId id) = 0;
+		virtual const std::vector<EntityId> GetOutputTextureIds() const = 0;
+		// Set scene meshes to a program.
+		virtual void AddSceneMeshId(EntityId id) = 0;
+		virtual void RemoveSceneMeshId(EntityId id) = 0;
+		virtual const std::vector<EntityId> GetSceneMeshIds() const = 0;
 		// Link shaders to a program.
 		virtual void LinkShader() = 0;
 		// Use the program.

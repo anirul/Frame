@@ -13,9 +13,9 @@ namespace frame::opengl {
 
 	public:
 		// Set the default matrices.
-		void SetPerspective(glm::mat4 perspective) 
+		void SetProjection(glm::mat4 projection) 
 		{ 
-			perspective_ = std::move(perspective); 
+			projection_ = std::move(projection); 
 		}
 		void SetView(glm::mat4 view) { view_ = std::move(view); }
 		void SetModel(glm::mat4 model) { model_ = std::move(model); }
@@ -36,7 +36,7 @@ namespace frame::opengl {
 			const double dt = 0.0);
 
 	private:
-		glm::mat4 perspective_ = glm::mat4(1.0f);
+		glm::mat4 projection_ = glm::mat4(1.0f);
 		glm::mat4 view_ = glm::mat4(1.0f);
 		glm::mat4 model_ = glm::mat4(1.0f);
 	};

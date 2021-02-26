@@ -45,7 +45,7 @@ namespace frame::opengl {
 		void AttachRender(const RenderBuffer& render) const;
 		// /!\ This will bind and unbind!
 		void AttachTexture(
-			const std::shared_ptr<TextureInterface> texture,
+			unsigned int texture_id,
 			const FrameColorAttachment frame_color_attachment =
 				FrameColorAttachment::COLOR_ATTACHMENT0,
 			const int mipmap = 0,

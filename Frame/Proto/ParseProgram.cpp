@@ -46,13 +46,13 @@ namespace frame::proto {
 		case SceneType::TEXTURE_2D:
 		{
 			EntityId quad_id = level->GetDefaultQuadSceneId();
-			program->SetSceneTreeId(quad_id);
+			program->AddSceneMeshId(quad_id);
 			break;
 		}
 		case SceneType::TEXTURE_3D:
 		{
 			EntityId cube_id = level->GetDefaultCubeSceneId();
-			program->SetSceneTreeId(cube_id);
+			program->AddSceneMeshId(cube_id);
 			break;
 		}
 		case SceneType::SCENE:
@@ -60,7 +60,7 @@ namespace frame::proto {
 			EntityId scene_id = 
 				level->GetIdFromName(proto_program.input_scene_name());
 			(void)level->GetSceneNodeMap().at(scene_id);
-			program->SetSceneTreeId(scene_id);
+			program->AddSceneMeshId(scene_id);
 			break;
 		}
 		case SceneType::NONE:

@@ -6,7 +6,7 @@ namespace frame::opengl {
 
 	Material::~Material()
 	{
-		DisableAll();
+		// DisableAll();
 	}
 
 	void Material::SetLevel(std::shared_ptr<LevelInterface> level)

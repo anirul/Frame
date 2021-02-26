@@ -44,25 +44,4 @@ namespace frame::file {
 		const proto::PixelStructure pixel_structure_;
 	};
 
-	std::shared_ptr<TextureInterface> LoadTextureFromFileOpenGL(
-		const std::string& file,
-		const proto::PixelElementSize pixel_element_size =
-			proto::PixelElementSize_BYTE(),
-		const proto::PixelStructure pixel_structure =
-			proto::PixelStructure_RGB());
-
-	std::shared_ptr<TextureInterface> LoadCubeMapTextureFromFileOpenGL(
-		const std::string& file,
-		const proto::PixelElementSize pixel_element_size =
-			proto::PixelElementSize_BYTE(),
-		const proto::PixelStructure pixel_structure =
-			proto::PixelStructure_RGB());
-
-	std::shared_ptr<TextureInterface> LoadCubeMapTextureFromFilesOpenGL(
-		const std::array<std::string, 6> files,
-		const proto::PixelElementSize pixel_element_size =
-			proto::PixelElementSize_BYTE(),
-		const proto::PixelStructure pixel_structure =
-			proto::PixelStructure_RGB());
-
 }	// End of namespace frame::file.

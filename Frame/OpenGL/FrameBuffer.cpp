@@ -57,7 +57,7 @@ namespace frame::opengl {
 	}
 
 	void FrameBuffer::AttachTexture(
-		const std::shared_ptr<TextureInterface> texture,
+		unsigned int texture_id,
 		const FrameColorAttachment frame_color_attachment /*=
 			FrameColorAttachment::COLOR_ATTACHMENT0*/,
 		const int mipmap /*= 0*/,
@@ -69,7 +69,7 @@ namespace frame::opengl {
 			GL_FRAMEBUFFER,
 			static_cast<GLenum>(frame_color_attachment),
 			GetFrameTextureType(frame_texture_type),
-			texture->GetId(),
+			texture_id,
 			mipmap);
 		error_.Display(__FILE__, __LINE__ - 6);
 		UnBind();

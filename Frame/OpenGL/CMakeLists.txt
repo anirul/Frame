@@ -41,8 +41,11 @@ target_include_directories(FrameOpenGL
 target_link_libraries(FrameOpenGL
   PUBLIC
     Frame
+    FrameFile
+    FrameOpenGLFile
     FrameProto
     GLEW::GLEW
 )
 
 add_subdirectory(Test)
+add_subdirectory(File)

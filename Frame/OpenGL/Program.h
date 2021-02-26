@@ -23,17 +23,17 @@ namespace frame::opengl {
 
 	public:
 		// Set & get input texture id.
-		void AddInputTextureId(std::uint64_t texture_id) override;
-		const std::vector<std::uint64_t>& GetInputTextureIds() const override;
+		void AddInputTextureId(EntityId id) override;
+		void RemoveInputTextureId(EntityId id) override;
+		const std::vector<EntityId> GetInputTextureIds() const override;
 		// Set & get output texture id.
-		void AddOutputTextureId(std::uint64_t texture_id) override;
-		const std::vector<std::uint64_t>& GetOutputTextureIds() const override;
+		void AddOutputTextureId(EntityId id) override;
+		void RemoveOutputTextureId(EntityId id) override;
+		const std::vector<EntityId> GetOutputTextureIds() const override;
 		// Set the scene to a program.
-		void SetSceneTreeId(std::uint64_t scene_id) override;
-		std::uint64_t GetSceneTreeId() const override;
-		// Remove and check texture id.
-		void RemoveTextureId(std::uint64_t texture_id) override;
-		bool HasTextureId(std::uint64_t texture_id) const override;
+		void AddSceneMeshId(EntityId id) override;
+		void RemoveSceneMeshId(EntityId id) override;
+		const std::vector<EntityId> GetSceneMeshIds() const override;
 		// Attach shader to a program.
 		void AddShader(const Shader& shader);
 		// Link shaders to a program.
@@ -65,7 +65,7 @@ namespace frame::opengl {
 
 	protected:
 		const int GetMemoizeUniformLocation(const std::string& name) const;
-		void ThrowIsInTextureIds(std::uint64_t texture_id) const;
+		void ThrowIsInTextureIds(EntityId texture_id) const;
 
 	private:
 		const Error& error_ = Error::GetInstance();
@@ -73,9 +73,9 @@ namespace frame::opengl {
 		mutable std::map<std::string, int> memoize_map_ = {};
 		std::vector<unsigned int> attached_shaders_ = {};
 		int program_id_ = 0;
-		std::vector<std::uint64_t> input_texture_ids_ = {};
-		std::vector<std::uint64_t> output_texture_ids_ = {};
-		std::uint64_t scene_tree_id_ = 0;
+		std::vector<EntityId> input_texture_ids_ = {};
+		std::vector<EntityId> output_texture_ids_ = {};
+		std::vector<EntityId> scene_mesh_ids_ = {};
 	};
 
 	// Create a program from two streams:

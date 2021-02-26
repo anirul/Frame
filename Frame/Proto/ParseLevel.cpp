@@ -11,10 +11,10 @@
 
 namespace frame::proto {
 
-	class LevelOpenGL :	public LevelBase
+	class LevelProto :	public LevelBase
 	{
 	public:
-		LevelOpenGL(
+		LevelProto(
 			const std::pair<std::int32_t, std::int32_t> size,
 			const std::string& default_path,
 			const proto::Level& proto_level,
@@ -75,12 +75,6 @@ namespace frame::proto {
 			}
 		}
 
-		EntityId GetDefaultQuadSceneId() const { return quad_id_; }
-		EntityId GetDefaultCubeSceneId() const { return cube_id_; }
-
-	private:
-		EntityId quad_id_ = 0;
-		EntityId cube_id_ = 0;
 	};
 
 	std::shared_ptr<LevelInterface> ParseLevelOpenGL(
@@ -92,7 +86,7 @@ namespace frame::proto {
 		const proto::TextureFile& proto_texture_file,
 		const proto::MaterialFile& proto_material_file)
 	{
-		return std::make_shared<LevelOpenGL>(
+		return std::make_shared<LevelProto>(
 			size,
 			default_path,
 			proto_level,

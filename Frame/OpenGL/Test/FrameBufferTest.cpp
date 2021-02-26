@@ -54,9 +54,8 @@ namespace test {
 		render.CreateStorage({ 1, 1 });
 		frame_->AttachRender(render);
 		EXPECT_NO_THROW(error_.Display());
-		auto texture = std::make_shared<frame::opengl::Texture>(
-			std::make_pair(8, 8));
-		frame_->AttachTexture(texture);
+		frame::opengl::Texture texture(std::make_pair(8, 8));
+		frame_->AttachTexture(texture.GetId());
 		EXPECT_NO_THROW(error_.Display());
 	}
 

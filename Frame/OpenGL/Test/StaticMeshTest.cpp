@@ -2,7 +2,7 @@
 #include <GL/glew.h>
 #include "Frame/BufferInterface.h"
 #include "Frame/File/FileSystem.h"
-#include "Frame/File/LoadStaticMesh.h"
+#include "Frame/OpenGL/File/LoadStaticMesh.h"
 #include "Frame/LevelBase.h"
 
 namespace test {
@@ -13,7 +13,7 @@ namespace test {
 		EXPECT_FALSE(static_mesh_);
 		EXPECT_TRUE(window_);
 		auto level = std::make_shared<frame::LevelBase>();
-		static_mesh_ = frame::file::LoadStaticMeshFromFileOpenGL(
+		static_mesh_ = frame::opengl::file::LoadStaticMeshFromFile(
 			level,
 			frame::file::FindPath("Asset") + "/Model/Cube.obj");
 		EXPECT_NE(0, static_mesh_->GetMaterialId());
@@ -34,7 +34,7 @@ namespace test {
 		EXPECT_FALSE(static_mesh_);
 		EXPECT_TRUE(window_);
 		auto level = std::make_shared<frame::LevelBase>();
-		static_mesh_ = frame::file::LoadStaticMeshFromFileOpenGL(
+		static_mesh_ = frame::opengl::file::LoadStaticMeshFromFile(
 			level,
 			"../Asset/Model/Torus.obj");
 		EXPECT_NE(0, static_mesh_->GetMaterialId());

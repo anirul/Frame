@@ -1,6 +1,6 @@
 #include "MaterialTest.h"
 #include "Frame/LevelBase.h"
-#include "Frame/File/LoadImage.h"
+#include "Frame/OpenGL/File/LoadTexture.h"
 #include "Frame/File/FileSystem.h"
 
 namespace test {
@@ -27,9 +27,9 @@ namespace test {
 		material_ = std::dynamic_pointer_cast<frame::MaterialInterface>(
 			material);
 		EXPECT_TRUE(material_);
-		auto texture1 = frame::file::LoadTextureFromFileOpenGL(
+		auto texture1 = frame::opengl::file::LoadTextureFromFile(
 			frame::file::FindPath("Asset") + "/CubeMap/PositiveX.png");
-		auto texture2 = frame::file::LoadTextureFromFileOpenGL(
+		auto texture2 = frame::opengl::file::LoadTextureFromFile(
 			frame::file::FindPath("Asset") + "/CubeMap/PositiveY.png");
 		auto id1 = level->AddTexture("PositiveX", texture1);
 		auto id2 = level->AddTexture("PositiveY", texture2);

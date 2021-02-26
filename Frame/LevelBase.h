@@ -13,9 +13,10 @@ namespace frame {
 		LevelBase() = default;
 
 	public:
-		// Has to be implemented in the driver class.
-		EntityId GetDefaultQuadSceneId() const override { return 0; }
-		EntityId GetDefaultCubeSceneId() const override { return 0; }
+		EntityId GetDefaultQuadSceneId() const final { return quad_id_; }
+		void SetDefaultQuadSceneId(EntityId id) final { quad_id_ = id; }
+		EntityId GetDefaultCubeSceneId() const final { return cube_id_; }
+		void SetDefaultCubeSceneId(EntityId id) final { cube_id_ = id; }
 
 	public:
 		const std::unordered_map<EntityId, std::shared_ptr<NodeInterface>>&
@@ -128,6 +129,8 @@ namespace frame {
 
 	protected:
 		mutable EntityId next_id_maker_ = 1;
+		EntityId quad_id_ = 0;
+		EntityId cube_id_ = 0;
 		std::string name_ = "";
 		std::string default_texture_name_ = "";
 		std::string default_root_scene_node_name_ = "";

@@ -72,12 +72,13 @@ namespace frame::opengl {
 	void Device::Display(const double dt)
 	{
 		dt_ = dt;
-		rendering_->SetPerspective(perspective_);
+		rendering_->SetProjection(projection_);
 		rendering_->SetView(view_);
 		rendering_->SetModel(model_);
 		for (const auto& program_id : program_render_)
 		{
-				
+			auto program = level_->GetProgramMap().at(program_id);
+			throw std::runtime_error("Not implemented yet!");
 		}
 	}
 
@@ -87,7 +88,7 @@ namespace frame::opengl {
 		const auto scene_camera = std::dynamic_pointer_cast<NodeCamera>(
 			level_->GetSceneNodeMap().at(id));
 		const auto camera = scene_camera->GetCamera();
-		perspective_ = camera->ComputeProjection(size_);
+		projection_ = camera->ComputeProjection(size_);
 		view_ = camera->ComputeView();
 	}
 

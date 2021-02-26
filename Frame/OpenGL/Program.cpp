@@ -156,98 +156,72 @@ namespace frame::opengl {
 		return memoize_map_[name];
 	}
 
-	void Program::AddInputTextureId(std::uint64_t texture_id)
+	void Program::AddInputTextureId(EntityId id)
 	{
-		ThrowIsInTextureIds(texture_id);
-		input_texture_ids_.push_back(texture_id);
+		ThrowIsInTextureIds(id);
+		input_texture_ids_.push_back(id);
 	}
 
-	const std::vector<std::uint64_t>& Program::GetInputTextureIds() const
+	void Program::RemoveInputTextureId(EntityId id)
+	{
+		auto it = std::find(
+			input_texture_ids_.begin(), 
+			input_texture_ids_.end(), 
+			id);
+		if (it != input_texture_ids_.end())
+		{
+			input_texture_ids_.erase(it);
+		}
+	}
+
+	const std::vector<EntityId> Program::GetInputTextureIds() const
 	{
 		return input_texture_ids_;
 	}
 
-	void Program::AddOutputTextureId(std::uint64_t texture_id)
+	void Program::AddOutputTextureId(EntityId id)
 	{
-		ThrowIsInTextureIds(texture_id);
-		output_texture_ids_.push_back(texture_id);
+		ThrowIsInTextureIds(id);
+		output_texture_ids_.push_back(id);
 	}
 
-	const std::vector<std::uint64_t>& Program::GetOutputTextureIds() const
+	void Program::RemoveOutputTextureId(EntityId id)
+	{
+		auto it = std::find(
+			output_texture_ids_.begin(), 
+			output_texture_ids_.end(), 
+			id);
+		if (it != output_texture_ids_.end())
+		{
+			output_texture_ids_.erase(it);
+		}
+	}
+
+	const std::vector<EntityId> Program::GetOutputTextureIds() const
 	{
 		return output_texture_ids_;
 	}
 
-	void Program::SetSceneTreeId(std::uint64_t scene_id)
+	void Program::AddSceneMeshId(EntityId id)
 	{
-		scene_tree_id_ = scene_id;
+		scene_mesh_ids_.push_back(id);
 	}
 
-	std::uint64_t Program::GetSceneTreeId() const
+	void Program::RemoveSceneMeshId(EntityId id)
 	{
-		return scene_tree_id_;
-	}
-
-	void Program::RemoveTextureId(std::uint64_t texture_id)
-	{
-		bool found = false;
+		auto it = std::find(scene_mesh_ids_.begin(), scene_mesh_ids_.end(), id);
+		if (it != scene_mesh_ids_.end())
 		{
-			auto it = std::find(
-				input_texture_ids_.begin(), 
-				input_texture_ids_.end(),
-				texture_id);
-			if (it != input_texture_ids_.end())
-			{
-				found = true;
-				input_texture_ids_.erase(it);
-			}
-		}
-		{
-			auto it = std::find(
-				output_texture_ids_.begin(),
-				output_texture_ids_.end(),
-				texture_id);
-			if (it != output_texture_ids_.end())
-			{
-				found = true;
-				output_texture_ids_.erase(it);
-			}
-		}
-		if (!found)
-		{
-			throw std::runtime_error(
-				"Could not find texture: [" + 
-				std::to_string(texture_id) + 
-				"].");
+			scene_mesh_ids_.erase(it);
 		}
 	}
 
-	bool Program::HasTextureId(std::uint64_t texture_id) const
+	const std::vector<EntityId> Program::GetSceneMeshIds() const
 	{
-		if (std::find_if(
-			input_texture_ids_.begin(), 
-			input_texture_ids_.end(), 
-			[&texture_id](auto id) 
-			{
-				return id == texture_id;
-			}) != input_texture_ids_.end())
-		{
-			return true;
-		}
-		if (std::find_if(
-			output_texture_ids_.begin(),
-			output_texture_ids_.end(),
-			[&texture_id](auto id)
-			{
-				return id == texture_id;
-			}) != output_texture_ids_.end())
-		{
-			return true;
-		}
-		return false;
+		return scene_mesh_ids_;
 	}
 
-	void Program::ThrowIsInTextureIds(std::uint64_t texture_id) const
+	void Program::ThrowIsInTextureIds(EntityId texture_id) const
 	{
 		if (std::count(
 			input_texture_ids_.begin(),

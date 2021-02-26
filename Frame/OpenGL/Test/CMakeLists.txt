@@ -40,6 +40,7 @@ target_link_libraries(FrameOpenGLTest
     Frame
     FrameFile
     FrameOpenGL
+    FrameOpenGLFile
     FrameProto
     GTest::gmock
     GTest::gtest

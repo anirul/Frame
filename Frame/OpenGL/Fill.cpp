@@ -104,14 +104,14 @@ namespace frame::opengl {
 			for (const auto& texture_id : program->GetOutputTextureIds())
 			{
 				frame.AttachTexture(
-					level->GetTextureMap().at(texture_id),
+					level->GetTextureMap().at(texture_id)->GetId(),
 					FrameBuffer::GetFrameColorAttachment(i),
 					mipmap_level);
 			}
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			error.Display(__FILE__, __LINE__ - 1);
 			Rendering rendering{};
-			rendering.SetPerspective(projection);
+			rendering.SetProjection(projection);
 			rendering.DisplayTexture(program);
 		}
 	}
@@ -182,7 +182,7 @@ namespace frame::opengl {
 				for (const auto& texture_id : program->GetOutputTextureIds())
 				{
 					frame.AttachTexture(
-						level->GetTextureMap().at(texture_id),
+						level->GetTextureMap().at(texture_id)->GetId(),
 						FrameBuffer::GetFrameColorAttachment(i),
 						mipmap_level);
 				}
@@ -190,7 +190,7 @@ namespace frame::opengl {
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 				error.Display(__FILE__, __LINE__ - 1);
 				Rendering rendering{};
-				rendering.SetPerspective(projection);
+				rendering.SetProjection(projection);
 				rendering.SetView(view);
 				rendering.DisplayCubeMap(program);
 			}

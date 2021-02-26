@@ -47,7 +47,7 @@ namespace frame::opengl {
 
 	public:
 		const double GetDeltaTime() const final { return dt_; }
-		const glm::mat4 GetProjection() const final { return perspective_; }
+		const glm::mat4 GetProjection() const final { return projection_; }
 		const glm::mat4 GetView() const final { return view_; }
 		const glm::mat4 GetModel() const final { return model_; }
 		void* GetDeviceContext() const final { return gl_context_; }
@@ -68,7 +68,7 @@ namespace frame::opengl {
 		// Output texture (to the screen).
 		std::string out_texture_name_ = "";
 		// PVM matrices.
-		glm::mat4 perspective_ = glm::mat4(1.0f);
+		glm::mat4 projection_ = glm::mat4(1.0f);
 		glm::mat4 view_ = glm::mat4(1.0f);
 		glm::mat4 model_ = glm::mat4(1.0f);
 		// Save dt locally per frame.

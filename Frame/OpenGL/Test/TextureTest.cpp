@@ -1,6 +1,7 @@
 #include "TextureTest.h"
 #include <GL/glew.h>
-#include "Frame/File/LoadImage.h"
+#include "Frame/File/FileSystem.h"
+#include "Frame/OpenGL/File/LoadTexture.h"
 #include "Frame/Proto/ParseTexture.h"
 
 namespace test {
@@ -10,8 +11,8 @@ namespace test {
 		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(texture_);
 		EXPECT_NO_THROW(
-			texture_ = frame::file::LoadTextureFromFileOpenGL(
-				"../Asset/CubeMap/PositiveX.png"));
+			texture_ = frame::opengl::file::LoadTextureFromFile(
+				frame::file::FindPath("Asset/") + "CubeMap/PositiveX.png"));
 		EXPECT_TRUE(texture_);
 		EXPECT_NO_THROW(error_.Display());
 	}
@@ -21,8 +22,8 @@ namespace test {
 		EXPECT_EQ(GLEW_OK, glewInit());
 		ASSERT_FALSE(texture_);
 		EXPECT_NO_THROW(
-			texture_ = frame::file::LoadTextureFromFileOpenGL(
-				"../Asset/CubeMap/PositiveX.png"));
+			texture_ = frame::opengl::file::LoadTextureFromFile(
+				frame::file::FindPath("Asset/") + "CubeMap/PositiveX.png"));
 		ASSERT_TRUE(texture_);
 		EXPECT_NE(0, texture_->GetId());
 		auto pair = std::make_pair<std::uint32_t, std::uint32_t>(1024, 1024);
@@ -35,9 +36,9 @@ namespace test {
 		EXPECT_EQ(GLEW_OK, glewInit());
 		ASSERT_FALSE(texture_);
 		EXPECT_NO_THROW(
-			texture_ = frame::file::LoadTextureFromFileOpenGL(
-					"../Asset/CubeMap/Hamarikyu.hdr",
-					frame::proto::PixelElementSize_HALF()));
+			texture_ = frame::opengl::file::LoadTextureFromFile(
+				frame::file::FindPath("Asset") + "/CubeMap/Hamarikyu.hdr",
+				frame::proto::PixelElementSize_HALF()));
 		ASSERT_TRUE(texture_);
 		EXPECT_NE(0, texture_->GetId());
 		auto pair = std::make_pair<std::uint32_t, std::uint32_t>(3200, 1600);
@@ -50,14 +51,15 @@ namespace test {
 		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(texture_);
 		EXPECT_NO_THROW(
-			texture_ = frame::file::LoadCubeMapTextureFromFilesOpenGL(
+			texture_ = frame::opengl::file::LoadCubeMapTextureFromFiles(
 				std::array<std::string, 6>{
-					"../Asset/CubeMap/PositiveX.png",
-					"../Asset/CubeMap/NegativeX.png",
-					"../Asset/CubeMap/PositiveY.png",
-					"../Asset/CubeMap/NegativeY.png",
-					"../Asset/CubeMap/PositiveZ.png",
-					"../Asset/CubeMap/NegativeZ.png" }));
+					frame::file::FindPath("Asset/") + "CubeMap/PositiveX.png",
+					frame::file::FindPath("Asset/") + "CubeMap/NegativeX.png",
+					frame::file::FindPath("Asset/") + "CubeMap/PositiveY.png",
+					frame::file::FindPath("Asset/") + "CubeMap/NegativeY.png",
+					frame::file::FindPath("Asset/") + "CubeMap/PositiveZ.png",
+					frame::file::FindPath("Asset/") + "CubeMap/NegativeZ.png" 
+					}));
 		EXPECT_TRUE(texture_);
 		EXPECT_NE(0, texture_->GetId());
 		EXPECT_NO_THROW(error_.Display());
@@ -68,8 +70,8 @@ namespace test {
 		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(texture_);
 		EXPECT_NO_THROW(
-			texture_ = frame::file::LoadCubeMapTextureFromFileOpenGL(
-				"../Asset/CubeMap/Hamarikyu.hdr",
+			texture_ = frame::opengl::file::LoadCubeMapTextureFromFile(
+				frame::file::FindPath("Asset/") + "CubeMap/Hamarikyu.hdr",
 				frame::proto::PixelElementSize_HALF()));
 		EXPECT_TRUE(texture_);
 		EXPECT_NE(0, texture_->GetId());

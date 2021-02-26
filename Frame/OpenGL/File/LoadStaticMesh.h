@@ -5,9 +5,9 @@
 #include "Frame/LevelInterface.h"
 #include "Frame/StaticMeshInterface.h"
 
-namespace frame::file {
+namespace frame::opengl::file {
 
-	std::shared_ptr<StaticMeshInterface> LoadStaticMeshFromFileOpenGL(
+	std::shared_ptr<StaticMeshInterface> LoadStaticMeshFromFile(
 		const std::shared_ptr<LevelInterface> level,
 		const std::string& file);
 

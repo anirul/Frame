@@ -4,10 +4,14 @@
 #include <stdexcept>
 #include <GL/glew.h>
 #include <cassert>
-#include "FrameBuffer.h"
-#include "RenderBuffer.h"
-#include "Program.h"
-#include "StaticMesh.h"
+#include "Frame/LevelBase.h"
+#include "Frame/OpenGL/Pixel.h"
+#include "Frame/OpenGL/FrameBuffer.h"
+#include "Frame/OpenGL/RenderBuffer.h"
+#include "Frame/OpenGL/Program.h"
+#include "Frame/OpenGL/StaticMesh.h"
+#include "Frame/OpenGL/Rendering.h"
+#include "Frame/OpenGL/File/LoadProgram.h"
 
 namespace frame::opengl {
 
@@ -247,7 +251,7 @@ namespace frame::opengl {
 			render_ = std::make_shared<RenderBuffer>();
 			render_->CreateStorage(size_);
 			frame_->AttachRender(*render_);
-			frame_->AttachTexture(shared_from_this());
+			frame_->AttachTexture(GetId());
 			frame_->DrawBuffers(1);
 		}
 		ScopedBind scoped_frame(*frame_);
@@ -268,23 +272,7 @@ namespace frame::opengl {
 		Texture(pixel_element_size, pixel_structure)
 	{
 		size_ = size;
-		CreateTextureCubeMap();
-		Bind();
-		for (unsigned int i = 0; i < 6; ++i)
-		{
-			glTexImage2D(
-				GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-				0,
-				opengl::ConvertToGLType(pixel_element_size_, pixel_structure_),
-				static_cast<GLsizei>(size_.first),
-				static_cast<GLsizei>(size_.second),
-				0,
-				opengl::ConvertToGLType(pixel_structure_),
-				opengl::ConvertToGLType(pixel_element_size_),
-				nullptr);
-			error_.Display(__FILE__, __LINE__ - 10);
-		}
-		UnBind();
+		CreateTextureCubeMap(size_);
 	}
 
 	TextureCubeMap::TextureCubeMap(
@@ -293,19 +281,76 @@ namespace frame::opengl {
 		const proto::PixelElementSize& pixel_element_size /*=
 			proto::PixelElementSize_BYTE()*/,
 		const proto::PixelStructure& pixel_structure /*=
-			proto::PixelStructure_RGB()*/)
+			proto::PixelStructure_RGB()*/) :
+		Texture(pixel_element_size, pixel_structure)
 	{
-		throw std::runtime_error("Not implemented!");
+		size_ = size;
+		auto material = std::make_shared<Material>();
+		FrameBuffer frame{};
+		RenderBuffer render{};
+		ScopedBind scoped_frame(frame);
+		ScopedBind scoped_render(render);
+		LevelBase level{};
+		level.SetDefaultQuadSceneId(CreateQuadStaticMesh(&level));
+		level.SetDefaultCubeSceneId(CreateCubeStaticMesh(&level));
+		auto equirectangular = std::make_shared<Texture>(
+			size_,
+			data, 
+			pixel_element_size_, 
+			pixel_structure_);
+		auto equirectangular_id = 
+			level.AddTexture("Equirectangular", equirectangular);
+		material->AddTextureId(equirectangular_id, "Equirectangular");
+		render.CreateStorage(size_);
+		frame.AttachRender(render);
+		auto floor_power_2 = [](int x) 
+		{
+			int power = 1;
+			while (x >>= 1) power <<= 1;
+			return power;
+		};
+		auto power2 = 
+			std::min(floor_power_2(size_.first), floor_power_2(size_.second));
+		CreateTextureCubeMap(std::make_pair(power2, power2));
+		glm::mat4 projection =
+			glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
+		Rendering rendering{};
+		// TODO(anirul): this should not happen!
+		// Create a program from file.
+		auto program = 
+			frame::opengl::file::LoadProgram("EquirectangularCubeMap");
+		program->AddInputTextureId(equirectangular_id);
+		glViewport(0, 0, size_.first, size_.second);
+		error_.Display(__FILE__, __LINE__ - 1);
+		int i = 0;
+		for (const glm::mat4& view : views_cubemap)
+		{
+			frame.AttachTexture(
+				GetId(),
+				FrameColorAttachment::COLOR_ATTACHMENT0,
+				0,
+				static_cast<FrameTextureType>(i));
+			i++;
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			error_.Display(__FILE__, __LINE__ - 1);
+			// CHECKME(anirul): Not sure about any of this.
+			rendering.SetProjection(projection);
+			rendering.SetView(view);
+			rendering.DisplayMesh(
+				program, 
+				level.GetStaticMeshMap().at(level.GetDefaultCubeSceneId()));
+		}
 	}
 
 	TextureCubeMap::TextureCubeMap(
-		const std::array<void*, 6>& cube_data,
+		const std::pair<std::uint32_t, std::uint32_t> size,
+		const std::array<void*, 6> cube_data,
 		const proto::PixelElementSize& pixel_element_size /*=
 			proto::PixelElementSize_BYTE()*/,
 		const proto::PixelStructure& pixel_structure /*=
 			proto::PixelStructure_RGB()*/)
 	{
-		throw std::runtime_error("Not implemented!");
+		CreateTextureCubeMap(size, cube_data);
 	}
 
 	void TextureCubeMap::Bind(const unsigned int slot /*= 0*/) const
@@ -453,7 +498,10 @@ namespace frame::opengl {
 		return ConvertFromGLType(filter);
 	}
 
-	void TextureCubeMap::CreateTextureCubeMap()
+	void TextureCubeMap::CreateTextureCubeMap(
+		const std::pair<std::uint32_t, std::uint32_t> size,
+		const std::array<void*, 6> cube_map/* =
+			{ nullptr, nullptr, nullptr, nullptr, nullptr, nullptr }*/)
 	{
 		glGenTextures(1, &texture_id_);
 		error_.Display(__FILE__, __LINE__ - 1);
@@ -477,6 +525,20 @@ namespace frame::opengl {
 			GL_TEXTURE_WRAP_R,
 			GL_CLAMP_TO_EDGE);
 		error_.Display(__FILE__, __LINE__ - 4);
+		for (unsigned int i = 0; i < 6; ++i)
+		{
+			glTexImage2D(
+				GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+				0,
+				opengl::ConvertToGLType(pixel_element_size_, pixel_structure_),
+				static_cast<GLsizei>(size.first),
+				static_cast<GLsizei>(size.second),
+				0,
+				opengl::ConvertToGLType(pixel_structure_),
+				opengl::ConvertToGLType(pixel_element_size_),
+				cube_map[i]);
+			error_.Display(__FILE__, __LINE__ - 10);
+		}
 		UnBind();
 	}
 

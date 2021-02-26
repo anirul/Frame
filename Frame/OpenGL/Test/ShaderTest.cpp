@@ -37,7 +37,7 @@ namespace test {
 		shader_ = std::make_shared<frame::opengl::Shader>(
 			frame::opengl::ShaderEnum::VERTEX_SHADER);
 		ASSERT_TRUE(shader_);
-		EXPECT_TRUE(shader_->LoadFromSource(GetFragmentSource()));
+		EXPECT_TRUE(shader_->LoadFromSource(GetVertexSource()));
 		EXPECT_NE(0, shader_->GetId());
 	}
 
