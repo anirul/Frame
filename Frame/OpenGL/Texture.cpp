@@ -431,8 +431,8 @@ namespace frame::opengl {
 			GL_TEXTURE_CUBE_MAP,
 			GL_TEXTURE_WRAP_S,
 			ConvertToGLType(texture_filter));
-		UnBind();
 		error_.Display(__FILE__, __LINE__ - 4);
+		UnBind();
 	}
 
 	TextureInterface::TextureFilterEnum TextureCubeMap::GetWrapS() const
@@ -509,7 +509,7 @@ namespace frame::opengl {
 		SetWrapS(proto::Texture::CLAMP_TO_EDGE);
 		SetWrapT(proto::Texture::CLAMP_TO_EDGE);
 		SetWrapR(proto::Texture::CLAMP_TO_EDGE);
-		for (unsigned int i = 0; i < 6; ++i)
+		for (unsigned int i : { 0, 1, 2, 3, 4, 5 })
 		{
 			glTexImage2D(
 				GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
