@@ -117,7 +117,8 @@ namespace frame::opengl {
 				proto::PixelElementSize_BYTE(),
 			const proto::PixelStructure pixel_structure = 
 				proto::PixelStructure_RGB());
-		// Create from a ray pointer.
+		// Create from a ray pointer a single image stretched by
+		// equi-rectangular cube map shader.
 		TextureCubeMap(
 			const std::pair<std::uint32_t, std::uint32_t> size,
 			const void* data,
@@ -126,9 +127,9 @@ namespace frame::opengl {
 			const proto::PixelStructure pixel_structure = 
 				proto::PixelStructure_RGB());
 		// Create from 6 pointer to be mapped to the cube map, Order is:
-		// right, left - (positive X, negative X)
-		// top, bottom - (positive Y, negative Y)
-		// front, back - (positive Z, negative Z)
+		//     right, left - (positive X, negative X)
+		//     top, bottom - (positive Y, negative Y)
+		//     front, back - (positive Z, negative Z)
 		// The size is equal to the size of an image (*6).
 		TextureCubeMap(
 			const std::pair<std::uint32_t, std::uint32_t> size,

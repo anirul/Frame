@@ -446,7 +446,6 @@ namespace frame::opengl {
 		error_.Display(__FILE__, __LINE__ - 4);
 		UnBind();
 		return ConvertFromGLType(filter);
-
 	}
 
 	void TextureCubeMap::SetWrapT(const TextureFilterEnum texture_filter)
@@ -471,7 +470,6 @@ namespace frame::opengl {
 		error_.Display(__FILE__, __LINE__ - 4);
 		UnBind();
 		return ConvertFromGLType(filter);
-
 	}
 
 	void TextureCubeMap::SetWrapR(const TextureFilterEnum texture_filter)
@@ -505,26 +503,12 @@ namespace frame::opengl {
 	{
 		glGenTextures(1, &texture_id_);
 		error_.Display(__FILE__, __LINE__ - 1);
-		Bind();
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		error_.Display(__FILE__, __LINE__ - 1);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		error_.Display(__FILE__, __LINE__ - 1);
-		glTexParameteri(
-			GL_TEXTURE_CUBE_MAP,
-			GL_TEXTURE_WRAP_S,
-			GL_CLAMP_TO_EDGE);
-		error_.Display(__FILE__, __LINE__ - 4);
-		glTexParameteri(
-			GL_TEXTURE_CUBE_MAP,
-			GL_TEXTURE_WRAP_T,
-			GL_CLAMP_TO_EDGE);
-		error_.Display(__FILE__, __LINE__ - 4);
-		glTexParameteri(
-			GL_TEXTURE_CUBE_MAP,
-			GL_TEXTURE_WRAP_R,
-			GL_CLAMP_TO_EDGE);
-		error_.Display(__FILE__, __LINE__ - 4);
+		ScopedBind scoped_bind(*this);
+		SetMinFilter(proto::Texture::LINEAR);
+		SetMagFilter(proto::Texture::LINEAR);
+		SetWrapS(proto::Texture::CLAMP_TO_EDGE);
+		SetWrapT(proto::Texture::CLAMP_TO_EDGE);
+		SetWrapR(proto::Texture::CLAMP_TO_EDGE);
 		for (unsigned int i = 0; i < 6; ++i)
 		{
 			glTexImage2D(
@@ -539,7 +523,6 @@ namespace frame::opengl {
 				cube_map[i]);
 			error_.Display(__FILE__, __LINE__ - 10);
 		}
-		UnBind();
 	}
 
 	int Texture::ConvertToGLType(const TextureFilterEnum texture_filter) const
@@ -565,11 +548,9 @@ namespace frame::opengl {
 			case frame::proto::Texture::REPEAT:
 				return GL_REPEAT;
 			default:
-				throw
-					std::runtime_error(
-						"Invalid texture filter : " +
-						std::to_string(
-							static_cast<int>(texture_filter)));
+				throw std::runtime_error(
+					"Invalid texture filter : " +
+					std::to_string(static_cast<int>(texture_filter)));
 		}
 	}
 
