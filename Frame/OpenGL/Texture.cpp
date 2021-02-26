@@ -48,9 +48,9 @@ namespace frame::opengl {
 
 	Texture::Texture(
 		const std::pair<std::uint32_t, std::uint32_t> size, 
-		const proto::PixelElementSize& pixel_element_size 
+		const proto::PixelElementSize pixel_element_size 
 			/*= PixelElementSize::BYTE*/, 
-		const proto::PixelStructure& pixel_structure 
+		const proto::PixelStructure pixel_structure 
 			/*= PixelStructure::RGB*/) :
 		size_(size),
 		pixel_element_size_(pixel_element_size),
@@ -75,9 +75,9 @@ namespace frame::opengl {
 	Texture::Texture(
 		const std::pair<std::uint32_t, std::uint32_t> size, 
 		const void* data, 
-		const proto::PixelElementSize& pixel_element_size
+		const proto::PixelElementSize pixel_element_size
 			/*= PixelElementSize::BYTE*/, 
-		const proto::PixelStructure& pixel_structure 
+		const proto::PixelStructure pixel_structure 
 			/*= PixelStructure::RGB*/) :
 		size_(size),
 		pixel_element_size_(pixel_element_size),
@@ -265,9 +265,9 @@ namespace frame::opengl {
 
 	TextureCubeMap::TextureCubeMap(
 		const std::pair<std::uint32_t, std::uint32_t> size, 
-		const proto::PixelElementSize& pixel_element_size 
+		const proto::PixelElementSize pixel_element_size 
 			/*= PixelElementSize::BYTE*/, 
-		const proto::PixelStructure& pixel_structure 
+		const proto::PixelStructure pixel_structure 
 			/*= PixelStructure::RGB*/) :
 		Texture(pixel_element_size, pixel_structure)
 	{
@@ -278,9 +278,9 @@ namespace frame::opengl {
 	TextureCubeMap::TextureCubeMap(
 		const std::pair<std::uint32_t, std::uint32_t> size,
 		const void* data,
-		const proto::PixelElementSize& pixel_element_size /*=
+		const proto::PixelElementSize pixel_element_size /*=
 			proto::PixelElementSize_BYTE()*/,
-		const proto::PixelStructure& pixel_structure /*=
+		const proto::PixelStructure pixel_structure /*=
 			proto::PixelStructure_RGB()*/) :
 		Texture(pixel_element_size, pixel_structure)
 	{
@@ -345,9 +345,9 @@ namespace frame::opengl {
 	TextureCubeMap::TextureCubeMap(
 		const std::pair<std::uint32_t, std::uint32_t> size,
 		const std::array<void*, 6> cube_data,
-		const proto::PixelElementSize& pixel_element_size /*=
+		const proto::PixelElementSize pixel_element_size /*=
 			proto::PixelElementSize_BYTE()*/,
-		const proto::PixelStructure& pixel_structure /*=
+		const proto::PixelStructure pixel_structure /*=
 			proto::PixelStructure_RGB()*/)
 	{
 		CreateTextureCubeMap(size, cube_data);

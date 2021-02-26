@@ -29,17 +29,17 @@ namespace frame::opengl {
 		// Create an empty texture of size size.
 		Texture(
 			const std::pair<std::uint32_t, std::uint32_t> size,
-			const proto::PixelElementSize& pixel_element_size = 
+			const proto::PixelElementSize pixel_element_size = 
 				proto::PixelElementSize_BYTE(),
-			const proto::PixelStructure& pixel_structure = 
+			const proto::PixelStructure pixel_structure = 
 				proto::PixelStructure_RGB());
 		// Create from a raw pointer.
 		Texture(
 			const std::pair<std::uint32_t, std::uint32_t> size,
 			const void* data,
-			const proto::PixelElementSize& pixel_element_size =
+			const proto::PixelElementSize pixel_element_size =
 				proto::PixelElementSize_BYTE(),
-			const proto::PixelStructure& pixel_structure = 
+			const proto::PixelStructure pixel_structure = 
 				proto::PixelStructure_RGB());
 		// Create from a proto.
 		virtual ~Texture();
@@ -86,9 +86,9 @@ namespace frame::opengl {
 	protected:
 		void CreateTexture();
 		Texture(
-			const proto::PixelElementSize& pixel_element_size =
+			const proto::PixelElementSize pixel_element_size =
 				proto::PixelElementSize_BYTE(),
-			const proto::PixelStructure& pixel_structure = 
+			const proto::PixelStructure pixel_structure = 
 				proto::PixelStructure_RGB()) :
 			pixel_element_size_(pixel_element_size),
 			pixel_structure_(pixel_structure) {}
@@ -113,17 +113,17 @@ namespace frame::opengl {
 		// Create an empty cube map of the size size.
 		TextureCubeMap(
 			const std::pair<std::uint32_t, std::uint32_t> size,
-			const proto::PixelElementSize& pixel_element_size =
+			const proto::PixelElementSize pixel_element_size =
 				proto::PixelElementSize_BYTE(),
-			const proto::PixelStructure& pixel_structure = 
+			const proto::PixelStructure pixel_structure = 
 				proto::PixelStructure_RGB());
 		// Create from a ray pointer.
 		TextureCubeMap(
 			const std::pair<std::uint32_t, std::uint32_t> size,
 			const void* data,
-			const proto::PixelElementSize& pixel_element_size =
+			const proto::PixelElementSize pixel_element_size =
 				proto::PixelElementSize_BYTE(),
-			const proto::PixelStructure& pixel_structure = 
+			const proto::PixelStructure pixel_structure = 
 				proto::PixelStructure_RGB());
 		// Create from 6 pointer to be mapped to the cube map, Order is:
 		// right, left - (positive X, negative X)
@@ -133,9 +133,9 @@ namespace frame::opengl {
 		TextureCubeMap(
 			const std::pair<std::uint32_t, std::uint32_t> size,
 			const std::array<void*, 6> cube_data,
-			const proto::PixelElementSize& pixel_element_size =
+			const proto::PixelElementSize pixel_element_size =
 				proto::PixelElementSize_BYTE(),
-			const proto::PixelStructure& pixel_structure = 
+			const proto::PixelStructure pixel_structure = 
 				proto::PixelStructure_RGB());
 
 	public:
