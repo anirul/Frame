@@ -41,30 +41,29 @@ namespace frame::proto {
 			(void)level->GetTextureMap().at(texture_id);
 			program->AddOutputTextureId(texture_id);
 		}
+		program->SetSceneRoot(0);
 		switch (proto_program.input_scene_type().value())
 		{
-		case SceneType::TEXTURE_2D:
+		case SceneType::QUAD:
 		{
-			EntityId quad_id = level->GetDefaultQuadSceneId();
-			program->AddSceneMeshId(quad_id);
+			EntityId quad_id = level->GetDefaultStaticMeshQuadId();
+			program->SetSceneRoot(quad_id);
 			break;
 		}
-		case SceneType::TEXTURE_3D:
+		case SceneType::CUBE:
 		{
-			EntityId cube_id = level->GetDefaultCubeSceneId();
-			program->AddSceneMeshId(cube_id);
+			EntityId cube_id = level->GetDefaultStaticMeshCubeId();
+			program->SetSceneRoot(cube_id);
 			break;
 		}
 		case SceneType::SCENE:
 		{
 			EntityId scene_id = 
 				level->GetIdFromName(proto_program.input_scene_name());
-			(void)level->GetSceneNodeMap().at(scene_id);
-			program->AddSceneMeshId(scene_id);
+			program->SetSceneRoot(scene_id);
 			break;
 		}
 		case SceneType::NONE:
-			break;
 		default:
 			throw std::runtime_error(
 				fmt::format(

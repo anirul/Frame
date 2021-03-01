@@ -78,7 +78,20 @@ namespace frame::opengl {
 		for (const auto& program_id : program_render_)
 		{
 			auto program = level_->GetProgramMap().at(program_id);
-			throw std::runtime_error("Not implemented yet!");
+			auto scene_root = program->GetSceneRoot();
+			auto it = level_->GetStaticMeshMap().find(scene_root);
+			if (it != level_->GetStaticMeshMap().end())
+			{
+				rendering_->DisplayMesh(
+					level_.get(), 
+					program.get(), 
+					it->second.get(), 
+					dt);
+			}
+			else
+			{
+				throw std::runtime_error("Not implemented yet!");
+			}
 		}
 	}
 

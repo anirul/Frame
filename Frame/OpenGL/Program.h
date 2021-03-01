@@ -30,10 +30,9 @@ namespace frame::opengl {
 		void AddOutputTextureId(EntityId id) override;
 		void RemoveOutputTextureId(EntityId id) override;
 		const std::vector<EntityId> GetOutputTextureIds() const override;
-		// Set the scene to a program.
-		void AddSceneMeshId(EntityId id) override;
-		void RemoveSceneMeshId(EntityId id) override;
-		const std::vector<EntityId> GetSceneMeshIds() const override;
+		// Select the input mesh or scene root.
+		EntityId GetSceneRoot() const override;
+		void SetSceneRoot(EntityId scene_root) override;
 		// Attach shader to a program.
 		void AddShader(const Shader& shader);
 		// Link shaders to a program.
@@ -73,9 +72,9 @@ namespace frame::opengl {
 		mutable std::map<std::string, int> memoize_map_ = {};
 		std::vector<unsigned int> attached_shaders_ = {};
 		int program_id_ = 0;
+		EntityId scene_root_ = 0;
 		std::vector<EntityId> input_texture_ids_ = {};
 		std::vector<EntityId> output_texture_ids_ = {};
-		std::vector<EntityId> scene_mesh_ids_ = {};
 	};
 
 	// Create a program from two streams:

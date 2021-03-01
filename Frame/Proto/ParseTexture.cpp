@@ -108,11 +108,7 @@ namespace frame::proto {
 		}
 		else
 		{
-			texture = std::make_shared<opengl::TextureCubeMap>(
-				texture_size,
-				proto_texture.pixels().data(),
-				proto_texture.pixel_element_size(),
-				proto_texture.pixel_structure());
+			throw std::runtime_error("Not implemented!");
 		}
 		constexpr auto INVALID_TEXTURE = frame::proto::Texture::INVALID;
 		if (proto_texture.min_filter() != INVALID_TEXTURE)

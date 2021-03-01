@@ -84,12 +84,12 @@ namespace frame::opengl {
 		}
 
 	protected:
-		void CreateTexture();
+		void CreateTexture(const void* data = nullptr);
 		Texture(
 			const proto::PixelElementSize pixel_element_size =
-				proto::PixelElementSize_BYTE(),
-			const proto::PixelStructure pixel_structure = 
-				proto::PixelStructure_RGB()) :
+			proto::PixelElementSize_BYTE(),
+			const proto::PixelStructure pixel_structure =
+			proto::PixelStructure_RGB()) :
 			pixel_element_size_(pixel_element_size),
 			pixel_structure_(pixel_structure) {}
 		void LockedBind() const override { locked_bind_ = true; }
@@ -113,15 +113,6 @@ namespace frame::opengl {
 		// Create an empty cube map of the size size.
 		TextureCubeMap(
 			const std::pair<std::uint32_t, std::uint32_t> size,
-			const proto::PixelElementSize pixel_element_size =
-				proto::PixelElementSize_BYTE(),
-			const proto::PixelStructure pixel_structure = 
-				proto::PixelStructure_RGB());
-		// Create from a ray pointer a single image stretched by
-		// equi-rectangular cube map shader.
-		TextureCubeMap(
-			const std::pair<std::uint32_t, std::uint32_t> size,
-			const void* data,
 			const proto::PixelElementSize pixel_element_size =
 				proto::PixelElementSize_BYTE(),
 			const proto::PixelStructure pixel_structure = 
@@ -160,7 +151,6 @@ namespace frame::opengl {
 	protected:
 		// Create a cube map and assign it to the texture_id_.
 		void CreateTextureCubeMap(
-			const std::pair<std::uint32_t, std::uint32_t> size,
 			const std::array<void*, 6> cube_map = 
 				{ nullptr, nullptr, nullptr, nullptr, nullptr, nullptr });
 	};

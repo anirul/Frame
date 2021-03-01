@@ -60,6 +60,7 @@ namespace frame::opengl {
 		void LockedBind() const override { locked_bind_ = true; }
 		void UnlockedBind() const override { locked_bind_ = false; }
 		unsigned int GetId() const override { return vertex_array_object_; }
+		bool IsClearBuffer() const { return clear_depth_buffer_; }
 
 	public:
 		void Bind(const unsigned int slot = 0) const override;

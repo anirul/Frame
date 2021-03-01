@@ -17,10 +17,9 @@ namespace frame {
 		virtual void AddOutputTextureId(EntityId id) = 0;
 		virtual void RemoveOutputTextureId(EntityId id) = 0;
 		virtual const std::vector<EntityId> GetOutputTextureIds() const = 0;
-		// Set scene meshes to a program.
-		virtual void AddSceneMeshId(EntityId id) = 0;
-		virtual void RemoveSceneMeshId(EntityId id) = 0;
-		virtual const std::vector<EntityId> GetSceneMeshIds() const = 0;
+		// Select the input mesh or scene root.
+		virtual EntityId GetSceneRoot() const = 0;
+		virtual void SetSceneRoot(EntityId scene_root) = 0;
 		// Link shaders to a program.
 		virtual void LinkShader() = 0;
 		// Use the program.

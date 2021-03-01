@@ -13,10 +13,10 @@ namespace frame {
 		LevelBase() = default;
 
 	public:
-		EntityId GetDefaultQuadSceneId() const final { return quad_id_; }
-		void SetDefaultQuadSceneId(EntityId id) final { quad_id_ = id; }
-		EntityId GetDefaultCubeSceneId() const final { return cube_id_; }
-		void SetDefaultCubeSceneId(EntityId id) final { cube_id_ = id; }
+		EntityId GetDefaultStaticMeshQuadId() const final { return quad_id_; }
+		void SetDefaultStaticMeshQuadId(EntityId id) final { quad_id_ = id; }
+		EntityId GetDefaultStaticMeshCubeId() const final { return cube_id_; }
+		void SetDefaultStaticMeshCubeId(EntityId id) final { cube_id_ = id; }
 
 	public:
 		const std::unordered_map<EntityId, std::shared_ptr<NodeInterface>>&

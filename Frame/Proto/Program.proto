@@ -10,8 +10,8 @@ package frame.proto;
 message SceneType {
 	enum Enum {
 		NONE			= 0;
-		TEXTURE_2D		= 1;
-		TEXTURE_3D		= 2;
+		QUAD			= 1;
+		CUBE			= 2;
 		SCENE			= 3;
 	}
 	Enum value = 1;

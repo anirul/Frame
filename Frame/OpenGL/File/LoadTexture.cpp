@@ -28,11 +28,7 @@ namespace frame::opengl::file {
 		std::string extention = file.substr(file.find_last_of(".") + 1);
 		if (cube_map_half_extention.count(extention))
 		{
-			texture = std::make_shared<frame::opengl::TextureCubeMap>(
-				image.GetSize(),
-				image.Data(),
-				pixel_element_size,
-				pixel_structure);
+			throw std::runtime_error("Not implemented yet!");
 		}
 		else
 		{

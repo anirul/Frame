@@ -100,7 +100,8 @@ namespace frame::opengl {
 				static_cast<std::uint32_t>(size.second * fact);
 			glViewport(0, 0, temporary_size.first, temporary_size.second);
 			error.Display(__FILE__, __LINE__ - 1);
-			int i = 0;
+			// TODO(anirul) : this is not incremented?
+			int i = 0; 
 			for (const auto& texture_id : program->GetOutputTextureIds())
 			{
 				frame.AttachTexture(
@@ -112,7 +113,11 @@ namespace frame::opengl {
 			error.Display(__FILE__, __LINE__ - 1);
 			Rendering rendering{};
 			rendering.SetProjection(projection);
-			rendering.DisplayTexture(program);
+			rendering.DisplayMesh(
+				level.get(),
+				program.get(), 
+				level->GetStaticMeshMap().at(
+					level->GetDefaultStaticMeshQuadId()).get());
 		}
 	}
 
@@ -192,7 +197,11 @@ namespace frame::opengl {
 				Rendering rendering{};
 				rendering.SetProjection(projection);
 				rendering.SetView(view);
-				rendering.DisplayCubeMap(program);
+				rendering.DisplayMesh(
+					level.get(),
+					program.get(),
+					level->GetStaticMeshMap().at(
+						level->GetDefaultStaticMeshCubeId()).get());
 			}
 		}
 	}

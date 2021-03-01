@@ -4,6 +4,7 @@
 #include "Frame/LevelInterface.h"
 #include "Frame/ProgramInterface.h"
 #include "Frame/StaticMeshInterface.h"
+#include "Frame/Error.h"
 
 namespace frame::opengl {
 
@@ -21,24 +22,18 @@ namespace frame::opengl {
 		void SetModel(glm::mat4 model) { model_ = std::move(model); }
 
 	public:
-		// Render to a texture at a dt time.
-		void DisplayTexture(
-			std::weak_ptr<ProgramInterface> program, 
-			const double dt = 0.0);
-		// Render to a cube map at a dt time.
-		void DisplayCubeMap(
-			std::weak_ptr<ProgramInterface> program,
-			const double dt = 0.0);
 		// Render to a mesh at a dt time.
 		void DisplayMesh(
-			std::weak_ptr<ProgramInterface> program,
-			std::weak_ptr<StaticMeshInterface> static_mesh,
+			LevelInterface* level,
+			ProgramInterface* program,
+			StaticMeshInterface* static_mesh,
 			const double dt = 0.0);
 
 	private:
 		glm::mat4 projection_ = glm::mat4(1.0f);
 		glm::mat4 view_ = glm::mat4(1.0f);
 		glm::mat4 model_ = glm::mat4(1.0f);
+		const Error& error_ = Error::GetInstance();
 	};
 
 } // End namespace frame::opengl.

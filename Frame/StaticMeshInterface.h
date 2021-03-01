@@ -17,6 +17,7 @@ namespace frame {
 		virtual EntityId GetTextureBufferId() const = 0;
 		virtual EntityId GetIndexBufferId() const = 0;
 		virtual std::size_t GetIndexSize() const = 0;
+		virtual bool IsClearBuffer() const = 0;
 	};
 
 } // End namespace frame.

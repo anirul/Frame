@@ -202,25 +202,6 @@ namespace frame::opengl {
 		return output_texture_ids_;
 	}
 
-	void Program::AddSceneMeshId(EntityId id)
-	{
-		scene_mesh_ids_.push_back(id);
-	}
-
-	void Program::RemoveSceneMeshId(EntityId id)
-	{
-		auto it = std::find(scene_mesh_ids_.begin(), scene_mesh_ids_.end(), id);
-		if (it != scene_mesh_ids_.end())
-		{
-			scene_mesh_ids_.erase(it);
-		}
-	}
-
-	const std::vector<EntityId> Program::GetSceneMeshIds() const
-	{
-		return scene_mesh_ids_;
-	}
-
 	void Program::ThrowIsInTextureIds(EntityId texture_id) const
 	{
 		if (std::count(
@@ -241,6 +222,16 @@ namespace frame::opengl {
 				"Texture: [" + std::to_string(texture_id) +
 				" is already in output texture ids.");
 		}
+	}
+
+	EntityId Program::GetSceneRoot() const
+	{
+		return scene_root_;
+	}
+
+	void Program::SetSceneRoot(EntityId scene_root)
+	{
+		scene_root_ = scene_root;
 	}
 
 } // End namespace sgl.
