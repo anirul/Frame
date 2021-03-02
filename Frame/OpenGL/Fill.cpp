@@ -100,7 +100,6 @@ namespace frame::opengl {
 				static_cast<std::uint32_t>(size.second * fact);
 			glViewport(0, 0, temporary_size.first, temporary_size.second);
 			error.Display(__FILE__, __LINE__ - 1);
-			// TODO(anirul) : this is not incremented?
 			int i = 0; 
 			for (const auto& texture_id : program->GetOutputTextureIds())
 			{
@@ -108,13 +107,13 @@ namespace frame::opengl {
 					level->GetTextureMap().at(texture_id)->GetId(),
 					FrameBuffer::GetFrameColorAttachment(i),
 					mipmap_level);
+					i++;
 			}
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			error.Display(__FILE__, __LINE__ - 1);
-			Rendering rendering{};
+			Rendering rendering{level, temporary_size};
 			rendering.SetProjection(projection);
-			rendering.DisplayMesh(
-				level.get(),
+			rendering.RenderMesh(
 				program.get(), 
 				level->GetStaticMeshMap().at(
 					level->GetDefaultStaticMeshQuadId()).get());
@@ -194,11 +193,10 @@ namespace frame::opengl {
 				cubemap_element++;
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 				error.Display(__FILE__, __LINE__ - 1);
-				Rendering rendering{};
+				Rendering rendering{level, temporary_size};
 				rendering.SetProjection(projection);
 				rendering.SetView(view);
-				rendering.DisplayMesh(
-					level.get(),
+				rendering.RenderMesh(
 					program.get(),
 					level->GetStaticMeshMap().at(
 						level->GetDefaultStaticMeshCubeId()).get());

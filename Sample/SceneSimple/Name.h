@@ -6,10 +6,8 @@
 class Name : public NameInterface
 {
 public:
-	const std::string& GetGlobalPath() const override { return global_path_; }
-	const std::string& GetLevelFileName() const override { return level_file_; }
+	const std::string GetLevelFileName() const override { return level_file_; }
 
 private:
-	std::string global_path_ = "../Asset/Json/";
 	std::string level_file_ = "SceneSimple.Level.json";
 };

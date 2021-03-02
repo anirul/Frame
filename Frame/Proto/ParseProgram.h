@@ -9,7 +9,6 @@ namespace frame::proto {
 
 	std::shared_ptr<ProgramInterface> ParseProgramOpenGL(
 		const frame::proto::Program& proto_program,
-		const std::string& default_path,
 		const LevelInterface* level);
 
 } // End namespace frame::proto.

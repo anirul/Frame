@@ -28,7 +28,7 @@ namespace frame::proto {
 				__FILE__,
 				__LINE__ - 7);
 		}
-		std::pair<std::uint32_t, std::uint32_t> texture_size = { 0, 0 };
+		std::pair<std::uint32_t, std::uint32_t> texture_size = size;
 		if (proto_texture.size().x() < 0)
 			texture_size.first /= std::abs(proto_texture.size().x());
 		else

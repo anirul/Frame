@@ -1,17 +1,17 @@
 #include "ParseProgram.h"
 #include <fstream>
 #include "Frame/OpenGL/Program.h"
+#include "Frame/File/FileSystem.h"
 
 namespace frame::proto {
 
 	std::shared_ptr<frame::ProgramInterface> ParseProgramOpenGL(
 		const Program& proto_program,
-		const std::string& default_path,
 		const LevelInterface* level)
 	{
 		Error& error = Error::GetInstance();
 		std::string shader_name = 
-			default_path + "Shader/OpenGL/" + proto_program.shader();
+			file::FindPath("Asset/") + "Shader/OpenGL/" + proto_program.shader();
 		std::ifstream ifs_vertex(shader_name + ".vert");
 		if (!ifs_vertex.is_open())
 		{

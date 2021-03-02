@@ -9,24 +9,18 @@ namespace frame::opengl {
 		// DisableAll();
 	}
 
-	void Material::SetLevel(std::shared_ptr<LevelInterface> level)
-	{
-		level_ = level;
-	}
-
-	bool Material::AddTextureId(std::uint64_t id, const std::string& name)
+	bool Material::AddTextureId(EntityId id, const std::string& name)
 	{
 		RemoveTextureId(id);
 		return id_name_map_.insert({ id, name }).second;
 	}
 
-	bool Material::HasTextureId(std::uint64_t id) const
+	bool Material::HasTextureId(EntityId id) const
 	{
-		auto it = id_name_map_.find(id);
-		return it != id_name_map_.end();
+		return static_cast<bool>(id_name_map_.count(id));
 	}
 
-	bool Material::RemoveTextureId(std::uint64_t id)
+	bool Material::RemoveTextureId(EntityId id)
 	{
 		if (!HasTextureId(id)) return false;
 		auto it = id_name_map_.find(id);
@@ -35,11 +29,8 @@ namespace frame::opengl {
 	}
 
 	const std::pair<std::string, int> Material::EnableTextureId(
-		std::uint64_t id) const
+		EntityId id) const
 	{
-		// Check Level exist.
-		if (!level_)
-			throw std::runtime_error("There is no level.");
 		// Check it exist.
 		if (!HasTextureId(id))
 			throw std::runtime_error("No texture id: " + std::to_string(id));
@@ -57,8 +48,6 @@ namespace frame::opengl {
 			if (id_array_[i] == 0)
 			{
 				id_array_[i] = id;
-				auto texture = level_->GetTextureMap().at(id);
-				texture->Bind(i);
 				return { id_name_map_.at(id), i };
 			}
 		}
@@ -66,7 +55,7 @@ namespace frame::opengl {
 		throw std::runtime_error("No free slots!");
 	}
 
-	void Material::DisableTextureId(std::uint64_t id) const
+	void Material::DisableTextureId(EntityId id) const
 	{
 		// Check Level exist.
 		if (!level_)
@@ -80,8 +69,6 @@ namespace frame::opengl {
 			if (i == id)
 			{
 				i = 0;
-				auto texture = level_->GetTextureMap().at(id);
-				texture->UnBind();
 				return;
 			}
 		}
@@ -93,9 +80,6 @@ namespace frame::opengl {
 
 	void Material::DisableAll() const
 	{
-		// Check Level exist.
-		if (!level_)
-			throw std::runtime_error("There is no level.");
 		for (int i = 0; i < 32; ++i)
 		{
 			if (id_array_[i])
@@ -105,9 +89,9 @@ namespace frame::opengl {
 		}
 	}
 
-	const std::vector<std::uint64_t> Material::GetIds() const
+	const std::vector<EntityId> Material::GetIds() const
 	{
-		std::vector<std::uint64_t> vec;
+		std::vector<EntityId> vec;
 		for (const auto& p : id_name_map_)
 		{
 			vec.push_back(p.first);

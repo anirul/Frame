@@ -11,7 +11,6 @@ namespace test {
 		EXPECT_FALSE(material_);
 		auto level = std::make_shared<frame::LevelBase>();
 		auto material = std::make_shared<frame::opengl::Material>();
-		material->SetLevel(level);
 		material_ = std::dynamic_pointer_cast<frame::MaterialInterface>(
 			material);
 		EXPECT_TRUE(material_);
@@ -23,7 +22,6 @@ namespace test {
 		EXPECT_FALSE(material_);
 		auto level = std::make_shared<frame::LevelBase>();
 		auto material = std::make_shared<frame::opengl::Material>();
-		material->SetLevel(level);
 		material_ = std::dynamic_pointer_cast<frame::MaterialInterface>(
 			material);
 		EXPECT_TRUE(material_);

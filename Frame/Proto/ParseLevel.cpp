@@ -59,18 +59,14 @@ namespace frame::proto {
 			// Load programs from proto.
 			for (const auto& proto_program : proto_program_file.programs())
 			{
-				auto program = ParseProgramOpenGL(
-					proto_program, 
-					default_path,
-					this);
+				auto program = ParseProgramOpenGL(proto_program, this);
 				AddProgram(proto_program.name(), program);
 			}
 
 			// Load material from proto.
 			for (const auto& proto_material : proto_material_file.materials())
 			{
-				std::shared_ptr<MaterialInterface> material =
-					ParseMaterialOpenGL(proto_material, this);
+				auto material = ParseMaterialOpenGL(proto_material, this);
 				AddMaterial(proto_material.name(), material);
 			}
 		}

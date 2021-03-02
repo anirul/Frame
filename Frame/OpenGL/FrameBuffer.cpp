@@ -43,8 +43,7 @@ namespace frame::opengl {
 			GL_RENDERBUFFER, 
 			render.GetId());
 		error_.Display(__FILE__, __LINE__ - 5);
-		auto status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-		if (status != GL_FRAMEBUFFER_COMPLETE)
+		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		{
 			auto error_pair = GetError();
 			error_.CreateError(

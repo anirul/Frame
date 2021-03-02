@@ -19,27 +19,25 @@ namespace frame::opengl {
 		virtual ~Material();
 
 	public:
-		// This will set the level interface into the material, this is needed!
-		void SetLevel(std::shared_ptr<LevelInterface> level);
 		// Texture management part.
-		bool AddTextureId(std::uint64_t id, const std::string& name) override;
-		bool HasTextureId(std::uint64_t id) const override;
-		bool RemoveTextureId(std::uint64_t id) override;
+		bool AddTextureId(EntityId id, const std::string& name) override;
+		bool HasTextureId(EntityId id) const override;
+		bool RemoveTextureId(EntityId id) override;
 		// Return the list of texture ids.
-		const std::vector<std::uint64_t> GetIds() const final;
+		const std::vector<EntityId> GetIds() const final;
 		// Return the name and the binding slot of a texture (to be passed to
 		// the program).
 		const std::pair<std::string, int> EnableTextureId(
-			std::uint64_t id) const override;
+			EntityId id) const override;
 		// Unbind the texture and remove it from the list.
-		void DisableTextureId(std::uint64_t) const override;
+		void DisableTextureId(EntityId id) const override;
 		// Disable all the texture and unbind them.
 		void DisableAll() const override;
 
 	private:
 		std::shared_ptr<LevelInterface> level_ = nullptr;
-		std::map<std::uint64_t, std::string> id_name_map_ = {};
-		mutable std::array<std::uint64_t, 32> id_array_ = {};
+		std::map<EntityId, std::string> id_name_map_ = {};
+		mutable std::array<EntityId, 32> id_array_ = {};
 	};
 
 } // End namespace frame::opengl.

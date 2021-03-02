@@ -61,7 +61,7 @@ namespace frame::opengl {
 			GetProgramIdTextureId(level_->GetDefaultOutputTextureId()));
 		// Setup camera.
 		SetupCamera();
-		rendering_ = std::make_unique<Rendering>();
+		rendering_ = std::make_unique<Rendering>(level_, size_);
 	}
 
 	void Device::Cleanup()
@@ -72,8 +72,16 @@ namespace frame::opengl {
 	void Device::Display(const double dt)
 	{
 		dt_ = dt;
+
+		glClearColor(.2f, 0.f, .2f, 1.0f);
+		error_.Display(__FILE__, __LINE__ - 1);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		error_.Display(__FILE__, __LINE__ - 1);
+
+		SetupCamera();
 		rendering_->SetProjection(projection_);
 		rendering_->SetView(view_);
+		// TODO(anirul): This is suppose to be from mesh.
 		rendering_->SetModel(model_);
 		for (const auto& program_id : program_render_)
 		{
@@ -82,8 +90,7 @@ namespace frame::opengl {
 			auto it = level_->GetStaticMeshMap().find(scene_root);
 			if (it != level_->GetStaticMeshMap().end())
 			{
-				rendering_->DisplayMesh(
-					level_.get(), 
+				rendering_->RenderMesh(
 					program.get(), 
 					it->second.get(), 
 					dt);
@@ -93,6 +100,7 @@ namespace frame::opengl {
 				throw std::runtime_error("Not implemented yet!");
 			}
 		}
+		rendering_->Display();
 	}
 
 	void Device::SetupCamera()
