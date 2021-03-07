@@ -57,9 +57,6 @@ namespace frame::opengl {
 
 	void Material::DisableTextureId(EntityId id) const
 	{
-		// Check Level exist.
-		if (!level_)
-			throw std::runtime_error("There is no level.");
 		// Check if exist.
 		if (!HasTextureId(id))
 			throw std::runtime_error("No texture id: " + std::to_string(id));

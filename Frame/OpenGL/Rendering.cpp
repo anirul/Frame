@@ -115,6 +115,7 @@ namespace frame::opengl {
 			level_->GetDefaultStaticMeshQuadId());
 		quad->SetMaterialId(display_material_id_);
 		auto program = level_->GetProgramMap().at(display_program_id_);
+		program->Use();
 		auto material = level_->GetMaterialMap().at(display_material_id_);
 
 		for (const auto id : material->GetIds())

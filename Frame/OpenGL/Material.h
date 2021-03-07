@@ -35,7 +35,6 @@ namespace frame::opengl {
 		void DisableAll() const override;
 
 	private:
-		std::shared_ptr<LevelInterface> level_ = nullptr;
 		std::map<EntityId, std::string> id_name_map_ = {};
 		mutable std::array<EntityId, 32> id_array_ = {};
 	};
