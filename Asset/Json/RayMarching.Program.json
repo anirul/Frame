@@ -1,10 +1,9 @@
 {
-  "effects": [
+  "programs": [
     {
       "name": "RayMarchingEffect",
-      "render_input_type": "NONE",
-      "render_output_type": "TEXTURE_2D",
       "output_texture_names": "billboard",
+      "input_scene_type": { "value": "QUAD" },
       "shader": "RayMarching",
       "parameters": [
         {

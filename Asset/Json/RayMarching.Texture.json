@@ -6,24 +6,17 @@
         "x": "-1",
         "y": "-1"
       },
+      "cubemap": "false",
       "pixel_element_size": {
         "value": "HALF"
       },
       "pixel_structure": {
         "value": "RGB"
       },
-      "min_filter": {
-        "value": "LINEAR"
-      },
-      "mag_filter": {
-        "value": "LINEAR"
-      },
-      "wrap_s": {
-        "value": "CLAMP_TO_EDGE"
-      },
-      "wrap_t": {
-        "value": "CLAMP_TO_EDGE"
-      }
+      "min_filter": "LINEAR",
+      "mag_filter": "LINEAR",
+      "wrap_s": "CLAMP_TO_EDGE",
+      "wrap_t": "CLAMP_TO_EDGE"
     }
   ]
 }
