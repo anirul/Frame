@@ -16,6 +16,7 @@
     {
       "name": "camera",
       "parent": "root",
+      "fov_degrees": "65.0",
       "position": {
         "x": "0",
         "y": "0",

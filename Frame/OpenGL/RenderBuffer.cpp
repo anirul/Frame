@@ -37,7 +37,7 @@ namespace frame::opengl {
 		Bind();
 		glRenderbufferStorage(
 			GL_RENDERBUFFER,
-			GL_DEPTH24_STENCIL8,
+			GL_DEPTH_COMPONENT32,
 			size.first,
 			size.second);
 		error_.Display(__FILE__, __LINE__ - 5);

@@ -33,9 +33,10 @@ namespace frame::opengl {
 		if (!program)
 			throw std::runtime_error("Program ptr doesn't exist.");
 		if (!static_mesh)
-			throw std::runtime_error("StatiMesh ptr doesn't exist.");
+			throw std::runtime_error("StaticMesh ptr doesn't exist.");
 
 		assert(program->GetOutputTextureIds().size());
+		program->Use();
 		auto texture_out_ids = program->GetOutputTextureIds();
 		auto texture_ref = 
 			level_->GetTextureMap().at(*texture_out_ids.cbegin());
@@ -58,7 +59,6 @@ namespace frame::opengl {
 		frame_buffer_.DrawBuffers(
 			static_cast<std::uint32_t>(texture_out_ids.size()));
 
-		program->Use();
 		program->Uniform("projection", projection_);
 		program->Uniform("view", view_);
 		program->Uniform("model", model_);

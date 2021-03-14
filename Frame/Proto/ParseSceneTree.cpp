@@ -27,6 +27,8 @@ namespace frame::proto {
 	std::shared_ptr<NodeCamera> ParseSceneCamera(
 		const frame::proto::SceneCamera& proto_scene_camera)
 	{
+		if (proto_scene_camera.fov_degrees() == 0.0)
+			throw std::runtime_error("Need field of view degrees in camera.");
 		auto scene_camera = std::make_shared<NodeCamera>(
 			ParseUniform(proto_scene_camera.position()),
 			ParseUniform(proto_scene_camera.target()),

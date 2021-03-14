@@ -39,7 +39,7 @@ namespace frame::opengl {
 		render.Bind();
 		glFramebufferRenderbuffer(
 			GL_FRAMEBUFFER, 
-			GL_DEPTH_STENCIL_ATTACHMENT,
+			GL_DEPTH_ATTACHMENT,
 			GL_RENDERBUFFER, 
 			render.GetId());
 		error_.Display(__FILE__, __LINE__ - 5);
