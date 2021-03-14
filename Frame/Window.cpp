@@ -248,12 +248,14 @@ namespace frame {
 #if defined(_WIN32) || defined(_WIN64)
 			HWND hwnd_ = nullptr;
 #endif
+			frame::Logger& logger_ = frame::Logger::GetInstance();
 		};
 
 		void* InitSDLOpenGLDevice(
 			const std::shared_ptr<WindowInterface>& window)
 		{
 			std::pair<int, int> gl_version;
+			frame::Logger& logger = frame::Logger::GetInstance();
 			// GL context.
 			void* gl_context = SDL_GL_CreateContext(
 				static_cast<SDL_Window*>(window->GetWindowContext()));
@@ -282,6 +284,10 @@ namespace frame {
 				&gl_version.second);
 			// Vsync off.
 			SDL_GL_SetSwapInterval(0);
+			logger->info(
+				"Started SDL OpenGL version {}.{}.", 
+				gl_version.first, 
+				gl_version.second);
 
 			return gl_context;
 		}
