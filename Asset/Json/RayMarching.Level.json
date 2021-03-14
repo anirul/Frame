@@ -2,6 +2,6 @@
   "name": "RayMarching",
   "default_texture_name": "billboard",
   "texture_file": "RayMarching.Texture.json",
-  "effect_file": "RayMarching.Effect.json",
-  "scene_file": "RayMarching.Scene.json"
+  "program_file": "RayMarching.Program.json",
+  "scene_tree_file": "RayMarching.Scene.json"
 }

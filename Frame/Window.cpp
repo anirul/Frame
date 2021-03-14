@@ -24,10 +24,7 @@ namespace frame {
 				size_(size)
 			{
 				if (SDL_Init(SDL_INIT_VIDEO) != 0)
-				{
-					ErrorMessageDisplay("Couldn't initialize SDL2.");
 					throw std::runtime_error("Couldn't initialize SDL2.");
-				}
 				sdl_window_ = SDL_CreateWindow(
 					"SDL OpenGL",
 					SDL_WINDOWPOS_CENTERED,
@@ -37,10 +34,10 @@ namespace frame {
 					SDL_WINDOW_OPENGL);
 				if (!sdl_window_)
 				{
-					ErrorMessageDisplay("Couldn't start a window in SDL2.");
 					throw std::runtime_error(
 						"Couldn't start a window in SDL2.");
 				}
+				logger_->info("Created an SDL2 window.");
 #if defined(_WIN32) || defined(_WIN64)
 				SDL_SysWMinfo wmInfo;
 				SDL_VERSION(&wmInfo.version);
@@ -54,9 +51,7 @@ namespace frame {
 			{
 				// TODO(anirul): Fix me to check which device this is.
 				if (device_)
-				{
 					SDL_GL_DeleteContext(device_->GetDeviceContext());
-				}
 				SDL_DestroyWindow(sdl_window_);
 				SDL_Quit();
 			}
@@ -95,9 +90,7 @@ namespace frame {
 
 					// Draw the Scene not used?
 					if (draw_interface_)
-					{
 						draw_interface_->RunDraw(time.count());
-					}
 					device_->Display(time.count());
 
 					SetWindowTitle(
@@ -108,9 +101,7 @@ namespace frame {
 
 					// TODO(anirul): Fix me to check which device this is.
 					if (device_)
-					{
 						SDL_GL_SwapWindow(sdl_window_);
-					}
 				} while (loop);
 			}
 
@@ -157,9 +148,7 @@ namespace frame {
 			bool RunEvent(const SDL_Event& event, const double dt)
 			{
 				if (event.type == SDL_QUIT)
-				{
 					return false;
-				}
 				if (event.type == SDL_KEYDOWN)
 				{
 					switch (event.key.keysym.sym)
@@ -214,15 +203,6 @@ namespace frame {
 				if (button & SDL_BUTTON_X1) ret += 8;
 				if (button & SDL_BUTTON_X2) ret += 16;
 				return ret;
-			}
-
-			void ErrorMessageDisplay(const std::string& message)
-			{
-#if defined(_WIN32) || defined(_WIN64)
-				MessageBox(hwnd_, message.c_str(), "OpenGL Error", 0);
-#else
-				std::cerr << "OpenGL Error: " << message << std::endl;
-#endif
 			}
 
 			// Can only be called ONCE per frame!
@@ -284,6 +264,7 @@ namespace frame {
 				&gl_version.second);
 			// Vsync off.
 			SDL_GL_SetSwapInterval(0);
+
 			logger->info(
 				"Started SDL OpenGL version {}.{}.", 
 				gl_version.first, 

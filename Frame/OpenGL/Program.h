@@ -30,6 +30,9 @@ namespace frame::opengl {
 		void AddOutputTextureId(EntityId id) override;
 		void RemoveOutputTextureId(EntityId id) override;
 		const std::vector<EntityId> GetOutputTextureIds() const override;
+		// Get the depth test flag.
+		void SetDepthTest(bool enable) final { is_depth_test_ = enable; }
+		bool GetDepthTest() const final { return is_depth_test_; }
 		// Select the input mesh or scene root.
 		EntityId GetSceneRoot() const override;
 		void SetSceneRoot(EntityId scene_root) override;
@@ -73,6 +76,7 @@ namespace frame::opengl {
 		std::vector<unsigned int> attached_shaders_ = {};
 		int program_id_ = 0;
 		EntityId scene_root_ = 0;
+		bool is_depth_test_ = false;
 		std::vector<EntityId> input_texture_ids_ = {};
 		std::vector<EntityId> output_texture_ids_ = {};
 	};

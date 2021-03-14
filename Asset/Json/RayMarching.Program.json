@@ -5,6 +5,7 @@
       "output_texture_names": "billboard",
       "input_scene_type": { "value": "QUAD" },
       "shader": "RayMarching",
+      "depth_test": "false",
       "parameters": [
         {
           "name": "time_s",

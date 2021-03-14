@@ -70,6 +70,7 @@ namespace frame::proto {
 					"No way {}?", 
 					proto_program.input_scene_type().value()));
 		}
+		program->SetDepthTest(proto_program.depth_test());
 		return program;
 	}
 

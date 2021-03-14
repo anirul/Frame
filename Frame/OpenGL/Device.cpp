@@ -37,7 +37,6 @@ namespace frame::opengl {
 		error_.Display(__FILE__, __LINE__ - 1);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		error_.Display(__FILE__, __LINE__ - 1);
-		// Enable Z buffer.
 		glEnable(GL_DEPTH_TEST);
 		error_.Display(__FILE__, __LINE__ - 1);
 		glDepthFunc(GL_LEQUAL);
@@ -86,6 +85,7 @@ namespace frame::opengl {
 		for (const auto& program_id : program_render_)
 		{
 			auto program = level_->GetProgramMap().at(program_id);
+			SetDepthTest(program->GetDepthTest());
 			auto scene_root = program->GetSceneRoot();
 			auto it = level_->GetStaticMeshMap().find(scene_root);
 			if (it != level_->GetStaticMeshMap().end())
@@ -223,6 +223,20 @@ namespace frame::opengl {
 		auto scene_camera = std::dynamic_pointer_cast<NodeCamera>(
 			level_->GetSceneNodeMap().at(id));
 		return scene_camera->GetCamera();
+	}
+
+	void Device::SetDepthTest(bool enable)
+	{
+		if (enable)
+		{
+			glEnable(GL_DEPTH_TEST);
+			error_.Display(__FILE__, __LINE__ - 1);
+		}
+		else
+		{
+			glDisable(GL_DEPTH_TEST);
+			error_.Display(__FILE__, __LINE__ - 1);
+		}
 	}
 
 } // End namespace frame::opengl.

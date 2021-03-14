@@ -32,13 +32,15 @@ namespace frame::opengl {
 		virtual ~Device();
 
 	public:
-		const std::shared_ptr<CameraInterface> GetCamera() const override;
+		const std::shared_ptr<CameraInterface> GetCamera() const final;
 		// Startup the scene.
-		void Startup(const std::shared_ptr<LevelInterface> level) override;
+		void Startup(const std::shared_ptr<LevelInterface> level) final;
 		// Cleanup the mess.
-		void Cleanup() override;
+		void Cleanup() final;
 		// Display the output texture to the display.
-		void Display(const double dt) override;
+		void Display(const double dt) final;
+		// Set the depth test.
+		void SetDepthTest(bool enable) final;
 		// Some implementation from in heritage.
 		const glm::vec3 GetCameraFront() const final;
 		const glm::vec3 GetCameraRight() const final;
