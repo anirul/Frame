@@ -1,4 +1,6 @@
 #include "ParseSceneTree.h"
+#include "Frame/File/FileSystem.h"
+#include "Frame/File/Obj.h"
 #include "Frame/Proto/ParseUniform.h"
 #include "Frame/NodeCamera.h"
 #include "Frame/NodeLight.h"
@@ -20,7 +22,8 @@ namespace frame::proto {
 	std::shared_ptr<NodeStaticMesh> ParseSceneStaticMesh(
 		const frame::proto::SceneStaticMesh& proto_scene_static_mesh)
 	{
-		throw std::runtime_error("Implement me!");
+		file::Obj obj(file::FindPath("Asset/Model/"), proto_scene_static_mesh.file_name());
+		const auto meshes = obj.GetMeshes();
 		return nullptr;
 	}
 
