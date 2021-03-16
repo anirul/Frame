@@ -1,96 +1,92 @@
 {
-  "scene_trees": [
+  "default_camera_name": "camera",
+  "default_root_name": "root",
+  "scene_matrices": [
     {
-      "name": "scene",
-      "root_node": "root",
-      "scene_matrices": [
-        {
-          "name": "root",
-          "matrix": {
-            "m11": "1",
-            "m22": "1",
-            "m33": "1",
-            "m44": "1"
-          }
-        },
-        {
-          "name": "mesh_holder",
-          "parent": "root",
-          "matrix": {
-            "m11": "1",
-            "m22": "1",
-            "m33": "1",
-            "m44": "1"
-          },
-          "quaternion": {
-            "w": "0.9998096",
-            "x": "0.0087261",
-            "y": "0.0174522",
-            "z": "0.0"
-          }
-        },
-        {
-          "name": "camera_holder",
-          "parent": "root",
-          "matrix": {
-            "m11": "1",
-            "m22": "1",
-            "m33": "1",
-            "m44": "1"
-          },
-          "quaternion": {
-            "w": "0.9999619",
-            "x": "0.0",
-            "y": "0.0087265",
-            "z": "0.0"
-          }
-        }
-      ],
-      "scene_static_meshes": [
-        {
-          "name": "apple",
-          "parent": "mesh_holder",
-          "file_name": "../Asset/Model/Apple.obj"
-        }
-      ],
-      "scene_cameras": [
-        {
-          "name": "camera",
-          "parent": "camera_holder",
-          "position": {
-            "x": "0.0",
-            "y": "0.0",
-            "z": "-2.0"
-          },
-          "target": {
-            "x": "0.0",
-            "y": "0.0",
-            "z": "0.0"
-          },
-          "up": {
-            "x": "0.0",
-            "y": "1.0",
-            "z": "0.0"
-          }
-        }
-      ],
-      "scene_lights": [
-        {
-          "name": "sun",
-          "parent": "root",
-          "light_type": "POINT",
-          "position": {
-            "x": "-1.0",
-            "y": "1.0",
-            "z": "1.0"
-          },
-          "color": {
-            "x": "1.0",
-            "y": "1.0",
-            "z": "1.0"
-          }
-        }
-      ]
+      "name": "root",
+      "matrix": {
+        "m11": "1",
+        "m22": "1",
+        "m33": "1",
+        "m44": "1"
+      }
+    },
+    {
+      "name": "mesh_holder",
+      "parent": "root",
+      "matrix": {
+        "m11": "1",
+        "m22": "1",
+        "m33": "1",
+        "m44": "1"
+      },
+      "quaternion": {
+        "w": "0.9998096",
+        "x": "0.0087261",
+        "y": "0.0174522",
+        "z": "0.0"
+      }
+    },
+    {
+      "name": "camera_holder",
+      "parent": "root",
+      "matrix": {
+        "m11": "1",
+        "m22": "1",
+        "m33": "1",
+        "m44": "1"
+      },
+      "quaternion": {
+        "w": "0.9999619",
+        "x": "0.0",
+        "y": "0.0087265",
+        "z": "0.0"
+      }
+    }
+  ],
+  "scene_static_meshes": [
+    {
+      "name": "apple",
+      "parent": "mesh_holder",
+      "file_name": "../Asset/Model/Apple.obj"
+    }
+  ],
+  "scene_cameras": [
+    {
+      "name": "camera",
+      "parent": "camera_holder",
+      "position": {
+        "x": "0.0",
+        "y": "0.0",
+        "z": "-2.0"
+      },
+      "target": {
+        "x": "0.0",
+        "y": "0.0",
+        "z": "0.0"
+      },
+      "up": {
+        "x": "0.0",
+        "y": "1.0",
+        "z": "0.0"
+      }
+    }
+  ],
+  "scene_lights": [
+    {
+      "name": "sun",
+      "parent": "root",
+      "light_type": "POINT",
+      "position": {
+        "x": "-1.0",
+        "y": "1.0",
+        "z": "1.0"
+      },
+      "color": {
+        "x": "1.0",
+        "y": "1.0",
+        "z": "1.0"
+      }
     }
   ]
 }

@@ -10,7 +10,7 @@ package frame.proto;
 // skeleton animation so a new type of mesh.
 
 // Matrix
-// Next 6
+// Next 5
 message SceneMatrix {
 	// This is the name of the scene matrix.
 	string name = 1;
@@ -18,6 +18,8 @@ message SceneMatrix {
 	string parent = 2;
 	// Matrix.
 	UniformMatrix4 matrix = 3;
+	// Quaternion
+	UniformQuaternion quaternion = 4;
 }
 
 // Static Mesh.

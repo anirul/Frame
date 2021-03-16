@@ -1,15 +1,11 @@
 {
-  "effects": [
+  "programs": [
     {
       "name": "CubeMap",
-      "render_input_type": "TEXTURE_3D",
-      "render_output_type": "TEXTURE_2D",
-      "input_texture_names": [
-        "skybox"
-      ],
-      "output_texture_names": [
-        "background"
-      ],
+      "input_texture_names": "skybox",
+      "output_texture_names": "albedo",
+      "input_scene_type": { "value": "CUBE" },
+      "depth_test": "false",
       "shader": "CubeMap",
       "parameters": [
         {
@@ -28,14 +24,14 @@
     },
     {
       "name": "apple",
-      "render_input_type": "SCENE",
-      "render_output_type": "TEXTURE_2D",
-      "input_scene": "scene",
       "output_texture_names": [
         "albedo",
         "zbuffer"
       ],
+      "input_scene_type": { "value": "SCENE" },
+      "input_scene_name": "scene",
       "shader": "SceneSimple",
+      "depth_test": "true",
       "parameters": [
         {
           "name": "projection",

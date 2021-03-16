@@ -1,5 +1,5 @@
 {
-  "default_camera_name" : "camera",
+  "default_camera_name": "camera",
   "default_root_name": "root",
   "scene_matrices": [
     {
