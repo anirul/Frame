@@ -11,20 +11,22 @@ namespace frame::proto {
 	{
 		Error& error = Error::GetInstance();
 		std::string shader_name = 
-			file::FindPath("Asset/") + "Shader/OpenGL/" + proto_program.shader();
+			file::FindPath("Asset/") + 
+			"Shader/OpenGL/" + 
+			proto_program.shader();
 		std::ifstream ifs_vertex(shader_name + ".vert");
 		if (!ifs_vertex.is_open())
 		{
 			std::string error_str = 
-				fmt::format("Couldn't open file {}", shader_name + ".vert");
-			error.CreateError(error_str, __FILE__, __LINE__);
+				fmt::format("Couldn't open file {}.vert", shader_name);
+			error.CreateError(error_str, __FILE__, __LINE__ - 4);
 		}
 		std::ifstream ifs_pixel(shader_name + ".frag");
 		if (!ifs_pixel.is_open())
 		{
 			std::string error_str =
-				fmt::format("Couldn't open file {}", shader_name + ".frag");
-			error.CreateError(error_str, __FILE__, __LINE__);
+				fmt::format("Couldn't open file {}.frag", shader_name);
+			error.CreateError(error_str, __FILE__, __LINE__ - 4);
 		}
 		auto program = opengl::CreateProgram(ifs_vertex, ifs_pixel);
 		for (const auto& texture_name : proto_program.input_texture_names())

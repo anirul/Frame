@@ -2,10 +2,12 @@
 
 add_library(FrameFile
   STATIC
+	FileSystem.cpp
+    FileSystem.h
 	Image.cpp
 	Image.h
-    FileSystem.cpp
-    FileSystem.h
+    Obj.cpp
+	Obj.h
 )
 
 target_include_directories(FrameFile
@@ -19,7 +21,7 @@ target_link_libraries(FrameFile
 	Frame
 	FrameProto
 	FrameOpenGL
-	assimp::assimp
+	tinyobjloader::tinyobjloader
 )
 
 add_subdirectory(Test)

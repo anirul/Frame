@@ -21,15 +21,15 @@ cd vcpkg
 Then you will need to install the following packages:
 
 - abseil
-- assimp
-- protobuf
-- gRPC
-- SDL2
-- GLEW
 - glm
+- gRPC
+- GLEW
 - GTest
+- protobuf
 - spdlog
 - stb
+- SDL2
+- tinyobjloader
 
 To install use the command line in the repository of vcpkg something like:
 

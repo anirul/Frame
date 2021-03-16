@@ -24,5 +24,4 @@ target_link_libraries(FrameOpenGLFile
 	FrameFile
 	FrameProto
 	FrameOpenGL
-	assimp::assimp
 )
