@@ -90,10 +90,7 @@ namespace frame::opengl {
 			auto it = level_->GetStaticMeshMap().find(scene_root);
 			if (it != level_->GetStaticMeshMap().end())
 			{
-				rendering_->RenderMesh(
-					program.get(), 
-					it->second.get(), 
-					dt);
+				rendering_->RenderMesh(program.get(), it->second.get(), dt);
 			}
 			else
 			{

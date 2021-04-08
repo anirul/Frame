@@ -102,7 +102,8 @@ namespace frame {
 					// TODO(anirul): Fix me to check which device this is.
 					if (device_)
 						SDL_GL_SwapWindow(sdl_window_);
-				} while (loop);
+				} 
+				while (loop);
 			}
 
 			void SetDrawInterface(

@@ -41,7 +41,8 @@ namespace frame::file {
 		for (size_t s = 0; s < shapes.size(); s++) 
 		{
 			std::vector<ObjVertex> points; 
-			std::vector<int> indices; 
+			std::vector<int> indices;
+			int material = 0;
 
 			// Loop over faces(polygon) this should be triangles?
 			size_t index_offset = 0;
@@ -68,10 +69,12 @@ namespace frame::file {
 				}
 				index_offset += fv;
 
-				// per-face material				
-				// shapes[s].mesh.material_ids[f];
+				// per-face material
+				if (material)
+					assert(material == shapes[s].mesh.material_ids[f]);
+				material = shapes[s].mesh.material_ids[f];
 			}
-			ObjMesh mesh(points, indices, -1);
+			ObjMesh mesh(points, indices, material);
 			meshes_.push_back(mesh);
 		}
 	}

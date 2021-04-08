@@ -14,7 +14,7 @@ namespace frame {
 		virtual unsigned int GetId() const = 0;
 		virtual const std::pair<bool, std::string> GetError() const
 		{
-			return { true, "" };
+			return { true, "Interface" };
 		}
 	};
 
