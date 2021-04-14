@@ -29,7 +29,7 @@
         "zbuffer"
       ],
       "input_scene_type": { "value": "SCENE" },
-      "input_scene_name": "scene",
+      "input_scene_name": "root",
       "shader": "SceneSimple",
       "depth_test": "true",
       "parameters": [

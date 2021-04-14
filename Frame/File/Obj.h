@@ -24,7 +24,7 @@ namespace frame::file {
 			points_(points), indices_(indices), material_(material) {}
 		const std::vector<ObjVertex>& GetVertices() const { return points_; }
 		const std::vector<int>& GetIndices() const { return indices_; }
-		int GetMaterialIds() const { return material_; }
+		int GetMaterialId() const { return material_; }
 
 	protected:
 		std::vector<ObjVertex> points_ = {};

@@ -48,13 +48,14 @@
     {
       "name": "apple",
       "parent": "mesh_holder",
-      "file_name": "../Asset/Model/Apple.obj"
+      "file_name": "Apple.obj"
     }
   ],
   "scene_cameras": [
     {
       "name": "camera",
       "parent": "camera_holder",
+      "fov_degrees": "65.0",
       "position": {
         "x": "0.0",
         "y": "0.0",

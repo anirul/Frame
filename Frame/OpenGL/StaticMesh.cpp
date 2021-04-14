@@ -12,13 +12,15 @@ namespace frame::opengl {
 		EntityId point_buffer_id,
 		EntityId normal_buffer_id,
 		EntityId texture_buffer_id,
-		EntityId index_buffer_id)
+		EntityId index_buffer_id,
+		EntityId material_id)
 	{
 		// Get a local copy of the pointer.
 		point_buffer_id_ = point_buffer_id;
 		normal_buffer_id_ = normal_buffer_id;
 		texture_buffer_id_ = texture_buffer_id;
 		index_buffer_id_ = index_buffer_id;
+		material_id_ = material_id;
 		index_size_ = level->GetBufferMap().at(index_buffer_id)->GetSize();
 
 		// Create a new vertex array (to render the mesh).

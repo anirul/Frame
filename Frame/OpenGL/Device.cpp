@@ -128,9 +128,11 @@ namespace frame::opengl {
 					if (program_id)
 					{
 						throw std::runtime_error(
-							"Texture : " + level_->GetNameFromId(texture_id)
-							+ "[" + std::to_string(texture_id) + "]" +
-							" cannot be output of more than one program.");
+							fmt::format(
+								"Texture : {}[{}] cannot be output of more"
+								" than one program.",
+								level_->GetNameFromId(texture_id),
+								texture_id));
 					}
 					program_id = id_program.first;
 				}

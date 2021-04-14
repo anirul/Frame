@@ -25,13 +25,14 @@ namespace frame::opengl {
 			EntityId point_buffer_id,
 			EntityId normal_buffer_id,
 			EntityId texture_buffer_id,
-			EntityId index_buffer_id);
+			EntityId index_buffer_id,
+			EntityId material_id = -1);
 		virtual ~StaticMesh();
 
 	public:
 		void SetMaterialId(EntityId id) override
-		{ 
-			material_id_ = id; 
+		{
+			material_id_ = id;
 		}
 		EntityId GetMaterialId() const override
 		{ 
