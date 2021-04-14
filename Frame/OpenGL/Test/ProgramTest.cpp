@@ -55,7 +55,7 @@ namespace test {
 			fragment_shader.LoadFromSource(GetFragmentSource()));
 		program_ptr->AddShader(fragment_shader);
 		program_->LinkShader();
-		program_->Use();
+		program_->Use(nullptr);
 	}
 
 	// TODO(anirul): add uniform tests!

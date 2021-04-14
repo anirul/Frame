@@ -75,7 +75,7 @@ namespace frame::proto {
 		program->SetDepthTest(proto_program.depth_test());
 		for (const auto& parameter : proto_program.parameters())
 		{
-			program->Uniform(parameter.name(), 1.0f);
+			program->Uniform(parameter.name(), parameter.uniform_enum());
 		}
 		return program;
 	}

@@ -4,6 +4,8 @@
 #include <vector>
 #include <glm/glm.hpp>
 #include "Frame/EntityId.h"
+#include "Frame/Proto/Proto.h"
+#include "Frame/UniformInterface.h"
 
 namespace frame {
 
@@ -25,8 +27,9 @@ namespace frame {
 		virtual void SetSceneRoot(EntityId scene_root) = 0;
 		// Link shaders to a program.
 		virtual void LinkShader() = 0;
-		// Use the program.
-		virtual void Use() const = 0;
+		// Use the program it takes an optional uniform interface pointer to 
+		// set the uniform variable parameters.
+		virtual void Use(const UniformInterface* uniform_interface) const = 0;
 		// Create a uniform from a string and a bool.
 		virtual void Uniform(const std::string& name, bool value) const = 0;
 		// Create a uniform from a string and an int.
@@ -49,6 +52,11 @@ namespace frame {
 		virtual void Uniform(
 			const std::string& name,
 			const glm::mat4 mat) const = 0;
+		// Add a later included value (like camera position or time), this will
+		// be set in the "Use" function.
+		virtual void Uniform(
+			const std::string& name,
+			const proto::Uniform::UniformEnum enum_value) const = 0;
 	};
 
 } // End namespace frame.

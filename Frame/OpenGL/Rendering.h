@@ -1,10 +1,11 @@
 #pragma once
 
 #include <memory>
+#include "Frame/Error.h"
 #include "Frame/LevelInterface.h"
 #include "Frame/ProgramInterface.h"
 #include "Frame/StaticMeshInterface.h"
-#include "Frame/Error.h"
+#include "Frame/UniformInterface.h"
 #include "Frame/OpenGL/FrameBuffer.h"
 #include "Frame/OpenGL/RenderBuffer.h"
 
@@ -29,11 +30,12 @@ namespace frame::opengl {
 	public:
 		// Render to a mesh at a dt time.
 		void RenderMesh(
+			const UniformInterface* uniform_interface,
 			ProgramInterface* program,
 			StaticMeshInterface* static_mesh,
 			const double dt = 0.0);
 		// Display the default texture to the screen.
-		void Display();
+		void Display(const UniformInterface* uniform_interface);
 
 	private:
 		// Level shared_ptr.

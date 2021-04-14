@@ -44,11 +44,13 @@ namespace frame::opengl {
 
 	void FillProgramMultiTexture(
 		const std::shared_ptr<LevelInterface> level,
-		const std::shared_ptr<ProgramInterface> program)
+		const std::shared_ptr<ProgramInterface> program,
+		const std::shared_ptr<UniformInterface> uniform_interface)
 	{
 		FillProgramMultiTextureMipmap(
 			level,
 			program,
+			uniform_interface,
 			0,
 			[](const int, const std::shared_ptr<ProgramInterface>) {});
 	}
@@ -56,6 +58,7 @@ namespace frame::opengl {
 	void FillProgramMultiTextureMipmap(
 		const std::shared_ptr<LevelInterface> level,
 		const std::shared_ptr<ProgramInterface> program,
+		const std::shared_ptr<UniformInterface> uniform_interface,
 		const int mipmap,
 		const std::function<void(
 			const int mipmap,
@@ -114,6 +117,7 @@ namespace frame::opengl {
 			Rendering rendering{level, temporary_size};
 			rendering.SetProjection(projection);
 			rendering.RenderMesh(
+				uniform_interface.get(),
 				program.get(), 
 				level->GetStaticMeshMap().at(
 					level->GetDefaultStaticMeshQuadId()).get());
@@ -122,11 +126,13 @@ namespace frame::opengl {
 
 	void FillProgramMultiTextureCubeMap(
 		const std::shared_ptr<LevelInterface> level,
-		const std::shared_ptr<ProgramInterface> program)
+		const std::shared_ptr<ProgramInterface> program,
+		const std::shared_ptr<UniformInterface> uniform_interface)
 	{
 		FillProgramMultiTextureCubeMapMipmap(
 			level,
 			program,
+			uniform_interface,
 			0,
 			[](const int, const std::shared_ptr<ProgramInterface>) {});
 	}
@@ -134,6 +140,7 @@ namespace frame::opengl {
 	void FillProgramMultiTextureCubeMapMipmap(
 		const std::shared_ptr<LevelInterface> level,
 		const std::shared_ptr<ProgramInterface> program,
+		const std::shared_ptr<UniformInterface> uniform_interface,
 		const int mipmap,
 		const std::function<void(
 			const int mipmap,
@@ -197,6 +204,7 @@ namespace frame::opengl {
 				rendering.SetProjection(projection);
 				rendering.SetView(view);
 				rendering.RenderMesh(
+					uniform_interface.get(),
 					program.get(),
 					level->GetStaticMeshMap().at(
 						level->GetDefaultStaticMeshCubeId()).get());

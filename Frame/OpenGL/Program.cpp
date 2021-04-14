@@ -79,10 +79,77 @@ namespace frame::opengl {
 		}
 	}
 
-	void Program::Use() const
+	void Program::Use(const UniformInterface* uniform_interface) const
 	{
 		glUseProgram(program_id_);
 		error_.Display(__FILE__, __LINE__ - 1);
+		// Now loop into the uniform map to include uniform interface values.
+		for (const auto& pair : uniform_variable_map_)
+		{
+			switch (pair.second)
+			{
+				case proto::Uniform::PROJECTION_MAT4 :
+				{
+					Uniform(pair.first, uniform_interface->GetProjection());
+					break;
+				}
+				case proto::Uniform::PROJECTION_INV_MAT4 :
+				{
+					Uniform(
+						pair.first, 
+						glm::inverse(uniform_interface->GetProjection()));
+					break;
+				}
+				case proto::Uniform::VIEW_MAT4 :
+				{
+					Uniform(pair.first, uniform_interface->GetView());
+					break;
+				}
+				case proto::Uniform::VIEW_INV_MAT4 :
+				{
+					Uniform(
+						pair.first, 
+						glm::inverse(uniform_interface->GetView()));
+					break;
+				}
+				case proto::Uniform::MODEL_MAT4 :
+				{
+					Uniform(pair.first, uniform_interface->GetModel());
+					break;
+				}
+				case proto::Uniform::MODEL_INV_MAT4 :
+				{
+					Uniform(
+						pair.first, 
+						glm::inverse(uniform_interface->GetModel()));
+					break;
+				}
+				case proto::Uniform::CAMERA_POSITION_VEC3 :
+				{
+					Uniform(pair.first, uniform_interface->GetCameraPosition());
+					break;
+				}
+				case proto::Uniform::CAMERA_DIRECTION_VEC3 :
+				{
+					Uniform(
+						pair.first, 
+						uniform_interface->GetCameraFront() - 
+							uniform_interface->GetCameraPosition());
+					break;
+				}
+				case proto::Uniform::FLOAT_TIME_S :
+				{
+					Uniform(
+						pair.first,
+						static_cast<float>(uniform_interface->GetDeltaTime()));
+					break;
+				}
+				case proto::Uniform::INVALID:
+				default:
+					throw std::runtime_error(
+						fmt::format("Unknown enum value {}", pair.second));
+			}
+		}
 	}
 
 	void Program::Uniform(const std::string& name, bool value) const
@@ -142,6 +209,13 @@ namespace frame::opengl {
 			GL_FALSE,
 			&mat[0][0]);
 		error_.Display(__FILE__, __LINE__ - 5);
+	}
+
+	void Program::Uniform(
+		const std::string& name, 
+		const proto::Uniform::UniformEnum enum_value) const
+	{
+		uniform_variable_map_.insert({ name, enum_value });
 	}
 
 	const int Program::GetMemoizeUniformLocation(const std::string& name) const

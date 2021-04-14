@@ -26,6 +26,7 @@ namespace frame::opengl {
 	}
 
 	void Rendering::RenderMesh(
+		const UniformInterface* uniform_interface,
 		ProgramInterface* program, 
 		StaticMeshInterface* static_mesh, 
 		const double dt /*= 0.0*/)
@@ -36,7 +37,7 @@ namespace frame::opengl {
 			throw std::runtime_error("StaticMesh ptr doesn't exist.");
 
 		assert(program->GetOutputTextureIds().size());
-		program->Use();
+		program->Use(uniform_interface);
 		auto texture_out_ids = program->GetOutputTextureIds();
 		auto texture_ref = 
 			level_->GetTextureMap().at(*texture_out_ids.cbegin());
@@ -109,13 +110,13 @@ namespace frame::opengl {
 		}
 	}
 
-	void Rendering::Display()
+	void Rendering::Display(const UniformInterface* uniform_interface)
 	{
 		auto quad = level_->GetStaticMeshMap().at(
 			level_->GetDefaultStaticMeshQuadId());
 		quad->SetMaterialId(display_material_id_);
 		auto program = level_->GetProgramMap().at(display_program_id_);
-		program->Use();
+		program->Use(uniform_interface);
 		auto material = level_->GetMaterialMap().at(display_material_id_);
 
 		for (const auto id : material->GetIds())

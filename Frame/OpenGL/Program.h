@@ -10,6 +10,7 @@
 #include "Frame/OpenGL/Shader.h"
 #include "Frame/ProgramInterface.h"
 #include "Frame/Proto/Proto.h"
+#include "Frame/UniformInterface.h"
 
 namespace frame::opengl {
 
@@ -41,7 +42,8 @@ namespace frame::opengl {
 		// Link shaders to a program.
 		void LinkShader() override;
 		// Use the program.
-		void Use() const override;
+		void Use(
+			const UniformInterface* uniform_interface = nullptr) const override;
 		// Create a uniform from a string and a bool.
 		void Uniform(const std::string& name, bool value) const override;
 		// Create a uniform from a string and an int.
@@ -64,6 +66,11 @@ namespace frame::opengl {
 		void Uniform(
 			const std::string& name,
 			const glm::mat4 mat) const override;
+		// Add a later included value (like camera position or time), this will
+		// be set in the use function.
+		virtual void Uniform(
+			const std::string& name,
+			const proto::Uniform::UniformEnum enum_value) const override;
 
 	protected:
 		const int GetMemoizeUniformLocation(const std::string& name) const;
@@ -73,6 +80,8 @@ namespace frame::opengl {
 		const Error& error_ = Error::GetInstance();
 		const Logger& logger_ = Logger::GetInstance();
 		mutable std::map<std::string, int> memoize_map_ = {};
+		mutable std::map<std::string, proto::Uniform::UniformEnum> 
+			uniform_variable_map_ = {};
 		std::vector<unsigned int> attached_shaders_ = {};
 		int program_id_ = 0;
 		EntityId scene_root_ = 0;

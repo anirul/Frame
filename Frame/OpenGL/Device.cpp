@@ -90,14 +90,18 @@ namespace frame::opengl {
 			auto it = level_->GetStaticMeshMap().find(scene_root);
 			if (it != level_->GetStaticMeshMap().end())
 			{
-				rendering_->RenderMesh(program.get(), it->second.get(), dt);
+				rendering_->RenderMesh(
+					this, 
+					program.get(), 
+					it->second.get(), 
+					dt);
 			}
 			else
 			{
 				throw std::runtime_error("Not implemented yet!");
 			}
 		}
-		rendering_->Display();
+		rendering_->Display(this);
 	}
 
 	void Device::SetupCamera()
