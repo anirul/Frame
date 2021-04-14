@@ -57,7 +57,7 @@ namespace frame::opengl {
 
 	protected:
 		void SetupCamera();
-		EntityId GetProgramIdTextureId(EntityId texture_id) const;
+		std::vector<EntityId> GetProgramIdTextureId(EntityId texture_id) const;
 		void AddToRenderProgram(EntityId program_id);
 
 	private:

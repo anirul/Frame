@@ -26,7 +26,7 @@ namespace frame::opengl {
 			EntityId normal_buffer_id,
 			EntityId texture_buffer_id,
 			EntityId index_buffer_id,
-			EntityId material_id = -1);
+			EntityId material_id = 0);
 		virtual ~StaticMesh();
 
 	public:

@@ -55,9 +55,12 @@ namespace frame::opengl {
 	{
 		// Copy level into the local area.
 		level_ = level;
-		// Preprocess the level to have a direct rendering.
-		AddToRenderProgram(
-			GetProgramIdTextureId(level_->GetDefaultOutputTextureId()));
+		// Process the level to have a direct rendering.
+		for (const auto& program_id : 
+			GetProgramIdTextureId(level_->GetDefaultOutputTextureId()))
+		{
+			AddToRenderProgram(program_id);
+		}
 		// Setup camera.
 		SetupCamera();
 		rendering_ = std::make_unique<Rendering>(level_, size_);
@@ -87,8 +90,9 @@ namespace frame::opengl {
 			auto program = level_->GetProgramMap().at(program_id);
 			SetDepthTest(program->GetDepthTest());
 			auto scene_root = program->GetSceneRoot();
-			auto it = level_->GetStaticMeshMap().find(scene_root);
-			if (it != level_->GetStaticMeshMap().end())
+			auto static_mesh_map = level_->GetStaticMeshMap();
+			auto it = static_mesh_map.find(scene_root);
+			if (it != static_mesh_map.end())
 			{
 				rendering_->RenderMesh(
 					this, 
@@ -98,6 +102,7 @@ namespace frame::opengl {
 			}
 			else
 			{
+				// TODO(anirul): What is needed here???
 				throw std::runtime_error("Not implemented yet!");
 			}
 		}
@@ -114,9 +119,10 @@ namespace frame::opengl {
 		view_ = camera->ComputeView();
 	}
 
-	EntityId Device::GetProgramIdTextureId(EntityId texture_id) const
+	std::vector<EntityId> Device::GetProgramIdTextureId(
+		EntityId texture_id) const
 	{
-		EntityId program_id = 0;
+		std::vector<EntityId> program_ids = {};
 		// Go through all programs.
 		for (const auto& id_program : level_->GetProgramMap())
 		{
@@ -125,28 +131,19 @@ namespace frame::opengl {
 			{
 				if (texture_id == output_texture_id)
 				{
-					if (program_id)
-					{
-						throw std::runtime_error(
-							fmt::format(
-								"Texture : {}[{}] cannot be output of more"
-								" than one program.",
-								level_->GetNameFromId(texture_id),
-								texture_id));
-					}
-					program_id = id_program.first;
+					program_ids.push_back(id_program.first);
 				}
 			}
 		}
 		// Check found anything.
-		if (program_id == 0)
+		if (program_ids.empty())
 		{
 			throw std::runtime_error(
 				"no program id that output texture: " + 
 				level_->GetNameFromId(texture_id) +
 				"[" + std::to_string(texture_id) + "].");
 		}
-		return program_id;
+		return program_ids;
 	}
 
 	void Device::AddToRenderProgram(EntityId program_id)
