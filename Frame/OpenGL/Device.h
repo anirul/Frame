@@ -59,6 +59,7 @@ namespace frame::opengl {
 		void SetupCamera();
 		std::vector<EntityId> GetProgramIdTextureId(EntityId texture_id) const;
 		void AddToRenderProgram(EntityId program_id);
+		bool HasNameInParents(EntityId node_id, const std::string& name) const;
 
 	private:
 		// Map of current stored level.

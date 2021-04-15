@@ -112,12 +112,40 @@ namespace frame::opengl {
 			{
 				// Found not a mesh but a hierarchy of meshes, this is the
 				// scene rendering part.
-				const auto& root_node = 
-					level_->GetSceneNodeMap().at(scene_root);
-				throw std::runtime_error("Not implemented yet!");
+				const auto& node_map = level_->GetSceneNodeMap();
+				const auto& root_name = level_->GetNameFromId(scene_root);
+				for (const auto& node : node_map)
+				{
+					if (!HasNameInParents(node.first, root_name))
+						continue;
+					if (!node.second->GetLocalMesh())
+						continue;
+					rendering_->SetModel(node.second->GetLocalModel(dt_));
+					rendering_->RenderMesh(
+						this,
+						program.get(),
+						node.second->GetLocalMesh().get(),
+						dt_);
+				}
 			}
 		}
 		rendering_->Display(this);
+	}
+
+	bool Device::HasNameInParents(EntityId node_id, const std::string& name) const
+	{
+		const auto& node_map = level_->GetSceneNodeMap();
+		const auto& node_interface = node_map.at(node_id);
+		const auto& parent_name = node_interface->GetParentName();
+		if (parent_name == name) 
+		{
+			return true;
+		}
+		else
+		{
+			const auto& id = level_->GetIdFromName(parent_name);
+			return HasNameInParents(id, name);
+		}
 	}
 
 	void Device::SetupCamera()
