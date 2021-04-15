@@ -88,21 +88,31 @@ namespace frame::opengl {
 		for (const auto& program_id : program_render_)
 		{
 			auto program = level_->GetProgramMap().at(program_id);
+#ifdef _DEBUG
+			logger_->info(
+				"Rendering program {}[{}].", 
+				level_->GetNameFromId(program_id), 
+				program_id);
+#endif // _DEBUG
 			SetDepthTest(program->GetDepthTest());
 			auto scene_root = program->GetSceneRoot();
 			auto static_mesh_map = level_->GetStaticMeshMap();
 			auto it = static_mesh_map.find(scene_root);
 			if (it != static_mesh_map.end())
 			{
+				// This is a special mesh no root node needed, this can be use
+				// per example when you have a cube map as a sky box.
 				rendering_->RenderMesh(
 					this, 
 					program.get(), 
 					it->second.get(), 
-					dt);
+					dt_);
 			}
 			else
 			{
-				// TODO(anirul): What is needed here???
+				// Found not a mesh but a hierarchy of meshes, this is the
+				// scene rendering part.
+
 				throw std::runtime_error("Not implemented yet!");
 			}
 		}
