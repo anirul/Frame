@@ -96,8 +96,8 @@ namespace frame::opengl {
 #endif // _DEBUG
 			SetDepthTest(program->GetDepthTest());
 			auto scene_root = program->GetSceneRoot();
-			auto static_mesh_map = level_->GetStaticMeshMap();
-			auto it = static_mesh_map.find(scene_root);
+			const auto& static_mesh_map = level_->GetStaticMeshMap();
+			const auto& it = static_mesh_map.find(scene_root);
 			if (it != static_mesh_map.end())
 			{
 				// This is a special mesh no root node needed, this can be use
@@ -112,7 +112,8 @@ namespace frame::opengl {
 			{
 				// Found not a mesh but a hierarchy of meshes, this is the
 				// scene rendering part.
-
+				const auto& root_node = 
+					level_->GetSceneNodeMap().at(scene_root);
 				throw std::runtime_error("Not implemented yet!");
 			}
 		}
