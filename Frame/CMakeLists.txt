@@ -50,7 +50,7 @@ target_link_libraries(Frame
     FrameProto
     SDL2::SDL2
     spdlog::spdlog
-    glm
+    glm::glm
 )
 
 add_subdirectory(File)
