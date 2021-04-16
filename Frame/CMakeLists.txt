@@ -45,13 +45,24 @@ target_include_directories(Frame
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-target_link_libraries(Frame
-  PUBLIC
-    FrameProto
-    SDL2::SDL2
-    spdlog::spdlog
-    glm::glm
-)
+# This should be changed as soon as the glm is changed...
+if(WIN32)
+    target_link_libraries(Frame
+        PUBLIC
+        FrameProto
+        SDL2::SDL2
+        spdlog::spdlog
+        glm
+    )
+else()
+    target_link_libraries(Frame
+      PUBLIC
+        FrameProto
+        SDL2::SDL2
+        spdlog::spdlog
+        glm::glm
+    )
+endif(WIN32)
 
 add_subdirectory(File)
 add_subdirectory(OpenGL)

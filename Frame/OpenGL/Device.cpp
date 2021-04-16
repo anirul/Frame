@@ -137,15 +137,12 @@ namespace frame::opengl {
 		const auto& node_map = level_->GetSceneNodeMap();
 		const auto& node_interface = node_map.at(node_id);
 		const auto& parent_name = node_interface->GetParentName();
+		if (parent_name.empty()) 
+			return false;
 		if (parent_name == name) 
-		{
 			return true;
-		}
-		else
-		{
-			const auto& id = level_->GetIdFromName(parent_name);
-			return HasNameInParents(id, name);
-		}
+		const auto& id = level_->GetIdFromName(parent_name);
+		return HasNameInParents(id, name);
 	}
 
 	void Device::SetupCamera()
