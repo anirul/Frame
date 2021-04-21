@@ -10,12 +10,12 @@
       "wrap_s": "CLAMP_TO_EDGE",
       "wrap_t": "CLAMP_TO_EDGE",
       "file_names": [
-        "../Asset/CubeMap/NegativeX.png",
-        "../Asset/CubeMap/PositiveX.png",
-        "../Asset/CubeMap/NegativeY.png",
-        "../Asset/CubeMap/PositiveY.png",
-        "../Asset/CubeMap/NegativeZ.png",
-        "../Asset/CubeMap/PositiveZ.png"
+        "Asset/CubeMap/NegativeX.png",
+        "Asset/CubeMap/PositiveX.png",
+        "Asset/CubeMap/NegativeY.png",
+        "Asset/CubeMap/PositiveY.png",
+        "Asset/CubeMap/NegativeZ.png",
+        "Asset/CubeMap/PositiveZ.png"
       ]
     },
     {
@@ -27,7 +27,7 @@
       "mag_filter": "LINEAR",
       "wrap_s": "CLAMP_TO_EDGE",
       "wrap_t": "CLAMP_TO_EDGE",
-      "file_name": "../Asset/Apple/Color.jpg"
+      "file_name": "Asset/Apple/Color.jpg"
     },
     {
       "name": "albedo",

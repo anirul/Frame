@@ -14,7 +14,7 @@ namespace frame::proto {
 		std::string shader_path = "Asset/Shader/OpenGL/";
 		std::string shader_name = shader_path + proto_program.shader();
 		std::string shader_vert = file::FindFile(shader_name + ".vert");
-		logger->info("Openning vertex shader: {}", shader_vert);
+		logger->info("Openning vertex shader: [{}].", shader_vert);
 		std::ifstream ifs_vertex(shader_vert);
 		if (!ifs_vertex.is_open())
 		{
@@ -23,7 +23,7 @@ namespace frame::proto {
 			error.CreateError(error_str, __FILE__, __LINE__ - 4);
 		}
 		std::string shader_frag = file::FindFile(shader_name + ".frag");
-		logger->info("Openning fragment shader: {}", shader_frag);
+		logger->info("Openning fragment shader: [{}].", shader_frag);
 		std::ifstream ifs_pixel(shader_frag);
 		if (!ifs_pixel.is_open())
 		{

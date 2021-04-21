@@ -12,7 +12,8 @@ namespace frame::file {
 		tinyobj::ObjReaderConfig reader_config;
 		reader_config.mtl_search_path = file_path;
 		tinyobj::ObjReader reader;
-		if (!reader.ParseFromFile(file_path + file_name))
+		std::string total_path = file::FindFile(file_path + file_name);
+		if (!reader.ParseFromFile(total_path))
 		{
 			if (!reader.Error().empty())
 			{
@@ -20,18 +21,16 @@ namespace frame::file {
 			}
 			throw std::runtime_error(
 				fmt::format(
-					"Unknown error parsing file {}/{}",
-					file_path,
-					file_name));
+					"Unknown error parsing file [{}].",
+					total_path));
 		}
 		
-		std::string total_path = file::FindFile(file_path + file_name);
-		logger_->info("Opening OBJ File {}", total_path);
+		logger_->info("Opening OBJ File [{}].", total_path);
 		if (!reader.Warning().empty())
 		{
 			logger_->warn(
 				"Warning parsing file {}: {}", 
-				file_name, 
+				total_path, 
 				reader.Warning());
 		}
 

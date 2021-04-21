@@ -36,7 +36,7 @@ namespace test {
 		auto level = std::make_shared<frame::LevelBase>();
 		static_mesh_ = frame::opengl::file::LoadStaticMeshFromFile(
 			level,
-			"../Asset/Model/Torus.obj");
+			"Asset/Model/Torus.obj");
 		EXPECT_NE(0, static_mesh_->GetMaterialId());
 		EXPECT_NE(0, static_mesh_->GetPointBufferId());
 		EXPECT_NE(0, static_mesh_->GetNormalBufferId());

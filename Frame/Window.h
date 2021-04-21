@@ -2,7 +2,7 @@
 
 #include <memory>
 #include <utility>
-#include "../Frame/WindowInterface.h"
+#include "Frame/WindowInterface.h"
 
 namespace frame {
 

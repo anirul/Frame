@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Frame/BindInterface.h"
+#include "Frame/BindInterface.h"
 
 namespace frame {
 

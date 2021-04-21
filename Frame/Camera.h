@@ -2,7 +2,7 @@
 
 #include <utility>
 #include <glm/glm.hpp>
-#include "../Frame/CameraInterface.h"
+#include "Frame/CameraInterface.h"
 
 namespace frame {
 

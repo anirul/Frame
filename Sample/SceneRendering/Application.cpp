@@ -11,8 +11,8 @@ void Application::Startup()
 	auto device = window_->GetUniqueDevice();
 	// device->Startup();
 	throw std::runtime_error("no way to do this yet.");
-	// device->LoadSceneFromObjFile("../Asset/Model/Scene.obj");
-	// device->AddEnvironment("../Asset/CubeMap/Shiodome.hdr");
+	// device->LoadSceneFromObjFile("Asset/Model/Scene.obj");
+	// device->AddEnvironment("Asset/CubeMap/Shiodome.hdr");
 }
 
 void Application::Run()

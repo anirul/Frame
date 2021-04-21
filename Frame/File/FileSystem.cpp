@@ -1,11 +1,17 @@
 #include "FileSystem.h"
 #include <array>
 #include <filesystem>
+#include <string_view>
+#include <fmt/core.h>
 
 namespace {
 
 	// This is an awful hack.
-	const std::array<std::string, 2> avoid_elements = { "build", "Build" };
+	constexpr std::array<std::string_view, 2> avoid_elements = 
+	{ 
+		"build", 
+		"Build" 
+	};
 
 } // End namespace.
 
@@ -15,7 +21,7 @@ namespace frame::file {
 	{
 		// This is a bad hack as this won't prevent people from adding Asset
 		// high in the path of the game.
-		for (auto i : {0, 4, 3, 2, 1})
+		for (auto i : { 0, 1, 2, 3, 4, 5 })
 		{
 			std::string f;
 			for (auto j = 0; j < i; ++j)
@@ -34,14 +40,15 @@ namespace frame::file {
 				if (!found) return final_path;
 			}
 		}
-		return "";
+		throw std::runtime_error(
+			fmt::format("Could not find a directory: [{}].", file));
 	}
 
 	const std::string FindFile(const std::string& file)
 	{
 		// This is a bad hack as this won't prevent people from adding Asset
 		// high in the path of the game.
-		for (auto i : { 0, 4, 3, 2, 1 })
+		for (auto i : { 0, 1, 2, 3, 4, 5 })
 		{
 			std::string f;
 			for (auto j = 0; j < i; ++j)
@@ -60,7 +67,8 @@ namespace frame::file {
 				if (!found) return final_path;
 			}
 		}
-		return "";
+		throw std::runtime_error(
+			fmt::format("Could not find a file: [{}].", file));
 	}
 
 	bool IsFileExist(const std::string& file)

@@ -5,7 +5,7 @@
 #include <vector>
 #include <string>
 #include <glm/glm.hpp>
-#include "../Frame/StaticMeshInterface.h"
+#include "Frame/StaticMeshInterface.h"
 
 namespace frame {
 

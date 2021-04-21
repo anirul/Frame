@@ -6,7 +6,7 @@
 void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 {
 	// Open the Display.json file (in Asset/).
-	std::string level_file_name = "../Asset/SceneRendering.Level.json";
+	std::string level_file_name = "Asset/SceneRendering.Level.json";
 	std::ifstream ifs_level(level_file_name.c_str(), std::ios::in);
 	if (!ifs_level) error_.CreateError(
 		"Couldn't open file " + level_file_name, 
