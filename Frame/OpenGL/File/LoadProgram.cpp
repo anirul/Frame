@@ -9,9 +9,9 @@ namespace frame::opengl::file {
 		const std::string& name)
 	{
 		std::string vertex_file = 
-			frame::file::FindPath("Asset/Shader/OpenGL/") + name + ".vert";
+			frame::file::FindDirectory("Asset/Shader/OpenGL/") + name + ".vert";
 		std::string fragment_file =
-			frame::file::FindPath("Asset/Shader/OpenGL/") + name + ".frag";
+			frame::file::FindDirectory("Asset/Shader/OpenGL/") + name + ".frag";
 		return LoadProgram(vertex_file, fragment_file);
 	}
 

@@ -3,12 +3,8 @@
     {
       "name": "skybox",
       "cubemap": "true",
-      "pixel_element_size": {
-        "value": "BYTE"
-      },
-      "pixel_structure": {
-        "value": "RGB"
-      },
+      "pixel_element_size": { "value": "BYTE" },
+      "pixel_structure": { "value": "RGB" },
       "min_filter": "LINEAR",
       "mag_filter": "LINEAR",
       "wrap_s": "CLAMP_TO_EDGE",
@@ -21,6 +17,17 @@
         "../Asset/CubeMap/NegativeZ.png",
         "../Asset/CubeMap/PositiveZ.png"
       ]
+    },
+    {
+      "name": "apple_texture",
+      "cubemap": "false",
+      "pixel_element_size": { "value": "BYTE" },
+      "pixel_structure": { "value": "RGB" },
+      "min_filter": "LINEAR",
+      "mag_filter": "LINEAR",
+      "wrap_s": "CLAMP_TO_EDGE",
+      "wrap_t": "CLAMP_TO_EDGE",
+      "file_name": "../Asset/Apple/Color.jpg"
     },
     {
       "name": "albedo",

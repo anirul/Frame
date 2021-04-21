@@ -2,8 +2,9 @@
 
 add_executable(SceneSimple
   WIN32
-    ../../Asset/Json/SceneSimple.Program.json
     ../../Asset/Json/SceneSimple.Level.json
+    ../../Asset/Json/SceneSimple.Material.json
+    ../../Asset/Json/SceneSimple.Program.json
     ../../Asset/Json/SceneSimple.Scene.json
     ../../Asset/Json/SceneSimple.Texture.json
     Name.h

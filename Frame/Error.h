@@ -23,7 +23,6 @@ namespace frame {
 			const int line = -1) const;
 
 	public:
-		bool AlreadyRaized() const { return already_raized_; }
 		static Error& GetInstance()
 		{
 			static Error error_;
@@ -37,7 +36,6 @@ namespace frame {
 	private:
 		Error() = default;
 		static void* window_ptr_;
-		static bool already_raized_;
 	};
 
 } // End namespace frame.

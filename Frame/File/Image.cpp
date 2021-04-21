@@ -17,6 +17,8 @@ namespace frame::file {
 		pixel_element_size_(pixel_element_size),
 		pixel_structure_(pixel_structure)
 	{
+		const auto& logger = frame::Logger::GetInstance();
+		logger->info("Openning image: {}", file);
 		int channels;
 		int desired_channels = { static_cast<int>(pixel_structure.value()) };
 		// This is in the case of OpenGL (for now the only case).

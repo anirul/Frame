@@ -7,7 +7,7 @@ struct NameInterface
 {
 	virtual const std::string GetGlobalPath() const 
 	{ 
-		return frame::file::FindPath("Asset/Json/");
+		return frame::file::FindDirectory("Asset/Json/");
 	}
 	virtual const std::string GetLevelFileName() const = 0;
 };

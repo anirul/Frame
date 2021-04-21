@@ -31,7 +31,7 @@ namespace frame {
 					SDL_WINDOWPOS_CENTERED,
 					size_.first,
 					size_.second,
-					SDL_WINDOW_OPENGL);
+					SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
 				if (!sdl_window_)
 				{
 					throw std::runtime_error(
@@ -237,13 +237,7 @@ namespace frame {
 		{
 			std::pair<int, int> gl_version;
 			frame::Logger& logger = frame::Logger::GetInstance();
-			// GL context.
-			void* gl_context = SDL_GL_CreateContext(
-				static_cast<SDL_Window*>(window->GetWindowContext()));
-			SDL_GL_SetAttribute(
-				SDL_GL_CONTEXT_PROFILE_MASK,
-				SDL_GL_CONTEXT_PROFILE_CORE);
-			if (!gl_context) return nullptr;
+			
 			SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 			SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 			SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
@@ -251,18 +245,34 @@ namespace frame {
 			SDL_GL_SetAttribute(
 				SDL_GL_CONTEXT_FLAGS,
 				SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
+			SDL_GL_SetAttribute(
+				SDL_GL_CONTEXT_PROFILE_MASK,
+				SDL_GL_CONTEXT_PROFILE_CORE);
 			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 #else
+			SDL_GL_SetAttribute(
+				SDL_GL_CONTEXT_FLAGS,
+				SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
+			SDL_GL_SetAttribute(
+				SDL_GL_CONTEXT_PROFILE_MASK, 
+				SDL_GL_CONTEXT_PROFILE_CORE);
 			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 6);
 #endif
+
+			// GL context.
+			void* gl_context = SDL_GL_CreateContext(
+				static_cast<SDL_Window*>(window->GetWindowContext()));
+			if (!gl_context) return nullptr;
+
 			SDL_GL_GetAttribute(
 				SDL_GL_CONTEXT_MAJOR_VERSION,
 				&gl_version.first);
 			SDL_GL_GetAttribute(
 				SDL_GL_CONTEXT_MINOR_VERSION,
 				&gl_version.second);
+
 			// Vsync off.
 			SDL_GL_SetSwapInterval(0);
 

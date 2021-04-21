@@ -3,6 +3,7 @@
 #define TINYOBJLOADER_IMPLEMENTATION // define this in only *one* .cc
 #include <tiny_obj_loader.h>
 #include <fmt/core.h>
+#include "Frame/File/FileSystem.h"
 
 namespace frame::file {
 
@@ -24,7 +25,8 @@ namespace frame::file {
 					file_name));
 		}
 		
-		logger_->info("File {}/{} oppened and parsed.", file_path, file_name);
+		std::string total_path = file::FindFile(file_path + file_name);
+		logger_->info("Opening OBJ File {}", total_path);
 		if (!reader.Warning().empty())
 		{
 			logger_->warn(

@@ -15,7 +15,7 @@ namespace test {
 		auto level = std::make_shared<frame::LevelBase>();
 		static_mesh_ = frame::opengl::file::LoadStaticMeshFromFile(
 			level,
-			frame::file::FindPath("Asset") + "/Model/Cube.obj");
+			frame::file::FindDirectory("Asset") + "/Model/Cube.obj");
 		EXPECT_NE(0, static_mesh_->GetMaterialId());
 		EXPECT_NE(0, static_mesh_->GetPointBufferId());
 		EXPECT_NE(0, static_mesh_->GetNormalBufferId());

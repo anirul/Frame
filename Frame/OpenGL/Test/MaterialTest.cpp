@@ -26,9 +26,9 @@ namespace test {
 			material);
 		EXPECT_TRUE(material_);
 		auto texture1 = frame::opengl::file::LoadTextureFromFile(
-			frame::file::FindPath("Asset") + "/CubeMap/PositiveX.png");
+			frame::file::FindDirectory("Asset") + "/CubeMap/PositiveX.png");
 		auto texture2 = frame::opengl::file::LoadTextureFromFile(
-			frame::file::FindPath("Asset") + "/CubeMap/PositiveY.png");
+			frame::file::FindDirectory("Asset") + "/CubeMap/PositiveY.png");
 		auto id1 = level->AddTexture("PositiveX", texture1);
 		auto id2 = level->AddTexture("PositiveY", texture2);
 		std::uint64_t id_false = 0;

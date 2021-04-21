@@ -27,7 +27,7 @@ namespace frame::proto {
 	{
 		std::vector<std::shared_ptr<NodeStaticMesh>> static_meshes = {};
 		file::Obj obj(
-			file::FindPath("Asset/Model/"),
+			file::FindDirectory("Asset/Model/"),
 			proto_scene_static_mesh.file_name());
 		const auto meshes = obj.GetMeshes();
 		frame::Logger& logger = Logger::GetInstance();

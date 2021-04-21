@@ -43,9 +43,19 @@ namespace frame::proto {
 			{
 				std::shared_ptr<TextureInterface> texture = nullptr;
 				if (proto_texture.cubemap())
-					texture = ParseCubeMapTexture(proto_texture, size);
+				{
+					if (proto_texture.file_name().empty())
+						texture = ParseCubeMapTexture(proto_texture, size);
+					else
+						texture = ParseCubeMapTextureFile(proto_texture);
+				}
 				else
-					texture = ParseTexture(proto_texture, size);
+				{
+					if (proto_texture.file_names().empty())
+						texture = ParseTexture(proto_texture, size);
+					else
+						texture = ParseTextureFile(proto_texture);
+				}
 				auto texture_id = AddTexture(proto_texture.name(), texture);
 			}
 

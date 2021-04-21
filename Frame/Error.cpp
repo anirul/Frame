@@ -10,7 +10,6 @@
 namespace frame {
 
 	void* Error::window_ptr_ = nullptr;
-	bool Error::already_raized_ = false;
 
 	std::string Error::GetLastError() const
 	{
@@ -68,17 +67,6 @@ namespace frame {
 			temporary_error = std::to_string(line) + "\n" + temporary_error;
 		}
 		if (!file.empty()) temporary_error = file + "\n" + temporary_error;
-		if (window_ptr_)
-		{
-#if defined(_WIN32) || defined(_WIN64)
-			MessageBox(
-				(HWND)window_ptr_,
-				temporary_error.c_str(),
-				"sgl::Error",
-				MB_ICONEXCLAMATION);
-#endif
-		}
-		already_raized_ = true;
 		throw std::runtime_error(temporary_error);
 	}
 

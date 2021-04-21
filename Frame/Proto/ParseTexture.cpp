@@ -1,14 +1,14 @@
 #include "ParseTexture.h"
 #include "Frame/Error.h"
+#include "Frame/File/FileSystem.h"
 #include "Frame/OpenGL/Texture.h"
+#include "Frame/OpenGL/File/LoadTexture.h"
 
-namespace frame::proto {
-
-	std::shared_ptr<frame::TextureInterface> ParseTexture(
-		const Texture& proto_texture, 
-		const std::pair<std::uint32_t, std::uint32_t> size)
+namespace {
+	
+	void CheckParameters(const frame::proto::Texture& proto_texture)
 	{
-		auto& error = Error::GetInstance();
+		auto& error = frame::Error::GetInstance();
 		// Get the pixel element size.
 		constexpr auto INVALID_ELEMENT_SIZE =
 			frame::proto::PixelElementSize::INVALID;
@@ -28,6 +28,18 @@ namespace frame::proto {
 				__FILE__,
 				__LINE__ - 7);
 		}
+	}
+
+} // End namespace.
+
+namespace frame::proto {
+
+	std::shared_ptr<frame::TextureInterface> ParseTexture(
+		const Texture& proto_texture, 
+		const std::pair<std::uint32_t, std::uint32_t> size)
+	{
+		auto& error = Error::GetInstance();
+		CheckParameters(proto_texture);
 		std::pair<std::uint32_t, std::uint32_t> texture_size = size;
 		if (proto_texture.size().x() < 0)
 			texture_size.first /= std::abs(proto_texture.size().x());
@@ -71,24 +83,7 @@ namespace frame::proto {
 	{
 		auto& error = Error::GetInstance();
 		// Get the pixel element size.
-		constexpr auto INVALID_ELEMENT_SIZE =
-			frame::proto::PixelElementSize::INVALID;
-		constexpr auto INVALID_STRUCTURE =
-			frame::proto::PixelStructure::INVALID;
-		if (proto_texture.pixel_element_size().value() == INVALID_ELEMENT_SIZE)
-		{
-			error.CreateError(
-				"Invalid pixel element size.",
-				__FILE__,
-				__LINE__ - 7);
-		}
-		if (proto_texture.pixel_structure().value() == INVALID_STRUCTURE)
-		{
-			error.CreateError(
-				"Invalid pixel structure.",
-				__FILE__,
-				__LINE__ - 7);
-		}
+		CheckParameters(proto_texture);
 		std::pair<std::uint32_t, std::uint32_t> texture_size = { 0, 0 };
 		if (proto_texture.size().x() < 0)
 			texture_size.first /= std::abs(proto_texture.size().x());
@@ -121,6 +116,56 @@ namespace frame::proto {
 			texture->SetWrapT(proto_texture.wrap_t());
 		if (proto_texture.wrap_r() != INVALID_TEXTURE)
 			texture->SetWrapR(proto_texture.wrap_r());
+		return texture;
+	}
+
+	std::shared_ptr<frame::TextureInterface> ParseTextureFile(
+		const proto::Texture& proto_texture)
+	{
+		auto& error = Error::GetInstance();
+		CheckParameters(proto_texture);
+		std::shared_ptr<frame::TextureInterface> texture =  
+			opengl::file::LoadTextureFromFile(
+				file::FindFile(proto_texture.file_name()), 
+				proto_texture.pixel_element_size(), 
+				proto_texture.pixel_structure());
+		return texture;
+	}
+
+	std::shared_ptr<frame::TextureInterface> ParseCubeMapTextureFile(
+		const proto::Texture& proto_texture)
+	{
+		auto& error = Error::GetInstance();
+		CheckParameters(proto_texture);
+		std::shared_ptr<frame::TextureInterface> texture = nullptr;
+		if (proto_texture.file_names().size() != 1)
+		{
+			if (proto_texture.file_names().size() != 6)
+			{
+				error.CreateError(
+					fmt::format(
+						"Invalid file_names size: {}.", 
+						proto_texture.file_names().size()),
+					__FILE__,
+					__LINE__ - 5);
+			}
+			std::array<std::string, 6> name_array = {};
+			for (int i = 0; i < 6; ++i)
+			{
+				name_array[i] = file::FindFile(proto_texture.file_names()[i]);
+			}
+			texture = opengl::file::LoadCubeMapTextureFromFiles(
+				name_array,
+				proto_texture.pixel_element_size(),
+				proto_texture.pixel_structure());
+		}
+		else
+		{
+			texture = opengl::file::LoadCubeMapTextureFromFile(
+				file::FindFile(proto_texture.file_names()[0]),
+				proto_texture.pixel_element_size(),
+				proto_texture.pixel_structure());
+		}
 		return texture;
 	}
 

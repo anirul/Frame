@@ -10,18 +10,21 @@ namespace frame::proto {
 		const LevelInterface* level)
 	{
 		Error& error = Error::GetInstance();
-		std::string shader_name = 
-			file::FindPath("Asset/") + 
-			"Shader/OpenGL/" + 
-			proto_program.shader();
-		std::ifstream ifs_vertex(shader_name + ".vert");
+		Logger& logger = Logger::GetInstance();
+		std::string shader_path = "Asset/Shader/OpenGL/";
+		std::string shader_name = shader_path + proto_program.shader();
+		std::string shader_vert = file::FindFile(shader_name + ".vert");
+		logger->info("Openning vertex shader: {}", shader_vert);
+		std::ifstream ifs_vertex(shader_vert);
 		if (!ifs_vertex.is_open())
 		{
 			std::string error_str = 
 				fmt::format("Couldn't open file {}.vert", shader_name);
 			error.CreateError(error_str, __FILE__, __LINE__ - 4);
 		}
-		std::ifstream ifs_pixel(shader_name + ".frag");
+		std::string shader_frag = file::FindFile(shader_name + ".frag");
+		logger->info("Openning fragment shader: {}", shader_frag);
+		std::ifstream ifs_pixel(shader_frag);
 		if (!ifs_pixel.is_open())
 		{
 			std::string error_str =
