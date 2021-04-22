@@ -81,4 +81,19 @@ namespace frame::file {
 		return std::filesystem::is_directory(file);
 	}
 
+	const std::pair<std::string, std::string> SplitFileDirectory(
+		const std::string& file)
+	{
+		const auto id = file.find_last_of("\\/");
+		if (id == std::string::npos)
+		{
+			throw std::runtime_error(
+				fmt::format(
+					"[{}] is not valid path it doesn't contains any file "
+					"(or any '/' or '\\').",
+					file));
+		}
+		return { file.substr(0, id + 1), file.substr(id + 1) };
+	}
+
 } // End namespace frame::file.

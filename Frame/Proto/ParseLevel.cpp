@@ -16,7 +16,6 @@ namespace frame::proto {
 	public:
 		LevelProto(
 			const std::pair<std::int32_t, std::int32_t> size,
-			const std::string& default_path,
 			const proto::Level& proto_level,
 			const proto::ProgramFile& proto_program_file,
 			const proto::SceneTreeFile& proto_scene_tree_file,
@@ -85,7 +84,6 @@ namespace frame::proto {
 
 	std::shared_ptr<LevelInterface> ParseLevelOpenGL(
 		const std::pair<std::int32_t, std::int32_t> size,
-		const std::string& default_path,
 		const proto::Level& proto_level,
 		const proto::ProgramFile& proto_program_file,
 		const proto::SceneTreeFile& proto_scene_tree_file,
@@ -94,7 +92,6 @@ namespace frame::proto {
 	{
 		return std::make_shared<LevelProto>(
 			size,
-			default_path,
 			proto_level,
 			proto_program_file,
 			proto_scene_tree_file,

@@ -42,7 +42,7 @@ namespace frame::file {
 	{
 	public:
 		// Parse from an OBJ file.
-		Obj(const std::string& file_path, const std::string& file_name);
+		Obj(const std::string& file_name);
 		// Get meshes, they are suppose to be sorted by material.
 		const std::vector<ObjMesh> GetMeshes() const { return meshes_; }
 		// Get the materials, id in mesh give the material in the vector.

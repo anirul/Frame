@@ -7,12 +7,14 @@
 
 namespace frame::file {
 
-	Obj::Obj(const std::string& file_path, const std::string& file_name)
+	Obj::Obj(const std::string& file_name)
 	{
 		tinyobj::ObjReaderConfig reader_config;
-		reader_config.mtl_search_path = file_path;
+		// TODO(anirul): Fix me!
+		const auto pair = SplitFileDirectory(file_name);
+		reader_config.mtl_search_path = pair.first;
 		tinyobj::ObjReader reader;
-		std::string total_path = file::FindFile(file_path + file_name);
+		std::string total_path = file::FindFile(file_name);
 		if (!reader.ParseFromFile(total_path))
 		{
 			if (!reader.Error().empty())

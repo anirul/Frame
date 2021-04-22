@@ -19,7 +19,6 @@ namespace test {
 		device_ = window_->GetUniqueDevice();
 		auto level = frame::proto::ParseLevelOpenGL(
 			std::make_pair<std::uint32_t, std::uint32_t>(32, 32),
-			frame::file::FindDirectory("Asset/"),
 			GetLevel(),
 			GetProgramFile(),
 			GetSceneFile(), 
@@ -44,6 +43,9 @@ namespace test {
 		{
 			program.set_name("program");
 			program.set_shader("Blur");
+			frame::proto::SceneType scene_type;
+			scene_type.set_value(frame::proto::SceneType::QUAD);
+			*program.mutable_input_scene_type() = scene_type;
 			program.add_output_texture_names("texture");
 		}
 		*program_file.add_programs() = program;
@@ -63,6 +65,7 @@ namespace test {
 			{
 				scene_camera.set_name("camera");
 				scene_camera.set_parent("root");
+				scene_camera.set_fov_degrees(60.0f);
 			}
 			*scene_tree_file.add_scene_cameras() = scene_camera;
 			scene_tree_file.set_default_root_name("root");

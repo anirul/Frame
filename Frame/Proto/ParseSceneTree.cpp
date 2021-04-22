@@ -7,6 +7,7 @@
 #include "Frame/NodeMatrix.h"
 #include "Frame/NodeStaticMesh.h"
 #include "Frame/OpenGL/Buffer.h"
+#include "Frame/OpenGL/File/LoadStaticMesh.h"
 #include "Frame/OpenGL/StaticMesh.h"
 
 namespace frame::proto {
@@ -25,130 +26,10 @@ namespace frame::proto {
 		const frame::proto::SceneStaticMesh& proto_scene_static_mesh,
 		LevelInterface* level)
 	{
-		std::vector<std::shared_ptr<NodeStaticMesh>> static_meshes = {};
-		file::Obj obj(
-			file::FindDirectory("Asset/Model/"),
-			proto_scene_static_mesh.file_name());
-		const auto meshes = obj.GetMeshes();
-		frame::Logger& logger = Logger::GetInstance();
-		const auto materials = obj.GetMaterials();
-		logger->info(
-			"Found in obj<{}> : {} materials.",
-			proto_scene_static_mesh.file_name(),
-			materials.size());
-		for (const auto& material : materials)
-		{
-			throw std::runtime_error("This is not implemented.");
-		}
-		logger->info(
-			"Found in obj<{}> : {} meshes.",
-			proto_scene_static_mesh.file_name(),
-			meshes.size());
-		std::vector<float> points;
-		std::vector<float> normals;
-		std::vector<float> tex_coords;
-		points.reserve(1024);
-		normals.reserve(1024);
-		tex_coords.reserve(1024);
-		int mesh_counter = 0;
-		for (const auto& mesh : meshes)
-		{
-			points.clear();
-			normals.clear();
-			tex_coords.clear();
-			const auto& vertices = mesh.GetVertices();
-			// TODO(anirul): could probably short this out!
-			for (const auto& vertice : vertices)
-			{
-				points.push_back(vertice.point.x);
-				points.push_back(vertice.point.y);
-				points.push_back(vertice.point.z);
-				normals.push_back(vertice.normal.x);
-				normals.push_back(vertice.normal.y);
-				normals.push_back(vertice.normal.z);
-				tex_coords.push_back(vertice.tex_coord.x);
-				tex_coords.push_back(vertice.tex_coord.y);
-			}
-			const auto& indices = mesh.GetIndices();
-			// TODO(anirul): This should be unique ptr
-			auto point_buffer = std::make_shared<opengl::Buffer>();
-			auto normal_buffer = std::make_shared<opengl::Buffer>();
-			auto texture_buffer = std::make_shared<opengl::Buffer>();
-			auto index_buffer = std::make_shared<opengl::Buffer>(
-				opengl::BufferTypeEnum::ELEMENT_ARRAY_BUFFER);
-
-			// Position buffer initialization.
-			point_buffer->Bind();
-			point_buffer->Copy(
-				points.size() * sizeof(float),
-				points.data());
-			point_buffer->UnBind();
-			std::string mesh_name_point = fmt::format(
-				"{}.{}.point",
-				proto_scene_static_mesh.name(), 
-				mesh_counter);
-			const EntityId point_buffer_id =
-				level->AddBuffer(mesh_name_point, point_buffer);
-
-			// Normal buffer initialization.
-			normal_buffer->Bind();
-			normal_buffer->Copy(
-				normals.size() * sizeof(float),
-				normals.data());
-			normal_buffer->UnBind();
-			std::string mesh_name_normal = fmt::format(
-				"{}.{}.normal",
-				proto_scene_static_mesh.name(), 
-				mesh_counter);
-			const EntityId normal_buffer_id =
-				level->AddBuffer(mesh_name_normal, normal_buffer);
-
-			// Texture coordinates buffer initialization.
-			texture_buffer->Bind();
-			texture_buffer->Copy(
-				tex_coords.size() * sizeof(float),
-				tex_coords.data());
-			texture_buffer->UnBind();
-			std::string mesh_name_tex_coord = fmt::format(
-				"{}.{}.tex_coord",
-				proto_scene_static_mesh.name(),
-				mesh_counter);
-			const EntityId tex_coord_buffer_id =
-				level->AddBuffer(mesh_name_tex_coord, texture_buffer);
-
-			// Index buffer array.
-			index_buffer->Bind();
-			index_buffer->Copy(
-				indices.size() * sizeof(std::int32_t),
-				indices.data());
-			index_buffer->UnBind();
-			std::string mesh_name_index = fmt::format(
-				"{}.{}.index",
-				proto_scene_static_mesh.name(),
-				mesh_counter);
-			const EntityId index_buffer_id =
-				level->AddBuffer(mesh_name_index, index_buffer);
-
-			// This should also be a unique ptr.
-			auto static_mesh = std::make_shared<opengl::StaticMesh>(
-				level,
-				point_buffer_id,
-				normal_buffer_id,
-				tex_coord_buffer_id,
-				index_buffer_id);
-			if (mesh.GetMaterialId() != -1)
-			{
-				throw std::runtime_error("No material implementation yet!");
-			}
-			std::string mesh_name = 
-				fmt::format(
-					"{}.{}", 
-					proto_scene_static_mesh.name(), 
-					mesh_counter);
-			level->AddStaticMesh(mesh_name, static_mesh);
-			mesh_counter++;
-		}
-		return static_meshes;
+		return frame::opengl::file::LoadStaticMeshesFromFile(
+			level, 
+			proto_scene_static_mesh.file_name(), 
+			proto_scene_static_mesh.name());
 	}
 
 	std::shared_ptr<NodeCamera> ParseSceneCamera(
@@ -218,11 +99,7 @@ namespace frame::proto {
 		for (const auto& proto_static_mesh :
 			proto_scene_tree_file.scene_static_meshes())
 		{
-			for (const auto& ptr : 
-				ParseSceneStaticMesh(proto_static_mesh, level))
-			{
-				level->AddSceneNode(ptr->GetName(), ptr);
-			}
+			ParseSceneStaticMesh(proto_static_mesh, level);
 		}
 		for (const auto& proto_camera : proto_scene_tree_file.scene_cameras())
 		{

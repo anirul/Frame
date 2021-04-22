@@ -2,13 +2,16 @@
 
 #include <memory>
 #include <string>
+#include "Frame/File/Obj.h"
 #include "Frame/LevelInterface.h"
 #include "Frame/StaticMeshInterface.h"
+#include "Frame/NodeStaticMesh.h"
 
 namespace frame::opengl::file {
 
-	std::shared_ptr<StaticMeshInterface> LoadStaticMeshFromFile(
-		const std::shared_ptr<LevelInterface> level,
-		const std::string& file);
+	std::vector<std::shared_ptr<NodeStaticMesh>> LoadStaticMeshesFromFile(
+		LevelInterface* level, 
+		const std::string& file,
+		const std::string& name);
 
 } // End namespace frame::file.

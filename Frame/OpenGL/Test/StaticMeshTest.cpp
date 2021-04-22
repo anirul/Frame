@@ -13,9 +13,13 @@ namespace test {
 		EXPECT_FALSE(static_mesh_);
 		EXPECT_TRUE(window_);
 		auto level = std::make_shared<frame::LevelBase>();
-		static_mesh_ = frame::opengl::file::LoadStaticMeshFromFile(
-			level,
-			frame::file::FindDirectory("Asset") + "/Model/Cube.obj");
+		const auto mesh_vec = frame::opengl::file::LoadStaticMeshesFromFile(
+			level.get(),
+			frame::file::FindFile("Asset/Model/Cube.obj"),
+			"cube");
+		static_mesh_ = mesh_vec[0]->GetLocalMesh();
+		EXPECT_EQ(1, mesh_vec.size());
+		EXPECT_TRUE(static_mesh_);
 		EXPECT_NE(0, static_mesh_->GetMaterialId());
 		EXPECT_NE(0, static_mesh_->GetPointBufferId());
 		EXPECT_NE(0, static_mesh_->GetNormalBufferId());
@@ -34,9 +38,13 @@ namespace test {
 		EXPECT_FALSE(static_mesh_);
 		EXPECT_TRUE(window_);
 		auto level = std::make_shared<frame::LevelBase>();
-		static_mesh_ = frame::opengl::file::LoadStaticMeshFromFile(
-			level,
-			"Asset/Model/Torus.obj");
+		const auto mesh_vec = frame::opengl::file::LoadStaticMeshesFromFile(
+			level.get(),
+			frame::file::FindFile("Asset/Model/Torus.obj"),
+			"torus");
+		static_mesh_ = mesh_vec[0]->GetLocalMesh();
+		EXPECT_EQ(1, mesh_vec.size());
+		EXPECT_TRUE(static_mesh_);
 		EXPECT_NE(0, static_mesh_->GetMaterialId());
 		EXPECT_NE(0, static_mesh_->GetPointBufferId());
 		EXPECT_NE(0, static_mesh_->GetNormalBufferId());

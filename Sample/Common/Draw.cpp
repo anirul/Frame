@@ -28,7 +28,6 @@ void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 	// Load level from proto files.
 	auto level = frame::proto::ParseLevelOpenGL(
 		size_,
-		name_->GetGlobalPath(),
 		proto_level, 
 		proto_program_file, 
 		proto_scene_tree_file, 
