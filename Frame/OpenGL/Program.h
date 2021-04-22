@@ -43,6 +43,8 @@ namespace frame::opengl {
 		void LinkShader() override;
 		// Use the program.
 		void Use(const UniformInterface* uniform_interface) const override;
+		// Stop using the program.
+		void UnUse() const override;
 		// Create a uniform from a string and a bool.
 		void Uniform(const std::string& name, bool value) const override;
 		// Create a uniform from a string and an int.

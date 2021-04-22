@@ -27,7 +27,7 @@ int main(int ac, char** av)
 	{
 		Application app(
 			std::make_shared<Name>(),
-			frame::CreateSDLOpenGL({ 1920, 1080 }));
+			frame::CreateSDLOpenGL({ 1280, 720 }));
 		app.Startup();
 		app.Run();
 	}

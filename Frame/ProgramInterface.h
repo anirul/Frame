@@ -30,6 +30,8 @@ namespace frame {
 		// Use the program it takes an optional uniform interface pointer to 
 		// set the uniform variable parameters.
 		virtual void Use(const UniformInterface* uniform_interface) const = 0;
+		// Stop using the program.
+		virtual void UnUse() const = 0;
 		// Create a uniform from a string and a bool.
 		virtual void Uniform(const std::string& name, bool value) const = 0;
 		// Create a uniform from a string and an int.

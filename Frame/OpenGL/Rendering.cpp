@@ -90,6 +90,7 @@ namespace frame::opengl {
 		error_.Display(__FILE__, __LINE__ - 5);
 		index_buffer->UnBind();
 
+		program->UnUse();
 		glBindVertexArray(0);
 		error_.Display(__FILE__, __LINE__ - 1);
 
@@ -139,6 +140,7 @@ namespace frame::opengl {
 		error_.Display(__FILE__, __LINE__ - 5);
 		index_buffer->UnBind();
 
+		program->UnUse();
 		glBindVertexArray(0);
 		error_.Display(__FILE__, __LINE__ - 1);
 

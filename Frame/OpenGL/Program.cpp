@@ -44,6 +44,7 @@ namespace frame::opengl {
 		program->Uniform("projection", glm::mat4(1.0));
 		program->Uniform("view", glm::mat4(1.0));
 		program->Uniform("model", glm::mat4(1.0));
+		program->UnUse();
 #ifdef _DEBUG
 		logger->info("with pointer := {}", static_cast<void*>(program.get()));
 #endif // _DEBUG
@@ -308,4 +309,10 @@ namespace frame::opengl {
 		scene_root_ = scene_root;
 	}
 
-} // End namespace sgl.
+	void Program::UnUse() const
+	{
+		glUseProgram(0);
+		error_.Display(__FILE__, __LINE__ - 1);
+	}
+
+} // End namespace frame::opengl.

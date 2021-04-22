@@ -23,6 +23,7 @@ namespace frame::opengl {
 			++i;
 		}
 		program->Uniform("light_max", static_cast<int>(lights_.size()));
+		program->UnUse();
 	}
 
 } // End namespace frame::opengl.
