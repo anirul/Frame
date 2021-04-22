@@ -28,7 +28,7 @@ namespace frame::proto {
 	{
 		return frame::opengl::file::LoadStaticMeshesFromFile(
 			level, 
-			proto_scene_static_mesh.file_name(), 
+			"Asset/Model/" + proto_scene_static_mesh.file_name(), 
 			proto_scene_static_mesh.name());
 	}
 

@@ -40,7 +40,7 @@ namespace frame::opengl {
 		program->AddShader(vertex);
 		program->AddShader(fragment);
 		program->LinkShader();
-		program->Use();
+		program->Use(nullptr);
 		program->Uniform("projection", glm::mat4(1.0));
 		program->Uniform("view", glm::mat4(1.0));
 		program->Uniform("model", glm::mat4(1.0));

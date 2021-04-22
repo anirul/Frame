@@ -10,7 +10,7 @@ namespace frame::opengl {
 		{
 			throw std::runtime_error("too many lights!");
 		}
-		program->Use();
+		program->Use(nullptr);
 		int i = 0;
 		for (const auto& light : lights_)
 		{
@@ -25,4 +25,4 @@ namespace frame::opengl {
 		program->Uniform("light_max", static_cast<int>(lights_.size()));
 	}
 
-} // End namespace sgl.
+} // End namespace frame::opengl.

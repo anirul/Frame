@@ -28,6 +28,8 @@ namespace frame::file {
 		}
 		const int GetLength() const { return size_.first * size_.second; }
 		const void* Data() const {	return image_; }
+		// Needed for the accessing of the pointer.
+		void* Data() { return image_; }
 		const proto::PixelElementSize GetPixelElementSize() const
 		{
 			return pixel_element_size_;

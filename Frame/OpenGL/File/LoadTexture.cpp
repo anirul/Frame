@@ -3,6 +3,7 @@
 #include <fstream>
 #include <vector>
 #include <set>
+#include "Frame/File/FileSystem.h"
 #include "Frame/File/Image.h"
 #include "Frame/OpenGL/Texture.h"
 
@@ -58,7 +59,28 @@ namespace frame::opengl::file {
 		const proto::PixelStructure pixel_structure 
 			/*= proto::PixelStructure_RGB()*/)
 	{
-		throw std::runtime_error("Not implemented!");
+		std::array<std::string, 6> final_files = {};
+		for (int i = 0; i < final_files.size(); ++i)
+		{
+			final_files[i] = frame::file::FindFile(files[i]);
+		}
+		std::pair<std::uint32_t, std::uint32_t> img_size;
+		std::array<std::unique_ptr<frame::file::Image>, 6> images;
+		std::array<void*, 6> pointers = {};
+		for (int i = 0; i < pointers.size(); ++i)
+		{
+			images[i] = std::make_unique<frame::file::Image>(
+				final_files[i],
+				pixel_element_size,
+				pixel_structure);
+			pointers[i] = images[i]->Data();
+		}
+		img_size = images[0]->GetSize();
+		return std::make_shared<opengl::TextureCubeMap>(
+			img_size,
+			pointers,
+			pixel_element_size,
+			pixel_structure);
 	}
 
 } // End namespace frame::file.
