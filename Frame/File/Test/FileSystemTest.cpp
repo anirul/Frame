@@ -5,7 +5,7 @@ namespace test {
 
 	TEST_F(FileSystemTest, FindDirectorySimpleTest)
 	{
-		std::string result = frame::file::FindDirectory("Asset");
+		std::string result = frame::file::FindDirectory("Asset/");
 		EXPECT_FALSE(result.empty());
 	}
 
@@ -18,17 +18,17 @@ namespace test {
 
 	TEST_F(FileSystemTest, IsDirectoryExist)
 	{
-		std::string asset = frame::file::FindDirectory("Asset");
+		std::string asset = frame::file::FindDirectory("Asset/");
 		EXPECT_FALSE(asset.empty());
 		EXPECT_TRUE(frame::file::IsDirectoryExist(asset));
 	}
 
 	TEST_F(FileSystemTest, IsFileExist)
 	{
-		std::string asset = frame::file::FindDirectory("Asset");
+		std::string asset = frame::file::FindDirectory("Asset/");
 		EXPECT_FALSE(asset.empty());
-		EXPECT_TRUE(frame::file::IsDirectoryExist(asset + "/CubeMap"));
-		EXPECT_TRUE(frame::file::IsFileExist(asset + "/CubeMap/PositiveX.png"));
+		EXPECT_TRUE(frame::file::IsDirectoryExist(asset + "CubeMap/"));
+		EXPECT_TRUE(frame::file::IsFileExist(asset + "CubeMap/PositiveX.png"));
 	}
 
 } // End namespace test.
