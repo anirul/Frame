@@ -13,6 +13,15 @@ namespace {
 		"Build" 
 	};
 
+	const std::string AddEndSlash(const std::string& path)
+	{
+		std::string directory = path;
+		const auto id = directory.find_last_of("\\/");
+		if (id != directory.length() - 1)
+			directory += "/";
+		return directory;
+	}
+
 } // End namespace.
 
 namespace frame::file {
@@ -20,13 +29,10 @@ namespace frame::file {
 	const std::string FindDirectory(const std::string& file)
 	{
 		// Treat the case where the end is not a '/' or '\\'.
-		std::string directory = file;
-		const auto id = directory.find_last_of("\\/");
-		if (id != directory.length() - 1)
-			directory += "/";
+		std::string directory = AddEndSlash(file);
 		// This is a bad hack as this won't prevent people from adding Asset
 		// high in the path of the game.
-		for (auto i : { 0, 1, 2, 3, 4, 5 })
+		for (auto i : { 0, 1, 2, 3, 4, 5, 6 })
 		{
 			std::string f;
 			for (auto j = 0; j < i; ++j)
@@ -35,14 +41,15 @@ namespace frame::file {
 			if (IsDirectoryExist(f))
 			{
 				std::filesystem::path p(f);
-				std::string final_path = std::filesystem::absolute(p).string();
+				std::string final_path = 
+					std::filesystem::canonical(p).string();
 				bool found = false;
 				for (const auto& element : avoid_elements)
 				{
 					if (final_path.find(element) != std::string::npos)
 						found = true;
 				}
-				if (!found) return final_path;
+				if (!found) return AddEndSlash(final_path);
 			}
 		}
 		throw std::runtime_error(
@@ -53,7 +60,7 @@ namespace frame::file {
 	{
 		// This is a bad hack as this won't prevent people from adding Asset
 		// high in the path of the game.
-		for (auto i : { 0, 1, 2, 3, 4, 5 })
+		for (auto i : { 0, 1, 2, 3, 4, 5, 6 })
 		{
 			std::string f;
 			for (auto j = 0; j < i; ++j)
@@ -62,7 +69,8 @@ namespace frame::file {
 			if (IsFileExist(f))
 			{
 				std::filesystem::path p(f);
-				std::string final_path = std::filesystem::absolute(p).string();
+				std::string final_path = 
+					std::filesystem::canonical(p).string();
 				bool found = false;
 				for (const auto& element : avoid_elements)
 				{
