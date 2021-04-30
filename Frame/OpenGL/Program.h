@@ -41,6 +41,8 @@ namespace frame::opengl {
 		void AddShader(const Shader& shader);
 		// Link shaders to a program.
 		void LinkShader() override;
+		// CHECKME(anirul): maybe this can be a Bind and Unbind? then it should
+		// CHECKME(anirul): derived from the Scoped bind thing.
 		// Use the program.
 		void Use(const UniformInterface* uniform_interface) const override;
 		// Stop using the program.

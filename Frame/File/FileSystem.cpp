@@ -19,6 +19,11 @@ namespace frame::file {
 
 	const std::string FindDirectory(const std::string& file)
 	{
+		// Treat the case where the end is not a '/' or '\\'.
+		std::string directory = file;
+		const auto id = directory.find_last_of("\\/");
+		if (id != directory.length() - 1)
+			directory += "/";
 		// This is a bad hack as this won't prevent people from adding Asset
 		// high in the path of the game.
 		for (auto i : { 0, 1, 2, 3, 4, 5 })
@@ -26,7 +31,7 @@ namespace frame::file {
 			std::string f;
 			for (auto j = 0; j < i; ++j)
 				f += "../";
-			f += file;
+			f += directory;
 			if (IsDirectoryExist(f))
 			{
 				std::filesystem::path p(f);
