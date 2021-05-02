@@ -1,0 +1,11 @@
+# MTL file: for Apple.obj
+# Material Count: 1
+
+newmtl AppleMaterial
+map_Ka Apple/Color.jpg
+map_Kd Apple/Color.jpg
+norm Apple/Normal.jpg
+map_Pm Apple/Metalness.jpg
+map_Pr Apple/Roughness.jpg
+d 1.000000
+illum 2

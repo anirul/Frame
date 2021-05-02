@@ -32,10 +32,21 @@ namespace frame::file {
 		int material_ = -1;
 	};
 
-	class ObjMaterial
+	struct ObjMaterial
 	{
-	public:
-		// TODO(anirul): implement me!
+		glm::vec4 ambient_vec4 = glm::vec4(0.5f, 0.5f, 0.5f, 1.0f);
+		std::string ambient_str = "";
+		glm::vec4 diffuse_vec4 = glm::vec4(0.5f, 0.5f, 0.5f, 1.0f);
+		std::string diffuse_str = "";
+		std::string displacement_str = "";
+		float roughness_val = 0.0f;
+		std::string roughness_str = "";
+		float metallic_val = 0.0f;
+		std::string metallic_str = "";
+		float sheen_val = 0.0f;
+		std::string sheen_str = "";
+		std::string emmissive_str = "";
+		std::string normal_str = "";
 	};
 
 	class Obj 

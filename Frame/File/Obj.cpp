@@ -10,7 +10,6 @@ namespace frame::file {
 	Obj::Obj(const std::string& file_name)
 	{
 		tinyobj::ObjReaderConfig reader_config;
-		// TODO(anirul): Fix me!
 		const auto pair = SplitFileDirectory(file_name);
 		reader_config.mtl_search_path = pair.first;
 		tinyobj::ObjReader reader;
@@ -45,13 +44,21 @@ namespace frame::file {
 		{
 			std::vector<ObjVertex> points; 
 			std::vector<int> indices;
-			int material = 0;
+			int material_id = 0;
 
 			// Loop over faces(polygon) this should be triangles?
 			size_t index_offset = 0;
 			for (size_t f = 0; f < shapes[s].mesh.num_face_vertices.size(); f++) 
 			{
+				// This SHOULD be 3!
 				int fv = shapes[s].mesh.num_face_vertices[f];
+				if (fv != 3)
+				{
+					throw std::runtime_error(
+						fmt::format(
+							"The face should be 3 in size now {}.", 
+							fv));
+				}
 				// Loop over vertices in the face.
 				for (size_t v = 0; v < fv; v++) {
 					ObjVertex vertex{};
@@ -69,16 +76,44 @@ namespace frame::file {
 					vertex.tex_coord.y = 
 						attrib.texcoords[2 * idx.texcoord_index + 1];
 					points.push_back(vertex);
+					indices.push_back(static_cast<int>(indices.size()));
 				}
 				index_offset += fv;
 
 				// per-face material
-				if (material)
-					assert(material == shapes[s].mesh.material_ids[f]);
-				material = shapes[s].mesh.material_ids[f];
+				if (material_id)
+					assert(material_id == shapes[s].mesh.material_ids[f]);
+				material_id = shapes[s].mesh.material_ids[f];
 			}
-			ObjMesh mesh(points, indices, material);
+			ObjMesh mesh(points, indices, material_id);
 			meshes_.push_back(mesh);
+		}
+
+		for (const auto& material : materials)
+		{
+			ObjMaterial obj_material{};
+			obj_material.ambient_str = material.ambient_texname;
+			obj_material.ambient_vec4 = glm::vec4(
+				material.ambient[0],
+				material.ambient[1],
+				material.ambient[2],
+				material.dissolve);
+			obj_material.diffuse_str = material.diffuse_texname;
+			obj_material.diffuse_vec4 = glm::vec4(
+				material.diffuse[0],
+				material.diffuse[1],
+				material.diffuse[2],
+				material.dissolve);
+			obj_material.displacement_str = material.displacement_texname;
+			obj_material.emmissive_str = material.emissive_texname;
+			obj_material.metallic_str = material.metallic_texname;
+			obj_material.metallic_val = material.metallic;
+			obj_material.normal_str = material.normal_texname;
+			obj_material.roughness_str = material.roughness_texname;
+			obj_material.roughness_val = material.roughness;
+			obj_material.sheen_str = material.sheen_texname;
+			obj_material.sheen_val = material.sheen;
+			materials_.emplace_back(obj_material);
 		}
 	}
 

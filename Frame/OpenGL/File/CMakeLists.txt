@@ -25,3 +25,5 @@ target_link_libraries(FrameOpenGLFile
 	FrameProto
 	FrameOpenGL
 )
+
+add_subdirectory(Test)

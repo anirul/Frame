@@ -5,13 +5,10 @@
 
 namespace test {
 
-	class ObjTest : public testing::Test 
+	class LoadTextureTest : public testing::Test
 	{
 	public:
-		ObjTest() = default;
-
-	protected:
-		std::unique_ptr<frame::file::Obj> obj_;
+		LoadTextureTest() = default;
 	};
 
 } // End namespace test.
