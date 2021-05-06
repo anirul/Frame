@@ -23,5 +23,4 @@ target_link_libraries(FrameFileTest
 	FrameFile
 	GTest::gmock
 	GTest::gtest
-	GTest::gtest_main
 )

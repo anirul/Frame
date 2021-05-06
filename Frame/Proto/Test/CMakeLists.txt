@@ -34,5 +34,4 @@ target_link_libraries(FrameProtoTest
     FrameProto
     GTest::gmock
     GTest::gtest
-    GTest::gtest_main
 )

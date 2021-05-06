@@ -16,7 +16,6 @@ add_executable(FrameOpenGLTest
     StaticMeshTest.h
     PixelTest.cpp
     PixelTest.h
-    ProgramMock.h
     ProgramTest.cpp
     ProgramTest.h
     RenderBufferTest.cpp
@@ -27,7 +26,6 @@ add_executable(FrameOpenGLTest
     ShaderTest.h
     TextureTest.cpp
     TextureTest.h
-    UniformMock.h
 )
 
 target_include_directories(FrameOpenGLTest
@@ -46,5 +44,4 @@ target_link_libraries(FrameOpenGLTest
     FrameProto
     GTest::gmock
     GTest::gtest
-    GTest::gtest_main
 )

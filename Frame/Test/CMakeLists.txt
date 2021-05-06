@@ -5,7 +5,9 @@ add_executable(FrameTest
 	CameraTest.h
 	ErrorTest.cpp
 	ErrorTest.h
+	ProgramMock.h
 	main.cpp
+	UniformMock.h
 	WindowTest.cpp
 	WindowTest.h
 )
@@ -21,5 +23,4 @@ target_link_libraries(FrameTest
 	Frame
 	GTest::gmock
 	GTest::gtest
-	GTest::gtest_main
 )
