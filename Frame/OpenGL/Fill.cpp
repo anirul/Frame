@@ -6,7 +6,7 @@
 #include "Frame/Error.h"
 #include "Frame/OpenGL/FrameBuffer.h"
 #include "Frame/OpenGL/RenderBuffer.h"
-#include "Frame/OpenGL/Rendering.h"
+#include "Frame/OpenGL/Renderer.h"
 #include "Frame/OpenGL/StaticMesh.h"
 
 namespace frame::opengl {
@@ -114,9 +114,9 @@ namespace frame::opengl {
 			}
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			error.Display(__FILE__, __LINE__ - 1);
-			Rendering rendering{level, temporary_size};
-			rendering.SetProjection(projection);
-			rendering.RenderMesh(
+			Renderer renderer{level, temporary_size};
+			renderer.SetProjection(projection);
+			renderer.RenderMesh(
 				uniform_interface.get(),
 				program.get(), 
 				level->GetStaticMeshMap().at(
@@ -200,10 +200,10 @@ namespace frame::opengl {
 				cubemap_element++;
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 				error.Display(__FILE__, __LINE__ - 1);
-				Rendering rendering{level, temporary_size};
-				rendering.SetProjection(projection);
-				rendering.SetView(view);
-				rendering.RenderMesh(
+				Renderer renderer{level, temporary_size};
+				renderer.SetProjection(projection);
+				renderer.SetView(view);
+				renderer.RenderMesh(
 					uniform_interface.get(),
 					program.get(),
 					level->GetStaticMeshMap().at(

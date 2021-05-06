@@ -10,7 +10,7 @@
 #include "Frame/OpenGL/RenderBuffer.h"
 #include "Frame/OpenGL/Program.h"
 #include "Frame/OpenGL/StaticMesh.h"
-#include "Frame/OpenGL/Rendering.h"
+#include "Frame/OpenGL/Renderer.h"
 #include "Frame/OpenGL/File/LoadProgram.h"
 
 namespace frame::opengl {

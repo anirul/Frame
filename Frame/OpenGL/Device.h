@@ -16,7 +16,7 @@
 #include "Frame/OpenGL/Buffer.h"
 #include "Frame/OpenGL/StaticMesh.h"
 #include "Frame/OpenGL/Light.h"
-#include "Frame/OpenGL/Rendering.h"
+#include "Frame/OpenGL/Renderer.h"
 #include "Frame/OpenGL/Material.h"
 #include "Frame/NodeCamera.h"
 
@@ -83,7 +83,7 @@ namespace frame::opengl {
 		const proto::PixelElementSize pixel_element_size_ = 
 			proto::PixelElementSize_HALF();
 		// Rendering pipeline.
-		std::unique_ptr<Rendering> rendering_ = nullptr;
+		std::unique_ptr<Renderer> renderer_ = nullptr;
 		// Error setup.
 		const Error& error_ = Error::GetInstance();
 		const Logger& logger_ = Logger::GetInstance();

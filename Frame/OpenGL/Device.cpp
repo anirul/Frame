@@ -8,7 +8,7 @@
 #include "FrameBuffer.h"
 #include "RenderBuffer.h"
 #include "Fill.h"
-#include "Rendering.h"
+#include "Renderer.h"
 
 namespace frame::opengl {
 
@@ -63,7 +63,7 @@ namespace frame::opengl {
 		}
 		// Setup camera.
 		SetupCamera();
-		rendering_ = std::make_unique<Rendering>(level_, size_);
+		renderer_ = std::make_unique<Renderer>(level_, size_);
 	}
 
 	void Device::Cleanup()
@@ -81,10 +81,10 @@ namespace frame::opengl {
 		error_.Display(__FILE__, __LINE__ - 1);
 
 		SetupCamera();
-		rendering_->SetProjection(projection_);
-		rendering_->SetView(view_);
+		renderer_->SetProjection(projection_);
+		renderer_->SetView(view_);
 		// TODO(anirul): This is suppose to be from mesh.
-		rendering_->SetModel(model_);
+		renderer_->SetModel(model_);
 		for (const auto& program_id : program_render_)
 		{
 			auto program = level_->GetProgramMap().at(program_id);
@@ -102,7 +102,7 @@ namespace frame::opengl {
 			{
 				// This is a special mesh no root node needed, this can be use
 				// per example when you have a cube map as a sky box.
-				rendering_->RenderMesh(
+				renderer_->RenderMesh(
 					this, 
 					program.get(), 
 					it->second.get(), 
@@ -120,8 +120,8 @@ namespace frame::opengl {
 						continue;
 					if (!node.second->GetLocalMesh())
 						continue;
-					rendering_->SetModel(node.second->GetLocalModel(dt_));
-					rendering_->RenderMesh(
+					renderer_->SetModel(node.second->GetLocalModel(dt_));
+					renderer_->RenderMesh(
 						this,
 						program.get(),
 						node.second->GetLocalMesh().get(),
@@ -129,7 +129,7 @@ namespace frame::opengl {
 				}
 			}
 		}
-		rendering_->Display(this);
+		renderer_->Display(this);
 	}
 
 	bool Device::HasNameInParents(EntityId node_id, const std::string& name) const

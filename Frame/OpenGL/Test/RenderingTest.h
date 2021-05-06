@@ -4,7 +4,7 @@
 #include "Frame/DeviceInterface.h"
 #include "Frame/Level.h"
 #include "Frame/Window.h"
-#include "Frame/OpenGL/Rendering.h"
+#include "Frame/OpenGL/Renderer.h"
 #include "Frame/Proto/ParseLevel.h"
 #include "Frame/Proto/ProtoLevelCreate.h"
 
@@ -32,7 +32,7 @@ namespace test {
 		std::shared_ptr<frame::WindowInterface> window_ = nullptr;
 		std::shared_ptr<frame::LevelInterface> level_ = nullptr;
 		std::shared_ptr<frame::DeviceInterface> device_ = nullptr;
-		std::shared_ptr<frame::opengl::Rendering> rendering_ = nullptr;
+		std::shared_ptr<frame::opengl::Renderer> renderer_ = nullptr;
 	};
 
 } // End namespace test.

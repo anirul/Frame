@@ -1,4 +1,4 @@
-#include "Rendering.h"
+#include "Renderer.h"
 #include <stdexcept>
 #include <fmt/core.h>
 #include <GL/glew.h>

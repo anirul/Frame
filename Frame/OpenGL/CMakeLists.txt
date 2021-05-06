@@ -22,8 +22,8 @@ add_library(FrameOpenGL
     Program.h
     RenderBuffer.cpp
     RenderBuffer.h
-    Rendering.cpp
-    Rendering.h
+    Renderer.cpp
+    Renderer.h
     ScopedBind.cpp
     ScopedBind.h
     Shader.cpp

@@ -11,10 +11,10 @@
 
 namespace frame::opengl {
 
-	class Rendering {
+	class Renderer {
 	public:
 		// This will also startup the frame and rendering buffer.
-		Rendering(
+		Renderer(
 			std::shared_ptr<LevelInterface> level,
 			std::pair<std::uint32_t, std::uint32_t> size);
 
