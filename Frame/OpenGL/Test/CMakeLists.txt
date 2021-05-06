@@ -7,8 +7,6 @@ add_executable(FrameOpenGLTest
     DeviceTest.h
     FrameBufferTest.cpp
     FrameBufferTest.h
-    LevelProtoCreate.cpp
-    LevelProtoCreate.h
     LightTest.cpp
     LightTest.h
     main.cpp

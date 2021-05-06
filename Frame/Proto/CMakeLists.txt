@@ -16,6 +16,8 @@ add_library(FrameProto
     ParseUniform.h
     ParseLevel.cpp
     ParseLevel.h
+    ProtoLevelCreate.cpp
+    ProtoLevelCreate.h
     Level.proto
     Material.proto
     Math.proto

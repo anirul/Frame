@@ -5,8 +5,8 @@
 #include "Frame/DeviceInterface.h"
 #include "Frame/Proto/ParseLevel.h"
 #include "Frame/Proto/Proto.h"
+#include "Frame/Proto/ProtoLevelCreate.h"
 #include "Frame/OpenGL/Device.h"
-#include "Frame/OpenGL/Test/LevelProtoCreate.h"
 
 namespace test {
 
@@ -21,11 +21,11 @@ namespace test {
 			device_ = window_->GetUniqueDevice();
 			level_ = frame::proto::ParseLevelOpenGL(
 				size,
-				GetLevel(),
-				GetProgramFile(),
-				GetSceneFile(),
-				GetTextureFile(),
-				GetMaterialFile());
+				frame::proto::GetLevel(),
+				frame::proto::GetProgramFile(),
+				frame::proto::GetSceneFile(),
+				frame::proto::GetTextureFile(),
+				frame::proto::GetMaterialFile());
 		}
 
 	protected:
