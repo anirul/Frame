@@ -3,6 +3,5 @@
   "default_texture_name": "albedo",
   "texture_file": "SceneSimple.Texture.json",
   "program_file": "SceneSimple.Program.json",
-  "scene_tree_file": "SceneSimple.Scene.json",
-  "material_file": "SceneSimple.Material.json"
+  "scene_tree_file": "SceneSimple.Scene.json"
 }

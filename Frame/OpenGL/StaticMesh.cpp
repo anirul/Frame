@@ -106,33 +106,21 @@ namespace frame::opengl {
 			std::make_shared<Buffer>();
 		std::shared_ptr<BufferInterface> index_buffer = 
 			std::make_shared<Buffer>(BufferTypeEnum::ELEMENT_ARRAY_BUFFER);
-		point_buffer->Bind();
 		point_buffer->Copy(points.size() * sizeof(float), points.data());
-		point_buffer->UnBind();
-		normal_buffer->Bind();
 		normal_buffer->Copy(normals.size() * sizeof(float), normals.data());
-		normal_buffer->UnBind();
-		texture_buffer->Bind();
 		texture_buffer->Copy(textures.size() * sizeof(float), textures.data());
-		texture_buffer->UnBind();
-		index_buffer->Bind();
 		index_buffer->Copy(indices.size() * sizeof(float), indices.data());
-		index_buffer->UnBind();
 		static int count = 0;
 		auto mesh = std::make_shared<StaticMesh>(
 			level, 
+			level->AddBuffer(fmt::format("QuadPoint.{}", count), point_buffer),
 			level->AddBuffer(
-				"QuadPoint" + std::to_string(count), 
-				point_buffer),
-			level->AddBuffer(
-				"QuadNormal" + std::to_string(count), 
+				fmt::format("QuadNormal.{}", count), 
 				normal_buffer),
 			level->AddBuffer(
-				"QuadTexture" + std::to_string(count), 
+				fmt::format("QuadTexture.{}", count), 
 				texture_buffer),
-			level->AddBuffer(
-				"QuadIndex" + std::to_string(count), 
-				index_buffer));
+			level->AddBuffer(fmt::format("QuadIndex.{}", count), index_buffer));
 		auto id = level->AddStaticMesh(
 			"QuadMesh" + std::to_string(count), 
 			mesh);
@@ -284,33 +272,23 @@ namespace frame::opengl {
 			std::make_shared<Buffer>();
 		std::shared_ptr<BufferInterface> index_buffer =
 			std::make_shared<Buffer>(BufferTypeEnum::ELEMENT_ARRAY_BUFFER);
-		point_buffer->Bind();
 		point_buffer->Copy(points.size() * sizeof(float), points.data());
-		point_buffer->UnBind();
-		normal_buffer->Bind();
 		normal_buffer->Copy(normals.size() * sizeof(float), normals.data());
-		normal_buffer->UnBind();
-		texture_buffer->Bind();
 		texture_buffer->Copy(textures.size() * sizeof(float), textures.data());
-		texture_buffer->UnBind();
-		index_buffer->Bind();
-		index_buffer->Copy(indices.size() * sizeof(float), indices.data());
-		index_buffer->UnBind();
+		index_buffer->Copy(
+			indices.size() * sizeof(std::int32_t), 
+			indices.data());
 		static int count = 0;
 		auto mesh = std::make_shared<StaticMesh>(
 			level,
+			level->AddBuffer(fmt::format("QuadPoint.{}", count), point_buffer),
 			level->AddBuffer(
-				"QuadPoint" + std::to_string(count),
-				point_buffer),
-			level->AddBuffer(
-				"QuadNormal" + std::to_string(count),
+				fmt::format("QuadNormal.{}", count), 
 				normal_buffer),
 			level->AddBuffer(
-				"QuadTexture" + std::to_string(count),
+				fmt::format("QuadTexture.{}", count),
 				texture_buffer),
-			level->AddBuffer(
-				"QuadIndex" + std::to_string(count),
-				index_buffer));
+			level->AddBuffer(fmt::format("QuadIndex.{}", count), index_buffer));
 		auto id = level->AddStaticMesh(
 			"QuadMesh" + std::to_string(count),
 			mesh);

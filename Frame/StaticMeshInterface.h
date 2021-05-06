@@ -16,6 +16,8 @@ namespace frame {
 		virtual EntityId GetNormalBufferId() const = 0;
 		virtual EntityId GetTextureBufferId() const = 0;
 		virtual EntityId GetIndexBufferId() const = 0;
+		// This is the size in bytes! so if you need the element size just
+		// divide this number by the sizeof(std::int32_t).
 		virtual std::size_t GetIndexSize() const = 0;
 		virtual bool IsClearBuffer() const = 0;
 	};

@@ -92,6 +92,7 @@ namespace frame::file {
 		for (const auto& material : materials)
 		{
 			ObjMaterial obj_material{};
+			obj_material.name = material.name;
 			obj_material.ambient_str = material.ambient_texname;
 			obj_material.ambient_vec4 = glm::vec4(
 				material.ambient[0],

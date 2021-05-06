@@ -38,13 +38,27 @@ namespace frame::opengl {
 		const std::size_t size, 
 		const void* data /*= nullptr*/) const
 	{
-		size_ = size;
+		Bind();
 		glBufferData(
 			static_cast<GLenum>(buffer_type_),
 			size,
 			data,
 			static_cast<GLenum>(buffer_usage_));
 		error_.Display(__FILE__, __LINE__ - 5);
+		UnBind();
+	}
+
+	std::size_t Buffer::GetSize() const
+	{
+		std::size_t size[1] = {0};
+		Bind();
+		glGetBufferParameteriv(
+			static_cast<GLenum>(buffer_type_), 
+			GL_BUFFER_SIZE, 
+			(GLint*)&size);
+		error_.Display(__FILE__, __LINE__ - 4);
+		UnBind();
+		return size[0];
 	}
 
 } // End namespace frame::opengl.

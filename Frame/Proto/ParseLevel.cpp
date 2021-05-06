@@ -1,5 +1,5 @@
 #include "ParseLevel.h"
-#include "Frame/LevelBase.h"
+#include "Frame/Level.h"
 #include "Frame/OpenGL/Texture.h"
 #include "Frame/OpenGL/Material.h"
 #include "Frame/OpenGL/StaticMesh.h"
@@ -11,7 +11,7 @@
 
 namespace frame::proto {
 
-	class LevelProto :	public LevelBase
+	class LevelProto :	public frame::Level
 	{
 	public:
 		LevelProto(

@@ -36,9 +36,10 @@ namespace test {
 		EXPECT_EQ(GLEW_OK, glewInit());
 		buffer_ = std::make_shared<frame::opengl::Buffer>();
 		ASSERT_TRUE(buffer_);
-		std::vector<float> test{ 4 };
+		std::vector<float> test(4, 1.0f);
 		buffer_->Bind();
-		buffer_->Copy(test.size(), test.data());
+		buffer_->Copy(test.size() * sizeof(float), test.data());
+		EXPECT_EQ(4 * sizeof(float), buffer_->GetSize());
 		buffer_->UnBind();
 		EXPECT_TRUE(buffer_);
 	}

@@ -34,6 +34,7 @@ namespace frame::file {
 
 	struct ObjMaterial
 	{
+		std::string name = "";
 		glm::vec4 ambient_vec4 = glm::vec4(0.5f, 0.5f, 0.5f, 1.0f);
 		std::string ambient_str = "";
 		glm::vec4 diffuse_vec4 = glm::vec4(0.5f, 0.5f, 0.5f, 1.0f);

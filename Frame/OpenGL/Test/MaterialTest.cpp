@@ -1,5 +1,5 @@
 #include "MaterialTest.h"
-#include "Frame/LevelBase.h"
+#include "Frame/Level.h"
 #include "Frame/OpenGL/File/LoadTexture.h"
 #include "Frame/File/FileSystem.h"
 
@@ -9,7 +9,7 @@ namespace test {
 	{
 		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(material_);
-		auto level = std::make_shared<frame::LevelBase>();
+		auto level = std::make_shared<frame::Level>();
 		auto material = std::make_shared<frame::opengl::Material>();
 		material_ = std::dynamic_pointer_cast<frame::MaterialInterface>(
 			material);
@@ -20,7 +20,7 @@ namespace test {
 	TEST_F(MaterialTest, CheckAddRemoveTextureTest)
 	{
 		EXPECT_FALSE(material_);
-		auto level = std::make_shared<frame::LevelBase>();
+		auto level = std::make_shared<frame::Level>();
 		auto material = std::make_shared<frame::opengl::Material>();
 		material_ = std::dynamic_pointer_cast<frame::MaterialInterface>(
 			material);

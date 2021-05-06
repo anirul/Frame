@@ -7,6 +7,8 @@ add_executable(FrameOpenGLTest
     DeviceTest.h
     FrameBufferTest.cpp
     FrameBufferTest.h
+    LevelProtoCreate.cpp
+    LevelProtoCreate.h
     LightTest.cpp
     LightTest.h
     main.cpp
@@ -21,6 +23,8 @@ add_executable(FrameOpenGLTest
     ProgramTest.h
     RenderBufferTest.cpp
     RenderBufferTest.h
+    RenderingTest.cpp
+    RenderingTest.h
     ShaderTest.cpp
     ShaderTest.h
     TextureTest.cpp

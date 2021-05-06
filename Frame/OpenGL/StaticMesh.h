@@ -75,7 +75,7 @@ namespace frame::opengl {
 		EntityId normal_buffer_id_ = 0;
 		EntityId texture_buffer_id_ = 0;
 		EntityId index_buffer_id_ = 0;
-		size_t index_size_ = 0;
+		std::size_t index_size_ = 0;
 		unsigned int vertex_array_object_ = 0;
 		const Error& error_ = Error::GetInstance();
 		std::string material_name_ = "";

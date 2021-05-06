@@ -83,4 +83,26 @@ namespace frame::opengl::file {
 			pixel_structure);
 	}
 
+
+	std::shared_ptr<TextureInterface> LoadTextureFromVec4(
+		const glm::vec4& vec4)
+	{
+		std::array<float, 4> ar = { vec4.x,	vec4.y,	vec4.z,	vec4.w };
+		return std::make_shared<frame::opengl::Texture>(
+			std::make_pair<std::uint32_t, std::uint32_t>(1, 1),
+			ar.data(),
+			frame::proto::PixelElementSize_FLOAT(),
+			frame::proto::PixelStructure_RGB_ALPHA());
+	}
+
+	std::shared_ptr<TextureInterface> LoadTextureFromFloat(float f)
+	{
+		return std::make_shared<frame::opengl::Texture>(
+			std::make_pair<std::uint32_t, std::uint32_t>(1, 1),
+			&f,
+			frame::proto::PixelElementSize_FLOAT(),
+			frame::proto::PixelStructure_GREY());
+	}
+
+
 } // End namespace frame::file.

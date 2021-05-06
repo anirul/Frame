@@ -14,8 +14,8 @@ add_library(Frame
     Error.h
     Frame.h
     InputInterface.h
-    LevelBase.cpp
-    LevelBase.h
+    Level.cpp
+    Level.h
     LevelInterface.h
     LightInterface.h
     Logger.cpp

@@ -4,6 +4,6 @@
 
 namespace frame {
 
-	using EntityId = std::uint64_t;
+	using EntityId = std::int64_t;
 
 } // End namespace frame.

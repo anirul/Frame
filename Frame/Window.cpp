@@ -130,6 +130,17 @@ namespace frame {
 				return device_;
 			}
 
+			void SetUniqueUniform(
+				const std::shared_ptr<UniformInterface> uniform) override
+			{
+				uniform_ = uniform;
+			}
+
+			std::shared_ptr<UniformInterface> GetUniqueUniform() override
+			{
+				return uniform_;
+			}
+
 			std::pair<std::uint32_t, std::uint32_t> GetSize() const override
 			{
 				return size_;
@@ -223,6 +234,7 @@ namespace frame {
 		private:
 			const std::pair<std::uint32_t, std::uint32_t> size_;
 			std::shared_ptr<DeviceInterface> device_ = nullptr;
+			std::shared_ptr<UniformInterface> uniform_ = nullptr;
 			std::shared_ptr<DrawInterface> draw_interface_ = nullptr;
 			std::shared_ptr<InputInterface> input_interface_ = nullptr;
 			SDL_Window* sdl_window_ = nullptr;
@@ -292,8 +304,9 @@ namespace frame {
 		auto window = std::make_shared<SDLOpenGLWindow>(size);
 		auto context = InitSDLOpenGLDevice(window);
 		if (!context) return nullptr;
-		window->SetUniqueDevice(
-			std::make_shared<opengl::Device>(context, size));
+		auto device = std::make_shared<opengl::Device>(context, size);
+		window->SetUniqueDevice(device);
+		window->SetUniqueUniform(device);
 		return window;
 	}
 

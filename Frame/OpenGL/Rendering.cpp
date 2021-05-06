@@ -12,17 +12,24 @@ namespace frame::opengl {
 		std::pair<std::uint32_t, std::uint32_t> size) :
 		level_(level)
 	{
-		assert(size.first);
-		assert(size.second);
+		if (!size.first || !size.second) 
+		{
+			throw std::runtime_error(
+				fmt::format("No size ({}, {})?", size.first, size.second));
+		}
 		render_buffer_.CreateStorage(size);
 		frame_buffer_.AttachRender(render_buffer_);
 		auto program = file::LoadProgram("Display");
+		if (!program)
+			throw std::runtime_error("No program!");
 		auto material = std::make_shared<Material>();
+		if (!level_) 
+			throw std::runtime_error("No level!");
 		display_program_id_ = level_->AddProgram("DisplayProgram", program);
 		display_material_id_ = level_->AddMaterial("DisplayMaterial", material);
-		auto out_texture = level_->GetTextureMap().at(
-			level_->GetDefaultOutputTextureId());
-		material->AddTextureId(level_->GetDefaultOutputTextureId(),	"Display");
+		auto out_texture_id = level->GetDefaultOutputTextureId();
+		auto out_texture = level_->GetTextureMap().at(out_texture_id);
+		material->AddTextureId(out_texture_id,	"Display");
 	}
 
 	void Rendering::RenderMesh(
@@ -84,7 +91,8 @@ namespace frame::opengl {
 		index_buffer->Bind();
 		glDrawElements(
 			GL_TRIANGLES,
-			static_cast<GLsizei>(static_mesh->GetIndexSize()),
+			static_cast<GLsizei>(static_mesh->GetIndexSize()) / 
+				sizeof(std::int32_t),
 			GL_UNSIGNED_INT,
 			nullptr);
 		error_.Display(__FILE__, __LINE__ - 5);
@@ -134,7 +142,7 @@ namespace frame::opengl {
 		index_buffer->Bind();
 		glDrawElements(
 			GL_TRIANGLES,
-			static_cast<GLsizei>(quad->GetIndexSize()),
+			static_cast<GLsizei>(quad->GetIndexSize()) / sizeof(std::int32_t),
 			GL_UNSIGNED_INT,
 			nullptr);
 		error_.Display(__FILE__, __LINE__ - 5);

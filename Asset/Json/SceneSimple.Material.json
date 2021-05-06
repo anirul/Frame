@@ -1,9 +1,0 @@
-{
-  "materials": [
-    {
-      "name": "Apple.Material",
-      "texture_names": [ "apple_texture" ],
-      "inner_names": [ "Color" ]
-    }
-  ]
-}

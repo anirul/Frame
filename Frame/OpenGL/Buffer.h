@@ -44,18 +44,23 @@ namespace frame::opengl {
 			const BufferTypeEnum buffer_type = BufferTypeEnum::ARRAY_BUFFER, 
 			const BufferUsageEnum buffer_usage = BufferUsageEnum::STATIC_DRAW);
 		virtual ~Buffer();
+
+	public:
+		// Copy a value in the buffer, the size is in bytes!
 		void Copy(
 			const std::size_t size, 
 			const void* data = nullptr) const override;
+		// Get the size of the buffer.
+		std::size_t GetSize() const override;
 		void Bind(const unsigned int slot = 0) const override;
 		void UnBind() const override;
+
+	public:
 		void LockedBind() const override { locked_bind_ = true; }
 		void UnlockedBind() const override { locked_bind_ = false; }
 		unsigned int GetId() const override { return buffer_object_; }
-		std::size_t GetSize() const override { return size_; }
 
 	private:
-		mutable std::size_t size_ = 0;
 		mutable bool locked_bind_ = false;
 		const BufferTypeEnum buffer_type_;
 		const BufferUsageEnum buffer_usage_;

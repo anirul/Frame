@@ -1,21 +1,21 @@
 #pragma once
 
 #include <gtest/gtest.h>
-#include "Frame/Window.h"
 #include "Frame/DeviceInterface.h"
-#include "Frame/Proto/ParseLevel.h"
-#include "Frame/Proto/Proto.h"
-#include "Frame/OpenGL/Device.h"
+#include "Frame/Level.h"
+#include "Frame/Window.h"
 #include "Frame/OpenGL/Test/LevelProtoCreate.h"
+#include "Frame/OpenGL/Rendering.h"
+#include "Frame/Proto/ParseLevel.h"
 
 namespace test {
 
-	class DeviceTest : public ::testing::Test
+	class RenderingTest : public testing::Test
 	{
 	public:
-		DeviceTest()
-		{
-			const auto size = 
+		RenderingTest() 
+		{ 
+			const auto size =
 				std::make_pair<std::uint32_t, std::uint32_t>(320, 200);
 			window_ = frame::CreateSDLOpenGL(size);
 			device_ = window_->GetUniqueDevice();
@@ -30,8 +30,9 @@ namespace test {
 
 	protected:
 		std::shared_ptr<frame::WindowInterface> window_ = nullptr;
-		std::shared_ptr<frame::DeviceInterface> device_ = nullptr;
 		std::shared_ptr<frame::LevelInterface> level_ = nullptr;
+		std::shared_ptr<frame::DeviceInterface> device_ = nullptr;
+		std::shared_ptr<frame::opengl::Rendering> rendering_ = nullptr;
 	};
 
 } // End namespace test.

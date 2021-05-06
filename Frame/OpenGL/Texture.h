@@ -66,9 +66,10 @@ namespace frame::opengl {
 		virtual TextureFilterEnum GetWrapS() const override;
 		virtual void SetWrapT(const TextureFilterEnum texture_filter) override;
 		virtual TextureFilterEnum GetWrapT() const override;
-		virtual bool IsCubeMap() const override { return false; }
+		void GetTexture(void* p);
 
 	public:
+		virtual bool IsCubeMap() const override { return false; }
 		unsigned int GetId() const override { return texture_id_; }
 		std::pair<std::uint32_t, std::uint32_t> GetSize() const override
 		{ 
@@ -144,6 +145,7 @@ namespace frame::opengl {
 		TextureFilterEnum GetWrapT() const override;
 		void SetWrapR(const TextureFilterEnum texture_filter) override;
 		TextureFilterEnum GetWrapR() const override;
+		void GetTextureCubeMap(std::array<void*, 6>& arr);
 
 	public:
 		bool IsCubeMap() const override { return true; }

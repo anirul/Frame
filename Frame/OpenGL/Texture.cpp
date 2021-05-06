@@ -4,7 +4,7 @@
 #include <stdexcept>
 #include <GL/glew.h>
 #include <cassert>
-#include "Frame/LevelBase.h"
+#include "Frame/Level.h"
 #include "Frame/OpenGL/Pixel.h"
 #include "Frame/OpenGL/FrameBuffer.h"
 #include "Frame/OpenGL/RenderBuffer.h"
@@ -82,6 +82,8 @@ namespace frame::opengl {
 		SetMagFilter(proto::Texture::LINEAR);
 		SetWrapS(proto::Texture::CLAMP_TO_EDGE);
 		SetWrapT(proto::Texture::CLAMP_TO_EDGE);
+		auto format = opengl::ConvertToGLType(pixel_structure_);
+		auto type = opengl::ConvertToGLType(pixel_element_size_);
 		glTexImage2D(
 			GL_TEXTURE_2D,
 			0,
@@ -89,8 +91,8 @@ namespace frame::opengl {
 			static_cast<GLsizei>(size_.first),
 			static_cast<GLsizei>(size_.second),
 			0,
-			opengl::ConvertToGLType(pixel_structure_),
-			opengl::ConvertToGLType(pixel_element_size_),
+			format,
+			type,
 			data);
 		error_.Display(__FILE__, __LINE__ - 10);
 	}
@@ -493,5 +495,40 @@ namespace frame::opengl {
 		throw std::runtime_error(
 			"invalid texture filter : " + std::to_string(gl_filter));
 	}
+
+	void Texture::GetTexture(void* p)
+	{
+		assert(!IsCubeMap());
+		Bind();
+		// glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+		// error_.Display(__FILE__, __LINE__ - 1);
+		auto format = opengl::ConvertToGLType(pixel_structure_);
+		auto type = opengl::ConvertToGLType(pixel_element_size_);
+		glGetTexImage(GL_TEXTURE_2D, 0, format, type, p);
+		error_.Display(__FILE__, __LINE__ - 1);
+		UnBind();
+	}
+
+	void TextureCubeMap::GetTextureCubeMap(std::array<void*, 6>& arr)
+	{
+		assert(IsCubeMap());
+		Bind();
+		// glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+		// error_.Display(__FILE__, __LINE__ - 1);
+		for (int i : {0, 1, 2, 3, 4, 5})
+		{
+			auto format = opengl::ConvertToGLType(pixel_structure_);
+			auto type = opengl::ConvertToGLType(pixel_element_size_);
+			glGetTexImage(
+				GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 
+				0, 
+				format, 
+				type, 
+				arr[i]);
+			error_.Display(__FILE__, __LINE__ - 1);
+		}
+		UnBind();
+	}
+
 
 } // End namespace frame::opengl.

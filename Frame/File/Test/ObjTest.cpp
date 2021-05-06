@@ -38,6 +38,7 @@ namespace test {
 			auto material_id = element.GetMaterialId();
 			EXPECT_LT(material_id, obj_->GetMaterials().size());
 			const auto material = obj_->GetMaterials()[material_id];
+			EXPECT_FALSE(material.name.empty());
 			if (material.ambient_str.empty())
 			{
 				EXPECT_NE(0.0f, material.ambient_vec4.x);

@@ -1,12 +1,12 @@
 #include "LoadStaticMeshTest.h"
-#include "Frame/LevelBase.h"
+#include "Frame/Level.h"
 #include "Frame/OpenGL/File/LoadStaticMesh.h"
 
 namespace test {
 
 	TEST_F(LoadStaticMeshTest, CreateLoadStaticMeshFromFileTest)
 	{
-		auto level = std::make_unique<frame::LevelBase>();
+		auto level = std::make_unique<frame::Level>();
 		ASSERT_TRUE(level);
 		auto mesh_vec = frame::opengl::file::LoadStaticMeshesFromFile(
 			level.get(),
@@ -20,7 +20,7 @@ namespace test {
 
 	TEST_F(LoadStaticMeshTest, CreateSceneFromFileTest)
 	{
-		auto level = std::make_unique<frame::LevelBase>();
+		auto level = std::make_unique<frame::Level>();
 		ASSERT_TRUE(level);
 		auto mesh_vec = frame::opengl::file::LoadStaticMeshesFromFile(
 			level.get(),
