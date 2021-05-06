@@ -21,8 +21,8 @@ add_executable(FrameOpenGLTest
     ProgramTest.h
     RenderBufferTest.cpp
     RenderBufferTest.h
-    RenderingTest.cpp
-    RenderingTest.h
+    RendererTest.cpp
+    RendererTest.h
     ShaderTest.cpp
     ShaderTest.h
     TextureTest.cpp
