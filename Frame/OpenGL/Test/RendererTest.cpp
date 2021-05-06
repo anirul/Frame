@@ -3,7 +3,7 @@
 
 namespace test {
 
-	TEST_F(RenderingTest, CreateRenderingTest)
+	TEST_F(RendererTest, CreateRenderingTest)
 	{
 		ASSERT_FALSE(renderer_);
 		renderer_ = std::make_shared<frame::opengl::Renderer>(
@@ -12,7 +12,7 @@ namespace test {
 		EXPECT_TRUE(renderer_);
 	}
 
-	TEST_F(RenderingTest, RenderingDisplayTest)
+	TEST_F(RendererTest, RenderingDisplayTest)
 	{
 		ASSERT_FALSE(renderer_);
 		renderer_ = std::make_shared<frame::opengl::Renderer>(

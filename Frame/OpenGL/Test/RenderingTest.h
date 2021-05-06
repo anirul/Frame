@@ -13,7 +13,7 @@ namespace test {
 	class RendererTest : public testing::Test
 	{
 	public:
-		RendererTest()
+		RendererTest() 
 		{ 
 			const auto size =
 				std::make_pair<std::uint32_t, std::uint32_t>(320, 200);
