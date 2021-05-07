@@ -1,7 +1,4 @@
 #include <gtest/gtest.h>
-#include "LoadProgramTest.h"
-#include "LoadStaticMeshTest.h"
-#include "LoadTextureTest.h"
 
 int main(int ac, char** av) 
 {
