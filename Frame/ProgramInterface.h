@@ -32,6 +32,8 @@ namespace frame {
 		virtual void Use(const UniformInterface* uniform_interface) const = 0;
 		// Stop using the program.
 		virtual void UnUse() const = 0;
+		// Get the list of uniforms.
+		virtual const std::vector<std::string>& GetUniformNameList() const = 0;
 		// Create a uniform from a string and a bool.
 		virtual void Uniform(const std::string& name, bool value) const = 0;
 		// Create a uniform from a string and an int.

@@ -315,4 +315,39 @@ namespace frame::opengl {
 		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
+	const std::vector<std::string>& Program::GetUniformNameList() const
+	{
+		uniform_list_.clear();
+		GLint count = 0;
+		glGetProgramiv(program_id_, GL_ACTIVE_UNIFORMS, &count);
+		error_.Display(__FILE__, __LINE__ - 1);
+		for (GLuint i = 0; i < static_cast<GLuint>(count); ++i)
+		{
+			constexpr GLsizei max_size = 256;
+			GLsizei length = 0;
+			GLsizei size = 0;
+			GLenum type = 0;
+			GLchar name[max_size];
+			glGetActiveUniform(
+				program_id_, 
+				i, 
+				max_size, 
+				&length, 
+				&size, 
+				&type, 
+				name);
+			error_.Display(__FILE__, __LINE__ - 8);
+			std::string name_str = std::string(name, name + length);
+			uniform_list_.push_back(name_str);
+			std::string warning_str = fmt::format(
+				"Program[{}].[{}]<{}>({})", 
+				program_id_, 
+				name_str, 
+				type, 
+				size);
+			logger_->info(warning_str);
+		}
+		return uniform_list_;
+	}
+
 } // End namespace frame::opengl.

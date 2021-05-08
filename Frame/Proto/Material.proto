@@ -7,6 +7,8 @@ package frame.proto;
 message Material {
 	// Name of the material.
 	string name = 1;
+	// Program reference.
+	string program_name = 5;
 	// Reference name of the texture names in the texture file.
 	repeated string texture_names = 3;
 	// Reference to the name inside the material in the shader file.

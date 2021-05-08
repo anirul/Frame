@@ -100,6 +100,7 @@ namespace frame {
 		EntityId AddStaticMesh(
 			const std::string& name,
 			std::shared_ptr<StaticMeshInterface> static_mesh) override;
+		const std::vector<EntityId> GetChildList(EntityId id) const override;
 
 	protected:
 		EntityId GetTextureNewId() const

@@ -10,6 +10,10 @@ namespace frame {
 
 	struct MaterialInterface 
 	{
+		// Get the program that is sued by this material.
+		virtual EntityId GetProgramId() const = 0;
+		// Set the program Id.
+		virtual void SetProgramId(EntityId id) = 0;
 		// Texture management part.
 		virtual bool AddTextureId(
 			EntityId id, 

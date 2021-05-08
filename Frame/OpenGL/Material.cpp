@@ -96,4 +96,17 @@ namespace frame::opengl {
 		return vec;
 	}
 
+	frame::EntityId Material::GetProgramId() const
+	{
+		if (program_id_) return program_id_;
+		throw std::runtime_error("No valid program!");
+	}
+
+	void Material::SetProgramId(EntityId id)
+	{
+		if (!id) throw std::runtime_error("Not a valid program id.");
+		// TODO(anirul): Check that the program has a valid uniform!
+		program_id_ = id;
+	}
+
 } // End namespace frame::opengl.

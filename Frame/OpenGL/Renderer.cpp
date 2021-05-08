@@ -8,9 +8,11 @@
 namespace frame::opengl {
 
 	Renderer::Renderer(
-		std::shared_ptr<LevelInterface> level, 
+		LevelInterface* level, 
+		UniformInterface* uniform_interface,
 		std::pair<std::uint32_t, std::uint32_t> size) :
-		level_(level)
+		level_(level),
+		uniform_interface_(uniform_interface)
 	{
 		if (!size.first || !size.second) 
 		{
@@ -23,28 +25,59 @@ namespace frame::opengl {
 		if (!program)
 			throw std::runtime_error("No program!");
 		auto material = std::make_shared<Material>();
+		display_program_id_ = level_->AddProgram("DisplayProgram", program);
 		if (!level_) 
 			throw std::runtime_error("No level!");
-		display_program_id_ = level_->AddProgram("DisplayProgram", program);
 		display_material_id_ = level_->AddMaterial("DisplayMaterial", material);
 		auto out_texture_id = level->GetDefaultOutputTextureId();
 		auto out_texture = level_->GetTextureMap().at(out_texture_id);
-		material->AddTextureId(out_texture_id,	"Display");
+		material->SetProgramId(display_program_id_);
+		material->AddTextureId(out_texture_id, "Display");
+	}
+
+	void Renderer::RenderNode(EntityId node_id, const double dt/* = 0.0*/)
+	{
+		// Check current node.
+		auto node = level_->GetSceneNodeMap().at(node_id);
+		auto static_mesh = node->GetLocalMesh();
+		if (static_mesh)
+		{
+			RenderMesh(static_mesh.get(), node->GetLocalModel(dt), dt);
+		}
+	}
+
+	void Renderer::RenderChildren(EntityId node_id, const double dt/* = 0.0*/)
+	{
+		RenderNode(node_id, dt);
+		// Loop into the child of the root node.
+		const std::vector<EntityId> list = level_->GetChildList(node_id);
+		for (const auto& id : list)	RenderChildren(id, dt);
+	}
+
+	void Renderer::RenderFromRootNode(const double dt/* = 0.0*/)
+	{
+		const EntityId root_id = level_->GetDefaultRootSceneNodeId();
+		RenderChildren(root_id, dt);
 	}
 
 	void Renderer::RenderMesh(
-		const UniformInterface* uniform_interface,
-		ProgramInterface* program, 
-		StaticMeshInterface* static_mesh, 
-		const double dt /*= 0.0*/)
+		StaticMeshInterface* static_mesh,
+		const glm::mat4& model_mat/* = glm::mat4(1.0f)*/,
+		const double dt/* = 0.0*/)
 	{
-		if (!program)
-			throw std::runtime_error("Program ptr doesn't exist.");
 		if (!static_mesh)
 			throw std::runtime_error("StaticMesh ptr doesn't exist.");
-
+		auto material_id = static_mesh->GetMaterialId();
+		auto material = level_->GetMaterialMap().at(material_id);
+		if (!material)
+			throw std::runtime_error("No material!");
+		auto program_id = material->GetProgramId();
+		auto program = level_->GetProgramMap().at(program_id);
+		if (!program)
+			throw std::runtime_error("Program ptr doesn't exist.");
+		
 		assert(program->GetOutputTextureIds().size());
-		program->Use(uniform_interface);
+		program->Use(uniform_interface_);
 		auto texture_out_ids = program->GetOutputTextureIds();
 		auto texture_ref = 
 			level_->GetTextureMap().at(*texture_out_ids.cbegin());
@@ -69,20 +102,15 @@ namespace frame::opengl {
 
 		program->Uniform("projection", projection_);
 		program->Uniform("view", view_);
-		program->Uniform("model", model_);
+		program->Uniform("model", model_mat);
 
-		auto material_id = static_mesh->GetMaterialId();
-		if (material_id)
+		for (const auto& id : material->GetIds())
 		{
-			auto material = level_->GetMaterialMap().at(material_id);
-			for (const auto& id : material->GetIds())
-			{
-				const auto p = material->EnableTextureId(id);
-				level_->GetTextureMap().at(id)->Bind(p.second);
-				program->Uniform(p.first, p.second);
-			}
+			const auto p = material->EnableTextureId(id);
+			level_->GetTextureMap().at(id)->Bind(p.second);
+			program->Uniform(p.first, p.second);
 		}
-
+		
 		glBindVertexArray(static_mesh->GetId());
 		error_.Display(__FILE__, __LINE__ - 1);
 
@@ -102,15 +130,11 @@ namespace frame::opengl {
 		glBindVertexArray(0);
 		error_.Display(__FILE__, __LINE__ - 1);
 
-		if (material_id)
+		for (const auto id : material->GetIds())
 		{
-			auto material = level_->GetMaterialMap().at(material_id);
-			for (const auto id : material->GetIds())
-			{
-				level_->GetTextureMap().at(id)->UnBind();
-			}
-			material->DisableAll();
+			level_->GetTextureMap().at(id)->UnBind();
 		}
+		material->DisableAll();
 
 		if (static_mesh->IsClearBuffer())
 		{
@@ -119,13 +143,13 @@ namespace frame::opengl {
 		}
 	}
 
-	void Renderer::Display(const UniformInterface* uniform_interface)
+	void Renderer::Display()
 	{
 		auto quad = level_->GetStaticMeshMap().at(
 			level_->GetDefaultStaticMeshQuadId());
 		quad->SetMaterialId(display_material_id_);
 		auto program = level_->GetProgramMap().at(display_program_id_);
-		program->Use(uniform_interface);
+		program->Use(uniform_interface_);
 		auto material = level_->GetMaterialMap().at(display_material_id_);
 
 		for (const auto id : material->GetIds())

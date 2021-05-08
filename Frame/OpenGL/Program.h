@@ -41,6 +41,8 @@ namespace frame::opengl {
 		void AddShader(const Shader& shader);
 		// Link shaders to a program.
 		void LinkShader() override;
+		// Get the list of uniforms needed by the program.
+		const std::vector<std::string>& GetUniformNameList() const override;
 		// CHECKME(anirul): maybe this can be a Bind and Unbind? then it should
 		// CHECKME(anirul): derived from the Scoped bind thing.
 		// Use the program.
@@ -85,6 +87,7 @@ namespace frame::opengl {
 		mutable std::map<std::string, int> memoize_map_ = {};
 		mutable std::map<std::string, proto::Uniform::UniformEnum> 
 			uniform_variable_map_ = {};
+		mutable std::vector<std::string> uniform_list_ = {};
 		std::vector<unsigned int> attached_shaders_ = {};
 		int program_id_ = 0;
 		EntityId scene_root_ = 0;

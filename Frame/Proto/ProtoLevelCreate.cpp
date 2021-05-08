@@ -48,21 +48,26 @@ namespace frame::proto {
 		return scene_tree_file;
 	}
 
-	TextureFile GetTextureFile()
+	TextureFile GetTextureFile(const std::string& filename /*= ""*/)
 	{
 		TextureFile texture_file{};
 		Texture texture{};
+		if (filename.empty())
 		{
 			texture.set_name("texture");
 			Size size;
 			size.set_x(-1);
 			size.set_y(-1);
 			*texture.mutable_size() = size;
-			texture.mutable_pixel_element_size()->set_value(
-				PixelElementSize::HALF);
-			texture.mutable_pixel_structure()->set_value(
-				PixelStructure::RGB);
 		}
+		else
+		{
+			texture.set_name("texture");
+			texture.set_file_name(filename);
+		}
+		texture.mutable_pixel_element_size()->set_value(
+			PixelElementSize::BYTE);
+		texture.mutable_pixel_structure()->set_value(PixelStructure::RGB);
 		*texture_file.add_textures() = texture;
 		return texture_file;
 	}

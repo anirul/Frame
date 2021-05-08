@@ -15,7 +15,8 @@ namespace frame::opengl {
 	public:
 		// This will also startup the frame and rendering buffer.
 		Renderer(
-			std::shared_ptr<LevelInterface> level,
+			LevelInterface* level,
+			UniformInterface* uniform_interface,
 			std::pair<std::uint32_t, std::uint32_t> size);
 
 	public:
@@ -25,21 +26,31 @@ namespace frame::opengl {
 			projection_ = std::move(projection); 
 		}
 		void SetView(glm::mat4 view) { view_ = std::move(view); }
+		// Can be changed by render mesh!
 		void SetModel(glm::mat4 model) { model_ = std::move(model); }
+		void SetUniformInterface(UniformInterface* uniform_interface)
+		{
+			uniform_interface_ = uniform_interface;
+		}
 
 	public:
 		// Render to a mesh at a dt time.
 		void RenderMesh(
-			const UniformInterface* uniform_interface,
-			ProgramInterface* program,
 			StaticMeshInterface* static_mesh,
+			const glm::mat4& model_mat = glm::mat4(1.0f),
 			const double dt = 0.0);
+		void RenderNode(EntityId node_id, const double dt = 0.0);
+		void RenderChildren(EntityId node_id, const double dt = 0.0);
+		void RenderFromRootNode(const double dt = 0.0);
 		// Display the default texture to the screen.
-		void Display(const UniformInterface* uniform_interface);
+		void Display();
 
 	private:
 		// Level shared_ptr.
-		std::shared_ptr<LevelInterface> level_;
+		LevelInterface* level_ = nullptr;
+		// Uniform interface to get the basic model from the scene and camera
+		// position and view.
+		UniformInterface* uniform_interface_ = nullptr;
 		// Projection / View / Model matrices.
 		glm::mat4 projection_ = glm::mat4(1.0f);
 		glm::mat4 view_ = glm::mat4(1.0f);

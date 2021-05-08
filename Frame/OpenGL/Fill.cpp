@@ -114,11 +114,12 @@ namespace frame::opengl {
 			}
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			error.Display(__FILE__, __LINE__ - 1);
-			Renderer renderer{level, temporary_size};
+			Renderer renderer(
+				level.get(), 
+				uniform_interface.get(), 
+				temporary_size);
 			renderer.SetProjection(projection);
 			renderer.RenderMesh(
-				uniform_interface.get(),
-				program.get(), 
 				level->GetStaticMeshMap().at(
 					level->GetDefaultStaticMeshQuadId()).get());
 		}
@@ -200,12 +201,13 @@ namespace frame::opengl {
 				cubemap_element++;
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 				error.Display(__FILE__, __LINE__ - 1);
-				Renderer renderer{level, temporary_size};
+				Renderer renderer(
+					level.get(), 
+					uniform_interface.get(), 
+					temporary_size);
 				renderer.SetProjection(projection);
 				renderer.SetView(view);
 				renderer.RenderMesh(
-					uniform_interface.get(),
-					program.get(),
 					level->GetStaticMeshMap().at(
 						level->GetDefaultStaticMeshCubeId()).get());
 			}

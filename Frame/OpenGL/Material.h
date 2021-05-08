@@ -19,6 +19,11 @@ namespace frame::opengl {
 		virtual ~Material();
 
 	public:
+		// Program management part.
+		EntityId GetProgramId() const override;
+		void SetProgramId(EntityId id) override;
+
+	public:
 		// Texture management part.
 		bool AddTextureId(EntityId id, const std::string& name) override;
 		bool HasTextureId(EntityId id) const override;
@@ -37,6 +42,7 @@ namespace frame::opengl {
 	private:
 		std::map<EntityId, std::string> id_name_map_ = {};
 		mutable std::array<EntityId, 32> id_array_ = {};
+		EntityId program_id_ = 0;
 	};
 
 } // End namespace frame::opengl.

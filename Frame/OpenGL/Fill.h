@@ -8,6 +8,8 @@
 #include "Frame/ProgramInterface.h"
 #include "Frame/TextureInterface.h"
 
+// THIS IS BROKEN
+// In case this is needed you should fix it!
 namespace frame::opengl {
 
 	// Fill multiple textures from a program.

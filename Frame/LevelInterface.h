@@ -47,6 +47,9 @@ namespace frame {
 		virtual EntityId GetDefaultRootSceneNodeId() const = 0;
 		virtual void SetDefaultCameraName(const std::string& name) = 0;
 		virtual EntityId GetDefaultCameraId() const = 0;
+		// Get the list of children from an id in the node list.
+		virtual const std::vector<EntityId> GetChildList(
+			const EntityId id) const = 0;
 		// Get & Set the default quad and cube.
 		virtual EntityId GetDefaultStaticMeshQuadId() const = 0;
 		virtual void SetDefaultStaticMeshQuadId(EntityId id) = 0;

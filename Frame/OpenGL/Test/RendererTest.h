@@ -7,6 +7,7 @@
 #include "Frame/OpenGL/Renderer.h"
 #include "Frame/Proto/ParseLevel.h"
 #include "Frame/Proto/ProtoLevelCreate.h"
+#include "Frame/File/FileSystem.h"
 
 namespace test {
 
@@ -24,7 +25,8 @@ namespace test {
 				frame::proto::GetLevel(),
 				frame::proto::GetProgramFile(),
 				frame::proto::GetSceneFile(),
-				frame::proto::GetTextureFile(),
+				frame::proto::GetTextureFile(
+					frame::file::FindFile("Asset/CubeMap/PositiveX.png")),
 				frame::proto::GetMaterialFile());
 		}
 

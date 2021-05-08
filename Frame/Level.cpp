@@ -82,4 +82,22 @@ namespace frame {
 		return id;
 	}
 
+	const std::vector<frame::EntityId> Level::GetChildList(EntityId id) const
+	{
+		std::vector<EntityId> list;
+		// TODO(anirul): Should probably replace this by a find to throw a more
+		// TODO(anirul): explicit error.
+		const auto node = id_scene_node_map_.at(id);
+		// Check who has node as a parent.
+		for (const auto& id : id_scene_node_map_)
+		{
+			// In case this is node then add it to the list.
+			if (id.second->GetParentName() == node->GetName())
+			{
+				list.push_back(id.first);
+			}
+		}
+		return list;
+	}
+
 } // End namespace frame.
