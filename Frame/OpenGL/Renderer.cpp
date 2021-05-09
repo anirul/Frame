@@ -39,9 +39,10 @@ namespace frame::opengl {
 	{
 		// Check current node.
 		auto node = level_->GetSceneNodeMap().at(node_id);
-		auto static_mesh = node->GetLocalMesh();
-		if (static_mesh)
+		auto mesh_id = node->GetLocalMesh();
+		if (mesh_id)
 		{
+			auto static_mesh = level_->GetStaticMeshMap().at(mesh_id);
 			RenderMesh(static_mesh.get(), node->GetLocalModel(dt), dt);
 		}
 	}

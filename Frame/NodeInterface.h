@@ -21,10 +21,7 @@ namespace frame {
 		// Get the local model of current node.
 		virtual const glm::mat4 GetLocalModel(double dt) const = 0;
 		// Get the local mesh of current node.
-		virtual const std::shared_ptr<StaticMeshInterface> GetLocalMesh() const
-		{
-			return nullptr;
-		}
+		virtual const EntityId GetLocalMesh() const { return 0; }
 
 	public:
 		// Set a callback that will return a node according to a name. This

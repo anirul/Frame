@@ -205,7 +205,9 @@ namespace frame::opengl::file {
 					mesh_counter);
 			static_mesh_vec.push_back(
 				std::make_shared<NodeStaticMesh>(
-					level->GetStaticMeshMap().at(static_mesh_id)));
+					static_mesh_id,
+					level->GetStaticMeshMap().at(
+						static_mesh_id)->GetMaterialId()));
 			mesh_counter++;
 		}
 		return static_mesh_vec;

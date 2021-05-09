@@ -122,7 +122,7 @@ namespace frame::opengl {
 				texture_buffer),
 			level->AddBuffer(fmt::format("QuadIndex.{}", count), index_buffer));
 		auto id = level->AddStaticMesh(
-			"QuadMesh" + std::to_string(count), 
+			fmt::format("QuadMesh.{}", count), 
 			mesh);
 		count++;
 		return id;
@@ -281,16 +281,16 @@ namespace frame::opengl {
 		static int count = 0;
 		auto mesh = std::make_shared<StaticMesh>(
 			level,
-			level->AddBuffer(fmt::format("QuadPoint.{}", count), point_buffer),
+			level->AddBuffer(fmt::format("CubePoint.{}", count), point_buffer),
 			level->AddBuffer(
-				fmt::format("QuadNormal.{}", count), 
+				fmt::format("CubeNormal.{}", count), 
 				normal_buffer),
 			level->AddBuffer(
-				fmt::format("QuadTexture.{}", count),
+				fmt::format("CubeTexture.{}", count),
 				texture_buffer),
-			level->AddBuffer(fmt::format("QuadIndex.{}", count), index_buffer));
+			level->AddBuffer(fmt::format("CubeIndex.{}", count), index_buffer));
 		auto id = level->AddStaticMesh(
-			"QuadMesh" + std::to_string(count),
+			fmt::format("CubeMesh.{}", count),
 			mesh);
 		count++;
 		return id;

@@ -8,13 +8,13 @@ namespace frame::proto {
 		const frame::proto::Material& proto_material, 
 		LevelInterface* level)
 	{
-		const std::size_t texture_size = proto_material.texture_names().size();
-		const std::size_t inner_size = proto_material.inner_names().size();
+		const std::size_t texture_size = proto_material.texture_names_size();
+		const std::size_t inner_size = proto_material.inner_names_size();
 		if (texture_size != inner_size)
 		{
 			throw std::runtime_error(
 				fmt::format(
-					"Not the same size for texture and inner names: {} != {}",
+					"Not the same size for texture and inner names: {} != {}.",
 					texture_size,
 					inner_size));
 		}
@@ -30,10 +30,10 @@ namespace frame::proto {
 		for (int i = 0; i < inner_size; ++i)
 		{
 			const EntityId texture_id = 
-				level->GetIdFromName(proto_material.texture_names().at(i));
+				level->GetIdFromName(proto_material.texture_names(i));
 			material->AddTextureId(
 				texture_id, 
-				proto_material.inner_names().at(i));
+				proto_material.inner_names(i));
 		}
 		return material;
 	}

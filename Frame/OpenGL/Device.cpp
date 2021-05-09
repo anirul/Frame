@@ -79,8 +79,6 @@ namespace frame::opengl {
 		SetupCamera();
 		renderer_->SetProjection(projection_);
 		renderer_->SetView(view_);
-		// TODO(anirul): This is suppose to be from mesh.
-		renderer_->SetModel(model_);
 		// Let's start rendering from root node.
 		renderer_->RenderFromRootNode();
 		// Present the result on screen.

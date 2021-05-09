@@ -10,8 +10,10 @@ namespace frame {
 	// Id are in EntityId to allow for more see the level interface.
 	struct StaticMeshInterface : public BindInterface
 	{
+		// TODO(anirul): Move material to node static mesh.
 		virtual void SetMaterialId(EntityId id) = 0;
 		virtual EntityId GetMaterialId() const = 0;
+		// Buffer management.
 		virtual EntityId GetPointBufferId() const = 0;
 		virtual EntityId GetNormalBufferId() const = 0;
 		virtual EntityId GetTextureBufferId() const = 0;

@@ -17,7 +17,9 @@ namespace test {
 			level.get(),
 			frame::file::FindFile("Asset/Model/Cube.obj"),
 			"cube");
-		static_mesh_ = mesh_vec[0]->GetLocalMesh();
+		auto static_mesh_id = mesh_vec[0]->GetLocalMesh();
+		EXPECT_NE(0, static_mesh_id);
+		static_mesh_ = level->GetStaticMeshMap().at(static_mesh_id);
 		EXPECT_EQ(1, mesh_vec.size());
 		EXPECT_TRUE(static_mesh_);
 		EXPECT_EQ(0, static_mesh_->GetMaterialId());
@@ -42,7 +44,9 @@ namespace test {
 			level.get(),
 			frame::file::FindFile("Asset/Model/Torus.obj"),
 			"torus");
-		static_mesh_ = mesh_vec[0]->GetLocalMesh();
+		auto static_mesh_id = mesh_vec[0]->GetLocalMesh();
+		EXPECT_NE(0, static_mesh_id);
+		static_mesh_ = level->GetStaticMeshMap().at(static_mesh_id);
 		EXPECT_EQ(1, mesh_vec.size());
 		EXPECT_TRUE(static_mesh_);
 		EXPECT_EQ(0, static_mesh_->GetMaterialId());

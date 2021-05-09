@@ -20,10 +20,9 @@ namespace frame {
 		return glm::mat4(1.0f);
 	}
 
-	const std::shared_ptr<StaticMeshInterface>
-		NodeStaticMesh::GetLocalMesh() const
+	const EntityId NodeStaticMesh::GetLocalMesh() const
 	{
-		return mesh_;
+		return static_mesh_id_;
 	}
 
 } // End namespace frame.

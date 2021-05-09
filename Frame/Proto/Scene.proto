@@ -23,16 +23,24 @@ message SceneMatrix {
 }
 
 // Static Mesh.
-// Next 6
+// Next 7
 message SceneStaticMesh {
 	// This is the name of the mesh.
 	string name = 1;
 	// Give the name of the parent (if present).
 	string parent = 2;
+
+	// Some mesh are included.
+	enum Enum {
+		INVALID				= 0;
+		CUBE				= 1;
+		QUAD				= 2;
+	}
+	// This can be a static mesh enum.
+	Enum mesh_enum = 6;
 	// Where the file is loaded from.
 	string file_name = 3;
-	// Effect applied to the mesh.
-	string effect_name = 4;
+
 	// Material name.
 	string material_name = 5;
 }
@@ -63,7 +71,7 @@ message SceneLight {
 	string parent = 2;
 	
 	// Light type this is what the light can be.
-	enum LightEnum {
+	enum Enum {
 		INVALID = 0;
 		AMBIENT = 1;
 		POINT = 2;
@@ -71,7 +79,7 @@ message SceneLight {
 		SPOT = 4;
 	}
 	// The light type of this light.
-	LightEnum light_type = 3;
+	Enum light_type = 3;
 	
 	// Position of the light.
 	// not considered in case this is AMBIENT, DIRECTIONAL.
