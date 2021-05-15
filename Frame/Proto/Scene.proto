@@ -30,7 +30,7 @@ message SceneStaticMesh {
 	// Give the name of the parent (if present).
 	string parent = 2;
 
-	// Some mesh are included.
+	// Some mesh are included?
 	enum Enum {
 		INVALID				= 0;
 		CUBE				= 1;

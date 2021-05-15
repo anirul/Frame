@@ -15,7 +15,7 @@ namespace frame::proto {
 	namespace {
 
 		std::shared_ptr<NodeMatrix> ParseSceneMatrix(
-			const frame::proto::SceneMatrix& proto_scene_matrix)
+			const SceneMatrix& proto_scene_matrix)
 		{
 			auto scene_matrix = std::make_shared<NodeMatrix>(
 				ParseUniform(proto_scene_matrix.matrix()));
@@ -24,8 +24,8 @@ namespace frame::proto {
 			return scene_matrix;
 		}
 
-		void ParseSceneStaticMesh(
-			const frame::proto::SceneStaticMesh& proto_scene_static_mesh,
+		std::vector<std::shared_ptr<NodeStaticMesh>> ParseSceneStaticMesh(
+			const SceneStaticMesh& proto_scene_static_mesh,
 			LevelInterface* level)
 		{
 			if (proto_scene_static_mesh.file_name().empty())
@@ -61,16 +61,31 @@ namespace frame::proto {
 				const EntityId material_id =
 					level->GetIdFromName(
 						proto_scene_static_mesh.material_name());
-				level->AddSceneNode(
-					proto_scene_static_mesh.name(),
-					std::make_shared<NodeStaticMesh>(mesh_id, material_id));
+				std::shared_ptr<NodeStaticMesh> ptr = 
+					std::make_shared<NodeStaticMesh>(mesh_id, material_id);
+				ptr->SetName(proto_scene_static_mesh.name());
+				ptr->SetParentName(proto_scene_static_mesh.parent());
+				std::vector<std::shared_ptr<NodeStaticMesh>> vec = { ptr };
+				return vec;
 			}
 			else
 			{
-				frame::opengl::file::LoadStaticMeshesFromFile(
+				auto vec_mesh = frame::opengl::file::LoadStaticMeshesFromFile(
 					level, 
 					"Asset/Model/" + proto_scene_static_mesh.file_name(), 
 					proto_scene_static_mesh.name());
+				int i = 0;
+				for (const auto& mesh : vec_mesh)
+				{
+					auto str = fmt::format(
+						"{}.{}", 
+						proto_scene_static_mesh.name(), 
+						i);
+					mesh->SetName(str);
+					mesh->SetParentName(proto_scene_static_mesh.parent());
+					++i;
+				}
+				return vec_mesh;
 			}
 		}
 
@@ -146,7 +161,13 @@ namespace frame::proto {
 		for (const auto& proto_static_mesh :
 			proto_scene_tree_file.scene_static_meshes())
 		{
-			ParseSceneStaticMesh(proto_static_mesh, level);
+			auto vec_ptr = ParseSceneStaticMesh(proto_static_mesh, level);
+			for (auto ptr : vec_ptr)
+			{	
+				level->AddSceneNode(
+					ptr->GetName(), 
+					std::dynamic_pointer_cast<NodeInterface>(ptr));
+			}
 		}
 		for (const auto& proto_camera : proto_scene_tree_file.scene_cameras())
 		{

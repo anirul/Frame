@@ -27,12 +27,6 @@ namespace frame::proto {
 			if (default_texture_name_.empty())
 				throw std::runtime_error("should have a default texture.");
 
-			// Load scenes from proto.
-			ParseSceneTreeFile(proto_scene_tree_file, this);
-			default_camera_name_ = proto_scene_tree_file.default_camera_name();
-			if (default_camera_name_.empty())
-				throw std::runtime_error("should have a default camera name.");
-
 			// Include the default cube and quad.
 			cube_id_ = opengl::CreateCubeStaticMesh(this);
 			quad_id_ = opengl::CreateQuadStaticMesh(this);
@@ -78,6 +72,12 @@ namespace frame::proto {
 				auto material = ParseMaterialOpenGL(proto_material, this);
 				AddMaterial(proto_material.name(), material);
 			}
+
+			// Load scenes from proto.
+			ParseSceneTreeFile(proto_scene_tree_file, this);
+			default_camera_name_ = proto_scene_tree_file.default_camera_name();
+			if (default_camera_name_.empty())
+				throw std::runtime_error("should have a default camera name.");
 		}
 
 	};

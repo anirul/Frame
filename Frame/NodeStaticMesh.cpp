@@ -1,5 +1,6 @@
 #include "NodeStaticMesh.h"
 #include <stdexcept>
+#include <fmt/core.h>
 
 namespace frame {
 
@@ -11,18 +12,13 @@ namespace frame {
 			if (!parent_node)
 			{
 				throw std::runtime_error(
-					"SceneStaticMesh func(" +
-					GetParentName() +
-					") returned nullptr");
+					fmt::format(
+						"SceneStaticMesh func({}) returned nullptr", 
+						GetParentName()));
 			}
 			return parent_node->GetLocalModel(dt);
 		}
 		return glm::mat4(1.0f);
-	}
-
-	const EntityId NodeStaticMesh::GetLocalMesh() const
-	{
-		return static_mesh_id_;
 	}
 
 } // End namespace frame.

@@ -23,11 +23,11 @@ message SceneType {
 message Program {
 	// Name of the effect.
 	string name = 1;
-	// Input texture names.
+	// Input texture names (this should come from scene?).
 	repeated string input_texture_names = 3;
 	// Output texture names.
 	repeated string output_texture_names = 4;
-	// Input Scene type.
+	// Input Scene type (this should come from scene?).
 	// In case you select 'SCENE' you'll have to set the input_scene_name.
 	SceneType input_scene_type = 9;
 	// Input Scenes name.

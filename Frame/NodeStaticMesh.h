@@ -16,9 +16,9 @@ namespace frame {
 
 	public:
 		const glm::mat4 GetLocalModel(const double dt) const override;
-		const EntityId GetLocalMesh() const override;
 
 	public:
+		const EntityId GetLocalMesh() const override { return static_mesh_id_; }
 		EntityId GetMaterialId() const { return material_id_; }
 		void SetMaterialId(EntityId id) { material_id_ = id; }
 
