@@ -2,6 +2,7 @@
 #include <stdexcept>
 #include <fmt/core.h>
 #include <GL/glew.h>
+#include "Frame/NodeStaticMesh.h"
 #include "Frame/OpenGL/Material.h"
 #include "Frame/OpenGL/File/LoadProgram.h"
 
@@ -39,12 +40,19 @@ namespace frame::opengl {
 	{
 		// Check current node.
 		auto node = level_->GetSceneNodeMap().at(node_id);
+		// Try to case to a node static mesh.
+		auto node_static_mesh = std::dynamic_pointer_cast<NodeStaticMesh>(node);
+		if (!node_static_mesh) return;
+		// Store the material id in case the mesh doesn't have one.
+		auto node_material_id = node_static_mesh->GetMaterialId();
 		auto mesh_id = node->GetLocalMesh();
-		if (mesh_id)
-		{
-			auto static_mesh = level_->GetStaticMeshMap().at(mesh_id);
-			RenderMesh(static_mesh.get(), node->GetLocalModel(dt), dt);
-		}
+		if (!mesh_id) return;
+		auto static_mesh = level_->GetStaticMeshMap().at(mesh_id);
+		// Get the mesh material id.
+		auto material_id = static_mesh->GetMaterialId();
+		// If no material is put the node material id in the mesh.
+		if (!material_id) static_mesh->SetMaterialId(node_material_id);
+		RenderMesh(static_mesh.get(), node->GetLocalModel(dt), dt);
 	}
 
 	void Renderer::RenderChildren(EntityId node_id, const double dt/* = 0.0*/)

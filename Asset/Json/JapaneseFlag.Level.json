@@ -2,6 +2,7 @@
   "name": "JapaneseFlag",
   "default_texture_name": "billboard",
   "texture_file": "JapaneseFlag.Texture.json",
+  "material_file": "JapaneseFlag.Material.json",
   "program_file": "JapaneseFlag.Program.json",
   "scene_tree_file": "JapaneseFlag.Scene.json"
 }

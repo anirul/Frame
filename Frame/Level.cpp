@@ -13,6 +13,7 @@ namespace frame {
 		id_scene_node_map_.insert({ id, scene_node });
 		id_name_map_.insert({ id, name });
 		name_id_map_.insert({ name, id });
+		id_enum_map_.insert({ id, EntityTypeEnum::NODE });
 		return id;
 	}
 
@@ -27,6 +28,7 @@ namespace frame {
 		id_texture_map_.insert({ id, texture });
 		id_name_map_.insert({ id, name });
 		name_id_map_.insert({ name, id });
+		id_enum_map_.insert({ id, EntityTypeEnum::TEXTURE });
 		return id;
 	}
 
@@ -40,6 +42,7 @@ namespace frame {
 		id_program_map_.insert({ id, program });
 		id_name_map_.insert({ id, name });
 		name_id_map_.insert({ name, id });
+		id_enum_map_.insert({ id, EntityTypeEnum::PROGRAM });
 		return id;
 	}
 
@@ -53,6 +56,7 @@ namespace frame {
 		id_material_map_.insert({ id, material });
 		id_name_map_.insert({ id, name });
 		name_id_map_.insert({ name, id });
+		id_enum_map_.insert({ id, EntityTypeEnum::MATERIAL });
 		return id;
 	}
 
@@ -66,6 +70,7 @@ namespace frame {
 		id_buffer_map_.insert({ id, buffer });
 		id_name_map_.insert({ id, name });
 		name_id_map_.insert({ name, id });
+		id_enum_map_.insert({ id, EntityTypeEnum::BUFFER });
 		return id;
 	}
 
@@ -79,6 +84,7 @@ namespace frame {
 		id_static_mesh_map_.insert({ id, static_mesh });
 		id_name_map_.insert({ id, name });
 		name_id_map_.insert({ name, id });
+		id_enum_map_.insert({ id, EntityTypeEnum::STATIC_MESH });
 		return id;
 	}
 

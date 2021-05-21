@@ -203,8 +203,18 @@ namespace frame::opengl::file {
 					name, 
 					material_ids,
 					mesh_counter);
+			auto func = [level](const std::string& name)->NodeInterface::Ptr
+			{
+				if (level)
+				{
+					auto  id = level->GetIdFromName(name);
+					return level->GetSceneNodeMap().at(id);
+				}
+				return nullptr;
+			};
 			std::shared_ptr<NodeStaticMesh> ptr = 
 				std::make_shared<NodeStaticMesh>(
+					func,
 					static_mesh_id,
 					level->GetStaticMeshMap().at(
 						static_mesh_id)->GetMaterialId());

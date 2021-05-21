@@ -1,0 +1,10 @@
+{
+  "materials": [
+    {
+      "name": "JapaneseFlagEffect",
+      "program_name": "JapaneseFlagProgram",
+      "texture_names": [],
+      "inner_names": []
+    }
+  ]
+}

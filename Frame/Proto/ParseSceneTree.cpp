@@ -61,8 +61,20 @@ namespace frame::proto {
 				const EntityId material_id =
 					level->GetIdFromName(
 						proto_scene_static_mesh.material_name());
+				auto func = 
+					[level](const std::string& name)->NodeInterface::Ptr 
+					{
+						if (level) {
+							auto id = level->GetIdFromName(name);
+							return level->GetSceneNodeMap().at(id);
+						}
+						return nullptr;
+					};
 				std::shared_ptr<NodeStaticMesh> ptr = 
-					std::make_shared<NodeStaticMesh>(mesh_id, material_id);
+					std::make_shared<NodeStaticMesh>(
+						func, 
+						mesh_id, 
+						material_id);
 				ptr->SetName(proto_scene_static_mesh.name());
 				ptr->SetParentName(proto_scene_static_mesh.parent());
 				std::vector<std::shared_ptr<NodeStaticMesh>> vec = { ptr };

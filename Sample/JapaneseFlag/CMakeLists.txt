@@ -4,6 +4,7 @@ add_executable(JapaneseFlag
   WIN32
     ../../Asset/Json/JapaneseFlag.Program.json
     ../../Asset/Json/JapaneseFlag.Level.json
+    ../../Asset/Json/JapaneseFlag.Material.json
     ../../Asset/Json/JapaneseFlag.Scene.json
     ../../Asset/Json/JapaneseFlag.Texture.json
     Name.h

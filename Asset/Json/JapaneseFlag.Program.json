@@ -1,7 +1,7 @@
 {
   "programs": [
     {
-      "name": "JapaneseFlagEffect",
+      "name": "JapaneseFlagProgram",
       "output_texture_names": "billboard",
       "input_scene_type": { "value": "QUAD" },
       "shader": "JapaneseFlag",

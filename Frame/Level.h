@@ -7,6 +7,16 @@
 
 namespace frame {
 
+	enum class EntityTypeEnum : std::uint8_t {
+		UNKNOWN						= 0,
+		NODE						= 1,
+		TEXTURE						= 2,
+		PROGRAM						= 3,
+		MATERIAL					= 4,
+		BUFFER						= 5,
+		STATIC_MESH					= 6,
+	};
+
 	class Level : public LevelInterface
 	{
 	public:
@@ -151,6 +161,7 @@ namespace frame {
 			id_static_mesh_map_ = {};
 		std::unordered_map<std::string, EntityId> name_id_map_ = {};
 		std::unordered_map<EntityId, std::string> id_name_map_ = {};
+		std::unordered_map<EntityId, EntityTypeEnum> id_enum_map_ = {};
 	};
 
 } // End namespace frame.
