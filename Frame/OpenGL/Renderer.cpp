@@ -25,6 +25,7 @@ namespace frame::opengl {
 		auto program = file::LoadProgram("Display");
 		if (!program)
 			throw std::runtime_error("No program!");
+		program->SetDepthTest(false);
 		auto material = std::make_shared<Material>();
 		display_program_id_ = level_->AddProgram("DisplayProgram", program);
 		if (!level_) 
@@ -84,8 +85,8 @@ namespace frame::opengl {
 		auto program = level_->GetProgramMap().at(program_id);
 		if (!program)
 			throw std::runtime_error("Program ptr doesn't exist.");
-		
 		assert(program->GetOutputTextureIds().size());
+		SetDepthTest(program->GetDepthTest());
 		program->Use(uniform_interface_);
 		auto texture_out_ids = program->GetOutputTextureIds();
 		auto texture_ref = 
@@ -158,6 +159,7 @@ namespace frame::opengl {
 			level_->GetDefaultStaticMeshQuadId());
 		quad->SetMaterialId(display_material_id_);
 		auto program = level_->GetProgramMap().at(display_program_id_);
+		SetDepthTest(program->GetDepthTest());
 		program->Use(uniform_interface_);
 		auto material = level_->GetMaterialMap().at(display_material_id_);
 
@@ -191,6 +193,20 @@ namespace frame::opengl {
 		}
 		material->DisableAll();
 		quad->SetMaterialId(0);
+	}
+
+	void Renderer::SetDepthTest(bool enable) const
+	{
+		if (enable)
+		{
+			glEnable(GL_DEPTH_TEST);
+			error_.Display(__FILE__, __LINE__ - 1);
+		}
+		else
+		{
+			glDisable(GL_DEPTH_TEST);
+			error_.Display(__FILE__, __LINE__ - 1);
+		}
 	}
 
 } // End namespace frame::opengl.

@@ -7,7 +7,7 @@
 namespace frame {
 
 	// Create an instance of the window in SDL using OpenGL.
-	std::shared_ptr<WindowInterface> CreateSDLOpenGL(
+	std::unique_ptr<WindowInterface> CreateSDLOpenGL(
 		std::pair<std::uint32_t, std::uint32_t> size);
 
 } // End namespace frame.

@@ -44,6 +44,7 @@ namespace frame::opengl {
 		void RenderFromRootNode(const double dt = 0.0);
 		// Display the default texture to the screen.
 		void Display();
+		void SetDepthTest(bool enable) const;
 
 	private:
 		// Level shared_ptr.

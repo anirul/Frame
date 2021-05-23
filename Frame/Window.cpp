@@ -31,7 +31,7 @@ namespace frame {
 					SDL_WINDOWPOS_CENTERED,
 					size_.first,
 					size_.second,
-					SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
+					SDL_WINDOW_OPENGL);
 				if (!sdl_window_)
 				{
 					throw std::runtime_error(
@@ -244,8 +244,7 @@ namespace frame {
 			frame::Logger& logger_ = frame::Logger::GetInstance();
 		};
 
-		void* InitSDLOpenGLDevice(
-			const std::shared_ptr<WindowInterface>& window)
+		void* InitSDLOpenGLDevice(const WindowInterface* window)
 		{
 			std::pair<int, int> gl_version;
 			frame::Logger& logger = frame::Logger::GetInstance();
@@ -298,11 +297,11 @@ namespace frame {
 
 	} // End namespace.
 
-	std::shared_ptr<WindowInterface> CreateSDLOpenGL(
+	std::unique_ptr<WindowInterface> CreateSDLOpenGL(
 		std::pair<std::uint32_t, std::uint32_t> size)
 	{
-		auto window = std::make_shared<SDLOpenGLWindow>(size);
-		auto context = InitSDLOpenGLDevice(window);
+		auto window = std::make_unique<SDLOpenGLWindow>(size);
+		auto context = InitSDLOpenGLDevice(window.get());
 		if (!context) return nullptr;
 		auto device = std::make_shared<opengl::Device>(context, size);
 		window->SetUniqueDevice(device);
