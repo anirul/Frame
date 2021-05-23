@@ -148,18 +148,4 @@ namespace frame::opengl {
 		return scene_camera->GetCamera();
 	}
 
-	void Device::SetDepthTest(bool enable)
-	{
-		if (enable)
-		{
-			glEnable(GL_DEPTH_TEST);
-			error_.Display(__FILE__, __LINE__ - 1);
-		}
-		else
-		{
-			glDisable(GL_DEPTH_TEST);
-			error_.Display(__FILE__, __LINE__ - 1);
-		}
-	}
-
 } // End namespace frame::opengl.

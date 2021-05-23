@@ -39,8 +39,6 @@ namespace frame::opengl {
 		void Cleanup() final;
 		// Display the output texture to the display.
 		void Display(const double dt) final;
-		// Set the depth test.
-		void SetDepthTest(bool enable) final;
 		// Some implementation from in heritage.
 		const glm::vec3 GetCameraFront() const final;
 		const glm::vec3 GetCameraRight() const final;
