@@ -1,7 +1,7 @@
 {
   "programs": [
     {
-      "name": "RayMarchingEffect",
+      "name": "RayMarchingProgram",
       "output_texture_names": "billboard",
       "input_scene_type": { "value": "QUAD" },
       "shader": "RayMarching",

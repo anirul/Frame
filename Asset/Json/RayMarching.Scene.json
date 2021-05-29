@@ -33,5 +33,13 @@
         "z": "0"
       }
     }
+  ],
+  "scene_static_meshes": [
+    {
+      "name": "RayMarchingRendering",
+      "parent": "root",
+      "mesh_enum": "QUAD",
+      "material_name": "RayMarchingMaterial"
+    }
   ]
 }

@@ -48,7 +48,8 @@
     {
       "name": "apple",
       "parent": "mesh_holder",
-      "file_name": "Apple.obj"
+      "file_name": "Apple.obj",
+      "material_name": "SimpleMaterial"
     }
   ],
   "scene_cameras": [

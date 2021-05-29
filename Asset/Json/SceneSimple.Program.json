@@ -1,7 +1,7 @@
 {
   "programs": [
     {
-      "name": "CubeMap",
+      "name": "CubeMapProgram",
       "input_texture_names": "skybox",
       "output_texture_names": "albedo",
       "input_scene_type": { "value": "CUBE" },
@@ -23,7 +23,7 @@
       ]
     },
     {
-      "name": "apple",
+      "name": "SceneSimpleProgram",
       "output_texture_names": [
         "albedo",
         "zbuffer"

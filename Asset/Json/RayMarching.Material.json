@@ -1,8 +1,8 @@
 {
   "materials": [
     {
-      "name": "JapaneseFlagMaterial",
-      "program_name": "JapaneseFlagProgram",
+      "name": "RayMarchingMaterial",
+      "program_name": "RayMarchingProgram",
       "texture_names": [],
       "inner_names": []
     }

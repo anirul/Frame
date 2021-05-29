@@ -36,10 +36,10 @@
   ],
   "scene_static_meshes": [
     {
-      "name": "japanese_flag_rendering",
+      "name": "JapaneseFlagRendering",
       "parent": "root",
       "mesh_enum": "QUAD",
-      "material_name": "JapaneseFlagEffect"
+      "material_name": "JapaneseFlagMaterial"
     }
   ]
 }

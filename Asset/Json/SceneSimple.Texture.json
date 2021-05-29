@@ -31,16 +31,13 @@
     },
     {
       "name": "albedo",
+      "cubemap": "false",
       "size": {
         "x": "-1",
         "y": "-1"
       },
-      "pixel_element_size": {
-        "value": "BYTE"
-      },
-      "pixel_structure": {
-        "value": "RGB"
-      },
+      "pixel_element_size": { "value": "BYTE" },
+      "pixel_structure": { "value": "RGB" },
       "min_filter": "LINEAR",
       "mag_filter": "LINEAR",
       "wrap_s": "CLAMP_TO_EDGE",
@@ -48,16 +45,13 @@
     },
     {
       "name": "zbuffer",
+      "cubemap": "false",
       "size": {
         "x": "-1",
         "y": "-1"
       },
-      "pixel_element_size": {
-        "value": "BYTE"
-      },
-      "pixel_structure": {
-        "value": "RGB"
-      },
+      "pixel_element_size": { "value": "BYTE" },
+      "pixel_structure": { "value": "RGB" },
       "min_filter": "LINEAR",
       "mag_filter": "LINEAR",
       "wrap_s": "CLAMP_TO_EDGE",
