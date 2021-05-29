@@ -1,0 +1,16 @@
+{
+	"name": "frame",
+	"version-string": "1.0",
+	"dependencies": [
+		"glm",
+		"grpc",
+		"glew",
+		"gtest",
+		"opengl",
+		"protobuf",
+		"spdlog",
+		"stb",
+		"sdl2",
+		"tinyobjloader"
+	]
+}
