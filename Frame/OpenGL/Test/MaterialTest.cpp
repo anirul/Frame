@@ -29,8 +29,8 @@ namespace test {
 			frame::file::FindDirectory("Asset") + "/CubeMap/PositiveX.png");
 		auto texture2 = frame::opengl::file::LoadTextureFromFile(
 			frame::file::FindDirectory("Asset") + "/CubeMap/PositiveY.png");
-		auto id1 = level->AddTexture("PositiveX", texture1);
-		auto id2 = level->AddTexture("PositiveY", texture2);
+		auto id1 = level->AddTexture("PositiveX", std::move(texture1));
+		auto id2 = level->AddTexture("PositiveY", std::move(texture2));
 		std::uint64_t id_false = 0;
 		material_->AddTextureId(id1, "PositiveX");
 		material_->AddTextureId(id2, "PositiveY");

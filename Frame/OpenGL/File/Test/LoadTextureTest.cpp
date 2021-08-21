@@ -9,9 +9,8 @@ namespace test {
 	TEST_F(LoadTextureTest, LoadTextureFromFloatTest)
 	{
 		const frame::Error& error = frame::Error::GetInstance();
-		std::shared_ptr<frame::TextureInterface> texture = nullptr;
-		ASSERT_FALSE(texture);
-		texture = frame::opengl::file::LoadTextureFromFloat(0.1f);
+		std::unique_ptr<frame::TextureInterface> texture = 
+			frame::opengl::file::LoadTextureFromFloat(0.1f);
 		EXPECT_TRUE(texture);
 		EXPECT_EQ(1, texture->GetSize().first);
 		EXPECT_EQ(1, texture->GetSize().second);
@@ -28,45 +27,39 @@ namespace test {
 	TEST_F(LoadTextureTest, LoadTextureFromVec4Test)
 	{
 		const frame::Error& error = frame::Error::GetInstance();
-		std::shared_ptr<frame::opengl::Texture> texture = nullptr;
-		ASSERT_FALSE(texture);
-		texture = std::dynamic_pointer_cast<frame::opengl::Texture>(
-				frame::opengl::file::LoadTextureFromVec4(
-					glm::vec4(0.1f, 0.2f, 0.3f, 0.4f)));
+		std::unique_ptr<frame::TextureInterface> texture = 
+			frame::opengl::file::LoadTextureFromVec4(
+				glm::vec4(0.1f, 0.2f, 0.3f, 0.4f));
 		EXPECT_TRUE(texture);
 		EXPECT_EQ(1, texture->GetSize().first);
 		EXPECT_EQ(1, texture->GetSize().second);
-		std::vector<float> v4(4, 0.0f);
-		texture->GetTexture(v4.data());
-		EXPECT_FLOAT_EQ(0.1f, v4[0]);
-		EXPECT_FLOAT_EQ(0.2f, v4[1]);
-		EXPECT_FLOAT_EQ(0.3f, v4[2]);
-		EXPECT_FLOAT_EQ(0.4f, v4[3]);
+		std::vector<std::any> v4 = texture->GetTexture();
+		EXPECT_EQ(4, v4.size());
+		EXPECT_FLOAT_EQ(0.1f, std::any_cast<float>(v4[0]));
+		EXPECT_FLOAT_EQ(0.2f, std::any_cast<float>(v4[1]));
+		EXPECT_FLOAT_EQ(0.3f, std::any_cast<float>(v4[2]));
+		EXPECT_FLOAT_EQ(0.4f, std::any_cast<float>(v4[3]));
 	}
 
 	TEST_F(LoadTextureTest, LoadTextureFromFileTest)
 	{
 		const frame::Error& error = frame::Error::GetInstance();
-		std::shared_ptr<frame::opengl::Texture> texture = nullptr;
-		ASSERT_FALSE(texture);
-		texture = std::dynamic_pointer_cast<frame::opengl::Texture>(
+		std::shared_ptr<frame::TextureInterface> texture = 
 				frame::opengl::file::LoadTextureFromFile(
 					frame::file::FindFile("Asset/CubeMap/PositiveX.png"),
 					frame::proto::PixelElementSize_BYTE(),
-					frame::proto::PixelStructure_RGB()));
+					frame::proto::PixelStructure_RGB());
 		EXPECT_TRUE(texture);
 		EXPECT_EQ(1024, texture->GetSize().first);
 		EXPECT_EQ(1024, texture->GetSize().second);
 		const std::size_t image_size = 
 			static_cast<std::size_t>(texture->GetSize().first) * 
 			static_cast<std::size_t>(texture->GetSize().second) * 
-			static_cast<std::size_t>(texture->GetPixelStructure().value());
-		std::vector<std::uint8_t> vec(image_size, 0);
-		texture->GetTexture(vec.data());
-		int position = 0;
+			static_cast<std::size_t>(texture->GetPixelStructure());
+		std::vector<std::any> vec = texture->GetTexture();
 		for (int position = 0; position < image_size; position += 1025 * 2) {
-			EXPECT_GE(0xff, vec[position]);
-			EXPECT_LE(0x4e, vec[position]);
+			EXPECT_GE(0xff, std::any_cast<std::uint8_t>(vec[position]));
+			EXPECT_LE(0x4e, std::any_cast<std::uint8_t>(vec[position]));
 		}
 	}
 
@@ -76,9 +69,7 @@ namespace test {
 	TEST_F(LoadTextureTest, LoadCubeMapFromFilesTest)
 	{
 		const frame::Error& error = frame::Error::GetInstance();
-		std::shared_ptr<frame::opengl::TextureCubeMap> texture = nullptr;
-		ASSERT_FALSE(texture);
-		texture = std::dynamic_pointer_cast<frame::opengl::TextureCubeMap>(
+		std::unique_ptr<frame::TextureInterface> texture =
 			frame::opengl::file::LoadCubeMapTextureFromFiles(
 				{ 
 					frame::file::FindFile("Asset/CubeMap/PositiveX.png"),
@@ -89,7 +80,7 @@ namespace test {
 					frame::file::FindFile("Asset/CubeMap/NegativeZ.png")
 				},
 				frame::proto::PixelElementSize_BYTE(),
-				frame::proto::PixelStructure_RGB()));
+				frame::proto::PixelStructure_RGB());
 		EXPECT_TRUE(texture);
 		EXPECT_EQ(1024, texture->GetSize().first);
 		EXPECT_EQ(1024, texture->GetSize().second);
@@ -98,31 +89,15 @@ namespace test {
 		const std::size_t image_size = 
 			static_cast<std::size_t>(texture->GetSize().first) *
 			static_cast<std::size_t>(texture->GetSize().second) *
-			static_cast<std::size_t>(texture->GetPixelStructure().value());
-		std::array<std::vector<std::uint8_t>, 6> arr_vec = { 
-			std::vector<std::uint8_t>(image_size, 0),
-			std::vector<std::uint8_t>(image_size, 0),
-			std::vector<std::uint8_t>(image_size, 0),
-			std::vector<std::uint8_t>(image_size, 0),
-			std::vector<std::uint8_t>(image_size, 0),
-			std::vector<std::uint8_t>(image_size, 0)
-		};
-		std::array<void*, 6> arr_ptr = { 
-			arr_vec[0].data(),
-			arr_vec[1].data(),
-			arr_vec[2].data(),
-			arr_vec[3].data(),
-			arr_vec[4].data(),
-			arr_vec[5].data()
-		};
-		texture->GetTextureCubeMap(arr_ptr);
-		for (const auto vec : arr_vec)
+			static_cast<std::size_t>(texture->GetPixelStructure());
+		for (const auto direction : {0, 1, 2, 3, 4, 5})
 		{
-			int position = 0;
+			std::vector<std::any> any_vec;
+			any_vec = texture->GetTexture(direction);
 			for (int position = 0; position < image_size; position += 1025 * 5)
 			{
-				EXPECT_GE(0xff, vec[position]);
-				EXPECT_LE(0x45, vec[position]);
+				EXPECT_GE(0xff, std::any_cast<std::uint8_t>(any_vec[position]));
+				EXPECT_LE(0x45, std::any_cast<std::uint8_t>(any_vec[position]));
 			}
 		}
 	}

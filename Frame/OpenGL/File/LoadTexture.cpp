@@ -17,32 +17,33 @@ namespace frame::opengl::file {
 
 	}
 
-	std::shared_ptr<frame::TextureInterface> LoadTextureFromFile(
+	std::unique_ptr<frame::TextureInterface> LoadTextureFromFile(
 		const std::string& file, 
 		const proto::PixelElementSize pixel_element_size 
 			/*= proto::PixelElementSize_BYTE()*/, 
 		const proto::PixelStructure pixel_structure 
 			/*= proto::PixelStructure_RGB()*/)
 	{
-		std::shared_ptr<TextureInterface> texture = nullptr;
 		frame::file::Image image(file, pixel_element_size, pixel_structure);
 		std::string extention = file.substr(file.find_last_of(".") + 1);
 		if (cube_map_half_extention.count(extention))
 		{
-			throw std::runtime_error("Not implemented yet!");
+			return LoadCubeMapTextureFromFile(
+				file, 
+				pixel_element_size, 
+				pixel_structure);
 		}
 		else
 		{
-			texture = std::make_shared<frame::opengl::Texture>(
+			return std::make_unique<frame::opengl::Texture>(
 				image.GetSize(),
 				image.Data(),
 				pixel_element_size,
 				pixel_structure);
 		}
-		return texture;
 	}
 
-	std::shared_ptr<frame::TextureInterface> LoadCubeMapTextureFromFile(
+	std::unique_ptr<frame::TextureInterface> LoadCubeMapTextureFromFile(
 		const std::string& file, 
 		const proto::PixelElementSize pixel_element_size 
 			/*= proto::PixelElementSize_BYTE()*/, 
@@ -52,7 +53,7 @@ namespace frame::opengl::file {
 		throw std::runtime_error("Not implemented!");
 	}
 
-	std::shared_ptr<frame::TextureInterface> LoadCubeMapTextureFromFiles(
+	std::unique_ptr<frame::TextureInterface> LoadCubeMapTextureFromFiles(
 		const std::array<std::string, 6> files, 
 		const proto::PixelElementSize pixel_element_size 
 			/*= proto::PixelElementSize_BYTE()*/, 
@@ -76,7 +77,7 @@ namespace frame::opengl::file {
 			pointers[i] = images[i]->Data();
 		}
 		img_size = images[0]->GetSize();
-		return std::make_shared<opengl::TextureCubeMap>(
+		return std::make_unique<opengl::TextureCubeMap>(
 			img_size,
 			pointers,
 			pixel_element_size,
@@ -84,20 +85,20 @@ namespace frame::opengl::file {
 	}
 
 
-	std::shared_ptr<TextureInterface> LoadTextureFromVec4(
+	std::unique_ptr<TextureInterface> LoadTextureFromVec4(
 		const glm::vec4& vec4)
 	{
 		std::array<float, 4> ar = { vec4.x,	vec4.y,	vec4.z,	vec4.w };
-		return std::make_shared<frame::opengl::Texture>(
+		return std::make_unique<frame::opengl::Texture>(
 			std::make_pair<std::uint32_t, std::uint32_t>(1, 1),
 			ar.data(),
 			frame::proto::PixelElementSize_FLOAT(),
 			frame::proto::PixelStructure_RGB_ALPHA());
 	}
 
-	std::shared_ptr<TextureInterface> LoadTextureFromFloat(float f)
+	std::unique_ptr<TextureInterface> LoadTextureFromFloat(float f)
 	{
-		return std::make_shared<frame::opengl::Texture>(
+		return std::make_unique<frame::opengl::Texture>(
 			std::make_pair<std::uint32_t, std::uint32_t>(1, 1),
 			&f,
 			frame::proto::PixelElementSize_FLOAT(),

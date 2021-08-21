@@ -1,5 +1,6 @@
 #pragma once
 
+#include <any>
 #include <cinttypes>
 #include <utility>
 #include <glm/glm.hpp>
@@ -13,7 +14,11 @@ namespace frame {
 	{
 		// Texture filter rename.
 		using TextureFilterEnum = frame::proto::Texture::TextureFilterEnum;
+		using PixelElementSizeEnum = frame::proto::PixelElementSize::Enum;
+		using PixelStructureEnum = frame::proto::PixelStructure::Enum;
 		// Common interface.
+		virtual PixelStructureEnum GetPixelStructure() const = 0;
+		virtual PixelElementSizeEnum GetPixelElementSize() const = 0;
 		virtual std::pair<std::uint32_t, std::uint32_t> GetSize() const = 0;
 		virtual void EnableMipmap() const = 0;
 		virtual void SetMinFilter(const TextureFilterEnum texture_filter) = 0;
@@ -34,6 +39,8 @@ namespace frame {
 		}
 		virtual void Clear(const glm::vec4 color) = 0;
 		virtual bool IsCubeMap() const = 0;
+		virtual std::vector<std::any> GetTexture() const = 0;
+		virtual std::vector<std::any> GetTexture(int i) const = 0;
 	};
 
 } // End namespace frame.

@@ -51,8 +51,14 @@ namespace frame::opengl {
 		// Bind and unbind a texture to the current context.
 		void Bind(const unsigned int slot = 0) const override;
 		void UnBind() const override;
+		std::vector<std::any> GetTexture() const override;
+		// Get a copy of the texture output, i is the texture number in case of
+		// a cube map (check IsCubeMap).
+		std::vector<std::any> GetTexture(int i) const override;
 		// Clear the texture.
 		void Clear(const glm::vec4 color) override;
+
+	public:
 		// Virtual part.
 		virtual void EnableMipmap() const override;
 		virtual void SetMinFilter(
@@ -66,7 +72,6 @@ namespace frame::opengl {
 		virtual TextureFilterEnum GetWrapS() const override;
 		virtual void SetWrapT(const TextureFilterEnum texture_filter) override;
 		virtual TextureFilterEnum GetWrapT() const override;
-		void GetTexture(void* p);
 
 	public:
 		virtual bool IsCubeMap() const override { return false; }
@@ -75,13 +80,13 @@ namespace frame::opengl {
 		{ 
 			return size_; 
 		}
-		const frame::proto::PixelElementSize GetPixelElementSize() const
+		proto::PixelElementSize::Enum GetPixelElementSize() const override
 		{
-			return pixel_element_size_; 
+			return pixel_element_size_.value(); 
 		}
-		const frame::proto::PixelStructure GetPixelStructure() const
+		proto::PixelStructure::Enum GetPixelStructure() const override
 		{
-			return pixel_structure_;
+			return pixel_structure_.value();
 		}
 
 	protected:
@@ -145,7 +150,6 @@ namespace frame::opengl {
 		TextureFilterEnum GetWrapT() const override;
 		void SetWrapR(const TextureFilterEnum texture_filter) override;
 		TextureFilterEnum GetWrapR() const override;
-		void GetTextureCubeMap(std::array<void*, 6>& arr);
 
 	public:
 		bool IsCubeMap() const override { return true; }

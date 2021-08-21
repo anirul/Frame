@@ -496,39 +496,71 @@ namespace frame::opengl {
 			"invalid texture filter : " + std::to_string(gl_filter));
 	}
 
-	void Texture::GetTexture(void* p)
+	std::vector<std::any> Texture::GetTexture() const 
 	{
-		assert(!IsCubeMap());
+		return GetTexture(0);
+	}
+
+	std::vector<std::any> Texture::GetTexture(int i) const
+	{
 		Bind();
 		// glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 		// error_.Display(__FILE__, __LINE__ - 1);
 		auto format = opengl::ConvertToGLType(pixel_structure_);
 		auto type = opengl::ConvertToGLType(pixel_element_size_);
-		glGetTexImage(GL_TEXTURE_2D, 0, format, type, p);
-		error_.Display(__FILE__, __LINE__ - 1);
-		UnBind();
-	}
-
-	void TextureCubeMap::GetTextureCubeMap(std::array<void*, 6>& arr)
-	{
-		assert(IsCubeMap());
-		Bind();
-		// glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-		// error_.Display(__FILE__, __LINE__ - 1);
-		for (int i : {0, 1, 2, 3, 4, 5})
+		std::vector<std::any> any_vec = {};
+		auto size = GetSize();
+		std::size_t image_size = 
+			static_cast<std::size_t>(GetSize().first) * 
+			static_cast<std::size_t>(GetSize().second) * 
+			static_cast<std::size_t>(GetPixelStructure());
+		any_vec.reserve(image_size);
+		short target = 
+			(IsCubeMap()) ? GL_TEXTURE_CUBE_MAP_POSITIVE_X + i : GL_TEXTURE_2D;
+		switch (GetPixelStructure()) 
 		{
-			auto format = opengl::ConvertToGLType(pixel_structure_);
-			auto type = opengl::ConvertToGLType(pixel_element_size_);
-			glGetTexImage(
-				GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 
-				0, 
-				format, 
-				type, 
-				arr[i]);
-			error_.Display(__FILE__, __LINE__ - 1);
+			case proto::PixelElementSize::BYTE:
+			{
+				std::vector<std::byte> byte_vec;
+				byte_vec.resize(image_size);
+				glGetTexImage(target, 0, format, type, byte_vec.data());
+				error_.Display(__FILE__, __LINE__ - 1);
+				any_vec.assign(byte_vec.begin(), byte_vec.end());
+			}
+			break;
+			case proto::PixelElementSize::SHORT:
+			{
+				std::vector<std::uint16_t> short_vec;
+				short_vec.resize(image_size);
+				glGetTexImage(target, 0, format, type, short_vec.data());
+				error_.Display(__FILE__, __LINE__ -1);
+				any_vec.assign(short_vec.begin(), short_vec.end());
+			}
+			break;
+			case proto::PixelElementSize::HALF:
+			{
+				// TODO(anirul) change me to use half when available.
+				std::vector<std::uint64_t> half_vec;
+				half_vec.resize(image_size);
+				glGetTexImage(target, 0, format, type, half_vec.data());
+				error_.Display(__FILE__, __LINE__ - 1);
+				any_vec.assign(half_vec.begin(), half_vec.end());
+			}
+			break;
+			case proto::PixelElementSize::FLOAT:
+			{
+				std::vector<float> float_vec;
+				float_vec.resize(image_size);
+				glGetTexImage(target, 0, format, type, float_vec.data());
+				error_.Display(__FILE__, __LINE__ - 1);
+				any_vec.assign(float_vec.begin(), float_vec.end());
+			}
+			break;
+			default:
+				throw std::runtime_error("Unknown pixel structure.");
 		}
 		UnBind();
+		return any_vec;
 	}
-
 
 } // End namespace frame::opengl.

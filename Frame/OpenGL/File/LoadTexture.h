@@ -11,12 +11,12 @@
 namespace frame::opengl::file {
 
 
-	std::shared_ptr<TextureInterface> LoadTextureFromVec4(
+	std::unique_ptr<TextureInterface> LoadTextureFromVec4(
 		const glm::vec4& vec4);
 
-	std::shared_ptr<TextureInterface> LoadTextureFromFloat(float f);
+	std::unique_ptr<TextureInterface> LoadTextureFromFloat(float f);
 
-	std::shared_ptr<TextureInterface> LoadTextureFromFile(
+	std::unique_ptr<TextureInterface> LoadTextureFromFile(
 		const std::string& file,
 		const proto::PixelElementSize pixel_element_size =
 			proto::PixelElementSize_BYTE(),
@@ -24,14 +24,14 @@ namespace frame::opengl::file {
 			proto::PixelStructure_RGB());
 
 	// Not implemented yet!
-	std::shared_ptr<TextureInterface> LoadCubeMapTextureFromFile(
+	std::unique_ptr<TextureInterface> LoadCubeMapTextureFromFile(
 		const std::string& file,
 		const proto::PixelElementSize pixel_element_size =
 			proto::PixelElementSize_BYTE(),
 		const proto::PixelStructure pixel_structure =
 			proto::PixelStructure_RGB());
 
-	std::shared_ptr<TextureInterface> LoadCubeMapTextureFromFiles(
+	std::unique_ptr<TextureInterface> LoadCubeMapTextureFromFiles(
 		const std::array<std::string, 6> files,
 		const proto::PixelElementSize pixel_element_size =
 			proto::PixelElementSize_BYTE(),
