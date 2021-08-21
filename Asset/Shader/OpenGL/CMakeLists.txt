@@ -43,3 +43,5 @@ add_custom_target(AssetShaderOpenGL
     ViewPositionNormal.frag
     ViewPositionNormal.vert
 )
+
+set_property(TARGET AssetShaderOpenGL PROPERTY FOLDER "Asset/Shader")

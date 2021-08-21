@@ -49,4 +49,6 @@ target_link_libraries(FrameProto
     protobuf::libprotobuf
 )
 
+set_property(TARGET FrameProto PROPERTY FOLDER "Frame")
+
 add_subdirectory(Test)

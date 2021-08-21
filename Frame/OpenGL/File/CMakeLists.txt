@@ -26,4 +26,6 @@ target_link_libraries(FrameOpenGLFile
 	FrameOpenGL
 )
 
+set_property(TARGET FrameOpenGLFile PROPERTY FOLDER "Frame/OpenGL")
+
 add_subdirectory(Test)

@@ -1,17 +1,20 @@
 cmake_minimum_required(VERSION 3.20)
 
+project(Frame)
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-if(UNIX AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
-    if(NOT DEFINED VCPKG_TARGET_TRIPLET)
+if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+    if(UNIX AND NOT DEFINED VCPKG_TARGET_TRIPLET)
         set(VCPKG_TARGET_TRIPLET x64-linux)
+    endif()
+    if(WIN32 AND NOT DEFINED VCPKG_TARGET_TRIPLET)
+        set(VCPKG_TARGET_TRIPLET x64-windows)
     endif()
     include("~/Documents/GitHub/vcpkg/scripts/buildsystems/vcpkg.cmake")
 endif()
 
-project(Frame)
-
-find_package(absl CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
 find_package(gRPC CONFIG REQUIRED)
 find_package(GLEW REQUIRED)

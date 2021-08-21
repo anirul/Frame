@@ -53,6 +53,9 @@ target_link_libraries(Frame
     glm::glm
 )
 
+
+set_property(TARGET Frame PROPERTY FOLDER "Frame")
+
 add_subdirectory(File)
 add_subdirectory(OpenGL)
 add_subdirectory(Proto)

@@ -35,3 +35,5 @@ target_link_libraries(FrameProtoTest
     GTest::gmock
     GTest::gtest
 )
+
+set_property(TARGET FrameProtoTest PROPERTY FOLDER "Frame")

@@ -21,3 +21,5 @@ target_link_libraries(SampleCommon
 	FrameProto
 	FrameOpenGL
 )
+
+set_property(TARGET SampleCommon PROPERTY FOLDER "Sample")

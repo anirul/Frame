@@ -9,11 +9,11 @@ namespace test {
 	TEST_F(TextureTest, CreateTextureTest)
 	{
 		EXPECT_EQ(GLEW_OK, glewInit());
-		EXPECT_FALSE(texture_);
+		ASSERT_FALSE(texture_);
 		EXPECT_NO_THROW(
 			texture_ = frame::opengl::file::LoadTextureFromFile(
 				frame::file::FindFile("Asset/CubeMap/PositiveX.png")));
-		EXPECT_TRUE(texture_);
+		ASSERT_TRUE(texture_);
 	}
 
 	TEST_F(TextureTest, GetSizeTextureTest)
@@ -46,7 +46,7 @@ namespace test {
 	TEST_F(TextureTest, CreateCubeMapTextureTest)
 	{
 		EXPECT_EQ(GLEW_OK, glewInit());
-		EXPECT_FALSE(texture_);
+		ASSERT_FALSE(texture_);
 		EXPECT_NO_THROW(
 			texture_ = frame::opengl::file::LoadCubeMapTextureFromFiles(
 				std::array<std::string, 6>{
@@ -57,19 +57,19 @@ namespace test {
 					frame::file::FindFile("Asset/CubeMap/PositiveZ.png"),
 					frame::file::FindFile("Asset/CubeMap/NegativeZ.png") 
 					}));
-		EXPECT_TRUE(texture_);
+		ASSERT_TRUE(texture_);
 		EXPECT_NE(0, texture_->GetId());
 	}
 
 	TEST_F(TextureTest, CreateEquirectangularTextureTest)
 	{
 		EXPECT_EQ(GLEW_OK, glewInit());
-		EXPECT_FALSE(texture_);
+		ASSERT_FALSE(texture_);
 		EXPECT_NO_THROW(
 			texture_ = frame::opengl::file::LoadCubeMapTextureFromFile(
 				frame::file::FindFile("Asset/CubeMap/Hamarikyu.hdr"),
 				frame::proto::PixelElementSize_HALF()));
-		EXPECT_TRUE(texture_);
+		ASSERT_TRUE(texture_);
 		EXPECT_NE(0, texture_->GetId());
 	}
 

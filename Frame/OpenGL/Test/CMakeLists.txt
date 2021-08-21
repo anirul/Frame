@@ -45,3 +45,5 @@ target_link_libraries(FrameOpenGLTest
     GTest::gmock
     GTest::gtest
 )
+
+set_property(TARGET FrameOpenGLTest PROPERTY FOLDER "Frame/OpenGL")

@@ -47,5 +47,7 @@ target_link_libraries(FrameOpenGL
     GLEW::GLEW
 )
 
+set_property(TARGET FrameOpenGL PROPERTY FOLDER "Frame/OpenGL")
+
 add_subdirectory(Test)
 add_subdirectory(File)

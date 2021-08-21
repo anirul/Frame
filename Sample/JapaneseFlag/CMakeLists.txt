@@ -29,3 +29,5 @@ target_link_libraries(JapaneseFlag
     FrameProto
     SampleCommon
 )
+
+set_property(TARGET JapaneseFlag PROPERTY FOLDER "Sample")

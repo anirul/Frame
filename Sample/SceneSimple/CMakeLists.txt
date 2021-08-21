@@ -25,3 +25,5 @@ target_link_libraries(SceneSimple
     FrameProto
     SampleCommon
 )
+
+set_property(TARGET SceneSimple PROPERTY FOLDER "Sample")

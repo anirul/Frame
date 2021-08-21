@@ -13,6 +13,7 @@ namespace frame {
 
 	std::string Error::GetLastError() const
 	{
+		// FIXME(anirul): This should be in FrameOpenGL and not here.
 		switch (glGetError())
 		{
 		case GL_INVALID_ENUM:

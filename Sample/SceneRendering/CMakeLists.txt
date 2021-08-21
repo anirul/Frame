@@ -29,3 +29,5 @@ target_link_libraries(SceneRendering
     FrameProto
     spdlog::spdlog
 )
+
+set_property(TARGET SceneRendering PROPERTY FOLDER "Sample")

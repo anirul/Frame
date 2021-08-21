@@ -25,3 +25,5 @@ target_link_libraries(RayMarching
     FrameProto
     SampleCommon
 )
+
+set_property(TARGET RayMarching PROPERTY FOLDER "Sample")
