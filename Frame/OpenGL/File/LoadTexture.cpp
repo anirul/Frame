@@ -17,7 +17,8 @@ namespace frame::opengl::file {
 
 	}
 
-	std::unique_ptr<frame::TextureInterface> LoadTextureFromFile(
+	std::optional<std::unique_ptr<frame::TextureInterface>> 
+	LoadTextureFromFile(
 		const std::string& file, 
 		const proto::PixelElementSize pixel_element_size 
 			/*= proto::PixelElementSize_BYTE()*/, 
@@ -43,7 +44,8 @@ namespace frame::opengl::file {
 		}
 	}
 
-	std::unique_ptr<frame::TextureInterface> LoadCubeMapTextureFromFile(
+	std::optional<std::unique_ptr<frame::TextureInterface>> 
+	LoadCubeMapTextureFromFile(
 		const std::string& file, 
 		const proto::PixelElementSize pixel_element_size 
 			/*= proto::PixelElementSize_BYTE()*/, 
@@ -53,7 +55,8 @@ namespace frame::opengl::file {
 		throw std::runtime_error("Not implemented!");
 	}
 
-	std::unique_ptr<frame::TextureInterface> LoadCubeMapTextureFromFiles(
+	std::optional<std::unique_ptr<frame::TextureInterface>> 
+	LoadCubeMapTextureFromFiles(
 		const std::array<std::string, 6> files, 
 		const proto::PixelElementSize pixel_element_size 
 			/*= proto::PixelElementSize_BYTE()*/, 
@@ -85,7 +88,8 @@ namespace frame::opengl::file {
 	}
 
 
-	std::unique_ptr<TextureInterface> LoadTextureFromVec4(
+	std::optional<std::unique_ptr<TextureInterface>> 
+	LoadTextureFromVec4(
 		const glm::vec4& vec4)
 	{
 		std::array<float, 4> ar = { vec4.x,	vec4.y,	vec4.z,	vec4.w };
@@ -96,7 +100,8 @@ namespace frame::opengl::file {
 			frame::proto::PixelStructure_RGB_ALPHA());
 	}
 
-	std::unique_ptr<TextureInterface> LoadTextureFromFloat(float f)
+	std::optional<std::unique_ptr<TextureInterface>> 
+	LoadTextureFromFloat(float f)
 	{
 		return std::make_unique<frame::opengl::Texture>(
 			std::make_pair<std::uint32_t, std::uint32_t>(1, 1),
@@ -104,6 +109,5 @@ namespace frame::opengl::file {
 			frame::proto::PixelElementSize_FLOAT(),
 			frame::proto::PixelStructure_GREY());
 	}
-
 
 } // End namespace frame::file.

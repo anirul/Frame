@@ -5,28 +5,24 @@
 #include <vector>
 #include <string>
 #include <glm/glm.hpp>
+#include "Frame/NameInterface.h"
 #include "Frame/StaticMeshInterface.h"
 
 namespace frame {
 
 	// Interface to visit the scene node.
-	struct NodeInterface
+	struct NodeInterface : public NameInterface
 	{
 	public:
-		// Redefinition for shortening.
-		using Ptr = std::shared_ptr<NodeInterface>;
-		using PtrVec = std::vector<std::shared_ptr<NodeInterface>>;
-
-	public:
 		// Get the local model of current node.
-		virtual const glm::mat4 GetLocalModel(double dt) const = 0;
+		virtual glm::mat4 GetLocalModel(double dt) const = 0;
 		// Get the local mesh of current node.
-		virtual const EntityId GetLocalMesh() const { return 0; }
+		virtual EntityId GetLocalMesh() const { return 0; }
 
 	public:
-		// Set a callback that will return a node according to a name. This
-		// should be set at the time the scene interface is set to a scene tree.
-		void SetCallback(std::function<Ptr(const std::string&)> func)
+		// Constructor for NodeInterface, it take a function as a parameter
+		// this function return the ID from a string (it will need a level).
+		NodeInterface(std::function<NodeInterface*(const std::string&)> func)
 		{
 			func_ = func;
 		}
@@ -37,14 +33,14 @@ namespace frame {
 		// Set the parent of a node.
 		void SetParentName(const std::string& parent) { parent_name_ = parent; }
 		// Getter for name.
-		const std::string GetName() const { return name_; }
+		std::string GetName() const override { return name_; }
 		// Setter for name.
-		void SetName(const std::string& name) { name_ = name; }
+		void SetName(const std::string& name) override { name_ = name; }
 
 	protected:
-		std::function<Ptr(const std::string&)> func_ =
+		std::function<NodeInterface*(const std::string&)> func_ =
 			[](const std::string) { return nullptr; };
-		std::string parent_name_;
+		std::string parent_name_ = "";
 		std::string name_ = "";
 	};
 

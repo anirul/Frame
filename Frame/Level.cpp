@@ -2,108 +2,178 @@
 
 namespace frame {
 
-	EntityId Level::AddSceneNode(
-		const std::string& name, 
-		std::shared_ptr<NodeInterface> scene_node)
+	std::optional<EntityId> Level::GetDefaultStaticMeshQuadId() const
 	{
-		if (string_set_.count(name))
-			throw std::runtime_error("Name: " + name + " is already in!");
+		if (quad_id_)
+		{
+			return quad_id_;
+		}
+		return std::nullopt;
+	}
+
+	std::optional<EntityId> Level::GetDefaultStaticMeshCubeId() const
+	{
+		if (cube_id_)
+		{
+			return cube_id_;
+		}
+		return std::nullopt;
+	}
+
+	std::optional<EntityId> Level::GetIdFromName(
+		const std::string& name) const
+	{
+		try 
+		{
+			return name_id_map_.at(name);
+		}
+		catch (std::out_of_range& ex)
+		{
+			return std::nullopt;
+		}
+	}
+
+	std::optional<std::string> Level::GetNameFromId(EntityId id) const
+	{
+		try
+		{
+			return id_name_map_.at(id);
+		}
+		catch (std::out_of_range& ex)
+		{
+			return std::nullopt;
+		}
+	}
+
+	std::optional<EntityId> Level::AddSceneNode(
+		std::unique_ptr<NodeInterface>&& scene_node)
+	{
 		EntityId id = GetSceneNodeNewId();
+		std::string name = scene_node->GetName();
+		// CHECKME(anirul): maybe this should return std::nullopt.
+		if (string_set_.count(name)) 
+			throw std::runtime_error("Name: " + name + " is already in!");
 		string_set_.insert(name);
-		id_scene_node_map_.insert({ id, scene_node });
+		id_scene_node_map_.insert({ id, std::move(scene_node) });
 		id_name_map_.insert({ id, name });
 		name_id_map_.insert({ name, id });
 		id_enum_map_.insert({ id, EntityTypeEnum::NODE });
 		return id;
 	}
 
-	EntityId Level::AddTexture(
-		const std::string& name,
-		std::shared_ptr<TextureInterface> texture)
+	std::optional<EntityId> Level::AddTexture(
+		std::unique_ptr<TextureInterface>&& texture)
 	{
+		EntityId id = GetTextureNewId();
+		std::string name = texture->GetName();
+		// CHECKME(anirul): maybe this should return std::nullopt.
 		if (string_set_.count(name))
 			throw std::runtime_error("Name: " + name + " is already in!");
-		EntityId id = GetTextureNewId();
 		string_set_.insert(name);
-		id_texture_map_.insert({ id, texture });
+		id_texture_map_.insert({ id, std::move(texture) });
 		id_name_map_.insert({ id, name });
 		name_id_map_.insert({ name, id });
 		id_enum_map_.insert({ id, EntityTypeEnum::TEXTURE });
 		return id;
 	}
 
-	EntityId Level::AddProgram(
-		const std::string& name,
-		std::shared_ptr<ProgramInterface> program)
+	std::optional<EntityId> Level::AddProgram(
+		std::unique_ptr<ProgramInterface>&& program)
 	{
+		EntityId id = GetProgramNewId();
+		std::string name = program->GetName();
+		// CHECKME(anirul): maybe this should return std::nullopt.
 		if (string_set_.count(name))
 			throw std::runtime_error("Name: " + name + " is already in!");
-		EntityId id = GetProgramNewId();
-		id_program_map_.insert({ id, program });
+		id_program_map_.insert({ id, std::move(program) });
 		id_name_map_.insert({ id, name });
 		name_id_map_.insert({ name, id });
 		id_enum_map_.insert({ id, EntityTypeEnum::PROGRAM });
 		return id;
 	}
 
-	EntityId Level::AddMaterial(
-		const std::string& name,
-		std::shared_ptr<MaterialInterface> material)
+	std::optional<EntityId> Level::AddMaterial(
+		std::unique_ptr<MaterialInterface>&& material)
 	{
+		EntityId id = GetMaterialNewId();
+		std::string name = material->GetName();
+		// CHECKME(anirul): maybe this should return std::nullopt.
 		if (string_set_.count(name))
 			throw std::runtime_error("Name: " + name + " is already in!");
-		EntityId id = GetMaterialNewId();
-		id_material_map_.insert({ id, material });
+		id_material_map_.insert({ id, std::move(material) });
 		id_name_map_.insert({ id, name });
 		name_id_map_.insert({ name, id });
 		id_enum_map_.insert({ id, EntityTypeEnum::MATERIAL });
 		return id;
 	}
 
-	EntityId Level::AddBuffer(
-		const std::string& name,
-		std::shared_ptr<BufferInterface> buffer)
+	std::optional<EntityId> Level::AddBuffer(
+		std::unique_ptr<BufferInterface>&& buffer)
 	{
+		EntityId id = GetBufferNewId();
+		std::string name = buffer->GetName();
+		// CHECKME(anirul): maybe this should return std::nullopt.
 		if (string_set_.count(name))
 			throw std::runtime_error("Name: " + name + " is already in!");
-		EntityId id = GetBufferNewId();
-		id_buffer_map_.insert({ id, buffer });
+		id_buffer_map_.insert({ id, std::move(buffer) });
 		id_name_map_.insert({ id, name });
 		name_id_map_.insert({ name, id });
 		id_enum_map_.insert({ id, EntityTypeEnum::BUFFER });
 		return id;
 	}
 
-	EntityId Level::AddStaticMesh(
-		const std::string& name,
-		std::shared_ptr<StaticMeshInterface> static_mesh)
+	std::optional<EntityId> Level::AddStaticMesh(
+		std::unique_ptr<StaticMeshInterface>&& static_mesh)
 	{
+		EntityId id = GetStaticMeshNewId();
+		std::string name = static_mesh->GetName();
+		// CHECKME(anirul): maybe this should return std::nullopt.
 		if (string_set_.count(name))
 			throw std::runtime_error("Name: " + name + " is already in!");
-		EntityId id = GetStaticMeshNewId();
-		id_static_mesh_map_.insert({ id, static_mesh });
+		id_static_mesh_map_.insert({ id, std::move(static_mesh) });
 		id_name_map_.insert({ id, name });
 		name_id_map_.insert({ name, id });
 		id_enum_map_.insert({ id, EntityTypeEnum::STATIC_MESH });
 		return id;
 	}
 
-	const std::vector<frame::EntityId> Level::GetChildList(EntityId id) const
+	std::optional<std::vector<frame::EntityId>> Level::GetChildList(
+		EntityId id) const
 	{
 		std::vector<EntityId> list;
-		// TODO(anirul): Should probably replace this by a find to throw a more
-		// TODO(anirul): explicit error.
-		const auto node = id_scene_node_map_.at(id);
-		// Check who has node as a parent.
-		for (const auto& id : id_scene_node_map_)
+		try 
 		{
-			// In case this is node then add it to the list.
-			if (id.second->GetParentName() == node->GetName())
+			const auto& node = id_scene_node_map_.at(id);
+			// Check who has node as a parent.
+			for (const auto& id_node : id_scene_node_map_)
 			{
-				list.push_back(id.first);
+				// In case this is node then add it to the list.
+				if (id_node.second->GetParentName() == node->GetName())
+				{
+					list.push_back(id_node.first);
+				}
 			}
 		}
+		catch (std::out_of_range& ex)
+		{
+			return std::nullopt;
+		}
 		return list;
+	}
+
+	std::optional<EntityId> Level::GetParentId(EntityId id) const
+	{
+		try
+		{
+			std::string name = id_scene_node_map_.at(id)->GetParentName();
+			auto maybe_id = GetIdFromName(name);
+			if (!maybe_id) return std::nullopt;
+			return maybe_id.value();
+		}
+		catch (std::out_of_range& ex)
+		{
+			return std::nullopt;
+		}
 	}
 
 } // End namespace frame.

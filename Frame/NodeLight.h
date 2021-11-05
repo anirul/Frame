@@ -17,15 +17,20 @@ namespace frame {
 	{
 	public:
 		// Create an ambient light.
-		NodeLight(const glm::vec3 color) :
+		NodeLight(
+			std::function<NodeInterface*(const std::string&)> func, 
+			const glm::vec3 color) :
+			NodeInterface(func),
 			light_type_(NodeLightEnum::AMBIENT), color_(color) {}
 		// Create a point or directional light.
 		NodeLight(
+			std::function<NodeInterface*(const std::string&)> func,
 			const frame::NodeLightEnum light_type,
 			const glm::vec3 position_or_direction,
 			const glm::vec3 color);
 		// Create a spot light.
 		NodeLight(
+			std::function<NodeInterface*(const std::string&)> func,
 			const glm::vec3 position,
 			const glm::vec3 direction,
 			const glm::vec3 color,
@@ -33,7 +38,7 @@ namespace frame {
 			const float dot_outer_limit);
 
 	public:
-		const glm::mat4 GetLocalModel(const double dt) const override;
+		glm::mat4 GetLocalModel(const double dt) const override;
 
 	public:
 		const NodeLightEnum GetType() const

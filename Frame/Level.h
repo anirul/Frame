@@ -8,68 +8,48 @@
 namespace frame {
 
 	enum class EntityTypeEnum : std::uint8_t {
-		UNKNOWN						= 0,
-		NODE						= 1,
-		TEXTURE						= 2,
-		PROGRAM						= 3,
-		MATERIAL					= 4,
-		BUFFER						= 5,
-		STATIC_MESH					= 6,
+		UNKNOWN		= 0,
+		NODE		= 1,
+		TEXTURE		= 2,
+		PROGRAM		= 3,
+		MATERIAL	= 4,
+		BUFFER		= 5,
+		STATIC_MESH	= 6,
 	};
 
 	class Level : public LevelInterface
 	{
 	public:
 		Level() = default;
-
-	public:
-		EntityId GetDefaultStaticMeshQuadId() const final { return quad_id_; }
 		void SetDefaultStaticMeshQuadId(EntityId id) final { quad_id_ = id; }
-		EntityId GetDefaultStaticMeshCubeId() const final { return cube_id_; }
 		void SetDefaultStaticMeshCubeId(EntityId id) final { cube_id_ = id; }
-
-	public:
-		const std::unordered_map<EntityId, std::shared_ptr<NodeInterface>>&
-			GetSceneNodeMap() const override
+		// Get Node from Id.
+		NodeInterface* GetSceneNodeFromId(EntityId id) const override
 		{
-			return id_scene_node_map_;
+			return id_scene_node_map_.at(id).get();
 		}
-		const std::unordered_map<EntityId, std::shared_ptr<TextureInterface>>&
-			GetTextureMap() const override
+		TextureInterface* GetTextureFromId(EntityId id) const override
 		{
-			return id_texture_map_;
+			return id_texture_map_.at(id).get();
 		}
-		const std::unordered_map<EntityId, std::shared_ptr<ProgramInterface>>&
-			GetProgramMap() const override
+		ProgramInterface* GetProgramFromId(EntityId id) const override
 		{
-			return id_program_map_;
+			return id_program_map_.at(id).get();
 		}
-		const std::unordered_map<EntityId, std::shared_ptr<MaterialInterface>>&
-			GetMaterialMap() const override
+		MaterialInterface* GetMaterialFromId(EntityId id) const override
 		{
-			return id_material_map_;
+			return id_material_map_.at(id).get();
 		}
-		const std::unordered_map<EntityId, std::shared_ptr<BufferInterface>>&
-			GetBufferMap() const override
+		BufferInterface* GetBufferFromId(EntityId id) const override
 		{
-			return id_buffer_map_;
+			return id_buffer_map_.at(id).get();
 		}
-		const std::unordered_map<
-			EntityId, 
-			std::shared_ptr<StaticMeshInterface>>&
-			GetStaticMeshMap() const override
+		StaticMeshInterface* GetStaticMeshFromId(
+			EntityId id) const override
 		{
-			return id_static_mesh_map_;
+			return id_static_mesh_map_.at(id).get();
 		}
-		EntityId GetIdFromName(const std::string& name) const override
-		{
-			return name_id_map_.at(name);
-		}
-		std::string GetNameFromId(EntityId id) const override
-		{
-			return id_name_map_.at(id);
-		}
-		EntityId GetDefaultOutputTextureId() const override
+		std::optional<EntityId> GetDefaultOutputTextureId() const override
 		{
 			return GetIdFromName(default_texture_name_);
 		}
@@ -77,7 +57,7 @@ namespace frame {
 		{
 			default_camera_name_ = name;
 		}
-		EntityId GetDefaultRootSceneNodeId() const override
+		std::optional<EntityId> GetDefaultRootSceneNodeId() const override
 		{
 			return GetIdFromName(default_root_scene_node_name_);
 		}
@@ -85,32 +65,33 @@ namespace frame {
 		{
 			default_root_scene_node_name_ = name;
 		}
-		EntityId GetDefaultCameraId() const override
+		std::optional<EntityId> GetDefaultCameraId() const override
 		{
 			assert(!default_camera_name_.empty());
 			return GetIdFromName(default_camera_name_);
 		}
 
 	public:
-		EntityId AddSceneNode(
-			const std::string& name,
-			std::shared_ptr<NodeInterface> scene_node) override;
-		EntityId AddTexture(
-			const std::string& name,
-			std::shared_ptr<TextureInterface> texture) override;
-		EntityId AddProgram(
-			const std::string& name,
-			std::shared_ptr<ProgramInterface> program) override;
-		EntityId AddMaterial(
-			const std::string& name,
-			std::shared_ptr<MaterialInterface> material) override;
-		EntityId AddBuffer(
-			const std::string& name,
-			std::shared_ptr<BufferInterface> buffer) override;
-		EntityId AddStaticMesh(
-			const std::string& name,
-			std::shared_ptr<StaticMeshInterface> static_mesh) override;
-		const std::vector<EntityId> GetChildList(EntityId id) const override;
+		std::optional<EntityId> GetDefaultStaticMeshQuadId() const final;
+		std::optional<EntityId> GetDefaultStaticMeshCubeId() const final;
+		std::optional<EntityId> GetIdFromName(
+			const std::string& name) const override;
+		std::optional<std::string> GetNameFromId(EntityId id) const override;
+		std::optional<EntityId> AddSceneNode(
+			std::unique_ptr<NodeInterface>&& scene_node) override;
+		std::optional<EntityId> AddTexture(
+			std::unique_ptr<TextureInterface>&& texture) override;
+		std::optional<EntityId> AddProgram(
+			std::unique_ptr<ProgramInterface>&& program) override;
+		std::optional<EntityId> AddMaterial(
+			std::unique_ptr<MaterialInterface>&& material) override;
+		std::optional<EntityId> AddBuffer(
+			std::unique_ptr<BufferInterface>&& buffer) override;
+		std::optional<EntityId> AddStaticMesh(
+			std::unique_ptr<StaticMeshInterface>&& static_mesh) override;
+		std::optional<std::vector<EntityId>> GetChildList(
+			EntityId id) const override;
+		std::optional<EntityId> GetParentId(EntityId id) const override;
 
 	protected:
 		EntityId GetTextureNewId() const
@@ -147,17 +128,17 @@ namespace frame {
 		std::string default_root_scene_node_name_ = "";
 		std::string default_camera_name_ = "";
 		std::unordered_set<std::string> string_set_ = {};
-		std::unordered_map<EntityId, std::shared_ptr<NodeInterface>>
+		std::unordered_map<EntityId, std::unique_ptr<NodeInterface>>
 			id_scene_node_map_ = {};
-		std::unordered_map<EntityId, std::shared_ptr<TextureInterface>>
+		std::unordered_map<EntityId, std::unique_ptr<TextureInterface>>
 			id_texture_map_ = {};
-		std::unordered_map<EntityId, std::shared_ptr<ProgramInterface>>
+		std::unordered_map<EntityId, std::unique_ptr<ProgramInterface>>
 			id_program_map_ = {};
-		std::unordered_map<EntityId, std::shared_ptr<MaterialInterface>>
+		std::unordered_map<EntityId, std::unique_ptr<MaterialInterface>>
 			id_material_map_ = {};
-		std::unordered_map<EntityId, std::shared_ptr<BufferInterface>>
+		std::unordered_map<EntityId, std::unique_ptr<BufferInterface>>
 			id_buffer_map_ = {};
-		std::unordered_map<EntityId, std::shared_ptr<StaticMeshInterface>>
+		std::unordered_map<EntityId, std::unique_ptr<StaticMeshInterface>>
 			id_static_mesh_map_ = {};
 		std::unordered_map<std::string, EntityId> name_id_map_ = {};
 		std::unordered_map<EntityId, std::string> id_name_map_ = {};

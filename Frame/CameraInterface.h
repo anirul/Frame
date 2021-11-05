@@ -5,7 +5,7 @@
 
 namespace frame {
 
-	struct CameraInterface 
+	struct CameraInterface
 	{
 		virtual const glm::mat4 ComputeView() const = 0;
 		virtual const glm::mat4 ComputeProjection(

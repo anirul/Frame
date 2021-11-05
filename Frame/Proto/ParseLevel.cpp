@@ -28,28 +28,49 @@ namespace frame::proto {
 				throw std::runtime_error("should have a default texture.");
 
 			// Include the default cube and quad.
-			cube_id_ = opengl::CreateCubeStaticMesh(this);
-			quad_id_ = opengl::CreateQuadStaticMesh(this);
+			auto maybe_cube_id = opengl::CreateCubeStaticMesh(this);
+			if (!maybe_cube_id) 
+				throw std::runtime_error("Could not create static cube mesh.");
+			cube_id_ = maybe_cube_id.value();
+			auto maybe_quad_id = opengl::CreateQuadStaticMesh(this);
+			if (!maybe_quad_id)
+				throw std::runtime_error("Could not create static quad mesh.");
+			quad_id_ = maybe_quad_id.value();
 
 			// Load textures from proto.
 			for (const auto& proto_texture : proto_texture_file.textures())
 			{
-				std::shared_ptr<TextureInterface> texture = nullptr;
+				std::optional<std::unique_ptr<TextureInterface>> maybe_texture;
+				std::unique_ptr<TextureInterface> texture = nullptr;
 				if (proto_texture.cubemap())
 				{
 					if (proto_texture.file_name().empty())
-						texture = ParseCubeMapTexture(proto_texture, size);
+					{
+						maybe_texture = 
+							ParseCubeMapTexture(proto_texture, size);
+					}
 					else
-						texture = ParseCubeMapTextureFile(proto_texture);
+					{
+						maybe_texture = ParseCubeMapTextureFile(proto_texture);
+					}	
 				}
 				else
 				{
 					if (proto_texture.file_names().empty())
-						texture = ParseTexture(proto_texture, size);
+						maybe_texture = ParseTexture(proto_texture, size);
 					else
-						texture = ParseTextureFile(proto_texture);
+						maybe_texture = ParseTextureFile(proto_texture);
 				}
-				auto texture_id = AddTexture(proto_texture.name(), texture);
+				if (!maybe_texture)
+				{
+					throw std::runtime_error(
+						fmt::format(
+							"Could not load texture: {}",
+							proto_texture.file_name()));
+				}
+				texture = std::move(maybe_texture.value());
+				texture->SetName(proto_texture.name());
+				AddTexture(std::move(texture));
 			}
 
 			// Check the default texture is in.
@@ -62,19 +83,38 @@ namespace frame::proto {
 			// Load programs from proto.
 			for (const auto& proto_program : proto_program_file.programs())
 			{
-				auto program = ParseProgramOpenGL(proto_program, this);
-				AddProgram(proto_program.name(), program);
+				auto maybe_program = ParseProgramOpenGL(proto_program, this);
+				if (!maybe_program) 
+				{
+					throw std::runtime_error(
+						fmt::format(
+							"invalid program: {}", 
+							proto_program.name()));
+				}
+				auto program = std::move(maybe_program.value());
+				program->SetName(proto_program.name());
+				AddProgram(std::move(program));
 			}
 
 			// Load material from proto.
 			for (const auto& proto_material : proto_material_file.materials())
 			{
-				auto material = ParseMaterialOpenGL(proto_material, this);
-				AddMaterial(proto_material.name(), material);
+				auto maybe_material = ParseMaterialOpenGL(proto_material, this);
+				if (!maybe_material)
+				{
+					throw std::runtime_error(
+						fmt::format(
+							"invalid material : {}",
+							proto_material.name()));
+				}
+				auto material = std::move(maybe_material.value());
+				material->SetName(proto_material.name());
+				AddMaterial(std::move(material));
 			}
 
 			// Load scenes from proto.
-			ParseSceneTreeFile(proto_scene_tree_file, this);
+			if (!ParseSceneTreeFile(proto_scene_tree_file, this))
+				throw std::runtime_error("Could not parse proto scene file.");
 			default_camera_name_ = proto_scene_tree_file.default_camera_name();
 			if (default_camera_name_.empty())
 				throw std::runtime_error("should have a default camera name.");

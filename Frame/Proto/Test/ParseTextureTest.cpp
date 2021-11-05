@@ -11,8 +11,9 @@ namespace test {
 		frame::proto::Texture texture_proto;
 		std::pair<std::uint32_t, std::uint32_t> size = { 512, 512 };
 		EXPECT_FALSE(texture_);
+		std::optional<std::unique_ptr<frame::TextureInterface>> maybe_texture;
 		EXPECT_THROW(
-			texture_ = frame::proto::ParseTexture(texture_proto, size),
+			maybe_texture = frame::proto::ParseTexture(texture_proto, size),
 			std::exception);
 	}
 
@@ -30,8 +31,11 @@ namespace test {
 		size_proto.set_y(-2);
 		*texture_proto.mutable_size() = size_proto;
 		EXPECT_FALSE(texture_);
-		EXPECT_NO_THROW(texture_ =
+		std::optional<std::unique_ptr<frame::TextureInterface>> maybe_texture;
+		EXPECT_NO_THROW(maybe_texture =
 			frame::proto::ParseTexture(texture_proto, size));
+		EXPECT_TRUE(maybe_texture);
+		texture_ = std::move(maybe_texture.value());
 		EXPECT_TRUE(texture_);
 		std::pair<std::uint32_t, std::uint32_t> test_size = { 256, 256 };
 		EXPECT_EQ(test_size, texture_->GetSize());
@@ -50,8 +54,10 @@ namespace test {
 		size_proto.set_y(16);
 		*texture_proto.mutable_size() = size_proto;
 		EXPECT_FALSE(texture_);
-		EXPECT_NO_THROW(texture_ =
+		std::optional<std::unique_ptr<frame::TextureInterface>> maybe_texture;
+		EXPECT_NO_THROW(maybe_texture =
 			frame::proto::ParseTexture(texture_proto, size));
+		texture_ = std::move(maybe_texture.value());
 		EXPECT_TRUE(texture_);
 		EXPECT_NE(size, texture_->GetSize());
 		std::pair<std::uint32_t, std::uint32_t> test_size = { 16, 16 };

@@ -8,9 +8,11 @@ namespace test {
 	{
 		const auto proto_program_file = frame::proto::GetProgramFile();
 		const auto proto_program = frame::proto::GetProgramFile().programs(0);
-		program_ = frame::proto::ParseProgramOpenGL(
+		auto maybe_program = frame::proto::ParseProgramOpenGL(
 			proto_program,
 			level_.get());
+		EXPECT_TRUE(maybe_program);
+		program_ = std::move(maybe_program.value());
 		EXPECT_TRUE(program_);
 	}
 

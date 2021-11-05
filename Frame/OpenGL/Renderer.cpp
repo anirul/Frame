@@ -22,17 +22,28 @@ namespace frame::opengl {
 		}
 		render_buffer_.CreateStorage(size);
 		frame_buffer_.AttachRender(render_buffer_);
-		auto program = file::LoadProgram("Display");
-		if (!program)
-			throw std::runtime_error("No program!");
+		auto maybe_program = file::LoadProgram("Display");
+		if (!maybe_program)	throw std::runtime_error("No program!");
+		auto program = std::move(maybe_program.value());
 		program->SetDepthTest(false);
-		auto material = std::make_shared<Material>();
-		display_program_id_ = level_->AddProgram("DisplayProgram", program);
-		if (!level_) 
-			throw std::runtime_error("No level!");
-		display_material_id_ = level_->AddMaterial("DisplayMaterial", material);
-		auto out_texture_id = level->GetDefaultOutputTextureId();
-		auto out_texture = level_->GetTextureMap().at(out_texture_id);
+		auto material = std::make_unique<Material>();
+		program->SetName("DisplayProgram");
+		if (!level_) throw std::runtime_error("No level!");
+		auto maybe_display_program_id = level_->AddProgram(std::move(program));
+		if (!maybe_display_program_id) 
+			throw std::runtime_error("No display program id.");
+		display_program_id_ = maybe_display_program_id.value();
+		material->SetName("DisplayMaterial");
+		auto maybe_display_material_id = 
+			level_->AddMaterial(std::move(material));
+		if (!maybe_display_material_id) 
+			throw std::runtime_error("No display material id.");
+		display_material_id_ = maybe_display_material_id.value();
+		auto maybe_out_texture_id = level->GetDefaultOutputTextureId();
+		if (!maybe_out_texture_id) 
+			throw std::runtime_error("No output texture id.");
+		auto out_texture_id = maybe_out_texture_id.value();
+		auto out_texture = level_->GetTextureFromId(out_texture_id);
 		material->SetProgramId(display_program_id_);
 		material->AddTextureId(out_texture_id, "Display");
 	}
@@ -40,33 +51,37 @@ namespace frame::opengl {
 	void Renderer::RenderNode(EntityId node_id, const double dt/* = 0.0*/)
 	{
 		// Check current node.
-		auto node = level_->GetSceneNodeMap().at(node_id);
-		// Try to case to a node static mesh.
-		auto node_static_mesh = std::dynamic_pointer_cast<NodeStaticMesh>(node);
+		auto node = level_->GetSceneNodeFromId(node_id);
+		// Try to cast to a node static mesh.
+		auto node_static_mesh = dynamic_cast<NodeStaticMesh*>(node);
 		if (!node_static_mesh) return;
 		// Store the material id in case the mesh doesn't have one.
 		auto node_material_id = node_static_mesh->GetMaterialId();
 		auto mesh_id = node->GetLocalMesh();
 		if (!mesh_id) return;
-		auto static_mesh = level_->GetStaticMeshMap().at(mesh_id);
+		auto static_mesh = level_->GetStaticMeshFromId(mesh_id);
 		// Get the mesh material id.
 		auto material_id = static_mesh->GetMaterialId();
 		// If no material is put the node material id in the mesh.
 		if (!material_id) static_mesh->SetMaterialId(node_material_id);
-		RenderMesh(static_mesh.get(), node->GetLocalModel(dt), dt);
+		RenderMesh(static_mesh, node->GetLocalModel(dt), dt);
 	}
 
 	void Renderer::RenderChildren(EntityId node_id, const double dt/* = 0.0*/)
 	{
 		RenderNode(node_id, dt);
 		// Loop into the child of the root node.
-		const std::vector<EntityId> list = level_->GetChildList(node_id);
+		auto maybe_list = level_->GetChildList(node_id);
+		if (!maybe_list) throw std::runtime_error("No child list.");
+		auto list = maybe_list.value();
 		for (const auto& id : list)	RenderChildren(id, dt);
 	}
 
 	void Renderer::RenderFromRootNode(const double dt/* = 0.0*/)
 	{
-		const EntityId root_id = level_->GetDefaultRootSceneNodeId();
+		auto maybe_root_id = level_->GetDefaultRootSceneNodeId();
+		if (!maybe_root_id) throw std::runtime_error("No root id.");
+		EntityId root_id = maybe_root_id.value();
 		RenderChildren(root_id, dt);
 	}
 
@@ -78,11 +93,11 @@ namespace frame::opengl {
 		if (!static_mesh)
 			throw std::runtime_error("StaticMesh ptr doesn't exist.");
 		auto material_id = static_mesh->GetMaterialId();
-		auto material = level_->GetMaterialMap().at(material_id);
+		auto material = level_->GetMaterialFromId(material_id);
 		if (!material)
 			throw std::runtime_error("No material!");
 		auto program_id = material->GetProgramId();
-		auto program = level_->GetProgramMap().at(program_id);
+		auto program = level_->GetProgramFromId(program_id);
 		if (!program)
 			throw std::runtime_error("Program ptr doesn't exist.");
 		assert(program->GetOutputTextureIds().size());
@@ -90,7 +105,7 @@ namespace frame::opengl {
 		program->Use(uniform_interface_);
 		auto texture_out_ids = program->GetOutputTextureIds();
 		auto texture_ref = 
-			level_->GetTextureMap().at(*texture_out_ids.cbegin());
+			level_->GetTextureFromId(*texture_out_ids.cbegin());
 		auto size = texture_ref->GetSize();
 
 		glViewport(0, 0, size.first, size.second);
@@ -102,7 +117,7 @@ namespace frame::opengl {
 		{
 			// TODO(anirul): Check the mipmap level (last parameter)!
 			frame_buffer_.AttachTexture(
-				level_->GetTextureMap().at(texture_id)->GetId(),
+				level_->GetTextureFromId(texture_id)->GetId(),
 				FrameBuffer::GetFrameColorAttachment(i),
 				0);
 			i++;
@@ -117,14 +132,14 @@ namespace frame::opengl {
 		for (const auto& id : material->GetIds())
 		{
 			const auto p = material->EnableTextureId(id);
-			level_->GetTextureMap().at(id)->Bind(p.second);
+			level_->GetTextureFromId(id)->Bind(p.second);
 			program->Uniform(p.first, p.second);
 		}
 		
 		glBindVertexArray(static_mesh->GetId());
 		error_.Display(__FILE__, __LINE__ - 1);
 
-		auto index_buffer = level_->GetBufferMap().at(
+		auto index_buffer = level_->GetBufferFromId(
 			static_mesh->GetIndexBufferId());
 		index_buffer->Bind();
 		glDrawElements(
@@ -142,7 +157,7 @@ namespace frame::opengl {
 
 		for (const auto id : material->GetIds())
 		{
-			level_->GetTextureMap().at(id)->UnBind();
+			level_->GetTextureFromId(id)->UnBind();
 		}
 		material->DisableAll();
 
@@ -155,25 +170,26 @@ namespace frame::opengl {
 
 	void Renderer::Display()
 	{
-		auto quad = level_->GetStaticMeshMap().at(
-			level_->GetDefaultStaticMeshQuadId());
+		auto maybe_quad_id = level_->GetDefaultStaticMeshQuadId();
+		if (!maybe_quad_id) throw std::runtime_error("No quad id.");
+		auto quad = level_->GetStaticMeshFromId(maybe_quad_id.value());
 		quad->SetMaterialId(display_material_id_);
-		auto program = level_->GetProgramMap().at(display_program_id_);
+		auto program = level_->GetProgramFromId(display_program_id_);
 		SetDepthTest(program->GetDepthTest());
 		program->Use(uniform_interface_);
-		auto material = level_->GetMaterialMap().at(display_material_id_);
+		auto material = level_->GetMaterialFromId(display_material_id_);
 
 		for (const auto id : material->GetIds())
 		{
 			const auto p = material->EnableTextureId(id);
-			level_->GetTextureMap().at(id)->Bind(p.second);
+			level_->GetTextureFromId(id)->Bind(p.second);
 			program->Uniform(p.first, p.second);
 		}
 
 		glBindVertexArray(quad->GetId());
 		error_.Display(__FILE__, __LINE__ - 1);
 
-		auto index_buffer = level_->GetBufferMap().at(quad->GetIndexBufferId());
+		auto index_buffer = level_->GetBufferFromId(quad->GetIndexBufferId());
 		index_buffer->Bind();
 		glDrawElements(
 			GL_TRIANGLES,
@@ -189,7 +205,7 @@ namespace frame::opengl {
 
 		for (const auto id : material->GetIds())
 		{
-			level_->GetTextureMap().at(id)->UnBind();
+			level_->GetTextureFromId(id)->UnBind();
 		}
 		material->DisableAll();
 		quad->SetMaterialId(0);

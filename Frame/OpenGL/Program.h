@@ -23,6 +23,11 @@ namespace frame::opengl {
 		virtual ~Program();
 
 	public:
+		// Get & set name from the name interface.
+		std::string GetName() const override { return name_; }
+		void SetName(const std::string& name) override { name_ = name; }
+
+	public:
 		// Set & get input texture id.
 		void AddInputTextureId(EntityId id) override;
 		void RemoveInputTextureId(EntityId id) override;
@@ -34,6 +39,9 @@ namespace frame::opengl {
 		// Get the depth test flag.
 		void SetDepthTest(bool enable) final { is_depth_test_ = enable; }
 		bool GetDepthTest() const final { return is_depth_test_; }
+		// Select temporary input mesh or scene root.
+		std::string GetTemporarySceneRoot() const override;
+		void SetTemporarySceneRoot(const std::string& name) override;
 		// Select the input mesh or scene root.
 		EntityId GetSceneRoot() const override;
 		void SetSceneRoot(EntityId scene_root) override;
@@ -89,6 +97,8 @@ namespace frame::opengl {
 			uniform_variable_map_ = {};
 		mutable std::vector<std::string> uniform_list_ = {};
 		std::vector<unsigned int> attached_shaders_ = {};
+		std::string temporary_scene_root_ = "";
+		std::string name_ = "";
 		int program_id_ = 0;
 		EntityId scene_root_ = 0;
 		bool is_depth_test_ = false;
@@ -100,8 +110,9 @@ namespace frame::opengl {
 	// - vertex shader code;
 	// - pixel shader code.
 	// Also set the matrix for projection/view/model to I.
-	std::shared_ptr<frame::ProgramInterface> CreateProgram(
-		std::istream& vertex_shader_code,
-		std::istream& pixel_shader_code);
+	std::optional<std::unique_ptr<frame::ProgramInterface>> 
+		CreateProgram(
+			std::istream& vertex_shader_code,
+			std::istream& pixel_shader_code);
 
 } // End namespace frame::opengl.

@@ -5,10 +5,11 @@
 #include <string>
 #include <vector>
 #include "Frame/EntityId.h"
+#include "Frame/NameInterface.h"
 
 namespace frame {
 
-	struct MaterialInterface 
+	struct MaterialInterface : public NameInterface
 	{
 		// Get the program that is sued by this material.
 		virtual EntityId GetProgramId() const = 0;

@@ -34,9 +34,10 @@ namespace {
 
 namespace frame::proto {
 
-	std::shared_ptr<frame::TextureInterface> ParseTexture(
-		const Texture& proto_texture, 
-		const std::pair<std::uint32_t, std::uint32_t> size)
+	std::optional<std::unique_ptr<frame::TextureInterface>> 
+		ParseTexture(
+			const Texture& proto_texture, 
+			const std::pair<std::uint32_t, std::uint32_t> size)
 	{
 		auto& error = Error::GetInstance();
 		CheckParameters(proto_texture);
@@ -49,10 +50,10 @@ namespace frame::proto {
 			texture_size.second /= std::abs(proto_texture.size().y());
 		else
 			texture_size.second = proto_texture.size().y();
-		std::shared_ptr<TextureInterface> texture = nullptr;
+		std::unique_ptr<TextureInterface> texture = nullptr;
 		if (proto_texture.pixels().size())
 		{
-			texture = std::make_shared<frame::opengl::Texture>(
+			texture = std::make_unique<frame::opengl::Texture>(
 				texture_size,
 				proto_texture.pixels().data(),
 				proto_texture.pixel_element_size(),
@@ -60,7 +61,7 @@ namespace frame::proto {
 		}
 		else
 		{
-			texture = std::make_shared<frame::opengl::Texture>(
+			texture = std::make_unique<frame::opengl::Texture>(
 				texture_size,
 				proto_texture.pixel_element_size(),
 				proto_texture.pixel_structure());
@@ -77,9 +78,10 @@ namespace frame::proto {
 		return texture;
 	}
 
-	std::shared_ptr<frame::TextureInterface> ParseCubeMapTexture(
-		const Texture& proto_texture, 
-		const std::pair<std::uint32_t, std::uint32_t> size)
+	std::optional<std::unique_ptr<TextureInterface>> 
+		ParseCubeMapTexture(
+			const Texture& proto_texture, 
+			const std::pair<std::uint32_t, std::uint32_t> size)
 	{
 		auto& error = Error::GetInstance();
 		// Get the pixel element size.
@@ -93,14 +95,14 @@ namespace frame::proto {
 			texture_size.second /= std::abs(proto_texture.size().y());
 		else
 			texture_size.second = proto_texture.size().y();
-		std::shared_ptr<TextureInterface> texture = nullptr;
+		std::unique_ptr<TextureInterface> texture = nullptr;
 		if (proto_texture.pixels().size())
 		{
 			throw std::runtime_error("Not implemented!");
 		}
 		else
 		{
-			texture = std::make_shared<opengl::TextureCubeMap>(
+			texture = std::make_unique<opengl::TextureCubeMap>(
 				texture_size,
 				proto_texture.pixel_element_size(),
 				proto_texture.pixel_structure());
@@ -119,25 +121,33 @@ namespace frame::proto {
 		return texture;
 	}
 
-	std::shared_ptr<frame::TextureInterface> ParseTextureFile(
-		const proto::Texture& proto_texture)
+	std::optional<std::unique_ptr<TextureInterface>> 
+		ParseTextureFile(
+			const proto::Texture& proto_texture)
 	{
 		auto& error = Error::GetInstance();
 		CheckParameters(proto_texture);
-		std::shared_ptr<frame::TextureInterface> texture =  
+		auto maybe_texture =
 			opengl::file::LoadTextureFromFile(
 				file::FindFile(proto_texture.file_name()), 
 				proto_texture.pixel_element_size(), 
 				proto_texture.pixel_structure());
-		return texture;
+		if (!maybe_texture)
+		{
+			throw std::runtime_error(
+				fmt::format(
+					"no texture with name: {}", 
+					proto_texture.file_name()));
+		}
+		return std::move(maybe_texture.value());
 	}
 
-	std::shared_ptr<frame::TextureInterface> ParseCubeMapTextureFile(
-		const proto::Texture& proto_texture)
+	std::optional<std::unique_ptr<TextureInterface>> 
+		ParseCubeMapTextureFile(
+			const proto::Texture& proto_texture)
 	{
 		auto& error = Error::GetInstance();
 		CheckParameters(proto_texture);
-		std::shared_ptr<frame::TextureInterface> texture = nullptr;
 		if (proto_texture.file_names().size() != 1)
 		{
 			if (proto_texture.file_names().size() != 6)
@@ -154,19 +164,22 @@ namespace frame::proto {
 			{
 				name_array[i] = file::FindFile(proto_texture.file_names()[i]);
 			}
-			texture = opengl::file::LoadCubeMapTextureFromFiles(
+			auto maybe_texture = opengl::file::LoadCubeMapTextureFromFiles(
 				name_array,
 				proto_texture.pixel_element_size(),
 				proto_texture.pixel_structure());
+			if (!maybe_texture) return std::nullopt;
+			return std::move(maybe_texture.value());
 		}
 		else
 		{
-			texture = opengl::file::LoadCubeMapTextureFromFile(
+			auto maybe_texture = opengl::file::LoadCubeMapTextureFromFile(
 				file::FindFile(proto_texture.file_names()[0]),
 				proto_texture.pixel_element_size(),
 				proto_texture.pixel_structure());
+			if (!maybe_texture) return std::nullopt;
+			return std::move(maybe_texture.value());
 		}
-		return texture;
 	}
 
 } // End namespace frame::proto.

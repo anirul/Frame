@@ -16,8 +16,8 @@ namespace test {
 		const std::string GetFragmentSource() const;
 
 	protected:
-		std::shared_ptr<frame::WindowInterface> window_ = nullptr;
-		std::shared_ptr<frame::ProgramInterface> program_ = nullptr;
+		std::unique_ptr<frame::WindowInterface> window_ = nullptr;
+		std::unique_ptr<frame::ProgramInterface> program_ = nullptr;
 	};
 
 } // End namespace test.

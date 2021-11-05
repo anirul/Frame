@@ -11,27 +11,24 @@ namespace frame::opengl::file {
 	namespace {
 
 		template <typename T>
-		EntityId CreateBufferInLevel(
+		std::optional<EntityId> CreateBufferInLevel(
 			LevelInterface* level,
 			const std::vector<T>& vec, 
 			const std::string& desc,
-			const BufferTypeEnum buffer_type = 
-				BufferTypeEnum::ARRAY_BUFFER,
-			const BufferUsageEnum buffer_usage =
-				BufferUsageEnum::STATIC_DRAW)
+			const BufferTypeEnum buffer_type = BufferTypeEnum::ARRAY_BUFFER,
+			const BufferUsageEnum buffer_usage = BufferUsageEnum::STATIC_DRAW)
 		{
-			std::shared_ptr<BufferInterface> buffer = 
-				std::make_shared<Buffer>(buffer_type, buffer_usage);
+			std::unique_ptr<BufferInterface> buffer = 
+				std::make_unique<Buffer>(buffer_type, buffer_usage);
 			// Buffer initialization.
 			buffer->Bind();
-			buffer->Copy(
-				vec.size() * sizeof(T),
-				vec.data());
+			buffer->Copy(vec.size() * sizeof(T), vec.data());
 			buffer->UnBind();
-			return level->AddBuffer(desc, buffer);
+			buffer->SetName(desc);
+			return level->AddBuffer(std::move(buffer));
 		}
 
-		std::shared_ptr<TextureInterface> LoadTextureFromString(
+		std::optional<std::unique_ptr<TextureInterface>> LoadTextureFromString(
 			const std::string& str,
 			const proto::PixelElementSize pixel_element_size,
 			const proto::PixelStructure pixel_structure)
@@ -42,59 +39,76 @@ namespace frame::opengl::file {
 				pixel_structure);
 		}
 
-		EntityId LoadMaterialFromObj(
+		std::optional<EntityId> LoadMaterialFromObj(
 			LevelInterface* level,
 			const frame::file::ObjMaterial& material_obj)
 		{
 			// Load textures.
-			std::shared_ptr<TextureInterface> color = 
+			auto maybe_color = 
 				(material_obj.ambient_str.empty()) ?
 					LoadTextureFromVec4(material_obj.ambient_vec4) :
 					LoadTextureFromString(
 						material_obj.ambient_str,
 						proto::PixelElementSize_BYTE(),
 						proto::PixelStructure_RGB());
-			std::shared_ptr<TextureInterface> normal =
+			if (!maybe_color) return std::nullopt;
+			auto maybe_normal =
 				(material_obj.normal_str.empty()) ?
 					LoadTextureFromVec4(glm::vec4(0.f, 0.f, 0.f, 1.f)) :
 					LoadTextureFromString(material_obj.normal_str,
 						proto::PixelElementSize_BYTE(),
 						proto::PixelStructure_RGB());
-			std::shared_ptr<TextureInterface> roughness =
+			if (!maybe_normal) return std::nullopt;
+			auto maybe_roughness =
 				(material_obj.roughness_str.empty()) ?
 					LoadTextureFromFloat(material_obj.roughness_val) :
 					LoadTextureFromString(material_obj.roughness_str,
 						proto::PixelElementSize_BYTE(),
 						proto::PixelStructure_GREY());
-			std::shared_ptr<TextureInterface> metallic = 
+			if (!maybe_roughness) return std::nullopt;
+			auto maybe_metallic =
 				(material_obj.metallic_str.empty()) ?
 					LoadTextureFromFloat(material_obj.metallic_val) :
 					LoadTextureFromString(material_obj.metallic_str,
 						proto::PixelElementSize_BYTE(),
 						proto::PixelStructure_GREY());
+			if (!maybe_metallic) return std::nullopt;
 			// Create names for textures.
 			auto color_name = fmt::format("{}.Color", material_obj.name);
 			auto normal_name = fmt::format("{}.Normal", material_obj.name);
 			auto roughness_name = fmt::format("{}.Roughness", material_obj.name);
 			auto metallic_name = fmt::format("{}.Metallic", material_obj.name);
 			// Add texture to the level.
-			auto color_id = level->AddTexture(color_name, color);
-			auto normal_id = level->AddTexture(normal_name,	normal);
-			auto roughness_id = level->AddTexture(roughness_name, roughness);
-			auto metallic_id = level->AddTexture(metallic_name, metallic);
+			maybe_color.value()->SetName(color_name);
+			auto maybe_color_id = 
+				level->AddTexture(std::move(maybe_color.value()));
+			if (!maybe_color_id) return std::nullopt;
+			maybe_normal.value()->SetName(normal_name);
+			auto maybe_normal_id = 
+				level->AddTexture(std::move(maybe_normal.value()));
+			if (!maybe_normal_id) return std::nullopt;
+			maybe_roughness.value()->SetName(roughness_name);
+			auto maybe_roughness_id =
+				level->AddTexture(std::move(maybe_roughness.value()));
+			if (!maybe_roughness_id) return std::nullopt;
+			maybe_metallic.value()->SetName(metallic_name);
+			auto maybe_metallic_id =
+				level->AddTexture(std::move(maybe_metallic.value()));
+			if (!maybe_metallic_id) return std::nullopt;
 			// Create the material.
-			std::shared_ptr<MaterialInterface> material =
-				std::make_shared<opengl::Material>();
+			std::unique_ptr<MaterialInterface> material =
+				std::make_unique<opengl::Material>();
 			// Add texture to the material.
-			material->AddTextureId(color_id, color_name);
-			material->AddTextureId(normal_id, normal_name);
-			material->AddTextureId(roughness_id, roughness_name);
-			material->AddTextureId(metallic_id, metallic_name);
+			material->AddTextureId(maybe_color_id.value(), color_name);
+			material->AddTextureId(maybe_normal_id.value(), normal_name);
+			material->AddTextureId(maybe_roughness_id.value(), roughness_name);
+			material->AddTextureId(maybe_metallic_id.value(), metallic_name);
 			// Finally add the material to the level.
-			return level->AddMaterial(material_obj.name, material);
+			material->SetName(material_obj.name);
+			return level->AddMaterial(std::move(material));
 		}
 
-		EntityId LoadStaticMeshFromObj(
+		std::optional<EntityId> LoadStaticMeshFromObj(
 			LevelInterface* level,
 			const frame::file::ObjMesh& mesh_obj,
 			const std::string& name,
@@ -120,36 +134,40 @@ namespace frame::opengl::file {
 			const auto& indices = mesh_obj.GetIndices();
 
 			// Point buffer initialization.
-			const EntityId point_buffer_id =
-				CreateBufferInLevel(
-					level, 
-					points, 
-					fmt::format("{}.{}.point",	name, counter));
+			auto maybe_point_buffer_id = CreateBufferInLevel(
+				level,
+				points,
+				fmt::format("{}.{}.point", name, counter));
+			if (!maybe_point_buffer_id) return std::nullopt;
+			EntityId point_buffer_id = maybe_point_buffer_id.value();
 
 			// Normal buffer initialization.
-			const EntityId normal_buffer_id =
-				CreateBufferInLevel(
-					level,
-					normals,
-					fmt::format("{}.{}.normal", name, counter));
+			auto maybe_normal_buffer_id = CreateBufferInLevel(
+				level,
+				normals,
+				fmt::format("{}.{}.normal", name, counter));
+			if (!maybe_normal_buffer_id) return std::nullopt;
+			EntityId normal_buffer_id = maybe_normal_buffer_id.value();
 
 			// Texture coordinates buffer initialization.
-			const EntityId tex_coord_buffer_id =
-				CreateBufferInLevel(
-					level,
-					textures,
-					fmt::format("{}.{}.texture", name, counter));
+			auto maybe_tex_coord_buffer_id = CreateBufferInLevel(
+				level,
+				textures,
+				fmt::format("{}.{}.texture", name, counter));
+			if (!maybe_tex_coord_buffer_id) return std::nullopt;
+			EntityId tex_coord_buffer_id = maybe_tex_coord_buffer_id.value();
 		
 			// Index buffer array.
-			const EntityId index_buffer_id =
-				CreateBufferInLevel(
-					level,
-					indices,
-					fmt::format("{}.{}.index", name, counter),
-					opengl::BufferTypeEnum::ELEMENT_ARRAY_BUFFER);
+			auto maybe_index_buffer_id = CreateBufferInLevel(
+				level,
+				indices,
+				fmt::format("{}.{}.index", name, counter),
+				opengl::BufferTypeEnum::ELEMENT_ARRAY_BUFFER);
+			if (!maybe_index_buffer_id) return std::nullopt;
+			EntityId index_buffer_id = maybe_index_buffer_id.value();
 
 			// This should also be a unique ptr.
-			auto static_mesh = std::make_shared<opengl::StaticMesh>(
+			auto static_mesh = std::make_unique<opengl::StaticMesh>(
 				level,
 				point_buffer_id,
 				normal_buffer_id,
@@ -165,17 +183,18 @@ namespace frame::opengl::file {
 					"{}.{}",
 					name,
 					counter);
-			return level->AddStaticMesh(mesh_name, static_mesh);
+			static_mesh->SetName(mesh_name);
+			return level->AddStaticMesh(std::move(static_mesh));
 		}
 
 	} // End namespace.
 
-	std::vector<std::shared_ptr<NodeStaticMesh>> LoadStaticMeshesFromFile(
+	std::optional<std::vector<EntityId>> LoadStaticMeshesFromFile(
 		LevelInterface* level, 
 		const std::string& file,
 		const std::string& name)
 	{
-		std::vector<std::shared_ptr<NodeStaticMesh>> static_mesh_vec;
+		std::vector<EntityId> entity_id_vec;
 		frame::file::Obj obj(frame::file::FindFile(file));
 		const auto meshes = obj.GetMeshes();
 		Logger& logger = Logger::GetInstance();
@@ -187,41 +206,50 @@ namespace frame::opengl::file {
 		std::vector<EntityId> material_ids;
 		for (const auto& material : materials)
 		{
-			const EntityId id = LoadMaterialFromObj(
-				level,
-				material);
-			material_ids.push_back(id);
+			auto maybe_material_id = LoadMaterialFromObj(level, material);
+			if (!maybe_material_id) return std::nullopt;
+			material_ids.push_back(maybe_material_id.value());
 		}
 		logger->info("Found in obj<{}> : {} meshes.", file, meshes.size());
 		int mesh_counter = 0;
 		for (const auto& mesh : meshes)
 		{
-			EntityId static_mesh_id = 
+			auto maybe_static_mesh_id = 
 				LoadStaticMeshFromObj(
 					level, 
 					mesh, 
 					name, 
-					material_ids,
+					material_ids, 
 					mesh_counter);
-			auto func = [level](const std::string& name)->NodeInterface::Ptr
+			if (!maybe_static_mesh_id) return std::nullopt;
+			EntityId static_mesh_id = maybe_static_mesh_id.value();
+			auto func = [level](const std::string& name)->NodeInterface*
 			{
 				if (level)
 				{
-					auto  id = level->GetIdFromName(name);
-					return level->GetSceneNodeMap().at(id);
+					auto maybe_id = level->GetIdFromName(name);
+					if (!maybe_id)
+					{
+						throw std::runtime_error(
+							fmt::format("no id for name: {}", name));
+					}
+					return level->GetSceneNodeFromId(maybe_id.value());
 				}
 				return nullptr;
 			};
-			std::shared_ptr<NodeStaticMesh> ptr = 
-				std::make_shared<NodeStaticMesh>(
+			std::unique_ptr<NodeInterface> ptr = 
+				std::make_unique<NodeStaticMesh>(
 					func,
 					static_mesh_id,
-					level->GetStaticMeshMap().at(
+					level->GetStaticMeshFromId(
 						static_mesh_id)->GetMaterialId());
-			static_mesh_vec.push_back(ptr);
+			ptr->SetName(fmt::format("{}.{}", name, mesh_counter));
+			auto maybe_id = level->AddSceneNode(std::move(ptr));
+			if (!maybe_id) return std::nullopt;
+			entity_id_vec.push_back(maybe_id.value());
 			mesh_counter++;
 		}
-		return static_mesh_vec;
+		return entity_id_vec;
 	}
 
-} // End namespace frame::file.
+} // End namespace frame::opengl::file.

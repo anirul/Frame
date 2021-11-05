@@ -59,8 +59,11 @@ namespace frame::opengl {
 		void LockedBind() const override { locked_bind_ = true; }
 		void UnlockedBind() const override { locked_bind_ = false; }
 		unsigned int GetId() const override { return buffer_object_; }
+		std::string GetName() const override { return name_; }
+		void SetName(const std::string& name) { name_ = name; }
 
 	private:
+		std::string name_ = "buffer???";
 		mutable bool locked_bind_ = false;
 		const BufferTypeEnum buffer_type_;
 		const BufferUsageEnum buffer_usage_;

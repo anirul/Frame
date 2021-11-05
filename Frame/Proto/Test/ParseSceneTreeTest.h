@@ -16,9 +16,8 @@ namespace test {
 		}
 
 	protected:
-		std::shared_ptr<frame::LevelInterface> level_ = nullptr;
-		std::shared_ptr<frame::NodeInterface> node_ = nullptr;
-		std::shared_ptr<frame::WindowInterface> window_ = nullptr;
+		std::unique_ptr<frame::LevelInterface> level_ = nullptr;
+		std::unique_ptr<frame::WindowInterface> window_ = nullptr;
 	};
 
 } // End namespace test.

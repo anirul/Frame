@@ -1,10 +1,11 @@
 #pragma once
 
 #include "Frame/BindInterface.h"
+#include "Frame/NameInterface.h"
 
 namespace frame {
 
-	struct BufferInterface : public BindInterface
+	struct BufferInterface : public BindInterface, public NameInterface
 	{
 		virtual void Copy(
 			const size_t size, 

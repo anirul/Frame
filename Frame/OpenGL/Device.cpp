@@ -85,66 +85,54 @@ namespace frame::opengl {
 		renderer_->Display();
 	}
 
-	bool Device::HasNameInParents(EntityId node_id, const std::string& name) const
+	bool Device::HasNameInParents(
+		EntityId node_id, 
+		const std::string& name) const
 	{
-		const auto& node_map = level_->GetSceneNodeMap();
-		const auto& node_interface = node_map.at(node_id);
-		const auto& parent_name = node_interface->GetParentName();
-		if (parent_name.empty()) 
-			return false;
-		if (parent_name == name) 
-			return true;
-		const auto& id = level_->GetIdFromName(parent_name);
-		return HasNameInParents(id, name);
+		auto maybe_id = level_->GetParentId(node_id);
+		if (!maybe_id) return false;
+		EntityId parent_id = maybe_id.value();
+		auto maybe_name = level_->GetNameFromId(parent_id);
+		if (!maybe_name) return false;
+		if (name == maybe_name.value()) return true;
+		return HasNameInParents(parent_id, name);
 	}
 
 	void Device::SetupCamera()
 	{
-		auto id = level_->GetDefaultCameraId();
-		const auto scene_camera = std::dynamic_pointer_cast<NodeCamera>(
-			level_->GetSceneNodeMap().at(id));
-		const auto camera = scene_camera->GetCamera();
+		auto camera = GetCamera();
 		projection_ = camera->ComputeProjection(size_);
 		view_ = camera->ComputeView();
 	}
 
 	const glm::vec3 Device::GetCameraPosition() const
 	{
-		auto id = level_->GetDefaultCameraId();
-		auto scene_camera = std::dynamic_pointer_cast<NodeCamera>(
-			level_->GetSceneNodeMap().at(id));
-		return scene_camera->GetCamera()->GetPosition();
+		return GetCamera()->GetPosition();
 	}
 
 	const glm::vec3 Device::GetCameraFront() const
 	{
-		auto id = level_->GetDefaultCameraId();
-		auto scene_camera = std::dynamic_pointer_cast<NodeCamera>(
-			level_->GetSceneNodeMap().at(id));
-		return scene_camera->GetCamera()->GetFront();
+		return GetCamera()->GetFront();
 	}
 
 	const glm::vec3 Device::GetCameraRight() const
 	{
-		auto id = level_->GetDefaultCameraId();
-		auto scene_camera = std::dynamic_pointer_cast<NodeCamera>(
-			level_->GetSceneNodeMap().at(id));
-		return scene_camera->GetCamera()->GetRight();
+		return GetCamera()->GetRight();
 	}
 
 	const glm::vec3 Device::GetCameraUp() const
 	{
-		auto id = level_->GetDefaultCameraId();
-		auto scene_camera = std::dynamic_pointer_cast<NodeCamera>(
-			level_->GetSceneNodeMap().at(id));
-		return scene_camera->GetCamera()->GetUp();
+		return GetCamera()->GetUp();
 	}
 
 	const std::shared_ptr<frame::CameraInterface> Device::GetCamera() const
 	{
-		auto id = level_->GetDefaultCameraId();
-		auto scene_camera = std::dynamic_pointer_cast<NodeCamera>(
-			level_->GetSceneNodeMap().at(id));
+		auto maybe_id = level_->GetDefaultCameraId();
+		if (!maybe_id) throw std::runtime_error("No camera?");
+		auto scene_camera =
+			dynamic_cast<NodeCamera*>(
+				level_->GetSceneNodeFromId(maybe_id.value()));
+		if (!scene_camera) throw std::runtime_error("Invalid cast.");
 		return scene_camera->GetCamera();
 	}
 

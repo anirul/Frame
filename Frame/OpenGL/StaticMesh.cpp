@@ -21,24 +21,24 @@ namespace frame::opengl {
 		texture_buffer_id_ = texture_buffer_id;
 		index_buffer_id_ = index_buffer_id;
 		material_id_ = material_id;
-		index_size_ = level->GetBufferMap().at(index_buffer_id)->GetSize();
+		index_size_ = level->GetBufferFromId(index_buffer_id)->GetSize();
 
 		// Create a new vertex array (to render the mesh).
 		glGenVertexArrays(1, &vertex_array_object_);
 		error_.Display(__FILE__, __LINE__ - 1);
 		glBindVertexArray(vertex_array_object_);
 		error_.Display(__FILE__, __LINE__ - 1);
-		level->GetBufferMap().at(point_buffer_id_)->Bind();
+		level->GetBufferFromId(point_buffer_id_)->Bind();
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 		error_.Display(__FILE__, __LINE__ - 1);
-		level->GetBufferMap().at(point_buffer_id_)->UnBind();
-		level->GetBufferMap().at(normal_buffer_id_)->Bind();
+		level->GetBufferFromId(point_buffer_id_)->UnBind();
+		level->GetBufferFromId(normal_buffer_id_)->Bind();
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 		error_.Display(__FILE__, __LINE__ - 1);
-		level->GetBufferMap().at(texture_buffer_id_)->Bind();
+		level->GetBufferFromId(texture_buffer_id_)->Bind();
 		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
 		error_.Display(__FILE__, __LINE__ - 1);
-		level->GetBufferMap().at(texture_buffer_id_)->UnBind();
+		level->GetBufferFromId(texture_buffer_id_)->UnBind();
 
 		// Enable vertex attrib array.
 		glEnableVertexAttribArray(0);
@@ -70,7 +70,7 @@ namespace frame::opengl {
 		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
-	EntityId CreateQuadStaticMesh(LevelInterface* level)
+	std::optional<EntityId> CreateQuadStaticMesh(LevelInterface* level)
 	{
 		std::array<float, 12> points =
 		{
@@ -98,37 +98,46 @@ namespace frame::opengl {
 			0, 1, 2,
 			1, 3, 2,
 		};
-		std::shared_ptr<BufferInterface> point_buffer = 
-			std::make_shared<Buffer>();
-		std::shared_ptr<BufferInterface> normal_buffer = 
-			std::make_shared<Buffer>();
-		std::shared_ptr<BufferInterface> texture_buffer = 
-			std::make_shared<Buffer>();
-		std::shared_ptr<BufferInterface> index_buffer = 
-			std::make_shared<Buffer>(BufferTypeEnum::ELEMENT_ARRAY_BUFFER);
+		auto point_buffer = std::make_unique<Buffer>();
+		auto normal_buffer = std::make_unique<Buffer>();
+		auto texture_buffer = std::make_unique<Buffer>();
+		auto index_buffer = std::make_unique<Buffer>(
+			BufferTypeEnum::ELEMENT_ARRAY_BUFFER);
 		point_buffer->Copy(points.size() * sizeof(float), points.data());
 		normal_buffer->Copy(normals.size() * sizeof(float), normals.data());
 		texture_buffer->Copy(textures.size() * sizeof(float), textures.data());
 		index_buffer->Copy(indices.size() * sizeof(float), indices.data());
 		static int count = 0;
-		auto mesh = std::make_shared<StaticMesh>(
-			level, 
-			level->AddBuffer(fmt::format("QuadPoint.{}", count), point_buffer),
-			level->AddBuffer(
-				fmt::format("QuadNormal.{}", count), 
-				normal_buffer),
-			level->AddBuffer(
-				fmt::format("QuadTexture.{}", count), 
-				texture_buffer),
-			level->AddBuffer(fmt::format("QuadIndex.{}", count), index_buffer));
-		auto id = level->AddStaticMesh(
-			fmt::format("QuadMesh.{}", count), 
-			mesh);
 		count++;
-		return id;
+		point_buffer->SetName(fmt::format("QuadPoint.{}", count));
+		normal_buffer->SetName(fmt::format("QuadNormal.{}", count));
+		texture_buffer->SetName(fmt::format("QuadTexture.{}", count));
+		index_buffer->SetName(fmt::format("QuadIndex.{}", count));
+		auto maybe_point_buffer_id = 
+			level->AddBuffer(std::move(point_buffer));
+		if (!maybe_point_buffer_id) return std::nullopt;
+		auto maybe_normal_buffer_id = 
+			level->AddBuffer(std::move(normal_buffer));
+		if (!maybe_normal_buffer_id) return std::nullopt;
+		auto maybe_texture_buffer_id = 
+			level->AddBuffer(std::move(texture_buffer));
+		if (!maybe_texture_buffer_id) return std::nullopt;
+		auto maybe_index_buffer_id = 
+			level->AddBuffer(std::move(index_buffer));
+		if (!maybe_index_buffer_id) return std::nullopt;
+		auto mesh = std::make_unique<StaticMesh>(
+			level, 
+			maybe_point_buffer_id.value(),
+			maybe_normal_buffer_id.value(),
+			maybe_texture_buffer_id.value(),
+			maybe_index_buffer_id.value());
+		mesh->SetName(fmt::format("QuadMesh.{}", count));
+		auto maybe_id = level->AddStaticMesh(std::move(mesh));
+		if (!maybe_id) return std::nullopt;
+		return maybe_id.value();
 	}
 
-	EntityId CreateCubeStaticMesh(LevelInterface* level)
+	std::optional<EntityId> CreateCubeStaticMesh(LevelInterface* level)
 	{
 		std::array<float, 18 * 6> points =
 		{
@@ -264,14 +273,11 @@ namespace frame::opengl {
 		};
 		std::array<std::int32_t, 18 * 3> indices = {};
 		std::iota(indices.begin(), indices.end(), 0);
-		std::shared_ptr<BufferInterface> point_buffer =
-			std::make_shared<Buffer>();
-		std::shared_ptr<BufferInterface> normal_buffer =
-			std::make_shared<Buffer>();
-		std::shared_ptr<BufferInterface> texture_buffer =
-			std::make_shared<Buffer>();
-		std::shared_ptr<BufferInterface> index_buffer =
-			std::make_shared<Buffer>(BufferTypeEnum::ELEMENT_ARRAY_BUFFER);
+		auto point_buffer =	std::make_unique<Buffer>();
+		auto normal_buffer = std::make_unique<Buffer>();
+		auto texture_buffer = std::make_unique<Buffer>();
+		auto index_buffer = 
+			std::make_unique<Buffer>(BufferTypeEnum::ELEMENT_ARRAY_BUFFER);
 		point_buffer->Copy(points.size() * sizeof(float), points.data());
 		normal_buffer->Copy(normals.size() * sizeof(float), normals.data());
 		texture_buffer->Copy(textures.size() * sizeof(float), textures.data());
@@ -279,21 +285,33 @@ namespace frame::opengl {
 			indices.size() * sizeof(std::int32_t), 
 			indices.data());
 		static int count = 0;
-		auto mesh = std::make_shared<StaticMesh>(
-			level,
-			level->AddBuffer(fmt::format("CubePoint.{}", count), point_buffer),
-			level->AddBuffer(
-				fmt::format("CubeNormal.{}", count), 
-				normal_buffer),
-			level->AddBuffer(
-				fmt::format("CubeTexture.{}", count),
-				texture_buffer),
-			level->AddBuffer(fmt::format("CubeIndex.{}", count), index_buffer));
-		auto id = level->AddStaticMesh(
-			fmt::format("CubeMesh.{}", count),
-			mesh);
 		count++;
-		return id;
+		point_buffer->SetName(fmt::format("CubePoint.{}", count));
+		normal_buffer->SetName(fmt::format("CubeNormal.{}", count));
+		texture_buffer->SetName(fmt::format("CubeTexture.{}", count));
+		index_buffer->SetName(fmt::format("CubeIndex.{}", count));
+		auto maybe_point_buffer_id =
+			level->AddBuffer(std::move(point_buffer));
+		if (!maybe_point_buffer_id) return std::nullopt;
+		auto maybe_normal_buffer_id =
+			level->AddBuffer(std::move(normal_buffer));
+		if (!maybe_normal_buffer_id) return std::nullopt;
+		auto maybe_texture_buffer_id =
+			level->AddBuffer(std::move(texture_buffer));
+		if (!maybe_texture_buffer_id) return std::nullopt;
+		auto maybe_index_buffer_id =
+			level->AddBuffer(std::move(index_buffer));
+		if (!maybe_index_buffer_id) return std::nullopt;
+		auto mesh = std::make_unique<StaticMesh>(
+			level,
+			maybe_point_buffer_id.value(),
+			maybe_normal_buffer_id.value(),
+			maybe_texture_buffer_id.value(),
+			maybe_index_buffer_id.value());
+		mesh->SetName(fmt::format("CubeMesh.{}", count));
+		auto maybe_id = level->AddStaticMesh(std::move(mesh));
+		if (!maybe_id) return std::nullopt;
+		return maybe_id.value();
 	}
 
 } // End namespace frame::opengl.

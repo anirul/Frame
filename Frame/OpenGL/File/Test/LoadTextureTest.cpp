@@ -9,8 +9,9 @@ namespace test {
 	TEST_F(LoadTextureTest, LoadTextureFromFloatTest)
 	{
 		const frame::Error& error = frame::Error::GetInstance();
-		std::unique_ptr<frame::TextureInterface> texture = 
-			frame::opengl::file::LoadTextureFromFloat(0.1f);
+		auto maybe_texture = frame::opengl::file::LoadTextureFromFloat(0.1f);
+		EXPECT_TRUE(maybe_texture);
+		auto texture = std::move(maybe_texture.value());
 		EXPECT_TRUE(texture);
 		EXPECT_EQ(1, texture->GetSize().first);
 		EXPECT_EQ(1, texture->GetSize().second);
@@ -27,9 +28,10 @@ namespace test {
 	TEST_F(LoadTextureTest, LoadTextureFromVec4Test)
 	{
 		const frame::Error& error = frame::Error::GetInstance();
-		std::unique_ptr<frame::TextureInterface> texture = 
-			frame::opengl::file::LoadTextureFromVec4(
+		auto maybe_texture = frame::opengl::file::LoadTextureFromVec4(
 				glm::vec4(0.1f, 0.2f, 0.3f, 0.4f));
+		EXPECT_TRUE(maybe_texture);
+		auto texture = std::move(maybe_texture.value());
 		EXPECT_TRUE(texture);
 		EXPECT_EQ(1, texture->GetSize().first);
 		EXPECT_EQ(1, texture->GetSize().second);
@@ -44,11 +46,13 @@ namespace test {
 	TEST_F(LoadTextureTest, LoadTextureFromFileTest)
 	{
 		const frame::Error& error = frame::Error::GetInstance();
-		std::shared_ptr<frame::TextureInterface> texture = 
+		auto maybe_texture = 
 				frame::opengl::file::LoadTextureFromFile(
 					frame::file::FindFile("Asset/CubeMap/PositiveX.png"),
 					frame::proto::PixelElementSize_BYTE(),
 					frame::proto::PixelStructure_RGB());
+		EXPECT_TRUE(maybe_texture);
+		auto texture = std::move(maybe_texture.value());
 		EXPECT_TRUE(texture);
 		EXPECT_EQ(1024, texture->GetSize().first);
 		EXPECT_EQ(1024, texture->GetSize().second);
@@ -69,7 +73,7 @@ namespace test {
 	TEST_F(LoadTextureTest, LoadCubeMapFromFilesTest)
 	{
 		const frame::Error& error = frame::Error::GetInstance();
-		std::unique_ptr<frame::TextureInterface> texture =
+		auto maybe_texture =
 			frame::opengl::file::LoadCubeMapTextureFromFiles(
 				{ 
 					frame::file::FindFile("Asset/CubeMap/PositiveX.png"),
@@ -81,6 +85,8 @@ namespace test {
 				},
 				frame::proto::PixelElementSize_BYTE(),
 				frame::proto::PixelStructure_RGB());
+		EXPECT_TRUE(maybe_texture);
+		auto texture = std::move(maybe_texture.value());
 		EXPECT_TRUE(texture);
 		EXPECT_EQ(1024, texture->GetSize().first);
 		EXPECT_EQ(1024, texture->GetSize().second);

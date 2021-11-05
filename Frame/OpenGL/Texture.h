@@ -21,9 +21,7 @@
 
 namespace frame::opengl {
 
-	class Texture : 
-		public TextureInterface, 
-		public std::enable_shared_from_this<Texture>
+	class Texture : public TextureInterface
 	{
 	public:
 		// Create an empty texture of size size.
@@ -57,6 +55,9 @@ namespace frame::opengl {
 		std::vector<std::any> GetTexture(int i) const override;
 		// Clear the texture.
 		void Clear(const glm::vec4 color) override;
+		// Name interface.
+		std::string GetName() const override { return name_; }
+		void SetName(const std::string& name) { name_ = name; }
 
 	public:
 		// Virtual part.
@@ -111,6 +112,7 @@ namespace frame::opengl {
 		mutable bool locked_bind_ = false;
 		std::shared_ptr<RenderBuffer> render_ = nullptr;
 		std::shared_ptr<FrameBuffer> frame_ = nullptr;
+		std::string name_ = "";
 	};
 
 	class TextureCubeMap : public Texture

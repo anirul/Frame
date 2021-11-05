@@ -25,15 +25,25 @@ namespace test {
 		material_ = std::dynamic_pointer_cast<frame::MaterialInterface>(
 			material);
 		EXPECT_TRUE(material_);
-		auto texture1 = frame::opengl::file::LoadTextureFromFile(
+		auto maybe_texture1 = frame::opengl::file::LoadTextureFromFile(
 			frame::file::FindDirectory("Asset") + "/CubeMap/PositiveX.png");
-		auto texture2 = frame::opengl::file::LoadTextureFromFile(
+		EXPECT_TRUE(maybe_texture1);
+		auto maybe_texture2 = frame::opengl::file::LoadTextureFromFile(
 			frame::file::FindDirectory("Asset") + "/CubeMap/PositiveY.png");
-		auto id1 = level->AddTexture("PositiveX", std::move(texture1));
-		auto id2 = level->AddTexture("PositiveY", std::move(texture2));
+		EXPECT_TRUE(maybe_texture2);
+		auto texture1 = std::move(maybe_texture1.value());
+		texture1->SetName("PositiveX");
+		auto maybe_id1 = level->AddTexture(std::move(texture1));
+		EXPECT_TRUE(maybe_id1);
+		auto texture2 = std::move(maybe_texture2.value());
+		texture2->SetName("PositiveY");
+		auto maybe_id2 = level->AddTexture(std::move(texture2));
+		EXPECT_TRUE(maybe_id2);
 		std::uint64_t id_false = 0;
-		material_->AddTextureId(id1, "PositiveX");
-		material_->AddTextureId(id2, "PositiveY");
+		auto id1 = maybe_id1.value();
+		auto id2 = maybe_id2.value();
+		EXPECT_TRUE(material_->AddTextureId(id1, "PositiveX"));
+		EXPECT_TRUE(material_->AddTextureId(id2, "PositiveY"));
 		EXPECT_TRUE(material_->HasTextureId(id1));
 		EXPECT_TRUE(material_->HasTextureId(id2));
 		EXPECT_FALSE(id_false);

@@ -34,12 +34,13 @@ add_library(FrameProto
 target_include_directories(FrameProto 
   PUBLIC 
     ${CMAKE_SOURCE_DIR}
+    ${Protobuf_INCLUDE_DIRS}
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 # I still doesn't know how to pass the path correctly to the generate in case
 # there is any external include.
-protobuf_generate(APPEND_PATH TARGET FrameProto)
+protobuf_generate(TARGET FrameProto LANGUAGE cpp)
 
 target_link_libraries(FrameProto 
   PUBLIC

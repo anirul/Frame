@@ -4,12 +4,13 @@
 #include <vector>
 #include <glm/glm.hpp>
 #include "Frame/EntityId.h"
+#include "Frame/NameInterface.h"
 #include "Frame/Proto/Proto.h"
 #include "Frame/UniformInterface.h"
 
 namespace frame {
 
-	struct ProgramInterface
+	struct ProgramInterface : public NameInterface
 	{
 		// Set & get input texture id.
 		virtual void AddInputTextureId(EntityId id) = 0;
@@ -22,6 +23,9 @@ namespace frame {
 		// Get & Set depth test boolean.
 		virtual void SetDepthTest(bool enable) = 0;
 		virtual bool GetDepthTest() const = 0;
+		// Select the input (temporary) mesh or scene root.
+		virtual std::string GetTemporarySceneRoot() const = 0;
+		virtual void SetTemporarySceneRoot(const std::string& name) = 0;
 		// Select the input mesh or scene root.
 		virtual EntityId GetSceneRoot() const = 0;
 		virtual void SetSceneRoot(EntityId scene_root) = 0;

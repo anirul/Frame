@@ -38,11 +38,15 @@ namespace frame::opengl {
 		void DisableTextureId(EntityId id) const override;
 		// Disable all the texture and unbind them.
 		void DisableAll() const override;
+		// Name interface.
+		std::string GetName() const { return name_; }
+		void SetName(const std::string& name) { name_ = name; }
 
 	private:
 		std::map<EntityId, std::string> id_name_map_ = {};
 		mutable std::array<EntityId, 32> id_array_ = {};
 		EntityId program_id_ = 0;
+		std::string name_ = "";
 	};
 
 } // End namespace frame::opengl.

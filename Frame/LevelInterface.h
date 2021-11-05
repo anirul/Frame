@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 #include <unordered_map>
 #include "Frame/EntityId.h"
 #include "Frame/BufferInterface.h"
@@ -15,65 +16,45 @@ namespace frame {
 	struct LevelInterface
 	{
 		// Get maps from the store.
-		virtual const std::unordered_map<
-			EntityId,
-			std::shared_ptr<NodeInterface>>&
-			GetSceneNodeMap() const = 0;
-		virtual const std::unordered_map<
-			EntityId,
-			std::shared_ptr<TextureInterface>>&
-			GetTextureMap() const = 0;
-		virtual const std::unordered_map<
-			EntityId,
-			std::shared_ptr<ProgramInterface>>&
-			GetProgramMap() const = 0;
-		virtual const std::unordered_map<
-			EntityId,
-			std::shared_ptr<MaterialInterface>>&
-			GetMaterialMap() const = 0;
-		virtual const std::unordered_map<
-			EntityId,
-			std::shared_ptr<BufferInterface>>&
-			GetBufferMap() const = 0;
-		virtual const std::unordered_map<
-			EntityId,
-			std::shared_ptr<StaticMeshInterface>>&
-			GetStaticMeshMap() const = 0;
+		virtual NodeInterface* GetSceneNodeFromId(EntityId id) const = 0;
+		virtual TextureInterface* GetTextureFromId(EntityId id) const = 0;
+		virtual ProgramInterface* GetProgramFromId(EntityId id) const = 0;
+		virtual MaterialInterface* GetMaterialFromId(
+			EntityId id) const = 0;
+		virtual BufferInterface* GetBufferFromId(EntityId id) const = 0;
+		virtual StaticMeshInterface* GetStaticMeshFromId(
+			EntityId id) const = 0;
 		// Get element id and name from the store.
-		virtual EntityId GetIdFromName(const std::string& name) const = 0;
-		virtual std::string GetNameFromId(const EntityId id) const = 0;
-		virtual EntityId GetDefaultOutputTextureId() const = 0;
+		virtual std::optional<EntityId> GetIdFromName(
+			const std::string& name) const = 0;
+		virtual std::optional<std::string> GetNameFromId(EntityId id) const = 0;
+		virtual std::optional<EntityId> GetDefaultOutputTextureId() const = 0;
 		virtual void SetDefaultRootSceneNodeName(const std::string& name) = 0;
-		virtual EntityId GetDefaultRootSceneNodeId() const = 0;
+		virtual std::optional<EntityId> GetDefaultRootSceneNodeId() const = 0;
 		virtual void SetDefaultCameraName(const std::string& name) = 0;
-		virtual EntityId GetDefaultCameraId() const = 0;
+		virtual std::optional<EntityId> GetDefaultCameraId() const = 0;
 		// Get the list of children from an id in the node list.
-		virtual const std::vector<EntityId> GetChildList(
+		virtual std::optional<std::vector<EntityId>> GetChildList(
 			const EntityId id) const = 0;
+		virtual std::optional<EntityId> GetParentId(EntityId id) const = 0;
 		// Get & Set the default quad and cube.
-		virtual EntityId GetDefaultStaticMeshQuadId() const = 0;
+		virtual std::optional<EntityId> GetDefaultStaticMeshQuadId() const = 0;
 		virtual void SetDefaultStaticMeshQuadId(EntityId id) = 0;
-		virtual EntityId GetDefaultStaticMeshCubeId() const = 0;
+		virtual std::optional<EntityId> GetDefaultStaticMeshCubeId() const = 0;
 		virtual void SetDefaultStaticMeshCubeId(EntityId id) = 0;
 		// Add element to the store.
-		virtual EntityId AddSceneNode(
-			const std::string& name,
-			std::shared_ptr<NodeInterface> scene_node) = 0;
-		virtual EntityId AddTexture(
-			const std::string& name,
-			std::shared_ptr<TextureInterface> texture) = 0;
-		virtual EntityId AddProgram(
-			const std::string& name,
-			std::shared_ptr<ProgramInterface> program) = 0;
-		virtual EntityId AddMaterial(
-			const std::string& name,
-			std::shared_ptr<MaterialInterface> material) = 0;
-		virtual EntityId AddBuffer(
-			const std::string& name,
-			std::shared_ptr<BufferInterface> buffer) = 0;
-		virtual EntityId AddStaticMesh(
-			const std::string& name,
-			std::shared_ptr<StaticMeshInterface> static_mesh) = 0;
+		virtual std::optional<EntityId> AddSceneNode(
+			std::unique_ptr<NodeInterface>&& scene_node) = 0;
+		virtual std::optional<EntityId> AddTexture(
+			std::unique_ptr<TextureInterface>&& texture) = 0;
+		virtual std::optional<EntityId> AddProgram(
+			std::unique_ptr<ProgramInterface>&& program) = 0;
+		virtual std::optional<EntityId> AddMaterial(
+			std::unique_ptr<MaterialInterface>&& material) = 0;
+		virtual std::optional<EntityId> AddBuffer(
+			std::unique_ptr<BufferInterface>&& buffer) = 0;
+		virtual std::optional<EntityId> AddStaticMesh(
+			std::unique_ptr<StaticMeshInterface>&& static_mesh) = 0;
 	};
 
 } // End namespace frame.

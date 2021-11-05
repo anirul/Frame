@@ -10,9 +10,12 @@ namespace test {
 	{
 		EXPECT_EQ(GLEW_OK, glewInit());
 		ASSERT_FALSE(texture_);
+		std::optional<std::unique_ptr<frame::TextureInterface>> maybe_texture;
 		EXPECT_NO_THROW(
-			texture_ = frame::opengl::file::LoadTextureFromFile(
+			maybe_texture = frame::opengl::file::LoadTextureFromFile(
 				frame::file::FindFile("Asset/CubeMap/PositiveX.png")));
+		ASSERT_TRUE(maybe_texture);
+		texture_ = std::move(maybe_texture.value());
 		ASSERT_TRUE(texture_);
 	}
 
@@ -20,9 +23,12 @@ namespace test {
 	{
 		EXPECT_EQ(GLEW_OK, glewInit());
 		ASSERT_FALSE(texture_);
+		std::optional<std::unique_ptr<frame::TextureInterface>> maybe_texture;
 		EXPECT_NO_THROW(
-			texture_ = frame::opengl::file::LoadTextureFromFile(
+			maybe_texture = frame::opengl::file::LoadTextureFromFile(
 				frame::file::FindFile("Asset/CubeMap/PositiveX.png")));
+		ASSERT_TRUE(maybe_texture);
+		texture_ = std::move(maybe_texture.value());
 		ASSERT_TRUE(texture_);
 		EXPECT_NE(0, texture_->GetId());
 		auto pair = std::make_pair<std::uint32_t, std::uint32_t>(1024, 1024);
@@ -33,10 +39,13 @@ namespace test {
 	{
 		EXPECT_EQ(GLEW_OK, glewInit());
 		ASSERT_FALSE(texture_);
+		std::optional<std::unique_ptr<frame::TextureInterface>> maybe_texture;
 		EXPECT_NO_THROW(
-			texture_ = frame::opengl::file::LoadTextureFromFile(
+			maybe_texture = frame::opengl::file::LoadTextureFromFile(
 				frame::file::FindFile("Asset/CubeMap/Hamarikyu.hdr"),
 				frame::proto::PixelElementSize_HALF()));
+		ASSERT_TRUE(maybe_texture);
+		texture_ = std::move(maybe_texture.value());
 		ASSERT_TRUE(texture_);
 		EXPECT_NE(0, texture_->GetId());
 		auto pair = std::make_pair<std::uint32_t, std::uint32_t>(3200, 1600);
@@ -47,8 +56,9 @@ namespace test {
 	{
 		EXPECT_EQ(GLEW_OK, glewInit());
 		ASSERT_FALSE(texture_);
+		std::optional<std::unique_ptr<frame::TextureInterface>> maybe_texture;
 		EXPECT_NO_THROW(
-			texture_ = frame::opengl::file::LoadCubeMapTextureFromFiles(
+			maybe_texture = frame::opengl::file::LoadCubeMapTextureFromFiles(
 				std::array<std::string, 6>{
 					frame::file::FindFile("Asset/CubeMap/PositiveX.png"),
 					frame::file::FindFile("Asset/CubeMap/NegativeX.png"),
@@ -57,6 +67,8 @@ namespace test {
 					frame::file::FindFile("Asset/CubeMap/PositiveZ.png"),
 					frame::file::FindFile("Asset/CubeMap/NegativeZ.png") 
 					}));
+		ASSERT_TRUE(maybe_texture);
+		texture_ = std::move(maybe_texture.value());
 		ASSERT_TRUE(texture_);
 		EXPECT_NE(0, texture_->GetId());
 	}
@@ -65,10 +77,13 @@ namespace test {
 	{
 		EXPECT_EQ(GLEW_OK, glewInit());
 		ASSERT_FALSE(texture_);
+		std::optional<std::unique_ptr<frame::TextureInterface>> maybe_texture;
 		EXPECT_NO_THROW(
-			texture_ = frame::opengl::file::LoadCubeMapTextureFromFile(
+			maybe_texture = frame::opengl::file::LoadCubeMapTextureFromFile(
 				frame::file::FindFile("Asset/CubeMap/Hamarikyu.hdr"),
 				frame::proto::PixelElementSize_HALF()));
+		ASSERT_TRUE(maybe_texture);
+		texture_ = std::move(maybe_texture.value());
 		ASSERT_TRUE(texture_);
 		EXPECT_NE(0, texture_->GetId());
 	}

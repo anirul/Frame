@@ -5,9 +5,10 @@
 
 namespace frame::proto {
 
-	std::shared_ptr<frame::ProgramInterface> ParseProgramOpenGL(
-		const Program& proto_program,
-		const LevelInterface* level)
+	std::optional<std::unique_ptr<frame::ProgramInterface>> 
+		ParseProgramOpenGL(
+			const Program& proto_program,
+			const LevelInterface* level)
 	{
 		Error& error = Error::GetInstance();
 		Logger& logger = Logger::GetInstance();
@@ -31,19 +32,23 @@ namespace frame::proto {
 				fmt::format("Couldn't open file {}.frag", shader_name);
 			error.CreateError(error_str, __FILE__, __LINE__ - 4);
 		}
-		auto program = opengl::CreateProgram(ifs_vertex, ifs_pixel);
+		auto maybe_program = opengl::CreateProgram(ifs_vertex, ifs_pixel);
+		if (!maybe_program) return std::nullopt;
+		auto program = std::move(maybe_program.value());
 		for (const auto& texture_name : proto_program.input_texture_names())
 		{
-			EntityId texture_id = level->GetIdFromName(texture_name);
+			auto maybe_texture_id = level->GetIdFromName(texture_name);
+			if (!maybe_texture_id) return std::nullopt;
+			EntityId texture_id = maybe_texture_id.value();
 			// Check this is a texture.
-			(void)level->GetTextureMap().at(texture_id);
 			program->AddInputTextureId(texture_id);
 		}
 		for (const auto& texture_name : proto_program.output_texture_names())
 		{
-			EntityId texture_id = level->GetIdFromName(texture_name);
+			auto maybe_texture_id = level->GetIdFromName(texture_name);
+			if (!maybe_texture_id) return std::nullopt;
+			EntityId texture_id = maybe_texture_id.value();
 			// Check this is a texture.
-			(void)level->GetTextureMap().at(texture_id);
 			program->AddOutputTextureId(texture_id);
 		}
 		program->SetSceneRoot(0);
@@ -51,21 +56,27 @@ namespace frame::proto {
 		{
 		case SceneType::QUAD:
 		{
-			EntityId quad_id = level->GetDefaultStaticMeshQuadId();
+			auto maybe_quad_id = level->GetDefaultStaticMeshQuadId();
+			if (!maybe_quad_id) return std::nullopt;
+			EntityId quad_id = maybe_quad_id.value();
 			program->SetSceneRoot(quad_id);
 			break;
 		}
 		case SceneType::CUBE:
 		{
-			EntityId cube_id = level->GetDefaultStaticMeshCubeId();
+			auto maybe_cube_id = level->GetDefaultStaticMeshCubeId();
+			if (!maybe_cube_id) return std::nullopt;
+			EntityId cube_id = maybe_cube_id.value();
 			program->SetSceneRoot(cube_id);
 			break;
 		}
 		case SceneType::SCENE:
 		{
-			EntityId scene_id = 
+			auto maybe_scene_id = 
 				level->GetIdFromName(proto_program.input_scene_name());
-			program->SetSceneRoot(scene_id);
+			if (!maybe_scene_id) return std::nullopt;
+			EntityId scene_id = maybe_scene_id.value();
+			program->SetTemporarySceneRoot(proto_program.input_scene_name());
 			break;
 		}
 		case SceneType::NONE:

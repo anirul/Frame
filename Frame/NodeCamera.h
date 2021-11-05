@@ -10,15 +10,17 @@ namespace frame {
 	{
 	public:
 		NodeCamera(
+			std::function<NodeInterface*(const std::string&)> func,
 			const glm::vec3 position = glm::vec3{ 0.f, 0.f, 0.f },
 			const glm::vec3 target = glm::vec3{ 0.f, 0.f, -1.f },
 			const glm::vec3 up = glm::vec3{ 0.f, 1.f, 0.f },
 			const float fov_degrees = 65.0f) :
+			NodeInterface(func),
 			camera_(std::make_shared<Camera>(position, target, up, fov_degrees))
 		{}
 
 	public:
-		const glm::mat4 GetLocalModel(const double dt) const override;
+		glm::mat4 GetLocalModel(const double dt) const override;
 
 	public:
 		std::shared_ptr<CameraInterface> GetCamera() { return camera_; }

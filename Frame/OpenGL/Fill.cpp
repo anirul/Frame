@@ -68,7 +68,7 @@ namespace frame::opengl {
 		auto& error = Error::GetInstance();
 		assert(program->GetOutputTextureIds().size());
 		auto texture_out_ids = program->GetOutputTextureIds();
-		auto texture_ref = level->GetTextureMap().at(*texture_out_ids.cbegin());
+		auto texture_ref = level->GetTextureFromId(*texture_out_ids.cbegin());
 		auto size = texture_ref->GetSize();
 		FrameBuffer frame{};
 		RenderBuffer render{};
@@ -82,7 +82,7 @@ namespace frame::opengl {
 		{
 			for (const auto& texture_id : texture_out_ids)
 			{
-				auto texture = level->GetTextureMap().at(texture_id);
+				auto texture = level->GetTextureFromId(texture_id);
 				texture->Bind();
 				texture->EnableMipmap();
 			}
@@ -107,7 +107,7 @@ namespace frame::opengl {
 			for (const auto& texture_id : program->GetOutputTextureIds())
 			{
 				frame.AttachTexture(
-					level->GetTextureMap().at(texture_id)->GetId(),
+					level->GetTextureFromId(texture_id)->GetId(),
 					FrameBuffer::GetFrameColorAttachment(i),
 					mipmap_level);
 					i++;
@@ -119,9 +119,13 @@ namespace frame::opengl {
 				uniform_interface.get(), 
 				temporary_size);
 			renderer.SetProjection(projection);
-			renderer.RenderMesh(
-				level->GetStaticMeshMap().at(
-					level->GetDefaultStaticMeshQuadId()).get());
+			auto maybe_id = level->GetDefaultStaticMeshQuadId();
+			if (!maybe_id) 
+			{
+				throw std::runtime_error(
+					"Invalid default static mesh quad id.");
+			}
+			renderer.RenderMesh(level->GetStaticMeshFromId(maybe_id.value()));
 		}
 	}
 
@@ -151,7 +155,7 @@ namespace frame::opengl {
 		auto& error = Error::GetInstance();
 		assert(program->GetOutputTextureIds().size());
 		auto texture_out_ids = program->GetOutputTextureIds();
-		auto texture_ref = level->GetTextureMap().at(*texture_out_ids.cbegin());
+		auto texture_ref = level->GetTextureFromId(*texture_out_ids.cbegin());
 		auto size = texture_ref->GetSize();
 		FrameBuffer frame{};
 		RenderBuffer render{};
@@ -164,7 +168,7 @@ namespace frame::opengl {
 		{
 			for (const auto& texture_id : texture_out_ids)
 			{
-				auto texture = level->GetTextureMap().at(texture_id);
+				auto texture = level->GetTextureFromId(texture_id);
 				texture->Bind();
 				texture->EnableMipmap();
 			}
@@ -194,7 +198,7 @@ namespace frame::opengl {
 				for (const auto& texture_id : program->GetOutputTextureIds())
 				{
 					frame.AttachTexture(
-						level->GetTextureMap().at(texture_id)->GetId(),
+						level->GetTextureFromId(texture_id)->GetId(),
 						FrameBuffer::GetFrameColorAttachment(i),
 						mipmap_level);
 				}
@@ -207,9 +211,14 @@ namespace frame::opengl {
 					temporary_size);
 				renderer.SetProjection(projection);
 				renderer.SetView(view);
+				auto maybe_id = level->GetDefaultStaticMeshCubeId();
+				if (!maybe_id)
+				{
+					throw std::runtime_error(
+						"Invalid default static mesh cube id.");
+				}
 				renderer.RenderMesh(
-					level->GetStaticMeshMap().at(
-						level->GetDefaultStaticMeshCubeId()).get());
+					level->GetStaticMeshFromId(maybe_id.value()));
 			}
 		}
 	}

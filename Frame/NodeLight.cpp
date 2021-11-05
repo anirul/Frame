@@ -4,9 +4,11 @@
 namespace frame {
 	
 	NodeLight::NodeLight(
+		std::function<NodeInterface*(const std::string&)> func,
 		const NodeLightEnum light_type,
 		const glm::vec3 position_or_direction,
 		const glm::vec3 color) :
+		NodeInterface(func),
 		light_type_(light_type),
 		color_(color)
 	{
@@ -26,11 +28,13 @@ namespace frame {
 	}
 
 	NodeLight::NodeLight(
+		std::function<NodeInterface*(const std::string&)> func,
 		const glm::vec3 position,
 		const glm::vec3 direction,
 		const glm::vec3 color,
 		const float dot_inner_limit,
 		const float dot_outer_limit) :
+		NodeInterface(func),
 		light_type_(NodeLightEnum::SPOT),
 		position_(position),
 		direction_(direction),
@@ -38,11 +42,11 @@ namespace frame {
 		dot_inner_limit_(dot_inner_limit),
 		dot_outer_limit_(dot_outer_limit) {}
 
-	const glm::mat4 NodeLight::GetLocalModel(const double dt) const
+	glm::mat4 NodeLight::GetLocalModel(const double dt) const
 	{
 		if (!GetParentName().empty())
 		{
-			NodeInterface::Ptr parent_node = func_(GetParentName());
+			auto parent_node = func_(GetParentName());
 			if (!parent_node)
 			{
 				throw std::runtime_error(

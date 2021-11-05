@@ -9,7 +9,7 @@
 
 namespace frame::opengl::file {
 
-	std::vector<std::shared_ptr<NodeStaticMesh>> LoadStaticMeshesFromFile(
+	std::optional<std::vector<EntityId>> LoadStaticMeshesFromFile(
 		LevelInterface* level, 
 		const std::string& file,
 		const std::string& name);

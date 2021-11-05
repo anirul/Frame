@@ -9,20 +9,18 @@ namespace frame {
 	{
 	public:
 		NodeStaticMesh(
-			std::function<Ptr(const std::string&)> func,
+			std::function<NodeInterface*(const std::string&)> func,
 			EntityId static_mesh_id, 
 			EntityId material_id) :
+			NodeInterface(func),
 			static_mesh_id_(static_mesh_id),
-			material_id_(material_id) 
-			{
-				SetCallback(func);
-			}
+			material_id_(material_id) {}
 
 	public:
-		const glm::mat4 GetLocalModel(const double dt) const override;
+		glm::mat4 GetLocalModel(const double dt) const override;
 
 	public:
-		const EntityId GetLocalMesh() const override { return static_mesh_id_; }
+		EntityId GetLocalMesh() const override { return static_mesh_id_; }
 		EntityId GetMaterialId() const { return material_id_; }
 		void SetMaterialId(EntityId id) { material_id_ = id; }
 

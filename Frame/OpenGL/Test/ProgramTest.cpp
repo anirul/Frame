@@ -8,7 +8,7 @@ namespace test {
 		EXPECT_EQ(GLEW_OK, glewInit());
 		frame::Error::SetWindowPtr(nullptr);
 		EXPECT_FALSE(program_);
-		program_ = std::make_shared<frame::opengl::Program>();
+		program_ = std::make_unique<frame::opengl::Program>();
 		EXPECT_TRUE(program_);
 	}
 
@@ -17,20 +17,18 @@ namespace test {
 		EXPECT_EQ(GLEW_OK, glewInit());
 		frame::Error::SetWindowPtr(nullptr);
 		EXPECT_FALSE(program_);
-		program_ = std::make_shared<frame::opengl::Program>();
-		auto program_ptr =
-			std::dynamic_pointer_cast<frame::opengl::Program>(program_);
+		program_ = std::make_unique<frame::opengl::Program>();
 		EXPECT_TRUE(program_);
-		EXPECT_TRUE(program_ptr);
+		auto program_ptr = 
+			dynamic_cast<frame::opengl::Program*>(program_.get());
+		ASSERT_TRUE(program_ptr);
 		frame::opengl::Shader vertex_shader(
 			frame::opengl::ShaderEnum::VERTEX_SHADER);
-		EXPECT_TRUE(
-			vertex_shader.LoadFromSource(GetVertexSource()));
+		EXPECT_TRUE(vertex_shader.LoadFromSource(GetVertexSource()));
 		program_ptr->AddShader(vertex_shader);
 		frame::opengl::Shader fragment_shader(
 			frame::opengl::ShaderEnum::FRAGMENT_SHADER);
-		EXPECT_TRUE(
-			fragment_shader.LoadFromSource(GetFragmentSource()));
+		EXPECT_TRUE(fragment_shader.LoadFromSource(GetFragmentSource()));
 		program_ptr->AddShader(fragment_shader);
 	}
 
@@ -39,9 +37,9 @@ namespace test {
 		EXPECT_EQ(GLEW_OK, glewInit());
 		frame::Error::SetWindowPtr(nullptr);
 		EXPECT_FALSE(program_);
-		program_ = std::make_shared<frame::opengl::Program>();
-		auto program_ptr =
-			std::dynamic_pointer_cast<frame::opengl::Program>(program_);
+		program_ = std::make_unique<frame::opengl::Program>();
+		auto program_ptr = 
+			dynamic_cast<frame::opengl::Program*>(program_.get());
 		EXPECT_TRUE(program_);
 		EXPECT_TRUE(program_ptr);
 		frame::opengl::Shader vertex_shader(
@@ -67,7 +65,10 @@ namespace test {
 		EXPECT_FALSE(program_);
 		std::istringstream iss_vertex(GetVertexSource());
 		std::istringstream iss_fragment(GetFragmentSource());
-		program_ = frame::opengl::CreateProgram(iss_vertex, iss_fragment);
+		auto maybe_program = 
+			frame::opengl::CreateProgram(iss_vertex, iss_fragment);
+		ASSERT_TRUE(maybe_program);
+		program_ = std::move(maybe_program.value());
 		EXPECT_TRUE(program_);
 	}
 

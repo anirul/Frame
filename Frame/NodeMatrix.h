@@ -9,10 +9,14 @@ namespace frame {
 	class NodeMatrix : public NodeInterface
 	{
 	public:
-		NodeMatrix(const glm::mat4 matrix) : matrix_(matrix) {}
+		NodeMatrix(
+			std::function<NodeInterface*(const std::string&)> func, 
+			const glm::mat4 matrix) : 
+			NodeInterface(func),
+			matrix_(matrix) {}
 
 	public:
-		const glm::mat4 GetLocalModel(const double dt) const override;
+		glm::mat4 GetLocalModel(const double dt) const override;
 
 	protected:
 		glm::mat4 ComputeLocalRotation(const double dt) const;

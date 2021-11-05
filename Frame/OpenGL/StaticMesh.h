@@ -62,6 +62,9 @@ namespace frame::opengl {
 		void UnlockedBind() const override { locked_bind_ = false; }
 		unsigned int GetId() const override { return vertex_array_object_; }
 		bool IsClearBuffer() const override { return clear_depth_buffer_; }
+		// Name interface.
+		std::string GetName() const override { return name_; }
+		void SetName(const std::string& name) { name_ = name; }
 
 	public:
 		void Bind(const unsigned int slot = 0) const override;
@@ -78,12 +81,12 @@ namespace frame::opengl {
 		std::size_t index_size_ = 0;
 		unsigned int vertex_array_object_ = 0;
 		const Error& error_ = Error::GetInstance();
-		std::string material_name_ = "";
+		std::string name_ = "";
 	};
 
 	// Create a quad static mesh.
-	EntityId CreateQuadStaticMesh(LevelInterface* level);
+	std::optional<EntityId> CreateQuadStaticMesh(LevelInterface* level);
 	// Create a cube static mesh.
-	EntityId CreateCubeStaticMesh(LevelInterface* level);
+	std::optional<EntityId> CreateCubeStaticMesh(LevelInterface* level);
 
 } // End namespace frame::opengl.

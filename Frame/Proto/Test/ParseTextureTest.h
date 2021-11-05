@@ -15,8 +15,8 @@ namespace test {
 		}
 
 	protected:
-		std::shared_ptr<frame::WindowInterface> window_ = nullptr;
-		std::shared_ptr<frame::TextureInterface> texture_ = nullptr;
+		std::unique_ptr<frame::WindowInterface> window_ = nullptr;
+		std::unique_ptr<frame::TextureInterface> texture_ = nullptr;
 	};
 
 } // End namespace test.

@@ -22,6 +22,7 @@ add_library(Frame
     Logger.h
     MaterialInterface.h
     ProgramInterface.h
+    NameInterface.h
     NodeCamera.cpp
     NodeCamera.h
     NodeLight.cpp

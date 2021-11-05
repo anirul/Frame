@@ -48,8 +48,10 @@ namespace frame::proto {
 		if (!status.ok())
 		{
 			throw std::runtime_error(
-				"Couldn't parse file: [" + file_name + 
-				"] status error: [" + status.error_message().as_string() + "]");
+				fmt::format(
+					"Couldn't parse file: [{}] status error: [{}]", 
+					file_name,
+					status.message().as_string()));
 		}
 		return proto;
 	}

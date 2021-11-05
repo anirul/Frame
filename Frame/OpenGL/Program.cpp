@@ -5,9 +5,10 @@
 
 namespace frame::opengl {
 
-	std::shared_ptr<ProgramInterface> CreateProgram(
-		std::istream& vertex_shader_code,
-		std::istream& pixel_shader_code)
+	std::optional<std::unique_ptr<ProgramInterface>> 
+		CreateProgram(
+			std::istream& vertex_shader_code,
+			std::istream& pixel_shader_code)
 	{
 		std::string vertex_source(
 			std::istreambuf_iterator<char>(vertex_shader_code), 
@@ -19,7 +20,7 @@ namespace frame::opengl {
 		auto& logger = Logger::GetInstance();
 		logger->info("Creating program");
 #endif // _DEBUG
-		auto program = std::make_shared<Program>();
+		auto program = std::make_unique<Program>();
 		const auto& error = Error::GetInstance();
 		Shader vertex(ShaderEnum::VERTEX_SHADER);
 		Shader fragment(ShaderEnum::FRAGMENT_SHADER);
@@ -48,7 +49,7 @@ namespace frame::opengl {
 #ifdef _DEBUG
 		logger->info("with pointer := {}", static_cast<void*>(program.get()));
 #endif // _DEBUG
-		return program;
+		return std::move(program);
 	}
 
 	Program::Program()
@@ -301,6 +302,8 @@ namespace frame::opengl {
 
 	EntityId Program::GetSceneRoot() const
 	{
+		// TODO(anirul): Change me with an assert.
+		if (!scene_root_) throw std::runtime_error("Should not be null!");
 		return scene_root_;
 	}
 
@@ -348,6 +351,16 @@ namespace frame::opengl {
 			logger_->info(warning_str);
 		}
 		return uniform_list_;
+	}
+
+	std::string Program::GetTemporarySceneRoot() const
+	{
+		return temporary_scene_root_;
+	}
+
+	void Program::SetTemporarySceneRoot(const std::string& name)
+	{
+		temporary_scene_root_ = name;
 	}
 
 } // End namespace frame::opengl.
