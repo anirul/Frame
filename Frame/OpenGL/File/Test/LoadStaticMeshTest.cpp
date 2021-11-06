@@ -8,14 +8,17 @@ namespace test {
 	{
 		auto level = std::make_unique<frame::Level>();
 		ASSERT_TRUE(level);
-		auto maybe_mesh_vec = frame::opengl::file::LoadStaticMeshesFromFile(
+		auto maybe_node_vec = frame::opengl::file::LoadStaticMeshesFromFile(
 			level.get(),
 			"Asset/Model/Monkey.obj",
 			"Monkey");
-		EXPECT_TRUE(maybe_mesh_vec);
-		auto mesh_vec = std::move(maybe_mesh_vec.value());
-		EXPECT_EQ(1, mesh_vec.size());
-		auto mesh_id = mesh_vec.at(0);
+		ASSERT_TRUE(maybe_node_vec);
+		auto node_vec = maybe_node_vec.value();
+		EXPECT_EQ(1, node_vec.size());
+		auto node_id = node_vec.at(0);
+		auto node = level->GetSceneNodeFromId(node_id);
+		ASSERT_TRUE(node);
+		auto mesh_id = node->GetLocalMesh();
 		EXPECT_NE(0, mesh_id);
 		auto mesh = level->GetStaticMeshFromId(mesh_id);
 		EXPECT_TRUE(mesh);

@@ -40,8 +40,7 @@ namespace frame {
 		}
 		virtual void Clear(const glm::vec4 color) = 0;
 		virtual bool IsCubeMap() const = 0;
-		virtual std::vector<std::any> GetTexture() const = 0;
-		virtual std::vector<std::any> GetTexture(int i) const = 0;
+		virtual std::pair<void*, std::size_t> GetTexture(int i) const = 0;
 	};
 
 } // End namespace frame.

@@ -49,10 +49,9 @@ namespace frame::opengl {
 		// Bind and unbind a texture to the current context.
 		void Bind(const unsigned int slot = 0) const override;
 		void UnBind() const override;
-		std::vector<std::any> GetTexture() const override;
 		// Get a copy of the texture output, i is the texture number in case of
 		// a cube map (check IsCubeMap).
-		std::vector<std::any> GetTexture(int i) const override;
+		std::pair<void*, std::size_t> GetTexture(int i) const override;
 		// Clear the texture.
 		void Clear(const glm::vec4 color) override;
 		// Name interface.

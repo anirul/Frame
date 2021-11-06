@@ -35,12 +35,16 @@ namespace test {
 		EXPECT_TRUE(texture);
 		EXPECT_EQ(1, texture->GetSize().first);
 		EXPECT_EQ(1, texture->GetSize().second);
-		std::vector<std::any> v4 = texture->GetTexture();
+		auto pair = texture->GetTexture(0);
+		std::vector<float> v4;
+		v4.resize(4);
+		memcpy(v4.data(), pair.first, pair.second);
 		EXPECT_EQ(4, v4.size());
-		EXPECT_FLOAT_EQ(0.1f, std::any_cast<float>(v4[0]));
-		EXPECT_FLOAT_EQ(0.2f, std::any_cast<float>(v4[1]));
-		EXPECT_FLOAT_EQ(0.3f, std::any_cast<float>(v4[2]));
-		EXPECT_FLOAT_EQ(0.4f, std::any_cast<float>(v4[3]));
+		EXPECT_FLOAT_EQ(0.1f, v4[0]);
+		EXPECT_FLOAT_EQ(0.2f, v4[1]);
+		EXPECT_FLOAT_EQ(0.3f, v4[2]);
+		EXPECT_FLOAT_EQ(0.4f, v4[3]);
+		delete [] pair.first;
 	}
 
 	TEST_F(LoadTextureTest, LoadTextureFromFileTest)
@@ -50,7 +54,7 @@ namespace test {
 				frame::opengl::file::LoadTextureFromFile(
 					frame::file::FindFile("Asset/CubeMap/PositiveX.png"),
 					frame::proto::PixelElementSize_BYTE(),
-					frame::proto::PixelStructure_RGB());
+					frame::proto::PixelStructure_RGB_ALPHA());
 		EXPECT_TRUE(maybe_texture);
 		auto texture = std::move(maybe_texture.value());
 		EXPECT_TRUE(texture);
@@ -60,11 +64,13 @@ namespace test {
 			static_cast<std::size_t>(texture->GetSize().first) * 
 			static_cast<std::size_t>(texture->GetSize().second) * 
 			static_cast<std::size_t>(texture->GetPixelStructure());
-		std::vector<std::any> vec = texture->GetTexture();
-		for (int position = 0; position < image_size; position += 1025 * 2) {
-			EXPECT_GE(0xff, std::any_cast<std::uint8_t>(vec[position]));
-			EXPECT_LE(0x4e, std::any_cast<std::uint8_t>(vec[position]));
+		auto pair = texture->GetTexture(0);
+		for (int position = 0; position < pair.second; position += 1025 * 2) {
+			std::uint8_t* p = (std::uint8_t*)pair.first;
+			EXPECT_GE(0xff, p[position]);
+			EXPECT_LE(0x4e, p[position]);
 		}
+		delete [] pair.first;
 	}
 
 	// TODO(anirul): Add a test for the load Cubemap from single file when
@@ -84,27 +90,26 @@ namespace test {
 					frame::file::FindFile("Asset/CubeMap/NegativeZ.png")
 				},
 				frame::proto::PixelElementSize_BYTE(),
-				frame::proto::PixelStructure_RGB());
+				frame::proto::PixelStructure_RGB_ALPHA());
 		EXPECT_TRUE(maybe_texture);
 		auto texture = std::move(maybe_texture.value());
 		EXPECT_TRUE(texture);
 		EXPECT_EQ(1024, texture->GetSize().first);
 		EXPECT_EQ(1024, texture->GetSize().second);
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-		error.Display(__FILE__, __LINE__ - 1);
 		const std::size_t image_size = 
 			static_cast<std::size_t>(texture->GetSize().first) *
 			static_cast<std::size_t>(texture->GetSize().second) *
 			static_cast<std::size_t>(texture->GetPixelStructure());
 		for (const auto direction : {0, 1, 2, 3, 4, 5})
 		{
-			std::vector<std::any> any_vec;
-			any_vec = texture->GetTexture(direction);
+			auto pair = texture->GetTexture(direction);
 			for (int position = 0; position < image_size; position += 1025 * 5)
 			{
-				EXPECT_GE(0xff, std::any_cast<std::uint8_t>(any_vec[position]));
-				EXPECT_LE(0x45, std::any_cast<std::uint8_t>(any_vec[position]));
+				std::uint8_t* p = (std::uint8_t*)pair.first;
+				EXPECT_GE(0xff, p[position]);
+				EXPECT_LE(0x45, p[position]);
 			}
+			delete [] pair.first;
 		}
 	}
 

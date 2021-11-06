@@ -28,7 +28,10 @@ namespace frame {
 			static Error error_;
 			return error_;
 		}
-		static void SetWindowPtr(void* window_ptr) { window_ptr_ = window_ptr; }
+		static void SetWindowPtr(void* window_ptr) 
+		{ 
+			window_ptr_ = window_ptr; 
+		}
 
 	protected:
 		std::string GetLastError() const;
