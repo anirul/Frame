@@ -2,6 +2,7 @@
 #include "Frame/Error.h"
 #include "Frame/File/FileSystem.h"
 #include "Frame/OpenGL/Texture.h"
+#include "Frame/OpenGL/TextureCubeMap.h"
 #include "Frame/OpenGL/File/LoadTexture.h"
 
 namespace {

@@ -6,6 +6,7 @@
 #include "Frame/File/FileSystem.h"
 #include "Frame/File/Image.h"
 #include "Frame/OpenGL/Texture.h"
+#include "Frame/OpenGL/TextureCubeMap.h"
 
 namespace frame::opengl::file {
 

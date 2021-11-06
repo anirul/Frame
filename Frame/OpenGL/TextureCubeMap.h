@@ -21,34 +21,34 @@
 
 namespace frame::opengl {
 
-	class Texture : public TextureInterface
+	class TextureCubeMap : public TextureInterface
 	{
 	public:
-		// Create an empty texture of size size.
-		Texture(
+		// Create an empty cube map of the size size.
+		TextureCubeMap(
 			const std::pair<std::uint32_t, std::uint32_t> size,
-			const proto::PixelElementSize pixel_element_size = 
-				proto::PixelElementSize_BYTE(),
-			const proto::PixelStructure pixel_structure = 
-				proto::PixelStructure_RGB());
-		// Create from a raw pointer.
-		Texture(
-			const std::pair<std::uint32_t, std::uint32_t> size,
-			const void* data,
 			const proto::PixelElementSize pixel_element_size =
 				proto::PixelElementSize_BYTE(),
-			const proto::PixelStructure pixel_structure = 
+			const proto::PixelStructure pixel_structure =
 				proto::PixelStructure_RGB());
-		// Create from a proto.
-		virtual ~Texture();
+		// Create from 6 pointer to be mapped to the cube map, Order is:
+		//     right, left - (positive X, negative X)
+		//     top, bottom - (positive Y, negative Y)
+		//     front, back - (positive Z, negative Z)
+		// The size is equal to the size of an image (*6).
+		TextureCubeMap(
+			const std::pair<std::uint32_t, std::uint32_t> size,
+			const std::array<void*, 6> cube_data,
+			const proto::PixelElementSize pixel_element_size =
+				proto::PixelElementSize_BYTE(),
+			const proto::PixelStructure pixel_structure =
+				proto::PixelStructure_RGB());
+		~TextureCubeMap();
 
 	public:
 		// Convert to GL type and from GL type.
 		int ConvertToGLType(TextureFilterEnum texture_filter) const;
 		TextureFilterEnum ConvertFromGLType(int gl_filter) const;
-		// Bind and unbind a texture to the current context.
-		void Bind(const unsigned int slot = 0) const override;
-		void UnBind() const override;
 		// Get a copy of the texture output, i is the texture number in case of
 		// a cube map (check IsCubeMap).
 		std::pair<void*, std::size_t> GetTexture(int i) const override;
@@ -59,30 +59,31 @@ namespace frame::opengl {
 		void SetName(const std::string& name) { name_ = name; }
 
 	public:
-		// Virtual part.
-		virtual void EnableMipmap() const override;
-		virtual void SetMinFilter(
-			const TextureFilterEnum texture_filter) override;
-		virtual TextureFilterEnum GetMinFilter() const override;
-		virtual void SetMagFilter(
-			const TextureFilterEnum texture_filter) override;
-		virtual TextureFilterEnum GetMagFilter() const override;
-		virtual void SetWrapS(
-			const TextureFilterEnum texture_filter) override;
-		virtual TextureFilterEnum GetWrapS() const override;
-		virtual void SetWrapT(const TextureFilterEnum texture_filter) override;
-		virtual TextureFilterEnum GetWrapT() const override;
+		// Bind and unbind a texture to the current context.
+		void Bind(const unsigned int slot = 0) const override;
+		void UnBind() const override;
+		void EnableMipmap() const override;
+		void SetMinFilter(const TextureFilterEnum texture_filter) override;
+		TextureFilterEnum GetMinFilter() const override;
+		void SetMagFilter(const TextureFilterEnum texture_filter) override;
+		TextureFilterEnum GetMagFilter() const override;
+		void SetWrapS(const TextureFilterEnum texture_filter) override;
+		TextureFilterEnum GetWrapS() const override;
+		void SetWrapT(const TextureFilterEnum texture_filter) override;
+		TextureFilterEnum GetWrapT() const override;
+		void SetWrapR(const TextureFilterEnum texture_filter) override;
+		TextureFilterEnum GetWrapR() const override;
 
 	public:
-		bool IsCubeMap() const final { return false; }
+		bool IsCubeMap() const final { return true; }
 		unsigned int GetId() const override { return texture_id_; }
 		std::pair<std::uint32_t, std::uint32_t> GetSize() const override
-		{ 
-			return size_; 
+		{
+			return size_;
 		}
 		proto::PixelElementSize::Enum GetPixelElementSize() const override
 		{
-			return pixel_element_size_.value(); 
+			return pixel_element_size_.value();
 		}
 		proto::PixelStructure::Enum GetPixelStructure() const override
 		{
@@ -90,14 +91,17 @@ namespace frame::opengl {
 		}
 
 	protected:
-		Texture(
+		TextureCubeMap(
 			const proto::PixelElementSize pixel_element_size =
 			proto::PixelElementSize_BYTE(),
 			const proto::PixelStructure pixel_structure =
 			proto::PixelStructure_RGB()) :
 			pixel_element_size_(pixel_element_size),
 			pixel_structure_(pixel_structure) {}
-		void CreateTexture(const void* data = nullptr);
+		// Create a cube map and assign it to the texture_id_.
+		void CreateTextureCubeMap(
+			const std::array<void*, 6> cube_map =
+			{ nullptr, nullptr, nullptr, nullptr, nullptr, nullptr });
 		void LockedBind() const override { locked_bind_ = true; }
 		void UnlockedBind() const override { locked_bind_ = false; }
 		friend class ScopedBind;

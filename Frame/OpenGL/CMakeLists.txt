@@ -30,6 +30,8 @@ add_library(FrameOpenGL
     Shader.h
     Texture.cpp
     Texture.h
+    TextureCubeMap.cpp
+    TextureCubeMap.h
 )
 
 target_include_directories(FrameOpenGL
