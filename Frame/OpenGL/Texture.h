@@ -78,11 +78,11 @@ namespace frame::opengl {
 		unsigned int GetId() const override { return texture_id_; }
 		std::pair<std::uint32_t, std::uint32_t> GetSize() const override
 		{ 
-			return size_; 
+			return size_;
 		}
 		proto::PixelElementSize::Enum GetPixelElementSize() const override
 		{
-			return pixel_element_size_.value(); 
+			return pixel_element_size_.value();
 		}
 		proto::PixelStructure::Enum GetPixelStructure() const override
 		{
@@ -92,9 +92,9 @@ namespace frame::opengl {
 	protected:
 		Texture(
 			const proto::PixelElementSize pixel_element_size =
-			proto::PixelElementSize_BYTE(),
+				proto::PixelElementSize_BYTE(),
 			const proto::PixelStructure pixel_structure =
-			proto::PixelStructure_RGB()) :
+				proto::PixelStructure_RGB()) :
 			pixel_element_size_(pixel_element_size),
 			pixel_structure_(pixel_structure) {}
 		void CreateTexture(const void* data = nullptr);

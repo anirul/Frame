@@ -44,8 +44,14 @@ namespace frame::opengl {
 			throw std::runtime_error("No output texture id.");
 		auto out_texture_id = maybe_out_texture_id.value();
 		auto out_texture = level_->GetTextureFromId(out_texture_id);
-		material->SetProgramId(display_program_id_);
-		material->AddTextureId(out_texture_id, "Display");
+		// Get material from level as material was moved away.
+		level_->GetMaterialFromId(
+			display_material_id_)->SetProgramId(display_program_id_);
+		if (!level_->GetMaterialFromId(
+			display_material_id_)->AddTextureId(out_texture_id, "Display"))
+		{
+			throw std::runtime_error("Couldn't add texture to material.");
+		}
 	}
 
 	void Renderer::RenderNode(EntityId node_id, const double dt/* = 0.0*/)
