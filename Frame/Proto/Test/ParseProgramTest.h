@@ -14,13 +14,15 @@ namespace test {
 		ParseProgramTest()
 		{
 			window_ = frame::CreateSDLOpenGL({ 320, 200 });
-			level_ = frame::proto::ParseLevelOpenGL(
+			auto maybe_level = frame::proto::ParseLevelOpenGL(
 				{ 320, 200 },
 				frame::proto::GetLevel(),
 				{},
 				frame::proto::GetSceneFile(),
 				frame::proto::GetTextureFile(),
 				{});
+			if (!maybe_level) throw std::runtime_error("Couldn't parse level.");
+			level_ = std::move(maybe_level.value());
 		}
 
 	protected:

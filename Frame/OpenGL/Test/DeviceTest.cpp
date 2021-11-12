@@ -14,7 +14,7 @@ namespace test {
 	TEST_F(DeviceTest, StartupDeviceWithCameraTest)
 	{
 		EXPECT_TRUE(window_);
-		device_->Startup(level_);
+		device_->Startup(std::move(level_));
 		EXPECT_TRUE(device_);
 	}
 

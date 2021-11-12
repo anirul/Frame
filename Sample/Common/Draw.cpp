@@ -23,15 +23,17 @@ void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 			name_->GetGlobalPath() + proto_level.material_file());
 
 	// Load level from proto files.
-	auto level = frame::proto::ParseLevelOpenGL(
+	auto maybe_level = frame::proto::ParseLevelOpenGL(
 		size_,
 		proto_level, 
 		proto_program_file, 
 		proto_scene_tree_file, 
 		proto_texture_file,
 		proto_material_file);
+	if (!maybe_level)
+		throw std::runtime_error("Couldn't load level!");
 	
-	device_->Startup(level);
+	device_->Startup(std::move(maybe_level.value()));
 }
 
 void Draw::RunDraw(const double dt) {}

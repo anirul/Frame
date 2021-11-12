@@ -70,7 +70,13 @@ namespace frame::proto {
 				}
 				texture = std::move(maybe_texture.value());
 				texture->SetName(proto_texture.name());
-				AddTexture(std::move(texture));
+				if (!AddTexture(std::move(texture)))
+				{
+					throw std::runtime_error(
+						fmt::format(
+							"Coudn't save texture {} to level.", 
+							proto_texture.name()));
+				}
 			}
 
 			// Check the default texture is in.
@@ -93,13 +99,20 @@ namespace frame::proto {
 				}
 				auto program = std::move(maybe_program.value());
 				program->SetName(proto_program.name());
-				AddProgram(std::move(program));
+				if (!AddProgram(std::move(program)))
+				{
+					throw std::runtime_error(
+						fmt::format(
+							"Couldn't save program {} to level.",
+							proto_program.name()));
+				}
 			}
 
 			// Load material from proto.
 			for (const auto& proto_material : proto_material_file.materials())
 			{
-				auto maybe_material = ParseMaterialOpenGL(proto_material, this);
+				auto maybe_material = 
+					ParseMaterialOpenGL(proto_material, this);
 				if (!maybe_material)
 				{
 					throw std::runtime_error(
@@ -109,7 +122,13 @@ namespace frame::proto {
 				}
 				auto material = std::move(maybe_material.value());
 				material->SetName(proto_material.name());
-				AddMaterial(std::move(material));
+				if (!AddMaterial(std::move(material)))
+				{
+					throw std::runtime_error(
+						fmt::format(
+							"Couldn't save material {} to level.",
+							proto_material.name()));
+				}
 			}
 
 			// Load scenes from proto.
@@ -122,7 +141,7 @@ namespace frame::proto {
 
 	};
 
-	std::shared_ptr<LevelInterface> ParseLevelOpenGL(
+	std::optional<std::unique_ptr<LevelInterface>> ParseLevelOpenGL(
 		const std::pair<std::int32_t, std::int32_t> size,
 		const proto::Level& proto_level,
 		const proto::ProgramFile& proto_program_file,
@@ -130,13 +149,15 @@ namespace frame::proto {
 		const proto::TextureFile& proto_texture_file,
 		const proto::MaterialFile& proto_material_file)
 	{
-		return std::make_shared<LevelProto>(
+		auto ptr = std::make_unique<LevelProto>(
 			size,
 			proto_level,
 			proto_program_file,
 			proto_scene_tree_file,
 			proto_texture_file,
 			proto_material_file);
+		if (ptr) return ptr;
+		return std::nullopt;
 	}
 
 } // End namespace frame::proto.

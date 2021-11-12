@@ -32,9 +32,10 @@ namespace frame::opengl {
 		virtual ~Device();
 
 	public:
-		const std::shared_ptr<CameraInterface> GetCamera() const final;
+		const CameraInterface& GetCamera() const final;
+		CameraInterface& GetCamera() final;
 		// Startup the scene.
-		void Startup(const std::shared_ptr<LevelInterface> level) final;
+		void Startup(std::unique_ptr<LevelInterface>&& level) final;
 		// Cleanup the mess.
 		void Cleanup() final;
 		// Display the output texture to the display.
@@ -59,7 +60,7 @@ namespace frame::opengl {
 
 	private:
 		// Map of current stored level.
-		std::shared_ptr<LevelInterface> level_ = nullptr;
+		std::unique_ptr<LevelInterface> level_ = nullptr;
 		// Order of program to be rendered (fixed by input output).
 		// The order is relevant and this should also be a set as program
 		// should only be referred once.

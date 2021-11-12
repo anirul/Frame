@@ -51,10 +51,10 @@ namespace frame::opengl {
 		Cleanup();
 	}
 
-	void Device::Startup(const std::shared_ptr<frame::LevelInterface> level)
+	void Device::Startup(std::unique_ptr<frame::LevelInterface>&& level)
 	{
 		// Copy level into the local area.
-		level_ = level;
+		level_ = std::move(level);
 		// Setup camera.
 		SetupCamera();
 		// Create a renderer.
@@ -100,32 +100,30 @@ namespace frame::opengl {
 
 	void Device::SetupCamera()
 	{
-		auto camera = GetCamera();
-		projection_ = camera->ComputeProjection(size_);
-		view_ = camera->ComputeView();
+		view_ = GetCamera().ComputeView();
 	}
 
 	const glm::vec3 Device::GetCameraPosition() const
 	{
-		return GetCamera()->GetPosition();
+		return GetCamera().GetPosition();
 	}
 
 	const glm::vec3 Device::GetCameraFront() const
 	{
-		return GetCamera()->GetFront();
+		return GetCamera().GetFront();
 	}
 
 	const glm::vec3 Device::GetCameraRight() const
 	{
-		return GetCamera()->GetRight();
+		return GetCamera().GetRight();
 	}
 
 	const glm::vec3 Device::GetCameraUp() const
 	{
-		return GetCamera()->GetUp();
+		return GetCamera().GetUp();
 	}
 
-	const std::shared_ptr<frame::CameraInterface> Device::GetCamera() const
+	const CameraInterface& Device::GetCamera() const
 	{
 		auto maybe_id = level_->GetDefaultCameraId();
 		if (!maybe_id) throw std::runtime_error("No camera?");
@@ -133,7 +131,18 @@ namespace frame::opengl {
 			dynamic_cast<NodeCamera*>(
 				level_->GetSceneNodeFromId(maybe_id.value()));
 		if (!scene_camera) throw std::runtime_error("Invalid cast.");
-		return scene_camera->GetCamera();
+		return *scene_camera->GetCamera();
+	}
+
+	CameraInterface& Device::GetCamera()
+	{
+		auto maybe_id = level_->GetDefaultCameraId();
+		if (!maybe_id) throw std::runtime_error("No camera?");
+		auto scene_camera =
+			dynamic_cast<NodeCamera*>(
+				level_->GetSceneNodeFromId(maybe_id.value()));
+		if (!scene_camera) throw std::runtime_error("Invalid cast.");
+		return *scene_camera->GetCamera();
 	}
 
 } // End namespace frame::opengl.

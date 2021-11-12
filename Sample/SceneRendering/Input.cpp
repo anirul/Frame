@@ -3,11 +3,11 @@
 bool Input::KeyPressed(const char key, const double dt)
 {
 	const float inc = 5.f * static_cast<float>(dt);
-	auto camera = device_->GetCamera();
-	auto position = camera->GetPosition();
-	auto right = camera->GetRight();
-	auto up = camera->GetUp();
-	auto front = camera->GetFront();
+	auto& camera = device_->GetCamera();
+	auto position = camera.GetPosition();
+	auto right = camera.GetRight();
+	auto up = camera.GetUp();
+	auto front = camera.GetFront();
 	if (key == 'a')
 	{
 		position -= right * inc;
@@ -24,7 +24,7 @@ bool Input::KeyPressed(const char key, const double dt)
 	{
 		position -= front * inc;
 	}
-	camera->SetPosition(position);
+	camera.SetPosition(position);
 	return true;
 }
 
@@ -39,10 +39,10 @@ bool Input::MouseMoved(
 	const double dt)
 {
 	const float inc = 1.f * static_cast<float>(dt);
-	auto camera = device_->GetCamera();
-	auto front = camera->GetFront();
-	auto right = camera->GetRight();
-	auto up = camera->GetUp();
+	auto& camera = device_->GetCamera();
+	auto front = camera.GetFront();
+	auto right = camera.GetRight();
+	auto up = camera.GetUp();
 	if (relative.x) 
 	{
 		front += right * relative.x * inc;
@@ -51,8 +51,8 @@ bool Input::MouseMoved(
 	{
 		front -= up * relative.y * inc;
 	}
-	camera->SetFront(front);
-	camera->SetUp({ 0, 1, 0 });
+	camera.SetFront(front);
+	camera.SetUp({ 0, 1, 0 });
 	return true;
 }
 
