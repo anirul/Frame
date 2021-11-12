@@ -104,6 +104,9 @@ namespace frame::opengl {
 			{ nullptr, nullptr, nullptr, nullptr, nullptr, nullptr });
 		void LockedBind() const override { locked_bind_ = true; }
 		void UnlockedBind() const override { locked_bind_ = false; }
+
+	protected:
+		void CreateFrameAndRenderBuffer();
 		friend class ScopedBind;
 
 	private:
@@ -113,8 +116,8 @@ namespace frame::opengl {
 		const proto::PixelStructure pixel_structure_;
 		const Error& error_ = Error::GetInstance();
 		mutable bool locked_bind_ = false;
-		std::shared_ptr<RenderBuffer> render_ = nullptr;
-		std::shared_ptr<FrameBuffer> frame_ = nullptr;
+		std::unique_ptr<RenderBuffer> render_ = nullptr;
+		std::unique_ptr<FrameBuffer> frame_ = nullptr;
 		std::string name_ = "";
 	};
 

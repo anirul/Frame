@@ -305,19 +305,21 @@ namespace frame::opengl {
 			"invalid texture filter : " + std::to_string(gl_filter));
 	}
 
+	void TextureCubeMap::CreateFrameAndRenderBuffer()
+	{
+		frame_ = std::make_unique<FrameBuffer>();
+		render_ = std::make_unique<RenderBuffer>();
+		render_->CreateStorage(size_);
+		frame_->AttachRender(*render_);
+		frame_->AttachTexture(GetId());
+		frame_->DrawBuffers(1);
+	}
+
 	void TextureCubeMap::Clear(const glm::vec4 color)
 	{
 		// First time this is called this will create a frame and a render.
 		Bind();
-		if (!frame_)
-		{
-			frame_ = std::make_shared<FrameBuffer>();
-			render_ = std::make_shared<RenderBuffer>();
-			render_->CreateStorage(size_);
-			frame_->AttachRender(*render_);
-			frame_->AttachTexture(GetId());
-			frame_->DrawBuffers(1);
-		}
+		if (!frame_) CreateFrameAndRenderBuffer();
 		ScopedBind scoped_frame(*frame_);
 		glViewport(0, 0, size_.first, size_.second);
 		error_.Display(__FILE__, __LINE__ - 1);
