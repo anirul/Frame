@@ -6,7 +6,7 @@ namespace test {
 	{
 		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(shader_);
-		shader_ = std::make_shared<frame::opengl::Shader>(
+		shader_ = std::make_unique<frame::opengl::Shader>(
 			frame::opengl::ShaderEnum::VERTEX_SHADER);
 		EXPECT_TRUE(shader_);
 	}
@@ -15,7 +15,7 @@ namespace test {
 	{
 		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(shader_);
-		shader_ = std::make_shared<frame::opengl::Shader>(
+		shader_ = std::make_unique<frame::opengl::Shader>(
 			frame::opengl::ShaderEnum::FRAGMENT_SHADER);
 		EXPECT_TRUE(shader_);
 	}
@@ -24,7 +24,7 @@ namespace test {
 	{
 		ASSERT_EQ(GLEW_OK, glewInit());
 		ASSERT_FALSE(shader_);
-		shader_ = std::make_shared<frame::opengl::Shader>(
+		shader_ = std::make_unique<frame::opengl::Shader>(
 			frame::opengl::ShaderEnum::FRAGMENT_SHADER);
 		ASSERT_TRUE(shader_);
 		EXPECT_FALSE(shader_->LoadFromSource("false"));
@@ -34,7 +34,7 @@ namespace test {
 	{
 		ASSERT_EQ(GLEW_OK, glewInit());
 		ASSERT_FALSE(shader_);
-		shader_ = std::make_shared<frame::opengl::Shader>(
+		shader_ = std::make_unique<frame::opengl::Shader>(
 			frame::opengl::ShaderEnum::VERTEX_SHADER);
 		ASSERT_TRUE(shader_);
 		EXPECT_TRUE(shader_->LoadFromSource(GetVertexSource()));
@@ -45,7 +45,7 @@ namespace test {
 	{
 		ASSERT_EQ(GLEW_OK, glewInit());
 		ASSERT_FALSE(shader_);
-		shader_ = std::make_shared<frame::opengl::Shader>(
+		shader_ = std::make_unique<frame::opengl::Shader>(
 			frame::opengl::ShaderEnum::FRAGMENT_SHADER);
 		ASSERT_TRUE(shader_);
 		EXPECT_TRUE(shader_->LoadFromSource(GetFragmentSource()));

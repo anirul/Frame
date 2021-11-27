@@ -5,7 +5,7 @@ namespace test {
 	TEST_F(LightTest, CreateLightTest)
 	{
 		EXPECT_FALSE(light_);
-		light_ = std::make_shared<frame::opengl::LightPoint>(
+		light_ = std::make_unique<frame::opengl::LightPoint>(
 			glm::vec3(1, 2, 3),
 			glm::vec3(4, 5, 6));
 		EXPECT_TRUE(light_);
@@ -14,7 +14,7 @@ namespace test {
 	TEST_F(LightTest, CheckValuesLightTest)
 	{
 		EXPECT_FALSE(light_);
-		light_ = std::make_shared<frame::opengl::LightDirectional>(
+		light_ = std::make_unique<frame::opengl::LightDirectional>(
 			glm::vec3(1, 2, 3),
 			glm::vec3(4, 5, 6));
 		EXPECT_TRUE(light_);
@@ -25,14 +25,14 @@ namespace test {
 	TEST_F(LightTest, CreateLightManagerTest)
 	{
 		EXPECT_FALSE(light_manager_);
-		light_manager_ = std::make_shared<frame::opengl::LightManager>();
+		light_manager_ = std::make_unique<frame::opengl::LightManager>();
 		EXPECT_TRUE(light_manager_);
 	}
 
 	TEST_F(LightTest, AddLightToLightManagerLightTest)
 	{
 		EXPECT_FALSE(light_manager_);
-		light_manager_ = std::make_shared<frame::opengl::LightManager>();
+		light_manager_ = std::make_unique<frame::opengl::LightManager>();
 		EXPECT_TRUE(light_manager_);
 		EXPECT_EQ(0, light_manager_->GetLightCount());
 		light_manager_->AddLight(

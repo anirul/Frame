@@ -12,16 +12,16 @@ namespace test {
 	class MaterialTest : public testing::Test
 	{
 	public:
-		MaterialTest()
+		MaterialTest() : window_(frame::CreateSDLOpenGL(size_))
 		{
-			window_ = frame::CreateSDLOpenGL({ 320, 200 });
 			error_.SetWindowPtr(nullptr);
 		}
 
 	protected:
-		std::shared_ptr<frame::WindowInterface> window_ = nullptr;
+		const std::pair<std::uint32_t, std::uint32_t> size_ = { 320, 200 };
+		std::unique_ptr<frame::WindowInterface> window_ = nullptr;
+		std::unique_ptr<frame::MaterialInterface> material_ = nullptr;
 		frame::Error& error_ = frame::Error::GetInstance();
-		std::shared_ptr<frame::MaterialInterface> material_ = nullptr;
 	};
 
 } // End namespace test.

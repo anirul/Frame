@@ -7,7 +7,7 @@ namespace test {
 	{
 		EXPECT_FALSE(buffer_);
 		EXPECT_EQ(GLEW_OK, glewInit());
-		buffer_ = std::make_shared<frame::opengl::Buffer>();
+		buffer_ = std::make_unique<frame::opengl::Buffer>();
 		EXPECT_TRUE(buffer_);
 	}
 
@@ -15,7 +15,7 @@ namespace test {
 	{
 		ASSERT_FALSE(buffer_);
 		EXPECT_EQ(GLEW_OK, glewInit());
-		buffer_ = std::make_shared<frame::opengl::Buffer>();
+		buffer_ = std::make_unique<frame::opengl::Buffer>();
 		ASSERT_TRUE(buffer_);
 		EXPECT_NE(0, buffer_->GetId());
 	}
@@ -24,7 +24,7 @@ namespace test {
 	{
 		ASSERT_FALSE(buffer_);
 		EXPECT_EQ(GLEW_OK, glewInit());
-		buffer_ = std::make_shared<frame::opengl::Buffer>();
+		buffer_ = std::make_unique<frame::opengl::Buffer>();
 		ASSERT_TRUE(buffer_);
 		buffer_->Bind();
 		buffer_->UnBind();
@@ -34,7 +34,7 @@ namespace test {
 	{
 		ASSERT_FALSE(buffer_);
 		EXPECT_EQ(GLEW_OK, glewInit());
-		buffer_ = std::make_shared<frame::opengl::Buffer>();
+		buffer_ = std::make_unique<frame::opengl::Buffer>();
 		ASSERT_TRUE(buffer_);
 		std::vector<float> test(4, 1.0f);
 		buffer_->Bind();

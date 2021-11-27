@@ -7,7 +7,7 @@ namespace test {
 	{
 		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(frame_);
-		frame_ = std::make_shared<frame::opengl::FrameBuffer>();
+		frame_ = std::make_unique<frame::opengl::FrameBuffer>();
 		EXPECT_TRUE(frame_);
 		EXPECT_NO_THROW(error_.Display());
 	}
@@ -16,7 +16,7 @@ namespace test {
 	{
 		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(frame_);
-		frame_ = std::make_shared<frame::opengl::FrameBuffer>();
+		frame_ = std::make_unique<frame::opengl::FrameBuffer>();
 		EXPECT_TRUE(frame_);
 		EXPECT_NE(0, frame_->GetId());
 		EXPECT_NO_THROW(error_.Display());
@@ -26,7 +26,7 @@ namespace test {
 	{
 		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(frame_);
-		frame_ = std::make_shared<frame::opengl::FrameBuffer>();
+		frame_ = std::make_unique<frame::opengl::FrameBuffer>();
 		EXPECT_TRUE(frame_);
 		frame::opengl::RenderBuffer render{};
 		EXPECT_THROW(frame_->AttachRender(render), std::exception);
@@ -36,7 +36,7 @@ namespace test {
 	{
 		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(frame_);
-		frame_ = std::make_shared<frame::opengl::FrameBuffer>();
+		frame_ = std::make_unique<frame::opengl::FrameBuffer>();
 		EXPECT_TRUE(frame_);
 		frame::opengl::RenderBuffer render{};
 		render.CreateStorage({ 1, 1 });
@@ -48,7 +48,7 @@ namespace test {
 	{
 		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(frame_);
-		frame_ = std::make_shared<frame::opengl::FrameBuffer>();
+		frame_ = std::make_unique<frame::opengl::FrameBuffer>();
 		EXPECT_TRUE(frame_);
 		frame::opengl::RenderBuffer render{};
 		render.CreateStorage({ 1, 1 });

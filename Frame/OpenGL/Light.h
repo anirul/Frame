@@ -70,6 +70,7 @@ namespace frame::opengl {
 		glm::vec3 color_intensity_;
 	};
 
+	// TODO(anirul): Modify me to use unique_ptr or at lease references.
 	class LightManager 
 	{
 	public:
@@ -96,4 +97,4 @@ namespace frame::opengl {
 		std::vector<std::shared_ptr<LightInterface>> lights_;
 	};
 
-} // End namespace sgl.
+} // End namespace frame::opengl.

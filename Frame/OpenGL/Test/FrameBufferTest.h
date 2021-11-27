@@ -10,15 +10,15 @@ namespace test {
 	class FrameBufferTest : public testing::Test 
 	{
 	public:
-		FrameBufferTest() 
+		FrameBufferTest() : window_(frame::CreateSDLOpenGL(size_))
 		{
-			window_ = frame::CreateSDLOpenGL({ 320, 200 });
 			error_.SetWindowPtr(nullptr);
 		}
 
 	protected:
-		std::shared_ptr<frame::opengl::FrameBuffer> frame_ = nullptr;
-		std::shared_ptr<frame::WindowInterface> window_ = nullptr;
+		const std::pair<std::uint32_t, std::uint32_t> size_ = { 320, 200 };
+		std::unique_ptr<frame::opengl::FrameBuffer> frame_ = nullptr;
+		std::unique_ptr<frame::WindowInterface> window_ = nullptr;
 		frame::Error& error_ = frame::Error::GetInstance();
 	};
 

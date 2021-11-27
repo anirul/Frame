@@ -9,10 +9,9 @@ namespace test {
 	{
 		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(material_);
-		auto level = std::make_shared<frame::Level>();
-		auto material = std::make_shared<frame::opengl::Material>();
-		material_ = std::dynamic_pointer_cast<frame::MaterialInterface>(
-			material);
+		auto level = std::make_unique<frame::Level>();
+		auto material = std::make_unique<frame::opengl::Material>();
+		material_ = std::move(material);
 		EXPECT_TRUE(material_);
 		EXPECT_NO_THROW(error_.Display());
 	}
@@ -20,10 +19,9 @@ namespace test {
 	TEST_F(MaterialTest, CheckAddRemoveTextureTest)
 	{
 		EXPECT_FALSE(material_);
-		auto level = std::make_shared<frame::Level>();
-		auto material = std::make_shared<frame::opengl::Material>();
-		material_ = std::dynamic_pointer_cast<frame::MaterialInterface>(
-			material);
+		auto level = std::make_unique<frame::Level>();
+		auto material = std::make_unique<frame::opengl::Material>();
+		material_ = std::move(material);
 		EXPECT_TRUE(material_);
 		auto maybe_texture1 = frame::opengl::file::LoadTextureFromFile(
 			frame::file::FindDirectory("Asset") + "/CubeMap/PositiveX.png");

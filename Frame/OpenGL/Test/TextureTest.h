@@ -10,16 +10,16 @@ namespace test {
 	class TextureTest : public testing::Test
 	{
 	public:
-		TextureTest()
+		TextureTest() : window_(frame::CreateSDLOpenGL(size_))
 		{
-			window_ = frame::CreateSDLOpenGL({ 320, 200 });
 			error_.SetWindowPtr(nullptr);
 		}
 
 	protected:
-		frame::Error& error_ = frame::Error::GetInstance();
+		const std::pair<std::uint32_t, std::uint32_t> size_ = { 320, 200 };
 		std::unique_ptr<frame::WindowInterface> window_ = nullptr;
 		std::unique_ptr<frame::TextureInterface> texture_ = nullptr;
+		frame::Error& error_ = frame::Error::GetInstance();
 	};
 
 } // End namespace test.

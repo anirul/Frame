@@ -1,4 +1,4 @@
-#include "RenderingTest.h"
+#include "RendererTest.h"
 #include "Frame/Level.h"
 
 namespace test {
@@ -6,7 +6,8 @@ namespace test {
 	TEST_F(RendererTest, CreateRenderingTest)
 	{
 		ASSERT_FALSE(renderer_);
-		renderer_ = std::make_shared<frame::opengl::Renderer>(
+		ASSERT_TRUE(LoadDefaultLevel());
+		renderer_ = std::make_unique<frame::opengl::Renderer>(
 			level_.get(),
 			window_->GetUniqueUniform().get(),
 			window_->GetSize());
@@ -16,7 +17,8 @@ namespace test {
 	TEST_F(RendererTest, RenderingDisplayTest)
 	{
 		ASSERT_FALSE(renderer_);
-		renderer_ = std::make_shared<frame::opengl::Renderer>(
+		ASSERT_TRUE(LoadDefaultLevel());
+		renderer_ = std::make_unique<frame::opengl::Renderer>(
 			level_.get(),
 			window_->GetUniqueUniform().get(),
 			window_->GetSize());
