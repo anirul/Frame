@@ -144,8 +144,8 @@ namespace frame::proto {
 					ParseUniform(proto_scene_camera.up()),
 					proto_scene_camera.fov_degrees(),
 					proto_scene_camera.aspect_ratio(),
-					proto_scene_camera.near(),
-					proto_scene_camera.far());
+					proto_scene_camera.near_clip(),
+					proto_scene_camera.far_clip());
 			scene_camera->SetName(proto_scene_camera.name());
 			scene_camera->SetParentName(proto_scene_camera.parent());
 			auto maybe_scene_id = level->AddSceneNode(std::move(scene_camera));

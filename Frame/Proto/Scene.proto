@@ -63,9 +63,9 @@ message SceneCamera {
 	// Width / Height proportions.
 	float aspect_ratio = 7;
 	// Near clipping plane.
-	float near = 8;
+	float near_clip = 8;
 	// Far clipping plane.
-	float far = 9;
+	float far_clip = 9;
 }
 
 // Light
