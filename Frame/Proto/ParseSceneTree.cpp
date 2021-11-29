@@ -14,7 +14,8 @@ namespace frame::proto {
 
 	namespace {
 
-		std::function<NodeInterface*(const std::string& name)> GetFunctor(
+		std::function<NodeInterface*(const std::string& name)> 
+		GetFunctor(
 			LevelInterface* level)
 		{
 			return [level](const std::string& name)->NodeInterface*
@@ -135,13 +136,16 @@ namespace frame::proto {
 				throw std::runtime_error(
 					"Need field of view degrees in camera.");
 			}
-			std::unique_ptr<NodeInterface> scene_camera = 
+			std::unique_ptr<NodeInterface> scene_camera =
 				std::make_unique<NodeCamera>(
 					GetFunctor(level),
 					ParseUniform(proto_scene_camera.position()),
 					ParseUniform(proto_scene_camera.target()),
 					ParseUniform(proto_scene_camera.up()),
-					proto_scene_camera.fov_degrees());
+					proto_scene_camera.fov_degrees(),
+					proto_scene_camera.aspect_ratio(),
+					proto_scene_camera.near(),
+					proto_scene_camera.far());
 			scene_camera->SetName(proto_scene_camera.name());
 			scene_camera->SetParentName(proto_scene_camera.parent());
 			auto maybe_scene_id = level->AddSceneNode(std::move(scene_camera));

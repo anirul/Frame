@@ -46,7 +46,7 @@ message SceneStaticMesh {
 }
 
 // Camera
-// Next 7
+// Next 10
 message SceneCamera {
 	// This is the name of the camera.
 	string name = 1;
@@ -60,6 +60,12 @@ message SceneCamera {
 	UniformVector3 up = 5;
 	// Fov in degrees.
 	float fov_degrees = 6;
+	// Width / Height proportions.
+	float aspect_ratio = 7;
+	// Near clipping plane.
+	float near = 8;
+	// Far clipping plane.
+	float far = 9;
 }
 
 // Light

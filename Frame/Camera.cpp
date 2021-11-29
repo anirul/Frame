@@ -8,11 +8,17 @@ namespace frame {
 		const glm::vec3 position /*= { 0.f, 0.f, 0.f }*/, 
 		const glm::vec3 front /*= { 0.f, 0.f, 1.f }*/, 
 		const glm::vec3 up /*= { 0.f, 1.f, 0.f }*/,
-		const float fov_degrees /*= 65.0f */) :
+		const float fov_degrees /*= 65.0f */,
+		const float aspect_ratio /*= 16.0f / 9.0f*/,
+		const float near /*= 0.1f*/,
+		const float far /*= 1000.0f*/) :
 		position_(position),
 		front_(front),
 		up_(up),
-		fov_rad_(glm::radians(fov_degrees))
+		fov_rad_(glm::radians(fov_degrees)),
+		aspect_ratio_(aspect_ratio),
+		near_(near),
+		far_(far)
 	{
 		UpdateCameraVectors();
 	}

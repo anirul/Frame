@@ -67,7 +67,7 @@ namespace frame::opengl::file {
 
 		proto::TextureFile CreateEquirectangularProtoTextureFile(
 			const std::string& input_file,
-			const std::pair<std::uint32_t, std::uint32_t> size,
+			const std::pair<std::uint32_t, std::uint32_t> out_size,
 			const proto::PixelElementSize pixel_element_size,
 			const proto::PixelStructure pixel_structure)
 		{
@@ -76,6 +76,7 @@ namespace frame::opengl::file {
 				proto::Texture texture{};
 				texture.set_name("InputTexture");
 				texture.set_file_name(input_file);
+				texture.set_cubemap(false);
 				*texture.mutable_pixel_element_size() = pixel_element_size;
 				*texture.mutable_pixel_structure() = pixel_structure;
 				*texture_file.add_textures() = texture;
@@ -84,8 +85,9 @@ namespace frame::opengl::file {
 				proto::Texture texture{};
 				texture.set_name("OutputCubemap");
 				proto::Size proto_size{};
-				proto_size.set_x(size.first);
-				proto_size.set_y(size.second);
+				texture.set_cubemap(true);
+				proto_size.set_x(out_size.first);
+				proto_size.set_y(out_size.second);
 				*texture.mutable_size() = proto_size;
 				*texture.mutable_pixel_element_size() = pixel_element_size;
 				*texture.mutable_pixel_structure() = pixel_structure;
@@ -152,7 +154,11 @@ namespace frame::opengl::file {
 			CreateEquirectangularProtoLevel(),
 			CreateEquirectangularProtoProgramFile(),
 			CreateEquirectangularProtoSceneTreeFile(),
-			CreateEquirectangularProtoTextureFile(),
+			CreateEquirectangularProtoTextureFile(
+				file, 
+				{128, 128}, 
+				proto::PixelElementSize_HALF(),
+				proto::PixelStructure_RGB()),
 			CreateEquirectangularProtoMaterialFile());
 		ScopedBind scoped_bind_frame(*frame);
 		ScopedBind scoped_bind_render(*render);

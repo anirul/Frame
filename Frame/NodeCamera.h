@@ -14,9 +14,19 @@ namespace frame {
 			const glm::vec3 position = glm::vec3{ 0.f, 0.f, 0.f },
 			const glm::vec3 target = glm::vec3{ 0.f, 0.f, -1.f },
 			const glm::vec3 up = glm::vec3{ 0.f, 1.f, 0.f },
-			const float fov_degrees = 65.0f) :
+			const float fov_degrees = 65.0f,
+			const float aspect_ratio = 16.0f / 9.0f,
+			const float near_clip = 0.1f,
+			const float far_clip = 1000.0f) :
 			NodeInterface(func),
-			camera_(std::make_shared<Camera>(position, target, up, fov_degrees))
+			camera_(std::make_shared<Camera>(
+				position, 
+				target, 
+				up, 
+				fov_degrees, 
+				aspect_ratio, 
+				near_clip, 
+				far_clip))
 		{}
 
 	public:
