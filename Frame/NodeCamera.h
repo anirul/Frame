@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
+
 #include "Frame/Camera.h"
 #include "Frame/NodeInterface.h"
 
@@ -19,28 +20,24 @@ namespace frame {
 			const float near_clip = 0.1f,
 			const float far_clip = 1000.0f) :
 			NodeInterface(func),
-			camera_(std::make_shared<Camera>(
+			camera_(std::make_unique<Camera>(
 				position, 
 				target, 
 				up, 
 				fov_degrees, 
 				aspect_ratio, 
 				near_clip, 
-				far_clip))
-		{}
+				far_clip)) {}
 
 	public:
 		glm::mat4 GetLocalModel(const double dt) const override;
 
 	public:
-		std::shared_ptr<CameraInterface> GetCamera() { return camera_; }
-		const std::shared_ptr<CameraInterface> GetCamera() const 
-		{ 
-			return camera_; 
-		}
+		CameraInterface* GetCamera() { return camera_.get(); }
+		const CameraInterface* GetCamera() const { return camera_.get(); }
 
 	private:
-		std::shared_ptr<CameraInterface> camera_ = nullptr;
+		std::unique_ptr<CameraInterface> camera_ = nullptr;
 	};
 
 } // End namespace frame.

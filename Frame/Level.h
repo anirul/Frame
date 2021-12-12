@@ -3,19 +3,11 @@
 #include <cinttypes>
 #include <memory>
 #include <utility>
+
+#include "Frame/Logger.h"
 #include "Frame/LevelInterface.h"
 
 namespace frame {
-
-	enum class EntityTypeEnum : std::uint8_t {
-		UNKNOWN		= 0,
-		NODE		= 1,
-		TEXTURE		= 2,
-		PROGRAM		= 3,
-		MATERIAL	= 4,
-		BUFFER		= 5,
-		STATIC_MESH	= 6,
-	};
 
 	class Level : public LevelInterface
 	{
@@ -92,6 +84,9 @@ namespace frame {
 		std::optional<std::vector<EntityId>> GetChildList(
 			EntityId id) const override;
 		std::optional<EntityId> GetParentId(EntityId id) const override;
+		std::optional<std::unique_ptr<TextureInterface>>
+			ExtractTexture(EntityId id) override;
+		CameraInterface* GetDefaultCamera() override;
 
 	protected:
 		EntityId GetTextureNewId() const
@@ -120,6 +115,7 @@ namespace frame {
 		}
 
 	protected:
+		Logger& logger_ = Logger::GetInstance();
 		mutable EntityId next_id_maker_ = 1;
 		EntityId quad_id_ = 0;
 		EntityId cube_id_ = 0;

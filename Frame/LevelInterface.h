@@ -3,6 +3,8 @@
 #include <memory>
 #include <optional>
 #include <unordered_map>
+
+#include "Frame/CameraInterface.h"
 #include "Frame/EntityId.h"
 #include "Frame/BufferInterface.h"
 #include "Frame/StaticMeshInterface.h"
@@ -55,6 +57,10 @@ namespace frame {
 			std::unique_ptr<BufferInterface>&& buffer) = 0;
 		virtual std::optional<EntityId> AddStaticMesh(
 			std::unique_ptr<StaticMeshInterface>&& static_mesh) = 0;
+		// Extract an entity from a level (this entity will be unvalidated!).
+		virtual std::optional<std::unique_ptr<TextureInterface>> 
+			ExtractTexture(EntityId id) = 0;
+		virtual CameraInterface* GetDefaultCamera() = 0;
 	};
 
 } // End namespace frame.

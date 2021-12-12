@@ -41,10 +41,7 @@ namespace frame {
 		glm::mat4 GetLocalModel(const double dt) const override;
 
 	public:
-		const NodeLightEnum GetType() const
-		{
-			return light_type_;
-		}
+		const NodeLightEnum GetType() const	{ return light_type_; }
 		const glm::vec3 GetPosition() const { return position_; }
 		const glm::vec3 GetDirection() const { return direction_; }
 		const glm::vec3 GetColor() const { return color_; }

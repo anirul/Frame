@@ -1,11 +1,16 @@
 #include "Frame/OpenGL/File/LoadTexture.h"
+
 #include <algorithm>
 #include <fstream>
 #include <vector>
 #include <set>
+
 #include "Frame/File/FileSystem.h"
 #include "Frame/File/Image.h"
+#include "Frame/Logger.h"
 #include "Frame/OpenGL/Material.h"
+#include "Frame/OpenGL/Renderer.h"
+#include "Frame/OpenGL/StaticMesh.h"
 #include "Frame/OpenGL/Texture.h"
 #include "Frame/OpenGL/TextureCubeMap.h"
 #include "Frame/Proto/ParseLevel.h"
@@ -15,9 +20,38 @@ namespace frame::opengl::file {
 
 	namespace {
 
-		std::set<std::string> basic_byte_extention = { "jpeg", "jpg" };
-		std::set<std::string> basic_rgba_extention = { "png" };
-		std::set<std::string> cube_map_half_extention = { "hdr", "dds" };
+		// Get the 6 view for the cube map.
+		const std::array<glm::mat4, 6> views_cubemap =
+		{
+			glm::lookAt(
+				glm::vec3(0.0f, 0.0f, 0.0f),
+				glm::vec3(1.0f, 0.0f, 0.0f),
+				glm::vec3(0.0f, -1.0f, 0.0f)),
+			glm::lookAt(
+				glm::vec3(0.0f, 0.0f, 0.0f),
+				glm::vec3(-1.0f, 0.0f, 0.0f),
+				glm::vec3(0.0f, -1.0f, 0.0f)),
+			glm::lookAt(
+				glm::vec3(0.0f, 0.0f, 0.0f),
+				glm::vec3(0.0f, 1.0f, 0.0f),
+				glm::vec3(0.0f, 0.0f, 1.0f)),
+			glm::lookAt(
+				glm::vec3(0.0f, 0.0f, 0.0f),
+				glm::vec3(0.0f, -1.0f, 0.0f),
+				glm::vec3(0.0f, 0.0f, -1.0f)),
+			glm::lookAt(
+				glm::vec3(0.0f, 0.0f, 0.0f),
+				glm::vec3(0.0f, 0.0f, 1.0f),
+				glm::vec3(0.0f, -1.0f, 0.0f)),
+			glm::lookAt(
+				glm::vec3(0.0f, 0.0f, 0.0f),
+				glm::vec3(0.0f, 0.0f, -1.0f),
+				glm::vec3(0.0f, -1.0f, 0.0f))
+		};
+
+		std::set<std::string> byte_extention = { "jpeg", "jpg" };
+		std::set<std::string> rgba_extention = { "png" };
+		std::set<std::string> half_extention = { "hdr", "dds" };
 
 		proto::Level CreateEquirectangularProtoLevel()
 		{
@@ -57,6 +91,9 @@ namespace frame::opengl::file {
 					scene_camera.set_name("camera");
 					scene_camera.set_parent("root");
 					scene_camera.set_fov_degrees(90.0f);
+					scene_camera.set_near_clip(0.1f);
+					scene_camera.set_far_clip(1000.0f);
+					scene_camera.set_aspect_ratio(1.0f);
 				}
 				*scene_tree_file.add_scene_cameras() = scene_camera;
 				scene_tree_file.set_default_root_name("root");
@@ -74,17 +111,21 @@ namespace frame::opengl::file {
 			proto::TextureFile texture_file{};
 			{
 				proto::Texture texture{};
+				proto::Size proto_size{};
 				texture.set_name("InputTexture");
 				texture.set_file_name(input_file);
 				texture.set_cubemap(false);
+				proto_size.set_x(out_size.first);
+				proto_size.set_y(out_size.second);
+				*texture.mutable_size() = proto_size;
 				*texture.mutable_pixel_element_size() = pixel_element_size;
 				*texture.mutable_pixel_structure() = pixel_structure;
 				*texture_file.add_textures() = texture;
 			}
 			{
 				proto::Texture texture{};
-				texture.set_name("OutputCubemap");
 				proto::Size proto_size{};
+				texture.set_name("OutputCubemap");
 				texture.set_cubemap(true);
 				proto_size.set_x(out_size.first);
 				proto_size.set_y(out_size.second);
@@ -109,6 +150,12 @@ namespace frame::opengl::file {
 			}
 			return material_file;
 		}
+
+		std::uint32_t PowerFloor(std::uint32_t x) {
+			std::uint32_t power = 1;
+			while (x >>= 1) power <<= 1;
+			return power;
+		}
 	}
 
 	std::optional<std::unique_ptr<frame::TextureInterface>> 
@@ -119,23 +166,12 @@ namespace frame::opengl::file {
 		const proto::PixelStructure pixel_structure 
 			/*= proto::PixelStructure_RGB()*/)
 	{
-		frame::file::Image image(file, pixel_element_size, pixel_structure);
-		std::string extention = file.substr(file.find_last_of(".") + 1);
-		if (cube_map_half_extention.count(extention))
-		{
-			return LoadCubeMapTextureFromFile(
-				file, 
-				pixel_element_size, 
-				pixel_structure);
-		}
-		else
-		{
-			return std::make_unique<frame::opengl::Texture>(
-				image.GetSize(),
-				image.Data(),
-				pixel_element_size,
-				pixel_structure);
-		}
+		frame::file::Image image(file, pixel_element_size, pixel_structure);	
+		return std::make_unique<frame::opengl::Texture>(
+			image.GetSize(),
+			image.Data(),
+			pixel_element_size,
+			pixel_structure);
 	}
 
 	std::optional<std::unique_ptr<frame::TextureInterface>> 
@@ -149,23 +185,69 @@ namespace frame::opengl::file {
 		auto material = std::make_unique<frame::opengl::Material>();
 		auto frame = std::make_unique<frame::opengl::FrameBuffer>();
 		auto render = std::make_unique<frame::opengl::RenderBuffer>();
+		auto& logger = Logger::GetInstance();
+		auto maybe_equirectangular =
+			LoadTextureFromFile(file, pixel_element_size, pixel_structure);
+		if (!maybe_equirectangular)
+		{
+			logger->info("Could not load texture: [{}].", file);
+			return std::nullopt;
+		}
+		std::unique_ptr<TextureInterface> equirectangular = 
+			std::move(maybe_equirectangular.value());
+		auto size = equirectangular->GetSize();
+		// Seams correct when you are less than 2048 in height you get 512.
+		std::uint32_t cube_single_res = PowerFloor(size.second) / 2;
+		std::pair<std::uint32_t, std::uint32_t> cube_pair_res =
+			{ cube_single_res, cube_single_res };
 		auto maybe_level = frame::proto::ParseLevelOpenGL(
-			{128, 128}, 
+			cube_pair_res,
 			CreateEquirectangularProtoLevel(),
 			CreateEquirectangularProtoProgramFile(),
 			CreateEquirectangularProtoSceneTreeFile(),
 			CreateEquirectangularProtoTextureFile(
 				file, 
-				{128, 128}, 
+				cube_pair_res,
 				proto::PixelElementSize_HALF(),
 				proto::PixelStructure_RGB()),
 			CreateEquirectangularProtoMaterialFile());
 		ScopedBind scoped_bind_frame(*frame);
 		ScopedBind scoped_bind_render(*render);
-		auto equirectangular = 
-			LoadTextureFromFile(file, pixel_element_size, pixel_structure);
-		
-		throw std::runtime_error("Not implemented!");
+		if (!maybe_level)
+		{
+			logger->info("Could not create level.");
+			return std::nullopt;
+		}
+		auto level = std::move(maybe_level.value());
+		auto maybe_id = level->GetIdFromName("OutputCubemap");
+		if (!maybe_id)
+		{
+			logger->info("Could not get the id of \"OutputCubemap\".");
+			return std::nullopt;
+		}
+		auto* out_texture_ptr = level->GetTextureFromId(maybe_id.value());
+		Renderer renderer(level.get(), cube_pair_res);
+		auto maybe_cube_id = level->GetDefaultStaticMeshCubeId();
+		if (!maybe_cube_id)
+		{
+			logger->info("Could not get the default cube id.");
+			return std::nullopt;
+		}
+		auto cube_id = maybe_cube_id.value();
+		for (std::uint32_t i = 0; i < 6; ++i)
+		{
+			frame->AttachTexture(
+				out_texture_ptr->GetId(),
+				FrameColorAttachment::COLOR_ATTACHMENT0,
+				0,
+				static_cast<FrameTextureType>(i));
+			renderer.RenderMesh(
+				level->GetStaticMeshFromId(cube_id), 
+				views_cubemap[i]);
+		}
+		auto maybe_output_id = level->GetIdFromName("OutputCubemap");
+		if (!maybe_output_id) return std::nullopt;
+		return level->ExtractTexture(maybe_output_id.value());
 	}
 
 	std::optional<std::unique_ptr<frame::TextureInterface>> 

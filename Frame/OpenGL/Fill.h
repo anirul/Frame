@@ -18,8 +18,7 @@ namespace frame::opengl {
 	//		- unform_interface		: interface to update the uniforms.
 	void FillProgramMultiTexture(
 		const std::shared_ptr<LevelInterface> level,
-		const std::shared_ptr<ProgramInterface> program,
-		const std::shared_ptr<UniformInterface> uniform_interface);
+		const std::shared_ptr<ProgramInterface> program);
 
 	// Fill multiple textures from a program.
 	//		- level					: structure that contain textures.
@@ -30,7 +29,6 @@ namespace frame::opengl {
 	void FillProgramMultiTextureMipmap(
 		const std::shared_ptr<LevelInterface> level,
 		const std::shared_ptr<ProgramInterface> program,
-		const std::shared_ptr<UniformInterface> uniform_interface,
 		const int mipmap,
 		const std::function<void(
 			const int mipmap,
@@ -43,8 +41,7 @@ namespace frame::opengl {
 	//		- unform_interface		: interface to update the uniforms.
 	void FillProgramMultiTextureCubeMap(
 		const std::shared_ptr<LevelInterface> level,
-		const std::shared_ptr<ProgramInterface> program,
-		const std::shared_ptr<UniformInterface> uniform_interface);
+		const std::shared_ptr<ProgramInterface> program);
 
 	// Fill multiple cube map texture from a program.
 	//		- level					: structure that contain textures.
@@ -55,7 +52,6 @@ namespace frame::opengl {
 	void FillProgramMultiTextureCubeMapMipmap(
 		const std::shared_ptr<LevelInterface> level,
 		const std::shared_ptr<ProgramInterface> program,
-		const std::shared_ptr<UniformInterface> uniform_interface,
 		const int mipmap,
 		const std::function<void(
 			const int mipmap,

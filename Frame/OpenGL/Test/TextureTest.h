@@ -1,6 +1,7 @@
 #pragma once
 
 #include <gtest/gtest.h>
+
 #include "Frame/Error.h"
 #include "Frame/TextureInterface.h"
 #include "Frame/Window.h"

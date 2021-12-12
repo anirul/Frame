@@ -176,4 +176,40 @@ namespace frame {
 		}
 	}
 
+	std::optional<std::unique_ptr<frame::TextureInterface>> 
+		Level::ExtractTexture(EntityId id)
+	{
+		auto ptr = GetTextureFromId(id);
+		if (!ptr) return std::nullopt;
+		auto node_texture = id_texture_map_.extract(id);
+		auto node_name = id_name_map_.extract(id);
+		auto node_id = name_id_map_.extract(node_name.mapped());
+		auto node_enum = id_enum_map_.extract(id);
+		return std::move(node_texture.mapped());
+	}
+
+	frame::CameraInterface* Level::GetDefaultCamera()
+	{
+		auto maybe_camera_id = GetDefaultCameraId();
+		if (!maybe_camera_id)
+		{
+			logger_->info("Could not get the camera id.");
+			return nullptr;
+		}
+		auto camera_id = maybe_camera_id.value();
+		auto node_interface = GetSceneNodeFromId(camera_id);
+		if (!node_interface)
+		{
+			logger_->info("Could not get node interface.");
+			return nullptr;
+		}
+		NodeCamera* node_camera = dynamic_cast<NodeCamera*>(node_interface);
+		if (!node_camera)
+		{
+			logger_->info("Could not get node camera ptr.");
+			return nullptr;
+		}
+		return node_camera->GetCamera();
+	}
+
 } // End namespace frame.

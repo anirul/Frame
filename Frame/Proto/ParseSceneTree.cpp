@@ -1,4 +1,5 @@
 #include "ParseSceneTree.h"
+
 #include "Frame/File/FileSystem.h"
 #include "Frame/File/Obj.h"
 #include "Frame/Proto/ParseUniform.h"
@@ -15,8 +16,7 @@ namespace frame::proto {
 	namespace {
 
 		std::function<NodeInterface*(const std::string& name)> 
-		GetFunctor(
-			LevelInterface* level)
+		GetFunctor(LevelInterface* level)
 		{
 			return [level](const std::string& name)->NodeInterface*
 			{

@@ -2,6 +2,7 @@
 
 #include <utility>
 #include <glm/glm.hpp>
+
 #include "Frame/CameraInterface.h"
 
 namespace frame {
@@ -10,54 +11,39 @@ namespace frame {
 	{
 	public:
 		Camera(
-			const glm::vec3 position = { 0.f, 0.f, 0.f },
-			const glm::vec3 front = { 0.f, 0.f, -1.f },
-			const glm::vec3 up = { 0.f, 1.f, 0.f },
-			const float fov_degrees = 65.0f,
-			const float aspect_ratio = 16.0f / 9.0f,
-			const float near_clip = 0.1f,
-			const float far_clip = 1000.0f);
+			glm::vec3 position = { 0.f, 0.f, 0.f },
+			glm::vec3 front = { 0.f, 0.f, -1.f },
+			glm::vec3 up = { 0.f, 1.f, 0.f },
+			float fov_degrees = 65.0f,
+			float aspect_ratio = 16.0f / 9.0f,
+			float near_clip = 0.1f,
+			float far_clip = 1000.0f);
 
 	public:
-		const glm::mat4 ComputeView() const override;
-		const glm::mat4 ComputeProjection(
-			const std::pair<std::uint32_t, std::uint32_t> size,
-			const float near = .1f,
-			const float far = 100.f) const override;
-		void SetFront(const glm::vec3 vec) override;
-		void SetPosition(const glm::vec3 vec) override;
-		void SetUp(const glm::vec3 vec) override;
+		glm::mat4 ComputeView() const override;
+		glm::mat4 ComputeProjection() const override;
+		void SetFront(glm::vec3 vec) override;
+		void SetPosition(glm::vec3 vec) override;
+		void SetUp(glm::vec3 vec) override;
 
 	public:
-		void SetFovRadians(const float fov) override { fov_rad_ = fov; }
-		void SetFovDegrees(const float fov) override
-		{
-			fov_rad_ = glm::radians(fov);
-		}
-		void SetAspectRatio(const float aspect_ratio) override
+		void SetFovRadians(float fov) override { fov_rad_ = fov; }
+		void SetFovDegrees(float fov) override { fov_rad_ = glm::radians(fov); }
+		void SetAspectRatio(float aspect_ratio) override 
 		{
 			aspect_ratio_ = aspect_ratio;
 		}
-		void SetNearClip(const float near_clip) override 
-		{
-			near_clip_ = near_clip; 
-		}
-		void SetFarClip(const float far_clip) override 
-		{ 
-			far_clip_ = far_clip;	
-		}
-		const glm::vec3 GetFront() const override { return front_; }
-		const glm::vec3 GetPosition() const override { return position_; }
-		const glm::vec3 GetRight() const override { return right_; }
-		const glm::vec3 GetUp() const override { return up_; }
-		const float GetFovRadians() const override { return fov_rad_; }
-		const float GetFovDegrees() const override 
-		{ 
-			return glm::degrees(fov_rad_); 
-		}
-		const float GetAspectRatio() const override { return aspect_ratio_; }
-		const float GetNearClip() const override { return near_clip_; }
-		const float GetFarClip() const override { return far_clip_; }
+		void SetNearClip(float near_clip) override { near_clip_ = near_clip; }
+		void SetFarClip(float far_clip) override { far_clip_ = far_clip; }
+		glm::vec3 GetFront() const override { return front_; }
+		glm::vec3 GetPosition() const override { return position_; }
+		glm::vec3 GetRight() const override { return right_; }
+		glm::vec3 GetUp() const override { return up_; }
+		float GetFovRadians() const override { return fov_rad_; }
+		float GetFovDegrees() const override { return glm::degrees(fov_rad_); }
+		float GetAspectRatio() const override { return aspect_ratio_; }
+		float GetNearClip() const override { return near_clip_; }
+		float GetFarClip() const override { return far_clip_; }
 
 	protected:
 		void UpdateCameraVectors();

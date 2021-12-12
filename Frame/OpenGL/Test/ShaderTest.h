@@ -1,6 +1,7 @@
 #pragma once
 
 #include <gtest/gtest.h>
+
 #include "Frame/Window.h"
 #include "Frame/OpenGL/Shader.h"
 

@@ -32,9 +32,12 @@ add_library(Frame
     NodeInterface.h
     NodeStaticMesh.cpp
     NodeStaticMesh.h
+    RendererInterface.h
     StaticMeshInterface.h
     TextureInterface.h
     UniformInterface.h
+    UniformWrapper.cpp
+    UniformWrapper.h
     Window.cpp
     Window.h
     WindowInterface.h

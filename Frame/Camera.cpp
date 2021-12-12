@@ -1,17 +1,18 @@
 #include "Camera.h"
+
 #include <cmath>
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace frame {
 
 	Camera::Camera(
-		const glm::vec3 position /*= { 0.f, 0.f, 0.f }*/, 
-		const glm::vec3 front /*= { 0.f, 0.f, 1.f }*/, 
-		const glm::vec3 up /*= { 0.f, 1.f, 0.f }*/,
-		const float fov_degrees /*= 65.0f */,
-		const float aspect_ratio /*= 16.0f / 9.0f*/,
-		const float near_clip /*= 0.1f*/,
-		const float far_clip /*= 1000.0f*/) :
+		glm::vec3 position /*= { 0.f, 0.f, 0.f }*/, 
+		glm::vec3 front /*= { 0.f, 0.f, 1.f }*/, 
+		glm::vec3 up /*= { 0.f, 1.f, 0.f }*/,
+		float fov_degrees /*= 65.0f */,
+		float aspect_ratio /*= 16.0f / 9.0f*/,
+		float near_clip /*= 0.1f*/,
+		float far_clip /*= 1000.0f*/) :
 		position_(position),
 		front_(front),
 		up_(up),
@@ -23,34 +24,29 @@ namespace frame {
 		UpdateCameraVectors();
 	}
 
-	const glm::mat4 Camera::ComputeView() const
+	glm::mat4 Camera::ComputeView() const
 	{
 		return glm::lookAt(position_, front_ + position_, up_);
 	}
 
-	const glm::mat4 Camera::ComputeProjection(
-		const std::pair<std::uint32_t, std::uint32_t> size,
-		const float near,
-		const float far) const
+	glm::mat4 Camera::ComputeProjection() const
 	{
-		const float aspect =
-			static_cast<float>(size.first) / static_cast<float>(size.second);
-		return glm::perspective(fov_rad_, aspect, near, far);
+		return glm::perspective(fov_rad_, aspect_ratio_, near_clip_, far_clip_);
 	}
 
-	void Camera::SetFront(const glm::vec3 vec)
+	void Camera::SetFront(glm::vec3 vec)
 	{
 		front_ = vec;
 		UpdateCameraVectors();
 	}
 
-	void Camera::SetPosition(const glm::vec3 vec)
+	void Camera::SetPosition(glm::vec3 vec)
 	{
 		position_ = vec;
 		UpdateCameraVectors();
 	}
 
-	void Camera::SetUp(const glm::vec3 vec)
+	void Camera::SetUp(glm::vec3 vec)
 	{
 		up_ = vec;
 		UpdateCameraVectors();

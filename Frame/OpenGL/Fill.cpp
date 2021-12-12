@@ -1,8 +1,10 @@
 #include "Fill.h"
+
 #include <array>
 #include <assert.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+
 #include "Frame/Error.h"
 #include "Frame/OpenGL/FrameBuffer.h"
 #include "Frame/OpenGL/RenderBuffer.h"
@@ -44,13 +46,11 @@ namespace frame::opengl {
 
 	void FillProgramMultiTexture(
 		const std::shared_ptr<LevelInterface> level,
-		const std::shared_ptr<ProgramInterface> program,
-		const std::shared_ptr<UniformInterface> uniform_interface)
+		const std::shared_ptr<ProgramInterface> program)
 	{
 		FillProgramMultiTextureMipmap(
 			level,
 			program,
-			uniform_interface,
 			0,
 			[](const int, const std::shared_ptr<ProgramInterface>) {});
 	}
@@ -58,7 +58,6 @@ namespace frame::opengl {
 	void FillProgramMultiTextureMipmap(
 		const std::shared_ptr<LevelInterface> level,
 		const std::shared_ptr<ProgramInterface> program,
-		const std::shared_ptr<UniformInterface> uniform_interface,
 		const int mipmap,
 		const std::function<void(
 			const int mipmap,
@@ -116,7 +115,6 @@ namespace frame::opengl {
 			error.Display(__FILE__, __LINE__ - 1);
 			Renderer renderer(
 				level.get(), 
-				uniform_interface.get(), 
 				temporary_size);
 			renderer.SetProjection(projection);
 			auto maybe_id = level->GetDefaultStaticMeshQuadId();
@@ -131,13 +129,11 @@ namespace frame::opengl {
 
 	void FillProgramMultiTextureCubeMap(
 		const std::shared_ptr<LevelInterface> level,
-		const std::shared_ptr<ProgramInterface> program,
-		const std::shared_ptr<UniformInterface> uniform_interface)
+		const std::shared_ptr<ProgramInterface> program)
 	{
 		FillProgramMultiTextureCubeMapMipmap(
 			level,
 			program,
-			uniform_interface,
 			0,
 			[](const int, const std::shared_ptr<ProgramInterface>) {});
 	}
@@ -145,7 +141,6 @@ namespace frame::opengl {
 	void FillProgramMultiTextureCubeMapMipmap(
 		const std::shared_ptr<LevelInterface> level,
 		const std::shared_ptr<ProgramInterface> program,
-		const std::shared_ptr<UniformInterface> uniform_interface,
 		const int mipmap,
 		const std::function<void(
 			const int mipmap,
@@ -207,7 +202,6 @@ namespace frame::opengl {
 				error.Display(__FILE__, __LINE__ - 1);
 				Renderer renderer(
 					level.get(), 
-					uniform_interface.get(), 
 					temporary_size);
 				renderer.SetProjection(projection);
 				renderer.SetView(view);

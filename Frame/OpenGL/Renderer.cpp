@@ -1,19 +1,20 @@
 #include "Renderer.h"
+
 #include <stdexcept>
 #include <fmt/core.h>
 #include <GL/glew.h>
+
 #include "Frame/NodeStaticMesh.h"
+#include "Frame/UniformWrapper.h"
 #include "Frame/OpenGL/Material.h"
 #include "Frame/OpenGL/File/LoadProgram.h"
 
 namespace frame::opengl {
 
 	Renderer::Renderer(
-		LevelInterface* level, 
-		UniformInterface* uniform_interface,
+		LevelInterface* level,
 		std::pair<std::uint32_t, std::uint32_t> size) :
-		level_(level),
-		uniform_interface_(uniform_interface)
+		level_(level)
 	{
 		if (!size.first || !size.second) 
 		{
@@ -54,7 +55,7 @@ namespace frame::opengl {
 		}
 	}
 
-	void Renderer::RenderNode(EntityId node_id, const double dt/* = 0.0*/)
+	void Renderer::RenderNode(EntityId node_id, double dt/* = 0.0*/)
 	{
 		// Check current node.
 		auto node = level_->GetSceneNodeFromId(node_id);
@@ -73,7 +74,7 @@ namespace frame::opengl {
 		RenderMesh(static_mesh, node->GetLocalModel(dt), dt);
 	}
 
-	void Renderer::RenderChildren(EntityId node_id, const double dt/* = 0.0*/)
+	void Renderer::RenderChildren(EntityId node_id, double dt/* = 0.0*/)
 	{
 		RenderNode(node_id, dt);
 		// Loop into the child of the root node.
@@ -83,7 +84,7 @@ namespace frame::opengl {
 		for (const auto& id : list)	RenderChildren(id, dt);
 	}
 
-	void Renderer::RenderFromRootNode(const double dt/* = 0.0*/)
+	void Renderer::RenderFromRootNode(double dt/* = 0.0*/)
 	{
 		auto maybe_root_id = level_->GetDefaultRootSceneNodeId();
 		if (!maybe_root_id) throw std::runtime_error("No root id.");
@@ -93,8 +94,8 @@ namespace frame::opengl {
 
 	void Renderer::RenderMesh(
 		StaticMeshInterface* static_mesh,
-		const glm::mat4& model_mat/* = glm::mat4(1.0f)*/,
-		const double dt/* = 0.0*/)
+		glm::mat4 model_mat/* = glm::mat4(1.0f)*/,
+		double dt/* = 0.0*/)
 	{
 		if (!static_mesh)
 			throw std::runtime_error("StaticMesh ptr doesn't exist.");
@@ -108,7 +109,9 @@ namespace frame::opengl {
 			throw std::runtime_error("Program ptr doesn't exist.");
 		assert(program->GetOutputTextureIds().size());
 		SetDepthTest(program->GetDepthTest());
-		program->Use(uniform_interface_);
+		UniformWrapper uniform_wrapper(level_->GetDefaultCamera());
+		uniform_wrapper.SetTime(dt);
+		program->Use(&uniform_wrapper);
 		auto texture_out_ids = program->GetOutputTextureIds();
 		auto texture_ref = 
 			level_->GetTextureFromId(*texture_out_ids.cbegin());
@@ -182,7 +185,9 @@ namespace frame::opengl {
 		quad->SetMaterialId(display_material_id_);
 		auto program = level_->GetProgramFromId(display_program_id_);
 		SetDepthTest(program->GetDepthTest());
-		program->Use(uniform_interface_);
+		UniformWrapper uniform_wrapper(level_->GetDefaultCamera());
+		uniform_wrapper.SetTime(dt);
+		program->Use(&uniform_wrapper);
 		auto material = level_->GetMaterialFromId(display_material_id_);
 
 		for (const auto id : material->GetIds())
@@ -217,7 +222,7 @@ namespace frame::opengl {
 		quad->SetMaterialId(0);
 	}
 
-	void Renderer::SetDepthTest(bool enable) const
+	void Renderer::SetDepthTest(bool enable)
 	{
 		if (enable)
 		{
