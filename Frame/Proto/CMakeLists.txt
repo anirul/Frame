@@ -16,15 +16,13 @@ add_library(FrameProto
     ParseUniform.h
     ParseLevel.cpp
     ParseLevel.h
-    ProtoLevelCreate.cpp
-    ProtoLevelCreate.h
+    Proto.cpp
+    Proto.h
     Level.proto
     Material.proto
     Math.proto
     Pixel.proto
     Program.proto
-    Proto.cpp
-    Proto.h
     Scene.proto
     Size.proto
     Texture.proto

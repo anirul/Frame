@@ -7,7 +7,7 @@
 namespace frame::proto {
 
 	[[nodiscard]] bool ParseSceneTreeFile(
-		const SceneTreeFile& proto_scene_tree_file,
+		const SceneTree& proto_scene_tree,
 		LevelInterface* level);
 
 } // End namespace frame::proto.

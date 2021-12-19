@@ -14,10 +14,3 @@ message Material {
 	// Reference to the name inside the material in the shader file.
 	repeated string inner_names = 4;
 }
-
-// File description of the materials description.
-// Next 2
-message MaterialFile {
-	// Contain many materials.
-	repeated Material materials = 1;
-}

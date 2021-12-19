@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <fstream>
 #include <vector>
+#include <regex>
 #include <set>
 
 #include "Frame/File/FileSystem.h"
@@ -15,7 +16,6 @@
 #include "Frame/OpenGL/Texture.h"
 #include "Frame/OpenGL/TextureCubeMap.h"
 #include "Frame/Proto/ParseLevel.h"
-#include "Frame/Proto/ProtoLevelCreate.h"
 
 namespace frame::opengl::file {
 
@@ -50,129 +50,101 @@ namespace frame::opengl::file {
 				glm::vec3(0.0f, -1.0f, 0.0f))
 		};
 
-		std::set<std::string> byte_extention = { "jpeg", "jpg" };
-		std::set<std::string> rgba_extention = { "png" };
-		std::set<std::string> half_extention = { "hdr", "dds" };
+		const std::set<std::string> byte_extention = { "jpeg", "jpg" };
+		const std::set<std::string> rgba_extention = { "png" };
+		const std::set<std::string> half_extention = { "hdr", "dds" };
 
 		const std::string proto_level_json = R"json(
 				{
 					"name": "Equirectangular",
 					"default_texture_name": "OutputCubemap"
+					"programs": [
+						{
+							"name": "EquirectangularProgram",
+							"shader": "EquirectangularCubemap",
+							"input_scene_type":	{
+								"value": "QUAD"
+							},
+							"output_texture_names: [ "OutputCubeMap" ]
+						}
+					]
+					"scene_tree": {
+						"default_root_name": "root",
+						"defautl_camera_name": "camera",
+						"scene_matrices": [
+							{
+								"name": "root"
+							},
+							{
+								"name": "camera_boon",
+								"parent": "root"
+							}
+						],
+						"scene_static_meshes": [
+							{
+								"name": "Cube",
+								"mesh_enum": "CUBE",
+								"material_name": "EquirectangularMaterial",
+								"parent": "root"
+							}
+						],
+						"scene_cameras": [
+							{
+								"name": "camera",
+								"parent": "camera_boon",
+								"fov_degrees": "90.0",
+								"near_clip": "0.1f",
+								"far_clip": "1000.0f",
+								"aspect_ratio": "1.0f"
+							}
+						]
+					}
+					"textures" : [
+						{
+							"name": "InputTexture",
+							"file_name": "<filename>",
+							"cubemap": "false",
+							"size" : {
+								"x": "<x>",
+								"y": "<y>"
+							},
+							"pixel_element_size": "<pixel_element_size>",
+							"pixel_structure": "<pixel_structure>"
+						},
+						{
+							"name": "OutputTexture",
+							"cubemap": "true",
+							"size": {
+								"x": "<x>",
+								"y": "<y>"
+							},
+							"pixel_element_size": "<pixel_element_size>",
+							"pixel_structure": "<pixel_structure>"
+						}
+					],
+					"materials": [
+						{
+							"name": "EquirectangularMaterial",
+							"program_name": "EquirectangularProgram",
+							"texture_names": [ "InputTexture" ],
+							"inner_names": "Equirectangular"
+						}
+					]
 				}
 			)json";
 
-		proto::Level CreateEquirectangularProtoLevel()
+		std::string FillLevel(
+			const std::string& initial, 
+			const std::map<std::string, std::string>& map)
 		{
-			proto::Level level = proto::LoadProtoFromJson<proto::Level>(proto_level_json);
-			level.set_name("Equirectangular");
-			level.set_default_texture_name("OutputCubemap");
-			return level;
-		}
-
-		proto::ProgramFile CreateEquirectangularProtoProgramFile()
-		{
-			proto::ProgramFile program_file{};
-			proto::Program program{};
+			std::string out = initial;
+			for (const auto& [from, to] : map)
 			{
-				program.set_name("EquirectangularProgram");
-				program.set_shader("EquirectangularCubeMap");
-				proto::SceneType scene_type{};
-				scene_type.set_value(proto::SceneType::QUAD);
-				*program.mutable_input_scene_type() = scene_type;
-				program.add_output_texture_names("OutputCubemap");
+				std::string temp = 
+					std::regex_replace(out, std::regex(from), to);
+				out = temp;
 			}
-			*program_file.add_programs() = program;
-			return program_file;
-		}
-
-		proto::SceneTreeFile CreateEquirectangularProtoSceneTreeFile()
-		{
-			proto::SceneTreeFile scene_tree_file{};
-			{
-				proto::SceneMatrix scene_matrix{};
-				{
-					scene_matrix.set_name("root");
-				}
-				*scene_tree_file.add_scene_matrices() = scene_matrix;
-				proto::SceneMatrix scene_camera_boon{};
-				{
-					scene_camera_boon.set_name("camera_boon");
-					scene_camera_boon.set_parent("root");
-				}
-				*scene_tree_file.add_scene_matrices() = scene_camera_boon;
-				proto::SceneCamera scene_camera{};
-				{
-					scene_camera.set_name("camera");
-					scene_camera.set_parent("camera_boon");
-					scene_camera.set_fov_degrees(90.0f);
-					scene_camera.set_near_clip(0.1f);
-					scene_camera.set_far_clip(1000.0f);
-					scene_camera.set_aspect_ratio(1.0f);
-				}
-				*scene_tree_file.add_scene_cameras() = scene_camera;
-				scene_tree_file.set_default_root_name("root");
-				scene_tree_file.set_default_camera_name("camera");
-				proto::SceneStaticMesh scene_static_mesh{};
-				{
-					scene_static_mesh.set_name("Cube");
-					scene_static_mesh.set_mesh_enum(
-						proto::SceneStaticMesh::CUBE);
-					scene_static_mesh.set_material_name(
-						"EquirectangularMaterial");
-					scene_static_mesh.set_parent("root");
-				}
-				*scene_tree_file.add_scene_static_meshes() = scene_static_mesh;
-			}
-			return scene_tree_file;
-		}
-
-		proto::TextureFile CreateEquirectangularProtoTextureFile(
-			const std::string& input_file,
-			const std::pair<std::uint32_t, std::uint32_t> out_size,
-			const proto::PixelElementSize pixel_element_size,
-			const proto::PixelStructure pixel_structure)
-		{
-			proto::TextureFile texture_file{};
-			{
-				proto::Texture texture{};
-				proto::Size proto_size{};
-				texture.set_name("InputTexture");
-				texture.set_file_name(input_file);
-				texture.set_cubemap(false);
-				proto_size.set_x(out_size.first);
-				proto_size.set_y(out_size.second);
-				*texture.mutable_size() = proto_size;
-				*texture.mutable_pixel_element_size() = pixel_element_size;
-				*texture.mutable_pixel_structure() = pixel_structure;
-				*texture_file.add_textures() = texture;
-			}
-			{
-				proto::Texture texture{};
-				proto::Size proto_size{};
-				texture.set_name("OutputCubemap");
-				texture.set_cubemap(true);
-				proto_size.set_x(out_size.first);
-				proto_size.set_y(out_size.second);
-				*texture.mutable_size() = proto_size;
-				*texture.mutable_pixel_element_size() = pixel_element_size;
-				*texture.mutable_pixel_structure() = pixel_structure;
-				*texture_file.add_textures() = texture;
-			}
-			return texture_file;
-		}
-
-		proto::MaterialFile CreateEquirectangularProtoMaterialFile()
-		{
-			proto::MaterialFile material_file{};
-			{
-				proto::Material material{};
-				material.set_name("EquirectangularMaterial");
-				material.set_program_name("EquirectangularProgram");
-				material.add_texture_names("InputTexture");
-				material.add_inner_names("Equirectangular");
-				*material_file.add_materials() = material;
-			}
-			return material_file;
+			return out;
 		}
 
 		std::uint32_t PowerFloor(std::uint32_t x) {
@@ -224,17 +196,18 @@ namespace frame::opengl::file {
 		std::uint32_t cube_single_res = PowerFloor(size.second) / 2;
 		std::pair<std::uint32_t, std::uint32_t> cube_pair_res =
 			{ cube_single_res, cube_single_res };
-		auto maybe_level = frame::proto::ParseLevelOpenGL(
-			cube_pair_res,
-			CreateEquirectangularProtoLevel(),
-			CreateEquirectangularProtoProgramFile(),
-			CreateEquirectangularProtoSceneTreeFile(),
-			CreateEquirectangularProtoTextureFile(
-				file,
+		std::map<std::string, std::string> filling_map = {
+			{ "<filename>", file },
+			{ "<x>", std::to_string(cube_pair_res.first) },
+			{ "<y>", std::to_string(cube_pair_res.second) },
+			{ "<pixel_element_size>", "HALF" },
+			{ "<pixel_structure>", "RGB" }
+		};
+		auto maybe_level = 
+			frame::proto::ParseLevelOpenGL(
 				cube_pair_res,
-				proto::PixelElementSize_HALF(),
-				proto::PixelStructure_RGB()),
-			CreateEquirectangularProtoMaterialFile());
+				proto::LoadProtoFromJson<proto::Level>(
+					FillLevel(proto_level_json, filling_map)));
 		if (!maybe_level)
 		{
 			logger->info("Could not create level.");

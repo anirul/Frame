@@ -39,10 +39,3 @@ message Program {
 	// Additionnal parameters for the shader.
 	repeated Uniform parameters = 7;
 }
-
-// Description of an effect file.
-// Next 2
-message ProgramFile {
-	// Contain many programs.
-	repeated Program programs = 1;
-}

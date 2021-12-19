@@ -106,7 +106,7 @@ message SceneLight {
 
 // Scene definition.
 // Next 7
-message SceneTreeFile {
+message SceneTree {
 	// This defined witch is the root of the scene tree (not really needed).
 	string default_root_name = 1;
 	// This is the default camera node name.

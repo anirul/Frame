@@ -28,32 +28,36 @@
 namespace frame::proto {
 
 	template <typename T>
-	T LoadProtoFromJsonFile(const std::string& file_name)
+	T LoadProtoFromJson(const std::string& json)
 	{
-		// Empty case (no such file return an empty structure).
-		if (file_name.empty()) 
-			return T{};
-		// Try to open it.
-		std::ifstream ifs_level(file_name.c_str(), std::ios::in);
-		if (!ifs_level.is_open())
-			throw std::runtime_error("Couldn't open file: " + file_name);
 		T proto{};
-		std::string contents(std::istreambuf_iterator<char>(ifs_level), {});
 		google::protobuf::util::JsonParseOptions options{};
 		options.ignore_unknown_fields = false;
 		auto status = google::protobuf::util::JsonStringToMessage(
-			contents,
+			json,
 			&proto,
 			options);
 		if (!status.ok())
 		{
 			throw std::runtime_error(
 				fmt::format(
-					"Couldn't parse file: [{}] status error: [{}]", 
-					file_name,
+					"Couldn't parse json status error: [{}]",
 					status.message().as_string()));
 		}
 		return proto;
+	}
+
+	template <typename T>
+	T LoadProtoFromJsonFile(const std::string& file_name)
+	{
+		// Empty case (no such file return an empty structure).
+		if (file_name.empty()) return T{};
+		// Try to open it.
+		std::ifstream ifs_level(file_name.c_str(), std::ios::in);
+		if (!ifs_level.is_open())
+			throw std::runtime_error("Couldn't open file: " + file_name);
+		std::string contents(std::istreambuf_iterator<char>(ifs_level), {});
+		return LoadProtoFromJson<T>(contents);
 	}
 
 	template <typename T>

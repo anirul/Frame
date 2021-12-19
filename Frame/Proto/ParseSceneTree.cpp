@@ -200,30 +200,30 @@ namespace frame::proto {
 	} // End namespace.
 
 	[[nodiscard]] bool ParseSceneTreeFile(
-		const SceneTreeFile& proto_scene_tree_file,
+		const SceneTree& proto_scene_tree,
 		LevelInterface* level)
 	{
 		level->SetDefaultCameraName(
-			proto_scene_tree_file.default_camera_name());
+			proto_scene_tree.default_camera_name());
 		level->SetDefaultRootSceneNodeName(
-			proto_scene_tree_file.default_root_name());
-		for (const auto& proto_matrix : proto_scene_tree_file.scene_matrices())
+			proto_scene_tree.default_root_name());
+		for (const auto& proto_matrix : proto_scene_tree.scene_matrices())
 		{
 			if (!ParseSceneMatrix(level, proto_matrix))
 				return false;
 		}
 		for (const auto& proto_static_mesh :
-			proto_scene_tree_file.scene_static_meshes())
+			proto_scene_tree.scene_static_meshes())
 		{
 			if (!ParseSceneStaticMesh(level, proto_static_mesh))
 				return false;
 		}
-		for (const auto& proto_camera : proto_scene_tree_file.scene_cameras())
+		for (const auto& proto_camera : proto_scene_tree.scene_cameras())
 		{
 			if (!ParseSceneCamera(level, proto_camera))
 				return false;
 		}
-		for (const auto& proto_light : proto_scene_tree_file.scene_lights())
+		for (const auto& proto_light : proto_scene_tree.scene_lights())
 		{
 			if (!ParseSceneLight(level, proto_light))
 				return false;

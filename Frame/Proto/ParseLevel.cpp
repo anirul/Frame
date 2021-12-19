@@ -16,11 +16,7 @@ namespace frame::proto {
 	public:
 		LevelProto(
 			const std::pair<std::int32_t, std::int32_t> size,
-			const proto::Level& proto_level,
-			const proto::ProgramFile& proto_program_file,
-			const proto::SceneTreeFile& proto_scene_tree_file,
-			const proto::TextureFile& proto_texture_file,
-			const proto::MaterialFile& proto_material_file)
+			const proto::Level& proto_level)
 		{
 			name_ = proto_level.name();
 			default_texture_name_ = proto_level.default_texture_name();
@@ -38,7 +34,7 @@ namespace frame::proto {
 			quad_id_ = maybe_quad_id.value();
 
 			// Load textures from proto.
-			for (const auto& proto_texture : proto_texture_file.textures())
+			for (const auto& proto_texture : proto_level.textures())
 			{
 				std::optional<std::unique_ptr<TextureInterface>> maybe_texture;
 				std::unique_ptr<TextureInterface> texture = nullptr;
@@ -87,7 +83,7 @@ namespace frame::proto {
 			}
 
 			// Load programs from proto.
-			for (const auto& proto_program : proto_program_file.programs())
+			for (const auto& proto_program : proto_level.programs())
 			{
 				auto maybe_program = ParseProgramOpenGL(proto_program, this);
 				if (!maybe_program) 
@@ -109,7 +105,7 @@ namespace frame::proto {
 			}
 
 			// Load material from proto.
-			for (const auto& proto_material : proto_material_file.materials())
+			for (const auto& proto_material : proto_level.materials())
 			{
 				auto maybe_material = 
 					ParseMaterialOpenGL(proto_material, this);
@@ -132,9 +128,10 @@ namespace frame::proto {
 			}
 
 			// Load scenes from proto.
-			if (!ParseSceneTreeFile(proto_scene_tree_file, this))
+			if (!ParseSceneTreeFile(proto_level.scene_tree(), this))
 				throw std::runtime_error("Could not parse proto scene file.");
-			default_camera_name_ = proto_scene_tree_file.default_camera_name();
+			default_camera_name_ = 
+				proto_level.scene_tree().default_camera_name();
 			if (default_camera_name_.empty())
 				throw std::runtime_error("should have a default camera name.");
 		}
@@ -143,19 +140,9 @@ namespace frame::proto {
 
 	std::optional<std::unique_ptr<LevelInterface>> ParseLevelOpenGL(
 		const std::pair<std::int32_t, std::int32_t> size,
-		const proto::Level& proto_level,
-		const proto::ProgramFile& proto_program_file,
-		const proto::SceneTreeFile& proto_scene_tree_file,
-		const proto::TextureFile& proto_texture_file,
-		const proto::MaterialFile& proto_material_file)
+		const proto::Level& proto_level)
 	{
-		auto ptr = std::make_unique<LevelProto>(
-			size,
-			proto_level,
-			proto_program_file,
-			proto_scene_tree_file,
-			proto_texture_file,
-			proto_material_file);
+		auto ptr = std::make_unique<LevelProto>(size, proto_level);
 		if (ptr) return ptr;
 		return std::nullopt;
 	}

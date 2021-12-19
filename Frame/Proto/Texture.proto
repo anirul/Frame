@@ -54,10 +54,3 @@ message Texture {
 	// This is suppose to represent the 6 face of a cube map.
 	repeated string file_names = 15;
 }
-
-// Texture file.
-// Next 2
-message TextureFile {
-	// Contain many textures.
-	repeated Texture textures = 1;
-}
