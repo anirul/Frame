@@ -8,8 +8,7 @@
 class Draw : public frame::DrawInterface
 {
 public:
-	Draw(const std::shared_ptr<frame::DeviceInterface> device) :
-		device_(device) {}
+	Draw(frame::DeviceInterface* device) : device_(device) {}
 
 public:
 	void Startup(const std::pair<std::uint32_t, std::uint32_t> size) override;
@@ -18,7 +17,7 @@ public:
 private:
 	frame::Error& error_ = frame::Error::GetInstance();
 	frame::Logger& logger_ = frame::Logger::GetInstance();
-	std::shared_ptr<frame::DeviceInterface> device_ = nullptr;
+	frame::DeviceInterface* device_ = nullptr;
 	std::string preferred_texture_ = "";
 	std::map<std::string, std::shared_ptr<frame::TextureInterface>> 
 		texture_map_ = {};

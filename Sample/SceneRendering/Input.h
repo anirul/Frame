@@ -6,8 +6,7 @@
 class Input : public frame::InputInterface
 {
 public:
-	Input(const std::shared_ptr<frame::DeviceInterface> device) : 
-		device_(device) {}
+	Input(frame::DeviceInterface* device) : device_(device) {}
 
 public:
 	bool KeyPressed(const char key, const double dt) override;
@@ -21,5 +20,5 @@ public:
 	void NextFrame() override;
 
 private:
-	std::shared_ptr<frame::DeviceInterface> device_;
+	frame::DeviceInterface* device_;
 };

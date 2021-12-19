@@ -3,7 +3,7 @@
 #include <string>
 #include "Frame/File/FileSystem.h"
 
-struct NameInterface
+struct PathInterface
 {
 	virtual const std::string GetGlobalPath() const 
 	{ 

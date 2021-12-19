@@ -9,7 +9,6 @@ namespace test {
 		ASSERT_TRUE(LoadDefaultLevel());
 		renderer_ = std::make_unique<frame::opengl::Renderer>(
 			level_.get(),
-			window_->GetUniqueUniform().get(),
 			window_->GetSize());
 		EXPECT_TRUE(renderer_);
 	}
@@ -20,7 +19,6 @@ namespace test {
 		ASSERT_TRUE(LoadDefaultLevel());
 		renderer_ = std::make_unique<frame::opengl::Renderer>(
 			level_.get(),
-			window_->GetUniqueUniform().get(),
 			window_->GetSize());
 		EXPECT_TRUE(renderer_);
 		renderer_->Display();

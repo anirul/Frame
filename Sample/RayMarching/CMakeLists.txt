@@ -7,7 +7,6 @@ add_executable(RayMarching
     ../../Asset/Json/RayMarching.Program.json
     ../../Asset/Json/RayMarching.Scene.json
     ../../Asset/Json/RayMarching.Texture.json
-    Name.h
     main.cpp
 )
 

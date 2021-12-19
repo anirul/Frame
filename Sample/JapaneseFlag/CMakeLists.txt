@@ -7,7 +7,6 @@ add_executable(JapaneseFlag
     ../../Asset/Json/JapaneseFlag.Material.json
     ../../Asset/Json/JapaneseFlag.Scene.json
     ../../Asset/Json/JapaneseFlag.Texture.json
-    Name.h
     main.cpp
 )
 

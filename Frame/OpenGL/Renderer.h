@@ -40,7 +40,7 @@ namespace frame::opengl {
 		void RenderChildren(EntityId node_id, double dt = 0.0) override;
 		void RenderFromRootNode(double dt = 0.0) override;
 		// Display the default texture to the screen.
-		void Display() override;
+		void Display(double dt = 0.0) override;
 		void SetDepthTest(bool enable) override;
 
 	private:

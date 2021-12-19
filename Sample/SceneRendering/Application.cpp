@@ -3,8 +3,8 @@
 #include "Draw.h"
 #include "Input.h"
 
-Application::Application(const std::shared_ptr<frame::WindowInterface> window) :
-	window_(window) {}
+Application::Application(std::unique_ptr<frame::WindowInterface>&& window) :
+	window_(std::move(window)) {}
 
 void Application::Startup() 
 {
@@ -18,8 +18,8 @@ void Application::Startup()
 void Application::Run()
 {
 	window_->SetDrawInterface(
-		std::make_shared<Draw>(window_->GetUniqueDevice()));
+		std::make_unique<Draw>(window_->GetUniqueDevice()));
 	window_->SetInputInterface(
-		std::make_shared<Input>(window_->GetUniqueDevice()));
+		std::make_unique<Input>(window_->GetUniqueDevice()));
 	window_->Run();
 }

@@ -101,12 +101,10 @@ namespace frame::opengl {
 			throw std::runtime_error("StaticMesh ptr doesn't exist.");
 		auto material_id = static_mesh->GetMaterialId();
 		auto material = level_->GetMaterialFromId(material_id);
-		if (!material)
-			throw std::runtime_error("No material!");
+		if (!material) throw std::runtime_error("No material!");
 		auto program_id = material->GetProgramId();
 		auto program = level_->GetProgramFromId(program_id);
-		if (!program)
-			throw std::runtime_error("Program ptr doesn't exist.");
+		if (!program) throw std::runtime_error("Program ptr doesn't exist.");
 		assert(program->GetOutputTextureIds().size());
 		SetDepthTest(program->GetDepthTest());
 		UniformWrapper uniform_wrapper(level_->GetDefaultCamera());
@@ -177,7 +175,7 @@ namespace frame::opengl {
 		}
 	}
 
-	void Renderer::Display()
+	void Renderer::Display(double dt/* = 0.0*/)
 	{
 		auto maybe_quad_id = level_->GetDefaultStaticMeshQuadId();
 		if (!maybe_quad_id) throw std::runtime_error("No quad id.");

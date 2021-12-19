@@ -56,4 +56,10 @@ namespace frame::proto {
 		return proto;
 	}
 
+	template <typename T>
+	T LoadProtoFromJsonFile(const std::filesystem::path path)
+	{
+		return LoadProtoFromJsonFile<T>(path.native());
+	}
+
 } // End namespace frame::proto.

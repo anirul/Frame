@@ -10,8 +10,6 @@
 #include "Frame/Error.h"
 #include "Frame/Window.h"
 #include "Sample/Common/Application.h"
-#include "Sample/SceneSimple/Name.h"
-
 
 #if defined(_WIN32) || defined(_WIN64)
 int WINAPI WinMain(
@@ -26,7 +24,8 @@ int main(int ac, char** av)
 	try
 	{
 		Application app(
-			std::make_shared<Name>(), 
+			frame::file::FindDirectory("Asset/Json/") + 
+				"SceneSimple.Level.json",
 			frame::CreateSDLOpenGL({ 1280, 720 }));
 		app.Startup();
 		app.Run();

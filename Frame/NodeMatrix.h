@@ -18,6 +18,9 @@ namespace frame {
 	public:
 		glm::mat4 GetLocalModel(const double dt) const override;
 
+	public:
+		void SetMatrix(glm::mat4 matrix) { matrix_ = matrix; }
+
 	protected:
 		glm::mat4 ComputeLocalRotation(const double dt) const;
 

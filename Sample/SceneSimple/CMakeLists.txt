@@ -7,7 +7,6 @@ add_executable(SceneSimple
     ../../Asset/Json/SceneSimple.Program.json
     ../../Asset/Json/SceneSimple.Scene.json
     ../../Asset/Json/SceneSimple.Texture.json
-    Name.h
     main.cpp
 )
 

@@ -8,6 +8,7 @@
 #include "Frame/File/FileSystem.h"
 #include "Frame/File/Image.h"
 #include "Frame/Logger.h"
+#include "Frame/NodeMatrix.h"
 #include "Frame/OpenGL/Material.h"
 #include "Frame/OpenGL/Renderer.h"
 #include "Frame/OpenGL/StaticMesh.h"
@@ -53,9 +54,16 @@ namespace frame::opengl::file {
 		std::set<std::string> rgba_extention = { "png" };
 		std::set<std::string> half_extention = { "hdr", "dds" };
 
+		const std::string proto_level_json = R"json(
+				{
+					"name": "Equirectangular",
+					"default_texture_name": "OutputCubemap"
+				}
+			)json";
+
 		proto::Level CreateEquirectangularProtoLevel()
 		{
-			proto::Level level{};
+			proto::Level level = proto::LoadProtoFromJson<proto::Level>(proto_level_json);
 			level.set_name("Equirectangular");
 			level.set_default_texture_name("OutputCubemap");
 			return level;
@@ -86,10 +94,16 @@ namespace frame::opengl::file {
 					scene_matrix.set_name("root");
 				}
 				*scene_tree_file.add_scene_matrices() = scene_matrix;
+				proto::SceneMatrix scene_camera_boon{};
+				{
+					scene_camera_boon.set_name("camera_boon");
+					scene_camera_boon.set_parent("root");
+				}
+				*scene_tree_file.add_scene_matrices() = scene_camera_boon;
 				proto::SceneCamera scene_camera{};
 				{
 					scene_camera.set_name("camera");
-					scene_camera.set_parent("root");
+					scene_camera.set_parent("camera_boon");
 					scene_camera.set_fov_degrees(90.0f);
 					scene_camera.set_near_clip(0.1f);
 					scene_camera.set_far_clip(1000.0f);
@@ -98,6 +112,16 @@ namespace frame::opengl::file {
 				*scene_tree_file.add_scene_cameras() = scene_camera;
 				scene_tree_file.set_default_root_name("root");
 				scene_tree_file.set_default_camera_name("camera");
+				proto::SceneStaticMesh scene_static_mesh{};
+				{
+					scene_static_mesh.set_name("Cube");
+					scene_static_mesh.set_mesh_enum(
+						proto::SceneStaticMesh::CUBE);
+					scene_static_mesh.set_material_name(
+						"EquirectangularMaterial");
+					scene_static_mesh.set_parent("root");
+				}
+				*scene_tree_file.add_scene_static_meshes() = scene_static_mesh;
 			}
 			return scene_tree_file;
 		}
@@ -206,13 +230,11 @@ namespace frame::opengl::file {
 			CreateEquirectangularProtoProgramFile(),
 			CreateEquirectangularProtoSceneTreeFile(),
 			CreateEquirectangularProtoTextureFile(
-				file, 
+				file,
 				cube_pair_res,
 				proto::PixelElementSize_HALF(),
 				proto::PixelStructure_RGB()),
 			CreateEquirectangularProtoMaterialFile());
-		ScopedBind scoped_bind_frame(*frame);
-		ScopedBind scoped_bind_render(*render);
 		if (!maybe_level)
 		{
 			logger->info("Could not create level.");
@@ -227,13 +249,14 @@ namespace frame::opengl::file {
 		}
 		auto* out_texture_ptr = level->GetTextureFromId(maybe_id.value());
 		Renderer renderer(level.get(), cube_pair_res);
-		auto maybe_cube_id = level->GetDefaultStaticMeshCubeId();
-		if (!maybe_cube_id)
-		{
-			logger->info("Could not get the default cube id.");
-			return std::nullopt;
-		}
-		auto cube_id = maybe_cube_id.value();
+		auto maybe_camera_boon_id = level->GetIdFromName("camera_boon");
+		if (!maybe_camera_boon_id) 
+			throw std::runtime_error("Could not get camera boon id.");
+		auto camera_boon_id = maybe_camera_boon_id.value();
+		auto camera_boon = level->GetSceneNodeFromId(camera_boon_id);
+		NodeMatrix* scene_matrix = dynamic_cast<NodeMatrix*>(camera_boon);
+		if (!scene_matrix)
+			throw std::runtime_error("Could not cast to NodeMatrix.");
 		for (std::uint32_t i = 0; i < 6; ++i)
 		{
 			frame->AttachTexture(
@@ -241,9 +264,8 @@ namespace frame::opengl::file {
 				FrameColorAttachment::COLOR_ATTACHMENT0,
 				0,
 				static_cast<FrameTextureType>(i));
-			renderer.RenderMesh(
-				level->GetStaticMeshFromId(cube_id), 
-				views_cubemap[i]);
+			scene_matrix->SetMatrix(views_cubemap[i]);
+			renderer.RenderFromRootNode();
 		}
 		auto maybe_output_id = level->GetIdFromName("OutputCubemap");
 		if (!maybe_output_id) return std::nullopt;

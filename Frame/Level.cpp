@@ -1,5 +1,7 @@
 #include "Level.h"
 
+#include "Frame/NodeCamera.h"
+
 namespace frame {
 
 	std::optional<EntityId> Level::GetDefaultStaticMeshQuadId() const

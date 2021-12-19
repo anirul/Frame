@@ -107,38 +107,26 @@ namespace frame {
 			}
 
 			void SetDrawInterface(
-				const std::shared_ptr<DrawInterface> draw_interface) override
+				std::unique_ptr<DrawInterface>&& draw_interface) override
 			{
-				draw_interface_ = draw_interface;
+				draw_interface_ = std::move(draw_interface);
 			}
 
 			void SetInputInterface(
-				const std::shared_ptr<InputInterface> input_interface)
-				override
+				std::unique_ptr<InputInterface>&& input_interface) override
 			{
-				input_interface_ = input_interface;
+				input_interface_ = std::move(input_interface);
 			}
 
 			void SetUniqueDevice(
-				const std::shared_ptr<DeviceInterface> device) override
+				std::unique_ptr<DeviceInterface>&& device) override
 			{
-				device_ = device;
+				device_ = std::move(device);
 			}
 
-			std::shared_ptr<DeviceInterface> GetUniqueDevice() override
+			DeviceInterface* GetUniqueDevice() override
 			{
-				return device_;
-			}
-
-			void SetUniqueUniform(
-				const std::shared_ptr<UniformInterface> uniform) override
-			{
-				uniform_ = uniform;
-			}
-
-			std::shared_ptr<UniformInterface> GetUniqueUniform() override
-			{
-				return uniform_;
+				return device_.get();
 			}
 
 			std::pair<std::uint32_t, std::uint32_t> GetSize() const override
@@ -233,10 +221,9 @@ namespace frame {
 
 		private:
 			const std::pair<std::uint32_t, std::uint32_t> size_;
-			std::shared_ptr<DeviceInterface> device_ = nullptr;
-			std::shared_ptr<UniformInterface> uniform_ = nullptr;
-			std::shared_ptr<DrawInterface> draw_interface_ = nullptr;
-			std::shared_ptr<InputInterface> input_interface_ = nullptr;
+			std::unique_ptr<DeviceInterface> device_ = nullptr;
+			std::unique_ptr<DrawInterface> draw_interface_ = nullptr;
+			std::unique_ptr<InputInterface> input_interface_ = nullptr;
 			SDL_Window* sdl_window_ = nullptr;
 #if defined(_WIN32) || defined(_WIN64)
 			HWND hwnd_ = nullptr;
@@ -303,9 +290,8 @@ namespace frame {
 		auto window = std::make_unique<SDLOpenGLWindow>(size);
 		auto context = InitSDLOpenGLDevice(window.get());
 		if (!context) return nullptr;
-		auto device = std::make_shared<opengl::Device>(context, size);
-		window->SetUniqueDevice(device);
-		window->SetUniqueUniform(device);
+		window->SetUniqueDevice(
+			std::make_unique<opengl::Device>(context, size));
 		return window;
 	}
 

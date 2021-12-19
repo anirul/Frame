@@ -67,4 +67,10 @@ namespace frame::opengl {
 		renderer_ = nullptr;
 	}
 
+	void Device::Display(double dt /*= 0.0*/)
+	{
+		if (!renderer_) throw std::runtime_error("No Renderer.");
+		renderer_->Display(dt);
+	}
+
 } // End namespace frame::opengl.

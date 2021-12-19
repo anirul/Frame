@@ -1,19 +1,21 @@
 #pragma once
 
 #include <memory>
+#include <filesystem>
+
 #include "Frame/Window.h"
-#include "Sample/Common/NameInterface.h"
+#include "Sample/Common/PathInterface.h"
 
 class Application
 {
 public:
 	Application(
-		const std::shared_ptr<NameInterface>& name,
-		const std::shared_ptr<frame::WindowInterface>& window);
+		std::filesystem::path path,
+		std::unique_ptr<frame::WindowInterface>&& window);
 	void Startup();
 	void Run();
 
 protected:
-	std::shared_ptr<frame::WindowInterface> window_;
-	std::shared_ptr<NameInterface> name_ = nullptr;
+	std::filesystem::path path_;
+	std::unique_ptr<frame::WindowInterface> window_ = nullptr;
 };

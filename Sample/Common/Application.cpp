@@ -1,20 +1,22 @@
 #include "Application.h"
+
 #include <glm/gtc/matrix_transform.hpp>
+
 #include "Draw.h"
 
 Application::Application(
-	const std::shared_ptr<NameInterface>& name,
-	const std::shared_ptr<frame::WindowInterface>& window) :
-	name_(name),
-	window_(window) {}
+	std::filesystem::path path,
+	std::unique_ptr<frame::WindowInterface>&& window) :
+	path_(path),
+	window_(std::move(window)) {}
 
 void Application::Startup()
 {
-	auto draw = std::make_shared<Draw>(
-		window_->GetSize(), 
-		name_, 
-		window_->GetUniqueDevice());
-	window_->SetDrawInterface(draw);
+	window_->SetDrawInterface(
+		std::make_unique<Draw>(
+			window_->GetSize(),
+			path_,
+			window_->GetUniqueDevice()));
 }
 
 void Application::Run()

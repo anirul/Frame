@@ -37,8 +37,12 @@ namespace frame::opengl {
 		void Startup(std::unique_ptr<LevelInterface>&& level) final;
 		// Cleanup the mess.
 		void Cleanup() final;
+		// Display to the screen.
+		void Display(double dt = 0.0) final;
+		// Return the current level.
 
 	public:
+		LevelInterface* GetLevel() final { return level_.get(); }
 		void* GetDeviceContext() const final { return gl_context_; }
 		const std::string GetTypeString() const final { return "OpenGL"; }
 

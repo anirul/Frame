@@ -6,21 +6,16 @@
 void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 {
 	// Load proto from files.
-	auto proto_level = 
-		frame::proto::LoadProtoFromJsonFile<frame::proto::Level>(
-			name_->GetGlobalPath() + name_->GetLevelFileName());
+	auto proto_level =
+		frame::proto::LoadProtoFromJsonFile<frame::proto::Level>(path_);
 	auto proto_texture_file =
-		frame::proto::LoadProtoFromJsonFile<frame::proto::TextureFile>(
-			name_->GetGlobalPath() + proto_level.texture_file());
+		frame::proto::LoadProtoFromJsonFile<frame::proto::TextureFile>(path_);
 	auto proto_program_file =
-		frame::proto::LoadProtoFromJsonFile<frame::proto::ProgramFile>(
-			name_->GetGlobalPath() + proto_level.program_file());
+		frame::proto::LoadProtoFromJsonFile<frame::proto::ProgramFile>(path_);
 	auto proto_scene_tree_file =
-		frame::proto::LoadProtoFromJsonFile<frame::proto::SceneTreeFile>(
-			name_->GetGlobalPath() + proto_level.scene_tree_file());
+		frame::proto::LoadProtoFromJsonFile<frame::proto::SceneTreeFile>(path_);
 	auto proto_material_file =
-		frame::proto::LoadProtoFromJsonFile<frame::proto::MaterialFile>(
-			name_->GetGlobalPath() + proto_level.material_file());
+		frame::proto::LoadProtoFromJsonFile<frame::proto::MaterialFile>(path_);
 
 	// Load level from proto files.
 	auto maybe_level = frame::proto::ParseLevelOpenGL(
