@@ -6,7 +6,6 @@
 #include "Frame/Window.h"
 #include "Frame/OpenGL/Renderer.h"
 #include "Frame/Proto/ParseLevel.h"
-#include "Frame/Proto/ProtoLevelCreate.h"
 #include "Frame/File/FileSystem.h"
 
 namespace test {
@@ -21,12 +20,8 @@ namespace test {
 		{
 			auto maybe_level = frame::proto::ParseLevelOpenGL(
 				size_,
-				frame::proto::GetLevel(),
-				frame::proto::GetProgramFile(),
-				frame::proto::GetSceneFile(),
-				frame::proto::GetTextureFile(
-					frame::file::FindFile("Asset/CubeMap/PositiveX.png")),
-				frame::proto::GetMaterialFile());
+				frame::proto::LoadProtoFromJsonFile<frame::proto::Level>(
+					frame::file::FindFile("Asset/Json/RendererTest.json")));
 			if (maybe_level)
 			{
 				level_ = std::move(maybe_level.value());

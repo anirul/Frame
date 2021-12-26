@@ -6,7 +6,6 @@
 #include "Frame/MaterialInterface.h"
 #include "Frame/Window.h"
 #include "Frame/Proto/ParseLevel.h"
-#include "Frame/Proto/ProtoLevelCreate.h"
 
 namespace test {
 
@@ -18,11 +17,8 @@ namespace test {
 			window_ = frame::CreateSDLOpenGL({ 320, 200 });
 			auto maybe_level = frame::proto::ParseLevelOpenGL(
 				{ 320, 200 },
-				frame::proto::GetLevel(),
-				frame::proto::GetProgramFile(),
-				frame::proto::GetSceneFile(),
-				frame::proto::GetTextureFile(),
-				{});
+				frame::proto::LoadProtoFromJsonFile<frame::proto::Level>(
+					"Asset/Json/MaterialTest.json"));
 			if (!maybe_level) throw std::runtime_error("Couldn't create level.");
 			level_ = std::move(maybe_level.value());
 		}

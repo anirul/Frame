@@ -2,12 +2,12 @@
 
 #include <gtest/gtest.h>
 
-#include "Frame/Window.h"
 #include "Frame/DeviceInterface.h"
+#include "Frame/File/FileSystem.h"
+#include "Frame/OpenGL/Device.h"
 #include "Frame/Proto/ParseLevel.h"
 #include "Frame/Proto/Proto.h"
-#include "Frame/Proto/ProtoLevelCreate.h"
-#include "Frame/OpenGL/Device.h"
+#include "Frame/Window.h"
 
 namespace test {
 
@@ -18,11 +18,8 @@ namespace test {
 		{
 			auto maybe_level = frame::proto::ParseLevelOpenGL(
 				size_,
-				frame::proto::GetLevel(),
-				frame::proto::GetProgramFile(),
-				frame::proto::GetSceneFile(),
-				frame::proto::GetTextureFile(),
-				frame::proto::GetMaterialFile());
+				frame::proto::LoadProtoFromJsonFile<frame::proto::Level>(
+					frame::file::FindFile("Assert/Json/DeviceTest.json")));
 			if (!maybe_level) 
 				throw std::runtime_error("Couldn't create level.");
 			level_ = std::move(maybe_level.value());

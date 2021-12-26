@@ -1,7 +1,6 @@
 #include "Frame/Proto/Test/ParseMaterialTest.h"
 
 #include "Frame/Proto/ParseMaterial.h"
-#include "Frame/Proto/ProtoLevelCreate.h"
 
 namespace test {
 

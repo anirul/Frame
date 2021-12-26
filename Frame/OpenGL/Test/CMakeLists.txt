@@ -1,6 +1,7 @@
 # Frame OpenGL Test.
 
 add_executable(FrameOpenGLTest
+    ../../Asset/Json/DeviceTest.json
     BufferTest.cpp
     BufferTest.h
     DeviceTest.cpp

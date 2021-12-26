@@ -1,7 +1,6 @@
 #include "Frame/Proto/Test/ParseSceneTreeTest.h"
 
 #include "Frame/Proto/ParseSceneTree.h"
-#include "Frame/Proto/ProtoLevelCreate.h"
 #include "Frame/Level.h"
 
 namespace test {
@@ -10,7 +9,7 @@ namespace test {
 	{
 		level_ = std::make_unique<frame::Level>();
 		bool succeed = frame::proto::ParseSceneTreeFile(
-			frame::proto::GetSceneFile(), 
+			proto_level_.scene_tree(),
 			dynamic_cast<frame::LevelInterface*>(level_.get()));
 		EXPECT_TRUE(succeed);
 		auto maybe_scene_id = level_->GetDefaultRootSceneNodeId();

@@ -2,6 +2,8 @@
 // This is just an helpfull header that include all the protos.
 
 #include <fstream>
+
+#include <fmt/core.h>
 // This is there to avoid most of the warnings.
 #if defined(_WIN32) || defined(_WIN64)
 #pragma warning(push)
@@ -58,12 +60,6 @@ namespace frame::proto {
 			throw std::runtime_error("Couldn't open file: " + file_name);
 		std::string contents(std::istreambuf_iterator<char>(ifs_level), {});
 		return LoadProtoFromJson<T>(contents);
-	}
-
-	template <typename T>
-	T LoadProtoFromJsonFile(const std::filesystem::path path)
-	{
-		return LoadProtoFromJsonFile<T>(path.native());
 	}
 
 } // End namespace frame::proto.
