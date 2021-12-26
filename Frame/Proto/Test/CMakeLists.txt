@@ -1,10 +1,10 @@
 # Frame Proto Test.
 
 add_executable(FrameProtoTest
-    ../../Asset/Json/LevelTest.json
-	../../Asset/Json/MaterialTest.json
-	../../Asset/Json/ProgramTest.json
-	../../Asset/Json/SceneTreeTest.json
+	${CMAKE_SOURCE_DIR}/Asset/Json/LevelTest.json
+	${CMAKE_SOURCE_DIR}/Asset/Json/MaterialTest.json
+	${CMAKE_SOURCE_DIR}/Asset/Json/ProgramTest.json
+	${CMAKE_SOURCE_DIR}/Asset/Json/SceneTreeTest.json
 	main.cpp
 	ParseLevelTest.cpp
 	ParseLevelTest.h
