@@ -1,7 +1,6 @@
 # Frame OpenGL Test.
 
 add_executable(FrameOpenGLTest
-    ${CMAKE_SOURCE_DIR}/Asset/Json/DeviceTest.json
     BufferTest.cpp
     BufferTest.h
     DeviceTest.cpp
@@ -27,6 +26,8 @@ add_executable(FrameOpenGLTest
     ShaderTest.h
     TextureTest.cpp
     TextureTest.h
+    ${CMAKE_SOURCE_DIR}/Asset/Json/DeviceTest.json
+    ${CMAKE_SOURCE_DIR}/Asset/Json/RendererTest.json
 )
 
 target_include_directories(FrameOpenGLTest

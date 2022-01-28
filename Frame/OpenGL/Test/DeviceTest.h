@@ -19,7 +19,7 @@ namespace test {
 			auto maybe_level = frame::proto::ParseLevelOpenGL(
 				size_,
 				frame::proto::LoadProtoFromJsonFile<frame::proto::Level>(
-					frame::file::FindFile("Assert/Json/DeviceTest.json")));
+					frame::file::FindFile("Asset/Json/DeviceTest.json")));
 			if (!maybe_level) 
 				throw std::runtime_error("Couldn't create level.");
 			level_ = std::move(maybe_level.value());

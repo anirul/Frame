@@ -1,5 +1,5 @@
 {
-  "name": "DeviceTest",
+  "name": "RendererTest",
   "default_texture_name": "DefaultTexture",
   "textures": [
     {
