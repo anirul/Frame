@@ -1,7 +1,8 @@
 # Frame
 
-3D engine example it use OpenGL and soon it will be using Vulkan. It take 
-models in obj forms and images that can be read by stb (jpg, png, hdr,...).
+3D engine example it use OpenGL and soon it will be using (Vulkan or DirectX 
+12). It take models in obj forms and images that can be read by stb (jpg, png,
+hdr,...).
 
 ![SceneRendering](https://github.com/anirul/ShaderGL/raw/master/Sample/SceneRendering.png "A Scene rendering made with ShaderGL.")
 

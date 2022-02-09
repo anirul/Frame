@@ -122,11 +122,27 @@ namespace frame::opengl {
 		int i = 0;
 		for (const auto& texture_id : program->GetOutputTextureIds())
 		{
-			// TODO(anirul): Check the mipmap level (last parameter)!
-			frame_buffer_.AttachTexture(
-				level_->GetTextureFromId(texture_id)->GetId(),
-				FrameBuffer::GetFrameColorAttachment(i),
-				0);
+			if (level_->GetTextureFromId(texture_id)->IsCubeMap())
+			{
+				for (int j = 0; j < 6; ++j)
+				{
+					// TODO(anirul): Check the mipmap level (last parameter)!
+					frame_buffer_.AttachTexture(
+						level_->GetTextureFromId(texture_id)->GetId(),
+						FrameBuffer::GetFrameColorAttachment(i),
+						FrameBuffer::GetFrameTextureType(j),
+						0);
+				}
+			} 
+			else
+			{
+				// TODO(anirul): Check the mipmap level (last parameter)!
+				frame_buffer_.AttachTexture(
+					level_->GetTextureFromId(texture_id)->GetId(),
+					FrameBuffer::GetFrameColorAttachment(i),
+					FrameTextureType::TEXTURE_2D,
+					0);
+			}
 			i++;
 		}
 		frame_buffer_.DrawBuffers(

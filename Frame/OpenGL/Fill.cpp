@@ -108,6 +108,7 @@ namespace frame::opengl {
 				frame.AttachTexture(
 					level->GetTextureFromId(texture_id)->GetId(),
 					FrameBuffer::GetFrameColorAttachment(i),
+					FrameTextureType::TEXTURE_2D,
 					mipmap_level);
 					i++;
 			}
@@ -195,6 +196,7 @@ namespace frame::opengl {
 					frame.AttachTexture(
 						level->GetTextureFromId(texture_id)->GetId(),
 						FrameBuffer::GetFrameColorAttachment(i),
+						FrameTextureType::TEXTURE_2D,
 						mipmap_level);
 				}
 				cubemap_element++;

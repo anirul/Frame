@@ -57,7 +57,7 @@ namespace frame::opengl::file {
 		const std::string proto_level_json = R"json(
 				{
 					"name": "Equirectangular",
-					"default_texture_name": "OutputCubemap"
+					"default_texture_name": "OutputTexture",
 					"programs": [
 						{
 							"name": "EquirectangularProgram",
@@ -65,12 +65,12 @@ namespace frame::opengl::file {
 							"input_scene_type":	{
 								"value": "QUAD"
 							},
-							"output_texture_names: [ "OutputCubeMap" ]
+							"output_texture_names": [ "OutputTexture" ]
 						}
-					]
+					],
 					"scene_tree": {
 						"default_root_name": "root",
-						"defautl_camera_name": "camera",
+						"default_camera_name": "camera",
 						"scene_matrices": [
 							{
 								"name": "root"
@@ -93,12 +93,12 @@ namespace frame::opengl::file {
 								"name": "camera",
 								"parent": "camera_boon",
 								"fov_degrees": "90.0",
-								"near_clip": "0.1f",
-								"far_clip": "1000.0f",
-								"aspect_ratio": "1.0f"
+								"near_clip": "0.1",
+								"far_clip": "1000.0",
+								"aspect_ratio": "1.0"
 							}
 						]
-					}
+					},
 					"textures" : [
 						{
 							"name": "InputTexture",
@@ -108,8 +108,12 @@ namespace frame::opengl::file {
 								"x": "<x>",
 								"y": "<y>"
 							},
-							"pixel_element_size": "<pixel_element_size>",
-							"pixel_structure": "<pixel_structure>"
+							"pixel_element_size": { 
+								"value": "<pixel_element_size>" 
+							},
+							"pixel_structure": { 
+								"value": "<pixel_structure>" 
+							}
 						},
 						{
 							"name": "OutputTexture",
@@ -118,8 +122,12 @@ namespace frame::opengl::file {
 								"x": "<x>",
 								"y": "<y>"
 							},
-							"pixel_element_size": "<pixel_element_size>",
-							"pixel_structure": "<pixel_structure>"
+							"pixel_element_size": { 
+								"value": "<pixel_element_size>" 
+							},
+							"pixel_structure": { 
+								"value": "<pixel_structure>" 
+							}
 						}
 					],
 					"materials": [
@@ -214,10 +222,10 @@ namespace frame::opengl::file {
 			return std::nullopt;
 		}
 		auto level = std::move(maybe_level.value());
-		auto maybe_id = level->GetIdFromName("OutputCubemap");
+		auto maybe_id = level->GetIdFromName("OutputTexture");
 		if (!maybe_id)
 		{
-			logger->info("Could not get the id of \"OutputCubemap\".");
+			logger->info("Could not get the id of \"OutputTexture\".");
 			return std::nullopt;
 		}
 		auto* out_texture_ptr = level->GetTextureFromId(maybe_id.value());
@@ -235,12 +243,12 @@ namespace frame::opengl::file {
 			frame->AttachTexture(
 				out_texture_ptr->GetId(),
 				FrameColorAttachment::COLOR_ATTACHMENT0,
-				0,
-				static_cast<FrameTextureType>(i));
+				static_cast<FrameTextureType>(i),
+				0);
 			scene_matrix->SetMatrix(views_cubemap[i]);
 			renderer.RenderFromRootNode();
 		}
-		auto maybe_output_id = level->GetIdFromName("OutputCubemap");
+		auto maybe_output_id = level->GetIdFromName("OutputTexture");
 		if (!maybe_output_id) return std::nullopt;
 		return level->ExtractTexture(maybe_output_id.value());
 	}

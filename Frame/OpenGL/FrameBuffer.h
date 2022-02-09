@@ -48,9 +48,9 @@ namespace frame::opengl {
 			unsigned int texture_id,
 			const FrameColorAttachment frame_color_attachment =
 				FrameColorAttachment::COLOR_ATTACHMENT0,
-			const int mipmap = 0,
-			const FrameTextureType frame_texture_type = 
-				FrameTextureType::TEXTURE_2D) const;
+            const FrameTextureType frame_texture_type =
+				FrameTextureType::TEXTURE_2D,
+			const int mipmap = 0) const;
 		static FrameColorAttachment GetFrameColorAttachment(const int i);
 		static FrameTextureType GetFrameTextureType(const int i);
 		// /!\ This will bind and unbind!
