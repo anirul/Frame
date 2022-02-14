@@ -187,8 +187,6 @@ namespace frame::opengl::file {
 			/*= proto::PixelStructure_RGB()*/)
 	{
 		auto material = std::make_unique<frame::opengl::Material>();
-		auto frame = std::make_unique<frame::opengl::FrameBuffer>();
-		auto render = std::make_unique<frame::opengl::RenderBuffer>();
 		auto& logger = Logger::GetInstance();
 		auto maybe_equirectangular =
 			LoadTextureFromFile(file, pixel_element_size, pixel_structure);
@@ -240,11 +238,7 @@ namespace frame::opengl::file {
 			throw std::runtime_error("Could not cast to NodeMatrix.");
 		for (std::uint32_t i = 0; i < 6; ++i)
 		{
-			frame->AttachTexture(
-				out_texture_ptr->GetId(),
-				FrameColorAttachment::COLOR_ATTACHMENT0,
-				static_cast<FrameTextureType>(i),
-				0);
+			renderer.SetCubeMapTarget(GetTextureFrameFromPosition(i));
 			scene_matrix->SetMatrix(views_cubemap[i]);
 			renderer.RenderFromRootNode();
 		}

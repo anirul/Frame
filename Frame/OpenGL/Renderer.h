@@ -29,6 +29,11 @@ namespace frame::opengl {
 		void SetView(glm::mat4 view) override { view_ = std::move(view); }
 		// Can be changed by render mesh!
 		void SetModel(glm::mat4 model) override { model_ = std::move(model); }
+		// Set the cubemap target (used in the render mesh method).
+		void SetCubeMapTarget(frame::proto::TextureFrame texture_frame) override
+		{
+			texture_frame_ = texture_frame;
+		}
 
 	public:
 		// Render to a mesh at a dt time.
@@ -57,6 +62,8 @@ namespace frame::opengl {
 		// Display ids.
 		EntityId display_program_id_ = 0;
 		EntityId display_material_id_ = 0;
+		// Texture frame (used in render mesh).
+		frame::proto::TextureFrame texture_frame_;
 	};
 
 } // End namespace frame::opengl.

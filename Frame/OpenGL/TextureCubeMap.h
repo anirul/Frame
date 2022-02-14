@@ -21,6 +21,8 @@
 
 namespace frame::opengl {
 
+	proto::TextureFrame GetTextureFrameFromPosition(int i);
+
 	class TextureCubeMap : public TextureInterface
 	{
 	public:

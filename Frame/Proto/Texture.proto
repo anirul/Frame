@@ -5,11 +5,9 @@ import "Pixel.proto";
 
 package frame.proto;
 
-// Texture
-// Next 17
-message Texture {
-	// TextureFilterEnum
-	enum TextureFilterEnum {
+// Next = 2
+message TextureFilter {
+	enum Enum {
 		INVALID                = 0;
 		NEAREST                = 1;
 		LINEAR                 = 2;
@@ -21,6 +19,27 @@ message Texture {
 		MIRRORED_REPEAT        = 8;
 		REPEAT                 = 9;
 	}
+	Enum value = 1;
+}
+
+// Next = 2
+message TextureFrame {
+	enum Enum {
+		INVALID				   = 0;
+		CUBE_MAP_POSITIVE_X	   = 1;
+		CUBE_MAP_NEGATIVE_X	   = 2;
+		CUBE_MAP_POSITIVE_Y	   = 3;
+		CUBE_MAP_NEGATIVE_Y	   = 4;
+		CUBE_MAP_POSITIVE_Z	   = 5;
+		CUBE_MAP_NEGATIVE_Z	   = 6;
+		TEXTURE_2D			   = 7;
+	}
+	Enum value = 1;
+}
+
+// Texture
+// Next 17
+message Texture {
 	// Name of the texture.
 	string name = 1;
 	// Size of the texture.
@@ -38,11 +57,11 @@ message Texture {
 	PixelStructure pixel_structure = 7;
 
 	// Filter for mirroring and texture sampling.
-	TextureFilterEnum min_filter = 8;
-	TextureFilterEnum mag_filter = 9;
-	TextureFilterEnum wrap_s = 10;
-	TextureFilterEnum wrap_t = 11;
-	TextureFilterEnum wrap_r = 12;
+	TextureFilter min_filter = 8;
+	TextureFilter mag_filter = 9;
+	TextureFilter wrap_s = 10;
+	TextureFilter wrap_t = 11;
+	TextureFilter wrap_r = 12;
 
 	// Pixel (if provided).
 	bytes pixels = 13;

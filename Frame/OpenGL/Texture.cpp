@@ -47,10 +47,10 @@ namespace frame::opengl {
 		glGenTextures(1, &texture_id_);
 		error_.Display(__FILE__, __LINE__ - 1);
 		ScopedBind scoped_bind(*this);
-		SetMinFilter(proto::Texture::LINEAR);
-		SetMagFilter(proto::Texture::LINEAR);
-		SetWrapS(proto::Texture::CLAMP_TO_EDGE);
-		SetWrapT(proto::Texture::CLAMP_TO_EDGE);
+		SetMinFilter(proto::TextureFilter::LINEAR);
+		SetMagFilter(proto::TextureFilter::LINEAR);
+		SetWrapS(proto::TextureFilter::CLAMP_TO_EDGE);
+		SetWrapT(proto::TextureFilter::CLAMP_TO_EDGE);
 		auto format = opengl::ConvertToGLType(pixel_structure_);
 		auto type = opengl::ConvertToGLType(pixel_element_size_);
 		glTexImage2D(
@@ -218,23 +218,23 @@ namespace frame::opengl {
 	{
 		switch (texture_filter)
 		{
-			case frame::proto::Texture::NEAREST:
+			case frame::proto::TextureFilter::NEAREST:
 				return GL_NEAREST;
-			case frame::proto::Texture::LINEAR:
+			case frame::proto::TextureFilter::LINEAR:
 				return GL_LINEAR;
-			case frame::proto::Texture::NEAREST_MIPMAP_NEAREST:
+			case frame::proto::TextureFilter::NEAREST_MIPMAP_NEAREST:
 				return GL_NEAREST_MIPMAP_NEAREST;
-			case frame::proto::Texture::LINEAR_MIPMAP_NEAREST:
+			case frame::proto::TextureFilter::LINEAR_MIPMAP_NEAREST:
 				return GL_LINEAR_MIPMAP_NEAREST;
-			case frame::proto::Texture::NEAREST_MIPMAP_LINEAR:
+			case frame::proto::TextureFilter::NEAREST_MIPMAP_LINEAR:
 				return GL_NEAREST_MIPMAP_LINEAR;
-			case frame::proto::Texture::LINEAR_MIPMAP_LINEAR:
+			case frame::proto::TextureFilter::LINEAR_MIPMAP_LINEAR:
 				return GL_LINEAR_MIPMAP_LINEAR;
-			case frame::proto::Texture::CLAMP_TO_EDGE:
+			case frame::proto::TextureFilter::CLAMP_TO_EDGE:
 				return GL_CLAMP_TO_EDGE;
-			case frame::proto::Texture::MIRRORED_REPEAT:
+			case frame::proto::TextureFilter::MIRRORED_REPEAT:
 				return GL_MIRRORED_REPEAT;
-			case frame::proto::Texture::REPEAT:
+			case frame::proto::TextureFilter::REPEAT:
 				return GL_REPEAT;
 			default:
 				throw std::runtime_error(
@@ -249,23 +249,23 @@ namespace frame::opengl {
 		switch (gl_filter)
 		{
 		case GL_NEAREST:
-			return frame::proto::Texture::NEAREST;
+			return frame::proto::TextureFilter::NEAREST;
 		case GL_LINEAR:
-			return frame::proto::Texture::LINEAR;
+			return frame::proto::TextureFilter::LINEAR;
 		case GL_NEAREST_MIPMAP_NEAREST:
-			return frame::proto::Texture::NEAREST_MIPMAP_NEAREST;
+			return frame::proto::TextureFilter::NEAREST_MIPMAP_NEAREST;
 		case GL_LINEAR_MIPMAP_NEAREST:
-			return frame::proto::Texture::LINEAR_MIPMAP_NEAREST;
+			return frame::proto::TextureFilter::LINEAR_MIPMAP_NEAREST;
 		case GL_NEAREST_MIPMAP_LINEAR:
-			return frame::proto::Texture::NEAREST_MIPMAP_LINEAR;
+			return frame::proto::TextureFilter::NEAREST_MIPMAP_LINEAR;
 		case GL_LINEAR_MIPMAP_LINEAR:
-			return frame::proto::Texture::LINEAR_MIPMAP_LINEAR;
+			return frame::proto::TextureFilter::LINEAR_MIPMAP_LINEAR;
 		case GL_CLAMP_TO_EDGE:
-			return frame::proto::Texture::CLAMP_TO_EDGE;
+			return frame::proto::TextureFilter::CLAMP_TO_EDGE;
 		case GL_MIRRORED_REPEAT:
-			return frame::proto::Texture::MIRRORED_REPEAT;
+			return frame::proto::TextureFilter::MIRRORED_REPEAT;
 		case GL_REPEAT:
-			return frame::proto::Texture::REPEAT;
+			return frame::proto::TextureFilter::REPEAT;
 		}
 		throw std::runtime_error(
 			"invalid texture filter : " + std::to_string(gl_filter));

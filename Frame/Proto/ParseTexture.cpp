@@ -67,15 +67,15 @@ namespace frame::proto {
 				proto_texture.pixel_element_size(),
 				proto_texture.pixel_structure());
 		}
-		constexpr auto INVALID_TEXTURE = frame::proto::Texture::INVALID;
-		if (proto_texture.min_filter() != INVALID_TEXTURE)
-			texture->SetMinFilter(proto_texture.min_filter());
-		if (proto_texture.mag_filter() != INVALID_TEXTURE)
-			texture->SetMagFilter(proto_texture.mag_filter());
-		if (proto_texture.wrap_s() != INVALID_TEXTURE)
-			texture->SetWrapS(proto_texture.wrap_s());
-		if (proto_texture.wrap_t() != INVALID_TEXTURE)
-			texture->SetWrapT(proto_texture.wrap_t());
+		constexpr auto INVALID_TEXTURE = frame::proto::TextureFilter::INVALID;
+		if (proto_texture.min_filter().value() != INVALID_TEXTURE)
+			texture->SetMinFilter(proto_texture.min_filter().value());
+		if (proto_texture.mag_filter().value() != INVALID_TEXTURE)
+			texture->SetMagFilter(proto_texture.mag_filter().value());
+		if (proto_texture.wrap_s().value() != INVALID_TEXTURE)
+			texture->SetWrapS(proto_texture.wrap_s().value());
+		if (proto_texture.wrap_t().value() != INVALID_TEXTURE)
+			texture->SetWrapT(proto_texture.wrap_t().value());
 		return texture;
 	}
 
@@ -108,17 +108,17 @@ namespace frame::proto {
 				proto_texture.pixel_element_size(),
 				proto_texture.pixel_structure());
 		}
-		constexpr auto INVALID_TEXTURE = frame::proto::Texture::INVALID;
-		if (proto_texture.min_filter() != INVALID_TEXTURE)
-			texture->SetMinFilter(proto_texture.min_filter());
-		if (proto_texture.mag_filter() != INVALID_TEXTURE)
-			texture->SetMagFilter(proto_texture.mag_filter());
-		if (proto_texture.wrap_s() != INVALID_TEXTURE)
-			texture->SetWrapS(proto_texture.wrap_s());
-		if (proto_texture.wrap_t() != INVALID_TEXTURE)
-			texture->SetWrapT(proto_texture.wrap_t());
-		if (proto_texture.wrap_r() != INVALID_TEXTURE)
-			texture->SetWrapR(proto_texture.wrap_r());
+		constexpr auto INVALID_TEXTURE = frame::proto::TextureFilter::INVALID;
+		if (proto_texture.min_filter().value() != INVALID_TEXTURE)
+			texture->SetMinFilter(proto_texture.min_filter().value());
+		if (proto_texture.mag_filter().value() != INVALID_TEXTURE)
+			texture->SetMagFilter(proto_texture.mag_filter().value());
+		if (proto_texture.wrap_s().value() != INVALID_TEXTURE)
+			texture->SetWrapS(proto_texture.wrap_s().value());
+		if (proto_texture.wrap_t().value() != INVALID_TEXTURE)
+			texture->SetWrapT(proto_texture.wrap_t().value());
+		if (proto_texture.wrap_r().value() != INVALID_TEXTURE)
+			texture->SetWrapR(proto_texture.wrap_r().value());
 		return texture;
 	}
 

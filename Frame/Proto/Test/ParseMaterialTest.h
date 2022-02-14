@@ -2,6 +2,7 @@
 
 #include <gtest/gtest.h>
 
+#include "Frame/File/FileSystem.h"
 #include "Frame/Level.h"
 #include "Frame/MaterialInterface.h"
 #include "Frame/Window.h"
@@ -18,8 +19,9 @@ namespace test {
 			auto maybe_level = frame::proto::ParseLevelOpenGL(
 				{ 320, 200 },
 				frame::proto::LoadProtoFromJsonFile<frame::proto::Level>(
-					"Asset/Json/MaterialTest.json"));
-			if (!maybe_level) throw std::runtime_error("Couldn't create level.");
+					frame::file::FindFile("Asset/Json/MaterialTest.json")));
+			if (!maybe_level) 
+				throw std::runtime_error("Couldn't create level.");
 			level_ = std::move(maybe_level.value());
 		}
 

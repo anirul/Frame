@@ -115,6 +115,30 @@ namespace frame::opengl {
 		return static_cast<FrameTextureType>(i);
 	}
 
+    frame::opengl::FrameTextureType FrameBuffer::GetFrameTextureType(
+		frame::proto::TextureFrame texture_frame)
+    {
+		switch (texture_frame.value())
+		{
+		case frame::proto::TextureFrame::TEXTURE_2D:
+			return FrameTextureType::TEXTURE_2D;
+		case frame::proto::TextureFrame::CUBE_MAP_POSITIVE_X:
+			return FrameTextureType::CUBE_MAP_POSITIVE_X;
+		case frame::proto::TextureFrame::CUBE_MAP_NEGATIVE_X:
+			return FrameTextureType::CUBE_MAP_NEGATIVE_X;
+        case frame::proto::TextureFrame::CUBE_MAP_POSITIVE_Y:
+            return FrameTextureType::CUBE_MAP_POSITIVE_Y;
+        case frame::proto::TextureFrame::CUBE_MAP_NEGATIVE_Y:
+            return FrameTextureType::CUBE_MAP_NEGATIVE_Y;
+        case frame::proto::TextureFrame::CUBE_MAP_POSITIVE_Z:
+            return FrameTextureType::CUBE_MAP_POSITIVE_Z;
+        case frame::proto::TextureFrame::CUBE_MAP_NEGATIVE_Z:
+            return FrameTextureType::CUBE_MAP_NEGATIVE_Z;
+		default:
+			throw std::runtime_error("Invalid enum.");
+		}
+    }
+
 	void FrameBuffer::DrawBuffers(const std::uint32_t size /*= 1*/)
 	{
 		Bind();

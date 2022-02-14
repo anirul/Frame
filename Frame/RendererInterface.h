@@ -11,6 +11,8 @@ namespace frame {
 		virtual void SetProjection(glm::mat4 projection) = 0;
 		virtual void SetView(glm::mat4 view) = 0;
 		virtual void SetModel(glm::mat4 model) = 0;
+		virtual void SetCubeMapTarget(
+			frame::proto::TextureFrame texture_frame) = 0;
 		virtual void RenderMesh(
 			StaticMeshInterface* static_mesh,
 			glm::mat4 model_mat = glm::mat4(1.0f),

@@ -24,6 +24,8 @@ add_executable(FrameOpenGLTest
     RendererTest.h
     ShaderTest.cpp
     ShaderTest.h
+    TextureCubeMapTest.cpp
+    TextureCubeMapTest.h
     TextureTest.cpp
     TextureTest.h
     ${CMAKE_SOURCE_DIR}/Asset/Json/DeviceTest.json

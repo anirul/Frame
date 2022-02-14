@@ -14,7 +14,7 @@ namespace frame {
 	struct TextureInterface : public BindInterface, public NameInterface
 	{
 		// Texture filter rename.
-		using TextureFilterEnum = frame::proto::Texture::TextureFilterEnum;
+		using TextureFilterEnum = frame::proto::TextureFilter::Enum;
 		using PixelElementSizeEnum = frame::proto::PixelElementSize::Enum;
 		using PixelStructureEnum = frame::proto::PixelStructure::Enum;
 		// Common interface.

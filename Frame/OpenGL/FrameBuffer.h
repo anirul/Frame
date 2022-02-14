@@ -53,6 +53,8 @@ namespace frame::opengl {
 			const int mipmap = 0) const;
 		static FrameColorAttachment GetFrameColorAttachment(const int i);
 		static FrameTextureType GetFrameTextureType(const int i);
+		static FrameTextureType GetFrameTextureType(
+			frame::proto::TextureFrame texture_frame);
 		// /!\ This will bind and unbind!
 		void DrawBuffers(const std::uint32_t size = 1);
 		// /!\ This will bind and unbind!
