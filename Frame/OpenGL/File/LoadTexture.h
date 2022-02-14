@@ -13,8 +13,7 @@ namespace frame::opengl::file {
 
 
 	std::optional<std::unique_ptr<TextureInterface>> 
-		LoadTextureFromVec4(
-			const glm::vec4& vec4);
+		LoadTextureFromVec4(const glm::vec4& vec4);
 
 	std::optional<std::unique_ptr<TextureInterface>> 
 		LoadTextureFromFloat(float f);
@@ -27,7 +26,6 @@ namespace frame::opengl::file {
 			const proto::PixelStructure pixel_structure =
 				proto::PixelStructure_RGB());
 
-	// Not implemented yet!
 	std::optional<std::unique_ptr<TextureInterface>> 
 		LoadCubeMapTextureFromFile(
 			const std::string& file,
