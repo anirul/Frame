@@ -166,7 +166,6 @@ namespace frame::opengl::file {
 			if (!maybe_index_buffer_id) return std::nullopt;
 			EntityId index_buffer_id = maybe_index_buffer_id.value();
 
-			// This should also be a unique ptr.
 			auto static_mesh = std::make_unique<opengl::StaticMesh>(
 				level,
 				point_buffer_id,

@@ -72,11 +72,8 @@ namespace frame::proto {
 		}
 		case SceneType::SCENE:
 		{
-			auto maybe_scene_id = 
-				level->GetIdFromName(proto_program.input_scene_name());
-			if (!maybe_scene_id) return std::nullopt;
-			EntityId scene_id = maybe_scene_id.value();
-			program->SetTemporarySceneRoot(proto_program.input_scene_name());
+			program->SetTemporarySceneRoot(
+				proto_program.input_scene_root_name());
 			break;
 		}
 		case SceneType::NONE:

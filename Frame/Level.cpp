@@ -22,8 +22,7 @@ namespace frame {
 		return std::nullopt;
 	}
 
-	std::optional<EntityId> Level::GetIdFromName(
-		const std::string& name) const
+	std::optional<EntityId> Level::GetIdFromName(const std::string& name) const
 	{
 		try 
 		{

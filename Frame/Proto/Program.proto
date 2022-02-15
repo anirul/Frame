@@ -31,7 +31,7 @@ message Program {
 	// In case you select 'SCENE' you'll have to set the input_scene_name.
 	SceneType input_scene_type = 9;
 	// Input Scenes name.
-	string input_scene_name = 5;
+	string input_scene_root_name = 5;
 	// Shader name (used to find the shader).
 	string shader = 6;
 	// Set if the depth test is enable or not.

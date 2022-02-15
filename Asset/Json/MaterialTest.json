@@ -21,9 +21,18 @@
       "pixel_structure": { "value": "RGB" }
     }
   ],
-  "programs": [],
+  "programs": [
+    {
+      "name": "program",
+      "input_texture_names": ["texture"],
+      "output_texture_names": ["DefaultTexture"],
+      "input_scene_type": { "value": "SCENE" },
+      "input_scene_root_name": "root",
+      "shader": "Blur"
+    }
+  ],
   "scene_tree": {
-    "default_root_name": "MaterialScene",
+    "default_root_name": "root",
     "default_camera_name": "camera",
     "scene_matrices": [
       {
