@@ -2,23 +2,15 @@
 
 add_executable(JapaneseFlag
   WIN32
-    ../../Asset/Json/JapaneseFlag.Program.json
-    ../../Asset/Json/JapaneseFlag.Level.json
-    ../../Asset/Json/JapaneseFlag.Material.json
-    ../../Asset/Json/JapaneseFlag.Scene.json
-    ../../Asset/Json/JapaneseFlag.Texture.json
     main.cpp
-)
-
-target_include_directories(JapaneseFlag
-  PUBLIC
-    ${CMAKE_SOURCE_DIR}
-    ${CMAKE_CURRENT_BINARY_DIR}
+    ${CMAKE_SOURCE_DIR}/Asset/Json/JapaneseFlag.json
 )
 
 target_include_directories(JapaneseFlag
   PUBLIC
     Sample/JapaneseFlag
+    ${CMAKE_SOURCE_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 target_link_libraries(JapaneseFlag

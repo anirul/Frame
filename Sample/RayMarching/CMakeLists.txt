@@ -2,12 +2,8 @@
 
 add_executable(RayMarching
   WIN32
-    ../../Asset/Json/RayMarching.Level.json
-    ../../Asset/Json/RayMarching.Material.json
-    ../../Asset/Json/RayMarching.Program.json
-    ../../Asset/Json/RayMarching.Scene.json
-    ../../Asset/Json/RayMarching.Texture.json
     main.cpp
+    ${CMAKE_SOURCE_DIR}/Asset/Json/RayMarching.json
 )
 
 target_include_directories(RayMarching

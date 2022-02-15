@@ -2,19 +2,15 @@
 
 add_executable(SceneSimple
   WIN32
-    ../../Asset/Json/SceneSimple.Level.json
-    ../../Asset/Json/SceneSimple.Material.json
-    ../../Asset/Json/SceneSimple.Program.json
-    ../../Asset/Json/SceneSimple.Scene.json
-    ../../Asset/Json/SceneSimple.Texture.json
     main.cpp
+    ${CMAKE_SOURCE_DIR}/Asset/Json/SceneSimple.json
 )
 
 target_include_directories(SceneSimple
   PUBLIC
+    Sample/SceneSimple
     ${CMAKE_SOURCE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
-    Sample/SceneSimple
 )
 
 target_link_libraries(SceneSimple

@@ -14,7 +14,7 @@
   ],
   "programs": [],
   "scene_tree": {
-    "default_root_name": "LevelScene",
+    "default_root_name": "root",
     "default_camera_name": "camera",
     "scene_matrices": [
       {

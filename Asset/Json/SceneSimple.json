@@ -1,0 +1,214 @@
+{
+  "name": "SceneSimple",
+  "default_texture_name": "albedo",
+  "materials": [
+    {
+      "name": "SceneSimpleMaterial",
+      "program_name": "SceneSimpleProgram",
+      "texture_names": [ "apple_texture" ],
+      "inner_names": [ "Color" ]
+    }
+  ],
+  "programs": [
+    {
+      "name": "CubeMapProgram",
+      "input_texture_names": "skybox",
+      "output_texture_names": "albedo",
+      "input_scene_type": { "value": "CUBE" },
+      "depth_test": "false",
+      "shader": "CubeMap",
+      "parameters": [
+        {
+          "name": "projection",
+          "uniform_enum": "PROJECTION_MAT4"
+        },
+        {
+          "name": "view",
+          "uniform_enum": "VIEW_MAT4"
+        },
+        {
+          "name": "model",
+          "uniform_enum": "MODEL_MAT4"
+        }
+      ]
+    },
+    {
+      "name": "SceneSimpleProgram",
+      "output_texture_names": [
+        "albedo",
+        "zbuffer"
+      ],
+      "input_scene_type": { "value": "SCENE" },
+      "input_scene_name": "root",
+      "shader": "SceneSimple",
+      "depth_test": "true",
+      "parameters": [
+        {
+          "name": "projection",
+          "uniform_enum": "PROJECTION_MAT4"
+        },
+        {
+          "name": "view",
+          "uniform_enum": "VIEW_MAT4"
+        },
+        {
+          "name": "model",
+          "uniform_enum": "MODEL_MAT4"
+        }
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "name": "skybox",
+      "cubemap": "true",
+      "pixel_element_size": { "value": "BYTE" },
+      "pixel_structure": { "value": "RGB" },
+      "min_filter": "LINEAR",
+      "mag_filter": "LINEAR",
+      "wrap_s": "CLAMP_TO_EDGE",
+      "wrap_t": "CLAMP_TO_EDGE",
+      "file_names": [
+        "Asset/CubeMap/NegativeX.png",
+        "Asset/CubeMap/PositiveX.png",
+        "Asset/CubeMap/NegativeY.png",
+        "Asset/CubeMap/PositiveY.png",
+        "Asset/CubeMap/NegativeZ.png",
+        "Asset/CubeMap/PositiveZ.png"
+      ]
+    },
+    {
+      "name": "apple_texture",
+      "cubemap": "false",
+      "pixel_element_size": { "value": "BYTE" },
+      "pixel_structure": { "value": "RGB" },
+      "min_filter": "LINEAR",
+      "mag_filter": "LINEAR",
+      "wrap_s": "CLAMP_TO_EDGE",
+      "wrap_t": "CLAMP_TO_EDGE",
+      "file_name": "Asset/Apple/Color.jpg"
+    },
+    {
+      "name": "albedo",
+      "cubemap": "false",
+      "size": {
+        "x": "-1",
+        "y": "-1"
+      },
+      "pixel_element_size": { "value": "BYTE" },
+      "pixel_structure": { "value": "RGB" },
+      "min_filter": "LINEAR",
+      "mag_filter": "LINEAR",
+      "wrap_s": "CLAMP_TO_EDGE",
+      "wrap_t": "CLAMP_TO_EDGE"
+    },
+    {
+      "name": "zbuffer",
+      "cubemap": "false",
+      "size": {
+        "x": "-1",
+        "y": "-1"
+      },
+      "pixel_element_size": { "value": "BYTE" },
+      "pixel_structure": { "value": "RGB" },
+      "min_filter": "LINEAR",
+      "mag_filter": "LINEAR",
+      "wrap_s": "CLAMP_TO_EDGE",
+      "wrap_t": "CLAMP_TO_EDGE"
+    }
+  ],
+  "scene_tree": {
+    "default_camera_name": "camera",
+    "default_root_name": "root",
+    "scene_matrices": [
+      {
+        "name": "root",
+        "matrix": {
+          "m11": "1",
+          "m22": "1",
+          "m33": "1",
+          "m44": "1"
+        }
+      },
+      {
+        "name": "mesh_holder",
+        "parent": "root",
+        "matrix": {
+          "m11": "1",
+          "m22": "1",
+          "m33": "1",
+          "m44": "1"
+        },
+        "quaternion": {
+          "w": "0.9998096",
+          "x": "0.0087261",
+          "y": "0.0174522",
+          "z": "0.0"
+        }
+      },
+      {
+        "name": "camera_holder",
+        "parent": "root",
+        "matrix": {
+          "m11": "1",
+          "m22": "1",
+          "m33": "1",
+          "m44": "1"
+        },
+        "quaternion": {
+          "w": "0.9999619",
+          "x": "0.0",
+          "y": "0.0087265",
+          "z": "0.0"
+        }
+      }
+    ],
+    "scene_static_meshes": [
+      {
+        "name": "apple",
+        "parent": "mesh_holder",
+        "file_name": "Apple.obj",
+        "material_name": "SimpleMaterial"
+      }
+    ],
+    "scene_cameras": [
+      {
+        "name": "camera",
+        "parent": "camera_holder",
+        "fov_degrees": "65.0",
+        "position": {
+          "x": "0.0",
+          "y": "0.0",
+          "z": "-2.0"
+        },
+        "target": {
+          "x": "0.0",
+          "y": "0.0",
+          "z": "0.0"
+        },
+        "up": {
+          "x": "0.0",
+          "y": "1.0",
+          "z": "0.0"
+        }
+      }
+    ],
+    "scene_lights": [
+      {
+        "name": "sun",
+        "parent": "root",
+        "light_type": "POINT",
+        "position": {
+          "x": "-1.0",
+          "y": "1.0",
+          "z": "1.0"
+        },
+        "color": {
+          "x": "1.0",
+          "y": "1.0",
+          "z": "1.0"
+        }
+      }
+    ]
+  }
+}

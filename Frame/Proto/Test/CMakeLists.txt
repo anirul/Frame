@@ -1,10 +1,6 @@
 # Frame Proto Test.
 
 add_executable(FrameProtoTest
-	${CMAKE_SOURCE_DIR}/Asset/Json/LevelTest.json
-	${CMAKE_SOURCE_DIR}/Asset/Json/MaterialTest.json
-	${CMAKE_SOURCE_DIR}/Asset/Json/ProgramTest.json
-	${CMAKE_SOURCE_DIR}/Asset/Json/SceneTreeTest.json
 	main.cpp
 	ParseLevelTest.cpp
 	ParseLevelTest.h
@@ -20,13 +16,17 @@ add_executable(FrameProtoTest
 	ParseTextureTest.h
 	ParseUniformTest.cpp
 	ParseUniformTest.h
+	${CMAKE_SOURCE_DIR}/Asset/Json/LevelTest.json
+	${CMAKE_SOURCE_DIR}/Asset/Json/MaterialTest.json
+	${CMAKE_SOURCE_DIR}/Asset/Json/ProgramTest.json
+	${CMAKE_SOURCE_DIR}/Asset/Json/SceneTreeTest.json
 )
 
 target_include_directories(FrameProtoTest
   PUBLIC
+	FrameProto
     ${CMAKE_SOURCE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
-    FrameProto
 )
 
 target_link_libraries(FrameProtoTest

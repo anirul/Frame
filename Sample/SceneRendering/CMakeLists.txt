@@ -2,10 +2,6 @@
 
 add_executable(SceneRendering
   WIN32
-    ../../Asset/Json/SceneRendering.Program.json
-    ../../Asset/Json/SceneRendering.Level.json
-    ../../Asset/Json/SceneRendering.Scene.json
-    ../../Asset/Json/SceneRendering.Texture.json
     Application.cpp
     Application.h
     Draw.cpp
@@ -13,13 +9,14 @@ add_executable(SceneRendering
     Input.cpp
     Input.h
     main.cpp
+    ${CMAKE_SOURCE_DIR}/Asset/Json/SceneRendering.json
 )
 
 target_include_directories(SceneRendering
   PUBLIC
+    Sample/SceneRendering
     ${CMAKE_SOURCE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
-    Sample/SceneRendering
 )
 
 target_link_libraries(SceneRendering

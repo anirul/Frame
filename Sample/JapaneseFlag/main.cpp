@@ -25,8 +25,7 @@ int main(int ac, char** av)
 	try
 	{
 		Application app(
-			frame::file::FindDirectory("Asset/Json/") +
-				"JapaneseFlag.Level.json",
+			frame::file::FindFile("Asset/Json/JapaneseFlag.json"),
 			frame::CreateSDLOpenGL({ 640, 480 }));
 		app.Startup();
 		app.Run();

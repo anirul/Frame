@@ -1,0 +1,92 @@
+{
+  "name": "RayMarching",
+  "default_texture_name": "billboard",
+  "materials": [
+    {
+      "name": "RayMarchingMaterial",
+      "program_name": "RayMarchingProgram",
+      "texture_names": [],
+      "inner_names": []
+    }
+  ],
+  "programs": [
+    {
+      "name": "RayMarchingProgram",
+      "output_texture_names": "billboard",
+      "input_scene_type": { "value": "QUAD" },
+      "shader": "RayMarching",
+      "depth_test": "false",
+      "parameters": [
+        {
+          "name": "time_s",
+          "uniform_enum": "FLOAT_TIME_S"
+        }
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "name": "billboard",
+      "size": {
+        "x": "-1",
+        "y": "-1"
+      },
+      "cubemap": "false",
+      "pixel_element_size": {
+        "value": "HALF"
+      },
+      "pixel_structure": {
+        "value": "RGB"
+      },
+      "min_filter": "LINEAR",
+      "mag_filter": "LINEAR",
+      "wrap_s": "CLAMP_TO_EDGE",
+      "wrap_t": "CLAMP_TO_EDGE"
+    }
+  ],
+  "scene_tree": {
+    "default_camera_name": "camera",
+    "default_root_name": "root",
+    "scene_matrices": [
+      {
+        "name": "root",
+        "matrix": {
+          "m11": "1.0",
+          "m22": "1.0",
+          "m33": "1.0",
+          "m44": "1.0"
+        }
+      }
+    ],
+    "scene_cameras": [
+      {
+        "name": "camera",
+        "parent": "root",
+        "fov_degrees": "65.0",
+        "position": {
+          "x": "0",
+          "y": "0",
+          "z": "-1"
+        },
+        "target": {
+          "x": "0",
+          "y": "0",
+          "z": "1"
+        },
+        "up": {
+          "x": "0",
+          "y": "1",
+          "z": "0"
+        }
+      }
+    ],
+    "scene_static_meshes": [
+      {
+        "name": "RayMarchingRendering",
+        "parent": "root",
+        "mesh_enum": "QUAD",
+        "material_name": "RayMarchingMaterial"
+      }
+    ]
+  }
+}

@@ -1,8 +1,0 @@
-{
-  "name": "RayMarching",
-  "default_texture_name": "billboard",
-  "texture_file": "RayMarching.Texture.json",
-  "material_file": "RayMarching.Material.json",
-  "program_file": "RayMarching.Program.json",
-  "scene_tree_file": "RayMarching.Scene.json"
-}
