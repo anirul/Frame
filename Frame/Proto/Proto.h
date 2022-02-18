@@ -49,7 +49,7 @@ namespace frame::proto {
 		{
 			throw std::runtime_error(
 				"Couldn't parse file: [" + file_name + 
-				"] status error: [" + status.error_message().as_string() + "]");
+				"] status error: [" + status.message().as_string() + "]");
 		}
 		return proto;
 	}
