@@ -33,13 +33,14 @@ namespace frame::opengl {
 		virtual ~Device();
 
 	public:
+		// Clear the Screen.
+		void Clear() const final;
 		// Startup the scene.
 		void Startup(std::unique_ptr<LevelInterface>&& level) final;
 		// Cleanup the mess.
 		void Cleanup() final;
 		// Display to the screen.
 		void Display(double dt = 0.0) final;
-		// Return the current level.
 
 	public:
 		LevelInterface* GetLevel() final { return level_.get(); }

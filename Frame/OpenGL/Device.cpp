@@ -67,9 +67,18 @@ namespace frame::opengl {
 		renderer_ = nullptr;
 	}
 
+    void Device::Clear() const
+    {
+        glClearColor(.2f, 0.f, .2f, 1.0f);
+        error_.Display(__FILE__, __LINE__ - 1);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        error_.Display(__FILE__, __LINE__ - 1);
+    }
+
 	void Device::Display(double dt /*= 0.0*/)
 	{
 		if (!renderer_) throw std::runtime_error("No Renderer.");
+		renderer_->RenderFromRootNode(dt);
 		renderer_->Display(dt);
 	}
 

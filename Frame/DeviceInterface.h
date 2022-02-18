@@ -10,6 +10,8 @@ namespace frame {
 
 	struct DeviceInterface
 	{
+        // Clear the Screen.
+        virtual void Clear() const = 0;
 		// Startup the scene.
 		virtual void Startup(std::unique_ptr<LevelInterface>&& level) = 0;
 		// Display to the screen
