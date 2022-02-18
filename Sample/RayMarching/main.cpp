@@ -26,8 +26,7 @@ int main(int ac, char** av)
 	try
 	{
 		Application app(
-			frame::file::FindDirectory("Asset/Json/") + 
-				"RayMarching.Level.json",
+			frame::file::FindFile("Asset/Json/RayMarching.json"),
 			frame::CreateSDLOpenGL({ 640, 480 }));
 		app.Startup();
 		app.Run();
