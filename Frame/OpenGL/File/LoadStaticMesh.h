@@ -12,6 +12,7 @@ namespace frame::opengl::file {
 	std::optional<std::vector<EntityId>> LoadStaticMeshesFromFile(
 		LevelInterface* level, 
 		const std::string& file,
-		const std::string& name);
+		const std::string& name,
+		bool skip_file_material = false);
 
 } // End namespace frame::file.

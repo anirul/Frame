@@ -113,7 +113,8 @@ namespace frame::opengl::file {
 			const frame::file::ObjMesh& mesh_obj,
 			const std::string& name,
 			const std::vector<EntityId> material_ids,
-			int counter)
+			int counter,
+			bool skip_file_material)
 		{
 			std::vector<float> points;
 			std::vector<float> normals;
@@ -172,10 +173,13 @@ namespace frame::opengl::file {
 				normal_buffer_id,
 				tex_coord_buffer_id,
 				index_buffer_id);
-			if (mesh_obj.GetMaterialId() != -1)
+			if (!skip_file_material)
 			{
-				static_mesh->SetMaterialId(
-					material_ids.at(mesh_obj.GetMaterialId()));
+				if (mesh_obj.GetMaterialId() != -1)
+				{
+					static_mesh->SetMaterialId(
+						material_ids.at(mesh_obj.GetMaterialId()));
+				}
 			}
 			std::string mesh_name =
 				fmt::format(
@@ -191,23 +195,27 @@ namespace frame::opengl::file {
 	std::optional<std::vector<EntityId>> LoadStaticMeshesFromFile(
 		LevelInterface* level, 
 		const std::string& file,
-		const std::string& name)
+        const std::string& name,
+        bool skip_file_material/* = false*/)
 	{
 		std::vector<EntityId> entity_id_vec;
 		frame::file::Obj obj(frame::file::FindFile(file));
 		const auto meshes = obj.GetMeshes();
 		Logger& logger = Logger::GetInstance();
-		const auto materials = obj.GetMaterials();
-		logger->info(
-			"Found in obj<{}> : {} materials.",
-			file,
-			materials.size());
 		std::vector<EntityId> material_ids;
-		for (const auto& material : materials)
-		{
-			auto maybe_material_id = LoadMaterialFromObj(level, material);
-			if (!maybe_material_id) return std::nullopt;
-			material_ids.push_back(maybe_material_id.value());
+        if (!skip_file_material)
+        {
+			const auto materials = obj.GetMaterials();
+			logger->info(
+				"Found in obj<{}> : {} materials.",
+				file,
+				materials.size());
+			for (const auto& material : materials)
+			{
+				auto maybe_material_id = LoadMaterialFromObj(level, material);
+				if (!maybe_material_id) return std::nullopt;
+				material_ids.push_back(maybe_material_id.value());
+			}
 		}
 		logger->info("Found in obj<{}> : {} meshes.", file, meshes.size());
 		int mesh_counter = 0;
@@ -219,7 +227,8 @@ namespace frame::opengl::file {
 					mesh, 
 					name, 
 					material_ids, 
-					mesh_counter);
+					mesh_counter,
+					skip_file_material);
 			if (!maybe_static_mesh_id) return std::nullopt;
 			EntityId static_mesh_id = maybe_static_mesh_id.value();
 			auto func = [level](const std::string& name)->NodeInterface*

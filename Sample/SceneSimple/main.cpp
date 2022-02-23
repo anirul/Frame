@@ -24,8 +24,7 @@ int main(int ac, char** av)
 	try
 	{
 		Application app(
-			frame::file::FindDirectory("Asset/Json/") + 
-				"SceneSimple.Level.json",
+			frame::file::FindFile("Asset/Json/SceneSimple.json"),
 			frame::CreateSDLOpenGL({ 1280, 720 }));
 		app.Startup();
 		app.Run();

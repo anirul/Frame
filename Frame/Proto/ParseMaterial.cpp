@@ -20,16 +20,20 @@ namespace frame::proto {
 					inner_size));
 		}
 		auto material = std::make_unique<frame::opengl::Material>();
+		material->SetName(proto_material.name());
 		if (proto_material.program_name().empty())
 		{
 			throw std::runtime_error(
 				fmt::format("No program name in {}.", proto_material.name()));
 		}
+		material->SetProgramName(proto_material.program_name());
 		auto maybe_program_id = 
 			level->GetIdFromName(proto_material.program_name());
-		if (!maybe_program_id) return std::nullopt;
-		EntityId program_id = maybe_program_id.value();
-		material->SetProgramId(program_id);
+		if (maybe_program_id)
+		{
+			EntityId program_id = maybe_program_id.value();
+			material->SetProgramId(program_id);
+		}
 		for (int i = 0; i < inner_size; ++i)
 		{
 			auto maybe_texture_id = 

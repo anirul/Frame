@@ -81,7 +81,10 @@ namespace frame::opengl {
 		auto maybe_list = level_->GetChildList(node_id);
 		if (!maybe_list) throw std::runtime_error("No child list.");
 		auto list = maybe_list.value();
-		for (const auto& id : list)	RenderChildren(id, dt);
+		for (const auto& id : list) 
+		{
+			RenderChildren(id, dt);
+		}
 	}
 
 	void Renderer::RenderFromRootNode(double dt/* = 0.0*/)

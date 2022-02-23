@@ -67,9 +67,10 @@ namespace frame::opengl {
 		renderer_ = nullptr;
 	}
 
-    void Device::Clear() const
+    void Device::Clear(
+		const glm::vec4& color/* = glm::vec4(.2f, 0.f, .2f, 1.0f*/) const
     {
-        glClearColor(.2f, 0.f, .2f, 1.0f);
+        glClearColor(color.r, color.g, color.b, color.a);
         error_.Display(__FILE__, __LINE__ - 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         error_.Display(__FILE__, __LINE__ - 1);

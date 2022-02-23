@@ -11,7 +11,8 @@ namespace frame {
 	struct DeviceInterface
 	{
         // Clear the Screen.
-        virtual void Clear() const = 0;
+        virtual void Clear(
+			const glm::vec4& color = glm::vec4(.2f, 0.f, .2f, 1.0f)) const = 0;
 		// Startup the scene.
 		virtual void Startup(std::unique_ptr<LevelInterface>&& level) = 0;
 		// Display to the screen

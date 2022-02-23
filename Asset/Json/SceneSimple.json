@@ -39,7 +39,7 @@
         "zbuffer"
       ],
       "input_scene_type": { "value": "SCENE" },
-      "input_scene_name": "root",
+      "input_scene_root_name": "root",
       "shader": "SceneSimple",
       "depth_test": "true",
       "parameters": [
@@ -64,10 +64,10 @@
       "cubemap": "true",
       "pixel_element_size": { "value": "BYTE" },
       "pixel_structure": { "value": "RGB" },
-      "min_filter": "LINEAR",
-      "mag_filter": "LINEAR",
-      "wrap_s": "CLAMP_TO_EDGE",
-      "wrap_t": "CLAMP_TO_EDGE",
+      "min_filter": { "value": "LINEAR" },
+      "mag_filter": { "value": "LINEAR" },
+      "wrap_s": { "value": "CLAMP_TO_EDGE" },
+      "wrap_t": { "value": "CLAMP_TO_EDGE" },
       "file_names": [
         "Asset/CubeMap/NegativeX.png",
         "Asset/CubeMap/PositiveX.png",
@@ -82,10 +82,10 @@
       "cubemap": "false",
       "pixel_element_size": { "value": "BYTE" },
       "pixel_structure": { "value": "RGB" },
-      "min_filter": "LINEAR",
-      "mag_filter": "LINEAR",
-      "wrap_s": "CLAMP_TO_EDGE",
-      "wrap_t": "CLAMP_TO_EDGE",
+      "min_filter": { "value": "LINEAR" },
+      "mag_filter": { "value": "LINEAR" },
+      "wrap_s": { "value": "CLAMP_TO_EDGE" },
+      "wrap_t": { "value": "CLAMP_TO_EDGE" },
       "file_name": "Asset/Apple/Color.jpg"
     },
     {
@@ -97,10 +97,10 @@
       },
       "pixel_element_size": { "value": "BYTE" },
       "pixel_structure": { "value": "RGB" },
-      "min_filter": "LINEAR",
-      "mag_filter": "LINEAR",
-      "wrap_s": "CLAMP_TO_EDGE",
-      "wrap_t": "CLAMP_TO_EDGE"
+      "min_filter": { "value": "LINEAR" },
+      "mag_filter": { "value": "LINEAR" },
+      "wrap_s": { "value": "CLAMP_TO_EDGE" },
+      "wrap_t": { "value": "CLAMP_TO_EDGE" }
     },
     {
       "name": "zbuffer",
@@ -111,10 +111,10 @@
       },
       "pixel_element_size": { "value": "BYTE" },
       "pixel_structure": { "value": "RGB" },
-      "min_filter": "LINEAR",
-      "mag_filter": "LINEAR",
-      "wrap_s": "CLAMP_TO_EDGE",
-      "wrap_t": "CLAMP_TO_EDGE"
+      "min_filter": { "value": "LINEAR" },
+      "mag_filter": { "value": "LINEAR" },
+      "wrap_s": { "value": "CLAMP_TO_EDGE" },
+      "wrap_t": { "value": "CLAMP_TO_EDGE" }
     }
   ],
   "scene_tree": {
@@ -168,7 +168,8 @@
         "name": "apple",
         "parent": "mesh_holder",
         "file_name": "Apple.obj",
-        "material_name": "SimpleMaterial"
+        "material_name": "SceneSimpleMaterial",
+        "skip_file_material": "true"
       }
     ],
     "scene_cameras": [

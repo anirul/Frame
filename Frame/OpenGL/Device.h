@@ -34,7 +34,9 @@ namespace frame::opengl {
 
 	public:
 		// Clear the Screen.
-		void Clear() const final;
+		void Clear(
+			const glm::vec4& color = 
+				glm::vec4(.2f, 0.f, .2f, 1.0f)) const final;
 		// Startup the scene.
 		void Startup(std::unique_ptr<LevelInterface>&& level) final;
 		// Cleanup the mess.

@@ -92,35 +92,40 @@ namespace frame::proto {
 					proto_scene_static_mesh.material_name());
 				if (!maybe_material_id) return false;
 				const EntityId material_id = maybe_material_id.value();
-				std::unique_ptr<NodeInterface> ptr = 
+				std::unique_ptr<NodeInterface> node_interface = 
 					std::make_unique<NodeStaticMesh>(
 						GetFunctor(level), 
 						mesh_id, 
 						material_id);
-				ptr->SetName(proto_scene_static_mesh.name());
-				ptr->SetParentName(proto_scene_static_mesh.parent());
-				auto maybe_scene_id = level->AddSceneNode(std::move(ptr));
+				node_interface->SetName(proto_scene_static_mesh.name());
+				node_interface->SetParentName(proto_scene_static_mesh.parent());
+				auto maybe_scene_id = 
+					level->AddSceneNode(std::move(node_interface));
 				return static_cast<bool>(maybe_scene_id);
 			}
 			else
 			{
 				// TODO(anirul): this should be OpenGL agnostic.
-				auto maybe_vec_mesh_id = 
+				auto maybe_vec_node_mesh_id = 
 					opengl::file::LoadStaticMeshesFromFile(
 						level,
 						"Asset/Model/" + proto_scene_static_mesh.file_name(),
-						proto_scene_static_mesh.name());
-				if (!maybe_vec_mesh_id) return false;
-				auto& vec_mesh_id = maybe_vec_mesh_id.value();
+						proto_scene_static_mesh.name(),
+						proto_scene_static_mesh.skip_file_material());
+				if (!maybe_vec_node_mesh_id) return false;
+				auto& vec_node_mesh_id = maybe_vec_node_mesh_id.value();
 				int i = 0;
-				for (const auto mesh_id : vec_mesh_id)
+				for (const auto node_mesh_id : vec_node_mesh_id)
 				{
-					auto mesh = level->GetStaticMeshFromId(mesh_id);
+					auto node = level->GetSceneNodeFromId(node_mesh_id);
+					auto mesh = 
+						level->GetStaticMeshFromId(node->GetLocalMesh());
 					auto str = fmt::format(
 						"{}.{}", 
 						proto_scene_static_mesh.name(), 
 						i);
 					mesh->SetName(str);
+					node->SetParentName(proto_scene_static_mesh.parent());
 					++i;
 				}
 			}

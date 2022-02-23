@@ -23,7 +23,7 @@ message SceneMatrix {
 }
 
 // Static Mesh.
-// Next 7
+// Next 8
 message SceneStaticMesh {
 	// This is the name of the mesh.
 	string name = 1;
@@ -43,6 +43,8 @@ message SceneStaticMesh {
 
 	// Material name.
 	string material_name = 5;
+	// Skip the material that are in the file.
+	bool skip_file_material = 7;
 }
 
 // Camera

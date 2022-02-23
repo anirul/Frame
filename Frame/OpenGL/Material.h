@@ -20,8 +20,10 @@ namespace frame::opengl {
 
 	public:
 		// Program management part.
-		EntityId GetProgramId() const override;
+		EntityId GetProgramId(
+			const LevelInterface* level = nullptr) const override;
 		void SetProgramId(EntityId id) override;
+		void SetProgramName(const std::string& name) override;
 
 	public:
 		// Texture management part.
@@ -39,14 +41,15 @@ namespace frame::opengl {
 		// Disable all the texture and unbind them.
 		void DisableAll() const override;
 		// Name interface.
-		std::string GetName() const { return name_; }
-		void SetName(const std::string& name) { name_ = name; }
+		std::string GetName() const override { return name_; }
+		void SetName(const std::string& name) override { name_ = name; }
 
 	private:
 		std::map<EntityId, std::string> id_name_map_ = {};
 		mutable std::array<EntityId, 32> id_array_ = {};
-		EntityId program_id_ = 0;
-		std::string name_ = "";
+		mutable EntityId program_id_ = 0;
+		std::string name_;
+		std::string program_name_;
 	};
 
 } // End namespace frame::opengl.

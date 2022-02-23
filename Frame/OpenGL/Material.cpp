@@ -96,9 +96,16 @@ namespace frame::opengl {
 		return vec;
 	}
 
-	frame::EntityId Material::GetProgramId() const
+	frame::EntityId Material::GetProgramId(
+		const LevelInterface* level /*= nullptr*/) const
 	{
 		if (program_id_) return program_id_;
+		auto maybe_id = level->GetIdFromName(program_name_);
+		if (maybe_id)
+		{
+			program_id_ = maybe_id.value();
+			return program_id_;
+		}
 		throw std::runtime_error("No valid program!");
 	}
 
@@ -108,5 +115,10 @@ namespace frame::opengl {
 		// TODO(anirul): Check that the program has a valid uniform!
 		program_id_ = id;
 	}
+
+    void Material::SetProgramName(const std::string& name)
+    {
+		program_name_ = name;
+    }
 
 } // End namespace frame::opengl.

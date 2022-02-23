@@ -117,7 +117,6 @@ namespace frame::proto {
 							proto_material.name()));
 				}
 				auto material = std::move(maybe_material.value());
-				material->SetName(proto_material.name());
 				if (!AddMaterial(std::move(material)))
 				{
 					throw std::runtime_error(
