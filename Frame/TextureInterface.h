@@ -17,6 +17,7 @@ namespace frame {
 		using TextureFilterEnum = frame::proto::TextureFilter::Enum;
 		using PixelElementSizeEnum = frame::proto::PixelElementSize::Enum;
 		using PixelStructureEnum = frame::proto::PixelStructure::Enum;
+		virtual ~TextureInterface() = default;
 		// Common interface.
 		virtual PixelStructureEnum GetPixelStructure() const = 0;
 		virtual PixelElementSizeEnum GetPixelElementSize() const = 0;

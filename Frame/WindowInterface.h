@@ -11,6 +11,7 @@ namespace frame {
 	// Linux, OSX, iOS, etc...).
 	struct WindowInterface
 	{
+		virtual ~WindowInterface() = default;
 		// Run the windows interface this will take the current thread.
 		virtual void Run() = 0;
 		// Set the drawing interface (see above).

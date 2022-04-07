@@ -35,6 +35,7 @@ namespace frame {
 		virtual void DisableTextureId(EntityId id) const = 0;
 		// Disable all the texture and unbind them.
 		virtual void DisableAll() const = 0;
+		virtual ~MaterialInterface() = default;
 	};
 
 } // End namespace frame.

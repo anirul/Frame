@@ -14,6 +14,7 @@ namespace frame {
 
 	struct LightInterface
 	{
+		virtual ~LightInterface() = default;
 		virtual const LightTypeEnum GetType() const = 0;
 		virtual const glm::vec3 GetVector() const = 0;
 		virtual const glm::vec3 GetColorIntensity() const = 0;

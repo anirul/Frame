@@ -58,7 +58,7 @@ namespace frame::opengl {
 		void Clear(const glm::vec4 color) override;
 		// Name interface.
 		std::string GetName() const override { return name_; }
-		void SetName(const std::string& name) { name_ = name; }
+		void SetName(const std::string& name) override { name_ = name; }
 
 	public:
 		// Bind and unbind a texture to the current context.

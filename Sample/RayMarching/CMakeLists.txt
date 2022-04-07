@@ -16,6 +16,7 @@ target_include_directories(RayMarching
 target_link_libraries(RayMarching
   PUBLIC
     Frame
+    FrameFile
     FrameOpenGL
     FrameProto
     SampleCommon

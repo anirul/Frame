@@ -8,6 +8,7 @@ namespace frame {
 	// Get access to essential part of the rendering uniform system.
 	struct UniformInterface
 	{
+		virtual ~UniformInterface() = default;
 		virtual glm::vec3 GetCameraPosition() const = 0;
 		virtual glm::vec3 GetCameraFront() const = 0;
 		virtual glm::vec3 GetCameraRight() const = 0;

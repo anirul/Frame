@@ -262,7 +262,12 @@ namespace frame {
 			// GL context.
 			void* gl_context = SDL_GL_CreateContext(
 				static_cast<SDL_Window*>(window->GetWindowContext()));
-			if (!gl_context) return nullptr;
+			if (!gl_context) 
+			{
+				std::string error = SDL_GetError();
+				logger->error(error);
+				throw std::runtime_error(error);
+			}
 
 			SDL_GL_GetAttribute(
 				SDL_GL_CONTEXT_MAJOR_VERSION,

@@ -24,20 +24,17 @@ add_executable(FrameProtoTest
 
 target_include_directories(FrameProtoTest
   PUBLIC
-	FrameProto
     ${CMAKE_SOURCE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 target_link_libraries(FrameProtoTest
   PUBLIC
-    Frame
-    FrameFile
-    FrameOpenGL
-    FrameOpenGLFile
-    FrameProto
-    GTest::gmock
-    GTest::gtest
+  	Frame
+  	FrameFile
+  	FrameProto
+  	GTest::gmock
+  	GTest::gtest
 )
 
 set_property(TARGET FrameProtoTest PROPERTY FOLDER "Frame")

@@ -10,6 +10,7 @@ namespace frame {
 
 	struct DeviceInterface
 	{
+		virtual ~DeviceInterface() = default;
         // Clear the Screen.
         virtual void Clear(
 			const glm::vec4& color = glm::vec4(.2f, 0.f, .2f, 1.0f)) const = 0;

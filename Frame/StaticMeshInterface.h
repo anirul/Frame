@@ -12,6 +12,7 @@ namespace frame {
 	class StaticMeshInterface : public BindInterface, public NameInterface
 	{
 	public:
+		virtual ~StaticMeshInterface() = default;
 		// TODO(anirul): Move material to node static mesh.
 		virtual void SetMaterialId(EntityId id) = 0;
 		virtual EntityId GetMaterialId() const = 0;

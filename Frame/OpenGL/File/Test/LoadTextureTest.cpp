@@ -44,7 +44,6 @@ namespace test {
 		EXPECT_FLOAT_EQ(0.2f, v4[1]);
 		EXPECT_FLOAT_EQ(0.3f, v4[2]);
 		EXPECT_FLOAT_EQ(0.4f, v4[3]);
-		delete [] pair.first;
 	}
 
 	TEST_F(LoadTextureTest, LoadTextureFromFileTest)
@@ -70,7 +69,6 @@ namespace test {
 			EXPECT_GE(0xff, p[position]);
 			EXPECT_LE(0x4e, p[position]);
 		}
-		delete [] pair.first;
 	}
 
 	// TODO(anirul): Add a test for the load Cubemap from single file when
@@ -109,7 +107,6 @@ namespace test {
 				EXPECT_GE(0xff, p[position]);
 				EXPECT_LE(0x45, p[position]);
 			}
-			delete [] pair.first;
 		}
 	}
 

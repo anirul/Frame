@@ -17,6 +17,7 @@ target_link_libraries(SceneSimple
   PUBLIC
     Frame
     FrameOpenGL
+    FrameOpenGLFile
     FrameProto
     SampleCommon
 )

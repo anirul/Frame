@@ -9,6 +9,7 @@ namespace frame {
 	{
 		virtual std::string GetName() const = 0;
 		virtual void SetName(const std::string& name) = 0;
+		virtual ~NameInterface() = default;
 	};
 
 } // End namespace frame.

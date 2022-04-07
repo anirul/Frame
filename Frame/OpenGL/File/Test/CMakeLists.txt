@@ -20,6 +20,7 @@ target_include_directories(FrameOpenGLFileTest
 target_link_libraries(FrameOpenGLFileTest
   PUBLIC
     Frame
+    FrameFile
     FrameOpenGL
     FrameOpenGLFile
     GTest::gmock

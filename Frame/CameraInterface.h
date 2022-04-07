@@ -7,6 +7,7 @@ namespace frame {
 
 	struct CameraInterface
 	{
+		virtual ~CameraInterface() = default;
 		virtual glm::mat4 ComputeView() const = 0;
 		virtual glm::mat4 ComputeProjection() const = 0;
 		virtual void SetFront(glm::vec3 vec) = 0;

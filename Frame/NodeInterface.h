@@ -26,6 +26,7 @@ namespace frame {
 		{
 			func_ = func;
 		}
+		virtual ~NodeInterface() = default;
 		// Return true if this is the root node (no parents).
 		bool IsRoot() const { return GetParentName().empty(); }
 		// Get the parent of a node.

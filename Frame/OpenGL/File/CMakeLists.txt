@@ -22,8 +22,8 @@ target_link_libraries(FrameOpenGLFile
   PUBLIC
 	Frame
 	FrameFile
-	FrameProto
 	FrameOpenGL
+	FrameProto
 )
 
 set_property(TARGET FrameOpenGLFile PROPERTY FOLDER "Frame/OpenGL")

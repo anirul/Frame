@@ -7,6 +7,7 @@ namespace frame {
 	// This is the interface for input.
 	struct InputInterface
 	{
+		virtual ~InputInterface() = default;
 		// Keyboard interface in case of pressed on a key.
 		virtual bool KeyPressed(char key, double dt) = 0;
 		// Keyboard interface in case of release of a key.

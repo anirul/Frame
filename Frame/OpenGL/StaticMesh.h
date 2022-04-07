@@ -64,7 +64,7 @@ namespace frame::opengl {
 		bool IsClearBuffer() const override { return clear_depth_buffer_; }
 		// Name interface.
 		std::string GetName() const override { return name_; }
-		void SetName(const std::string& name) { name_ = name; }
+		void SetName(const std::string& name) override { name_ = name; }
 
 	public:
 		void Bind(const unsigned int slot = 0) const override;

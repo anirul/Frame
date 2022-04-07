@@ -12,11 +12,18 @@ Application::Application(
 
 void Application::Startup()
 {
-	window_->SetDrawInterface(
-		std::make_unique<Draw>(
-			window_->GetSize(),
-			path_,
-			window_->GetUniqueDevice()));
+	if (window_)
+	{
+		window_->SetDrawInterface(
+			std::make_unique<Draw>(
+				window_->GetSize(),
+				path_,
+				window_->GetUniqueDevice()));
+	}
+	else
+	{
+		throw std::runtime_error("[nullptr] is not a window.");
+	}
 }
 
 void Application::Run()

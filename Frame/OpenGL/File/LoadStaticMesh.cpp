@@ -1,6 +1,8 @@
 #include "Frame/OpenGL/File/LoadStaticMesh.h"
 #include <stdexcept>
 #include "Frame/File/FileSystem.h"
+#include "Frame/File/Image.h"
+#include "Frame/File/Obj.h"
 #include "Frame/Logger.h"
 #include "Frame/OpenGL/Buffer.h"
 #include "Frame/OpenGL/File/LoadTexture.h"

@@ -271,10 +271,11 @@ namespace frame::opengl {
 			return GL_MIRRORED_REPEAT;
 		case frame::proto::TextureFilter::REPEAT:
 			return GL_REPEAT;
+		default:
+			throw std::runtime_error(
+				"Invalid texture filter : " +
+				std::to_string(static_cast<int>(texture_filter)));
 		}
-		throw std::runtime_error(
-			"Invalid texture filter : " +
-			std::to_string(static_cast<int>(texture_filter)));
 	}
 
 	TextureInterface::TextureFilterEnum TextureCubeMap::ConvertFromGLType(

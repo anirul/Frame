@@ -60,7 +60,7 @@ namespace frame::opengl {
 		void UnlockedBind() const override { locked_bind_ = false; }
 		unsigned int GetId() const override { return buffer_object_; }
 		std::string GetName() const override { return name_; }
-		void SetName(const std::string& name) { name_ = name; }
+		void SetName(const std::string& name) override { name_ = name; }
 
 	private:
 		std::string name_ = "buffer???";

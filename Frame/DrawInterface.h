@@ -10,6 +10,7 @@ namespace frame {
 	// to a drawing interface (see DirectX, OpenGL, Metal, etc...).
 	struct DrawInterface
 	{
+		virtual ~DrawInterface() = default;
 		// Initialize with the size of the out buffer.
 		virtual void Startup(
 			std::pair<std::uint32_t, std::uint32_t> size) = 0;

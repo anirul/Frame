@@ -12,6 +12,7 @@ namespace frame {
 
 	struct ProgramInterface : public NameInterface
 	{
+		virtual ~ProgramInterface() = default;
 		// Set & get input texture id.
 		virtual void AddInputTextureId(EntityId id) = 0;
 		virtual void RemoveInputTextureId(EntityId id) = 0;

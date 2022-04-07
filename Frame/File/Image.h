@@ -4,13 +4,14 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include "Frame/ImageInterface.h"
 #include "Frame/OpenGL/Pixel.h"
 #include "Frame/Proto/ParsePixel.h"
 #include "Frame/TextureInterface.h"
 
 namespace frame::file {
 
-	class Image
+	class Image : public ImageInterface
 	{
 	public:
 		Image(
@@ -22,19 +23,22 @@ namespace frame::file {
 		virtual ~Image();
 
 	public:
-		const std::pair<std::uint32_t, std::uint32_t> GetSize() const 
+		const std::pair<std::uint32_t, std::uint32_t> GetSize() const override 
 		{ 
 			return size_; 
 		}
-		const int GetLength() const { return size_.first * size_.second; }
-		const void* Data() const {	return image_; }
+		const int GetLength() const override 
+		{ 
+			return size_.first * size_.second; 
+		}
+		const void* Data() const override { return image_; }
 		// Needed for the accessing of the pointer.
-		void* Data() { return image_; }
-		const proto::PixelElementSize GetPixelElementSize() const
+		void* Data() override { return image_; }
+		const proto::PixelElementSize GetPixelElementSize() const override 
 		{
 			return pixel_element_size_;
 		}
-		const proto::PixelStructure GetPixelStructure() const
+		const proto::PixelStructure GetPixelStructure() const override 
 		{
 			return pixel_structure_;
 		}

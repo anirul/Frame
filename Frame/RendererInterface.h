@@ -8,6 +8,7 @@ namespace frame {
 	class RendererInterface
 	{
 	public:
+		virtual ~RendererInterface() = default;
 		virtual void SetProjection(glm::mat4 projection) = 0;
 		virtual void SetView(glm::mat4 view) = 0;
 		virtual void SetModel(glm::mat4 model) = 0;
