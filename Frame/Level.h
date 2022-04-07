@@ -119,10 +119,10 @@ namespace frame {
 		mutable EntityId next_id_maker_ = 1;
 		EntityId quad_id_ = 0;
 		EntityId cube_id_ = 0;
-		std::string name_ = "";
-		std::string default_texture_name_ = "";
-		std::string default_root_scene_node_name_ = "";
-		std::string default_camera_name_ = "";
+		std::string name_;
+		std::string default_texture_name_;
+		std::string default_root_scene_node_name_;
+		std::string default_camera_name_;
 		std::unordered_set<std::string> string_set_ = {};
 		std::unordered_map<EntityId, std::unique_ptr<NodeInterface>>
 			id_scene_node_map_ = {};

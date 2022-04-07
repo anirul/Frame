@@ -30,6 +30,7 @@ namespace frame {
 		}
 		catch (std::out_of_range& ex)
 		{
+			logger_->warn(ex.what());
 			return std::nullopt;
 		}
 	}
@@ -42,6 +43,7 @@ namespace frame {
 		}
 		catch (std::out_of_range& ex)
 		{
+			logger_->warn(ex.what());
 			return std::nullopt;
 		}
 	}
@@ -157,6 +159,7 @@ namespace frame {
 		}
 		catch (std::out_of_range& ex)
 		{
+			logger_->warn(ex.what());
 			return std::nullopt;
 		}
 		return list;
@@ -173,6 +176,7 @@ namespace frame {
 		}
 		catch (std::out_of_range& ex)
 		{
+			logger_->warn(ex.what());
 			return std::nullopt;
 		}
 	}

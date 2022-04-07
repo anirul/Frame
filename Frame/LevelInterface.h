@@ -15,8 +15,9 @@
 
 namespace frame {
 
-	struct LevelInterface
+	class LevelInterface
 	{
+	public:
 		virtual ~LevelInterface() = default;
 		// Get maps from the store.
 		virtual NodeInterface* GetSceneNodeFromId(EntityId id) const = 0;
