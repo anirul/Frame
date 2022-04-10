@@ -80,11 +80,14 @@ namespace test {
 		EXPECT_EQ(1024, texture->GetSize().first);
 		EXPECT_EQ(1024, texture->GetSize().second);
 		auto vec8 = texture->GetTextureByte();
+		bool not_full = false;
 		for (int position = 0; position < vec8.size(); position += 1025 * 5)
 		{
+			if (vec8[position] != 0xff) not_full = true;
 			EXPECT_GE(0xff, vec8[position]);
 			EXPECT_LE(0x45, vec8[position]);
 		}
+		EXPECT_TRUE(not_full);
 	}
 
 } // End namespace test.

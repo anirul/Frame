@@ -332,7 +332,6 @@ namespace frame::opengl {
 
 	std::vector<std::uint8_t> TextureCubeMap::GetTextureByte() const
 	{
-        Bind();
         auto format = opengl::ConvertToGLType(pixel_structure_);
         auto type = opengl::ConvertToGLType(pixel_element_size_);
         if (type != GL_UNSIGNED_BYTE)
@@ -350,20 +349,18 @@ namespace frame::opengl {
         std::vector<std::uint8_t> result = {};
         result.resize(image_size);
         glGetTextureImage(
-			GL_TEXTURE_CUBE_MAP,
+			texture_id_,
 			0, 
 			format, 
 			type, 
-			static_cast<GLsizei>(image_size), 
+			static_cast<GLsizei>(image_size * sizeof(std::uint8_t)), 
 			result.data());
-        error_.Display(__FILE__, __LINE__ - 1);
-        UnBind();
+        error_.Display(__FILE__, __LINE__ - 7);
         return result;
 	}
 
     std::vector<std::uint16_t> TextureCubeMap::GetTextureWord() const
     {
-        Bind();
         auto format = opengl::ConvertToGLType(pixel_structure_);
         auto type = opengl::ConvertToGLType(pixel_element_size_);
         if (type != GL_UNSIGNED_SHORT)
@@ -377,18 +374,22 @@ namespace frame::opengl {
         std::size_t image_size =
             static_cast<std::size_t>(size.first) *
             static_cast<std::size_t>(size.second) *
-            static_cast<std::size_t>(pixel_structure);
+            static_cast<std::size_t>(pixel_structure) * 6;
         std::vector<std::uint16_t> result = {};
         result.resize(image_size);
-        glGetTexImage(GL_TEXTURE_2D, 0, format, type, result.data());
-        error_.Display(__FILE__, __LINE__ - 1);
-        UnBind();
+        glGetTextureImage(
+			texture_id_, 
+			0, 
+			format, 
+			type, 
+			static_cast<GLsizei>(image_size * sizeof(std::uint16_t)),
+			result.data());
+        error_.Display(__FILE__, __LINE__ - 7);
         return result;
     }
 
     std::vector<std::uint32_t> TextureCubeMap::GetTextureDWord() const
     {
-        Bind();
         auto format = opengl::ConvertToGLType(pixel_structure_);
         auto type = opengl::ConvertToGLType(pixel_element_size_);
         if (type != GL_FLOAT)
@@ -402,69 +403,20 @@ namespace frame::opengl {
         std::size_t image_size =
             static_cast<std::size_t>(size.first) *
             static_cast<std::size_t>(size.second) *
-            static_cast<std::size_t>(pixel_structure);
+            static_cast<std::size_t>(pixel_structure) * 6;
         std::vector<std::uint32_t> result = {};
         result.resize(image_size);
-        glGetTexImage(GL_TEXTURE_2D, 0, format, type, result.data());
-        error_.Display(__FILE__, __LINE__ - 1);
-        UnBind();
+        glGetTextureImage(
+            texture_id_,
+            0,
+            format,
+            type,
+            static_cast<GLsizei>(image_size * sizeof(std::uint32_t)),
+            result.data());
+        error_.Display(__FILE__, __LINE__ - 7);
         return result;
     }
-/*
-	std::pair<void*, std::size_t> TextureCubeMap::GetTexture() const
-	{
-		std::pair<void*, std::size_t> result_pair = { nullptr, 0 };
-		Bind();
-		// glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-		// error_.Display(__FILE__, __LINE__ - 1);
-		auto format = opengl::ConvertToGLType(pixel_structure_);
-		auto type = opengl::ConvertToGLType(pixel_element_size_);
-		std::vector<std::any> any_vec = {};
-		auto size = GetSize();
-		auto pixel_structure = GetPixelStructure();
-		std::size_t image_size =
-			static_cast<std::size_t>(size.first) *
-			static_cast<std::size_t>(size.second) *
-			static_cast<std::size_t>(pixel_structure);
-		short target = GL_TEXTURE_3D;
-		switch (GetPixelElementSize())
-		{
-		case proto::PixelElementSize::BYTE:
-		{
-			result_pair.first = new std::uint8_t[image_size];
-			result_pair.second = image_size * sizeof(std::uint8_t);
-		}
-		break;
-		case proto::PixelElementSize::SHORT:
-		{
-			result_pair.first = new std::uint16_t[image_size];
-			result_pair.second = image_size * sizeof(std::uint16_t);
-		}
-		break;
-		case proto::PixelElementSize::HALF:
-		{
-			result_pair.first = new std::uint16_t[image_size];
-			result_pair.second = image_size * sizeof(std::uint16_t);
-		}
-		break;
-		case proto::PixelElementSize::FLOAT:
-		{
-			result_pair.first = new float[image_size];
-			result_pair.second = image_size * sizeof(float);
-		}
-		break;
-		default:
-			throw std::runtime_error("Unknown pixel element structure.");
-		}
-		if (result_pair.second)
-		{
-			glGetTextureImage(target, 0, format, type, image_size, result_pair.first);
-			error_.Display(__FILE__, __LINE__ - 1);
-		}
-		UnBind();
-		return result_pair;
-	}
-*/
+
     proto::TextureFrame GetTextureFrameFromPosition(int i)
     {
 		proto::TextureFrame texture_frame{};
