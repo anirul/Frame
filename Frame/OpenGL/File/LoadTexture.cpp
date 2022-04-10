@@ -162,8 +162,7 @@ namespace frame::opengl::file {
 		}
 	}
 
-	std::optional<std::unique_ptr<frame::TextureInterface>> 
-	LoadTextureFromFile(
+	std::unique_ptr<frame::TextureInterface> LoadTextureFromFile(
 		const std::string& file, 
 		const proto::PixelElementSize pixel_element_size 
 			/*= proto::PixelElementSize_BYTE()*/, 
@@ -178,8 +177,7 @@ namespace frame::opengl::file {
 			pixel_structure);
 	}
 
-	std::optional<std::unique_ptr<frame::TextureInterface>> 
-	LoadCubeMapTextureFromFile(
+	std::unique_ptr<frame::TextureInterface> LoadCubeMapTextureFromFile(
 		const std::string& file, 
 		const proto::PixelElementSize pixel_element_size 
 			/*= proto::PixelElementSize_BYTE()*/, 
@@ -188,15 +186,13 @@ namespace frame::opengl::file {
 	{
 		auto material = std::make_unique<frame::opengl::Material>();
 		auto& logger = Logger::GetInstance();
-		auto maybe_equirectangular =
+		auto equirectangular =
 			LoadTextureFromFile(file, pixel_element_size, pixel_structure);
-		if (!maybe_equirectangular)
+		if (!equirectangular)
 		{
 			logger->info("Could not load texture: [{}].", file);
-			return std::nullopt;
+			return nullptr;
 		}
-		std::unique_ptr<TextureInterface> equirectangular = 
-			std::move(maybe_equirectangular.value());
 		auto size = equirectangular->GetSize();
 		// Seams correct when you are less than 2048 in height you get 512.
 		std::uint32_t cube_single_res = PowerFloor(size.second) / 2;
@@ -217,14 +213,14 @@ namespace frame::opengl::file {
 		if (!maybe_level)
 		{
 			logger->info("Could not create level.");
-			return std::nullopt;
+			return nullptr;
 		}
 		auto level = std::move(maybe_level.value());
 		auto maybe_id = level->GetIdFromName("OutputTexture");
 		if (!maybe_id)
 		{
 			logger->info("Could not get the id of \"OutputTexture\".");
-			return std::nullopt;
+			return nullptr;
 		}
 		auto* out_texture_ptr = level->GetTextureFromId(maybe_id.value());
 		Renderer renderer(level.get(), cube_pair_res);
@@ -243,12 +239,11 @@ namespace frame::opengl::file {
 			renderer.RenderFromRootNode();
 		}
 		auto maybe_output_id = level->GetIdFromName("OutputTexture");
-		if (!maybe_output_id) return std::nullopt;
+		if (!maybe_output_id) return nullptr;
 		return level->ExtractTexture(maybe_output_id.value());
 	}
 
-	std::optional<std::unique_ptr<frame::TextureInterface>> 
-	LoadCubeMapTextureFromFiles(
+	std::unique_ptr<frame::TextureInterface> LoadCubeMapTextureFromFiles(
 		const std::array<std::string, 6> files, 
 		const proto::PixelElementSize pixel_element_size 
 			/*= proto::PixelElementSize_BYTE()*/, 
@@ -280,9 +275,7 @@ namespace frame::opengl::file {
 	}
 
 
-	std::optional<std::unique_ptr<TextureInterface>> 
-	LoadTextureFromVec4(
-		const glm::vec4& vec4)
+	std::unique_ptr<TextureInterface> LoadTextureFromVec4(const glm::vec4& vec4)
 	{
 		std::array<float, 4> ar = { vec4.x,	vec4.y,	vec4.z,	vec4.w };
 		return std::make_unique<frame::opengl::Texture>(
@@ -292,8 +285,7 @@ namespace frame::opengl::file {
 			frame::proto::PixelStructure_RGB_ALPHA());
 	}
 
-	std::optional<std::unique_ptr<TextureInterface>> 
-	LoadTextureFromFloat(float f)
+	std::unique_ptr<TextureInterface> LoadTextureFromFloat(float f)
 	{
 		return std::make_unique<frame::opengl::Texture>(
 			std::make_pair<std::uint32_t, std::uint32_t>(1, 1),

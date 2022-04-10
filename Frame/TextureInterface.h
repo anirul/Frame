@@ -41,7 +41,14 @@ namespace frame {
 		}
 		virtual void Clear(const glm::vec4 color) = 0;
 		virtual bool IsCubeMap() const = 0;
-		virtual std::pair<void*, std::size_t> GetTexture(int i) const = 0;
+		// Get the underlying texture as byte or word or dword.
+		// This will be multiply by the pixel structure and multiply by 6 if
+		// cubemap.
+		virtual std::vector<std::uint8_t> GetTextureByte() const = 0;
+		// Can contain either a half or a short.
+		virtual std::vector<std::uint16_t> GetTextureWord() const = 0;
+		// Can contain either an int or a float.
+		virtual std::vector<std::uint32_t> GetTextureDWord() const = 0;
 	};
 
 } // End namespace frame.

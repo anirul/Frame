@@ -5,6 +5,7 @@
 #include <chrono>
 #include <utility>
 #include <sstream>
+#include <fmt/core.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_syswm.h>
 #include <GL/glew.h>
@@ -15,6 +16,30 @@ namespace frame {
 
 	// Private space.
 	namespace {
+
+        void GLAPIENTRY MessageCallback(GLenum source,
+            GLenum type,
+            GLuint id,
+            GLenum severity,
+            GLsizei length,
+            const GLchar* message,
+            const void* userParam)
+        {
+			Logger& logger = Logger::GetInstance();
+			std::string str_message = fmt::format(
+				"GL Callback: type {} severity {} message {}",
+				type, 
+				severity, 
+				message);
+			if (type == GL_DEBUG_TYPE_ERROR)
+			{
+				logger->error(str_message);
+			}
+			else
+			{
+				logger->info(str_message);
+			}
+        }
 
 		class SDLOpenGLWindow : public WindowInterface
 		{
@@ -235,7 +260,7 @@ namespace frame {
 		{
 			std::pair<int, int> gl_version;
 			frame::Logger& logger = frame::Logger::GetInstance();
-			
+
 			SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 			SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 			SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
@@ -283,6 +308,21 @@ namespace frame {
 				"Started SDL OpenGL version {}.{}.", 
 				gl_version.first, 
 				gl_version.second);
+
+            // Initialize GLEW to find the 'glDebugMessageCallback' function.
+            auto result = glewInit();
+            if (result != GLEW_OK)
+            {
+                throw std::runtime_error(
+					fmt::format(
+						"GLEW problems : {}", 
+						reinterpret_cast<const char*>(
+							glewGetErrorString(result))));
+            }
+
+            // During init, enable debug output
+            glEnable(GL_DEBUG_OUTPUT);
+            glDebugMessageCallback(MessageCallback, nullptr);
 
 			return gl_context;
 		}

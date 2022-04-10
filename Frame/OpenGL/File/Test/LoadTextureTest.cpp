@@ -9,9 +9,7 @@ namespace test {
 	TEST_F(LoadTextureTest, LoadTextureFromFloatTest)
 	{
 		const frame::Error& error = frame::Error::GetInstance();
-		auto maybe_texture = frame::opengl::file::LoadTextureFromFloat(0.1f);
-		EXPECT_TRUE(maybe_texture);
-		auto texture = std::move(maybe_texture.value());
+		auto texture = frame::opengl::file::LoadTextureFromFloat(0.1f);
 		EXPECT_TRUE(texture);
 		EXPECT_EQ(1, texture->GetSize().first);
 		EXPECT_EQ(1, texture->GetSize().second);
@@ -28,46 +26,35 @@ namespace test {
 	TEST_F(LoadTextureTest, LoadTextureFromVec4Test)
 	{
 		const frame::Error& error = frame::Error::GetInstance();
-		auto maybe_texture = frame::opengl::file::LoadTextureFromVec4(
+		auto texture = frame::opengl::file::LoadTextureFromVec4(
 				glm::vec4(0.1f, 0.2f, 0.3f, 0.4f));
-		EXPECT_TRUE(maybe_texture);
-		auto texture = std::move(maybe_texture.value());
 		EXPECT_TRUE(texture);
 		EXPECT_EQ(1, texture->GetSize().first);
 		EXPECT_EQ(1, texture->GetSize().second);
-		auto pair = texture->GetTexture(0);
-		std::vector<float> v4;
-		v4.resize(4);
-		memcpy(v4.data(), pair.first, pair.second);
-		EXPECT_EQ(4, v4.size());
-		EXPECT_FLOAT_EQ(0.1f, v4[0]);
-		EXPECT_FLOAT_EQ(0.2f, v4[1]);
-		EXPECT_FLOAT_EQ(0.3f, v4[2]);
-		EXPECT_FLOAT_EQ(0.4f, v4[3]);
+		auto vec32 = texture->GetTextureDWord();
+		EXPECT_EQ(4, vec32.size());
+		auto floats = reinterpret_cast<float*>(vec32.data());
+		EXPECT_FLOAT_EQ(0.1f, floats[0]);
+		EXPECT_FLOAT_EQ(0.2f, floats[1]);
+		EXPECT_FLOAT_EQ(0.3f, floats[2]);
+		EXPECT_FLOAT_EQ(0.4f, floats[3]);
 	}
 
 	TEST_F(LoadTextureTest, LoadTextureFromFileTest)
 	{
 		const frame::Error& error = frame::Error::GetInstance();
-		auto maybe_texture = 
-				frame::opengl::file::LoadTextureFromFile(
-					frame::file::FindFile("Asset/CubeMap/PositiveX.png"),
-					frame::proto::PixelElementSize_BYTE(),
-					frame::proto::PixelStructure_RGB_ALPHA());
-		EXPECT_TRUE(maybe_texture);
-		auto texture = std::move(maybe_texture.value());
+		auto texture = 
+			frame::opengl::file::LoadTextureFromFile(
+				frame::file::FindFile("Asset/CubeMap/PositiveX.png"),
+				frame::proto::PixelElementSize_BYTE(),
+				frame::proto::PixelStructure_RGB_ALPHA());
 		EXPECT_TRUE(texture);
 		EXPECT_EQ(1024, texture->GetSize().first);
 		EXPECT_EQ(1024, texture->GetSize().second);
-		const std::size_t image_size = 
-			static_cast<std::size_t>(texture->GetSize().first) * 
-			static_cast<std::size_t>(texture->GetSize().second) * 
-			static_cast<std::size_t>(texture->GetPixelStructure());
-		auto pair = texture->GetTexture(0);
-		for (int position = 0; position < pair.second; position += 1025 * 2) {
-			std::uint8_t* p = (std::uint8_t*)pair.first;
-			EXPECT_GE(0xff, p[position]);
-			EXPECT_LE(0x4e, p[position]);
+		auto vec8 = texture->GetTextureByte();
+		for (int position = 0; position < vec8.size(); position += 1025 * 2) {
+			EXPECT_GE(0xff, vec8[position]);
+			EXPECT_LE(0x4e, vec8[position]);
 		}
 	}
 
@@ -77,7 +64,7 @@ namespace test {
 	TEST_F(LoadTextureTest, LoadCubeMapFromFilesTest)
 	{
 		const frame::Error& error = frame::Error::GetInstance();
-		auto maybe_texture =
+		auto texture =
 			frame::opengl::file::LoadCubeMapTextureFromFiles(
 				{ 
 					frame::file::FindFile("Asset/CubeMap/PositiveX.png"),
@@ -89,24 +76,14 @@ namespace test {
 				},
 				frame::proto::PixelElementSize_BYTE(),
 				frame::proto::PixelStructure_RGB_ALPHA());
-		EXPECT_TRUE(maybe_texture);
-		auto texture = std::move(maybe_texture.value());
 		EXPECT_TRUE(texture);
 		EXPECT_EQ(1024, texture->GetSize().first);
 		EXPECT_EQ(1024, texture->GetSize().second);
-		const std::size_t image_size = 
-			static_cast<std::size_t>(texture->GetSize().first) *
-			static_cast<std::size_t>(texture->GetSize().second) *
-			static_cast<std::size_t>(texture->GetPixelStructure());
-		for (const auto direction : {0, 1, 2, 3, 4, 5})
+		auto vec8 = texture->GetTextureByte();
+		for (int position = 0; position < vec8.size(); position += 1025 * 5)
 		{
-			auto pair = texture->GetTexture(direction);
-			for (int position = 0; position < image_size; position += 1025 * 5)
-			{
-				std::uint8_t* p = (std::uint8_t*)pair.first;
-				EXPECT_GE(0xff, p[position]);
-				EXPECT_LE(0x45, p[position]);
-			}
+			EXPECT_GE(0xff, vec8[position]);
+			EXPECT_LE(0x45, vec8[position]);
 		}
 	}
 

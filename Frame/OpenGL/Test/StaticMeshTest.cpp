@@ -11,7 +11,6 @@ namespace test {
 
 	TEST_F(StaticMeshTest, CreateCubeMeshTest)
 	{
-		EXPECT_EQ(GLEW_OK, glewInit());
 		ASSERT_TRUE(window_);
 		auto level = std::make_unique<frame::Level>();
 		auto maybe_mesh_vec = frame::opengl::file::LoadStaticMeshesFromFile(
@@ -43,7 +42,6 @@ namespace test {
 
 	TEST_F(StaticMeshTest, CreateTorusMeshTest)
 	{
-		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_TRUE(window_);
 		auto level = std::make_unique<frame::Level>();
 		auto maybe_mesh_vec = frame::opengl::file::LoadStaticMeshesFromFile(

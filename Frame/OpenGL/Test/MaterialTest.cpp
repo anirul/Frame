@@ -7,7 +7,6 @@ namespace test {
 
 	TEST_F(MaterialTest, CreateMaterialTest)
 	{
-		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(material_);
 		auto level = std::make_unique<frame::Level>();
 		auto material = std::make_unique<frame::opengl::Material>();
@@ -23,18 +22,16 @@ namespace test {
 		auto material = std::make_unique<frame::opengl::Material>();
 		material_ = std::move(material);
 		EXPECT_TRUE(material_);
-		auto maybe_texture1 = frame::opengl::file::LoadTextureFromFile(
+		auto texture1 = frame::opengl::file::LoadTextureFromFile(
 			frame::file::FindDirectory("Asset") + "/CubeMap/PositiveX.png");
-		EXPECT_TRUE(maybe_texture1);
-		auto maybe_texture2 = frame::opengl::file::LoadTextureFromFile(
-			frame::file::FindDirectory("Asset") + "/CubeMap/PositiveY.png");
-		EXPECT_TRUE(maybe_texture2);
-		auto texture1 = std::move(maybe_texture1.value());
+		EXPECT_TRUE(texture1);
 		texture1->SetName("PositiveX");
+        auto texture2 = frame::opengl::file::LoadTextureFromFile(
+			frame::file::FindDirectory("Asset") + "/CubeMap/PositiveY.png");
+		EXPECT_TRUE(texture2);
+		texture2->SetName("PositiveY");
 		auto maybe_id1 = level->AddTexture(std::move(texture1));
 		EXPECT_TRUE(maybe_id1);
-		auto texture2 = std::move(maybe_texture2.value());
-		texture2->SetName("PositiveY");
 		auto maybe_id2 = level->AddTexture(std::move(texture2));
 		EXPECT_TRUE(maybe_id2);
 		std::uint64_t id_false = 0;

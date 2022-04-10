@@ -9,7 +9,6 @@ namespace test {
 
     TEST_F(TextureCubeMapTest, CreateTextureCubeMapTest)
     {
-        EXPECT_EQ(GLEW_OK, glewInit());
         ASSERT_FALSE(texture_);
         std::optional<std::unique_ptr<frame::TextureInterface>> maybe_texture;
         EXPECT_NO_THROW(
@@ -30,7 +29,6 @@ namespace test {
 
     TEST_F(TextureCubeMapTest, CreateEquirectangularTextureCubeMapTest)
     {
-        EXPECT_EQ(GLEW_OK, glewInit());
         ASSERT_FALSE(texture_);
         std::optional<std::unique_ptr<frame::TextureInterface>> maybe_texture;
         EXPECT_NO_THROW(

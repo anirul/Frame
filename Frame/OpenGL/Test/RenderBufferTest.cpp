@@ -4,7 +4,6 @@ namespace test {
 
 	TEST_F(RenderBufferTest, CreateRenderTest)
 	{
-		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(render_);
 		render_ = std::make_unique<frame::opengl::RenderBuffer>();
 		EXPECT_TRUE(render_);
@@ -13,7 +12,6 @@ namespace test {
 
 	TEST_F(RenderBufferTest, CheckIdRenderTest)
 	{
-		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(render_);
 		render_ = std::make_unique<frame::opengl::RenderBuffer>();
 		EXPECT_TRUE(render_);
@@ -23,7 +21,6 @@ namespace test {
 
 	TEST_F(RenderBufferTest, BindStorageRenderTest)
 	{
-		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(render_);
 		render_ = std::make_unique<frame::opengl::RenderBuffer>();
 		EXPECT_TRUE(render_);

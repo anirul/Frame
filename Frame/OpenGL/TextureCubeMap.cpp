@@ -330,7 +330,88 @@ namespace frame::opengl {
 		UnBind();
 	}
 
-	std::pair<void*, std::size_t> TextureCubeMap::GetTexture(int i) const
+	std::vector<std::uint8_t> TextureCubeMap::GetTextureByte() const
+	{
+        Bind();
+        auto format = opengl::ConvertToGLType(pixel_structure_);
+        auto type = opengl::ConvertToGLType(pixel_element_size_);
+        if (type != GL_UNSIGNED_BYTE)
+        {
+            throw std::runtime_error(
+                "Invalid format should be byte is : " +
+                proto::PixelElementSize_Enum_Name(pixel_element_size_.value()));
+        }
+        auto size = GetSize();
+        auto pixel_structure = GetPixelStructure();
+        std::size_t image_size =
+            static_cast<std::size_t>(size.first) *
+            static_cast<std::size_t>(size.second) *
+            static_cast<std::size_t>(pixel_structure) * 6;
+        std::vector<std::uint8_t> result = {};
+        result.resize(image_size);
+        glGetTextureImage(
+			GL_TEXTURE_CUBE_MAP,
+			0, 
+			format, 
+			type, 
+			static_cast<GLsizei>(image_size), 
+			result.data());
+        error_.Display(__FILE__, __LINE__ - 1);
+        UnBind();
+        return result;
+	}
+
+    std::vector<std::uint16_t> TextureCubeMap::GetTextureWord() const
+    {
+        Bind();
+        auto format = opengl::ConvertToGLType(pixel_structure_);
+        auto type = opengl::ConvertToGLType(pixel_element_size_);
+        if (type != GL_UNSIGNED_SHORT)
+        {
+            throw std::runtime_error(
+                "Invalid format should be float is : " +
+                proto::PixelElementSize_Enum_Name(pixel_element_size_.value()));
+        }
+        auto size = GetSize();
+        auto pixel_structure = GetPixelStructure();
+        std::size_t image_size =
+            static_cast<std::size_t>(size.first) *
+            static_cast<std::size_t>(size.second) *
+            static_cast<std::size_t>(pixel_structure);
+        std::vector<std::uint16_t> result = {};
+        result.resize(image_size);
+        glGetTexImage(GL_TEXTURE_2D, 0, format, type, result.data());
+        error_.Display(__FILE__, __LINE__ - 1);
+        UnBind();
+        return result;
+    }
+
+    std::vector<std::uint32_t> TextureCubeMap::GetTextureDWord() const
+    {
+        Bind();
+        auto format = opengl::ConvertToGLType(pixel_structure_);
+        auto type = opengl::ConvertToGLType(pixel_element_size_);
+        if (type != GL_FLOAT)
+        {
+            throw std::runtime_error(
+                "Invalid format should be float is : " +
+                proto::PixelElementSize_Enum_Name(pixel_element_size_.value()));
+        }
+        auto size = GetSize();
+        auto pixel_structure = GetPixelStructure();
+        std::size_t image_size =
+            static_cast<std::size_t>(size.first) *
+            static_cast<std::size_t>(size.second) *
+            static_cast<std::size_t>(pixel_structure);
+        std::vector<std::uint32_t> result = {};
+        result.resize(image_size);
+        glGetTexImage(GL_TEXTURE_2D, 0, format, type, result.data());
+        error_.Display(__FILE__, __LINE__ - 1);
+        UnBind();
+        return result;
+    }
+/*
+	std::pair<void*, std::size_t> TextureCubeMap::GetTexture() const
 	{
 		std::pair<void*, std::size_t> result_pair = { nullptr, 0 };
 		Bind();
@@ -345,7 +426,7 @@ namespace frame::opengl {
 			static_cast<std::size_t>(size.first) *
 			static_cast<std::size_t>(size.second) *
 			static_cast<std::size_t>(pixel_structure);
-		short target = GL_TEXTURE_CUBE_MAP_POSITIVE_X + i;
+		short target = GL_TEXTURE_3D;
 		switch (GetPixelElementSize())
 		{
 		case proto::PixelElementSize::BYTE:
@@ -377,13 +458,13 @@ namespace frame::opengl {
 		}
 		if (result_pair.second)
 		{
-			glGetTexImage(target, 0, format, type, result_pair.first);
+			glGetTextureImage(target, 0, format, type, image_size, result_pair.first);
 			error_.Display(__FILE__, __LINE__ - 1);
 		}
 		UnBind();
 		return result_pair;
 	}
-
+*/
     proto::TextureFrame GetTextureFrameFromPosition(int i)
     {
 		proto::TextureFrame texture_frame{};

@@ -51,9 +51,10 @@ namespace frame::opengl {
 		// Convert to GL type and from GL type.
 		int ConvertToGLType(TextureFilterEnum texture_filter) const;
 		TextureFilterEnum ConvertFromGLType(int gl_filter) const;
-		// Get a copy of the texture output, i is the texture number in case of
-		// a cube map (check IsCubeMap).
-		std::pair<void*, std::size_t> GetTexture(int i) const override;
+		// Get a copy of the texture output.
+		std::vector<std::uint8_t> GetTextureByte() const override;
+		std::vector<std::uint16_t> GetTextureWord() const override;
+		std::vector<std::uint32_t> GetTextureDWord() const override;
 		// Clear the texture.
 		void Clear(const glm::vec4 color) override;
 		// Name interface.

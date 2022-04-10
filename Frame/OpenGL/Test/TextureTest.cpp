@@ -8,7 +8,6 @@ namespace test {
 
 	TEST_F(TextureTest, CreateTextureTest)
 	{
-		EXPECT_EQ(GLEW_OK, glewInit());
 		ASSERT_FALSE(texture_);
 		std::optional<std::unique_ptr<frame::TextureInterface>> maybe_texture;
 		EXPECT_NO_THROW(
@@ -21,7 +20,6 @@ namespace test {
 
 	TEST_F(TextureTest, GetSizeTextureTest)
 	{
-		EXPECT_EQ(GLEW_OK, glewInit());
 		ASSERT_FALSE(texture_);
 		std::optional<std::unique_ptr<frame::TextureInterface>> maybe_texture;
 		EXPECT_NO_THROW(
@@ -37,7 +35,6 @@ namespace test {
 
 	TEST_F(TextureTest, CreateHDRTextureTest)
 	{
-		EXPECT_EQ(GLEW_OK, glewInit());
 		ASSERT_FALSE(texture_);
 		std::optional<std::unique_ptr<frame::TextureInterface>> maybe_texture;
 		EXPECT_NO_THROW(

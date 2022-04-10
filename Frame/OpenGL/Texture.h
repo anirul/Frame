@@ -49,9 +49,10 @@ namespace frame::opengl {
 		// Bind and unbind a texture to the current context.
 		void Bind(const unsigned int slot = 0) const override;
 		void UnBind() const override;
-		// Get a copy of the texture output, i is the texture number in case of
-		// a cube map (check IsCubeMap).
-		std::pair<void*, std::size_t> GetTexture(int i) const override;
+		// Get a copy of the texture output.
+        std::vector<std::uint8_t> GetTextureByte() const override;
+        std::vector<std::uint16_t> GetTextureWord() const override;
+        std::vector<std::uint32_t> GetTextureDWord() const override;
 		// Clear the texture.
 		void Clear(const glm::vec4 color) override;
 		// Name interface.
@@ -60,18 +61,15 @@ namespace frame::opengl {
 
 	public:
 		// Virtual part.
-		virtual void EnableMipmap() const override;
-		virtual void SetMinFilter(
-			const TextureFilterEnum texture_filter) override;
-		virtual TextureFilterEnum GetMinFilter() const override;
-		virtual void SetMagFilter(
-			const TextureFilterEnum texture_filter) override;
-		virtual TextureFilterEnum GetMagFilter() const override;
-		virtual void SetWrapS(
-			const TextureFilterEnum texture_filter) override;
-		virtual TextureFilterEnum GetWrapS() const override;
-		virtual void SetWrapT(const TextureFilterEnum texture_filter) override;
-		virtual TextureFilterEnum GetWrapT() const override;
+		void EnableMipmap() const override;
+		void SetMinFilter(const TextureFilterEnum texture_filter) override;
+		TextureFilterEnum GetMinFilter() const override;
+		void SetMagFilter(const TextureFilterEnum texture_filter) override;
+		TextureFilterEnum GetMagFilter() const override;
+		void SetWrapS(const TextureFilterEnum texture_filter) override;
+		TextureFilterEnum GetWrapS() const override;
+		void SetWrapT(const TextureFilterEnum texture_filter) override;
+		TextureFilterEnum GetWrapT() const override;
 
 	public:
 		bool IsCubeMap() const final { return false; }
@@ -114,7 +112,7 @@ namespace frame::opengl {
 		mutable bool locked_bind_ = false;
 		std::unique_ptr<RenderBuffer> render_ = nullptr;
 		std::unique_ptr<FrameBuffer> frame_ = nullptr;
-		std::string name_ = "";
+		std::string name_;
 	};
 
 } // End namespace frame::opengl.

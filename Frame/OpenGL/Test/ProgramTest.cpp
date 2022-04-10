@@ -5,8 +5,6 @@ namespace test {
 
 	TEST_F(ProgramTest, CreateProgramTest)
 	{
-		EXPECT_EQ(GLEW_OK, glewInit());
-		frame::Error::SetWindowPtr(nullptr);
 		EXPECT_FALSE(program_);
 		program_ = std::make_unique<frame::opengl::Program>();
 		EXPECT_TRUE(program_);
@@ -14,8 +12,6 @@ namespace test {
 
 	TEST_F(ProgramTest, CheckShaderProgramTest)
 	{
-		EXPECT_EQ(GLEW_OK, glewInit());
-		frame::Error::SetWindowPtr(nullptr);
 		EXPECT_FALSE(program_);
 		program_ = std::make_unique<frame::opengl::Program>();
 		EXPECT_TRUE(program_);
@@ -34,8 +30,6 @@ namespace test {
 
 	TEST_F(ProgramTest, CheckUseAndLinkProgramTest)
 	{
-		EXPECT_EQ(GLEW_OK, glewInit());
-		frame::Error::SetWindowPtr(nullptr);
 		EXPECT_FALSE(program_);
 		program_ = std::make_unique<frame::opengl::Program>();
 		auto program_ptr = 
@@ -60,8 +54,6 @@ namespace test {
 
 	TEST_F(ProgramTest, CreateSimpleProgramProgramTest)
 	{
-		EXPECT_EQ(GLEW_OK, glewInit());
-		frame::Error::SetWindowPtr(nullptr);
 		EXPECT_FALSE(program_);
 		std::istringstream iss_vertex(GetVertexSource());
 		std::istringstream iss_fragment(GetFragmentSource());

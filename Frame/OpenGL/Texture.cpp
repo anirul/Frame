@@ -271,7 +271,82 @@ namespace frame::opengl {
 			"invalid texture filter : " + std::to_string(gl_filter));
 	}
 
-	std::pair<void*, std::size_t> Texture::GetTexture(int i) const
+	std::vector<std::uint8_t> Texture::GetTextureByte() const
+	{
+		Bind();
+        auto format = opengl::ConvertToGLType(pixel_structure_);
+        auto type = opengl::ConvertToGLType(pixel_element_size_);
+		if (type != GL_UNSIGNED_BYTE)
+		{
+			throw std::runtime_error(
+				"Invalid format should be byte is : " + 
+				proto::PixelElementSize_Enum_Name(pixel_element_size_.value()));
+		}
+		auto size = GetSize();
+		auto pixel_structure = GetPixelStructure();
+		std::size_t image_size = 
+            static_cast<std::size_t>(size.first) *
+            static_cast<std::size_t>(size.second) *
+            static_cast<std::size_t>(pixel_structure);
+		std::vector<std::uint8_t> result = {};
+		result.resize(image_size);
+        glGetTexImage(GL_TEXTURE_2D, 0, format, type, result.data());
+        error_.Display(__FILE__, __LINE__ - 1);
+		UnBind();
+		return result;
+	}
+
+	std::vector<std::uint16_t> Texture::GetTextureWord() const
+	{
+        Bind();
+        auto format = opengl::ConvertToGLType(pixel_structure_);
+        auto type = opengl::ConvertToGLType(pixel_element_size_);
+        if (type != GL_UNSIGNED_SHORT)
+        {
+            throw std::runtime_error(
+                "Invalid format should be float is : " +
+                proto::PixelElementSize_Enum_Name(pixel_element_size_.value()));
+        }
+        auto size = GetSize();
+        auto pixel_structure = GetPixelStructure();
+        std::size_t image_size =
+            static_cast<std::size_t>(size.first) *
+            static_cast<std::size_t>(size.second) *
+            static_cast<std::size_t>(pixel_structure);
+        std::vector<std::uint16_t> result = {};
+        result.resize(image_size);
+        glGetTexImage(GL_TEXTURE_2D, 0, format, type, result.data());
+        error_.Display(__FILE__, __LINE__ - 1);
+        UnBind();
+        return result;
+	}
+
+    std::vector<std::uint32_t> Texture::GetTextureDWord() const
+    {
+        Bind();
+        auto format = opengl::ConvertToGLType(pixel_structure_);
+        auto type = opengl::ConvertToGLType(pixel_element_size_);
+        if (type != GL_FLOAT)
+        {
+            throw std::runtime_error(
+                "Invalid format should be float is : " +
+                proto::PixelElementSize_Enum_Name(pixel_element_size_.value()));
+        }
+        auto size = GetSize();
+        auto pixel_structure = GetPixelStructure();
+        std::size_t image_size =
+            static_cast<std::size_t>(size.first) *
+            static_cast<std::size_t>(size.second) *
+            static_cast<std::size_t>(pixel_structure);
+        std::vector<std::uint32_t> result = {};
+        result.resize(image_size);
+        glGetTexImage(GL_TEXTURE_2D, 0, format, type, result.data());
+        error_.Display(__FILE__, __LINE__ - 1);
+        UnBind();
+        return result;
+    }
+/*
+	std::pair<void*, std::size_t> Texture::GetTexture() const
 	{
 		std::pair<void*, std::size_t> result_pair = { nullptr, 0 };
 		Bind();
@@ -324,5 +399,5 @@ namespace frame::opengl {
 		UnBind();
 		return result_pair;
 	}
-
+	*/
 } // End namespace frame::opengl.

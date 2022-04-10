@@ -4,7 +4,6 @@ namespace test {
 
 	TEST_F(ShaderTest, CreateVertexShaderTest)
 	{
-		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(shader_);
 		shader_ = std::make_unique<frame::opengl::Shader>(
 			frame::opengl::ShaderEnum::VERTEX_SHADER);
@@ -13,7 +12,6 @@ namespace test {
 
 	TEST_F(ShaderTest, CreateFragmentShaderTest)
 	{
-		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(shader_);
 		shader_ = std::make_unique<frame::opengl::Shader>(
 			frame::opengl::ShaderEnum::FRAGMENT_SHADER);
@@ -22,7 +20,6 @@ namespace test {
 
 	TEST_F(ShaderTest, FailedToLoadShaderTest)
 	{
-		ASSERT_EQ(GLEW_OK, glewInit());
 		ASSERT_FALSE(shader_);
 		shader_ = std::make_unique<frame::opengl::Shader>(
 			frame::opengl::ShaderEnum::FRAGMENT_SHADER);
@@ -32,7 +29,6 @@ namespace test {
 
 	TEST_F(ShaderTest, LoadFromFileVertexShaderTest)
 	{
-		ASSERT_EQ(GLEW_OK, glewInit());
 		ASSERT_FALSE(shader_);
 		shader_ = std::make_unique<frame::opengl::Shader>(
 			frame::opengl::ShaderEnum::VERTEX_SHADER);
@@ -43,7 +39,6 @@ namespace test {
 
 	TEST_F(ShaderTest, LoadFromFileFragmentShaderTest)
 	{
-		ASSERT_EQ(GLEW_OK, glewInit());
 		ASSERT_FALSE(shader_);
 		shader_ = std::make_unique<frame::opengl::Shader>(
 			frame::opengl::ShaderEnum::FRAGMENT_SHADER);

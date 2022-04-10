@@ -5,7 +5,6 @@ namespace test {
 
 	TEST_F(FrameBufferTest, CreateFrameTest)
 	{
-		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(frame_);
 		frame_ = std::make_unique<frame::opengl::FrameBuffer>();
 		EXPECT_TRUE(frame_);
@@ -14,7 +13,6 @@ namespace test {
 
 	TEST_F(FrameBufferTest, CheckIdFrameTest)
 	{
-		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(frame_);
 		frame_ = std::make_unique<frame::opengl::FrameBuffer>();
 		EXPECT_TRUE(frame_);
@@ -24,7 +22,6 @@ namespace test {
 
 	TEST_F(FrameBufferTest, BindAttachErrorFrameTest)
 	{
-		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(frame_);
 		frame_ = std::make_unique<frame::opengl::FrameBuffer>();
 		EXPECT_TRUE(frame_);
@@ -34,7 +31,6 @@ namespace test {
 
 	TEST_F(FrameBufferTest, BindAttachFrameTest)
 	{
-		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(frame_);
 		frame_ = std::make_unique<frame::opengl::FrameBuffer>();
 		EXPECT_TRUE(frame_);
@@ -46,7 +42,6 @@ namespace test {
 
 	TEST_F(FrameBufferTest, BindTextureFrameTest)
 	{
-		EXPECT_EQ(GLEW_OK, glewInit());
 		EXPECT_FALSE(frame_);
 		frame_ = std::make_unique<frame::opengl::FrameBuffer>();
 		EXPECT_TRUE(frame_);

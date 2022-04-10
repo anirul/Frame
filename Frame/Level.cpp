@@ -181,11 +181,10 @@ namespace frame {
 		}
 	}
 
-	std::optional<std::unique_ptr<frame::TextureInterface>> 
-		Level::ExtractTexture(EntityId id)
+	std::unique_ptr<frame::TextureInterface> Level::ExtractTexture(EntityId id)
 	{
 		auto ptr = GetTextureFromId(id);
-		if (!ptr) return std::nullopt;
+		if (!ptr) return nullptr;
 		auto node_texture = id_texture_map_.extract(id);
 		auto node_name = id_name_map_.extract(id);
 		auto node_id = name_id_map_.extract(node_name.mapped());
@@ -208,7 +207,7 @@ namespace frame {
 			logger_->info("Could not get node interface.");
 			return nullptr;
 		}
-		NodeCamera* node_camera = dynamic_cast<NodeCamera*>(node_interface);
+		auto node_camera = dynamic_cast<NodeCamera*>(node_interface);
 		if (!node_camera)
 		{
 			logger_->info("Could not get node camera ptr.");

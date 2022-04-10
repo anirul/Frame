@@ -60,8 +60,8 @@ namespace frame {
 		virtual std::optional<EntityId> AddStaticMesh(
 			std::unique_ptr<StaticMeshInterface>&& static_mesh) = 0;
 		// Extract an entity from a level (this entity will be unvalidated!).
-		virtual std::optional<std::unique_ptr<TextureInterface>> 
-			ExtractTexture(EntityId id) = 0;
+		virtual std::unique_ptr<TextureInterface> ExtractTexture(
+			EntityId id) = 0;
 		virtual CameraInterface* GetDefaultCamera() = 0;
 	};
 

@@ -84,8 +84,7 @@ namespace frame {
 		std::optional<std::vector<EntityId>> GetChildList(
 			EntityId id) const override;
 		std::optional<EntityId> GetParentId(EntityId id) const override;
-		std::optional<std::unique_ptr<TextureInterface>>
-			ExtractTexture(EntityId id) override;
+		std::unique_ptr<TextureInterface> ExtractTexture(EntityId id) override;
 		CameraInterface* GetDefaultCamera() override;
 
 	protected:
