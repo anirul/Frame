@@ -53,6 +53,7 @@ namespace frame::opengl {
         std::vector<std::uint8_t> GetTextureByte() const override;
         std::vector<std::uint16_t> GetTextureWord() const override;
         std::vector<std::uint32_t> GetTextureDWord() const override;
+		std::vector<float> GetTextureFloat() const override;
 		// Clear the texture.
 		void Clear(const glm::vec4 color) override;
 		// Name interface.

@@ -47,6 +47,35 @@ namespace frame::opengl {
 
 	}
 
+    proto::TextureFrame GetTextureFrameFromPosition(int i)
+    {
+        proto::TextureFrame texture_frame{};
+        switch (i)
+        {
+        case 0:
+            texture_frame.set_value(proto::TextureFrame::CUBE_MAP_POSITIVE_X);
+            break;
+        case 1:
+            texture_frame.set_value(proto::TextureFrame::CUBE_MAP_NEGATIVE_X);
+            break;
+        case 2:
+            texture_frame.set_value(proto::TextureFrame::CUBE_MAP_POSITIVE_Y);
+            break;
+        case 3:
+            texture_frame.set_value(proto::TextureFrame::CUBE_MAP_NEGATIVE_Y);
+            break;
+        case 4:
+            texture_frame.set_value(proto::TextureFrame::CUBE_MAP_POSITIVE_Z);
+            break;
+        case 5:
+            texture_frame.set_value(proto::TextureFrame::CUBE_MAP_NEGATIVE_Z);
+            break;
+        default:
+            throw std::runtime_error(fmt::format("Invalid entry {}.", i));
+        }
+        return texture_frame;
+    }
+
 	TextureCubeMap::~TextureCubeMap()
 	{
 		glDeleteTextures(1, &texture_id_);
@@ -337,7 +366,7 @@ namespace frame::opengl {
         if (type != GL_UNSIGNED_BYTE)
         {
             throw std::runtime_error(
-                "Invalid format should be byte is : " +
+                "Invalid format should be unsigned byte is : " +
                 proto::PixelElementSize_Enum_Name(pixel_element_size_.value()));
         }
         auto size = GetSize();
@@ -363,10 +392,10 @@ namespace frame::opengl {
     {
         auto format = opengl::ConvertToGLType(pixel_structure_);
         auto type = opengl::ConvertToGLType(pixel_element_size_);
-        if (type != GL_UNSIGNED_SHORT)
+		if (type != GL_UNSIGNED_SHORT)
         {
             throw std::runtime_error(
-                "Invalid format should be float is : " +
+                "Invalid format should be unsigned short is : " +
                 proto::PixelElementSize_Enum_Name(pixel_element_size_.value()));
         }
         auto size = GetSize();
@@ -392,10 +421,10 @@ namespace frame::opengl {
     {
         auto format = opengl::ConvertToGLType(pixel_structure_);
         auto type = opengl::ConvertToGLType(pixel_element_size_);
-        if (type != GL_FLOAT)
+        if (type != GL_UNSIGNED_INT)
         {
             throw std::runtime_error(
-                "Invalid format should be float is : " +
+                "Invalid format should be unsigned int is : " +
                 proto::PixelElementSize_Enum_Name(pixel_element_size_.value()));
         }
         auto size = GetSize();
@@ -417,33 +446,33 @@ namespace frame::opengl {
         return result;
     }
 
-    proto::TextureFrame GetTextureFrameFromPosition(int i)
+    std::vector<float> TextureCubeMap::GetTextureFloat() const
     {
-		proto::TextureFrame texture_frame{};
-		switch (i)
-		{
-		case 0:
-			texture_frame.set_value(proto::TextureFrame::CUBE_MAP_POSITIVE_X);
-			break;
-		case 1:
-			texture_frame.set_value(proto::TextureFrame::CUBE_MAP_NEGATIVE_X);
-			break;
-        case 2:
-            texture_frame.set_value(proto::TextureFrame::CUBE_MAP_POSITIVE_Y);
-            break;
-        case 3:
-            texture_frame.set_value(proto::TextureFrame::CUBE_MAP_NEGATIVE_Y);
-            break;
-        case 4:
-            texture_frame.set_value(proto::TextureFrame::CUBE_MAP_POSITIVE_Z);
-            break;
-        case 5:
-            texture_frame.set_value(proto::TextureFrame::CUBE_MAP_NEGATIVE_Z);
-            break;
-		default:
-			throw std::runtime_error(fmt::format("Invalid entry {}.", i));
-		}
-		return texture_frame;
+        auto format = opengl::ConvertToGLType(pixel_structure_);
+        auto type = opengl::ConvertToGLType(pixel_element_size_);
+        if (type != GL_FLOAT)
+        {
+            throw std::runtime_error(
+                "Invalid format should be float is : " +
+                proto::PixelElementSize_Enum_Name(pixel_element_size_.value()));
+        }
+        auto size = GetSize();
+        auto pixel_structure = GetPixelStructure();
+        std::size_t image_size =
+            static_cast<std::size_t>(size.first) *
+            static_cast<std::size_t>(size.second) *
+            static_cast<std::size_t>(pixel_structure) * 6;
+        std::vector<float> result = {};
+        result.resize(image_size);
+        glGetTextureImage(
+            texture_id_,
+            0,
+            format,
+            type,
+            static_cast<GLsizei>(image_size * sizeof(float)),
+            result.data());
+        error_.Display(__FILE__, __LINE__ - 7);
+        return result;
     }
 
 } // End namespace frame::opengl.

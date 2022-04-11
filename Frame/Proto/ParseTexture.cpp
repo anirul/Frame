@@ -36,7 +36,7 @@ namespace {
 namespace frame::proto {
 
 	std::unique_ptr<frame::TextureInterface> ParseTexture(
-		const Texture& proto_texture, 
+		const Texture& proto_texture,
 		const std::pair<std::uint32_t, std::uint32_t> size)
 	{
 		auto& error = Error::GetInstance();
@@ -79,7 +79,7 @@ namespace frame::proto {
 	}
 
 	std::unique_ptr<TextureInterface> ParseCubeMapTexture(
-		const Texture& proto_texture, 
+		const Texture& proto_texture,
 		const std::pair<std::uint32_t, std::uint32_t> size)
 	{
 		auto& error = Error::GetInstance();
@@ -123,14 +123,14 @@ namespace frame::proto {
 		auto& error = Error::GetInstance();
 		CheckParameters(proto_texture);
 		auto texture = opengl::file::LoadTextureFromFile(
-			file::FindFile(proto_texture.file_name()), 
-			proto_texture.pixel_element_size(), 
+			file::FindFile(proto_texture.file_name()),
+			proto_texture.pixel_element_size(),
 			proto_texture.pixel_structure());
 		if (!texture)
 		{
 			throw std::runtime_error(
 				fmt::format(
-					"no texture with name: {}", 
+					"no texture with name: {}",
 					proto_texture.file_name()));
 		}
 		return std::move(texture);
@@ -141,7 +141,8 @@ namespace frame::proto {
 	{
 		auto& error = Error::GetInstance();
 		CheckParameters(proto_texture);
-		if (proto_texture.file_names().size() != 1)
+		if ((proto_texture.file_names().size() != 1) &&
+			!proto_texture.file_names().empty())
 		{
 			if (proto_texture.file_names().size() != 6)
 			{
@@ -163,8 +164,10 @@ namespace frame::proto {
 				proto_texture.pixel_structure());
 			return std::move(texture);
 		}
+		std::string file_name = (proto_texture.file_name().empty()) ?
+			proto_texture.file_names()[0] : proto_texture.file_name();
 		auto texture = opengl::file::LoadCubeMapTextureFromFile(
-			file::FindFile(proto_texture.file_names()[0]),
+			file_name,
 			proto_texture.pixel_element_size(),
 			proto_texture.pixel_structure());
 		return std::move(texture);

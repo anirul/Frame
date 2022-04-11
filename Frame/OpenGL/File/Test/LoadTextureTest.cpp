@@ -31,13 +31,12 @@ namespace test {
 		EXPECT_TRUE(texture);
 		EXPECT_EQ(1, texture->GetSize().first);
 		EXPECT_EQ(1, texture->GetSize().second);
-		auto vec32 = texture->GetTextureDWord();
-		EXPECT_EQ(4, vec32.size());
-		auto floats = reinterpret_cast<float*>(vec32.data());
-		EXPECT_FLOAT_EQ(0.1f, floats[0]);
-		EXPECT_FLOAT_EQ(0.2f, floats[1]);
-		EXPECT_FLOAT_EQ(0.3f, floats[2]);
-		EXPECT_FLOAT_EQ(0.4f, floats[3]);
+		auto vecf = texture->GetTextureFloat();
+		EXPECT_EQ(4, vecf.size());
+		EXPECT_FLOAT_EQ(0.1f, vecf[0]);
+		EXPECT_FLOAT_EQ(0.2f, vecf[1]);
+		EXPECT_FLOAT_EQ(0.3f, vecf[2]);
+		EXPECT_FLOAT_EQ(0.4f, vecf[3]);
 	}
 
 	TEST_F(LoadTextureTest, LoadTextureFromFileTest)

@@ -21,7 +21,7 @@
 
 namespace frame::opengl {
 
-	proto::TextureFrame GetTextureFrameFromPosition(int i);
+    proto::TextureFrame GetTextureFrameFromPosition(int i);
 
 	class TextureCubeMap : public TextureInterface
 	{
@@ -55,6 +55,7 @@ namespace frame::opengl {
 		std::vector<std::uint8_t> GetTextureByte() const override;
 		std::vector<std::uint16_t> GetTextureWord() const override;
 		std::vector<std::uint32_t> GetTextureDWord() const override;
+		std::vector<float> GetTextureFloat() const override;
 		// Clear the texture.
 		void Clear(const glm::vec4 color) override;
 		// Name interface.

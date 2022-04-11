@@ -141,16 +141,30 @@ namespace frame::opengl::file {
 				}
 			)json";
 
+        std::size_t replace_all(
+			std::string& inout, 
+			std::string_view what, 
+			std::string_view with)
+        {
+            std::size_t count{};
+            for (std::string::size_type pos{};
+                inout.npos != (pos = inout.find(what.data(), pos, what.length()));
+                pos += with.length(), ++count) {
+                inout.replace(pos, what.length(), with.data(), with.length());
+            }
+            return count;
+        }
+
 		std::string FillLevel(
 			const std::string& initial, 
 			const std::map<std::string, std::string>& map)
 		{
+
 			std::string out = initial;
-			for (const auto& [from, to] : map)
+			for (auto [from, to] : map)
 			{
-				std::string temp = 
-					std::regex_replace(out, std::regex(from), to);
-				out = temp;
+				replace_all(to, "\\", "/");
+				replace_all(out, from, to);
 			}
 			return out;
 		}
@@ -202,7 +216,10 @@ namespace frame::opengl::file {
 			{ "<filename>", file },
 			{ "<x>", std::to_string(cube_pair_res.first) },
 			{ "<y>", std::to_string(cube_pair_res.second) },
-			{ "<pixel_element_size>", "HALF" },
+			{ 
+				"<pixel_element_size>", 
+				PixelElementSize_Enum_Name(pixel_element_size.value()) 
+			},
 			{ "<pixel_structure>", "RGB" }
 		};
 		auto maybe_level = 

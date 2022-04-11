@@ -36,35 +36,37 @@ namespace frame::proto {
 			// Load textures from proto.
 			for (const auto& proto_texture : proto_level.textures())
 			{
-				std::optional<std::unique_ptr<TextureInterface>> maybe_texture;
 				std::unique_ptr<TextureInterface> texture = nullptr;
 				if (proto_texture.cubemap())
 				{
-					if (proto_texture.file_name().empty())
+					if (proto_texture.file_name().empty() &&
+						proto_texture.file_names().empty())
 					{
-						maybe_texture = 
-							ParseCubeMapTexture(proto_texture, size);
+						texture = ParseCubeMapTexture(proto_texture, size);
 					}
 					else
 					{
-						maybe_texture = ParseCubeMapTextureFile(proto_texture);
-					}	
+						texture = ParseCubeMapTextureFile(proto_texture);
+					}
 				}
 				else
 				{
-					if (proto_texture.file_names().empty())
-						maybe_texture = ParseTexture(proto_texture, size);
+					if (proto_texture.file_name().empty())
+					{
+						texture = ParseTexture(proto_texture, size);
+					}
 					else
-						maybe_texture = ParseTextureFile(proto_texture);
+					{
+						texture = ParseTextureFile(proto_texture);
+					}
 				}
-				if (!maybe_texture)
+				if (!texture)
 				{
 					throw std::runtime_error(
 						fmt::format(
 							"Could not load texture: {}",
 							proto_texture.file_name()));
 				}
-				texture = std::move(maybe_texture.value());
 				texture->SetName(proto_texture.name());
 				if (!AddTexture(std::move(texture)))
 				{

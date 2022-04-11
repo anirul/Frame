@@ -49,6 +49,8 @@ namespace frame {
 		virtual std::vector<std::uint16_t> GetTextureWord() const = 0;
 		// Can contain either an int or a float.
 		virtual std::vector<std::uint32_t> GetTextureDWord() const = 0;
+		// Can contain a texture as float.
+		virtual std::vector<float> GetTextureFloat() const = 0;
 	};
 
 } // End namespace frame.
