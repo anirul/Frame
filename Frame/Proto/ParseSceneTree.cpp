@@ -111,6 +111,7 @@ namespace frame::proto {
 						level,
 						"Asset/Model/" + proto_scene_static_mesh.file_name(),
 						proto_scene_static_mesh.name(),
+						proto_scene_static_mesh.material_name(),
 						proto_scene_static_mesh.skip_file_material());
 				if (!maybe_vec_node_mesh_id) return false;
 				auto& vec_node_mesh_id = maybe_vec_node_mesh_id.value();

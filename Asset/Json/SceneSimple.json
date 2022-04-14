@@ -54,6 +54,10 @@
         {
           "name": "model",
           "uniform_enum": "MODEL_MAT4"
+        },
+        {
+          "name": "time_s",
+          "uniform_enum": "FLOAT_TIME_S"
         }
       ]
     }

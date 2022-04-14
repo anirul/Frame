@@ -183,6 +183,18 @@ namespace frame::opengl::file {
 						material_ids.at(mesh_obj.GetMaterialId()));
 				}
 			}
+			else
+			{
+				if (!material_ids.empty())
+				{
+					if (material_ids.size() != 1)
+					{
+						throw std::runtime_error(
+							"should only have 1 material here.");
+					}
+					static_mesh->SetMaterialId(material_ids[0]);
+				}
+			}
 			std::string mesh_name =
 				fmt::format(
 					"{}.{}",
@@ -198,6 +210,7 @@ namespace frame::opengl::file {
 		LevelInterface* level, 
 		const std::string& file,
         const std::string& name,
+        const std::string& material_name/* = ""*/,
         bool skip_file_material/* = false*/)
 	{
 		std::vector<EntityId> entity_id_vec;
@@ -218,6 +231,12 @@ namespace frame::opengl::file {
 				if (!maybe_material_id) return std::nullopt;
 				material_ids.push_back(maybe_material_id.value());
 			}
+		}
+		if (!material_name.empty())
+		{
+			auto maybe_id = level->GetIdFromName(material_name);
+			if (maybe_id)
+				material_ids.push_back(maybe_id.value());
 		}
 		logger->info("Found in obj<{}> : {} meshes.", file, meshes.size());
 		int mesh_counter = 0;

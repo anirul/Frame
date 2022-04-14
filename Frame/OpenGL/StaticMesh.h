@@ -71,7 +71,7 @@ namespace frame::opengl {
 		void UnBind() const override;
 
 	protected:
-		bool clear_depth_buffer_ = false;
+		bool clear_depth_buffer_ = true;
 		mutable bool locked_bind_ = false;
 		EntityId material_id_ = 0;
 		EntityId point_buffer_id_ = 0;
@@ -81,7 +81,7 @@ namespace frame::opengl {
 		std::size_t index_size_ = 0;
 		unsigned int vertex_array_object_ = 0;
 		const Error& error_ = Error::GetInstance();
-		std::string name_ = "";
+		std::string name_;
 	};
 
 	// Create a quad static mesh.

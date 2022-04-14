@@ -25,14 +25,9 @@ namespace frame {
 		// divide this number by the sizeof(std::int32_t).
 		virtual std::size_t GetIndexSize() const = 0;
 		virtual bool IsClearBuffer() const = 0;
-
-	public:
 		// Name interface
-		std::string GetName() const override { return name_; }
-		void SetName(const std::string& name) override { name_ = name; }
-
-	protected:
-		std::string name_ = "";
+		std::string GetName() const override = 0;
+		void SetName(const std::string& name) override = 0;
 	};
 
 } // End namespace frame.
