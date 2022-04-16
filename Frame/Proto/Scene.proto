@@ -1,5 +1,6 @@
 syntax = "proto3";
 
+import "Pixel.proto";
 import "Math.proto";
 
 package frame.proto;
@@ -10,7 +11,7 @@ package frame.proto;
 // skeleton animation so a new type of mesh.
 
 // Matrix
-// Next 5
+// Next 6
 message SceneMatrix {
 	// This is the name of the scene matrix.
 	string name = 1;
@@ -20,6 +21,8 @@ message SceneMatrix {
 	UniformMatrix4 matrix = 3;
 	// Quaternion
 	UniformQuaternion quaternion = 4;
+	// Clean the z buffer to make thinks seen.
+	CleanBuffer clean_buffer = 5;
 }
 
 // Static Mesh.

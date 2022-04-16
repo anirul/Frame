@@ -3,6 +3,16 @@ syntax = "proto3";
 package frame.proto;
 
 // Next 2
+message CleanBuffer {
+	enum Enum {
+		INVALID				= 0;
+		CLEAR_COLOR			= 1;
+		CLEAR_DEPTH			= 2;
+	}
+	repeated Enum values = 1;
+}
+
+// Next 2
 message PixelElementSize {
 	enum Enum {
 		INVALID				= 0;

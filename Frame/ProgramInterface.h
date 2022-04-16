@@ -21,9 +21,6 @@ namespace frame {
 		virtual void AddOutputTextureId(EntityId id) = 0;
 		virtual void RemoveOutputTextureId(EntityId id) = 0;
 		virtual const std::vector<EntityId> GetOutputTextureIds() const = 0;
-		// Get & Set depth test boolean.
-		virtual void SetDepthTest(bool enable) = 0;
-		virtual bool GetDepthTest() const = 0;
 		// Select the input (temporary) mesh or scene root.
 		virtual std::string GetTemporarySceneRoot() const = 0;
 		virtual void SetTemporarySceneRoot(const std::string& name) = 0;

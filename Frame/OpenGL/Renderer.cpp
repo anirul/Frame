@@ -26,7 +26,6 @@ namespace frame::opengl {
 		auto maybe_program = file::LoadProgram("Display");
 		if (!maybe_program)	throw std::runtime_error("No program!");
 		auto program = std::move(maybe_program.value());
-		program->SetDepthTest(false);
 		auto material = std::make_unique<Material>();
 		program->SetName("DisplayProgram");
 		if (!level_) throw std::runtime_error("No level!");
@@ -109,7 +108,6 @@ namespace frame::opengl {
 		auto program = level_->GetProgramFromId(program_id);
 		if (!program) throw std::runtime_error("Program ptr doesn't exist.");
 		assert(program->GetOutputTextureIds().size());
-		SetDepthTest(program->GetDepthTest());
 		UniformWrapper uniform_wrapper(level_->GetDefaultCamera());
 		uniform_wrapper.SetTime(dt);
 		program->Use(&uniform_wrapper);
@@ -198,7 +196,6 @@ namespace frame::opengl {
 		auto quad = level_->GetStaticMeshFromId(maybe_quad_id.value());
 		quad->SetMaterialId(display_material_id_);
 		auto program = level_->GetProgramFromId(display_program_id_);
-		SetDepthTest(program->GetDepthTest());
 		UniformWrapper uniform_wrapper(level_->GetDefaultCamera());
 		uniform_wrapper.SetTime(dt);
 		program->Use(&uniform_wrapper);

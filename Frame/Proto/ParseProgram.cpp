@@ -83,7 +83,6 @@ namespace frame::proto {
 					"No way {}?", 
 					proto_program.input_scene_type().value()));
 		}
-		program->SetDepthTest(proto_program.depth_test());
 		for (const auto& parameter : proto_program.parameters())
 		{
 			program->Uniform(parameter.name(), parameter.uniform_enum());

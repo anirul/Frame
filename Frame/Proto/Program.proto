@@ -19,7 +19,7 @@ message SceneType {
 
 // Description of an effect that can be used as a 2D effect on a rendering or
 // as a shader for material.
-// Next 11
+// Next 10
 message Program {
 	// Name of the effect.
 	string name = 1;
@@ -34,8 +34,6 @@ message Program {
 	string input_scene_root_name = 5;
 	// Shader name (used to find the shader).
 	string shader = 6;
-	// Set if the depth test is enable or not.
-	bool depth_test = 10;
 	// Additionnal parameters for the shader.
 	repeated Uniform parameters = 7;
 }

@@ -15,7 +15,6 @@
       "input_texture_names": "skybox",
       "output_texture_names": "albedo",
       "input_scene_type": { "value": "CUBE" },
-      "depth_test": "false",
       "shader": "CubeMap",
       "parameters": [
         {
@@ -41,7 +40,6 @@
       "input_scene_type": { "value": "SCENE" },
       "input_scene_root_name": "root",
       "shader": "SceneSimple",
-      "depth_test": "true",
       "parameters": [
         {
           "name": "projection",
@@ -136,6 +134,9 @@
       },
       {
         "name": "mesh_holder",
+        "clean_buffer": {
+          "values": [ "CLEAR_COLOR", "CLEAR_DEPTH" ] 
+        },
         "parent": "root",
         "matrix": {
           "m11": "1",
@@ -180,7 +181,10 @@
       {
         "name": "camera",
         "parent": "camera_holder",
+        "aspect_ratio": "1.7777",
         "fov_degrees": "65.0",
+        "near_clip": "0.01",
+        "far_clip": "1000.0",
         "position": {
           "x": "0.0",
           "y": "0.0",
