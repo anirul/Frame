@@ -22,8 +22,7 @@
       "name": "JapaneseFlagProgram",
       "output_texture_names": "billboard",
       "input_scene_type": { "value": "QUAD" },
-      "shader": "JapaneseFlag",
-      "depth_test": "false"
+      "shader": "JapaneseFlag"
     }
   ],
   "materials": [
@@ -40,6 +39,9 @@
     "scene_matrices": [
       {
         "name": "root",
+        "clean_buffer": {
+          "values": [ "CLEAR_COLOR", "CLEAR_DEPTH" ]
+        },
         "matrix": {
           "m11": "1.0",
           "m22": "1.0",

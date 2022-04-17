@@ -38,12 +38,16 @@ namespace frame::proto {
 			LevelInterface* level,
 			const SceneMatrix& proto_scene_matrix)
 		{
-			std::unique_ptr<NodeInterface> scene_matrix = 
+			auto scene_matrix = 
 				std::make_unique<NodeMatrix>(
 					GetFunctor(level),
 					ParseUniform(proto_scene_matrix.matrix()));
 			scene_matrix->SetName(proto_scene_matrix.name());
 			scene_matrix->SetParentName(proto_scene_matrix.parent());
+			for (auto flag : proto_scene_matrix.clean_buffer().values())
+			{
+				scene_matrix->AddClearFlags(flag);
+			}
 			auto maybe_scene_id = level->AddSceneNode(std::move(scene_matrix));
 			return static_cast<bool>(maybe_scene_id);
 		}

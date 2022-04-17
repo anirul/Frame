@@ -4,6 +4,7 @@
 #include <fmt/core.h>
 #include <GL/glew.h>
 
+#include "Frame/NodeMatrix.h"
 #include "Frame/NodeStaticMesh.h"
 #include "Frame/UniformWrapper.h"
 #include "Frame/OpenGL/Material.h"
@@ -58,6 +59,23 @@ namespace frame::opengl {
 	{
 		// Check current node.
 		auto node = level_->GetSceneNodeFromId(node_id);
+		// Try to cast to a node matrix.
+		auto node_matrix = dynamic_cast<NodeMatrix*>(node);
+		if (node_matrix)
+		{
+			// Clean the back color and depth if needed.
+			std::uint32_t flags = node_matrix->GetClearFlags();
+			if (flags)
+			{
+                GLbitfield gl_clear = 0;
+                if (flags & proto::CleanBuffer::CLEAR_COLOR)
+					gl_clear |= GL_COLOR_BUFFER_BIT;
+				if (flags & proto::CleanBuffer::CLEAR_DEPTH)
+					gl_clear |= GL_DEPTH_BUFFER_BIT;
+				glClear(gl_clear);
+				error_.Display(__FILE__, __LINE__ - 1);
+			}
+		}
 		// Try to cast to a node static mesh.
 		auto node_static_mesh = dynamic_cast<NodeStaticMesh*>(node);
 		if (!node_static_mesh) return;
