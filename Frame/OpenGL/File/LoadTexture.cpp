@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <fstream>
 #include <vector>
-#include <regex>
 #include <set>
 
 #include "Frame/File/FileSystem.h"
@@ -73,7 +72,10 @@ namespace frame::opengl::file {
 						"default_camera_name": "camera",
 						"scene_matrices": [
 							{
-								"name": "root"
+								"name": "root",
+								"clean_buffer": {
+									"values": [ "CLEAR_COLOR", "CLEAR_DEPTH" ] 
+								}
 							},
 							{
 								"name": "camera_boon",
@@ -141,15 +143,18 @@ namespace frame::opengl::file {
 				}
 			)json";
 
+		// Taken from cpp reference.
         std::size_t replace_all(
 			std::string& inout, 
-			std::string_view what, 
-			std::string_view with)
+			const std::string_view what, 
+			const std::string_view with)
         {
-            std::size_t count{};
-            for (std::string::size_type pos{};
-                inout.npos != (pos = inout.find(what.data(), pos, what.length()));
-                pos += with.length(), ++count) {
+            std::size_t count = 0;
+            for (std::string::size_type pos = 0;
+                inout.npos != 
+					(pos = inout.find(what.data(), pos, what.length()));
+                pos += with.length(), ++count) 
+			{
                 inout.replace(pos, what.length(), with.data(), with.length());
             }
             return count;
