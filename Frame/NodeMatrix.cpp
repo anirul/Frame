@@ -29,7 +29,26 @@ namespace frame {
 
 	glm::mat4 NodeMatrix::ComputeLocalRotation(const double dt) const
 	{
-		return matrix_;
+		if (matrix_ == glm::mat4(1.0f)) return matrix_;
+		glm::quat rotation = glm::quat_cast(matrix_);
+		// should decode the angle and recode it.
+		float normal = std::sqrt(
+			rotation.x * rotation.x +
+			rotation.y * rotation.y +
+			rotation.z * rotation.z);
+		float angle_rad = 2.0f * std::atan2(normal, rotation.w);
+		glm::vec3 axis =
+			glm::vec3(
+				rotation.x / normal,
+				rotation.y / normal,
+				rotation.z / normal);
+		// Reconvert from angle / axis to quaternion.
+		glm::quat present_rotation = 
+			glm::angleAxis(
+				angle_rad * static_cast<float>(dt), 
+				glm::normalize(axis));
+		glm::mat4 result_matrix = glm::toMat4(present_rotation);
+		return result_matrix;
 	}
 
 } // End namespace frame.

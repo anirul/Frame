@@ -135,31 +135,19 @@
       {
         "name": "mesh_holder",
         "clean_buffer": {
-          "values": [ "CLEAR_COLOR", "CLEAR_DEPTH" ] 
+          "values": [ "CLEAR_COLOR", "CLEAR_DEPTH" ]
         },
         "parent": "root",
-        "matrix": {
-          "m11": "1",
-          "m22": "1",
-          "m33": "1",
-          "m44": "1"
-        },
         "quaternion": {
-          "w": "0.9998096",
-          "x": "0.0087261",
-          "y": "0.0174522",
+          "w": "0.70710678118",
+          "x": "0.0",
+          "y": "0.70710678118",
           "z": "0.0"
         }
       },
       {
         "name": "camera_holder",
         "parent": "root",
-        "matrix": {
-          "m11": "1",
-          "m22": "1",
-          "m33": "1",
-          "m44": "1"
-        },
         "quaternion": {
           "w": "0.9999619",
           "x": "0.0",

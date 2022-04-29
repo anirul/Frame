@@ -10,10 +10,15 @@ namespace frame {
 	{
 	public:
 		NodeMatrix(
-			std::function<NodeInterface*(const std::string&)> func, 
-			const glm::mat4 matrix) : 
+			std::function<NodeInterface* (const std::string&)> func,
+			const glm::mat4 matrix) :
 			NodeInterface(func),
 			matrix_(matrix) {}
+		NodeMatrix(
+			std::function<NodeInterface* (const std::string&)> func,
+			const glm::quat quat) :
+			NodeInterface(func),
+			matrix_(glm::toMat4(quat)) {}
 
 	public:
 		glm::mat4 GetLocalModel(const double dt) const override;

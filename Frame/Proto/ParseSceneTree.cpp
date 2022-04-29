@@ -38,10 +38,21 @@ namespace frame::proto {
 			LevelInterface* level,
 			const SceneMatrix& proto_scene_matrix)
 		{
-			auto scene_matrix = 
-				std::make_unique<NodeMatrix>(
-					GetFunctor(level),
-					ParseUniform(proto_scene_matrix.matrix()));
+			std::unique_ptr<NodeMatrix> scene_matrix = nullptr;
+			if (proto_scene_matrix.has_matrix())
+			{
+				scene_matrix =
+					std::make_unique<NodeMatrix>(
+						GetFunctor(level),
+						ParseUniform(proto_scene_matrix.matrix()));
+			}
+			else if (proto_scene_matrix.has_quaternion())
+			{
+				scene_matrix =
+					std::make_unique<NodeMatrix>(
+						GetFunctor(level), 
+						ParseUniform(proto_scene_matrix.quaternion()));
+			}
 			scene_matrix->SetName(proto_scene_matrix.name());
 			scene_matrix->SetParentName(proto_scene_matrix.parent());
 			for (auto flag : proto_scene_matrix.clean_buffer().values())

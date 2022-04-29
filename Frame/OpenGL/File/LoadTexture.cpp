@@ -144,7 +144,7 @@ namespace frame::opengl::file {
 			)json";
 
 		// Taken from cpp reference.
-        std::size_t replace_all(
+        std::size_t ReplaceAll(
 			std::string& inout, 
 			const std::string_view what, 
 			const std::string_view with)
@@ -168,8 +168,8 @@ namespace frame::opengl::file {
 			std::string out = initial;
 			for (auto [from, to] : map)
 			{
-				replace_all(to, "\\", "/");
-				replace_all(out, from, to);
+				ReplaceAll(to, "\\", "/");
+				ReplaceAll(out, from, to);
 			}
 			return out;
 		}

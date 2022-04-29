@@ -5,21 +5,21 @@ namespace frame::proto {
 
 	glm::vec2 ParseUniform(const UniformVector2& uniform_vec2)
 	{
-		return glm::vec2(uniform_vec2.x(), uniform_vec2.y());
+		return {uniform_vec2.x(), uniform_vec2.y()};
 	}
 
 	glm::vec3 ParseUniform(const UniformVector3& uniform_vec3)
 	{
-		return glm::vec3(uniform_vec3.x(), uniform_vec3.y(), uniform_vec3.z());
+		return {uniform_vec3.x(), uniform_vec3.y(), uniform_vec3.z()};
 	}
 
 	glm::vec4 ParseUniform(const UniformVector4& uniform_vec4)
 	{
-		return glm::vec4(
+		return {
 			uniform_vec4.x(),
 			uniform_vec4.y(),
 			uniform_vec4.z(),
-			uniform_vec4.w());
+			uniform_vec4.w()};
 	}
 
 	glm::mat4 ParseUniform(const UniformMatrix4& uniform_mat4)
@@ -48,11 +48,11 @@ namespace frame::proto {
 
 	glm::quat ParseUniform(const UniformQuaternion& uniform_quat)
 	{
-		return glm::quat(
+		return {
 			uniform_quat.w(),
 			uniform_quat.x(),
 			uniform_quat.y(),
-			uniform_quat.z());
+			uniform_quat.z()};
 	}
 
 	void RegisterUniformFromProto(
