@@ -1,0 +1,94 @@
+{
+  "name": "TextureModif",
+  "default_texture_name": "billboard",
+  "textures": [
+    {
+      "name": "billboard",
+      "size": {
+        "x": "-1",
+        "y": "-1"
+      },
+      "cubemap": "false",
+      "pixel_element_size": { "value": "FLOAT" },
+      "pixel_structure": { "value": "RGB" },
+      "min_filter": { "value": "LINEAR" },
+      "mag_filter": { "value": "LINEAR" },
+      "wrap_s": { "value": "CLAMP_TO_EDGE" },
+      "wrap_t": { "value": "CLAMP_TO_EDGE" }
+    },
+    {
+      "name": "input",
+      "pixel_element_size": { "value": "SHORT" },
+      "pixel_structure": { "value": "GREY" },
+      "min_filter": { "value": "LINEAR" },
+      "mag_filter": { "value": "LINEAR" },
+      "wrap_s": { "value": "CLAMP_TO_EDGE" },
+      "wrap_t": { "value": "CLAMP_TO_EDGE" },
+      "file_name": "Asset/input.png"
+    }
+  ],
+  "programs": [
+    {
+      "name": "TextureModifProgram",
+      "output_texture_names": "billboard",
+      "input_scene_type": { "value": "QUAD" },
+      "shader": "TextureModif"
+    }
+  ],
+  "materials": [
+    {
+      "name": "TextureModifMaterial",
+      "program_name": "TextureModifProgram",
+      "texture_names": [ "input" ],
+      "inner_names": [ "Depth" ]
+    }
+  ],
+  "scene_tree": {
+    "default_camera_name": "camera",
+    "default_root_name": "root",
+    "scene_matrices": [
+      {
+        "name": "root",
+        "clean_buffer": {
+          "values": [ "CLEAR_COLOR", "CLEAR_DEPTH" ]
+        },
+        "matrix": {
+          "m11": "1.0",
+          "m22": "1.0",
+          "m33": "1.0",
+          "m44": "1.0"
+        }
+      }
+    ],
+    "scene_cameras": [
+      {
+        "name": "camera",
+        "parent": "root",
+        "fov_degrees": "65.0",
+        "position": {
+          "x": "0",
+          "y": "0",
+          "z": "-1"
+        },
+        "target": {
+          "x": "0",
+          "y": "0",
+          "z": "1"
+        },
+        "up": {
+          "x": "0",
+          "y": "1",
+          "z": "0"
+        }
+      }
+    ],
+    "scene_static_meshes": [
+      {
+        "name": "TextureModifRendering",
+        "parent": "root",
+        "mesh_enum": "QUAD",
+        "material_name": "TextureModifMaterial"
+      }
+    ]
+  }
+}

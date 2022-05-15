@@ -36,6 +36,8 @@ add_custom_target(AssetShaderOpenGL
     ScreenSpaceAmbientOcclusion.vert
     SceneSimple.frag
     SceneSimple.vert
+    TextureModif.frag
+    TextureModif.vert
     VectorAddition.frag
     VectorAddition.vert
     VectorMultiply.frag

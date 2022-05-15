@@ -11,13 +11,19 @@ namespace frame {
 	public:
 		NodeMatrix(
 			std::function<NodeInterface* (const std::string&)> func,
-			const glm::mat4 matrix) :
+			glm::mat4 matrix) :
 			NodeInterface(func),
 			matrix_(matrix) {}
 		NodeMatrix(
 			std::function<NodeInterface* (const std::string&)> func,
-			const glm::quat quat) :
+			glm::quat quat) :
 			NodeInterface(func),
+			matrix_(glm::toMat4(quat)) {}
+		NodeMatrix(glm::mat4 matrix) :
+			NodeInterface([](std::string) { return nullptr; }),
+			matrix_(matrix) {}
+		NodeMatrix(glm::quat quat) :
+			NodeInterface([](std::string) { return nullptr; }),
 			matrix_(glm::toMat4(quat)) {}
 
 	public:
