@@ -32,7 +32,13 @@
       "name": "TextureModifProgram",
       "output_texture_names": "billboard",
       "input_scene_type": { "value": "QUAD" },
-      "shader": "TextureModif"
+      "shader": "TextureModif",
+      "parameters": [
+        {
+          "name": "time_s",
+          "uniform_enum": "FLOAT_TIME_S"
+        }
+      ]
     }
   ],
   "materials": [
