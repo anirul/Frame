@@ -109,8 +109,17 @@ message SceneLight {
 	UniformVector3 color = 8;
 }
 
+// Scene Post processing.
+// Next 3
+message SceneProcessing {
+	// Name of the post proceesing step.
+	string name = 1;
+	// Name of the material applied to the step.
+	string material_name = 2;
+}
+
 // Scene definition.
-// Next 7
+// Next 8
 message SceneTree {
 	// This defined witch is the root of the scene tree (not really needed).
 	string default_root_name = 1;
@@ -124,4 +133,6 @@ message SceneTree {
 	repeated SceneCamera scene_cameras = 5;
 	// This is the node for the lights.
 	repeated SceneLight scene_lights = 6;
+	// This node is for post processing.
+	repeated SceneProcessing post_processings = 7;
 }

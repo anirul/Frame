@@ -43,6 +43,8 @@ namespace frame::opengl {
 		void Cleanup() final;
 		// Display to the screen.
 		void Display(double dt = 0.0) final;
+		// Make a screen shot to a file.
+		void ScreenShot(const std::string& file) const final;
 
 	public:
 		LevelInterface* GetLevel() final { return level_.get(); }

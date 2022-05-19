@@ -1,5 +1,6 @@
 #include "ParseSceneTree.h"
 
+#include <fmt/core.h>
 #include "Frame/File/FileSystem.h"
 #include "Frame/File/Obj.h"
 #include "Frame/Proto/ParseUniform.h"
@@ -218,6 +219,32 @@ namespace frame::proto {
 			return false;
 		}
 
+		[[nodiscard]] bool ParsePostProcessing(
+			LevelInterface* level,
+			const proto::PostProcessing& proto_post_processing)
+		{
+			auto maybe_id = level->GetIdFromName(proto_post_processing.material_name());
+			if (!maybe_id)
+			{
+				throw std::runtime_error(
+					fmt::format(
+						"unknown id for name: {}", 
+						proto_post_processing.material_name()));
+			}
+			auto maybe_material_id = level->GetMaterialFromId(maybe_id.value());
+			if (!maybe_material_id)
+			{
+				throw std::runtime_error(
+					fmt::format(
+						"unknown material name: {}",
+						proto_post_processing.material_name()));
+			}
+			level->PushBackPostProcessing(
+				proto_post_processing.name(), 
+				proto_post_processing.material_name());
+			return true;
+		}
+
 	} // End namespace.
 
 	[[nodiscard]] bool ParseSceneTreeFile(
@@ -247,6 +274,11 @@ namespace frame::proto {
 		for (const auto& proto_light : proto_scene_tree.scene_lights())
 		{
 			if (!ParseSceneLight(level, proto_light))
+				return false;
+		}
+		for (const auto& proto_post_processing : proto_scene_tree.post_processings())
+		{
+			if (!ParsePostProcessing(level, proto_post_processing))
 				return false;
 		}
 		return true;

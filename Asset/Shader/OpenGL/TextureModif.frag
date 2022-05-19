@@ -15,7 +15,7 @@ layout(location = 0) out vec4 frag_color;
 uniform float time_s;
 uniform sampler2D Depth;
 
-const vec2 resolution = vec2(1280, 960);
+const vec2 resolution = vec2(1280, 800);
 // Considering that the screen at the person distance is more or less 1m2.
 // This will compute the move per meter on the pixel level.
 const vec2 one_meter_on_resolution = 1.0 / resolution;

@@ -5,6 +5,7 @@
 #include <random>
 #include <cmath>
 #include <glm/gtc/matrix_transform.hpp>
+#include "Frame/File/Image.h"
 #include "FrameBuffer.h"
 #include "RenderBuffer.h"
 #include "Fill.h"
@@ -81,6 +82,26 @@ namespace frame::opengl {
 		if (!renderer_) throw std::runtime_error("No Renderer.");
 		renderer_->RenderFromRootNode(dt);
 		renderer_->Display(dt);
+	}
+
+	void Device::ScreenShot(const std::string& file) const
+	{
+		auto maybe_texture_id = level_->GetDefaultOutputTextureId();
+		if (!maybe_texture_id) throw std::runtime_error("no default texture.");
+		auto texture_id = maybe_texture_id.value();
+		auto* texture = level_->GetTextureFromId(texture_id);
+		if (!texture) throw std::runtime_error("could not open texture.");
+		proto::PixelElementSize pixel_element_size{};
+		pixel_element_size.set_value(texture->GetPixelElementSize());
+		proto::PixelStructure pixel_structure{};
+		pixel_structure.set_value(texture->GetPixelStructure());
+		file::Image output_image(
+			texture->GetSize(),
+			pixel_element_size,
+			pixel_structure);
+		auto vec = texture->GetTextureByte();
+		output_image.SetData(vec.data());
+		output_image.SaveImageToFile(file);
 	}
 
 } // End namespace frame::opengl.

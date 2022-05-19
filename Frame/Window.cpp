@@ -262,6 +262,8 @@ namespace frame {
 					{
 					case SDLK_ESCAPE:
 						return false;
+					case SDLK_PRINTSCREEN:
+						device_->ScreenShot("ScreenShot.png");
 					}
 				}
 				if (input_interface_)

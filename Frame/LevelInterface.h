@@ -63,6 +63,13 @@ namespace frame {
 		virtual std::unique_ptr<TextureInterface> ExtractTexture(
 			EntityId id) = 0;
 		virtual CameraInterface* GetDefaultCamera() = 0;
+		virtual void PushBackPostProcessing(
+			const std::string& name, 
+			const std::string& material_name) = 0;
+		virtual const std::vector<std::string>& 
+			GetPostProcessingNames() const = 0;
+		virtual const std::vector<EntityId>& 
+			GetPostProcessingMaterialIds() const = 0;
 	};
 
 } // End namespace frame.

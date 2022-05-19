@@ -9,7 +9,7 @@
         "y": "-1"
       },
       "cubemap": "false",
-      "pixel_element_size": { "value": "FLOAT" },
+      "pixel_element_size": { "value": "BYTE" },
       "pixel_structure": { "value": "RGB" }
     },
     {
@@ -17,12 +17,22 @@
       "pixel_element_size": { "value": "SHORT" },
       "pixel_structure": { "value": "GREY" },
       "file_name": "Asset/input.png"
+    },
+    {
+        "name": "output",
+        "size": {
+            "x": "-1",
+            "y": "-1"
+        },
+        "cubemap": "false",
+        "pixel_element_size": { "value": "FLOAT" },
+        "pixel_structure": { "value": "RGB" }
     }
   ],
   "programs": [
     {
       "name": "TextureModifProgram",
-      "output_texture_names": "billboard",
+      "output_texture_names": [ "billboard" ],
       "input_scene_type": { "value": "QUAD" },
       "shader": "TextureModif",
       "parameters": [
@@ -31,6 +41,18 @@
           "uniform_enum": "FLOAT_TIME_S"
         }
       ]
+    },
+    {
+        "name": "BlurProgram",
+        "output_texture_names": [ "output" ],
+        "input_scene_type": { "value": "QUAD" },
+        "shader": "Blur",
+        "parameters": [
+            {
+                "name": "exponent",
+                "uniform_float": "1.0"
+            }
+        ]
     }
   ],
   "materials": [
@@ -39,6 +61,12 @@
       "program_name": "TextureModifProgram",
       "texture_names": [ "input" ],
       "inner_names": [ "Depth" ]
+    },
+    {
+        "name": "BlurMaterial",
+        "program_name": "BlurProgram",
+        "texture_names": [ "billboard" ],
+        "inner_names": [ "Image" ]
     }
   ],
   "scene_tree": {
@@ -86,6 +114,12 @@
         "parent": "root",
         "mesh_enum": "QUAD",
         "material_name": "TextureModifMaterial"
+      },
+      {
+          "name": "TextureModifRenderingFinal",
+          "parent": "root",
+          "mesh_enum": "QUAD",
+          "material_name": "BlurMaterial"
       }
     ]
   }

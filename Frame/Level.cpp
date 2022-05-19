@@ -216,4 +216,11 @@ namespace frame {
 		return node_camera->GetCamera();
 	}
 
+	void Level::PushBackPostProcessing(
+		const std::string& name, 
+		const std::string& material_name)
+	{
+		throw std::runtime_error("TODO");
+	}
+
 } // End namespace frame.

@@ -112,6 +112,18 @@ namespace frame {
 		{
 			return next_id_maker_++;
 		}
+		void PushBackPostProcessing(
+			const std::string& name,
+			const std::string& material_name) override;
+		const std::vector<std::string>& GetPostProcessingNames() const override
+		{
+			return post_processing_names_;
+		}
+		const std::vector<EntityId>& 
+			GetPostProcessingMaterialIds() const override
+		{
+			return post_processing_material_ids_;
+		}
 
 	protected:
 		Logger& logger_ = Logger::GetInstance();
@@ -138,6 +150,8 @@ namespace frame {
 		std::unordered_map<std::string, EntityId> name_id_map_ = {};
 		std::unordered_map<EntityId, std::string> id_name_map_ = {};
 		std::unordered_map<EntityId, EntityTypeEnum> id_enum_map_ = {};
+		std::vector<std::string> post_processing_names_ = {};
+		std::vector<EntityId> post_processing_material_ids_ = {};
 	};
 
 } // End namespace frame.
