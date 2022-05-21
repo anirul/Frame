@@ -109,17 +109,22 @@ message SceneLight {
 	UniformVector3 color = 8;
 }
 
-// Scene Post processing.
-// Next 3
-message SceneProcessing {
+// Scene Pre and Post process.
+// Next 4
+message SceneProcess {
 	// Name of the post proceesing step.
 	string name = 1;
-	// Name of the material applied to the step.
-	string material_name = 2;
+	// Name of the mesh applied to the step, the mesh will contain a material
+	// that can be ignored in case a material name is specified.
+	string mesh_name = 2;
+	// Name of the material that needs to be used with said mesh.
+	string material_name = 3;
+	// Is cleaning required?
+	CleanBuffer clean_buffer = 4;
 }
 
 // Scene definition.
-// Next 8
+// Next 9
 message SceneTree {
 	// This defined witch is the root of the scene tree (not really needed).
 	string default_root_name = 1;
@@ -133,6 +138,8 @@ message SceneTree {
 	repeated SceneCamera scene_cameras = 5;
 	// This is the node for the lights.
 	repeated SceneLight scene_lights = 6;
+	// This node is for pre processing steps.
+	repeated SceneProcess pre_processes = 7;
 	// This node is for post processing.
-	repeated SceneProcessing post_processings = 7;
+	repeated SceneProcess post_processes = 8;
 }

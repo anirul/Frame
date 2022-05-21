@@ -57,7 +57,8 @@ namespace frame::opengl {
 		// Copy level into the local area.
 		level_ = std::move(level);
 		// Setup camera.
-		level_->GetDefaultCamera()->ComputeView();
+		auto* camera = level_->GetDefaultCamera();
+		if (camera) camera->ComputeView();
 		// Create a renderer.
 		renderer_ = std::make_unique<Renderer>(level_.get(), size_);
 	}
@@ -80,7 +81,9 @@ namespace frame::opengl {
 	void Device::Display(double dt /*= 0.0*/)
 	{
 		if (!renderer_) throw std::runtime_error("No Renderer.");
+		renderer_->RenderPreProcess(dt);
 		renderer_->RenderFromRootNode(dt);
+		renderer_->RenderPostProcess(dt);
 		renderer_->Display(dt);
 	}
 

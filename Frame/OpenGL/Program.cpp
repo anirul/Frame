@@ -296,7 +296,7 @@ namespace frame::opengl {
 		{
 			throw std::runtime_error(
 				"Texture: [" + std::to_string(texture_id) +
-				" is already in output texture ids.");
+				"] is already in output texture ids.");
 		}
 	}
 

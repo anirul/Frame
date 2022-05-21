@@ -55,7 +55,10 @@ namespace frame::opengl {
 		}
 	}
 
-	void Renderer::RenderNode(EntityId node_id, double dt/* = 0.0*/)
+	void Renderer::RenderNode(
+		EntityId node_id, 
+		EntityId material_id/* = NullId*/, 
+		double dt/* = 0.0*/)
 	{
 		// Check current node.
 		auto node = level_->GetSceneNodeFromId(node_id);
@@ -85,15 +88,16 @@ namespace frame::opengl {
 		if (!mesh_id) return;
 		auto static_mesh = level_->GetStaticMeshFromId(mesh_id);
 		// Get the mesh material id.
-		auto material_id = static_mesh->GetMaterialId();
+		if (!material_id) material_id = static_mesh->GetMaterialId();
 		// If no material is put the node material id in the mesh.
 		if (!material_id) static_mesh->SetMaterialId(node_material_id);
-		RenderMesh(static_mesh, node->GetLocalModel(dt), dt);
+		auto* material = level_->GetMaterialFromId(material_id);
+		RenderMesh(static_mesh, material, node->GetLocalModel(dt), dt);
 	}
 
 	void Renderer::RenderChildren(EntityId node_id, double dt/* = 0.0*/)
 	{
-		RenderNode(node_id, dt);
+		RenderNode(node_id, NullId, dt);
 		// Loop into the child of the root node.
 		auto maybe_list = level_->GetChildList(node_id);
 		if (!maybe_list) throw std::runtime_error("No child list.");
@@ -107,20 +111,21 @@ namespace frame::opengl {
 	void Renderer::RenderFromRootNode(double dt/* = 0.0*/)
 	{
 		auto maybe_root_id = level_->GetDefaultRootSceneNodeId();
-		if (!maybe_root_id) throw std::runtime_error("No root id.");
+		if (!maybe_root_id)	return;
 		EntityId root_id = maybe_root_id.value();
 		RenderChildren(root_id, dt);
 	}
 
 	void Renderer::RenderMesh(
 		StaticMeshInterface* static_mesh,
+		MaterialInterface* material/* = nullptr*/,
 		glm::mat4 model_mat/* = glm::mat4(1.0f)*/,
 		double dt/* = 0.0*/)
 	{
 		if (!static_mesh)
 			throw std::runtime_error("StaticMesh ptr doesn't exist.");
 		auto material_id = static_mesh->GetMaterialId();
-		auto material = level_->GetMaterialFromId(material_id);
+		if (!material) material = level_->GetMaterialFromId(material_id);
 		if (!material) throw std::runtime_error("No material!");
 		auto program_id = material->GetProgramId();
 		auto program = level_->GetProgramFromId(program_id);
@@ -249,6 +254,34 @@ namespace frame::opengl {
 		}
 		material->DisableAll();
 		quad->SetMaterialId(0);
+	}
+
+	void Renderer::RenderPreProcess(double dt /* = 0.0 */)
+	{
+        auto pre_process_mesh_ids = level_->GetPreProcessMeshIds();
+		auto pre_process_material_ids = level_->GetPreProcessMaterialIds();
+        for (int i = 0; i < pre_process_mesh_ids.size(); ++i)
+        {
+			const auto& mesh_id = pre_process_mesh_ids[i];
+			const auto& material_id = pre_process_material_ids[i];
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            error_.Display(__FILE__, __LINE__ - 1);
+			RenderNode(mesh_id, material_id, dt);
+        }
+	}
+
+	void Renderer::RenderPostProcess(double dt /* = 0.0 */)
+	{
+		auto post_process_mesh_ids = level_->GetPostProcessMeshIds();
+		auto post_process_material_ids = level_->GetPostProcessMaterialIds();
+		for (int i = 0; i < post_process_material_ids.size(); ++i)
+		{
+			const auto& mesh_id = post_process_mesh_ids[i];
+			const auto& material_id = post_process_material_ids[i];
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            error_.Display(__FILE__, __LINE__ - 1);
+			RenderNode(mesh_id, material_id, dt);
+		}
 	}
 
 	void Renderer::SetDepthTest(bool enable)

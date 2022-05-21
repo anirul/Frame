@@ -39,13 +39,20 @@ namespace frame::opengl {
 		// Render to a mesh at a dt time.
 		void RenderMesh(
 			StaticMeshInterface* static_mesh,
+			MaterialInterface* material = nullptr,
 			glm::mat4 model_mat = glm::mat4(1.0f),
 			double dt = 0.0) override;
-		void RenderNode(EntityId node_id, double dt = 0.0) override;
+		void RenderNode(
+			EntityId node_id, 
+			EntityId material_id = NullId,
+			double dt = 0.0) override;
 		void RenderChildren(EntityId node_id, double dt = 0.0) override;
 		void RenderFromRootNode(double dt = 0.0) override;
 		// Display the default texture to the screen.
 		void Display(double dt = 0.0) override;
+		// 'pre' and 'post' render effects (materials).
+		void RenderPreProcess(double dt = 0.0) override;
+		void RenderPostProcess(double dt = 0.0) override;
 		void SetDepthTest(bool enable) override;
 
 	private:

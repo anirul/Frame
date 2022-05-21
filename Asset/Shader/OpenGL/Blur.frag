@@ -3,8 +3,10 @@
 in vec2 vert_texcoord;
 layout (location = 0) out vec4 frag_color;
 
+// uniform float exponent;
 uniform sampler2D Image;
-uniform float exponent;
+
+const float exponent = 1.0;
 
 void main() 
 {

@@ -219,31 +219,99 @@ namespace frame::proto {
 			return false;
 		}
 
-		[[nodiscard]] bool ParsePostProcessing(
+		[[nodiscard]] bool ParsePreProcess(
 			LevelInterface* level,
-			const proto::PostProcessing& proto_post_processing)
+			const proto::SceneProcess& proto_scene_process)
 		{
-			auto maybe_id = level->GetIdFromName(proto_post_processing.material_name());
-			if (!maybe_id)
+			auto maybe_mesh_id = 
+				level->GetIdFromName(proto_scene_process.mesh_name());
+			if (!maybe_mesh_id)
 			{
 				throw std::runtime_error(
 					fmt::format(
-						"unknown id for name: {}", 
-						proto_post_processing.material_name()));
+						"unknown id for mesh with name: {}", 
+						proto_scene_process.mesh_name()));
 			}
-			auto maybe_material_id = level->GetMaterialFromId(maybe_id.value());
+			auto maybe_node_id = 
+				level->GetSceneNodeFromId(maybe_mesh_id.value());
+			if (!maybe_node_id)
+			{
+				throw std::runtime_error(
+					fmt::format(
+						"unknown mesh name: {}",
+						proto_scene_process.mesh_name()));
+			}
+			auto maybe_material_id =
+				level->GetIdFromName(proto_scene_process.material_name());
 			if (!maybe_material_id)
 			{
 				throw std::runtime_error(
 					fmt::format(
-						"unknown material name: {}",
-						proto_post_processing.material_name()));
+						"unknown id for material with name: {}",
+						proto_scene_process.material_name()));
 			}
-			level->PushBackPostProcessing(
-				proto_post_processing.name(), 
-				proto_post_processing.material_name());
+			auto* maybe_material = 
+				level->GetMaterialFromId(maybe_material_id.value());
+			if (!maybe_material)
+			{
+				throw std::runtime_error(
+					fmt::format(
+						"unknown material with name: {}",
+						proto_scene_process.material_name()));
+			}
+			level->PushBackPreProcess(
+				proto_scene_process.name(),
+				proto_scene_process.mesh_name(),
+				proto_scene_process.material_name());
 			return true;
 		}
+
+        [[nodiscard]] bool ParsePostProcess(
+            LevelInterface* level,
+            const proto::SceneProcess& proto_scene_process)
+        {
+            auto maybe_mesh_id =
+                level->GetIdFromName(proto_scene_process.mesh_name());
+            if (!maybe_mesh_id)
+            {
+                throw std::runtime_error(
+                    fmt::format(
+                        "unknown id for mesh with name: {}",
+                        proto_scene_process.mesh_name()));
+            }
+            auto maybe_node_id =
+                level->GetSceneNodeFromId(maybe_mesh_id.value());
+            if (!maybe_node_id)
+            {
+                throw std::runtime_error(
+                    fmt::format(
+                        "unknown mesh name: {}",
+                        proto_scene_process.mesh_name()));
+            }
+            auto maybe_material_id =
+                level->GetIdFromName(proto_scene_process.material_name());
+            if (!maybe_material_id)
+            {
+                throw std::runtime_error(
+                    fmt::format(
+                        "unknown id for material with name: {}",
+                        proto_scene_process.material_name()));
+            }
+            auto* maybe_material =
+                level->GetMaterialFromId(maybe_material_id.value());
+            if (!maybe_material)
+            {
+                throw std::runtime_error(
+                    fmt::format(
+                        "unknown material with name: {}",
+                        proto_scene_process.material_name()));
+            }
+            level->PushBackPostProcess(
+				proto_scene_process.name(),
+				proto_scene_process.mesh_name(),
+				proto_scene_process.material_name());
+            return true;
+        }
 
 	} // End namespace.
 
@@ -257,29 +325,28 @@ namespace frame::proto {
 			proto_scene_tree.default_root_name());
 		for (const auto& proto_matrix : proto_scene_tree.scene_matrices())
 		{
-			if (!ParseSceneMatrix(level, proto_matrix))
-				return false;
+			if (!ParseSceneMatrix(level, proto_matrix))	return false;
 		}
 		for (const auto& proto_static_mesh :
 			proto_scene_tree.scene_static_meshes())
 		{
-			if (!ParseSceneStaticMesh(level, proto_static_mesh))
-				return false;
+			if (!ParseSceneStaticMesh(level, proto_static_mesh)) return false;
 		}
 		for (const auto& proto_camera : proto_scene_tree.scene_cameras())
 		{
-			if (!ParseSceneCamera(level, proto_camera))
-				return false;
+			if (!ParseSceneCamera(level, proto_camera))	return false;
 		}
 		for (const auto& proto_light : proto_scene_tree.scene_lights())
 		{
-			if (!ParseSceneLight(level, proto_light))
-				return false;
+			if (!ParseSceneLight(level, proto_light)) return false;
 		}
-		for (const auto& proto_post_processing : proto_scene_tree.post_processings())
+		for (const auto& proto_pre_process : proto_scene_tree.pre_processes())
 		{
-			if (!ParsePostProcessing(level, proto_post_processing))
-				return false;
+			if (!ParsePreProcess(level, proto_pre_process)) return false;
+		}
+		for (const auto& proto_post_process : proto_scene_tree.post_processes())
+		{
+			if (!ParsePostProcess(level, proto_post_process)) return false;
 		}
 		return true;
 	}

@@ -5,7 +5,7 @@
 // now we also have the fact that the texture is in short (unsigned short).
 // but loaded as a signed short (this should not be a probleme as long as we
 // don't reach the last bit mean more than 32m).
-// so the depth is = to depth * 32767.
+// so the depth is = to depth * 32'767 (2^15 - 1).
 // and this should be divided by 1000 (to be in m).
 #define DEPTH_TO_METER (32767.0 / 1000.0)
 
@@ -15,10 +15,10 @@ layout(location = 0) out vec4 frag_color;
 uniform float time_s;
 uniform sampler2D Depth;
 
-const vec2 resolution = vec2(1280, 800);
+vec2 resolution = vec2(textureSize(Depth, 0));
 // Considering that the screen at the person distance is more or less 1m2.
 // This will compute the move per meter on the pixel level.
-const vec2 one_meter_on_resolution = 1.0 / resolution;
+vec2 one_meter_on_resolution = 1.0 / resolution;
 
 float GetValueAt(vec2 uv)
 {
@@ -53,6 +53,7 @@ vec3 ComputeNormal(vec2 uv)
 void main()
 {
 	vec3 normal = ComputeNormal(vert_texcoord);
+	// Store in normal map format (moved to [0, 1] scale).
 	normal = normal * 0.5 + 0.5;
 	frag_color = vec4(normal, 1);
 }
