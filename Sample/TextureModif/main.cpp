@@ -26,7 +26,7 @@ int main(int ac, char** av)
 	{
 		Application app(
 			frame::file::FindFile("Asset/Json/TextureModif.json"),
-			frame::CreateSDLOpenGL({ 1280, 800 }));
+			frame::CreateSDLOpenGL({ 640, 512 }));
 		app.Startup();
 		app.Run();
 	}

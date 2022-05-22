@@ -1,6 +1,6 @@
 {
   "name": "TextureModif",
-  "default_texture_name": "blured_normal_map",
+  "default_texture_name": "normal_map",
   "textures": [
     {
       "name": "input_depth",
