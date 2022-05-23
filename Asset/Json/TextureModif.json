@@ -9,6 +9,16 @@
       "file_name": "Asset/input.png"
     },
     {
+      "name": "corrected_depth",
+      "size": {
+        "x": "-1",
+        "y": "-1"
+      },
+      "cubemap": "false",
+      "pixel_element_size": { "value": "FLOAT" },
+      "pixel_structure": { "value": "GREY" },
+    },
+    {
       "name": "normal_map",
       "size": {
         "x": "-1",
@@ -31,6 +41,12 @@
   ],
   "programs": [
     {
+      "name": "HorizontalSmoothProgram",
+      "output_texture_names": [ "corrected_depth" ],
+      "input_scene_type": { "value": "QUAD" },
+      "shader": "HorizontalSmooth"
+    },
+    {
       "name": "ComputeNormalProgram",
       "output_texture_names": [ "normal_map" ],
       "input_scene_type": { "value": "QUAD" },
@@ -50,6 +66,12 @@
     }
   ],
   "materials": [
+    {
+      "name": "HorizontalSmoothMaterial",
+      "program_name": "HorizontalSmoothProgram",
+      "texture_names": [ "input_depth" ],
+      "inner_names": [ "Depth" ]
+    },
     {
       "name": "ComputeNormalMaterial",
       "program_name": "ComputeNormalProgram",
@@ -80,6 +102,12 @@
     ],
     "scene_static_meshes": [
       {
+        "name": "HorizontalSmoothMesh",
+        "parent": "root",
+        "material_name": "HorizontalSmoothMaterial",
+        "mesh_enum": "QUAD"
+      },
+      {
         "name": "ComputeNormalMesh",
         "parent": "root",
         "material_name": "ComputeNormalMaterial",
@@ -94,18 +122,17 @@
     ],
     "post_processes": [
       {
+        "name": "HorizontalSmoothProcess",
+        "mesh_name": "HorizontalSmoothMesh",
+        "material_name": "HorizontalSmoothMaterial"
+      },
+      {
         "name": "ComputeNormalPostProcess",
-        "clean_buffer": {
-          "values": [ "CLEAR_COLOR", "CLEAR_DEPTH" ]
-        },
         "mesh_name": "ComputeNormalMesh",
         "material_name": "ComputeNormalMaterial"
       },
       {
         "name": "BlurPostProcess",
-        "clean_buffer": {
-          "values": [ "CLEAR_COLOR", "CLEAR_DEPTH" ]
-        },
         "mesh_name": "BlurMesh",
         "material_name": "BlurMaterial"
       }

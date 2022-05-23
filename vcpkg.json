@@ -2,6 +2,7 @@
 	"name": "frame",
 	"version-string": "1.0",
 	"dependencies": [
+		"fmt",
 		"glm",
 		"grpc",
 		"glew",

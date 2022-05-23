@@ -18,6 +18,8 @@ add_custom_target(AssetShaderOpenGL
     GaussianBlur.vert
     HighDynamicRange.frag
     HighDynamicRange.vert
+    HorizontalSmooth.frag
+    HorizontalSmooth.vert
     IntegrateBRDF.frag
     IntegrateBRDF.vert
     IrradianceCubeMap.frag

@@ -10,6 +10,7 @@
 #include "Frame/Error.h"
 #include "Frame/Window.h"
 #include "Frame/File/FileSystem.h"
+#include "Frame/File/Image.h"
 #include "Sample/Common/Application.h"
 
 #if defined(_WIN32) || defined(_WIN64)
@@ -24,9 +25,15 @@ int main(int ac, char** av)
 {
 	try
 	{
+		// A hack to have the size of the image.
+		std::pair<std::uint32_t, std::uint32_t> size;
+		{
+			frame::file::Image img(frame::file::FindFile("./Asset/input.png"));
+			size = img.GetSize();
+		}
 		Application app(
 			frame::file::FindFile("Asset/Json/TextureModif.json"),
-			frame::CreateSDLOpenGL({ 640, 512 }));
+			frame::CreateSDLOpenGL(size));
 		app.Startup();
 		app.Run();
 	}
