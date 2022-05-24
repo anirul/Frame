@@ -6,7 +6,7 @@
 #include <optional>
 #include <string>
 #include <vector>
-#include "Frame/Error.h"
+
 #include "Frame/LevelInterface.h"
 #include "Frame/OpenGL/Buffer.h"
 #include "Frame/OpenGL/Material.h"
@@ -80,7 +80,6 @@ namespace frame::opengl {
 		EntityId index_buffer_id_ = 0;
 		std::size_t index_size_ = 0;
 		unsigned int vertex_array_object_ = 0;
-		const Error& error_ = Error::GetInstance();
 		std::string name_;
 	};
 

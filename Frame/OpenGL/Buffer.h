@@ -1,7 +1,6 @@
 #pragma once
 
 #include <GL/glew.h>
-#include "Frame/Error.h"
 #include "Frame/BufferInterface.h"
 
 namespace frame::opengl {
@@ -68,7 +67,6 @@ namespace frame::opengl {
 		const BufferTypeEnum buffer_type_;
 		const BufferUsageEnum buffer_usage_;
 		unsigned int buffer_object_ = 0;
-		const Error& error_ = Error::GetInstance();
 	};
 
 } // End namespace frame::opengl.

@@ -12,7 +12,6 @@ namespace frame::opengl {
 		buffer_usage_(buffer_usage)
 	{
 		glGenBuffers(1, &buffer_object_);
-		error_.Display(__FILE__, __LINE__ - 1);
 	}
 	
 	Buffer::~Buffer()
@@ -24,14 +23,12 @@ namespace frame::opengl {
 	{
 		if (locked_bind_) return;
 		glBindBuffer(static_cast<GLenum>(buffer_type_), buffer_object_);
-		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
 	void Buffer::UnBind() const
 	{
 		if (locked_bind_) return;
 		glBindBuffer(static_cast<GLenum>(buffer_type_), 0);
-		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
 	void Buffer::Copy(
@@ -44,7 +41,6 @@ namespace frame::opengl {
 			size,
 			data,
 			static_cast<GLenum>(buffer_usage_));
-		error_.Display(__FILE__, __LINE__ - 5);
 		UnBind();
 	}
 
@@ -56,7 +52,6 @@ namespace frame::opengl {
 			static_cast<GLenum>(buffer_type_), 
 			GL_BUFFER_SIZE, 
 			(GLint*)&size);
-		error_.Display(__FILE__, __LINE__ - 4);
 		UnBind();
 		return size[0];
 	}

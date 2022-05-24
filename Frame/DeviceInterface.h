@@ -26,6 +26,8 @@ namespace frame {
 		virtual void* GetDeviceContext() const = 0;
 		// Return the name of the underlying API.
 		virtual const std::string GetTypeString() const = 0;
+		// Make a screen shot to a file.
+		virtual void ScreenShot(const std::string& file) const = 0;
 	};
 
 } // End namespace frame.

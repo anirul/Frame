@@ -15,10 +15,9 @@ public:
 	void RunDraw(const double dt) override;
 
 private:
-	frame::Error& error_ = frame::Error::GetInstance();
 	frame::Logger& logger_ = frame::Logger::GetInstance();
 	frame::DeviceInterface* device_ = nullptr;
-	std::string preferred_texture_ = "";
+	std::string preferred_texture_;
 	std::map<std::string, std::shared_ptr<frame::TextureInterface>> 
 		texture_map_ = {};
 	std::map<std::string, std::shared_ptr<frame::ProgramInterface>> 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include "Frame/Error.h"
+
 #include "Frame/LevelInterface.h"
 #include "Frame/ProgramInterface.h"
 #include "Frame/RendererInterface.h"
@@ -39,9 +39,13 @@ namespace frame::opengl {
 		// Render to a mesh at a dt time.
 		void RenderMesh(
 			StaticMeshInterface* static_mesh,
+			MaterialInterface* material = nullptr,
 			glm::mat4 model_mat = glm::mat4(1.0f),
 			double dt = 0.0) override;
-		void RenderNode(EntityId node_id, double dt = 0.0) override;
+		void RenderNode(
+			EntityId node_id, 
+			EntityId material_id = NullId,
+			double dt = 0.0) override;
 		void RenderChildren(EntityId node_id, double dt = 0.0) override;
 		void RenderFromRootNode(double dt = 0.0) override;
 		// Display the default texture to the screen.
@@ -51,6 +55,7 @@ namespace frame::opengl {
 	private:
 		// Level shared_ptr.
 		LevelInterface* level_ = nullptr;
+		Logger& logger_ = Logger::GetInstance();
 		// Projection / View / Model matrices.
 		glm::mat4 projection_ = glm::mat4(1.0f);
 		glm::mat4 view_ = glm::mat4(1.0f);
@@ -58,7 +63,6 @@ namespace frame::opengl {
 		// Frame & Render buffers.
 		FrameBuffer frame_buffer_{};
 		RenderBuffer render_buffer_{};
-		const Error& error_ = Error::GetInstance();
 		// Display ids.
 		EntityId display_program_id_ = 0;
 		EntityId display_material_id_ = 0;

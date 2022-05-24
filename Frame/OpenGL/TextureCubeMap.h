@@ -9,7 +9,7 @@
 #include <array>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include "Frame/Error.h"
+
 #include "Frame/OpenGL/Pixel.h"
 #include "Frame/OpenGL/Program.h"
 #include "Frame/OpenGL/FrameBuffer.h"
@@ -118,11 +118,10 @@ namespace frame::opengl {
 		std::pair<std::uint32_t, std::uint32_t> size_ = { 0, 0 };
 		const proto::PixelElementSize pixel_element_size_;
 		const proto::PixelStructure pixel_structure_;
-		const Error& error_ = Error::GetInstance();
 		mutable bool locked_bind_ = false;
 		std::unique_ptr<RenderBuffer> render_ = nullptr;
 		std::unique_ptr<FrameBuffer> frame_ = nullptr;
-		std::string name_ = "";
+		std::string name_;
 	};
 
 } // End namespace frame::opengl.

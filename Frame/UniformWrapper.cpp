@@ -1,4 +1,5 @@
 #include "Frame/UniformWrapper.h"
+#include "Frame/NodeMatrix.h"
 
 namespace frame {
 

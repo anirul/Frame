@@ -1,0 +1,97 @@
+{
+  "name": "TextureModif",
+  "default_texture_name": "blured_normal_map",
+  "textures": [
+    {
+      "name": "input_depth",
+      "pixel_element_size": { "value": "SHORT" },
+      "pixel_structure": { "value": "GREY" },
+      "file_name": "Asset/input.png"
+    },
+    {
+      "name": "normal_map",
+      "size": {
+        "x": "-1",
+        "y": "-1"
+      },
+      "cubemap": "false",
+      "pixel_element_size": { "value": "BYTE" },
+      "pixel_structure": { "value": "RGB" }
+    },
+    {
+      "name": "blured_normal_map",
+      "size": {
+        "x": "-1",
+        "y": "-1"
+      },
+      "cubemap": "false",
+      "pixel_element_size": { "value": "BYTE" },
+      "pixel_structure": { "value": "RGB" }
+    }
+  ],
+  "programs": [
+    {
+      "name": "ComputeNormalProgram",
+      "output_texture_names": [ "normal_map" ],
+      "input_scene_type": { "value": "QUAD" },
+      "shader": "TextureModif",
+      "parameters": [
+        {
+          "name": "time_s",
+          "uniform_enum": "FLOAT_TIME_S"
+        }
+      ]
+    },
+    {
+      "name": "BlurProgram",
+      "output_texture_names": [ "blured_normal_map" ],
+      "input_scene_type": { "value": "QUAD" },
+      "shader": "Blur"
+    }
+  ],
+  "materials": [
+    {
+      "name": "ComputeNormalMaterial",
+      "program_name": "ComputeNormalProgram",
+      "texture_names": [ "input_depth" ],
+      "inner_names": [ "Depth" ]
+    },
+    {
+      "name": "BlurMaterial",
+      "program_name": "BlurProgram",
+      "texture_names": [ "normal_map" ],
+      "inner_names": [ "Image" ]
+    }
+  ],
+  "scene_tree": {
+    "default_root_name": "root",
+    "scene_matrices": [
+      {
+        "name": "root",
+        "clean_buffer": {
+          "values": [ "CLEAR_COLOR", "CLEAR_DEPTH" ]
+        },
+        "matrix": {
+          "m11": "1.0",
+          "m22": "1.0",
+          "m33": "1.0",
+          "m44": "1.0"
+        }
+      }
+    ],
+    "scene_static_meshes": [
+      {
+        "name": "ComputeNormalMesh",
+        "parent": "root",
+        "material_name": "ComputeNormalMaterial",
+        "mesh_enum": "QUAD"
+      },
+      {
+        "name": "BlurMesh",
+        "parent": "root",
+        "material_name": "BlurMaterial",
+        "mesh_enum": "QUAD"
+      }
+    ]
+  }
+}

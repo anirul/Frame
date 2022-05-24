@@ -24,6 +24,11 @@ namespace frame {
 
 	std::optional<EntityId> Level::GetIdFromName(const std::string& name) const
 	{
+		if (name.empty()) 
+		{
+			logger_->warn("name is empty.");
+			return std::nullopt;
+		}
 		try 
 		{
 			return name_id_map_.at(name);

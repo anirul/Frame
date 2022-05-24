@@ -1,5 +1,4 @@
 #include "LoadTextureTest.h"
-#include "Frame/Error.h"
 #include "Frame/File/FileSystem.h"
 #include "Frame/OpenGL/File/LoadTexture.h"
 #include "Frame/OpenGL/Texture.h"
@@ -8,24 +7,20 @@ namespace test {
 
 	TEST_F(LoadTextureTest, LoadTextureFromFloatTest)
 	{
-		const frame::Error& error = frame::Error::GetInstance();
 		auto texture = frame::opengl::file::LoadTextureFromFloat(0.1f);
 		EXPECT_TRUE(texture);
 		EXPECT_EQ(1, texture->GetSize().first);
 		EXPECT_EQ(1, texture->GetSize().second);
 		texture->Bind();
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-		error.Display(__FILE__, __LINE__ - 1);
 		float f = 0.0f;
 		glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_FLOAT, &f);
-		error.Display(__FILE__, __LINE__ - 1);
 		EXPECT_FLOAT_EQ(0.1f, f);
 		texture->UnBind();
 	}
 
 	TEST_F(LoadTextureTest, LoadTextureFromVec4Test)
 	{
-		const frame::Error& error = frame::Error::GetInstance();
 		auto texture = frame::opengl::file::LoadTextureFromVec4(
 				glm::vec4(0.1f, 0.2f, 0.3f, 0.4f));
 		EXPECT_TRUE(texture);
@@ -41,7 +36,6 @@ namespace test {
 
 	TEST_F(LoadTextureTest, LoadTextureFromFileTest)
 	{
-		const frame::Error& error = frame::Error::GetInstance();
 		auto texture = 
 			frame::opengl::file::LoadTextureFromFile(
 				frame::file::FindFile("Asset/CubeMap/PositiveX.png"),
@@ -62,7 +56,6 @@ namespace test {
 
 	TEST_F(LoadTextureTest, LoadCubeMapFromFilesTest)
 	{
-		const frame::Error& error = frame::Error::GetInstance();
 		auto texture =
 			frame::opengl::file::LoadCubeMapTextureFromFiles(
 				{ 

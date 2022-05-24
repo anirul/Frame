@@ -10,8 +10,6 @@ add_library(Frame
     DeviceInterface.h
     DrawInterface.h
     EntityId.h
-    Error.cpp
-    Error.h
     Frame.h
     ImageInterface.h
     InputInterface.h

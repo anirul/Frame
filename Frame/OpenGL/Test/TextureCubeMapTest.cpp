@@ -46,9 +46,9 @@ namespace test {
         // Image size time the number of color per pixel time 6 (cubemap).
         EXPECT_EQ(512 * 512 * 3 * 6, vecf.size());
         auto p = std::minmax_element(vecf.begin(), vecf.end());
-        // FIXME(anirul): This is suppose to be 2 different values.
+        // Should probably make a GT and LT...
         EXPECT_EQ(0.0f, *p.first);
-        EXPECT_EQ(0.0f, *p.second);
+        EXPECT_FLOAT_EQ(20.413086f, *p.second);
     }
 
 } // End namespace test.

@@ -59,7 +59,6 @@ namespace frame {
 		}
 		std::optional<EntityId> GetDefaultCameraId() const override
 		{
-			assert(!default_camera_name_.empty());
 			return GetIdFromName(default_camera_name_);
 		}
 
@@ -88,30 +87,12 @@ namespace frame {
 		CameraInterface* GetDefaultCamera() override;
 
 	protected:
-		EntityId GetTextureNewId() const
-		{
-			return next_id_maker_++;
-		}
-		EntityId GetProgramNewId() const
-		{
-			return next_id_maker_++;
-		}
-		EntityId GetMaterialNewId() const
-		{
-			return next_id_maker_++;
-		}
-		EntityId GetBufferNewId() const
-		{
-			return next_id_maker_++;
-		}
-		EntityId GetStaticMeshNewId() const
-		{
-			return next_id_maker_++;
-		}
-		EntityId GetSceneNodeNewId() const
-		{
-			return next_id_maker_++;
-		}
+		EntityId GetTextureNewId() const { return next_id_maker_++;	}
+		EntityId GetProgramNewId() const { return next_id_maker_++; }
+		EntityId GetMaterialNewId() const { return next_id_maker_++; }
+		EntityId GetBufferNewId() const { return next_id_maker_++; }
+		EntityId GetStaticMeshNewId() const { return next_id_maker_++; }
+		EntityId GetSceneNodeNewId() const { return next_id_maker_++; }
 
 	protected:
 		Logger& logger_ = Logger::GetInstance();
@@ -122,22 +103,22 @@ namespace frame {
 		std::string default_texture_name_;
 		std::string default_root_scene_node_name_;
 		std::string default_camera_name_;
-		std::unordered_set<std::string> string_set_ = {};
-		std::unordered_map<EntityId, std::unique_ptr<NodeInterface>>
+		std::set<std::string> string_set_ = {};
+		std::map<EntityId, std::unique_ptr<NodeInterface>> 
 			id_scene_node_map_ = {};
-		std::unordered_map<EntityId, std::unique_ptr<TextureInterface>>
+		std::map<EntityId, std::unique_ptr<TextureInterface>> 
 			id_texture_map_ = {};
-		std::unordered_map<EntityId, std::unique_ptr<ProgramInterface>>
+		std::map<EntityId, std::unique_ptr<ProgramInterface>>
 			id_program_map_ = {};
-		std::unordered_map<EntityId, std::unique_ptr<MaterialInterface>>
+		std::map<EntityId, std::unique_ptr<MaterialInterface>>
 			id_material_map_ = {};
-		std::unordered_map<EntityId, std::unique_ptr<BufferInterface>>
+		std::map<EntityId, std::unique_ptr<BufferInterface>>
 			id_buffer_map_ = {};
-		std::unordered_map<EntityId, std::unique_ptr<StaticMeshInterface>>
+		std::map<EntityId, std::unique_ptr<StaticMeshInterface>>
 			id_static_mesh_map_ = {};
-		std::unordered_map<std::string, EntityId> name_id_map_ = {};
-		std::unordered_map<EntityId, std::string> id_name_map_ = {};
-		std::unordered_map<EntityId, EntityTypeEnum> id_enum_map_ = {};
+		std::map<std::string, EntityId> name_id_map_ = {};
+		std::map<EntityId, std::string> id_name_map_ = {};
+		std::map<EntityId, EntityTypeEnum> id_enum_map_ = {};
 	};
 
 } // End namespace frame.

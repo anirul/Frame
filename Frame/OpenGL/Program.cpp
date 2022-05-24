@@ -1,6 +1,5 @@
 #include "Program.h"
 #include <stdexcept>
-#include "Frame/Error.h"
 #include "Frame/Logger.h"
 
 namespace frame::opengl {
@@ -21,22 +20,15 @@ namespace frame::opengl {
 		logger->info("Creating program");
 #endif // _DEBUG
 		auto program = std::make_unique<Program>();
-		const auto& error = Error::GetInstance();
 		Shader vertex(ShaderEnum::VERTEX_SHADER);
 		Shader fragment(ShaderEnum::FRAGMENT_SHADER);
 		if (!vertex.LoadFromSource(vertex_source))
 		{
-			error.CreateError(
-				vertex.GetErrorMessage(),
-				__FILE__,
-				__LINE__ - 5);
+			throw std::runtime_error(vertex.GetErrorMessage());
 		}
 		if (!fragment.LoadFromSource(pixel_source))
 		{
-			error.CreateError(
-				fragment.GetErrorMessage(),
-				__FILE__,
-				__LINE__ - 5);
+			throw std::runtime_error(fragment.GetErrorMessage());
 		}
 		program->AddShader(vertex);
 		program->AddShader(fragment);
@@ -55,7 +47,6 @@ namespace frame::opengl {
 	Program::Program()
 	{
 		program_id_ = glCreateProgram();
-		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
 	Program::~Program()
@@ -66,25 +57,21 @@ namespace frame::opengl {
 	void Program::AddShader(const Shader& shader)
 	{
 		glAttachShader(program_id_, shader.GetId());
-		error_.Display(__FILE__, __LINE__ - 1);
 		attached_shaders_.push_back(shader.GetId());
 	}
 
 	void Program::LinkShader()
 	{
 		glLinkProgram(program_id_);
-		error_.Display(__FILE__, __LINE__ - 1);
 		for (const auto& id : attached_shaders_)
 		{
 			glDetachShader(program_id_, id);
-			error_.Display(__FILE__, __LINE__ - 1);
 		}
 	}
 
 	void Program::Use(const UniformInterface* uniform_interface) const
 	{
 		glUseProgram(program_id_);
-		error_.Display(__FILE__, __LINE__ - 1);
 		// Now loop into the uniform map to include uniform interface values.
 		for (const auto& pair : uniform_variable_map_)
 		{
@@ -157,19 +144,16 @@ namespace frame::opengl {
 	void Program::Uniform(const std::string& name, bool value) const
 	{
 		glUniform1i(GetMemoizeUniformLocation(name), (int)value);
-		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
 	void Program::Uniform(const std::string& name, int value) const
 	{
 		glUniform1i(GetMemoizeUniformLocation(name), value);
-		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
 	void Program::Uniform(const std::string& name, float value) const
 	{
 		glUniform1f(GetMemoizeUniformLocation(name), value);
-		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
 	void Program::Uniform(
@@ -177,7 +161,6 @@ namespace frame::opengl {
 		const glm::vec2 vec2) const
 	{
 		glUniform2f(GetMemoizeUniformLocation(name), vec2.x, vec2.y);
-		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
 	void Program::Uniform(
@@ -185,7 +168,6 @@ namespace frame::opengl {
 		const glm::vec3 vec3) const
 	{
 		glUniform3f(GetMemoizeUniformLocation(name), vec3.x, vec3.y, vec3.z);
-		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
 	void Program::Uniform(
@@ -198,7 +180,6 @@ namespace frame::opengl {
 			vec4.y,
 			vec4.z,
 			vec4.w);
-		error_.Display(__FILE__, __LINE__ - 6);
 	}
 
 	void Program::Uniform(
@@ -210,7 +191,6 @@ namespace frame::opengl {
 			1, 
 			GL_FALSE,
 			&mat[0][0]);
-		error_.Display(__FILE__, __LINE__ - 5);
 	}
 
 	void Program::Uniform(
@@ -227,7 +207,6 @@ namespace frame::opengl {
 		{
 			memoize_map_[name] = 
 				glGetUniformLocation(program_id_, name.c_str());
-			error_.Display(__FILE__, __LINE__ - 1);
 		}
 		return memoize_map_[name];
 	}
@@ -296,7 +275,7 @@ namespace frame::opengl {
 		{
 			throw std::runtime_error(
 				"Texture: [" + std::to_string(texture_id) +
-				" is already in output texture ids.");
+				"] is already in output texture ids.");
 		}
 	}
 
@@ -315,7 +294,6 @@ namespace frame::opengl {
 	void Program::UnUse() const
 	{
 		glUseProgram(0);
-		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
 	const std::vector<std::string>& Program::GetUniformNameList() const
@@ -323,7 +301,6 @@ namespace frame::opengl {
 		uniform_list_.clear();
 		GLint count = 0;
 		glGetProgramiv(program_id_, GL_ACTIVE_UNIFORMS, &count);
-		error_.Display(__FILE__, __LINE__ - 1);
 		for (GLuint i = 0; i < static_cast<GLuint>(count); ++i)
 		{
 			constexpr GLsizei max_size = 256;
@@ -339,7 +316,6 @@ namespace frame::opengl {
 				&size, 
 				&type, 
 				name);
-			error_.Display(__FILE__, __LINE__ - 8);
 			std::string name_str = std::string(name, name + length);
 			uniform_list_.push_back(name_str);
 			std::string warning_str = fmt::format(

@@ -5,13 +5,13 @@ namespace frame {
 
 	glm::mat4 NodeMatrix::GetLocalModel(const double dt) const
 	{
-		if (!func_("root")) 
-		{
-			throw std::runtime_error(
-				"Should initiate NodeInterface correctly!");
-		}
 		if (!GetParentName().empty())
 		{
+            if (!func_("root"))
+            {
+                throw std::runtime_error(
+                    "Should initiate NodeInterface correctly!");
+            }
 			auto parent_node = func_(GetParentName());
 			if (!parent_node)
 			{
@@ -27,6 +27,7 @@ namespace frame {
 		return ComputeLocalRotation(dt);
 	}
 
+	// FIXME(anirul): Find a better way.
 	glm::mat4 NodeMatrix::ComputeLocalRotation(const double dt) const
 	{
 		if (matrix_ == glm::mat4(1.0f)) return matrix_;

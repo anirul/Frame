@@ -4,7 +4,6 @@
 
 #include "Frame/DeviceInterface.h"
 #include "Frame/DrawInterface.h"
-#include "Frame/Error.h"
 #include "Frame/Logger.h"
 #include "Frame/Window.h"
 #include "Sample/Common/PathInterface.h"
@@ -25,7 +24,6 @@ public:
 	void RunDraw(double dt) override;
 
 private:
-	frame::Error& error_ = frame::Error::GetInstance();
 	frame::Logger& logger_ = frame::Logger::GetInstance();
 	std::pair<std::uint32_t, std::uint32_t> size_ = { 0, 0 };
 	std::filesystem::path path_;

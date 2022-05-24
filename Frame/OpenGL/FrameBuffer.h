@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include "Frame/Error.h"
+
 #include "Frame/Logger.h"
 #include "Frame/OpenGL/RenderBuffer.h"
 #include "Frame/OpenGL/ScopedBind.h"
@@ -77,7 +77,6 @@ namespace frame::opengl {
 	private:
 		unsigned int frame_id_ = 0;
 		mutable bool locked_bind_ = false;
-		const Error& error_ = Error::GetInstance();
 		const Logger& logger_ = Logger::GetInstance();
 	};
 

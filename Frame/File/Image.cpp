@@ -5,6 +5,8 @@
 #include <set>
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include <stb_image_write.h>
 #include "Frame/OpenGL/Texture.h"
 
 namespace frame::file {
@@ -72,12 +74,49 @@ namespace frame::file {
 		{
 			throw std::runtime_error("unsupported file: " + file);
 		}
+		free_ = true;
 		size_ = size;
+	}
+
+	Image::Image(
+		std::pair<std::uint32_t, std::uint32_t> size,
+		const proto::PixelElementSize pixel_element_size/* =
+			proto::PixelElementSize_BYTE()*/,
+		const proto::PixelStructure pixel_structure/* =
+		proto::PixelStructure_RGB()*/) :
+			size_(size),
+			pixel_element_size_(pixel_element_size),
+			pixel_structure_(pixel_structure)
+	{
+		free_ = false;
+	}
+
+	void Image::SaveImageToFile(const std::string& file) const
+	{
+		// For OpenGL it seams...
+		stbi_flip_vertically_on_write(true);
+		const auto& logger = frame::Logger::GetInstance();
+		logger->info("Saving [{}]...", file);
+		if (!image_) throw std::runtime_error("no pointer to be saved?");
+		stbi_write_png(
+			file.c_str(),
+			size_.first,
+			size_.second,
+			pixel_structure_.value(),
+			image_,
+			size_.first * pixel_structure_.value());
+	}
+
+	void Image::SetData(void* data)
+	{
+		if (free_) stbi_image_free(image_);
+		image_ = data;
+		free_ = false;
 	}
 
 	Image::~Image()
 	{
-		stbi_image_free(image_);
+		if (free_) stbi_image_free(image_);
 	}
 
 } // End namespace frame::file.

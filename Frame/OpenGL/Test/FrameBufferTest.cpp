@@ -8,7 +8,6 @@ namespace test {
 		EXPECT_FALSE(frame_);
 		frame_ = std::make_unique<frame::opengl::FrameBuffer>();
 		EXPECT_TRUE(frame_);
-		EXPECT_NO_THROW(error_.Display());
 	}
 
 	TEST_F(FrameBufferTest, CheckIdFrameTest)
@@ -17,7 +16,6 @@ namespace test {
 		frame_ = std::make_unique<frame::opengl::FrameBuffer>();
 		EXPECT_TRUE(frame_);
 		EXPECT_NE(0, frame_->GetId());
-		EXPECT_NO_THROW(error_.Display());
 	}
 
 	TEST_F(FrameBufferTest, BindAttachErrorFrameTest)
@@ -36,8 +34,7 @@ namespace test {
 		EXPECT_TRUE(frame_);
 		frame::opengl::RenderBuffer render{};
 		render.CreateStorage({ 1, 1 });
-		frame_->AttachRender(render);
-		EXPECT_NO_THROW(error_.Display());
+		EXPECT_NO_THROW(frame_->AttachRender(render));
 	}
 
 	TEST_F(FrameBufferTest, BindTextureFrameTest)
@@ -47,11 +44,9 @@ namespace test {
 		EXPECT_TRUE(frame_);
 		frame::opengl::RenderBuffer render{};
 		render.CreateStorage({ 1, 1 });
-		frame_->AttachRender(render);
-		EXPECT_NO_THROW(error_.Display());
+		EXPECT_NO_THROW(frame_->AttachRender(render));
 		frame::opengl::Texture texture(std::make_pair(8, 8));
-		frame_->AttachTexture(texture.GetId());
-		EXPECT_NO_THROW(error_.Display());
+		EXPECT_NO_THROW(frame_->AttachTexture(texture.GetId()));
 	}
 
 } // End namespace test.

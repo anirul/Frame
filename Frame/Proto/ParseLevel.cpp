@@ -133,8 +133,6 @@ namespace frame::proto {
 				throw std::runtime_error("Could not parse proto scene file.");
 			default_camera_name_ = 
 				proto_level.scene_tree().default_camera_name();
-			if (default_camera_name_.empty())
-				throw std::runtime_error("should have a default camera name.");
 		}
 
 	};

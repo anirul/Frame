@@ -1,5 +1,6 @@
 #include "ParseSceneTree.h"
 
+#include <fmt/core.h>
 #include "Frame/File/FileSystem.h"
 #include "Frame/File/Obj.h"
 #include "Frame/Proto/ParseUniform.h"
@@ -52,6 +53,13 @@ namespace frame::proto {
 					std::make_unique<NodeMatrix>(
 						GetFunctor(level), 
 						ParseUniform(proto_scene_matrix.quaternion()));
+			}
+			else
+			{
+				scene_matrix = 
+					std::make_unique<NodeMatrix>(
+						GetFunctor(level), 
+						glm::mat4(1.0f));
 			}
 			scene_matrix->SetName(proto_scene_matrix.name());
 			scene_matrix->SetParentName(proto_scene_matrix.parent());
@@ -230,24 +238,20 @@ namespace frame::proto {
 			proto_scene_tree.default_root_name());
 		for (const auto& proto_matrix : proto_scene_tree.scene_matrices())
 		{
-			if (!ParseSceneMatrix(level, proto_matrix))
-				return false;
+			if (!ParseSceneMatrix(level, proto_matrix))	return false;
 		}
 		for (const auto& proto_static_mesh :
 			proto_scene_tree.scene_static_meshes())
 		{
-			if (!ParseSceneStaticMesh(level, proto_static_mesh))
-				return false;
+			if (!ParseSceneStaticMesh(level, proto_static_mesh)) return false;
 		}
 		for (const auto& proto_camera : proto_scene_tree.scene_cameras())
 		{
-			if (!ParseSceneCamera(level, proto_camera))
-				return false;
+			if (!ParseSceneCamera(level, proto_camera))	return false;
 		}
 		for (const auto& proto_light : proto_scene_tree.scene_lights())
 		{
-			if (!ParseSceneLight(level, proto_light))
-				return false;
+			if (!ParseSceneLight(level, proto_light)) return false;
 		}
 		return true;
 	}
