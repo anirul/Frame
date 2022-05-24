@@ -63,23 +63,6 @@ namespace frame {
 		virtual std::unique_ptr<TextureInterface> ExtractTexture(
 			EntityId id) = 0;
 		virtual CameraInterface* GetDefaultCamera() = 0;
-		// Interface for 'pre-' and 'post-' processing materials.
-		virtual void PushBackPreProcess(
-			const std::string& name, 
-			const std::string& mesh_name,
-			const std::string& material_name) = 0;
-        virtual void PushBackPostProcess(
-            const std::string& name,
-			const std::string& mesh_name,
-            const std::string& material_name) = 0;
-		virtual const std::vector<std::string>& GetPreProcessNames() const = 0;
-        virtual const std::vector<std::string>& GetPostProcessNames() const = 0;
-		virtual const std::vector<EntityId>& GetPreProcessMeshIds() const = 0;
-        virtual const std::vector<EntityId>& GetPostProcessMeshIds() const = 0;
-		virtual const std::vector<EntityId>& 
-			GetPreProcessMaterialIds() const = 0;
-		virtual const std::vector<EntityId>&
-			GetPostProcessMaterialIds() const = 0;
 	};
 
 } // End namespace frame.

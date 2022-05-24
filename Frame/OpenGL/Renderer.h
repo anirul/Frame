@@ -50,9 +50,6 @@ namespace frame::opengl {
 		void RenderFromRootNode(double dt = 0.0) override;
 		// Display the default texture to the screen.
 		void Display(double dt = 0.0) override;
-		// 'pre' and 'post' render effects (materials).
-		void RenderPreProcess(double dt = 0.0) override;
-		void RenderPostProcess(double dt = 0.0) override;
 		void SetDepthTest(bool enable) override;
 
 	private:

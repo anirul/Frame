@@ -81,9 +81,7 @@ namespace frame::opengl {
 	void Device::Display(double dt /*= 0.0*/)
 	{
 		if (!renderer_) throw std::runtime_error("No Renderer.");
-		renderer_->RenderPreProcess(dt);
 		renderer_->RenderFromRootNode(dt);
-		renderer_->RenderPostProcess(dt);
 		renderer_->Display(dt);
 	}
 

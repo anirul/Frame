@@ -219,100 +219,6 @@ namespace frame::proto {
 			return false;
 		}
 
-		[[nodiscard]] bool ParsePreProcess(
-			LevelInterface* level,
-			const proto::SceneProcess& proto_scene_process)
-		{
-			auto maybe_mesh_id = 
-				level->GetIdFromName(proto_scene_process.mesh_name());
-			if (!maybe_mesh_id)
-			{
-				throw std::runtime_error(
-					fmt::format(
-						"unknown id for mesh with name: {}", 
-						proto_scene_process.mesh_name()));
-			}
-			auto maybe_node_id = 
-				level->GetSceneNodeFromId(maybe_mesh_id.value());
-			if (!maybe_node_id)
-			{
-				throw std::runtime_error(
-					fmt::format(
-						"unknown mesh name: {}",
-						proto_scene_process.mesh_name()));
-			}
-			auto maybe_material_id =
-				level->GetIdFromName(proto_scene_process.material_name());
-			if (!maybe_material_id)
-			{
-				throw std::runtime_error(
-					fmt::format(
-						"unknown id for material with name: {}",
-						proto_scene_process.material_name()));
-			}
-			auto* maybe_material = 
-				level->GetMaterialFromId(maybe_material_id.value());
-			if (!maybe_material)
-			{
-				throw std::runtime_error(
-					fmt::format(
-						"unknown material with name: {}",
-						proto_scene_process.material_name()));
-			}
-			level->PushBackPreProcess(
-				proto_scene_process.name(),
-				proto_scene_process.mesh_name(),
-				proto_scene_process.material_name());
-			return true;
-		}
-
-        [[nodiscard]] bool ParsePostProcess(
-            LevelInterface* level,
-            const proto::SceneProcess& proto_scene_process)
-        {
-            auto maybe_mesh_id =
-                level->GetIdFromName(proto_scene_process.mesh_name());
-            if (!maybe_mesh_id)
-            {
-                throw std::runtime_error(
-                    fmt::format(
-                        "unknown id for mesh with name: {}",
-                        proto_scene_process.mesh_name()));
-            }
-            auto maybe_node_id =
-                level->GetSceneNodeFromId(maybe_mesh_id.value());
-            if (!maybe_node_id)
-            {
-                throw std::runtime_error(
-                    fmt::format(
-                        "unknown mesh name: {}",
-                        proto_scene_process.mesh_name()));
-            }
-            auto maybe_material_id =
-                level->GetIdFromName(proto_scene_process.material_name());
-            if (!maybe_material_id)
-            {
-                throw std::runtime_error(
-                    fmt::format(
-                        "unknown id for material with name: {}",
-                        proto_scene_process.material_name()));
-            }
-            auto* maybe_material =
-                level->GetMaterialFromId(maybe_material_id.value());
-            if (!maybe_material)
-            {
-                throw std::runtime_error(
-                    fmt::format(
-                        "unknown material with name: {}",
-                        proto_scene_process.material_name()));
-            }
-            level->PushBackPostProcess(
-				proto_scene_process.name(),
-				proto_scene_process.mesh_name(),
-				proto_scene_process.material_name());
-            return true;
-        }
-
 	} // End namespace.
 
 	[[nodiscard]] bool ParseSceneTreeFile(
@@ -339,14 +245,6 @@ namespace frame::proto {
 		for (const auto& proto_light : proto_scene_tree.scene_lights())
 		{
 			if (!ParseSceneLight(level, proto_light)) return false;
-		}
-		for (const auto& proto_pre_process : proto_scene_tree.pre_processes())
-		{
-			if (!ParsePreProcess(level, proto_pre_process)) return false;
-		}
-		for (const auto& proto_post_process : proto_scene_tree.post_processes())
-		{
-			if (!ParsePostProcess(level, proto_post_process)) return false;
 		}
 		return true;
 	}

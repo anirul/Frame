@@ -260,34 +260,6 @@ namespace frame::opengl {
 		quad->SetMaterialId(0);
 	}
 
-	void Renderer::RenderPreProcess(double dt /* = 0.0 */)
-	{
-        auto pre_process_mesh_ids = level_->GetPreProcessMeshIds();
-		auto pre_process_material_ids = level_->GetPreProcessMaterialIds();
-        for (int i = 0; i < pre_process_mesh_ids.size(); ++i)
-        {
-			const auto& mesh_id = pre_process_mesh_ids[i];
-			const auto& material_id = pre_process_material_ids[i];
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            error_.Display(__FILE__, __LINE__ - 1);
-			RenderNode(mesh_id, material_id, dt);
-        }
-	}
-
-	void Renderer::RenderPostProcess(double dt /* = 0.0 */)
-	{
-		auto post_process_mesh_ids = level_->GetPostProcessMeshIds();
-		auto post_process_material_ids = level_->GetPostProcessMaterialIds();
-		for (int i = 0; i < post_process_material_ids.size(); ++i)
-		{
-			const auto& mesh_id = post_process_mesh_ids[i];
-			const auto& material_id = post_process_material_ids[i];
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            error_.Display(__FILE__, __LINE__ - 1);
-			RenderNode(mesh_id, material_id, dt);
-		}
-	}
-
 	void Renderer::SetDepthTest(bool enable)
 	{
 		if (enable)

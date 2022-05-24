@@ -85,14 +85,6 @@ namespace frame {
 		std::optional<EntityId> GetParentId(EntityId id) const override;
 		std::unique_ptr<TextureInterface> ExtractTexture(EntityId id) override;
 		CameraInterface* GetDefaultCamera() override;
-        void PushBackPreProcess(
-            const std::string& name,
-			const std::string& mesh_name,
-            const std::string& material_name) override;
-        void PushBackPostProcess(
-            const std::string& name,
-			const std::string& mesh_name,
-            const std::string& material_name) override;
 
 	protected:
 		EntityId GetTextureNewId() const { return next_id_maker_++;	}
@@ -101,39 +93,6 @@ namespace frame {
 		EntityId GetBufferNewId() const { return next_id_maker_++; }
 		EntityId GetStaticMeshNewId() const { return next_id_maker_++; }
 		EntityId GetSceneNodeNewId() const { return next_id_maker_++; }
-		const std::vector<std::string>& GetPreProcessNames() const override
-		{
-			return post_process_names_;
-		}
-        const std::vector<std::string>& GetPostProcessNames() const override
-        {
-            return post_process_names_;
-        }
-		const std::vector<EntityId>& GetPreProcessMeshIds() const override
-		{
-			return pre_process_mesh_ids_;
-		}
-        const std::vector<EntityId>& GetPostProcessMeshIds() const override
-        {
-            return post_process_mesh_ids_;
-        }
-		const std::vector<EntityId>& GetPreProcessMaterialIds() const override
-		{
-			return pre_process_material_ids_;
-		}
-		const std::vector<EntityId>& GetPostProcessMaterialIds() const override
-		{
-			return post_process_material_ids_;
-		}
-
-	protected:
-		void PushBackSceneProcess(
-			const std::string& name,
-			const std::string& mesh_name,
-			const std::string& material_name,
-			std::vector<std::string>& input_names,
-			std::vector<EntityId>& input_mesh_ids,
-			std::vector<EntityId>& input_material_ids);
 
 	protected:
 		Logger& logger_ = Logger::GetInstance();
@@ -160,12 +119,6 @@ namespace frame {
 		std::map<std::string, EntityId> name_id_map_ = {};
 		std::map<EntityId, std::string> id_name_map_ = {};
 		std::map<EntityId, EntityTypeEnum> id_enum_map_ = {};
-		std::vector<std::string> pre_process_names_ = {};
-		std::vector<std::string> post_process_names_ = {};
-		std::vector<EntityId> pre_process_mesh_ids_ = {};
-		std::vector<EntityId> post_process_mesh_ids_ = {};
-		std::vector<EntityId> pre_process_material_ids_ = {};
-		std::vector<EntityId> post_process_material_ids_ = {};
 	};
 
 } // End namespace frame.

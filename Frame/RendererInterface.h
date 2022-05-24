@@ -27,8 +27,6 @@ namespace frame {
 		virtual void RenderChildren(EntityId node_id, double dt = 0.0) = 0;
 		virtual void RenderFromRootNode(double dt = 0.0) = 0;
 		virtual void Display(double dt = 0.0) = 0;
-		virtual void RenderPreProcess(double dt = 0.0) = 0;
-		virtual void RenderPostProcess(double dt = 0.0) = 0;
 		virtual void SetDepthTest(bool enable) = 0;
 	};
 
