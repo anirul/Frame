@@ -7,7 +7,6 @@
 #include <windows.h>
 #endif
 
-#include "Frame/Error.h"
 #include "Frame/Window.h"
 #include "Frame/File/FileSystem.h"
 #include "Sample/Common/Application.h"

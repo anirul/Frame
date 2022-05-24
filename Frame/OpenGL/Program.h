@@ -5,7 +5,7 @@
 #include <memory>
 #include <vector>
 #include <glm/glm.hpp>
-#include "Frame/Error.h"
+
 #include "Frame/Logger.h"
 #include "Frame/OpenGL/Shader.h"
 #include "Frame/ProgramInterface.h"
@@ -87,15 +87,15 @@ namespace frame::opengl {
 		void ThrowIsInTextureIds(EntityId texture_id) const;
 
 	private:
-		const Error& error_ = Error::GetInstance();
+
 		const Logger& logger_ = Logger::GetInstance();
 		mutable std::map<std::string, int> memoize_map_ = {};
 		mutable std::map<std::string, proto::Uniform::UniformEnum> 
 			uniform_variable_map_ = {};
 		mutable std::vector<std::string> uniform_list_ = {};
 		std::vector<unsigned int> attached_shaders_ = {};
-		std::string temporary_scene_root_ = "";
-		std::string name_ = "";
+		std::string temporary_scene_root_;
+		std::string name_;
 		int program_id_ = 0;
 		EntityId scene_root_ = 0;
 		std::vector<EntityId> input_texture_ids_ = {};

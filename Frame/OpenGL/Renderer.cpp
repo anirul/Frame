@@ -76,7 +76,6 @@ namespace frame::opengl {
 				if (flags & proto::CleanBuffer::CLEAR_DEPTH)
 					gl_clear |= GL_DEPTH_BUFFER_BIT;
 				glClear(gl_clear);
-				error_.Display(__FILE__, __LINE__ - 1);
 			}
 		}
 		// Try to cast to a node static mesh.
@@ -86,7 +85,6 @@ namespace frame::opengl {
 		auto node_material_id = node_static_mesh->GetMaterialId();
 		auto mesh_id = node->GetLocalMesh();
 		if (!mesh_id) return;
-		logger_->info("Found a mesh id: {}", mesh_id);
 		auto static_mesh = level_->GetStaticMeshFromId(mesh_id);
 		MaterialInterface* material = nullptr;
 		// If no material is put the node material id in the mesh.
@@ -125,12 +123,8 @@ namespace frame::opengl {
 		if (!static_mesh)
 			throw std::runtime_error("StaticMesh ptr doesn't exist.");
 		auto material_id = static_mesh->GetMaterialId();
-		logger_->info("Set material to : {}", material_id);
 		if (!material) material = level_->GetMaterialFromId(material_id);
 		if (!material) throw std::runtime_error("No material!");
-		logger_->info(
-			"Material pointer set to: {}", 
-			static_cast<void*>(material));
 		auto program_id = material->GetProgramId();
 		auto program = level_->GetProgramFromId(program_id);
 		if (!program) throw std::runtime_error("Program ptr doesn't exist.");
@@ -144,7 +138,6 @@ namespace frame::opengl {
 		auto size = texture_ref->GetSize();
 
 		glViewport(0, 0, size.first, size.second);
-		error_.Display(__FILE__, __LINE__ - 1);
 
 		ScopedBind scoped_frame(frame_buffer_);
 		int i = 0;
@@ -185,7 +178,6 @@ namespace frame::opengl {
 		}
 		
 		glBindVertexArray(static_mesh->GetId());
-		error_.Display(__FILE__, __LINE__ - 1);
 
 		auto index_buffer = level_->GetBufferFromId(
 			static_mesh->GetIndexBufferId());
@@ -196,12 +188,10 @@ namespace frame::opengl {
 				sizeof(std::int32_t),
 			GL_UNSIGNED_INT,
 			nullptr);
-		error_.Display(__FILE__, __LINE__ - 5);
 		index_buffer->UnBind();
 
 		program->UnUse();
 		glBindVertexArray(0);
-		error_.Display(__FILE__, __LINE__ - 1);
 
 		for (const auto id : material->GetIds())
 		{
@@ -212,7 +202,6 @@ namespace frame::opengl {
 		if (static_mesh->IsClearBuffer())
 		{
 			glClear(GL_DEPTH_BUFFER_BIT);
-			error_.Display(__FILE__, __LINE__ - 1);
 		}
 	}
 
@@ -236,7 +225,6 @@ namespace frame::opengl {
 		}
 
 		glBindVertexArray(quad->GetId());
-		error_.Display(__FILE__, __LINE__ - 1);
 
 		auto index_buffer = level_->GetBufferFromId(quad->GetIndexBufferId());
 		index_buffer->Bind();
@@ -245,12 +233,10 @@ namespace frame::opengl {
 			static_cast<GLsizei>(quad->GetIndexSize()) / sizeof(std::int32_t),
 			GL_UNSIGNED_INT,
 			nullptr);
-		error_.Display(__FILE__, __LINE__ - 5);
 		index_buffer->UnBind();
 
 		program->UnUse();
 		glBindVertexArray(0);
-		error_.Display(__FILE__, __LINE__ - 1);
 
 		for (const auto id : material->GetIds())
 		{
@@ -265,12 +251,10 @@ namespace frame::opengl {
 		if (enable)
 		{
 			glEnable(GL_DEPTH_TEST);
-			error_.Display(__FILE__, __LINE__ - 1);
 		}
 		else
 		{
 			glDisable(GL_DEPTH_TEST);
-			error_.Display(__FILE__, __LINE__ - 1);
 		}
 	}
 

@@ -9,7 +9,6 @@
 
 #include "Frame/Camera.h"
 #include "Frame/DeviceInterface.h"
-#include "Frame/Error.h"
 #include "Frame/Logger.h"
 #include "Frame/UniformInterface.h"
 #include "Frame/OpenGL/Program.h"
@@ -63,7 +62,6 @@ namespace frame::opengl {
 		// Rendering pipeline.
 		std::unique_ptr<Renderer> renderer_ = nullptr;
 		// Error setup.
-		const Error& error_ = Error::GetInstance();
 		const Logger& logger_ = Logger::GetInstance();
 	};
 

@@ -3,8 +3,6 @@
 add_executable(FrameTest
 	CameraTest.cpp
 	CameraTest.h
-	ErrorTest.cpp
-	ErrorTest.h
 	ProgramMock.h
 	main.cpp
 	UniformMock.h

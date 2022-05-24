@@ -111,22 +111,18 @@ namespace frame::opengl {
 		assert(slot < GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS);
 		if (locked_bind_) return;
 		glActiveTexture(GL_TEXTURE0 + slot);
-		error_.Display(__FILE__, __LINE__ - 1);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, texture_id_);
-		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
 	void TextureCubeMap::UnBind() const
 	{
 		if (locked_bind_) return;
 		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
 	void TextureCubeMap::EnableMipmap() const
 	{
 		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
-		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
 	void TextureCubeMap::SetMinFilter(const TextureFilterEnum texture_filter)
@@ -136,7 +132,6 @@ namespace frame::opengl {
 			GL_TEXTURE_CUBE_MAP,
 			GL_TEXTURE_MIN_FILTER,
 			ConvertToGLType(texture_filter));
-		error_.Display(__FILE__, __LINE__ - 4);
 		UnBind();
 	}
 
@@ -148,7 +143,6 @@ namespace frame::opengl {
 			GL_TEXTURE_CUBE_MAP,
 			GL_TEXTURE_MIN_FILTER,
 			&filter);
-		error_.Display(__FILE__, __LINE__ - 4);
 		UnBind();
 		return ConvertFromGLType(filter);
 	}
@@ -160,7 +154,6 @@ namespace frame::opengl {
 			GL_TEXTURE_CUBE_MAP,
 			GL_TEXTURE_MAG_FILTER,
 			ConvertToGLType(texture_filter));
-		error_.Display(__FILE__, __LINE__ - 4);
 		UnBind();
 	}
 
@@ -172,7 +165,6 @@ namespace frame::opengl {
 			GL_TEXTURE_CUBE_MAP,
 			GL_TEXTURE_MAG_FILTER,
 			&filter);
-		error_.Display(__FILE__, __LINE__ - 4);
 		UnBind();
 		return ConvertFromGLType(filter);
 	}
@@ -184,7 +176,6 @@ namespace frame::opengl {
 			GL_TEXTURE_CUBE_MAP,
 			GL_TEXTURE_WRAP_S,
 			ConvertToGLType(texture_filter));
-		error_.Display(__FILE__, __LINE__ - 4);
 		UnBind();
 	}
 
@@ -196,7 +187,6 @@ namespace frame::opengl {
 			GL_TEXTURE_CUBE_MAP,
 			GL_TEXTURE_WRAP_S,
 			&filter);
-		error_.Display(__FILE__, __LINE__ - 4);
 		UnBind();
 		return ConvertFromGLType(filter);
 	}
@@ -208,7 +198,6 @@ namespace frame::opengl {
 			GL_TEXTURE_CUBE_MAP,
 			GL_TEXTURE_WRAP_T,
 			ConvertToGLType(texture_filter));
-		error_.Display(__FILE__, __LINE__ - 4);
 		UnBind();
 	}
 
@@ -220,7 +209,6 @@ namespace frame::opengl {
 			GL_TEXTURE_CUBE_MAP,
 			GL_TEXTURE_WRAP_T,
 			&filter);
-		error_.Display(__FILE__, __LINE__ - 4);
 		UnBind();
 		return ConvertFromGLType(filter);
 	}
@@ -232,7 +220,6 @@ namespace frame::opengl {
 			GL_TEXTURE_CUBE_MAP,
 			GL_TEXTURE_WRAP_R,
 			ConvertToGLType(texture_filter));
-		error_.Display(__FILE__, __LINE__ - 4);
 		UnBind();
 	}
 
@@ -244,7 +231,6 @@ namespace frame::opengl {
 			GL_TEXTURE_CUBE_MAP,
 			GL_TEXTURE_WRAP_R,
 			&filter);
-		error_.Display(__FILE__, __LINE__ - 4);
 		UnBind();
 		return ConvertFromGLType(filter);
 	}
@@ -254,7 +240,6 @@ namespace frame::opengl {
 			{ nullptr, nullptr, nullptr, nullptr, nullptr, nullptr }*/)
 	{
 		glGenTextures(1, &texture_id_);
-		error_.Display(__FILE__, __LINE__ - 1);
 		ScopedBind scoped_bind(*this);
 		SetMinFilter(proto::TextureFilter::LINEAR);
 		SetMagFilter(proto::TextureFilter::LINEAR);
@@ -273,7 +258,6 @@ namespace frame::opengl {
 				opengl::ConvertToGLType(pixel_structure_),
 				opengl::ConvertToGLType(pixel_element_size_),
 				cube_map[i]);
-			error_.Display(__FILE__, __LINE__ - 10);
 		}
 	}
 
@@ -352,10 +336,8 @@ namespace frame::opengl {
 		if (!frame_) CreateFrameAndRenderBuffer();
 		ScopedBind scoped_frame(*frame_);
 		glViewport(0, 0, size_.first, size_.second);
-		error_.Display(__FILE__, __LINE__ - 1);
 		GLfloat clear_color[4] = { color.r, color.g, color.b, color.a };
 		glClearBufferfv(GL_COLOR, 0, clear_color);
-		error_.Display(__FILE__, __LINE__ - 1);
 		UnBind();
 	}
 
@@ -384,7 +366,6 @@ namespace frame::opengl {
 			type, 
 			static_cast<GLsizei>(image_size * sizeof(std::uint8_t)), 
 			result.data());
-        error_.Display(__FILE__, __LINE__ - 7);
         return result;
 	}
 
@@ -413,7 +394,6 @@ namespace frame::opengl {
 			type, 
 			static_cast<GLsizei>(image_size * sizeof(std::uint16_t)),
 			result.data());
-        error_.Display(__FILE__, __LINE__ - 7);
         return result;
     }
 
@@ -442,7 +422,6 @@ namespace frame::opengl {
             type,
             static_cast<GLsizei>(image_size * sizeof(std::uint32_t)),
             result.data());
-        error_.Display(__FILE__, __LINE__ - 7);
         return result;
     }
 
@@ -471,7 +450,6 @@ namespace frame::opengl {
             type,
             static_cast<GLsizei>(image_size * sizeof(float)),
             result.data());
-        error_.Display(__FILE__, __LINE__ - 7);
         return result;
     }
 

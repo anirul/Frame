@@ -9,7 +9,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_syswm.h>
 #include <GL/glew.h>
-#include "Error.h"
+
 #include "Frame/OpenGL/Device.h"
 
 namespace frame {
@@ -150,7 +150,6 @@ namespace frame {
 				SDL_VERSION(&wmInfo.version);
 				SDL_GetWindowWMInfo(sdl_window_, &wmInfo);
 				hwnd_ = wmInfo.info.win.window;
-				Error::SetWindowPtr(hwnd_);
 #endif
 			}
 

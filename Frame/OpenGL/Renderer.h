@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include "Frame/Error.h"
+
 #include "Frame/LevelInterface.h"
 #include "Frame/ProgramInterface.h"
 #include "Frame/RendererInterface.h"
@@ -63,7 +63,6 @@ namespace frame::opengl {
 		// Frame & Render buffers.
 		FrameBuffer frame_buffer_{};
 		RenderBuffer render_buffer_{};
-		const Error& error_ = Error::GetInstance();
 		// Display ids.
 		EntityId display_program_id_ = 0;
 		EntityId display_material_id_ = 0;

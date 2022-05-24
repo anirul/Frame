@@ -1,5 +1,4 @@
 #include "ParseTexture.h"
-#include "Frame/Error.h"
 #include "Frame/File/FileSystem.h"
 #include "Frame/OpenGL/Texture.h"
 #include "Frame/OpenGL/TextureCubeMap.h"
@@ -9,7 +8,6 @@ namespace {
 	
 	void CheckParameters(const frame::proto::Texture& proto_texture)
 	{
-		auto& error = frame::Error::GetInstance();
 		// Get the pixel element size.
 		constexpr auto INVALID_ELEMENT_SIZE =
 			frame::proto::PixelElementSize::INVALID;
@@ -17,17 +15,11 @@ namespace {
 			frame::proto::PixelStructure::INVALID;
 		if (proto_texture.pixel_element_size().value() == INVALID_ELEMENT_SIZE)
 		{
-			error.CreateError(
-				"Invalid pixel element size.",
-				__FILE__,
-				__LINE__ - 5);
+			throw std::runtime_error("Invalid pixel element size.");
 		}
 		if (proto_texture.pixel_structure().value() == INVALID_STRUCTURE)
 		{
-			error.CreateError(
-				"Invalid pixel structure.",
-				__FILE__,
-				__LINE__ - 5);
+			throw std::runtime_error("Invalid pixel structure.");
 		}
 	}
 
@@ -39,7 +31,6 @@ namespace frame::proto {
 		const Texture& proto_texture,
 		const std::pair<std::uint32_t, std::uint32_t> size)
 	{
-		auto& error = Error::GetInstance();
 		CheckParameters(proto_texture);
 		std::pair<std::uint32_t, std::uint32_t> texture_size = size;
 		if (proto_texture.size().x() < 0)
@@ -82,7 +73,6 @@ namespace frame::proto {
 		const Texture& proto_texture,
 		const std::pair<std::uint32_t, std::uint32_t> size)
 	{
-		auto& error = Error::GetInstance();
 		// Get the pixel element size.
 		CheckParameters(proto_texture);
 		std::pair<std::uint32_t, std::uint32_t> texture_size = { 0, 0 };
@@ -138,19 +128,16 @@ namespace frame::proto {
 	std::unique_ptr<TextureInterface> ParseCubeMapTextureFile(
 		const proto::Texture& proto_texture)
 	{
-		auto& error = Error::GetInstance();
 		CheckParameters(proto_texture);
 		if ((proto_texture.file_names().size() != 1) &&
 			!proto_texture.file_names().empty())
 		{
 			if (proto_texture.file_names().size() != 6)
 			{
-				error.CreateError(
+				throw std::runtime_error(
 					fmt::format(
-						"Invalid file_names size: {}.", 
-						proto_texture.file_names().size()),
-					__FILE__,
-					__LINE__ - 5);
+						"Invalid file_names size: {}.",
+						proto_texture.file_names().size()));
 			}
 			std::array<std::string, 6> name_array = {};
 			for (int i = 0; i < 6; ++i)

@@ -1,8 +1,9 @@
 #pragma once
+
 #include <utility>
 #include <string>
+
 #include "Frame/BindInterface.h"
-#include "Frame/Error.h"
 
 namespace frame::opengl {
 
@@ -15,7 +16,6 @@ namespace frame::opengl {
 		virtual ~ScopedBind();
 
 	private:
-		const Error& error_ = Error::GetInstance();
 		const BindInterface& bind_locked_;
 	};
 

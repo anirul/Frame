@@ -28,23 +28,17 @@ namespace frame::opengl {
 		// This should maintain the culling to none.
 		// FIXME(anirul): Change this as to be working!
 		glDisable(GL_CULL_FACE);
-		error_.Display(__FILE__, __LINE__ - 1);
 		// glCullFace(GL_BACK);
 		// error_.Display(__FILE__, __LINE__ - 1);
 		// glFrontFace(GL_CW);
 		// error_.Display(__FILE__, __LINE__ - 1);
 		// Enable blending to 1 - source alpha.
 		glEnable(GL_BLEND);
-		error_.Display(__FILE__, __LINE__ - 1);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		error_.Display(__FILE__, __LINE__ - 1);
 		glEnable(GL_DEPTH_TEST);
-		error_.Display(__FILE__, __LINE__ - 1);
 		glDepthFunc(GL_LEQUAL);
-		error_.Display(__FILE__, __LINE__ - 1);
 		// Enable seamless cube map.
 		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
 	Device::~Device() 
@@ -73,9 +67,7 @@ namespace frame::opengl {
 		const glm::vec4& color/* = glm::vec4(.2f, 0.f, .2f, 1.0f*/) const
     {
         glClearColor(color.r, color.g, color.b, color.a);
-        error_.Display(__FILE__, __LINE__ - 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        error_.Display(__FILE__, __LINE__ - 1);
     }
 
 	void Device::Display(double dt /*= 0.0*/)

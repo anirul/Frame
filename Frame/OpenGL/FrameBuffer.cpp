@@ -10,7 +10,6 @@ namespace frame::opengl {
 	FrameBuffer::FrameBuffer()
 	{
 		glGenFramebuffers(1, &frame_id_);
-		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
 	FrameBuffer::~FrameBuffer()
@@ -23,14 +22,12 @@ namespace frame::opengl {
 		assert(slot == 0);
 		if (locked_bind_) return;
 		glBindFramebuffer(GL_FRAMEBUFFER, frame_id_);
-		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
 	void FrameBuffer::UnBind() const
 	{
 		if (locked_bind_) return;
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		error_.Display(__FILE__, __LINE__ - 1);
 	}
 
 	void FrameBuffer::AttachRender(const RenderBuffer& render) const
@@ -42,14 +39,11 @@ namespace frame::opengl {
 			GL_DEPTH_ATTACHMENT,
 			GL_RENDERBUFFER, 
 			render.GetId());
-		error_.Display(__FILE__, __LINE__ - 5);
 		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		{
 			auto error_pair = GetError();
-			error_.CreateError(
-				"frame buffer is not completed: " + error_pair.second, 
-				__FILE__, 
-				__LINE__ - 4);
+			throw std::runtime_error(
+				fmt::format("{} - {}", error_pair.first, error_pair.second));
 		}
 		render.UnBind();
 		UnBind();
@@ -70,7 +64,6 @@ namespace frame::opengl {
 			GetFrameTextureType(frame_texture_type),
 			texture_id,
 			mipmap);
-		error_.Display(__FILE__, __LINE__ - 6);
 		UnBind();
 	}
 
@@ -153,7 +146,6 @@ namespace frame::opengl {
 		glDrawBuffers(
 			static_cast<GLsizei>(draw_buffer.size()), 
 			draw_buffer.data());
-		error_.Display(__FILE__, __LINE__ - 3);
 		UnBind();
 	}
 
