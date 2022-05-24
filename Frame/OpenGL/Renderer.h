@@ -58,6 +58,7 @@ namespace frame::opengl {
 	private:
 		// Level shared_ptr.
 		LevelInterface* level_ = nullptr;
+		Logger& logger_ = Logger::GetInstance();
 		// Projection / View / Model matrices.
 		glm::mat4 projection_ = glm::mat4(1.0f);
 		glm::mat4 view_ = glm::mat4(1.0f);

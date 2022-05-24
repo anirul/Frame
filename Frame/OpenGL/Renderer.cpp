@@ -86,12 +86,12 @@ namespace frame::opengl {
 		auto node_material_id = node_static_mesh->GetMaterialId();
 		auto mesh_id = node->GetLocalMesh();
 		if (!mesh_id) return;
+		logger_->info("Found a mesh id: {}", mesh_id);
 		auto static_mesh = level_->GetStaticMeshFromId(mesh_id);
-		// Get the mesh material id.
-		if (!material_id) material_id = static_mesh->GetMaterialId();
+		MaterialInterface* material = nullptr;
 		// If no material is put the node material id in the mesh.
-		if (!material_id) static_mesh->SetMaterialId(node_material_id);
-		auto* material = level_->GetMaterialFromId(material_id);
+		if (!material_id)
+			static_mesh->SetMaterialId(node_material_id);
 		RenderMesh(static_mesh, material, node->GetLocalModel(dt), dt);
 	}
 
@@ -125,8 +125,12 @@ namespace frame::opengl {
 		if (!static_mesh)
 			throw std::runtime_error("StaticMesh ptr doesn't exist.");
 		auto material_id = static_mesh->GetMaterialId();
+		logger_->info("Set material to : {}", material_id);
 		if (!material) material = level_->GetMaterialFromId(material_id);
 		if (!material) throw std::runtime_error("No material!");
+		logger_->info(
+			"Material pointer set to: {}", 
+			static_cast<void*>(material));
 		auto program_id = material->GetProgramId();
 		auto program = level_->GetProgramFromId(program_id);
 		if (!program) throw std::runtime_error("Program ptr doesn't exist.");

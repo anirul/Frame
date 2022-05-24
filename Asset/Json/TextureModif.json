@@ -1,6 +1,6 @@
 {
   "name": "TextureModif",
-  "default_texture_name": "normal_map",
+  "default_texture_name": "blured_normal_map",
   "textures": [
     {
       "name": "input_depth",
@@ -64,6 +64,7 @@
     }
   ],
   "scene_tree": {
+    "default_root_name": "root",
     "scene_matrices": [
       {
         "name": "root",
@@ -90,24 +91,6 @@
         "parent": "root",
         "material_name": "BlurMaterial",
         "mesh_enum": "QUAD"
-      }
-    ],
-    "post_processes": [
-      {
-        "name": "ComputeNormalPostProcess",
-        "clean_buffer": {
-          "values": [ "CLEAR_COLOR", "CLEAR_DEPTH" ]
-        },
-        "mesh_name": "ComputeNormalMesh",
-        "material_name": "ComputeNormalMaterial"
-      },
-      {
-        "name": "BlurPostProcess",
-        "clean_buffer": {
-          "values": [ "CLEAR_COLOR", "CLEAR_DEPTH" ]
-        },
-        "mesh_name": "BlurMesh",
-        "material_name": "BlurMaterial"
       }
     ]
   }
