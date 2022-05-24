@@ -54,6 +54,13 @@ namespace frame::proto {
 						GetFunctor(level), 
 						ParseUniform(proto_scene_matrix.quaternion()));
 			}
+			else
+			{
+				scene_matrix = 
+					std::make_unique<NodeMatrix>(
+						GetFunctor(level), 
+						glm::mat4(1.0f));
+			}
 			scene_matrix->SetName(proto_scene_matrix.name());
 			scene_matrix->SetParentName(proto_scene_matrix.parent());
 			for (auto flag : proto_scene_matrix.clean_buffer().values())
