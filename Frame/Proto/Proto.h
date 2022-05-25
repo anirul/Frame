@@ -2,7 +2,6 @@
 // This is just an helpfull header that include all the protos.
 
 #include <fstream>
-
 #include <fmt/core.h>
 // This is there to avoid most of the warnings.
 #if defined(_WIN32) || defined(_WIN64)

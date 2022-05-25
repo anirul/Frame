@@ -1,4 +1,4 @@
-#version 330 core
+#version 450 core
 // DEPTH_TO_X_Y is a value to multiply the depth to be = to the left / right.
 // Ok at the person level 1 pixel is more or less equal to 1mm (0.001m).
 // and the depth buffer is computed in mm (1.1mm).
