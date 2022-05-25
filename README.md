@@ -8,45 +8,67 @@ hdr,...).
 
 ## Install
 
-You will need vcpkg to use the cmake that is in the root of the repository.
-If you install it you can install it in the ```~/Documents/GitHub/vcpkg``` 
-or go to ```~/Documents/GitHub``` and clone it by using 
-```git clone https://github.com/microsoft/vcpkg.git```. If you do so you won't
-have to follow the vcpkg part of this tutorial, skip ahead to the cmake part.
-
-### vcpgk
-
-You can have a look at vcpkg in [here](https://github.com/microsoft/vcpkg) and
-install it:
+Now use *conan* for dependencies query and update, so you will need *python* 
+and *conan* if you want to build the software. So first install 
+[python](https://www.python.org/downloads/) version 3.x. Then install *conan* 
+with *pip*.
 
 ```cmd
-git clone https://github.com/microsoft/vcpkg.git
-cd vcpkg
-.\bootstrap-vcpkg.bat
+pip install conan
+```
+
+Go into the directory where you installed the software and create a new folder
+for building and creating the environment.
+
+```cmd
+cd ~/Document/GitHub/Frame
+mkdir Build
+cd Build
+```
+
+Then use *conan* to install dependencies needed by *Frame*. Using the following
+commands.
+
+For Debug:
+```cmd
+conan install --build=missing -s build_type=Debug ..
+```
+
+For Release:
+```cmd
+conan install --build=missing -s build_type=Release ..
 ```
 
 ### cmake
 
-Install cmake from [here](https://cmake.org/). Check if you can execute it at
+Install *cmake* from [here](https://cmake.org/). Check if you can execute it at
 the command line and if not use the GUI version.
 
+Still in the *Build* directory you should use:
 ```cmd
-mkdir Build/
-cd Build
-cmake .. -DCMAKE_TOOLCHAIN_FILE="[path_to_vcpkg]\scripts\buildsystems\vcpkg.cmake"
-```
-or if you have installed vcpkg in the ```~/Documents/GitHub/``` directory you 
-can simply:
-
-```cmd
-mkdir Build
-cd Build
 cmake ..
+```
+
+This will generate your project file that you can specify your generator 
+```-G``` to be either Visual Studio for windows or makefiles for Linux.
+
+And then you can build either for Debug:
+```cmd
+cmake --build . --config=Debug
+```
+
+Or for Release:
+```cmd
+cmake --build . --config=Release
 ```
 
 ### Visual Studio
 
 Open the project with Visual studio 2019 or 2022.
+
+```cmd
+./Frame.sln
+```
 
 ### makefiles
 
@@ -54,11 +76,7 @@ You can just use the ```make``` command.
 
 ## Use
 
-You have 6 program that can be used:
-
-### ShaderGLTest
-
-This is a test for the functionality of the ShaderGLLib.
+You have may programs that can be used:
 
 ### JapaneseFlag
 
