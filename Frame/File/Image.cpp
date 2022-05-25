@@ -83,7 +83,7 @@ namespace frame::file {
 		const proto::PixelElementSize pixel_element_size/* =
 			proto::PixelElementSize_BYTE()*/,
 		const proto::PixelStructure pixel_structure/* =
-		proto::PixelStructure_RGB()*/) :
+			proto::PixelStructure_RGB()*/) :
 			size_(size),
 			pixel_element_size_(pixel_element_size),
 			pixel_structure_(pixel_structure)

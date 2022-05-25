@@ -8,7 +8,7 @@ void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 	// Load proto from files.
 	auto proto_level =
 		frame::proto::LoadProtoFromJsonFile<frame::proto::Level>(
-			path_.u8string());
+			path_.string());
 	// Load level from proto files.
 	auto maybe_level = frame::proto::ParseLevelOpenGL(size_, proto_level);
 	if (!maybe_level) throw std::runtime_error("Couldn't load level!");
