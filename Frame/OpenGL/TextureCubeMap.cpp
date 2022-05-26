@@ -353,6 +353,7 @@ namespace frame::opengl {
         }
         auto size = GetSize();
         auto pixel_structure = GetPixelStructure();
+		// 6 because of cubemap!
         std::size_t image_size =
             static_cast<std::size_t>(size.first) *
             static_cast<std::size_t>(size.second) *
@@ -381,6 +382,7 @@ namespace frame::opengl {
         }
         auto size = GetSize();
         auto pixel_structure = GetPixelStructure();
+		// 6 because of cubemap!
         std::size_t image_size =
             static_cast<std::size_t>(size.first) *
             static_cast<std::size_t>(size.second) *
@@ -409,7 +411,8 @@ namespace frame::opengl {
         }
         auto size = GetSize();
         auto pixel_structure = GetPixelStructure();
-        std::size_t image_size =
+		// 6 because of cubemap!
+		std::size_t image_size =
             static_cast<std::size_t>(size.first) *
             static_cast<std::size_t>(size.second) *
             static_cast<std::size_t>(pixel_structure) * 6;
@@ -437,7 +440,8 @@ namespace frame::opengl {
         }
         auto size = GetSize();
         auto pixel_structure = GetPixelStructure();
-        std::size_t image_size =
+		// 6 because of cubemap!
+		std::size_t image_size =
             static_cast<std::size_t>(size.first) *
             static_cast<std::size_t>(size.second) *
             static_cast<std::size_t>(pixel_structure) * 6;

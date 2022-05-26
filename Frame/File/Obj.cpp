@@ -9,6 +9,7 @@ namespace frame::file {
 
 	Obj::Obj(const std::string& file_name)
 	{
+#ifdef TINY_OBJ_LOADER_V2
 		tinyobj::ObjReaderConfig reader_config;
 		const auto pair = SplitFileDirectory(file_name);
 		reader_config.mtl_search_path = pair.first;
@@ -38,6 +39,26 @@ namespace frame::file {
 		auto& attrib = reader.GetAttrib();
 		auto& shapes = reader.GetShapes();
 		auto& materials = reader.GetMaterials();
+#else
+		tinyobj::attrib_t attrib;
+		std::vector<tinyobj::shape_t> shapes;
+		std::vector<tinyobj::material_t> materials;
+		const auto pair = SplitFileDirectory(file_name);
+
+		std::string err;
+		bool ret = tinyobj::LoadObj(
+			&attrib, 
+			&shapes, 
+			&materials, 
+			&err, 
+			file::FindFile(file_name).c_str(),
+			pair.first.c_str());
+
+		if (!err.empty()) {
+			logger_->error(err);
+			throw std::runtime_error(err);
+		}
+#endif // TINY_OBJ_LOADER_V2
 
 		// Loop over shapes
 		for (size_t s = 0; s < shapes.size(); s++) 

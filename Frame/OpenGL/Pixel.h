@@ -8,13 +8,13 @@
 namespace frame::opengl {
 
 	// Get the GL_FLOAT and GL_UNSIGNED_BYTE.
-	int ConvertToGLType(
+	GLenum ConvertToGLType(
 		const frame::proto::PixelElementSize& pixel_element_size);
 	// Get the GL_RGBA or GL_R.
-	int ConvertToGLType(
+	GLenum ConvertToGLType(
 		const frame::proto::PixelStructure& pixel_structure);
 	// Get the GL_RGBA8 and GL_RG32F.
-	int ConvertToGLType(
+	GLenum ConvertToGLType(
 		const frame::proto::PixelElementSize& pixel_element_size,
 		const frame::proto::PixelStructure& pixel_structure);
 
