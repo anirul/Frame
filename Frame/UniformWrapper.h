@@ -15,6 +15,8 @@ namespace frame {
 
 	public:
 		void SetModel(glm::mat4 model) { model_ = model; }
+		void SetProjection(glm::mat4 projection) { projection_ = projection; }
+		void SetView(glm::mat4 view) { view_ = view; }
 		void SetTime(double time) { time_ = time; }
 
 	public:
@@ -30,6 +32,8 @@ namespace frame {
 	private:
 		CameraInterface* camera_ = nullptr;
 		glm::mat4 model_ = glm::mat4(1.0f);
+		glm::mat4 projection_ = glm::mat4(1.0f);
+		glm::mat4 view_ = glm::mat4(1.0f);
 		double time_ = 0.0;
 	};
 

@@ -129,9 +129,13 @@ namespace frame::opengl {
 		auto program = level_->GetProgramFromId(program_id);
 		if (!program) throw std::runtime_error("Program ptr doesn't exist.");
 		assert(program->GetOutputTextureIds().size());
+
+		// In case the camera doesn't exist it will create a basic one.
 		UniformWrapper uniform_wrapper(level_->GetDefaultCamera());
+		uniform_wrapper.SetModel(model_mat);
 		uniform_wrapper.SetTime(dt);
 		program->Use(&uniform_wrapper);
+		
 		auto texture_out_ids = program->GetOutputTextureIds();
 		auto texture_ref = 
 			level_->GetTextureFromId(*texture_out_ids.cbegin());
@@ -165,21 +169,7 @@ namespace frame::opengl {
 		}
 		frame_buffer_.DrawBuffers(
 			static_cast<std::uint32_t>(texture_out_ids.size()));
-		auto* camera = level_->GetDefaultCamera();
-		if (!camera) 
-		{
-			projection_ = glm::mat4(1.0f);
-			view_ = glm::mat4(1.0f);
-		}
-		else
-		{
-			projection_ = camera->ComputeProjection();
-			view_ = camera->ComputeView();
-		}
-		program->Uniform("projection", projection_);
-		program->Uniform("view", view_);
-		program->Uniform("model", model_mat);
-
+		
 		for (const auto& id : material->GetIds())
 		{
 			const auto p = material->EnableTextureId(id);

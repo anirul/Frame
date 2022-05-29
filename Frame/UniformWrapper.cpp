@@ -5,32 +5,44 @@ namespace frame {
 
 	glm::vec3 UniformWrapper::GetCameraPosition() const
 	{
-		return camera_->GetPosition();
+		if (camera_)
+			return camera_->GetPosition();
+		return glm::vec3(0.0f);
 	}
 
 	glm::vec3 UniformWrapper::GetCameraFront() const
 	{
-		return camera_->GetFront();
+		if (camera_)
+			return camera_->GetFront();
+		return glm::vec3(0.0f);
 	}
 
 	glm::vec3 UniformWrapper::GetCameraRight() const
 	{
-		return camera_->GetRight();
+		if (camera_)
+			return camera_->GetRight();
+		return glm::vec3(0.0f);
 	}
 
 	glm::vec3 UniformWrapper::GetCameraUp() const
 	{
-		return camera_->GetUp();
+		if (camera_)
+			return camera_->GetUp();
+		return glm::vec3(0.0f);
 	}
 
 	glm::mat4 UniformWrapper::GetProjection() const
 	{
-		return camera_->ComputeProjection();
+		if (camera_)
+			return camera_->ComputeProjection();
+		return projection_;
 	}
 
 	glm::mat4 UniformWrapper::GetView() const
 	{
-		return camera_->ComputeView();
+		if (camera_)
+			return camera_->ComputeView();
+		return view_;
 	}
 
 	glm::mat4 UniformWrapper::GetModel() const
