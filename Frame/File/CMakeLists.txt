@@ -21,7 +21,8 @@ target_link_libraries(FrameFile
 	Frame
 	FrameProto
 	FrameOpenGL
-	tinyobjloader::tinyobjloader
+	tinyobjloader
+	stb::stb
 )
 
 set_property(TARGET FrameFile PROPERTY FOLDER "Frame")

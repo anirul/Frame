@@ -9,10 +9,7 @@ namespace test {
 	class ProgramTest : public testing::Test
 	{
 	public:
-		ProgramTest() : window_(frame::CreateSDLOpenGL(size_)) 
-		{
-			error_.SetWindowPtr(nullptr);
-		}
+		ProgramTest() : window_(frame::CreateSDLOpenGL(size_)) {}
 
 	public:
 		const std::string GetVertexSource() const;
@@ -20,7 +17,6 @@ namespace test {
 
 	protected:
 		const std::pair<std::uint32_t, std::uint32_t> size_ = { 320, 200 };
-		frame::Error& error_ = frame::Error::GetInstance();
 		std::unique_ptr<frame::WindowInterface> window_ = nullptr;
 		std::unique_ptr<frame::ProgramInterface> program_ = nullptr;
 	};

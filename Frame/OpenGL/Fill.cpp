@@ -5,7 +5,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "Frame/Error.h"
 #include "Frame/OpenGL/FrameBuffer.h"
 #include "Frame/OpenGL/RenderBuffer.h"
 #include "Frame/OpenGL/Renderer.h"
@@ -64,7 +63,6 @@ namespace frame::opengl {
 			const std::shared_ptr<ProgramInterface> program)> func /*=
 		[](const int, const std::shared_ptr<sgl::ProgramInterface>) {}*/)
 	{
-		auto& error = Error::GetInstance();
 		assert(program->GetOutputTextureIds().size());
 		auto texture_out_ids = program->GetOutputTextureIds();
 		auto texture_ref = level->GetTextureFromId(*texture_out_ids.cbegin());
@@ -101,7 +99,6 @@ namespace frame::opengl {
 			temporary_size.second =
 				static_cast<std::uint32_t>(size.second * fact);
 			glViewport(0, 0, temporary_size.first, temporary_size.second);
-			error.Display(__FILE__, __LINE__ - 1);
 			int i = 0; 
 			for (const auto& texture_id : program->GetOutputTextureIds())
 			{
@@ -113,7 +110,6 @@ namespace frame::opengl {
 					i++;
 			}
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			error.Display(__FILE__, __LINE__ - 1);
 			Renderer renderer(
 				level.get(), 
 				temporary_size);
@@ -148,7 +144,6 @@ namespace frame::opengl {
 			const std::shared_ptr<ProgramInterface> program)> func /*=
 		[](const int, const std::shared_ptr<sgl::ProgramInterface>) {}*/)
 	{
-		auto& error = Error::GetInstance();
 		assert(program->GetOutputTextureIds().size());
 		auto texture_out_ids = program->GetOutputTextureIds();
 		auto texture_ref = level->GetTextureFromId(*texture_out_ids.cbegin());
@@ -186,7 +181,6 @@ namespace frame::opengl {
 			render.CreateStorage(temporary_size);
 			frame.AttachRender(render);
 			glViewport(0, 0, temporary_size.first, temporary_size.second);
-			error.Display(__FILE__, __LINE__ - 1);
 			int cubemap_element = 0;
 			for (const auto& view : views_cubemap)
 			{
@@ -201,7 +195,6 @@ namespace frame::opengl {
 				}
 				cubemap_element++;
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-				error.Display(__FILE__, __LINE__ - 1);
 				Renderer renderer(
 					level.get(), 
 					temporary_size);

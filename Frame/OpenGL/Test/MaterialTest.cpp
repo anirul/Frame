@@ -12,7 +12,6 @@ namespace test {
 		auto material = std::make_unique<frame::opengl::Material>();
 		material_ = std::move(material);
 		EXPECT_TRUE(material_);
-		EXPECT_NO_THROW(error_.Display());
 	}
 
 	TEST_F(MaterialTest, CheckAddRemoveTextureTest)
@@ -46,7 +45,6 @@ namespace test {
 		EXPECT_TRUE(material_->RemoveTextureId(id1));
 		material_->AddTextureId(id1, "PositiveX");
 		EXPECT_EQ(2, material_->GetIds().size());
-		EXPECT_NO_THROW(error_.Display());
 	}
 
 } // End namespace test.

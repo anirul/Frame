@@ -16,5 +16,6 @@ namespace frame {
 	};
 
 	using EntityId = std::int64_t;
+	constexpr EntityId NullId = 0;
 
 } // End namespace frame.

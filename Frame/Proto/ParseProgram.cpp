@@ -10,7 +10,6 @@ namespace frame::proto {
 			const Program& proto_program,
 			const LevelInterface* level)
 	{
-		Error& error = Error::GetInstance();
 		Logger& logger = Logger::GetInstance();
 		std::string shader_path = "Asset/Shader/OpenGL/";
 		std::string shader_name = shader_path + proto_program.shader();
@@ -19,18 +18,16 @@ namespace frame::proto {
 		std::ifstream ifs_vertex(shader_vert);
 		if (!ifs_vertex.is_open())
 		{
-			std::string error_str = 
-				fmt::format("Couldn't open file {}.vert", shader_name);
-			error.CreateError(error_str, __FILE__, __LINE__ - 4);
+			throw std::runtime_error(
+				fmt::format("Couldn't open file {}.vert", shader_name));
 		}
 		std::string shader_frag = file::FindFile(shader_name + ".frag");
 		logger->info("Openning fragment shader: [{}].", shader_frag);
 		std::ifstream ifs_pixel(shader_frag);
 		if (!ifs_pixel.is_open())
 		{
-			std::string error_str =
-				fmt::format("Couldn't open file {}.frag", shader_name);
-			error.CreateError(error_str, __FILE__, __LINE__ - 4);
+			throw std::runtime_error(
+				fmt::format("Couldn't open file {}.frag", shader_name));
 		}
 		auto maybe_program = opengl::CreateProgram(ifs_vertex, ifs_pixel);
 		if (!maybe_program) return std::nullopt;

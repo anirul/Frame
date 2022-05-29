@@ -8,7 +8,7 @@ namespace frame {
 		logger_ptr_->info("start logging!");
 	}
 
-	Logger::~Logger() {}
+	Logger::~Logger() = default;
 
 	Logger& Logger::GetInstance()
 	{

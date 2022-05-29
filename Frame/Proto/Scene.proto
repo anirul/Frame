@@ -110,7 +110,7 @@ message SceneLight {
 }
 
 // Scene definition.
-// Next 7
+// Next 9
 message SceneTree {
 	// This defined witch is the root of the scene tree (not really needed).
 	string default_root_name = 1;

@@ -8,10 +8,8 @@ void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 	// Open the Display.json file (in Asset/).
 	std::string level_file_name = "Asset/SceneRendering.Level.json";
 	std::ifstream ifs_level(level_file_name.c_str(), std::ios::in);
-	if (!ifs_level) error_.CreateError(
-		"Couldn't open file " + level_file_name, 
-		__FILE__, 
-		__LINE__ - 4);
+	if (!ifs_level) throw std::runtime_error(
+		fmt::format("Couldn't open file : {}", level_file_name));
 	// Create a display (empty for now).
 	frame::proto::Level level{};
 	// Get the content of the file.
@@ -24,10 +22,7 @@ void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size)
 		contents,
 		&level,
 		options);
-	if (!status.ok()) error_.CreateError(
-		status.ToString(), 
-		__FILE__, 
-		__LINE__ - 7);
+	if (!status.ok()) throw std::runtime_error(status.ToString());
 	assert(false);
 /*	// TODO(anirul): change these for "error_" checks.
 	assert(display.out_textures_size() > 0);

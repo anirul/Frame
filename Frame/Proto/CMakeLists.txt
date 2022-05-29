@@ -44,6 +44,7 @@ target_link_libraries(FrameProto
   PUBLIC
     Frame
     FrameOpenGL
+    glm::glm
     protobuf::libprotoc
     protobuf::libprotobuf
 )

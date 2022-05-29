@@ -9,8 +9,8 @@
 
 #include "Frame/Window.h"
 #include "Frame/File/FileSystem.h"
+#include "Frame/File/Image.h"
 #include "Sample/Common/Application.h"
-#include "Sample/RayMarching/Name.h"
 
 #if defined(_WIN32) || defined(_WIN64)
 int WINAPI WinMain(
@@ -24,9 +24,16 @@ int main(int ac, char** av)
 {
 	try
 	{
+		// Would be nice to have an open file query.
+		std::pair<std::uint32_t, std::uint32_t> size = { 0, 0 };
+		{
+			frame::file::Image image(
+				frame::file::FindFile("./Asset/input.png"));
+			size = image.GetSize();
+		}
 		Application app(
-			frame::file::FindFile("Asset/Json/RayMarching.json"),
-			frame::CreateSDLOpenGL({ 640, 480 }));
+			frame::file::FindFile("Asset/Json/TextureModif.json"),
+			frame::CreateSDLOpenGL(size));
 		app.Startup();
 		app.Run();
 	}
