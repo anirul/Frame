@@ -7,6 +7,12 @@
       "program_name": "SceneSimpleProgram",
       "texture_names": [ "apple_texture" ],
       "inner_names": [ "Color" ]
+    },
+    {
+      "name": "CubeMapMaterial",
+      "program_name": "CubeMapProgram",
+      "texture_names": [ "skybox" ],
+      "inner_names": [ "Skybox" ]
     }
   ],
   "programs": [
@@ -66,10 +72,6 @@
       "cubemap": "true",
       "pixel_element_size": { "value": "BYTE" },
       "pixel_structure": { "value": "RGB" },
-      "min_filter": { "value": "LINEAR" },
-      "mag_filter": { "value": "LINEAR" },
-      "wrap_s": { "value": "CLAMP_TO_EDGE" },
-      "wrap_t": { "value": "CLAMP_TO_EDGE" },
       "file_names": [
         "Asset/CubeMap/NegativeX.png",
         "Asset/CubeMap/PositiveX.png",
@@ -84,10 +86,6 @@
       "cubemap": "false",
       "pixel_element_size": { "value": "BYTE" },
       "pixel_structure": { "value": "RGB" },
-      "min_filter": { "value": "LINEAR" },
-      "mag_filter": { "value": "LINEAR" },
-      "wrap_s": { "value": "CLAMP_TO_EDGE" },
-      "wrap_t": { "value": "CLAMP_TO_EDGE" },
       "file_name": "Asset/Apple/Color.jpg"
     },
     {
@@ -98,11 +96,7 @@
         "y": "-1"
       },
       "pixel_element_size": { "value": "BYTE" },
-      "pixel_structure": { "value": "RGB" },
-      "min_filter": { "value": "LINEAR" },
-      "mag_filter": { "value": "LINEAR" },
-      "wrap_s": { "value": "CLAMP_TO_EDGE" },
-      "wrap_t": { "value": "CLAMP_TO_EDGE" }
+      "pixel_structure": { "value": "RGB" }
     },
     {
       "name": "zbuffer",
@@ -112,11 +106,7 @@
         "y": "-1"
       },
       "pixel_element_size": { "value": "BYTE" },
-      "pixel_structure": { "value": "RGB" },
-      "min_filter": { "value": "LINEAR" },
-      "mag_filter": { "value": "LINEAR" },
-      "wrap_s": { "value": "CLAMP_TO_EDGE" },
-      "wrap_t": { "value": "CLAMP_TO_EDGE" }
+      "pixel_structure": { "value": "RGB" }
     }
   ],
   "scene_tree": {
@@ -125,6 +115,19 @@
     "scene_matrices": [
       {
         "name": "root",
+        "clean_buffer": {
+          "values": [ "CLEAR_COLOR", "CLEAR_DEPTH" ]
+        },
+        "matrix": {
+          "m11": "1",
+          "m22": "1",
+          "m33": "1",
+          "m44": "1"
+        }
+      },
+      {
+        "name": "root_skybox",
+        "parent": "root",
         "matrix": {
           "m11": "1",
           "m22": "1",
@@ -134,9 +137,6 @@
       },
       {
         "name": "mesh_holder",
-        "clean_buffer": {
-          "values": [ "CLEAR_COLOR", "CLEAR_DEPTH" ]
-        },
         "parent": "root",
         "quaternion": {
           "w": "0.70710678118",
@@ -146,23 +146,32 @@
         }
       },
       {
-        "name": "camera_holder",
-        "parent": "root",
+        "name": "skybox_holder",
+        "parent": "root_skybox",
+        "clean_buffer": {
+          "values": [ "CLEAR_DEPTH" ]
+        },
         "quaternion": {
-          "w": "0.9999619",
+          "w": "0.70710678118",
           "x": "0.0",
-          "y": "0.0087265",
+          "y": "0.70710678118",
           "z": "0.0"
         }
       }
     ],
     "scene_static_meshes": [
       {
-        "name": "apple",
+        "name": "AppleMesh",
         "parent": "mesh_holder",
         "file_name": "Apple.obj",
         "material_name": "SceneSimpleMaterial",
         "skip_file_material": "true"
+      },
+      {
+        "name": "CubeMapMesh",
+        "parent": "root",
+        "material_name": "CubeMapMaterial",
+        "mesh_enum": "CUBE"
       }
     ],
     "scene_cameras": [
@@ -176,12 +185,12 @@
         "position": {
           "x": "0.0",
           "y": "0.0",
-          "z": "-2.0"
+          "z": "2.0"
         },
         "target": {
           "x": "0.0",
           "y": "0.0",
-          "z": "0.0"
+          "z": "-1.0"
         },
         "up": {
           "x": "0.0",

@@ -163,7 +163,17 @@ namespace frame::opengl {
 		}
 		frame_buffer_.DrawBuffers(
 			static_cast<std::uint32_t>(texture_out_ids.size()));
-
+		auto* camera = level_->GetDefaultCamera();
+		if (!camera) 
+		{
+			projection_ = glm::mat4(1.0f);
+			view_ = glm::mat4(1.0f);
+		}
+		else
+		{
+			projection_ = camera->ComputeProjection();
+			view_ = camera->ComputeView();
+		}
 		program->Uniform("projection", projection_);
 		program->Uniform("view", view_);
 		program->Uniform("model", model_mat);

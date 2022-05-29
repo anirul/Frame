@@ -28,7 +28,7 @@ message Program {
 	// Output texture names.
 	repeated string output_texture_names = 4;
 	// Input Scene type (this should come from scene?).
-	// In case you select 'SCENE' you'll have to set the input_scene_name.
+	// In case you select 'SCENE' you'll have to set the input_scene_root_name.
 	SceneType input_scene_type = 9;
 	// Input Scenes name.
 	string input_scene_root_name = 5;
