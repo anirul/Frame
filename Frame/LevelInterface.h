@@ -28,6 +28,9 @@ namespace frame {
 		virtual BufferInterface* GetBufferFromId(EntityId id) const = 0;
 		virtual StaticMeshInterface* GetStaticMeshFromId(
 			EntityId id) const = 0;
+		virtual std::optional<EntityId> GetNodeIdFromMeshId(
+			EntityId id) const = 0;
+		virtual std::vector<EntityId> GetStaticMeshIds() const = 0;
 		// Get element id and name from the store.
 		virtual std::optional<EntityId> GetIdFromName(
 			const std::string& name) const = 0;

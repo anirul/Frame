@@ -13,6 +13,33 @@ namespace frame {
 		return std::nullopt;
 	}
 
+    std::vector<EntityId> Level::GetStaticMeshIds() const
+    {
+        std::vector<EntityId> mesh_ids{};
+        mesh_ids.reserve(id_static_mesh_map_.size());
+        for (const auto& p : id_static_mesh_map_)
+        {
+            mesh_ids.push_back(p.first);
+        }
+        return mesh_ids;
+    }
+
+    std::optional<EntityId> Level::GetNodeIdFromMeshId(EntityId id) const
+    {
+		assert(id);
+        static std::map<EntityId, EntityId> node_id_mesh_id{};
+        auto it = node_id_mesh_id.find(id);
+        if (it != node_id_mesh_id.end()) return it->second;
+		for (const auto& p : id_scene_node_map_)
+		{
+			if (p.second->GetLocalMesh() == id)
+			{
+				node_id_mesh_id.insert({ id, p.first });
+				return p.first;
+			}
+		}
+    }
+
 	std::optional<EntityId> Level::GetDefaultStaticMeshCubeId() const
 	{
 		if (cube_id_)

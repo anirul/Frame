@@ -41,6 +41,7 @@ namespace frame {
 		{
 			return id_static_mesh_map_.at(id).get();
 		}
+
 		std::optional<EntityId> GetDefaultOutputTextureId() const override
 		{
 			return GetIdFromName(default_texture_name_);
@@ -63,6 +64,10 @@ namespace frame {
 		}
 
 	public:
+		// This is doing an unzip so not free!
+		std::vector<EntityId> GetStaticMeshIds() const override;
+		// Use mail slot to solve the mesh_id to node_id.
+		std::optional<EntityId> GetNodeIdFromMeshId(EntityId id) const override;
 		std::optional<EntityId> GetDefaultStaticMeshQuadId() const final;
 		std::optional<EntityId> GetDefaultStaticMeshCubeId() const final;
 		std::optional<EntityId> GetIdFromName(

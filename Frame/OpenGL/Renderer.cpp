@@ -258,4 +258,33 @@ namespace frame::opengl {
 		}
 	}
 
+    void Renderer::RenderAllMeshes(double dt /*= 0.0*/)
+    {
+		for (const auto& mesh_id : level_->GetStaticMeshIds())
+		{
+			// Get the node from the mesh_id!?
+			auto maybe_node_id = level_->GetNodeIdFromMeshId(mesh_id);
+			if (!maybe_node_id) 
+			{
+				throw std::runtime_error(
+					fmt::format("Invalid node id (not a node?): {}", mesh_id));
+			}
+			auto node = level_->GetSceneNodeFromId(maybe_node_id.value());
+			assert(node);
+			auto* mesh = level_->GetStaticMeshFromId(mesh_id);
+			assert(mesh);
+			auto material_id = mesh->GetMaterialId();
+			MaterialInterface* material = nullptr;
+			if (material_id) 
+				material = level_->GetMaterialFromId(material_id);
+			if (!material)
+			{
+				material_id = 
+					static_cast<NodeStaticMesh*>(node)->GetMaterialId();
+				material = level_->GetMaterialFromId(material_id);
+			}
+			RenderMesh(mesh, material, node->GetLocalModel(dt), dt);
+		}
+    }
+
 } // End namespace frame::opengl.
