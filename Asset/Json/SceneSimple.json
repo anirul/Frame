@@ -139,10 +139,10 @@
         "name": "mesh_holder",
         "parent": "root",
         "quaternion": {
-          "w": "0.70710678118",
           "x": "0.0",
-          "y": "0.70710678118",
-          "z": "0.0"
+          "y": "0.1979232",
+          "z": "0.1484424",
+          "w": "0.9689124"
         }
       },
       {
@@ -152,17 +152,17 @@
           "values": [ "CLEAR_DEPTH" ]
         },
         "quaternion": {
-          "w": "0.70710678118",
-          "x": "0.0",
-          "y": "0.70710678118",
-          "z": "0.0"
+          "x": "0",
+          "y": "0.0499792",
+          "z": "0.0",
+          "w": "0.9987503"
         }
       }
     ],
     "scene_static_meshes": [
       {
         "name": "CubeMapMesh",
-        "parent": "root",
+        "parent": "skybox_holder",
         "material_name": "CubeMapMaterial",
         "mesh_enum": "CUBE"
       },
