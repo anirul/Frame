@@ -9,7 +9,7 @@ layout(location = 1) out vec4 frag_zbuffer;
 
 uniform sampler2D Color;
 
-const vec3 light_position = vec3(-1.0, 1.0, 1.0);
+const vec3 light_position = vec3(1.0, 1.0, -1.0);
 
 void main()
 {

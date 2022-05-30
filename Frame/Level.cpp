@@ -13,6 +13,28 @@ namespace frame {
 		return std::nullopt;
 	}
 
+    std::optional<EntityId> Level::GetNodeIdFromMeshId(EntityId id) const
+    {
+		assert(id);
+        static std::map<EntityId, EntityId> node_id_mesh_id{};
+        auto it = node_id_mesh_id.find(id);
+        if (it != node_id_mesh_id.end()) return it->second;
+		for (const auto& p : id_scene_node_map_)
+		{
+			auto local_id = p.second->GetLocalMesh();
+			if (p.second->GetLocalMesh() == id)
+			{
+				node_id_mesh_id.insert({ id, p.first });
+				return p.first;
+			}
+		}
+		// auto maybe_name = GetNameFromId(id);
+		// auto name = (maybe_name) ? maybe_name.value() : std::string("???");
+		// throw std::runtime_error(
+		//	std::format("mesh {}-{} has no node connected to it!", id, name));
+		return std::nullopt;
+    }
+
 	std::optional<EntityId> Level::GetDefaultStaticMeshCubeId() const
 	{
 		if (cube_id_)

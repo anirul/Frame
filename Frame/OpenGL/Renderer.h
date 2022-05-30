@@ -46,6 +46,7 @@ namespace frame::opengl {
 			EntityId node_id, 
 			EntityId material_id = NullId,
 			double dt = 0.0) override;
+		void RenderAllMeshes(double dt = 0.0) override;
 		void RenderChildren(EntityId node_id, double dt = 0.0) override;
 		void RenderFromRootNode(double dt = 0.0) override;
 		// Display the default texture to the screen.

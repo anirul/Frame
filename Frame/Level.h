@@ -41,6 +41,11 @@ namespace frame {
 		{
 			return id_static_mesh_map_.at(id).get();
 		}
+		std::vector<std::pair<EntityId, EntityId>>
+			GetStaticMeshMaterialIds() const override
+		{
+			return mesh_material_ids_;
+		}
 		std::optional<EntityId> GetDefaultOutputTextureId() const override
 		{
 			return GetIdFromName(default_texture_name_);
@@ -61,8 +66,16 @@ namespace frame {
 		{
 			return GetIdFromName(default_camera_name_);
 		}
+		void AddMeshMaterialId(
+			EntityId node_id,
+			EntityId material_id) override
+		{
+			mesh_material_ids_.push_back({ node_id, material_id });
+		}
 
 	public:
+		// Use mail slot to solve the mesh_id to node_id.
+		std::optional<EntityId> GetNodeIdFromMeshId(EntityId id) const override;
 		std::optional<EntityId> GetDefaultStaticMeshQuadId() const final;
 		std::optional<EntityId> GetDefaultStaticMeshCubeId() const final;
 		std::optional<EntityId> GetIdFromName(
@@ -119,6 +132,7 @@ namespace frame {
 		std::map<std::string, EntityId> name_id_map_ = {};
 		std::map<EntityId, std::string> id_name_map_ = {};
 		std::map<EntityId, EntityTypeEnum> id_enum_map_ = {};
+		std::vector<std::pair<EntityId, EntityId>> mesh_material_ids_ = {};
 	};
 
 } // End namespace frame.

@@ -18,5 +18,7 @@ void main()
     mat4 pvm = projection * rotation_view * rotation_model;
     
     vec4 clip_pos = pvm * vec4(vert_local_pos, 1.0);
+    // Y is inverted for?
+    clip_pos.y = -clip_pos.y;
     gl_Position = clip_pos.xyww;
 }

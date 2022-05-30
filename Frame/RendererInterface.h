@@ -25,6 +25,7 @@ namespace frame {
 			EntityId material_id = NullId,
 			double dt = 0.0) = 0;
 		virtual void RenderChildren(EntityId node_id, double dt = 0.0) = 0;
+		virtual void RenderAllMeshes(double dt = 0.0) = 0;
 		virtual void RenderFromRootNode(double dt = 0.0) = 0;
 		virtual void Display(double dt = 0.0) = 0;
 		virtual void SetDepthTest(bool enable) = 0;
