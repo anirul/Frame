@@ -13,17 +13,6 @@ namespace frame {
 		return std::nullopt;
 	}
 
-    std::vector<EntityId> Level::GetStaticMeshIds() const
-    {
-        std::vector<EntityId> mesh_ids{};
-        mesh_ids.reserve(id_static_mesh_map_.size());
-        for (const auto& p : id_static_mesh_map_)
-        {
-            mesh_ids.push_back(p.first);
-        }
-        return mesh_ids;
-    }
-
     std::optional<EntityId> Level::GetNodeIdFromMeshId(EntityId id) const
     {
 		assert(id);
@@ -32,12 +21,18 @@ namespace frame {
         if (it != node_id_mesh_id.end()) return it->second;
 		for (const auto& p : id_scene_node_map_)
 		{
+			auto local_id = p.second->GetLocalMesh();
 			if (p.second->GetLocalMesh() == id)
 			{
 				node_id_mesh_id.insert({ id, p.first });
 				return p.first;
 			}
 		}
+		// auto maybe_name = GetNameFromId(id);
+		// auto name = (maybe_name) ? maybe_name.value() : std::string("???");
+		// throw std::runtime_error(
+		//	std::format("mesh {}-{} has no node connected to it!", id, name));
+		return std::nullopt;
     }
 
 	std::optional<EntityId> Level::GetDefaultStaticMeshCubeId() const

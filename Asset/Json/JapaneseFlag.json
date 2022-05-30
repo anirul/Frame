@@ -10,11 +10,7 @@
       },
       "cubemap": "false",
       "pixel_element_size": { "value": "HALF" },
-      "pixel_structure": { "value": "RGB" },
-      "min_filter": { "value": "LINEAR" },
-      "mag_filter": { "value": "LINEAR" },
-      "wrap_s": { "value": "CLAMP_TO_EDGE" },
-      "wrap_t": { "value": "CLAMP_TO_EDGE" }
+      "pixel_structure": { "value": "RGB" }
     }
   ],
   "programs": [
@@ -34,7 +30,6 @@
     }
   ],
   "scene_tree": {
-    "default_camera_name": "camera",
     "default_root_name": "root",
     "scene_matrices": [
       {
@@ -47,28 +42,6 @@
           "m22": "1.0",
           "m33": "1.0",
           "m44": "1.0"
-        }
-      }
-    ],
-    "scene_cameras": [
-      {
-        "name": "camera",
-        "parent": "root",
-        "fov_degrees": "65.0",
-        "position": {
-          "x": "0",
-          "y": "0",
-          "z": "-1"
-        },
-        "target": {
-          "x": "0",
-          "y": "0",
-          "z": "1"
-        },
-        "up": {
-          "x": "0",
-          "y": "1",
-          "z": "0"
         }
       }
     ],

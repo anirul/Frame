@@ -124,6 +124,7 @@ namespace frame::proto {
 				node_interface->SetParentName(proto_scene_static_mesh.parent());
 				auto maybe_scene_id = 
 					level->AddSceneNode(std::move(node_interface));
+				level->AddMeshMaterialId(maybe_scene_id.value(), material_id);
 				return static_cast<bool>(maybe_scene_id);
 			}
 			else

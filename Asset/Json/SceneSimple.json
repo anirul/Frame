@@ -161,17 +161,17 @@
     ],
     "scene_static_meshes": [
       {
+        "name": "CubeMapMesh",
+        "parent": "root",
+        "material_name": "CubeMapMaterial",
+        "mesh_enum": "CUBE"
+      },
+      {
         "name": "AppleMesh",
         "parent": "mesh_holder",
         "file_name": "Apple.obj",
         "material_name": "SceneSimpleMaterial",
         "skip_file_material": "true"
-      },
-      {
-        "name": "CubeMapMesh",
-        "parent": "root",
-        "material_name": "CubeMapMaterial",
-        "mesh_enum": "CUBE"
       }
     ],
     "scene_cameras": [
@@ -185,7 +185,7 @@
         "position": {
           "x": "0.0",
           "y": "0.0",
-          "z": "2.0"
+          "z": "-2.0"
         },
         "target": {
           "x": "0.0",

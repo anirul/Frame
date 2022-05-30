@@ -266,15 +266,17 @@ namespace frame::opengl::file {
 				}
 				return nullptr;
 			};
+			auto material_id = level->GetStaticMeshFromId(
+				static_mesh_id)->GetMaterialId();
 			std::unique_ptr<NodeInterface> ptr = 
 				std::make_unique<NodeStaticMesh>(
 					func,
 					static_mesh_id,
-					level->GetStaticMeshFromId(
-						static_mesh_id)->GetMaterialId());
+					material_id);
 			ptr->SetName(fmt::format("{}.{}", name, mesh_counter));
 			auto maybe_id = level->AddSceneNode(std::move(ptr));
 			if (!maybe_id) return std::nullopt;
+			level->AddMeshMaterialId(maybe_id.value(), material_id);
 			entity_id_vec.push_back(maybe_id.value());
 			mesh_counter++;
 		}

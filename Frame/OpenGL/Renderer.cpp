@@ -87,9 +87,15 @@ namespace frame::opengl {
 		if (!mesh_id) return;
 		auto static_mesh = level_->GetStaticMeshFromId(mesh_id);
 		MaterialInterface* material = nullptr;
-		// If no material is put the node material id in the mesh.
-		if (!material_id)
-			static_mesh->SetMaterialId(node_material_id);
+		// Try to find the material for the mesh.
+		if (material_id)
+		{
+			material = level_->GetMaterialFromId(material_id);
+		}
+		else if (node_material_id)
+		{
+			material = level_->GetMaterialFromId(node_material_id);
+		}
 		RenderMesh(static_mesh, material, node->GetLocalModel(dt), dt);
 	}
 
@@ -212,7 +218,7 @@ namespace frame::opengl {
 		auto quad = level_->GetStaticMeshFromId(maybe_quad_id.value());
 		quad->SetMaterialId(display_material_id_);
 		auto program = level_->GetProgramFromId(display_program_id_);
-		UniformWrapper uniform_wrapper(level_->GetDefaultCamera());
+		UniformWrapper uniform_wrapper(nullptr);
 		uniform_wrapper.SetTime(dt);
 		program->Use(&uniform_wrapper);
 		auto material = level_->GetMaterialFromId(display_material_id_);
@@ -260,30 +266,9 @@ namespace frame::opengl {
 
     void Renderer::RenderAllMeshes(double dt /*= 0.0*/)
     {
-		for (const auto& mesh_id : level_->GetStaticMeshIds())
+		for (const auto& p : level_->GetStaticMeshMaterialIds())
 		{
-			// Get the node from the mesh_id!?
-			auto maybe_node_id = level_->GetNodeIdFromMeshId(mesh_id);
-			if (!maybe_node_id) 
-			{
-				throw std::runtime_error(
-					fmt::format("Invalid node id (not a node?): {}", mesh_id));
-			}
-			auto node = level_->GetSceneNodeFromId(maybe_node_id.value());
-			assert(node);
-			auto* mesh = level_->GetStaticMeshFromId(mesh_id);
-			assert(mesh);
-			auto material_id = mesh->GetMaterialId();
-			MaterialInterface* material = nullptr;
-			if (material_id) 
-				material = level_->GetMaterialFromId(material_id);
-			if (!material)
-			{
-				material_id = 
-					static_cast<NodeStaticMesh*>(node)->GetMaterialId();
-				material = level_->GetMaterialFromId(material_id);
-			}
-			RenderMesh(mesh, material, node->GetLocalModel(dt), dt);
+			RenderNode(p.first, p.second, dt);
 		}
     }
 

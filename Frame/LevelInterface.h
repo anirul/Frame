@@ -30,7 +30,9 @@ namespace frame {
 			EntityId id) const = 0;
 		virtual std::optional<EntityId> GetNodeIdFromMeshId(
 			EntityId id) const = 0;
-		virtual std::vector<EntityId> GetStaticMeshIds() const = 0;
+		// Get a couple between mesh and material ids.
+		virtual std::vector<std::pair<EntityId, EntityId>>
+			GetStaticMeshMaterialIds() const = 0;
 		// Get element id and name from the store.
 		virtual std::optional<EntityId> GetIdFromName(
 			const std::string& name) const = 0;
@@ -62,6 +64,9 @@ namespace frame {
 			std::unique_ptr<BufferInterface>&& buffer) = 0;
 		virtual std::optional<EntityId> AddStaticMesh(
 			std::unique_ptr<StaticMeshInterface>&& static_mesh) = 0;
+		virtual void AddMeshMaterialId(
+			EntityId node_id, 
+			EntityId material_id) = 0;
 		// Extract an entity from a level (this entity will be unvalidated!).
 		virtual std::unique_ptr<TextureInterface> ExtractTexture(
 			EntityId id) = 0;
