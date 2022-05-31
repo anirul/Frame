@@ -49,7 +49,9 @@ namespace frame::opengl {
 		level_->GetMaterialFromId(
 			display_material_id_)->SetProgramId(display_program_id_);
 		if (!level_->GetMaterialFromId(
-			display_material_id_)->AddTextureId(out_texture_id, "Display"))
+				display_material_id_)->AddTextureId(
+					out_texture_id, 
+					"Display"))
 		{
 			throw std::runtime_error("Couldn't add texture to material.");
 		}
