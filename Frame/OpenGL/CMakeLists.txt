@@ -7,8 +7,6 @@ add_library(FrameOpenGL
     Buffer.h
     Device.cpp
     Device.h
-    Fill.cpp
-    Fill.h
     FrameBuffer.cpp
     FrameBuffer.h
     Light.cpp

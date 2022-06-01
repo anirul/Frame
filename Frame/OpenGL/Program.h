@@ -14,6 +14,10 @@
 
 namespace frame::opengl {
 
+	/**
+	* @class Program
+	* @brief This is containing the program and all associated functions.
+	*/
 	class Program : public ProgramInterface
 	{
 	public:
@@ -78,7 +82,7 @@ namespace frame::opengl {
 			const glm::mat4 mat) const override;
 		// Add a later included value (like camera position or time), this will
 		// be set in the use function.
-		virtual void Uniform(
+		void Uniform(
 			const std::string& name,
 			const proto::Uniform::UniformEnum enum_value) const override;
 

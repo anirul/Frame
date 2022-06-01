@@ -4,11 +4,6 @@
 
 namespace frame::opengl {
 
-	Material::~Material()
-	{
-		// DisableAll();
-	}
-
 	bool Material::AddTextureId(EntityId id, const std::string& name)
 	{
 		RemoveTextureId(id);

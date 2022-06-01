@@ -1,0 +1,9 @@
+BasedOnStyle: Google
+DerivePointerAlignment: false
+PointerAlignment: Left
+IndentWidth: 4
+Cpp11BracedListStyle: false
+ColumnLimit: 100
+AlignConsecutiveAssignments: true
+AllowAllArgumentsOnNextLine: false
+AllowAllParametersOfDeclarationOnNextLine : false
