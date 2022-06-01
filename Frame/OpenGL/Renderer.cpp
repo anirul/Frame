@@ -7,8 +7,11 @@
 #include "Frame/NodeMatrix.h"
 #include "Frame/NodeStaticMesh.h"
 #include "Frame/UniformWrapper.h"
-#include "Frame/OpenGL/Material.h"
 #include "Frame/OpenGL/File/LoadProgram.h"
+#include "Frame/OpenGL/Material.h"
+#include "Frame/OpenGL/StaticMesh.h"
+#include "Frame/OpenGL/Texture.h"
+#include "Frame/OpenGL/TextureCubeMap.h"
 
 namespace frame::opengl {
 
@@ -157,18 +160,24 @@ namespace frame::opengl {
 		{
 			if (level_->GetTextureFromId(texture_id)->IsCubeMap())
 			{
+				auto* opengl_texture = 
+					dynamic_cast<Texture*>(
+						level_->GetTextureFromId(texture_id));
 				// TODO(anirul): Check the mipmap level (last parameter)!
 				frame_buffer_.AttachTexture(
-					level_->GetTextureFromId(texture_id)->GetId(),
+					opengl_texture->GetId(),
 					FrameBuffer::GetFrameColorAttachment(i),
 					FrameBuffer::GetFrameTextureType(texture_frame_),
 					0);
 			} 
 			else
 			{
+				auto* opengl_texture =
+					dynamic_cast<Texture*>(
+						level_->GetTextureFromId(texture_id));
 				// TODO(anirul): Check the mipmap level (last parameter)!
 				frame_buffer_.AttachTexture(
-					level_->GetTextureFromId(texture_id)->GetId(),
+					opengl_texture->GetId(),
 					FrameBuffer::GetFrameColorAttachment(i),
 					FrameTextureType::TEXTURE_2D,
 					0);
@@ -181,29 +190,62 @@ namespace frame::opengl {
 		for (const auto& id : material->GetIds())
 		{
 			const auto p = material->EnableTextureId(id);
-			level_->GetTextureFromId(id)->Bind(p.second);
-			program->Uniform(p.first, p.second);
+			auto* texture = level_->GetTextureFromId(id);
+			if (texture->IsCubeMap())
+			{
+				auto* gl_texture =
+					dynamic_cast<TextureCubeMap*>(level_->GetTextureFromId(id));
+				assert(gl_texture);
+				gl_texture->Bind(p.second);
+				program->Uniform(p.first, p.second);
+			}
+			else
+			{
+                auto* gl_texture = 
+					dynamic_cast<Texture*>(level_->GetTextureFromId(id));
+				assert(gl_texture);
+                gl_texture->Bind(p.second);
+                program->Uniform(p.first, p.second);
+			}
 		}
 		
-		glBindVertexArray(static_mesh->GetId());
+		auto* gl_static_mesh = dynamic_cast<StaticMesh*>(static_mesh);
+		assert(gl_static_mesh);
+		glBindVertexArray(gl_static_mesh->GetId());
 
 		auto index_buffer = level_->GetBufferFromId(
 			static_mesh->GetIndexBufferId());
-		index_buffer->Bind();
+		auto* gl_index_buffer = dynamic_cast<Buffer*>(index_buffer);
+		assert(gl_index_buffer);
+		gl_index_buffer->Bind();
 		glDrawElements(
 			GL_TRIANGLES,
 			static_cast<GLsizei>(static_mesh->GetIndexSize()) / 
 				sizeof(std::int32_t),
 			GL_UNSIGNED_INT,
 			nullptr);
-		index_buffer->UnBind();
+		gl_index_buffer->UnBind();
 
 		program->UnUse();
 		glBindVertexArray(0);
 
 		for (const auto id : material->GetIds())
 		{
-			level_->GetTextureFromId(id)->UnBind();
+			auto* texture = level_->GetTextureFromId(id);
+			if (texture->IsCubeMap())
+			{
+				auto* gl_texture =
+					dynamic_cast<TextureCubeMap*>(level_->GetTextureFromId(id));
+				assert(gl_texture);
+				gl_texture->UnBind();
+			}
+			else
+			{
+                auto* gl_texture =
+                    dynamic_cast<Texture*>(level_->GetTextureFromId(id));
+                assert(gl_texture);
+                gl_texture->UnBind();
+			}
 		}
 		material->DisableAll();
 
@@ -227,28 +269,36 @@ namespace frame::opengl {
 
 		for (const auto id : material->GetIds())
 		{
+			auto* opengl_texture = 
+				dynamic_cast<Texture*>(level_->GetTextureFromId(id));
 			const auto p = material->EnableTextureId(id);
-			level_->GetTextureFromId(id)->Bind(p.second);
+			opengl_texture->Bind(p.second);
 			program->Uniform(p.first, p.second);
 		}
 
-		glBindVertexArray(quad->GetId());
+		auto* gl_quad = dynamic_cast<StaticMesh*>(quad);
+		assert(gl_quad);
+		glBindVertexArray(gl_quad->GetId());
 
 		auto index_buffer = level_->GetBufferFromId(quad->GetIndexBufferId());
-		index_buffer->Bind();
+		auto* gl_index_buffer = dynamic_cast<Buffer*>(index_buffer);
+		assert(gl_index_buffer);
+		gl_index_buffer->Bind();
 		glDrawElements(
 			GL_TRIANGLES,
 			static_cast<GLsizei>(quad->GetIndexSize()) / sizeof(std::int32_t),
 			GL_UNSIGNED_INT,
 			nullptr);
-		index_buffer->UnBind();
+		gl_index_buffer->UnBind();
 
 		program->UnUse();
 		glBindVertexArray(0);
 
 		for (const auto id : material->GetIds())
 		{
-			level_->GetTextureFromId(id)->UnBind();
+			auto* opengl_texture =
+				dynamic_cast<Texture*>(level_->GetTextureFromId(id));
+			opengl_texture->UnBind();
 		}
 		material->DisableAll();
 		quad->SetMaterialId(0);

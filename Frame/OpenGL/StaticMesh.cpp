@@ -26,14 +26,27 @@ namespace frame::opengl {
 		// Create a new vertex array (to render the mesh).
 		glGenVertexArrays(1, &vertex_array_object_);
 		glBindVertexArray(vertex_array_object_);
-		level->GetBufferFromId(point_buffer_id_)->Bind();
+		
+		auto* gl_point_buffer = 
+			dynamic_cast<Buffer*>(level->GetBufferFromId(point_buffer_id_));
+		assert(gl_point_buffer);
+		gl_point_buffer->Bind();
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-		level->GetBufferFromId(point_buffer_id_)->UnBind();
-		level->GetBufferFromId(normal_buffer_id_)->Bind();
+		gl_point_buffer->UnBind();
+
+		auto* gl_normal_buffer =
+			dynamic_cast<Buffer*>(level->GetBufferFromId(normal_buffer_id_));
+		assert(gl_normal_buffer);
+		gl_normal_buffer->Bind();
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-		level->GetBufferFromId(texture_buffer_id_)->Bind();
+		gl_normal_buffer->UnBind();
+
+		auto* gl_texture_buffer =
+			dynamic_cast<Buffer*>(level->GetBufferFromId(texture_buffer_id_));
+		assert(gl_texture_buffer);
+		gl_texture_buffer->Bind();
 		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
-		level->GetBufferFromId(texture_buffer_id_)->UnBind();
+		gl_texture_buffer->UnBind();
 
 		// Enable vertex attrib array.
 		glEnableVertexAttribArray(0);

@@ -23,7 +23,7 @@ namespace frame::opengl {
 
     proto::TextureFrame GetTextureFrameFromPosition(int i);
 
-	class TextureCubeMap : public TextureInterface
+	class TextureCubeMap : public TextureInterface, public BindInterface
 	{
 	public:
 		// Create an empty cube map of the size size.

@@ -2,6 +2,7 @@
 
 add_library(FrameOpenGL
   STATIC
+    BindInterface.h
     Buffer.cpp
     Buffer.h
     Device.cpp

@@ -11,12 +11,14 @@ namespace test {
 		EXPECT_TRUE(texture);
 		EXPECT_EQ(1, texture->GetSize().first);
 		EXPECT_EQ(1, texture->GetSize().second);
-		texture->Bind();
+		auto* opengl_texture = 
+			dynamic_cast<frame::opengl::Texture*>(texture.get());
+		opengl_texture->Bind();
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 		float f = 0.0f;
 		glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_FLOAT, &f);
 		EXPECT_FLOAT_EQ(0.1f, f);
-		texture->UnBind();
+		opengl_texture->UnBind();
 	}
 
 	TEST_F(LoadTextureTest, LoadTextureFromVec4Test)

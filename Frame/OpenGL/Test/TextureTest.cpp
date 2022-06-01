@@ -2,6 +2,7 @@
 #include <GL/glew.h>
 #include "Frame/File/FileSystem.h"
 #include "Frame/OpenGL/File/LoadTexture.h"
+#include "Frame/OpenGL/Texture.h"
 #include "Frame/Proto/ParseTexture.h"
 
 namespace test {
@@ -28,7 +29,9 @@ namespace test {
 		ASSERT_TRUE(maybe_texture);
 		texture_ = std::move(maybe_texture.value());
 		ASSERT_TRUE(texture_);
-		EXPECT_NE(0, texture_->GetId());
+		auto* opengl_texture = 
+			dynamic_cast<frame::opengl::Texture*>(texture_.get());
+		EXPECT_NE(0, opengl_texture->GetId());
 		auto pair = std::make_pair<std::uint32_t, std::uint32_t>(1024, 1024);
 		EXPECT_EQ(pair, texture_->GetSize());
 		auto vec8 = texture_->GetTextureByte();
@@ -49,7 +52,9 @@ namespace test {
 		ASSERT_TRUE(maybe_texture);
 		texture_ = std::move(maybe_texture.value());
 		ASSERT_TRUE(texture_);
-		EXPECT_NE(0, texture_->GetId());
+		auto* opengl_texture = 
+			dynamic_cast<frame::opengl::Texture*>(texture_.get());
+		EXPECT_NE(0, opengl_texture->GetId());
 		auto pair = std::make_pair<std::uint32_t, std::uint32_t>(3200, 1600);
 		EXPECT_EQ(pair, texture_->GetSize());
 		// TODO(anirul): Check half content in picture.
@@ -66,7 +71,9 @@ namespace test {
         ASSERT_TRUE(maybe_texture);
         texture_ = std::move(maybe_texture.value());
         ASSERT_TRUE(texture_);
-        EXPECT_NE(0, texture_->GetId());
+		auto* opengl_texture = 
+			dynamic_cast<frame::opengl::Texture*>(texture_.get());
+        EXPECT_NE(0, opengl_texture->GetId());
         auto pair = std::make_pair<std::uint32_t, std::uint32_t>(3200, 1600);
         EXPECT_EQ(pair, texture_->GetSize());
         auto vecf = texture_->GetTextureFloat();

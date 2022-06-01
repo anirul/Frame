@@ -22,10 +22,12 @@ namespace frame::opengl::file {
 		{
 			std::unique_ptr<BufferInterface> buffer = 
 				std::make_unique<Buffer>(buffer_type, buffer_usage);
+			auto* gl_buffer = dynamic_cast<Buffer*>(buffer.get());
+			assert(gl_buffer);
 			// Buffer initialization.
-			buffer->Bind();
+			gl_buffer->Bind();
 			buffer->Copy(vec.size() * sizeof(T), vec.data());
-			buffer->UnBind();
+			gl_buffer->UnBind();
 			buffer->SetName(desc);
 			return level->AddBuffer(std::move(buffer));
 		}

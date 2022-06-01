@@ -4,14 +4,13 @@
 #include <cinttypes>
 #include <utility>
 #include <glm/glm.hpp>
-#include "Frame/BindInterface.h"
 #include "Frame/NameInterface.h"
 #include "Frame/Proto/Proto.h"
 
 namespace frame {
 
 	// Interface to a texture.
-	struct TextureInterface : public BindInterface, public NameInterface
+	struct TextureInterface : public NameInterface
 	{
 		// Texture filter rename.
 		using TextureFilterEnum = frame::proto::TextureFilter::Enum;

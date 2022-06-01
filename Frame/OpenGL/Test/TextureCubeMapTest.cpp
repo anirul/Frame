@@ -4,6 +4,7 @@
 #include <GL/glew.h>
 #include "Frame/File/FileSystem.h"
 #include "Frame/OpenGL/File/LoadTexture.h"
+#include "Frame/OpenGL/TextureCubeMap.h"
 #include "Frame/Proto/ParseTexture.h"
 
 namespace test {
@@ -22,7 +23,10 @@ namespace test {
                     frame::file::FindFile("Asset/CubeMap/NegativeZ.png")
                 }));
         ASSERT_TRUE(texture_);
-        ASSERT_NE(0, texture_->GetId());
+        auto* opengl_texture = 
+            dynamic_cast<frame::opengl::TextureCubeMap*>(texture_.get());
+        ASSERT_NE(nullptr, opengl_texture);
+        ASSERT_NE(0, opengl_texture->GetId());
         EXPECT_EQ(1024, texture_->GetSize().first);
         EXPECT_EQ(1024, texture_->GetSize().second);
         auto vec8 = texture_->GetTextureByte();
@@ -31,6 +35,9 @@ namespace test {
         EXPECT_EQ(0xff, *p.second);
     }
 
+    // FIXME(anirul): There is a problem in there...
+    // FIXME(anirul): Note that the issue is slightly different with card and
+    // FIXME(anirul): if you execute it stand alone.
     TEST_F(TextureCubeMapTest, DISABLED_CreateEquirectangularTextureCubeMapTest)
     {
         ASSERT_FALSE(texture_);
@@ -39,7 +46,10 @@ namespace test {
                 frame::file::FindFile("Asset/CubeMap/Hamarikyu.hdr"),
                 frame::proto::PixelElementSize_FLOAT()));
         ASSERT_TRUE(texture_);
-        EXPECT_NE(0, texture_->GetId());
+        auto* opengl_texture =
+            dynamic_cast<frame::opengl::TextureCubeMap*>(texture_.get());
+        ASSERT_NE(nullptr, opengl_texture);
+        ASSERT_NE(0, opengl_texture->GetId());
         EXPECT_EQ(512, texture_->GetSize().first);
         EXPECT_EQ(512, texture_->GetSize().second);
         auto vecf = texture_->GetTextureFloat();

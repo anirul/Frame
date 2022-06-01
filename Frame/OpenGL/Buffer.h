@@ -2,6 +2,7 @@
 
 #include <GL/glew.h>
 #include "Frame/BufferInterface.h"
+#include "Frame/OpenGL/BindInterface.h"
 
 namespace frame::opengl {
 
@@ -36,7 +37,7 @@ namespace frame::opengl {
 		DYNAMIC_COPY				= GL_DYNAMIC_COPY,
 	};
 
-	class Buffer : public BufferInterface
+	class Buffer : public BindInterface, public BufferInterface
 	{
 	public:
 		Buffer(

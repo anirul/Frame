@@ -2,7 +2,6 @@
 
 add_library(Frame
   STATIC
-    BindInterface.h
     BufferInterface.h
     Camera.cpp
     Camera.h

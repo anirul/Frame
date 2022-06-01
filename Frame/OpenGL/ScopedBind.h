@@ -3,7 +3,7 @@
 #include <utility>
 #include <string>
 
-#include "Frame/BindInterface.h"
+#include "Frame/OpenGL/BindInterface.h"
 
 namespace frame::opengl {
 

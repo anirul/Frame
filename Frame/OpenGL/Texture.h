@@ -21,7 +21,7 @@
 
 namespace frame::opengl {
 
-	class Texture : public TextureInterface
+	class Texture : public TextureInterface, public BindInterface
 	{
 	public:
 		// Create an empty texture of size size.

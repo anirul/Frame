@@ -1,7 +1,6 @@
 #pragma once
 
 #include <memory>
-#include "Frame/BindInterface.h"
 #include "Frame/EntityId.h"
 #include "Frame/NameInterface.h"
 
@@ -9,7 +8,7 @@ namespace frame {
 
 	// Static mesh interface (proposal).
 	// Id are in EntityId to allow for more see the level interface.
-	class StaticMeshInterface : public BindInterface, public NameInterface
+	class StaticMeshInterface : public NameInterface
 	{
 	public:
 		virtual ~StaticMeshInterface() = default;

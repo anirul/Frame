@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "Frame/LevelInterface.h"
+#include "Frame/OpenGL/BindInterface.h"
 #include "Frame/OpenGL/Buffer.h"
 #include "Frame/OpenGL/Material.h"
 #include "Frame/OpenGL/Program.h"
@@ -16,7 +17,7 @@
 
 namespace frame::opengl {
 
-	class StaticMesh : public StaticMeshInterface
+	class StaticMesh : public BindInterface, public StaticMeshInterface
 	{
 	public:
 		// Create a mesh from a set of vectors.

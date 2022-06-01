@@ -15,7 +15,9 @@ namespace test {
 		ASSERT_FALSE(buffer_);
 		buffer_ = std::make_unique<frame::opengl::Buffer>();
 		ASSERT_TRUE(buffer_);
-		EXPECT_NE(0, buffer_->GetId());
+		auto* gl_buffer = dynamic_cast<frame::opengl::Buffer*>(buffer_.get());
+		ASSERT_TRUE(gl_buffer);
+		EXPECT_NE(0, gl_buffer->GetId());
 	}
 
 	TEST_F(BufferTest, BindBufferTest)
@@ -23,8 +25,10 @@ namespace test {
 		ASSERT_FALSE(buffer_);
 		buffer_ = std::make_unique<frame::opengl::Buffer>();
 		ASSERT_TRUE(buffer_);
-		buffer_->Bind();
-		buffer_->UnBind();
+        auto* gl_buffer = dynamic_cast<frame::opengl::Buffer*>(buffer_.get());
+        ASSERT_TRUE(gl_buffer);
+		gl_buffer->Bind();
+		gl_buffer->UnBind();
 	}
 
 	TEST_F(BufferTest, CopyBufferTest)
@@ -33,10 +37,12 @@ namespace test {
 		buffer_ = std::make_unique<frame::opengl::Buffer>();
 		ASSERT_TRUE(buffer_);
 		std::vector<float> test(4, 1.0f);
-		buffer_->Bind();
+        auto* gl_buffer = dynamic_cast<frame::opengl::Buffer*>(buffer_.get());
+        ASSERT_TRUE(gl_buffer);
+		gl_buffer->Bind();
 		buffer_->Copy(test.size() * sizeof(float), test.data());
 		EXPECT_EQ(4 * sizeof(float), buffer_->GetSize());
-		buffer_->UnBind();
+		gl_buffer->UnBind();
 		EXPECT_TRUE(buffer_);
 	}
 

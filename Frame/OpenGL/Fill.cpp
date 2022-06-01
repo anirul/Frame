@@ -80,7 +80,8 @@ namespace frame::opengl {
 			for (const auto& texture_id : texture_out_ids)
 			{
 				auto texture = level->GetTextureFromId(texture_id);
-				texture->Bind();
+				auto* opengl_texture = dynamic_cast<Texture*>(texture);
+				opengl_texture->Bind();
 				texture->EnableMipmap();
 			}
 		}
@@ -102,8 +103,10 @@ namespace frame::opengl {
 			int i = 0; 
 			for (const auto& texture_id : program->GetOutputTextureIds())
 			{
+				auto* opengl_texture = 
+					dynamic_cast<Texture*>(level->GetTextureFromId(texture_id));
 				frame.AttachTexture(
-					level->GetTextureFromId(texture_id)->GetId(),
+					opengl_texture->GetId(),
 					FrameBuffer::GetFrameColorAttachment(i),
 					FrameTextureType::TEXTURE_2D,
 					mipmap_level);
@@ -160,7 +163,8 @@ namespace frame::opengl {
 			for (const auto& texture_id : texture_out_ids)
 			{
 				auto texture = level->GetTextureFromId(texture_id);
-				texture->Bind();
+				auto* opengl_texture = dynamic_cast<Texture*>(texture);
+				opengl_texture->Bind();
 				texture->EnableMipmap();
 			}
 		}
@@ -187,8 +191,11 @@ namespace frame::opengl {
 				int i = 0;
 				for (const auto& texture_id : program->GetOutputTextureIds())
 				{
+					auto* opengl_texture = 
+						dynamic_cast<Texture*>(
+							level->GetTextureFromId(texture_id));
 					frame.AttachTexture(
-						level->GetTextureFromId(texture_id)->GetId(),
+						opengl_texture->GetId(),
 						FrameBuffer::GetFrameColorAttachment(i),
 						FrameTextureType::TEXTURE_2D,
 						mipmap_level);
