@@ -1,119 +1,90 @@
 #include "Material.h"
-#include <sstream>
+
 #include <cassert>
+#include <sstream>
 
 namespace frame::opengl {
 
-	bool Material::AddTextureId(EntityId id, const std::string& name)
-	{
-		RemoveTextureId(id);
-		return id_name_map_.insert({ id, name }).second;
-	}
+bool Material::AddTextureId(EntityId id, const std::string& name) {
+    RemoveTextureId(id);
+    return id_name_map_.insert({ id, name }).second;
+}
 
-	bool Material::HasTextureId(EntityId id) const
-	{
-		return static_cast<bool>(id_name_map_.count(id));
-	}
+bool Material::HasTextureId(EntityId id) const { return static_cast<bool>(id_name_map_.count(id)); }
 
-	bool Material::RemoveTextureId(EntityId id)
-	{
-		if (!HasTextureId(id)) return false;
-		auto it = id_name_map_.find(id);
-		id_name_map_.erase(it);
-		return true;
-	}
+bool Material::RemoveTextureId(EntityId id) {
+    if (!HasTextureId(id)) return false;
+    auto it = id_name_map_.find(id);
+    id_name_map_.erase(it);
+    return true;
+}
 
-	const std::pair<std::string, int> Material::EnableTextureId(
-		EntityId id) const
-	{
-		// Check it exist.
-		if (!HasTextureId(id))
-			throw std::runtime_error("No texture id: " + std::to_string(id));
-		// Check it is not already enabled.
-		for (const auto& i : id_array_)
-		{
-			if (i == id)
-			{
-				throw std::runtime_error("Already in?");
-			}
-		}
-		// Assign it.
-		for (int i = 0; i < id_array_.size(); ++i)
-		{
-			if (id_array_[i] == 0)
-			{
-				id_array_[i] = id;
-				return { id_name_map_.at(id), i };
-			}
-		}
-		// No free slots.
-		throw std::runtime_error("No free slots!");
-	}
-
-	void Material::DisableTextureId(EntityId id) const
-	{
-		// Check if exist.
-		if (!HasTextureId(id))
-			throw std::runtime_error("No texture id: " + std::to_string(id));
-		// Disable it.
-		for (auto& i : id_array_)
-		{
-			if (i == id)
-			{
-				i = 0;
-				return;
-			}
-		}
-		// Error not found in the enable array.
-		throw std::runtime_error(
-			"Texture id: " + std::to_string(id) + 
-			" was not bind to any slots.");
-	}
-
-	void Material::DisableAll() const
-	{
-		for (int i = 0; i < 32; ++i)
-		{
-			if (id_array_[i])
-			{
-				DisableTextureId(id_array_[i]);
-			}
-		}
-	}
-
-	const std::vector<EntityId> Material::GetIds() const
-	{
-		std::vector<EntityId> vec;
-		for (const auto& p : id_name_map_)
-		{
-			vec.push_back(p.first);
-		}
-		return vec;
-	}
-
-	frame::EntityId Material::GetProgramId(
-		const LevelInterface* level /*= nullptr*/) const
-	{
-		if (program_id_) return program_id_;
-		auto maybe_id = level->GetIdFromName(program_name_);
-		if (maybe_id)
-		{
-			program_id_ = maybe_id.value();
-			return program_id_;
-		}
-		throw std::runtime_error("No valid program!");
-	}
-
-	void Material::SetProgramId(EntityId id)
-	{
-		if (!id) throw std::runtime_error("Not a valid program id.");
-		// TODO(anirul): Check that the program has a valid uniform!
-		program_id_ = id;
-	}
-
-    void Material::SetProgramName(const std::string& name)
-    {
-		program_name_ = name;
+const std::pair<std::string, int> Material::EnableTextureId(EntityId id) const {
+    // Check it exist.
+    if (!HasTextureId(id)) throw std::runtime_error("No texture id: " + std::to_string(id));
+    // Check it is not already enabled.
+    for (const auto& i : id_array_) {
+        if (i == id) {
+            throw std::runtime_error("Already in?");
+        }
     }
+    // Assign it.
+    for (int i = 0; i < id_array_.size(); ++i) {
+        if (id_array_[i] == 0) {
+            id_array_[i] = id;
+            return { id_name_map_.at(id), i };
+        }
+    }
+    // No free slots.
+    throw std::runtime_error("No free slots!");
+}
 
-} // End namespace frame::opengl.
+void Material::DisableTextureId(EntityId id) const {
+    // Check if exist.
+    if (!HasTextureId(id)) throw std::runtime_error("No texture id: " + std::to_string(id));
+    // Disable it.
+    for (auto& i : id_array_) {
+        if (i == id) {
+            i = 0;
+            return;
+        }
+    }
+    // Error not found in the enable array.
+    throw std::runtime_error("Texture id: " + std::to_string(id) + " was not bind to any slots.");
+}
+
+void Material::DisableAll() const {
+    for (int i = 0; i < 32; ++i) {
+        if (id_array_[i]) {
+            DisableTextureId(id_array_[i]);
+        }
+    }
+}
+
+const std::vector<EntityId> Material::GetIds() const {
+    std::vector<EntityId> vec;
+    for (const auto& p : id_name_map_) {
+        vec.push_back(p.first);
+    }
+    return vec;
+}
+
+frame::EntityId Material::GetProgramId(const LevelInterface* level /*= nullptr*/) const {
+    if (program_id_) return program_id_;
+    auto maybe_id = level->GetIdFromName(program_name_);
+    if (maybe_id) {
+        program_id_ = maybe_id.value();
+        return program_id_;
+    }
+    throw std::runtime_error("No valid program!");
+}
+
+void Material::SetProgramId(EntityId id) {
+    if (!id) throw std::runtime_error("Not a valid program id.");
+    // TODO(anirul): Check that the program has a valid uniform!
+    program_id_ = id;
+}
+
+void Material::SetProgramName(const std::string& name) { program_name_ = name; }
+
+}  // End namespace frame::opengl.

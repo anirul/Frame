@@ -13,7 +13,6 @@
 #include "Frame/Logger.h"
 #include "Frame/NodeCamera.h"
 #include "Frame/OpenGL/Buffer.h"
-#include "Frame/OpenGL/Light.h"
 #include "Frame/OpenGL/Material.h"
 #include "Frame/OpenGL/Program.h"
 #include "Frame/OpenGL/Renderer.h"

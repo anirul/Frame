@@ -49,9 +49,7 @@ class FrameBuffer : public BindInterface {
      * @param slot: Should be ignored.
      */
     void Bind(const unsigned int slot = 0) const override;
-    /**
-     * @brief From the bind interface this will unbind the current frame buffer from the context.
-     */
+    //! @brief From the bind interface this will unbind the current frame buffer from the context.
     void UnBind() const override;
     /**
      * @brief Attach a render buffer to the current frame buffer, warning this will bind the frame
@@ -110,13 +108,9 @@ class FrameBuffer : public BindInterface {
      * @return Id of the OpenGL object.
      */
     unsigned int GetId() const final { return frame_id_; }
-    /**
-     * @brief Lock the bind for RAII interface to the bind interface.
-     */
+    //! @brief Lock the bind for RAII interface to the bind interface.
     void LockedBind() const final { locked_bind_ = true; }
-    /**
-     * @brief Unlock the bind for RAII interface to the bind interface.
-     */
+    //! @brief Unlock the bind for RAII interface to the bind interface.
     void UnlockedBind() const final { locked_bind_ = false; }
 
    protected:

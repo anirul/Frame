@@ -16,7 +16,7 @@ namespace frame::opengl {
 	{
 	public:
 		Material() = default;
-		virtual ~Material();
+		virtual ~Material() = default;
 
 	public:
 		// Program management part.

@@ -2,26 +2,27 @@
 
 #include <memory>
 #include <string>
+
 #include "Frame/File/Obj.h"
 #include "Frame/LevelInterface.h"
-#include "Frame/StaticMeshInterface.h"
 #include "Frame/NodeStaticMesh.h"
+#include "Frame/StaticMeshInterface.h"
 
 namespace frame::opengl::file {
 
-	// Load static meshes from file:
-	//	- level					: the level in which you want to load the mesh.
-	//	- file					: the file name of the mesh.
-	//	- name					: the name of the mesh.
-	//	- material_name			: the material that is used.
-	//	- skip_material_file	: should you skip the material that are in the
-	//							  file?
-	// Return the entity id of the mesh in the level.
-	std::optional<std::vector<EntityId>> LoadStaticMeshesFromFile(
-		LevelInterface* level, 
-		const std::string& file,
-		const std::string& name,
-		const std::string& material_name = "",
-		bool skip_material_file = false);
+/**
+ * @brief Load static meshes from file.
+ * @param level: The level in which you want to load the mesh.
+ * @param file: The file name of the mesh.
+ * @param name: The name of the mesh.
+ * @param material_name: The material that is used.
+ * @param skip_material_file: Should you skip the material that are in the file?
+ * @return The entity id of the mesh in the level.
+ */
+std::optional<std::vector<EntityId>> LoadStaticMeshesFromFile(LevelInterface* level,
+                                                              const std::string& file,
+                                                              const std::string& name,
+                                                              const std::string& material_name = "",
+                                                              bool skip_material_file = false);
 
-} // End namespace frame::file.
+}  // namespace frame::opengl::file
