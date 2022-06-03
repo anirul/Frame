@@ -1,8 +1,9 @@
 #pragma once
 
+#include <glm/glm.hpp>
 #include <string>
 #include <vector>
-#include <glm/glm.hpp>
+
 #include "Frame/EntityId.h"
 #include "Frame/NameInterface.h"
 #include "Frame/Proto/Proto.h"
@@ -10,59 +11,128 @@
 
 namespace frame {
 
-	struct ProgramInterface : public NameInterface
-	{
-		virtual ~ProgramInterface() = default;
-		// Set & get input texture id.
-		virtual void AddInputTextureId(EntityId id) = 0;
-		virtual void RemoveInputTextureId(EntityId id) = 0;
-		virtual const std::vector<EntityId>	GetInputTextureIds() const = 0;
-		// Set & get output texture id.
-		virtual void AddOutputTextureId(EntityId id) = 0;
-		virtual void RemoveOutputTextureId(EntityId id) = 0;
-		virtual const std::vector<EntityId> GetOutputTextureIds() const = 0;
-		// Select the input (temporary) mesh or scene root.
-		virtual std::string GetTemporarySceneRoot() const = 0;
-		virtual void SetTemporarySceneRoot(const std::string& name) = 0;
-		// Select the input mesh or scene root.
-		virtual EntityId GetSceneRoot() const = 0;
-		virtual void SetSceneRoot(EntityId scene_root) = 0;
-		// Link shaders to a program.
-		virtual void LinkShader() = 0;
-		// Use the program it takes an optional uniform interface pointer to 
-		// set the uniform variable parameters.
-		virtual void Use(const UniformInterface* uniform_interface) const = 0;
-		// Stop using the program.
-		virtual void UnUse() const = 0;
-		// Get the list of uniforms.
-		virtual const std::vector<std::string>& GetUniformNameList() const = 0;
-		// Create a uniform from a string and a bool.
-		virtual void Uniform(const std::string& name, bool value) const = 0;
-		// Create a uniform from a string and an int.
-		virtual void Uniform(const std::string& name, int value) const = 0;
-		// Create a uniform from a string and a float.
-		virtual void Uniform(const std::string& name, float value) const = 0;
-		// Create a uniform from a string and a vector2.
-		virtual void Uniform(
-			const std::string& name,
-			const glm::vec2 vec2) const = 0;
-		// Create a uniform from a string and a vector3.
-		virtual void Uniform(
-			const std::string& name,
-			const glm::vec3 vec3) const = 0;
-		// Create a uniform from a string and a vector4.
-		virtual void Uniform(
-			const std::string& name,
-			const glm::vec4 vec4) const = 0;
-		// Create a uniform from a string and a matrix.
-		virtual void Uniform(
-			const std::string& name,
-			const glm::mat4 mat) const = 0;
-		// Add a later included value (like camera position or time), this will
-		// be set in the "Use" function.
-		virtual void Uniform(
-			const std::string& name,
-			const proto::Uniform::UniformEnum enum_value) const = 0;
-	};
+/**
+ * @class Program
+ * @brief This is containing the program and all associated functions.
+ */
+struct ProgramInterface : public NameInterface {
+    //! @brief Virtual destructor
+    virtual ~ProgramInterface() = default;
+    /**
+     * @brief Set input texture id.
+     * @param id: Add the texture id into the input program.
+     */
+    virtual void AddInputTextureId(EntityId id) = 0;
+    /**
+     * @brief Remove texture id.
+     * @param id: Id to be removed from the input texture.
+     */
+    virtual void RemoveInputTextureId(EntityId id) = 0;
+    /**
+     * @brief Get input texture ids.
+     * @return Vector of entity ids of input texture.
+     */
+    virtual const std::vector<EntityId> GetInputTextureIds() const = 0;
+    /**
+     * @brief Set output texture id.
+     * @param id: Add the texture id into the output program.
+     */
+    virtual void AddOutputTextureId(EntityId id)                    = 0;
+    /**
+     * @brief Remove texture id.
+     * @param id: Id to be removed from the output texture.
+     */
+    virtual void RemoveOutputTextureId(EntityId id)                 = 0;
+    /**
+     * @brief Get output texture ids.
+     * @return Vector of entity ids of output texture.
+     */
+    virtual const std::vector<EntityId> GetOutputTextureIds() const = 0;
+    /**
+     * @brief Select temporary (before assignment to a entity id) scene root.
+     * @return Get the temporary scene root.
+     */
+    virtual std::string GetTemporarySceneRoot() const           = 0;
+    /**
+     * @brief Select temporary (before assignment to a entity id) scene root.
+     * @param Set the temporary scene root.
+     */
+    virtual void SetTemporarySceneRoot(const std::string& name) = 0;
+    /**
+     * @brief Get scene root id.
+     * @return Id of the scene root.
+     */
+    virtual EntityId GetSceneRoot() const          = 0;
+    /**
+     * @brief Set scene root.
+     * @param scene_root: Set the scene root id.
+     */
+    virtual void SetSceneRoot(EntityId scene_root) = 0;
+    //! @brief Link shaders to a program.
+    virtual void LinkShader() = 0;
+    /**
+     * @brief Use the program, a little bit like bind.
+     * @param uniform_interface: The way to communicate the uniform like matrices (model, view,
+     * projection) but also time and other uniform that could be needed.
+     */
+    virtual void Use(const UniformInterface* uniform_interface) const = 0;
+    //! @brief Stop using the program, a little bit like unbind.
+    virtual void UnUse() const = 0;
+    /**
+     * @brief Get the list of uniforms needed by the program.
+     * @return Vector of string that represent the names of uniforms.
+     */
+    virtual const std::vector<std::string>& GetUniformNameList() const = 0;
+    /**
+     * @brief Create a uniform from a string and a bool.
+     * @param name: Name of the uniform.
+     * @param value: Boolean.
+     */
+    virtual void Uniform(const std::string& name, bool value) const = 0;
+    /**
+     * @brief Create a uniform from a string and an int.
+     * @param name: Name of the uniform.
+     * @param value: Integer.
+     */
+    virtual void Uniform(const std::string& name, int value) const = 0;
+    /**
+     * @brief Create a uniform from a string and a float.
+     * @param name: Name of the uniform.
+     * @param value: Float.
+     */
+    virtual void Uniform(const std::string& name, float value) const = 0;
+    /**
+     * @brief Create a uniform from a string and a vector2.
+     * @param name: Name of the uniform.
+     * @param value: Vector2.
+     */
+    virtual void Uniform(const std::string& name, const glm::vec2 vec2) const = 0;
+    /**
+     * @brief Create a uniform from a string and a vector3.
+     * @param name: Name of the uniform.
+     * @param value: Vector3.
+     */
+    virtual void Uniform(const std::string& name, const glm::vec3 vec3) const = 0;
+    /**
+     * @brief Create a uniform from a string and a vector4.
+     * @param name: Name of the uniform.
+     * @param value: Vector4.
+     */
+    virtual void Uniform(const std::string& name, const glm::vec4 vec4) const = 0;
+    /**
+     * @brief Create a uniform from a string and a matrix.
+     * @param name: Name of the uniform.
+     * @param value: Matrix.
+     */
+    virtual void Uniform(const std::string& name, const glm::mat4 mat) const = 0;
+    /**
+     * @brief Add a later included value (like camera position or time), this will be set in unifrom
+     * interface.
+     * @param name: Name of the uniform.
+     * @param value: Enum value of the uniform (see proto declaration for that).
+     */
+    virtual void Uniform(const std::string& name,
+                         const proto::Uniform::UniformEnum enum_value) const = 0;
+};
 
-} // End namespace frame.
+}  // End namespace frame.

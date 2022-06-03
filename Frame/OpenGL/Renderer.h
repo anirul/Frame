@@ -25,20 +25,20 @@ class Renderer : public RendererInterface {
 
    public:
     /**
-     * @brief Set the default projection matrix.
+     * @brief Set the default projection matrix (move elision).
      * @param projection: The projection matrix.
      */
-    void SetProjection(glm::mat4 projection) override { projection_ = std::move(projection); }
+    void SetProjection(glm::mat4 projection) override { projection_ = projection; }
     /**
-     * @brief Set the default view matrix.
+     * @brief Set the default view matrix (move elision).
      * @param projection: The view matrix.
      */
-    void SetView(glm::mat4 view) override { view_ = std::move(view); }
+    void SetView(glm::mat4 view) override { view_ = view; }
     /**
-     * @brief Set the default model matrix, can be changed by render mesh!
+     * @brief Set the default model matrix, can be changed by render mesh (move elision)!
      * @param projection: The model matrix.
      */
-    void SetModel(glm::mat4 model) override { model_ = std::move(model); }
+    void SetModel(glm::mat4 model) override { model_ = model; }
     /**
      * @brief Set the cubemap target(used in the render mesh method).
      * @param texture_frame: The proto describing the cube map.

@@ -118,8 +118,7 @@ namespace frame::proto {
 				std::unique_ptr<NodeInterface> node_interface = 
 					std::make_unique<NodeStaticMesh>(
 						GetFunctor(level), 
-						mesh_id, 
-						material_id);
+						mesh_id);
 				node_interface->SetName(proto_scene_static_mesh.name());
 				node_interface->SetParentName(proto_scene_static_mesh.parent());
 				auto maybe_scene_id = 

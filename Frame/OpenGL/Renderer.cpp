@@ -66,17 +66,13 @@ void Renderer::RenderNode(EntityId node_id, EntityId material_id /* = NullId*/,
     // Try to cast to a node static mesh.
     auto node_static_mesh = dynamic_cast<NodeStaticMesh*>(node);
     if (!node_static_mesh) return;
-    // Store the material id in case the mesh doesn't have one.
-    auto node_material_id = node_static_mesh->GetMaterialId();
-    auto mesh_id          = node->GetLocalMesh();
+    auto mesh_id = node->GetLocalMesh();
     if (!mesh_id) return;
     auto static_mesh            = level_->GetStaticMeshFromId(mesh_id);
     MaterialInterface* material = nullptr;
     // Try to find the material for the mesh.
     if (material_id) {
         material = level_->GetMaterialFromId(material_id);
-    } else if (node_material_id) {
-        material = level_->GetMaterialFromId(node_material_id);
     }
     RenderMesh(static_mesh, material, node->GetLocalModel(dt), dt);
 }
@@ -103,8 +99,6 @@ void Renderer::RenderMesh(StaticMeshInterface* static_mesh,
                           MaterialInterface* material /* = nullptr*/,
                           glm::mat4 model_mat /* = glm::mat4(1.0f)*/, double dt /* = 0.0*/) {
     if (!static_mesh) throw std::runtime_error("StaticMesh ptr doesn't exist.");
-    auto material_id = static_mesh->GetMaterialId();
-    if (!material) material = level_->GetMaterialFromId(material_id);
     if (!material) throw std::runtime_error("No material!");
     auto program_id = material->GetProgramId();
     auto program    = level_->GetProgramFromId(program_id);

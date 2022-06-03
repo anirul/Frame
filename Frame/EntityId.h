@@ -4,18 +4,21 @@
 
 namespace frame {
 
-	enum class EntityTypeEnum : std::uint8_t 
-	{
-		UNKNOWN = 0,
-		NODE = 1,
-		TEXTURE = 2,
-		PROGRAM = 3,
-		MATERIAL = 4,
-		BUFFER = 5,
-		STATIC_MESH = 6,
-	};
+enum class EntityTypeEnum : std::uint8_t {
+    UNKNOWN     = 0,
+    NODE        = 1,
+    TEXTURE     = 2,
+    PROGRAM     = 3,
+    MATERIAL    = 4,
+    BUFFER      = 5,
+    STATIC_MESH = 6,
+};
 
-	using EntityId = std::int64_t;
-	constexpr EntityId NullId = 0;
+/**
+ * @brief This is used by the code to have an abstraction from pointer to structure see data based
+ * programming. All object are represented by Id that are stored in the level structure.
+ */
+using EntityId            = std::int64_t;
+constexpr EntityId NullId = 0;
 
-} // End namespace frame.
+}  // End namespace frame.

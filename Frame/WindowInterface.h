@@ -3,7 +3,9 @@
 #include <memory>
 #include <string>
 #include <utility>
-#include "Frame/Frame.h"
+#include "Frame/DrawInterface.h"
+#include "Frame/InputInterface.h"
+#include "Frame/DeviceInterface.h"
 
 namespace frame {
 

@@ -69,12 +69,12 @@ class Program : public ProgramInterface {
      */
     const std::vector<EntityId> GetOutputTextureIds() const override;
     /**
-     * @brief Select temporary (before assignement to a entity id) scene root.
+     * @brief Select temporary (before assignment to a entity id) scene root.
      * @return Get the temporary scene root.
      */
     std::string GetTemporarySceneRoot() const override;
     /**
-     * @brief Select temporary (before assignement to a entity id) scene root.
+     * @brief Select temporary (before assignment to a entity id) scene root.
      * @param Set the temporary scene root.
      */
     void SetTemporarySceneRoot(const std::string& name) override;
@@ -102,7 +102,7 @@ class Program : public ProgramInterface {
     const std::vector<std::string>& GetUniformNameList() const override;
     /**
      * @brief Use the program, a little bit like bind.
-     * @param uniform_interface: The way to comunicate the uniform like matrices (model, view,
+     * @param uniform_interface: The way to communicate the uniform like matrices (model, view,
      * projection) but also time and other uniform that could be needed.
      */
     void Use(const UniformInterface* uniform_interface) const override;

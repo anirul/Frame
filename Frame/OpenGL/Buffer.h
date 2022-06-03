@@ -45,7 +45,6 @@ class Buffer : public BindInterface, public BufferInterface {
     /**
      * @brief Constructor this is where you can define the way a buffer is handled on the code
      * level.
-     *
      * @param buffer_type: This is the type of buffer you want to use (ARRAY_BUFFER should be enough
      * for most cases).
      * @param buffer_usage: Access way of the buffer is it gonna change or is it going to be the
@@ -58,20 +57,17 @@ class Buffer : public BindInterface, public BufferInterface {
    public:
     /**
      * @brief Copy a value in the buffer, the size is in bytes!
-     *
      * @param size: Number of bytes to be copied.
      * @param data: Data pointer to the data to be copied (void*).
      */
     void Copy(const std::size_t size, const void* data = nullptr) const override;
     /**
      * @brief Get the size in byte of the buffer.
-     *
      * @return The size of the buffer.
      */
     std::size_t GetSize() const override;
     /**
      * @brief From the bind interface this is where we bind a buffer to the current context.
-     *
      * @param slot: The slot of the current buffer to be bind in this case (buffer) this should be
      * 0.
      */
@@ -99,13 +95,11 @@ class Buffer : public BindInterface, public BufferInterface {
     unsigned int GetId() const override { return buffer_object_; }
     /**
      * @brief From the name interface this is returning the name of the buffer.
-     *
      * @return The name of the object.
      */
     std::string GetName() const override { return name_; }
     /**
      * @brief This is the set part of the name interface.
-     *
      * @param name: The name of the object.
      */
     void SetName(const std::string& name) override { name_ = name; }

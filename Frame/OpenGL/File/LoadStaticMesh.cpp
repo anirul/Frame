@@ -201,8 +201,7 @@ std::optional<std::vector<EntityId>> LoadStaticMeshesFromFile(
             return nullptr;
         };
         auto material_id = level->GetStaticMeshFromId(static_mesh_id)->GetMaterialId();
-        std::unique_ptr<NodeInterface> ptr =
-            std::make_unique<NodeStaticMesh>(func, static_mesh_id, material_id);
+        auto ptr = std::make_unique<NodeStaticMesh>(func, static_mesh_id);
         ptr->SetName(fmt::format("{}.{}", name, mesh_counter));
         auto maybe_id = level->AddSceneNode(std::move(ptr));
         if (!maybe_id) return std::nullopt;

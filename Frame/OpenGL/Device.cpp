@@ -25,9 +25,7 @@ Device::Device(void* gl_context, const std::pair<std::uint32_t, std::uint32_t> s
     // FIXME(anirul): Change this as to be working!
     glDisable(GL_CULL_FACE);
     // glCullFace(GL_BACK);
-    // error_.Display(__FILE__, __LINE__ - 1);
     // glFrontFace(GL_CW);
-    // error_.Display(__FILE__, __LINE__ - 1);
     // Enable blending to 1 - source alpha.
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

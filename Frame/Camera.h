@@ -12,12 +12,12 @@ namespace frame {
 class Camera {
    public:
     /**
-	* @brief Constructor it will create a camera acording to the params.
+	* @brief Constructor it will create a camera according to the params.
 	* @param position: Position of the camera.
 	* @param front: Direction the camera is facing to (normalized).
 	* @param up: Direction of the up for the camera (normalized).
 	* @param fov_degrees: Field of view (angle in degrees of the vertical field of view).
-	* @param aspect_ratio: Aspect ratio of the screen weigth on height.
+	* @param aspect_ratio: Aspect ratio of the screen (weight on height).
 	* @param near_clip: Near clipping plane (front distance to be drawn).
 	* @param far_clip: Far clipping plane (back distance to be drawn).
 	*/
@@ -70,26 +70,64 @@ class Camera {
     void SetAspectRatio(float aspect_ratio) { aspect_ratio_ = aspect_ratio; }
     /**
 	* @brief Set near clipping plane distance.
-	* @param near_clip: Set the boundary of the close rendering frustrum.
+	* @param near_clip: Set the boundary of the close rendering frustum.
 	*/
     void SetNearClip(float near_clip) { near_clip_ = near_clip; }
     /**
 	* @brief Set far clipping plane distance.
-	* @param far_clip: Set the far boundery of the rendering frustrum.
+	* @param far_clip: Set the far boundary of the rendering frustum.
 	*/
     void SetFarClip(float far_clip) { far_clip_ = far_clip; }
+    /**
+     * @brief Get front vector (normalized).
+	 * @return Front vector (normalized).
+     */
     glm::vec3 GetFront() const { return front_; }
+    /**
+     * @brief Get position vector.
+	 * @return Position vector.
+     */
     glm::vec3 GetPosition() const { return position_; }
+    /**
+     * @brief Get right vector (normalized).
+	 * @return Right vector (normalized).
+     */
     glm::vec3 GetRight() const { return right_; }
+    /**
+     * @brief Get up vector (normalized).
+	 * @return Up vector (normalized).
+     */
     glm::vec3 GetUp() const { return up_; }
+    /**
+     * @brief Get vertical field of view in radians.
+	 * @return Vertical field of view in radians.
+     */
     float GetFovRadians() const { return fov_rad_; }
+    /**
+     * @brief Get vertical field of view in degrees.
+	 * @return Vertical field of view in degrees.
+     */
     float GetFovDegrees() const { return glm::degrees(fov_rad_); }
+    /**
+     * @brief Get aspect ration (horizontal on vertical).
+	 * @return Aspect ration (horizontal on vertical).
+     */
     float GetAspectRatio() const { return aspect_ratio_; }
+    /**
+     * @brief Get near clipping plane distance.
+	 * @return Near clipping plane distance.
+     */
     float GetNearClip() const { return near_clip_; }
+    /**
+     * @brief Get far clipping plane distance.
+	 * @return Far clipping plane distance.
+     */
     float GetFarClip() const { return far_clip_; }
 
    protected:
+	//! This will update all the vector by using cross product.
     void UpdateCameraVectors();
+	// Default values for each parameter.
     glm::vec3 position_ = { 0, 0, 0 };
     glm::vec3 front_    = { 0, 0, -1 };
     glm::vec3 up_       = { 0, 1, 0 };

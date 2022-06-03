@@ -26,15 +26,15 @@ class StaticMesh : public BindInterface, public StaticMeshInterface {
     /**
      * @brief Create a mesh from a set of vectors.
      * @param level: The level into witch the mesh will be stored.
-     * @param point_buffer_id: A buffer that countain the point to the mesh.
-     * @param normal_buffer_id: A buffer that countain the noramal to the mesh.
-     * @param texture_buffer_id: A buffer that countain the u,v information to the mesh.
-     * @param index_buffer_id: A buffer that countain the index of the triangles from the mesh.
+     * @param point_buffer_id: A buffer that contain the point to the mesh.
+     * @param normal_buffer_id: A buffer that contain the normal to the mesh.
+     * @param texture_buffer_id: A buffer that contain the u,v information to the mesh.
+     * @param index_buffer_id: A buffer that contain the index of the triangles from the mesh.
      * @param material_id: An id to the material used to render the mesh.
      */
     StaticMesh(LevelInterface* level, EntityId point_buffer_id, EntityId normal_buffer_id,
                EntityId texture_buffer_id, EntityId index_buffer_id, EntityId material_id = 0);
-    //! @brief Destructor
+    //! @brief Virtual destructor.
     virtual ~StaticMesh();
 
    public:
@@ -69,8 +69,9 @@ class StaticMesh : public BindInterface, public StaticMeshInterface {
      */
     EntityId GetIndexBufferId() const override { return index_buffer_id_; }
     /**
-     * @brief Get the siye of the index buffer.
-     * @return Number of element in the index buffer.
+     * @brief This is the size in bytes! so if you need the element size just divide this number by
+     * the sizeof(std::int32_t).
+     * @return Size of the index buffer in bytes!
      */
     std::size_t GetIndexSize() const override { return index_size_; }
     //! @brief Lock the bind for RAII interface to the bind interface.

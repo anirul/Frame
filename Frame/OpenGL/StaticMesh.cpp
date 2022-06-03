@@ -107,183 +107,173 @@ std::optional<EntityId> CreateQuadStaticMesh(LevelInterface* level) {
 std::optional<EntityId> CreateCubeStaticMesh(LevelInterface* level) {
     std::array<float, 18 * 6> points = {
         // clang-format off
-			// Face front.
-			-0.5f, -0.5f, -0.5f,
-			 0.5f, -0.5f, -0.5f,
-			 0.5f,  0.5f, -0.5f,
-			 0.5f,  0.5f, -0.5f,
-			-0.5f,  0.5f, -0.5f,
-			-0.5f, -0.5f, -0.5f,
-			// Face back
-			-0.5f, -0.5f,  0.5f,
-			 0.5f, -0.5f,  0.5f,
-			 0.5f,  0.5f,  0.5f,
-			 0.5f,  0.5f,  0.5f,
-			-0.5f,  0.5f,  0.5f,
-			-0.5f, -0.5f,  0.5f,
-			// Face left.
-			-0.5f,  0.5f,  0.5f,
-			-0.5f,  0.5f, -0.5f,
-			-0.5f, -0.5f, -0.5f,
-			-0.5f, -0.5f, -0.5f,
-			-0.5f, -0.5f,  0.5f,
-			-0.5f,  0.5f,  0.5f,
-			// Face right.
-			 0.5f,  0.5f,  0.5f,
-			 0.5f,  0.5f, -0.5f,
-			 0.5f, -0.5f, -0.5f,
-			 0.5f, -0.5f, -0.5f,
-			 0.5f, -0.5f,  0.5f,
-			 0.5f,  0.5f,  0.5f,
-			 // Face bottom.
-			-0.5f, -0.5f, -0.5f,
-			 0.5f, -0.5f, -0.5f,
-			 0.5f, -0.5f,  0.5f,
-			 0.5f, -0.5f,  0.5f,
-			-0.5f, -0.5f,  0.5f,
-			-0.5f, -0.5f, -0.5f,
-			// Face top.
-			-0.5f,  0.5f, -0.5f,
-			 0.5f,  0.5f, -0.5f,
-			 0.5f,  0.5f,  0.5f,
-			 0.5f,  0.5f,  0.5f,
-			-0.5f,  0.5f,  0.5f,
-			-0.5f,  0.5f, -0.5f,
+		// Face front.
+		-0.5f, -0.5f, -0.5f,
+		 0.5f, -0.5f, -0.5f,
+		 0.5f,  0.5f, -0.5f,
+		 0.5f,  0.5f, -0.5f,
+		-0.5f,  0.5f, -0.5f,
+		-0.5f, -0.5f, -0.5f,
+		// Face back
+		-0.5f, -0.5f,  0.5f,
+		 0.5f, -0.5f,  0.5f,
+		 0.5f,  0.5f,  0.5f,
+		 0.5f,  0.5f,  0.5f,
+		-0.5f,  0.5f,  0.5f,
+		-0.5f, -0.5f,  0.5f,
+		// Face left.
+		-0.5f,  0.5f,  0.5f,
+		-0.5f,  0.5f, -0.5f,
+		-0.5f, -0.5f, -0.5f,
+		-0.5f, -0.5f, -0.5f,
+		-0.5f, -0.5f,  0.5f,
+		-0.5f,  0.5f,  0.5f,
+		// Face right.
+		 0.5f,  0.5f,  0.5f,
+		 0.5f,  0.5f, -0.5f,
+		 0.5f, -0.5f, -0.5f,
+		 0.5f, -0.5f, -0.5f,
+		 0.5f, -0.5f,  0.5f,
+		 0.5f,  0.5f,  0.5f,
+		// Face bottom.
+		-0.5f, -0.5f, -0.5f,
+		 0.5f, -0.5f, -0.5f,
+		 0.5f, -0.5f,  0.5f,
+		 0.5f, -0.5f,  0.5f,
+		-0.5f, -0.5f,  0.5f,
+		-0.5f, -0.5f, -0.5f,
+		// Face top.
+		-0.5f,  0.5f, -0.5f,
+		 0.5f,  0.5f, -0.5f,
+		 0.5f,  0.5f,  0.5f,
+		 0.5f,  0.5f,  0.5f,
+		-0.5f,  0.5f,  0.5f,
+		-0.5f,  0.5f, -0.5f,
         // clang-format on
     };
     std::array<float, 18 * 6> normals = {
         // clang-format off
-			// Face front.
-			.0f, .0f, -1.f,
-			.0f, .0f, -1.f,
-			.0f, .0f, -1.f,
-			.0f, .0f, -1.f,
-			.0f, .0f, -1.f,
-			.0f, .0f, -1.f,
-            // Face back.
-			.0f, .0f, 1.f,
-			.0f, .0f, 1.f,
-			.0f, .0f, 1.f,
-			.0f, .0f, 1.f,
-			.0f, .0f, 1.f,
-			.0f, .0f, 1.f,
-			// Face left.
-			-1.f, .0f, .0f,
-			-1.f, .0f, .0f,
-			-1.f, .0f, .0f,
-			-1.f, .0f, .0f,
-			-1.f, .0f, .0f,
-			-1.f, .0f, .0f,
-			// Face right.
-			1.f, .0f, .0f,
-			1.f, .0f, .0f,
-			1.f, .0f, .0f,
-			1.f, .0f, .0f,
-			1.f, .0f, .0f,
-			1.f, .0f, .0f,
-			// Face bottom.
-			.0f, -1.f, -.0f,
-			.0f, -1.f, -.0f,
-			.0f, -1.f, -.0f,
-			.0f, -1.f, -.0f,
-			.0f, -1.f, -.0f,
-			.0f, -1.f, -.0f,
-			// Face top.
-			.0f, 1.f, 0.f,
-			.0f, 1.f, 0.f,
-			.0f, 1.f, 0.f,
-			.0f, 1.f, 0.f,
-			.0f, 1.f, 0.f,
-			.0f, 1.f, 0.f,
+		// Face front.
+		.0f, .0f, -1.f,
+		.0f, .0f, -1.f,
+		.0f, .0f, -1.f,
+		.0f, .0f, -1.f,
+		.0f, .0f, -1.f,
+		.0f, .0f, -1.f,
+        // Face back.
+		.0f, .0f, 1.f,
+		.0f, .0f, 1.f,
+		.0f, .0f, 1.f,
+		.0f, .0f, 1.f,
+		.0f, .0f, 1.f,
+		.0f, .0f, 1.f,
+		// Face left.
+		-1.f, .0f, .0f,
+		-1.f, .0f, .0f,
+		-1.f, .0f, .0f,
+		-1.f, .0f, .0f,
+		-1.f, .0f, .0f,
+		-1.f, .0f, .0f,
+		// Face right.
+		1.f, .0f, .0f,
+		1.f, .0f, .0f,
+		1.f, .0f, .0f,
+		1.f, .0f, .0f,
+		1.f, .0f, .0f,
+		1.f, .0f, .0f,
+		// Face bottom.
+		.0f, -1.f, -.0f,
+		.0f, -1.f, -.0f,
+		.0f, -1.f, -.0f,
+		.0f, -1.f, -.0f,
+		.0f, -1.f, -.0f,
+		.0f, -1.f, -.0f,
+		// Face top.
+		.0f, 1.f, 0.f,
+		.0f, 1.f, 0.f,
+		.0f, 1.f, 0.f,
+		.0f, 1.f, 0.f,
+		.0f, 1.f, 0.f,
+		.0f, 1.f, 0.f,
         // clang-format on
     };
     std::array<float, 12 * 6> textures = {
         // clang-format off
-			// Face front.
-			 0.0f, 0.0f,
-			 1.0f, 0.0f,
-			 1.0f, 1.0f,
-			 1.0f, 1.0f,
-			 0.0f, 1.0f,
-			 0.0f, 0.0f,
-			// Face back.
-			 0.0f, 0.0f,
-			 1.0f, 0.0f,
-			 1.0f, 1.0f,
-			 1.0f, 1.0f,
-			 0.0f, 1.0f,
-			 0.0f, 0.0f,
-			 // Face left.
-			 1.0f, 0.0f,
-			 1.0f, 1.0f,
-			 0.0f, 1.0f,
-			 0.0f, 1.0f,
-			 0.0f, 0.0f,
-			 1.0f, 0.0f,
-			 // Face right.
-			 1.0f, 0.0f,
-			 1.0f, 1.0f,
-			 0.0f, 1.0f,
-			 0.0f, 1.0f,
-			 0.0f, 0.0f,
-			 1.0f, 0.0f,
-			// Face bottom.
-			 0.0f, 1.0f,
-			 1.0f, 1.0f,
-			 1.0f, 0.0f,
-			 1.0f, 0.0f,
-			 0.0f, 0.0f,
-			 0.0f, 1.0f,
-			// Face top.
-			 0.0f, 1.0f,
-			 1.0f, 1.0f,
-			 1.0f, 0.0f,
-			 1.0f, 0.0f,
-			 0.0f, 0.0f,
-			 0.0f, 1.0f
-			// clang-format off
-		};
-		std::array<std::int32_t, 18 * 3> indices = {};
-		std::iota(indices.begin(), indices.end(), 0);
-		auto point_buffer =	std::make_unique<Buffer>();
-		auto normal_buffer = std::make_unique<Buffer>();
-		auto texture_buffer = std::make_unique<Buffer>();
-		auto index_buffer = 
-			std::make_unique<Buffer>(BufferTypeEnum::ELEMENT_ARRAY_BUFFER);
-		point_buffer->Copy(points.size() * sizeof(float), points.data());
-		normal_buffer->Copy(normals.size() * sizeof(float), normals.data());
-		texture_buffer->Copy(textures.size() * sizeof(float), textures.data());
-		index_buffer->Copy(
-			indices.size() * sizeof(std::int32_t), 
-			indices.data());
-		static int count = 0;
-		count++;
-		point_buffer->SetName(fmt::format("CubePoint.{}", count));
-		normal_buffer->SetName(fmt::format("CubeNormal.{}", count));
-		texture_buffer->SetName(fmt::format("CubeTexture.{}", count));
-		index_buffer->SetName(fmt::format("CubeIndex.{}", count));
-		auto maybe_point_buffer_id =
-			level->AddBuffer(std::move(point_buffer));
-		if (!maybe_point_buffer_id) return std::nullopt;
-		auto maybe_normal_buffer_id =
-			level->AddBuffer(std::move(normal_buffer));
-		if (!maybe_normal_buffer_id) return std::nullopt;
-		auto maybe_texture_buffer_id =
-			level->AddBuffer(std::move(texture_buffer));
-		if (!maybe_texture_buffer_id) return std::nullopt;
-		auto maybe_index_buffer_id =
-			level->AddBuffer(std::move(index_buffer));
-		if (!maybe_index_buffer_id) return std::nullopt;
-		auto mesh = std::make_unique<StaticMesh>(
-			level,
-			maybe_point_buffer_id.value(),
-			maybe_normal_buffer_id.value(),
-			maybe_texture_buffer_id.value(),
-			maybe_index_buffer_id.value());
-		mesh->SetName(fmt::format("CubeMesh.{}", count));
-		auto maybe_id = level->AddStaticMesh(std::move(mesh));
-		if (!maybe_id) return std::nullopt;
-		return maybe_id.value();
-	}
+		// Face front.
+		0.0f, 0.0f,
+		1.0f, 0.0f,
+		1.0f, 1.0f,
+		1.0f, 1.0f,
+		0.0f, 1.0f,
+		0.0f, 0.0f,
+		// Face back.
+		0.0f, 0.0f,
+		1.0f, 0.0f,
+		1.0f, 1.0f,
+		1.0f, 1.0f,
+		0.0f, 1.0f,
+		0.0f, 0.0f,
+		// Face left.
+		1.0f, 0.0f,
+		1.0f, 1.0f,
+		0.0f, 1.0f,
+		0.0f, 1.0f,
+		0.0f, 0.0f,
+		1.0f, 0.0f,
+		// Face right.
+		1.0f, 0.0f,
+		1.0f, 1.0f,
+		0.0f, 1.0f,
+		0.0f, 1.0f,
+		0.0f, 0.0f,
+		1.0f, 0.0f,
+		// Face bottom.
+		0.0f, 1.0f,
+		1.0f, 1.0f,
+		1.0f, 0.0f,
+		1.0f, 0.0f,
+		0.0f, 0.0f,
+		0.0f, 1.0f,
+		// Face top.
+		0.0f, 1.0f,
+		1.0f, 1.0f,
+		1.0f, 0.0f,
+		1.0f, 0.0f,
+		0.0f, 0.0f,
+		0.0f, 1.0f
+        // clang-format on
+    };
+    std::array<std::int32_t, 18 * 3> indices = {};
+    std::iota(indices.begin(), indices.end(), 0);
+    auto point_buffer   = std::make_unique<Buffer>();
+    auto normal_buffer  = std::make_unique<Buffer>();
+    auto texture_buffer = std::make_unique<Buffer>();
+    auto index_buffer   = std::make_unique<Buffer>(BufferTypeEnum::ELEMENT_ARRAY_BUFFER);
+    point_buffer->Copy(points.size() * sizeof(float), points.data());
+    normal_buffer->Copy(normals.size() * sizeof(float), normals.data());
+    texture_buffer->Copy(textures.size() * sizeof(float), textures.data());
+    index_buffer->Copy(indices.size() * sizeof(std::int32_t), indices.data());
+    static int count = 0;
+    count++;
+    point_buffer->SetName(fmt::format("CubePoint.{}", count));
+    normal_buffer->SetName(fmt::format("CubeNormal.{}", count));
+    texture_buffer->SetName(fmt::format("CubeTexture.{}", count));
+    index_buffer->SetName(fmt::format("CubeIndex.{}", count));
+    auto maybe_point_buffer_id = level->AddBuffer(std::move(point_buffer));
+    if (!maybe_point_buffer_id) return std::nullopt;
+    auto maybe_normal_buffer_id = level->AddBuffer(std::move(normal_buffer));
+    if (!maybe_normal_buffer_id) return std::nullopt;
+    auto maybe_texture_buffer_id = level->AddBuffer(std::move(texture_buffer));
+    if (!maybe_texture_buffer_id) return std::nullopt;
+    auto maybe_index_buffer_id = level->AddBuffer(std::move(index_buffer));
+    if (!maybe_index_buffer_id) return std::nullopt;
+    auto mesh = std::make_unique<StaticMesh>(
+        level, maybe_point_buffer_id.value(), maybe_normal_buffer_id.value(),
+        maybe_texture_buffer_id.value(), maybe_index_buffer_id.value());
+    mesh->SetName(fmt::format("CubeMesh.{}", count));
+    auto maybe_id = level->AddStaticMesh(std::move(mesh));
+    if (!maybe_id) return std::nullopt;
+    return maybe_id.value();
+}
 
-} // End namespace frame::opengl.
+}  // End namespace frame::opengl.

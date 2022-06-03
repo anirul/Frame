@@ -8,7 +8,6 @@ add_library(Frame
     DeviceInterface.h
     DrawInterface.h
     EntityId.h
-    Frame.h
     ImageInterface.h
     InputInterface.h
     Level.cpp

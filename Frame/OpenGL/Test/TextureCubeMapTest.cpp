@@ -28,14 +28,14 @@ TEST_F(TextureCubeMapTest, CreateTextureCubeMapTest) {
     EXPECT_EQ(1024, texture_->GetSize().first);
     EXPECT_EQ(1024, texture_->GetSize().second);
     auto vec8 = texture_->GetTextureByte();
-    auto p    = std::minmax_element(vec8.begin(), vec8.end());
+    EXPECT_EQ(1024 * 1024 * 3 * 6, vec8.size());
+    auto p = std::minmax_element(vec8.begin(), vec8.end());
     EXPECT_EQ(0x49, *p.first);
     EXPECT_EQ(0xff, *p.second);
 }
 
-// FIXME(anirul): There is a problem in there...
-// FIXME(anirul): Note that the issue is slightly different with card and
-// FIXME(anirul): if you execute it stand alone.
+// FIXME(anirul): There is a problem in there... Note that the issue is slightly different with card
+// and if you execute it stand alone. Is it short and not float?
 TEST_F(TextureCubeMapTest, DISABLED_CreateEquirectangularTextureCubeMapTest) {
     ASSERT_FALSE(texture_);
     EXPECT_NO_THROW(texture_ = frame::opengl::file::LoadCubeMapTextureFromFile(
