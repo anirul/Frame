@@ -110,8 +110,6 @@ namespace frame::proto {
 			texture->SetWrapS(proto_texture.wrap_s().value());
 		if (proto_texture.wrap_t().value() != INVALID_TEXTURE)
 			texture->SetWrapT(proto_texture.wrap_t().value());
-		if (proto_texture.wrap_r().value() != INVALID_TEXTURE)
-			texture->SetWrapR(proto_texture.wrap_r().value());
 		return texture;
 	}
 

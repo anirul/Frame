@@ -33,11 +33,11 @@ namespace frame {
 		glm::mat4 GetLocalModel(const double dt) const override;
 
 	public:
-		CameraInterface* GetCamera() { return camera_.get(); }
-		const CameraInterface* GetCamera() const { return camera_.get(); }
+		Camera* GetCamera() { return camera_.get(); }
+		const Camera* GetCamera() const { return camera_.get(); }
 
 	private:
-		std::unique_ptr<CameraInterface> camera_ = nullptr;
+		std::unique_ptr<Camera> camera_ = nullptr;
 	};
 
 } // End namespace frame.

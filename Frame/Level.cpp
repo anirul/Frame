@@ -219,7 +219,7 @@ namespace frame {
 		return std::move(node_texture.mapped());
 	}
 
-	frame::CameraInterface* Level::GetDefaultCamera()
+	frame::Camera* Level::GetDefaultCamera()
 	{
 		auto maybe_camera_id = GetDefaultCameraId();
 		if (!maybe_camera_id)

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <gtest/gtest.h>
-#include "Frame/CameraInterface.h"
+#include "Frame/Camera.h"
 
 namespace test {
 
@@ -11,7 +11,7 @@ namespace test {
 		CameraTest() = default;
 
 	protected:
-		std::shared_ptr<frame::CameraInterface> camera_ = nullptr;
+		std::shared_ptr<frame::Camera> camera_ = nullptr;
 	};
 
 } // End namespace test.

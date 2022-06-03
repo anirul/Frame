@@ -3,7 +3,6 @@
 #include <memory>
 #include <string>
 
-#include "Frame/CameraInterface.h"
 #include "Frame/LevelInterface.h"
 
 namespace frame {

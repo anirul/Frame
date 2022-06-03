@@ -30,14 +30,6 @@ namespace frame {
 		virtual TextureFilterEnum GetWrapS() const = 0;
 		virtual void SetWrapT(const TextureFilterEnum texture_filter) = 0;
 		virtual TextureFilterEnum GetWrapT() const = 0;
-		virtual void SetWrapR(const TextureFilterEnum texture_filter)
-		{
-			throw std::runtime_error("Not implemented!");
-		}
-		virtual TextureFilterEnum GetWrapR() const
-		{
-			throw std::runtime_error("Not implemented!");
-		}
 		virtual void Clear(const glm::vec4 color) = 0;
 		virtual bool IsCubeMap() const = 0;
 		// Get the underlying texture as byte or word or dword.

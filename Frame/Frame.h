@@ -3,7 +3,6 @@
 #include "Frame/EntityId.h"
 #include "Frame/DrawInterface.h"
 #include "Frame/InputInterface.h"
-#include "Frame/CameraInterface.h"
 #include "Frame/LightInterface.h"
 #include "Frame/UniformInterface.h"
 

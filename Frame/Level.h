@@ -97,7 +97,7 @@ namespace frame {
 			EntityId id) const override;
 		std::optional<EntityId> GetParentId(EntityId id) const override;
 		std::unique_ptr<TextureInterface> ExtractTexture(EntityId id) override;
-		CameraInterface* GetDefaultCamera() override;
+		Camera* GetDefaultCamera() override;
 
 	protected:
 		EntityId GetTextureNewId() const { return next_id_maker_++;	}

@@ -4,7 +4,7 @@
 #include <optional>
 #include <unordered_map>
 
-#include "Frame/CameraInterface.h"
+#include "Frame/Camera.h"
 #include "Frame/EntityId.h"
 #include "Frame/BufferInterface.h"
 #include "Frame/StaticMeshInterface.h"
@@ -70,7 +70,7 @@ namespace frame {
 		// Extract an entity from a level (this entity will be unvalidated!).
 		virtual std::unique_ptr<TextureInterface> ExtractTexture(
 			EntityId id) = 0;
-		virtual CameraInterface* GetDefaultCamera() = 0;
+		virtual Camera* GetDefaultCamera() = 0;
 	};
 
 } // End namespace frame.
