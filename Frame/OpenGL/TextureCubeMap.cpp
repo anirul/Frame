@@ -101,13 +101,13 @@ void TextureCubeMap::UnBind() const {
 
 void TextureCubeMap::EnableMipmap() const { glGenerateMipmap(GL_TEXTURE_CUBE_MAP); }
 
-void TextureCubeMap::SetMinFilter(const TextureFilterEnum texture_filter) {
+void TextureCubeMap::SetMinFilter(const proto::TextureFilter::Enum texture_filter) {
     Bind();
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, ConvertToGLType(texture_filter));
     UnBind();
 }
 
-TextureInterface::TextureFilterEnum TextureCubeMap::GetMinFilter() const {
+frame::proto::TextureFilter::Enum TextureCubeMap::GetMinFilter() const {
     GLint filter;
     Bind();
     glGetTexParameteriv(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, &filter);
@@ -115,13 +115,13 @@ TextureInterface::TextureFilterEnum TextureCubeMap::GetMinFilter() const {
     return ConvertFromGLType(filter);
 }
 
-void TextureCubeMap::SetMagFilter(const TextureFilterEnum texture_filter) {
+void TextureCubeMap::SetMagFilter(const proto::TextureFilter::Enum texture_filter) {
     Bind();
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, ConvertToGLType(texture_filter));
     UnBind();
 }
 
-TextureInterface::TextureFilterEnum TextureCubeMap::GetMagFilter() const {
+frame::proto::TextureFilter::Enum TextureCubeMap::GetMagFilter() const {
     GLint filter;
     Bind();
     glGetTexParameteriv(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, &filter);
@@ -129,13 +129,13 @@ TextureInterface::TextureFilterEnum TextureCubeMap::GetMagFilter() const {
     return ConvertFromGLType(filter);
 }
 
-void TextureCubeMap::SetWrapS(const TextureFilterEnum texture_filter) {
+void TextureCubeMap::SetWrapS(const proto::TextureFilter::Enum texture_filter) {
     Bind();
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, ConvertToGLType(texture_filter));
     UnBind();
 }
 
-TextureInterface::TextureFilterEnum TextureCubeMap::GetWrapS() const {
+frame::proto::TextureFilter::Enum TextureCubeMap::GetWrapS() const {
     GLint filter;
     Bind();
     glGetTexParameteriv(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, &filter);
@@ -143,13 +143,13 @@ TextureInterface::TextureFilterEnum TextureCubeMap::GetWrapS() const {
     return ConvertFromGLType(filter);
 }
 
-void TextureCubeMap::SetWrapT(const TextureFilterEnum texture_filter) {
+void TextureCubeMap::SetWrapT(const proto::TextureFilter::Enum texture_filter) {
     Bind();
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, ConvertToGLType(texture_filter));
     UnBind();
 }
 
-TextureInterface::TextureFilterEnum TextureCubeMap::GetWrapT() const {
+frame::proto::TextureFilter::Enum TextureCubeMap::GetWrapT() const {
     GLint filter;
     Bind();
     glGetTexParameteriv(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, &filter);
@@ -176,7 +176,7 @@ void TextureCubeMap::CreateTextureCubeMap(
     }
 }
 
-int TextureCubeMap::ConvertToGLType(const TextureFilterEnum texture_filter) const {
+int TextureCubeMap::ConvertToGLType(const proto::TextureFilter::Enum texture_filter) const {
     switch (texture_filter) {
         case frame::proto::TextureFilter::NEAREST:
             return GL_NEAREST;
@@ -202,7 +202,7 @@ int TextureCubeMap::ConvertToGLType(const TextureFilterEnum texture_filter) cons
     }
 }
 
-TextureInterface::TextureFilterEnum TextureCubeMap::ConvertFromGLType(int gl_filter) const {
+frame::proto::TextureFilter::Enum TextureCubeMap::ConvertFromGLType(int gl_filter) const {
     switch (gl_filter) {
         case GL_NEAREST:
             return frame::proto::TextureFilter::NEAREST;

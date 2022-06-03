@@ -67,13 +67,13 @@ class TextureCubeMap : public TextureInterface, public BindInterface {
      * @param texture_filter: Proto filter to be converted to OpenGL.
      * @return OpenGL value.
      */
-    int ConvertToGLType(TextureFilterEnum texture_filter) const;
+    int ConvertToGLType(proto::TextureFilter::Enum texture_filter) const;
     /**
      * @brief Convert texture OpenGL to filter enum.
      * @param gl_filter: OpenGL value to be converted.
      * @return Proto texture filter.
      */
-    TextureFilterEnum ConvertFromGLType(int gl_filter) const;
+    proto::TextureFilter::Enum ConvertFromGLType(int gl_filter) const;
     /**
      * @brief Get a copy of the texture output (8 bit format).
 	 * @warning This is not working well!
@@ -116,44 +116,44 @@ class TextureCubeMap : public TextureInterface, public BindInterface {
      * @brief Set the minification filter.
      * @param texture_filter: Usually and by default GL_LINEAR.
      */
-    void SetMinFilter(const TextureFilterEnum texture_filter) override;
+    void SetMinFilter(const proto::TextureFilter::Enum texture_filter) override;
     /**
      * @brief Get the minification filter.
      * @return The value of the minification filter.
      */
-    TextureFilterEnum GetMinFilter() const override;
+    proto::TextureFilter::Enum GetMinFilter() const override;
     /**
      * @brief Set the magnification filter.
      * @param texture_filter: Usually and by default GL_LINEAR.
      */
-    void SetMagFilter(const TextureFilterEnum texture_filter) override;
+    void SetMagFilter(const proto::TextureFilter::Enum texture_filter) override;
     /**
      * @brief Get the magnification filter.
      * @return The value of the magnification filter.
      */
-    TextureFilterEnum GetMagFilter() const override;
+    proto::TextureFilter::Enum GetMagFilter() const override;
     /**
      * @brief Set the wrapping on the s size of the texture (horizontal) this will decide how the
      * texture is treated in case you overflow in this direction.
      * @param texture_filter: Could be any of (REPEAT, CLAMP_TO_EDGE, MIRRORED_REPEAT).
      */
-    void SetWrapS(const TextureFilterEnum texture_filter) override;
+    void SetWrapS(const proto::TextureFilter::Enum texture_filter) override;
     /**
      * @brief Get the wrapping on the s size of the texture (horizontal).
      * @return The way the texture is wrap could be any of (REPEAT, CLAMP_TO_EDGE, MIRRORED_REPEAT).
      */
-    TextureFilterEnum GetWrapS() const override;
+    proto::TextureFilter::Enum GetWrapS() const override;
     /**
      * @brief Set the wrapping on the t size of the texture (vertical) this will decide how the
      * texture is treated in case you overflow in this direction.
      * @param texture_filter: Could be any of (REPEAT, CLAMP_TO_EDGE, MIRRORED_REPEAT).
      */
-    void SetWrapT(const TextureFilterEnum texture_filter) override;
+    void SetWrapT(const proto::TextureFilter::Enum texture_filter) override;
     /**
      * @brief Get the wrapping on the t size of the texture (vertical).
      * @return The way the texture is wrap could be any of (REPEAT, CLAMP_TO_EDGE, MIRRORED_REPEAT).
      */
-    TextureFilterEnum GetWrapT() const override;
+    proto::TextureFilter::Enum GetWrapT() const override;
 
    public:
     /**
