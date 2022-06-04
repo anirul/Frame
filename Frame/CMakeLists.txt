@@ -5,11 +5,9 @@ add_library(Frame
     BufferInterface.h
     Camera.cpp
     Camera.h
-    CameraInterface.h
     DeviceInterface.h
     DrawInterface.h
     EntityId.h
-    Frame.h
     ImageInterface.h
     InputInterface.h
     Level.cpp

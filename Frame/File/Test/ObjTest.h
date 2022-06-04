@@ -1,17 +1,17 @@
 #pragma once
 
 #include <gtest/gtest.h>
+
 #include "Frame/File/Obj.h"
 
 namespace test {
 
-	class ObjTest : public testing::Test 
-	{
-	public:
-		ObjTest() = default;
+class ObjTest : public testing::Test {
+   public:
+    ObjTest() = default;
 
-	protected:
-		std::unique_ptr<frame::file::Obj> obj_;
-	};
+   protected:
+    std::unique_ptr<frame::file::Obj> obj_;
+};
 
-} // End namespace test.
+}  // End namespace test.

@@ -1,5 +1,3 @@
 #include "Proto.h"
 
-namespace frame::proto {
-
-} // End namespace frame::proto.
+namespace frame::proto {}  // End namespace frame::proto.
