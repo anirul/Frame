@@ -9,21 +9,18 @@
 
 namespace test {
 
-	class ParseSceneTreeTest: public testing::Test 
-	{
-	public:
-		ParseSceneTreeTest()
-		{
-			window_ = frame::CreateSDLOpenGL({ 320, 200 });
-			proto_level_ =
-				frame::proto::LoadProtoFromJsonFile<frame::proto::Level>(
-					frame::file::FindFile("Asset/Json/SceneTreeTest.json"));
-		}
+class ParseSceneTreeTest : public testing::Test {
+   public:
+    ParseSceneTreeTest() {
+        window_      = frame::CreateSDLOpenGL({ 320, 200 });
+        proto_level_ = frame::proto::LoadProtoFromJsonFile<frame::proto::Level>(
+            frame::file::FindFile("Asset/Json/SceneTreeTest.json"));
+    }
 
-	protected:
-		frame::proto::Level proto_level_ = {};
-		std::unique_ptr<frame::LevelInterface> level_ = nullptr;
-		std::unique_ptr<frame::WindowInterface> window_ = nullptr;
-	};
+   protected:
+    frame::proto::Level proto_level_                = {};
+    std::unique_ptr<frame::LevelInterface> level_   = nullptr;
+    std::unique_ptr<frame::WindowInterface> window_ = nullptr;
+};
 
-} // End namespace test.
+}  // End namespace test.
