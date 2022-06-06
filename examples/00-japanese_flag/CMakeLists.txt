@@ -3,12 +3,12 @@
 add_executable(JapaneseFlag
   WIN32
     main.cpp
-    ${CMAKE_SOURCE_DIR}/Asset/Json/JapaneseFlag.json
+    ${CMAKE_SOURCE_DIR}/asset/json/japanese_flag.json
 )
 
 target_include_directories(JapaneseFlag
   PUBLIC
-    Sample/JapaneseFlag
+    examples/00-japanese_flag
     ${CMAKE_SOURCE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
 )
@@ -21,4 +21,4 @@ target_link_libraries(JapaneseFlag
     SampleCommon
 )
 
-set_property(TARGET JapaneseFlag PROPERTY FOLDER "Sample")
+set_property(TARGET JapaneseFlag PROPERTY FOLDER "Examples")

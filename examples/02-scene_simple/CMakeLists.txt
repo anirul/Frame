@@ -3,12 +3,12 @@
 add_executable(SceneSimple
   WIN32
     main.cpp
-    ${CMAKE_SOURCE_DIR}/Asset/Json/SceneSimple.json
+    ${CMAKE_SOURCE_DIR}/asset/json/scene_simple.json
 )
 
 target_include_directories(SceneSimple
   PUBLIC
-    Sample/SceneSimple
+    examples/02-scene_simple
     ${CMAKE_SOURCE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
 )
@@ -22,4 +22,4 @@ target_link_libraries(SceneSimple
     SampleCommon
 )
 
-set_property(TARGET SceneSimple PROPERTY FOLDER "Sample")
+set_property(TARGET SceneSimple PROPERTY FOLDER "Examples")

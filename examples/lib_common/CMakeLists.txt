@@ -2,11 +2,11 @@
 
 add_library(SampleCommon
   STATIC
-	Application.cpp
-	Application.h
-	Draw.cpp
-	Draw.h
-	PathInterface.h
+	application.cpp
+	application.h
+	draw.cpp
+	draw.h
+	path_interface.h
 )
 
 target_include_directories(SampleCommon
