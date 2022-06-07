@@ -1,6 +1,6 @@
-#include "ParseMaterial.h"
+#include "frame/proto/parse_material.h"
 
-#include "Frame/OpenGL/Material.h"
+#include "frame/open_gl/material.h"
 
 namespace frame::proto {
 

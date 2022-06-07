@@ -1,6 +1,6 @@
-#include "Level.h"
+#include "frame/level.h"
 
-#include "Frame/NodeCamera.h"
+#include "frame/node_camera.h"
 
 namespace frame {
 

@@ -1,7 +1,7 @@
-#include "Frame/Proto/Test/ParsePixelTest.h"
+#include "frame/proto/parse_pixel_test.h"
 
-#include "Frame/Proto/ParsePixel.h"
-#include "Frame/Proto/Proto.h"
+#include "frame/proto/parse_pixel.h"
+#include "frame/proto/proto.h"
 
 namespace test {
 

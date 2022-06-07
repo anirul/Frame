@@ -3,8 +3,8 @@
 #include <filesystem>
 #include <memory>
 
-#include "Frame/Window.h"
-#include "Sample/Common/PathInterface.h"
+#include "frame/window.h"
+#include "examples/lib_common/path_interface.h"
 
 class Application {
    public:

@@ -5,14 +5,14 @@
 
 #include <stdexcept>
 
-#include "Frame/NodeMatrix.h"
-#include "Frame/NodeStaticMesh.h"
-#include "Frame/OpenGL/File/LoadProgram.h"
-#include "Frame/OpenGL/Material.h"
-#include "Frame/OpenGL/StaticMesh.h"
-#include "Frame/OpenGL/Texture.h"
-#include "Frame/OpenGL/TextureCubeMap.h"
-#include "Frame/UniformWrapper.h"
+#include "frame/node_matrix.h"
+#include "frame/node_static_mesh.h"
+#include "frame/open_gl/file/load_program.h"
+#include "frame/open_gl/material.h"
+#include "frame/open_gl/static_mesh.h"
+#include "frame/open_gl/texture.h"
+#include "frame/open_gl/texture_cube_map.h"
+#include "frame/uniform_wrapper.h"
 
 namespace frame::opengl {
 

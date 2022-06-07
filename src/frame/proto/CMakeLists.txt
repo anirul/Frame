@@ -2,6 +2,17 @@
 
 add_library(FrameProto
   STATIC
+    ${CMAKE_SOURCE_DIR}/include/frame/proto/parse_level.h
+    ${CMAKE_SOURCE_DIR}/include/frame/proto/proto.h
+    level.proto
+    material.proto
+    math.proto
+    pixel.proto
+    program.proto
+    scene.proto
+    size.proto
+    texture.proto
+    uniform.proto
     parse_material.cpp
     parse_material.h
     parse_pixel.cpp
@@ -15,25 +26,17 @@ add_library(FrameProto
     parse_uniform.cpp
     parse_uniform.h
     parse_level.cpp
-    parse_level.h
     proto.cpp
-    proto.h
-    level.proto
-    material.proto
-    math.proto
-    pixel.proto
-    program.proto
-    scene.proto
-    size.proto
-    texture.proto
-    uniform.proto
 )
 
 target_include_directories(FrameProto 
-  PUBLIC 
+  PUBLIC
     ${CMAKE_SOURCE_DIR}
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/src
     ${Protobuf_INCLUDE_DIRS}
     ${CMAKE_CURRENT_BINARY_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR}/src/frame/proto
 )
 
 # I still doesn't know how to pass the path correctly to the generate in case

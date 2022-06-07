@@ -2,10 +2,10 @@
 
 #include <gtest/gtest.h>
 
-#include "Frame/File/FileSystem.h"
-#include "Frame/LevelInterface.h"
-#include "Frame/NodeInterface.h"
-#include "Frame/Window.h"
+#include "frame/file/file_system.h"
+#include "frame/level_interface.h"
+#include "frame/node_interface.h"
+#include "frame/window.h"
 
 namespace test {
 

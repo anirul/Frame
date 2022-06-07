@@ -2,8 +2,8 @@
 
 #include <glm/glm.hpp>
 
-#include "Frame/LightInterface.h"
-#include "Frame/OpenGL/Program.h"
+#include "frame/light_interface.h"
+#include "frame/open_gl/program.h"
 
 namespace frame::opengl {
 

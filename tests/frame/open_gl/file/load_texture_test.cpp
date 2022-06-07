@@ -1,8 +1,8 @@
-#include "LoadTextureTest.h"
+#include "frame/open_gl/file/load_texture_test.h"
 
-#include "Frame/File/FileSystem.h"
-#include "Frame/OpenGL/File/LoadTexture.h"
-#include "Frame/OpenGL/Texture.h"
+#include "frame/file/file_system.h"
+#include "frame/open_gl/file/load_texture.h"
+#include "frame/open_gl/texture.h"
 
 namespace test {
 
@@ -35,8 +35,8 @@ TEST_F(LoadTextureTest, LoadTextureFromVec4Test) {
 
 TEST_F(LoadTextureTest, LoadTextureFromFileTest) {
     auto texture = frame::opengl::file::LoadTextureFromFile(
-        frame::file::FindFile("Asset/CubeMap/PositiveX.png"), frame::proto::PixelElementSize_BYTE(),
-        frame::proto::PixelStructure_RGB_ALPHA());
+        frame::file::FindFile("asset/cubemap/positive_x.png"),
+        frame::proto::PixelElementSize_BYTE(), frame::proto::PixelStructure_RGB_ALPHA());
     EXPECT_TRUE(texture);
     EXPECT_EQ(1024, texture->GetSize().first);
     EXPECT_EQ(1024, texture->GetSize().second);
@@ -51,12 +51,12 @@ TEST_F(LoadTextureTest, LoadTextureFromFileTest) {
 
 TEST_F(LoadTextureTest, LoadCubeMapFromFilesTest) {
     auto texture = frame::opengl::file::LoadCubeMapTextureFromFiles(
-        { frame::file::FindFile("Asset/CubeMap/PositiveX.png"),
-          frame::file::FindFile("Asset/CubeMap/NegativeX.png"),
-          frame::file::FindFile("Asset/CubeMap/PositiveY.png"),
-          frame::file::FindFile("Asset/CubeMap/NegativeY.png"),
-          frame::file::FindFile("Asset/CubeMap/PositiveZ.png"),
-          frame::file::FindFile("Asset/CubeMap/NegativeZ.png") },
+        { frame::file::FindFile("asset/cubemap/positive_x.png"),
+          frame::file::FindFile("asset/cubemap/negative_x.png"),
+          frame::file::FindFile("asset/cubemap/positive_y.png"),
+          frame::file::FindFile("asset/cubemap/negative_y.png"),
+          frame::file::FindFile("asset/cubemap/positive_z.png"),
+          frame::file::FindFile("asset/cubemap/negative_z.png") },
         frame::proto::PixelElementSize_BYTE(), frame::proto::PixelStructure_RGB_ALPHA());
     EXPECT_TRUE(texture);
     EXPECT_EQ(1024, texture->GetSize().first);

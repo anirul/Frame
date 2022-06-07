@@ -1,11 +1,11 @@
-#include "Frame/File/Obj.h"
+#include "frame/file/obj.h"
 
 #include <fstream>
 #define TINYOBJLOADER_IMPLEMENTATION  // define this in only *one* .cc
 #include <fmt/core.h>
 #include <tiny_obj_loader.h>
 
-#include "Frame/File/FileSystem.h"
+#include "frame/file/file_system.h"
 
 namespace frame::file {
 

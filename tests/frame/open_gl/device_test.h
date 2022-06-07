@@ -2,12 +2,12 @@
 
 #include <gtest/gtest.h>
 
-#include "Frame/DeviceInterface.h"
-#include "Frame/File/FileSystem.h"
-#include "Frame/OpenGL/Device.h"
-#include "Frame/Proto/ParseLevel.h"
-#include "Frame/Proto/Proto.h"
-#include "Frame/Window.h"
+#include "frame/device_interface.h"
+#include "frame/file/file_system.h"
+#include "frame/open_gl/device.h"
+#include "frame/proto/parse_level.h"
+#include "frame/proto/proto.h"
+#include "frame/window.h"
 
 namespace test {
 
@@ -16,7 +16,7 @@ class DeviceTest : public ::testing::Test {
     DeviceTest() : window_(frame::CreateSDLOpenGL(size_)) {
         auto maybe_level = frame::proto::ParseLevelOpenGL(
             size_, frame::proto::LoadProtoFromJsonFile<frame::proto::Level>(
-                       frame::file::FindFile("Asset/Json/DeviceTest.json")));
+                       frame::file::FindFile("asset/json/device_test.json")));
         if (!maybe_level) throw std::runtime_error("Couldn't create level.");
         level_ = std::move(maybe_level.value());
     }

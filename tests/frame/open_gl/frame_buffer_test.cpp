@@ -1,6 +1,6 @@
-#include "FrameBufferTest.h"
+#include "frame/open_gl/frame_buffer_test.h"
 
-#include "Frame/OpenGL/Texture.h"
+#include "frame/open_gl/texture.h"
 
 namespace test {
 

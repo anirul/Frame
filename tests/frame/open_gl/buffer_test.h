@@ -2,8 +2,8 @@
 
 #include <gtest/gtest.h>
 
-#include "Frame/BufferInterface.h"
-#include "Frame/Window.h"
+#include "frame/buffer_interface.h"
+#include "frame/window.h"
 
 namespace test {
 

@@ -2,11 +2,11 @@
 
 #include <filesystem>
 
-#include "Frame/DeviceInterface.h"
-#include "Frame/DrawInterface.h"
-#include "Frame/Logger.h"
-#include "Frame/Window.h"
-#include "Sample/Common/PathInterface.h"
+#include "frame/device_interface.h"
+#include "frame/draw_interface.h"
+#include "frame/logger.h"
+#include "frame/window.h"
+#include "examples/lib_common/path_interface.h"
 
 class Draw : public frame::DrawInterface {
    public:

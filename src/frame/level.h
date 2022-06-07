@@ -4,8 +4,8 @@
 #include <memory>
 #include <utility>
 
-#include "Frame/LevelInterface.h"
-#include "Frame/Logger.h"
+#include "frame/level_interface.h"
+#include "frame/logger.h"
 
 namespace frame {
 

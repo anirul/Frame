@@ -2,8 +2,8 @@
 
 #include <gtest/gtest.h>
 
-#include "Frame/OpenGL/FrameBuffer.h"
-#include "Frame/Window.h"
+#include "frame/open_gl/frame_buffer.h"
+#include "frame/window.h"
 
 namespace test {
 

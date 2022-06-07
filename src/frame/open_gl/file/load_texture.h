@@ -6,9 +6,9 @@
 #include <string>
 #include <vector>
 
-#include "Frame/OpenGL/Pixel.h"
-#include "Frame/Proto/ParsePixel.h"
-#include "Frame/TextureInterface.h"
+#include "frame/open_gl/pixel.h"
+#include "frame/proto/parse_pixel.h"
+#include "frame/texture_interface.h"
 
 namespace frame::opengl::file {
 

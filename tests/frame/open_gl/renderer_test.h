@@ -2,12 +2,12 @@
 
 #include <gtest/gtest.h>
 
-#include "Frame/DeviceInterface.h"
-#include "Frame/File/FileSystem.h"
-#include "Frame/Level.h"
-#include "Frame/OpenGL/Renderer.h"
-#include "Frame/Proto/ParseLevel.h"
-#include "Frame/Window.h"
+#include "frame/device_interface.h"
+#include "frame/file/file_system.h"
+#include "frame/level.h"
+#include "frame/open_gl/renderer.h"
+#include "frame/proto/parse_level.h"
+#include "frame/window.h"
 
 namespace test {
 
@@ -19,7 +19,7 @@ class RendererTest : public testing::Test {
     bool LoadDefaultLevel() {
         auto maybe_level = frame::proto::ParseLevelOpenGL(
             size_, frame::proto::LoadProtoFromJsonFile<frame::proto::Level>(
-                       frame::file::FindFile("Asset/Json/RendererTest.json")));
+                       frame::file::FindFile("asset/json/renderer_test.json")));
         if (maybe_level) {
             level_ = std::move(maybe_level.value());
             return true;

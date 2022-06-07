@@ -6,11 +6,11 @@
 #include <optional>
 #include <vector>
 
-#include "Frame/Logger.h"
-#include "Frame/OpenGL/Shader.h"
-#include "Frame/ProgramInterface.h"
-#include "Frame/Proto/Proto.h"
-#include "Frame/UniformInterface.h"
+#include "frame/logger.h"
+#include "frame/open_gl/shader.h"
+#include "frame/program_interface.h"
+#include "frame/proto/proto.h"
+#include "frame/uniform_interface.h"
 
 namespace frame::opengl {
 

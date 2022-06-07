@@ -8,17 +8,17 @@
 #include <memory>
 #include <optional>
 
-#include "Frame/Camera.h"
-#include "Frame/DeviceInterface.h"
-#include "Frame/Logger.h"
-#include "Frame/NodeCamera.h"
-#include "Frame/OpenGL/Buffer.h"
-#include "Frame/OpenGL/Material.h"
-#include "Frame/OpenGL/Program.h"
-#include "Frame/OpenGL/Renderer.h"
-#include "Frame/OpenGL/StaticMesh.h"
-#include "Frame/OpenGL/Texture.h"
-#include "Frame/UniformInterface.h"
+#include "frame/camera.h"
+#include "frame/device_interface.h"
+#include "frame/logger.h"
+#include "frame/node_camera.h"
+#include "frame/open_gl/buffer.h"
+#include "frame/open_gl/material.h"
+#include "frame/open_gl/program.h"
+#include "frame/open_gl/renderer.h"
+#include "frame/open_gl/static_mesh.h"
+#include "frame/open_gl/texture.h"
+#include "frame/uniform_interface.h"
 
 namespace frame::opengl {
 

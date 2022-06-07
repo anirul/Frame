@@ -3,9 +3,9 @@
 #include <memory>
 #include <optional>
 
-#include "Frame/LevelInterface.h"
-#include "Frame/ProgramInterface.h"
-#include "Frame/Proto/Proto.h"
+#include "frame/level_interface.h"
+#include "frame/program_interface.h"
+#include "frame/proto/proto.h"
 
 namespace frame::proto {
 

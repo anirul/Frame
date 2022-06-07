@@ -1,4 +1,4 @@
-#include "ParsePixel.h"
+#include "frame/proto/parse_pixel.h"
 
 namespace frame::proto {
 

@@ -1,4 +1,4 @@
-#include "Window.h"
+#include "frame/window.h"
 
 #include <GL/glew.h>
 #include <SDL2/SDL.h>
@@ -12,7 +12,7 @@
 #include <stdexcept>
 #include <utility>
 
-#include "Frame/OpenGL/Device.h"
+#include "frame/open_gl/device.h"
 
 namespace frame {
 

@@ -2,8 +2,8 @@
 
 #include <GL/glew.h>
 
-#include "Frame/BufferInterface.h"
-#include "Frame/OpenGL/BindInterface.h"
+#include "frame/buffer_interface.h"
+#include "frame/open_gl/bind_interface.h"
 
 namespace frame::opengl {
 

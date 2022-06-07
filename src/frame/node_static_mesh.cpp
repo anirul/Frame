@@ -1,4 +1,4 @@
-#include "NodeStaticMesh.h"
+#include "frame/node_static_mesh.h"
 
 #include <fmt/core.h>
 

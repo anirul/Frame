@@ -3,9 +3,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/quaternion.hpp>
 
-#include "Frame/ProgramInterface.h"
-#include "Frame/Proto/Proto.h"
-#include "Frame/UniformInterface.h"
+#include "frame/program_interface.h"
+#include "frame/proto/proto.h"
+#include "frame/uniform_interface.h"
 
 namespace frame::proto {
 

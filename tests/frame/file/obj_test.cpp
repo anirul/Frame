@@ -1,19 +1,19 @@
-#include "ObjTest.h"
+#include "frame/file/obj_test.h"
 
-#include "Frame/File/FileSystem.h"
-#include "Frame/File/Obj.h"
+#include "frame/file/file_system.h"
+#include "frame/file/obj.h"
 
 namespace test {
 
 TEST_F(ObjTest, CreateObjTest) {
     ASSERT_FALSE(obj_);
-    obj_ = std::make_unique<frame::file::Obj>(frame::file::FindFile("Asset/Model/Cube.obj"));
+    obj_ = std::make_unique<frame::file::Obj>(frame::file::FindFile("asset/model/cube.obj"));
     EXPECT_TRUE(obj_);
 }
 
 TEST_F(ObjTest, ObjGetMeshesTest) {
     ASSERT_FALSE(obj_);
-    obj_ = std::make_unique<frame::file::Obj>(frame::file::FindFile("Asset/Model/Scene.obj"));
+    obj_ = std::make_unique<frame::file::Obj>(frame::file::FindFile("asset/model/scene.obj"));
     EXPECT_TRUE(obj_);
     EXPECT_NE(0, obj_->GetMeshes().size());
     for (const auto& element : obj_->GetMeshes()) {
@@ -24,7 +24,7 @@ TEST_F(ObjTest, ObjGetMeshesTest) {
 
 TEST_F(ObjTest, ObjGetMaterialTest) {
     ASSERT_FALSE(obj_);
-    obj_ = std::make_unique<frame::file::Obj>(frame::file::FindFile("Asset/Model/Scene.obj"));
+    obj_ = std::make_unique<frame::file::Obj>(frame::file::FindFile("asset/model/scene.obj"));
     EXPECT_TRUE(obj_);
     EXPECT_NE(0, obj_->GetMeshes().size());
     for (const auto& element : obj_->GetMeshes()) {

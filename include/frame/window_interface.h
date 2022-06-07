@@ -4,9 +4,9 @@
 #include <string>
 #include <utility>
 
-#include "Frame/DeviceInterface.h"
-#include "Frame/DrawInterface.h"
-#include "Frame/InputInterface.h"
+#include "frame/device_interface.h"
+#include "frame/draw_interface.h"
+#include "frame/input_interface.h"
 
 namespace frame {
 

@@ -2,13 +2,13 @@
 
 #include <memory>
 
-#include "Frame/LevelInterface.h"
-#include "Frame/OpenGL/FrameBuffer.h"
-#include "Frame/OpenGL/RenderBuffer.h"
-#include "Frame/ProgramInterface.h"
-#include "Frame/RendererInterface.h"
-#include "Frame/StaticMeshInterface.h"
-#include "Frame/UniformInterface.h"
+#include "frame/level_interface.h"
+#include "frame/open_gl/frame_buffer.h"
+#include "frame/open_gl/render_buffer.h"
+#include "frame/program_interface.h"
+#include "frame/renderer_interface.h"
+#include "frame/static_mesh_interface.h"
+#include "frame/uniform_interface.h"
 
 namespace frame::opengl {
 

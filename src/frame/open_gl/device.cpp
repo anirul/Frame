@@ -7,10 +7,10 @@
 #include <sstream>
 #include <stdexcept>
 
-#include "Frame/File/Image.h"
-#include "FrameBuffer.h"
-#include "RenderBuffer.h"
-#include "Renderer.h"
+#include "frame/file/image.h"
+#include "frame/open_gl/frame_buffer.h"
+#include "frame/open_gl/render_buffer.h"
+#include "frame/open_gl/renderer.h"
 
 namespace frame::opengl {
 

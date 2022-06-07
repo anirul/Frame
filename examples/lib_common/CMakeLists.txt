@@ -11,7 +11,8 @@ add_library(LibCommon
 
 target_include_directories(LibCommon
   PUBLIC
-	${CMAKE_SOURCE_DIR}
+	${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}
 	${CMAKE_CURRENT_BINARY_DIR}
 )
 

@@ -7,13 +7,13 @@
 #include <string>
 #include <vector>
 
-#include "Frame/LevelInterface.h"
-#include "Frame/OpenGL/BindInterface.h"
-#include "Frame/OpenGL/Buffer.h"
-#include "Frame/OpenGL/Material.h"
-#include "Frame/OpenGL/Program.h"
-#include "Frame/OpenGL/Texture.h"
-#include "Frame/StaticMeshInterface.h"
+#include "frame/level_interface.h"
+#include "frame/open_gl/bind_interface.h"
+#include "frame/open_gl/buffer.h"
+#include "frame/open_gl/material.h"
+#include "frame/open_gl/program.h"
+#include "frame/open_gl/texture.h"
+#include "frame/static_mesh_interface.h"
 
 namespace frame::opengl {
 

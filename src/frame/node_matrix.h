@@ -3,7 +3,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/quaternion.hpp>
 
-#include "Frame/NodeInterface.h"
+#include "frame/node_interface.h"
 
 namespace frame {
 

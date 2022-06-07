@@ -12,7 +12,8 @@ add_executable(FrameFileTest
 
 target_include_directories(FrameFileTest
   PUBLIC
-	${CMAKE_SOURCE_DIR}
+    ${CMAKE_SOURCE_DIR}/include
+	${CMAKE_SOURCE_DIR}/tests
 	${CMAKE_CURRENT_BINARY_DIR}
 	${STB_INCLUDE_DIRS}
 )

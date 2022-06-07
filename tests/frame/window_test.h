@@ -1,7 +1,7 @@
 #pragma once
 
 #include <gtest/gtest.h>
-#include "Frame/WindowInterface.h"
+#include "frame/window_interface.h"
 
 namespace test {
 

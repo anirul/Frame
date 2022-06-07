@@ -2,10 +2,10 @@
 
 #include <gtest/gtest.h>
 
-#include "Frame/MaterialInterface.h"
-#include "Frame/OpenGL/Material.h"
-#include "Frame/OpenGL/Texture.h"
-#include "Frame/Window.h"
+#include "frame/material_interface.h"
+#include "frame/open_gl/material.h"
+#include "frame/open_gl/texture.h"
+#include "frame/window.h"
 
 namespace test {
 

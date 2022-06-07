@@ -2,8 +2,8 @@
 
 #include <gtest/gtest.h>
 
-#include "Frame/TextureInterface.h"
-#include "Frame/Window.h"
+#include "frame/texture_interface.h"
+#include "frame/window.h"
 
 namespace test {
 

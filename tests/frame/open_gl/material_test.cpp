@@ -1,8 +1,8 @@
-#include "MaterialTest.h"
+#include "frame/open_gl/material_test.h"
 
-#include "Frame/File/FileSystem.h"
-#include "Frame/Level.h"
-#include "Frame/OpenGL/File/LoadTexture.h"
+#include "frame/file/file_system.h"
+#include "frame/level.h"
+#include "frame/open_gl/file/load_texture.h"
 
 namespace test {
 

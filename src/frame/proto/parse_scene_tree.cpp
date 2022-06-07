@@ -1,17 +1,17 @@
-#include "ParseSceneTree.h"
+#include "frame/proto/parse_scene_tree.h"
 
 #include <fmt/core.h>
 
-#include "Frame/File/FileSystem.h"
-#include "Frame/File/Obj.h"
-#include "Frame/NodeCamera.h"
-#include "Frame/NodeLight.h"
-#include "Frame/NodeMatrix.h"
-#include "Frame/NodeStaticMesh.h"
-#include "Frame/OpenGL/Buffer.h"
-#include "Frame/OpenGL/File/LoadStaticMesh.h"
-#include "Frame/OpenGL/StaticMesh.h"
-#include "Frame/Proto/ParseUniform.h"
+#include "frame/file/file_system.h"
+#include "frame/file/obj.h"
+#include "frame/node_camera.h"
+#include "frame/node_light.h"
+#include "frame/node_matrix.h"
+#include "frame/node_static_mesh.h"
+#include "frame/open_gl/buffer.h"
+#include "frame/open_gl/file/load_static_mesh.h"
+#include "frame/open_gl/static_mesh.h"
+#include "frame/proto/parse_uniform.h"
 
 namespace frame::proto {
 

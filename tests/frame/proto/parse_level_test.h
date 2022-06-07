@@ -2,8 +2,8 @@
 
 #include <gtest/gtest.h>
 
-#include "Frame/LevelInterface.h"
-#include "Frame/Window.h"
+#include "frame/level_interface.h"
+#include "frame/window.h"
 
 namespace test {
 

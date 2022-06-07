@@ -3,7 +3,7 @@
 #include <memory>
 #include <optional>
 
-#include "Frame/ProgramInterface.h"
+#include "frame/program_interface.h"
 
 namespace frame::opengl::file {
 

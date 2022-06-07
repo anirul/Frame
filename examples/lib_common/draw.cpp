@@ -2,8 +2,8 @@
 
 #include <fstream>
 
-#include "Frame/File/FileSystem.h"
-#include "Frame/Proto/ParseLevel.h"
+#include "frame/file/file_system.h"
+#include "frame/proto/parse_level.h"
 
 void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size) {
     // Load proto from files.

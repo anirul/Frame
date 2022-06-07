@@ -1,7 +1,7 @@
-#include "LoadStaticMeshTest.h"
+#include "frame/open_gl/file/load_static_mesh_test.h"
 
-#include "Frame/Level.h"
-#include "Frame/OpenGL/File/LoadStaticMesh.h"
+#include "frame/level.h"
+#include "frame/open_gl/file/load_static_mesh.h"
 
 namespace test {
 

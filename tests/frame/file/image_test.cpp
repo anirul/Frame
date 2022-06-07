@@ -1,22 +1,22 @@
-#include "ImageTest.h"
+#include "frame/file/image_test.h"
 
 #include <memory>
 
-#include "Frame/File/FileSystem.h"
+#include "frame/file/file_system.h"
 
 namespace test {
 
 TEST_F(ImageTest, CreateImageTest) {
     ASSERT_FALSE(image_);
     image_ =
-        std::make_unique<frame::file::Image>(frame::file::FindFile("Asset/CubeMap/PositiveX.png"));
+        std::make_unique<frame::file::Image>(frame::file::FindFile("asset/cubemap/positive_x.png"));
     EXPECT_TRUE(image_);
 }
 
 TEST_F(ImageTest, CheckSizeImageTest) {
     ASSERT_FALSE(image_);
     image_ =
-        std::make_unique<frame::file::Image>(frame::file::FindFile("Asset/CubeMap/PositiveX.png"));
+        std::make_unique<frame::file::Image>(frame::file::FindFile("asset/cubemap/positive_x.png"));
     ASSERT_TRUE(image_);
     EXPECT_EQ(1024, image_->GetSize().first);
     EXPECT_EQ(1024, image_->GetSize().second);
@@ -25,7 +25,7 @@ TEST_F(ImageTest, CheckSizeImageTest) {
 TEST_F(ImageTest, CheckTypeImageTest) {
     ASSERT_FALSE(image_);
     image_ =
-        std::make_unique<frame::file::Image>(frame::file::FindFile("Asset/CubeMap/PositiveX.png"));
+        std::make_unique<frame::file::Image>(frame::file::FindFile("asset/cubemap/positive_x.png"));
     ASSERT_TRUE(image_);
     EXPECT_EQ(frame::proto::PixelElementSize_BYTE(), image_->GetPixelElementSize());
     EXPECT_EQ(frame::proto::PixelStructure_RGB(), image_->GetPixelStructure());
@@ -35,7 +35,7 @@ TEST_F(ImageTest, CreateCubeMapImageTest) {
     ASSERT_FALSE(image_);
     // This is not needed it could be strait bytes.
     image_ = std::make_unique<frame::file::Image>(
-        frame::file::FindFile("Asset/CubeMap/Hamarikyu.hdr"), frame::proto::PixelElementSize_HALF(),
+        frame::file::FindFile("asset/cubemap/hamarikyu.hdr"), frame::proto::PixelElementSize_HALF(),
         frame::proto::PixelStructure_RGB());
     EXPECT_TRUE(image_);
 }
@@ -43,7 +43,7 @@ TEST_F(ImageTest, CreateCubeMapImageTest) {
 TEST_F(ImageTest, CreateCubeMapPointerImageTest) {
     ASSERT_FALSE(image_);
     image_ = std::make_unique<frame::file::Image>(
-        frame::file::FindFile("Asset/CubeMap/Hamarikyu.hdr"),
+        frame::file::FindFile("asset/cubemap/hamarikyu.hdr"),
         frame::proto::PixelElementSize_FLOAT(), frame::proto::PixelStructure_RGB_ALPHA());
     ASSERT_TRUE(image_);
     EXPECT_EQ(3200, image_->GetSize().first);

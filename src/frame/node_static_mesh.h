@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "Frame/NodeInterface.h"
+#include "frame/node_interface.h"
 
 namespace frame {
 

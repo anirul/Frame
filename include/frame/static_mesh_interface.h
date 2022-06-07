@@ -2,8 +2,8 @@
 
 #include <memory>
 
-#include "Frame/EntityId.h"
-#include "Frame/NameInterface.h"
+#include "frame/entity_id.h"
+#include "frame/name_interface.h"
 
 namespace frame {
 

@@ -1,4 +1,4 @@
-#include "NodeCamera.h"
+#include "frame/node_camera.h"
 
 #include <stdexcept>
 

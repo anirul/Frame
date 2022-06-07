@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "Frame/OpenGL/Pixel.h"
+#include "frame/open_gl/pixel.h"
 
 namespace test {
 

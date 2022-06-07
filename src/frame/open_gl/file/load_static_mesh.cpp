@@ -1,14 +1,14 @@
-#include "Frame/OpenGL/File/LoadStaticMesh.h"
+#include "frame/open_gl/file/load_static_mesh.h"
 
 #include <stdexcept>
 
-#include "Frame/File/FileSystem.h"
-#include "Frame/File/Image.h"
-#include "Frame/File/Obj.h"
-#include "Frame/Logger.h"
-#include "Frame/OpenGL/Buffer.h"
-#include "Frame/OpenGL/File/LoadTexture.h"
-#include "Frame/OpenGL/StaticMesh.h"
+#include "frame/file/file_system.h"
+#include "frame/file/image.h"
+#include "frame/file/obj.h"
+#include "frame/logger.h"
+#include "frame/open_gl/buffer.h"
+#include "frame/open_gl/file/load_texture.h"
+#include "frame/open_gl/static_mesh.h"
 
 namespace frame::opengl::file {
 

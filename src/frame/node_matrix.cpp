@@ -1,4 +1,4 @@
-#include "NodeMatrix.h"
+#include "frame/node_matrix.h"
 
 #include <stdexcept>
 

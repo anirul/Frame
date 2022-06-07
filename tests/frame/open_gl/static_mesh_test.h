@@ -2,8 +2,8 @@
 
 #include <gtest/gtest.h>
 
-#include "Frame/StaticMeshInterface.h"
-#include "Frame/Window.h"
+#include "frame/static_mesh_interface.h"
+#include "frame/window.h"
 
 namespace test {
 

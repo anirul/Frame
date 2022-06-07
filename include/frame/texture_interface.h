@@ -4,9 +4,8 @@
 #include <cinttypes>
 #include <glm/glm.hpp>
 #include <utility>
-
-#include "Frame/NameInterface.h"
-#include "Frame/Proto/Proto.h"
+#include "frame/name_interface.h"
+#include "frame/proto/proto.h"
 
 namespace frame {
 

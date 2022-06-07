@@ -1,4 +1,4 @@
-#include "StaticMesh.h"
+#include "frame/open_gl/static_mesh.h"
 
 #include <GL/glew.h>
 

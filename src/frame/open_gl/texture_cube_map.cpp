@@ -1,4 +1,4 @@
-#include "TextureCubeMap.h"
+#include "frame/open_gl/texture_cube_map.h"
 
 #include <GL/glew.h>
 
@@ -7,14 +7,14 @@
 #include <functional>
 #include <stdexcept>
 
-#include "Frame/Level.h"
-#include "Frame/OpenGL/File/LoadProgram.h"
-#include "Frame/OpenGL/FrameBuffer.h"
-#include "Frame/OpenGL/Pixel.h"
-#include "Frame/OpenGL/Program.h"
-#include "Frame/OpenGL/RenderBuffer.h"
-#include "Frame/OpenGL/Renderer.h"
-#include "Frame/OpenGL/StaticMesh.h"
+#include "frame/level.h"
+#include "frame/open_gl/file/load_program.h"
+#include "frame/open_gl/frame_buffer.h"
+#include "frame/open_gl/pixel.h"
+#include "frame/open_gl/program.h"
+#include "frame/open_gl/render_buffer.h"
+#include "frame/open_gl/renderer.h"
+#include "frame/open_gl/static_mesh.h"
 
 namespace frame::opengl {
 

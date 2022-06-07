@@ -1,20 +1,20 @@
-#include "Frame/OpenGL/File/LoadTexture.h"
+#include "frame/open_gl/file/load_texture.h"
 
 #include <algorithm>
 #include <fstream>
 #include <set>
 #include <vector>
 
-#include "Frame/File/FileSystem.h"
-#include "Frame/File/Image.h"
-#include "Frame/Logger.h"
-#include "Frame/NodeMatrix.h"
-#include "Frame/OpenGL/Material.h"
-#include "Frame/OpenGL/Renderer.h"
-#include "Frame/OpenGL/StaticMesh.h"
-#include "Frame/OpenGL/Texture.h"
-#include "Frame/OpenGL/TextureCubeMap.h"
-#include "Frame/Proto/ParseLevel.h"
+#include "frame/file/file_system.h"
+#include "frame/file/image.h"
+#include "frame/logger.h"
+#include "frame/node_matrix.h"
+#include "frame/open_gl/material.h"
+#include "frame/open_gl/renderer.h"
+#include "frame/open_gl/static_mesh.h"
+#include "frame/open_gl/texture.h"
+#include "frame/open_gl/texture_cube_map.h"
+#include "frame/proto/parse_level.h"
 
 namespace frame::opengl::file {
 

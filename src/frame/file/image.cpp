@@ -1,4 +1,4 @@
-#include "Frame/File/Image.h"
+#include "frame/file/image.h"
 
 #include <algorithm>
 #include <fstream>
@@ -9,7 +9,7 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image_write.h>
 
-#include "Frame/OpenGL/Texture.h"
+#include "frame/logger.h"
 
 namespace frame::file {
 

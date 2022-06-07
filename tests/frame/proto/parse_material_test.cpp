@@ -1,6 +1,6 @@
-#include "Frame/Proto/Test/ParseMaterialTest.h"
+#include "frame/proto/parse_material_test.h"
 
-#include "Frame/Proto/ParseMaterial.h"
+#include "frame/proto/parse_material.h"
 
 namespace test {
 

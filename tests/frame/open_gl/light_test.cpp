@@ -1,4 +1,4 @@
-#include "LightTest.h"
+#include "frame/open_gl/light_test.h"
 
 namespace test {
 

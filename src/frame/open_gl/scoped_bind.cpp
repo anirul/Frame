@@ -1,4 +1,4 @@
-#include "ScopedBind.h"
+#include "frame/open_gl/scoped_bind.h"
 
 #include <stdexcept>
 

@@ -1,11 +1,11 @@
-#include "TextureTest.h"
+#include "frame/open_gl/texture_test.h"
 
 #include <GL/glew.h>
 
-#include "Frame/File/FileSystem.h"
-#include "Frame/OpenGL/File/LoadTexture.h"
-#include "Frame/OpenGL/Texture.h"
-#include "Frame/Proto/ParseTexture.h"
+#include "frame/file/file_system.h"
+#include "frame/open_gl/file/load_texture.h"
+#include "frame/open_gl/texture.h"
+#include "frame/proto/parse_texture.h"
 
 namespace test {
 

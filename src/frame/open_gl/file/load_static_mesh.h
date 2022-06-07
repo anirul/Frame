@@ -3,10 +3,10 @@
 #include <memory>
 #include <string>
 
-#include "Frame/File/Obj.h"
-#include "Frame/LevelInterface.h"
-#include "Frame/NodeStaticMesh.h"
-#include "Frame/StaticMeshInterface.h"
+#include "frame/file/obj.h"
+#include "frame/level_interface.h"
+#include "frame/node_static_mesh.h"
+#include "frame/static_mesh_interface.h"
 
 namespace frame::opengl::file {
 

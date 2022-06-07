@@ -4,14 +4,14 @@
 #include <optional>
 #include <unordered_map>
 
-#include "Frame/BufferInterface.h"
-#include "Frame/Camera.h"
-#include "Frame/EntityId.h"
-#include "Frame/MaterialInterface.h"
-#include "Frame/NodeInterface.h"
-#include "Frame/ProgramInterface.h"
-#include "Frame/StaticMeshInterface.h"
-#include "Frame/TextureInterface.h"
+#include "frame/buffer_interface.h"
+#include "frame/camera.h"
+#include "frame/entity_id.h"
+#include "frame/material_interface.h"
+#include "frame/node_interface.h"
+#include "frame/program_interface.h"
+#include "frame/static_mesh_interface.h"
+#include "frame/texture_interface.h"
 
 namespace frame {
 

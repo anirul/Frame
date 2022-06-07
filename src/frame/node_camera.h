@@ -2,8 +2,8 @@
 
 #include <glm/glm.hpp>
 
-#include "Frame/Camera.h"
-#include "Frame/NodeInterface.h"
+#include "frame/camera.h"
+#include "frame/node_interface.h"
 
 namespace frame {
 

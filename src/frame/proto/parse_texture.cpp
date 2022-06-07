@@ -1,9 +1,9 @@
-#include "ParseTexture.h"
+#include "frame/proto/parse_texture.h"
 
-#include "Frame/File/FileSystem.h"
-#include "Frame/OpenGL/File/LoadTexture.h"
-#include "Frame/OpenGL/Texture.h"
-#include "Frame/OpenGL/TextureCubeMap.h"
+#include "frame/file/file_system.h"
+#include "frame/open_gl/file/load_texture.h"
+#include "frame/open_gl/texture.h"
+#include "frame/open_gl/texture_cube_map.h"
 
 namespace {
 

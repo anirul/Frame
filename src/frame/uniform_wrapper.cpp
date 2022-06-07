@@ -1,6 +1,6 @@
-#include "Frame/UniformWrapper.h"
+#include "frame/uniform_wrapper.h"
 
-#include "Frame/NodeMatrix.h"
+#include "frame/node_matrix.h"
 
 namespace frame {
 

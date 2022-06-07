@@ -2,11 +2,11 @@
 
 #include <gtest/gtest.h>
 
-#include "Frame/File/FileSystem.h"
-#include "Frame/Level.h"
-#include "Frame/MaterialInterface.h"
-#include "Frame/Proto/ParseLevel.h"
-#include "Frame/Window.h"
+#include "frame/file/file_system.h"
+#include "frame/level.h"
+#include "frame/material_interface.h"
+#include "frame/proto/parse_level.h"
+#include "frame/window.h"
 
 namespace test {
 

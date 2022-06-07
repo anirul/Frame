@@ -1,6 +1,6 @@
-#include "Frame/Proto/Test/ParseProgramTest.h"
+#include "frame/proto/parse_program_test.h"
 
-#include "Frame/Proto/ParseProgram.h"
+#include "frame/proto/parse_program.h"
 
 namespace test {
 

@@ -4,10 +4,10 @@
 #include <string>
 #include <vector>
 
-#include "Frame/EntityId.h"
-#include "Frame/NameInterface.h"
-#include "Frame/Proto/Proto.h"
-#include "Frame/UniformInterface.h"
+#include "frame/entity_id.h"
+#include "frame/name_interface.h"
+#include "frame/proto/proto.h"
+#include "frame/uniform_interface.h"
 
 namespace frame {
 

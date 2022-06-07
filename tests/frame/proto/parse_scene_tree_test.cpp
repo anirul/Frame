@@ -1,7 +1,7 @@
-#include "Frame/Proto/Test/ParseSceneTreeTest.h"
+#include "frame/proto/parse_scene_tree_test.h"
 
-#include "Frame/Level.h"
-#include "Frame/Proto/ParseSceneTree.h"
+#include "frame/level.h"
+#include "frame/proto/parse_scene_tree.h"
 
 namespace test {
 

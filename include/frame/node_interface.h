@@ -6,8 +6,8 @@
 #include <string>
 #include <vector>
 
-#include "Frame/NameInterface.h"
-#include "Frame/StaticMeshInterface.h"
+#include "frame/name_interface.h"
+#include "frame/static_mesh_interface.h"
 
 namespace frame {
 

@@ -1,6 +1,6 @@
-#include "BufferTest.h"
+#include "frame/open_gl/buffer_test.h"
 
-#include "Frame/OpenGL/Buffer.h"
+#include "frame/open_gl/buffer.h"
 
 namespace test {
 

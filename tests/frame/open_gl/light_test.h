@@ -2,8 +2,8 @@
 
 #include <gtest/gtest.h>
 
-#include "Frame/LightInterface.h"
-#include "Frame/OpenGL/Light.h"
+#include "frame/light_interface.h"
+#include "frame/open_gl/light.h"
 
 namespace test {
 

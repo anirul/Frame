@@ -10,14 +10,14 @@
 #include <utility>
 #include <vector>
 
-#include "Frame/OpenGL/FrameBuffer.h"
-#include "Frame/OpenGL/Pixel.h"
-#include "Frame/OpenGL/Program.h"
-#include "Frame/OpenGL/RenderBuffer.h"
-#include "Frame/OpenGL/ScopedBind.h"
-#include "Frame/Proto/ParsePixel.h"
-#include "Frame/Proto/Proto.h"
-#include "Frame/TextureInterface.h"
+#include "frame/open_gl/frame_buffer.h"
+#include "frame/open_gl/pixel.h"
+#include "frame/open_gl/program.h"
+#include "frame/open_gl/render_buffer.h"
+#include "frame/open_gl/scoped_bind.h"
+#include "frame/proto/parse_pixel.h"
+#include "frame/proto/proto.h"
+#include "frame/texture_interface.h"
 
 namespace frame::opengl {
 

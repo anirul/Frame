@@ -1,4 +1,4 @@
-#include "RenderBuffer.h"
+#include "frame/open_gl/render_buffer.h"
 
 #include <GL/glew.h>
 

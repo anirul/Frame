@@ -2,9 +2,9 @@
 
 #include <utility>
 
-#include "Frame/Logger.h"
-#include "Frame/OpenGL/Pixel.h"
-#include "Frame/OpenGL/ScopedBind.h"
+#include "frame/logger.h"
+#include "frame/open_gl/pixel.h"
+#include "frame/open_gl/scoped_bind.h"
 
 namespace frame::opengl {
 

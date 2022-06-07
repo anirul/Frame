@@ -2,10 +2,10 @@
 
 #include <memory>
 
-#include "Frame/Logger.h"
-#include "Frame/OpenGL/RenderBuffer.h"
-#include "Frame/OpenGL/ScopedBind.h"
-#include "Frame/TextureInterface.h"
+#include "frame/logger.h"
+#include "frame/open_gl/render_buffer.h"
+#include "frame/open_gl/scoped_bind.h"
+#include "frame/texture_interface.h"
 
 namespace frame::opengl {
 

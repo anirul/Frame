@@ -4,9 +4,9 @@
 #include <set>
 #include <string>
 
-#include "Frame/LevelInterface.h"
-#include "Frame/MaterialInterface.h"
-#include "Frame/OpenGL/Texture.h"
+#include "frame/level_interface.h"
+#include "frame/material_interface.h"
+#include "frame/open_gl/texture.h"
 
 namespace frame::opengl {
 

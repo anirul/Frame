@@ -1,7 +1,7 @@
-#include "DeviceTest.h"
+#include "frame/open_gl/device_test.h"
 
-#include "Frame/File/FileSystem.h"
-#include "Frame/Proto/ParseLevel.h"
+#include "frame/file/file_system.h"
+#include "frame/proto/parse_level.h"
 
 namespace test {
 

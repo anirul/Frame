@@ -2,8 +2,8 @@
 
 #include <glm/glm.hpp>
 
-#include "Frame/MaterialInterface.h"
-#include "Frame/StaticMeshInterface.h"
+#include "frame/material_interface.h"
+#include "frame/static_mesh_interface.h"
 
 namespace frame {
 

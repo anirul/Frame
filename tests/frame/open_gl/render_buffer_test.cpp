@@ -1,4 +1,4 @@
-#include "RenderBufferTest.h"
+#include "frame/open_gl/render_buffer_test.h"
 
 namespace test {
 

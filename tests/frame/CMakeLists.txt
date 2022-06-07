@@ -12,7 +12,8 @@ add_executable(FrameTest
 
 target_include_directories(FrameTest
   PUBLIC
-	${CMAKE_SOURCE_DIR}
+	${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/tests
 	${CMAKE_CURRENT_BINARY_DIR}
 )
 

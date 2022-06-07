@@ -2,7 +2,7 @@
 
 #include <glm/glm.hpp>
 
-#include "Frame/NodeInterface.h"
+#include "frame/node_interface.h"
 
 namespace frame {
 

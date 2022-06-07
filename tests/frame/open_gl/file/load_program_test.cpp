@@ -1,6 +1,6 @@
-#include "LoadProgramTest.h"
+#include "frame/open_gl/file/load_program_test.h"
 
-#include "Frame/OpenGL/File/LoadProgram.h"
+#include "frame/open_gl/file/load_program.h"
 
 namespace test {
 

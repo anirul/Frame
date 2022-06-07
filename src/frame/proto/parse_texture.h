@@ -3,8 +3,8 @@
 #include <memory>
 #include <optional>
 
-#include "Frame/Proto/Proto.h"
-#include "Frame/TextureInterface.h"
+#include "frame/proto/proto.h"
+#include "frame/texture_interface.h"
 
 namespace frame::proto {
 

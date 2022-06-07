@@ -1,11 +1,11 @@
-#include "StaticMeshTest.h"
+#include "frame/open_gl/static_mesh_test.h"
 
 #include <GL/glew.h>
 
-#include "Frame/BufferInterface.h"
-#include "Frame/File/FileSystem.h"
-#include "Frame/Level.h"
-#include "Frame/OpenGL/File/LoadStaticMesh.h"
+#include "frame/buffer_interface.h"
+#include "frame/file/file_system.h"
+#include "frame/level.h"
+#include "frame/open_gl/file/load_static_mesh.h"
 
 namespace test {
 

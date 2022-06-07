@@ -1,9 +1,9 @@
-#include "ParseProgram.h"
+#include "frame/proto/parse_program.h"
 
 #include <fstream>
 
-#include "Frame/File/FileSystem.h"
-#include "Frame/OpenGL/Program.h"
+#include "frame/file/file_system.h"
+#include "frame/open_gl/program.h"
 
 namespace frame::proto {
 

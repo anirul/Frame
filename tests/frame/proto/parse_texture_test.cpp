@@ -1,8 +1,8 @@
-#include "ParseTextureTest.h"
+#include "frame/proto/parse_texture_test.h"
 
-#include "Frame/Proto/ParsePixel.h"
-#include "Frame/Proto/ParseTexture.h"
-#include "Frame/Proto/Proto.h"
+#include "frame/proto/parse_pixel.h"
+#include "frame/proto/parse_texture.h"
+#include "frame/proto/proto.h"
 
 namespace test {
 

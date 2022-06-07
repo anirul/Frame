@@ -5,8 +5,8 @@
 #include <string>
 #include <vector>
 
-#include "Frame/ImageInterface.h"
-#include "Frame/Proto/ParsePixel.h"
+#include "frame/image_interface.h"
+#include "frame/proto/parse_pixel.h"
 
 namespace frame::file {
 

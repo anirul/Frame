@@ -1,4 +1,4 @@
-#include "Camera.h"
+#include "frame/camera.h"
 
 #include <cmath>
 #include <glm/gtc/matrix_transform.hpp>

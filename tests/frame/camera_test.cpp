@@ -1,7 +1,9 @@
-#include "CameraTest.h"
+#include "frame/camera_test.h"
+
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/epsilon.hpp>
-#include "Frame/Camera.h"
+
+#include "frame/camera.h"
 
 namespace test {
 

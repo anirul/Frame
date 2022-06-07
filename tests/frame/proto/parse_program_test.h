@@ -2,10 +2,10 @@
 
 #include <gtest/gtest.h>
 
-#include "Frame/File/FileSystem.h"
-#include "Frame/LevelInterface.h"
-#include "Frame/Proto/ParseLevel.h"
-#include "Frame/Window.h"
+#include "frame/file/file_system.h"
+#include "frame/level_interface.h"
+#include "frame/proto/parse_level.h"
+#include "frame/window.h"
 
 namespace test {
 
@@ -14,7 +14,7 @@ class ParseProgramTest : public testing::Test {
     ParseProgramTest() {
         window_      = frame::CreateSDLOpenGL({ 320, 200 });
         proto_level_ = frame::proto::LoadProtoFromJsonFile<frame::proto::Level>(
-            frame::file::FindFile("Asset/Json/ProgramTest.json"));
+            frame::file::FindFile("asset/json/program_test.json"));
         auto maybe_level = frame::proto::ParseLevelOpenGL({ 320, 200 }, proto_level_);
         if (!maybe_level) throw std::runtime_error("Couldn't parse level.");
         level_ = std::move(maybe_level.value());

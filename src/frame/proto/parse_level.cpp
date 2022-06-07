@@ -1,14 +1,14 @@
-#include "ParseLevel.h"
+#include "frame/proto/parse_level.h"
 
-#include "Frame/Level.h"
-#include "Frame/OpenGL/Material.h"
-#include "Frame/OpenGL/StaticMesh.h"
-#include "Frame/OpenGL/Texture.h"
-#include "Frame/ProgramInterface.h"
-#include "Frame/Proto/ParseMaterial.h"
-#include "Frame/Proto/ParseProgram.h"
-#include "Frame/Proto/ParseSceneTree.h"
-#include "Frame/Proto/ParseTexture.h"
+#include "frame/level.h"
+#include "frame/open_gl/material.h"
+#include "frame/open_gl/static_mesh.h"
+#include "frame/open_gl/texture.h"
+#include "frame/program_interface.h"
+#include "frame/proto/parse_material.h"
+#include "frame/proto/parse_program.h"
+#include "frame/proto/parse_scene_tree.h"
+#include "frame/proto/parse_texture.h"
 
 namespace frame::proto {
 

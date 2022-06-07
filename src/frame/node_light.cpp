@@ -1,4 +1,4 @@
-#include "NodeLight.h"
+#include "frame/node_light.h"
 
 #include <stdexcept>
 

@@ -1,13 +1,13 @@
-#include "TextureCubeMapTest.h"
+#include "frame/open_gl/texture_cube_map_test.h"
 
 #include <GL/glew.h>
 
 #include <algorithm>
 
-#include "Frame/File/FileSystem.h"
-#include "Frame/OpenGL/File/LoadTexture.h"
-#include "Frame/OpenGL/TextureCubeMap.h"
-#include "Frame/Proto/ParseTexture.h"
+#include "frame/file/file_system.h"
+#include "frame/open_gl/file/load_texture.h"
+#include "frame/open_gl/texture_cube_map.h"
+#include "frame/proto/parse_texture.h"
 
 namespace test {
 
@@ -15,12 +15,12 @@ TEST_F(TextureCubeMapTest, CreateTextureCubeMapTest) {
     ASSERT_FALSE(texture_);
     EXPECT_NO_THROW(
         texture_ = frame::opengl::file::LoadCubeMapTextureFromFiles(
-            std::array<std::string, 6>{ frame::file::FindFile("Asset/CubeMap/PositiveX.png"),
-                                        frame::file::FindFile("Asset/CubeMap/NegativeX.png"),
-                                        frame::file::FindFile("Asset/CubeMap/PositiveY.png"),
-                                        frame::file::FindFile("Asset/CubeMap/NegativeY.png"),
-                                        frame::file::FindFile("Asset/CubeMap/PositiveZ.png"),
-                                        frame::file::FindFile("Asset/CubeMap/NegativeZ.png") }));
+            std::array<std::string, 6>{ frame::file::FindFile("asset/cubemap/positive_x.png"),
+                                        frame::file::FindFile("asset/cubemap/negative_x.png"),
+                                        frame::file::FindFile("asset/cubemap/positive_y.png"),
+                                        frame::file::FindFile("asset/cubemap/negative_y.png"),
+                                        frame::file::FindFile("asset/cubemap/positive_z.png"),
+                                        frame::file::FindFile("asset/cubemap/negative_z.png") }));
     ASSERT_TRUE(texture_);
     auto* opengl_texture = dynamic_cast<frame::opengl::TextureCubeMap*>(texture_.get());
     ASSERT_NE(nullptr, opengl_texture);
@@ -39,7 +39,7 @@ TEST_F(TextureCubeMapTest, CreateTextureCubeMapTest) {
 TEST_F(TextureCubeMapTest, DISABLED_CreateEquirectangularTextureCubeMapTest) {
     ASSERT_FALSE(texture_);
     EXPECT_NO_THROW(texture_ = frame::opengl::file::LoadCubeMapTextureFromFile(
-                        frame::file::FindFile("Asset/CubeMap/Hamarikyu.hdr"),
+                        frame::file::FindFile("asset/cubemap/hamarikyu.hdr"),
                         frame::proto::PixelElementSize_FLOAT()));
     ASSERT_TRUE(texture_);
     auto* opengl_texture = dynamic_cast<frame::opengl::TextureCubeMap*>(texture_.get());

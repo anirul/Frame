@@ -1,5 +1,5 @@
-#include "WindowTest.h"
-#include "Frame/Window.h"
+#include "frame/window_test.h"
+#include "frame/window.h"
 
 namespace test {
 
