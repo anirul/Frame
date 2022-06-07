@@ -2,24 +2,24 @@
 
 add_executable(FrameProtoTest
 	main.cpp
-	ParseLevelTest.cpp
-	ParseLevelTest.h
-	ParseMaterialTest.cpp
-	ParseMaterialTest.h
-	ParsePixelTest.cpp
-	ParsePixelTest.h
-	ParseProgramTest.cpp
-	ParseProgramTest.h
-	ParseSceneTreeTest.cpp
-	ParseSceneTreeTest.h
-	ParseTextureTest.cpp
-	ParseTextureTest.h
-	ParseUniformTest.cpp
-	ParseUniformTest.h
-	${CMAKE_SOURCE_DIR}/Asset/Json/LevelTest.json
-	${CMAKE_SOURCE_DIR}/Asset/Json/MaterialTest.json
-	${CMAKE_SOURCE_DIR}/Asset/Json/ProgramTest.json
-	${CMAKE_SOURCE_DIR}/Asset/Json/SceneTreeTest.json
+	parse_level_test.cpp
+	parse_level_test.h
+	parse_material_test.cpp
+	parse_material_test.h
+	parse_pixel_test.cpp
+	parse_pixel_test.h
+	parse_program_test.cpp
+	parse_program_test.h
+	parse_scene_tree_test.cpp
+	parse_scene_tree_test.h
+	parse_texture_test.cpp
+	parse_texture_test.h
+	parse_uniform_test.cpp
+	parse_uniform_test.h
+	${CMAKE_SOURCE_DIR}/asset/json/level_test.json
+	${CMAKE_SOURCE_DIR}/asset/json/material_test.json
+	${CMAKE_SOURCE_DIR}/asset/json/program_test.json
+	${CMAKE_SOURCE_DIR}/asset/json/scene_tree_test.json
 )
 
 target_include_directories(FrameProtoTest

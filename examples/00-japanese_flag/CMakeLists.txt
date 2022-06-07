@@ -18,7 +18,7 @@ target_link_libraries(JapaneseFlag
     Frame
     FrameOpenGL
     FrameProto
-    SampleCommon
+    LibCommon
 )
 
 set_property(TARGET JapaneseFlag PROPERTY FOLDER "Examples")

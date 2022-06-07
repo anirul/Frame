@@ -1,6 +1,6 @@
 # Sample Common.
 
-add_library(SampleCommon
+add_library(LibCommon
   STATIC
 	application.cpp
 	application.h
@@ -9,17 +9,17 @@ add_library(SampleCommon
 	path_interface.h
 )
 
-target_include_directories(SampleCommon
+target_include_directories(LibCommon
   PUBLIC
 	${CMAKE_SOURCE_DIR}
 	${CMAKE_CURRENT_BINARY_DIR}
 )
 
-target_link_libraries(SampleCommon
+target_link_libraries(LibCommon
   PUBLIC
 	Frame
 	FrameProto
 	FrameOpenGL
 )
 
-set_property(TARGET SampleCommon PROPERTY FOLDER "Sample")
+set_property(TARGET LibCommon PROPERTY FOLDER "Examples")

@@ -19,7 +19,7 @@ target_link_libraries(RayMarching
     FrameFile
     FrameOpenGL
     FrameProto
-    SampleCommon
+    LibCommon
 )
 
 set_property(TARGET RayMarching PROPERTY FOLDER "Examples")

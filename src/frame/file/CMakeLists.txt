@@ -2,12 +2,12 @@
 
 add_library(FrameFile
   STATIC
-	FileSystem.cpp
-    FileSystem.h
-	Image.cpp
-	Image.h
-    Obj.cpp
-	Obj.h
+	file_system.cpp
+    file_system.h
+	image.cpp
+	image.h
+    obj.cpp
+	obj.h
 )
 
 target_include_directories(FrameFile
@@ -26,5 +26,3 @@ target_link_libraries(FrameFile
 )
 
 set_property(TARGET FrameFile PROPERTY FOLDER "Frame")
-
-add_subdirectory(Test)

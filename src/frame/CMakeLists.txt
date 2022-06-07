@@ -2,41 +2,41 @@
 
 add_library(Frame
   STATIC
-    BufferInterface.h
-    Camera.cpp
-    Camera.h
-    DeviceInterface.h
-    DrawInterface.h
-    EntityId.h
-    ImageInterface.h
-    InputInterface.h
-    Level.cpp
-    Level.h
-    LevelInterface.h
-    LightInterface.h
-    Logger.cpp
-    Logger.h
-    MaterialInterface.h
-    ProgramInterface.h
-    NameInterface.h
-    NodeCamera.cpp
-    NodeCamera.h
-    NodeLight.cpp
-    NodeLight.h
-    NodeMatrix.cpp
-    NodeMatrix.h
-    NodeInterface.h
-    NodeStaticMesh.cpp
-    NodeStaticMesh.h
-    RendererInterface.h
-    StaticMeshInterface.h
-    TextureInterface.h
-    UniformInterface.h
-    UniformWrapper.cpp
-    UniformWrapper.h
-    Window.cpp
-    Window.h
-    WindowInterface.h
+    buffer_interface.h
+    camera.cpp
+    camera.h
+    device_interface.h
+    draw_interface.h
+    entity_id.h
+    image_interface.h
+    input_interface.h
+    level.cpp
+    level.h
+    level_interface.h
+    light_interface.h
+    logger.cpp
+    logger.h
+    material_interface.h
+    program_interface.h
+    name_interface.h
+    node_camera.cpp
+    node_camera.h
+    node_light.cpp
+    node_light.h
+    node_matrix.cpp
+    node_matrix.h
+    node_interface.h
+    node_static_mesh.cpp
+    node_static_mesh.h
+    renderer_interface.h
+    static_mesh_interface.h
+    texture_interface.h
+    uniform_interface.h
+    uniform_wrapper.cpp
+    uniform_wrapper.h
+    window.cpp
+    window.h
+    window_interface.h
 )
 
 target_include_directories(Frame
@@ -53,10 +53,8 @@ target_link_libraries(Frame
     glm::glm
 )
 
-
 set_property(TARGET Frame PROPERTY FOLDER "Frame")
 
-add_subdirectory(File)
-add_subdirectory(OpenGL)
-add_subdirectory(Proto)
-add_subdirectory(Test)
+add_subdirectory(file)
+add_subdirectory(open_gl)
+add_subdirectory(proto)

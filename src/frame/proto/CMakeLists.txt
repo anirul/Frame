@@ -2,31 +2,31 @@
 
 add_library(FrameProto
   STATIC
-    ParseMaterial.cpp
-    ParseMaterial.h
-    ParsePixel.cpp
-    ParsePixel.h
-    ParseProgram.cpp
-    ParseProgram.h
-    ParseSceneTree.cpp
-    ParseSceneTree.h
-    ParseTexture.cpp
-    ParseTexture.h
-    ParseUniform.cpp
-    ParseUniform.h
-    ParseLevel.cpp
-    ParseLevel.h
-    Proto.cpp
-    Proto.h
-    Level.proto
-    Material.proto
-    Math.proto
-    Pixel.proto
-    Program.proto
-    Scene.proto
-    Size.proto
-    Texture.proto
-    Uniform.proto
+    parse_material.cpp
+    parse_material.h
+    parse_pixel.cpp
+    parse_pixel.h
+    parse_program.cpp
+    parse_program.h
+    parse_scene_tree.cpp
+    parse_scene_tree.h
+    parse_texture.cpp
+    parse_texture.h
+    parse_uniform.cpp
+    parse_uniform.h
+    parse_level.cpp
+    parse_level.h
+    proto.cpp
+    proto.h
+    level.proto
+    material.proto
+    math.proto
+    pixel.proto
+    program.proto
+    scene.proto
+    size.proto
+    texture.proto
+    uniform.proto
 )
 
 target_include_directories(FrameProto 
@@ -50,5 +50,3 @@ target_link_libraries(FrameProto
 )
 
 set_property(TARGET FrameProto PROPERTY FOLDER "Frame")
-
-add_subdirectory(Test)

@@ -1,13 +1,13 @@
 # Frame Test.
 
 add_executable(FrameTest
-	CameraTest.cpp
-	CameraTest.h
-	ProgramMock.h
+	camera_test.cpp
+	camera_test.h
 	main.cpp
-	UniformMock.h
-	WindowTest.cpp
-	WindowTest.h
+	program_mock.h
+	uniform_mock.h
+	window_test.cpp
+	window_test.h
 )
 
 target_include_directories(FrameTest
@@ -24,3 +24,7 @@ target_link_libraries(FrameTest
 )
 
 set_property(TARGET FrameTest PROPERTY FOLDER "Frame")
+
+add_subdirectory(file)
+add_subdirectory(open_gl)
+add_subdirectory(proto)

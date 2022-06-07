@@ -1,13 +1,13 @@
 # Frame File Test.
 
 add_executable(FrameFileTest
-	FileSystemTest.cpp
-	FileSystemTest.h
-	ImageTest.cpp
-	ImageTest.h
+	file_system_test.cpp
+	file_system_test.h
+	image_test.cpp
+	image_test.h
 	main.cpp
-	ObjTest.cpp
-	ObjTest.h
+	obj_test.cpp
+	obj_test.h
 )
 
 target_include_directories(FrameFileTest

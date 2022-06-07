@@ -7,8 +7,8 @@
 #include <windows.h>
 #endif
 
-#include "Frame/Window.h"
-#include "Sample/Common/Application.h"
+#include "frame/window.h"
+#include "examples/lib_common/application.h"
 
 #if defined(_WIN32) || defined(_WIN64)
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine,
@@ -18,7 +18,7 @@ int main(int ac, char** av)
 #endif
 {
     try {
-        Application app(frame::file::FindFile("Asset/Json/SceneSimple.json"),
+        Application app(frame::file::FindFile("asset/json/scene_simple.json"),
                         frame::CreateSDLOpenGL({ 1280, 720 }));
         app.Startup();
         app.Run();

@@ -2,35 +2,35 @@
 
 add_library(FrameOpenGL
   STATIC
-    BindInterface.h
-    Buffer.cpp
-    Buffer.h
-    Device.cpp
-    Device.h
-    FrameBuffer.cpp
-    FrameBuffer.h
-    Light.cpp
-    Light.h
-    Material.cpp
-    Material.h
-    StaticMesh.cpp
-    StaticMesh.h
-    Pixel.cpp
-    Pixel.h
-    Program.cpp
-    Program.h
-    RenderBuffer.cpp
-    RenderBuffer.h
-    Renderer.cpp
-    Renderer.h
-    ScopedBind.cpp
-    ScopedBind.h
-    Shader.cpp
-    Shader.h
-    Texture.cpp
-    Texture.h
-    TextureCubeMap.cpp
-    TextureCubeMap.h
+    bind_interface.h
+    buffer.cpp
+    buffer.h
+    device.cpp
+    device.h
+    frame_buffer.cpp
+    frame_buffer.h
+    light.cpp
+    light.h
+    material.cpp
+    material.h
+    static_mesh.cpp
+    static_mesh.h
+    pixel.cpp
+    pixel.h
+    program.cpp
+    program.h
+    render_buffer.cpp
+    render_buffer.h
+    renderer.cpp
+    renderer.h
+    scoped_bind.cpp
+    scoped_bind.h
+    shader.cpp
+    shader.h
+    texture.cpp
+    texture.h
+    texture_cube_map.cpp
+    texture_cube_map.h
 )
 
 target_include_directories(FrameOpenGL
@@ -50,5 +50,4 @@ target_link_libraries(FrameOpenGL
 
 set_property(TARGET FrameOpenGL PROPERTY FOLDER "Frame/OpenGL")
 
-add_subdirectory(Test)
-add_subdirectory(File)
+add_subdirectory(file)

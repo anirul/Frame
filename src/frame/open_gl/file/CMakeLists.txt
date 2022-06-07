@@ -2,12 +2,12 @@
 
 add_library(FrameOpenGLFile
   STATIC
-	LoadProgram.cpp
-	LoadProgram.h
-	LoadStaticMesh.cpp
-	LoadStaticMesh.h
-	LoadTexture.cpp
-	LoadTexture.h
+	load_program.cpp
+	load_program.h
+	load_static_mesh.cpp
+	load_static_mesh.h
+	load_texture.cpp
+	load_texture.h
 )
 
 target_include_directories(FrameOpenGLFile
@@ -27,5 +27,3 @@ target_link_libraries(FrameOpenGLFile
 )
 
 set_property(TARGET FrameOpenGLFile PROPERTY FOLDER "Frame/OpenGL")
-
-add_subdirectory(Test)

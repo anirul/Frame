@@ -1,13 +1,13 @@
 # Frame OpenGL File Test
 
 add_executable(FrameOpenGLFileTest
+    load_program_test.cpp
+    load_program_test.h
+    load_static_mesh_test.cpp
+    load_static_mesh_test.h
+    load_texture_test.cpp
+    load_texture_test.h
     main.cpp
-    LoadProgramTest.cpp
-    LoadProgramTest.h
-    LoadStaticMeshTest.cpp
-    LoadStaticMeshTest.h
-    LoadTextureTest.cpp
-    LoadTextureTest.h
 )
 
 target_include_directories(FrameOpenGLFileTest

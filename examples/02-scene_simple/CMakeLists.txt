@@ -19,7 +19,7 @@ target_link_libraries(SceneSimple
     FrameOpenGL
     FrameOpenGLFile
     FrameProto
-    SampleCommon
+    LibCommon
 )
 
 set_property(TARGET SceneSimple PROPERTY FOLDER "Examples")
