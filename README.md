@@ -94,7 +94,7 @@ shading and the shadow.
 
 ### Simple
 
-![Simple](https://github.com/anirul/Frame/raw/master/Sample/scene_simple.png "A rendering of an apple floating in the coulds.")
+![Simple](https://github.com/anirul/Frame/raw/master/examples/scene_simple.png "A rendering of an apple floating in the coulds.")
 
 This will draw a cube map and an apple (simple just albedo).
 
@@ -105,4 +105,4 @@ directory directly into the 3D software. This render the scene using
 Physically Based Rendering, the parameters are fetch from ```mtl``` files.
 It also add Screen Space Ambient Occlusion and Bloom effect before rendering.
 
-![SceneRendering](https://github.com/anirul/ShaderGL/raw/master/Sample/SceneRendering.png "A Scene rendering made with ShaderGL.")
+![SceneRendering](https://github.com/anirul/ShaderGL/raw/master/examples/SceneRendering.png "A Scene rendering made with ShaderGL.")
