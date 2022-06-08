@@ -105,4 +105,4 @@ directory directly into the 3D software. This render the scene using
 Physically Based Rendering, the parameters are fetch from ```mtl``` files.
 It also add Screen Space Ambient Occlusion and Bloom effect before rendering.
 
-![SceneRendering](https://github.com/anirul/ShaderGL/raw/master/examples/SceneRendering.png "A Scene rendering made with ShaderGL.")
+![SceneRendering](https://github.com/anirul/Frame/raw/master/examples/scene_rendering.png "A Scene rendering made with ShaderGL.")
