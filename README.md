@@ -4,7 +4,7 @@
 12). It take models in obj forms and images that can be read by stb (jpg, png,
 hdr,...).
 
-![SceneRendering](https://github.com/anirul/ShaderGL/raw/master/Sample/SceneRendering.png "A Scene rendering made with ShaderGL.")
+![SceneRendering](https://github.com/anirul/Frame/raw/master/examples/scene_rendering.png "A Scene rendering made with ShaderGL.")
 
 ## Install
 
@@ -80,21 +80,21 @@ You have may programs that can be used:
 
 ### JapaneseFlag
 
-![JapaneseFlag](https://github.com/anirul/ShaderGL/raw/master/Sample/JapaneseFlag.png "A rendering of the Japanese flag using shaders.")
+![JapaneseFlag](https://github.com/anirul/Frame/raw/master/examples/japanese_flag.png "A rendering of the Japanese flag using shaders.")
 
 This is a very bare bone Shader example that will open a window and display
 the Japanese flag (using shaders).
 
 ### RayMarching
 
-![RayMarching](https://github.com/anirul/ShaderGL/raw/master/Sample/RayMarching.png "A rendering of a sphere on a plane using raymaching shaders.")
+![RayMarching](https://github.com/anirul/Frame/raw/master/examples/ray_marching.png "A rendering of a sphere on a plane using raymaching shaders.")
 
 This is a simple ray marching example, it will draw a sphere and compute the
 shading and the shadow.
 
 ### Simple
 
-![Simple](https://github.com/anirul/ShaderGL/raw/master/Sample/Simple.png "A rendering of an apple floating in the coulds.")
+![Simple](https://github.com/anirul/Frame/raw/master/Sample/scene_simple.png "A rendering of an apple floating in the coulds.")
 
 This will draw a cube map and an apple (simple just albedo).
 
