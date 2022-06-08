@@ -10,13 +10,13 @@
 #include <utility>
 #include <vector>
 
+#include "frame/json/parse_pixel.h"
+#include "frame/json/proto.h"
 #include "frame/open_gl/frame_buffer.h"
 #include "frame/open_gl/pixel.h"
 #include "frame/open_gl/program.h"
 #include "frame/open_gl/render_buffer.h"
 #include "frame/open_gl/scoped_bind.h"
-#include "frame/proto/parse_pixel.h"
-#include "frame/proto/proto.h"
 #include "frame/texture_interface.h"
 
 namespace frame::opengl {
@@ -190,9 +190,9 @@ class Texture : public TextureInterface, public BindInterface {
             const proto::PixelStructure pixel_structure      = proto::PixelStructure_RGB())
         : pixel_element_size_(pixel_element_size), pixel_structure_(pixel_structure) {}
     /**
-	* @brief Fill a texture with a data pointer, the size has to be set first!
-	* @param data: pixel used to fill up (or null for don't care).
-	*/
+     * @brief Fill a texture with a data pointer, the size has to be set first!
+     * @param data: pixel used to fill up (or null for don't care).
+     */
     void CreateTexture(const void* data = nullptr);
     //! @brief Lock the bind for RAII interface to the bind interface.
     void LockedBind() const override { locked_bind_ = true; }
@@ -200,7 +200,7 @@ class Texture : public TextureInterface, public BindInterface {
     void UnlockedBind() const override { locked_bind_ = false; }
 
    protected:
-	//! Create a render and a frame buffer for internal rendering (used in Clear).
+    //! Create a render and a frame buffer for internal rendering (used in Clear).
     void CreateFrameAndRenderBuffer();
     friend class ScopedBind;
 

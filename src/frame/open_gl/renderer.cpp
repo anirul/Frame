@@ -23,7 +23,7 @@ Renderer::Renderer(LevelInterface* level, std::pair<std::uint32_t, std::uint32_t
     }
     render_buffer_.CreateStorage(size);
     frame_buffer_.AttachRender(render_buffer_);
-    auto maybe_program = file::LoadProgram("Display");
+    auto maybe_program = file::LoadProgram("display");
     if (!maybe_program) throw std::runtime_error("No program!");
     auto program  = std::move(maybe_program.value());
     auto material = std::make_unique<Material>();

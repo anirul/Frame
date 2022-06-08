@@ -1,5 +1,5 @@
 {
-  "name": "TextureModif",
+  "name": "DepthNormal",
   "default_texture_name": "blured_normal_map",
   "textures": [
     {
@@ -34,7 +34,7 @@
       "name": "ComputeNormalProgram",
       "output_texture_names": [ "normal_map" ],
       "input_scene_type": { "value": "QUAD" },
-      "shader": "TextureModif",
+      "shader": "depth_normal",
       "parameters": [
         {
           "name": "time_s",

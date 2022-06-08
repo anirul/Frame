@@ -9,7 +9,7 @@ TEST_F(LoadStaticMeshTest, CreateLoadStaticMeshFromFileTest) {
     auto level = std::make_unique<frame::Level>();
     ASSERT_TRUE(level);
     auto maybe_node_vec = frame::opengl::file::LoadStaticMeshesFromFile(
-        level.get(), "Asset/Model/Monkey.obj", "Monkey");
+        level.get(), "asset/model/monkey.obj", "Monkey");
     ASSERT_TRUE(maybe_node_vec);
     auto node_vec = maybe_node_vec.value();
     EXPECT_EQ(1, node_vec.size());
@@ -27,7 +27,7 @@ TEST_F(LoadStaticMeshTest, CreateSceneFromFileTest) {
     auto level = std::make_unique<frame::Level>();
     ASSERT_TRUE(level);
     auto maybe_node_vec = frame::opengl::file::LoadStaticMeshesFromFile(
-        level.get(), "Asset/Model/Scene.obj", "Scene");
+        level.get(), "asset/model/scene.obj", "Scene");
     EXPECT_TRUE(maybe_node_vec);
     auto node_vec = maybe_node_vec.value();
     EXPECT_EQ(5, node_vec.size());

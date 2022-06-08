@@ -3,7 +3,7 @@
 #include <fstream>
 
 #include "frame/file/file_system.h"
-#include "frame/proto/parse_level.h"
+#include "frame/json/parse_level.h"
 
 void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size) {
     // Load proto from files.

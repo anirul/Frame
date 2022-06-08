@@ -1,6 +1,6 @@
 #pragma once
 
-#include "frame/proto/proto.h"
+#include "frame/json/proto.h"
 
 namespace frame {
 

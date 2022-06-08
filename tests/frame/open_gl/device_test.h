@@ -5,8 +5,8 @@
 #include "frame/device_interface.h"
 #include "frame/file/file_system.h"
 #include "frame/open_gl/device.h"
-#include "frame/proto/parse_level.h"
-#include "frame/proto/proto.h"
+#include "frame/json/parse_level.h"
+#include "frame/json/proto.h"
 #include "frame/window.h"
 
 namespace test {

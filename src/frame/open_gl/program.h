@@ -6,10 +6,10 @@
 #include <optional>
 #include <vector>
 
+#include "frame/json/proto.h"
 #include "frame/logger.h"
 #include "frame/open_gl/shader.h"
 #include "frame/program_interface.h"
-#include "frame/proto/proto.h"
 #include "frame/uniform_interface.h"
 
 namespace frame::opengl {
@@ -109,16 +109,16 @@ class Program : public ProgramInterface {
     //! @brief Stop using the program, a little bit like unbind.
     void UnUse() const override;
     /**
-	* @brief Create a uniform from a string and a bool.
-	* @param name: Name of the uniform.
-	* @param value: Boolean.
-	*/
+     * @brief Create a uniform from a string and a bool.
+     * @param name: Name of the uniform.
+     * @param value: Boolean.
+     */
     void Uniform(const std::string& name, bool value) const override;
     /**
-	* @brief Create a uniform from a string and an int.
-	* @param name: Name of the uniform.
-	* @param value: Integer.
-	*/
+     * @brief Create a uniform from a string and an int.
+     * @param name: Name of the uniform.
+     * @param value: Integer.
+     */
     void Uniform(const std::string& name, int value) const override;
     /**
      * @brief Create a uniform from a string and a float.
@@ -151,7 +151,8 @@ class Program : public ProgramInterface {
      */
     void Uniform(const std::string& name, const glm::mat4 mat) const override;
     /**
-     * @brief Add a later included value (like camera position or time), this will be set in unifrom interface.
+     * @brief Add a later included value (like camera position or time), this will be set in unifrom
+     * interface.
      * @param name: Name of the uniform.
      * @param value: Enum value of the uniform (see proto declaration for that).
      */
@@ -160,15 +161,15 @@ class Program : public ProgramInterface {
 
    protected:
     /**
-	* @brief Get the memoize version of the uniform (stored locally).
-	* @param name: Name of the uniform.
-	* @return Id of the uniform.
-	*/
+     * @brief Get the memoize version of the uniform (stored locally).
+     * @param name: Name of the uniform.
+     * @return Id of the uniform.
+     */
     const int GetMemoizeUniformLocation(const std::string& name) const;
     /**
-	* @brief Throw an exception in case this texture is already in the program.
-	* @param texture_id: Texture id to be tested.
-	*/
+     * @brief Throw an exception in case this texture is already in the program.
+     * @param texture_id: Texture id to be tested.
+     */
     void ThrowIsInTextureIds(EntityId texture_id) const;
 
    private:

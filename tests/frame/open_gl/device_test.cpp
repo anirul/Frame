@@ -1,7 +1,7 @@
 #include "frame/open_gl/device_test.h"
 
 #include "frame/file/file_system.h"
-#include "frame/proto/parse_level.h"
+#include "frame/json/parse_level.h"
 
 namespace test {
 

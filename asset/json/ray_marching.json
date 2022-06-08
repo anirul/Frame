@@ -14,7 +14,7 @@
       "name": "RayMarchingProgram",
       "output_texture_names": "billboard",
       "input_scene_type": { "value": "QUAD" },
-      "shader": "RayMarching",
+      "shader": "ray_marching",
       "parameters": [
         {
           "name": "time_s",

@@ -51,6 +51,6 @@ target_link_libraries(FrameOpenGLTest
     GTest::gtest
 )
 
-set_property(TARGET FrameOpenGLTest PROPERTY FOLDER "Frame/OpenGL")
+set_property(TARGET FrameOpenGLTest PROPERTY FOLDER "Tests/OpenGL")
 
 add_subdirectory(file)

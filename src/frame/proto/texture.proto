@@ -1,7 +1,7 @@
 syntax = "proto3";
 
-import "Size.proto";
-import "Pixel.proto";
+import "size.proto";
+import "pixel.proto";
 
 package frame.proto;
 

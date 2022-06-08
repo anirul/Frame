@@ -2,7 +2,7 @@
 
 #include <GL/glew.h>
 
-#include "frame/proto/parse_pixel.h"
+#include "frame/json/parse_pixel.h"
 
 namespace test {
 

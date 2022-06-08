@@ -26,4 +26,4 @@ target_link_libraries(FrameFileTest
 	GTest::gtest
 )
 
-set_property(TARGET FrameFileTest PROPERTY FOLDER "Frame")
+set_property(TARGET FrameFileTest PROPERTY FOLDER "Tests")

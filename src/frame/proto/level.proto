@@ -1,9 +1,9 @@
 syntax = "proto3";
 
-import "Texture.proto";
-import "Program.proto";
-import "Scene.proto";
-import "Material.proto";
+import "texture.proto";
+import "program.proto";
+import "scene.proto";
+import "material.proto";
 
 package frame.proto;
 

@@ -37,6 +37,7 @@ target_include_directories(FrameOpenGL
   PUBLIC
     ${CMAKE_SOURCE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR}/src/frame/proto
 )
 
 target_link_libraries(FrameOpenGL
@@ -44,7 +45,7 @@ target_link_libraries(FrameOpenGL
     Frame
     FrameFile
     FrameOpenGLFile
-    FrameProto
+    FrameJson
     GLEW::GLEW
 )
 

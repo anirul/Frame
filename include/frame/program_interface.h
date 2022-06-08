@@ -5,8 +5,8 @@
 #include <vector>
 
 #include "frame/entity_id.h"
+#include "frame/json/proto.h"
 #include "frame/name_interface.h"
-#include "frame/proto/proto.h"
 #include "frame/uniform_interface.h"
 
 namespace frame {
@@ -37,12 +37,12 @@ struct ProgramInterface : public NameInterface {
      * @brief Set output texture id.
      * @param id: Add the texture id into the output program.
      */
-    virtual void AddOutputTextureId(EntityId id)                    = 0;
+    virtual void AddOutputTextureId(EntityId id) = 0;
     /**
      * @brief Remove texture id.
      * @param id: Id to be removed from the output texture.
      */
-    virtual void RemoveOutputTextureId(EntityId id)                 = 0;
+    virtual void RemoveOutputTextureId(EntityId id) = 0;
     /**
      * @brief Get output texture ids.
      * @return Vector of entity ids of output texture.
@@ -52,7 +52,7 @@ struct ProgramInterface : public NameInterface {
      * @brief Select temporary (before assignment to a entity id) scene root.
      * @return Get the temporary scene root.
      */
-    virtual std::string GetTemporarySceneRoot() const           = 0;
+    virtual std::string GetTemporarySceneRoot() const = 0;
     /**
      * @brief Select temporary (before assignment to a entity id) scene root.
      * @param Set the temporary scene root.
@@ -62,7 +62,7 @@ struct ProgramInterface : public NameInterface {
      * @brief Get scene root id.
      * @return Id of the scene root.
      */
-    virtual EntityId GetSceneRoot() const          = 0;
+    virtual EntityId GetSceneRoot() const = 0;
     /**
      * @brief Set scene root.
      * @param scene_root: Set the scene root id.

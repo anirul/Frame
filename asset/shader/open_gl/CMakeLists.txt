@@ -36,8 +36,8 @@ add_custom_target(AssetShaderOpenGL
     screen_space_ambient_occlusion.vert
     scene_simple.frag
     scene_simple.vert
-    depth_to_normal.frag
-    depth_to_normal.vert
+    depth_normal.frag
+    depth_normal.vert
     vector_addition.frag
     vector_addition.vert
     vector_multiply.frag

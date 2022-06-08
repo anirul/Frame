@@ -8,8 +8,8 @@
 namespace frame::opengl::file {
 
 std::optional<std::unique_ptr<frame::ProgramInterface>> LoadProgram(const std::string& name) {
-    std::string vertex_file   = frame::file::FindFile("Asset/Shader/OpenGL/" + name + ".vert");
-    std::string fragment_file = frame::file::FindFile("Asset/Shader/OpenGL/" + name + ".frag");
+    std::string vertex_file   = frame::file::FindFile("asset/shader/open_gl/" + name + ".vert");
+    std::string fragment_file = frame::file::FindFile("asset/shader/open_gl/" + name + ".frag");
     return LoadProgram(vertex_file, fragment_file);
 }
 

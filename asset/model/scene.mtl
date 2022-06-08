@@ -2,38 +2,38 @@
 # Material Count: 5
 
 newmtl AppleMaterial
-map_Ka Apple/Color.jpg
-map_Kd Apple/Color.jpg
-norm Apple/Normal.jpg
-map_Pm Apple/Metalness.jpg
-map_Pr Apple/Roughness.jpg
+map_Ka apple/color.jpg
+map_Kd apple/color.jpg
+norm apple/normal.jpg
+map_Pm apple/metalness.jpg
+map_Pr apple/roughness.jpg
 d 1.000000
 illum 2
 
 newmtl SuzanneMaterial
-map_Ka Planks/Color.jpg
-map_Kd Planks/Color.jpg
-norm Planks/Normal.jpg
-map_Pm Planks/Metalness.jpg
-map_Pr Planks/Roughness.jpg
+map_Ka planks/color.jpg
+map_Kd planks/color.jpg
+norm planks/normal.jpg
+map_Pm planks/metalness.jpg
+map_Pr planks/roughness.jpg
 d 1.000000
 illum 3
 
 newmtl SphereMaterial
-map_Ka Metal/Color.jpg
-map_Kd Metal/Color.jpg
-norm Metal/Normal.jpg
-map_Pm Metal/Metalness.jpg
-map_Pr Metal/Roughness.jpg
+map_Ka metal/color.jpg
+map_Kd metal/color.jpg
+norm metal/normal.jpg
+map_Pm metal/metalness.jpg
+map_Pr metal/roughness.jpg
 d 1.000000
 illum 3
 
 newmtl GroundMaterial
 Ka 0.282 0.239 0.545
 Kd 0.282 0.239 0.545
-norm Planks/Normal.jpg
-map_Pm Planks/Metalness.jpg
-map_Pr Planks/Roughness.jpg
+norm planks/normal.jpg
+map_Pm planks/metalness.jpg
+map_Pr planks/roughness.jpg
 # norm 0.5 0.5 1.0
 # Pm 0.1
 # Pr 1.0
@@ -43,9 +43,9 @@ illum 2
 newmtl WallMaterial
 Ka 0.5 0.5 0.5
 Kd 0.5 0.5 0.5
-norm Metal/Normal.jpg
-map_Pm Metal/Metalness.jpg
-map_Pr Metal/Roughness.jpg
+norm metal/normal.jpg
+map_Pm metal/metalness.jpg
+map_Pr metal/roughness.jpg
 # norm 0.5 0.5 1.0
 # Pm 0.9
 # Pr 0.1

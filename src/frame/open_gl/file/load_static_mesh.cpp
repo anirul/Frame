@@ -33,7 +33,7 @@ std::optional<EntityId> CreateBufferInLevel(
 std::optional<std::unique_ptr<TextureInterface>> LoadTextureFromString(
     const std::string& str, const proto::PixelElementSize pixel_element_size,
     const proto::PixelStructure pixel_structure) {
-    return opengl::file::LoadTextureFromFile(frame::file::FindFile("Asset/" + str),
+    return opengl::file::LoadTextureFromFile(frame::file::FindFile("asset/" + str),
                                              pixel_element_size, pixel_structure);
 }
 

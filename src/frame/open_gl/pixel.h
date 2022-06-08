@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <glm/glm.hpp>
 
-#include "Frame/Proto/Proto.h"
+#include "frame/json/proto.h"
 
 namespace frame::opengl {
 

@@ -21,7 +21,7 @@
       "input_texture_names": "skybox",
       "output_texture_names": "albedo",
       "input_scene_type": { "value": "CUBE" },
-      "shader": "CubeMap",
+      "shader": "cubemap",
       "parameters": [
         {
           "name": "projection",
@@ -45,7 +45,7 @@
       ],
       "input_scene_type": { "value": "SCENE" },
       "input_scene_root_name": "root",
-      "shader": "SceneSimple",
+      "shader": "scene_simple",
       "parameters": [
         {
           "name": "projection",
@@ -73,12 +73,12 @@
       "pixel_element_size": { "value": "BYTE" },
       "pixel_structure": { "value": "RGB" },
       "file_names": [
-        "Asset/CubeMap/NegativeX.png",
-        "Asset/CubeMap/PositiveX.png",
-        "Asset/CubeMap/NegativeY.png",
-        "Asset/CubeMap/PositiveY.png",
-        "Asset/CubeMap/NegativeZ.png",
-        "Asset/CubeMap/PositiveZ.png"
+        "asset/cubemap/negative_x.png",
+        "asset/cubemap/positive_x.png",
+        "asset/cubemap/negative_y.png",
+        "asset/cubemap/positive_y.png",
+        "asset/cubemap/negative_z.png",
+        "asset/cubemap/positive_z.png"
       ]
     },
     {
@@ -86,7 +86,7 @@
       "cubemap": "false",
       "pixel_element_size": { "value": "BYTE" },
       "pixel_structure": { "value": "RGB" },
-      "file_name": "Asset/Apple/Color.jpg"
+      "file_name": "asset/apple/color.jpg"
     },
     {
       "name": "albedo",
@@ -169,7 +169,7 @@
       {
         "name": "AppleMesh",
         "parent": "mesh_holder",
-        "file_name": "Apple.obj",
+        "file_name": "apple.obj",
         "material_name": "SceneSimpleMaterial",
         "skip_file_material": "true"
       }

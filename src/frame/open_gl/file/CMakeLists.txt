@@ -14,6 +14,7 @@ target_include_directories(FrameOpenGLFile
   PUBLIC
 	${CMAKE_SOURCE_DIR}
 	${CMAKE_CURRENT_BINARY_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR}/src/frame/proto
   PRIVATE 
 	${STB_INCLUDE_DIRS}
 )
@@ -23,7 +24,8 @@ target_link_libraries(FrameOpenGLFile
 	Frame
 	FrameFile
 	FrameOpenGL
-	FrameProto
+    FrameProto
+	FrameJson
 )
 
 set_property(TARGET FrameOpenGLFile PROPERTY FOLDER "Frame/OpenGL")

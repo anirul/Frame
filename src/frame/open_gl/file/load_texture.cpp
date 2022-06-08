@@ -7,6 +7,7 @@
 
 #include "frame/file/file_system.h"
 #include "frame/file/image.h"
+#include "frame/json/parse_level.h"
 #include "frame/logger.h"
 #include "frame/node_matrix.h"
 #include "frame/open_gl/material.h"
@@ -14,7 +15,6 @@
 #include "frame/open_gl/static_mesh.h"
 #include "frame/open_gl/texture.h"
 #include "frame/open_gl/texture_cube_map.h"
-#include "frame/proto/parse_level.h"
 
 namespace frame::opengl::file {
 

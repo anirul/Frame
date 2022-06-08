@@ -4,8 +4,9 @@
 #include <cinttypes>
 #include <glm/glm.hpp>
 #include <utility>
+
+#include "frame/json/proto.h"
 #include "frame/name_interface.h"
-#include "frame/proto/proto.h"
 
 namespace frame {
 
@@ -14,7 +15,7 @@ namespace frame {
  * @brief This class is there to hold a texture (2D or 3D).
  */
 struct TextureInterface : public NameInterface {
-	//! @brief Virtual destructor.
+    //! @brief Virtual destructor.
     virtual ~TextureInterface() = default;
     /**
      * @brief Get the pixel structure (R, RG, RGB, RGBA).
@@ -32,7 +33,7 @@ struct TextureInterface : public NameInterface {
      */
     virtual std::pair<std::uint32_t, std::uint32_t> GetSize() const = 0;
     //! @brief Enable mipmap, this allow a recursive level of texture faster for rendering.
-    virtual void EnableMipmap() const                                 = 0;
+    virtual void EnableMipmap() const = 0;
     /**
      * @brief Set the minification filter.
      * @param texture_filter: Usually and by default GL_LINEAR.
@@ -52,18 +53,18 @@ struct TextureInterface : public NameInterface {
      * @brief Get the magnification filter.
      * @return The value of the magnification filter.
      */
-    virtual proto::TextureFilter::Enum GetMagFilter() const                    = 0;
+    virtual proto::TextureFilter::Enum GetMagFilter() const = 0;
     /**
      * @brief Set the wrapping on the s size of the texture (horizontal) this will decide how the
      * texture is treated in case you overflow in this direction.
      * @param texture_filter: Could be any of (REPEAT, CLAMP_TO_EDGE, MIRRORED_REPEAT).
      */
-    virtual void SetWrapS(const proto::TextureFilter::Enum texture_filter)     = 0;
+    virtual void SetWrapS(const proto::TextureFilter::Enum texture_filter) = 0;
     /**
      * @brief Get the wrapping on the s size of the texture (horizontal).
      * @return The way the texture is wrap could be any of (REPEAT, CLAMP_TO_EDGE, MIRRORED_REPEAT).
      */
-    virtual proto::TextureFilter::Enum GetWrapS() const                        = 0;
+    virtual proto::TextureFilter::Enum GetWrapS() const = 0;
     /**
      * @brief Set the wrapping on the t size of the texture (vertical) this will decide how the
      * texture is treated in case you overflow in this direction.

@@ -10,13 +10,13 @@
 #include <utility>
 #include <vector>
 
+#include "frame/json/parse_pixel.h"
+#include "frame/json/proto.h"
 #include "frame/open_gl/frame_buffer.h"
 #include "frame/open_gl/pixel.h"
 #include "frame/open_gl/program.h"
 #include "frame/open_gl/render_buffer.h"
 #include "frame/open_gl/scoped_bind.h"
-#include "frame/proto/parse_pixel.h"
-#include "frame/proto/proto.h"
 #include "frame/texture_interface.h"
 
 namespace frame::opengl {
@@ -46,19 +46,19 @@ class TextureCubeMap : public TextureInterface, public BindInterface {
         const proto::PixelStructure pixel_structure      = proto::PixelStructure_RGB());
     /**
      * @brief Constructor create from 6 pointer to be mapped to the cube map.
-	 * @param cube_data: Pointer to texture data in following order:
-	 *     right, left - (positive X, negative X)
+     * @param cube_data: Pointer to texture data in following order:
+     *     right, left - (positive X, negative X)
      *     top, bottom - (positive Y, negative Y)
      *     front, back - (positive Z, negative Z)
      * @param size: Size of one of the 6 texture Should be square.
      * @param pixel_element_size: Size of one of the element in a pixel (BYTE, SHORT, HALF, FLOAT).
      * @param pixel_element_structure: Structure of a pixel (R, RG, RGB, RGBA).
      */
-	TextureCubeMap(
+    TextureCubeMap(
         const std::pair<std::uint32_t, std::uint32_t> size, const std::array<void*, 6> cube_data,
         const proto::PixelElementSize pixel_element_size = proto::PixelElementSize_BYTE(),
         const proto::PixelStructure pixel_structure      = proto::PixelStructure_RGB());
-	//! @brief Destroy texture also on GPU side.
+    //! @brief Destroy texture also on GPU side.
     ~TextureCubeMap();
 
    public:
@@ -76,7 +76,7 @@ class TextureCubeMap : public TextureInterface, public BindInterface {
     proto::TextureFilter::Enum ConvertFromGLType(int gl_filter) const;
     /**
      * @brief Get a copy of the texture output (8 bit format).
-	 * @warning This is not working well!
+     * @warning This is not working well!
      * @return A vector containing the pixel of the image in 8 bit format.
      */
     std::vector<std::uint8_t> GetTextureByte() const override;
@@ -167,19 +167,19 @@ class TextureCubeMap : public TextureInterface, public BindInterface {
      */
     void SetName(const std::string& name) override { name_ = name; }
     /**
-	* @brief Will respond true as this is a cube map.
-	* @return True this is a cube map.
-	*/
+     * @brief Will respond true as this is a cube map.
+     * @return True this is a cube map.
+     */
     bool IsCubeMap() const final { return true; }
     /**
-	* @brief Return the texture cube map OpenGL id, from the bind interface.
-	* @return Get the OpenGL id of the texture.
-	*/
+     * @brief Return the texture cube map OpenGL id, from the bind interface.
+     * @return Get the OpenGL id of the texture.
+     */
     unsigned int GetId() const override { return texture_id_; }
     /**
-	* @brief Get the texture cube map size.
-	* @return A single side size in pixel.
-	*/
+     * @brief Get the texture cube map size.
+     * @return A single side size in pixel.
+     */
     std::pair<std::uint32_t, std::uint32_t> GetSize() const override { return size_; }
     /**
      * @brief Get the pixel element size individual element (BYTE, SHORT, LONG, FLOAT).

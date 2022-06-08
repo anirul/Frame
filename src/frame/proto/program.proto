@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-import "Uniform.proto";
+import "uniform.proto";
 
 package frame.proto;
 

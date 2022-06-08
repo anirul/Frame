@@ -4,9 +4,9 @@
 
 #include "frame/device_interface.h"
 #include "frame/file/file_system.h"
+#include "frame/json/parse_level.h"
 #include "frame/level.h"
 #include "frame/open_gl/renderer.h"
-#include "frame/proto/parse_level.h"
 #include "frame/window.h"
 
 namespace test {

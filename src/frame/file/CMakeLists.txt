@@ -19,7 +19,7 @@ target_include_directories(FrameFile
 target_link_libraries(FrameFile
   PUBLIC
 	Frame
-	FrameProto
+	FrameJson
 	FrameOpenGL
 	tinyobjloader
 	stb::stb

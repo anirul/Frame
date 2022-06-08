@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "Frame/File/Image.h"
+#include "frame/file/image.h"
 
 namespace test {
 

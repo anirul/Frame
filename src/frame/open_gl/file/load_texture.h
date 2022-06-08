@@ -6,17 +6,17 @@
 #include <string>
 #include <vector>
 
+#include "frame/json/parse_pixel.h"
 #include "frame/open_gl/pixel.h"
-#include "frame/proto/parse_pixel.h"
 #include "frame/texture_interface.h"
 
 namespace frame::opengl::file {
 
 /**
-* @brief Load texture from vec4 containing a color.
-* @param vec4: A glm vec4 containing a color definition.
-* @return A unique pointer to the texture interface (or null in case of failure).
-*/
+ * @brief Load texture from vec4 containing a color.
+ * @param vec4: A glm vec4 containing a color definition.
+ * @return A unique pointer to the texture interface (or null in case of failure).
+ */
 std::unique_ptr<TextureInterface> LoadTextureFromVec4(const glm::vec4& vec4);
 /**
  * @brief Load texture from a float.
@@ -28,7 +28,7 @@ std::unique_ptr<TextureInterface> LoadTextureFromFloat(float f);
  * @brief Load texture from file (*.png).
  * @param file: An image file (should be accessible from the current location).
  * @param pixel_element_size: Size of one of the element in a pixel (BYTE, SHORT, HALF, FLOAT).
- * @param pixel_element_structure: Structure of a pixel (R, RG, RGB, RGBA).  
+ * @param pixel_element_structure: Structure of a pixel (R, RG, RGB, RGBA).
  * @return A unique pointer to the texture interface (or null in case of failure).
  */
 std::unique_ptr<TextureInterface> LoadTextureFromFile(

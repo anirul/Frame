@@ -50,7 +50,7 @@ target_include_directories(Frame
 
 target_link_libraries(Frame
   PUBLIC
-    FrameProto
+    FrameJson
     SDL2::SDL2
     spdlog::spdlog
     glm::glm
@@ -61,3 +61,4 @@ set_property(TARGET Frame PROPERTY FOLDER "Frame")
 add_subdirectory(file)
 add_subdirectory(open_gl)
 add_subdirectory(proto)
+add_subdirectory(json)

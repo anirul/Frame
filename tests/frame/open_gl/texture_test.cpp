@@ -3,9 +3,9 @@
 #include <GL/glew.h>
 
 #include "frame/file/file_system.h"
+#include "frame/json/parse_texture.h"
 #include "frame/open_gl/file/load_texture.h"
 #include "frame/open_gl/texture.h"
-#include "frame/proto/parse_texture.h"
 
 namespace test {
 
@@ -13,7 +13,7 @@ TEST_F(TextureTest, CreateTextureTest) {
     ASSERT_FALSE(texture_);
     std::optional<std::unique_ptr<frame::TextureInterface>> maybe_texture;
     EXPECT_NO_THROW(maybe_texture = frame::opengl::file::LoadTextureFromFile(
-                        frame::file::FindFile("Asset/CubeMap/PositiveX.png")));
+                        frame::file::FindFile("asset/cubemap/positive_x.png")));
     ASSERT_TRUE(maybe_texture);
     texture_ = std::move(maybe_texture.value());
     ASSERT_TRUE(texture_);
@@ -23,7 +23,7 @@ TEST_F(TextureTest, GetSizeTextureByteTest) {
     ASSERT_FALSE(texture_);
     std::optional<std::unique_ptr<frame::TextureInterface>> maybe_texture;
     EXPECT_NO_THROW(maybe_texture = frame::opengl::file::LoadTextureFromFile(
-                        frame::file::FindFile("Asset/CubeMap/PositiveX.png")));
+                        frame::file::FindFile("asset/cubemap/positive_x.png")));
     ASSERT_TRUE(maybe_texture);
     texture_ = std::move(maybe_texture.value());
     ASSERT_TRUE(texture_);
@@ -42,7 +42,7 @@ TEST_F(TextureTest, CreateHDRTextureHalfTest) {
     ASSERT_FALSE(texture_);
     std::optional<std::unique_ptr<frame::TextureInterface>> maybe_texture;
     EXPECT_NO_THROW(maybe_texture = frame::opengl::file::LoadTextureFromFile(
-                        frame::file::FindFile("Asset/CubeMap/Hamarikyu.hdr"),
+                        frame::file::FindFile("asset/cubemap/hamarikyu.hdr"),
                         frame::proto::PixelElementSize_HALF()));
     ASSERT_TRUE(maybe_texture);
     texture_ = std::move(maybe_texture.value());
@@ -58,7 +58,7 @@ TEST_F(TextureTest, CreateHDRTextureFloatTest) {
     ASSERT_FALSE(texture_);
     std::optional<std::unique_ptr<frame::TextureInterface>> maybe_texture;
     EXPECT_NO_THROW(maybe_texture = frame::opengl::file::LoadTextureFromFile(
-                        frame::file::FindFile("Asset/CubeMap/Hamarikyu.hdr"),
+                        frame::file::FindFile("asset/cubemap/hamarikyu.hdr"),
                         frame::proto::PixelElementSize_FLOAT()));
     ASSERT_TRUE(maybe_texture);
     texture_ = std::move(maybe_texture.value());

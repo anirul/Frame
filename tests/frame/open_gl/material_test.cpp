@@ -20,12 +20,12 @@ TEST_F(MaterialTest, CheckAddRemoveTextureTest) {
     auto material = std::make_unique<frame::opengl::Material>();
     material_     = std::move(material);
     EXPECT_TRUE(material_);
-    auto texture1 = frame::opengl::file::LoadTextureFromFile(frame::file::FindDirectory("Asset") +
-                                                             "/CubeMap/PositiveX.png");
+    auto texture1 = frame::opengl::file::LoadTextureFromFile(frame::file::FindDirectory("asset") +
+                                                             "/cubemap/positive_x.png");
     EXPECT_TRUE(texture1);
     texture1->SetName("PositiveX");
-    auto texture2 = frame::opengl::file::LoadTextureFromFile(frame::file::FindDirectory("Asset") +
-                                                             "/CubeMap/PositiveY.png");
+    auto texture2 = frame::opengl::file::LoadTextureFromFile(frame::file::FindDirectory("asset") +
+                                                             "/cubemap/positive_y.png");
     EXPECT_TRUE(texture2);
     texture2->SetName("PositiveY");
     auto maybe_id1 = level->AddTexture(std::move(texture1));
