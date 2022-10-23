@@ -32,7 +32,7 @@ struct ProgramInterface : public NameInterface {
      * @brief Get input texture ids.
      * @return Vector of entity ids of input texture.
      */
-    virtual const std::vector<EntityId> GetInputTextureIds() const = 0;
+    virtual std::vector<EntityId> GetInputTextureIds() const = 0;
     /**
      * @brief Set output texture id.
      * @param id: Add the texture id into the output program.
@@ -47,7 +47,7 @@ struct ProgramInterface : public NameInterface {
      * @brief Get output texture ids.
      * @return Vector of entity ids of output texture.
      */
-    virtual const std::vector<EntityId> GetOutputTextureIds() const = 0;
+    virtual std::vector<EntityId> GetOutputTextureIds() const = 0;
     /**
      * @brief Select temporary (before assignment to a entity id) scene root.
      * @return Get the temporary scene root.
@@ -82,7 +82,7 @@ struct ProgramInterface : public NameInterface {
      * @brief Get the list of uniforms needed by the program.
      * @return Vector of string that represent the names of uniforms.
      */
-    virtual const std::vector<std::string>& GetUniformNameList() const = 0;
+    virtual std::vector<std::string> GetUniformNameList() const = 0;
     /**
      * @brief Create a uniform from a string and a bool.
      * @param name: Name of the uniform.
@@ -126,13 +126,49 @@ struct ProgramInterface : public NameInterface {
      */
     virtual void Uniform(const std::string& name, const glm::mat4 mat) const = 0;
     /**
-     * @brief Add a later included value (like camera position or time), this will be set in unifrom
-     * interface.
+     * @brief Create a uniform from a string and a vector.
+     * @param name: Name of the uniform.
+     * @param vector: Vector to be inputed into the uniform.
+     */
+    virtual void Uniform(const std::string& name, const std::vector<float>& vector,
+                         std::pair<std::uint32_t, std::uint32_t> size = { 0, 0 }) const = 0;
+    /**
+     * @brief Create a uniform from a string and a vector.
+     * @param name: Name of the uniform.
+     * @param vector: Vector to be inputed into the uniform.
+     */
+    virtual void Uniform(const std::string& name, const std::vector<std::int32_t>& vector,
+                         std::pair<std::uint32_t, std::uint32_t> size = { 0, 0 }) const = 0;
+    /**
+     * @brief Add a later included value.
+     * Like camera position or time, this will be set in uniform interface.
      * @param name: Name of the uniform.
      * @param value: Enum value of the uniform (see proto declaration for that).
      */
-    virtual void Uniform(const std::string& name,
-                         const proto::Uniform::UniformEnum enum_value) const = 0;
+    virtual void PreInscribeEnumUniformFloat(
+        const std::string& name, proto::Uniform::UniformEnum enum_value) const = 0;
+    /**
+     * @brief Add a later included streamed value.
+     * @param name: Name of the uniform.
+     * @param value: String pointing to the streamed uniform.
+     */
+    virtual void PreInscribeStreamUniformFloat(const std::string& name,
+                                               proto::Stream::StreamEnum value) const = 0;
+    /**
+     * @brief Add a later included value.
+     * Like camera position or time, this will be set in uniform interface.
+     * @param name: Name of the uniform.
+     * @param value: Enum value of the uniform (see proto declaration for that).
+     */
+    virtual void PreInscribeEnumUniformInt(const std::string& name,
+                                           proto::Uniform::UniformEnum enum_value) const = 0;
+    /**
+     * @brief Add a later included streamed value.
+     * @param name: Name of the uniform.
+     * @param value: String pointing to the streamed uniform.
+     */
+    virtual void PreInscribeStreamUniformInt(const std::string& name,
+                                             proto::Stream::StreamEnum value) const = 0;
 };
 
 }  // End namespace frame.

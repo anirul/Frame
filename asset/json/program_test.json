@@ -28,7 +28,13 @@
       "output_texture_names": [ "DefaultTexture" ],
       "input_scene_type": { "value": "SCENE" },
       "input_scene_root_name": "root",
-      "shader": "blur"
+      "shader": "blur",
+      "parameters": [
+        {
+          "name": "exponent",
+          "uniform_float": "1.0"
+        }
+      ]
     }
   ],
   "scene_tree": {

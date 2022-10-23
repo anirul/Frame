@@ -2,6 +2,7 @@ syntax = "proto3";
 
 import "pixel.proto";
 import "math.proto";
+import "stream.proto";
 
 package frame.proto;
 
@@ -11,7 +12,7 @@ package frame.proto;
 // skeleton animation so a new type of mesh.
 
 // Matrix
-// Next 6
+// Next 5
 message SceneMatrix {
 	// This is the name of the scene matrix.
 	string name = 1;
@@ -19,35 +20,47 @@ message SceneMatrix {
 	string parent = 2;
 	// Matrix.
 	UniformMatrix4 matrix = 3;
-	// Quaternion
+	// Quaternion moving.
 	UniformQuaternion quaternion = 4;
-	// Clean the z buffer to make thinks seen.
-	CleanBuffer clean_buffer = 5;
 }
 
 // Static Mesh.
-// Next 8
+// Next 11
 message SceneStaticMesh {
 	// This is the name of the mesh.
 	string name = 1;
 	// Give the name of the parent (if present).
 	string parent = 2;
 
+	// Different kind of rendering possible.
+	enum RenderPrimitiveEnum {
+		TRIANGLE			= 0; //< default!
+		POINT				= 1;
+		LINE				= 2;
+	}
+	// What kind of rendering is required (default = triangle).
+	RenderPrimitiveEnum render_primitive_enum = 8;
+
 	// Some mesh are included?
-	enum Enum {
+	enum MeshEnum {
 		INVALID				= 0;
 		CUBE				= 1;
 		QUAD				= 2;
 	}
-	// This can be a static mesh enum.
-	Enum mesh_enum = 6;
-	// Where the file is loaded from.
-	string file_name = 3;
+	// Can only have one of the 3 cases mesh_enum, file_name or stream_input.
+	oneof mesh_oneof {
+		// If any of the clean buffer is activated, then only this is used!
+		CleanBuffer clean_buffer = 7;
+		// This can be a static mesh enum.
+		MeshEnum mesh_enum = 6;
+		// Where the file is loaded from.
+		string file_name = 3;
+		// Stream input.
+		Stream stream = 10;
+	}
 
 	// Material name.
 	string material_name = 5;
-	// Skip the material that are in the file.
-	bool skip_file_material = 7;
 }
 
 // Camera

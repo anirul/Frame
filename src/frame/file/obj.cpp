@@ -9,7 +9,7 @@
 
 namespace frame::file {
 
-Obj::Obj(const std::string& file_name) {
+Obj::Obj(const std::filesystem::path& file_name) {
 #ifdef TINY_OBJ_LOADER_V2
     tinyobj::ObjReaderConfig reader_config;
     const auto pair               = SplitFileDirectory(file_name);
@@ -35,11 +35,12 @@ Obj::Obj(const std::string& file_name) {
     tinyobj::attrib_t attrib;
     std::vector<tinyobj::shape_t> shapes;
     std::vector<tinyobj::material_t> materials;
-    const auto pair = SplitFileDirectory(file_name);
+    const auto directory = file_name.parent_path();
+    const auto file      = file_name.filename();
 
     std::string err;
-    bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &err,
-                                file::FindFile(file_name).c_str(), pair.first.c_str());
+    bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, &file_name.string(),
+                                directory.string().append("/").c_str());
 
     if (!err.empty()) {
         logger_->error(err);
@@ -55,14 +56,14 @@ Obj::Obj(const std::string& file_name) {
 
         // Loop over faces(polygon) this should be triangles?
         size_t index_offset = 0;
-        for (size_t f = 0; f < shapes[s].mesh.num_face_vertices.size(); f++) {
+        for (std::size_t f = 0; f < shapes[s].mesh.num_face_vertices.size(); f++) {
             // This SHOULD be 3!
             int fv = shapes[s].mesh.num_face_vertices[f];
             if (fv != 3) {
                 throw std::runtime_error(fmt::format("The face should be 3 in size now {}.", fv));
             }
             // Loop over vertices in the face.
-            for (size_t v = 0; v < fv; v++) {
+            for (std::size_t v = 0; v < fv; v++) {
                 ObjVertex vertex{};
                 // access to vertex
                 tinyobj::index_t idx = shapes[s].mesh.indices[index_offset + v];

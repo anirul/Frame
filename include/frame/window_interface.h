@@ -4,6 +4,7 @@
 #include <string>
 #include <utility>
 
+#include "frame/api.h"
 #include "frame/device_interface.h"
 #include "frame/draw_interface.h"
 #include "frame/input_interface.h"
@@ -12,7 +13,7 @@ namespace frame {
 
 /**
  * @class WindowInterface
- * @brief  Interface to a window this is specific to a platform (see Windows, SDL, Linux, OSX, iOS,
+ * @brief Interface to a window this is specific to a platform (see Windows, SDL, Linux, OSX, iOS,
  * etc...).
  */
 struct WindowInterface {
@@ -21,10 +22,16 @@ struct WindowInterface {
     //! @brief Run the windows interface this will take the current thread.
     virtual void Run() = 0;
     /**
-     * @brief Set the drawing interface (see above).
+     * @brief Add a drawing interface.
      * @param draw_interface: Move a draw interface to the window object.
+     * @return The index of the draw interface.
      */
-    virtual void SetDrawInterface(std::unique_ptr<DrawInterface>&& draw_interface) = 0;
+    virtual int AddDrawInterface(std::unique_ptr<DrawInterface>&& draw_interface) = 0;
+    /**
+     * @brief Remove a drawing interface.
+     * @param index: The index of the draw interface to remove.
+     */
+    virtual void RemoveDrawInterface(int index) = 0;
     /**
      * @brief Set the input interface (see above).
      * @param input_interface: Move a input interface to the window object.
@@ -47,16 +54,46 @@ struct WindowInterface {
      */
     virtual std::pair<std::uint32_t, std::uint32_t> GetSize() const = 0;
     /**
+     * @brief Get the desktop size.
+     * @return A size {x, y} of the desktop.
+     */
+    virtual std::pair<std::uint32_t, std::uint32_t> GetDesktopSize() const = 0;
+    /**
      * @brief Return the context to the window (this is a void* as this can be a Windows HWND, a
      * Linux window or ?).
      * @return A pointer to an underlying window context.
      */
     virtual void* GetWindowContext() const = 0;
     /**
+     * @brief Return an graphic context.
+     * @return A pointer to an graphic context.
+     */
+    virtual void* GetGraphicContext() const = 0;
+    /**
      * @brief Set the window title (the name of the window).
-	 * @param title: Window title.
+     * @param title: Window title.
      */
     virtual void SetWindowTitle(const std::string& title) const = 0;
+    /**
+     * @brief Get the window enum (know if this is an SDL a NONE or other window).
+     * @return A window enum.
+     */
+    virtual WindowEnum GetWindowEnum() const = 0;
+    /**
+     * @brief Resize the window.
+     * @param size: The new window size.
+     */
+    virtual void Resize(std::pair<std::uint32_t, std::uint32_t> size) = 0;
+    /**
+     * @brief Set window full screen mode.
+     * @param fullscreen_enum: Is it full screen or not?
+     */
+    virtual void SetFullScreen(FullScreenEnum fullscreen_enum) = 0;
+    /**
+     * @brief Get window full screen enum.
+     * @return The full screen enum.
+     */
+    virtual FullScreenEnum GetFullScreenEnum() const = 0;
 };
 
 }  // End namespace frame.

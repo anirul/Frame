@@ -22,7 +22,12 @@ struct DrawInterface {
      * @brief This should draw from the device.
 	 * @param dt: Delta time from the start of the software in seconds.
      */
-    virtual void RunDraw(double dt) = 0;
+    virtual bool RunDraw(double dt) = 0;
+    /**
+     * @brief Poll event.
+     * @param event: The event to be polled.
+     */
+    virtual bool PollEvent(void* event) = 0;
 };
 
 }  // End namespace frame.

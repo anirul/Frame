@@ -1,18 +1,52 @@
 #pragma once
 
 #include <any>
+#include <array>
 #include <cinttypes>
 #include <glm/glm.hpp>
 #include <utility>
 
+#include "frame/json/parse_pixel.h"
 #include "frame/json/proto.h"
 #include "frame/name_interface.h"
 
 namespace frame {
 
 /**
+ * @class TextureTypeEnum
+ * @brief The type of texture you want to create.
+ */
+enum class TextureTypeEnum {
+    TEXTURE_2D,
+    TEXTURE_3D,
+    CUBMAP,
+};
+
+/**
+ * @class TextureParameter
+ * @brief This is the parameters needed to create a new texture.
+ * @note TODO(anirul): Change cubemap to a enum and add a parameter for mip map.
+ */
+struct TextureParameter {
+    //! @brief Pixel element size, this should be the same as sizeof(T).
+    proto::PixelElementSize pixel_element_size = proto::PixelElementSize_BYTE();
+    //! @brief Pixel structure, this is the number of color you have in the texture 1 to 4.
+    proto::PixelStructure pixel_structure = proto::PixelStructure_RGB();
+    //! @brief Texture size.
+    std::pair<std::uint32_t, std::uint32_t> size = { 1, 1 };
+    //! @brief Texture data, in case you don't want to provide it just pass an empty vector.
+    //! You have to multiply the size by the pixel element size to get the size of the vector.
+    void* data_ptr = nullptr;
+    //! @brief In case of cube map you need 6 planes of array pointers.
+    std::array<void*, 6> array_data_ptr = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
+    //! @brief Is it a cube map or a normal 2d texture.
+    TextureTypeEnum map_type = TextureTypeEnum::TEXTURE_2D;
+};
+
+/**
  * @class TextureInterface
  * @brief This class is there to hold a texture (2D or 3D).
+ * In case you want to create a texture, you should use the device.
  */
 struct TextureInterface : public NameInterface {
     //! @brief Virtual destructor.
@@ -106,6 +140,14 @@ struct TextureInterface : public NameInterface {
      * @return A vector containing the pixel of the image in 32 bit float format.
      */
     virtual std::vector<float> GetTextureFloat() const = 0;
+    /**
+     * @brief Copy the texture input to the texture.
+     * @param vector: Vector of uint32_t containing the RGBA values of the texture.
+     * @param size: Size of the image.
+     */
+    virtual void Update(std::vector<std::uint8_t>&& vector,
+                        std::pair<std::uint32_t, std::uint32_t> size,
+                        std::uint8_t bytes_per_pixel) = 0;
 };
 
 }  // End namespace frame.

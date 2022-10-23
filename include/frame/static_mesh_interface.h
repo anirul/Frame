@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "frame/entity_id.h"
+#include "frame/json/proto.h"
 #include "frame/name_interface.h"
 
 namespace frame {
@@ -15,20 +16,15 @@ struct StaticMeshInterface : public NameInterface {
     //! @brief Virtual destructor.
     virtual ~StaticMeshInterface() = default;
     /**
-     * @brief Set the material id.
-     * @param id: the material id to be set.
-     */
-    virtual void SetMaterialId(EntityId id) = 0;
-    /**
-     * @brief Get material id.
-     * @return Current material id.
-     */
-    virtual EntityId GetMaterialId() const = 0;
-    /**
      * @brief Get point buffer id.
      * @return Current point buffer id.
      */
     virtual EntityId GetPointBufferId() const = 0;
+    /**
+     * @brief Get color buffer id.
+     * @return Current color buffer id.
+     */
+    virtual EntityId GetColorBufferId() const = 0;
     /**
      * @brief Get normal buffer id.
      * @return Current normal buffer id.
@@ -51,10 +47,25 @@ struct StaticMeshInterface : public NameInterface {
      */
     virtual std::size_t GetIndexSize() const = 0;
     /**
+     * @brief Update the index size for streams.
+     * @param level: The level corresponding to this mesh.
+     */
+    virtual void SetIndexSize(std::size_t index_size) = 0;
+    /**
      * @brief Check if depth buffer is cleared or not.
      * @return Is depth buffer cleared?
      */
-    virtual bool IsClearBuffer() const       = 0;
+    virtual bool IsClearBuffer() const = 0;
+    /**
+     * @brief Set the way a mesh is rendered (point/line/triangle) triangle is the default.
+     * @param render_enum: The basic shape of the renderer that should be used on this mesh.
+     */
+    virtual void SetRenderPrimitive(proto::SceneStaticMesh::RenderPrimitiveEnum render_enum) = 0;
+    /**
+     * @brief Get the static mesh render primitive.
+     * @return Get the render primitive.
+     */
+    virtual proto::SceneStaticMesh::RenderPrimitiveEnum GetRenderPrimitive() const = 0;
 };
 
 }  // End namespace frame.

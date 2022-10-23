@@ -3,8 +3,9 @@
 #include <glm/glm.hpp>
 #include <string>
 #include <vector>
+#include <filesystem>
 
-#include "Frame/Logger.h"
+#include "frame/logger.h"
 
 namespace frame::file {
 
@@ -35,17 +36,17 @@ class ObjMesh {
         : points_(points), indices_(indices), material_(material) {}
     /**
      * @brief Will return the list of vertices.
-	 * @return Vector of vertices.
+     * @return Vector of vertices.
      */
     const std::vector<ObjVertex>& GetVertices() const { return points_; }
     /**
      * @brief Will return the list of indices.
-	 * @return Vector of indices.
+     * @return Vector of indices.
      */
     const std::vector<int>& GetIndices() const { return indices_; }
     /**
      * @brief Will return an index to the material vector.
-	 * @return An index to the material vector.
+     * @return An index to the material vector.
      */
     int GetMaterialId() const { return material_; }
 
@@ -84,26 +85,26 @@ class Obj {
    public:
     /**
      * @brief Constructor parse from an OBJ file.
-	 * @param file_name: File to be open.
+     * @param file_name: File to be open.
      */
-    Obj(const std::string& file_name);
+    Obj(const std::filesystem::path& file_name);
 
-	public:
+   public:
     /**
      * @brief Get meshes, they are suppose to be sorted by material.
-	 * @return The meshes that are in the file.
+     * @return The meshes that are in the file.
      */
-    const std::vector<ObjMesh> GetMeshes() const { return meshes_; }
+    const std::vector<ObjMesh>& GetMeshes() const { return meshes_; }
     /**
      * @brief Get the materials, id in mesh give the material in the vector (*.mtl).
-	 * @return The materials that are in the file.
+     * @return The materials that are in the file.
      */
-    const std::vector<ObjMaterial> GetMaterials() const { return materials_; }
+    const std::vector<ObjMaterial>& GetMaterials() const { return materials_; }
 
    protected:
-    std::vector<ObjMesh> meshes_;
-    std::vector<ObjMaterial> materials_;
-    Logger& logger_ = Logger::GetInstance();
+    std::vector<ObjMesh> meshes_        = {};
+    std::vector<ObjMaterial> materials_ = {};
+    Logger& logger_                     = Logger::GetInstance();
 };
 
 }  // End namespace frame::file.

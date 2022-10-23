@@ -1,43 +1,33 @@
 #include "frame/json/parse_program.h"
 
+#include <filesystem>
 #include <fstream>
 
 #include "frame/file/file_system.h"
-#include "frame/open_gl/program.h"
+#include "frame/json/parse_stream.h"
+#include "frame/json/parse_uniform.h"
+#include "frame/opengl/file/load_program.h"
+#include "frame/opengl/program.h"
 
 namespace frame::proto {
 
-std::optional<std::unique_ptr<frame::ProgramInterface>> ParseProgramOpenGL(
-    const Program& proto_program, const LevelInterface* level) {
-    Logger& logger          = Logger::GetInstance();
-    std::string shader_path = "asset/shader/open_gl/";
-    std::string shader_name = shader_path + proto_program.shader();
-    std::string shader_vert = file::FindFile(shader_name + ".vert");
-    logger->info("Openning vertex shader: [{}].", shader_vert);
-    std::ifstream ifs_vertex(shader_vert);
-    if (!ifs_vertex.is_open()) {
-        throw std::runtime_error(fmt::format("Couldn't open file {}.vert", shader_name));
-    }
-    std::string shader_frag = file::FindFile(shader_name + ".frag");
-    logger->info("Openning fragment shader: [{}].", shader_frag);
-    std::ifstream ifs_pixel(shader_frag);
-    if (!ifs_pixel.is_open()) {
-        throw std::runtime_error(fmt::format("Couldn't open file {}.frag", shader_name));
-    }
-    auto maybe_program = opengl::CreateProgram(ifs_vertex, ifs_pixel);
-    if (!maybe_program) return std::nullopt;
-    auto program = std::move(maybe_program.value());
+std::unique_ptr<frame::ProgramInterface> ParseProgramOpenGL(const Program& proto_program,
+                                                            LevelInterface* level) {
+    Logger& logger = Logger::GetInstance();
+    // Create the program.
+    auto program = opengl::file::LoadProgram(proto_program.shader());
+    if (!program) return nullptr;
     for (const auto& texture_name : proto_program.input_texture_names()) {
         auto maybe_texture_id = level->GetIdFromName(texture_name);
-        if (!maybe_texture_id) return std::nullopt;
-        EntityId texture_id = maybe_texture_id.value();
+        if (!maybe_texture_id) return nullptr;
+        EntityId texture_id = maybe_texture_id;
         // Check this is a texture.
         program->AddInputTextureId(texture_id);
     }
     for (const auto& texture_name : proto_program.output_texture_names()) {
         auto maybe_texture_id = level->GetIdFromName(texture_name);
-        if (!maybe_texture_id) return std::nullopt;
-        EntityId texture_id = maybe_texture_id.value();
+        if (!maybe_texture_id) return nullptr;
+        EntityId texture_id = maybe_texture_id;
         // Check this is a texture.
         program->AddOutputTextureId(texture_id);
     }
@@ -45,15 +35,15 @@ std::optional<std::unique_ptr<frame::ProgramInterface>> ParseProgramOpenGL(
     switch (proto_program.input_scene_type().value()) {
         case SceneType::QUAD: {
             auto maybe_quad_id = level->GetDefaultStaticMeshQuadId();
-            if (!maybe_quad_id) return std::nullopt;
-            EntityId quad_id = maybe_quad_id.value();
+            if (!maybe_quad_id) return nullptr;
+            EntityId quad_id = maybe_quad_id;
             program->SetSceneRoot(quad_id);
             break;
         }
         case SceneType::CUBE: {
             auto maybe_cube_id = level->GetDefaultStaticMeshCubeId();
-            if (!maybe_cube_id) return std::nullopt;
-            EntityId cube_id = maybe_cube_id.value();
+            if (!maybe_cube_id) return nullptr;
+            EntityId cube_id = maybe_cube_id;
             program->SetSceneRoot(cube_id);
             break;
         }
@@ -67,7 +57,66 @@ std::optional<std::unique_ptr<frame::ProgramInterface>> ParseProgramOpenGL(
                 fmt::format("No way {}?", proto_program.input_scene_type().value()));
     }
     for (const auto& parameter : proto_program.parameters()) {
-        program->Uniform(parameter.name(), parameter.uniform_enum());
+        switch (parameter.value_oneof_case()) {
+            case Uniform::kUniformEnum:
+                program->PreInscribeEnumUniformFloat(parameter.name(), parameter.uniform_enum());
+                break;
+            case Uniform::kUniformBool:
+                program->Uniform(parameter.name(), parameter.uniform_bool());
+                break;
+            case Uniform::kUniformInt:
+                program->Uniform(parameter.name(), parameter.uniform_int());
+                break;
+            case Uniform::kUniformFloat:
+                program->Uniform(parameter.name(), parameter.uniform_float());
+                break;
+            case Uniform::kUniformVec2:
+                program->Uniform(parameter.name(), ParseUniform(parameter.uniform_vec2()));
+                break;
+            case Uniform::kUniformVec3:
+                program->Uniform(parameter.name(), ParseUniform(parameter.uniform_vec3()));
+                break;
+            case Uniform::kUniformVec4:
+                program->Uniform(parameter.name(), ParseUniform(parameter.uniform_vec4()));
+                break;
+            case Uniform::kUniformMat4:
+                program->Uniform(parameter.name(), ParseUniform(parameter.uniform_mat4()));
+                break;
+            case Uniform::kUniformFloatStream: {
+                if (parameter.uniform_float_stream().value() == proto::Stream::ALL) {
+                    for (auto* element_ptr : ParseAllUniformFloatStream(parameter)) {
+                        program->PreInscribeStreamUniformFloat(
+                            element_ptr->GetName(), parameter.uniform_float_stream().value());
+                        level->AddUniformFloatStream(element_ptr);
+                    }
+                } else {
+                    auto element_ptr = ParseNoneUniformFloatStream(parameter);
+                    program->PreInscribeStreamUniformFloat(
+                        element_ptr->GetName(), parameter.uniform_float_stream().value());
+                    level->AddUniformFloatStream(element_ptr);
+                }
+                break;
+            }
+            case Uniform::kUniformIntStream: {
+                if (parameter.uniform_int_stream().value() == proto::Stream::ALL) {
+                    for (auto* element_ptr : ParseAllUniformIntStream(parameter)) {
+                        program->PreInscribeStreamUniformInt(
+                            element_ptr->GetName(), parameter.uniform_int_stream().value());
+                        level->AddUniformIntStream(element_ptr);
+                    }
+                } else {
+                    auto* element_ptr = ParseNoneUniformIntStream(parameter);
+                    program->PreInscribeStreamUniformInt(element_ptr->GetName(),
+                                                         parameter.uniform_int_stream().value());
+                    level->AddUniformIntStream(element_ptr);
+                }
+                break;
+            }
+            default:
+                throw std::runtime_error(
+                    fmt::format("No handle for parameter {}#?",
+                                static_cast<int>(parameter.value_oneof_case())));
+        }
     }
     return program;
 }

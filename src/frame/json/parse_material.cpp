@@ -1,6 +1,6 @@
 #include "frame/json/parse_material.h"
 
-#include "frame/open_gl/material.h"
+#include "frame/opengl/material.h"
 
 namespace frame::proto {
 
@@ -20,13 +20,13 @@ std::optional<std::unique_ptr<frame::MaterialInterface>> ParseMaterialOpenGL(
     material->SetProgramName(proto_material.program_name());
     auto maybe_program_id = level->GetIdFromName(proto_material.program_name());
     if (maybe_program_id) {
-        EntityId program_id = maybe_program_id.value();
+        EntityId program_id = maybe_program_id;
         material->SetProgramId(program_id);
     }
     for (int i = 0; i < inner_size; ++i) {
         auto maybe_texture_id = level->GetIdFromName(proto_material.texture_names(i));
         if (!maybe_texture_id) return std::nullopt;
-        EntityId texture_id = maybe_texture_id.value();
+        EntityId texture_id = maybe_texture_id;
         material->AddTextureId(texture_id, proto_material.inner_names(i));
     }
     return material;

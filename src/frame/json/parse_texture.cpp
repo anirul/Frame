@@ -1,9 +1,12 @@
 #include "frame/json/parse_texture.h"
 
+#include <filesystem>
+
 #include "frame/file/file_system.h"
-#include "frame/open_gl/file/load_texture.h"
-#include "frame/open_gl/texture.h"
-#include "frame/open_gl/texture_cube_map.h"
+#include "frame/json/parse_stream.h"
+#include "frame/opengl/file/load_texture.h"
+#include "frame/opengl/texture.h"
+#include "frame/opengl/texture_cube_map.h"
 
 namespace {
 
@@ -25,24 +28,27 @@ namespace frame::proto {
 
 std::unique_ptr<frame::TextureInterface> ParseTexture(
     const Texture& proto_texture, const std::pair<std::uint32_t, std::uint32_t> size) {
-    CheckParameters(proto_texture);
     std::pair<std::uint32_t, std::uint32_t> texture_size = size;
-    if (proto_texture.size().x() < 0)
+    if (proto_texture.size().x() < 0) {
         texture_size.first /= std::abs(proto_texture.size().x());
-    else
-        texture_size.first = proto_texture.size().x();
-    if (proto_texture.size().y() < 0)
-        texture_size.second /= std::abs(proto_texture.size().y());
-    else
-        texture_size.second = proto_texture.size().y();
-    std::unique_ptr<TextureInterface> texture = nullptr;
-    if (!proto_texture.pixels().empty()) {
-        texture = std::make_unique<frame::opengl::Texture>(
-            texture_size, proto_texture.pixels().data(), proto_texture.pixel_element_size(),
-            proto_texture.pixel_structure());
     } else {
-        texture = std::make_unique<frame::opengl::Texture>(
-            texture_size, proto_texture.pixel_element_size(), proto_texture.pixel_structure());
+        texture_size.first = proto_texture.size().x();
+    }
+    if (proto_texture.size().y() < 0) {
+        texture_size.second /= std::abs(proto_texture.size().y());
+    } else {
+        texture_size.second = proto_texture.size().y();
+    }
+    std::unique_ptr<TextureInterface> texture = nullptr;
+    TextureParameter texture_parameter        = {};
+    texture_parameter.pixel_element_size      = proto_texture.pixel_element_size();
+    texture_parameter.pixel_structure         = proto_texture.pixel_structure();
+    texture_parameter.size                    = texture_size;
+    if (!proto_texture.pixels().empty()) {
+        texture_parameter.data_ptr = (void*)proto_texture.pixels().data();
+        texture                    = std::make_unique<frame::opengl::Texture>(texture_parameter);
+    } else {
+        texture = std::make_unique<frame::opengl::Texture>(texture_parameter);
     }
     constexpr auto INVALID_TEXTURE = frame::proto::TextureFilter::INVALID;
     if (proto_texture.min_filter().value() != INVALID_TEXTURE)
@@ -58,9 +64,7 @@ std::unique_ptr<frame::TextureInterface> ParseTexture(
 
 std::unique_ptr<TextureInterface> ParseCubeMapTexture(
     const Texture& proto_texture, const std::pair<std::uint32_t, std::uint32_t> size) {
-    // Get the pixel element size.
-    CheckParameters(proto_texture);
-    std::pair<std::uint32_t, std::uint32_t> texture_size = { 0, 0 };
+    std::pair<std::uint32_t, std::uint32_t> texture_size = size;
     if (proto_texture.size().x() < 0) {
         texture_size.first /= std::abs(proto_texture.size().x());
     } else {
@@ -75,8 +79,12 @@ std::unique_ptr<TextureInterface> ParseCubeMapTexture(
     if (!proto_texture.pixels().empty()) {
         throw std::runtime_error("Not implemented!");
     }
-    texture = std::make_unique<opengl::TextureCubeMap>(
-        texture_size, proto_texture.pixel_element_size(), proto_texture.pixel_structure());
+    TextureParameter texture_parameter = {};
+    texture_parameter.pixel_element_size = proto_texture.pixel_element_size();
+    texture_parameter.pixel_structure    = proto_texture.pixel_structure();
+    texture_parameter.map_type           = TextureTypeEnum::CUBMAP;
+    texture_parameter.size               = texture_size;
+    texture = std::make_unique<opengl::TextureCubeMap>(texture_parameter);
     constexpr auto INVALID_TEXTURE = frame::proto::TextureFilter::INVALID;
     if (proto_texture.min_filter().value() != INVALID_TEXTURE)
         texture->SetMinFilter(proto_texture.min_filter().value());
@@ -90,30 +98,46 @@ std::unique_ptr<TextureInterface> ParseCubeMapTexture(
 }
 
 std::unique_ptr<TextureInterface> ParseTextureFile(const proto::Texture& proto_texture) {
-    CheckParameters(proto_texture);
-    return opengl::file::LoadTextureFromFile(file::FindFile(proto_texture.file_name()),
-                                             proto_texture.pixel_element_size(),
-                                             proto_texture.pixel_structure());
+    return opengl::file::LoadTextureFromFile(
+        file::FindFile(std::filesystem::path(proto_texture.file_name())),
+        proto_texture.pixel_element_size(), proto_texture.pixel_structure());
 }
 
 std::unique_ptr<TextureInterface> ParseCubeMapTextureFile(const proto::Texture& proto_texture) {
+    return opengl::file::LoadCubeMapTextureFromFile(
+        std::filesystem::path(proto_texture.file_name()), proto_texture.pixel_element_size(),
+        proto_texture.pixel_structure());
+}
+
+std::unique_ptr<TextureInterface> ParseCubeMapTextureFiles(const proto::Texture& proto_texture) {
+    std::array<std::filesystem::path, 6> name_array = {
+        file::FindFile(std::filesystem::path(proto_texture.file_names().positive_x())),
+        file::FindFile(std::filesystem::path(proto_texture.file_names().negative_x())),
+        file::FindFile(std::filesystem::path(proto_texture.file_names().positive_y())),
+        file::FindFile(std::filesystem::path(proto_texture.file_names().negative_y())),
+        file::FindFile(std::filesystem::path(proto_texture.file_names().positive_z())),
+        file::FindFile(std::filesystem::path(proto_texture.file_names().negative_z()))
+    };
+    return opengl::file::LoadCubeMapTextureFromFiles(name_array, proto_texture.pixel_element_size(),
+                                                     proto_texture.pixel_structure());
+}
+
+std::unique_ptr<frame::TextureInterface> ParseBasicTexture(
+    const proto::Texture& proto_texture, const std::pair<std::uint32_t, std::uint32_t> size) {
     CheckParameters(proto_texture);
-    if ((proto_texture.file_names().size() != 1) && !proto_texture.file_names().empty()) {
-        if (proto_texture.file_names().size() != 6) {
-            throw std::runtime_error(
-                fmt::format("Invalid file_names size: {}.", proto_texture.file_names().size()));
-        }
-        std::array<std::string, 6> name_array = {};
-        for (int i = 0; i < 6; ++i) {
-            name_array[i] = file::FindFile(proto_texture.file_names()[i]);
-        }
-        return opengl::file::LoadCubeMapTextureFromFiles(
-            name_array, proto_texture.pixel_element_size(), proto_texture.pixel_structure());
+    if (proto_texture.has_file_name() && !proto_texture.cubemap()) {
+        return ParseTextureFile(proto_texture);
     }
-    std::string file_name = (proto_texture.file_name().empty()) ? proto_texture.file_names()[0]
-                                                                : proto_texture.file_name();
-    return opengl::file::LoadCubeMapTextureFromFile(file_name, proto_texture.pixel_element_size(),
-                                                    proto_texture.pixel_structure());
+    if (proto_texture.has_file_name() && proto_texture.cubemap()) {
+        return ParseCubeMapTextureFile(proto_texture);
+    }
+    if (proto_texture.has_file_names() && proto_texture.cubemap()) {
+        return ParseCubeMapTextureFiles(proto_texture);
+    }
+    if (proto_texture.cubemap()) {
+        return ParseCubeMapTexture(proto_texture, size);
+    }
+    return ParseTexture(proto_texture, size);
 }
 
 }  // End namespace frame::proto.

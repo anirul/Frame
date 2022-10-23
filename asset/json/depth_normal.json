@@ -6,7 +6,7 @@
       "name": "input_depth",
       "pixel_element_size": { "value": "SHORT" },
       "pixel_structure": { "value": "GREY" },
-      "file_name": "Asset/input.png"
+      "file_name": "asset/input.png"
     },
     {
       "name": "normal_map",
@@ -68,9 +68,6 @@
     "scene_matrices": [
       {
         "name": "root",
-        "clean_buffer": {
-          "values": [ "CLEAR_COLOR", "CLEAR_DEPTH" ]
-        },
         "matrix": {
           "m11": "1.0",
           "m22": "1.0",

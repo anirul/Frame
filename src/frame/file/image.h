@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <filesystem>
 
 #include "frame/image_interface.h"
 #include "frame/json/parse_pixel.h"
@@ -34,7 +35,7 @@ class Image : public ImageInterface {
      * @param pixel_element_size: Size of one of the element in a pixel (BYTE, SHORT, HALF, FLOAT).
      * @param pixel_element_structure: Structure of a pixel (R, RG, RGB, RGBA).
      */
-    Image(const std::string& file,
+    Image(const std::filesystem::path& file,
           const proto::PixelElementSize pixel_element_size = proto::PixelElementSize_BYTE(),
           const proto::PixelStructure pixel_structure      = proto::PixelStructure_RGB());
     //! Virtual destructor.

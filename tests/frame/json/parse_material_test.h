@@ -6,19 +6,19 @@
 #include "frame/json/parse_level.h"
 #include "frame/level.h"
 #include "frame/material_interface.h"
-#include "frame/window.h"
+#include "frame/opengl/window.h"
 
 namespace test {
 
 class ParseMaterialTest : public testing::Test {
    public:
     ParseMaterialTest() {
-        window_          = frame::CreateSDLOpenGL({ 320, 200 });
-        auto maybe_level = frame::proto::ParseLevelOpenGL(
-            { 320, 200 }, frame::proto::LoadProtoFromJsonFile<frame::proto::Level>(
-                              frame::file::FindFile("asset/json/material_test.json")));
-        if (!maybe_level) throw std::runtime_error("Couldn't create level.");
-        level_ = std::move(maybe_level.value());
+        window_    = frame::opengl::CreateNoneOpenGL({ 320, 200 });
+        auto level = frame::proto::ParseLevel(
+            { 320, 200 }, frame::file::FindFile("asset/json/material_test.json"),
+            window_->GetUniqueDevice());
+        if (!level) throw std::runtime_error("Couldn't create level.");
+        level_ = std::move(level);
     }
 
    protected:

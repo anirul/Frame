@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package frame.proto;
+
+// Stream structure.
+// Next 3
+message Stream {
+    // Is it a id relevant stream or not.
+    enum StreamEnum {
+        NONE = 0;   //< This is not a id relevant id.
+        ALL = 1;    //< You can go through all of the local ids.
+    }
+    // Inner name of the stream.
+    string name = 1;
+    // Stream enum, what kind of stream is it.
+    StreamEnum value = 2;
+}

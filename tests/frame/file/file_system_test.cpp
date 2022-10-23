@@ -5,26 +5,26 @@
 namespace test {
 
 TEST_F(FileSystemTest, FindDirectorySimpleTest) {
-    std::string result = frame::file::FindDirectory("asset/");
+    std::filesystem::path result = frame::file::FindDirectory("asset/");
     EXPECT_FALSE(result.empty());
 }
 
 TEST_F(FileSystemTest, FindFileSimpleTest) {
-    std::string result = frame::file::FindFile("asset/cubemap/positive_x.png");
+    std::filesystem::path result = frame::file::FindFile("asset/cubemap/positive_x.png");
     EXPECT_FALSE(result.empty());
 }
 
 TEST_F(FileSystemTest, IsDirectoryExist) {
-    std::string asset = frame::file::FindDirectory("asset/");
+    std::filesystem::path asset = frame::file::FindDirectory("asset/");
     EXPECT_FALSE(asset.empty());
-    EXPECT_TRUE(frame::file::IsDirectoryExist(asset));
+    EXPECT_TRUE(std::filesystem::is_directory(asset));
 }
 
 TEST_F(FileSystemTest, IsFileExist) {
-    std::string asset = frame::file::FindDirectory("asset/");
+    std::filesystem::path asset = frame::file::FindDirectory("asset/");
     EXPECT_FALSE(asset.empty());
-    EXPECT_TRUE(frame::file::IsDirectoryExist(asset + "cubemap/"));
-    EXPECT_TRUE(frame::file::IsFileExist(asset + "cubemap/positive_x.png"));
+    EXPECT_TRUE(std::filesystem::is_directory(asset / "cubemap/"));
+    EXPECT_TRUE(std::filesystem::is_regular_file(asset / "cubemap/positive_x.png"));
 }
 
 }  // End namespace test.

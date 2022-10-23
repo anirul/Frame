@@ -1,25 +1,31 @@
 #include "frame/file/image.h"
 
+// Removed the warning from sprintf.
+#if defined(_WIN32) || defined(_WIN64)
+#pragma warning(disable : 4996)
+#endif
+
 #include <algorithm>
 #include <fstream>
 #include <set>
 #include <vector>
-#define STB_IMAGE_IMPLEMENTATION
+// This will be included if needed in the "image_stb.h".
+// #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
-#define STB_IMAGE_WRITE_IMPLEMENTATION
+// #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image_write.h>
 
 #include "frame/logger.h"
 
 namespace frame::file {
 
-Image::Image(const std::string& file,
+Image::Image(const std::filesystem::path& file,
              const proto::PixelElementSize pixel_element_size
              /*= PixelElementSize::BYTE*/,
              const proto::PixelStructure pixel_structure /*= PixelStructure::RGB*/)
     : pixel_element_size_(pixel_element_size), pixel_structure_(pixel_structure) {
     const auto& logger = frame::Logger::GetInstance();
-    logger->info("Openning image: [{}].", file);
+    logger->info("Openning image: [{}].", file.string());
     int channels;
     int desired_channels = { static_cast<int>(pixel_structure.value()) };
     // This is in the case of OpenGL (for now the only case).
@@ -27,20 +33,20 @@ Image::Image(const std::string& file,
     std::pair<int, int> size = { 0, 0 };
     switch (pixel_element_size.value()) {
         case proto::PixelElementSize::BYTE: {
-            image_ =
-                stbi_load(file.c_str(), &size.first, &size.second, &channels, desired_channels);
+            image_ = stbi_load(file.string().c_str(), &size.first, &size.second, &channels,
+                               desired_channels);
             break;
         }
         case proto::PixelElementSize::SHORT: {
-            image_ =
-                stbi_load_16(file.c_str(), &size.first, &size.second, &channels, desired_channels);
+            image_ = stbi_load_16(file.string().c_str(), &size.first, &size.second, &channels,
+                                  desired_channels);
             break;
         }
         case proto::PixelElementSize::HALF:
             [[fallthrough]];
         case proto::PixelElementSize::FLOAT: {
-            image_ =
-                stbi_loadf(file.c_str(), &size.first, &size.second, &channels, desired_channels);
+            image_ = stbi_loadf(file.string().c_str(), &size.first, &size.second, &channels,
+                                desired_channels);
             break;
         }
         default:
@@ -48,7 +54,7 @@ Image::Image(const std::string& file,
                                      std::to_string(static_cast<int>(pixel_element_size_.value())));
     }
     if (!image_) {
-        throw std::runtime_error("unsupported file: " + file);
+        throw std::runtime_error("unsupported file: " + file.string());
     }
     free_ = true;
     size_ = size;

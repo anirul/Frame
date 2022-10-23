@@ -12,7 +12,7 @@ TEST_F(ParseSceneTreeTest, CreateParseSceneTreeTest) {
     EXPECT_TRUE(succeed);
     auto maybe_scene_id = level_->GetDefaultRootSceneNodeId();
     EXPECT_TRUE(maybe_scene_id);
-    auto scene_id = maybe_scene_id.value();
+    auto scene_id = maybe_scene_id;
     EXPECT_NE(0, scene_id);
     frame::NodeInterface* node = nullptr;
     EXPECT_NO_THROW(node = level_->GetSceneNodeFromId(scene_id));

@@ -1,12 +1,13 @@
 syntax = "proto3";
 
 import "math.proto";
+import "stream.proto";
 
 package frame.proto;
 
 // This is the definition of an Uniform parameter.
 // These are parameters that are passed to the shader.
-// Next 19
+// Next 21
 message Uniform {
 	enum UniformEnum {
 		INVALID = 0;
@@ -27,6 +28,8 @@ message Uniform {
 		int32 uniform_int = 2;
 		bool uniform_bool = 3;
 		float uniform_float = 4;
+		Stream uniform_float_stream = 19;
+		Stream uniform_int_stream = 20;
 		// This value come from outside, this could be projection or camera.
 		// it will be set acording to the type of the enum.
 		UniformEnum uniform_enum = 5;

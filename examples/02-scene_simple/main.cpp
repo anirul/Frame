@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -7,28 +8,41 @@
 #include <windows.h>
 #endif
 
-#include "frame/window.h"
-#include "examples/lib_common/application.h"
+#include "frame/common/application.h"
+#include "frame/file/image_stb.h"
+#include "frame/gui/draw_gui_factory.h"
+#include "frame/gui/window_resolution.h"
+#include "frame/window_factory.h"
 
 #if defined(_WIN32) || defined(_WIN64)
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine,
-                   _In_ int nShowCmd)
+                   _In_ int nShowCmd) try {
 #else
-int main(int ac, char** av)
+int main(int ac, char** av) try {
 #endif
-{
-    try {
-        Application app(frame::file::FindFile("asset/json/scene_simple.json"),
-                        frame::CreateSDLOpenGL({ 1280, 720 }));
-        app.Startup();
+    std::pair<std::uint32_t, std::uint32_t> size = { 800, 600 };
+    bool end                                     = true;
+
+    frame::gui::WindowResolution* ptr_window_resolution = nullptr;
+    auto win = frame::CreateNewWindow(frame::WindowEnum::SDL2, frame::DeviceEnum::OPENGL, size);
+    auto gui_window = frame::gui::CreateDrawGui(win->GetUniqueDevice(), win.get());
+    auto gui_resolution =
+        std::make_unique<frame::gui::WindowResolution>("Resolution", size, win->GetDesktopSize());
+    ptr_window_resolution = gui_resolution.get();
+    gui_window->AddWindow(std::move(gui_resolution));
+    win->AddDrawInterface(std::move(gui_window));
+    frame::common::Application app(std::move(win));
+    do {
+        app.Startup(frame::file::FindFile("asset/json/scene_simple.json"));
         app.Run();
-    } catch (std::exception ex) {
-#if defined(_WIN32) || defined(_WIN64)
-        MessageBox(nullptr, ex.what(), "Exception", MB_ICONEXCLAMATION);
-#else
-        std::cerr << "Error: " << ex.what() << std::endl;
-#endif
-        return -2;
-    }
+        app.Resize(ptr_window_resolution->GetSize());
+    } while (!ptr_window_resolution->End());
     return 0;
+} catch (std::exception ex) {
+#if defined(_WIN32) || defined(_WIN64)
+    MessageBox(nullptr, ex.what(), "Exception", MB_ICONEXCLAMATION);
+#else
+    std::cerr << "Error: " << ex.what() << std::endl;
+#endif
+    return -2;
 }

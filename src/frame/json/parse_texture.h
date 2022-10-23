@@ -36,5 +36,13 @@ std::unique_ptr<TextureInterface> ParseTextureFile(const proto::Texture& proto_t
  * @return A unique pointer to a texture interface.
  */
 std::unique_ptr<TextureInterface> ParseCubeMapTextureFile(const proto::Texture& proto_texture);
+/**
+* @brief Parse a basic texture from a proto and a size.
+* @param proto_texture: proto for the texture.
+* @param size: Size of the basic screen (in case you use relative size).
+* @return A unique pointer to a texture interface.
+*/
+std::unique_ptr<TextureInterface> ParseBasicTexture(const proto::Texture& proto_texture,
+													const std::pair<std::uint32_t, std::uint32_t> size);
 
 }  // End namespace frame::proto.

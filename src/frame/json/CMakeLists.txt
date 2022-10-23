@@ -2,16 +2,19 @@
 
 add_library(FrameJson
   STATIC
+    ${CMAKE_SOURCE_DIR}/include/frame/json/parse_json.h
     ${CMAKE_SOURCE_DIR}/include/frame/json/parse_level.h
+    ${CMAKE_SOURCE_DIR}/include/frame/json/parse_pixel.h
     ${CMAKE_SOURCE_DIR}/include/frame/json/proto.h
     parse_material.cpp
     parse_material.h
     parse_pixel.cpp
-    parse_pixel.h
     parse_program.cpp
     parse_program.h
     parse_scene_tree.cpp
     parse_scene_tree.h
+    parse_stream.cpp
+    parse_stream.h
     parse_texture.cpp
     parse_texture.h
     parse_uniform.cpp

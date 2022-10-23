@@ -63,16 +63,6 @@ class NodeMatrix : public NodeInterface {
 	* @param matrix: The new matrix.
 	*/
     void SetMatrix(glm::mat4 matrix) { matrix_ = matrix; }
-    /**
-     * @brief Add a flag to the clear flag list.
-	 * @param value: Flag(s) to be added (CLEAR_DEPTH/CLEAR_COLOR see proto for list).
-     */
-    void AddClearFlags(std::uint32_t value) { clear_flags |= value; }
-    /**
-     * @brief Get clear flags.
-	 * @return clear flags (CLEAR_DEPTH/CLEAR_COLOR see proto for list).
-     */
-    std::uint32_t GetClearFlags() const { return clear_flags; }
 
    protected:
     /**

@@ -19,6 +19,29 @@ Camera::Camera(glm::vec3 position /*= { 0.f, 0.f, 0.f }*/, glm::vec3 front /*= {
     UpdateCameraVectors();
 }
 
+Camera::Camera(const Camera& camera) {
+    position_     = camera.position_;
+    front_        = camera.front_;
+    up_           = camera.up_;
+    fov_rad_      = camera.fov_rad_;
+    aspect_ratio_ = camera.aspect_ratio_;
+    near_clip_    = camera.near_clip_;
+    far_clip_     = camera.far_clip_;
+    UpdateCameraVectors();
+}
+
+frame::Camera& Camera::operator=(const Camera& camera) {
+    position_     = camera.position_;
+    front_        = camera.front_;
+    up_           = camera.up_;
+    fov_rad_      = camera.fov_rad_;
+    aspect_ratio_ = camera.aspect_ratio_;
+    near_clip_    = camera.near_clip_;
+    far_clip_     = camera.far_clip_;
+    UpdateCameraVectors();
+    return *this;
+}
+
 glm::mat4 Camera::ComputeView() const { return glm::lookAt(position_, front_ + position_, up_); }
 
 glm::mat4 Camera::ComputeProjection() const {
@@ -37,6 +60,12 @@ void Camera::SetPosition(glm::vec3 vec) {
 
 void Camera::SetUp(glm::vec3 vec) {
     up_ = vec;
+    UpdateCameraVectors();
+}
+
+void Camera::SetRight(glm::vec3 vec) {
+    right_ = vec;
+    up_    = glm::normalize(glm::cross(front_, -right_));
     UpdateCameraVectors();
 }
 

@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package frame.proto;
 
+// This is represented by bit on a byte size length.
 // Next 2
 message CleanBuffer {
 	enum Enum {

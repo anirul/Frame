@@ -1,25 +1,27 @@
 # Sample SceneSimple.
 
-add_executable(SceneSimple
+add_executable(02_SceneSimple
   WIN32
     main.cpp
     ${CMAKE_SOURCE_DIR}/asset/json/scene_simple.json
 )
 
-target_include_directories(SceneSimple
+target_include_directories(02_SceneSimple
   PUBLIC
     examples/02-scene_simple
     ${CMAKE_SOURCE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-target_link_libraries(SceneSimple
+target_link_libraries(02_SceneSimple
   PUBLIC
     Frame
+    FrameCommon
+    FrameGui
     FrameOpenGL
+    FrameOpenGLGui
     FrameOpenGLFile
     FrameProto
-    LibCommon
 )
 
-set_property(TARGET SceneSimple PROPERTY FOLDER "Examples")
+set_property(TARGET 02_SceneSimple PROPERTY FOLDER "Examples")

@@ -14,7 +14,7 @@ class UniformWrapper : public UniformInterface {
    public:
     /**
      * @brief Constructor create a wrapper from a camera pointer.
-	 * @param Camera pointer.
+     * @param Camera pointer.
      */
     UniformWrapper(Camera* camera) { camera_ = camera; }
 
@@ -39,6 +39,20 @@ class UniformWrapper : public UniformInterface {
      * @param time: The delta time.
      */
     void SetTime(double time) { time_ = time; }
+    /**
+     * @brief Set value from stream.
+     * @param name: Stream name.
+     * @param vector: Values of the current stream.
+     */
+    void SetValueFloatFromStream(const std::string& name, std::vector<float>& vector,
+                                 std::pair<std::uint32_t, std::uint32_t> size);
+    /**
+     * @brief Set value from stream.
+     * @param name: Stream name.
+     * @param vector: Values of the current stream.
+     */
+    void SetValueIntFromStream(const std::string& name, std::vector<std::int32_t>& vector,
+                               std::pair<std::uint32_t, std::uint32_t> size);
 
    public:
     /**
@@ -77,17 +91,53 @@ class UniformWrapper : public UniformInterface {
      */
     glm::mat4 GetModel() const override;
     /**
+     * @brief Get the value of a stream.
+     * @param name: Name of the stream.
+     * @return The vector that correspond to the value of a stream.
+     */
+    std::vector<float> GetValueFloatFromStream(const std::string& name) const override;
+    /**
+     * @brief Get the value of a stream.
+     * @param name: Name of the stream.
+     * @return The vector that correspond to the value of a stream.
+     */
+    std::vector<std::int32_t> GetValueIntFromStream(const std::string& name) const override;
+    /**
+     * @brief Get the value of a stream.
+     * @param name: Name of the stream.
+     * @return The vector that correspond to the value of a stream.
+     */
+    std::pair<std::uint32_t, std::uint32_t> GetSizeFromFloatStream(
+        const std::string& name) const override;
+    /**
+     * @brief Get the value of a stream.
+     * @param name: Name of the stream.
+     * @return The vector that correspond to the value of a stream.
+     */
+    std::pair<std::uint32_t, std::uint32_t> GetSizeFromIntStream(
+        const std::string& name) const override;
+    /**
      * @brief Get the delta time.
      * @return The delta time.
      */
     double GetDeltaTime() const override;
 
    private:
-    Camera* camera_       = nullptr;
-    glm::mat4 model_      = glm::mat4(1.0f);
-    glm::mat4 projection_ = glm::mat4(1.0f);
-    glm::mat4 view_       = glm::mat4(1.0f);
-    double time_          = 0.0;
+    struct FloatValues {
+        std::vector<float> value;
+        std::pair<std::uint32_t, std::uint32_t> size;
+    };
+    struct IntValues {
+        std::vector<std::int32_t> value;
+        std::pair<std::uint32_t, std::uint32_t> size;
+    };
+    Camera* camera_                                            = nullptr;
+    glm::mat4 model_                                           = glm::mat4(1.0f);
+    glm::mat4 projection_                                      = glm::mat4(1.0f);
+    glm::mat4 view_                                            = glm::mat4(1.0f);
+    std::map<std::string, FloatValues> stream_value_float_map_ = {};
+    std::map<std::string, IntValues> stream_value_int_map_     = {};
+    double time_                                               = 0.0;
 };
 
 }  // End namespace frame.

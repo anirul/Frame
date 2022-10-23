@@ -49,6 +49,32 @@ struct UniformInterface {
      */
     virtual glm::mat4 GetModel() const = 0;
     /**
+     * @brief Get the value of a stream.
+     * @param name: Stream name.
+	 * @return The vector that correspond to the value of a stream.
+     */
+    virtual std::vector<float> GetValueFloatFromStream(const std::string& name) const = 0;
+    /**
+     * @brief Get the value of a stream.
+     * @param name: Stream name.
+     * @return The vector that correspond to the value of a stream.
+     */
+    virtual std::vector<std::int32_t> GetValueIntFromStream(const std::string& name) const = 0;
+    /**
+     * @brief Get the size from a stream.
+	 * @param name: Stream name.
+	 * @return The size of the stream.
+     */
+    virtual std::pair<std::uint32_t, std::uint32_t> GetSizeFromFloatStream(
+        const std::string& name) const = 0;
+    /**
+     * @brief Get the size from a stream.
+     * @param name: Stream name.
+     * @return The size of the stream.
+     */
+    virtual std::pair<std::uint32_t, std::uint32_t> GetSizeFromIntStream(
+        const std::string& name) const = 0;
+    /**
      * @brief Get the delta time.
      * @return The delta time.
      */

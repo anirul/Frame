@@ -45,9 +45,6 @@
     "scene_matrices": [
       {
         "name": "root",
-        "clean_buffer": {
-          "values": [ "CLEAR_COLOR", "CLEAR_DEPTH" ]
-        },
         "matrix": {
           "m11": "1.0",
           "m22": "1.0",

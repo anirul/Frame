@@ -18,11 +18,8 @@ glm::vec4 ParseUniform(const UniformVector4& uniform_vec4) {
 
 glm::mat4 ParseUniform(const UniformMatrix4& uniform_mat4) {
     return glm::mat4(uniform_mat4.m11(), uniform_mat4.m12(), uniform_mat4.m13(), uniform_mat4.m14(),
-
                      uniform_mat4.m21(), uniform_mat4.m22(), uniform_mat4.m23(), uniform_mat4.m24(),
-
                      uniform_mat4.m31(), uniform_mat4.m32(), uniform_mat4.m33(), uniform_mat4.m34(),
-
                      uniform_mat4.m41(), uniform_mat4.m42(), uniform_mat4.m43(),
                      uniform_mat4.m44());
 }

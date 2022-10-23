@@ -7,9 +7,9 @@ namespace test {
 
 TEST_F(ParseLevelTest, CreateLevelProtoTest) {
     EXPECT_TRUE(
-        frame::proto::ParseLevelOpenGL(std::make_pair<std::uint32_t, std::uint32_t>(320, 200),
-                                       frame::proto::LoadProtoFromJsonFile<frame::proto::Level>(
-                                           frame::file::FindFile("asset/json/level_test.json"))));
+        frame::proto::ParseLevel(std::make_pair<std::uint32_t, std::uint32_t>(320, 200),
+                                         frame::file::FindFile("asset/json/level_test.json"),
+                                         window_->GetUniqueDevice()));
 }
 
 }  // End namespace test.
