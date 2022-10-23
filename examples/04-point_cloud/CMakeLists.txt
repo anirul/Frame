@@ -15,8 +15,10 @@ target_include_directories(04_PointCloud
 
 target_link_libraries(04_PointCloud
   PUBLIC
+    absl::base 
     absl::flags
-    absl::flags_commandlineflag
+    absl::flags_parse
+    absl::flags_commandlineflag 
     Frame
     FrameCommon
     FrameGui

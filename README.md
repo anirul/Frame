@@ -6,130 +6,52 @@ hdr,...).
 
 ![SceneRendering](https://github.com/anirul/Frame/raw/master/examples/scene_rendering.png "A Scene rendering made with ShaderGL.")
 
-## Building - New Scripts
+## Requirements
 
-As the project is using **conan** on top of CMake as its build gpu, the following commands need to be ran in order to build everything. The dependencies are automatically downloaded and managed by conan. Note that the unit tests of the library are ran automatically on every build.
+- *GIT* needed if you want to get the sources.
+- *A compiler* needed for compilation.
+    - Visual Studio Community edition should be enough.
+    - You could also use clang or gcc...
+- *cmake* you can get it [here](https://cmake.org/).
+- *VCPKG* you can get it [here](https://github.com/Microsoft/vcpkg/)
 
-**Make sure that your `volaio` environment is active.**
+## VCPKG
 
-- First of all, the different command line arguments expected by the script can be printed easily.
+This project use _VCPKG_ again so you should be able to build it! Basically 
+you have to install and setup _VCPKG_, you can get it 
+[here](https://github.com/Microsoft/vcpkg/). Use the `./boostrap.bat` or the 
+OS specific command to have it instlled on you OS. 
 
-```shell
-python build.py -h
-```
+Then you can install all the required packages, you can use the command line
+tools provided later:
 
-- It is possible to build the documentation:
+- abseil
+- glm
+- gtest
+- happly
+- imgui
+- opengl
+- protobuf
+- sdl2
+- spdlog
+- stb
+- tinyobjloader
 
-```shell
-python build.py docs
-```
+## Building
 
-- It is possible to remove the files and folders generated previously:
-
-```shell
-python build.py clean
-```
-
-- It is also possible to select a build type (release or debug):
-
-```shell
-# Builds the gpu library in release mode only.
-python build.py configure --type release
-python build.py build
-```
-
-- It is possible to run the unit tests by running the following commands:
-
-```shell
-# Builds the shared lvv-gpu library (dll on windows).
-python build.py --type release
-python build.py build
-python build.py test
-```
-
-- The examples can be enabled as well:
+To your install path using this commands.
 
 ```shell
-# Builds the gpu library with the examples.
-python build.py configure --type release
-python build.py build
+[...]Frame> mkdir build
+[...]Frame> cd build
+[...]Frame/build> cmake .. -DCMAKE_TOOLCHAIN_FILE="[...]\vcpkg\scripts\buildsystems\vcpkg.cmake"
 ```
 
-- By default libraries are being built statically. A shared build can be enabled:
+Then you can either use the *Visual Studio* from your OS or use the command 
+line.
 
 ```shell
-# Builds the shared lvv-gpu library (dll on windows).
-python build.py --lib shared
-python build.py build
-```
-
-## Install (old approach)
-
-Now use _conan_ for dependencies query and update, so you will need _python_
-and _conan_ if you want to build the software. So first install
-[python](https://www.python.org/downloads/) version 3.x. Then install _conan_
-with _pip_.
-
-```cmd
-pip install conan
-```
-
-Go into the directory where you installed the software and create a new folder
-for building and creating the environment.
-
-```cmd
-cd ~/Document/GitHub/Frame
-mkdir Build
-cd Build
-```
-
-Then use _conan_ to install dependencies needed by _Frame_. Using the following
-commands.
-
-For Debug:
-
-```cmd
-conan install --build=missing -s build_type=Debug ..
-```
-
-For Release:
-
-```cmd
-conan install --build=missing -s build_type=Release ..
-```
-
-### cmake
-
-Install _cmake_ from [here](https://cmake.org/). Check if you can execute it at
-the command line and if not use the GUI version.
-
-Still in the _Build_ directory you should use:
-
-```cmd
-cmake ..
-```
-
-This will generate your project file that you can specify your generator
-`-G` to be either Visual Studio for windows or makefiles for Linux.
-
-And then you can build either for Debug:
-
-```cmd
-cmake --build . --config=Debug
-```
-
-Or for Release:
-
-```cmd
-cmake --build . --config=Release
-```
-
-### Visual Studio
-
-Open the project with Visual studio 2019 or 2022.
-
-```cmd
-./Frame.sln
+Frame/build> cmake --build .
 ```
 
 ### makefiles
