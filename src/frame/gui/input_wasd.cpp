@@ -59,6 +59,8 @@ bool InputWasd::MouseReleased(char button, double dt) {
     return true;
 }
 
+bool InputWasd::WheelMoved(float relative, double dt) { return true; }
+
 void InputWasd::NextFrame() {}
 
 }  // End namespace frame::gui.

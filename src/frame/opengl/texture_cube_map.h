@@ -140,7 +140,7 @@ class TextureCubeMap : public TextureInterface, public BindInterface {
      * @param vector: Vector of uint32_t containing the RGBA values of the texture.
      * @param size: Size of the image.
      */
-    void Update(std::vector<std::uint8_t>&& vector, std::pair<std::uint32_t, std::uint32_t> size,
+    void Update(std::vector<std::uint8_t>&& vector, glm::uvec2 size,
                 std::uint8_t bytes_per_pixel) override;
 
    public:
@@ -168,7 +168,7 @@ class TextureCubeMap : public TextureInterface, public BindInterface {
      * @brief Get the texture cube map size.
      * @return A single side size in pixel.
      */
-    std::pair<std::uint32_t, std::uint32_t> GetSize() const override { return size_; }
+    glm::uvec2 GetSize() const override { return size_; }
     /**
      * @brief Get the pixel element size individual element (BYTE, SHORT, LONG, FLOAT).
      * @return The pixel element size.
@@ -212,8 +212,8 @@ class TextureCubeMap : public TextureInterface, public BindInterface {
     friend class ScopedBind;
 
    private:
-    unsigned int texture_id_                      = 0;
-    std::pair<std::uint32_t, std::uint32_t> size_ = { 0, 0 };
+    unsigned int texture_id_ = 0;
+    glm::uvec2 size_         = glm::uvec2(0, 0);
     const proto::PixelElementSize pixel_element_size_;
     const proto::PixelStructure pixel_structure_;
     mutable bool locked_bind_             = false;

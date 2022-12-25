@@ -3,22 +3,22 @@
 #include <gtest/gtest.h>
 
 #include "frame/opengl/program.h"
-#include "frame/opengl/window.h"
+#include "frame/window_factory.h"
 
 namespace test {
 
 class ProgramTest : public testing::Test {
    public:
-    ProgramTest() : window_(frame::opengl::CreateNoneOpenGL(size_)) {}
+    ProgramTest() : window_(frame::CreateNewWindow(frame::DrawingTargetEnum::NONE)) {}
 
    public:
     const std::string GetVertexSource() const;
     const std::string GetFragmentSource() const;
 
    protected:
-    const std::pair<std::uint32_t, std::uint32_t> size_ = { 320, 200 };
-    std::unique_ptr<frame::WindowInterface> window_     = nullptr;
-    std::unique_ptr<frame::ProgramInterface> program_   = nullptr;
+    const glm::uvec2 size_                            = { 320, 200 };
+    std::unique_ptr<frame::WindowInterface> window_   = nullptr;
+    std::unique_ptr<frame::ProgramInterface> program_ = nullptr;
 };
 
 }  // End namespace test.

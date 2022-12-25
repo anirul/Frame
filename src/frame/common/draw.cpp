@@ -7,7 +7,8 @@
 
 namespace frame::common {
 
-void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size) {
+// CHECKME(anirul): Why not assign size to size_?
+void Draw::Startup(const glm::uvec2 size) {
     // Just one case the other one is treated after.
     if (draw_type_based_ == DrawTypeEnum::PATH) {
         // Load level from proto files.
@@ -18,6 +19,9 @@ void Draw::Startup(const std::pair<std::uint32_t, std::uint32_t> size) {
     level_ = nullptr;
 }
 
-bool Draw::RunDraw(const double dt) { return true; }
+bool Draw::Update(DeviceInterface* device, double dt) { return true; }
+
+void Draw::PreRender(UniformInterface& uniform, DeviceInterface* device,
+                     StaticMeshInterface* static_mesh, MaterialInterface* material) {}
 
 }  // End namespace frame::common.

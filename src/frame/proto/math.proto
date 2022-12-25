@@ -67,11 +67,6 @@ message UniformInts {
 }
 
 // Next 2
-message	UniformBools {
-	repeated bool values = 1;
-}
-
-// Next 2
 message UniformFloats {
 	repeated float values = 1;
 }

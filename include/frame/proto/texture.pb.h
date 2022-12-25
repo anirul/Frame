@@ -33,7 +33,7 @@
 #include <google/protobuf/unknown_field_set.h>
 #include "size.pb.h"
 #include "pixel.pb.h"
-#include "stream.pb.h"
+#include "plugin.pb.h"
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 #define PROTOBUF_INTERNAL_EXPORT_texture_2eproto
@@ -805,7 +805,7 @@ class Texture final :
   enum TextureOneofCase {
     kPixels = 13,
     kFileName = 14,
-    kStream = 17,
+    kPlugin = 17,
     kFileNames = 15,
     TEXTURE_ONEOF_NOT_SET = 0,
   };
@@ -902,7 +902,7 @@ class Texture final :
     kCubemapFieldNumber = 5,
     kPixelsFieldNumber = 13,
     kFileNameFieldNumber = 14,
-    kStreamFieldNumber = 17,
+    kPluginFieldNumber = 17,
     kFileNamesFieldNumber = 15,
   };
   // string name = 1;
@@ -1117,23 +1117,23 @@ class Texture final :
   std::string* _internal_mutable_file_name();
   public:
 
-  // .frame.proto.Stream stream = 17;
-  bool has_stream() const;
+  // .frame.proto.Plugin plugin = 17;
+  bool has_plugin() const;
   private:
-  bool _internal_has_stream() const;
+  bool _internal_has_plugin() const;
   public:
-  void clear_stream();
-  const ::frame::proto::Stream& stream() const;
-  PROTOBUF_NODISCARD ::frame::proto::Stream* release_stream();
-  ::frame::proto::Stream* mutable_stream();
-  void set_allocated_stream(::frame::proto::Stream* stream);
+  void clear_plugin();
+  const ::frame::proto::Plugin& plugin() const;
+  PROTOBUF_NODISCARD ::frame::proto::Plugin* release_plugin();
+  ::frame::proto::Plugin* mutable_plugin();
+  void set_allocated_plugin(::frame::proto::Plugin* plugin);
   private:
-  const ::frame::proto::Stream& _internal_stream() const;
-  ::frame::proto::Stream* _internal_mutable_stream();
+  const ::frame::proto::Plugin& _internal_plugin() const;
+  ::frame::proto::Plugin* _internal_mutable_plugin();
   public:
-  void unsafe_arena_set_allocated_stream(
-      ::frame::proto::Stream* stream);
-  ::frame::proto::Stream* unsafe_arena_release_stream();
+  void unsafe_arena_set_allocated_plugin(
+      ::frame::proto::Plugin* plugin);
+  ::frame::proto::Plugin* unsafe_arena_release_plugin();
 
   // .frame.proto.CubeMapFiles file_names = 15;
   bool has_file_names() const;
@@ -1160,7 +1160,7 @@ class Texture final :
   class _Internal;
   void set_has_pixels();
   void set_has_file_name();
-  void set_has_stream();
+  void set_has_plugin();
   void set_has_file_names();
 
   inline bool has_texture_oneof() const;
@@ -1187,7 +1187,7 @@ class Texture final :
         ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized _constinit_;
       ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr pixels_;
       ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr file_name_;
-      ::frame::proto::Stream* stream_;
+      ::frame::proto::Plugin* plugin_;
       ::frame::proto::CubeMapFiles* file_names_;
     } texture_oneof_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
@@ -2459,69 +2459,69 @@ inline void Texture::set_allocated_file_name(std::string* file_name) {
   // @@protoc_insertion_point(field_set_allocated:frame.proto.Texture.file_name)
 }
 
-// .frame.proto.Stream stream = 17;
-inline bool Texture::_internal_has_stream() const {
-  return texture_oneof_case() == kStream;
+// .frame.proto.Plugin plugin = 17;
+inline bool Texture::_internal_has_plugin() const {
+  return texture_oneof_case() == kPlugin;
 }
-inline bool Texture::has_stream() const {
-  return _internal_has_stream();
+inline bool Texture::has_plugin() const {
+  return _internal_has_plugin();
 }
-inline void Texture::set_has_stream() {
-  _impl_._oneof_case_[0] = kStream;
+inline void Texture::set_has_plugin() {
+  _impl_._oneof_case_[0] = kPlugin;
 }
-inline ::frame::proto::Stream* Texture::release_stream() {
-  // @@protoc_insertion_point(field_release:frame.proto.Texture.stream)
-  if (_internal_has_stream()) {
+inline ::frame::proto::Plugin* Texture::release_plugin() {
+  // @@protoc_insertion_point(field_release:frame.proto.Texture.plugin)
+  if (_internal_has_plugin()) {
     clear_has_texture_oneof();
-    ::frame::proto::Stream* temp = _impl_.texture_oneof_.stream_;
+    ::frame::proto::Plugin* temp = _impl_.texture_oneof_.plugin_;
     if (GetArenaForAllocation() != nullptr) {
       temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
     }
-    _impl_.texture_oneof_.stream_ = nullptr;
+    _impl_.texture_oneof_.plugin_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline const ::frame::proto::Stream& Texture::_internal_stream() const {
-  return _internal_has_stream()
-      ? *_impl_.texture_oneof_.stream_
-      : reinterpret_cast< ::frame::proto::Stream&>(::frame::proto::_Stream_default_instance_);
+inline const ::frame::proto::Plugin& Texture::_internal_plugin() const {
+  return _internal_has_plugin()
+      ? *_impl_.texture_oneof_.plugin_
+      : reinterpret_cast< ::frame::proto::Plugin&>(::frame::proto::_Plugin_default_instance_);
 }
-inline const ::frame::proto::Stream& Texture::stream() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Texture.stream)
-  return _internal_stream();
+inline const ::frame::proto::Plugin& Texture::plugin() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Texture.plugin)
+  return _internal_plugin();
 }
-inline ::frame::proto::Stream* Texture::unsafe_arena_release_stream() {
-  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.Texture.stream)
-  if (_internal_has_stream()) {
+inline ::frame::proto::Plugin* Texture::unsafe_arena_release_plugin() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.Texture.plugin)
+  if (_internal_has_plugin()) {
     clear_has_texture_oneof();
-    ::frame::proto::Stream* temp = _impl_.texture_oneof_.stream_;
-    _impl_.texture_oneof_.stream_ = nullptr;
+    ::frame::proto::Plugin* temp = _impl_.texture_oneof_.plugin_;
+    _impl_.texture_oneof_.plugin_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline void Texture::unsafe_arena_set_allocated_stream(::frame::proto::Stream* stream) {
+inline void Texture::unsafe_arena_set_allocated_plugin(::frame::proto::Plugin* plugin) {
   clear_texture_oneof();
-  if (stream) {
-    set_has_stream();
-    _impl_.texture_oneof_.stream_ = stream;
+  if (plugin) {
+    set_has_plugin();
+    _impl_.texture_oneof_.plugin_ = plugin;
   }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.Texture.stream)
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.Texture.plugin)
 }
-inline ::frame::proto::Stream* Texture::_internal_mutable_stream() {
-  if (!_internal_has_stream()) {
+inline ::frame::proto::Plugin* Texture::_internal_mutable_plugin() {
+  if (!_internal_has_plugin()) {
     clear_texture_oneof();
-    set_has_stream();
-    _impl_.texture_oneof_.stream_ = CreateMaybeMessage< ::frame::proto::Stream >(GetArenaForAllocation());
+    set_has_plugin();
+    _impl_.texture_oneof_.plugin_ = CreateMaybeMessage< ::frame::proto::Plugin >(GetArenaForAllocation());
   }
-  return _impl_.texture_oneof_.stream_;
+  return _impl_.texture_oneof_.plugin_;
 }
-inline ::frame::proto::Stream* Texture::mutable_stream() {
-  ::frame::proto::Stream* _msg = _internal_mutable_stream();
-  // @@protoc_insertion_point(field_mutable:frame.proto.Texture.stream)
+inline ::frame::proto::Plugin* Texture::mutable_plugin() {
+  ::frame::proto::Plugin* _msg = _internal_mutable_plugin();
+  // @@protoc_insertion_point(field_mutable:frame.proto.Texture.plugin)
   return _msg;
 }
 

@@ -22,10 +22,10 @@ target_include_directories(FrameFileTest
 
 target_link_libraries(FrameFileTest
   PUBLIC
-  Frame
-  FrameFile
-  GTest::gmock
-  GTest::gtest
+    Frame
+    FrameFile
+    GTest::gmock
+    GTest::gtest
 )
 
 # In order to remove the tests from the bin folder.

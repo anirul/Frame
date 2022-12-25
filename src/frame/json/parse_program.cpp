@@ -4,7 +4,6 @@
 #include <fstream>
 
 #include "frame/file/file_system.h"
-#include "frame/json/parse_stream.h"
 #include "frame/json/parse_uniform.h"
 #include "frame/opengl/file/load_program.h"
 #include "frame/opengl/program.h"
@@ -13,7 +12,6 @@ namespace frame::proto {
 
 std::unique_ptr<frame::ProgramInterface> ParseProgramOpenGL(const Program& proto_program,
                                                             LevelInterface* level) {
-    Logger& logger = Logger::GetInstance();
     // Create the program.
     auto program = opengl::file::LoadProgram(proto_program.shader());
     if (!program) return nullptr;
@@ -59,10 +57,6 @@ std::unique_ptr<frame::ProgramInterface> ParseProgramOpenGL(const Program& proto
     for (const auto& parameter : proto_program.parameters()) {
         switch (parameter.value_oneof_case()) {
             case Uniform::kUniformEnum:
-                program->PreInscribeEnumUniformFloat(parameter.name(), parameter.uniform_enum());
-                break;
-            case Uniform::kUniformBool:
-                program->Uniform(parameter.name(), parameter.uniform_bool());
                 break;
             case Uniform::kUniformInt:
                 program->Uniform(parameter.name(), parameter.uniform_int());
@@ -82,36 +76,10 @@ std::unique_ptr<frame::ProgramInterface> ParseProgramOpenGL(const Program& proto
             case Uniform::kUniformMat4:
                 program->Uniform(parameter.name(), ParseUniform(parameter.uniform_mat4()));
                 break;
-            case Uniform::kUniformFloatStream: {
-                if (parameter.uniform_float_stream().value() == proto::Stream::ALL) {
-                    for (auto* element_ptr : ParseAllUniformFloatStream(parameter)) {
-                        program->PreInscribeStreamUniformFloat(
-                            element_ptr->GetName(), parameter.uniform_float_stream().value());
-                        level->AddUniformFloatStream(element_ptr);
-                    }
-                } else {
-                    auto element_ptr = ParseNoneUniformFloatStream(parameter);
-                    program->PreInscribeStreamUniformFloat(
-                        element_ptr->GetName(), parameter.uniform_float_stream().value());
-                    level->AddUniformFloatStream(element_ptr);
-                }
+            case Uniform::kUniformFloatPlugin:
                 break;
-            }
-            case Uniform::kUniformIntStream: {
-                if (parameter.uniform_int_stream().value() == proto::Stream::ALL) {
-                    for (auto* element_ptr : ParseAllUniformIntStream(parameter)) {
-                        program->PreInscribeStreamUniformInt(
-                            element_ptr->GetName(), parameter.uniform_int_stream().value());
-                        level->AddUniformIntStream(element_ptr);
-                    }
-                } else {
-                    auto* element_ptr = ParseNoneUniformIntStream(parameter);
-                    program->PreInscribeStreamUniformInt(element_ptr->GetName(),
-                                                         parameter.uniform_int_stream().value());
-                    level->AddUniformIntStream(element_ptr);
-                }
+            case Uniform::kUniformIntPlugin: 
                 break;
-            }
             default:
                 throw std::runtime_error(
                     fmt::format("No handle for parameter {}#?",

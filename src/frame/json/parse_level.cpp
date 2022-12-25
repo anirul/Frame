@@ -3,7 +3,6 @@
 #include "frame/json/parse_material.h"
 #include "frame/json/parse_program.h"
 #include "frame/json/parse_scene_tree.h"
-#include "frame/json/parse_stream.h"
 #include "frame/json/parse_texture.h"
 #include "frame/level.h"
 #include "frame/opengl/material.h"
@@ -15,10 +14,10 @@ namespace frame::proto {
 
 class LevelProto : public frame::Level {
    public:
-    LevelProto(const std::pair<std::int32_t, std::int32_t> size, const std::string content,
-               DeviceInterface* device) {
+    virtual ~LevelProto() = default;
+    LevelProto(glm::uvec2 size, const std::string content, DeviceInterface* device) : frame::Level{} {
         // TODO(anirul): Do correct the code later.
-        assert(device->GetDeviceEnum() == DeviceEnum::OPENGL);
+        assert(device->GetDeviceEnum() == RenderingAPIEnum::OPENGL);
         auto proto_level      = LoadProtoFromJson<proto::Level>(content);
         name_                 = proto_level.name();
         default_texture_name_ = proto_level.default_texture_name();
@@ -36,33 +35,19 @@ class LevelProto : public frame::Level {
         // Load textures from proto.
         for (const auto& proto_texture : proto_level.textures()) {
             std::unique_ptr<TextureInterface> texture = ParseBasicTexture(proto_texture, size);
-            EntityId stream_id                        = NullId;
             EntityId texture_id                       = NullId;
-            // Implement the stream input part for texture.
-            if (proto_texture.has_stream()) {
-                auto vector = ParseAllTextureStream(proto_texture);
-                for (auto& stream : vector) {
-                    stream_id = AddTextureStream(stream);
-                    if (!stream_id) {
-                        throw std::runtime_error(fmt::format("Could not initiate stream {}",
-                                                             proto_texture.stream().name()));
-                    }
-                }
-            }
+            std::string texture_name                  = proto_texture.name();
             if (!texture) {
                 throw std::runtime_error(
                     fmt::format("Could not load texture: {}", proto_texture.file_name()));
             }
-            texture->SetName(proto_texture.name());
+            texture->SetName(texture_name);
             texture_id = AddTexture(std::move(texture));
             logger_->info(fmt::format("Add a new texture {}, with id [{}].", proto_texture.name(),
                                       texture_id));
             if (!texture_id) {
                 throw std::runtime_error(
                     fmt::format("Coudn't save texture {} to level.", proto_texture.name()));
-            }
-            if (stream_id) {
-                AddStreamTextureCorrespondence(stream_id, texture_id);
             }
         }
 
@@ -105,16 +90,14 @@ class LevelProto : public frame::Level {
     }
 };
 
-std::unique_ptr<LevelInterface> ParseLevel(const std::pair<std::int32_t, std::int32_t> size,
-                                           const std::filesystem::path& path,
+std::unique_ptr<LevelInterface> ParseLevel(glm::uvec2 size, const std::filesystem::path& path,
                                            DeviceInterface* device) {
     std::ifstream ifs(path.string().c_str());
     std::string content(std::istreambuf_iterator<char>(ifs), {});
     return std::make_unique<LevelProto>(size, content, device);
 }
 
-std::unique_ptr<frame::LevelInterface> ParseLevel(const std::pair<std::int32_t, std::int32_t> size,
-                                                  const std::string& content,
+std::unique_ptr<frame::LevelInterface> ParseLevel(glm::uvec2 size, const std::string& content,
                                                   DeviceInterface* device) {
     return std::make_unique<LevelProto>(size, content, device);
 }

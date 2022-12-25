@@ -35,37 +35,38 @@ struct RendererInterface {
      */
     virtual void SetCubeMapTarget(frame::proto::TextureFrame texture_frame) = 0;
     /**
+     * @brief Set the current viewport.
+     * @param viewport: New viewport.
+     */
+    virtual void SetViewport(glm::uvec4 viewport) = 0;
+    /**
      * @brief Render to a mesh at a dt time.
      * @param static_mesh: Static mesh to render.
      * @param material: Material to be used (or null).
-     * @param model_mat: Model matrix to be used.
+     * @param projection: Projection matrix used.
+     * @param view: View matrix used.
+     * @param model: Model matrix to be used.
      * @param dt: Delta time between the beginning of execution and now in seconds.
      */
-    virtual void RenderMesh(StaticMeshInterface* static_mesh, MaterialInterface* material = nullptr,
-                            glm::mat4 model_mat = glm::mat4(1.0f), double dt = 0.0) = 0;
+    virtual void RenderMesh(StaticMeshInterface* static_mesh, MaterialInterface* material,
+                            const glm::mat4& projection, const glm::mat4& view = glm::mat4(1.0f),
+                            const glm::mat4& model_mat = glm::mat4(1.0f), double dt = 0.0) = 0;
     /**
      * @brief Render a node given an id and the id of a material at dt time.
      * @param node_id: Node to be rendered.
      * @param material_id: Material id to be used.
+     * @param projection: Projection matrix used.
+     * @param view: View matrix used.
      * @param dt: Delta time between the beginning of execution and now in seconds.
      */
-    virtual void RenderNode(EntityId node_id, EntityId material_id = NullId, double dt = 0.0) = 0;
+    virtual void RenderNode(EntityId node_id, EntityId material_id, const glm::mat4& projection,
+                            const glm::mat4& view, double dt = 0.0) = 0;
     /**
      * @brief Render all meshes at a dt time.
      * @param dt: Delta time between the beginning of execution and now in seconds.
      */
-    virtual void RenderAllMeshes(double dt = 0.0) = 0;
-    /**
-     * @brief Render all children of node id at a dt time.
-     * @param node_id: Node to start rendering from.
-     * @param dt: Delta time between the beginning of execution and now in seconds.
-     */
-    virtual void RenderChildren(EntityId node_id, double dt = 0.0) = 0;
-    /**
-     * @brief Render all from a root node.
-     * @param dt: Delta time between the beginning of execution and now in seconds.
-     */
-    virtual void RenderFromRootNode(double dt = 0.0) = 0;
+    virtual void RenderAllMeshes(const glm::mat4& projection, const glm::mat4& view,
+                                 double dt = 0.0) = 0;
     /**
      * @brief Display to the screen at dt time.
      * @param dt: Delta time between the beginning of execution and now in seconds.

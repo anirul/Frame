@@ -33,7 +33,7 @@
 #include <google/protobuf/unknown_field_set.h>
 #include "pixel.pb.h"
 #include "math.pb.h"
-#include "stream.pb.h"
+#include "plugin.pb.h"
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 #define PROTOBUF_INTERNAL_EXPORT_scene_2eproto
@@ -415,7 +415,7 @@ class SceneStaticMesh final :
     kCleanBuffer = 7,
     kMeshEnum = 6,
     kFileName = 3,
-    kStream = 10,
+    kMultiPlugin = 10,
     MESH_ONEOF_NOT_SET = 0,
   };
 
@@ -568,7 +568,7 @@ class SceneStaticMesh final :
     kCleanBufferFieldNumber = 7,
     kMeshEnumFieldNumber = 6,
     kFileNameFieldNumber = 3,
-    kStreamFieldNumber = 10,
+    kMultiPluginFieldNumber = 10,
   };
   // string name = 1;
   void clear_name();
@@ -670,23 +670,23 @@ class SceneStaticMesh final :
   std::string* _internal_mutable_file_name();
   public:
 
-  // .frame.proto.Stream stream = 10;
-  bool has_stream() const;
+  // .frame.proto.MultiPlugin multi_plugin = 10;
+  bool has_multi_plugin() const;
   private:
-  bool _internal_has_stream() const;
+  bool _internal_has_multi_plugin() const;
   public:
-  void clear_stream();
-  const ::frame::proto::Stream& stream() const;
-  PROTOBUF_NODISCARD ::frame::proto::Stream* release_stream();
-  ::frame::proto::Stream* mutable_stream();
-  void set_allocated_stream(::frame::proto::Stream* stream);
+  void clear_multi_plugin();
+  const ::frame::proto::MultiPlugin& multi_plugin() const;
+  PROTOBUF_NODISCARD ::frame::proto::MultiPlugin* release_multi_plugin();
+  ::frame::proto::MultiPlugin* mutable_multi_plugin();
+  void set_allocated_multi_plugin(::frame::proto::MultiPlugin* multi_plugin);
   private:
-  const ::frame::proto::Stream& _internal_stream() const;
-  ::frame::proto::Stream* _internal_mutable_stream();
+  const ::frame::proto::MultiPlugin& _internal_multi_plugin() const;
+  ::frame::proto::MultiPlugin* _internal_mutable_multi_plugin();
   public:
-  void unsafe_arena_set_allocated_stream(
-      ::frame::proto::Stream* stream);
-  ::frame::proto::Stream* unsafe_arena_release_stream();
+  void unsafe_arena_set_allocated_multi_plugin(
+      ::frame::proto::MultiPlugin* multi_plugin);
+  ::frame::proto::MultiPlugin* unsafe_arena_release_multi_plugin();
 
   void clear_mesh_oneof();
   MeshOneofCase mesh_oneof_case() const;
@@ -696,7 +696,7 @@ class SceneStaticMesh final :
   void set_has_clean_buffer();
   void set_has_mesh_enum();
   void set_has_file_name();
-  void set_has_stream();
+  void set_has_multi_plugin();
 
   inline bool has_mesh_oneof() const;
   inline void clear_has_mesh_oneof();
@@ -715,7 +715,7 @@ class SceneStaticMesh final :
       ::frame::proto::CleanBuffer* clean_buffer_;
       int mesh_enum_;
       ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr file_name_;
-      ::frame::proto::Stream* stream_;
+      ::frame::proto::MultiPlugin* multi_plugin_;
     } mesh_oneof_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
     uint32_t _oneof_case_[1];
@@ -2130,69 +2130,69 @@ inline void SceneStaticMesh::set_allocated_file_name(std::string* file_name) {
   // @@protoc_insertion_point(field_set_allocated:frame.proto.SceneStaticMesh.file_name)
 }
 
-// .frame.proto.Stream stream = 10;
-inline bool SceneStaticMesh::_internal_has_stream() const {
-  return mesh_oneof_case() == kStream;
+// .frame.proto.MultiPlugin multi_plugin = 10;
+inline bool SceneStaticMesh::_internal_has_multi_plugin() const {
+  return mesh_oneof_case() == kMultiPlugin;
 }
-inline bool SceneStaticMesh::has_stream() const {
-  return _internal_has_stream();
+inline bool SceneStaticMesh::has_multi_plugin() const {
+  return _internal_has_multi_plugin();
 }
-inline void SceneStaticMesh::set_has_stream() {
-  _impl_._oneof_case_[0] = kStream;
+inline void SceneStaticMesh::set_has_multi_plugin() {
+  _impl_._oneof_case_[0] = kMultiPlugin;
 }
-inline ::frame::proto::Stream* SceneStaticMesh::release_stream() {
-  // @@protoc_insertion_point(field_release:frame.proto.SceneStaticMesh.stream)
-  if (_internal_has_stream()) {
+inline ::frame::proto::MultiPlugin* SceneStaticMesh::release_multi_plugin() {
+  // @@protoc_insertion_point(field_release:frame.proto.SceneStaticMesh.multi_plugin)
+  if (_internal_has_multi_plugin()) {
     clear_has_mesh_oneof();
-    ::frame::proto::Stream* temp = _impl_.mesh_oneof_.stream_;
+    ::frame::proto::MultiPlugin* temp = _impl_.mesh_oneof_.multi_plugin_;
     if (GetArenaForAllocation() != nullptr) {
       temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
     }
-    _impl_.mesh_oneof_.stream_ = nullptr;
+    _impl_.mesh_oneof_.multi_plugin_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline const ::frame::proto::Stream& SceneStaticMesh::_internal_stream() const {
-  return _internal_has_stream()
-      ? *_impl_.mesh_oneof_.stream_
-      : reinterpret_cast< ::frame::proto::Stream&>(::frame::proto::_Stream_default_instance_);
+inline const ::frame::proto::MultiPlugin& SceneStaticMesh::_internal_multi_plugin() const {
+  return _internal_has_multi_plugin()
+      ? *_impl_.mesh_oneof_.multi_plugin_
+      : reinterpret_cast< ::frame::proto::MultiPlugin&>(::frame::proto::_MultiPlugin_default_instance_);
 }
-inline const ::frame::proto::Stream& SceneStaticMesh::stream() const {
-  // @@protoc_insertion_point(field_get:frame.proto.SceneStaticMesh.stream)
-  return _internal_stream();
+inline const ::frame::proto::MultiPlugin& SceneStaticMesh::multi_plugin() const {
+  // @@protoc_insertion_point(field_get:frame.proto.SceneStaticMesh.multi_plugin)
+  return _internal_multi_plugin();
 }
-inline ::frame::proto::Stream* SceneStaticMesh::unsafe_arena_release_stream() {
-  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.SceneStaticMesh.stream)
-  if (_internal_has_stream()) {
+inline ::frame::proto::MultiPlugin* SceneStaticMesh::unsafe_arena_release_multi_plugin() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.SceneStaticMesh.multi_plugin)
+  if (_internal_has_multi_plugin()) {
     clear_has_mesh_oneof();
-    ::frame::proto::Stream* temp = _impl_.mesh_oneof_.stream_;
-    _impl_.mesh_oneof_.stream_ = nullptr;
+    ::frame::proto::MultiPlugin* temp = _impl_.mesh_oneof_.multi_plugin_;
+    _impl_.mesh_oneof_.multi_plugin_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline void SceneStaticMesh::unsafe_arena_set_allocated_stream(::frame::proto::Stream* stream) {
+inline void SceneStaticMesh::unsafe_arena_set_allocated_multi_plugin(::frame::proto::MultiPlugin* multi_plugin) {
   clear_mesh_oneof();
-  if (stream) {
-    set_has_stream();
-    _impl_.mesh_oneof_.stream_ = stream;
+  if (multi_plugin) {
+    set_has_multi_plugin();
+    _impl_.mesh_oneof_.multi_plugin_ = multi_plugin;
   }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.SceneStaticMesh.stream)
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.SceneStaticMesh.multi_plugin)
 }
-inline ::frame::proto::Stream* SceneStaticMesh::_internal_mutable_stream() {
-  if (!_internal_has_stream()) {
+inline ::frame::proto::MultiPlugin* SceneStaticMesh::_internal_mutable_multi_plugin() {
+  if (!_internal_has_multi_plugin()) {
     clear_mesh_oneof();
-    set_has_stream();
-    _impl_.mesh_oneof_.stream_ = CreateMaybeMessage< ::frame::proto::Stream >(GetArenaForAllocation());
+    set_has_multi_plugin();
+    _impl_.mesh_oneof_.multi_plugin_ = CreateMaybeMessage< ::frame::proto::MultiPlugin >(GetArenaForAllocation());
   }
-  return _impl_.mesh_oneof_.stream_;
+  return _impl_.mesh_oneof_.multi_plugin_;
 }
-inline ::frame::proto::Stream* SceneStaticMesh::mutable_stream() {
-  ::frame::proto::Stream* _msg = _internal_mutable_stream();
-  // @@protoc_insertion_point(field_mutable:frame.proto.SceneStaticMesh.stream)
+inline ::frame::proto::MultiPlugin* SceneStaticMesh::mutable_multi_plugin() {
+  ::frame::proto::MultiPlugin* _msg = _internal_mutable_multi_plugin();
+  // @@protoc_insertion_point(field_mutable:frame.proto.SceneStaticMesh.multi_plugin)
   return _msg;
 }
 

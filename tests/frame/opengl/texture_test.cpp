@@ -29,7 +29,7 @@ TEST_F(TextureTest, GetSizeTextureByteTest) {
     ASSERT_TRUE(texture_);
     auto* opengl_texture = dynamic_cast<frame::opengl::Texture*>(texture_.get());
     EXPECT_NE(0, opengl_texture->GetId());
-    auto pair = std::make_pair<std::uint32_t, std::uint32_t>(1024, 1024);
+    auto pair = glm::uvec2(1024, 1024);
     EXPECT_EQ(pair, texture_->GetSize());
     auto vec8 = texture_->GetTextureByte();
     EXPECT_EQ(1024 * 1024 * 3, vec8.size());
@@ -49,7 +49,7 @@ TEST_F(TextureTest, CreateHDRTextureHalfTest) {
     ASSERT_TRUE(texture_);
     auto* opengl_texture = dynamic_cast<frame::opengl::Texture*>(texture_.get());
     EXPECT_NE(0, opengl_texture->GetId());
-    auto pair = std::make_pair<std::uint32_t, std::uint32_t>(3200, 1600);
+    auto pair = glm::uvec2(3200, 1600);
     EXPECT_EQ(pair, texture_->GetSize());
     // TODO(anirul): Check half content in picture.
 }
@@ -65,7 +65,7 @@ TEST_F(TextureTest, CreateHDRTextureFloatTest) {
     ASSERT_TRUE(texture_);
     auto* opengl_texture = dynamic_cast<frame::opengl::Texture*>(texture_.get());
     EXPECT_NE(0, opengl_texture->GetId());
-    auto pair = std::make_pair<std::uint32_t, std::uint32_t>(3200, 1600);
+    auto pair = glm::uvec2(3200, 1600);
     EXPECT_EQ(pair, texture_->GetSize());
     auto vecf = texture_->GetTextureFloat();
     EXPECT_EQ(3200 * 1600 * 3, vecf.size());

@@ -5,6 +5,7 @@
 
 #include <stdexcept>
 
+#include "frame/context.h"
 #include "frame/node_matrix.h"
 #include "frame/node_static_mesh.h"
 #include "frame/opengl/file/load_program.h"
@@ -16,12 +17,10 @@
 
 namespace frame::opengl {
 
-Renderer::Renderer(LevelInterface* level, std::pair<std::uint32_t, std::uint32_t> size)
-    : level_(level) {
-    if (!size.first || !size.second) {
-        throw std::runtime_error(fmt::format("No size ({}, {})?", size.first, size.second));
-    }
-    render_buffer_.CreateStorage(size);
+Renderer::Renderer(Context context, glm::uvec4 viewport)
+    : device_(context.device), level_(context.level), viewport_(viewport) {
+    // TODO(anirul): Check viewport!!!
+    render_buffer_.CreateStorage({ viewport_.z - viewport_.x, viewport_.w - viewport_.y });
     frame_buffer_.AttachRender(render_buffer_);
     auto program = file::LoadProgram("display");
     if (!program) throw std::runtime_error("No program!");
@@ -35,10 +34,9 @@ Renderer::Renderer(LevelInterface* level, std::pair<std::uint32_t, std::uint32_t
     auto maybe_display_material_id = level_->AddMaterial(std::move(material));
     if (!maybe_display_material_id) throw std::runtime_error("No display material id.");
     display_material_id_      = maybe_display_material_id;
-    auto maybe_out_texture_id = level->GetDefaultOutputTextureId();
+    auto maybe_out_texture_id = level_->GetDefaultOutputTextureId();
     if (!maybe_out_texture_id) throw std::runtime_error("No output texture id.");
     auto out_texture_id = maybe_out_texture_id;
-    auto out_texture    = level_->GetTextureFromId(out_texture_id);
     // Get material from level as material was moved away.
     level_->GetMaterialFromId(display_material_id_)->SetProgramId(display_program_id_);
     if (!level_->GetMaterialFromId(display_material_id_)->AddTextureId(out_texture_id, "Display")) {
@@ -46,8 +44,8 @@ Renderer::Renderer(LevelInterface* level, std::pair<std::uint32_t, std::uint32_t
     }
 }
 
-void Renderer::RenderNode(EntityId node_id, EntityId material_id /* = NullId*/,
-                          double dt /* = 0.0*/) {
+void Renderer::RenderNode(EntityId node_id, EntityId material_id, const glm::mat4& projection,
+                          const glm::mat4& view, double dt /* = 0.0*/) {
     // Check current node.
     auto node = level_->GetSceneNodeFromId(node_id);
     // Try to cast to a node static mesh.
@@ -69,30 +67,12 @@ void Renderer::RenderNode(EntityId node_id, EntityId material_id /* = NullId*/,
     if (material_id) {
         material = level_->GetMaterialFromId(material_id);
     }
-    RenderMesh(static_mesh, material, node->GetLocalModel(dt), dt);
+    RenderMesh(static_mesh, material, projection, view, node->GetLocalModel(dt), dt);
 }
 
-void Renderer::RenderChildren(EntityId node_id, double dt /* = 0.0*/) {
-    RenderNode(node_id, NullId, dt);
-    // Loop into the child of the root node.
-    auto maybe_list = level_->GetChildList(node_id);
-    if (!maybe_list) throw std::runtime_error("No child list.");
-    auto list = maybe_list.value();
-    for (const auto& id : list) {
-        RenderChildren(id, dt);
-    }
-}
-
-void Renderer::RenderFromRootNode(double dt /* = 0.0*/) {
-    auto maybe_root_id = level_->GetDefaultRootSceneNodeId();
-    if (!maybe_root_id) return;
-    EntityId root_id = maybe_root_id;
-    RenderChildren(root_id, dt);
-}
-
-void Renderer::RenderMesh(StaticMeshInterface* static_mesh,
-                          MaterialInterface* material /* = nullptr*/,
-                          glm::mat4 model_mat /* = glm::mat4(1.0f)*/, double dt /* = 0.0*/) {
+void Renderer::RenderMesh(StaticMeshInterface* static_mesh, MaterialInterface* material,
+                          const glm::mat4& projection, const glm::mat4& view,
+                          const glm::mat4& model /* = glm::mat4(1.0f)*/, double dt /* = 0.0*/) {
     if (!static_mesh) throw std::runtime_error("StaticMesh ptr doesn't exist.");
     if (!material) throw std::runtime_error("No material!");
     auto program_id = material->GetProgramId();
@@ -102,30 +82,18 @@ void Renderer::RenderMesh(StaticMeshInterface* static_mesh,
     assert(program->GetOutputTextureIds().size());
 
     // In case the camera doesn't exist it will create a basic one.
-    UniformWrapper uniform_wrapper(level_->GetDefaultCamera());
-    uniform_wrapper.SetModel(model_mat);
-    uniform_wrapper.SetTime(dt);
-    // Get the stream from level to the uniform float wrapper.
-    for (const EntityId id : level_->GetUniformFloatStreamIds()) {
-        auto* stream     = level_->GetUniformFloatStreamFromId(id);
-        auto string_name = stream->GetName();
-        uniform_wrapper.SetValueFloatFromStream(string_name, stream->ExtractVector(),
-                                                stream->GetSize());
-    }
-    // Get the stream from level to the uniform int wrapper.
-    for (const EntityId id : level_->GetUniformIntStreamIds()) {
-        auto* stream     = level_->GetUniformIntStreamFromId(id);
-        auto string_name = stream->GetName();
-        uniform_wrapper.SetValueIntFromStream(string_name, stream->ExtractVector(),
-                                              stream->GetSize());
+    UniformWrapper uniform_wrapper(projection, view, model, dt);
+
+    // Go through the plugin list.
+    assert(device_);
+    for (auto* plugin : device_->GetPluginPtrs()) {
+        plugin->PreRender(uniform_wrapper, device_, static_mesh, material);
     }
     program->Use(&uniform_wrapper);
 
     auto texture_out_ids = program->GetOutputTextureIds();
-    auto texture_ref     = level_->GetTextureFromId(*texture_out_ids.cbegin());
-    auto size            = texture_ref->GetSize();
 
-    glViewport(0, 0, size.first, size.second);
+    glViewport(viewport_.x, viewport_.y, viewport_.z, viewport_.w);
 
     ScopedBind scoped_frame(frame_buffer_);
     int i = 0;
@@ -148,16 +116,25 @@ void Renderer::RenderMesh(StaticMeshInterface* static_mesh,
     }
     frame_buffer_.DrawBuffers(static_cast<std::uint32_t>(texture_out_ids.size()));
 
+    std::map<std::string, std::vector<std::int32_t>> uniform_include;
     for (const auto& id : material->GetIds()) {
+        EntityId texture_id = NullId;
+        if (level_->GetEnumTypeFromId(id) == EntityTypeEnum::TEXTURE) {
+            texture_id = id;
+        } else {
+            // TODO(anirul): Find a better way to find the texture associated with the stream.
+            texture_id = id + 1;
+        }
+        // TODO(anirul): Why? id and not texture id?
         const auto p  = material->EnableTextureId(id);
-        auto* texture = level_->GetTextureFromId(id);
+        auto* texture = level_->GetTextureFromId(texture_id);
         if (texture->IsCubeMap()) {
-            auto* gl_texture = dynamic_cast<TextureCubeMap*>(level_->GetTextureFromId(id));
+            auto* gl_texture = dynamic_cast<TextureCubeMap*>(level_->GetTextureFromId(texture_id));
             assert(gl_texture);
             gl_texture->Bind(p.second);
             program->Uniform(p.first, p.second);
         } else {
-            auto* gl_texture = dynamic_cast<Texture*>(level_->GetTextureFromId(id));
+            auto* gl_texture = dynamic_cast<Texture*>(level_->GetTextureFromId(texture_id));
             assert(gl_texture);
             gl_texture->Bind(p.second);
             program->Uniform(p.first, p.second);
@@ -204,13 +181,17 @@ void Renderer::RenderMesh(StaticMeshInterface* static_mesh,
     glBindVertexArray(0);
 
     for (const auto id : material->GetIds()) {
-        auto* texture = level_->GetTextureFromId(id);
+        EntityId texture_id = id;
+        if (level_->GetEnumTypeFromId(id) != EntityTypeEnum::TEXTURE) {
+            texture_id = id + 1;
+        }
+        auto* texture = level_->GetTextureFromId(texture_id);
         if (texture->IsCubeMap()) {
-            auto* gl_texture = dynamic_cast<TextureCubeMap*>(level_->GetTextureFromId(id));
+            auto* gl_texture = dynamic_cast<TextureCubeMap*>(level_->GetTextureFromId(texture_id));
             assert(gl_texture);
             gl_texture->UnBind();
         } else {
-            auto* gl_texture = dynamic_cast<Texture*>(level_->GetTextureFromId(id));
+            auto* gl_texture = dynamic_cast<Texture*>(level_->GetTextureFromId(texture_id));
             assert(gl_texture);
             gl_texture->UnBind();
         }
@@ -227,8 +208,7 @@ void Renderer::Display(double dt /* = 0.0*/) {
     if (!maybe_quad_id) throw std::runtime_error("No quad id.");
     auto quad    = level_->GetStaticMeshFromId(maybe_quad_id);
     auto program = level_->GetProgramFromId(display_program_id_);
-    UniformWrapper uniform_wrapper(nullptr);
-    uniform_wrapper.SetTime(dt);
+    UniformWrapper uniform_wrapper{};
     program->Use(&uniform_wrapper);
     auto material = level_->GetMaterialFromId(display_material_id_);
 
@@ -270,10 +250,11 @@ void Renderer::SetDepthTest(bool enable) {
     }
 }
 
-void Renderer::RenderAllMeshes(double dt /*= 0.0*/) {
+void Renderer::RenderAllMeshes(const glm::mat4& projection, const glm::mat4& view,
+                               double dt /*= 0.0*/) {
     for (const auto& p : level_->GetStaticMeshMaterialIds()) {
         // This should also call clear buffers.
-        RenderNode(p.first, p.second, dt);
+        RenderNode(p.first, p.second, projection, view, dt);
     }
 }
 

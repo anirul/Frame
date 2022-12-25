@@ -139,14 +139,14 @@ std::pair<EntityId, EntityId> LoadStaticMeshFromObj(LevelInterface* level,
         CreateBufferInLevel(level, indices, fmt::format("{}.{}.index", name, counter),
                             opengl::BufferTypeEnum::ELEMENT_ARRAY_BUFFER);
     if (!maybe_index_buffer_id) return { NullId, NullId };
-    EntityId index_buffer_id = maybe_index_buffer_id.value();
-    StaticMeshConfig config  = {};
-    config.point_buffer_id   = point_buffer_id;
-    config.normal_buffer_id  = normal_buffer_id;
-    config.texture_buffer_id = tex_coord_buffer_id;
-    config.index_buffer_id   = index_buffer_id;
-    auto static_mesh         = std::make_unique<opengl::StaticMesh>(level, config);
-    auto material_id         = NullId;
+    EntityId index_buffer_id      = maybe_index_buffer_id.value();
+    StaticMeshParameter parameter = {};
+    parameter.point_buffer_id     = point_buffer_id;
+    parameter.normal_buffer_id    = normal_buffer_id;
+    parameter.texture_buffer_id   = tex_coord_buffer_id;
+    parameter.index_buffer_id     = index_buffer_id;
+    auto static_mesh              = std::make_unique<opengl::StaticMesh>(level, parameter);
+    auto material_id              = NullId;
     if (!material_ids.empty()) {
         if (material_ids.size() != 1) {
             throw std::runtime_error("should only have 1 material here.");
@@ -162,7 +162,6 @@ std::pair<EntityId, EntityId> LoadStaticMeshFromObj(LevelInterface* level,
 
 EntityId LoadStaticMeshFromPly(LevelInterface* level, const frame::file::Ply& ply,
                                const std::string& name) {
-    EntityId result = NullId;
     std::vector<float> points;
     std::vector<float> normals;
     std::vector<float> textures;
@@ -218,17 +217,17 @@ EntityId LoadStaticMeshFromPly(LevelInterface* level, const frame::file::Ply& pl
 
     std::unique_ptr<opengl::StaticMesh> static_mesh = nullptr;
 
-    StaticMeshConfig config = {};
-    config.point_buffer_id = point_buffer_id;
-    config.index_buffer_id = index_buffer_id;
+    StaticMeshParameter parameter = {};
+    parameter.point_buffer_id     = point_buffer_id;
+    parameter.index_buffer_id     = index_buffer_id;
     // Check if a colored per vertex file or not.
     if (colors.empty()) {
-        config.normal_buffer_id  = normal_buffer_id;
-        config.texture_buffer_id = tex_coord_buffer_id;
+        parameter.normal_buffer_id  = normal_buffer_id;
+        parameter.texture_buffer_id = tex_coord_buffer_id;
     } else {
-        config.color_buffer_id = color_buffer_id;
+        parameter.color_buffer_id = color_buffer_id;
     }
-    static_mesh           = std::make_unique<opengl::StaticMesh>(level, config);
+    static_mesh           = std::make_unique<opengl::StaticMesh>(level, parameter);
     std::string mesh_name = fmt::format("{}", name);
     static_mesh->SetName(mesh_name);
     auto maybe_mesh_id = level->AddStaticMesh(std::move(static_mesh));
@@ -281,7 +280,6 @@ EntityId LoadStaticMeshFromPlyFile(LevelInterface* level, const std::filesystem:
                                    const std::string& material_name /* = ""*/) {
     EntityId entity_id = NullId;
     frame::file::Ply ply(file);
-    Logger& logger       = Logger::GetInstance();
     EntityId material_id = NullId;
     if (!material_name.empty()) {
         auto maybe_id = level->GetIdFromName(material_name);

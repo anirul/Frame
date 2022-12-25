@@ -15,6 +15,8 @@ target_include_directories(01_RayMarching
 
 target_link_libraries(01_RayMarching
   PUBLIC
+    absl::base
+    absl::flags
     Frame
     FrameCommon
     FrameFile

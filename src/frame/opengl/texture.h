@@ -29,7 +29,7 @@ class Texture : public TextureInterface, public BindInterface {
    public:
     /**
      * @brief Default constructor.
-	 * @param Parameter for creating the texture.
+     * @param Parameter for creating the texture.
      */
     Texture(const TextureParameter& texture_parameter);
     //! @brief Destructor this will free memory on the GPU also!
@@ -128,7 +128,7 @@ class Texture : public TextureInterface, public BindInterface {
      * @brief Copy the texture input to the texture.
      * @param vector: Vector of uint32_t containing the RGBA values of the texture.
      */
-    void Update(std::vector<std::uint8_t>&& vector, std::pair<std::uint32_t, std::uint32_t> size,
+    void Update(std::vector<std::uint8_t>&& vector, glm::uvec2 size,
                 std::uint8_t bytes_per_pixel) override;
 
    public:
@@ -146,7 +146,7 @@ class Texture : public TextureInterface, public BindInterface {
      * @brief Get the size of the current texture.
      * @return The size of the texture.
      */
-    std::pair<std::uint32_t, std::uint32_t> GetSize() const override { return size_; }
+    glm::uvec2 GetSize() const override { return size_; }
     /**
      * @brief Get the pixel element size individual element (BYTE, SHORT, LONG, FLOAT).
      * @return The pixel element size.
@@ -198,8 +198,8 @@ class Texture : public TextureInterface, public BindInterface {
     friend class ScopedBind;
 
    private:
-    unsigned int texture_id_                      = 0;
-    std::pair<std::uint32_t, std::uint32_t> size_ = { 0, 0 };
+    unsigned int texture_id_ = 0;
+    glm::uvec2 size_         = glm::uvec2(0, 0);
     const proto::PixelElementSize pixel_element_size_;
     const proto::PixelStructure pixel_structure_;
     mutable bool locked_bind_             = false;

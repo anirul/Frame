@@ -13,8 +13,6 @@ add_library(FrameOpenGL
     light.h
     material.cpp
     material.h
-    none_opengl_window.cpp
-    none_opengl_window.h
     static_mesh.cpp
     static_mesh.h
     pixel.cpp
@@ -35,10 +33,14 @@ add_library(FrameOpenGL
     texture.h
     texture_cube_map.cpp
     texture_cube_map.h
+    sdl_opengl_none.cpp
+    sdl_opengl_none.h
     sdl_opengl_window.cpp
     sdl_opengl_window.h
     window.cpp
     window.h
+    win32_opengl_none.cpp
+    win32_opengl_none.h
 )
 
 target_include_directories(FrameOpenGL
@@ -50,11 +52,10 @@ target_include_directories(FrameOpenGL
 
 target_link_libraries(FrameOpenGL
   PUBLIC
-    absl::base
     Frame
     FrameFile
-    FrameOpenGLFile
     FrameJson
+    FrameOpenGLFile
     GLEW::GLEW
 )
 

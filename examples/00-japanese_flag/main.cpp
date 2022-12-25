@@ -18,8 +18,8 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 #else
 int main(int ac, char** av) try {
 #endif
-    frame::common::Application app(
-        frame::CreateNewWindow(frame::WindowEnum::SDL2, frame::DeviceEnum::OPENGL, { 640, 480 }));
+    frame::common::Application app(frame::CreateNewWindow(
+        frame::DrawingTargetEnum::WINDOW, frame::RenderingAPIEnum::OPENGL, { 640, 480 }));
     app.Startup(frame::file::FindFile("asset/json/japanese_flag.json"));
     app.Run();
     return 0;

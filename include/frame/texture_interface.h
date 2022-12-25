@@ -33,7 +33,7 @@ struct TextureParameter {
     //! @brief Pixel structure, this is the number of color you have in the texture 1 to 4.
     proto::PixelStructure pixel_structure = proto::PixelStructure_RGB();
     //! @brief Texture size.
-    std::pair<std::uint32_t, std::uint32_t> size = { 1, 1 };
+    glm::uvec2 size = glm::uvec2(1, 1);
     //! @brief Texture data, in case you don't want to provide it just pass an empty vector.
     //! You have to multiply the size by the pixel element size to get the size of the vector.
     void* data_ptr = nullptr;
@@ -65,7 +65,7 @@ struct TextureInterface : public NameInterface {
      * @brief Get the size of the current texture.
      * @return The size of the texture.
      */
-    virtual std::pair<std::uint32_t, std::uint32_t> GetSize() const = 0;
+    virtual glm::uvec2 GetSize() const = 0;
     //! @brief Enable mipmap, this allow a recursive level of texture faster for rendering.
     virtual void EnableMipmap() const = 0;
     /**
@@ -145,8 +145,7 @@ struct TextureInterface : public NameInterface {
      * @param vector: Vector of uint32_t containing the RGBA values of the texture.
      * @param size: Size of the image.
      */
-    virtual void Update(std::vector<std::uint8_t>&& vector,
-                        std::pair<std::uint32_t, std::uint32_t> size,
+    virtual void Update(std::vector<std::uint8_t>&& vector, glm::uvec2 size,
                         std::uint8_t bytes_per_pixel) = 0;
 };
 

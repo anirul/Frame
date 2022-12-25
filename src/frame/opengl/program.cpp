@@ -3,11 +3,11 @@
 #include <absl/strings/match.h>
 #include <absl/strings/string_view.h>
 
+#include <regex>
 #include <stdexcept>
 #include <string_view>
 
 #include "frame/logger.h"
-#include "frame/stream_storage_singleton.h"
 
 namespace frame::opengl {
 
@@ -43,59 +43,33 @@ void Program::LinkShader() {
 
 void Program::Use(const UniformInterface* uniform_interface) const {
     glUseProgram(program_id_);
-    // Now loop into the uniform map to include uniform interface values.
-    for (const auto& pair : uniform_float_variable_map_) {
-        if (!HasUniform(pair.first)) continue;
-        switch (pair.second) {
-            case proto::Uniform::PROJECTION_MAT4: {
-                Uniform(pair.first, uniform_interface->GetProjection());
-                break;
-            }
-            case proto::Uniform::PROJECTION_INV_MAT4: {
-                Uniform(pair.first, glm::inverse(uniform_interface->GetProjection()));
-                break;
-            }
-            case proto::Uniform::VIEW_MAT4: {
-                Uniform(pair.first, uniform_interface->GetView());
-                break;
-            }
-            case proto::Uniform::VIEW_INV_MAT4: {
-                Uniform(pair.first, glm::inverse(uniform_interface->GetView()));
-                break;
-            }
-            case proto::Uniform::MODEL_MAT4: {
-                Uniform(pair.first, uniform_interface->GetModel());
-                break;
-            }
-            case proto::Uniform::MODEL_INV_MAT4: {
-                Uniform(pair.first, glm::inverse(uniform_interface->GetModel()));
-                break;
-            }
-            case proto::Uniform::CAMERA_POSITION_VEC3: {
-                Uniform(pair.first, uniform_interface->GetCameraPosition());
-                break;
-            }
-            case proto::Uniform::CAMERA_DIRECTION_VEC3: {
-                Uniform(pair.first, uniform_interface->GetCameraFront() -
-                                        uniform_interface->GetCameraPosition());
-                break;
-            }
-            case proto::Uniform::FLOAT_TIME_S: {
-                Uniform(pair.first, static_cast<float>(uniform_interface->GetDeltaTime()));
-                break;
-            }
-            case proto::Uniform::INVALID:
-            default:
-                throw std::runtime_error(fmt::format("Unknown enum value {}", pair.second));
+    if (!uniform_interface) {
+        logger_->warn("No uniform interface passed to program {}?", GetName());
+        return;
+    }
+    if (HasUniform("projection")) {
+        Uniform("projection", uniform_interface->GetProjection());
+    }
+    if (HasUniform("view")) {
+        Uniform("view", uniform_interface->GetView());
+    }
+    if (HasUniform("model")) {
+        Uniform("model", uniform_interface->GetModel());
+    }
+    if (HasUniform("time_s")) {
+        Uniform("time_s", static_cast<float>(uniform_interface->GetDeltaTime()));
+    }
+    for (const auto& name : uniform_interface->GetFloatNames()) {
+        if (HasUniform(name)) {
+            Uniform(name, uniform_interface->GetValueFloat(name),
+                    uniform_interface->GetSizeFromFloat(name));
         }
     }
-    for (const auto& [name, value] : stream_float_variable_map_) {
-        Uniform(name, uniform_interface->GetValueFloatFromStream(name),
-                uniform_interface->GetSizeFromFloatStream(name));
-    }
-    for (const auto& [name, value] : stream_int_variable_map_) {
-        Uniform(name, uniform_interface->GetValueIntFromStream(name),
-                uniform_interface->GetSizeFromIntStream(name));
+    for (const auto& name : uniform_interface->GetIntNames()) {
+        if (HasUniform(name)) {
+            Uniform(name, uniform_interface->GetValueInt(name),
+                    uniform_interface->GetSizeFromInt(name));
+        }
     }
 }
 
@@ -128,8 +102,8 @@ void Program::Uniform(const std::string& name, const glm::mat4 mat) const {
 }
 
 void Program::Uniform(const std::string& name, const std::vector<float>& vector,
-                      std::pair<std::uint32_t, std::uint32_t> size) const {
-    if (size.second == 0 && size.first == 0) {
+                      glm::uvec2 size) const {
+    if (size.y == 0 && size.x == 0) {
         if (vector.size() == 0) {
             logger_->warn("Entered a uniform [{}] without size.", name);
             return;
@@ -137,53 +111,53 @@ void Program::Uniform(const std::string& name, const std::vector<float>& vector,
         throw std::runtime_error(
             fmt::format("Unknown size doesn't know that size equivalent: {}", vector.size()));
     }
-    assert(vector.size() == size.first * size.second);
-    if (size.second == 1) {
-        if (size.first == 1) {
+    assert(vector.size() == size.x * size.y);
+    if (size.y == 1) {
+        if (size.x == 1) {
             glUniform1f(GetMemoizeUniformLocation(name), vector[0]);
             return;
         }
-        glUniform1fv(GetMemoizeUniformLocation(name), size.first, vector.data());
+        glUniform1fv(GetMemoizeUniformLocation(name), size.x, vector.data());
         return;
     }
-    if (size.second == 2) {
-        if (size.first == 1) {
+    if (size.y == 2) {
+        if (size.x == 1) {
             glUniform2f(GetMemoizeUniformLocation(name), vector[0], vector[1]);
             return;
         }
-        if (size.first == 2) {
+        if (size.x == 2) {
             glUniformMatrix2fv(GetMemoizeUniformLocation(name), 1, GL_FALSE, vector.data());
             return;
         }
     }
-    if (size.second == 3) {
-        if (size.first == 1) {
+    if (size.y == 3) {
+        if (size.x == 1) {
             glUniform3f(GetMemoizeUniformLocation(name), vector[0], vector[1], vector[2]);
             return;
         }
-        if (size.first == 3) {
+        if (size.x == 3) {
             glUniformMatrix3fv(GetMemoizeUniformLocation(name), 1, GL_FALSE, vector.data());
             return;
         }
     }
-    if (size.second == 4) {
-        if (size.first == 1) {
+    if (size.y == 4) {
+        if (size.x == 1) {
             glUniform4f(GetMemoizeUniformLocation(name), vector[0], vector[1], vector[2],
                         vector[3]);
             return;
         }
-        if (size.first == 4) {
+        if (size.x == 4) {
             glUniformMatrix4fv(GetMemoizeUniformLocation(name), 1, GL_FALSE, vector.data());
             return;
         }
     }
     throw std::runtime_error(fmt::format(
-        "Unknown size doesn't know that size equivalent: < {}, {} >.", size.first, size.second));
+        "Unknown size doesn't know that size equivalent: < {}, {} >.", size.x, size.y));
 }
 
 void Program::Uniform(const std::string& name, const std::vector<std::int32_t>& vector,
-                      std::pair<std::uint32_t, std::uint32_t> size /*= { 0, 0 }*/) const {
-    if (size.second == 0 && size.first == 0) {
+                      glm::uvec2 size /*= { 0, 0 }*/) const {
+    if (size.y == 0 && size.x == 0) {
         if (vector.size() == 0) {
             logger_->warn("Entered a uniform [{}] without size.", name);
             return;
@@ -191,92 +165,57 @@ void Program::Uniform(const std::string& name, const std::vector<std::int32_t>& 
         throw std::runtime_error(
             fmt::format("Unknown size doesn't know that size equivalent: {}", vector.size()));
     }
-    assert(vector.size() == size.first * size.second);
-    if (size.second == 1) {
-        if (size.first == 1) {
+    assert(vector.size() == size.x * size.y);
+    if (size.y == 1) {
+        if (size.x == 1) {
             glUniform1i(GetMemoizeUniformLocation(name), vector[0]);
             return;
         }
-        glUniform1iv(GetMemoizeUniformLocation(name), size.first, vector.data());
+        glUniform1iv(GetMemoizeUniformLocation(name), size.x,
+                     static_cast<const GLint*>(vector.data()));
         return;
     }
-    if (size.second == 2) {
-        if (size.first == 1) {
+    if (size.y == 2) {
+        if (size.x == 1) {
             glUniform2i(GetMemoizeUniformLocation(name), vector[0], vector[1]);
             return;
         }
     }
-    if (size.second == 3) {
-        if (size.first == 1) {
+    if (size.y == 3) {
+        if (size.x == 1) {
             glUniform3i(GetMemoizeUniformLocation(name), vector[0], vector[1], vector[2]);
             return;
         }
     }
-    if (size.second == 4) {
-        if (size.first == 1) {
+    if (size.y == 4) {
+        if (size.x == 1) {
             glUniform4i(GetMemoizeUniformLocation(name), vector[0], vector[1], vector[2],
                         vector[3]);
             return;
         }
     }
     throw std::runtime_error(fmt::format(
-        "Unknown size doesn't know that size equivalent: < {}, {} >.", size.first, size.second));
+        "Unknown size doesn't know that size equivalent: < {}, {} >.", size.x, size.y));
 }
 
-void Program::PreInscribeEnumUniformFloat(const std::string& name,
-                                          proto::Uniform::UniformEnum uniform_enum) const {
-    if (StreamStorageSingleton::GetInstance().HasStreamName(name)) {
-        auto item_name = StreamStorageSingleton::GetInstance().GetItemNameFromStreamName(name);
-        uniform_float_variable_map_.insert({ item_name, uniform_enum });
-    } else {
-        uniform_float_variable_map_.insert({ name, uniform_enum });
+bool Program::IsUniformInList(const std::string& name) const {
+    const auto vector = GetUniformNameList();
+    if (std::none_of(vector.cbegin(), vector.cend(),
+                     [name](const std::string& inner) { return absl::StrContains(inner, name); })) {
+        return false;
     }
-}
-
-void Program::PreInscribeStreamUniformFloat(const std::string& name,
-                                            proto::Stream::StreamEnum stream_enum) const {
-    if (StreamStorageSingleton::GetInstance().HasStreamName(name)) {
-        auto item_name = StreamStorageSingleton::GetInstance().GetItemNameFromStreamName(name);
-        stream_float_variable_map_.insert({ item_name, stream_enum });
-    } else {
-        stream_float_variable_map_.insert({ name, stream_enum });
-    }
-}
-
-void Program::PreInscribeEnumUniformInt(const std::string& name,
-                                        proto::Uniform::UniformEnum uniform_enum) const {
-    if (StreamStorageSingleton::GetInstance().HasStreamName(name)) {
-        auto item_name = StreamStorageSingleton::GetInstance().GetItemNameFromStreamName(name);
-        uniform_int_variable_map_.insert({ item_name, uniform_enum });
-    } else {
-        uniform_int_variable_map_.insert({ name, uniform_enum });
-    }
-}
-
-void Program::PreInscribeStreamUniformInt(const std::string& name,
-                                          proto::Stream::StreamEnum stream_enum) const {
-    if (StreamStorageSingleton::GetInstance().HasStreamName(name)) {
-        auto item_name = StreamStorageSingleton::GetInstance().GetItemNameFromStreamName(name);
-        stream_int_variable_map_.insert({ item_name, stream_enum });
-    } else {
-        stream_int_variable_map_.insert({ name, stream_enum });
-    }
+    return true;
 }
 
 int Program::GetMemoizeUniformLocation(const std::string& name) const {
     if (!memoize_map_.count(name)) {
 #ifdef _DEBUG
-        auto vector = GetUniformNameList();
-        if (std::none_of(vector.begin(), vector.end(), [name](const std::string& inner) {
-                return absl::StrContains(inner, name);
-            })) {
+        if (!IsUniformInList(name)) {
             throw std::runtime_error(fmt::format("Could not find a uniform [{}].", name));
         }
+        logger_->info("GetMemoizeUniformLocation [{}].", name);
 #endif  // _DEBUG
         int location = glGetUniformLocation(program_id_, name.c_str());
-        if (location == -1) {
-            location = glGetUniformLocation(program_id_, fmt::format("{}[0]", name).c_str());
-        }
         if (location == -1) {
             throw std::runtime_error(fmt::format("Could not get a location for uniform {}.", name));
         }
@@ -363,7 +302,11 @@ std::vector<std::string> Program::GetUniformNameList() const {
 
 bool Program::HasUniform(const std::string& name) const {
     std::vector<std::string> uniform_list = GetUniformNameList();
-    return static_cast<bool>(std::count(uniform_list.begin(), uniform_list.end(), name));
+    if (!std::count(uniform_list.begin(), uniform_list.end(), name)) {
+        // To solve the fact that the uniform could end with a `[0]`.
+        return std::count(uniform_list.begin(), uniform_list.end(), name + "[0]");
+    }
+    return true;
 }
 
 std::string Program::GetTemporarySceneRoot() const { return temporary_scene_root_; }

@@ -35,10 +35,6 @@ void RegisterUniformFromProto(const Uniform& uniform, const UniformInterface& un
             program_interface.Uniform(uniform.name(), uniform.uniform_int());
             return;
         }
-        case Uniform::kUniformBool: {
-            program_interface.Uniform(uniform.name(), uniform.uniform_bool());
-            return;
-        }
         case Uniform::kUniformFloat: {
             program_interface.Uniform(uniform.name(), uniform.uniform_float());
             return;
@@ -67,10 +63,6 @@ void RegisterUniformFromProto(const Uniform& uniform, const UniformInterface& un
         case Uniform::kUniformInts: {
             ParseUniformVec<std::int32_t>(uniform.name(), uniform.uniform_ints(),
                                           program_interface);
-            return;
-        }
-        case Uniform::kUniformBools: {
-            ParseUniformVec<bool>(uniform.name(), uniform.uniform_bools(), program_interface);
             return;
         }
         case Uniform::kUniformFloats: {
@@ -128,15 +120,6 @@ void RegisterUniformEnumFromProto(const std::string& name, const Uniform::Unifor
         }
         case Uniform::MODEL_INV_MAT4: {
             program_interface.Uniform(name, glm::inverse(uniform_interface.GetModel()));
-            break;
-        }
-        case Uniform::CAMERA_POSITION_VEC3: {
-            program_interface.Uniform(name, uniform_interface.GetCameraPosition());
-            break;
-        }
-        case Uniform::CAMERA_DIRECTION_VEC3: {
-            program_interface.Uniform(
-                name, uniform_interface.GetCameraFront() - uniform_interface.GetCameraPosition());
             break;
         }
         case Uniform::FLOAT_TIME_S: {

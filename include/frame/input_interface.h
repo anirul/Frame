@@ -13,23 +13,23 @@ struct InputInterface {
     virtual ~InputInterface() = default;
     /**
      * @brief Keyboard interface in case of pressed on a key.
-	 * @param key: Key of the keyboard that was pressed.
-	 * @param dt: Delta time from the beginning of the software in seconds.
-	 * @return True if processed false if not.
+     * @param key: Key of the keyboard that was pressed.
+     * @param dt: Delta time from the beginning of the software in seconds.
+     * @return True if processed false if not.
      */
     virtual bool KeyPressed(char key, double dt) = 0;
     /**
      * @brief Keyboard interface in case of release of a key.
      * @param key: Key of the keyboard that was pressed.
      * @param dt: Delta time from the beginning of the software in seconds.
-	 * @return True if processed false if not.
+     * @return True if processed false if not.
      */
     virtual bool KeyReleased(char key, double dt) = 0;
     /**
      * @brief Mouse moved in relative positions.
      * @param position: Relative position of the mouse (from last).
      * @param dt: Delta time from the beginning of the software in seconds.
-	 * @return True if processed false if not.
+     * @return True if processed false if not.
      */
     virtual bool MouseMoved(glm::vec2 position, glm::vec2 relative, double dt) = 0;
     /**
@@ -46,6 +46,13 @@ struct InputInterface {
      * @return True if processed false if not.
      */
     virtual bool MouseReleased(char button, double dt) = 0;
+    /**
+     * @brief Mouse moved in relative positions.
+     * @param relative: Relative position of the wheel (from last).
+     * @param dt: Delta time from the beginning of the software in seconds.
+     * @return True if processed false if not.
+     */
+    virtual bool WheelMoved(float relative, double dt) = 0;
     //! @brief Validate the next frame.
     virtual void NextFrame() = 0;
 };

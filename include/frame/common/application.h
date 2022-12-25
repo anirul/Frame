@@ -34,13 +34,9 @@ class Application {
     /**
      * @brief A helper function that call the inner resize of the window.
      * @param size: The new size of the window.
+	 * @param fullscreen_enum: The new full screen state of the window.
      */
-    void Resize(std::pair<std::uint32_t, std::uint32_t> size);
-    /**
-     * @brief A helper function that call the inner full screen of the window.
-     * @param fullscreen: The new full screen state of the window.
-     */
-    void SetFullscreen(frame::FullScreenEnum fullscreen_mode);
+    void Resize(glm::uvec2 size, FullScreenEnum fullscreen_enum);
     /**
      * @brief Run the application.
      */
@@ -48,7 +44,7 @@ class Application {
 
    protected:
     std::unique_ptr<frame::WindowInterface> window_ = nullptr;
-    int index_                                      = -1;
+    std::string plugin_name_;
 };
 
 }  // End namespace frame::common.

@@ -46,9 +46,6 @@ struct TableStruct_math_2eproto {
 extern const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_math_2eproto;
 namespace frame {
 namespace proto {
-class UniformBools;
-struct UniformBoolsDefaultTypeInternal;
-extern UniformBoolsDefaultTypeInternal _UniformBools_default_instance_;
 class UniformFloats;
 struct UniformFloatsDefaultTypeInternal;
 extern UniformFloatsDefaultTypeInternal _UniformFloats_default_instance_;
@@ -88,7 +85,6 @@ extern UniformVector4sDefaultTypeInternal _UniformVector4s_default_instance_;
 }  // namespace proto
 }  // namespace frame
 PROTOBUF_NAMESPACE_OPEN
-template<> ::frame::proto::UniformBools* Arena::CreateMaybeMessage<::frame::proto::UniformBools>(Arena*);
 template<> ::frame::proto::UniformFloats* Arena::CreateMaybeMessage<::frame::proto::UniformFloats>(Arena*);
 template<> ::frame::proto::UniformInts* Arena::CreateMaybeMessage<::frame::proto::UniformInts>(Arena*);
 template<> ::frame::proto::UniformMatrix4* Arena::CreateMaybeMessage<::frame::proto::UniformMatrix4>(Arena*);
@@ -1273,167 +1269,6 @@ class UniformInts final :
 };
 // -------------------------------------------------------------------
 
-class UniformBools final :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:frame.proto.UniformBools) */ {
- public:
-  inline UniformBools() : UniformBools(nullptr) {}
-  ~UniformBools() override;
-  explicit PROTOBUF_CONSTEXPR UniformBools(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
-
-  UniformBools(const UniformBools& from);
-  UniformBools(UniformBools&& from) noexcept
-    : UniformBools() {
-    *this = ::std::move(from);
-  }
-
-  inline UniformBools& operator=(const UniformBools& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  inline UniformBools& operator=(UniformBools&& from) noexcept {
-    if (this == &from) return *this;
-    if (GetOwningArena() == from.GetOwningArena()
-  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
-        && GetOwningArena() != nullptr
-  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
-    ) {
-      InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-
-  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
-    return GetDescriptor();
-  }
-  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
-    return default_instance().GetMetadata().descriptor;
-  }
-  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
-    return default_instance().GetMetadata().reflection;
-  }
-  static const UniformBools& default_instance() {
-    return *internal_default_instance();
-  }
-  static inline const UniformBools* internal_default_instance() {
-    return reinterpret_cast<const UniformBools*>(
-               &_UniformBools_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    6;
-
-  friend void swap(UniformBools& a, UniformBools& b) {
-    a.Swap(&b);
-  }
-  inline void Swap(UniformBools* other) {
-    if (other == this) return;
-  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
-    if (GetOwningArena() != nullptr &&
-        GetOwningArena() == other->GetOwningArena()) {
-   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
-    if (GetOwningArena() == other->GetOwningArena()) {
-  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
-      InternalSwap(other);
-    } else {
-      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
-    }
-  }
-  void UnsafeArenaSwap(UniformBools* other) {
-    if (other == this) return;
-    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
-    InternalSwap(other);
-  }
-
-  // implements Message ----------------------------------------------
-
-  UniformBools* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
-    return CreateMaybeMessage<UniformBools>(arena);
-  }
-  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
-  void CopyFrom(const UniformBools& from);
-  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
-  void MergeFrom( const UniformBools& from) {
-    UniformBools::MergeImpl(*this, from);
-  }
-  private:
-  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
-  public:
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
-  uint8_t* _InternalSerialize(
-      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
-
-  private:
-  void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
-  void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(UniformBools* other);
-
-  private:
-  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
-  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "frame.proto.UniformBools";
-  }
-  protected:
-  explicit UniformBools(::PROTOBUF_NAMESPACE_ID::Arena* arena,
-                       bool is_message_owned = false);
-  public:
-
-  static const ClassData _class_data_;
-  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
-
-  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  enum : int {
-    kValuesFieldNumber = 1,
-  };
-  // repeated bool values = 1;
-  int values_size() const;
-  private:
-  int _internal_values_size() const;
-  public:
-  void clear_values();
-  private:
-  bool _internal_values(int index) const;
-  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< bool >&
-      _internal_values() const;
-  void _internal_add_values(bool value);
-  ::PROTOBUF_NAMESPACE_ID::RepeatedField< bool >*
-      _internal_mutable_values();
-  public:
-  bool values(int index) const;
-  void set_values(int index, bool value);
-  void add_values(bool value);
-  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< bool >&
-      values() const;
-  ::PROTOBUF_NAMESPACE_ID::RepeatedField< bool >*
-      mutable_values();
-
-  // @@protoc_insertion_point(class_scope:frame.proto.UniformBools)
- private:
-  class _Internal;
-
-  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
-  typedef void InternalArenaConstructable_;
-  typedef void DestructorSkippable_;
-  struct Impl_ {
-    ::PROTOBUF_NAMESPACE_ID::RepeatedField< bool > values_;
-    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
-  };
-  union { Impl_ _impl_; };
-  friend struct ::TableStruct_math_2eproto;
-};
-// -------------------------------------------------------------------
-
 class UniformFloats final :
     public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:frame.proto.UniformFloats) */ {
  public:
@@ -1482,7 +1317,7 @@ class UniformFloats final :
                &_UniformFloats_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    7;
+    6;
 
   friend void swap(UniformFloats& a, UniformFloats& b) {
     a.Swap(&b);
@@ -1643,7 +1478,7 @@ class UniformVector2s final :
                &_UniformVector2s_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    8;
+    7;
 
   friend void swap(UniformVector2s& a, UniformVector2s& b) {
     a.Swap(&b);
@@ -1800,7 +1635,7 @@ class UniformVector3s final :
                &_UniformVector3s_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    9;
+    8;
 
   friend void swap(UniformVector3s& a, UniformVector3s& b) {
     a.Swap(&b);
@@ -1957,7 +1792,7 @@ class UniformVector4s final :
                &_UniformVector4s_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    10;
+    9;
 
   friend void swap(UniformVector4s& a, UniformVector4s& b) {
     a.Swap(&b);
@@ -2114,7 +1949,7 @@ class UniformQuaternions final :
                &_UniformQuaternions_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    11;
+    10;
 
   friend void swap(UniformQuaternions& a, UniformQuaternions& b) {
     a.Swap(&b);
@@ -2271,7 +2106,7 @@ class UniformMatrix4s final :
                &_UniformMatrix4s_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    12;
+    11;
 
   friend void swap(UniformMatrix4s& a, UniformMatrix4s& b) {
     a.Swap(&b);
@@ -3038,57 +2873,6 @@ UniformInts::mutable_values() {
 
 // -------------------------------------------------------------------
 
-// UniformBools
-
-// repeated bool values = 1;
-inline int UniformBools::_internal_values_size() const {
-  return _impl_.values_.size();
-}
-inline int UniformBools::values_size() const {
-  return _internal_values_size();
-}
-inline void UniformBools::clear_values() {
-  _impl_.values_.Clear();
-}
-inline bool UniformBools::_internal_values(int index) const {
-  return _impl_.values_.Get(index);
-}
-inline bool UniformBools::values(int index) const {
-  // @@protoc_insertion_point(field_get:frame.proto.UniformBools.values)
-  return _internal_values(index);
-}
-inline void UniformBools::set_values(int index, bool value) {
-  _impl_.values_.Set(index, value);
-  // @@protoc_insertion_point(field_set:frame.proto.UniformBools.values)
-}
-inline void UniformBools::_internal_add_values(bool value) {
-  _impl_.values_.Add(value);
-}
-inline void UniformBools::add_values(bool value) {
-  _internal_add_values(value);
-  // @@protoc_insertion_point(field_add:frame.proto.UniformBools.values)
-}
-inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< bool >&
-UniformBools::_internal_values() const {
-  return _impl_.values_;
-}
-inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< bool >&
-UniformBools::values() const {
-  // @@protoc_insertion_point(field_list:frame.proto.UniformBools.values)
-  return _internal_values();
-}
-inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< bool >*
-UniformBools::_internal_mutable_values() {
-  return &_impl_.values_;
-}
-inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< bool >*
-UniformBools::mutable_values() {
-  // @@protoc_insertion_point(field_mutable_list:frame.proto.UniformBools.values)
-  return _internal_mutable_values();
-}
-
-// -------------------------------------------------------------------
-
 // UniformFloats
 
 // repeated float values = 1;
@@ -3361,8 +3145,6 @@ UniformMatrix4s::values() const {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
-// -------------------------------------------------------------------
-
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

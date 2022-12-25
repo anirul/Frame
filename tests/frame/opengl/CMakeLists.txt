@@ -36,20 +36,20 @@ add_executable(FrameOpenGLTest
 
 target_include_directories(FrameOpenGLTest
   PUBLIC
-  ${CMAKE_SOURCE_DIR}/tests
-  ${CMAKE_SOURCE_DIR}/include
-  ${CMAKE_CURRENT_BINARY_DIR}
+    ${CMAKE_SOURCE_DIR}/tests
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 target_link_libraries(FrameOpenGLTest
   PUBLIC
-  Frame
-  FrameFile
-  FrameOpenGL
-  FrameOpenGLFile
-  FrameProto
-  GTest::gmock
-  GTest::gtest
+    Frame
+    FrameFile
+    FrameOpenGL
+    FrameOpenGLFile
+    FrameProto
+    GTest::gmock
+    GTest::gtest
 )
 
 # In order to remove the tests from the bin folder.

@@ -7,7 +7,7 @@
 #include <functional>
 #include <stdexcept>
 
-#include "frame/Level.h"
+#include "frame/level.h"
 #include "frame/opengl/file/load_program.h"
 #include "frame/opengl/frame_buffer.h"
 #include "frame/opengl/pixel.h"
@@ -36,8 +36,8 @@ void Texture::CreateTexture(const void* data /* = nullptr*/) {
     auto format = opengl::ConvertToGLType(pixel_structure_);
     auto type   = opengl::ConvertToGLType(pixel_element_size_);
     glTexImage2D(GL_TEXTURE_2D, 0, opengl::ConvertToGLType(pixel_element_size_, pixel_structure_),
-                 static_cast<GLsizei>(size_.first), static_cast<GLsizei>(size_.second), 0, format,
-                 type, data);
+                 static_cast<GLsizei>(size_.x), static_cast<GLsizei>(size_.y), 0, format, type,
+                 data);
 }
 
 Texture::~Texture() { glDeleteTextures(1, &texture_id_); }
@@ -126,7 +126,7 @@ void Texture::Clear(const glm::vec4 color) {
     Bind();
     if (!frame_) CreateFrameAndRenderBuffer();
     ScopedBind scoped_frame(*frame_);
-    glViewport(0, 0, size_.first, size_.second);
+    glViewport(0, 0, size_.x, size_.y);
     GLfloat clear_color[4] = { color.r, color.g, color.b, color.a };
     glClearBufferfv(GL_COLOR, 0, clear_color);
     UnBind();
@@ -194,8 +194,7 @@ std::vector<std::uint8_t> Texture::GetTextureByte() const {
     }
     auto size              = GetSize();
     auto pixel_structure   = GetPixelStructure();
-    std::size_t image_size = static_cast<std::size_t>(size.first) *
-                             static_cast<std::size_t>(size.second) *
+    std::size_t image_size = static_cast<std::size_t>(size.x) * static_cast<std::size_t>(size.y) *
                              static_cast<std::size_t>(pixel_structure);
     std::vector<std::uint8_t> result = {};
     result.resize(image_size);
@@ -214,8 +213,7 @@ std::vector<std::uint16_t> Texture::GetTextureWord() const {
     }
     auto size              = GetSize();
     auto pixel_structure   = GetPixelStructure();
-    std::size_t image_size = static_cast<std::size_t>(size.first) *
-                             static_cast<std::size_t>(size.second) *
+    std::size_t image_size = static_cast<std::size_t>(size.x) * static_cast<std::size_t>(size.y) *
                              static_cast<std::size_t>(pixel_structure);
     std::vector<std::uint16_t> result = {};
     result.resize(image_size);
@@ -234,8 +232,7 @@ std::vector<std::uint32_t> Texture::GetTextureDWord() const {
     }
     auto size              = GetSize();
     auto pixel_structure   = GetPixelStructure();
-    std::size_t image_size = static_cast<std::size_t>(size.first) *
-                             static_cast<std::size_t>(size.second) *
+    std::size_t image_size = static_cast<std::size_t>(size.x) * static_cast<std::size_t>(size.y) *
                              static_cast<std::size_t>(pixel_structure);
     std::vector<std::uint32_t> result = {};
     result.resize(image_size);
@@ -254,8 +251,7 @@ std::vector<float> Texture::GetTextureFloat() const {
     }
     auto size              = GetSize();
     auto pixel_structure   = GetPixelStructure();
-    std::size_t image_size = static_cast<std::size_t>(size.first) *
-                             static_cast<std::size_t>(size.second) *
+    std::size_t image_size = static_cast<std::size_t>(size.x) * static_cast<std::size_t>(size.y) *
                              static_cast<std::size_t>(pixel_structure);
     std::vector<float> result = {};
     result.resize(image_size);
@@ -264,8 +260,8 @@ std::vector<float> Texture::GetTextureFloat() const {
     return result;
 }
 
-void Texture::Update(std::vector<std::uint8_t>&& vector,
-                     std::pair<std::uint32_t, std::uint32_t> size, std::uint8_t bytes_per_pixel) {
+void Texture::Update(std::vector<std::uint8_t>&& vector, glm::uvec2 size,
+                     std::uint8_t bytes_per_pixel) {
     ScopedBind scoped_bind(*this);
     size_ = size;
     assert(pixel_element_size_.value() == 1);
@@ -273,8 +269,8 @@ void Texture::Update(std::vector<std::uint8_t>&& vector,
     auto format = opengl::ConvertToGLType(pixel_structure_);
     auto type   = opengl::ConvertToGLType(pixel_element_size_);
     glTexImage2D(GL_TEXTURE_2D, 0, opengl::ConvertToGLType(pixel_element_size_, pixel_structure_),
-                 static_cast<GLsizei>(size_.first), static_cast<GLsizei>(size_.second), 0, format,
-                 type, vector.data());
+                 static_cast<GLsizei>(size_.x), static_cast<GLsizei>(size_.y), 0, format, type,
+                 vector.data());
 }
 
 }  // End namespace frame::opengl.

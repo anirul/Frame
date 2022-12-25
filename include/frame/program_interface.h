@@ -131,44 +131,20 @@ struct ProgramInterface : public NameInterface {
      * @param vector: Vector to be inputed into the uniform.
      */
     virtual void Uniform(const std::string& name, const std::vector<float>& vector,
-                         std::pair<std::uint32_t, std::uint32_t> size = { 0, 0 }) const = 0;
+                         glm::uvec2 size = { 0, 0 }) const = 0;
     /**
      * @brief Create a uniform from a string and a vector.
      * @param name: Name of the uniform.
      * @param vector: Vector to be inputed into the uniform.
      */
     virtual void Uniform(const std::string& name, const std::vector<std::int32_t>& vector,
-                         std::pair<std::uint32_t, std::uint32_t> size = { 0, 0 }) const = 0;
+                         glm::uvec2 size = { 0, 0 }) const = 0;
     /**
-     * @brief Add a later included value.
-     * Like camera position or time, this will be set in uniform interface.
+     * @brief Check if the program has the uniform passed as name.
      * @param name: Name of the uniform.
-     * @param value: Enum value of the uniform (see proto declaration for that).
+     * @return True if present false otherwise.
      */
-    virtual void PreInscribeEnumUniformFloat(
-        const std::string& name, proto::Uniform::UniformEnum enum_value) const = 0;
-    /**
-     * @brief Add a later included streamed value.
-     * @param name: Name of the uniform.
-     * @param value: String pointing to the streamed uniform.
-     */
-    virtual void PreInscribeStreamUniformFloat(const std::string& name,
-                                               proto::Stream::StreamEnum value) const = 0;
-    /**
-     * @brief Add a later included value.
-     * Like camera position or time, this will be set in uniform interface.
-     * @param name: Name of the uniform.
-     * @param value: Enum value of the uniform (see proto declaration for that).
-     */
-    virtual void PreInscribeEnumUniformInt(const std::string& name,
-                                           proto::Uniform::UniformEnum enum_value) const = 0;
-    /**
-     * @brief Add a later included streamed value.
-     * @param name: Name of the uniform.
-     * @param value: String pointing to the streamed uniform.
-     */
-    virtual void PreInscribeStreamUniformInt(const std::string& name,
-                                             proto::Stream::StreamEnum value) const = 0;
+    virtual bool HasUniform(const std::string& name) const = 0;
 };
 
 }  // End namespace frame.

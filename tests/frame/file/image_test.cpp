@@ -18,8 +18,8 @@ TEST_F(ImageTest, CheckSizeImageTest) {
     image_ =
         std::make_unique<frame::file::Image>(frame::file::FindFile("asset/cubemap/positive_x.png"));
     ASSERT_TRUE(image_);
-    EXPECT_EQ(1024, image_->GetSize().first);
-    EXPECT_EQ(1024, image_->GetSize().second);
+    EXPECT_EQ(1024, image_->GetSize().x);
+    EXPECT_EQ(1024, image_->GetSize().y);
 }
 
 TEST_F(ImageTest, CheckTypeImageTest) {
@@ -46,8 +46,8 @@ TEST_F(ImageTest, CreateCubeMapPointerImageTest) {
         frame::file::FindFile("asset/cubemap/hamarikyu.hdr"),
         frame::proto::PixelElementSize_FLOAT(), frame::proto::PixelStructure_RGB_ALPHA());
     ASSERT_TRUE(image_);
-    EXPECT_EQ(3200, image_->GetSize().first);
-    EXPECT_EQ(1600, image_->GetSize().second);
+    EXPECT_EQ(3200, image_->GetSize().x);
+    EXPECT_EQ(1600, image_->GetSize().y);
     EXPECT_EQ(frame::proto::PixelElementSize_FLOAT(), image_->GetPixelElementSize());
     EXPECT_EQ(frame::proto::PixelStructure_RGB_ALPHA(), image_->GetPixelStructure());
     {
@@ -56,7 +56,7 @@ TEST_F(ImageTest, CreateCubeMapPointerImageTest) {
         // Check against a random position (should be around the middle).
         const auto x        = 1600;
         const auto y        = 800;
-        const auto position = x + y * size.first;
+        const auto position = x + y * size.x;
         // CHECKME the coordinate don't correspond I don't know why.
         // CHECKME old coordinates 581, 753 : (1.78125f, 2.4375f, 2.85938f)
         EXPECT_FLOAT_EQ(0.05078125f, pointer[position * 4]);

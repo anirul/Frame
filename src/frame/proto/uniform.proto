@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 import "math.proto";
-import "stream.proto";
+import "plugin.proto";
 
 package frame.proto;
 
@@ -17,19 +17,16 @@ message Uniform {
 		VIEW_INV_MAT4 = 4;
 		MODEL_MAT4 = 5;
 		MODEL_INV_MAT4 = 6;
-		CAMERA_POSITION_VEC3 = 7;
-		CAMERA_DIRECTION_VEC3 = 8;
-		FLOAT_TIME_S = 9;
+		FLOAT_TIME_S = 7;
 	}
 	// Name of the uniform (should be the same as declared in the shader!).
 	string name = 1;
 	// Value of the uniform (same as before).
 	oneof value_oneof {
 		int32 uniform_int = 2;
-		bool uniform_bool = 3;
 		float uniform_float = 4;
-		Stream uniform_float_stream = 19;
-		Stream uniform_int_stream = 20;
+		Plugin uniform_float_plugin = 19;
+		Plugin uniform_int_plugin = 20;
 		// This value come from outside, this could be projection or camera.
 		// it will be set acording to the type of the enum.
 		UniformEnum uniform_enum = 5;
@@ -40,7 +37,6 @@ message Uniform {
 		UniformQuaternion uniform_quat = 9;
 		UniformMatrix4 uniform_mat4 = 10;
 		UniformInts uniform_ints = 11;
-		UniformBools uniform_bools = 12;
 		UniformFloats uniform_floats = 13;
 		UniformVector2s uniform_vec2s = 14;
 		UniformVector3s uniform_vec3s = 15;

@@ -3,12 +3,13 @@
 namespace frame {
 
 /**
- * @class DeviceEnum
+ * @class RenderingAPIEnum
  * @brief List of Device API.
  */
-enum class DeviceEnum {
+enum class RenderingAPIEnum {
     OPENGL,
     VULKAN,
+	// From: https://sourceforge.net/p/predef/wiki/OperatingSystems/
 #if defined(_WIN32) || defined(_WIN64)
 	DIRECTX11,
     DIRECTX12,
@@ -16,12 +17,12 @@ enum class DeviceEnum {
 };
 
 /**
- * @class WindowEnum
- * @brief List of window API.
+ * @class DrawingTargetEnum
+ * @brief Where do you want to draw?
  */
-enum class WindowEnum {
-    NONE,
-    SDL2,
+enum class DrawingTargetEnum {
+	NONE,
+	WINDOW
 };
 
 /**
@@ -32,6 +33,21 @@ enum class FullScreenEnum {
 	WINDOW,
 	FULLSCREEN,
     FULLSCREEN_DESKTOP,
+};
+
+/**
+ * @class StereoEnum
+ * @brief List of stereo implementation API.
+ */
+enum class StereoEnum {
+    //! No stereo.
+	NONE,
+	//! Anaglyph used by colored glasses.
+    ANAGLYPH,
+    //! Split, single image wrapped to fit in the image size.
+    HORIZONTAL_SPLIT,
+	//! Side by side keep the image aspect ratio and put one image side-by-side.
+	HORIZONTAL_SIDE_BY_SIDE,
 };
 
 /**

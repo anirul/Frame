@@ -6,8 +6,8 @@
 
 #include "frame/api.h"
 #include "frame/device_interface.h"
-#include "frame/draw_interface.h"
 #include "frame/input_interface.h"
+#include "frame/plugin_interface.h"
 
 namespace frame {
 
@@ -21,17 +21,6 @@ struct WindowInterface {
     virtual ~WindowInterface() = default;
     //! @brief Run the windows interface this will take the current thread.
     virtual void Run() = 0;
-    /**
-     * @brief Add a drawing interface.
-     * @param draw_interface: Move a draw interface to the window object.
-     * @return The index of the draw interface.
-     */
-    virtual int AddDrawInterface(std::unique_ptr<DrawInterface>&& draw_interface) = 0;
-    /**
-     * @brief Remove a drawing interface.
-     * @param index: The index of the draw interface to remove.
-     */
-    virtual void RemoveDrawInterface(int index) = 0;
     /**
      * @brief Set the input interface (see above).
      * @param input_interface: Move a input interface to the window object.
@@ -52,12 +41,12 @@ struct WindowInterface {
      * @brief Get the size of the window (useful to make a buffer).
      * @return A size {x, y} of the window.
      */
-    virtual std::pair<std::uint32_t, std::uint32_t> GetSize() const = 0;
+    virtual glm::uvec2 GetSize() const = 0;
     /**
      * @brief Get the desktop size.
      * @return A size {x, y} of the desktop.
      */
-    virtual std::pair<std::uint32_t, std::uint32_t> GetDesktopSize() const = 0;
+    virtual glm::uvec2 GetDesktopSize() const = 0;
     /**
      * @brief Return the context to the window (this is a void* as this can be a Windows HWND, a
      * Linux window or ?).
@@ -75,20 +64,12 @@ struct WindowInterface {
      */
     virtual void SetWindowTitle(const std::string& title) const = 0;
     /**
-     * @brief Get the window enum (know if this is an SDL a NONE or other window).
-     * @return A window enum.
-     */
-    virtual WindowEnum GetWindowEnum() const = 0;
-    /**
      * @brief Resize the window.
+     * @param fullscreen_enum: Is it full screen or not?
      * @param size: The new window size.
      */
-    virtual void Resize(std::pair<std::uint32_t, std::uint32_t> size) = 0;
-    /**
-     * @brief Set window full screen mode.
-     * @param fullscreen_enum: Is it full screen or not?
-     */
-    virtual void SetFullScreen(FullScreenEnum fullscreen_enum) = 0;
+    virtual void Resize(glm::uvec2 size,
+                        FullScreenEnum fullscreen_enum = FullScreenEnum::WINDOW) = 0;
     /**
      * @brief Get window full screen enum.
      * @return The full screen enum.

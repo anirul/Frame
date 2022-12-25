@@ -26,8 +26,8 @@ TEST_F(TextureCubeMapTest, CreateTextureCubeMapTest) {
     auto* opengl_texture = dynamic_cast<frame::opengl::TextureCubeMap*>(texture_.get());
     ASSERT_NE(nullptr, opengl_texture);
     ASSERT_NE(0, opengl_texture->GetId());
-    EXPECT_EQ(1024, texture_->GetSize().first);
-    EXPECT_EQ(1024, texture_->GetSize().second);
+    EXPECT_EQ(1024, texture_->GetSize().x);
+    EXPECT_EQ(1024, texture_->GetSize().y);
     auto vec8 = texture_->GetTextureByte();
     EXPECT_EQ(1024 * 1024 * 3 * 6, vec8.size());
     auto p = std::minmax_element(vec8.begin(), vec8.end());
@@ -47,8 +47,8 @@ TEST_F(TextureCubeMapTest, DISABLED_CreateEquirectangularTextureCubeMapTest) {
     auto* opengl_texture = dynamic_cast<frame::opengl::TextureCubeMap*>(texture_.get());
     ASSERT_NE(nullptr, opengl_texture);
     ASSERT_NE(0, opengl_texture->GetId());
-    EXPECT_EQ(512, texture_->GetSize().first);
-    EXPECT_EQ(512, texture_->GetSize().second);
+    EXPECT_EQ(512, texture_->GetSize().x);
+    EXPECT_EQ(512, texture_->GetSize().y);
     auto vecf = texture_->GetTextureFloat();
     // Image size time the number of color per pixel time 6 (cubemap).
     EXPECT_EQ(512 * 512 * 3 * 6, vecf.size());

@@ -16,7 +16,7 @@
 
 namespace frame::opengl {
 
-Device::Device(void* gl_context, const std::pair<std::uint32_t, std::uint32_t> size)
+Device::Device(void* gl_context, glm::uvec2 size)
     : gl_context_(gl_context), size_(size) {
     // This should maintain the culling to none.
     // FIXME(anirul): Change this as to be working!
@@ -40,10 +40,66 @@ void Device::Startup(std::unique_ptr<frame::LevelInterface>&& level) {
     level_ = std::move(level);
     // Setup camera.
     auto* camera = level_->GetDefaultCamera();
-    camera->SetAspectRatio(static_cast<float>(size_.first) / static_cast<float>(size_.second));
-    if (camera) camera->ComputeView();
+    if (camera) {
+        camera->SetAspectRatio(static_cast<float>(size_.x) / static_cast<float>(size_.y));
+    }
     // Create a renderer.
-    renderer_ = std::make_unique<Renderer>(level_.get(), size_);
+    Context context{ nullptr, this, level_.get() };
+    renderer_ = std::make_unique<Renderer>(context, glm::uvec4(0, 0, size_.x, size_.y));
+}
+
+void Device::AddPlugin(std::unique_ptr<PluginInterface>&& plugin_interface) {
+    std::string plugin_name = plugin_interface->GetName();
+    for (int i = 0; i < plugin_interfaces_.size(); ++i) {
+        if (plugin_interfaces_[i]) {
+            // If the plugin name is already in the list, then replace it.
+            if (plugin_interfaces_[i]->GetName() == plugin_name) {
+                plugin_interfaces_[i].reset();
+                plugin_interfaces_[i] = std::move(plugin_interface);
+                return;
+            }
+        }
+    }
+    for (int i = 0; i < plugin_interfaces_.size(); ++i) {
+        // This is a free space add the plugin here.
+        if (!plugin_interfaces_[i]) {
+            plugin_interfaces_[i] = std::move(plugin_interface);
+            return;
+        }
+    }
+    // No free space add the plugin at the end.
+    plugin_interfaces_.push_back(std::move(plugin_interface));
+}
+
+std::vector<PluginInterface*> Device::GetPluginPtrs() {
+    std::vector<PluginInterface*> plugin_ptrs;
+    for (auto& plugin_interface : plugin_interfaces_) {
+        if (plugin_interface) {
+            plugin_ptrs.push_back(plugin_interface.get());
+        }
+    }
+    return plugin_ptrs;
+}
+
+std::vector<std::string> Device::GetPluginNames() const {
+    std::vector<std::string> names;
+    for (const auto& plugin_interface : plugin_interfaces_) {
+        if (plugin_interface) {
+            names.push_back(plugin_interface->GetName());
+        }
+    }
+    return names;
+}
+
+void Device::RemovePluginByName(const std::string& name) {
+    for (int i = 0; i < plugin_interfaces_.size(); ++i) {
+        if (plugin_interfaces_[i]) {
+            if (plugin_interfaces_[i]->GetName() == name) {
+                plugin_interfaces_[i].reset();
+                return;
+            }
+        }
+    }
 }
 
 void Device::Cleanup() { renderer_ = nullptr; }
@@ -53,19 +109,63 @@ void Device::Clear(const glm::vec4& color /* = glm::vec4(.2f, 0.f, .2f, 1.0f*/) 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+void Device::DisplayCamera(const Camera& camera, glm::uvec4 viewport, double time) {
+    renderer_->SetViewport(viewport);
+    renderer_->RenderAllMeshes(camera.ComputeProjection(), camera.ComputeView(), time);
+}
+
+void Device::DisplayLeftRightCamera(const Camera& camera_left, const Camera& camera_right,
+                                    glm::uvec4 viewport_left, glm::uvec4 viewport_right,
+                                    double time) {
+    if (invert_left_right_) {
+        DisplayCamera(camera_right, viewport_left, time);
+        DisplayCamera(camera_left, viewport_right, time);
+    } else {
+        DisplayCamera(camera_left, viewport_left, time);
+        DisplayCamera(camera_right, viewport_right, time);
+    }
+}
+
 void Device::Display(double dt /*= 0.0*/) {
     if (!renderer_) throw std::runtime_error("No Renderer.");
     Clear();
-    renderer_->RenderAllMeshes(dt);
-    // renderer_->RenderFromRootNode(dt);
-    renderer_->Display(dt);
-    if (level_) {
-        Level* ptr = dynamic_cast<Level*>(level_.get());
-        assert(ptr);
-        auto last_program_id = renderer_->GetLastProgramId();
-        if (last_program_id == NullId) logger_->warn("No last program id?");
-        ptr->Update(this, ptr->GetProgramFromId(last_program_id), dt);
+    // Compute left and right cameras.
+    Camera left_camera = *level_->GetDefaultCamera();
+    left_camera.SetPosition(left_camera.GetPosition() -
+                            left_camera.GetRight() * interocular_distance_ * 0.5f);
+    glm::vec3 left_camera_direction =
+        level_->GetDefaultCamera()->GetPosition() + focus_point_ - left_camera.GetPosition();
+    left_camera.SetFront(glm::normalize(left_camera_direction));
+    Camera right_camera = *level_->GetDefaultCamera();
+    right_camera.SetPosition(right_camera.GetPosition() +
+                             right_camera.GetRight() * interocular_distance_ * 0.5f);
+    glm::vec3 right_camera_direction =
+        level_->GetDefaultCamera()->GetPosition() + focus_point_ - right_camera.GetPosition();
+    right_camera.SetFront(glm::normalize(right_camera_direction));
+    switch (stereo_enum_) {
+        case StereoEnum::NONE:
+            DisplayCamera(*level_->GetDefaultCamera(), glm::uvec4(0, 0, size_.x, size_.y),
+                          dt);
+            break;
+        case StereoEnum::HORIZONTAL_SPLIT:
+            DisplayLeftRightCamera(
+                left_camera, right_camera, glm::uvec4(0, 0, size_.x / 2, size_.y),
+                glm::uvec4(size_.x / 2, 0, size_.x / 2, size_.y), dt);
+            break;
+        case StereoEnum::HORIZONTAL_SIDE_BY_SIDE:
+            DisplayLeftRightCamera(
+                left_camera, right_camera, glm::uvec4(0, 0, size_.x / 2, size_.y / 2),
+                glm::uvec4(size_.x / 2, 0, size_.x / 2, size_.y / 2), dt);
+            break;
+        default:
+            throw std::runtime_error(
+                fmt::format("Unknown StereoEnum type {}.", static_cast<int>(stereo_enum_)));
     }
+    // Reset viewport.
+    renderer_->SetViewport(glm::uvec4(0, 0, size_.x, size_.y));
+    // Final display.
+    // CHECKME(anirul): Is this still needed?
+    renderer_->Display(dt);
 }
 
 void Device::ScreenShot(const std::string& file) const {
@@ -94,8 +194,8 @@ std::unique_ptr<frame::BufferInterface> Device::CreateIndexBuffer(
 }
 
 std::unique_ptr<frame::StaticMeshInterface> Device::CreateStaticMesh(
-    std::vector<float>&& vector, std::uint32_t point_buffer_size) {
-    return opengl::CreateStaticMesh(GetLevel(), std::move(vector), point_buffer_size);
+    const StaticMeshParameter& static_mesh_parameter) {
+    return std::make_unique<opengl::StaticMesh>(GetLevel(), static_mesh_parameter);
 }
 
 std::unique_ptr<frame::TextureInterface> Device::CreateTexture(
@@ -112,10 +212,18 @@ std::unique_ptr<frame::TextureInterface> Device::CreateTexture(
     }
 }
 
-void Device::Resize(std::pair<std::uint32_t, std::uint32_t> size) {
+void Device::Resize(glm::uvec2 size) {
     Cleanup();
     size_ = size;
     Startup(std::move(level_));
+}
+
+void Device::SetStereo(StereoEnum stereo_enum, float interocular_distance, glm::vec3 focus_point,
+                       bool invert_left_right) {
+    stereo_enum_          = stereo_enum;
+    interocular_distance_ = interocular_distance;
+    focus_point_          = focus_point;
+    invert_left_right_    = invert_left_right;
 }
 
 }  // End namespace frame::opengl.

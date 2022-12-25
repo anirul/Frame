@@ -3,7 +3,9 @@
 add_executable(FrameTest
   camera_test.cpp
   camera_test.h
+  device_mock.h
   main.cpp
+  plugin_mock.h
   program_mock.h
   uniform_mock.h
   window_factory_test.cpp

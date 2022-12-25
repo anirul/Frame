@@ -9,18 +9,18 @@
 
 namespace frame::opengl {
 
-StaticMesh::StaticMesh(LevelInterface* level, const StaticMeshConfig& config)
+StaticMesh::StaticMesh(LevelInterface* level, const StaticMeshParameter& parameter)
     : level_(level),
-      point_buffer_id_(config.point_buffer_id),
-      point_buffer_size_(config.point_buffer_size),
-      color_buffer_id_(config.color_buffer_id),
-      color_buffer_size_(config.color_buffer_size),
-      normal_buffer_id_(config.normal_buffer_id),
-      normal_buffer_size_(config.normal_buffer_size),
-      texture_buffer_id_(config.texture_buffer_id),
-      texture_buffer_size_(config.texture_buffer_size),
-      index_buffer_id_(config.index_buffer_id),
-      render_primitive_enum_(config.render_primitive_enum) {
+      point_buffer_id_(parameter.point_buffer_id),
+      point_buffer_size_(parameter.point_buffer_size),
+      color_buffer_id_(parameter.color_buffer_id),
+      color_buffer_size_(parameter.color_buffer_size),
+      normal_buffer_id_(parameter.normal_buffer_id),
+      normal_buffer_size_(parameter.normal_buffer_size),
+      texture_buffer_id_(parameter.texture_buffer_id),
+      texture_buffer_size_(parameter.texture_buffer_size),
+      index_buffer_id_(parameter.index_buffer_id),
+      render_primitive_enum_(parameter.render_primitive_enum) {
     if (!point_buffer_id_) throw std::runtime_error("No point buffer specified.");
     // Create a new vertex array (to render the mesh).
     glGenVertexArrays(1, &vertex_array_object_);
@@ -47,8 +47,8 @@ StaticMesh::StaticMesh(LevelInterface* level, const StaticMeshConfig& config)
         glVertexAttribPointer(++vertex_array_count, color_buffer_size_, GL_FLOAT, GL_FALSE, 0,
                               nullptr);
         gl_color_buffer->UnBind();
-    } else if (std::count(config.generate_list.begin(), config.generate_list.end(),
-                          StaticMeshConfig::StaticMeshConfigEnum::GENERATE_COLOR)) {
+    } else if (std::count(parameter.generate_list.begin(), parameter.generate_list.end(),
+                          StaticMeshParameter::StaticMeshParameterEnum::GENERATE_COLOR)) {
         std::vector<float> color;
         color.resize(point_size_element);
         std::fill(color.begin(), color.end(), 1.0f);
@@ -72,8 +72,8 @@ StaticMesh::StaticMesh(LevelInterface* level, const StaticMeshConfig& config)
         glVertexAttribPointer(++vertex_array_count, normal_buffer_size_, GL_FLOAT, GL_TRUE, 0,
                               nullptr);
         gl_normal_buffer->UnBind();
-    } else if (std::count(config.generate_list.begin(), config.generate_list.end(),
-                          StaticMeshConfig::StaticMeshConfigEnum::GENERATE_NORMAL)) {
+    } else if (std::count(parameter.generate_list.begin(), parameter.generate_list.end(),
+                          StaticMeshParameter::StaticMeshParameterEnum::GENERATE_NORMAL)) {
         std::vector<float> normal;
         normal.resize(point_size_element);
         std::fill(normal.begin(), normal.end(), 0.0f);
@@ -100,8 +100,9 @@ StaticMesh::StaticMesh(LevelInterface* level, const StaticMeshConfig& config)
         glVertexAttribPointer(++vertex_array_count, texture_buffer_size_, GL_FLOAT, GL_FALSE, 0,
                               nullptr);
         gl_texture_buffer->UnBind();
-    } else if (std::count(config.generate_list.begin(), config.generate_list.end(),
-                          StaticMeshConfig::StaticMeshConfigEnum::GENERATE_TEXTURE_COORDINATE)) {
+    } else if (std::count(
+                   parameter.generate_list.begin(), parameter.generate_list.end(),
+                   StaticMeshParameter::StaticMeshParameterEnum::GENERATE_TEXTURE_COORDINATE)) {
         std::vector<float> texture_coordinate;
         std::size_t texture_coordinate_size =
             static_cast<std::size_t>(point_size_element * 2.0 / 3.0);
@@ -125,8 +126,8 @@ StaticMesh::StaticMesh(LevelInterface* level, const StaticMeshConfig& config)
         if (render_primitive_enum_ != proto::SceneStaticMesh::POINT) {
             throw std::runtime_error("No index buffer and render type is not set to point.");
         }
-        if (!std::count(config.generate_list.begin(), config.generate_list.end(),
-                        StaticMeshConfig::StaticMeshConfigEnum::GENERATE_INDEX)) {
+        if (!std::count(parameter.generate_list.begin(), parameter.generate_list.end(),
+                        StaticMeshParameter::StaticMeshParameterEnum::GENERATE_INDEX)) {
             throw std::runtime_error("No GENERATE_INDEX in the generate list.");
         }
         std::size_t index_size_element = point_size_element / 3;
@@ -219,13 +220,13 @@ EntityId CreateQuadStaticMesh(LevelInterface* level) {
     if (!maybe_texture_buffer_id) return NullId;
     auto maybe_index_buffer_id = level->AddBuffer(std::move(index_buffer));
     if (!maybe_index_buffer_id) return NullId;
-    StaticMeshConfig config      = {};
-    config.point_buffer_id       = maybe_point_buffer_id;
-    config.normal_buffer_id      = maybe_normal_buffer_id;
-    config.texture_buffer_id     = maybe_texture_buffer_id;
-    config.index_buffer_id       = maybe_index_buffer_id;
-    config.render_primitive_enum = proto::SceneStaticMesh::TRIANGLE;
-    auto mesh                    = std::make_unique<StaticMesh>(level, config);
+    StaticMeshParameter parameter   = {};
+    parameter.point_buffer_id       = maybe_point_buffer_id;
+    parameter.normal_buffer_id      = maybe_normal_buffer_id;
+    parameter.texture_buffer_id     = maybe_texture_buffer_id;
+    parameter.index_buffer_id       = maybe_index_buffer_id;
+    parameter.render_primitive_enum = proto::SceneStaticMesh::TRIANGLE;
+    auto mesh                       = std::make_unique<StaticMesh>(level, parameter);
     mesh->SetName(fmt::format("QuadMesh.{}", count));
     return level->AddStaticMesh(std::move(mesh));
 }
@@ -395,31 +396,15 @@ EntityId CreateCubeStaticMesh(LevelInterface* level) {
     if (!maybe_texture_buffer_id) return NullId;
     auto maybe_index_buffer_id = level->AddBuffer(std::move(index_buffer));
     if (!maybe_index_buffer_id) return NullId;
-    StaticMeshConfig config      = {};
-    config.point_buffer_id       = maybe_point_buffer_id;
-    config.normal_buffer_id      = maybe_normal_buffer_id;
-    config.texture_buffer_id     = maybe_texture_buffer_id;
-    config.index_buffer_id       = maybe_index_buffer_id;
-    config.render_primitive_enum = proto::SceneStaticMesh::TRIANGLE;
-    auto mesh                    = std::make_unique<StaticMesh>(level, config);
+    StaticMeshParameter parameter   = {};
+    parameter.point_buffer_id       = maybe_point_buffer_id;
+    parameter.normal_buffer_id      = maybe_normal_buffer_id;
+    parameter.texture_buffer_id     = maybe_texture_buffer_id;
+    parameter.index_buffer_id       = maybe_index_buffer_id;
+    parameter.render_primitive_enum = proto::SceneStaticMesh::TRIANGLE;
+    auto mesh                       = std::make_unique<StaticMesh>(level, parameter);
     mesh->SetName(fmt::format("CubeMesh.{}", count));
     return level->AddStaticMesh(std::move(mesh));
-}
-
-std::unique_ptr<frame::StaticMeshInterface> CreateStaticMesh(LevelInterface* level,
-                                                             std::vector<float>&& vector,
-                                                             std::uint32_t point_buffer_size) {
-    static std::int64_t count = 0;
-    auto point_buffer         = std::make_unique<Buffer>();
-    point_buffer->Copy(vector);
-    point_buffer->SetName(fmt::format("buffer.point.{}", count++));
-    auto point_buffer_id         = level->AddBuffer(std::move(point_buffer));
-    StaticMeshConfig config      = {};
-    config.point_buffer_id       = point_buffer_id;
-    config.point_buffer_size     = point_buffer_size;
-    config.render_primitive_enum = proto::SceneStaticMesh::POINT;
-    config.generate_list.insert(StaticMeshConfig::StaticMeshConfigEnum::GENERATE_INDEX);
-    return std::make_unique<StaticMesh>(level, config);
 }
 
 }  // End namespace frame::opengl.

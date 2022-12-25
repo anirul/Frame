@@ -3,13 +3,13 @@
 #include <gtest/gtest.h>
 
 #include "frame/file/obj.h"
-#include "frame/opengl/window.h"
+#include "frame/window_factory.h"
 
 namespace test {
 
 class LoadProgramTest : public testing::Test {
    public:
-    LoadProgramTest() : window_(frame::opengl::CreateNoneOpenGL({ 320, 200 })) {}
+    LoadProgramTest() : window_(frame::CreateNewWindow(frame::DrawingTargetEnum::NONE)) {}
 
    protected:
     std::unique_ptr<frame::WindowInterface> window_ = nullptr;

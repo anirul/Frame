@@ -15,7 +15,7 @@ enum class EntityTypeEnum : std::uint8_t {
     MATERIAL    = 4,
     BUFFER      = 5,
     STATIC_MESH = 6,
-    STREAM      = 7,
+    PLUGIN      = 7,
 };
 
 /**

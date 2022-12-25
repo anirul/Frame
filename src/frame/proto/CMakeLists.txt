@@ -6,10 +6,10 @@ add_library(FrameProto
     material.proto
     math.proto
     pixel.proto
+    plugin.proto
     program.proto
     scene.proto
     size.proto
-    stream.proto
     texture.proto
     uniform.proto
 )
@@ -27,10 +27,10 @@ set(HEADERS_TO_BE_COPIED
   material.pb.h
   math.pb.h
   pixel.pb.h
+  plugin.pb.h
   program.pb.h
   scene.pb.h
   size.pb.h
-  stream.pb.h
   texture.pb.h
   uniform.pb.h
 )

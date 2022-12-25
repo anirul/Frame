@@ -216,6 +216,9 @@ cython_debug/
 .history
 .ionide
 
+#Visual Studio 20xx
+.vs/
+
 # Support for Project snippet scope
 
 # End of https://www.toptal.com/developers/gitignore/api/python,c++,visualstudiocode

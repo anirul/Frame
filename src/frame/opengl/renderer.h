@@ -2,13 +2,14 @@
 
 #include <memory>
 
-#include "frame/level_interface.h"
+#include "frame/context.h"
 #include "frame/opengl/frame_buffer.h"
 #include "frame/opengl/render_buffer.h"
 #include "frame/program_interface.h"
 #include "frame/renderer_interface.h"
 #include "frame/static_mesh_interface.h"
 #include "frame/uniform_interface.h"
+#include "frame/window_interface.h"
 
 namespace frame::opengl {
 
@@ -21,7 +22,7 @@ class Renderer : public RendererInterface {
     /**
      * @brief This will also startup the frame and rendering buffer.
      */
-    Renderer(LevelInterface* level, std::pair<std::uint32_t, std::uint32_t> size);
+    Renderer(Context context, glm::uvec4 viewport);
 
    public:
     /**
@@ -51,6 +52,11 @@ class Renderer : public RendererInterface {
      * @return The id of the last program used by this renderer.
      */
     EntityId GetLastProgramId() const { return last_program_id_; }
+    /**
+     * @brief Set the current viewport.
+     * @param viewport: New viewport.
+     */
+    void SetViewport(glm::uvec4 viewport) override { viewport_ = viewport; }
 
    public:
     /**
@@ -60,31 +66,25 @@ class Renderer : public RendererInterface {
      * @param model_mat: Model matrix to be used.
      * @param dt: Delta time between the beginning of execution and now in seconds.
      */
-    void RenderMesh(StaticMeshInterface* static_mesh, MaterialInterface* material = nullptr,
-                    glm::mat4 model_mat = glm::mat4(1.0f), double dt = 0.0) override;
+    void RenderMesh(StaticMeshInterface* static_mesh, MaterialInterface* material,
+                    const glm::mat4& projection, const glm::mat4& view = glm::mat4(1.0f),
+                    const glm::mat4& model = glm::mat4(1.0f), double dt = 0.0) override;
     /**
      * @brief Render a node given an id and the id of a material at dt time.
      * @param node_id: Node to be rendered.
      * @param material_id: Material id to be used.
+     * @param projection: Projection matrix used.
+     * @param view: View matrix used.
      * @param dt: Delta time between the beginning of execution and now in seconds.
      */
-    void RenderNode(EntityId node_id, EntityId material_id = NullId, double dt = 0.0) override;
+    void RenderNode(EntityId node_id, EntityId material_id, const glm::mat4& projection,
+                    const glm::mat4& view, double dt = 0.0) override;
     /**
      * @brief Render all meshes at a dt time.
      * @param dt: Delta time between the beginning of execution and now in seconds.
      */
-    void RenderAllMeshes(double dt = 0.0) override;
-    /**
-     * @brief Render all children of node id at a dt time.
-     * @param node_id: Node to start rendering from.
-     * @param dt: Delta time between the beginning of execution and now in seconds.
-     */
-    void RenderChildren(EntityId node_id, double dt = 0.0) override;
-    /**
-     * @brief Render all from a root node.
-     * @param dt: Delta time between the beginning of execution and now in seconds.
-     */
-    void RenderFromRootNode(double dt = 0.0) override;
+    void RenderAllMeshes(const glm::mat4& projection, const glm::mat4& view,
+                         double dt = 0.0) override;
     /**
      * @brief Display to the screen at dt time.
      * @param dt: Delta time between the beginning of execution and now in seconds.
@@ -97,7 +97,7 @@ class Renderer : public RendererInterface {
     void SetDepthTest(bool enable) override;
 
    private:
-    // Level shared_ptr.
+    DeviceInterface* device_  = nullptr;
     LevelInterface* level_    = nullptr;
     EntityId last_program_id_ = NullId;
     Logger& logger_           = Logger::GetInstance();
@@ -105,6 +105,8 @@ class Renderer : public RendererInterface {
     glm::mat4 projection_ = glm::mat4(1.0f);
     glm::mat4 view_       = glm::mat4(1.0f);
     glm::mat4 model_      = glm::mat4(1.0f);
+    // Viewport top left and bottom right.
+	glm::uvec4 viewport_;
     // Frame & Render buffers.
     FrameBuffer frame_buffer_{};
     RenderBuffer render_buffer_{};

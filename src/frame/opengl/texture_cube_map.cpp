@@ -156,7 +156,7 @@ void TextureCubeMap::CreateTextureCubeMap(
     for (unsigned int i : { 0, 1, 2, 3, 4, 5 }) {
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0,
                      opengl::ConvertToGLType(pixel_element_size_, pixel_structure_),
-                     static_cast<GLsizei>(size_.first), static_cast<GLsizei>(size_.second), 0,
+                     static_cast<GLsizei>(size_.x), static_cast<GLsizei>(size_.y), 0,
                      opengl::ConvertToGLType(pixel_structure_),
                      opengl::ConvertToGLType(pixel_element_size_), cube_map[i]);
     }
@@ -226,7 +226,7 @@ void TextureCubeMap::Clear(const glm::vec4 color) {
     Bind();
     if (!frame_) CreateFrameAndRenderBuffer();
     ScopedBind scoped_frame(*frame_);
-    glViewport(0, 0, size_.first, size_.second);
+    glViewport(0, 0, size_.x, size_.y);
     GLfloat clear_color[4] = { color.r, color.g, color.b, color.a };
     glClearBufferfv(GL_COLOR, 0, clear_color);
     UnBind();
@@ -242,8 +242,7 @@ std::vector<std::uint8_t> TextureCubeMap::GetTextureByte() const {
     auto size            = GetSize();
     auto pixel_structure = GetPixelStructure();
     // 6 because of cubemap!
-    std::size_t image_size = static_cast<std::size_t>(size.first) *
-                             static_cast<std::size_t>(size.second) *
+    std::size_t image_size = static_cast<std::size_t>(size.x) * static_cast<std::size_t>(size.y) *
                              static_cast<std::size_t>(pixel_structure) * 6;
     std::vector<std::uint8_t> result = {};
     result.resize(image_size);
@@ -262,8 +261,7 @@ std::vector<std::uint16_t> TextureCubeMap::GetTextureWord() const {
     auto size            = GetSize();
     auto pixel_structure = GetPixelStructure();
     // 6 because of cubemap!
-    std::size_t image_size = static_cast<std::size_t>(size.first) *
-                             static_cast<std::size_t>(size.second) *
+    std::size_t image_size = static_cast<std::size_t>(size.x) * static_cast<std::size_t>(size.y) *
                              static_cast<std::size_t>(pixel_structure) * 6;
     std::vector<std::uint16_t> result = {};
     result.resize(image_size);
@@ -282,8 +280,7 @@ std::vector<std::uint32_t> TextureCubeMap::GetTextureDWord() const {
     auto size            = GetSize();
     auto pixel_structure = GetPixelStructure();
     // 6 because of cubemap!
-    std::size_t image_size = static_cast<std::size_t>(size.first) *
-                             static_cast<std::size_t>(size.second) *
+    std::size_t image_size = static_cast<std::size_t>(size.x) * static_cast<std::size_t>(size.y) *
                              static_cast<std::size_t>(pixel_structure) * 6;
     std::vector<std::uint32_t> result = {};
     result.resize(image_size);
@@ -302,8 +299,7 @@ std::vector<float> TextureCubeMap::GetTextureFloat() const {
     auto size            = GetSize();
     auto pixel_structure = GetPixelStructure();
     // 6 because of cubemap!
-    std::size_t image_size = static_cast<std::size_t>(size.first) *
-                             static_cast<std::size_t>(size.second) *
+    std::size_t image_size = static_cast<std::size_t>(size.x) * static_cast<std::size_t>(size.y) *
                              static_cast<std::size_t>(pixel_structure) * 6;
     std::vector<float> result = {};
     result.resize(image_size);
@@ -312,8 +308,7 @@ std::vector<float> TextureCubeMap::GetTextureFloat() const {
     return result;
 }
 
-void TextureCubeMap::Update(std::vector<std::uint8_t>&& vector,
-                            std::pair<std::uint32_t, std::uint32_t> size,
+void TextureCubeMap::Update(std::vector<std::uint8_t>&& vector, glm::uvec2 size,
                             std::uint8_t bytes_per_pixel) {
     throw std::runtime_error("Not implemented yet!");
 }

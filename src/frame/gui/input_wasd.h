@@ -32,6 +32,7 @@ class InputWasd : public InputInterface {
     bool MouseMoved(glm::vec2 position, glm::vec2 relative, double dt) override;
     bool MousePressed(char button, double dt) override;
     bool MouseReleased(char button, double dt) override;
+    bool WheelMoved(float relative, double dt) override;
     void NextFrame() override;
 
    private:

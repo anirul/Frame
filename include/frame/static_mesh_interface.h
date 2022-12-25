@@ -9,10 +9,48 @@
 namespace frame {
 
 /**
+ * @class Mesh parameter
+ * @brief This class is there to pass entity id of buffer and a config parameter.
+ */
+struct StaticMeshParameter {
+    //! @brief Buffer of points (this has to be present cannot be generated).
+    EntityId point_buffer_id = NullId;
+    //! @brief Buffer of points size (should be 3).
+    std::uint32_t point_buffer_size = 3;
+    //! @brief Buffer of colors (can be generated as white).
+    EntityId color_buffer_id = NullId;
+    //! @brief Buffer of colors size (should be 3).
+    std::uint32_t color_buffer_size = 3;
+    //! @brief Buffer of normal (will be generated as 0, 0, -1).
+    EntityId normal_buffer_id = NullId;
+    //! @brief Buffer of normal size (should be 3).
+    std::uint32_t normal_buffer_size = 3;
+    //! @brief Texture coordinates (will be generated as 0.5, 0.5).
+    EntityId texture_buffer_id = NullId;
+    //! @brief Texture coordinates size (should be 2).
+    std::uint32_t texture_buffer_size = 2;
+    //! @brief Index of the points 3 per triangle 2 per line and 1 per point.
+    EntityId index_buffer_id = NullId;
+    //! @brief The kind of draw that the mesh is.
+    proto::SceneStaticMesh::RenderPrimitiveEnum render_primitive_enum =
+        proto::SceneStaticMesh::TRIANGLE;
+    //! @brief what kind of buffer will be generated (no point of course).
+    enum class StaticMeshParameterEnum {
+        GENERATE_COLOR,
+        GENERATE_INDEX,
+        GENERATE_TEXTURE_COORDINATE,
+        GENERATE_NORMAL,
+    };
+    //! @brief The list of generated buffers.
+    std::set<StaticMeshParameterEnum> generate_list = {};
+};
+
+/**
  * @class StaticMeshInterface
  * @brief A static mesh is a mesh that cannot change over time (no skeleton).
  */
-struct StaticMeshInterface : public NameInterface {
+class StaticMeshInterface : public NameInterface {
+   public:
     //! @brief Virtual destructor.
     virtual ~StaticMeshInterface() = default;
     /**

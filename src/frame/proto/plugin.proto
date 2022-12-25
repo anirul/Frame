@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package frame.proto;
+
+// Plugin structure.
+// Next 4
+message Plugin {
+    // Is it a id relevant stream or not.
+    enum PluginEnum {
+        NONE = 0;        //< This is not a id relevant id.
+        ALL = 1;         //< You can go through all of the local ids.
+        POINT_RANGE = 2; //< This is a point buffer range plugin.
+        NORMAL = 3;      //< This is a normal buffer range plugin.
+    }
+    // Inner name of the stream.
+    string name = 1;
+    // Base in case you are ALL.
+    string base = 3;
+    // Stream enum, what kind of stream is it.
+    PluginEnum value = 2;
+}
+
+// Multi plugin structure.
+// Next 2
+message MultiPlugin {
+    // This is the plugin list.
+    repeated Plugin plugins = 1;
+}

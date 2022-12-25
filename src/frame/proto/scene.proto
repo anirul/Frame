@@ -2,7 +2,7 @@ syntax = "proto3";
 
 import "pixel.proto";
 import "math.proto";
-import "stream.proto";
+import "plugin.proto";
 
 package frame.proto;
 
@@ -55,8 +55,8 @@ message SceneStaticMesh {
 		MeshEnum mesh_enum = 6;
 		// Where the file is loaded from.
 		string file_name = 3;
-		// Stream input.
-		Stream stream = 10;
+		// Plugin input.
+		MultiPlugin multi_plugin = 10;
 	}
 
 	// Material name.

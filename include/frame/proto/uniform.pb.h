@@ -32,7 +32,7 @@
 #include <google/protobuf/generated_enum_reflection.h>
 #include <google/protobuf/unknown_field_set.h>
 #include "math.pb.h"
-#include "stream.pb.h"
+#include "plugin.pb.h"
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 #define PROTOBUF_INTERNAL_EXPORT_uniform_2eproto
@@ -68,9 +68,7 @@ enum Uniform_UniformEnum : int {
   Uniform_UniformEnum_VIEW_INV_MAT4 = 4,
   Uniform_UniformEnum_MODEL_MAT4 = 5,
   Uniform_UniformEnum_MODEL_INV_MAT4 = 6,
-  Uniform_UniformEnum_CAMERA_POSITION_VEC3 = 7,
-  Uniform_UniformEnum_CAMERA_DIRECTION_VEC3 = 8,
-  Uniform_UniformEnum_FLOAT_TIME_S = 9,
+  Uniform_UniformEnum_FLOAT_TIME_S = 7,
   Uniform_UniformEnum_Uniform_UniformEnum_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::min(),
   Uniform_UniformEnum_Uniform_UniformEnum_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::max()
 };
@@ -140,10 +138,9 @@ class Uniform final :
   }
   enum ValueOneofCase {
     kUniformInt = 2,
-    kUniformBool = 3,
     kUniformFloat = 4,
-    kUniformFloatStream = 19,
-    kUniformIntStream = 20,
+    kUniformFloatPlugin = 19,
+    kUniformIntPlugin = 20,
     kUniformEnum = 5,
     kUniformVec2 = 6,
     kUniformVec3 = 7,
@@ -151,7 +148,6 @@ class Uniform final :
     kUniformQuat = 9,
     kUniformMat4 = 10,
     kUniformInts = 11,
-    kUniformBools = 12,
     kUniformFloats = 13,
     kUniformVec2S = 14,
     kUniformVec3S = 15,
@@ -251,10 +247,6 @@ class Uniform final :
     Uniform_UniformEnum_MODEL_MAT4;
   static constexpr UniformEnum MODEL_INV_MAT4 =
     Uniform_UniformEnum_MODEL_INV_MAT4;
-  static constexpr UniformEnum CAMERA_POSITION_VEC3 =
-    Uniform_UniformEnum_CAMERA_POSITION_VEC3;
-  static constexpr UniformEnum CAMERA_DIRECTION_VEC3 =
-    Uniform_UniformEnum_CAMERA_DIRECTION_VEC3;
   static constexpr UniformEnum FLOAT_TIME_S =
     Uniform_UniformEnum_FLOAT_TIME_S;
   static inline bool UniformEnum_IsValid(int value) {
@@ -287,10 +279,9 @@ class Uniform final :
   enum : int {
     kNameFieldNumber = 1,
     kUniformIntFieldNumber = 2,
-    kUniformBoolFieldNumber = 3,
     kUniformFloatFieldNumber = 4,
-    kUniformFloatStreamFieldNumber = 19,
-    kUniformIntStreamFieldNumber = 20,
+    kUniformFloatPluginFieldNumber = 19,
+    kUniformIntPluginFieldNumber = 20,
     kUniformEnumFieldNumber = 5,
     kUniformVec2FieldNumber = 6,
     kUniformVec3FieldNumber = 7,
@@ -298,7 +289,6 @@ class Uniform final :
     kUniformQuatFieldNumber = 9,
     kUniformMat4FieldNumber = 10,
     kUniformIntsFieldNumber = 11,
-    kUniformBoolsFieldNumber = 12,
     kUniformFloatsFieldNumber = 13,
     kUniformVec2SFieldNumber = 14,
     kUniformVec3SFieldNumber = 15,
@@ -333,19 +323,6 @@ class Uniform final :
   void _internal_set_uniform_int(int32_t value);
   public:
 
-  // bool uniform_bool = 3;
-  bool has_uniform_bool() const;
-  private:
-  bool _internal_has_uniform_bool() const;
-  public:
-  void clear_uniform_bool();
-  bool uniform_bool() const;
-  void set_uniform_bool(bool value);
-  private:
-  bool _internal_uniform_bool() const;
-  void _internal_set_uniform_bool(bool value);
-  public:
-
   // float uniform_float = 4;
   bool has_uniform_float() const;
   private:
@@ -359,41 +336,41 @@ class Uniform final :
   void _internal_set_uniform_float(float value);
   public:
 
-  // .frame.proto.Stream uniform_float_stream = 19;
-  bool has_uniform_float_stream() const;
+  // .frame.proto.Plugin uniform_float_plugin = 19;
+  bool has_uniform_float_plugin() const;
   private:
-  bool _internal_has_uniform_float_stream() const;
+  bool _internal_has_uniform_float_plugin() const;
   public:
-  void clear_uniform_float_stream();
-  const ::frame::proto::Stream& uniform_float_stream() const;
-  PROTOBUF_NODISCARD ::frame::proto::Stream* release_uniform_float_stream();
-  ::frame::proto::Stream* mutable_uniform_float_stream();
-  void set_allocated_uniform_float_stream(::frame::proto::Stream* uniform_float_stream);
+  void clear_uniform_float_plugin();
+  const ::frame::proto::Plugin& uniform_float_plugin() const;
+  PROTOBUF_NODISCARD ::frame::proto::Plugin* release_uniform_float_plugin();
+  ::frame::proto::Plugin* mutable_uniform_float_plugin();
+  void set_allocated_uniform_float_plugin(::frame::proto::Plugin* uniform_float_plugin);
   private:
-  const ::frame::proto::Stream& _internal_uniform_float_stream() const;
-  ::frame::proto::Stream* _internal_mutable_uniform_float_stream();
+  const ::frame::proto::Plugin& _internal_uniform_float_plugin() const;
+  ::frame::proto::Plugin* _internal_mutable_uniform_float_plugin();
   public:
-  void unsafe_arena_set_allocated_uniform_float_stream(
-      ::frame::proto::Stream* uniform_float_stream);
-  ::frame::proto::Stream* unsafe_arena_release_uniform_float_stream();
+  void unsafe_arena_set_allocated_uniform_float_plugin(
+      ::frame::proto::Plugin* uniform_float_plugin);
+  ::frame::proto::Plugin* unsafe_arena_release_uniform_float_plugin();
 
-  // .frame.proto.Stream uniform_int_stream = 20;
-  bool has_uniform_int_stream() const;
+  // .frame.proto.Plugin uniform_int_plugin = 20;
+  bool has_uniform_int_plugin() const;
   private:
-  bool _internal_has_uniform_int_stream() const;
+  bool _internal_has_uniform_int_plugin() const;
   public:
-  void clear_uniform_int_stream();
-  const ::frame::proto::Stream& uniform_int_stream() const;
-  PROTOBUF_NODISCARD ::frame::proto::Stream* release_uniform_int_stream();
-  ::frame::proto::Stream* mutable_uniform_int_stream();
-  void set_allocated_uniform_int_stream(::frame::proto::Stream* uniform_int_stream);
+  void clear_uniform_int_plugin();
+  const ::frame::proto::Plugin& uniform_int_plugin() const;
+  PROTOBUF_NODISCARD ::frame::proto::Plugin* release_uniform_int_plugin();
+  ::frame::proto::Plugin* mutable_uniform_int_plugin();
+  void set_allocated_uniform_int_plugin(::frame::proto::Plugin* uniform_int_plugin);
   private:
-  const ::frame::proto::Stream& _internal_uniform_int_stream() const;
-  ::frame::proto::Stream* _internal_mutable_uniform_int_stream();
+  const ::frame::proto::Plugin& _internal_uniform_int_plugin() const;
+  ::frame::proto::Plugin* _internal_mutable_uniform_int_plugin();
   public:
-  void unsafe_arena_set_allocated_uniform_int_stream(
-      ::frame::proto::Stream* uniform_int_stream);
-  ::frame::proto::Stream* unsafe_arena_release_uniform_int_stream();
+  void unsafe_arena_set_allocated_uniform_int_plugin(
+      ::frame::proto::Plugin* uniform_int_plugin);
+  ::frame::proto::Plugin* unsafe_arena_release_uniform_int_plugin();
 
   // .frame.proto.Uniform.UniformEnum uniform_enum = 5;
   bool has_uniform_enum() const;
@@ -516,24 +493,6 @@ class Uniform final :
       ::frame::proto::UniformInts* uniform_ints);
   ::frame::proto::UniformInts* unsafe_arena_release_uniform_ints();
 
-  // .frame.proto.UniformBools uniform_bools = 12;
-  bool has_uniform_bools() const;
-  private:
-  bool _internal_has_uniform_bools() const;
-  public:
-  void clear_uniform_bools();
-  const ::frame::proto::UniformBools& uniform_bools() const;
-  PROTOBUF_NODISCARD ::frame::proto::UniformBools* release_uniform_bools();
-  ::frame::proto::UniformBools* mutable_uniform_bools();
-  void set_allocated_uniform_bools(::frame::proto::UniformBools* uniform_bools);
-  private:
-  const ::frame::proto::UniformBools& _internal_uniform_bools() const;
-  ::frame::proto::UniformBools* _internal_mutable_uniform_bools();
-  public:
-  void unsafe_arena_set_allocated_uniform_bools(
-      ::frame::proto::UniformBools* uniform_bools);
-  ::frame::proto::UniformBools* unsafe_arena_release_uniform_bools();
-
   // .frame.proto.UniformFloats uniform_floats = 13;
   bool has_uniform_floats() const;
   private:
@@ -648,10 +607,9 @@ class Uniform final :
  private:
   class _Internal;
   void set_has_uniform_int();
-  void set_has_uniform_bool();
   void set_has_uniform_float();
-  void set_has_uniform_float_stream();
-  void set_has_uniform_int_stream();
+  void set_has_uniform_float_plugin();
+  void set_has_uniform_int_plugin();
   void set_has_uniform_enum();
   void set_has_uniform_vec2();
   void set_has_uniform_vec3();
@@ -659,7 +617,6 @@ class Uniform final :
   void set_has_uniform_quat();
   void set_has_uniform_mat4();
   void set_has_uniform_ints();
-  void set_has_uniform_bools();
   void set_has_uniform_floats();
   void set_has_uniform_vec2s();
   void set_has_uniform_vec3s();
@@ -679,10 +636,9 @@ class Uniform final :
       constexpr ValueOneofUnion() : _constinit_{} {}
         ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized _constinit_;
       int32_t uniform_int_;
-      bool uniform_bool_;
       float uniform_float_;
-      ::frame::proto::Stream* uniform_float_stream_;
-      ::frame::proto::Stream* uniform_int_stream_;
+      ::frame::proto::Plugin* uniform_float_plugin_;
+      ::frame::proto::Plugin* uniform_int_plugin_;
       int uniform_enum_;
       ::frame::proto::UniformVector2* uniform_vec2_;
       ::frame::proto::UniformVector3* uniform_vec3_;
@@ -690,7 +646,6 @@ class Uniform final :
       ::frame::proto::UniformQuaternion* uniform_quat_;
       ::frame::proto::UniformMatrix4* uniform_mat4_;
       ::frame::proto::UniformInts* uniform_ints_;
-      ::frame::proto::UniformBools* uniform_bools_;
       ::frame::proto::UniformFloats* uniform_floats_;
       ::frame::proto::UniformVector2s* uniform_vec2s_;
       ::frame::proto::UniformVector3s* uniform_vec3s_;
@@ -804,44 +759,6 @@ inline void Uniform::set_uniform_int(int32_t value) {
   // @@protoc_insertion_point(field_set:frame.proto.Uniform.uniform_int)
 }
 
-// bool uniform_bool = 3;
-inline bool Uniform::_internal_has_uniform_bool() const {
-  return value_oneof_case() == kUniformBool;
-}
-inline bool Uniform::has_uniform_bool() const {
-  return _internal_has_uniform_bool();
-}
-inline void Uniform::set_has_uniform_bool() {
-  _impl_._oneof_case_[0] = kUniformBool;
-}
-inline void Uniform::clear_uniform_bool() {
-  if (_internal_has_uniform_bool()) {
-    _impl_.value_oneof_.uniform_bool_ = false;
-    clear_has_value_oneof();
-  }
-}
-inline bool Uniform::_internal_uniform_bool() const {
-  if (_internal_has_uniform_bool()) {
-    return _impl_.value_oneof_.uniform_bool_;
-  }
-  return false;
-}
-inline void Uniform::_internal_set_uniform_bool(bool value) {
-  if (!_internal_has_uniform_bool()) {
-    clear_value_oneof();
-    set_has_uniform_bool();
-  }
-  _impl_.value_oneof_.uniform_bool_ = value;
-}
-inline bool Uniform::uniform_bool() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Uniform.uniform_bool)
-  return _internal_uniform_bool();
-}
-inline void Uniform::set_uniform_bool(bool value) {
-  _internal_set_uniform_bool(value);
-  // @@protoc_insertion_point(field_set:frame.proto.Uniform.uniform_bool)
-}
-
 // float uniform_float = 4;
 inline bool Uniform::_internal_has_uniform_float() const {
   return value_oneof_case() == kUniformFloat;
@@ -880,135 +797,135 @@ inline void Uniform::set_uniform_float(float value) {
   // @@protoc_insertion_point(field_set:frame.proto.Uniform.uniform_float)
 }
 
-// .frame.proto.Stream uniform_float_stream = 19;
-inline bool Uniform::_internal_has_uniform_float_stream() const {
-  return value_oneof_case() == kUniformFloatStream;
+// .frame.proto.Plugin uniform_float_plugin = 19;
+inline bool Uniform::_internal_has_uniform_float_plugin() const {
+  return value_oneof_case() == kUniformFloatPlugin;
 }
-inline bool Uniform::has_uniform_float_stream() const {
-  return _internal_has_uniform_float_stream();
+inline bool Uniform::has_uniform_float_plugin() const {
+  return _internal_has_uniform_float_plugin();
 }
-inline void Uniform::set_has_uniform_float_stream() {
-  _impl_._oneof_case_[0] = kUniformFloatStream;
+inline void Uniform::set_has_uniform_float_plugin() {
+  _impl_._oneof_case_[0] = kUniformFloatPlugin;
 }
-inline ::frame::proto::Stream* Uniform::release_uniform_float_stream() {
-  // @@protoc_insertion_point(field_release:frame.proto.Uniform.uniform_float_stream)
-  if (_internal_has_uniform_float_stream()) {
+inline ::frame::proto::Plugin* Uniform::release_uniform_float_plugin() {
+  // @@protoc_insertion_point(field_release:frame.proto.Uniform.uniform_float_plugin)
+  if (_internal_has_uniform_float_plugin()) {
     clear_has_value_oneof();
-    ::frame::proto::Stream* temp = _impl_.value_oneof_.uniform_float_stream_;
+    ::frame::proto::Plugin* temp = _impl_.value_oneof_.uniform_float_plugin_;
     if (GetArenaForAllocation() != nullptr) {
       temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
     }
-    _impl_.value_oneof_.uniform_float_stream_ = nullptr;
+    _impl_.value_oneof_.uniform_float_plugin_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline const ::frame::proto::Stream& Uniform::_internal_uniform_float_stream() const {
-  return _internal_has_uniform_float_stream()
-      ? *_impl_.value_oneof_.uniform_float_stream_
-      : reinterpret_cast< ::frame::proto::Stream&>(::frame::proto::_Stream_default_instance_);
+inline const ::frame::proto::Plugin& Uniform::_internal_uniform_float_plugin() const {
+  return _internal_has_uniform_float_plugin()
+      ? *_impl_.value_oneof_.uniform_float_plugin_
+      : reinterpret_cast< ::frame::proto::Plugin&>(::frame::proto::_Plugin_default_instance_);
 }
-inline const ::frame::proto::Stream& Uniform::uniform_float_stream() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Uniform.uniform_float_stream)
-  return _internal_uniform_float_stream();
+inline const ::frame::proto::Plugin& Uniform::uniform_float_plugin() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Uniform.uniform_float_plugin)
+  return _internal_uniform_float_plugin();
 }
-inline ::frame::proto::Stream* Uniform::unsafe_arena_release_uniform_float_stream() {
-  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.Uniform.uniform_float_stream)
-  if (_internal_has_uniform_float_stream()) {
+inline ::frame::proto::Plugin* Uniform::unsafe_arena_release_uniform_float_plugin() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.Uniform.uniform_float_plugin)
+  if (_internal_has_uniform_float_plugin()) {
     clear_has_value_oneof();
-    ::frame::proto::Stream* temp = _impl_.value_oneof_.uniform_float_stream_;
-    _impl_.value_oneof_.uniform_float_stream_ = nullptr;
+    ::frame::proto::Plugin* temp = _impl_.value_oneof_.uniform_float_plugin_;
+    _impl_.value_oneof_.uniform_float_plugin_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline void Uniform::unsafe_arena_set_allocated_uniform_float_stream(::frame::proto::Stream* uniform_float_stream) {
+inline void Uniform::unsafe_arena_set_allocated_uniform_float_plugin(::frame::proto::Plugin* uniform_float_plugin) {
   clear_value_oneof();
-  if (uniform_float_stream) {
-    set_has_uniform_float_stream();
-    _impl_.value_oneof_.uniform_float_stream_ = uniform_float_stream;
+  if (uniform_float_plugin) {
+    set_has_uniform_float_plugin();
+    _impl_.value_oneof_.uniform_float_plugin_ = uniform_float_plugin;
   }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.Uniform.uniform_float_stream)
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.Uniform.uniform_float_plugin)
 }
-inline ::frame::proto::Stream* Uniform::_internal_mutable_uniform_float_stream() {
-  if (!_internal_has_uniform_float_stream()) {
+inline ::frame::proto::Plugin* Uniform::_internal_mutable_uniform_float_plugin() {
+  if (!_internal_has_uniform_float_plugin()) {
     clear_value_oneof();
-    set_has_uniform_float_stream();
-    _impl_.value_oneof_.uniform_float_stream_ = CreateMaybeMessage< ::frame::proto::Stream >(GetArenaForAllocation());
+    set_has_uniform_float_plugin();
+    _impl_.value_oneof_.uniform_float_plugin_ = CreateMaybeMessage< ::frame::proto::Plugin >(GetArenaForAllocation());
   }
-  return _impl_.value_oneof_.uniform_float_stream_;
+  return _impl_.value_oneof_.uniform_float_plugin_;
 }
-inline ::frame::proto::Stream* Uniform::mutable_uniform_float_stream() {
-  ::frame::proto::Stream* _msg = _internal_mutable_uniform_float_stream();
-  // @@protoc_insertion_point(field_mutable:frame.proto.Uniform.uniform_float_stream)
+inline ::frame::proto::Plugin* Uniform::mutable_uniform_float_plugin() {
+  ::frame::proto::Plugin* _msg = _internal_mutable_uniform_float_plugin();
+  // @@protoc_insertion_point(field_mutable:frame.proto.Uniform.uniform_float_plugin)
   return _msg;
 }
 
-// .frame.proto.Stream uniform_int_stream = 20;
-inline bool Uniform::_internal_has_uniform_int_stream() const {
-  return value_oneof_case() == kUniformIntStream;
+// .frame.proto.Plugin uniform_int_plugin = 20;
+inline bool Uniform::_internal_has_uniform_int_plugin() const {
+  return value_oneof_case() == kUniformIntPlugin;
 }
-inline bool Uniform::has_uniform_int_stream() const {
-  return _internal_has_uniform_int_stream();
+inline bool Uniform::has_uniform_int_plugin() const {
+  return _internal_has_uniform_int_plugin();
 }
-inline void Uniform::set_has_uniform_int_stream() {
-  _impl_._oneof_case_[0] = kUniformIntStream;
+inline void Uniform::set_has_uniform_int_plugin() {
+  _impl_._oneof_case_[0] = kUniformIntPlugin;
 }
-inline ::frame::proto::Stream* Uniform::release_uniform_int_stream() {
-  // @@protoc_insertion_point(field_release:frame.proto.Uniform.uniform_int_stream)
-  if (_internal_has_uniform_int_stream()) {
+inline ::frame::proto::Plugin* Uniform::release_uniform_int_plugin() {
+  // @@protoc_insertion_point(field_release:frame.proto.Uniform.uniform_int_plugin)
+  if (_internal_has_uniform_int_plugin()) {
     clear_has_value_oneof();
-    ::frame::proto::Stream* temp = _impl_.value_oneof_.uniform_int_stream_;
+    ::frame::proto::Plugin* temp = _impl_.value_oneof_.uniform_int_plugin_;
     if (GetArenaForAllocation() != nullptr) {
       temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
     }
-    _impl_.value_oneof_.uniform_int_stream_ = nullptr;
+    _impl_.value_oneof_.uniform_int_plugin_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline const ::frame::proto::Stream& Uniform::_internal_uniform_int_stream() const {
-  return _internal_has_uniform_int_stream()
-      ? *_impl_.value_oneof_.uniform_int_stream_
-      : reinterpret_cast< ::frame::proto::Stream&>(::frame::proto::_Stream_default_instance_);
+inline const ::frame::proto::Plugin& Uniform::_internal_uniform_int_plugin() const {
+  return _internal_has_uniform_int_plugin()
+      ? *_impl_.value_oneof_.uniform_int_plugin_
+      : reinterpret_cast< ::frame::proto::Plugin&>(::frame::proto::_Plugin_default_instance_);
 }
-inline const ::frame::proto::Stream& Uniform::uniform_int_stream() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Uniform.uniform_int_stream)
-  return _internal_uniform_int_stream();
+inline const ::frame::proto::Plugin& Uniform::uniform_int_plugin() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Uniform.uniform_int_plugin)
+  return _internal_uniform_int_plugin();
 }
-inline ::frame::proto::Stream* Uniform::unsafe_arena_release_uniform_int_stream() {
-  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.Uniform.uniform_int_stream)
-  if (_internal_has_uniform_int_stream()) {
+inline ::frame::proto::Plugin* Uniform::unsafe_arena_release_uniform_int_plugin() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.Uniform.uniform_int_plugin)
+  if (_internal_has_uniform_int_plugin()) {
     clear_has_value_oneof();
-    ::frame::proto::Stream* temp = _impl_.value_oneof_.uniform_int_stream_;
-    _impl_.value_oneof_.uniform_int_stream_ = nullptr;
+    ::frame::proto::Plugin* temp = _impl_.value_oneof_.uniform_int_plugin_;
+    _impl_.value_oneof_.uniform_int_plugin_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline void Uniform::unsafe_arena_set_allocated_uniform_int_stream(::frame::proto::Stream* uniform_int_stream) {
+inline void Uniform::unsafe_arena_set_allocated_uniform_int_plugin(::frame::proto::Plugin* uniform_int_plugin) {
   clear_value_oneof();
-  if (uniform_int_stream) {
-    set_has_uniform_int_stream();
-    _impl_.value_oneof_.uniform_int_stream_ = uniform_int_stream;
+  if (uniform_int_plugin) {
+    set_has_uniform_int_plugin();
+    _impl_.value_oneof_.uniform_int_plugin_ = uniform_int_plugin;
   }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.Uniform.uniform_int_stream)
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.Uniform.uniform_int_plugin)
 }
-inline ::frame::proto::Stream* Uniform::_internal_mutable_uniform_int_stream() {
-  if (!_internal_has_uniform_int_stream()) {
+inline ::frame::proto::Plugin* Uniform::_internal_mutable_uniform_int_plugin() {
+  if (!_internal_has_uniform_int_plugin()) {
     clear_value_oneof();
-    set_has_uniform_int_stream();
-    _impl_.value_oneof_.uniform_int_stream_ = CreateMaybeMessage< ::frame::proto::Stream >(GetArenaForAllocation());
+    set_has_uniform_int_plugin();
+    _impl_.value_oneof_.uniform_int_plugin_ = CreateMaybeMessage< ::frame::proto::Plugin >(GetArenaForAllocation());
   }
-  return _impl_.value_oneof_.uniform_int_stream_;
+  return _impl_.value_oneof_.uniform_int_plugin_;
 }
-inline ::frame::proto::Stream* Uniform::mutable_uniform_int_stream() {
-  ::frame::proto::Stream* _msg = _internal_mutable_uniform_int_stream();
-  // @@protoc_insertion_point(field_mutable:frame.proto.Uniform.uniform_int_stream)
+inline ::frame::proto::Plugin* Uniform::mutable_uniform_int_plugin() {
+  ::frame::proto::Plugin* _msg = _internal_mutable_uniform_int_plugin();
+  // @@protoc_insertion_point(field_mutable:frame.proto.Uniform.uniform_int_plugin)
   return _msg;
 }
 
@@ -1443,72 +1360,6 @@ inline ::frame::proto::UniformInts* Uniform::_internal_mutable_uniform_ints() {
 inline ::frame::proto::UniformInts* Uniform::mutable_uniform_ints() {
   ::frame::proto::UniformInts* _msg = _internal_mutable_uniform_ints();
   // @@protoc_insertion_point(field_mutable:frame.proto.Uniform.uniform_ints)
-  return _msg;
-}
-
-// .frame.proto.UniformBools uniform_bools = 12;
-inline bool Uniform::_internal_has_uniform_bools() const {
-  return value_oneof_case() == kUniformBools;
-}
-inline bool Uniform::has_uniform_bools() const {
-  return _internal_has_uniform_bools();
-}
-inline void Uniform::set_has_uniform_bools() {
-  _impl_._oneof_case_[0] = kUniformBools;
-}
-inline ::frame::proto::UniformBools* Uniform::release_uniform_bools() {
-  // @@protoc_insertion_point(field_release:frame.proto.Uniform.uniform_bools)
-  if (_internal_has_uniform_bools()) {
-    clear_has_value_oneof();
-    ::frame::proto::UniformBools* temp = _impl_.value_oneof_.uniform_bools_;
-    if (GetArenaForAllocation() != nullptr) {
-      temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
-    }
-    _impl_.value_oneof_.uniform_bools_ = nullptr;
-    return temp;
-  } else {
-    return nullptr;
-  }
-}
-inline const ::frame::proto::UniformBools& Uniform::_internal_uniform_bools() const {
-  return _internal_has_uniform_bools()
-      ? *_impl_.value_oneof_.uniform_bools_
-      : reinterpret_cast< ::frame::proto::UniformBools&>(::frame::proto::_UniformBools_default_instance_);
-}
-inline const ::frame::proto::UniformBools& Uniform::uniform_bools() const {
-  // @@protoc_insertion_point(field_get:frame.proto.Uniform.uniform_bools)
-  return _internal_uniform_bools();
-}
-inline ::frame::proto::UniformBools* Uniform::unsafe_arena_release_uniform_bools() {
-  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.Uniform.uniform_bools)
-  if (_internal_has_uniform_bools()) {
-    clear_has_value_oneof();
-    ::frame::proto::UniformBools* temp = _impl_.value_oneof_.uniform_bools_;
-    _impl_.value_oneof_.uniform_bools_ = nullptr;
-    return temp;
-  } else {
-    return nullptr;
-  }
-}
-inline void Uniform::unsafe_arena_set_allocated_uniform_bools(::frame::proto::UniformBools* uniform_bools) {
-  clear_value_oneof();
-  if (uniform_bools) {
-    set_has_uniform_bools();
-    _impl_.value_oneof_.uniform_bools_ = uniform_bools;
-  }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.Uniform.uniform_bools)
-}
-inline ::frame::proto::UniformBools* Uniform::_internal_mutable_uniform_bools() {
-  if (!_internal_has_uniform_bools()) {
-    clear_value_oneof();
-    set_has_uniform_bools();
-    _impl_.value_oneof_.uniform_bools_ = CreateMaybeMessage< ::frame::proto::UniformBools >(GetArenaForAllocation());
-  }
-  return _impl_.value_oneof_.uniform_bools_;
-}
-inline ::frame::proto::UniformBools* Uniform::mutable_uniform_bools() {
-  ::frame::proto::UniformBools* _msg = _internal_mutable_uniform_bools();
-  // @@protoc_insertion_point(field_mutable:frame.proto.Uniform.uniform_bools)
   return _msg;
 }
 

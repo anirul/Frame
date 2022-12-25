@@ -1,6 +1,6 @@
 # Blender v2.80 (sub 75) OBJ File: ''
 # www.blender.org
-mtllib Apple.mtl
+mtllib apple.mtl
 o Apple
 v 0.055240 0.399340 0.034600
 v 0.055930 0.399900 0.033840

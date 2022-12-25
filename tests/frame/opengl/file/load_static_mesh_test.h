@@ -3,13 +3,13 @@
 #include <gtest/gtest.h>
 
 #include "frame/file/obj.h"
-#include "frame/opengl/window.h"
+#include "frame/window_factory.h"
 
 namespace test {
 
 class LoadStaticMeshTest : public testing::Test {
    public:
-    LoadStaticMeshTest() { window_ = frame::opengl::CreateNoneOpenGL({ 320, 200 }); }
+    LoadStaticMeshTest() : window_(frame::CreateNewWindow(frame::DrawingTargetEnum::NONE)) {}
 
    protected:
     std::shared_ptr<frame::WindowInterface> window_ = nullptr;

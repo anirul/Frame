@@ -1,7 +1,5 @@
 # Frame Import.
 
-find_path(HAPPLY_INCLUDE_DIRS "happly.h")
-
 add_library(FrameFile
   STATIC
   	${CMAKE_SOURCE_DIR}/include/frame/file/file_system.h
@@ -21,6 +19,7 @@ target_include_directories(FrameFile
     ${CMAKE_CURRENT_BINARY_DIR}
   PRIVATE
     ${HAPPLY_INCLUDE_DIRS}
+    ${STB_INCLUDE_DIRS}
 )
 
 target_link_libraries(FrameFile
@@ -28,8 +27,7 @@ target_link_libraries(FrameFile
     Frame
     FrameJson
     FrameOpenGL
-#   stb::stb
-#   tinyobjloader
+    tinyobjloader::tinyobjloader
 )
 
 set_property(TARGET FrameFile PROPERTY FOLDER "Frame")

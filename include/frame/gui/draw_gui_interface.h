@@ -2,8 +2,8 @@
 
 #include <functional>
 
-#include "frame/draw_interface.h"
 #include "frame/name_interface.h"
+#include "frame/plugin_interface.h"
 
 namespace frame::gui {
 
@@ -21,7 +21,7 @@ struct GuiWindowInterface : public NameInterface {
  * @class DrawGuiInterface
  * @brief Interface for drawing GUI elements.
  */
-class DrawGuiInterface : public DrawInterface {
+class DrawGuiInterface : public PluginInterface {
    public:
     //! @brief Virtual destructor.
     virtual ~DrawGuiInterface() = default;
@@ -40,6 +40,16 @@ class DrawGuiInterface : public DrawInterface {
      * @param name: the name of the window to be deleted.
      */
     virtual void DeleteWindow(const std::string& name) = 0;
+    /**
+     * @brief Is the draw gui active?
+     * @param enable: True if enable.
+     */
+    virtual void SetVisible(bool enable) = 0;
+    /**
+     * @brief Is the draw gui active?
+     * @return True if enable.
+     */
+    virtual bool IsVisible() const = 0;
 };
 
 }  // End namespace frame::gui.

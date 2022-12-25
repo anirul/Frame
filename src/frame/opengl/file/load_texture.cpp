@@ -21,6 +21,7 @@ namespace frame::opengl::file {
 namespace {
 
 // Get the 6 view for the cube map.
+// CHECKME(anirul): Why mat4? why not mat3 or having an individual 1 in the 4th column?
 const std::array<glm::mat4, 6> views_cubemap = {
     glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f),
                 glm::vec3(0.0f, -1.0f, 0.0f)),
@@ -163,8 +164,8 @@ std::uint32_t PowerFloor(std::uint32_t x) {
 
 std::unique_ptr<frame::TextureInterface> LoadTextureFromFile(
     const std::filesystem::path& file,
-    const proto::PixelElementSize pixel_element_size /*= proto::PixelElementSize_BYTE()*/,
-    const proto::PixelStructure pixel_structure /*= proto::PixelStructure_RGB()*/) {
+    proto::PixelElementSize pixel_element_size /*= proto::PixelElementSize_BYTE()*/,
+    proto::PixelStructure pixel_structure /*= proto::PixelStructure_RGB()*/) {
     frame::file::Image image(file, pixel_element_size, pixel_structure);
     TextureParameter texture_parameter = { pixel_element_size, pixel_structure, image.GetSize(),
                                            image.Data() };
@@ -173,8 +174,8 @@ std::unique_ptr<frame::TextureInterface> LoadTextureFromFile(
 
 std::unique_ptr<frame::TextureInterface> LoadCubeMapTextureFromFile(
     const std::filesystem::path& file,
-    const proto::PixelElementSize pixel_element_size /*= proto::PixelElementSize_BYTE()*/,
-    const proto::PixelStructure pixel_structure /*= proto::PixelStructure_RGB()*/) {
+    proto::PixelElementSize pixel_element_size /*= proto::PixelElementSize_BYTE()*/,
+    proto::PixelStructure pixel_structure /*= proto::PixelStructure_RGB()*/) {
     auto& logger         = Logger::GetInstance();
     auto equirectangular = LoadTextureFromFile(file, pixel_element_size, pixel_structure);
     if (!equirectangular) {
@@ -183,19 +184,18 @@ std::unique_ptr<frame::TextureInterface> LoadCubeMapTextureFromFile(
     }
     auto size = equirectangular->GetSize();
     // Seams correct when you are less than 2048 in height you get 512.
-    std::uint32_t cube_single_res                         = PowerFloor(size.second) / 2;
-    std::pair<std::uint32_t, std::uint32_t> cube_pair_res = { cube_single_res, cube_single_res };
+    std::uint32_t cube_single_res                         = PowerFloor(size.y) / 2;
+    glm::uvec2 cube_pair_res = { cube_single_res, cube_single_res };
     std::map<std::string, std::string> filling_map        = {
                { "<filename>", file.string() },
-               { "<x>", std::to_string(cube_pair_res.first) },
-               { "<y>", std::to_string(cube_pair_res.second) },
+               { "<x>", std::to_string(cube_pair_res.x) },
+               { "<y>", std::to_string(cube_pair_res.y) },
                { "<pixel_element_size>", PixelElementSize_Enum_Name(pixel_element_size.value()) },
                { "<pixel_structure>", "RGB" }
     };
     // TODO(anirul): Fix this!
-    auto level = frame::proto::ParseLevel(
-        cube_pair_res,
-        FillLevel(proto_level_json, filling_map), nullptr);
+    auto level =
+        frame::proto::ParseLevel(cube_pair_res, FillLevel(proto_level_json, filling_map), nullptr);
     if (!level) {
         logger->info("Could not create level.");
         return nullptr;
@@ -205,8 +205,8 @@ std::unique_ptr<frame::TextureInterface> LoadCubeMapTextureFromFile(
         logger->info("Could not get the id of \"OutputTexture\".");
         return nullptr;
     }
-    auto* out_texture_ptr = level->GetTextureFromId(maybe_id);
-    Renderer renderer(level.get(), cube_pair_res);
+    Renderer renderer({ nullptr, nullptr, level.get() },
+                      { 0, 0, cube_pair_res.x, cube_pair_res.y });
     StaticMeshInterface* mesh_ptr = level->GetStaticMeshFromId(level->GetDefaultStaticMeshQuadId());
     if (!mesh_ptr) throw std::runtime_error("No default cube mesh found.");
     auto material_id = level->GetIdFromName("EquirectangularMaterial");
@@ -225,13 +225,12 @@ std::unique_ptr<frame::TextureInterface> LoadCubeMapTextureFromFile(
 
 std::unique_ptr<frame::TextureInterface> LoadCubeMapTextureFromFiles(
     const std::array<std::filesystem::path, 6>& files,
-    const proto::PixelElementSize pixel_element_size /*= proto::PixelElementSize_BYTE()*/,
-    const proto::PixelStructure pixel_structure /*= proto::PixelStructure_RGB()*/) {
+    proto::PixelElementSize pixel_element_size /*= proto::PixelElementSize_BYTE()*/,
+    proto::PixelStructure pixel_structure /*= proto::PixelStructure_RGB()*/) {
     std::array<std::filesystem::path, 6> final_files = {};
     for (int i = 0; i < final_files.size(); ++i) {
         final_files[i] = frame::file::FindFile(files[i]);
     }
-    std::pair<std::uint32_t, std::uint32_t> img_size;
     std::array<std::unique_ptr<frame::file::Image>, 6> images;
     std::array<void*, 6> pointers      = {};
     TextureParameter texture_parameter = { pixel_element_size, pixel_structure };

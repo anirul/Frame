@@ -13,35 +13,38 @@ Application::Application(std::unique_ptr<frame::WindowInterface>&& window)
 
 void Application::Startup(std::filesystem::path path) {
     assert(window_);
-    if (index_ != -1) {
-        window_->RemoveDrawInterface(index_);
+    auto device = window_->GetUniqueDevice();
+    assert(device);
+    if (!plugin_name_.empty()) {
+        device->RemovePluginByName(plugin_name_);
     }
-    index_ = window_->AddDrawInterface(
-        std::make_unique<Draw>(window_->GetSize(), path, window_->GetUniqueDevice()));
+    auto plugin  = std::make_unique<Draw>(window_->GetSize(), path, device);
+    plugin_name_ = "ApplicationDraw";
+    plugin->SetName(plugin_name_);
+    device->AddPlugin(std::move(plugin));
 }
 
 void Application::Startup(std::unique_ptr<frame::LevelInterface>&& level) {
     assert(window_);
-    if (index_ != -1) {
-        window_->RemoveDrawInterface(index_);
+    auto device = window_->GetUniqueDevice();
+    assert(device);
+    if (!plugin_name_.empty()) {
+        device->RemovePluginByName(plugin_name_);
     }
-    index_ = window_->AddDrawInterface(
-        std::make_unique<Draw>(window_->GetSize(), std::move(level), window_->GetUniqueDevice()));
+    auto plugin  = std::make_unique<Draw>(window_->GetSize(), std::move(level), device);
+    plugin_name_ = "ApplicationDraw";
+    plugin->SetName(plugin_name_);
+    device->AddPlugin(std::move(plugin));
 }
 
-void Application::Resize(std::pair<std::uint32_t, std::uint32_t> size) {
+void Application::Resize(glm::uvec2 size, FullScreenEnum fullscreen_enum) {
     assert(window_);
-    window_->Resize(size);
+    window_->Resize(size, fullscreen_enum);
 }
 
 void Application::Run() {
     assert(window_);
     window_->Run();
-}
-
-void Application::SetFullscreen(frame::FullScreenEnum fullscreen_mode) {
-    assert(window_);
-    window_->SetFullScreen(fullscreen_mode);
 }
 
 }  // End namespace frame::common.

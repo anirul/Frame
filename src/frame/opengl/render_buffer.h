@@ -33,7 +33,7 @@ class RenderBuffer : public BindInterface {
 	* @brief Create a storage in the render buffer, this will bind and unbind!
 	* @param size: Render buffer size.
 	*/
-    void CreateStorage(const std::pair<std::uint32_t, std::uint32_t> size) const;
+    void CreateStorage(glm::uvec2 size) const;
 
    public:
     /**

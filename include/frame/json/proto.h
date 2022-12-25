@@ -18,6 +18,7 @@
 #include "frame/proto/material.pb.h"
 #include "frame/proto/math.pb.h"
 #include "frame/proto/pixel.pb.h"
+#include "frame/proto/plugin.pb.h"
 #include "frame/proto/program.pb.h"
 #include "frame/proto/scene.pb.h"
 #include "frame/proto/size.pb.h"

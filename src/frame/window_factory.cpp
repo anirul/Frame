@@ -16,19 +16,21 @@ namespace frame {
  * @return A unique pointer to a window.
  */
 std::unique_ptr<frame::WindowInterface> CreateNewWindow(
-    WindowEnum window_enum, DeviceEnum device_enum, std::pair<std::uint32_t, std::uint32_t> size) {
-    switch (window_enum) {
-        case WindowEnum::NONE:
-            switch (device_enum) {
-                case DeviceEnum::OPENGL:
-                    return frame::opengl::CreateNoneOpenGL(size);
+    DrawingTargetEnum drawing_target_enum /* = DrawingTargetEnum::WINDOW*/,
+    RenderingAPIEnum rendering_api_enum /*   = RenderingAPIEnum::OPENGL*/,
+    glm::uvec2 size /*                       = { 320, 200 }*/) {
+    switch (drawing_target_enum) {
+        case DrawingTargetEnum::NONE:
+            switch (rendering_api_enum) {
+                case RenderingAPIEnum::OPENGL:
+                    return frame::opengl::CreateSDL2OpenGLNone(size);
                 default:
                     throw std::runtime_error("Unsupported device enum.");
             }
-        case WindowEnum::SDL2:
-            switch (device_enum) {
-                case DeviceEnum::OPENGL:
-                    return frame::opengl::CreateSDL2OpenGL(size);
+        case DrawingTargetEnum::WINDOW:
+            switch (rendering_api_enum) {
+                case RenderingAPIEnum::OPENGL:
+                    return frame::opengl::CreateSDL2OpenGLWindow(size);
                 default:
                     throw std::runtime_error("Unsupported device enum.");
             }

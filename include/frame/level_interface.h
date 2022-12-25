@@ -11,7 +11,6 @@
 #include "frame/node_interface.h"
 #include "frame/program_interface.h"
 #include "frame/static_mesh_interface.h"
-#include "frame/stream_interface.h"
 #include "frame/texture_interface.h"
 
 namespace frame {
@@ -62,30 +61,6 @@ class LevelInterface {
      * @return A pointer to a static mesh or null.
      */
     virtual StaticMeshInterface* GetStaticMeshFromId(EntityId id) const = 0;
-    /**
-     * @brief Will get a buffer stream from an id.
-     * @param id: The id to get the stream from.
-     * @return A pointer to a stream or null.
-     */
-    virtual StreamInterface<float>* GetBufferStreamFromId(EntityId id) const = 0;
-    /**
-     * @brief Will get a uniform from an id.
-     * @param id: The id to get the uniform from.
-     * @return A pointer to a stream or null.
-     */
-    virtual StreamInterface<float>* GetUniformFloatStreamFromId(EntityId id) const = 0;
-    /**
-     * @brief Will get a uniform from an id.
-     * @param id: The id to get the uniform from.
-     * @return A pointer to a stream or null.
-     */
-    virtual StreamInterface<std::int32_t>* GetUniformIntStreamFromId(EntityId id) const = 0;
-    /**
-     * @brief Will get a texture stream from an id.
-     * @param id: The id to get the stream from.
-     * @return A pointer to a stream or null.
-     */
-    virtual StreamInterface<std::uint8_t>* GetTextureStreamFromId(EntityId id) const = 0;
     /**
      * @brief Get a vector of static mesh id and corresponding material id.
      * @return Vector of static mesh id and corresponding material id.
@@ -197,30 +172,6 @@ class LevelInterface {
      */
     virtual void RemoveBuffer(EntityId buffer) = 0;
     /**
-     * @brief Add a buffer stream to the level.
-     * @param stream: Move a stream in the level.
-     * @return Assigned entity id or error.
-     */
-    virtual EntityId AddBufferStream(StreamInterface<float>* stream) = 0;
-    /**
-     * @brief Add a uniform to the level.
-     * @param stream: Move a uniform in the level.
-     * @return Assigned entity id or error.
-     */
-    virtual EntityId AddUniformFloatStream(StreamInterface<float>* stream) = 0;
-    /**
-     * @brief Add a uniform to the level.
-     * @param stream: Move a uniform in the level.
-     * @return Assigned entity id or error.
-     */
-    virtual EntityId AddUniformIntStream(StreamInterface<std::int32_t>* stream) = 0;
-    /**
-     * @brief Add a texture stream to the level.
-     * @param stream: Move a stream in the level.
-     * @return Assigned entity id or error.
-     */
-    virtual EntityId AddTextureStream(StreamInterface<std::uint8_t>* stream) = 0;
-    /**
      * @brief Add a static mesh to the level.
      * @param static_mesh: Move a buffer in the level.
      * @return Assigned entity id or error.
@@ -233,27 +184,10 @@ class LevelInterface {
      */
     virtual void AddMeshMaterialId(EntityId node_id, EntityId material_id) = 0;
     /**
-     * @brief This add a correspondence between a stream and an texture id.
-     * @param stream_id: Stream id.
-     * @param texture_id: Texture id.
+     * @brief Get all texture from the level.
+     * @return A vector of texture ids.
      */
-    virtual void AddStreamTextureCorrespondence(EntityId stream_id, EntityId texture_id) = 0;
-    /**
-     * @brief This add a correspondence between a stream and an buffer id.
-     * @param stream_id: Stream id.
-     * @param buffer_id: Buffer id.
-     */
-    virtual void AddStreamBufferCorrespondence(EntityId stream_id, EntityId buffer_id) = 0;
-    /**
-     * @brief Return a vector of entity id that are part of the uniform stream.
-     * @return The list of ids of uniform stream.
-     */
-    virtual std::vector<EntityId> GetUniformFloatStreamIds() const = 0;
-    /**
-     * @brief Return a vector of entity id that are part of the uniform stream.
-     * @return The list of ids of uniform stream.
-     */
-    virtual std::vector<EntityId> GetUniformIntStreamIds() const = 0;
+    virtual std::vector<EntityId> GetAllTextures() const = 0;
     /**
      * @brief Extract a texture (move it) from the level to outside (used in special cases).
      * @warning This will invalidate this entry!
@@ -266,6 +200,27 @@ class LevelInterface {
      * @return A pointer to the default camera.
      */
     virtual Camera* GetDefaultCamera() = 0;
+    /**
+     * @brief Get enum type from Id.
+     * @param id: Id to be returned.
+     * @return An enum type.
+     */
+    virtual EntityTypeEnum GetEnumTypeFromId(EntityId id) const = 0;
+    /**
+     * @brief Replace a texture to a new texture given as a vector.
+     * @param vector: The new vector containing the new texture.
+     * @param size: Size of the new texture.
+     * @param bytes_per_pixels: Byte per pixel in the new texture.
+     * @param id: The id of the texture to be replaced.
+     */
+    virtual void ReplaceTexture(std::vector<std::uint8_t>&& vector, glm::uvec2 size,
+                                std::uint8_t bytes_per_pixel, EntityId id) = 0;
+    /**
+     * @brief Replace a mesh in the mesh vector in the entity management element.
+     * @param mesh: A unique pointer to the mesh.
+     * @param id: The id to replace the mesh.
+     */
+    virtual void ReplaceMesh(std::unique_ptr<StaticMeshInterface>&& mesh, EntityId id) = 0;
 };
 
 }  // End namespace frame.

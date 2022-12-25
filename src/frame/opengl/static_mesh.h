@@ -19,43 +19,6 @@
 namespace frame::opengl {
 
 /**
- * @class Mesh config
- * @brief This class is there to pass entity id of buffer and a config parameter.
- */
-struct StaticMeshConfig {
-    //! @brief Buffer of points (this has to be present cannot be generated).
-    EntityId point_buffer_id = NullId;
-    //! @brief Buffer of points size (should be 3).
-    std::uint32_t point_buffer_size = 3;
-    //! @brief Buffer of colors (can be generated as white).
-    EntityId color_buffer_id = NullId;
-    //! @brief Buffer of colors size (should be 3).
-    std::uint32_t color_buffer_size = 3;
-    //! @brief Buffer of normal (will be generated as 0, 0, -1).
-    EntityId normal_buffer_id = NullId;
-    //! @brief Buffer of normal size (should be 3).
-    std::uint32_t normal_buffer_size = 3;
-    //! @brief Texture coordinates (will be generated as 0.5, 0.5).
-    EntityId texture_buffer_id = NullId;
-    //! @brief Texture coordinates size (should be 2).
-    std::uint32_t texture_buffer_size = 2;
-    //! @brief Index of the points 3 per triangle 2 per line and 1 per point.
-    EntityId index_buffer_id = NullId;
-    //! @brief The kind of draw that the mesh is.
-    proto::SceneStaticMesh::RenderPrimitiveEnum render_primitive_enum =
-        proto::SceneStaticMesh::TRIANGLE;
-    //! @brief what kind of buffer will be generated (no point of course).
-    enum class StaticMeshConfigEnum {
-        GENERATE_COLOR,
-        GENERATE_INDEX,
-        GENERATE_TEXTURE_COORDINATE,
-        GENERATE_NORMAL,
-    };
-    //! @brief The list of generated buffers.
-    std::set<StaticMeshConfigEnum> generate_list = {};
-};
-
-/**
  * @class StaticMesh
  * @brief A static mesh is a mesh that cannot change over time (no skeleton).
  */
@@ -66,7 +29,7 @@ class StaticMesh : public BindInterface, public StaticMeshInterface {
      * @param level: The level into witch the class will be generated.
      * @param config: The static mesh config structure.
      */
-    StaticMesh(LevelInterface* level, const StaticMeshConfig& config);
+    StaticMesh(LevelInterface* level, const StaticMeshParameter& parameters);
     //! @brief Virtual destructor.
     virtual ~StaticMesh();
 
@@ -190,15 +153,5 @@ EntityId CreateQuadStaticMesh(LevelInterface* level);
  * @return Will return an entity id if successful.
  */
 EntityId CreateCubeStaticMesh(LevelInterface* level);
-/**
- * @brief Create a static mesh.
- * TODO(anirul): Return an entity id? or a unique ptr (to a static mesh interface)? also on
- * parameters?
- * @param level: The mesh will be added to this level.
- * @return Will return a pointer to a static mesh interface.
- */
-std::unique_ptr<StaticMeshInterface> CreateStaticMesh(LevelInterface* level,
-                                                      std::vector<float>&& vector,
-                                                      std::uint32_t point_buffer_size);
 
 }  // End namespace frame::opengl.

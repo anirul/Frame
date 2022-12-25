@@ -2,7 +2,7 @@ syntax = "proto3";
 
 import "size.proto";
 import "pixel.proto";
-import "stream.proto";
+import "plugin.proto";
 
 package frame.proto;
 
@@ -90,7 +90,7 @@ message Texture {
 		// Load from a file.
 		string file_name = 14;
 		// Load from a stream.
-		Stream stream = 17;
+		Plugin plugin = 17;
 		// Load from files, this is suppose to represent the 6 face of a cube map.
 		CubeMapFiles file_names = 15;
     }

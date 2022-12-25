@@ -5,14 +5,14 @@
 #include "frame/file/file_system.h"
 #include "frame/level_interface.h"
 #include "frame/node_interface.h"
-#include "frame/opengl/window.h"
+#include "frame/window_factory.h"
 
 namespace test {
 
 class ParseSceneTreeTest : public testing::Test {
    public:
     ParseSceneTreeTest() {
-        window_      = frame::opengl::CreateNoneOpenGL({ 320, 200 });
+        window_      = frame::CreateNewWindow(frame::DrawingTargetEnum::NONE);
         proto_level_ = frame::proto::LoadProtoFromJsonFile<frame::proto::Level>(
             frame::file::FindFile("asset/json/scene_tree_test.json"));
     }

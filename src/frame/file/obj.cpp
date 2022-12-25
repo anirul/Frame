@@ -39,8 +39,9 @@ Obj::Obj(const std::filesystem::path& file_name) {
     const auto file      = file_name.filename();
 
     std::string err;
-    bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, &file_name.string(),
-                                directory.string().append("/").c_str());
+    std::string warn;
+    tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, file_name.string().c_str(),
+                     directory.string().append("/").c_str());
 
     if (!err.empty()) {
         logger_->error(err);

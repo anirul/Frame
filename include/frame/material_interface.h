@@ -18,7 +18,8 @@ class LevelInterface;
  * so that you know which program to run on each pixel (fragment shader mostly). For now this is not
  * saving a local copy of the level so you'll have to pass it through.
  */
-struct MaterialInterface : public NameInterface {
+class MaterialInterface : public NameInterface {
+   public:
     //! @brief Virtual destructor.
     virtual ~MaterialInterface() = default;
     /**

@@ -13,7 +13,8 @@ namespace frame {
  * @param size: The size of the window.
  * @return A unique pointer to a window.
  */
-std::unique_ptr<WindowInterface> CreateNewWindow(WindowEnum window_enum, DeviceEnum device_enum,
-                                                 std::pair<std::uint32_t, std::uint32_t> size);
+std::unique_ptr<WindowInterface> CreateNewWindow(
+    DrawingTargetEnum drawing_target_enum = DrawingTargetEnum::WINDOW,
+    RenderingAPIEnum rendering_api_enum = RenderingAPIEnum::OPENGL, glm::uvec2 size = { 320, 200 });
 
 }  // End namespace frame.

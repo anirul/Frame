@@ -1,5 +1,7 @@
 #pragma once
 
+#include <glm/glm.hpp>
+
 #include "frame/json/proto.h"
 
 namespace frame {
@@ -15,12 +17,12 @@ struct ImageInterface {
      * @brief Get size of the image.
      * @return The size of the image.
      */
-    virtual const std::pair<std::uint32_t, std::uint32_t> GetSize() const = 0;
+    virtual glm::uvec2 GetSize() const = 0;
     /**
      * @brief Get the length of the image (should be size.x * size.y).
      * @return The size of the image in linear.
      */
-    virtual const int GetLength() const = 0;
+    virtual int GetLength() const = 0;
     /**
      * @brief Get a pointer to the underlying structure.
      * @return A void pointer to the data structure.
@@ -35,12 +37,12 @@ struct ImageInterface {
      * @brief Get pixel element size (BYTE/SHOT/HALF/FLOAT).
      * @return The proto pixel element size.
      */
-    virtual const proto::PixelElementSize GetPixelElementSize() const = 0;
+    virtual proto::PixelElementSize GetPixelElementSize() const = 0;
     /**
      * @brief Get pixel structure (R/RG/RGB/RGBA).
      * @return The proto pixel structure.
      */
-    virtual const proto::PixelStructure GetPixelStructure() const = 0;
+    virtual proto::PixelStructure GetPixelStructure() const = 0;
 };
 
 }  // End namespace frame.

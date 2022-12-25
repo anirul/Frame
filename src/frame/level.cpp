@@ -135,58 +135,6 @@ EntityId Level::AddStaticMesh(std::unique_ptr<StaticMeshInterface>&& static_mesh
     return id;
 }
 
-EntityId Level::AddBufferStream(StreamInterface<float>* stream) {
-    EntityId id      = GetStreamNewId();
-    std::string name = stream->GetName();
-    // CHECKME(anirul): maybe this should return std::nullopt.
-    if (string_set_.count(name)) throw std::runtime_error("Name: " + name + " is already in!");
-    string_set_.insert(name);
-    id_buffer_stream_map_.insert({ id, std::move(stream) });
-    id_name_map_.insert({ id, name });
-    name_id_map_.insert({ name, id });
-    id_enum_map_.insert({ id, EntityTypeEnum::STREAM });
-    return id;
-}
-
-EntityId Level::AddUniformFloatStream(StreamInterface<float>* stream) {
-    EntityId id      = GetStreamNewId();
-    std::string name = stream->GetName();
-    // CHECKME(anirul): maybe this should return std::nullopt.
-    if (string_set_.count(name)) throw std::runtime_error("Name: " + name + " is already in!");
-    string_set_.insert(name);
-    id_uniform_float_stream_map_.insert({ id, std::move(stream) });
-    id_name_map_.insert({ id, name });
-    name_id_map_.insert({ name, id });
-    id_enum_map_.insert({ id, EntityTypeEnum::STREAM });
-    return id;
-}
-
-EntityId Level::AddUniformIntStream(StreamInterface<std::int32_t>* stream) {
-    EntityId id      = GetStreamNewId();
-    std::string name = stream->GetName();
-    // CHECKME(anirul): maybe this should return std::nullopt.
-    if (string_set_.count(name)) throw std::runtime_error("Name: " + name + " is already in!");
-    string_set_.insert(name);
-    id_uniform_int_stream_map_.insert({ id, std::move(stream) });
-    id_name_map_.insert({ id, name });
-    name_id_map_.insert({ name, id });
-    id_enum_map_.insert({ id, EntityTypeEnum::STREAM });
-    return id;
-}
-
-EntityId Level::AddTextureStream(StreamInterface<std::uint8_t>* stream) {
-    EntityId id      = GetStreamNewId();
-    std::string name = stream->GetName();
-    // CHECKME(anirul): maybe this should return std::nullopt.
-    if (string_set_.count(name)) throw std::runtime_error("Name: " + name + " is already in!");
-    string_set_.insert(name);
-    id_texture_stream_map_.insert({ id, std::move(stream) });
-    id_name_map_.insert({ id, name });
-    name_id_map_.insert({ name, id });
-    id_enum_map_.insert({ id, EntityTypeEnum::STREAM });
-    return id;
-}
-
 std::optional<std::vector<frame::EntityId>> Level::GetChildList(EntityId id) const {
     std::vector<EntityId> list;
     try {
@@ -214,6 +162,14 @@ EntityId Level::GetParentId(EntityId id) const {
         logger_->warn(ex.what());
         return NullId;
     }
+}
+
+std::vector<frame::EntityId> Level::GetAllTextures() const {
+    std::vector<EntityId> list;
+    for (const auto& id_texture : id_texture_map_) {
+        list.push_back(id_texture.first);
+    }
+    return list;
 }
 
 std::unique_ptr<frame::TextureInterface> Level::ExtractTexture(EntityId id) {
@@ -246,67 +202,8 @@ frame::Camera* Level::GetDefaultCamera() {
     return node_camera->GetCamera();
 }
 
-void Level::AddStreamTextureCorrespondence(EntityId stream_id, EntityId texture_id) {
-    if (!id_texture_stream_map_.count(stream_id))
-        throw std::runtime_error(fmt::format("No {} stream found.", stream_id));
-    if (!id_texture_map_.count(texture_id))
-        throw std::runtime_error(fmt::format("No {} texture found.", texture_id));
-    stream_texture_ids_.push_back({ stream_id, texture_id });
-}
-
-void Level::AddStreamBufferCorrespondence(EntityId stream_id, EntityId buffer_id) {
-    if (!id_buffer_stream_map_.count(stream_id))
-        throw std::runtime_error(fmt::format("No {} stream found.", stream_id));
-    for (const auto& p : id_static_mesh_map_) {
-        const auto* mesh = p.second.get();
-        if (mesh->GetPointBufferId() == buffer_id) {
-            stream_static_mesh_ids_.push_back({ stream_id, p.first });
-            return;
-        }
-    }
-    throw std::runtime_error(
-        fmt::format("Error didn't find any mesh with point buffer id {}", buffer_id));
-}
-
-std::vector<frame::EntityId> Level::GetUniformFloatStreamIds() const {
-    std::vector<EntityId> list;
-    for (const auto& [id, _] : id_uniform_float_stream_map_) {
-        list.push_back(id);
-    }
-    return list;
-}
-
-std::vector<frame::EntityId> Level::GetUniformIntStreamIds() const {
-    std::vector<EntityId> list;
-    for (const auto& [id, _] : id_uniform_int_stream_map_) {
-        list.push_back(id);
-    }
-    return list;
-}
-
-void Level::Update(DeviceInterface* device, ProgramInterface* program, double dt /*= 0.0*/) {
-    for (const auto [stream_id, texture_id] : stream_texture_ids_) {
-        auto* stream = GetTextureStreamFromId(stream_id);
-        auto vector  = stream->ExtractVector();
-        if (vector.empty()) continue;
-        ReplaceTexture(std::move(vector), stream->GetSize(), stream->GetBytesPerPixel(),
-                       texture_id);
-    }
-    for (const auto [stream_id, static_mesh_id] : stream_static_mesh_ids_) {
-        auto* stream = GetBufferStreamFromId(stream_id);
-        auto vector  = stream->ExtractVector();
-        // In case nothing is set just skip it!
-        if (vector.empty()) continue;
-        // This is here that I sheet the system by inputing 4 in the number of float.
-        auto mesh = device->CreateStaticMesh(std::move(vector), 4);
-        mesh->SetName(id_name_map_.at(static_mesh_id));
-        ReplaceMesh(std::move(mesh), static_mesh_id);
-    }
-    // We don't need to update the uniform as they are updated from the uniform wrapper class.
-}
-
 void Level::ReplaceTexture(std::vector<std::uint8_t>&& vector,
-                           std::pair<std::uint32_t, std::uint32_t> size,
+                           glm::uvec2 size,
                            std::uint8_t bytes_per_pixel, EntityId id) {
     if (!id_texture_map_.count(id))
         throw std::runtime_error("trying to replace {} but no texture there yet?");
@@ -317,8 +214,10 @@ void Level::ReplaceTexture(std::vector<std::uint8_t>&& vector,
 }
 
 void Level::ReplaceMesh(std::unique_ptr<StaticMeshInterface>&& mesh, EntityId id) {
-    if (!id_static_mesh_map_.count(id))
-        throw std::runtime_error("trying to replace {} but no mesh there yet?");
+    if (!id_static_mesh_map_.count(id)) {
+        throw std::runtime_error(
+            fmt::format("trying to replace {} by {} but no mesh there yet?", mesh->GetName(), id));
+    }
     id_static_mesh_map_.erase(id);
     id_static_mesh_map_.emplace(id, std::move(mesh));
 }

@@ -1,9 +1,9 @@
-#include "frame/opengl/none_opengl_window.h"
+#include "frame/opengl/win32_opengl_none.h"
 
 #include <GL/glew.h>
-#include <GL/wglew.h>
 #if defined(_WIN32) || defined(_WIN64)
 #define WINDOWS_LEAN_AND_MEAN
+#include <GL/wglew.h>
 #include <windows.h>
 #endif
 #include <string>
@@ -12,7 +12,8 @@
 
 namespace frame::opengl {
 
-NoneOpenGLWindow::NoneOpenGLWindow(std::pair<std::uint32_t, std::uint32_t> size) : size_(size) {
+Win32OpenGLNone::Win32OpenGLNone(glm::uvec2 size) : size_(size) {
+#if defined(_WIN32) || defined(_WIN64)
     hwnd_dummy_ =
         CreateWindowExW(0, L"STATIC", L"DummyWindow", WS_OVERLAPPED, CW_USEDEFAULT, CW_USEDEFAULT,
                         CW_USEDEFAULT, CW_USEDEFAULT, nullptr, nullptr, nullptr, nullptr);
@@ -52,28 +53,32 @@ NoneOpenGLWindow::NoneOpenGLWindow(std::pair<std::uint32_t, std::uint32_t> size)
     }
     ok = wglMakeCurrent(hdc_, hglrc);
     if (!ok) throw std::runtime_error("Failed to make current OpenGL context from dummy window");
+#else
+    throw std::runtime_error("Not on windows.");
+#endif
 }
 
-NoneOpenGLWindow::~NoneOpenGLWindow() {
+Win32OpenGLNone::~Win32OpenGLNone() {
+#if defined(_WIN32) || defined(_WIN64)
     HGLRC hglrc = wglGetCurrentContext();
     if (hglrc) wglDeleteContext(hglrc);
     wglMakeCurrent(hdc_, nullptr);
     ReleaseDC(hwnd_dummy_, hdc_);
+#endif
 }
 
-void NoneOpenGLWindow::Run() {
-    for (const auto& draw_interface : draw_interfaces_) {
-        draw_interface->Startup(size_);
+void Win32OpenGLNone::Run() {
+    for (const auto& plugin_interface : device_->GetPluginPtrs()) {
+        plugin_interface->Startup(size_);
     }
     if (input_interface_) input_interface_->NextFrame();
-    // Draw the Scene not used?
-    for (const auto& draw_interface : draw_interfaces_) {
-        draw_interface->RunDraw(0.0);
-    }
     device_->Display(0.0);
+    for (const auto& plugin_interface : device_->GetPluginPtrs()) {
+        plugin_interface->Update(device_.get(), 0.0);
+    }
 }
 
-void* NoneOpenGLWindow::GetGraphicContext() const {
+void* Win32OpenGLNone::GetGraphicContext() const {
     // Initialize GLEW.
     GLenum error = GLEW_OK;
     if (GLEW_OK != (error = glewInit())) {
@@ -92,6 +97,7 @@ void* NoneOpenGLWindow::GetGraphicContext() const {
     const char* renderer = (const char*)glGetString(GL_RENDERER);
     logger_->info(fmt::format("Renderer : {}", renderer));
 
+#if defined(_WIN32) || defined(_WIN64)
     if (wglewIsSupported("WGL_ARB_create_context")) {
         // GL_MAJOR_VERSION -> 4
         // GL_MINOR_VERSION -> 5
@@ -116,6 +122,10 @@ void* NoneOpenGLWindow::GetGraphicContext() const {
 
     // Return current context.
     return wglGetCurrentContext();
+#else
+    throw std::runtime_error("Not on windows.");
+#endif
 }
 
 }  // End namespace frame::opengl.
+

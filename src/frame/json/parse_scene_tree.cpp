@@ -4,7 +4,6 @@
 
 #include "frame/file/file_system.h"
 #include "frame/file/obj.h"
-#include "frame/json/parse_stream.h"
 #include "frame/json/parse_uniform.h"
 #include "frame/node_camera.h"
 #include "frame/node_light.h"
@@ -123,13 +122,15 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(LevelInterface
 
 [[nodiscard]] bool ParseSceneStaticMeshStreamInput(LevelInterface* level,
                                                    const SceneStaticMesh& proto_scene_static_mesh) {
-    assert(proto_scene_static_mesh.has_stream());
-    // Create the buffer based streams.
-    auto stream_id    = level->AddBufferStream(ParseNoneBufferStream(proto_scene_static_mesh));
+    assert(proto_scene_static_mesh.has_multi_plugin());
     auto point_buffer = std::make_unique<opengl::Buffer>(opengl::BufferTypeEnum::ARRAY_BUFFER,
                                                          opengl::BufferUsageEnum::STREAM_DRAW);
     point_buffer->SetName("point." + proto_scene_static_mesh.name());
     auto point_buffer_id = level->AddBuffer(std::move(point_buffer));
+    auto normal_buffer   = std::make_unique<opengl::Buffer>(opengl::BufferTypeEnum::ARRAY_BUFFER,
+                                                          opengl::BufferUsageEnum::STREAM_DRAW);
+    normal_buffer->SetName("normal." + proto_scene_static_mesh.name());
+    auto normal_buffer_id = level->AddBuffer(std::move(normal_buffer));
     auto index_buffer    = std::make_unique<opengl::Buffer>(
         opengl::BufferTypeEnum::ELEMENT_ARRAY_BUFFER, opengl::BufferUsageEnum::STREAM_DRAW);
     index_buffer->SetName("index." + proto_scene_static_mesh.name());
@@ -140,17 +141,15 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(LevelInterface
     auto color_buffer_id = level->AddBuffer(std::move(color_buffer));
 
     // Create a new static mesh.
-    opengl::StaticMeshConfig config = {};
-    config.point_buffer_id          = point_buffer_id;
-    config.color_buffer_id          = color_buffer_id;
-    config.index_buffer_id          = index_buffer_id;
-    config.render_primitive_enum    = proto::SceneStaticMesh::POINT;
-    auto mesh                       = std::make_unique<opengl::StaticMesh>(level, config);
+    StaticMeshParameter parameter   = {};
+    parameter.point_buffer_id       = point_buffer_id;
+    parameter.normal_buffer_id      = normal_buffer_id;
+    parameter.color_buffer_id       = color_buffer_id;
+    parameter.index_buffer_id       = index_buffer_id;
+    parameter.render_primitive_enum = proto::SceneStaticMesh::POINT;
+    auto mesh                       = std::make_unique<opengl::StaticMesh>(level, parameter);
     mesh->SetName("mesh." + proto_scene_static_mesh.name());
     auto mesh_id = level->AddStaticMesh(std::move(mesh));
-
-    // Create a correspondence between stream and mesh ids.
-    level->AddStreamBufferCorrespondence(stream_id, point_buffer_id);
 
     // Get the material id.
     auto maybe_material_id = level->GetIdFromName(proto_scene_static_mesh.material_name());
@@ -186,7 +185,7 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(LevelInterface
         return ParseSceneStaticMeshFileName(level, proto_scene_static_mesh);
     }
     // 4th case stream input.
-    if (proto_scene_static_mesh.has_stream()) {
+    if (proto_scene_static_mesh.has_multi_plugin()) {
         return ParseSceneStaticMeshStreamInput(level, proto_scene_static_mesh);
     }
     return false;

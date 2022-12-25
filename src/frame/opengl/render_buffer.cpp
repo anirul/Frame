@@ -23,9 +23,9 @@ void RenderBuffer::UnBind() const {
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
 }
 
-void RenderBuffer::CreateStorage(const std::pair<std::uint32_t, std::uint32_t> size) const {
+void RenderBuffer::CreateStorage(glm::uvec2 size) const {
     Bind();
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT32, size.first, size.second);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT32, size.x, size.y);
     UnBind();
 }
 

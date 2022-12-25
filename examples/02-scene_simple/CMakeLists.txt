@@ -22,6 +22,7 @@ target_link_libraries(02_SceneSimple
     FrameOpenGLGui
     FrameOpenGLFile
     FrameProto
+    imgui::imgui
 )
 
 set_property(TARGET 02_SceneSimple PROPERTY FOLDER "Examples")

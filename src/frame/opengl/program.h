@@ -158,7 +158,7 @@ class Program : public ProgramInterface {
      * @param size: Size of the vector (ex: 3x3 for a mat3).
      */
     void Uniform(const std::string& name, const std::vector<float>& vector,
-                 std::pair<std::uint32_t, std::uint32_t> size = { 0, 0 }) const override;
+                 glm::uvec2 size = { 0, 0 }) const override;
     /**
      * @brief Create a uniform from a string and a vector.
      * For now this is checking the size of the vector to input in the corresponding matrix.
@@ -167,37 +167,13 @@ class Program : public ProgramInterface {
      * @param size: Size of the vector (ex: 3x3 for a mat3).
      */
     void Uniform(const std::string& name, const std::vector<std::int32_t>& vector,
-                 std::pair<std::uint32_t, std::uint32_t> size = { 0, 0 }) const override;
-    /**
-     * @brief Add a later included value (like camera position or time).
-     * This will be set in uniform interface.
+                 glm::uvec2 size = { 0, 0 }) const override;
+	/**
+     * @brief Check if the program has the uniform passed as name.
      * @param name: Name of the uniform.
-     * @param value: Enum value of the uniform (see proto declaration for that).
+     * @return True if present false otherwise.
      */
-    void PreInscribeEnumUniformFloat(const std::string& name,
-                                     proto::Uniform::UniformEnum uniform_enum) const override;
-    /**
-     * @brief Add a later included streamed value.
-     * @param name: Name of the uniform.
-     * @param value: String pointing to the streamed uniform.
-     */
-    void PreInscribeStreamUniformFloat(const std::string& name,
-                                       proto::Stream::StreamEnum stream_enum) const override;
-    /**
-     * @brief Add a later included value (like camera position or time).
-     * This will be set in uniform interface.
-     * @param name: Name of the uniform.
-     * @param value: Enum value of the uniform (see proto declaration for that).
-     */
-    void PreInscribeEnumUniformInt(const std::string& name,
-                                   proto::Uniform::UniformEnum uniform_enum) const override;
-    /**
-     * @brief Add a later included streamed value.
-     * @param name: Name of the uniform.
-     * @param value: String pointing to the streamed uniform.
-     */
-    void PreInscribeStreamUniformInt(const std::string& name,
-                                     proto::Stream::StreamEnum stream_enum) const override;
+    bool HasUniform(const std::string& name) const override;
 
    protected:
     /**
@@ -207,11 +183,11 @@ class Program : public ProgramInterface {
      */
     int GetMemoizeUniformLocation(const std::string& name) const;
     /**
-     * @brief Check if the program has the uniform passed as name.
-     * @param name: Name of the uniform.
-     * @return True if present false otherwise.
+     * @brief Test if the uniform is in the uniform list.
+     * @param name: Uniform to be tested.
+     * @return True if the uniform is in the list.
      */
-    bool HasUniform(const std::string& name) const;
+    bool IsUniformInList(const std::string& name) const;
     /**
      * @brief Throw an exception in case this texture is already in the program.
      * @param texture_id: Texture id to be tested.
@@ -236,8 +212,6 @@ class Program : public ProgramInterface {
     mutable std::map<std::string, int> memoize_map_ = {};
     mutable std::map<std::string, proto::Uniform::UniformEnum> uniform_float_variable_map_ = {};
     mutable std::map<std::string, proto::Uniform::UniformEnum> uniform_int_variable_map_   = {};
-    mutable std::map<std::string, proto::Stream::StreamEnum> stream_float_variable_map_    = {};
-    mutable std::map<std::string, proto::Stream::StreamEnum> stream_int_variable_map_      = {};
     mutable std::vector<UniformValue> uniform_list_                                        = {};
     std::vector<unsigned int> attached_shaders_                                            = {};
     std::string temporary_scene_root_;

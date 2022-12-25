@@ -13,8 +13,6 @@ add_library(FrameJson
     parse_program.h
     parse_scene_tree.cpp
     parse_scene_tree.h
-    parse_stream.cpp
-    parse_stream.h
     parse_texture.cpp
     parse_texture.h
     parse_uniform.cpp

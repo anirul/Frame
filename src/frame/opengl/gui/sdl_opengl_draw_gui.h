@@ -25,6 +25,40 @@ class SDL2OpenGLDrawGui : public frame::gui::DrawGuiInterface {
 
    public:
     /**
+     * @brief Get name.
+     * @return Name.
+     */
+    std::string GetName() const override { return name_; }
+    /**
+     * @brief Set name.
+     * @return Name.
+     */
+    void SetName(const std::string& name) override { name_ = name; }
+    /**
+     * @brief Called before rendering.
+     * @param uniform[in, out]: The uniform data.
+     * @param device: The device.
+     * @param level: The level.
+     * @param static_mesh: The static mesh.
+     * @param material: The material associated with the mesh.
+     */
+    void PreRender(UniformInterface& uniform, DeviceInterface* device,
+                   StaticMeshInterface* static_mesh, MaterialInterface* material) override {}
+    //! @brief Called to cleanup at the end.
+    void End() override {}
+    /**
+     * @brief Is the draw gui active?
+     * @param enable: True if enable.
+     */
+    void SetVisible(bool enable) override { is_visible_ = enable; }
+    /**
+     * @brief Is the draw gui active?
+     * @return True if enable.
+     */
+    bool IsVisible() const override { return is_visible_; }
+
+   public:
+    /**
      * @brief Add sub window to the main window.
      * @param callback: A window callback that can add buttons, etc.
      */
@@ -43,12 +77,13 @@ class SDL2OpenGLDrawGui : public frame::gui::DrawGuiInterface {
      * @brief Initialize with the size of the out buffer.
      * @param size: Size of the out buffer.
      */
-    void Startup(std::pair<std::uint32_t, std::uint32_t> size) override;
+    void Startup(glm::uvec2 size) override;
     /**
-     * @brief This should draw from the device.
-     * @param dt: Delta time from the start of the software in seconds.
+     * @brief Called to update variables, called after the main render phase.
+     * @param level: The level.
+     * @return Is it still looping or not?
      */
-    bool RunDraw(double dt) override;
+    bool Update(DeviceInterface* device, double dt = 0.0) override;
     /**
      * @brief Poll event.
      * @param event: The event to be polled.
@@ -59,6 +94,10 @@ class SDL2OpenGLDrawGui : public frame::gui::DrawGuiInterface {
     std::map<std::string, std::unique_ptr<frame::gui::GuiWindowInterface>> callbacks_ = {};
     WindowInterface* window_interface_                                                = nullptr;
     DeviceInterface* device_interface_                                                = nullptr;
+    std::string name_;
+    glm::uvec2 size_         = { 0, 0 };
+    bool is_keyboard_passed_ = false;
+    bool is_visible_         = true;
 };
 
 }  // End namespace frame::opengl::gui.

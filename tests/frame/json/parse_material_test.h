@@ -6,14 +6,13 @@
 #include "frame/json/parse_level.h"
 #include "frame/level.h"
 #include "frame/material_interface.h"
-#include "frame/opengl/window.h"
+#include "frame/window_factory.h"
 
 namespace test {
 
 class ParseMaterialTest : public testing::Test {
    public:
-    ParseMaterialTest() {
-        window_    = frame::opengl::CreateNoneOpenGL({ 320, 200 });
+    ParseMaterialTest() : window_(frame::CreateNewWindow(frame::DrawingTargetEnum::NONE)) {
         auto level = frame::proto::ParseLevel(
             { 320, 200 }, frame::file::FindFile("asset/json/material_test.json"),
             window_->GetUniqueDevice());

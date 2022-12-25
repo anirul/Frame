@@ -10,8 +10,8 @@ namespace test {
 TEST_F(LoadTextureTest, LoadTextureFromFloatTest) {
     auto texture = frame::opengl::file::LoadTextureFromFloat(0.1f);
     EXPECT_TRUE(texture);
-    EXPECT_EQ(1, texture->GetSize().first);
-    EXPECT_EQ(1, texture->GetSize().second);
+    EXPECT_EQ(1, texture->GetSize().x);
+    EXPECT_EQ(1, texture->GetSize().y);
     auto vecf            = texture->GetTextureFloat();
     EXPECT_FLOAT_EQ(0.1f, *vecf.data());
 }
@@ -19,8 +19,8 @@ TEST_F(LoadTextureTest, LoadTextureFromFloatTest) {
 TEST_F(LoadTextureTest, LoadTextureFromVec4Test) {
     auto texture = frame::opengl::file::LoadTextureFromVec4(glm::vec4(0.1f, 0.2f, 0.3f, 0.4f));
     EXPECT_TRUE(texture);
-    EXPECT_EQ(1, texture->GetSize().first);
-    EXPECT_EQ(1, texture->GetSize().second);
+    EXPECT_EQ(1, texture->GetSize().x);
+    EXPECT_EQ(1, texture->GetSize().y);
     auto vecf = texture->GetTextureFloat();
     EXPECT_EQ(4, vecf.size());
     EXPECT_FLOAT_EQ(0.1f, vecf[0]);
@@ -34,8 +34,8 @@ TEST_F(LoadTextureTest, LoadTextureFromFileTest) {
         frame::file::FindFile("asset/cubemap/positive_x.png"),
         frame::proto::PixelElementSize_BYTE(), frame::proto::PixelStructure_RGB_ALPHA());
     EXPECT_TRUE(texture);
-    EXPECT_EQ(1024, texture->GetSize().first);
-    EXPECT_EQ(1024, texture->GetSize().second);
+    EXPECT_EQ(1024, texture->GetSize().x);
+    EXPECT_EQ(1024, texture->GetSize().y);
     auto vec8 = texture->GetTextureByte();
     auto it_pair = std::minmax_element(vec8.begin(), vec8.end());
     EXPECT_EQ(0x59, *it_pair.first);
@@ -54,8 +54,8 @@ TEST_F(LoadTextureTest, LoadCubeMapFromFilesTest) {
           frame::file::FindFile("asset/cubemap/negative_z.png") },
         frame::proto::PixelElementSize_BYTE(), frame::proto::PixelStructure_RGB_ALPHA());
     EXPECT_TRUE(texture);
-    EXPECT_EQ(1024, texture->GetSize().first);
-    EXPECT_EQ(1024, texture->GetSize().second);
+    EXPECT_EQ(1024, texture->GetSize().x);
+    EXPECT_EQ(1024, texture->GetSize().y);
     auto vec8     = texture->GetTextureByte();
     auto it_pair  = std::minmax_element(vec8.begin(), vec8.end());
     EXPECT_EQ(0x49, *it_pair.first);

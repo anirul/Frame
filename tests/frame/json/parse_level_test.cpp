@@ -6,8 +6,7 @@
 namespace test {
 
 TEST_F(ParseLevelTest, CreateLevelProtoTest) {
-    EXPECT_TRUE(
-        frame::proto::ParseLevel(std::make_pair<std::uint32_t, std::uint32_t>(320, 200),
+    EXPECT_TRUE(frame::proto::ParseLevel(glm::uvec2(320, 200),
                                          frame::file::FindFile("asset/json/level_test.json"),
                                          window_->GetUniqueDevice()));
 }
