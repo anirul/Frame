@@ -5,7 +5,6 @@
 #include "frame/common/path_interface.h"
 #include "frame/device_interface.h"
 #include "frame/logger.h"
-#include "frame/opengl/window.h"
 #include "frame/plugin_interface.h"
 
 namespace frame::common {

@@ -1,6 +1,6 @@
 #include "frame/opengl/window_test.h"
 
-#include "frame/opengl/window.h"
+#include "frame/opengl/window_factory.h"
 
 namespace test {
 

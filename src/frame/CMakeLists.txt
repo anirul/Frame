@@ -57,7 +57,10 @@ target_link_libraries(Frame
     absl::flags_parse
     absl::strings
     FrameJson
-    SDL2::SDL2
+    FrameOpenGL
+    FrameVulkan
+    $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
+    $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
     spdlog::spdlog
     glm::glm
 )
@@ -65,6 +68,7 @@ target_link_libraries(Frame
 set_property(TARGET Frame PROPERTY FOLDER "Frame")
 
 add_subdirectory(opengl)
+add_subdirectory(vulkan)
 
 add_subdirectory(common)
 add_subdirectory(file)

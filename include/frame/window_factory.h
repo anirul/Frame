@@ -8,8 +8,8 @@ namespace frame {
 /**
  * @brief Create a new window.
  * This could not be named create window as windows is already defining it as a macro.
- * @param window_enum: The window API you want to use [NONE, SDL2, ...].
- * @param device_enum: The device API you want to use [OPENGL, ...].
+ * @param drawing_target_enum: Window or not?
+ * @param rendering_api_enum: Which rendering API it use [OpenGL, Vulkan, ...].
  * @param size: The size of the window.
  * @return A unique pointer to a window.
  */

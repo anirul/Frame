@@ -37,10 +37,8 @@ add_library(FrameOpenGL
     sdl_opengl_none.h
     sdl_opengl_window.cpp
     sdl_opengl_window.h
-    window.cpp
-    window.h
-    win32_opengl_none.cpp
-    win32_opengl_none.h
+    window_factory.cpp
+    window_factory.h
 )
 
 target_include_directories(FrameOpenGL

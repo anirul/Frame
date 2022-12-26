@@ -36,6 +36,7 @@ find_package(spdlog CONFIG REQUIRED)
 # find_package(stb CONFIG REQUIRED)
 find_package(tinyobjloader CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
+find_package(Vulkan REQUIRED)
 
 # Sources.
 add_subdirectory(asset/shader/opengl)
