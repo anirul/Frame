@@ -49,6 +49,7 @@ class SDLVulkanNone : public WindowInterface {
     SDL_Window* sdl_window_                          = nullptr;
     frame::Logger& logger_                           = frame::Logger::GetInstance();
     vk::UniqueInstance vk_unique_instance_;
+    vk::DispatchLoaderDynamic vk_dispatch_loader_dynamic_;
 };
 
 }  // namespace frame::vulkan.

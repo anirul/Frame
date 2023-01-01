@@ -53,18 +53,18 @@ SDLVulkanNone::SDLVulkanNone(glm::uvec2 size) : size_(size) {
                                                 extensions.data());
 
     vk_unique_instance_ = vk::createInstanceUnique(instance_create_info);
-    vk::DispatchLoaderDynamic dispatch_loader_dynamic(*vk_unique_instance_, vkGetInstanceProcAddr);
+    vk_dispatch_loader_dynamic_.init(*vk_unique_instance_, vkGetInstanceProcAddr);
     auto result = vk_unique_instance_->createDebugUtilsMessengerEXT(
         vk::DebugUtilsMessengerCreateInfoEXT(
             {},
             vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose |
-            vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning |
-            vk::DebugUtilsMessageSeverityFlagBitsEXT::eError,
+                vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning |
+                vk::DebugUtilsMessageSeverityFlagBitsEXT::eError,
             vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral |
-            vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation |
-            vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance,
+                vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation |
+                vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance,
             DebugCallback),
-            nullptr, dispatch_loader_dynamic);
+        nullptr, vk_dispatch_loader_dynamic_);
 }
 
 SDLVulkanNone::~SDLVulkanNone() {

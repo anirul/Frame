@@ -6,6 +6,7 @@
 #include <vulkan/vulkan.hpp>
 
 #include "frame/gui/draw_gui_interface.h"
+#include "frame/vulkan/debug_callback.h"
 
 namespace frame::vulkan {
 
@@ -33,14 +34,13 @@ SDLVulkanWindow::SDLVulkanWindow(glm::uvec2 size) : size_(size) {
         throw std::runtime_error(
             fmt::format("Could not get the extension count: {}", SDL_GetError()));
     }
-
     std::vector<const char*> extensions(extension_count);
     SDL_Vulkan_GetInstanceExtensions(sdl_window_, &extension_count, extensions.data());
     if (extension_count == 0) {
         throw std::runtime_error(
             fmt::format("Could not get the extension count: {}", SDL_GetError()));
     }
-
+    extensions.push_back("VK_EXT_debug_utils");
     for (const auto& extension : extensions) {
         logger_->info("Extension: {}", extension);
     }
@@ -53,6 +53,18 @@ SDLVulkanWindow::SDLVulkanWindow(glm::uvec2 size) : size_(size) {
                                                 extensions.data());
 
     vk_unique_instance_ = vk::createInstanceUnique(instance_create_info);
+    vk_dispatch_loader_dynamic_.init(*vk_unique_instance_, vkGetInstanceProcAddr);
+    auto result = vk_unique_instance_->createDebugUtilsMessengerEXT(
+        vk::DebugUtilsMessengerCreateInfoEXT(
+            {},
+            vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose |
+                vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning |
+                vk::DebugUtilsMessageSeverityFlagBitsEXT::eError,
+            vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral |
+                vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation |
+                vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance,
+            DebugCallback),
+        nullptr, vk_dispatch_loader_dynamic_);
 }
 
 SDLVulkanWindow::~SDLVulkanWindow() {

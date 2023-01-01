@@ -14,7 +14,11 @@ namespace frame::vulkan {
  */
 class Device : public DeviceInterface {
    public:
-    //! @brief Constructor will initialize the Vulkan context.
+    /**
+     * @brief Constructor will initialize the Vulkan context.
+	 * @param vk_instance: The vk::Instance passed as a void*.
+	 * @param size: Window size.
+     */
     Device(void* vk_instance, glm::uvec2 size);
     //! @brief Destructor this is where the memory is freed.
     virtual ~Device();

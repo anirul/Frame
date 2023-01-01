@@ -61,6 +61,7 @@ class SDLVulkanWindow : public WindowInterface {
 #endif
     frame::Logger& logger_ = frame::Logger::GetInstance();
 	vk::UniqueInstance vk_unique_instance_;
+    vk::DispatchLoaderDynamic vk_dispatch_loader_dynamic_;
 };
 
 }  // namespace frame::vulkan.
