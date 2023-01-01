@@ -1,7 +1,8 @@
 #pragma once
 
 #include <SDL2/SDL.h>
-#include <vulkan/vulkan.h>
+
+#include <vulkan/vulkan.hpp>
 #if defined(_WIN32) || defined(_WIN64)
 #include <SDL2/SDL_syswm.h>
 #endif
@@ -47,7 +48,7 @@ class SDLVulkanNone : public WindowInterface {
     std::unique_ptr<InputInterface> input_interface_ = nullptr;
     SDL_Window* sdl_window_                          = nullptr;
     frame::Logger& logger_                           = frame::Logger::GetInstance();
-    VkInstance instance_;
+    vk::UniqueInstance vk_unique_instance_;
 };
 
 }  // namespace frame::vulkan.

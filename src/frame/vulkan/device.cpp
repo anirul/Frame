@@ -2,8 +2,8 @@
 
 namespace frame::vulkan {
 
-Device::Device(void* vulkan_instance, glm::uvec2 size)
-    : vulkan_instance_(vulkan_instance), size_(size) {
+Device::Device(void* vk_instance, glm::uvec2 size)
+    : vk_instance_(static_cast<VkInstance>(vk_instance)), size_(size) {
     logger_->debug("Implement the constructor for the class frame::vulkan::Device.");
 }
 

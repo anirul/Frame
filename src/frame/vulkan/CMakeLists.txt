@@ -2,14 +2,16 @@
 
 add_library(FrameVulkan
   STATIC
-    window_factory.h
-    window_factory.cpp
+    debug_callback.cpp
+    debug_callback.h
     device.h
     device.cpp
     sdl_vulkan_none.h
     sdl_vulkan_none.cpp
     sdl_vulkan_window.h
     sdl_vulkan_window.cpp
+    window_factory.h
+    window_factory.cpp
 )
 
 target_include_directories(FrameVulkan

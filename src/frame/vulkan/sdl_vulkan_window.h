@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SDL2/SDL.h>
+#include <vulkan/vulkan.hpp>
 #if defined(_WIN32) || defined(_WIN64)
 #include <SDL2/SDL_syswm.h>
 #endif
@@ -59,6 +60,7 @@ class SDLVulkanWindow : public WindowInterface {
     HWND hwnd_ = nullptr;
 #endif
     frame::Logger& logger_ = frame::Logger::GetInstance();
+	vk::UniqueInstance vk_unique_instance_;
 };
 
 }  // namespace frame::vulkan.

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vulkan/vulkan.hpp>
+
 #include "frame/camera.h"
 #include "frame/device_interface.h"
 #include "frame/logger.h"
@@ -13,7 +15,7 @@ namespace frame::vulkan {
 class Device : public DeviceInterface {
    public:
     //! @brief Constructor will initialize the Vulkan context.
-    Device(void* vulkan_context, glm::uvec2 size);
+    Device(void* vk_instance, glm::uvec2 size);
     //! @brief Destructor this is where the memory is freed.
     virtual ~Device();
 
@@ -111,7 +113,7 @@ class Device : public DeviceInterface {
      * @brief Get the current context.
      * @return A pointer to the current context (this is used by the windowing system).
      */
-    void* GetDeviceContext() const final { return vulkan_instance_; }
+    void* GetDeviceContext() const final { return vk_instance_; }
     /**
      * @brief Get the enum describing the stereo situation.
      * @return Return the enum describing the stereo situation.
@@ -138,8 +140,9 @@ class Device : public DeviceInterface {
     std::unique_ptr<LevelInterface> level_ = nullptr;
     // Storage of the plugin.
     std::vector<std::unique_ptr<PluginInterface>> plugin_interfaces_ = {};
-    // Vulkan instance.
-    void* vulkan_instance_                             = nullptr;
+    // Vulkan stuff.
+    vk::Instance vk_instance_ = nullptr;
+    // Size.
     glm::uvec2 size_                                  = { 0, 0 };
     const proto::PixelElementSize pixel_element_size_ = proto::PixelElementSize_HALF();
     // Rendering pipeline.

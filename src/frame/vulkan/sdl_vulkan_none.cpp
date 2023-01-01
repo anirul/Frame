@@ -2,11 +2,14 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_vulkan.h>
-#include <vulkan/vulkan.h>
+
+#include <vulkan/vulkan.hpp>
+
+#include "frame/vulkan/debug_callback.h"
 
 namespace frame::vulkan {
 
-SDLVulkanNone::SDLVulkanNone(glm::uvec2 size) : size_(size){
+SDLVulkanNone::SDLVulkanNone(glm::uvec2 size) : size_(size) {
     // Initialize SDL with the video subsystem.
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         throw std::runtime_error(fmt::format("Couldn't initialize SDL: {}", SDL_GetError()));
@@ -31,40 +34,41 @@ SDLVulkanNone::SDLVulkanNone(glm::uvec2 size) : size_(size){
         throw std::runtime_error(
             fmt::format("Could not get the extension count: {}", SDL_GetError()));
     }
-
     std::vector<const char*> extensions(extension_count);
     SDL_Vulkan_GetInstanceExtensions(sdl_window_, &extension_count, extensions.data());
     if (extension_count == 0) {
         throw std::runtime_error(
             fmt::format("Could not get the extension count: {}", SDL_GetError()));
     }
-
+    // Add the extension to have the debug layers.
+    extensions.push_back("VK_EXT_debug_utils");
     for (const auto& extension : extensions) {
         logger_->info("Extension: {}", extension);
     }
 
-    VkApplicationInfo app_info  = {};
-    app_info.sType              = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-    app_info.pApplicationName   = "SDL Vulkan Headless";
-    app_info.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-    app_info.pEngineName        = "Frame";
-    app_info.engineVersion      = VK_MAKE_VERSION(1, 0, 0);
-    app_info.apiVersion         = VK_API_VERSION_1_3;
+    vk::ApplicationInfo application_info("Frame", VK_MAKE_VERSION(0, 5, 1), "SDL - Vulkan - None",
+                                         VK_MAKE_VERSION(0, 5, 1), VK_API_VERSION_1_3);
+    vk::InstanceCreateInfo instance_create_info({}, &application_info, 0, nullptr,
+                                                static_cast<std::uint32_t>(extensions.size()),
+                                                extensions.data());
 
-    VkInstanceCreateInfo create_info    = {};
-    create_info.sType                   = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-    create_info.pApplicationInfo        = &app_info;
-    create_info.enabledExtensionCount   = static_cast<uint32_t>(extensions.size());
-    create_info.ppEnabledExtensionNames = extensions.data();
-
-    if (vkCreateInstance(&create_info, nullptr, &instance_) != VK_SUCCESS) {
-        throw std::runtime_error("Failed to create instance.");
-    }
+    vk_unique_instance_ = vk::createInstanceUnique(instance_create_info);
+    vk::DispatchLoaderDynamic dispatch_loader_dynamic(*vk_unique_instance_, vkGetInstanceProcAddr);
+    auto result = vk_unique_instance_->createDebugUtilsMessengerEXT(
+        vk::DebugUtilsMessengerCreateInfoEXT(
+            {},
+            vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose |
+            vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning |
+            vk::DebugUtilsMessageSeverityFlagBitsEXT::eError,
+            vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral |
+            vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation |
+            vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance,
+            DebugCallback),
+            nullptr, dispatch_loader_dynamic);
 }
 
 SDLVulkanNone::~SDLVulkanNone() {
     // Destroy the surface and instance when finished
-    vkDestroyInstance(instance_, nullptr);
     SDL_DestroyWindow(sdl_window_);
     SDL_Quit();
 }
@@ -80,25 +84,6 @@ void SDLVulkanNone::Run() {
     }
 }
 
-void* SDLVulkanNone::GetGraphicContext() const {
-    uint32_t physical_device_count = 0;
-    vkEnumeratePhysicalDevices(instance_, &physical_device_count, nullptr);
-    if (physical_device_count == 0) {
-        throw std::runtime_error("Failed to find GPUs with Vulkan support.");
-    }
-
-    std::vector<VkPhysicalDevice> physical_devices(physical_device_count);
-    vkEnumeratePhysicalDevices(instance_, &physical_device_count, physical_devices.data());
-    if (physical_device_count == 0) {
-        throw std::runtime_error("Failed to find GPUs with Vulkan support.");
-    }
-
-    for (const auto& physical_device : physical_devices) {
-        VkPhysicalDeviceProperties properties;
-        vkGetPhysicalDeviceProperties(physical_device, &properties);
-        logger_->info("Device: {}", properties.deviceName);
-    }
-    return instance_;
-}
+void* SDLVulkanNone::GetGraphicContext() const { return vk_unique_instance_.get(); }
 
 }  // End namespace frame::vulkan.
