@@ -42,6 +42,10 @@ class SDLVulkanNone : public WindowInterface {
     }
     FullScreenEnum GetFullScreenEnum() const override { return FullScreenEnum::WINDOW; }
 
+   public:
+    vk::DispatchLoaderDynamic& GetVulkanDispatch() { return vk_dispatch_loader_dynamic_; }
+	vk::SurfaceKHR& GetVulkanSurfaceKHR() { return vk_surface_.get(); }
+
    private:
     glm::uvec2 size_;
     std::unique_ptr<DeviceInterface> device_         = nullptr;
@@ -50,6 +54,7 @@ class SDLVulkanNone : public WindowInterface {
     frame::Logger& logger_                           = frame::Logger::GetInstance();
     vk::UniqueInstance vk_unique_instance_;
     vk::DispatchLoaderDynamic vk_dispatch_loader_dynamic_;
+	vk::UniqueSurfaceKHR vk_surface_;
 };
 
 }  // namespace frame::vulkan.

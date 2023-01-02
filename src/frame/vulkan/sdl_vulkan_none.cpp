@@ -65,6 +65,15 @@ SDLVulkanNone::SDLVulkanNone(glm::uvec2 size) : size_(size) {
                 vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance,
             DebugCallback),
         nullptr, vk_dispatch_loader_dynamic_);
+
+    // Create the surface.
+    // CHECKME(anirul): What happen in case of a resize?
+    VkSurfaceKHR vk_surface;
+    if (SDL_Vulkan_CreateSurface(sdl_window_, *vk_unique_instance_, &vk_surface) != SDL_TRUE) {
+        throw std::runtime_error(
+            fmt::format("Error while create vulkan surface: {}", SDL_GetError()));
+    }
+    vk_surface_ = vk::UniqueSurfaceKHR(vk_surface);
 }
 
 SDLVulkanNone::~SDLVulkanNone() {

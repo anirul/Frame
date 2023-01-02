@@ -16,10 +16,13 @@ class Device : public DeviceInterface {
    public:
     /**
      * @brief Constructor will initialize the Vulkan context.
-	 * @param vk_instance: The vk::Instance passed as a void*.
-	 * @param size: Window size.
+     * @param vk_instance: The vk::Instance passed as a void*.
+     * @param size: Window size.
+     * @param surface: Surface for the drawing.
+     * @param dispatch: Dispatch from vulkan.
      */
-    Device(void* vk_instance, glm::uvec2 size);
+    Device(void* vk_instance, glm::uvec2 size, vk::SurfaceKHR& surface,
+           vk::DispatchLoaderDynamic& dispatch);
     //! @brief Destructor this is where the memory is freed.
     virtual ~Device();
 
@@ -145,7 +148,12 @@ class Device : public DeviceInterface {
     // Storage of the plugin.
     std::vector<std::unique_ptr<PluginInterface>> plugin_interfaces_ = {};
     // Vulkan stuff.
-    vk::Instance vk_instance_ = nullptr;
+    vk::Instance vk_instance_              = {};
+    vk::PhysicalDevice vk_physical_device_ = {};
+    float queue_family_priority_           = 1.0f;
+    vk::UniqueHandle<vk::Device, vk::DispatchLoaderDynamic> vk_unique_device_;
+    vk::SurfaceKHR& vk_surface_;
+    vk::DispatchLoaderDynamic& vk_dispatch_loader_;
     // Size.
     glm::uvec2 size_                                  = { 0, 0 };
     const proto::PixelElementSize pixel_element_size_ = proto::PixelElementSize_HALF();

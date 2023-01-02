@@ -2,9 +2,57 @@
 
 namespace frame::vulkan {
 
-Device::Device(void* vk_instance, glm::uvec2 size)
-    : vk_instance_(static_cast<VkInstance>(vk_instance)), size_(size) {
-    logger_->debug("Implement the constructor for the class frame::vulkan::Device.");
+Device::Device(void* vk_instance, glm::uvec2 size, vk::SurfaceKHR& surface,
+               vk::DispatchLoaderDynamic& dispatch)
+    : vk_instance_(static_cast<VkInstance>(vk_instance)),
+      size_(size),
+      vk_surface_(surface),
+      vk_dispatch_loader_(dispatch) {
+    logger_->info("Creating Vulkan Device");
+    std::vector<vk::PhysicalDevice> physical_devices = vk_instance_.enumeratePhysicalDevices();
+    if (physical_devices.empty()) {
+        throw std::runtime_error("No Vulkan Physical Device found");
+    }
+    // Check and select physical device properties.
+    int last_best_score = 0;
+    for (const auto& physical_device : physical_devices) {
+        int score = 0;
+        logger_->info("Physical Device: {}", physical_device.getProperties().deviceName);
+        if (physical_device.getProperties().deviceType == vk::PhysicalDeviceType::eDiscreteGpu) {
+            logger_->info("\tis a GPU");
+            score += 10000;
+        }
+        score += physical_device.getProperties().limits.maxImageDimension2D;
+        if (physical_device.getFeatures().geometryShader) {
+            if (score > last_best_score) {
+                last_best_score     = score;
+                vk_physical_device_ = physical_device;
+            }
+        }
+    }
+    if (!vk_physical_device_) {
+        throw std::runtime_error("No Vulkan Physical Device found");
+    }
+    // Select a queue family.
+    std::vector<vk::QueueFamilyProperties> queue_families =
+        vk_physical_device_.getQueueFamilyProperties(vk_dispatch_loader_);
+    int i              = 0;
+    int selected_index = -1;
+    for (auto& queue_family : queue_families) {
+        if (queue_family.queueFlags & vk::QueueFlagBits::eGraphics) {
+            selected_index = i;
+        }
+        i++;
+    }
+    if (selected_index == -1) {
+        throw std::runtime_error("No Vulkan Queue Family found");
+    }
+    // Get the device.
+    vk::DeviceQueueCreateInfo device_queue_create_info({}, selected_index, 1,
+                                                       &queue_family_priority_);
+    vk::DeviceCreateInfo device_create_info({}, 1, &device_queue_create_info);
+    vk_unique_device_ =
+        vk_physical_device_.createDeviceUnique(device_create_info, nullptr, vk_dispatch_loader_);
 }
 
 Device::~Device() {}

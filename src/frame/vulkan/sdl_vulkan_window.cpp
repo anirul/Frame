@@ -2,7 +2,6 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_vulkan.h>
-
 #include <vulkan/vulkan.hpp>
 
 #include "frame/gui/draw_gui_interface.h"
@@ -65,6 +64,23 @@ SDLVulkanWindow::SDLVulkanWindow(glm::uvec2 size) : size_(size) {
                 vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance,
             DebugCallback),
         nullptr, vk_dispatch_loader_dynamic_);
+
+    // Create the surface.
+    // CHECKME(anirul): What happen in case of a resize?
+    VkSurfaceKHR vk_surface;
+    if (SDL_Vulkan_CreateSurface(sdl_window_, *vk_unique_instance_, &vk_surface) != SDL_TRUE) {
+        throw std::runtime_error(
+            fmt::format("Error while create vulkan surface: {}", SDL_GetError()));
+    }
+    vk_surface_ = vk::UniqueSurfaceKHR(vk_surface);
+
+    // Get the hwnd.
+#if defined(_WIN32) || defined(_WIN64)
+    SDL_SysWMinfo wmInfo;
+    SDL_VERSION(&wmInfo.version);
+    SDL_GetWindowWMInfo(sdl_window_, &wmInfo);
+    hwnd_      = wmInfo.info.win.window;
+#endif
 }
 
 SDLVulkanWindow::~SDLVulkanWindow() {
