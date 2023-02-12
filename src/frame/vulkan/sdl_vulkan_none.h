@@ -21,7 +21,7 @@ class SDLVulkanNone : public WindowInterface {
     virtual ~SDLVulkanNone();
 
    public:
-    void Run() override;
+    void Run(std::function<void()> lambda) override;
     void* GetGraphicContext() const override;
 
    public:

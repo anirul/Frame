@@ -1,5 +1,6 @@
 #pragma once
 
+#include <glm/glm.hpp>
 #include <utility>
 
 #include "frame/logger.h"
@@ -30,16 +31,16 @@ class RenderBuffer : public BindInterface {
     //! @brief Unbind the render buffer from the current context, this come from the bind interface.
     void UnBind() const override;
     /**
-	* @brief Create a storage in the render buffer, this will bind and unbind!
-	* @param size: Render buffer size.
-	*/
+     * @brief Create a storage in the render buffer, this will bind and unbind!
+     * @param size: Render buffer size.
+     */
     void CreateStorage(glm::uvec2 size) const;
 
    public:
     /**
-	* @brief Get id, come from the bind interface.
-	* @return Return the OpenGL id of the render interface.
-	*/
+     * @brief Get id, come from the bind interface.
+     * @return Return the OpenGL id of the render interface.
+     */
     unsigned int GetId() const override { return render_id_; }
 
    protected:

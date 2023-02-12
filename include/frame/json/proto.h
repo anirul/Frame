@@ -1,10 +1,4 @@
 #pragma once
-// This is just an helpfull header that include all the protos.
-
-#include <fmt/core.h>
-
-#include <filesystem>
-#include <fstream>
 
 // This is there to avoid most of the warnings.
 #if defined(_WIN32) || defined(_WIN64)
@@ -27,5 +21,3 @@
 #if defined(_WIN32) || defined(_WIN64)
 #pragma warning(pop)
 #endif
-
-#include "frame/json/parse_json.h"

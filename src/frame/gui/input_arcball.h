@@ -4,11 +4,11 @@
 namespace frame::gui {
 
 /**
- * @class InputWasd
+ * @class InputArcball
  * @brief This is where you can handle the input from keyboard and mouse to the app.
  * See the input interface class for more info.
  */
-class InputWasd : public InputInterface {
+class InputArcball : public InputInterface {
    public:
     /**
      * @brief Constructor take arguments for the input.
@@ -16,14 +16,16 @@ class InputWasd : public InputInterface {
      * @param move_multiplication: Factor by which the keys are multiply.
      * @param rotation_multiplication: Factor to change the mouse speed when in movement mode.
      */
-    InputWasd(DeviceInterface* device, float move_multiplication, float rotation_multiplication)
+    InputArcball(DeviceInterface* device, glm::vec3 pivot, float move_multiplication,
+                 float zoom_multiplication)
         : device_(device),
           move_multiplication_(move_multiplication),
-          rotation_multiplication_(rotation_multiplication) {}
+          zoom_multiplication_(zoom_multiplication),
+          pivot_(glm::vec4(pivot, 1.0f)) {}
     /**
      * @brief Virtual destructor (default).
      */
-    virtual ~InputWasd() = default;
+    virtual ~InputArcball() = default;
     /**
      * @brief Override from input interface.
      */
@@ -37,11 +39,12 @@ class InputWasd : public InputInterface {
 
    private:
     DeviceInterface* device_       = nullptr;
-    bool shift_                    = false;
     bool mouse_active_             = false;
-    float move_multiplication_     = 20.0f;
-    float rotation_multiplication_ = 1.0f;
-    float move_shift_              = 20.0f;
+    float move_multiplication_     = 1.0f;
+    float zoom_multiplication_     = 1.0f;
+    glm::uvec2 size_               = { 0, 0 };
+    glm::uvec2 previous_location_  = { 0, 0 };
+    glm::vec4 pivot_               = { 0.0f, 0.0f, 0.0f, 1.0f };
 };
 
 }  // End namespace frame::gui.

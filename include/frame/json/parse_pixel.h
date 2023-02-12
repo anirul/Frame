@@ -52,6 +52,16 @@ PixelStructure PixelStructure_RGB();
  */
 PixelStructure PixelStructure_RGB_ALPHA();
 /**
+ * @brief Triple value in a pixel also called RGB
+ * @return Pixel structure that will hold tree values.
+ */
+PixelStructure PixelStructure_BGR();
+/**
+ * @brief Quadruple value in a pixel also called RGBA
+ * @return Pixel structure that will hold four values.
+ */
+PixelStructure PixelStructure_BGR_ALPHA();
+/**
  * @brief Comparison operator for pixel structure.
  * @param l: Left operand.
  * @param r: Right operand.

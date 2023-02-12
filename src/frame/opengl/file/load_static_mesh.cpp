@@ -162,6 +162,7 @@ std::pair<EntityId, EntityId> LoadStaticMeshFromObj(LevelInterface* level,
 
 EntityId LoadStaticMeshFromPly(LevelInterface* level, const frame::file::Ply& ply,
                                const std::string& name) {
+    EntityId result = NullId;
     std::vector<float> points;
     std::vector<float> normals;
     std::vector<float> textures;
@@ -280,6 +281,7 @@ EntityId LoadStaticMeshFromPlyFile(LevelInterface* level, const std::filesystem:
                                    const std::string& material_name /* = ""*/) {
     EntityId entity_id = NullId;
     frame::file::Ply ply(file);
+    Logger& logger       = Logger::GetInstance();
     EntityId material_id = NullId;
     if (!material_name.empty()) {
         auto maybe_id = level->GetIdFromName(material_name);

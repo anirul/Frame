@@ -50,6 +50,18 @@ PixelStructure PixelStructure_RGB_ALPHA() {
     return pixel_structure;
 }
 
+PixelStructure PixelStructure_BGR() {
+    PixelStructure pixel_structure{};
+    pixel_structure.set_value(PixelStructure::BGR);
+    return pixel_structure;
+}
+
+PixelStructure PixelStructure_BGR_ALPHA() {
+    PixelStructure pixel_structure{};
+    pixel_structure.set_value(PixelStructure::BGR_ALPHA);
+    return pixel_structure;
+}
+
 bool operator==(const PixelStructure& l, const PixelStructure& r) { return l.value() == r.value(); }
 
 bool operator==(const PixelElementSize& l, const PixelElementSize& r) {

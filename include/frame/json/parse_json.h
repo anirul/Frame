@@ -15,8 +15,8 @@ T LoadProtoFromJson(const std::string& json) {
     options.ignore_unknown_fields = false;
     auto status = google::protobuf::util::JsonStringToMessage(json, &proto, options);
     if (!status.ok()) {
-        throw std::runtime_error(
-            fmt::format("Couldn't parse json status error: [{}]", status.message().as_string()));
+        throw std::runtime_error("Couldn't parse json status error: " +
+                                 status.message().as_string());
     }
     return proto;
 }

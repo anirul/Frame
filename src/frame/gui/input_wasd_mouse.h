@@ -4,7 +4,7 @@
 namespace frame::gui {
 
 /**
- * @class InputWindow
+ * @class InputWasdMouse
  * @brief This is where you can handle the input from keyboard and mouse to the app (with wheel
  * support). See the input interface class for more info.
  */

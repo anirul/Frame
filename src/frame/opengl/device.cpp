@@ -226,4 +226,6 @@ void Device::SetStereo(StereoEnum stereo_enum, float interocular_distance, glm::
     invert_left_right_    = invert_left_right;
 }
 
+glm::uvec2 Device::GetSize() const { return size_; }
+
 }  // End namespace frame::opengl.

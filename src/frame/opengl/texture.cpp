@@ -265,7 +265,6 @@ void Texture::Update(std::vector<std::uint8_t>&& vector, glm::uvec2 size,
     ScopedBind scoped_bind(*this);
     size_ = size;
     assert(pixel_element_size_.value() == 1);
-    assert(pixel_structure_.value() == bytes_per_pixel);
     auto format = opengl::ConvertToGLType(pixel_structure_);
     auto type   = opengl::ConvertToGLType(pixel_element_size_);
     glTexImage2D(GL_TEXTURE_2D, 0, opengl::ConvertToGLType(pixel_element_size_, pixel_structure_),

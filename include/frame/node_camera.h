@@ -30,6 +30,8 @@ class NodeCamera : public NodeInterface {
         : NodeInterface(func),
           camera_(std::make_unique<Camera>(position, target, up, fov_degrees, aspect_ratio,
                                            near_clip, far_clip)) {}
+    //! @brief Virtual destructor.
+    ~NodeCamera() override = default;
 
    public:
     /**

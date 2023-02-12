@@ -44,17 +44,27 @@ add_library(FrameOpenGL
 target_include_directories(FrameOpenGL
   PUBLIC
     ${CMAKE_SOURCE_DIR}
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}/src/frame/proto
 )
 
 target_link_libraries(FrameOpenGL
-  PUBLIC
+  PRIVATE
+    absl::base
+    absl::flags
+    absl::flags_parse
+    absl::strings
     Frame
     FrameFile
     FrameJson
     FrameOpenGLFile
     GLEW::GLEW
+    glm::glm
+    protobuf::libprotobuf
+    SDL2::SDL2
+    spdlog::spdlog
 )
 
 set_property(TARGET FrameOpenGL PROPERTY FOLDER "Frame/OpenGL")

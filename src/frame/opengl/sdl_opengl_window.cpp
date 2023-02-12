@@ -37,7 +37,7 @@ SDLOpenGLWindow::~SDLOpenGLWindow() {
     SDL_Quit();
 }
 
-void SDLOpenGLWindow::Run() {
+void SDLOpenGLWindow::Run(std::function<void()> lambda) {
     // Called only once at the beginning.
     for (const auto& plugin_interface : device_->GetPluginPtrs()) {
         // In case this is a removed one it will be nulled.
@@ -48,6 +48,7 @@ void SDLOpenGLWindow::Run() {
     }
     // While Run return true continue.
     bool loop             = true;
+    double previous_count = 0.0;
     // Timing counter.
     auto start = std::chrono::system_clock::now();
     do {
@@ -84,6 +85,8 @@ void SDLOpenGLWindow::Run() {
         }
 
         SetWindowTitle("SDL OpenGL - " + std::to_string(static_cast<float>(GetFPS(dt))));
+        previous_count = time.count();
+        lambda();
 
         // TODO(anirul): Fix me to check which device this is.
         if (device_) SDL_GL_SwapWindow(sdl_window_);
@@ -134,7 +137,6 @@ bool SDLOpenGLWindow::RunEvent(const SDL_Event& event, const double dt) {
         if (event.type == SDL_MOUSEBUTTONUP) {
             return input_interface_->MouseReleased(SDLButtonToChar(event.button.button), dt);
         }
-
         if (event.type == SDL_MOUSEWHEEL && event.wheel.y != 0) {
             return input_interface_->WheelMoved(static_cast<float>(event.wheel.y), dt);
         }

@@ -15,6 +15,8 @@ namespace frame::gui {
 struct GuiWindowInterface : public NameInterface {
     //! @brief Draw callback setting.
     virtual bool DrawCallback() = 0;
+    //! @brief Is it the end of the gui?
+    virtual bool End() const = 0;
 };
 
 /**
@@ -30,6 +32,12 @@ class DrawGuiInterface : public PluginInterface {
      * @param callback: A window callback that can add buttons, etc.
      */
     virtual void AddWindow(std::unique_ptr<GuiWindowInterface>&& callback) = 0;
+    /**
+     * @brief Get a specific window (associated with a name).
+     * @param name: The name of the window.
+     * @return A pointer to the window.
+     */
+    virtual GuiWindowInterface* GetWindow(const std::string& name) = 0;
     /**
      * @brief Get all sub window name (title).
      * @return A list of all the sub windows.

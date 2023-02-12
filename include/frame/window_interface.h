@@ -20,7 +20,7 @@ struct WindowInterface {
     //! Virtual destructor.
     virtual ~WindowInterface() = default;
     //! @brief Run the windows interface this will take the current thread.
-    virtual void Run() = 0;
+    virtual void Run(std::function<void()> lambda = []{}) = 0;
     /**
      * @brief Set the input interface (see above).
      * @param input_interface: Move a input interface to the window object.

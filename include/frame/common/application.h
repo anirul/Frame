@@ -4,9 +4,7 @@
 #include <memory>
 
 #include "frame/api.h"
-#include "frame/common/path_interface.h"
 #include "frame/window_interface.h"
-#include "frame/proto/level.pb.h"
 
 namespace frame::common {
 
@@ -40,7 +38,7 @@ class Application {
     /**
      * @brief Run the application.
      */
-    void Run();
+    void Run(std::function<void()> lambda = []{});
 
    protected:
     std::unique_ptr<frame::WindowInterface> window_ = nullptr;

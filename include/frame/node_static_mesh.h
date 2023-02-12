@@ -31,6 +31,8 @@ class NodeStaticMesh : public NodeInterface {
                 clean_buffer_ |= proto::CleanBuffer::CLEAR_DEPTH;
         }
     }
+    //! @brief Virtual destructor.
+    ~NodeStaticMesh() override = default;
 
    public:
     /**

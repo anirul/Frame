@@ -1,7 +1,5 @@
 #include "frame/common/application.h"
 
-#include <glm/gtc/matrix_transform.hpp>
-
 #include "frame/common/draw.h"
 
 namespace frame::common {
@@ -42,9 +40,9 @@ void Application::Resize(glm::uvec2 size, FullScreenEnum fullscreen_enum) {
     window_->Resize(size, fullscreen_enum);
 }
 
-void Application::Run() {
+void Application::Run(std::function<void()> lambda) {
     assert(window_);
-    window_->Run();
+    window_->Run(lambda);
 }
 
 }  // End namespace frame::common.

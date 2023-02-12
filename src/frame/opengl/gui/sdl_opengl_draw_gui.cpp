@@ -171,4 +171,8 @@ bool SDL2OpenGLDrawGui::PollEvent(void* event) {
     return io.WantCaptureMouse || io.WantCaptureKeyboard;
 }
 
+frame::gui::GuiWindowInterface* SDL2OpenGLDrawGui::GetWindow(const std::string& name) {
+    return callbacks_.at(name).get();
+}
+
 }  // End namespace frame::opengl::gui.

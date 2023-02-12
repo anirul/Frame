@@ -16,4 +16,8 @@ std::unique_ptr<InputInterface> CreateInputWasdMouse(DeviceInterface* device,
                                                      float translation_multiplication,
                                                      float wheel_multiplication);
 
+std::unique_ptr<InputInterface> CreateInputArcball(DeviceInterface* device, glm::vec3 pivot,
+                                                   float move_multiplication,
+												   float zoom_multiplication);
+
 }  // End namespace frame::gui.

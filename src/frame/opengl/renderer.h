@@ -97,6 +97,7 @@ class Renderer : public RendererInterface {
     void SetDepthTest(bool enable) override;
 
    private:
+    WindowInterface* window_  = nullptr;
     DeviceInterface* device_  = nullptr;
     LevelInterface* level_    = nullptr;
     EntityId last_program_id_ = NullId;

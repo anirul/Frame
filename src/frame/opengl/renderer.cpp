@@ -18,7 +18,7 @@
 namespace frame::opengl {
 
 Renderer::Renderer(Context context, glm::uvec4 viewport)
-    : device_(context.device), level_(context.level), viewport_(viewport) {
+    : window_(context.window), device_(context.device), level_(context.level), viewport_(viewport) {
     // TODO(anirul): Check viewport!!!
     render_buffer_.CreateStorage({ viewport_.z - viewport_.x, viewport_.w - viewport_.y });
     frame_buffer_.AttachRender(render_buffer_);
@@ -37,6 +37,7 @@ Renderer::Renderer(Context context, glm::uvec4 viewport)
     auto maybe_out_texture_id = level_->GetDefaultOutputTextureId();
     if (!maybe_out_texture_id) throw std::runtime_error("No output texture id.");
     auto out_texture_id = maybe_out_texture_id;
+    auto out_texture    = level_->GetTextureFromId(out_texture_id);
     // Get material from level as material was moved away.
     level_->GetMaterialFromId(display_material_id_)->SetProgramId(display_program_id_);
     if (!level_->GetMaterialFromId(display_material_id_)->AddTextureId(out_texture_id, "Display")) {
@@ -92,6 +93,8 @@ void Renderer::RenderMesh(StaticMeshInterface* static_mesh, MaterialInterface* m
     program->Use(&uniform_wrapper);
 
     auto texture_out_ids = program->GetOutputTextureIds();
+    auto texture_ref     = level_->GetTextureFromId(*texture_out_ids.cbegin());
+    auto size            = texture_ref->GetSize();
 
     glViewport(viewport_.x, viewport_.y, viewport_.z, viewport_.w);
 

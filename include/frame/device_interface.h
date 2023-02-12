@@ -60,6 +60,11 @@ class DeviceInterface {
      * @param size: The new size of the window.
      */
     virtual void Resize(glm::uvec2 size) = 0;
+	/**
+     * @brief Get the size of the window.
+	 * @return The size of the window.
+	 */
+    virtual glm::uvec2 GetSize() const   = 0;
     /**
      * @brief  Get the current level.
      * @return A pointer to the level.

@@ -9,7 +9,7 @@
 namespace frame::gui {
 
 /**
- * @class GuiWindowInterface
+ * @class WindowResolution
  * @brief Select to change resolution window.
  */
 class WindowResolution : public GuiWindowInterface {
@@ -73,7 +73,7 @@ class WindowResolution : public GuiWindowInterface {
      * @brief Check if this is the end of the software.
      * @return True if this is the end false if not.
      */
-    bool End();
+    bool End() const override;
 
    private:
     glm::uvec2 size_;
