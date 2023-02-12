@@ -67,7 +67,7 @@ Win32OpenGLNone::~Win32OpenGLNone() {
 #endif
 }
 
-void Win32OpenGLNone::Run() {
+void Win32OpenGLNone::Run(std::function<void()> lambda) {
     for (const auto& plugin_interface : device_->GetPluginPtrs()) {
         plugin_interface->Startup(size_);
     }
@@ -76,6 +76,7 @@ void Win32OpenGLNone::Run() {
     for (const auto& plugin_interface : device_->GetPluginPtrs()) {
         plugin_interface->Update(device_.get(), 0.0);
     }
+    lambda();
 }
 
 void* Win32OpenGLNone::GetGraphicContext() const {

@@ -50,7 +50,7 @@ SDLOpenGLNone::~SDLOpenGLNone() {
     SDL_Quit();
 }
 
-void SDLOpenGLNone::Run() {
+void SDLOpenGLNone::Run(std::function<void()> lambda) {
     for (const auto& plugin_interface : device_->GetPluginPtrs()) {
         plugin_interface->Startup(size_);
     }
@@ -59,6 +59,7 @@ void SDLOpenGLNone::Run() {
     for (const auto& plugin_interface : device_->GetPluginPtrs()) {
         plugin_interface->Update(device_.get(), 0.0);
     }
+    lambda();
 }
 
 void* SDLOpenGLNone::GetGraphicContext() const {

@@ -3,10 +3,16 @@
 #include <filesystem>
 
 #include "frame/common/path_interface.h"
-#include "frame/device_interface.h"
-#include "frame/logger.h"
-#include "frame/opengl/window.h"
 #include "frame/plugin_interface.h"
+
+namespace frame {
+
+	class DeviceInterface;
+	class LevelInterface;
+	class StaticMeshInterface;
+	class MaterialInterface;
+
+} // End namespace frame.
 
 namespace frame::common {
 
@@ -82,7 +88,6 @@ class Draw : public frame::PluginInterface {
     void End() override {}
 
    private:
-    frame::Logger& logger_ = frame::Logger::GetInstance();
     glm::uvec2 size_       = { 0, 0 };
     enum class DrawTypeEnum {
         PATH,

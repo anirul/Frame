@@ -2,10 +2,13 @@
 
 #include <cmath>
 #include <glm/gtc/matrix_transform.hpp>
+#include <set>
+
+#include <frame/logger.h>
 
 namespace frame {
 
-Camera::Camera(glm::vec3 position /*= { 0.f, 0.f, 0.f }*/, glm::vec3 front /*= { 0.f, 0.f, 1.f }*/,
+Camera::Camera(glm::vec3 position /*= { 0.f, 0.f, 0.f }*/, glm::vec3 front /*= { 0.f, 0.f, -1.f }*/,
                glm::vec3 up /*= { 0.f, 1.f, 0.f }*/, float fov_degrees /*= 65.0f */,
                float aspect_ratio /*= 16.0f / 9.0f*/, float near_clip /*= 0.1f*/,
                float far_clip /*= 1000.0f*/)
@@ -20,24 +23,26 @@ Camera::Camera(glm::vec3 position /*= { 0.f, 0.f, 0.f }*/, glm::vec3 front /*= {
 }
 
 Camera::Camera(const Camera& camera) {
-    position_     = camera.position_;
-    front_        = camera.front_;
-    up_           = camera.up_;
-    fov_rad_      = camera.fov_rad_;
-    aspect_ratio_ = camera.aspect_ratio_;
-    near_clip_    = camera.near_clip_;
-    far_clip_     = camera.far_clip_;
+    SetCameraMode(camera.GetCameraMode());
+    SetFovRadians(camera.GetFovRadians());
+    SetAspectRatio(camera.GetAspectRatio());
+    SetNearClip(camera.GetNearClip());
+    SetFarClip(camera.GetFarClip());
+    SetPosition(camera.GetPosition());
+    SetFront(camera.GetFront());
+    SetUp(camera.GetUp());
     UpdateCameraVectors();
 }
 
 frame::Camera& Camera::operator=(const Camera& camera) {
-    position_     = camera.position_;
-    front_        = camera.front_;
-    up_           = camera.up_;
-    fov_rad_      = camera.fov_rad_;
-    aspect_ratio_ = camera.aspect_ratio_;
-    near_clip_    = camera.near_clip_;
-    far_clip_     = camera.far_clip_;
+    SetCameraMode(camera.GetCameraMode());
+    SetFovRadians(camera.GetFovRadians());
+    SetAspectRatio(camera.GetAspectRatio());
+    SetNearClip(camera.GetNearClip());
+    SetFarClip(camera.GetFarClip());
+    SetPosition(camera.GetPosition());
+    SetFront(camera.GetFront());
+    SetUp(camera.GetUp());
     UpdateCameraVectors();
     return *this;
 }
@@ -48,32 +53,37 @@ glm::mat4 Camera::ComputeProjection() const {
     return glm::perspective(fov_rad_, aspect_ratio_, near_clip_, far_clip_);
 }
 
-void Camera::SetFront(glm::vec3 vec) {
-    front_ = vec;
-    UpdateCameraVectors();
+void Camera::SetPosition(glm::vec3 vec) { position_ = vec; }
+
+bool Camera::SetFront(glm::vec3 vec) {
+    front_ = glm::normalize(vec);
+    return UpdateCameraVectors();
 }
 
-void Camera::SetPosition(glm::vec3 vec) {
-    position_ = vec;
-    UpdateCameraVectors();
+bool Camera::SetUp(glm::vec3 vec) {
+    up_       = glm::normalize(vec);
+    return UpdateCameraVectors();
 }
 
-void Camera::SetUp(glm::vec3 vec) {
-    up_ = vec;
-    UpdateCameraVectors();
-}
-
-void Camera::SetRight(glm::vec3 vec) {
-    right_ = vec;
-    up_    = glm::normalize(glm::cross(front_, -right_));
-    UpdateCameraVectors();
-}
-
-void Camera::UpdateCameraVectors() {
-    // TODO(anirul): Check field of view for correctness.
+bool Camera::UpdateCameraVectors() {
+    constexpr glm::vec3 UP(0, 1, 0);
     front_ = glm::normalize(front_);
-    right_ = glm::normalize(glm::cross(front_, up_));
-    up_    = glm::normalize(glm::cross(right_, front_));
+    if (camera_mode_ == CameraModeEnum::Y_AXIS_ALIGNED_ARCBALL) {
+        auto previous_right = right_;
+        auto previous_up = up_;
+        right_ = glm::normalize(glm::cross(front_, UP));
+        up_ = glm::normalize(glm::cross(right_, front_));
+        if (std::abs(glm::dot(up_, UP)) < 0.1) {
+            right_ = previous_right;
+            up_ = previous_up;
+            front_ = glm::normalize(glm::cross(up_, right_));
+            return true;
+        }
+    } else {
+        right_ = glm::normalize(glm::cross(front_, up_));
+        up_ = glm::normalize(glm::cross(right_, front_));
+    }
+    return false;
 }
 
 }  // End namespace frame.

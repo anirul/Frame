@@ -1,9 +1,11 @@
 #pragma once
 
+#include <array>
 #include <glm/glm.hpp>
-#include <utility>
 
 namespace frame {
+
+enum class CameraModeEnum { FREE_ARCBALL, Y_AXIS_ALIGNED_ARCBALL };
 
 /**
  * @class Camera
@@ -13,6 +15,9 @@ class Camera {
    public:
     /**
      * @brief Constructor it will create a camera according to the params.
+     * You can set the camera mode by using the set camera mode method. Note that in
+	 * Y_AXIS_ALIGNED_ARCBALL you won't be able to modify the up vector by the SetUp() method!
+     *
      * @param position: Position of the camera.
      * @param front: Direction the camera is facing to (normalized).
      * @param up: Direction of the up for the camera (normalized).
@@ -26,13 +31,13 @@ class Camera {
            float aspect_ratio = 16.0f / 9.0f, float near_clip = 0.1f, float far_clip = 1000.0f);
     /**
      * @brief Copy constructor.
-	 * @param camera: The camera from which this one will be created.
+     * @param camera: The camera from which this one will be created.
      */
     Camera(const Camera& camera);
     /**
      * @brief Copy assignment operator.
-	 * @param camera: The camera from which this one will be created.
-	 * @return The camera that was created.
+     * @param camera: The camera from which this one will be created.
+     * @return The camera that was created.
      */
     Camera& operator=(const Camera& camera);
 
@@ -50,8 +55,9 @@ class Camera {
     /**
      * @brief Update the front vector (normalized) and update the whole camera accordingly.
      * @param vec: Front vector of the camera.
+     * @return True if the camera is gimbal locked.
      */
-    void SetFront(glm::vec3 vec);
+    bool SetFront(glm::vec3 vec);
     /**
      * @brief Set position of the camera and update the whole camera accordingly.
      * @param vec: Position vector of the camera.
@@ -60,14 +66,10 @@ class Camera {
     /**
      * @brief Set the up position of the camera and update the whole camera accordingly.
      * @param vec: Up vector of the camera (normalized).
+     * @return True if the camera is gimbal locked.
      */
-    void SetUp(glm::vec3 vec);
-    /**
-     * @brief Set the right vector to the camera and update.
-	 * @param vec: The new right vector.
-     */
-    void SetRight(glm::vec3 vec);
-
+    bool SetUp(glm::vec3 vec);
+    
    public:
     /**
      * @brief Set the field of view in radians.
@@ -139,21 +141,37 @@ class Camera {
      * @return Far clipping plane distance.
      */
     float GetFarClip() const { return far_clip_; }
+	/**
+     * @brief Set when you want the camera not to be axis align.
+     * @param mode: Set the mode the camera is in, by default this is axis aligned!
+     */
+    void SetCameraMode(CameraModeEnum camera_mode) { camera_mode_ = camera_mode; }
+    /**
+     * @brief Get the camera mode.
+     * @return The camera mode.
+     */
+    CameraModeEnum GetCameraMode() const { return camera_mode_; }
 
    protected:
-    //! This will update all the vector by using cross product.
-    void UpdateCameraVectors();
-    // Default values for each parameter.
-    glm::vec3 position_ = { 0, 0, 0 };
-    glm::vec3 front_    = { 0, 0, -1 };
-    glm::vec3 up_       = { 0, 1, 0 };
-    glm::vec3 right_    = { 1, 0, 0 };
-    float yaw_          = -90.0f;
-    float pitch_        = 0.0f;
-    float fov_rad_      = glm::radians(65.0f);
-    float aspect_ratio_ = 16.f / 9.f;
-    float near_clip_    = 0.1f;
-    float far_clip_     = 1000.0f;
+    /**
+     * @brief This will update all the vector by using cross product.
+     * @return True if the camera is now gimbal locked.
+     */
+    bool UpdateCameraVectors();
+
+   private:
+    // Default values for each parameters.
+    glm::vec3 position_         = { 0, 0, 0 };
+    glm::vec3 front_            = { 0, 0, -1 };
+    glm::vec3 up_               = { 0, 1, 0 };
+    glm::vec3 right_            = { 1, 0, 0 };
+    float yaw_                  = -90.0f;
+    float pitch_                = 0.0f;
+    float fov_rad_              = glm::radians(65.0f);
+    float aspect_ratio_         = 16.f / 9.f;
+    float near_clip_            = 0.1f;
+    float far_clip_             = 1000.0f;
+    CameraModeEnum camera_mode_ = CameraModeEnum::Y_AXIS_ALIGNED_ARCBALL;
 };
 
 }  // End namespace frame.

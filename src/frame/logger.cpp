@@ -1,5 +1,7 @@
 #include "frame/logger.h"
 
+#include <spdlog/sinks/basic_file_sink.h>
+
 namespace frame {
 
 Logger::Logger() {

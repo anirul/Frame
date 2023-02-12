@@ -21,7 +21,7 @@ namespace frame {
  * all the object you need to render. This include the scene tree the materials the programs and the
  * meshes (for now only static meshes).
  */
-class LevelInterface {
+class LevelInterface : public NameInterface {
    public:
     //! @brief Virtual destructor.
     virtual ~LevelInterface() = default;
@@ -99,6 +99,11 @@ class LevelInterface {
      * @param name: Name of the scene root.
      */
     virtual void SetDefaultCameraName(const std::string& name) = 0;
+    /**
+     * @brief Set the default texture name.
+     * @param name: Name of the scene root.
+     */
+    virtual void SetDefaultTextureName(const std::string& name) = 0;
     /**
      * @brief Get the default camera id, using the name that was stored during loading.
      * @return An id or an error.

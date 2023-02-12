@@ -2,9 +2,6 @@
 
 #include <GL/glew.h>
 
-#include <cstdint>
-#include <glm/glm.hpp>
-
 #include "frame/json/proto.h"
 
 namespace frame::opengl {

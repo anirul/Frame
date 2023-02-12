@@ -205,6 +205,7 @@ std::unique_ptr<frame::TextureInterface> LoadCubeMapTextureFromFile(
         logger->info("Could not get the id of \"OutputTexture\".");
         return nullptr;
     }
+    auto* out_texture_ptr = level->GetTextureFromId(maybe_id);
     Renderer renderer({ nullptr, nullptr, level.get() },
                       { 0, 0, cube_pair_res.x, cube_pair_res.y });
     StaticMeshInterface* mesh_ptr = level->GetStaticMeshFromId(level->GetDefaultStaticMeshQuadId());
@@ -231,6 +232,7 @@ std::unique_ptr<frame::TextureInterface> LoadCubeMapTextureFromFiles(
     for (int i = 0; i < final_files.size(); ++i) {
         final_files[i] = frame::file::FindFile(files[i]);
     }
+    std::pair<std::uint32_t, std::uint32_t> img_size;
     std::array<std::unique_ptr<frame::file::Image>, 6> images;
     std::array<void*, 6> pointers      = {};
     TextureParameter texture_parameter = { pixel_element_size, pixel_structure };

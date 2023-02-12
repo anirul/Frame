@@ -18,6 +18,7 @@ namespace frame {
  */
 class Level : public LevelInterface {
    public:
+    Level() = default;
     /**
      * @brief Destructor.
      */
@@ -100,6 +101,11 @@ class Level : public LevelInterface {
      */
     void SetDefaultCameraName(const std::string& name) override { default_camera_name_ = name; }
     /**
+     * @brief Set the default texture name.
+     * @param name: Name of the scene root.
+     */
+    void SetDefaultTextureName(const std::string& name) override { default_texture_name_ = name; }
+    /**
      * @brief Get default root scene node id (this is the root of the scene tree).
      * @return An id or an error.
      */
@@ -133,6 +139,16 @@ class Level : public LevelInterface {
      * @return An enum type.
      */
     EntityTypeEnum GetEnumTypeFromId(EntityId id) const override { return id_enum_map_.at(id); }
+    /**
+     * @brief Get name.
+     * @return Name.
+     */
+    std::string GetName() const override { return name_; }
+    /**
+     * @brief Set name.
+     * @return Name.
+     */
+    void SetName(const std::string& name) override { name_ = name; }
 
    public:
     /**

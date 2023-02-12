@@ -80,6 +80,11 @@ class Device : public DeviceInterface {
      */
     void Resize(glm::uvec2 size) final;
     /**
+     * @brief Get the size of the window.
+     * @return The size of the window.
+     */
+    glm::uvec2 GetSize() const final;
+    /**
      * @brief Display to the screen.
      * @param dt: Delta time from the beginning of the software in seconds.
      */

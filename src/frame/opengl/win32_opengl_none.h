@@ -19,7 +19,7 @@ class Win32OpenGLNone : public WindowInterface {
     virtual ~Win32OpenGLNone();
 
    public:
-    void Run() override;
+    void Run(std::function<void()> lambda) override;
     void* GetGraphicContext() const override;
 
    public:

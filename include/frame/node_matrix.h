@@ -48,6 +48,9 @@ class NodeMatrix : public NodeInterface {
         : NodeInterface([](std::string) { return nullptr; }),
           matrix_(glm::toMat4(quat)),
           enable_rotation_(true) {}
+    //! @brief Virtual destructor.
+    ~NodeMatrix() override = default;
+
 
    public:
     /**

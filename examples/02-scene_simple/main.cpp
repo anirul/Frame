@@ -10,6 +10,7 @@
 #endif
 
 #include "frame/common/application.h"
+#include "frame/file/file_system.h"
 #include "frame/file/image_stb.h"
 #include "frame/gui/draw_gui_factory.h"
 #include "frame/gui/window_resolution.h"
@@ -23,6 +24,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 int main(int ac, char** av) try {
 #endif
     glm::uvec2 size = { 800, 600 };
+    bool end        = true;
 
     frame::gui::WindowResolution* ptr_window_resolution = nullptr;
     auto win         = frame::CreateNewWindow(frame::DrawingTargetEnum::WINDOW,

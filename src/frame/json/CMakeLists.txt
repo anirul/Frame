@@ -29,13 +29,16 @@ target_include_directories(FrameJson
     ${CMAKE_BINARY_DIR}/src/frame/proto
 )
 
-target_link_libraries(FrameJson 
-  PUBLIC
+target_link_libraries(FrameJson
+  PRIVATE
     Frame
     FrameProto
     FrameOpenGL
     glm::glm
+    GLEW::GLEW
+    glm::glm
     protobuf::libprotobuf
+    spdlog::spdlog
 )
 
-set_property(TARGET FrameJson PROPERTY FOLDER "Frame")
+set_property(TARGET FrameJson PROPERTY FOLDER "Frame/Json")

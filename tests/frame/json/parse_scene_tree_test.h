@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "frame/file/file_system.h"
+#include "frame/json/parse_json.h"
 #include "frame/level_interface.h"
 #include "frame/node_interface.h"
 #include "frame/window_factory.h"

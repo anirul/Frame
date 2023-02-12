@@ -52,6 +52,8 @@ class NodeLight : public NodeInterface {
     NodeLight(std::function<NodeInterface*(const std::string&)> func, const glm::vec3 position,
               const glm::vec3 direction, const glm::vec3 color, const float dot_inner_limit,
               const float dot_outer_limit);
+    //! @brief Virtual destructor.
+    ~NodeLight() override = default;
 
    public:
     /**

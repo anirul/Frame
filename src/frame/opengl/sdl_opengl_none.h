@@ -20,7 +20,7 @@ class SDLOpenGLNone : public WindowInterface {
     virtual ~SDLOpenGLNone();
 
    public:
-    void Run() override;
+    void Run(std::function<void()> lambda) override;
     void* GetGraphicContext() const override;
 
    public:

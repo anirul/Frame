@@ -1,7 +1,7 @@
 # Sample Common.
 
 add_library(FrameCommon
-  STATIC
+  OBJECT
     ${CMAKE_SOURCE_DIR}/include/frame/common/application.h
     ${CMAKE_SOURCE_DIR}/include/frame/common/draw.h
     ${CMAKE_SOURCE_DIR}/include/frame/common/path_interface.h
@@ -11,16 +11,19 @@ add_library(FrameCommon
 
 target_include_directories(FrameCommon
   PUBLIC
-    ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_SOURCE_DIR}
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 target_link_libraries(FrameCommon
-  PUBLIC
+  PRIVATE
     Frame
     FrameProto
     FrameOpenGL
+    glm::glm
+    protobuf::libprotobuf
 )
 
-set_property(TARGET FrameCommon PROPERTY FOLDER "Frame")
+set_property(TARGET FrameCommon PROPERTY FOLDER "Frame/Common")

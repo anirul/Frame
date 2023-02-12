@@ -64,6 +64,12 @@ class SDL2OpenGLDrawGui : public frame::gui::DrawGuiInterface {
      */
     void AddWindow(std::unique_ptr<frame::gui::GuiWindowInterface>&& callback) override;
     /**
+     * @brief Get a specific window (associated with a name).
+     * @param name: The name of the window.
+     * @return A pointer to the window.
+     */
+    frame::gui::GuiWindowInterface* GetWindow(const std::string& name) override;
+    /**
      * @brief Get all sub window name (title).
      * @return A list of all the sub windows.
      */

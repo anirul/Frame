@@ -12,6 +12,7 @@ namespace frame::proto {
 
 std::unique_ptr<frame::ProgramInterface> ParseProgramOpenGL(const Program& proto_program,
                                                             LevelInterface* level) {
+    Logger& logger = Logger::GetInstance();
     // Create the program.
     auto program = opengl::file::LoadProgram(proto_program.shader());
     if (!program) return nullptr;

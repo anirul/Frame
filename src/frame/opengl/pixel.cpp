@@ -33,6 +33,10 @@ GLenum ConvertToGLType(const frame::proto::PixelStructure& pixel_structure) {
             return GL_RGB;
         case frame::proto::PixelStructure::RGB_ALPHA:
             return GL_RGBA;
+        case frame::proto::PixelStructure::BGR:
+            return GL_BGR;
+        case frame::proto::PixelStructure::BGR_ALPHA:
+            return GL_BGRA;
         default:
             throw std::runtime_error("unknown structure : " +
                                      std::to_string(static_cast<int>(pixel_structure.value())));
@@ -48,8 +52,12 @@ GLenum ConvertToGLType(const frame::proto::PixelElementSize& pixel_element_size,
                     return GL_R8;
                 case frame::proto::PixelStructure::GREY_ALPHA:
                     return GL_RG8;
+                case frame::proto::PixelStructure::BGR:
+                    [[fallthrough]];
                 case frame::proto::PixelStructure::RGB:
                     return GL_RGB8;
+                case frame::proto::PixelStructure::BGR_ALPHA:
+                    [[fallthrough]];
                 case frame::proto::PixelStructure::RGB_ALPHA:
                     return GL_RGBA8;
                 default:

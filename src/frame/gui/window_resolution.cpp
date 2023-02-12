@@ -86,7 +86,7 @@ std::string WindowResolution::GetName() const { return name_; }
 
 void WindowResolution::SetName(const std::string& name) { name_ = name; }
 
-bool WindowResolution::End() { return end_; }
+bool WindowResolution::End() const { return end_; }
 
 glm::uvec2 WindowResolution::GetSize() const {
     if (fullscreen_ == FullScreenEnum::FULLSCREEN_DESKTOP) {

@@ -16,8 +16,8 @@ add_library(FrameProto
 
 protobuf_generate(TARGET FrameProto LANGUAGE cpp)
 
-target_link_libraries(FrameProto 
-  PUBLIC
+target_link_libraries(FrameProto
+  PRIVATE
     protobuf::libprotoc
     protobuf::libprotobuf
 )
