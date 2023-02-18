@@ -82,7 +82,7 @@ SDLVulkanNone::~SDLVulkanNone() {
     SDL_Quit();
 }
 
-void SDLVulkanNone::Run() {
+void SDLVulkanNone::Run(std::function<void()>/* lambda*/) {
     for (const auto& plugin_interface : device_->GetPluginPtrs()) {
         plugin_interface->Startup(size_);
     }

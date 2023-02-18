@@ -57,7 +57,6 @@ target_link_libraries(Frame
     absl::flags_parse
     absl::strings
     FrameJson
-    FrameOpenGL
     FrameVulkan
     $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
     $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>

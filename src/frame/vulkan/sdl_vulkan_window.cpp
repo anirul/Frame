@@ -89,7 +89,7 @@ SDLVulkanWindow::~SDLVulkanWindow() {
     SDL_Quit();
 }
 
-void SDLVulkanWindow::Run() {
+void SDLVulkanWindow::Run(std::function<void()> lambda/* = []{}*/) {
     // Called only once at the beginning.
     for (const auto& plugin_interface : device_->GetPluginPtrs()) {
         // In case this is a removed one it will be nulled.
@@ -136,6 +136,7 @@ void SDLVulkanWindow::Run() {
         }
 
         SetWindowTitle("SDL Vulkan - " + std::to_string(static_cast<float>(GetFPS(dt))));
+        lambda();
 
         // Swap the window.
         throw std::runtime_error("Implement swap window.");

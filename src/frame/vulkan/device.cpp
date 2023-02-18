@@ -90,6 +90,8 @@ void Device::Cleanup() { throw std::runtime_error("Not implemented!"); }
 
 void Device::Resize(glm::uvec2 size) { throw std::runtime_error("Not implemented!"); }
 
+glm::uvec2 Device::GetSize() const { throw std::runtime_error("Not implemented!"); }
+
 void Device::Display(double dt /*= 0.0*/) { throw std::runtime_error("Not implemented!"); }
 
 void Device::ScreenShot(const std::string& file) const {
