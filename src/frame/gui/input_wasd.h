@@ -16,7 +16,7 @@ class InputWasd : public InputInterface {
      * @param move_multiplication: Factor by which the keys are multiply.
      * @param rotation_multiplication: Factor to change the mouse speed when in movement mode.
      */
-    InputWasd(DeviceInterface* device, float move_multiplication, float rotation_multiplication)
+    InputWasd(DeviceInterface& device, float move_multiplication, float rotation_multiplication)
         : device_(device),
           move_multiplication_(move_multiplication),
           rotation_multiplication_(rotation_multiplication) {}
@@ -36,7 +36,7 @@ class InputWasd : public InputInterface {
     void NextFrame() override;
 
    private:
-    DeviceInterface* device_       = nullptr;
+    DeviceInterface& device_;
     bool shift_                    = false;
     bool mouse_active_             = false;
     float move_multiplication_     = 20.0f;

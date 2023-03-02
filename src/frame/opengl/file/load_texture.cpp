@@ -193,9 +193,7 @@ std::unique_ptr<frame::TextureInterface> LoadCubeMapTextureFromFile(
                { "<pixel_element_size>", PixelElementSize_Enum_Name(pixel_element_size.value()) },
                { "<pixel_structure>", "RGB" }
     };
-    // TODO(anirul): Fix this!
-    auto level =
-        frame::proto::ParseLevel(cube_pair_res, FillLevel(proto_level_json, filling_map), nullptr);
+    auto level = frame::proto::ParseLevel(cube_pair_res, FillLevel(proto_level_json, filling_map));
     if (!level) {
         logger->info("Could not create level.");
         return nullptr;
@@ -205,16 +203,15 @@ std::unique_ptr<frame::TextureInterface> LoadCubeMapTextureFromFile(
         logger->info("Could not get the id of \"OutputTexture\".");
         return nullptr;
     }
-    auto* out_texture_ptr = level->GetTextureFromId(maybe_id);
+    auto& out_texture_ptr = level->GetTextureFromId(maybe_id);
     Renderer renderer({ nullptr, nullptr, level.get() },
                       { 0, 0, cube_pair_res.x, cube_pair_res.y });
-    StaticMeshInterface* mesh_ptr = level->GetStaticMeshFromId(level->GetDefaultStaticMeshQuadId());
-    if (!mesh_ptr) throw std::runtime_error("No default cube mesh found.");
+    StaticMeshInterface& mesh_ptr = level->GetStaticMeshFromId(level->GetDefaultStaticMeshQuadId());
     auto material_id = level->GetIdFromName("EquirectangularMaterial");
-    if (!material_id)
+    if (material_id == NullId) {
         throw std::runtime_error("No material id found for [EquirectangularMaterial].");
-    MaterialInterface* material_ptr = level->GetMaterialFromId(material_id);
-    if (!material_ptr) throw std::runtime_error("No material found for [EquirectangularMaterial].");
+    }
+    MaterialInterface& material_ptr = level->GetMaterialFromId(material_id);
     for (std::uint32_t i = 0; i < 6; ++i) {
         renderer.SetCubeMapTarget(GetTextureFrameFromPosition(i));
         renderer.RenderMesh(mesh_ptr, material_ptr, views_cubemap[i]);

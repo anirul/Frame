@@ -18,8 +18,7 @@ class RendererTest : public testing::Test {
    public:
     bool LoadDefaultLevel() {
         auto level =
-            frame::proto::ParseLevel(size_, frame::file::FindFile("asset/json/renderer_test.json"),
-                                     window_->GetUniqueDevice());
+            frame::proto::ParseLevel(size_, frame::file::FindFile("asset/json/renderer_test.json"));
         if (level) {
             level_ = std::move(level);
             return true;

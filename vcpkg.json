@@ -1,23 +1,27 @@
 {
-    "name": "frame",
-    "version-string": "0.4.0-alpha",
-    "homepage": "https://github.com/anirul/Frame/",
-    "description": "Frame graphic library.",
-    "dependencies": [
-        "abseil",
-        "glm",
-        "glew",
-        "gtest",
-        "happly",
-        {
-            "name": "imgui",
-            "features": ["opengl3-binding", "sdl2-binding", "docking-experimental"]
-        },
-        "opengl",
-        "protobuf",
-        "sdl2",
-        "spdlog",
-        "stb",
-        "tinyobjloader"
-    ]
+  "name": "frame",
+  "version-string": "0.4.0-alpha",
+  "homepage": "https://github.com/anirul/Frame/",
+  "description": "Frame graphic library.",
+  "dependencies": [
+    "abseil",
+    "glm",
+    "glew",
+    "gtest",
+    "happly",
+    {
+      "name": "imgui",
+      "features": [ "opengl3-binding", "sdl2-binding", "docking-experimental" ]
+    },
+    "opengl",
+    "protobuf",
+    {
+      "name": "sdl2",
+      "features": [ "vulkan" ]
+    },
+    "spdlog",
+    "stb",
+    "tinyobjloader",
+    "vulkan"
+  ]
 }

@@ -11,20 +11,20 @@
 namespace frame::proto {
 
 std::unique_ptr<frame::ProgramInterface> ParseProgramOpenGL(const Program& proto_program,
-                                                            LevelInterface* level) {
+                                                            LevelInterface& level) {
     Logger& logger = Logger::GetInstance();
     // Create the program.
     auto program = opengl::file::LoadProgram(proto_program.shader());
     if (!program) return nullptr;
     for (const auto& texture_name : proto_program.input_texture_names()) {
-        auto maybe_texture_id = level->GetIdFromName(texture_name);
+        auto maybe_texture_id = level.GetIdFromName(texture_name);
         if (!maybe_texture_id) return nullptr;
         EntityId texture_id = maybe_texture_id;
         // Check this is a texture.
         program->AddInputTextureId(texture_id);
     }
     for (const auto& texture_name : proto_program.output_texture_names()) {
-        auto maybe_texture_id = level->GetIdFromName(texture_name);
+        auto maybe_texture_id = level.GetIdFromName(texture_name);
         if (!maybe_texture_id) return nullptr;
         EntityId texture_id = maybe_texture_id;
         // Check this is a texture.
@@ -33,14 +33,14 @@ std::unique_ptr<frame::ProgramInterface> ParseProgramOpenGL(const Program& proto
     program->SetSceneRoot(0);
     switch (proto_program.input_scene_type().value()) {
         case SceneType::QUAD: {
-            auto maybe_quad_id = level->GetDefaultStaticMeshQuadId();
+            auto maybe_quad_id = level.GetDefaultStaticMeshQuadId();
             if (!maybe_quad_id) return nullptr;
             EntityId quad_id = maybe_quad_id;
             program->SetSceneRoot(quad_id);
             break;
         }
         case SceneType::CUBE: {
-            auto maybe_cube_id = level->GetDefaultStaticMeshCubeId();
+            auto maybe_cube_id = level.GetDefaultStaticMeshCubeId();
             if (!maybe_cube_id) return nullptr;
             EntityId cube_id = maybe_cube_id;
             program->SetSceneRoot(cube_id);

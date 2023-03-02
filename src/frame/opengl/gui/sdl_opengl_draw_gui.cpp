@@ -13,7 +13,7 @@
 
 namespace frame::opengl::gui {
 
-SDL2OpenGLDrawGui::SDL2OpenGLDrawGui(frame::DeviceInterface* device, frame::WindowInterface* window)
+SDL2OpenGLDrawGui::SDL2OpenGLDrawGui(frame::DeviceInterface& device, frame::WindowInterface& window)
     : window_interface_(window), device_interface_(device) {
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
@@ -33,8 +33,8 @@ SDL2OpenGLDrawGui::SDL2OpenGLDrawGui(frame::DeviceInterface* device, frame::Wind
         file::FindFile("asset/font/poppins/Poppins-Light.ttf").string().c_str(), 20.0f);
 
     // Setup Platform/Renderer back ends
-    ImGui_ImplSDL2_InitForOpenGL(static_cast<SDL_Window*>(window_interface_->GetWindowContext()),
-                                 device_interface_->GetDeviceContext());
+    ImGui_ImplSDL2_InitForOpenGL(static_cast<SDL_Window*>(window_interface_.GetWindowContext()),
+                                 device_interface_.GetDeviceContext());
     ImGui_ImplOpenGL3_Init("#version 450");
 }
 
@@ -47,7 +47,7 @@ SDL2OpenGLDrawGui::~SDL2OpenGLDrawGui() {
 
 void SDL2OpenGLDrawGui::Startup(glm::uvec2 size) { size_ = size; }
 
-bool SDL2OpenGLDrawGui::Update(DeviceInterface* device, double dt) {
+bool SDL2OpenGLDrawGui::Update(DeviceInterface& device, double dt) {
     // Local variables.
     bool returned_value                  = true;
     is_keyboard_passed_                  = false;
@@ -56,7 +56,7 @@ bool SDL2OpenGLDrawGui::Update(DeviceInterface* device, double dt) {
 
     // Start the Dear ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplSDL2_NewFrame(static_cast<SDL_Window*>(window_interface_->GetWindowContext()));
+    ImGui_ImplSDL2_NewFrame(static_cast<SDL_Window*>(window_interface_.GetWindowContext()));
     ImGui::NewFrame();
 
     if (!is_visible_) {
@@ -76,23 +76,24 @@ bool SDL2OpenGLDrawGui::Update(DeviceInterface* device, double dt) {
     }
 
     // Go through all texture and create a window for each of them.
-    for (const EntityId& id : device->GetLevel()->GetAllTextures()) {
-        opengl::Texture* texture =
-            dynamic_cast<opengl::Texture*>(device->GetLevel()->GetTextureFromId(id));
-        if (!texture) continue;
-        auto* level = device->GetLevel();
+    for (const EntityId& id : device.GetLevel().GetAllTextures()) {
+        frame::TextureInterface& texture_interface = device.GetLevel().GetTextureFromId(id);
+        if (texture_interface.IsCubeMap()) continue;
+        opengl::Texture& texture =
+            dynamic_cast<opengl::Texture&>(device.GetLevel().GetTextureFromId(id));
+        auto& level = device.GetLevel();
         bool is_default_output =
-            level->GetIdFromName(texture->GetName()) == level->GetDefaultOutputTextureId();
+            level.GetIdFromName(texture.GetName()) == level.GetDefaultOutputTextureId();
         if (is_default_output) {
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
         }
         // If the window are not visible and it is not the main window then bail out.
         if (!is_visible_ && !is_default_output) continue;
         if (!is_visible_ && is_default_output) {
-            ImGui::Begin(fmt::format("{} - <fullscreen>", texture->GetName()).c_str(), nullptr,
+            ImGui::Begin(fmt::format("{} - <fullscreen>", texture.GetName()).c_str(), nullptr,
                          ImGuiWindowFlags_NoDecoration);
         } else {
-            ImGui::Begin(texture->GetName().c_str());
+            ImGui::Begin(texture.GetName().c_str());
         }
         // Check if you should enable default window keyboard and mouse.
         if (ImGui::IsWindowHovered() && is_default_output) {
@@ -100,7 +101,7 @@ bool SDL2OpenGLDrawGui::Update(DeviceInterface* device, double dt) {
         }
         // Get the window width.
         ImVec2 content_window = ImGui::GetContentRegionAvail();
-        auto size             = texture->GetSize();
+        auto size             = texture.GetSize();
         // Compute the aspect ratio.
         float aspect_ratio = static_cast<float>(size.x) / static_cast<float>(size.y);
         // Cast the opengl windows id.
@@ -109,7 +110,7 @@ bool SDL2OpenGLDrawGui::Update(DeviceInterface* device, double dt) {
 #pragma warning(push)
 #pragma warning(disable : 4312)
 #endif
-        ImTextureID gl_id = reinterpret_cast<ImTextureID>(texture->GetId());
+        ImTextureID gl_id = reinterpret_cast<ImTextureID>(texture.GetId());
 #if defined(_WIN32) || defined(_WIN64)
 #pragma warning(pop)
 #endif
@@ -137,8 +138,8 @@ bool SDL2OpenGLDrawGui::Update(DeviceInterface* device, double dt) {
     if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
         ImGui::UpdatePlatformWindows();
         ImGui::RenderPlatformWindowsDefault();
-        SDL_GL_MakeCurrent(static_cast<SDL_Window*>(window_interface_->GetWindowContext()),
-                           window_interface_->GetGraphicContext());
+        SDL_GL_MakeCurrent(static_cast<SDL_Window*>(window_interface_.GetWindowContext()),
+                           window_interface_.GetGraphicContext());
     }
 
     return returned_value;
@@ -171,8 +172,8 @@ bool SDL2OpenGLDrawGui::PollEvent(void* event) {
     return io.WantCaptureMouse || io.WantCaptureKeyboard;
 }
 
-frame::gui::GuiWindowInterface* SDL2OpenGLDrawGui::GetWindow(const std::string& name) {
-    return callbacks_.at(name).get();
+frame::gui::GuiWindowInterface& SDL2OpenGLDrawGui::GetWindow(const std::string& name) {
+    return *callbacks_.at(name).get();
 }
 
 }  // End namespace frame::opengl::gui.

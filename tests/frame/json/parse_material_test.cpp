@@ -10,7 +10,7 @@ TEST_F(ParseMaterialTest, CreateParseMaterialTest) {
     proto_material.set_program_name("program");
     proto_material.add_texture_names("texture");
     proto_material.add_inner_names("texture");
-    EXPECT_TRUE(frame::proto::ParseMaterialOpenGL(proto_material, level_.get()));
+    EXPECT_TRUE(frame::proto::ParseMaterialOpenGL(proto_material, *level_.get()));
 }
 
 }  // End namespace test.

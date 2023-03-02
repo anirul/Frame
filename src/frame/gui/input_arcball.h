@@ -16,7 +16,7 @@ class InputArcball : public InputInterface {
      * @param move_multiplication: Factor by which the keys are multiply.
      * @param rotation_multiplication: Factor to change the mouse speed when in movement mode.
      */
-    InputArcball(DeviceInterface* device, glm::vec3 pivot, float move_multiplication,
+    InputArcball(DeviceInterface& device, glm::vec3 pivot, float move_multiplication,
                  float zoom_multiplication)
         : device_(device),
           move_multiplication_(move_multiplication),
@@ -38,7 +38,7 @@ class InputArcball : public InputInterface {
     void NextFrame() override;
 
    private:
-    DeviceInterface* device_       = nullptr;
+    DeviceInterface& device_;
     bool mouse_active_             = false;
     float move_multiplication_     = 1.0f;
     float zoom_multiplication_     = 1.0f;

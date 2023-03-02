@@ -3,7 +3,7 @@
 #include <memory>
 
 #include "frame/api.h"
-#include "frame/opengl/window.h"
+#include "frame/opengl/window_factory.h"
 
 namespace frame {
 

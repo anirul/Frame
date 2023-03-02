@@ -1,6 +1,6 @@
 #include "frame/opengl/window_test.h"
 
-#include "frame/opengl/window.h"
+#include "frame/opengl/window_factory.h"
 
 namespace test {
 
@@ -22,7 +22,7 @@ TEST_F(WindowTest, CreateDeviceWindowTest) {
     ASSERT_FALSE(window_);
     window_ = frame::opengl::CreateSDL2OpenGLNone({ 640, 512 });
     ASSERT_TRUE(window_);
-    EXPECT_TRUE(window_->GetUniqueDevice());
+    EXPECT_NO_THROW(window_->GetUniqueDevice());
 }
 
 }  // End namespace test.

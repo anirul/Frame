@@ -40,11 +40,13 @@ Obj::Obj(const std::filesystem::path& file_name) {
 
     std::string err;
     std::string warn;
-    tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, file_name.string().c_str(),
-                     directory.string().append("/").c_str());
-
+    bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, file_name.string().c_str(),
+                                directory.string().append("/").c_str());
+    if (!warn.empty()) {
+        logger_->warn("Warning parsing file {}: {}", file_name.string(), warn);
+    }
     if (!err.empty()) {
-        logger_->error(err);
+        logger_->error("Error parsing file {}: {}", file_name.string(), err);
         throw std::runtime_error(err);
     }
 #endif  // TINY_OBJ_LOADER_V2

@@ -37,7 +37,7 @@ class DrawGuiInterface : public PluginInterface {
      * @param name: The name of the window.
      * @return A pointer to the window.
      */
-    virtual GuiWindowInterface* GetWindow(const std::string& name) = 0;
+    virtual GuiWindowInterface& GetWindow(const std::string& name) = 0;
     /**
      * @brief Get all sub window name (title).
      * @return A list of all the sub windows.

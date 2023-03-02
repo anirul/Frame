@@ -57,7 +57,7 @@ void SDLOpenGLNone::Run(std::function<void()> lambda) {
     if (input_interface_) input_interface_->NextFrame();
     device_->Display(0.0);
     for (const auto& plugin_interface : device_->GetPluginPtrs()) {
-        plugin_interface->Update(device_.get(), 0.0);
+        plugin_interface->Update(*device_.get(), 0.0);
     }
     lambda();
 }

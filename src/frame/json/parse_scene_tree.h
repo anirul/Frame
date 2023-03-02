@@ -13,6 +13,6 @@ namespace frame::proto {
  * @param level: A pointer to a level.
  * @return True if success and false if error.
  */
-[[nodiscard]] bool ParseSceneTreeFile(const SceneTree& proto_scene_tree, LevelInterface* level);
+[[nodiscard]] bool ParseSceneTreeFile(const SceneTree& proto_scene_tree, LevelInterface& level);
 
 }  // End namespace frame::proto.

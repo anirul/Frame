@@ -11,28 +11,26 @@ Application::Application(std::unique_ptr<frame::WindowInterface>&& window)
 
 void Application::Startup(std::filesystem::path path) {
     assert(window_);
-    auto device = window_->GetUniqueDevice();
-    assert(device);
+    auto& device = window_->GetUniqueDevice();
     if (!plugin_name_.empty()) {
-        device->RemovePluginByName(plugin_name_);
+        device.RemovePluginByName(plugin_name_);
     }
     auto plugin  = std::make_unique<Draw>(window_->GetSize(), path, device);
     plugin_name_ = "ApplicationDraw";
     plugin->SetName(plugin_name_);
-    device->AddPlugin(std::move(plugin));
+    device.AddPlugin(std::move(plugin));
 }
 
 void Application::Startup(std::unique_ptr<frame::LevelInterface>&& level) {
     assert(window_);
-    auto device = window_->GetUniqueDevice();
-    assert(device);
+    auto& device = window_->GetUniqueDevice();
     if (!plugin_name_.empty()) {
-        device->RemovePluginByName(plugin_name_);
+        device.RemovePluginByName(plugin_name_);
     }
     auto plugin  = std::make_unique<Draw>(window_->GetSize(), std::move(level), device);
     plugin_name_ = "ApplicationDraw";
     plugin->SetName(plugin_name_);
-    device->AddPlugin(std::move(plugin));
+    device.AddPlugin(std::move(plugin));
 }
 
 void Application::Resize(glm::uvec2 size, FullScreenEnum fullscreen_enum) {

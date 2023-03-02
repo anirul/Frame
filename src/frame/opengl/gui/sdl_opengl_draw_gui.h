@@ -19,7 +19,7 @@ class SDL2OpenGLDrawGui : public frame::gui::DrawGuiInterface {
      * @param device: The device to use.
      * @param window: The window to use.
      */
-    SDL2OpenGLDrawGui(frame::DeviceInterface* device, frame::WindowInterface* window);
+    SDL2OpenGLDrawGui(frame::DeviceInterface& device, frame::WindowInterface& window);
     //! @brief Destructor.
     virtual ~SDL2OpenGLDrawGui();
 
@@ -42,8 +42,8 @@ class SDL2OpenGLDrawGui : public frame::gui::DrawGuiInterface {
      * @param static_mesh: The static mesh.
      * @param material: The material associated with the mesh.
      */
-    void PreRender(UniformInterface& uniform, DeviceInterface* device,
-                   StaticMeshInterface* static_mesh, MaterialInterface* material) override {}
+    void PreRender(UniformInterface& uniform, DeviceInterface& device,
+                   StaticMeshInterface& static_mesh, MaterialInterface& material) override {}
     //! @brief Called to cleanup at the end.
     void End() override {}
     /**
@@ -68,7 +68,7 @@ class SDL2OpenGLDrawGui : public frame::gui::DrawGuiInterface {
      * @param name: The name of the window.
      * @return A pointer to the window.
      */
-    frame::gui::GuiWindowInterface* GetWindow(const std::string& name) override;
+    frame::gui::GuiWindowInterface& GetWindow(const std::string& name) override;
     /**
      * @brief Get all sub window name (title).
      * @return A list of all the sub windows.
@@ -89,7 +89,7 @@ class SDL2OpenGLDrawGui : public frame::gui::DrawGuiInterface {
      * @param level: The level.
      * @return Is it still looping or not?
      */
-    bool Update(DeviceInterface* device, double dt = 0.0) override;
+    bool Update(DeviceInterface& device, double dt = 0.0) override;
     /**
      * @brief Poll event.
      * @param event: The event to be polled.
@@ -98,8 +98,8 @@ class SDL2OpenGLDrawGui : public frame::gui::DrawGuiInterface {
 
    protected:
     std::map<std::string, std::unique_ptr<frame::gui::GuiWindowInterface>> callbacks_ = {};
-    WindowInterface* window_interface_                                                = nullptr;
-    DeviceInterface* device_interface_                                                = nullptr;
+    WindowInterface& window_interface_;
+    DeviceInterface& device_interface_;
     std::string name_;
     glm::uvec2 size_         = { 0, 0 };
     bool is_keyboard_passed_ = false;

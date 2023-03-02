@@ -9,11 +9,6 @@
 #include <iostream>
 #include <string_view>
 
-// Removed the warning from getenv.
-#if defined(_WIN32) || defined(_WIN64)
-#pragma warning(disable : 4996)
-#endif
-
 namespace {
 
 // This is an awful hack.
@@ -21,23 +16,25 @@ constexpr std::array<std::string_view, 2> avoid_elements = { "build", "Build" };
 
 const std::filesystem::path FindElement(const std::filesystem::path& file,
                                         std::function<bool(const std::filesystem::path&)> test) {
-    // This is a bad hack as this won't prevent people from adding Asset
-    // high in the path of the game.
+    // Find the current path to the executing path.
+    std::filesystem::path path = std::filesystem::current_path();
     for (auto i : { 0, 1, 2, 3, 4, 5, 6 }) {
-        // Cheat the GITHUB issues.
-        const char* cf = std::getenv("GITHUB_WORKSPACE");
-        std::string f  = (cf) ? std::string(cf) : std::string{};
-        if (!f.empty()) f += "/lvv_gpu/";
-        for (auto j = 0; j < i; ++j) f += "../";
-        f += file.string();
-        if (test(f)) {
-            std::filesystem::path p(f);
-            std::filesystem::path final_path = std::filesystem::canonical(p);
-            bool found                       = false;
+        auto new_path = path;
+        for (auto j = 0; j < i; ++j) new_path /= "../";
+        new_path /= file;
+        if (test(new_path)) {
+            // Prune the path from relative elements.
+            new_path   = new_path.lexically_normal();
+            // Search for build (it create a bunch of asset and other element that will confuse the
+            // search for the file and path).
+            bool found = false;
             for (const auto& element : avoid_elements) {
-                if (final_path.string().find(element) != std::string::npos) found = true;
+                if (new_path.string().find(element) != std::string::npos) found = true;
             }
-            if (!found) return final_path;
+            if (!found) {
+                std::cout << new_path << std::endl;
+                return new_path;
+            }
         }
     }
     throw std::runtime_error(fmt::format("Could not find any element: [{}].", file.string()));

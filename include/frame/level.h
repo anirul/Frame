@@ -38,48 +38,48 @@ class Level : public LevelInterface {
      * @param id: The id to get the scene node from.
      * @return A pointer to the node or null.
      */
-    NodeInterface* GetSceneNodeFromId(EntityId id) const override {
-        return id_scene_node_map_.at(id).get();
+    NodeInterface& GetSceneNodeFromId(EntityId id) const override {
+        return *id_scene_node_map_.at(id).get();
     }
     /**
      * @brief Will get the texture from an id.
      * @param id: The id to get the texture from.
      * @return A pointer to the texture or null.
      */
-    TextureInterface* GetTextureFromId(EntityId id) const override {
-        return id_texture_map_.at(id).get();
+    TextureInterface& GetTextureFromId(EntityId id) const override {
+        return *id_texture_map_.at(id).get();
     }
     /**
      * @brief Will get the program from an id.
      * @param id: The id to get the program from.
      * @return A pointer to the program or null.
      */
-    ProgramInterface* GetProgramFromId(EntityId id) const override {
-        return id_program_map_.at(id).get();
+    ProgramInterface& GetProgramFromId(EntityId id) const override {
+        return *id_program_map_.at(id).get();
     }
     /**
      * @brief Will get a material from an id.
      * @param id: The id to get the material from.
      * @return A pointer to a material or null.
      */
-    MaterialInterface* GetMaterialFromId(EntityId id) const override {
-        return id_material_map_.at(id).get();
+    MaterialInterface& GetMaterialFromId(EntityId id) const override {
+        return *id_material_map_.at(id).get();
     }
     /**
      * @brief Will get a buffer from an id.
      * @param id: The id to get the buffer from.
      * @return A pointer to a buffer or null.
      */
-    BufferInterface* GetBufferFromId(EntityId id) const override {
-        return id_buffer_map_.at(id).get();
+    BufferInterface& GetBufferFromId(EntityId id) const override {
+        return *id_buffer_map_.at(id).get();
     }
     /**
      * @brief Will get a static mesh from an id.
      * @param id: The id to get the static mesh from.
      * @return A pointer to a static mesh or null.
      */
-    StaticMeshInterface* GetStaticMeshFromId(EntityId id) const override {
-        return id_static_mesh_map_.at(id).get();
+    StaticMeshInterface& GetStaticMeshFromId(EntityId id) const override {
+        return *id_static_mesh_map_.at(id).get();
     }
     /**
      * @brief Get a vector of static mesh id and corresponding material id.
@@ -242,7 +242,7 @@ class Level : public LevelInterface {
      * @brief Get the default camera from the level.
      * @return A pointer to the default camera.
      */
-    Camera* GetDefaultCamera() override;
+    Camera& GetDefaultCamera() override;
     /**
      * @brief Replace a texture to a new texture given as a vector.
      * @param vector: The new vector containing the new texture.

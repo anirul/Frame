@@ -28,7 +28,7 @@ class Draw : public frame::PluginInterface {
      * @param path: A path to the JSON file containing the level interface.
      * @param device: A pointer to the current device (come from the window).
      */
-    Draw(glm::uvec2 size, std::filesystem::path path, frame::DeviceInterface* device)
+    Draw(glm::uvec2 size, std::filesystem::path path, frame::DeviceInterface& device)
         : size_(size), draw_type_based_(DrawTypeEnum::PATH), path_(path), device_(device) {}
     /**
      * @brief Construct a new Draw object.
@@ -37,7 +37,7 @@ class Draw : public frame::PluginInterface {
      * @param device: A pointer to the current device (come from the window).
      */
     Draw(glm::uvec2 size, std::unique_ptr<frame::LevelInterface>&& level,
-         frame::DeviceInterface* device)
+         frame::DeviceInterface& device)
         : size_(size),
           draw_type_based_(DrawTypeEnum::LEVEL),
           level_(std::move(level)),
@@ -57,15 +57,15 @@ class Draw : public frame::PluginInterface {
      * @param static_mesh: The static mesh.
      * @param material: The material associated with the mesh.
      */
-    void PreRender(UniformInterface& uniform, DeviceInterface* device,
-                   StaticMeshInterface* static_mesh, MaterialInterface* material) override;
+    void PreRender(UniformInterface& uniform, DeviceInterface& device,
+                   StaticMeshInterface& static_mesh, MaterialInterface& material) override;
     /**
      * @brief Called to update variables, called after the main render phase.
      * @param device: The device.
      * @param dt: Delta time between previous frame and present frame.
      * @return true: If the draw is still running.
      */
-    bool Update(DeviceInterface* device, double dt = 0.0) override;
+    bool Update(DeviceInterface& device, double dt = 0.0) override;
 
    public:
     /**
@@ -96,7 +96,7 @@ class Draw : public frame::PluginInterface {
     const DrawTypeEnum draw_type_based_;
     std::filesystem::path path_;
     std::unique_ptr<frame::LevelInterface> level_;
-    frame::DeviceInterface* device_ = nullptr;
+    frame::DeviceInterface& device_;
     std::string name_;
     double dt_ = 0.0;
 };

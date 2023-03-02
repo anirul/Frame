@@ -39,10 +39,10 @@ int main(int ac, char** av) try {
                                              frame::RenderingAPIEnum::OPENGL, size);
     frame::gui::WindowResolution* ptr_window_resolution = nullptr;
     frame::gui::WindowCamera* ptr_window_camera         = nullptr;
-    auto gui_window = frame::gui::CreateDrawGui(win->GetUniqueDevice(), win.get());
+    auto gui_window = frame::gui::CreateDrawGui(win->GetUniqueDevice(), *win.get());
     {
-        auto gui_resolution   = std::make_unique<frame::gui::WindowResolution>("Resolution", size,
-                                                                             win->GetDesktopSize());
+        auto gui_resolution = std::make_unique<frame::gui::WindowResolution>(
+            "Resolution", size, win->GetDesktopSize(), win->GetPixelPerInch());
         ptr_window_resolution = gui_resolution.get();
         gui_window->AddWindow(std::move(gui_resolution));
     }
@@ -51,22 +51,22 @@ int main(int ac, char** av) try {
         ptr_window_camera = gui_camera.get();
         gui_window->AddWindow(std::move(gui_camera));
     }
-    win->GetUniqueDevice()->AddPlugin(std::move(gui_window));
+    win->GetUniqueDevice().AddPlugin(std::move(gui_window));
     win->SetInputInterface(frame::gui::CreateInputArcball(
         win->GetUniqueDevice(), glm::vec3(0, 0, 1.0f), absl::GetFlag(FLAGS_move_mult),
         absl::GetFlag(FLAGS_zoom_mult)));
-    auto* device_ptr = win->GetUniqueDevice();
+    auto& device_ref = win->GetUniqueDevice();
     frame::common::Application app(std::move(win));
     std::vector<bool> check_end;
     bool do_once = true;
     do {
         std::unique_ptr<frame::LevelInterface> level = frame::proto::ParseLevel(
-            size, frame::file::FindFile("asset/json/point_cloud.json"), device_ptr);
+            size, frame::file::FindFile("asset/json/point_cloud.json"));
         // All except first.
         if (!std::exchange(do_once, false)) {
-            level->GetDefaultCamera()->operator=(ptr_window_camera->GetSavedCamera());
+            level->GetDefaultCamera().operator=(ptr_window_camera->GetSavedCamera());
         }
-        ptr_window_camera->SetCameraPtr(level->GetDefaultCamera());
+        ptr_window_camera->SetCameraPtr(&level->GetDefaultCamera());
         app.Startup(std::move(level));
         app.Run();
         app.Resize(ptr_window_resolution->GetSize(), ptr_window_resolution->GetFullScreen());

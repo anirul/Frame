@@ -30,37 +30,37 @@ class LevelInterface : public NameInterface {
      * @param id: The id to get the scene node from.
      * @return A pointer to the node or null.
      */
-    virtual NodeInterface* GetSceneNodeFromId(EntityId id) const = 0;
+    virtual NodeInterface& GetSceneNodeFromId(EntityId id) const = 0;
     /**
      * @brief Will get the texture from an id.
      * @param id: The id to get the texture from.
      * @return A pointer to the texture or null.
      */
-    virtual TextureInterface* GetTextureFromId(EntityId id) const = 0;
+    virtual TextureInterface& GetTextureFromId(EntityId id) const = 0;
     /**
      * @brief Will get the program from an id.
      * @param id: The id to get the program from.
      * @return A pointer to the program or null.
      */
-    virtual ProgramInterface* GetProgramFromId(EntityId id) const = 0;
+    virtual ProgramInterface& GetProgramFromId(EntityId id) const = 0;
     /**
      * @brief Will get a material from an id.
      * @param id: The id to get the material from.
      * @return A pointer to a material or null.
      */
-    virtual MaterialInterface* GetMaterialFromId(EntityId id) const = 0;
+    virtual MaterialInterface& GetMaterialFromId(EntityId id) const = 0;
     /**
      * @brief Will get a buffer from an id.
      * @param id: The id to get the buffer from.
      * @return A pointer to a buffer or null.
      */
-    virtual BufferInterface* GetBufferFromId(EntityId id) const = 0;
+    virtual BufferInterface& GetBufferFromId(EntityId id) const = 0;
     /**
      * @brief Will get a static mesh from an id.
      * @param id: The id to get the static mesh from.
      * @return A pointer to a static mesh or null.
      */
-    virtual StaticMeshInterface* GetStaticMeshFromId(EntityId id) const = 0;
+    virtual StaticMeshInterface& GetStaticMeshFromId(EntityId id) const = 0;
     /**
      * @brief Get a vector of static mesh id and corresponding material id.
      * @return Vector of static mesh id and corresponding material id.
@@ -204,7 +204,7 @@ class LevelInterface : public NameInterface {
      * @brief Get the default camera from the level.
      * @return A pointer to the default camera.
      */
-    virtual Camera* GetDefaultCamera() = 0;
+    virtual Camera& GetDefaultCamera() = 0;
     /**
      * @brief Get enum type from Id.
      * @param id: Id to be returned.

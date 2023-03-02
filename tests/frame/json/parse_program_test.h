@@ -16,9 +16,8 @@ class ParseProgramTest : public testing::Test {
         : window_(frame::CreateNewWindow(frame::DrawingTargetEnum::NONE)),
           proto_level_(frame::proto::LoadProtoFromJsonFile<frame::proto::Level>(
               frame::file::FindFile("asset/json/program_test.json"))) {
-        auto level = frame::proto::ParseLevel({ 320, 200 },
-                                              frame::file::FindFile("asset/json/program_test.json"),
-                                              window_->GetUniqueDevice());
+        auto level = frame::proto::ParseLevel(
+            { 320, 200 }, frame::file::FindFile("asset/json/program_test.json"));
         if (!level) throw std::runtime_error("Couldn't parse level.");
         level_ = std::move(level);
     }

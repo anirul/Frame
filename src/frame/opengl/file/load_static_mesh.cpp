@@ -17,7 +17,7 @@ namespace {
 
 template <typename T>
 std::optional<EntityId> CreateBufferInLevel(
-    LevelInterface* level, const std::vector<T>& vec, const std::string& desc,
+    LevelInterface& level, const std::vector<T>& vec, const std::string& desc,
     const BufferTypeEnum buffer_type   = BufferTypeEnum::ARRAY_BUFFER,
     const BufferUsageEnum buffer_usage = BufferUsageEnum::STATIC_DRAW) {
     auto buffer = std::make_unique<Buffer>(buffer_type, buffer_usage);
@@ -27,7 +27,7 @@ std::optional<EntityId> CreateBufferInLevel(
     buffer->Copy(vec.size() * sizeof(T), vec.data());
     buffer->UnBind();
     buffer->SetName(desc);
-    return level->AddBuffer(std::move(buffer));
+    return level.AddBuffer(std::move(buffer));
 }
 
 std::optional<std::unique_ptr<TextureInterface>> LoadTextureFromString(
@@ -37,7 +37,7 @@ std::optional<std::unique_ptr<TextureInterface>> LoadTextureFromString(
                                              pixel_element_size, pixel_structure);
 }
 
-std::optional<EntityId> LoadMaterialFromObj(LevelInterface* level,
+std::optional<EntityId> LoadMaterialFromObj(LevelInterface& level,
                                             const frame::file::ObjMaterial& material_obj) {
     // Load textures.
     auto maybe_color =
@@ -71,16 +71,16 @@ std::optional<EntityId> LoadMaterialFromObj(LevelInterface* level,
     auto metallic_name  = fmt::format("{}.Metallic", material_obj.name);
     // Add texture to the level.
     maybe_color.value()->SetName(color_name);
-    auto maybe_color_id = level->AddTexture(std::move(maybe_color.value()));
+    auto maybe_color_id = level.AddTexture(std::move(maybe_color.value()));
     if (!maybe_color_id) return std::nullopt;
     maybe_normal.value()->SetName(normal_name);
-    auto maybe_normal_id = level->AddTexture(std::move(maybe_normal.value()));
+    auto maybe_normal_id = level.AddTexture(std::move(maybe_normal.value()));
     if (!maybe_normal_id) return std::nullopt;
     maybe_roughness.value()->SetName(roughness_name);
-    auto maybe_roughness_id = level->AddTexture(std::move(maybe_roughness.value()));
+    auto maybe_roughness_id = level.AddTexture(std::move(maybe_roughness.value()));
     if (!maybe_roughness_id) return std::nullopt;
     maybe_metallic.value()->SetName(metallic_name);
-    auto maybe_metallic_id = level->AddTexture(std::move(maybe_metallic.value()));
+    auto maybe_metallic_id = level.AddTexture(std::move(maybe_metallic.value()));
     if (!maybe_metallic_id) return std::nullopt;
     // Create the material.
     std::unique_ptr<MaterialInterface> material = std::make_unique<opengl::Material>();
@@ -91,10 +91,10 @@ std::optional<EntityId> LoadMaterialFromObj(LevelInterface* level,
     material->AddTextureId(maybe_metallic_id, metallic_name);
     // Finally add the material to the level.
     material->SetName(material_obj.name);
-    return level->AddMaterial(std::move(material));
+    return level.AddMaterial(std::move(material));
 }
 
-std::pair<EntityId, EntityId> LoadStaticMeshFromObj(LevelInterface* level,
+std::pair<EntityId, EntityId> LoadStaticMeshFromObj(LevelInterface& level,
                                                     const frame::file::ObjMesh& mesh_obj,
                                                     const std::string& name,
                                                     const std::vector<EntityId> material_ids,
@@ -155,12 +155,12 @@ std::pair<EntityId, EntityId> LoadStaticMeshFromObj(LevelInterface* level,
     }
     std::string mesh_name = fmt::format("{}.{}", name, counter);
     static_mesh->SetName(mesh_name);
-    auto maybe_mesh_id = level->AddStaticMesh(std::move(static_mesh));
+    auto maybe_mesh_id = level.AddStaticMesh(std::move(static_mesh));
     if (!maybe_mesh_id) return { NullId, NullId };
     return { maybe_mesh_id, material_id };
 }
 
-EntityId LoadStaticMeshFromPly(LevelInterface* level, const frame::file::Ply& ply,
+EntityId LoadStaticMeshFromPly(LevelInterface& level, const frame::file::Ply& ply,
                                const std::string& name) {
     EntityId result = NullId;
     std::vector<float> points;
@@ -221,22 +221,27 @@ EntityId LoadStaticMeshFromPly(LevelInterface* level, const frame::file::Ply& pl
     StaticMeshParameter parameter = {};
     parameter.point_buffer_id     = point_buffer_id;
     parameter.index_buffer_id     = index_buffer_id;
-    // Check if a colored per vertex file or not.
-    if (colors.empty()) {
-        parameter.normal_buffer_id  = normal_buffer_id;
+
+    // Add for present buffer.
+    if (!normals.empty()) {
+        parameter.normal_buffer_id = normal_buffer_id;
+    }
+    if (!textures.empty()) {
         parameter.texture_buffer_id = tex_coord_buffer_id;
-    } else {
+    }
+    if (!colors.empty()) {
         parameter.color_buffer_id = color_buffer_id;
     }
+
     static_mesh           = std::make_unique<opengl::StaticMesh>(level, parameter);
     std::string mesh_name = fmt::format("{}", name);
     static_mesh->SetName(mesh_name);
-    auto maybe_mesh_id = level->AddStaticMesh(std::move(static_mesh));
+    auto maybe_mesh_id = level.AddStaticMesh(std::move(static_mesh));
     if (!maybe_mesh_id) return NullId;
     return maybe_mesh_id;
 }
 
-std::vector<EntityId> LoadStaticMeshesFromObjFile(LevelInterface* level,
+std::vector<EntityId> LoadStaticMeshesFromObjFile(LevelInterface& level,
                                                   const std::filesystem::path& file,
                                                   const std::string& name,
                                                   const std::string& material_name /* = ""*/) {
@@ -246,7 +251,7 @@ std::vector<EntityId> LoadStaticMeshesFromObjFile(LevelInterface* level,
     Logger& logger     = Logger::GetInstance();
     std::vector<EntityId> material_ids;
     if (!material_name.empty()) {
-        auto maybe_id = level->GetIdFromName(material_name);
+        auto maybe_id = level.GetIdFromName(material_name);
         if (maybe_id) material_ids.push_back(maybe_id);
     }
     logger->info("Found in obj<{}> : {} meshes.", file.string(), meshes.size());
@@ -255,28 +260,25 @@ std::vector<EntityId> LoadStaticMeshesFromObjFile(LevelInterface* level,
         auto [static_mesh_id, material_id] =
             LoadStaticMeshFromObj(level, mesh, name, material_ids, mesh_counter);
         if (!static_mesh_id) return {};
-        auto func = [level](const std::string& name) -> NodeInterface* {
-            if (level) {
-                auto maybe_id = level->GetIdFromName(name);
-                if (!maybe_id) {
-                    throw std::runtime_error(fmt::format("no id for name: {}", name));
-                }
-                return level->GetSceneNodeFromId(maybe_id);
+        auto func = [&level](const std::string& name) -> NodeInterface* {
+            auto maybe_id = level.GetIdFromName(name);
+            if (!maybe_id) {
+                throw std::runtime_error(fmt::format("no id for name: {}", name));
             }
-            return nullptr;
+            return &level.GetSceneNodeFromId(maybe_id);
         };
         auto ptr = std::make_unique<NodeStaticMesh>(func, static_mesh_id);
         ptr->SetName(fmt::format("Node.{}.{}", name, mesh_counter));
-        auto maybe_id = level->AddSceneNode(std::move(ptr));
+        auto maybe_id = level.AddSceneNode(std::move(ptr));
         if (!maybe_id) return {};
-        level->AddMeshMaterialId(maybe_id, material_id);
+        level.AddMeshMaterialId(maybe_id, material_id);
         entity_id_vec.push_back(maybe_id);
         mesh_counter++;
     }
     return entity_id_vec;
 }
 
-EntityId LoadStaticMeshFromPlyFile(LevelInterface* level, const std::filesystem::path& file,
+EntityId LoadStaticMeshFromPlyFile(LevelInterface& level, const std::filesystem::path& file,
                                    const std::string& name,
                                    const std::string& material_name /* = ""*/) {
     EntityId entity_id = NullId;
@@ -284,33 +286,30 @@ EntityId LoadStaticMeshFromPlyFile(LevelInterface* level, const std::filesystem:
     Logger& logger       = Logger::GetInstance();
     EntityId material_id = NullId;
     if (!material_name.empty()) {
-        auto maybe_id = level->GetIdFromName(material_name);
+        auto maybe_id = level.GetIdFromName(material_name);
         if (maybe_id) material_id = maybe_id;
     }
     auto static_mesh_id = LoadStaticMeshFromPly(level, ply, name);
     if (!static_mesh_id) return NullId;
-    auto func = [level](const std::string& name) -> NodeInterface* {
-        if (level) {
-            auto maybe_id = level->GetIdFromName(name);
-            if (!maybe_id) {
-                throw std::runtime_error(fmt::format("no id for name: {}", name));
-            }
-            return level->GetSceneNodeFromId(maybe_id);
+    auto func = [&level](const std::string& name) -> NodeInterface* {
+        auto maybe_id = level.GetIdFromName(name);
+        if (!maybe_id) {
+            throw std::runtime_error(fmt::format("no id for name: {}", name));
         }
-        return nullptr;
+        return &level.GetSceneNodeFromId(maybe_id);
     };
     auto ptr = std::make_unique<NodeStaticMesh>(func, static_mesh_id);
     ptr->SetName(fmt::format("Node.{}", name));
-    auto maybe_id = level->AddSceneNode(std::move(ptr));
+    auto maybe_id = level.AddSceneNode(std::move(ptr));
     if (!maybe_id) return NullId;
-    level->AddMeshMaterialId(maybe_id, material_id);
+    level.AddMeshMaterialId(maybe_id, material_id);
     entity_id = maybe_id;
     return entity_id;
 }
 
 }  // End namespace.
 
-std::vector<EntityId> LoadStaticMeshesFromFile(LevelInterface* level,
+std::vector<EntityId> LoadStaticMeshesFromFile(LevelInterface& level,
                                                const std::filesystem::path& file,
                                                const std::string& name,
                                                const std::string& material_name /* = ""*/) {

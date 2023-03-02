@@ -15,6 +15,7 @@ namespace frame {
  */
 std::unique_ptr<WindowInterface> CreateNewWindow(
     DrawingTargetEnum drawing_target_enum = DrawingTargetEnum::WINDOW,
-    RenderingAPIEnum rendering_api_enum = RenderingAPIEnum::OPENGL, glm::uvec2 size = { 320, 200 });
+    RenderingAPIEnum rendering_api_enum   = RenderingAPIEnum::OPENGL,
+    glm::uvec2 size                       = { 1980, 720 });
 
 }  // End namespace frame.

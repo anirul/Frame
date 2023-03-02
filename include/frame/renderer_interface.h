@@ -48,7 +48,7 @@ struct RendererInterface {
      * @param model: Model matrix to be used.
      * @param dt: Delta time between the beginning of execution and now in seconds.
      */
-    virtual void RenderMesh(StaticMeshInterface* static_mesh, MaterialInterface* material,
+    virtual void RenderMesh(StaticMeshInterface& static_mesh, MaterialInterface& material,
                             const glm::mat4& projection, const glm::mat4& view = glm::mat4(1.0f),
                             const glm::mat4& model_mat = glm::mat4(1.0f), double dt = 0.0) = 0;
     /**

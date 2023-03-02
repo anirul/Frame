@@ -75,7 +75,11 @@ struct ProgramInterface : public NameInterface {
      * @param uniform_interface: The way to communicate the uniform like matrices (model, view,
      * projection) but also time and other uniform that could be needed.
      */
-    virtual void Use(const UniformInterface* uniform_interface) const = 0;
+    virtual void Use(const UniformInterface& uniform_interface) const = 0;
+    /**
+     * @brief Use the program, a little bit like bind.
+     */
+	virtual void Use() const = 0;
     //! @brief Stop using the program, a little bit like unbind.
     virtual void UnUse() const = 0;
     /**
