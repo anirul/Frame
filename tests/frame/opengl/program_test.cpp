@@ -35,7 +35,7 @@ TEST_F(ProgramTest, CheckUseAndLinkProgramTest) {
     EXPECT_TRUE(fragment_shader.LoadFromSource(GetFragmentSource()));
     program_ptr->AddShader(fragment_shader);
     program_->LinkShader();
-    program_->Use(nullptr);
+    program_->Use();
 }
 
 TEST_F(ProgramTest, CreateSimpleProgramProgramTest) {

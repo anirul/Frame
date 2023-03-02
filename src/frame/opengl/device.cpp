@@ -39,10 +39,8 @@ void Device::Startup(std::unique_ptr<frame::LevelInterface>&& level) {
     // Copy level into the local area.
     level_ = std::move(level);
     // Setup camera.
-    auto* camera = level_->GetDefaultCamera();
-    if (camera) {
-        camera->SetAspectRatio(static_cast<float>(size_.x) / static_cast<float>(size_.y));
-    }
+    auto& camera = level_->GetDefaultCamera();
+    camera.SetAspectRatio(static_cast<float>(size_.x) / static_cast<float>(size_.y));
     // Create a renderer.
     Context context{ nullptr, this, level_.get() };
     renderer_ = std::make_unique<Renderer>(context, glm::uvec4(0, 0, size_.x, size_.y));
@@ -130,21 +128,21 @@ void Device::Display(double dt /*= 0.0*/) {
     if (!renderer_) throw std::runtime_error("No Renderer.");
     Clear();
     // Compute left and right cameras.
-    Camera left_camera = *level_->GetDefaultCamera();
+    Camera left_camera = level_->GetDefaultCamera();
     left_camera.SetPosition(left_camera.GetPosition() -
                             left_camera.GetRight() * interocular_distance_ * 0.5f);
     glm::vec3 left_camera_direction =
-        level_->GetDefaultCamera()->GetPosition() + focus_point_ - left_camera.GetPosition();
+        level_->GetDefaultCamera().GetPosition() + focus_point_ - left_camera.GetPosition();
     left_camera.SetFront(glm::normalize(left_camera_direction));
-    Camera right_camera = *level_->GetDefaultCamera();
+    Camera right_camera = level_->GetDefaultCamera();
     right_camera.SetPosition(right_camera.GetPosition() +
                              right_camera.GetRight() * interocular_distance_ * 0.5f);
     glm::vec3 right_camera_direction =
-        level_->GetDefaultCamera()->GetPosition() + focus_point_ - right_camera.GetPosition();
+        level_->GetDefaultCamera().GetPosition() + focus_point_ - right_camera.GetPosition();
     right_camera.SetFront(glm::normalize(right_camera_direction));
     switch (stereo_enum_) {
         case StereoEnum::NONE:
-            DisplayCamera(*level_->GetDefaultCamera(), glm::uvec4(0, 0, size_.x, size_.y),
+            DisplayCamera(level_->GetDefaultCamera(), glm::uvec4(0, 0, size_.x, size_.y),
                           dt);
             break;
         case StereoEnum::HORIZONTAL_SPLIT:
@@ -172,14 +170,13 @@ void Device::ScreenShot(const std::string& file) const {
     auto maybe_texture_id = level_->GetDefaultOutputTextureId();
     if (!maybe_texture_id) throw std::runtime_error("no default texture.");
     auto texture_id = maybe_texture_id;
-    auto* texture   = level_->GetTextureFromId(texture_id);
-    if (!texture) throw std::runtime_error("could not open texture.");
+    auto& texture   = level_->GetTextureFromId(texture_id);
     proto::PixelElementSize pixel_element_size{};
-    pixel_element_size.set_value(texture->GetPixelElementSize());
+    pixel_element_size.set_value(texture.GetPixelElementSize());
     proto::PixelStructure pixel_structure{};
-    pixel_structure.set_value(texture->GetPixelStructure());
-    file::Image output_image(texture->GetSize(), pixel_element_size, pixel_structure);
-    auto vec = texture->GetTextureByte();
+    pixel_structure.set_value(texture.GetPixelStructure());
+    file::Image output_image(texture.GetSize(), pixel_element_size, pixel_structure);
+    auto vec = texture.GetTextureByte();
     output_image.SetData(vec.data());
     output_image.SaveImageToFile(file);
 }

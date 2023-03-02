@@ -1,5 +1,12 @@
 #include "frame/opengl/sdl_opengl_window.h"
 
+// Needed under windows to get the PPI.
+#if defined(_WIN32) || defined(_WIN64)
+#include <shellscalingapi.h>
+#include <shtypes.h>
+#pragma comment(lib, "Shcore.lib")
+#endif
+
 #include "frame/gui/draw_gui_interface.h"
 #include "frame/opengl/gui/sdl_opengl_draw_gui.h"
 #include "frame/opengl/message_callback.h"
@@ -8,9 +15,8 @@ namespace frame::opengl {
 
 SDLOpenGLWindow::SDLOpenGLWindow(glm::uvec2 size) : size_(size) {
     if (SDL_Init(SDL_INIT_VIDEO) != 0) throw std::runtime_error("Couldn't initialize SDL2.");
-    sdl_window_ =
-        SDL_CreateWindow("SDL OpenGL", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-                         size_.x, size_.y, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
+    sdl_window_ = SDL_CreateWindow("SDL OpenGL", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+                                   size_.x, size_.y, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
     if (!sdl_window_) {
         throw std::runtime_error("Couldn't start a window in SDL2.");
     }
@@ -26,7 +32,7 @@ SDLOpenGLWindow::SDLOpenGLWindow(glm::uvec2 size) : size_(size) {
     int i = SDL_GetWindowDisplayIndex(sdl_window_);
     SDL_Rect j;
     SDL_GetDisplayBounds(i, &j);
-    desktop_size_.x  = j.w;
+    desktop_size_.x = j.w;
     desktop_size_.y = j.h;
 }
 
@@ -78,7 +84,7 @@ void SDLOpenGLWindow::Run(std::function<void()> lambda) {
         // Draw the Scene not used?
         for (const auto& plugin_interface : device_->GetPluginPtrs()) {
             if (plugin_interface) {
-                if (!plugin_interface->Update(device_.get(), time.count())) {
+                if (!plugin_interface->Update(*device_.get(), time.count())) {
                     loop = false;
                 }
             }
@@ -117,6 +123,9 @@ bool SDLOpenGLWindow::RunEvent(const SDL_Event& event, const double dt) {
             case SDLK_PRINTSCREEN:
                 device_->ScreenShot("ScreenShot.png");
                 return true;
+        }
+        if (key_callbacks_.count(event.key.keysym.sym)) {
+            return key_callbacks_[event.key.keysym.sym]();
         }
     }
     if (input_interface_) {
@@ -245,5 +254,76 @@ void SDLOpenGLWindow::Resize(glm::uvec2 size, FullScreenEnum fullscreen_enum) {
 }
 
 frame::FullScreenEnum SDLOpenGLWindow::GetFullScreenEnum() const { return fullscreen_enum_; }
+
+#if defined(_WIN32) || defined(_WIN64)
+namespace {
+
+std::vector<glm::vec2> s_ppi_vec = {};
+
+// This is a callback to receive the monitor and then to compute the PPI.
+BOOL MonitorEnumProc(HMONITOR hmonitor, HDC hdc, LPRECT p_rect, LPARAM param) {
+    std::uint32_t hppi = 0;
+    std::uint32_t vppi = 0;
+
+    // Get the PPI from monitor use the raw DPI to get real values not the one from font.
+    if (GetDpiForMonitor(hmonitor, MDT_RAW_DPI, &hppi, &vppi) != S_OK) {
+        throw std::runtime_error("Couldn't get the PPI.");
+    }
+
+    // Get the logical width and height of the monitor.
+    MONITORINFOEX miex;
+    miex.cbSize = sizeof(miex);
+    GetMonitorInfo(hmonitor, &miex);
+    int cx_logical = (miex.rcMonitor.right - miex.rcMonitor.left);
+    int cy_logical = (miex.rcMonitor.bottom - miex.rcMonitor.top);
+
+    // Get the physical width and height of the monitor.
+    DEVMODE dm;
+    dm.dmSize        = sizeof(dm);
+    dm.dmDriverExtra = 0;
+    EnumDisplaySettings(miex.szDevice, ENUM_CURRENT_SETTINGS, &dm);
+    int cx_physical = dm.dmPelsWidth;
+    int cy_physical = dm.dmPelsHeight;
+
+    // Calculate the scaling factor.
+    float horz_scale  = static_cast<float>(cx_physical) / static_cast<float>(cx_logical);
+    double vert_scale = static_cast<float>(cy_physical) / static_cast<float>(cy_logical);
+    // Used a epsilon to avoid problems in the assertion.
+    assert(fabs(horz_scale - vert_scale) < 1e-4f);
+    float multiplication_scale = horz_scale;
+
+    // Push back the value to the vector.
+    s_ppi_vec.push_back(glm::vec2(static_cast<float>(hppi) * multiplication_scale,
+                                  static_cast<float>(vppi) * multiplication_scale));
+    return TRUE;
+}
+
+}  // End namespace.
+#endif
+
+glm::vec2 SDLOpenGLWindow::GetPixelPerInch(std::uint32_t screen /*= 0*/) const {
+#if defined(_WIN32) || defined(_WIN64)
+    // Reset the vector.
+    s_ppi_vec = {};
+    // Enumerate the monitor with a callback to push the ppi in the vector.
+    if (!EnumDisplayMonitors(nullptr, nullptr, MonitorEnumProc, 0)) {
+        throw std::runtime_error("Couldn't enumerate monitors.");
+    }
+    // Check if we tried to get a screen that is in the screen values.
+    if (s_ppi_vec.size() < screen) {
+        throw std::runtime_error("Outside screen.");
+    }
+    return s_ppi_vec[screen];
+#else  // Not windows.
+    float hppi = 0.0f;
+    float vppi = 0.0f;
+    float dppi = 0.0f;
+    // Use the SDL function this should work on Linux?
+    if (SDL_GetDisplayDPI(screen, &dppi, &hppi, &vppi)) {
+        throw std::runtime_error(fmt::format("Error in GetPixelPerInch: {}", SDL_GetError()));
+    }
+    return glm::vec2(hppi, vppi);
+#endif
+}
 
 }  // End namespace frame::opengl.

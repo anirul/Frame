@@ -120,7 +120,7 @@ class Device : public DeviceInterface {
      * @brief Get the current level.
      * @return a temporary pointer to the current level being run.
      */
-    LevelInterface* GetLevel() final { return level_.get(); }
+    LevelInterface& GetLevel() final { return *level_.get(); }
     /**
      * @brief Get the current context.
      * @return A pointer to the current context (this is used by the windowing system).

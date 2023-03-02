@@ -19,7 +19,8 @@ class WindowResolution : public GuiWindowInterface {
      * @param name: The name of the window.
      * @param size: The initial size of the window.
      */
-    WindowResolution(const std::string& name, glm::uvec2 size, glm::uvec2 border_less_size);
+    WindowResolution(const std::string& name, glm::uvec2 size, glm::uvec2 border_less_size,
+                     glm::vec2 pixel_per_inch);
     //! @brief Virtual destructor.
     virtual ~WindowResolution() = default;
 
@@ -36,14 +37,19 @@ class WindowResolution : public GuiWindowInterface {
      * @param name: The name of the window.
      */
     void SetName(const std::string& name) override;
-
-   public:
     /**
      * @brief Get the window size.
      * This will vary according to what full screen mode is selected!
      * @return The size of the window.
      */
     glm::uvec2 GetSize() const;
+    /**
+     * @brief Check if this is the end of the software.
+     * @return True if this is the end false if not.
+     */
+    bool End() const override;
+
+   public:
     /**
      * @brief Get the full screen mode.
      * @return The full screen mode.
@@ -69,11 +75,6 @@ class WindowResolution : public GuiWindowInterface {
      * @return True if they are inverted.
      */
     bool IsInvertLeftRight() const { return invert_left_right_; }
-    /**
-     * @brief Check if this is the end of the software.
-     * @return True if this is the end false if not.
-     */
-    bool End() const override;
 
    private:
     glm::uvec2 size_;
@@ -109,6 +110,8 @@ class WindowResolution : public GuiWindowInterface {
     int resolution_selected_    = 0;
     int fullscreen_selected_    = 0;
     int stereo_selected_        = 0;
+    float hppi_                 = -1.0f;
+    float vppi_                 = -1.0f;
     bool invert_left_right_     = false;
     float interocular_distance_ = .065f;
     glm::vec3 focus_point_      = glm::vec3(0, 0, 1);

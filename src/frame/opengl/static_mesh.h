@@ -29,7 +29,7 @@ class StaticMesh : public BindInterface, public StaticMeshInterface {
      * @param level: The level into witch the class will be generated.
      * @param config: The static mesh config structure.
      */
-    StaticMesh(LevelInterface* level, const StaticMeshParameter& parameters);
+    StaticMesh(LevelInterface& level, const StaticMeshParameter& parameters);
     //! @brief Virtual destructor.
     virtual ~StaticMesh();
 
@@ -121,7 +121,7 @@ class StaticMesh : public BindInterface, public StaticMeshInterface {
     void UnBind() const override;
 
    protected:
-    LevelInterface* level_                                             = nullptr;
+    LevelInterface& level_;
     bool clear_depth_buffer_                                           = true;
     mutable bool locked_bind_                                          = false;
     EntityId point_buffer_id_                                          = NullId;
@@ -145,13 +145,13 @@ class StaticMesh : public BindInterface, public StaticMeshInterface {
  * @param level: The quad static mesh will be added to this level.
  * @return Will return an entity id if successful.
  */
-EntityId CreateQuadStaticMesh(LevelInterface* level);
+EntityId CreateQuadStaticMesh(LevelInterface& level);
 /**
  * @brief Create a cube static mesh center around the origin of space (this will be use to map a
  * cubemap).
  * @param level: The cube static mesh will be added to this level.
  * @return Will return an entity id if successful.
  */
-EntityId CreateCubeStaticMesh(LevelInterface* level);
+EntityId CreateCubeStaticMesh(LevelInterface& level);
 
 }  // End namespace frame::opengl.

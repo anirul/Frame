@@ -24,11 +24,17 @@ class SDLVulkanWindow : public WindowInterface {
     void SetInputInterface(std::unique_ptr<InputInterface>&& input_interface) override {
         input_interface_ = std::move(input_interface);
     }
+	void AddKeyCallback(std::int32_t key, std::function<bool()> func) override {
+		throw std::runtime_error("Not implemented yet!");
+	}
     void SetUniqueDevice(std::unique_ptr<DeviceInterface>&& device) override {
         device_ = std::move(device);
     }
-    DeviceInterface* GetUniqueDevice() override { return device_.get(); }
+    DeviceInterface& GetUniqueDevice() override { return *device_.get(); }
     glm::uvec2 GetSize() const override { return size_; }
+	glm::vec2 GetPixelPerInch(std::uint32_t screen = 0) const {
+        throw std::runtime_error("Not implemented yet!");
+    }
     glm::uvec2 GetDesktopSize() const override { return desktop_size_; }
     void* GetWindowContext() const override { return sdl_window_; }
     void SetWindowTitle(const std::string& title) const override {

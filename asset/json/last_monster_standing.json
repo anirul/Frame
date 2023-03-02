@@ -1,0 +1,121 @@
+{
+  "name": "LastMonsterStanding",
+  "default_texture_name": "final",
+  "textures": [
+    {
+      "name": "final",
+      "size": {
+        "x": -1,
+        "y": -1
+      },
+      "pixel_element_size": { "value": "BYTE" },
+      "pixel_structure": { "value": "RGB" }
+    },
+    {
+      "name": "skybox",
+      "cubemap": "true",
+      "pixel_element_size": { "value": "BYTE" },
+      "pixel_structure": { "value": "RGB" },
+      "file_names": {
+        "positive_x": "asset/cubemap/negative_x.png",
+        "negative_x": "asset/cubemap/positive_x.png",
+        "positive_y": "asset/cubemap/negative_y.png",
+        "negative_y": "asset/cubemap/positive_y.png",
+        "positive_z": "asset/cubemap/negative_z.png",
+        "negative_z": "asset/cubemap/positive_z.png"
+      }
+    }
+  ],
+  "materials": [
+    {
+      "name": "CubeMapMaterial",
+      "program_name": "CubeMapProgram",
+      "texture_names": [ "skybox" ],
+      "inner_names": [ "Skybox" ]
+    }
+  ],
+  "programs": [
+    {
+      "name": "CubeMapProgram",
+      "input_texture_names": "skybox",
+      "output_texture_names": "point_cloud_rendering",
+      "input_scene_type": { "value": "CUBE" },
+      "shader": "cubemap",
+      "parameters": [
+        {
+          "name": "projection",
+          "uniform_enum": "PROJECTION_MAT4"
+        },
+        {
+          "name": "view",
+          "uniform_enum": "VIEW_MAT4"
+        },
+        {
+          "name": "model",
+          "uniform_enum": "MODEL_MAT4"
+        }
+      ]
+    }
+  ],
+  "scene_tree": {
+    "default_camera_name": "camera",
+    "default_root_name": "root",
+    "scene_matrices": [
+      {
+        "name": "root",
+        "matrix": {
+          "m11": 1.0,
+          "m22": 1.0,
+          "m33": 1.0,
+          "m44": 1.0
+        }
+      },
+      {
+        "name": "skybox_holder",
+        "parent": "root",
+        "matrix": {
+          "m11": "1",
+          "m22": "1",
+          "m33": "1",
+          "m44": "1"
+        }
+      }
+    ],
+    "scene_static_meshes": [
+      {
+        "name": "CubeMapMesh",
+        "parent": "skybox_holder",
+        "material_name": "CubeMapMaterial",
+        "mesh_enum": "CUBE"
+      },
+      {
+        "name": "ClearDepthBuffer",
+        "clean_buffer": {
+          "values": [ "CLEAR_DEPTH" ]
+        }
+      }
+    ],
+    "scene_cameras": [
+      {
+        "name": "camera",
+        "parent": "root",
+        "fov_degrees": 65.0,
+        "position": {
+          "x": 0,
+          "y": 0,
+          "z": -1
+        },
+        "target": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        },
+        "up": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        }
+      }
+    ]
+  }
+}

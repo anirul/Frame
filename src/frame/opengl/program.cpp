@@ -41,34 +41,32 @@ void Program::LinkShader() {
     CreateUniformList();
 }
 
-void Program::Use(const UniformInterface* uniform_interface) const {
+void Program::Use() const { glUseProgram(program_id_); }
+
+void Program::Use(const UniformInterface& uniform_interface) const {
     glUseProgram(program_id_);
-    if (!uniform_interface) {
-        logger_->warn("No uniform interface passed to program {}?", GetName());
-        return;
-    }
     if (HasUniform("projection")) {
-        Uniform("projection", uniform_interface->GetProjection());
+        Uniform("projection", uniform_interface.GetProjection());
     }
     if (HasUniform("view")) {
-        Uniform("view", uniform_interface->GetView());
+        Uniform("view", uniform_interface.GetView());
     }
     if (HasUniform("model")) {
-        Uniform("model", uniform_interface->GetModel());
+        Uniform("model", uniform_interface.GetModel());
     }
     if (HasUniform("time_s")) {
-        Uniform("time_s", static_cast<float>(uniform_interface->GetDeltaTime()));
+        Uniform("time_s", static_cast<float>(uniform_interface.GetDeltaTime()));
     }
-    for (const auto& name : uniform_interface->GetFloatNames()) {
+    for (const auto& name : uniform_interface.GetFloatNames()) {
         if (HasUniform(name)) {
-            Uniform(name, uniform_interface->GetValueFloat(name),
-                    uniform_interface->GetSizeFromFloat(name));
+            Uniform(name, uniform_interface.GetValueFloat(name),
+                    uniform_interface.GetSizeFromFloat(name));
         }
     }
-    for (const auto& name : uniform_interface->GetIntNames()) {
+    for (const auto& name : uniform_interface.GetIntNames()) {
         if (HasUniform(name)) {
-            Uniform(name, uniform_interface->GetValueInt(name),
-                    uniform_interface->GetSizeFromInt(name));
+            Uniform(name, uniform_interface.GetValueInt(name),
+                    uniform_interface.GetSizeFromInt(name));
         }
     }
 }

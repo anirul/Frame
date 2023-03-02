@@ -9,7 +9,7 @@
 
 namespace frame::opengl {
 
-StaticMesh::StaticMesh(LevelInterface* level, const StaticMeshParameter& parameter)
+StaticMesh::StaticMesh(LevelInterface& level, const StaticMeshParameter& parameter)
     : level_(level),
       point_buffer_id_(parameter.point_buffer_id),
       point_buffer_size_(parameter.point_buffer_size),
@@ -27,26 +27,24 @@ StaticMesh::StaticMesh(LevelInterface* level, const StaticMeshParameter& paramet
     glBindVertexArray(vertex_array_object_);
 
     // Point buffer.
-    auto* point_buffer_ptr = dynamic_cast<Buffer*>(level_->GetBufferFromId(point_buffer_id_));
-    assert(point_buffer_ptr);
+    auto& point_buffer_ref = dynamic_cast<Buffer&>(level_.GetBufferFromId(point_buffer_id_));
     // Create the point buffer.
-    point_buffer_ptr->Bind();
+    point_buffer_ref.Bind();
     glVertexAttribPointer(0, point_buffer_size_, GL_FLOAT, GL_FALSE, 0, nullptr);
-    point_buffer_ptr->UnBind();
+    point_buffer_ref.UnBind();
 
     // Counter of array buffers.
     std::uint32_t vertex_array_count = 0;
     static std::uint32_t count       = 0;
-    std::size_t point_size_element   = point_buffer_ptr->GetSize() / sizeof(float);
+    std::size_t point_size_element   = point_buffer_ref.GetSize() / sizeof(float);
 
     // Color buffer.
     if (color_buffer_id_) {
-        auto* gl_color_buffer = dynamic_cast<Buffer*>(level->GetBufferFromId(color_buffer_id_));
-        assert(gl_color_buffer);
-        gl_color_buffer->Bind();
+        auto& gl_color_buffer = dynamic_cast<Buffer&>(level.GetBufferFromId(color_buffer_id_));
+        gl_color_buffer.Bind();
         glVertexAttribPointer(++vertex_array_count, color_buffer_size_, GL_FLOAT, GL_FALSE, 0,
                               nullptr);
-        gl_color_buffer->UnBind();
+        gl_color_buffer.UnBind();
     } else if (std::count(parameter.generate_list.begin(), parameter.generate_list.end(),
                           StaticMeshParameter::StaticMeshParameterEnum::GENERATE_COLOR)) {
         std::vector<float> color;
@@ -55,23 +53,21 @@ StaticMesh::StaticMesh(LevelInterface* level, const StaticMeshParameter& paramet
         std::unique_ptr<BufferInterface> gl_color_buffer = std::make_unique<Buffer>();
         gl_color_buffer->SetName(fmt::format("Mesh.Buffer.Color.{}", count));
         gl_color_buffer->Copy(color);
-        color_buffer_id_       = level_->AddBuffer(std::move(gl_color_buffer));
-        auto* color_buffer_ptr = dynamic_cast<Buffer*>(level_->GetBufferFromId(color_buffer_id_));
-        assert(color_buffer_ptr);
-        color_buffer_ptr->Bind();
+        color_buffer_id_       = level_.AddBuffer(std::move(gl_color_buffer));
+        auto& color_buffer_ref = dynamic_cast<Buffer&>(level_.GetBufferFromId(color_buffer_id_));
+        color_buffer_ref.Bind();
         glVertexAttribPointer(++vertex_array_count, color_buffer_size_, GL_FLOAT, GL_FALSE, 0,
                               nullptr);
-        color_buffer_ptr->UnBind();
+        color_buffer_ref.UnBind();
     }
 
     // Normal buffer.
     if (normal_buffer_id_) {
-        auto* gl_normal_buffer = dynamic_cast<Buffer*>(level->GetBufferFromId(normal_buffer_id_));
-        assert(gl_normal_buffer);
-        gl_normal_buffer->Bind();
+        auto& gl_normal_buffer = dynamic_cast<Buffer&>(level.GetBufferFromId(normal_buffer_id_));
+        gl_normal_buffer.Bind();
         glVertexAttribPointer(++vertex_array_count, normal_buffer_size_, GL_FLOAT, GL_TRUE, 0,
                               nullptr);
-        gl_normal_buffer->UnBind();
+        gl_normal_buffer.UnBind();
     } else if (std::count(parameter.generate_list.begin(), parameter.generate_list.end(),
                           StaticMeshParameter::StaticMeshParameterEnum::GENERATE_NORMAL)) {
         std::vector<float> normal;
@@ -83,23 +79,21 @@ StaticMesh::StaticMesh(LevelInterface* level, const StaticMeshParameter& paramet
         std::unique_ptr<BufferInterface> gl_normal_buffer = std::make_unique<Buffer>();
         gl_normal_buffer->SetName(fmt::format("Mesh.Buffer.Normal.{}", count));
         gl_normal_buffer->Copy(normal);
-        normal_buffer_id_       = level_->AddBuffer(std::move(gl_normal_buffer));
-        auto* normal_buffer_ptr = dynamic_cast<Buffer*>(level_->GetBufferFromId(normal_buffer_id_));
-        assert(normal_buffer_ptr);
-        normal_buffer_ptr->Bind();
+        normal_buffer_id_       = level_.AddBuffer(std::move(gl_normal_buffer));
+        auto& normal_buffer_ref = dynamic_cast<Buffer&>(level_.GetBufferFromId(normal_buffer_id_));
+        normal_buffer_ref.Bind();
         glVertexAttribPointer(++vertex_array_count, normal_buffer_size_, GL_FLOAT, GL_TRUE, 0,
                               nullptr);
-        normal_buffer_ptr->UnBind();
+        normal_buffer_ref.UnBind();
     }
 
     // Texture coordinate buffer.
     if (texture_buffer_id_) {
-        auto* gl_texture_buffer = dynamic_cast<Buffer*>(level->GetBufferFromId(texture_buffer_id_));
-        assert(gl_texture_buffer);
-        gl_texture_buffer->Bind();
+        auto& gl_texture_buffer = dynamic_cast<Buffer&>(level.GetBufferFromId(texture_buffer_id_));
+        gl_texture_buffer.Bind();
         glVertexAttribPointer(++vertex_array_count, texture_buffer_size_, GL_FLOAT, GL_FALSE, 0,
                               nullptr);
-        gl_texture_buffer->UnBind();
+        gl_texture_buffer.UnBind();
     } else if (std::count(
                    parameter.generate_list.begin(), parameter.generate_list.end(),
                    StaticMeshParameter::StaticMeshParameterEnum::GENERATE_TEXTURE_COORDINATE)) {
@@ -111,14 +105,13 @@ StaticMesh::StaticMesh(LevelInterface* level, const StaticMeshParameter& paramet
         std::unique_ptr<BufferInterface> gl_texture_coordinate = std::make_unique<Buffer>();
         gl_texture_coordinate->SetName(fmt::format("Mesh.Buffer.TexCoord.{}", count));
         gl_texture_coordinate->Copy(texture_coordinate);
-        texture_buffer_id_ = level_->AddBuffer(std::move(gl_texture_coordinate));
-        auto* texture_buffer_ptr =
-            dynamic_cast<Buffer*>(level_->GetBufferFromId(texture_buffer_id_));
-        assert(texture_buffer_ptr);
-        texture_buffer_ptr->Bind();
+        texture_buffer_id_ = level_.AddBuffer(std::move(gl_texture_coordinate));
+        auto& texture_buffer_ref =
+            dynamic_cast<Buffer&>(level_.GetBufferFromId(texture_buffer_id_));
+        texture_buffer_ref.Bind();
         glVertexAttribPointer(++vertex_array_count, texture_buffer_size_, GL_FLOAT, GL_FALSE, 0,
                               nullptr);
-        texture_buffer_ptr->UnBind();
+        texture_buffer_ref.UnBind();
     }
 
     // Index buffer.
@@ -139,9 +132,9 @@ StaticMesh::StaticMesh(LevelInterface* level, const StaticMeshParameter& paramet
             BufferTypeEnum::ELEMENT_ARRAY_BUFFER, BufferUsageEnum::STREAM_DRAW);
         gl_index_buffer->SetName(fmt::format("Mesh.Buffer.Index.{}", count));
         gl_index_buffer->Copy(index);
-        index_buffer_id_ = level_->AddBuffer(std::move(gl_index_buffer));
+        index_buffer_id_ = level_.AddBuffer(std::move(gl_index_buffer));
     } else {
-        index_size_ = level_->GetBufferFromId(index_buffer_id_)->GetSize();
+        index_size_ = level_.GetBufferFromId(index_buffer_id_).GetSize();
     }
 
     // Increment static counter.
@@ -159,19 +152,19 @@ StaticMesh::~StaticMesh() {
     glDeleteVertexArrays(1, &vertex_array_object_);
     // Try to delete assigned buffers.
     if (point_buffer_id_) {
-        level_->RemoveBuffer(point_buffer_id_);
+        level_.RemoveBuffer(point_buffer_id_);
     }
     if (color_buffer_id_) {
-        level_->RemoveBuffer(color_buffer_id_);
+        level_.RemoveBuffer(color_buffer_id_);
     }
     if (normal_buffer_id_) {
-        level_->RemoveBuffer(normal_buffer_id_);
+        level_.RemoveBuffer(normal_buffer_id_);
     }
     if (texture_buffer_id_) {
-        level_->RemoveBuffer(texture_buffer_id_);
+        level_.RemoveBuffer(texture_buffer_id_);
     }
     if (index_buffer_id_) {
-        level_->RemoveBuffer(index_buffer_id_);
+        level_.RemoveBuffer(index_buffer_id_);
     }
 }
 
@@ -185,7 +178,7 @@ void StaticMesh::UnBind() const {
     glBindVertexArray(0);
 }
 
-EntityId CreateQuadStaticMesh(LevelInterface* level) {
+EntityId CreateQuadStaticMesh(LevelInterface& level) {
     std::vector<float> points = {
         -1.f, 1.f, 0.f, 1.f, 1.f, 0.f, -1.f, -1.f, 0.f, 1.f, -1.f, 0.f,
     };
@@ -212,13 +205,13 @@ EntityId CreateQuadStaticMesh(LevelInterface* level) {
     normal_buffer->SetName(fmt::format("QuadNormal.{}", count));
     texture_buffer->SetName(fmt::format("QuadTexture.{}", count));
     index_buffer->SetName(fmt::format("QuadIndex.{}", count));
-    auto maybe_point_buffer_id = level->AddBuffer(std::move(point_buffer));
+    auto maybe_point_buffer_id = level.AddBuffer(std::move(point_buffer));
     if (!maybe_point_buffer_id) return NullId;
-    auto maybe_normal_buffer_id = level->AddBuffer(std::move(normal_buffer));
+    auto maybe_normal_buffer_id = level.AddBuffer(std::move(normal_buffer));
     if (!maybe_normal_buffer_id) return NullId;
-    auto maybe_texture_buffer_id = level->AddBuffer(std::move(texture_buffer));
+    auto maybe_texture_buffer_id = level.AddBuffer(std::move(texture_buffer));
     if (!maybe_texture_buffer_id) return NullId;
-    auto maybe_index_buffer_id = level->AddBuffer(std::move(index_buffer));
+    auto maybe_index_buffer_id = level.AddBuffer(std::move(index_buffer));
     if (!maybe_index_buffer_id) return NullId;
     StaticMeshParameter parameter   = {};
     parameter.point_buffer_id       = maybe_point_buffer_id;
@@ -228,10 +221,10 @@ EntityId CreateQuadStaticMesh(LevelInterface* level) {
     parameter.render_primitive_enum = proto::SceneStaticMesh::TRIANGLE;
     auto mesh                       = std::make_unique<StaticMesh>(level, parameter);
     mesh->SetName(fmt::format("QuadMesh.{}", count));
-    return level->AddStaticMesh(std::move(mesh));
+    return level.AddStaticMesh(std::move(mesh));
 }
 
-EntityId CreateCubeStaticMesh(LevelInterface* level) {
+EntityId CreateCubeStaticMesh(LevelInterface& level) {
     // Create a cube but multiply the size, so we can index it by iota.
     std::vector<float> points = {
         // clang-format off
@@ -388,13 +381,13 @@ EntityId CreateCubeStaticMesh(LevelInterface* level) {
     normal_buffer->SetName(fmt::format("CubeNormal.{}", count));
     texture_buffer->SetName(fmt::format("CubeTexture.{}", count));
     index_buffer->SetName(fmt::format("CubeIndex.{}", count));
-    auto maybe_point_buffer_id = level->AddBuffer(std::move(point_buffer));
+    auto maybe_point_buffer_id = level.AddBuffer(std::move(point_buffer));
     if (!maybe_point_buffer_id) return NullId;
-    auto maybe_normal_buffer_id = level->AddBuffer(std::move(normal_buffer));
+    auto maybe_normal_buffer_id = level.AddBuffer(std::move(normal_buffer));
     if (!maybe_normal_buffer_id) return NullId;
-    auto maybe_texture_buffer_id = level->AddBuffer(std::move(texture_buffer));
+    auto maybe_texture_buffer_id = level.AddBuffer(std::move(texture_buffer));
     if (!maybe_texture_buffer_id) return NullId;
-    auto maybe_index_buffer_id = level->AddBuffer(std::move(index_buffer));
+    auto maybe_index_buffer_id = level.AddBuffer(std::move(index_buffer));
     if (!maybe_index_buffer_id) return NullId;
     StaticMeshParameter parameter   = {};
     parameter.point_buffer_id       = maybe_point_buffer_id;
@@ -404,7 +397,7 @@ EntityId CreateCubeStaticMesh(LevelInterface* level) {
     parameter.render_primitive_enum = proto::SceneStaticMesh::TRIANGLE;
     auto mesh                       = std::make_unique<StaticMesh>(level, parameter);
     mesh->SetName(fmt::format("CubeMesh.{}", count));
-    return level->AddStaticMesh(std::move(mesh));
+    return level.AddStaticMesh(std::move(mesh));
 }
 
 }  // End namespace frame::opengl.

@@ -18,7 +18,7 @@ class InputWasdMouse : public InputInterface {
      * @param translation_multiplication: Factor to change the mouse speed when in translation mode.
      * @param wheel_multiplication: Factor to change the mouse wheel speed.
      */
-    InputWasdMouse(DeviceInterface* device, float move_multiplication,
+    InputWasdMouse(DeviceInterface& device, float move_multiplication,
                    float rotation_multiplication, float translation_multiplication,
                    float wheel_multiplication)
         : device_(device),
@@ -41,7 +41,7 @@ class InputWasdMouse : public InputInterface {
     void NextFrame() override;
 
    private:
-    DeviceInterface* device_          = nullptr;
+    DeviceInterface& device_;
     bool shift_                       = false;
     char mouse_button_pressed_        = 0;
     float move_multiplication_        = 20.0f;

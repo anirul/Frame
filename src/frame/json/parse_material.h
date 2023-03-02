@@ -15,6 +15,6 @@ namespace frame::proto {
  * @return A unique pointer to a material interface.
  */
 std::optional<std::unique_ptr<MaterialInterface>> ParseMaterialOpenGL(
-    const frame::proto::Material& proto_material, LevelInterface* level);
+    const frame::proto::Material& proto_material, LevelInterface& level);
 
 }  // End namespace frame::proto.

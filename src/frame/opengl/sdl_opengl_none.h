@@ -27,10 +27,13 @@ class SDLOpenGLNone : public WindowInterface {
     void SetInputInterface(std::unique_ptr<InputInterface>&& input_interface) override {
         input_interface_ = std::move(input_interface);
     }
+    void AddKeyCallback(std::int32_t key, std::function<bool()> func) override {
+        throw std::runtime_error("Not implemented.");
+    }
     void SetUniqueDevice(std::unique_ptr<DeviceInterface>&& device) override {
         device_ = std::move(device);
     }
-    DeviceInterface* GetUniqueDevice() override { return device_.get(); }
+    DeviceInterface& GetUniqueDevice() override { return *device_.get(); }
     glm::uvec2 GetSize() const override { return size_; }
     glm::uvec2 GetDesktopSize() const override { return {0, 0}; }
     void* GetWindowContext() const override { return sdl_window_; }
@@ -40,6 +43,9 @@ class SDLOpenGLNone : public WindowInterface {
         device_->Resize(size);
     }
     FullScreenEnum GetFullScreenEnum() const override { return FullScreenEnum::WINDOW; }
+    glm::vec2 GetPixelPerInch(std::uint32_t screen = 0) const override {
+        throw std::runtime_error("This is a none device so no screen.");
+    }
 	
    private:
     glm::uvec2 size_;

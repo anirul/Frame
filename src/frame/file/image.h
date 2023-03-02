@@ -39,7 +39,7 @@ class Image : public ImageInterface {
           proto::PixelElementSize pixel_element_size = proto::PixelElementSize_BYTE(),
           proto::PixelStructure pixel_structure      = proto::PixelStructure_RGB());
     //! Virtual destructor.
-    virtual ~Image();
+    ~Image();
 
    public:
     /**
@@ -78,14 +78,14 @@ class Image : public ImageInterface {
      * @brief Save an image to a file.
      * @param file: The file to save the image to.
      */
-    void SaveImageToFile(const std::string& file) const;
+    void SaveImageToFile(const std::string& file) const override;
     /**
      * @brief Set the data pointer to the class, used to be able to save to HDD.
      * @param data: Pointer to the memory containing the RGB data of the image.
      * @warning Note that the class won't be the owner of the pointer so it won't free it when
      * destroyed!
      */
-    void SetData(void* data);
+    void SetData(void* data) override;
 
    private:
     glm::ivec2 size_ = glm::ivec2(0, 0);

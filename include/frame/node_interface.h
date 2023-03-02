@@ -47,12 +47,12 @@ struct NodeInterface : public NameInterface {
     bool IsRoot() const { return GetParentName().empty(); }
     /**
      * @brief Get the name of the parent node.
-	 * @return String representation of the name of parent node.
+     * @return String representation of the name of parent node.
      */
     const std::string GetParentName() const { return parent_name_; }
     /**
      * @brief Set the parent node name.
-	 * @param parent: Set the name of the parent name node.
+     * @param parent: Set the name of the parent name node.
      */
     void SetParentName(const std::string& parent) { parent_name_ = parent; }
     /**
@@ -68,7 +68,7 @@ struct NodeInterface : public NameInterface {
 
    protected:
     std::function<NodeInterface*(const std::string&)> func_ =
-        [](const std::string) -> NodeInterface* { return nullptr; };
+        [](const std::string&) -> NodeInterface* { return nullptr; };
     std::string parent_name_;
     std::string name_;
 };

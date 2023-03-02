@@ -8,8 +8,11 @@
 namespace frame::gui {
 
 WindowResolution::WindowResolution(const std::string& name, glm::uvec2 size,
-                                   glm::uvec2 border_less_size)
-    : size_(size), border_less_size_(border_less_size) {
+                                   glm::uvec2 border_less_size, glm::vec2 pixel_per_inch)
+    : size_(size),
+      border_less_size_(border_less_size),
+      hppi_(pixel_per_inch.x),
+      vppi_(pixel_per_inch.y) {
     for (int i = 0; i < resolutions_.size(); ++i) {
         if (resolutions_.at(i).values == size_) {
             resolution_selected_ = i;
@@ -70,6 +73,9 @@ bool WindowResolution::DrawCallback() {
     ImGui::DragFloat("Interocular distance", &interocular_distance_, 0.0f, 1.0f, 0.001f);
     ImGui::DragFloat3("Focus point", glm::value_ptr(focus_point_), 0.0f, 1000.0f, 0.1f);
     ImGui::Checkbox("Invert Left and Right", &invert_left_right_);
+    ImGui::Separator();
+    ImGui::Text(fmt::format("Horizontal PPI: {}", hppi_).c_str());
+    ImGui::Text(fmt::format("Vertical PPI: {}", vppi_).c_str());
     ImGui::Separator();
     if (ImGui::Button("Change")) {
         size_       = resolutions_[resolution_selected_].values;

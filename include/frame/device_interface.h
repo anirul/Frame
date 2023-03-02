@@ -69,7 +69,7 @@ class DeviceInterface {
      * @brief  Get the current level.
      * @return A pointer to the level.
      */
-    virtual LevelInterface* GetLevel() = 0;
+    virtual LevelInterface& GetLevel() = 0;
     /**
      * @brief Get a device context on the underlying graphic API.
      * @return A device context on the underlying graphic API.

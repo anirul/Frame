@@ -6,13 +6,13 @@ namespace test {
 
 TEST_F(ParseProgramTest, CreateParseProgramTest) {
     const auto proto_program = proto_level_.programs(0);
-    auto program       = frame::proto::ParseProgramOpenGL(proto_program, level_.get());
+    auto program       = frame::proto::ParseProgramOpenGL(proto_program, *level_.get());
     EXPECT_TRUE(program);
 }
 
 TEST_F(ParseProgramTest, CreateParseProgramUniformTest) {
     const auto proto_program = proto_level_.programs(0);
-    auto program       = frame::proto::ParseProgramOpenGL(proto_program, level_.get());
+    auto program       = frame::proto::ParseProgramOpenGL(proto_program, *level_.get());
     EXPECT_TRUE(program);
     program_ = std::move(program);
     const auto uniform_list = program_->GetUniformNameList();

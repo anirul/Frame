@@ -15,8 +15,7 @@ namespace frame::proto {
  * @param device: Device pointer.
  * @return A unique pointer to a level interface.
  */
-std::unique_ptr<LevelInterface> ParseLevel(glm::uvec2 size, const std::filesystem::path& path,
-                                           DeviceInterface* device);
+std::unique_ptr<LevelInterface> ParseLevel(glm::uvec2 size, const std::filesystem::path& path);
 /**
  * @brief Parse a level as a proto represented as a string to an level.
  * @param size: Screen size.
@@ -24,7 +23,6 @@ std::unique_ptr<LevelInterface> ParseLevel(glm::uvec2 size, const std::filesyste
  * @param device: Device pointer.
  * @return A unique pointer to a level interface.
  */
-std::unique_ptr<LevelInterface> ParseLevel(glm::uvec2 size, const std::string& content,
-                                           DeviceInterface* device);
+std::unique_ptr<LevelInterface> ParseLevel(glm::uvec2 size, const std::string& content);
 
 }  // End namespace frame::proto.

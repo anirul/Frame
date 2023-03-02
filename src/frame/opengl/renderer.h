@@ -66,7 +66,7 @@ class Renderer : public RendererInterface {
      * @param model_mat: Model matrix to be used.
      * @param dt: Delta time between the beginning of execution and now in seconds.
      */
-    void RenderMesh(StaticMeshInterface* static_mesh, MaterialInterface* material,
+    void RenderMesh(StaticMeshInterface& static_mesh, MaterialInterface& material,
                     const glm::mat4& projection, const glm::mat4& view = glm::mat4(1.0f),
                     const glm::mat4& model = glm::mat4(1.0f), double dt = 0.0) override;
     /**
@@ -97,9 +97,9 @@ class Renderer : public RendererInterface {
     void SetDepthTest(bool enable) override;
 
    private:
-    WindowInterface* window_  = nullptr;
-    DeviceInterface* device_  = nullptr;
-    LevelInterface* level_    = nullptr;
+    WindowInterface& window_;
+    DeviceInterface& device_;
+    LevelInterface& level_;
     EntityId last_program_id_ = NullId;
     Logger& logger_           = Logger::GetInstance();
     // Projection / View / Model matrices.
@@ -107,7 +107,7 @@ class Renderer : public RendererInterface {
     glm::mat4 view_       = glm::mat4(1.0f);
     glm::mat4 model_      = glm::mat4(1.0f);
     // Viewport top left and bottom right.
-	glm::uvec4 viewport_;
+    glm::uvec4 viewport_;
     // Frame & Render buffers.
     FrameBuffer frame_buffer_{};
     RenderBuffer render_buffer_{};

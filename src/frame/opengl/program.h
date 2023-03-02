@@ -105,7 +105,11 @@ class Program : public ProgramInterface {
      * @param uniform_interface: The way to communicate the uniform like matrices (model, view,
      * projection) but also time and other uniform that could be needed.
      */
-    void Use(const UniformInterface* uniform_interface) const override;
+    void Use(const UniformInterface& uniform_interface) const override;
+	/**
+     * @brief Use the program, a little bit like bind.
+     */
+    void Use() const override;
     //! @brief Stop using the program, a little bit like unbind.
     void UnUse() const override;
     /**

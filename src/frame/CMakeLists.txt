@@ -17,11 +17,7 @@ add_library(Frame
     ${CMAKE_SOURCE_DIR}/include/frame/logger.h
     ${CMAKE_SOURCE_DIR}/include/frame/material_interface.h
     ${CMAKE_SOURCE_DIR}/include/frame/name_interface.h
-    ${CMAKE_SOURCE_DIR}/include/frame/node_camera.h
     ${CMAKE_SOURCE_DIR}/include/frame/node_interface.h
-    ${CMAKE_SOURCE_DIR}/include/frame/node_light.h
-    ${CMAKE_SOURCE_DIR}/include/frame/node_matrix.h
-    ${CMAKE_SOURCE_DIR}/include/frame/node_static_mesh.h
     ${CMAKE_SOURCE_DIR}/include/frame/plugin_interface.h
     ${CMAKE_SOURCE_DIR}/include/frame/program_interface.h
     ${CMAKE_SOURCE_DIR}/include/frame/renderer_interface.h
@@ -35,9 +31,13 @@ add_library(Frame
     level.cpp
     logger.cpp
     node_camera.cpp
+    node_camera.h
     node_light.cpp
+    node_light.h
     node_matrix.cpp
+    node_matrix.h
     node_static_mesh.cpp
+    node_static_mesh.h
     uniform_wrapper.cpp
     uniform_wrapper.h
     window_factory.cpp

@@ -129,7 +129,7 @@ void SDLVulkanWindow::Run(std::function<void()> lambda/* = []{}*/) {
         // Draw the Scene not used?
         for (const auto& plugin_interface : device_->GetPluginPtrs()) {
             if (plugin_interface) {
-                if (!plugin_interface->Update(device_.get(), time.count())) {
+                if (!plugin_interface->Update(*device_.get(), time.count())) {
                     loop = false;
                 }
             }

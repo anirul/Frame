@@ -14,10 +14,8 @@
 namespace frame::proto {
 
 namespace {
-std::unique_ptr<LevelInterface> LevelProto(glm::uvec2 size, const std::string content,
-                                           DeviceInterface* device) {
-    // TODO(anirul): Do correct the code later.
-    assert(device->GetDeviceEnum() == RenderingAPIEnum::OPENGL);
+std::unique_ptr<LevelInterface> LevelProto(glm::uvec2 size, const std::string content) {
+    // TODO(anirul): Check we are in OPENGL mode?
     auto logger      = Logger::GetInstance();
     auto level       = std::make_unique<frame::Level>();
     auto proto_level = LoadProtoFromJson<proto::Level>(content);
@@ -25,10 +23,10 @@ std::unique_ptr<LevelInterface> LevelProto(glm::uvec2 size, const std::string co
     level->SetDefaultTextureName(proto_level.default_texture_name());
 
     // Include the default cube and quad.
-    auto cube_id = opengl::CreateCubeStaticMesh(level.get());
+    auto cube_id = opengl::CreateCubeStaticMesh(*level.get());
     if (cube_id == NullId) throw std::runtime_error("Could not create static cube mesh.");
     level->SetDefaultStaticMeshCubeId(cube_id);
-    auto quad_id = opengl::CreateQuadStaticMesh(level.get());
+    auto quad_id = opengl::CreateQuadStaticMesh(*level.get());
     if (quad_id == NullId) throw std::runtime_error("Could not create static quad mesh.");
     level->SetDefaultStaticMeshQuadId(quad_id);
 
@@ -58,7 +56,7 @@ std::unique_ptr<LevelInterface> LevelProto(glm::uvec2 size, const std::string co
 
     // Load programs from proto.
     for (const auto& proto_program : proto_level.programs()) {
-        auto program = ParseProgramOpenGL(proto_program, level.get());
+        auto program = ParseProgramOpenGL(proto_program, *level.get());
         if (!program) {
             throw std::runtime_error(fmt::format("invalid program: {}", proto_program.name()));
         }
@@ -71,7 +69,7 @@ std::unique_ptr<LevelInterface> LevelProto(glm::uvec2 size, const std::string co
 
     // Load material from proto.
     for (const auto& proto_material : proto_level.materials()) {
-        auto maybe_material = ParseMaterialOpenGL(proto_material, level.get());
+        auto maybe_material = ParseMaterialOpenGL(proto_material, *level.get());
         if (!maybe_material) {
             throw std::runtime_error(fmt::format("invalid material : {}", proto_material.name()));
         }
@@ -83,23 +81,21 @@ std::unique_ptr<LevelInterface> LevelProto(glm::uvec2 size, const std::string co
     }
 
     // Load scenes from proto.
-    if (!ParseSceneTreeFile(proto_level.scene_tree(), level.get()))
+    if (!ParseSceneTreeFile(proto_level.scene_tree(), *level.get()))
         throw std::runtime_error("Could not parse proto scene file.");
     level->SetDefaultCameraName(proto_level.scene_tree().default_camera_name());
     return level;
 }
 }  // namespace
 
-std::unique_ptr<LevelInterface> ParseLevel(glm::uvec2 size, const std::filesystem::path& path,
-                                           DeviceInterface* device) {
+std::unique_ptr<LevelInterface> ParseLevel(glm::uvec2 size, const std::filesystem::path& path) {
     std::ifstream ifs(path.string().c_str());
     std::string content(std::istreambuf_iterator<char>(ifs), {});
-    return LevelProto(size, content, device);
+    return LevelProto(size, content);
 }
 
-std::unique_ptr<frame::LevelInterface> ParseLevel(glm::uvec2 size, const std::string& content,
-                                                  DeviceInterface* device) {
-    return LevelProto(size, content, device);
+std::unique_ptr<frame::LevelInterface> ParseLevel(glm::uvec2 size, const std::string& content) {
+    return LevelProto(size, content);
 }
 
 }  // End namespace frame::proto.
