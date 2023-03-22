@@ -17,8 +17,11 @@
 #include "frame/gui/draw_gui_factory.h"
 #include "frame/gui/input_factory.h"
 #include "frame/gui/window_camera.h"
+#include "frame/gui/window_cubemap.h"
 #include "frame/gui/window_resolution.h"
+#include "frame/json/parse_json.h"
 #include "frame/json/parse_level.h"
+#include "frame/json/proto.h"
 #include "frame/window_factory.h"
 
 ABSL_FLAG(float, move_mult, 1.0f, "Move multiplication factor.");
@@ -39,7 +42,8 @@ int main(int ac, char** av) try {
                                              frame::RenderingAPIEnum::OPENGL, size);
     frame::gui::WindowResolution* ptr_window_resolution = nullptr;
     frame::gui::WindowCamera* ptr_window_camera         = nullptr;
-    auto gui_window = frame::gui::CreateDrawGui(win->GetUniqueDevice(), *win.get());
+    frame::gui::WindowCubemap* ptr_window_cubemap       = nullptr;
+    auto gui_window                                     = frame::gui::CreateDrawGui(*win.get());
     {
         auto gui_resolution = std::make_unique<frame::gui::WindowResolution>(
             "Resolution", size, win->GetDesktopSize(), win->GetPixelPerInch());
@@ -51,17 +55,29 @@ int main(int ac, char** av) try {
         ptr_window_camera = gui_camera.get();
         gui_window->AddWindow(std::move(gui_camera));
     }
-    win->GetUniqueDevice().AddPlugin(std::move(gui_window));
-    win->SetInputInterface(frame::gui::CreateInputArcball(
-        win->GetUniqueDevice(), glm::vec3(0, 0, 1.0f), absl::GetFlag(FLAGS_move_mult),
-        absl::GetFlag(FLAGS_zoom_mult)));
-    auto& device_ref = win->GetUniqueDevice();
+    {
+        auto gui_cubemap   = std::make_unique<frame::gui::WindowCubemap>("Cubemap");
+        ptr_window_cubemap = gui_cubemap.get();
+        gui_window->AddWindow(std::move(gui_cubemap));
+    }
+    win->GetDevice().AddPlugin(std::move(gui_window));
+    win->SetInputInterface(frame::gui::CreateInputArcball(win->GetDevice(), glm::vec3(0, 0, 1.0f),
+                                                          absl::GetFlag(FLAGS_move_mult),
+                                                          absl::GetFlag(FLAGS_zoom_mult)));
+    auto& device = win->GetDevice();
     frame::common::Application app(std::move(win));
     std::vector<bool> check_end;
-    bool do_once = true;
+    bool do_once      = true;
+    bool create_proto = true;
+    frame::proto::Level proto_level;
     do {
-        std::unique_ptr<frame::LevelInterface> level = frame::proto::ParseLevel(
-            size, frame::file::FindFile("asset/json/point_cloud.json"));
+        if (std::exchange(create_proto, false)) {
+            proto_level = frame::proto::LoadProtoFromJsonFile<frame::proto::Level>(
+                frame::file::FindFile("asset/json/point_cloud.json"));
+        } else {
+            ptr_window_cubemap->ChangeLevel(proto_level);
+        }
+        std::unique_ptr<frame::LevelInterface> level = frame::proto::ParseLevel(size, proto_level);
         // All except first.
         if (!std::exchange(do_once, false)) {
             level->GetDefaultCamera().operator=(ptr_window_camera->GetSavedCamera());
@@ -71,7 +87,8 @@ int main(int ac, char** av) try {
         app.Run();
         app.Resize(ptr_window_resolution->GetSize(), ptr_window_resolution->GetFullScreen());
         ptr_window_camera->SaveCamera();
-        check_end = { ptr_window_resolution->End(), ptr_window_camera->End() };
+        check_end = { ptr_window_resolution->End(), ptr_window_camera->End(),
+                      ptr_window_cubemap->End() };
     } while (!std::all_of(check_end.begin(), check_end.end(), [](bool b) { return b; }));
     return 0;
 } catch (std::exception ex) {

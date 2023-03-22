@@ -11,7 +11,7 @@ Application::Application(std::unique_ptr<frame::WindowInterface>&& window)
 
 void Application::Startup(std::filesystem::path path) {
     assert(window_);
-    auto& device = window_->GetUniqueDevice();
+    auto& device = window_->GetDevice();
     if (!plugin_name_.empty()) {
         device.RemovePluginByName(plugin_name_);
     }
@@ -23,7 +23,7 @@ void Application::Startup(std::filesystem::path path) {
 
 void Application::Startup(std::unique_ptr<frame::LevelInterface>&& level) {
     assert(window_);
-    auto& device = window_->GetUniqueDevice();
+    auto& device = window_->GetDevice();
     if (!plugin_name_.empty()) {
         device.RemovePluginByName(plugin_name_);
     }

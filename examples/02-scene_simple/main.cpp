@@ -29,19 +29,19 @@ int main(int ac, char** av) try {
     frame::gui::WindowResolution* ptr_window_resolution = nullptr;
     auto win            = frame::CreateNewWindow(frame::DrawingTargetEnum::WINDOW,
                                                  frame::RenderingAPIEnum::OPENGL, size);
-    auto& device_ref    = win->GetUniqueDevice();
-    auto gui_window     = frame::gui::CreateDrawGui(win->GetUniqueDevice(), *win.get());
+    auto& device        = win->GetDevice();
+    auto gui_window     = frame::gui::CreateDrawGui(*win.get());
     auto gui_resolution = std::make_unique<frame::gui::WindowResolution>(
         "Resolution", size, win->GetDesktopSize(), win->GetPixelPerInch());
     ptr_window_resolution = gui_resolution.get();
     gui_window->AddWindow(std::move(gui_resolution));
-    win->GetUniqueDevice().AddPlugin(std::move(gui_window));
+    win->GetDevice().AddPlugin(std::move(gui_window));
     frame::common::Application app(std::move(win));
     do {
         app.Startup(frame::file::FindFile("asset/json/scene_simple.json"));
         app.Run();
         app.Resize(ptr_window_resolution->GetSize(), ptr_window_resolution->GetFullScreen());
-        device_ref.SetStereo(
+        device.SetStereo(
             ptr_window_resolution->GetStereo(), ptr_window_resolution->GetInterocularDistance(),
             ptr_window_resolution->GetFocusPoint(), ptr_window_resolution->IsInvertLeftRight());
     } while (!ptr_window_resolution->End());

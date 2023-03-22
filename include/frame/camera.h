@@ -16,7 +16,7 @@ class Camera {
     /**
      * @brief Constructor it will create a camera according to the params.
      * You can set the camera mode by using the set camera mode method. Note that in
-	 * Y_AXIS_ALIGNED_ARCBALL you won't be able to modify the up vector by the SetUp() method!
+     * Y_AXIS_ALIGNED_ARCBALL you won't be able to modify the up vector by the SetUp() method!
      *
      * @param position: Position of the camera.
      * @param front: Direction the camera is facing to (normalized).
@@ -25,10 +25,12 @@ class Camera {
      * @param aspect_ratio: Aspect ratio of the screen (weight on height).
      * @param near_clip: Near clipping plane (front distance to be drawn).
      * @param far_clip: Far clipping plane (back distance to be drawn).
+     * @param y_align: Used for arc ball should be true.
      */
     Camera(glm::vec3 position = { 0.f, 0.f, 0.f }, glm::vec3 front = { 0.f, 0.f, -1.f },
            glm::vec3 up = { 0.f, 1.f, 0.f }, float fov_degrees = 65.0f,
-           float aspect_ratio = 16.0f / 9.0f, float near_clip = 0.1f, float far_clip = 1000.0f);
+           float aspect_ratio = 16.0f / 9.0f, float near_clip = 0.1f, float far_clip = 1000.0f,
+           CameraModeEnum camera_mode = CameraModeEnum::Y_AXIS_ALIGNED_ARCBALL);
     /**
      * @brief Copy constructor.
      * @param camera: The camera from which this one will be created.
@@ -69,7 +71,7 @@ class Camera {
      * @return True if the camera is gimbal locked.
      */
     bool SetUp(glm::vec3 vec);
-    
+
    public:
     /**
      * @brief Set the field of view in radians.
@@ -141,7 +143,7 @@ class Camera {
      * @return Far clipping plane distance.
      */
     float GetFarClip() const { return far_clip_; }
-	/**
+    /**
      * @brief Set when you want the camera not to be axis align.
      * @param mode: Set the mode the camera is in, by default this is axis aligned!
      */

@@ -77,6 +77,20 @@ struct RendererInterface {
      * @param enable: Enable or disable depth test.
      */
     virtual void SetDepthTest(bool enable) = 0;
+    /**
+     * @brief Render callback is a callback that is called once per mesh.
+     * @param uniform: A list of uniform for the mesh.
+     * @param device: The device for the mesh rendering.
+     * @param mesh: The render mesh as a ref.
+     * @param material: The render material ref.
+     */
+    using RenderCallback =
+        std::function<void(UniformInterface&, StaticMeshInterface&, MaterialInterface&)>;
+    /**
+     * @brief Set the mesh render callback.
+     * @param callback: The callback to be added to the render.
+     */
+    virtual void SetMeshRenderCallback(RenderCallback callback) = 0;
 };
 
 }  // End namespace frame.

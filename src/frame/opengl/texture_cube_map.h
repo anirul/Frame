@@ -136,6 +136,17 @@ class TextureCubeMap : public TextureInterface, public BindInterface {
      */
     proto::TextureFilter::Enum GetWrapT() const override;
     /**
+     * @brief Set the wrapping on the t size of the texture (vertical) this will decide how the
+     * texture is treated in case you overflow in this direction.
+     * @param texture_filter: Could be any of (REPEAT, CLAMP_TO_EDGE, MIRRORED_REPEAT).
+     */
+    void SetWrapR(const proto::TextureFilter::Enum texture_filter);
+    /**
+     * @brief Get the wrapping on the t size of the texture (vertical).
+     * @return The way the texture is wrap could be any of (REPEAT, CLAMP_TO_EDGE, MIRRORED_REPEAT).
+     */
+    proto::TextureFilter::Enum GetWrapR() const;
+    /**
      * @brief Copy the texture input to the texture.
      * @param vector: Vector of uint32_t containing the RGBA values of the texture.
      * @param size: Size of the image.

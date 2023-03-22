@@ -16,10 +16,9 @@ class SDL2OpenGLDrawGui : public frame::gui::DrawGuiInterface {
    public:
     /**
      * @brief Constructor.
-     * @param device: The device to use.
      * @param window: The window to use.
      */
-    SDL2OpenGLDrawGui(frame::DeviceInterface& device, frame::WindowInterface& window);
+    SDL2OpenGLDrawGui(frame::WindowInterface& window);
     //! @brief Destructor.
     virtual ~SDL2OpenGLDrawGui();
 
@@ -98,8 +97,8 @@ class SDL2OpenGLDrawGui : public frame::gui::DrawGuiInterface {
 
    protected:
     std::map<std::string, std::unique_ptr<frame::gui::GuiWindowInterface>> callbacks_ = {};
-    WindowInterface& window_interface_;
-    DeviceInterface& device_interface_;
+    WindowInterface& window_;
+    DeviceInterface& device_;
     std::string name_;
     glm::uvec2 size_         = { 0, 0 };
     bool is_keyboard_passed_ = false;

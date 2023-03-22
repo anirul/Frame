@@ -29,7 +29,8 @@ class SDLOpenGLWindow : public WindowInterface {
     void SetUniqueDevice(std::unique_ptr<DeviceInterface>&& device) override {
         device_ = std::move(device);
     }
-    DeviceInterface& GetUniqueDevice() override { return *device_.get(); }
+    DeviceInterface& GetDevice() override { return *device_.get(); }
+    DrawingTargetEnum GetDrawingTargetEnum() const { return DrawingTargetEnum::WINDOW; }
     glm::uvec2 GetSize() const override { return size_; }
     glm::uvec2 GetDesktopSize() const override { return desktop_size_; }
     void* GetWindowContext() const override { return sdl_window_; }

@@ -13,8 +13,8 @@
 
 namespace frame::opengl::gui {
 
-SDL2OpenGLDrawGui::SDL2OpenGLDrawGui(frame::DeviceInterface& device, frame::WindowInterface& window)
-    : window_interface_(window), device_interface_(device) {
+SDL2OpenGLDrawGui::SDL2OpenGLDrawGui(frame::WindowInterface& window)
+    : window_(window), device_(window_.GetDevice()) {
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -33,8 +33,8 @@ SDL2OpenGLDrawGui::SDL2OpenGLDrawGui(frame::DeviceInterface& device, frame::Wind
         file::FindFile("asset/font/poppins/Poppins-Light.ttf").string().c_str(), 20.0f);
 
     // Setup Platform/Renderer back ends
-    ImGui_ImplSDL2_InitForOpenGL(static_cast<SDL_Window*>(window_interface_.GetWindowContext()),
-                                 device_interface_.GetDeviceContext());
+    ImGui_ImplSDL2_InitForOpenGL(static_cast<SDL_Window*>(window_.GetWindowContext()),
+                                 device_.GetDeviceContext());
     ImGui_ImplOpenGL3_Init("#version 450");
 }
 
@@ -56,7 +56,7 @@ bool SDL2OpenGLDrawGui::Update(DeviceInterface& device, double dt) {
 
     // Start the Dear ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplSDL2_NewFrame(static_cast<SDL_Window*>(window_interface_.GetWindowContext()));
+    ImGui_ImplSDL2_NewFrame(static_cast<SDL_Window*>(window_.GetWindowContext()));
     ImGui::NewFrame();
 
     if (!is_visible_) {
@@ -138,8 +138,8 @@ bool SDL2OpenGLDrawGui::Update(DeviceInterface& device, double dt) {
     if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
         ImGui::UpdatePlatformWindows();
         ImGui::RenderPlatformWindowsDefault();
-        SDL_GL_MakeCurrent(static_cast<SDL_Window*>(window_interface_.GetWindowContext()),
-                           window_interface_.GetGraphicContext());
+        SDL_GL_MakeCurrent(static_cast<SDL_Window*>(window_.GetWindowContext()),
+                           window_.GetGraphicContext());
     }
 
     return returned_value;

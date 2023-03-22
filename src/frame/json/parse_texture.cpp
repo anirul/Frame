@@ -25,8 +25,8 @@ void CheckParameters(const frame::proto::Texture& proto_texture) {
 
 namespace frame::proto {
 
-std::unique_ptr<frame::TextureInterface> ParseTexture(
-    const Texture& proto_texture, glm::uvec2 size) {
+std::unique_ptr<frame::TextureInterface> ParseTexture(const Texture& proto_texture,
+                                                      glm::uvec2 size) {
     glm::uvec2 texture_size = size;
     if (proto_texture.size().x() < 0) {
         texture_size.x /= std::abs(proto_texture.size().x());
@@ -61,8 +61,8 @@ std::unique_ptr<frame::TextureInterface> ParseTexture(
     return texture;
 }
 
-std::unique_ptr<TextureInterface> ParseCubeMapTexture(
-    const Texture& proto_texture, glm::uvec2 size) {
+std::unique_ptr<TextureInterface> ParseCubeMapTexture(const Texture& proto_texture,
+                                                      glm::uvec2 size) {
     glm::uvec2 texture_size = size;
     if (proto_texture.size().x() < 0) {
         texture_size.x /= std::abs(proto_texture.size().x());
@@ -78,12 +78,12 @@ std::unique_ptr<TextureInterface> ParseCubeMapTexture(
     if (!proto_texture.pixels().empty()) {
         throw std::runtime_error("Not implemented!");
     }
-    TextureParameter texture_parameter = {};
+    TextureParameter texture_parameter   = {};
     texture_parameter.pixel_element_size = proto_texture.pixel_element_size();
     texture_parameter.pixel_structure    = proto_texture.pixel_structure();
     texture_parameter.map_type           = TextureTypeEnum::CUBMAP;
     texture_parameter.size               = texture_size;
-    texture = std::make_unique<opengl::TextureCubeMap>(texture_parameter);
+    texture                        = std::make_unique<opengl::TextureCubeMap>(texture_parameter);
     constexpr auto INVALID_TEXTURE = frame::proto::TextureFilter::INVALID;
     if (proto_texture.min_filter().value() != INVALID_TEXTURE)
         texture->SetMinFilter(proto_texture.min_filter().value());
@@ -104,8 +104,8 @@ std::unique_ptr<TextureInterface> ParseTextureFile(const proto::Texture& proto_t
 
 std::unique_ptr<TextureInterface> ParseCubeMapTextureFile(const proto::Texture& proto_texture) {
     return opengl::file::LoadCubeMapTextureFromFile(
-        std::filesystem::path(proto_texture.file_name()), proto_texture.pixel_element_size(),
-        proto_texture.pixel_structure());
+        file::FindFile(std::filesystem::path(proto_texture.file_name())),
+        proto_texture.pixel_element_size(), proto_texture.pixel_structure());
 }
 
 std::unique_ptr<TextureInterface> ParseCubeMapTextureFiles(const proto::Texture& proto_texture) {
@@ -121,8 +121,8 @@ std::unique_ptr<TextureInterface> ParseCubeMapTextureFiles(const proto::Texture&
                                                      proto_texture.pixel_structure());
 }
 
-std::unique_ptr<frame::TextureInterface> ParseBasicTexture(
-    const proto::Texture& proto_texture, glm::uvec2 size) {
+std::unique_ptr<frame::TextureInterface> ParseBasicTexture(const proto::Texture& proto_texture,
+                                                           glm::uvec2 size) {
     CheckParameters(proto_texture);
     if (proto_texture.has_file_name() && !proto_texture.cubemap()) {
         return ParseTextureFile(proto_texture);

@@ -10,22 +10,22 @@ using testing::Return;
 
 TEST_F(DeviceTest, CreateDeviceTest) {
     EXPECT_TRUE(window_);
-    EXPECT_NO_THROW(window_->GetUniqueDevice());
+    EXPECT_EQ(window_->GetDevice().GetDeviceEnum(), frame::RenderingAPIEnum::OPENGL);
 }
 
 TEST_F(DeviceTest, StartupDeviceWithCameraTest) {
     EXPECT_TRUE(window_);
-    window_->GetUniqueDevice().Startup(std::move(level_));
-    EXPECT_NO_THROW(window_->GetUniqueDevice());
+    window_->GetDevice().Startup(std::move(level_));
+    EXPECT_EQ(window_->GetDevice().GetDeviceEnum(), frame::RenderingAPIEnum::OPENGL);
 }
 
 TEST_F(DeviceTest, AddOnePluginTest) {
     EXPECT_TRUE(window_);
-    window_->GetUniqueDevice().Startup(std::move(level_));
-    EXPECT_NO_THROW(window_->GetUniqueDevice());
+    window_->GetDevice().Startup(std::move(level_));
+    EXPECT_EQ(window_->GetDevice().GetDeviceEnum(), frame::RenderingAPIEnum::OPENGL);
     auto plugin = std::make_unique<test::PluginMock>();
     EXPECT_CALL(*plugin, GetName).WillRepeatedly(Return("test"));
-    auto& device = window_->GetUniqueDevice();
+    auto& device = window_->GetDevice();
     device.AddPlugin(std::move(plugin));
     EXPECT_EQ(1, device.GetPluginPtrs().size());
     EXPECT_EQ(std::vector<std::string>{ "test" }, device.GetPluginNames());
@@ -35,8 +35,9 @@ TEST_F(DeviceTest, AddOnePluginTest) {
 
 TEST_F(DeviceTest, AddManySamePluginTest) {
     EXPECT_TRUE(window_);
-    window_->GetUniqueDevice().Startup(std::move(level_));
-    auto& device = window_->GetUniqueDevice();
+    window_->GetDevice().Startup(std::move(level_));
+    auto& device = window_->GetDevice();
+    EXPECT_EQ(window_->GetDevice().GetDeviceEnum(), frame::RenderingAPIEnum::OPENGL);
     for (int i = 0; i < 8; ++i) {
         auto plugin = std::make_unique<test::PluginMock>();
         EXPECT_CALL(*plugin, GetName).WillRepeatedly(Return("test"));
@@ -50,8 +51,9 @@ TEST_F(DeviceTest, AddManySamePluginTest) {
 
 TEST_F(DeviceTest, AddManyDifferentPluginTest) {
     EXPECT_TRUE(window_);
-    window_->GetUniqueDevice().Startup(std::move(level_));
-    auto& device = window_->GetUniqueDevice();
+    window_->GetDevice().Startup(std::move(level_));
+    auto& device = window_->GetDevice();
+    EXPECT_EQ(window_->GetDevice().GetDeviceEnum(), frame::RenderingAPIEnum::OPENGL);
     for (int i = 0; i < 8; ++i) {
         auto plugin = std::make_unique<test::PluginMock>();
         EXPECT_CALL(*plugin, GetName).WillRepeatedly(Return(fmt::format("test{}", i)));

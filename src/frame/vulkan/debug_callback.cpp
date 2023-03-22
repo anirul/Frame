@@ -30,6 +30,7 @@ DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT message_severity,
     if (message_severity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT) {
         logger->info(p_callback_data->pMessage);
     }
+    return VK_TRUE;
 }
 
 }  // namespace frame::vulkan

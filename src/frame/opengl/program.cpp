@@ -149,8 +149,8 @@ void Program::Uniform(const std::string& name, const std::vector<float>& vector,
             return;
         }
     }
-    throw std::runtime_error(fmt::format(
-        "Unknown size doesn't know that size equivalent: < {}, {} >.", size.x, size.y));
+    throw std::runtime_error(
+        fmt::format("Unknown size doesn't know that size equivalent: < {}, {} >.", size.x, size.y));
 }
 
 void Program::Uniform(const std::string& name, const std::vector<std::int32_t>& vector,
@@ -192,8 +192,8 @@ void Program::Uniform(const std::string& name, const std::vector<std::int32_t>& 
             return;
         }
     }
-    throw std::runtime_error(fmt::format(
-        "Unknown size doesn't know that size equivalent: < {}, {} >.", size.x, size.y));
+    throw std::runtime_error(
+        fmt::format("Unknown size doesn't know that size equivalent: < {}, {} >.", size.x, size.y));
 }
 
 bool Program::IsUniformInList(const std::string& name) const {
@@ -215,7 +215,10 @@ int Program::GetMemoizeUniformLocation(const std::string& name) const {
 #endif  // _DEBUG
         int location = glGetUniformLocation(program_id_, name.c_str());
         if (location == -1) {
-            throw std::runtime_error(fmt::format("Could not get a location for uniform {}.", name));
+            GLenum error = glGetError();
+            throw std::runtime_error(
+                fmt::format("Could not get a location for uniform [{}] error: {}.", name,
+                            reinterpret_cast<const char*>(gluErrorString(error))));
         }
         memoize_map_.insert({ name, location });
     }

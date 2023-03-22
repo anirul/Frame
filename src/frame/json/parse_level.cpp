@@ -14,11 +14,11 @@
 namespace frame::proto {
 
 namespace {
-std::unique_ptr<LevelInterface> LevelProto(glm::uvec2 size, const std::string content) {
+
+std::unique_ptr<LevelInterface> LevelProto(glm::uvec2 size, const proto::Level& proto_level) {
     // TODO(anirul): Check we are in OPENGL mode?
     auto logger      = Logger::GetInstance();
     auto level       = std::make_unique<frame::Level>();
-    auto proto_level = LoadProtoFromJson<proto::Level>(content);
     level->SetName(proto_level.name());
     level->SetDefaultTextureName(proto_level.default_texture_name());
 
@@ -86,16 +86,23 @@ std::unique_ptr<LevelInterface> LevelProto(glm::uvec2 size, const std::string co
     level->SetDefaultCameraName(proto_level.scene_tree().default_camera_name());
     return level;
 }
-}  // namespace
+
+}  // End namespace.
+
+std::unique_ptr<LevelInterface> ParseLevel(glm::uvec2 size, const proto::Level& proto_level) {
+    return LevelProto(size, proto_level);
+}
+
+std::unique_ptr<frame::LevelInterface> ParseLevel(glm::uvec2 size, const std::string& content) {
+    auto proto_level = LoadProtoFromJson<Level>(content);
+    return LevelProto(size, proto_level);
+}
 
 std::unique_ptr<LevelInterface> ParseLevel(glm::uvec2 size, const std::filesystem::path& path) {
     std::ifstream ifs(path.string().c_str());
     std::string content(std::istreambuf_iterator<char>(ifs), {});
-    return LevelProto(size, content);
-}
-
-std::unique_ptr<frame::LevelInterface> ParseLevel(glm::uvec2 size, const std::string& content) {
-    return LevelProto(size, content);
+    auto proto_level = LoadProtoFromJson<Level>(content);
+    return LevelProto(size, proto_level);
 }
 
 }  // End namespace frame::proto.

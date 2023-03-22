@@ -16,8 +16,7 @@
 
 namespace frame::opengl {
 
-Device::Device(void* gl_context, glm::uvec2 size)
-    : gl_context_(gl_context), size_(size) {
+Device::Device(void* gl_context, glm::uvec2 size) : gl_context_(gl_context), size_(size) {
     // This should maintain the culling to none.
     // FIXME(anirul): Change this as to be working!
     glDisable(GL_CULL_FACE);
@@ -42,8 +41,16 @@ void Device::Startup(std::unique_ptr<frame::LevelInterface>&& level) {
     auto& camera = level_->GetDefaultCamera();
     camera.SetAspectRatio(static_cast<float>(size_.x) / static_cast<float>(size_.y));
     // Create a renderer.
-    Context context{ nullptr, this, level_.get() };
-    renderer_ = std::make_unique<Renderer>(context, glm::uvec4(0, 0, size_.x, size_.y));
+    renderer_ = std::make_unique<Renderer>(*level_.get(), glm::uvec4(0, 0, size_.x, size_.y));
+    // Add a callback to allow plugins to be called at pre-render step.
+    renderer_->SetMeshRenderCallback([this](UniformInterface& uniform,
+                                            StaticMeshInterface& static_mesh,
+                                            MaterialInterface& material) {
+        for (auto* plugin : GetPluginPtrs()) {
+            if (!plugin) continue;
+            plugin->PreRender(uniform, *this, static_mesh, material);
+        }
+    });
 }
 
 void Device::AddPlugin(std::unique_ptr<PluginInterface>&& plugin_interface) {
@@ -142,18 +149,17 @@ void Device::Display(double dt /*= 0.0*/) {
     right_camera.SetFront(glm::normalize(right_camera_direction));
     switch (stereo_enum_) {
         case StereoEnum::NONE:
-            DisplayCamera(level_->GetDefaultCamera(), glm::uvec4(0, 0, size_.x, size_.y),
-                          dt);
+            DisplayCamera(level_->GetDefaultCamera(), glm::uvec4(0, 0, size_.x, size_.y), dt);
             break;
         case StereoEnum::HORIZONTAL_SPLIT:
-            DisplayLeftRightCamera(
-                left_camera, right_camera, glm::uvec4(0, 0, size_.x / 2, size_.y),
-                glm::uvec4(size_.x / 2, 0, size_.x / 2, size_.y), dt);
+            DisplayLeftRightCamera(left_camera, right_camera,
+                                   glm::uvec4(0, 0, size_.x / 2, size_.y),
+                                   glm::uvec4(size_.x / 2, 0, size_.x / 2, size_.y), dt);
             break;
         case StereoEnum::HORIZONTAL_SIDE_BY_SIDE:
-            DisplayLeftRightCamera(
-                left_camera, right_camera, glm::uvec4(0, 0, size_.x / 2, size_.y / 2),
-                glm::uvec4(size_.x / 2, 0, size_.x / 2, size_.y / 2), dt);
+            DisplayLeftRightCamera(left_camera, right_camera,
+                                   glm::uvec4(0, 0, size_.x / 2, size_.y / 2),
+                                   glm::uvec4(size_.x / 2, 0, size_.x / 2, size_.y / 2), dt);
             break;
         default:
             throw std::runtime_error(

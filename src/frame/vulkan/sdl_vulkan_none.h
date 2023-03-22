@@ -34,7 +34,7 @@ class SDLVulkanNone : public WindowInterface {
     void SetUniqueDevice(std::unique_ptr<DeviceInterface>&& device) override {
         device_ = std::move(device);
     }
-    DeviceInterface& GetUniqueDevice() override { return *device_.get(); }
+    DeviceInterface& GetDevice() override { return *device_.get(); }
     glm::uvec2 GetSize() const override { return size_; }
     glm::vec2 GetPixelPerInch(std::uint32_t screen = 0) const {
         throw std::runtime_error("Not implemented yet!");
@@ -47,6 +47,7 @@ class SDLVulkanNone : public WindowInterface {
         device_->Resize(size);
     }
     FullScreenEnum GetFullScreenEnum() const override { return FullScreenEnum::WINDOW; }
+	DrawingTargetEnum GetDrawingTargetEnum() const override { return DrawingTargetEnum::NONE; }
 
    public:
     vk::DispatchLoaderDynamic& GetVulkanDispatch() { return vk_dispatch_loader_dynamic_; }

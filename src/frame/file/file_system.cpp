@@ -32,7 +32,6 @@ const std::filesystem::path FindElement(const std::filesystem::path& file,
                 if (new_path.string().find(element) != std::string::npos) found = true;
             }
             if (!found) {
-                std::cout << new_path << std::endl;
                 return new_path;
             }
         }

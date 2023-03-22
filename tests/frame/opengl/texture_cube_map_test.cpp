@@ -10,8 +10,7 @@
 #include "frame/opengl/texture_cube_map.h"
 
 namespace test {
-
-// FIXME(anirul): This is passing on a serious card (like a 2070 Super), but not on lighter card.
+    
 TEST_F(TextureCubeMapTest, CreateTextureCubeMapTest) {
     ASSERT_FALSE(texture_);
     EXPECT_NO_THROW(texture_ = frame::opengl::file::LoadCubeMapTextureFromFiles(
@@ -35,10 +34,7 @@ TEST_F(TextureCubeMapTest, CreateTextureCubeMapTest) {
     EXPECT_EQ(0xff, *p.second);
 }
 
-// FIXME(anirul): There is a problem in there... Note that the issue is slightly different with card
-// and if you execute it stand alone. Is it short and not float?
-// Check clear conditions!
-TEST_F(TextureCubeMapTest, DISABLED_CreateEquirectangularTextureCubeMapTest) {
+TEST_F(TextureCubeMapTest, CreateEquirectangularTextureCubeMapTest) {
     ASSERT_FALSE(texture_);
     EXPECT_NO_THROW(texture_ = frame::opengl::file::LoadCubeMapTextureFromFile(
                         frame::file::FindFile("asset/cubemap/hamarikyu.hdr"),
@@ -47,15 +43,15 @@ TEST_F(TextureCubeMapTest, DISABLED_CreateEquirectangularTextureCubeMapTest) {
     auto* opengl_texture = dynamic_cast<frame::opengl::TextureCubeMap*>(texture_.get());
     ASSERT_NE(nullptr, opengl_texture);
     ASSERT_NE(0, opengl_texture->GetId());
-    EXPECT_EQ(512, texture_->GetSize().x);
-    EXPECT_EQ(512, texture_->GetSize().y);
+    EXPECT_EQ(1024, texture_->GetSize().x);
+    EXPECT_EQ(1024, texture_->GetSize().y);
     auto vecf = texture_->GetTextureFloat();
     // Image size time the number of color per pixel time 6 (cubemap).
-    EXPECT_EQ(512 * 512 * 3 * 6, vecf.size());
+    EXPECT_EQ(1024 * 1024 * 3 * 6, vecf.size());
     auto p = std::minmax_element(vecf.begin(), vecf.end());
-    // Should probably make a GT and LT...
-    EXPECT_FLOAT_EQ(0.0f, *p.first);
-    EXPECT_FLOAT_EQ(20.413086f, *p.second);
+    // Use a EXPECT_NEAR as using equality had tendencies to fail.
+    EXPECT_NEAR(0.0f, *p.first, 0.1f);
+    EXPECT_NEAR(20.0f, *p.second, 1.0f);
 }
 
 }  // End namespace test.

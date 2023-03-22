@@ -5,6 +5,7 @@ add_library(FrameGui
     ${CMAKE_SOURCE_DIR}/include/frame/gui/draw_gui_interface.h
     ${CMAKE_SOURCE_DIR}/include/frame/gui/draw_gui_factory.h
     ${CMAKE_SOURCE_DIR}/include/frame/gui/window_camera.h
+    ${CMAKE_SOURCE_DIR}/include/frame/gui/window_cubemap.h
     ${CMAKE_SOURCE_DIR}/include/frame/gui/window_resolution.h
     ${CMAKE_SOURCE_DIR}/include/frame/gui/input_factory.h
     draw_gui_factory.cpp
@@ -16,6 +17,7 @@ add_library(FrameGui
     input_wasd_mouse.cpp
     input_wasd_mouse.h
     window_camera.cpp
+    window_cubemap.cpp
     window_resolution.cpp
 )
 

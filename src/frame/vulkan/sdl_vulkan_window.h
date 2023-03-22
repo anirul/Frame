@@ -30,7 +30,7 @@ class SDLVulkanWindow : public WindowInterface {
     void SetUniqueDevice(std::unique_ptr<DeviceInterface>&& device) override {
         device_ = std::move(device);
     }
-    DeviceInterface& GetUniqueDevice() override { return *device_.get(); }
+    DeviceInterface& GetDevice() override { return *device_.get(); }
     glm::uvec2 GetSize() const override { return size_; }
 	glm::vec2 GetPixelPerInch(std::uint32_t screen = 0) const {
         throw std::runtime_error("Not implemented yet!");
@@ -40,6 +40,7 @@ class SDLVulkanWindow : public WindowInterface {
     void SetWindowTitle(const std::string& title) const override {
         SDL_SetWindowTitle(sdl_window_, title.c_str());
     }
+	DrawingTargetEnum GetDrawingTargetEnum() const override { return DrawingTargetEnum::WINDOW; }
 
    public:
     void Run(std::function<void()> lambda = []{}) override;

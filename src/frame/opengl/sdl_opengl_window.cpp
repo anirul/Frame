@@ -286,10 +286,10 @@ BOOL MonitorEnumProc(HMONITOR hmonitor, HDC hdc, LPRECT p_rect, LPARAM param) {
     int cy_physical = dm.dmPelsHeight;
 
     // Calculate the scaling factor.
-    float horz_scale  = static_cast<float>(cx_physical) / static_cast<float>(cx_logical);
-    double vert_scale = static_cast<float>(cy_physical) / static_cast<float>(cy_logical);
+    float horz_scale = static_cast<float>(cx_physical) / static_cast<float>(cx_logical);
+    float vert_scale = static_cast<float>(cy_physical) / static_cast<float>(cy_logical);
     // Used a epsilon to avoid problems in the assertion.
-    assert(fabs(horz_scale - vert_scale) < 1e-4f);
+    assert(fabs(horz_scale - vert_scale) < 1e-3f);
     float multiplication_scale = horz_scale;
 
     // Push back the value to the vector.

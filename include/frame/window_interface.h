@@ -42,7 +42,7 @@ struct WindowInterface {
      * @brief Get the current device the one that was assign to this window.
      * @return A pointer to a device interface.
      */
-    virtual DeviceInterface& GetUniqueDevice() = 0;
+    virtual DeviceInterface& GetDevice() = 0;
     /**
      * @brief Get the size of the window (useful to make a buffer).
      * @return A size {x, y} of the window.
@@ -87,6 +87,11 @@ struct WindowInterface {
      * @return The full screen enum.
      */
     virtual FullScreenEnum GetFullScreenEnum() const = 0;
+    /**
+     * @brief Get the drawing target enum (none, window).
+     * @return The drawing target enum (none, window).
+     */
+    virtual DrawingTargetEnum GetDrawingTargetEnum() const = 0;
 };
 
 }  // End namespace frame.

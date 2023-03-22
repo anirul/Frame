@@ -2,7 +2,6 @@
 
 #include <memory>
 
-#include "frame/context.h"
 #include "frame/opengl/frame_buffer.h"
 #include "frame/opengl/render_buffer.h"
 #include "frame/program_interface.h"
@@ -20,9 +19,11 @@ namespace frame::opengl {
 class Renderer : public RendererInterface {
    public:
     /**
-     * @brief This will also startup the frame and rendering buffer.
+     * @brief Constructor
+     * @param level: The level to render.
+     * @param viewport: The viewport.
      */
-    Renderer(Context context, glm::uvec4 viewport);
+    Renderer(LevelInterface& level, glm::uvec4 viewport);
 
    public:
     /**
@@ -57,6 +58,11 @@ class Renderer : public RendererInterface {
      * @param viewport: New viewport.
      */
     void SetViewport(glm::uvec4 viewport) override { viewport_ = viewport; }
+    /**
+     * @brief Add a mesh render callback.
+     * @param callback: The callback to be added to the render.
+     */
+    void SetMeshRenderCallback(RenderCallback callback) override { callback_ = callback; }
 
    public:
     /**
@@ -97,8 +103,6 @@ class Renderer : public RendererInterface {
     void SetDepthTest(bool enable) override;
 
    private:
-    WindowInterface& window_;
-    DeviceInterface& device_;
     LevelInterface& level_;
     EntityId last_program_id_ = NullId;
     Logger& logger_           = Logger::GetInstance();
@@ -116,6 +120,8 @@ class Renderer : public RendererInterface {
     EntityId display_material_id_ = 0;
     // Texture frame (used in render mesh).
     frame::proto::TextureFrame texture_frame_;
+    // The render callback it will be called once per mesh.
+    RenderCallback callback_ = [](UniformInterface&, StaticMeshInterface&, MaterialInterface&) {};
 };
 
 }  // End namespace frame::opengl.

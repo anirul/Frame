@@ -5,7 +5,6 @@
 
 #include <stdexcept>
 
-#include "frame/context.h"
 #include "frame/node_matrix.h"
 #include "frame/node_static_mesh.h"
 #include "frame/opengl/file/load_program.h"
@@ -17,11 +16,8 @@
 
 namespace frame::opengl {
 
-Renderer::Renderer(Context context, glm::uvec4 viewport)
-    : window_(*context.window),
-      device_(*context.device),
-      level_(*context.level),
-      viewport_(viewport) {
+Renderer::Renderer(LevelInterface& level, glm::uvec4 viewport)
+    : level_(level), viewport_(viewport) {
     // TODO(anirul): Check viewport!!!
     render_buffer_.CreateStorage({ viewport_.z - viewport_.x, viewport_.w - viewport_.y });
     frame_buffer_.AttachRender(render_buffer_);
@@ -84,11 +80,8 @@ void Renderer::RenderMesh(StaticMeshInterface& static_mesh, MaterialInterface& m
 
     // In case the camera doesn't exist it will create a basic one.
     UniformWrapper uniform_wrapper(projection, view, model, dt);
-
-    // Go through the plugin list.
-    for (auto* plugin : device_.GetPluginPtrs()) {
-        plugin->PreRender(uniform_wrapper, device_, static_mesh, material);
-    }
+    // Go through the callback.
+    callback_(uniform_wrapper, static_mesh, material);
     program.Use(uniform_wrapper);
 
     auto texture_out_ids = program.GetOutputTextureIds();

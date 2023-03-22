@@ -143,6 +143,20 @@ frame::proto::TextureFilter::Enum TextureCubeMap::GetWrapT() const {
     return ConvertFromGLType(filter);
 }
 
+void TextureCubeMap::SetWrapR(const proto::TextureFilter::Enum texture_filter) {
+    Bind();
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, ConvertToGLType(texture_filter));
+    UnBind();
+}
+
+proto::TextureFilter::Enum TextureCubeMap::GetWrapR() const {
+    GLint filter;
+    Bind();
+    glGetTexParameteriv(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, &filter);
+    UnBind();
+    return ConvertFromGLType(filter);
+}
+
 void TextureCubeMap::CreateTextureCubeMap(
 		const std::array<void*, 6> cube_map/* =
 			{ nullptr, nullptr, nullptr, nullptr, nullptr, nullptr }*/)
@@ -153,6 +167,7 @@ void TextureCubeMap::CreateTextureCubeMap(
     SetMagFilter(proto::TextureFilter::LINEAR);
     SetWrapS(proto::TextureFilter::CLAMP_TO_EDGE);
     SetWrapT(proto::TextureFilter::CLAMP_TO_EDGE);
+    SetWrapR(proto::TextureFilter::CLAMP_TO_EDGE);
     for (unsigned int i : { 0, 1, 2, 3, 4, 5 }) {
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0,
                      opengl::ConvertToGLType(pixel_element_size_, pixel_structure_),

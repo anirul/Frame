@@ -32,7 +32,7 @@ struct TextureParameter {
     proto::PixelElementSize pixel_element_size = proto::PixelElementSize_BYTE();
     //! @brief Pixel structure, this is the number of color you have in the texture 1 to 4.
     proto::PixelStructure pixel_structure = proto::PixelStructure_RGB();
-    //! @brief Texture size.
+    //! @brief Texture size, in case of cubemap this is the value of a single plane.
     glm::uvec2 size = glm::uvec2(1, 1);
     //! @brief Texture data, in case you don't want to provide it just pass an empty vector.
     //! You have to multiply the size by the pixel element size to get the size of the vector.
