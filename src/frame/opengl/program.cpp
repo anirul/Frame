@@ -11,7 +11,10 @@
 
 namespace frame::opengl {
 
-Program::Program() { program_id_ = glCreateProgram(); }
+Program::Program(const std::string& name) {
+    SetName(name);
+    program_id_ = glCreateProgram();
+}
 
 Program::~Program() { glDeleteProgram(program_id_); }
 
@@ -274,11 +277,11 @@ void Program::SetSceneRoot(EntityId scene_root) { scene_root_ = scene_root; }
 
 void Program::UnUse() const { glUseProgram(0); }
 
-void Program::CreateUniformList() {
+void Program::CreateUniformList() const {
     uniform_list_.clear();
     GLint count = 0;
     glGetProgramiv(program_id_, GL_ACTIVE_UNIFORMS, &count);
-    logger_->info("Uniform {} count: {}", name_, count);
+    logger_->info("Uniform [{}] count: {}", name_, count);
     for (GLuint i = 0; i < static_cast<GLuint>(count); ++i) {
         constexpr GLsizei max_size = 256;
         GLsizei length             = 0;
@@ -314,7 +317,8 @@ std::string Program::GetTemporarySceneRoot() const { return temporary_scene_root
 
 void Program::SetTemporarySceneRoot(const std::string& name) { temporary_scene_root_ = name; }
 
-std::unique_ptr<ProgramInterface> CreateProgram(std::istream& vertex_shader_code,
+std::unique_ptr<ProgramInterface> CreateProgram(const std::string& name,
+                                                std::istream& vertex_shader_code,
                                                 std::istream& pixel_shader_code) {
     std::string vertex_source(std::istreambuf_iterator<char>(vertex_shader_code), {});
     std::string pixel_source(std::istreambuf_iterator<char>(pixel_shader_code), {});
@@ -322,7 +326,7 @@ std::unique_ptr<ProgramInterface> CreateProgram(std::istream& vertex_shader_code
     auto& logger = Logger::GetInstance();
     logger->info("Creating program");
 #endif  // _DEBUG
-    auto program = std::make_unique<Program>();
+    auto program = std::make_unique<Program>(name);
     Shader vertex(ShaderEnum::VERTEX_SHADER);
     Shader fragment(ShaderEnum::FRAGMENT_SHADER);
     if (!vertex.LoadFromSource(vertex_source)) {

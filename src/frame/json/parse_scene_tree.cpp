@@ -17,8 +17,7 @@ namespace frame::proto {
 
 namespace {
 
-std::function<NodeInterface*(const std::string& name)> GetFunctor(
-    LevelInterface& level) {
+std::function<NodeInterface*(const std::string& name)> GetFunctor(LevelInterface& level) {
     return [&level](const std::string& name) -> NodeInterface* {
         auto maybe_id = level.GetIdFromName(name);
         if (!maybe_id) {
@@ -79,7 +78,8 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
         }
         default: {
             throw std::runtime_error(
-                fmt::format("unknown mesh enum value: {}", proto_scene_static_mesh.mesh_enum()));
+                fmt::format("unknown mesh enum value: {}",
+                            static_cast<int>(proto_scene_static_mesh.mesh_enum())));
         }
     }
     auto maybe_material_id = level.GetIdFromName(proto_scene_static_mesh.material_name());
@@ -227,8 +227,8 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
         case proto::SceneLight::INVALID:
             [[fallthrough]];
         default:
-            throw std::runtime_error(
-                fmt::format("Unknown scene light type {}", proto_scene_light.light_type()));
+            throw std::runtime_error(fmt::format("Unknown scene light type {}",
+                                                 static_cast<int>(proto_scene_light.light_type())));
     }
     return false;
 }

@@ -20,6 +20,8 @@ add_custom_target(AssetShaderOpenGL
     gaussian_blur.vert
     high_dynamic_range.frag
     high_dynamic_range.vert
+    image_based_lighting.frag
+    image_based_lighting.vert
     integrate_brdf.frag
     integrate_brdf.vert
     irradiance_cubemap.frag

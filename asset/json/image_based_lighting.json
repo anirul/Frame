@@ -1,12 +1,47 @@
 {
-  "name": "SceneSimple",
+  "name": "LastMonsterStanding",
   "default_texture_name": "albedo",
+  "textures": [
+    {
+      "name": "albedo",
+      "size": {
+        "x": -1,
+        "y": -1
+      },
+      "pixel_element_size": { "value": "BYTE" },
+      "pixel_structure": { "value": "RGB" }
+    },
+    {
+      "name": "skybox",
+      "cubemap": "true",
+      "pixel_element_size": { "value": "FLOAT" },
+      "pixel_structure": { "value": "RGB" },
+      "file_name": "asset/cubemap/hamarikyu.hdr"
+    },
+    {
+      "name": "apple_texture",
+      "cubemap": false,
+      "pixel_element_size": { "value": "BYTE" },
+      "pixel_structure": { "value": "RGB" },
+      "file_name": "asset/apple/color.jpg"
+    },
+    {
+      "name": "zbuffer",
+      "cubemap": "false",
+      "size": {
+        "x": "-1",
+        "y": "-1"
+      },
+      "pixel_element_size": { "value": "BYTE" },
+      "pixel_structure": { "value": "RGB" }
+    }
+  ],
   "materials": [
     {
-      "name": "SceneSimpleMaterial",
-      "program_name": "SceneSimpleProgram",
-      "texture_names": [ "apple_texture" ],
-      "inner_names": [ "Color" ]
+      "name": "ImageBasedLightingMaterial",
+      "program_name": "ImageBasedLightingProgram",
+      "texture_names": [ "apple_texture", "skybox" ],
+      "inner_names": [ "Color", "IrradianceMap" ]
     },
     {
       "name": "CubeMapMaterial",
@@ -18,8 +53,8 @@
   "programs": [
     {
       "name": "CubeMapProgram",
-      "input_texture_names": "skybox",
-      "output_texture_names": "albedo",
+      "input_texture_names": [ "skybox" ],
+      "output_texture_names": [ "albedo" ],
       "input_scene_type": { "value": "CUBE" },
       "shader": "cubemap",
       "parameters": [
@@ -38,14 +73,12 @@
       ]
     },
     {
-      "name": "SceneSimpleProgram",
-      "output_texture_names": [
-        "albedo",
-        "zbuffer"
-      ],
+      "name": "ImageBasedLightingProgram",
+      "input_texture_names": [ "apple_texture", "skybox" ],
+      "output_texture_names": [ "albedo" ],
       "input_scene_type": { "value": "SCENE" },
       "input_scene_root_name": "root",
-      "shader": "scene_simple",
+      "shader": "image_based_lighting",
       "parameters": [
         {
           "name": "projection",
@@ -58,55 +91,8 @@
         {
           "name": "model",
           "uniform_enum": "MODEL_MAT4"
-        },
-        {
-          "name": "time_s",
-          "uniform_enum": "FLOAT_TIME_S"
         }
       ]
-    }
-  ],
-  "textures": [
-    {
-      "name": "skybox",
-      "cubemap": "true",
-      "pixel_element_size": { "value": "BYTE" },
-      "pixel_structure": { "value": "RGB" },
-      "file_names": {
-        "positive_x": "asset/cubemap/negative_x.png",
-        "negative_x": "asset/cubemap/positive_x.png",
-        "positive_y": "asset/cubemap/negative_y.png",
-        "negative_y": "asset/cubemap/positive_y.png",
-        "positive_z": "asset/cubemap/negative_z.png",
-        "negative_z": "asset/cubemap/positive_z.png"
-      }
-    },
-    {
-      "name": "apple_texture",
-      "cubemap": "false",
-      "pixel_element_size": { "value": "BYTE" },
-      "pixel_structure": { "value": "RGB" },
-      "file_name": "asset/apple/color.jpg"
-    },
-    {
-      "name": "albedo",
-      "cubemap": "false",
-      "size": {
-        "x": "-1",
-        "y": "-1"
-      },
-      "pixel_element_size": { "value": "BYTE" },
-      "pixel_structure": { "value": "RGB" }
-    },
-    {
-      "name": "zbuffer",
-      "cubemap": "false",
-      "size": {
-        "x": "-1",
-        "y": "-1"
-      },
-      "pixel_element_size": { "value": "BYTE" },
-      "pixel_structure": { "value": "RGB" }
     }
   ],
   "scene_tree": {
@@ -116,10 +102,10 @@
       {
         "name": "root",
         "matrix": {
-          "m11": "1",
-          "m22": "1",
-          "m33": "1",
-          "m44": "1"
+          "m11": 1.0,
+          "m22": 1.0,
+          "m33": 1.0,
+          "m44": 1.0
         }
       },
       {
@@ -166,31 +152,30 @@
         "name": "AppleMesh",
         "parent": "mesh_holder",
         "file_name": "apple.obj",
-        "material_name": "SceneSimpleMaterial"
+        "material_name": "ImageBasedLightingMaterial"
       }
     ],
     "scene_cameras": [
       {
         "name": "camera",
         "parent": "camera_holder",
-        "aspect_ratio": "1.3333",
-        "fov_degrees": "65.0",
-        "near_clip": "0.01",
-        "far_clip": "1000.0",
+        "fov_degrees": 65.0,
+        "near_clip": 0.01,
+        "far_clip": 1000.0,
         "position": {
-          "x": "0.0",
-          "y": "0.0",
-          "z": "-2.0"
+          "x": 0,
+          "y": 0,
+          "z": -2
         },
         "target": {
-          "x": "0.0",
-          "y": "0.0",
-          "z": "1.0"
+          "x": 0,
+          "y": 0,
+          "z": 1
         },
         "up": {
-          "x": "0.0",
-          "y": "1.0",
-          "z": "0.0"
+          "x": 0,
+          "y": 1,
+          "z": 0
         }
       }
     ],

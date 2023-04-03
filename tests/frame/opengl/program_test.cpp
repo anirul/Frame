@@ -4,13 +4,13 @@ namespace test {
 
 TEST_F(ProgramTest, CreateProgramTest) {
     EXPECT_FALSE(program_);
-    program_ = std::make_unique<frame::opengl::Program>();
+    program_ = std::make_unique<frame::opengl::Program>("test");
     EXPECT_TRUE(program_);
 }
 
 TEST_F(ProgramTest, CheckShaderProgramTest) {
     EXPECT_FALSE(program_);
-    program_ = std::make_unique<frame::opengl::Program>();
+    program_ = std::make_unique<frame::opengl::Program>("test");
     EXPECT_TRUE(program_);
     auto program_ptr = dynamic_cast<frame::opengl::Program*>(program_.get());
     ASSERT_TRUE(program_ptr);
@@ -24,7 +24,7 @@ TEST_F(ProgramTest, CheckShaderProgramTest) {
 
 TEST_F(ProgramTest, CheckUseAndLinkProgramTest) {
     EXPECT_FALSE(program_);
-    program_         = std::make_unique<frame::opengl::Program>();
+    program_         = std::make_unique<frame::opengl::Program>("test");
     auto program_ptr = dynamic_cast<frame::opengl::Program*>(program_.get());
     EXPECT_TRUE(program_);
     EXPECT_TRUE(program_ptr);
@@ -42,7 +42,7 @@ TEST_F(ProgramTest, CreateSimpleProgramProgramTest) {
     EXPECT_FALSE(program_);
     std::istringstream iss_vertex(GetVertexSource());
     std::istringstream iss_fragment(GetFragmentSource());
-    auto program = frame::opengl::CreateProgram(iss_vertex, iss_fragment);
+    auto program = frame::opengl::CreateProgram("test", iss_vertex, iss_fragment);
     ASSERT_TRUE(program);
 }
 
@@ -50,7 +50,7 @@ TEST_F(ProgramTest, UniformTest) {
     EXPECT_FALSE(program_);
     std::istringstream iss_vertex(GetVertexSource());
     std::istringstream iss_fragment(GetFragmentSource());
-    auto program = frame::opengl::CreateProgram(iss_vertex, iss_fragment);
+    auto program = frame::opengl::CreateProgram("test", iss_vertex, iss_fragment);
     ASSERT_TRUE(program);
     program_ = std::move(program);
     auto uniform_list = program_->GetUniformNameList();

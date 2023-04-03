@@ -52,8 +52,8 @@ std::unique_ptr<frame::ProgramInterface> ParseProgramOpenGL(const Program& proto
         }
         case SceneType::NONE:
         default:
-            throw std::runtime_error(
-                fmt::format("No way {}?", proto_program.input_scene_type().value()));
+            throw std::runtime_error(fmt::format(
+                "No way {}?", static_cast<int>(proto_program.input_scene_type().value())));
     }
     for (const auto& parameter : proto_program.parameters()) {
         switch (parameter.value_oneof_case()) {
@@ -79,7 +79,7 @@ std::unique_ptr<frame::ProgramInterface> ParseProgramOpenGL(const Program& proto
                 break;
             case Uniform::kUniformFloatPlugin:
                 break;
-            case Uniform::kUniformIntPlugin: 
+            case Uniform::kUniformIntPlugin:
                 break;
             default:
                 throw std::runtime_error(
