@@ -13,10 +13,17 @@
     },
     {
       "name": "skybox",
-      "cubemap": "true",
+      "cubemap": true,
       "pixel_element_size": { "value": "FLOAT" },
       "pixel_structure": { "value": "RGB" },
       "file_name": "asset/cubemap/hamarikyu.hdr"
+    },
+    {
+      "name": "irradiance",
+      "cubemap": true,
+      "pixel_element_size": { "value": "FLOAT" },
+      "pixel_structure": { "value": "RGB" },
+      "file_name": "asset/cubemap/hamarikyu_env.hdr"
     },
     {
       "name": "apple_texture",
@@ -29,8 +36,8 @@
       "name": "zbuffer",
       "cubemap": "false",
       "size": {
-        "x": "-1",
-        "y": "-1"
+        "x": -1,
+        "y": -1
       },
       "pixel_element_size": { "value": "BYTE" },
       "pixel_structure": { "value": "RGB" }
@@ -40,7 +47,7 @@
     {
       "name": "ImageBasedLightingMaterial",
       "program_name": "ImageBasedLightingProgram",
-      "texture_names": [ "apple_texture", "skybox" ],
+      "texture_names": [ "apple_texture", "irradiance" ],
       "inner_names": [ "Color", "IrradianceMap" ]
     },
     {
@@ -112,20 +119,20 @@
         "name": "mesh_holder",
         "parent": "root",
         "quaternion": {
-          "x": "0.0",
-          "y": "0.1979232",
-          "z": "0.1484424",
-          "w": "0.9689124"
+          "x": 0.0,
+          "y": 0.1979232,
+          "z": 0.1484424,
+          "w": 0.9689124
         }
       },
       {
         "name": "skybox_holder",
         "parent": "root",
         "quaternion": {
-          "x": "0",
-          "y": "0.0499792",
-          "z": "0.0",
-          "w": "0.9987503"
+          "x": 0,
+          "y": 0.0499792,
+          "z": 0.0,
+          "w": 0.9987503
         }
       }
     ],
@@ -185,14 +192,14 @@
         "parent": "root",
         "light_type": "DIRECTIONAL",
         "position": {
-          "x": "-1.0",
-          "y": "1.0",
-          "z": "1.0"
+          "x": -1.0,
+          "y": 1.0,
+          "z": 1.0
         },
         "color": {
-          "x": "1.0",
-          "y": "1.0",
-          "z": "1.0"
+          "x": 1.0,
+          "y": 1.0,
+          "z": 1.0
         }
       }
     ]
