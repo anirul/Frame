@@ -186,7 +186,7 @@
         "name": "PointCloudMesh",
         "parent": "root",
         "render_primitive_enum": "POINT",
-        "file_name": "bunny.ply",
+        "file_name": "racing_turbo.ply",
         "material_name": "PointCloudMaterial"
       }
     ],
