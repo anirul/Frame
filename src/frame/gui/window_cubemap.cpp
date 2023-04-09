@@ -9,8 +9,7 @@
 
 namespace frame::gui {
 
-WindowCubemap::WindowCubemap(const std::string& name)
-    : name_(name) {}
+WindowCubemap::WindowCubemap(const std::string& name) : name_(name) {}
 
 bool WindowCubemap::DrawCallback() {
     ImGui::Text("Select cubemap: ");
@@ -49,9 +48,11 @@ std::vector<std::filesystem::path> WindowCubemap::GetCubemaps() {
 void WindowCubemap::SaveCubemapPath(const std::filesystem::path& path) { cubemap_path_ = path; }
 
 void WindowCubemap::ChangeLevel(frame::proto::Level& level) {
-    for (auto& texture: *level.mutable_textures()) {
-        if (texture.name() == "skybox") {
-            texture.set_file_name(cubemap_path_.string());
+    if (!cubemap_path_.empty()) {
+        for (auto& texture : *level.mutable_textures()) {
+            if (texture.name() == "skybox") {
+                texture.set_file_name(cubemap_path_.string());
+            }
         }
     }
 }

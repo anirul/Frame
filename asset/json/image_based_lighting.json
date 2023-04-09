@@ -16,14 +16,14 @@
       "cubemap": true,
       "pixel_element_size": { "value": "FLOAT" },
       "pixel_structure": { "value": "RGB" },
-      "file_name": "asset/cubemap/hamarikyu.hdr"
+      "file_name": "asset/cubemap/shiodome.hdr"
     },
     {
       "name": "irradiance",
       "cubemap": true,
       "pixel_element_size": { "value": "FLOAT" },
       "pixel_structure": { "value": "RGB" },
-      "file_name": "asset/cubemap/hamarikyu_env.hdr"
+      "file_name": "asset/cubemap/shiodome_env.hdr"
     },
     {
       "name": "apple_texture",
@@ -126,7 +126,7 @@
         }
       },
       {
-        "name": "skybox_holder",
+        "name": "camera_holder",
         "parent": "root",
         "quaternion": {
           "x": 0,
@@ -145,7 +145,7 @@
       },
       {
         "name": "CubeMapMesh",
-        "parent": "skybox_holder",
+        "parent": "root",
         "material_name": "CubeMapMaterial",
         "mesh_enum": "CUBE"
       },
@@ -172,7 +172,7 @@
         "position": {
           "x": 0,
           "y": 0,
-          "z": -2
+          "z": -1.5
         },
         "target": {
           "x": 0,
