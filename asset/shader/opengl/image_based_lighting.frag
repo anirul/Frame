@@ -11,15 +11,16 @@ uniform samplerCube IrradianceMap;
 
 void main()
 {
-    // Sample the diffuse texture
+    // Sample the diffuse texture.
     vec3 diffuseColor = texture(Color, fragTexCoord).rgb;
 
-    // Sample the irradiance map why do I have to invert the normal?
+    // Sample the irradiance map.
+    // Why do I have to invert the normal?
     vec3 irradiance = texture(IrradianceMap, -fragNormal).rgb;
 
-    // Multiply the diffuse color with the irradiance color
+    // Multiply the diffuse color with the irradiance color.
     vec3 mixedColor = mix(irradiance, diffuseColor.rgb, 0.75);
 
-    // Output the mixed color
+    // Output the mixed color.
     fragColor = vec4(mixedColor, 1.0);
 }

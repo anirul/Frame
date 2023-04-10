@@ -186,7 +186,7 @@
         "name": "PointCloudMesh",
         "parent": "root",
         "render_primitive_enum": "POINT",
-        "file_name": "points_v0.2.obj",
+        "file_name": "racing_turbo.ply",
         "material_name": "PointCloudMaterial"
       }
     ],
