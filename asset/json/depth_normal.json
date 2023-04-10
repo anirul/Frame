@@ -65,6 +65,7 @@
   ],
   "scene_tree": {
     "default_root_name": "root",
+    "default_camera_name": "camera",
     "scene_matrices": [
       {
         "name": "root",
@@ -73,6 +74,30 @@
           "m22": "1.0",
           "m33": "1.0",
           "m44": "1.0"
+        }
+      }
+    ],
+    "scene_cameras": [
+      {
+        "name": "camera",
+        "parent": "root",
+        "fov_degrees": "90.0",
+        "near_clip": "0.01",
+        "far_clip": "1000.0",
+        "position": {
+          "x": "0.0",
+          "y": "0.0",
+          "z": "-1.0"
+        },
+        "target": {
+          "x": "0.0",
+          "y": "0.0",
+          "z": "1.0"
+        },
+        "up": {
+          "x": "0.0",
+          "y": "1.0",
+          "z": "0.0"
         }
       }
     ],

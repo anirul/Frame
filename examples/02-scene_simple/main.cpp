@@ -23,7 +23,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 #else
 int main(int ac, char** av) try {
 #endif
-    glm::uvec2 size = { 800, 600 };
+    glm::uvec2 size = { 1280, 720 };
     bool end        = true;
 
     frame::gui::WindowResolution* ptr_window_resolution = nullptr;

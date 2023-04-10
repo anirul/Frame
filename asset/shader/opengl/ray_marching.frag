@@ -6,7 +6,7 @@ layout(location = 0) out vec4 frag_color;
 
 uniform float time_s;
 
-const vec2 resolution = vec2(640, 480);
+const vec2 resolution = vec2(1280, 720);
 
 const int max_steps = 200;
 const float min_dist = 0.01;

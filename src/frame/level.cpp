@@ -182,6 +182,7 @@ std::unique_ptr<frame::TextureInterface> Level::ExtractTexture(EntityId id) {
 
 frame::Camera& Level::GetDefaultCamera() {
     auto camera_id      = GetDefaultCameraId();
+    assert(camera_id);
     auto& node_interface = GetSceneNodeFromId(camera_id);
     auto& node_camera = dynamic_cast<NodeCamera&>(node_interface);
     return node_camera.GetCamera();

@@ -37,7 +37,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 int main(int ac, char** av) try {
 #endif
     absl::ParseCommandLine(ac, av);
-    glm::uvec2 size = { 800, 600 };
+    glm::uvec2 size = { 1280, 720 };
     auto win        = frame::CreateNewWindow(frame::DrawingTargetEnum::WINDOW,
                                              frame::RenderingAPIEnum::OPENGL, size);
     frame::gui::WindowResolution* ptr_window_resolution = nullptr;
