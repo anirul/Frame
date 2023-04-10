@@ -23,7 +23,7 @@ int main(int ac, char** av) try {
     glm::uvec2 size = { 1280, 720 };
     frame::common::Application app(frame::CreateNewWindow(frame::DrawingTargetEnum::WINDOW,
                                                           frame::RenderingAPIEnum::OPENGL, size));
-    app.Startup(frame::file::FindFile("asset/json/last_monster_standing.json"));
+    app.Startup(frame::file::FindFile("asset/json/image_based_lighting.json"));
     app.Run();
     return 0;
 } catch (const std::exception& e) {

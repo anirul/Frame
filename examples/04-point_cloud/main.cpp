@@ -61,9 +61,8 @@ int main(int ac, char** av) try {
         gui_window->AddWindow(std::move(gui_cubemap));
     }
     win->GetDevice().AddPlugin(std::move(gui_window));
-    win->SetInputInterface(frame::gui::CreateInputArcball(win->GetDevice(), glm::vec3(0, 0, 1.0f),
-                                                          absl::GetFlag(FLAGS_move_mult),
-                                                          absl::GetFlag(FLAGS_zoom_mult)));
+    win->SetInputInterface(frame::gui::CreateInputWasd(
+        win->GetDevice(), absl::GetFlag(FLAGS_move_mult), absl::GetFlag(FLAGS_zoom_mult)));
     auto& device = win->GetDevice();
     frame::common::Application app(std::move(win));
     std::vector<bool> check_end;
@@ -87,6 +86,8 @@ int main(int ac, char** av) try {
         app.Run();
         app.Resize(ptr_window_resolution->GetSize(), ptr_window_resolution->GetFullScreen());
         ptr_window_camera->SaveCamera();
+        // Update screen resolution parameters.
+        size      = ptr_window_resolution->GetSize();
         check_end = { ptr_window_resolution->End(), ptr_window_camera->End(),
                       ptr_window_cubemap->End() };
     } while (!std::all_of(check_end.begin(), check_end.end(), [](bool b) { return b; }));

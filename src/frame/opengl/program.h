@@ -21,7 +21,7 @@ namespace frame::opengl {
 class Program : public ProgramInterface {
    public:
     //! @brief Constructor create the program.
-    Program();
+    Program(const std::string& name);
     //! @brief Destructor destroy objects.
     virtual ~Program();
 
@@ -106,7 +106,7 @@ class Program : public ProgramInterface {
      * projection) but also time and other uniform that could be needed.
      */
     void Use(const UniformInterface& uniform_interface) const override;
-	/**
+    /**
      * @brief Use the program, a little bit like bind.
      */
     void Use() const override;
@@ -172,7 +172,7 @@ class Program : public ProgramInterface {
      */
     void Uniform(const std::string& name, const std::vector<std::int32_t>& vector,
                  glm::uvec2 size = { 0, 0 }) const override;
-	/**
+    /**
      * @brief Check if the program has the uniform passed as name.
      * @param name: Name of the uniform.
      * @return True if present false otherwise.
@@ -200,7 +200,7 @@ class Program : public ProgramInterface {
     /**
      * @brief Create the uniform value list (internal).
      */
-    void CreateUniformList();
+    void CreateUniformList() const;
 
    private:
     /**
@@ -231,7 +231,8 @@ class Program : public ProgramInterface {
  * @param name: Name of the uniform.
  * @param value: Enum value of the uniform (see proto declaration for that).
  */
-std::unique_ptr<frame::ProgramInterface> CreateProgram(std::istream& vertex_shader_code,
+std::unique_ptr<frame::ProgramInterface> CreateProgram(const std::string& name,
+                                                       std::istream& vertex_shader_code,
                                                        std::istream& pixel_shader_code);
 
 }  // End namespace frame::opengl.

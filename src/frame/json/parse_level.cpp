@@ -81,8 +81,9 @@ std::unique_ptr<LevelInterface> LevelProto(glm::uvec2 size, const proto::Level& 
     }
 
     // Load scenes from proto.
-    if (!ParseSceneTreeFile(proto_level.scene_tree(), *level.get()))
+    if (!ParseSceneTreeFile(proto_level.scene_tree(), *level.get())) {
         throw std::runtime_error("Could not parse proto scene file.");
+    }
     level->SetDefaultCameraName(proto_level.scene_tree().default_camera_name());
     return level;
 }
