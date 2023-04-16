@@ -77,6 +77,9 @@ SDLVulkanNone::SDLVulkanNone(glm::uvec2 size) : size_(size) {
 }
 
 SDLVulkanNone::~SDLVulkanNone() {
+    // Has to be reset befor closing the window.
+    vk_unique_instance_.reset();
+    vk_surface_.reset();
     // Destroy the surface and instance when finished
     SDL_DestroyWindow(sdl_window_);
     SDL_Quit();
