@@ -26,7 +26,7 @@ This example show how you can get an normal map from a simple depth texture.
 
 ## 04 Point Cloud
 
-![Screenshot of the depth normal app.](https://github.com/anirul/Frame/raw/master/examples/point_cloud.png)
+![Screenshot of the depth point cloud app.](https://github.com/anirul/Frame/raw/master/examples/point_cloud.png)
 
 This is a test of the point cloud rendering ability of the software, it use an arcball to move around.
 
