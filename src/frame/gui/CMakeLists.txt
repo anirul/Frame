@@ -37,4 +37,4 @@ target_link_libraries(FrameGui
     protobuf::libprotobuf
 )
 
-set_property(TARGET FrameGui PROPERTY FOLDER "Frame/Gui")
+set_property(TARGET FrameGui PROPERTY FOLDER "Frame")

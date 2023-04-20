@@ -23,7 +23,10 @@
       "cubemap": true,
       "pixel_element_size": { "value": "FLOAT" },
       "pixel_structure": { "value": "RGB" },
-      "file_name": "asset/cubemap/shiodome_env.hdr"
+      "size": {
+        "x": 512,
+        "y": 512
+      }
     },
     {
       "name": "apple_texture",
@@ -55,9 +58,36 @@
       "program_name": "CubeMapProgram",
       "texture_names": [ "skybox" ],
       "inner_names": [ "Skybox" ]
+    },
+    {
+      "name": "IrradianceMaterial",
+      "program_name": "IrradianceProgram",
+      "texture_names": [ "skybox" ],
+      "inner_names": [ "Environment" ]
     }
   ],
   "programs": [
+    {
+      "name": "IrradianceProgram",
+      "input_texture_names": [ "skybox" ],
+      "output_texture_names": [ "irradiance" ],
+      "input_scene_type": { "value": "CUBE" },
+      "shader": "irradiance_cubemap",
+      "parameters": [
+        {
+          "name": "projection",
+          "uniform_enum": "PROJECTION_MAT4"
+        },
+        {
+          "name": "view",
+          "uniform_enum": "VIEW_MAT4"
+        },
+        {
+          "name": "model",
+          "uniform_enum": "MODEL_MAT4"
+        }
+      ]
+    },
     {
       "name": "CubeMapProgram",
       "input_texture_names": [ "skybox" ],
@@ -137,6 +167,20 @@
       }
     ],
     "scene_static_meshes": [
+      {
+        "name": "PreRenderClear",
+        "clean_buffer": {
+          "values": [ "CLEAR_COLOR", "CLEAR_DEPTH" ]
+        },
+        "render_time_enum": "PRE_RENDER"
+      },
+      {
+        "name": "ComputeIrradianceMap",
+        "parent": "root",
+        "mesh_enum": "CUBE",
+        "render_time_enum": "PRE_RENDER",
+        "material_name": "IrradianceMaterial"
+      },
       {
         "name": "InitCleanBuffer",
         "clean_buffer": {

@@ -26,4 +26,4 @@ target_link_libraries(FrameCommon
     protobuf::libprotobuf
 )
 
-set_property(TARGET FrameCommon PROPERTY FOLDER "Frame/Common")
+set_property(TARGET FrameCommon PROPERTY FOLDER "Frame")

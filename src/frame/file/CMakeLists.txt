@@ -35,4 +35,4 @@ target_link_libraries(FrameFile
     tinyobjloader::tinyobjloader
 )
 
-set_property(TARGET FrameFile PROPERTY FOLDER "Frame/File")
+set_property(TARGET FrameFile PROPERTY FOLDER "Frame")

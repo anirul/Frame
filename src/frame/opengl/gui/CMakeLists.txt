@@ -33,4 +33,4 @@ target_link_libraries(FrameOpenGLGui
     spdlog::spdlog
 )
 
-set_property(TARGET FrameOpenGLGui PROPERTY FOLDER "Frame/OpenGL/Gui")
+set_property(TARGET FrameOpenGLGui PROPERTY FOLDER "Frame/OpenGL")

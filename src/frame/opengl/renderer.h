@@ -120,6 +120,7 @@ class Renderer : public RendererInterface {
     EntityId display_material_id_ = 0;
     // Texture frame (used in render mesh).
     frame::proto::TextureFrame texture_frame_;
+	bool first_render_ = true;
     // The render callback it will be called once per mesh.
     RenderCallback callback_ = [](UniformInterface&, StaticMeshInterface&, MaterialInterface&) {};
 };

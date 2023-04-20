@@ -20,7 +20,6 @@
 namespace frame::opengl::file {
 
 namespace {
-
 // Get the 6 view for the cube map.
 const std::array<glm::mat4, 6> views_cubemap = {
     glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f),

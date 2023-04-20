@@ -83,9 +83,10 @@ class Level : public LevelInterface {
     }
     /**
      * @brief Get a vector of static mesh id and corresponding material id.
-     * @return Vector of static mesh id and corresponding material id.
+     * @return Vector of static mesh id and corresponding material id and RenderTimeEnum.
      */
-    std::vector<std::pair<EntityId, EntityId>> GetStaticMeshMaterialIds() const override {
+    std::vector<std::pair<EntityId, std::tuple<EntityId, proto::SceneStaticMesh::RenderTimeEnum>>>
+		GetStaticMeshMaterialIds() const override {
         return mesh_material_ids_;
     }
     /**
@@ -130,8 +131,10 @@ class Level : public LevelInterface {
      * @param node_id: Mesh node id.
      * @param material_id: Material id.
      */
-    void AddMeshMaterialId(EntityId node_id, EntityId material_id) override {
-        mesh_material_ids_.emplace_back(node_id, material_id);
+    void AddMeshMaterialId(EntityId node_id, EntityId material_id,
+                           proto::SceneStaticMesh::RenderTimeEnum render_time_enum =
+                               proto::SceneStaticMesh::PER_FRAME) override {
+        mesh_material_ids_.push_back({node_id, {material_id, render_time_enum}});
     }
     /**
      * @brief Get enum type from Id.
@@ -312,7 +315,8 @@ class Level : public LevelInterface {
     std::map<std::string, EntityId> name_id_map_                  = {};
     std::map<EntityId, std::string> id_name_map_                  = {};
     std::map<EntityId, EntityTypeEnum> id_enum_map_               = {};
-    std::vector<std::pair<EntityId, EntityId>> mesh_material_ids_ = {};
+    std::vector<std::pair<EntityId, std::tuple<EntityId, proto::SceneStaticMesh::RenderTimeEnum>>>
+		mesh_material_ids_ = {};
 };
 
 }  // End namespace frame.

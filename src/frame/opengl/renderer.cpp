@@ -16,6 +16,26 @@
 
 namespace frame::opengl {
 
+namespace {
+// Get the 6 view for the cube map.
+const std::array<glm::mat4, 6> views_cubemap = {
+    glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f),
+                glm::vec3(0.0f, 1.0f, 0.0f)),
+    glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f),
+                glm::vec3(0.0f, 1.0f, 0.0f)),
+    glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f),
+                glm::vec3(0.0f, 0.0f, 1.0f)),
+    glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f),
+                glm::vec3(0.0f, 0.0f, -1.0f)),
+    glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f),
+                glm::vec3(0.0f, 1.0f, 0.0f)),
+    glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f),
+                glm::vec3(0.0f, 1.0f, 0.0f))
+};
+// Projection cube map.
+const glm::mat4 projection_cubemap = glm::perspective(glm::radians(90.0f), 1.0f, 0.01f, 10.0f);
+}  // namespace
+
 Renderer::Renderer(LevelInterface& level, glm::uvec4 viewport)
     : level_(level), viewport_(viewport) {
     // TODO(anirul): Check viewport!!!
@@ -236,9 +256,29 @@ void Renderer::SetDepthTest(bool enable) {
 
 void Renderer::RenderAllMeshes(const glm::mat4& projection, const glm::mat4& view,
                                double dt /*= 0.0*/) {
+    // This will ensure that it is only true once.
+    auto first_render = std::exchange(first_render_, false);
     for (const auto& p : level_.GetStaticMeshMaterialIds()) {
-        // This should also call clear buffers.
-        RenderNode(p.first, p.second, projection, view, dt);
+        auto [material_id, render_time_enum] = p.second;
+        // Check this is a pre render action and this is the first render.
+        if (render_time_enum == proto::SceneStaticMesh::PRE_RENDER) {
+            auto temp_viewport = viewport_;
+            if (first_render) {
+                // FIXME(anirul): This is bad it should search for the scale of the image.
+                viewport_ = glm::ivec4(0, 0, 512, 512);
+                for (std::uint32_t i = 0; i < 6; ++i) {
+                    SetCubeMapTarget(GetTextureFrameFromPosition(i));
+                    RenderNode(p.first, material_id, projection_cubemap, views_cubemap[i], dt);
+                }
+                // Again why?
+                SetCubeMapTarget(GetTextureFrameFromPosition(0));
+                RenderNode(p.first, material_id, projection_cubemap, views_cubemap[0], dt);
+            }
+            viewport_ = temp_viewport;
+        } else {
+            // This should also call clear buffers.
+            RenderNode(p.first, material_id, projection, view, dt);
+        }
     }
 }
 

@@ -41,4 +41,4 @@ target_link_libraries(FrameJson
     spdlog::spdlog
 )
 
-set_property(TARGET FrameJson PROPERTY FOLDER "Frame/Json")
+set_property(TARGET FrameJson PROPERTY FOLDER "Frame")

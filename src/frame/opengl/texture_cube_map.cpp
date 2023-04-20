@@ -18,25 +18,6 @@
 
 namespace frame::opengl {
 
-namespace {
-// Get the 6 view for the cube map.
-const std::array<glm::mat4, 6> views_cubemap = {
-    glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f),
-                glm::vec3(0.0f, -1.0f, 0.0f)),
-    glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f),
-                glm::vec3(0.0f, -1.0f, 0.0f)),
-    glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f),
-                glm::vec3(0.0f, 0.0f, 1.0f)),
-    glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f),
-                glm::vec3(0.0f, 0.0f, -1.0f)),
-    glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f),
-                glm::vec3(0.0f, -1.0f, 0.0f)),
-    glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f),
-                glm::vec3(0.0f, -1.0f, 0.0f))
-};
-
-}  // namespace
-
 proto::TextureFrame GetTextureFrameFromPosition(int i) {
     proto::TextureFrame texture_frame{};
     switch (i) {

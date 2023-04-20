@@ -52,7 +52,7 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(LevelInterface
     node_interface->SetName(proto_scene_static_mesh.name());
     auto maybe_scene_id = level.AddSceneNode(std::move(node_interface));
     if (!maybe_scene_id) throw std::runtime_error("No scene Id.");
-    level.AddMeshMaterialId(maybe_scene_id, 0);
+    level.AddMeshMaterialId(maybe_scene_id, 0, proto_scene_static_mesh.render_time_enum());
     return true;
 }
 
@@ -83,7 +83,11 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(LevelInterface
         }
     }
     auto maybe_material_id = level.GetIdFromName(proto_scene_static_mesh.material_name());
-    if (!maybe_material_id) return false;
+    if (!maybe_material_id) {
+        throw std::runtime_error(
+            fmt::format("Couldn't find any material for this mesh: [{}].",
+                level.GetStaticMeshFromId(mesh_id).GetName()));
+    }
     const EntityId material_id = maybe_material_id;
     auto& mesh                 = level.GetStaticMeshFromId(mesh_id);
     mesh.SetRenderPrimitive(proto_scene_static_mesh.render_primitive_enum());
@@ -92,7 +96,8 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(LevelInterface
     node_interface->SetName(proto_scene_static_mesh.name());
     node_interface->SetParentName(proto_scene_static_mesh.parent());
     auto maybe_scene_id = level.AddSceneNode(std::move(node_interface));
-    level.AddMeshMaterialId(maybe_scene_id, material_id);
+    auto render_time_enum = proto_scene_static_mesh.render_time_enum();
+    level.AddMeshMaterialId(maybe_scene_id, material_id, render_time_enum);
     if (!maybe_scene_id) throw std::runtime_error("No scene Id.");
     return true;
 }
@@ -160,7 +165,7 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(LevelInterface
     node_interface->SetName(proto_scene_static_mesh.name());
     node_interface->SetParentName(proto_scene_static_mesh.parent());
     auto scene_id = level.AddSceneNode(std::move(node_interface));
-    level.AddMeshMaterialId(scene_id, material_id);
+    level.AddMeshMaterialId(scene_id, material_id, proto_scene_static_mesh.render_time_enum());
     if (!scene_id) throw std::runtime_error("No scene Id.");
     return true;
 }
