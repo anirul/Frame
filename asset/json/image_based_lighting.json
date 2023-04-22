@@ -24,8 +24,8 @@
       "pixel_element_size": { "value": "FLOAT" },
       "pixel_structure": { "value": "RGB" },
       "size": {
-        "x": 512,
-        "y": 512
+        "x": 1024,
+        "y": 1024
       }
     },
     {
@@ -56,7 +56,7 @@
     {
       "name": "CubeMapMaterial",
       "program_name": "CubeMapProgram",
-      "texture_names": [ "skybox" ],
+      "texture_names": [ "irradiance" ],
       "inner_names": [ "Skybox" ]
     },
     {
@@ -203,7 +203,7 @@
       {
         "name": "camera",
         "parent": "camera_holder",
-        "fov_degrees": 65.0,
+        "fov_degrees": 80.0,
         "near_clip": 0.01,
         "far_clip": 1000.0,
         "position": {

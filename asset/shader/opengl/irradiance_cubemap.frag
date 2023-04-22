@@ -23,7 +23,7 @@ void main()
     up = cross(normal, right);
 
     // Increase the number of samples
-    float sampleDensity = 512.0;
+    float sampleDensity = 1024.0;
     float sampleDelta = 2.0 * PI / sampleDensity;
     float nrSamples = 0.0;
 

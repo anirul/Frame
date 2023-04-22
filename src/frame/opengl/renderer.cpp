@@ -264,8 +264,13 @@ void Renderer::RenderAllMeshes(const glm::mat4& projection, const glm::mat4& vie
         if (render_time_enum == proto::SceneStaticMesh::PRE_RENDER) {
             auto temp_viewport = viewport_;
             if (first_render) {
-                // FIXME(anirul): This is bad it should search for the scale of the image.
-                viewport_ = glm::ivec4(0, 0, 512, 512);
+                // Now this get the image size from the environment map.
+                auto& material = level_.GetMaterialFromId(material_id);
+                auto ids      = material.GetIds();
+                assert(!ids.empty());
+                auto& texture = level_.GetTextureFromId(ids[0]);
+                auto size = texture.GetSize();
+                viewport_ = glm::ivec4(0, 0, size.x, size.y);
                 for (std::uint32_t i = 0; i < 6; ++i) {
                     SetCubeMapTarget(GetTextureFrameFromPosition(i));
                     RenderNode(p.first, material_id, projection_cubemap, views_cubemap[i], dt);
