@@ -16,27 +16,27 @@
 
 // From: https://sourceforge.net/p/predef/wiki/OperatingSystems/
 #if defined(_WIN32) || defined(_WIN64)
-int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine,
-                   _In_ int nShowCmd) try {
+int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
+                   _In_ LPSTR lpCmdLine, _In_ int nShowCmd) try {
 #else
 int main(int ac, char** av) try {
 #endif
-    // Would be nice to have an open file query.
-    glm::uvec2 size = { 0, 0 };
-    {
-        frame::file::Image image(frame::file::FindFile("./asset/input.png"));
-        size = image.GetSize();
-    }
-    frame::common::Application app(frame::CreateNewWindow(frame::DrawingTargetEnum::WINDOW,
-                                                          frame::RenderingAPIEnum::OPENGL, size));
-    app.Startup(frame::file::FindFile("asset/json/depth_normal.json"));
-    app.Run();
-    return 0;
+  // Would be nice to have an open file query.
+  glm::uvec2 size = {0, 0};
+  {
+    frame::file::Image image(frame::file::FindFile("./asset/input.png"));
+    size = image.GetSize();
+  }
+  frame::common::Application app(frame::CreateNewWindow(
+      frame::DrawingTargetEnum::WINDOW, frame::RenderingAPIEnum::OPENGL, size));
+  app.Startup(frame::file::FindFile("asset/json/depth_normal.json"));
+  app.Run();
+  return 0;
 } catch (std::exception ex) {
 #if defined(_WIN32) || defined(_WIN64)
-    MessageBox(nullptr, ex.what(), "Exception", MB_ICONEXCLAMATION);
+  MessageBox(nullptr, ex.what(), "Exception", MB_ICONEXCLAMATION);
 #else
-    std::cerr << "Error: " << ex.what() << std::endl;
+  std::cerr << "Error: " << ex.what() << std::endl;
 #endif
-    return -2;
+  return -2;
 }

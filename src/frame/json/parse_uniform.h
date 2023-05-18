@@ -14,12 +14,13 @@ namespace frame::proto {
  */
 
 /**
- * @brief First start with simple type, this is the template part (int, float, short,...).
+ * @brief First start with simple type, this is the template part (int, float,
+ * short,...).
  * @param uniform_val: Value to be transfered to a C++ value.
  */
 template <typename T>
 T ParseUniform(const T& uniform_val) {
-    return uniform_val;
+  return uniform_val;
 }
 /**
  * @brief Specialization into glm types (vec2).
@@ -60,11 +61,11 @@ glm::quat ParseUniform(const UniformQuaternion& uniform_quat);
 template <typename T, typename U>
 void ParseUniformVec(const std::string& name, const U& uniform_vec,
                      const ProgramInterface& program_interface) {
-    std::uint32_t counter = 0;
-    for (const T& uniform_val : uniform_vec.values()) {
-        program_interface.Uniform(name + '[' + std::to_string(counter++) + ']',
-                                  ParseUniform(uniform_val));
-    }
+  std::uint32_t counter = 0;
+  for (const T& uniform_val : uniform_vec.values()) {
+    program_interface.Uniform(name + '[' + std::to_string(counter++) + ']',
+                              ParseUniform(uniform_val));
+  }
 }
 /**
  * @brief Register the uniform in the program.
@@ -82,15 +83,17 @@ void RegisterUniformFromProto(const frame::proto::Uniform& uniform,
  * @param uniform_interface: Uniform interface.
  * @param program_interface: Program interface.
  */
-void RegisterUniformEnumFromProto(const std::string& name,
-                                  const frame::proto::Uniform::UniformEnum& uniform_enum,
-                                  const UniformInterface& uniform_interface,
-                                  const ProgramInterface& program_interface);
+void RegisterUniformEnumFromProto(
+    const std::string& name,
+    const frame::proto::Uniform::UniformEnum& uniform_enum,
+    const UniformInterface& uniform_interface,
+    const ProgramInterface& program_interface);
 /**
  * @brief Convert frame proto size into pair.
  * @param size: Proto size param.
  * @return Size result.
  */
-std::pair<std::uint32_t, std::uint32_t> ParseSizeInt(const frame::proto::Size size);
+std::pair<std::uint32_t, std::uint32_t> ParseSizeInt(
+    const frame::proto::Size size);
 
 }  // namespace frame::proto

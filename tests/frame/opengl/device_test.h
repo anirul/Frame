@@ -12,18 +12,19 @@
 namespace test {
 
 class DeviceTest : public ::testing::Test {
-   public:
-    DeviceTest() : window_(frame::CreateNewWindow(frame::DrawingTargetEnum::NONE)) {
-        auto level =
-            frame::proto::ParseLevel(size_, frame::file::FindFile("asset/json/device_test.json"));
-        if (!level) throw std::runtime_error("Couldn't create level.");
-        level_ = std::move(level);
-    }
+ public:
+  DeviceTest()
+      : window_(frame::CreateNewWindow(frame::DrawingTargetEnum::NONE)) {
+    auto level = frame::proto::ParseLevel(
+        size_, frame::file::FindFile("asset/json/device_test.json"));
+    if (!level) throw std::runtime_error("Couldn't create level.");
+    level_ = std::move(level);
+  }
 
-   protected:
-    const glm::uvec2 size_                          = { 320, 200 };
-    std::unique_ptr<frame::WindowInterface> window_ = nullptr;
-    std::unique_ptr<frame::LevelInterface> level_   = nullptr;
+ protected:
+  const glm::uvec2 size_ = {320, 200};
+  std::unique_ptr<frame::WindowInterface> window_ = nullptr;
+  std::unique_ptr<frame::LevelInterface> level_ = nullptr;
 };
 
 }  // End namespace test.

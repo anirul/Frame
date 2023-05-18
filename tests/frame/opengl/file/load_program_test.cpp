@@ -4,11 +4,14 @@
 
 namespace test {
 
-TEST_F(LoadProgramTest, LoadFromNameTest) { ASSERT_TRUE(frame::opengl::file::LoadProgram("blur")); }
+TEST_F(LoadProgramTest, LoadFromNameTest) {
+  ASSERT_TRUE(frame::opengl::file::LoadProgram("blur"));
+}
 
 TEST_F(LoadProgramTest, LoadFromFileTest) {
-    ASSERT_TRUE(frame::opengl::file::LoadProgram("blur", "asset/shader/opengl/blur.vert",
-                                                 "asset/shader/opengl/blur.frag"));
+  ASSERT_TRUE(
+      frame::opengl::file::LoadProgram("blur", "asset/shader/opengl/blur.vert",
+                                       "asset/shader/opengl/blur.frag"));
 }
 
 }  // End namespace test.

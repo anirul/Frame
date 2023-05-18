@@ -8,13 +8,14 @@
 namespace test {
 
 class FrameBufferTest : public testing::Test {
-   public:
-    FrameBufferTest() : window_(frame::CreateNewWindow(frame::DrawingTargetEnum::NONE)) {}
+ public:
+  FrameBufferTest()
+      : window_(frame::CreateNewWindow(frame::DrawingTargetEnum::NONE)) {}
 
-   protected:
-    const glm::uvec2 size_                             = { 320, 200 };
-    std::unique_ptr<frame::opengl::FrameBuffer> frame_ = nullptr;
-    std::unique_ptr<frame::WindowInterface> window_    = nullptr;
+ protected:
+  const glm::uvec2 size_ = {320, 200};
+  std::unique_ptr<frame::opengl::FrameBuffer> frame_ = nullptr;
+  std::unique_ptr<frame::WindowInterface> window_ = nullptr;
 };
 
 }  // End namespace test.

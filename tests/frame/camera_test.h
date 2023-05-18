@@ -7,11 +7,11 @@
 namespace test {
 
 class CameraTest : public testing::Test {
-   public:
-    CameraTest() = default;
+ public:
+  CameraTest() = default;
 
-   protected:
-    std::shared_ptr<frame::Camera> camera_ = nullptr;
+ protected:
+  std::shared_ptr<frame::Camera> camera_ = nullptr;
 };
 
 }  // End namespace test.

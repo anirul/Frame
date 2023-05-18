@@ -2,8 +2,8 @@
 
 #include <memory>
 
-#include "frame/level_interface.h"
 #include "frame/json/proto.h"
+#include "frame/level_interface.h"
 
 namespace frame::proto {
 
@@ -13,6 +13,7 @@ namespace frame::proto {
  * @param level: A pointer to a level.
  * @return True if success and false if error.
  */
-[[nodiscard]] bool ParseSceneTreeFile(const SceneTree& proto_scene_tree, LevelInterface& level);
+[[nodiscard]] bool ParseSceneTreeFile(const SceneTree& proto_scene_tree,
+                                      LevelInterface& level);
 
 }  // End namespace frame::proto.

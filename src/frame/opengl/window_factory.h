@@ -28,4 +28,4 @@ std::unique_ptr<WindowInterface> CreateWin32OpenGLNone(glm::uvec2 size);
  */
 std::unique_ptr<WindowInterface> CreateSDL2OpenGLNone(glm::uvec2 size);
 
-}  // End namespace frame.
+}  // namespace frame::opengl

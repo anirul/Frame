@@ -11,7 +11,8 @@ namespace frame::opengl {
  * @param pixel_element_size: Insert a pixel element size form proto.
  * @return The OpenGL corresponding value.
  */
-GLenum ConvertToGLType(const frame::proto::PixelElementSize& pixel_element_size);
+GLenum ConvertToGLType(
+    const frame::proto::PixelElementSize& pixel_element_size);
 /**
  * @brief Get the GL_RGBA or GL_R.
  * @param pixel_structure: Insert the pixel structure from proto.

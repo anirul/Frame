@@ -5,8 +5,8 @@
 namespace test {
 
 class ParsePixelTest : public testing::Test {
-   public:
-    ParsePixelTest() = default;
+ public:
+  ParsePixelTest() = default;
 };
 
 }  // End namespace test.

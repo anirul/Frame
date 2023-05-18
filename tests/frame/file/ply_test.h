@@ -9,11 +9,11 @@
 namespace test {
 
 class PlyTest : public testing::Test {
-   public:
-    PlyTest() = default;
+ public:
+  PlyTest() = default;
 
-   protected:
-    std::unique_ptr<frame::file::Ply> ply_;
+ protected:
+  std::unique_ptr<frame::file::Ply> ply_;
 };
 
 }  // End namespace test.

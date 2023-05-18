@@ -15,7 +15,7 @@ namespace frame::proto {
  * @param level: A pointer to a level.
  * @return A unique pointer to a program interface or error.
  */
-std::unique_ptr<ProgramInterface> ParseProgramOpenGL(const frame::proto::Program& proto_program,
-                                                     LevelInterface& level);
+std::unique_ptr<ProgramInterface> ParseProgramOpenGL(
+    const frame::proto::Program& proto_program, LevelInterface& level);
 
 }  // End namespace frame::proto.
