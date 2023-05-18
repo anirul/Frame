@@ -32,6 +32,6 @@ This is a test of the point cloud rendering ability of the software, it use an a
 
 ## 05 Image Based Rendering
 
-![Screenshot of the image based rendering app.](https://github.com/anirul/Frame/raw/master/examples/image_based_rendering.png)
+![Screenshot of the image based rendering app.](https://github.com/anirul/Frame/raw/master/examples/image_based_lighting.png)
 
 This is using image based rendering this use an env map from the enviroment map to decide where the light come from.
