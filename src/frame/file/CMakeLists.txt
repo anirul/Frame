@@ -2,8 +2,8 @@
 
 add_library(FrameFile
   STATIC
-    ${CMAKE_SOURCE_DIR}/include/frame/file/file_system.h
-    ${CMAKE_SOURCE_DIR}/include/frame/file/image_stb.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/file/file_system.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/file/image_stb.h
     file_system.cpp
     image.cpp
     image.h
@@ -15,8 +15,8 @@ add_library(FrameFile
 
 target_include_directories(FrameFile
   PUBLIC
-    ${CMAKE_SOURCE_DIR}/include
-    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../../include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../../src
     ${CMAKE_CURRENT_BINARY_DIR}
   PRIVATE
     ${HAPPLY_INCLUDE_DIRS}

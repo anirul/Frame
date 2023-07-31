@@ -19,7 +19,8 @@ Device::Device(void* vk_instance, glm::uvec2 size, vk::SurfaceKHR& surface,
   for (const auto& physical_device : physical_devices) {
     int score = 0;
     logger_->info("Physical Device: {}",
-                  physical_device.getProperties().deviceName);
+                  static_cast<char*>(
+                      physical_device.getProperties().deviceName));
     if (physical_device.getProperties().deviceType ==
         vk::PhysicalDeviceType::eDiscreteGpu) {
       logger_->info("\tis a GPU");

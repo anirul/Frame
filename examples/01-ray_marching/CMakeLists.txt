@@ -3,13 +3,13 @@
 add_executable(01_RayMarching
   WIN32
     main.cpp
-    ${CMAKE_SOURCE_DIR}/asset/json/ray_marching.json
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../asset/json/ray_marching.json
 )
 
 target_include_directories(01_RayMarching
   PUBLIC
     examples/01-ray_marching
-    ${CMAKE_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/../..
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 

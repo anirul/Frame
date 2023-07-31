@@ -41,8 +41,8 @@ foreach(HEADERN ${HEADERS_TO_BE_COPIED})
     POST_BUILD
     COMMAND
       ${CMAKE_COMMAND} -E copy_if_different
-      ${CMAKE_BINARY_DIR}/src/frame/proto/${HEADERN}
-      ${CMAKE_SOURCE_DIR}/include/frame/proto
+      ${CMAKE_CURRENT_BINARY_DIR}/${HEADERN}
+      ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/proto
   )
 endforeach(HEADERN)
 

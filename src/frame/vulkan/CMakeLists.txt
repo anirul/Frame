@@ -16,7 +16,7 @@ add_library(FrameVulkan
 
 target_include_directories(FrameVulkan
 PUBLIC
-    ${CMAKE_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}/src/frame/proto
 )

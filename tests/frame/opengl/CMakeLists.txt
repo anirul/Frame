@@ -30,14 +30,14 @@ add_executable(FrameOpenGLTest
   texture_test.h
   window_test.cpp
   window_test.h
-  ${CMAKE_SOURCE_DIR}/asset/json/device_test.json
-  ${CMAKE_SOURCE_DIR}/asset/json/renderer_test.json
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../../asset/json/device_test.json
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../../asset/json/renderer_test.json
 )
 
 target_include_directories(FrameOpenGLTest
   PUBLIC
-    ${CMAKE_SOURCE_DIR}/tests
-    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../../tests
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../../include
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 

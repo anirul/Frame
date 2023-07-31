@@ -12,8 +12,8 @@ add_executable(FrameOpenGLFileTest
 
 target_include_directories(FrameOpenGLFileTest
   PUBLIC
-  ${CMAKE_SOURCE_DIR}/include
-  ${CMAKE_SOURCE_DIR}/tests
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../../../include
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../../../tests
   ${CMAKE_CURRENT_BINARY_DIR}
   FrameOpenGLFile
 )
@@ -30,7 +30,7 @@ target_link_libraries(FrameOpenGLFileTest
 
 # In order to remove the tests from the bin folder.
 set_target_properties(FrameOpenGLFileTest PROPERTIES
-  RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+  RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/tests)
 
 include(GoogleTest)
 gtest_add_tests(TARGET FrameOpenGLFileTest)

@@ -2,12 +2,12 @@
 
 add_library(FrameGui
   STATIC
-    ${CMAKE_SOURCE_DIR}/include/frame/gui/draw_gui_interface.h
-    ${CMAKE_SOURCE_DIR}/include/frame/gui/draw_gui_factory.h
-    ${CMAKE_SOURCE_DIR}/include/frame/gui/window_camera.h
-    ${CMAKE_SOURCE_DIR}/include/frame/gui/window_cubemap.h
-    ${CMAKE_SOURCE_DIR}/include/frame/gui/window_resolution.h
-    ${CMAKE_SOURCE_DIR}/include/frame/gui/input_factory.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/gui/draw_gui_interface.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/gui/draw_gui_factory.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/gui/window_camera.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/gui/window_cubemap.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/gui/window_resolution.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/gui/input_factory.h
     draw_gui_factory.cpp
     input_arcball.cpp
     input_arcball.h
@@ -23,9 +23,9 @@ add_library(FrameGui
 
 target_include_directories(FrameGui
   PUBLIC
-  ${CMAKE_SOURCE_DIR}
-  ${CMAKE_SOURCE_DIR}/include
-  ${CMAKE_SOURCE_DIR}/src
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../..
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../../include
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../../src
   ${CMAME_CURRENT_BINARY_DIR}
 )
 

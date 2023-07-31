@@ -16,17 +16,17 @@ add_executable(FrameJsonTest
   parse_texture_test.h
   parse_uniform_test.cpp
   parse_uniform_test.h
-  ${CMAKE_SOURCE_DIR}/asset/json/level_test.json
-  ${CMAKE_SOURCE_DIR}/asset/json/material_test.json
-  ${CMAKE_SOURCE_DIR}/asset/json/program_test.json
-  ${CMAKE_SOURCE_DIR}/asset/json/scene_tree_test.json
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../../asset/json/level_test.json
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../../asset/json/material_test.json
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../../asset/json/program_test.json
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../../asset/json/scene_tree_test.json
 )
 
 target_include_directories(FrameJsonTest
   PUBLIC
-  ${CMAKE_SOURCE_DIR}/include
-  ${CMAKE_SOURCE_DIR}/tests
-  ${CMAKE_SOURCE_DIR}/src
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../../include
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../../tests
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../../src
   ${CMAKE_CURRENT_BINARY_DIR}
 )
 
