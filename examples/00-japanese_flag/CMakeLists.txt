@@ -21,4 +21,4 @@ target_link_libraries(00_JapaneseFlag
     FrameProto
 )
 
-set_property(TARGET 00_JapaneseFlag PROPERTY FOLDER "Examples")
+set_property(TARGET 00_JapaneseFlag PROPERTY FOLDER "FrameExamples")

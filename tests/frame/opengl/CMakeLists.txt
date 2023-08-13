@@ -61,4 +61,4 @@ gtest_add_tests(TARGET FrameOpenGLTest)
 
 add_subdirectory(file)
 
-set_property(TARGET FrameOpenGLTest PROPERTY FOLDER "Test/OpenGL")
+set_property(TARGET FrameOpenGLTest PROPERTY FOLDER "FrameTest/OpenGL")

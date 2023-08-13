@@ -39,4 +39,4 @@ add_subdirectory(file)
 add_subdirectory(json)
 add_subdirectory(opengl)
 
-set_property(TARGET FrameTest PROPERTY FOLDER "Test")
+set_property(TARGET FrameTest PROPERTY FOLDER "FrameTest")

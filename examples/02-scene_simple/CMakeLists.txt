@@ -25,4 +25,4 @@ target_link_libraries(02_SceneSimple
     imgui::imgui
 )
 
-set_property(TARGET 02_SceneSimple PROPERTY FOLDER "Examples")
+set_property(TARGET 02_SceneSimple PROPERTY FOLDER "FrameExamples")
