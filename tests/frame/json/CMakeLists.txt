@@ -46,4 +46,4 @@ set_target_properties(FrameJsonTest PROPERTIES
 include(GoogleTest)
 gtest_add_tests(TARGET FrameJsonTest)
 
-set_property(TARGET FrameJsonTest PROPERTY FOLDER "Test")
+set_property(TARGET FrameJsonTest PROPERTY FOLDER "FrameTest")

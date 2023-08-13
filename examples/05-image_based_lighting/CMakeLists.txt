@@ -23,4 +23,4 @@ target_link_libraries(05-ImageBasedLighting
     FrameProto
 )
 
-set_property(TARGET 05-ImageBasedLighting PROPERTY FOLDER "Examples")
+set_property(TARGET 05-ImageBasedLighting PROPERTY FOLDER "FrameExamples")
