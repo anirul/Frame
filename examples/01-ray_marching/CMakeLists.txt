@@ -24,4 +24,4 @@ target_link_libraries(01_RayMarching
     FrameProto
 )
 
-set_property(TARGET 01_RayMarching PROPERTY FOLDER "Examples")
+set_property(TARGET 01_RayMarching PROPERTY FOLDER "FrameExamples")

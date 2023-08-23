@@ -35,4 +35,4 @@ set_target_properties(FrameFileTest PROPERTIES
 include(GoogleTest)
 gtest_add_tests(TARGET FrameFileTest)
 
-set_property(TARGET FrameFileTest PROPERTY FOLDER "Test")
+set_property(TARGET FrameFileTest PROPERTY FOLDER "FrameTest")

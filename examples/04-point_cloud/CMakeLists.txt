@@ -23,4 +23,4 @@ target_link_libraries(04_PointCloud
     FrameProto
 )
 
-set_property(TARGET 04_PointCloud PROPERTY FOLDER "Examples")
+set_property(TARGET 04_PointCloud PROPERTY FOLDER "FrameExamples")

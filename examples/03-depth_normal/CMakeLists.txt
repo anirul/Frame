@@ -21,4 +21,4 @@ target_link_libraries(03_DepthNormal
     FrameProto
 )
 
-set_property(TARGET 03_DepthNormal PROPERTY FOLDER "Examples")
+set_property(TARGET 03_DepthNormal PROPERTY FOLDER "FrameExamples")

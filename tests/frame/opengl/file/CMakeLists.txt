@@ -35,4 +35,4 @@ set_target_properties(FrameOpenGLFileTest PROPERTIES
 include(GoogleTest)
 gtest_add_tests(TARGET FrameOpenGLFileTest)
 
-set_property(TARGET FrameOpenGLFileTest PROPERTY FOLDER "Test/OpenGL")
+set_property(TARGET FrameOpenGLFileTest PROPERTY FOLDER "FrameTest/OpenGL")
