@@ -50,4 +50,4 @@ add_custom_target(AssetShaderOpenGL
     view_position_normal.vert
 )
 
-set_property(TARGET AssetShaderOpenGL PROPERTY FOLDER "Asset/Shader")
+set_property(TARGET AssetShaderOpenGL PROPERTY FOLDER "FrameAsset/Shader")
