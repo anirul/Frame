@@ -5,53 +5,54 @@
 
 namespace test {
 
-TEST_F(ObjTest, CreateObjTest) {
-  ASSERT_FALSE(obj_);
-  obj_ = std::make_unique<frame::file::Obj>(
-      frame::file::FindFile("asset/model/cube.obj"));
-  EXPECT_TRUE(obj_);
-}
-
-TEST_F(ObjTest, ObjGetMeshesTest) {
-  ASSERT_FALSE(obj_);
-  obj_ = std::make_unique<frame::file::Obj>(
-      frame::file::FindFile("asset/model/scene.obj"));
-  EXPECT_TRUE(obj_);
-  EXPECT_NE(0, obj_->GetMeshes().size());
-  for (const auto& element : obj_->GetMeshes()) {
-    EXPECT_NE(0, element.GetVertices().size());
-    EXPECT_NE(0, element.GetIndices().size());
-  }
-}
-
-TEST_F(ObjTest, ObjGetMaterialTest) {
-  ASSERT_FALSE(obj_);
-  obj_ = std::make_unique<frame::file::Obj>(
-      frame::file::FindFile("asset/model/scene.obj"));
-  EXPECT_TRUE(obj_);
-  EXPECT_NE(0, obj_->GetMeshes().size());
-  for (const auto& element : obj_->GetMeshes()) {
-    auto material_id = element.GetMaterialId();
-    EXPECT_LT(material_id, obj_->GetMaterials().size());
-    const auto material = obj_->GetMaterials()[material_id];
-    EXPECT_FALSE(material.name.empty());
-    if (material.ambient_str.empty()) {
-      EXPECT_NE(0.0f, material.ambient_vec4.x);
-      EXPECT_NE(0.0f, material.ambient_vec4.y);
-      EXPECT_NE(0.0f, material.ambient_vec4.z);
-    } else {
-      EXPECT_LT(4, material.ambient_str.size());
+    TEST_F(ObjTest, CreateObjTest) {
+        ASSERT_FALSE(obj_);
+        obj_ = std::make_unique<frame::file::Obj>(
+            frame::file::FindFile("asset/model/cube.obj"));
+        EXPECT_TRUE(obj_);
     }
-    if (material.metallic_str.empty())
-      EXPECT_NE(0.0f, material.metallic_val);
-    else
-      EXPECT_LT(4, material.metallic_str.size());
-    if (material.roughness_str.empty())
-      EXPECT_NE(0.0f, material.roughness_val);
-    else
-      EXPECT_LT(4, material.roughness_str.size());
-    EXPECT_FALSE(material.normal_str.empty());
-  }
-}
+
+    TEST_F(ObjTest, ObjGetMeshesTest) {
+        ASSERT_FALSE(obj_);
+        obj_ = std::make_unique<frame::file::Obj>(
+            frame::file::FindFile("asset/model/scene.obj"));
+        EXPECT_TRUE(obj_);
+        EXPECT_NE(0, obj_->GetMeshes().size());
+        for (const auto& element : obj_->GetMeshes()) {
+            EXPECT_NE(0, element.GetVertices().size());
+            EXPECT_NE(0, element.GetIndices().size());
+        }
+    }
+
+    TEST_F(ObjTest, ObjGetMaterialTest) {
+        ASSERT_FALSE(obj_);
+        obj_ = std::make_unique<frame::file::Obj>(
+            frame::file::FindFile("asset/model/scene.obj"));
+        EXPECT_TRUE(obj_);
+        EXPECT_NE(0, obj_->GetMeshes().size());
+        for (const auto& element : obj_->GetMeshes()) {
+            auto material_id = element.GetMaterialId();
+            EXPECT_LT(material_id, obj_->GetMaterials().size());
+            const auto material = obj_->GetMaterials()[material_id];
+            EXPECT_FALSE(material.name.empty());
+            if (material.ambient_str.empty()) {
+                EXPECT_NE(0.0f, material.ambient_vec4.x);
+                EXPECT_NE(0.0f, material.ambient_vec4.y);
+                EXPECT_NE(0.0f, material.ambient_vec4.z);
+            }
+            else {
+                EXPECT_LT(4, material.ambient_str.size());
+            }
+            if (material.metallic_str.empty())
+                EXPECT_NE(0.0f, material.metallic_val);
+            else
+                EXPECT_LT(4, material.metallic_str.size());
+            if (material.roughness_str.empty())
+                EXPECT_NE(0.0f, material.roughness_val);
+            else
+                EXPECT_LT(4, material.roughness_str.size());
+            EXPECT_FALSE(material.normal_str.empty());
+        }
+    }
 
 }  // End namespace test.

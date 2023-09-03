@@ -6,9 +6,9 @@
 
 namespace test {
 
-class PixelTest : public testing::Test {
- public:
-  PixelTest() = default;
-};
+	class PixelTest : public testing::Test {
+	public:
+		PixelTest() = default;
+	};
 
 }  // End namespace test.

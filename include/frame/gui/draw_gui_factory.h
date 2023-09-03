@@ -8,6 +8,6 @@
 
 namespace frame::gui {
 
-std::unique_ptr<DrawGuiInterface> CreateDrawGui(WindowInterface& window);
+	std::unique_ptr<DrawGuiInterface> CreateDrawGui(WindowInterface& window);
 
 }  // End namespace frame::gui.

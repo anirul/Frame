@@ -4,9 +4,9 @@
 
 namespace test {
 
-class FileSystemTest : public testing::Test {
- public:
-  FileSystemTest() = default;
-};
+	class FileSystemTest : public testing::Test {
+	public:
+		FileSystemTest() = default;
+	};
 
 }  // End namespace test.
