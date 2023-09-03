@@ -18,8 +18,9 @@ TEST_F(LoadTextureTest, LoadTextureFromFloatTest) {
 }
 
 TEST_F(LoadTextureTest, LoadTextureFromVec4Test) {
-  auto texture = frame::opengl::file::LoadTextureFromVec4(
-      glm::vec4(0.1f, 0.2f, 0.3f, 0.4f));
+  auto texture =
+      frame::opengl::file::LoadTextureFromVec4(
+        glm::vec4(0.1f, 0.2f, 0.3f, 0.4f));
   EXPECT_TRUE(texture);
   EXPECT_EQ(1, texture->GetSize().x);
   EXPECT_EQ(1, texture->GetSize().y);
@@ -32,10 +33,11 @@ TEST_F(LoadTextureTest, LoadTextureFromVec4Test) {
 }
 
 TEST_F(LoadTextureTest, LoadTextureFromFileTest) {
-  auto texture = frame::opengl::file::LoadTextureFromFile(
-      frame::file::FindFile("asset/cubemap/positive_x.png"),
-      frame::proto::PixelElementSize_BYTE(),
-      frame::proto::PixelStructure_RGB_ALPHA());
+  auto texture =
+      frame::opengl::file::LoadTextureFromFile(
+          frame::file::FindFile("asset/cubemap/positive_x.png"),
+          frame::proto::PixelElementSize_BYTE(),
+          frame::proto::PixelStructure_RGB_ALPHA());
   EXPECT_TRUE(texture);
   EXPECT_EQ(1024, texture->GetSize().x);
   EXPECT_EQ(1024, texture->GetSize().y);
@@ -49,15 +51,18 @@ TEST_F(LoadTextureTest, LoadTextureFromFileTest) {
 // implemented.
 
 TEST_F(LoadTextureTest, LoadCubeMapFromFilesTest) {
-  auto texture = frame::opengl::file::LoadCubeMapTextureFromFiles(
-      {frame::file::FindFile("asset/cubemap/positive_x.png"),
-       frame::file::FindFile("asset/cubemap/negative_x.png"),
-       frame::file::FindFile("asset/cubemap/positive_y.png"),
-       frame::file::FindFile("asset/cubemap/negative_y.png"),
-       frame::file::FindFile("asset/cubemap/positive_z.png"),
-       frame::file::FindFile("asset/cubemap/negative_z.png")},
-      frame::proto::PixelElementSize_BYTE(),
-      frame::proto::PixelStructure_RGB_ALPHA());
+  auto texture =
+      frame::opengl::file::LoadCubeMapTextureFromFiles(
+          {
+              frame::file::FindFile("asset/cubemap/positive_x.png"),
+              frame::file::FindFile("asset/cubemap/negative_x.png"),
+              frame::file::FindFile("asset/cubemap/positive_y.png"),
+              frame::file::FindFile("asset/cubemap/negative_y.png"),
+              frame::file::FindFile("asset/cubemap/positive_z.png"),
+              frame::file::FindFile("asset/cubemap/negative_z.png")
+          },
+          frame::proto::PixelElementSize_BYTE(),
+          frame::proto::PixelStructure_RGB_ALPHA());
   EXPECT_TRUE(texture);
   EXPECT_EQ(1024, texture->GetSize().x);
   EXPECT_EQ(1024, texture->GetSize().y);

@@ -2,48 +2,48 @@
 
 namespace test {
 
-TEST_F(ShaderTest, CreateVertexShaderTest) {
-  EXPECT_FALSE(shader_);
-  shader_ = std::make_unique<frame::opengl::Shader>(
-      frame::opengl::ShaderEnum::VERTEX_SHADER);
-  EXPECT_TRUE(shader_);
-}
+    TEST_F(ShaderTest, CreateVertexShaderTest) {
+        EXPECT_FALSE(shader_);
+        shader_ = std::make_unique<frame::opengl::Shader>(
+            frame::opengl::ShaderEnum::VERTEX_SHADER);
+        EXPECT_TRUE(shader_);
+    }
 
-TEST_F(ShaderTest, CreateFragmentShaderTest) {
-  EXPECT_FALSE(shader_);
-  shader_ = std::make_unique<frame::opengl::Shader>(
-      frame::opengl::ShaderEnum::FRAGMENT_SHADER);
-  EXPECT_TRUE(shader_);
-}
+    TEST_F(ShaderTest, CreateFragmentShaderTest) {
+        EXPECT_FALSE(shader_);
+        shader_ = std::make_unique<frame::opengl::Shader>(
+            frame::opengl::ShaderEnum::FRAGMENT_SHADER);
+        EXPECT_TRUE(shader_);
+    }
 
-TEST_F(ShaderTest, FailedToLoadShaderTest) {
-  ASSERT_FALSE(shader_);
-  shader_ = std::make_unique<frame::opengl::Shader>(
-      frame::opengl::ShaderEnum::FRAGMENT_SHADER);
-  ASSERT_TRUE(shader_);
-  EXPECT_FALSE(shader_->LoadFromSource("false"));
-}
+    TEST_F(ShaderTest, FailedToLoadShaderTest) {
+        ASSERT_FALSE(shader_);
+        shader_ = std::make_unique<frame::opengl::Shader>(
+            frame::opengl::ShaderEnum::FRAGMENT_SHADER);
+        ASSERT_TRUE(shader_);
+        EXPECT_FALSE(shader_->LoadFromSource("false"));
+    }
 
-TEST_F(ShaderTest, LoadFromFileVertexShaderTest) {
-  ASSERT_FALSE(shader_);
-  shader_ = std::make_unique<frame::opengl::Shader>(
-      frame::opengl::ShaderEnum::VERTEX_SHADER);
-  ASSERT_TRUE(shader_);
-  EXPECT_TRUE(shader_->LoadFromSource(GetVertexSource()));
-  EXPECT_NE(0, shader_->GetId());
-}
+    TEST_F(ShaderTest, LoadFromFileVertexShaderTest) {
+        ASSERT_FALSE(shader_);
+        shader_ = std::make_unique<frame::opengl::Shader>(
+            frame::opengl::ShaderEnum::VERTEX_SHADER);
+        ASSERT_TRUE(shader_);
+        EXPECT_TRUE(shader_->LoadFromSource(GetVertexSource()));
+        EXPECT_NE(0, shader_->GetId());
+    }
 
-TEST_F(ShaderTest, LoadFromFileFragmentShaderTest) {
-  ASSERT_FALSE(shader_);
-  shader_ = std::make_unique<frame::opengl::Shader>(
-      frame::opengl::ShaderEnum::FRAGMENT_SHADER);
-  ASSERT_TRUE(shader_);
-  EXPECT_TRUE(shader_->LoadFromSource(GetFragmentSource()));
-  EXPECT_NE(0, shader_->GetId());
-}
+    TEST_F(ShaderTest, LoadFromFileFragmentShaderTest) {
+        ASSERT_FALSE(shader_);
+        shader_ = std::make_unique<frame::opengl::Shader>(
+            frame::opengl::ShaderEnum::FRAGMENT_SHADER);
+        ASSERT_TRUE(shader_);
+        EXPECT_TRUE(shader_->LoadFromSource(GetFragmentSource()));
+        EXPECT_NE(0, shader_->GetId());
+    }
 
-const std::string ShaderTest::GetVertexSource() const {
-  return R"vert(
+    const std::string ShaderTest::GetVertexSource() const {
+        return R"vert(
 #version 330 core
 
 layout(location = 0) in vec3 in_position;
@@ -67,10 +67,10 @@ void main()
 	gl_Position = pvm * vec4(in_position, 1.0);
 }
 		)vert";
-}
+    }
 
-const std::string ShaderTest::GetFragmentSource() const {
-  return R"frag(
+    const std::string ShaderTest::GetFragmentSource() const {
+        return R"frag(
 #version 330 core
 
 in vec3 vert_normal;
@@ -94,6 +94,6 @@ void main()
 	frag_zbuffer = vec4(z_value, z_value, z_value, 1.0);
 }
 		)frag";
-}
+    }
 
 }  // End namespace test.

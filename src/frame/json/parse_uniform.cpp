@@ -13,8 +13,12 @@ namespace frame::proto {
     }
 
     glm::vec4 ParseUniform(const UniformVector4& uniform_vec4) {
-        return { uniform_vec4.x(), uniform_vec4.y(), uniform_vec4.z(),
-                uniform_vec4.w() };
+        return {
+            uniform_vec4.x(),
+            uniform_vec4.y(),
+            uniform_vec4.z(),
+            uniform_vec4.w()
+        };
     }
 
     glm::mat4 ParseUniform(const UniformMatrix4& uniform_mat4) {
@@ -125,10 +129,12 @@ namespace frame::proto {
         }
     }
 
-    void RegisterUniformEnumFromProto(const std::string& name,
+    void RegisterUniformEnumFromProto(
+        const std::string& name,
         const Uniform::UniformEnum& uniform_enum,
         const UniformInterface& uniform_interface,
-        const ProgramInterface& program_interface) {
+        const ProgramInterface& program_interface)
+    {
         switch (uniform_enum) {
         case Uniform::PROJECTION_MAT4: {
             program_interface.Uniform(name, uniform_interface.GetProjection());
@@ -136,7 +142,8 @@ namespace frame::proto {
         }
         case Uniform::PROJECTION_INV_MAT4: {
             program_interface.Uniform(
-                name, glm::inverse(uniform_interface.GetProjection()));
+                name,
+                glm::inverse(uniform_interface.GetProjection()));
             break;
         }
         case Uniform::VIEW_MAT4: {
@@ -144,7 +151,8 @@ namespace frame::proto {
             break;
         }
         case Uniform::VIEW_INV_MAT4: {
-            program_interface.Uniform(name,
+            program_interface.Uniform(
+                name,
                 glm::inverse(uniform_interface.GetView()));
             break;
         }
@@ -153,16 +161,20 @@ namespace frame::proto {
             break;
         }
         case Uniform::MODEL_INV_MAT4: {
-            program_interface.Uniform(name,
+            program_interface.Uniform(
+                name,
                 glm::inverse(uniform_interface.GetModel()));
             break;
         }
         case Uniform::FLOAT_TIME_S: {
             static Logger& logger_ = Logger::GetInstance();
-            logger_->info("set {} := {}", name,
+            logger_->info(
+                "set {} := {}",
+                name,
                 static_cast<float>(uniform_interface.GetDeltaTime()));
             program_interface.Uniform(
-                name, static_cast<float>(uniform_interface.GetDeltaTime()));
+                name,
+                static_cast<float>(uniform_interface.GetDeltaTime()));
             break;
         }
         default:

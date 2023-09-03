@@ -4,9 +4,9 @@
 
 namespace test {
 
-class ParseUniformTest : public testing::Test {
- public:
-  ParseUniformTest() = default;
-};
+	class ParseUniformTest : public testing::Test {
+	public:
+		ParseUniformTest() = default;
+	};
 
 }  // End namespace test.

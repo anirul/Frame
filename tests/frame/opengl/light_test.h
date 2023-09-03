@@ -7,13 +7,13 @@
 
 namespace test {
 
-class LightTest : public testing::Test {
- public:
-  LightTest() = default;
+	class LightTest : public testing::Test {
+	public:
+		LightTest() = default;
 
- protected:
-  std::unique_ptr<frame::LightInterface> light_ = nullptr;
-  std::unique_ptr<frame::opengl::LightManager> light_manager_ = nullptr;
-};
+	protected:
+		std::unique_ptr<frame::LightInterface> light_ = nullptr;
+		std::unique_ptr<frame::opengl::LightManager> light_manager_ = nullptr;
+	};
 
 }  // End namespace test.
