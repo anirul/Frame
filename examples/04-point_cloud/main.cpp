@@ -33,20 +33,25 @@ int WINAPI WinMain(
     _In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
     _In_ LPSTR lpCmdLine,
-    _In_ int nShowCmd) try
+    _In_ int nShowCmd)
+try
 {
     int ac = __argc;
-    char** av = __argv;
+    char **av = __argv;
 #else
-int main(int ac, char** av) try {
+int main(int ac, char **av)
+try
+{
 #endif
     absl::ParseCommandLine(ac, av);
-    glm::uvec2 size = { 1280, 720 };
-    auto win = frame::CreateNewWindow(frame::DrawingTargetEnum::WINDOW,
-        frame::RenderingAPIEnum::OPENGL, size);
-    frame::gui::WindowResolution* ptr_window_resolution = nullptr;
-    frame::gui::WindowCamera* ptr_window_camera = nullptr;
-    frame::gui::WindowCubemap* ptr_window_cubemap = nullptr;
+    glm::uvec2 size = {1280, 720};
+    auto win = frame::CreateNewWindow(
+        frame::DrawingTargetEnum::WINDOW,
+        frame::RenderingAPIEnum::OPENGL,
+        size);
+    frame::gui::WindowResolution *ptr_window_resolution = nullptr;
+    frame::gui::WindowCamera *ptr_window_camera = nullptr;
+    frame::gui::WindowCubemap *ptr_window_cubemap = nullptr;
     auto gui_window = frame::gui::CreateDrawGui(*win.get());
     {
         auto gui_resolution = std::make_unique<frame::gui::WindowResolution>(
@@ -60,49 +65,61 @@ int main(int ac, char** av) try {
         gui_window->AddWindow(std::move(gui_camera));
     }
     {
-        auto gui_cubemap = std::make_unique<frame::gui::WindowCubemap>("Cubemap");
+        auto gui_cubemap =
+            std::make_unique<frame::gui::WindowCubemap>("Cubemap");
         ptr_window_cubemap = gui_cubemap.get();
         gui_window->AddWindow(std::move(gui_cubemap));
     }
     win->GetDevice().AddPlugin(std::move(gui_window));
     win->SetInputInterface(frame::gui::CreateInputWasd(
-        win->GetDevice(), absl::GetFlag(FLAGS_move_mult),
+        win->GetDevice(),
+        absl::GetFlag(FLAGS_move_mult),
         absl::GetFlag(FLAGS_zoom_mult)));
-    auto& device = win->GetDevice();
+    auto &device = win->GetDevice();
     frame::common::Application app(std::move(win));
     std::vector<bool> check_end;
     bool do_once = true;
     bool create_proto = true;
     frame::proto::Level proto_level;
-    do {
-        if (std::exchange(create_proto, false)) {
-            proto_level = frame::proto::LoadProtoFromJsonFile<frame::proto::Level>(
-                frame::file::FindFile("asset/json/point_cloud.json"));
+    do
+    {
+        if (std::exchange(create_proto, false))
+        {
+            proto_level =
+                frame::proto::LoadProtoFromJsonFile<frame::proto::Level>(
+                    frame::file::FindFile("asset/json/point_cloud.json"));
         }
-        else {
+        else
+        {
             ptr_window_cubemap->ChangeLevel(proto_level);
         }
         std::unique_ptr<frame::LevelInterface> level =
             frame::proto::ParseLevel(size, proto_level);
         // All except first.
-        if (!std::exchange(do_once, false)) {
-            level->GetDefaultCamera().operator=(ptr_window_camera->GetSavedCamera());
+        if (!std::exchange(do_once, false))
+        {
+            level->GetDefaultCamera().operator=(
+                ptr_window_camera->GetSavedCamera());
         }
         ptr_window_camera->SetCameraPtr(&level->GetDefaultCamera());
         app.Startup(std::move(level));
         app.Run();
-        app.Resize(ptr_window_resolution->GetSize(),
+        app.Resize(
+            ptr_window_resolution->GetSize(),
             ptr_window_resolution->GetFullScreen());
         ptr_window_camera->SaveCamera();
         // Update screen resolution parameters.
         size = ptr_window_resolution->GetSize();
-        check_end = { ptr_window_resolution->End(), ptr_window_camera->End(),
-                     ptr_window_cubemap->End() };
-    } while (!std::all_of(check_end.begin(), check_end.end(),
-        [](bool b) { return b; }));
+        check_end = {
+            ptr_window_resolution->End(),
+            ptr_window_camera->End(),
+            ptr_window_cubemap->End()};
+    } while (!std::all_of(
+        check_end.begin(), check_end.end(), [](bool b) { return b; }));
     return 0;
 }
-catch (std::exception ex) {
+catch (std::exception ex)
+{
     // From: https://sourceforge.net/p/predef/wiki/OperatingSystems/
 #if defined(_WIN32) || defined(_WIN64)
     MessageBox(nullptr, ex.what(), "Exception", MB_ICONEXCLAMATION);

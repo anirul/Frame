@@ -17,21 +17,27 @@ int WINAPI WinMain(
     _In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
     _In_ LPSTR lpCmdLine,
-    _In_ int nShowCmd) try
+    _In_ int nShowCmd)
+try
 {
     int ac = __argc;
-    char** av = __argv;
+    char **av = __argv;
 #else
-int main(int ac, char** av) try {
+int main(int ac, char **av)
+try
+{
 #endif
-    glm::uvec2 size = { 1280, 720 };
+    glm::uvec2 size = {1280, 720};
     frame::common::Application app(frame::CreateNewWindow(
-        frame::DrawingTargetEnum::WINDOW, frame::RenderingAPIEnum::OPENGL, size));
+        frame::DrawingTargetEnum::WINDOW,
+        frame::RenderingAPIEnum::OPENGL,
+        size));
     app.Startup(frame::file::FindFile("asset/json/image_based_lighting.json"));
     app.Run();
     return 0;
 }
-catch (const std::exception& e) {
+catch (const std::exception &e)
+{
 #if defined(_WIN32) || defined(_WIN64)
     MessageBoxA(nullptr, e.what(), "Error", MB_OK | MB_ICONERROR);
 #else
