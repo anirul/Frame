@@ -2,11 +2,13 @@
 
 #include <gtest/gtest.h>
 
-namespace test {
+namespace test
+{
 
-	class ParseUniformTest : public testing::Test {
-	public:
-		ParseUniformTest() = default;
-	};
+class ParseUniformTest : public testing::Test
+{
+  public:
+    ParseUniformTest() = default;
+};
 
-}  // End namespace test.
+} // End namespace test.

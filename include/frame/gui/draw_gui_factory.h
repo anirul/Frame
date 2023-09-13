@@ -6,8 +6,9 @@
 #include "frame/gui/draw_gui_interface.h"
 #include "frame/window_interface.h"
 
-namespace frame::gui {
+namespace frame::gui
+{
 
-	std::unique_ptr<DrawGuiInterface> CreateDrawGui(WindowInterface& window);
+std::unique_ptr<DrawGuiInterface> CreateDrawGui(WindowInterface &window);
 
-}  // End namespace frame::gui.
+} // End namespace frame::gui.

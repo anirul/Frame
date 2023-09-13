@@ -5,15 +5,19 @@
 #include "frame/file/obj.h"
 #include "frame/window_factory.h"
 
-namespace test {
+namespace test
+{
 
-	class LoadTextureTest : public testing::Test {
-	public:
-		LoadTextureTest()
-			: window_(frame::CreateNewWindow(frame::DrawingTargetEnum::NONE)) {}
+class LoadTextureTest : public testing::Test
+{
+  public:
+    LoadTextureTest()
+        : window_(frame::CreateNewWindow(frame::DrawingTargetEnum::NONE))
+    {
+    }
 
-	protected:
-		std::shared_ptr<frame::WindowInterface> window_;
-	};
+  protected:
+    std::shared_ptr<frame::WindowInterface> window_;
+};
 
-}  // End namespace test.
+} // End namespace test.

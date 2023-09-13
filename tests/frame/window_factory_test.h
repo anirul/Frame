@@ -4,14 +4,16 @@
 
 #include "frame/window_factory.h"
 
-namespace test {
+namespace test
+{
 
-	class WindowFactoryTest : public testing::Test {
-	public:
-		WindowFactoryTest() = default;
+class WindowFactoryTest : public testing::Test
+{
+  public:
+    WindowFactoryTest() = default;
 
-	protected:
-		std::unique_ptr<frame::WindowInterface> window_ = nullptr;
-	};
+  protected:
+    std::unique_ptr<frame::WindowInterface> window_ = nullptr;
+};
 
-}  // End namespace test.
+} // End namespace test.

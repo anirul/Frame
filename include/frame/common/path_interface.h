@@ -4,13 +4,16 @@
 
 #include "frame/file/file_system.h"
 
-namespace frame::common {
+namespace frame::common
+{
 
-	struct PathInterface {
-		virtual const std::filesystem::path GetGlobalPath() const {
-			return frame::file::FindDirectory("asset/json/");
-		}
-		virtual const std::filesystem::path GetLevelFileName() const = 0;
-	};
+struct PathInterface
+{
+    virtual const std::filesystem::path GetGlobalPath() const
+    {
+        return frame::file::FindDirectory("asset/json/");
+    }
+    virtual const std::filesystem::path GetLevelFileName() const = 0;
+};
 
-}  // End namespace frame::common.
+} // End namespace frame::common.
