@@ -71,7 +71,9 @@ Image::Image(
     }
     if (!image_)
     {
-        throw std::runtime_error("unsupported file: " + file.string());
+        std::string stbi_error = stbi_failure_reason();
+        throw std::runtime_error(fmt::format(
+            "unsupported file: [{}], reason: {}", file.string(), stbi_error));
     }
     free_ = true;
     size_ = size;

@@ -58,7 +58,7 @@
       "name": "PaintBlackProgram",
       "output_texture_names": [ "point_cloud_rendering" ],
       "input_scene_type": { "value": "QUAD" },
-      "shader": "Display"
+      "shader": "display"
     },
     {
       "name": "CubeMapProgram",
