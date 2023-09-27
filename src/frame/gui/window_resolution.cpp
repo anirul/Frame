@@ -98,8 +98,8 @@ bool WindowResolution::DrawCallback()
         "Focus point", glm::value_ptr(focus_point_), 0.0f, 1000.0f, 0.1f);
     ImGui::Checkbox("Invert Left and Right", &invert_left_right_);
     ImGui::Separator();
-    ImGui::Text(fmt::format("Horizontal PPI: {}", hppi_).c_str());
-    ImGui::Text(fmt::format("Vertical PPI: {}", vppi_).c_str());
+    ImGui::Text("%s", fmt::format("Horizontal PPI: {}", hppi_).c_str());
+    ImGui::Text("%s", fmt::format("Vertical PPI: {}", vppi_).c_str());
     ImGui::Separator();
     if (ImGui::Button("Change"))
     {
