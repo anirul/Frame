@@ -46,7 +46,7 @@
       "name": "BlurProgram",
       "output_texture_names": [ "blured_normal_map" ],
       "input_scene_type": { "value": "QUAD" },
-      "shader": "Blur"
+      "shader": "blur"
     }
   ],
   "materials": [
