@@ -5,7 +5,7 @@
 namespace frame::opengl
 {
 
-void LightManager::RegisterToProgram(Program &program) const
+void LightManager::RegisterToProgram(Program& program) const
 {
     if (lights_.size() > 32)
     {
@@ -13,7 +13,7 @@ void LightManager::RegisterToProgram(Program &program) const
     }
     program.Use();
     int i = 0;
-    for (const auto &light : lights_)
+    for (const auto& light : lights_)
     {
         program.Uniform(
             "light_position[" + std::to_string(i) + "]",

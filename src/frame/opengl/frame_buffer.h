@@ -65,7 +65,7 @@ class FrameBuffer : public BindInterface
      * @param render: The render buffer that will be attach to the frame
      * buffer.
      */
-    void AttachRender(const RenderBuffer &render) const;
+    void AttachRender(const RenderBuffer& render) const;
     /**
      * @brief Attach a texture to the frame buffer, warning this will bind
      * the frame buffer and the texture in case it is not yet!
@@ -151,7 +151,7 @@ class FrameBuffer : public BindInterface
   private:
     unsigned int frame_id_ = 0;
     mutable bool locked_bind_ = false;
-    const Logger &logger_ = Logger::GetInstance();
+    const Logger& logger_ = Logger::GetInstance();
 };
 
 } // End namespace frame::opengl.

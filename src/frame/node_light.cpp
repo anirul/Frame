@@ -7,7 +7,7 @@ namespace frame
 {
 
 NodeLight::NodeLight(
-    std::function<NodeInterface *(const std::string &)> func,
+    std::function<NodeInterface*(const std::string&)> func,
     const NodeLightEnum light_type,
     const glm::vec3 position_or_direction,
     const glm::vec3 color)
@@ -29,7 +29,7 @@ NodeLight::NodeLight(
 }
 
 NodeLight::NodeLight(
-    std::function<NodeInterface *(const std::string &)> func,
+    std::function<NodeInterface*(const std::string&)> func,
     const glm::vec3 position,
     const glm::vec3 direction,
     const glm::vec3 color,

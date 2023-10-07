@@ -36,7 +36,7 @@ void FrameBuffer::UnBind() const
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void FrameBuffer::AttachRender(const RenderBuffer &render) const
+void FrameBuffer::AttachRender(const RenderBuffer& render) const
 {
     Bind();
     render.Bind();

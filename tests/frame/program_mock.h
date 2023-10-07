@@ -12,13 +12,13 @@ class ProgramMock : public frame::ProgramInterface
   public:
     MOCK_METHOD(void, AddInputTextureId, (std::uint64_t), (override));
     MOCK_METHOD(
-        const std::vector<std::uint64_t> &,
+        const std::vector<std::uint64_t>&,
         GetInputTextureIds,
         (),
         (const, override));
     MOCK_METHOD(void, AddOutputTextureId, (std::uint64_t), (override));
     MOCK_METHOD(
-        const std::vector<std::uint64_t> &,
+        const std::vector<std::uint64_t>&,
         GetOutputTextureIds,
         (),
         (const, override));
@@ -31,34 +31,34 @@ class ProgramMock : public frame::ProgramInterface
     MOCK_METHOD(
         void,
         Uniform,
-        (const std::string &name, bool value),
+        (const std::string& name, bool value),
         (const, override));
     MOCK_METHOD(
-        void, Uniform, (const std::string &name, int value), (const, override));
+        void, Uniform, (const std::string& name, int value), (const, override));
     MOCK_METHOD(
         void,
         Uniform,
-        (const std::string &name, float value),
-        (const, override));
-    MOCK_METHOD(
-        void,
-        Uniform,
-        (const std::string &name, const glm::vec2 vec2),
+        (const std::string& name, float value),
         (const, override));
     MOCK_METHOD(
         void,
         Uniform,
-        (const std::string &name, const glm::vec3 vec3),
+        (const std::string& name, const glm::vec2 vec2),
         (const, override));
     MOCK_METHOD(
         void,
         Uniform,
-        (const std::string &name, const glm::vec4 vec4),
+        (const std::string& name, const glm::vec3 vec3),
         (const, override));
     MOCK_METHOD(
         void,
         Uniform,
-        (const std::string &name, const glm::mat4 mat4),
+        (const std::string& name, const glm::vec4 vec4),
+        (const, override));
+    MOCK_METHOD(
+        void,
+        Uniform,
+        (const std::string& name, const glm::mat4 mat4),
         (const, override));
 };
 

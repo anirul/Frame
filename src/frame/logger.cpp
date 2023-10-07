@@ -13,7 +13,7 @@ Logger::Logger()
 
 Logger::~Logger() = default;
 
-Logger &Logger::GetInstance()
+Logger& Logger::GetInstance()
 {
     static Logger logger_;
     return logger_;

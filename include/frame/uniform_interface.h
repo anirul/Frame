@@ -45,8 +45,8 @@ class UniformInterface
      * @param size: The size of the vector.
      */
     virtual void SetValueFloat(
-        const std::string &name,
-        const std::vector<float> &vector,
+        const std::string& name,
+        const std::vector<float>& vector,
         glm::uvec2 size) = 0;
     /**
      * @brief Set value int.
@@ -55,8 +55,8 @@ class UniformInterface
      * @param size: The size of the vector.
      */
     virtual void SetValueInt(
-        const std::string &name,
-        const std::vector<std::int32_t> &vector,
+        const std::string& name,
+        const std::vector<std::int32_t>& vector,
         glm::uvec2 size) = 0;
     /**
      * @brief Get a list of names for the float uniform plugin.
@@ -73,26 +73,26 @@ class UniformInterface
      * @param name: Connection name.
      * @return The vector that correspond to the value.
      */
-    virtual std::vector<float> GetValueFloat(const std::string &name) const = 0;
+    virtual std::vector<float> GetValueFloat(const std::string& name) const = 0;
     /**
      * @brief Get a value.
      * @param name: Connection name.
      * @return The vector that correspond to the value.
      */
     virtual std::vector<std::int32_t> GetValueInt(
-        const std::string &name) const = 0;
+        const std::string& name) const = 0;
     /**
      * @brief Get the size of a value.
      * @param name: Connection name.
      * @return The size of value.
      */
-    virtual glm::uvec2 GetSizeFromFloat(const std::string &name) const = 0;
+    virtual glm::uvec2 GetSizeFromFloat(const std::string& name) const = 0;
     /**
      * @brief Get the size of a value.
      * @param name: Connection name.
      * @return The size of value.
      */
-    virtual glm::uvec2 GetSizeFromInt(const std::string &name) const = 0;
+    virtual glm::uvec2 GetSizeFromInt(const std::string& name) const = 0;
 };
 
 } // End namespace frame.

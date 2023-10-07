@@ -31,7 +31,7 @@ PixelElementSize PixelElementSize_FLOAT();
  * @param r: Right operand.
  * @return Are they equal or not?
  */
-bool operator==(const PixelElementSize &l, const PixelElementSize &r);
+bool operator==(const PixelElementSize& l, const PixelElementSize& r);
 /**
  * @brief Single value in a pixel also called R.
  * @return Pixel structure that will hold only one value.
@@ -68,6 +68,6 @@ PixelStructure PixelStructure_BGR_ALPHA();
  * @param r: Right operand.
  * @return Are they equal or not?
  */
-bool operator==(const PixelStructure &l, const PixelStructure &r);
+bool operator==(const PixelStructure& l, const PixelStructure& r);
 
 } // End namespace frame::proto.

@@ -22,12 +22,12 @@ class ScopedBind
      * @param bind_locked: object on which to lock the bind interface.
      * @param slot: In case needed you can lock by slot.
      */
-    ScopedBind(const BindInterface &bind_locked, const unsigned int slot = 0);
+    ScopedBind(const BindInterface& bind_locked, const unsigned int slot = 0);
     //! @brief free the bind interface.
     virtual ~ScopedBind();
 
   private:
-    const BindInterface &bind_locked_;
+    const BindInterface& bind_locked_;
 };
 
 } // End namespace frame::opengl.

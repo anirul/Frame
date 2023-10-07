@@ -41,7 +41,7 @@ class TextureCubeMap : public TextureInterface, public BindInterface
      * @brief Create a texture from a texture parameter structure.
      * @param texture_parameter: Texture parameter structure.
      */
-    TextureCubeMap(const TextureParameter &texture_parameter);
+    TextureCubeMap(const TextureParameter& texture_parameter);
     //! @brief Destroy texture also on GPU side.
     ~TextureCubeMap();
 
@@ -169,7 +169,7 @@ class TextureCubeMap : public TextureInterface, public BindInterface
      * @param size: Size of the image.
      */
     void Update(
-        std::vector<std::uint8_t> &&vector,
+        std::vector<std::uint8_t>&& vector,
         glm::uvec2 size,
         std::uint8_t bytes_per_pixel) override;
 
@@ -186,7 +186,7 @@ class TextureCubeMap : public TextureInterface, public BindInterface
      * @brief Set name from the name interface.
      * @param name: New name to be set.
      */
-    void SetName(const std::string &name) override
+    void SetName(const std::string& name) override
     {
         name_ = name;
     }
@@ -257,7 +257,7 @@ class TextureCubeMap : public TextureInterface, public BindInterface
      * @param data: pixel used to fill up (or null for don't care).
      */
     void CreateTextureCubeMap(
-        const std::array<void *, 6> cube_map = {
+        const std::array<void*, 6> cube_map = {
             nullptr, nullptr, nullptr, nullptr, nullptr, nullptr});
     //! @brief Lock the bind for RAII interface to the bind interface.
     void LockedBind() const override

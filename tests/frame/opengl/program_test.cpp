@@ -15,7 +15,7 @@ TEST_F(ProgramTest, CheckShaderProgramTest)
     EXPECT_FALSE(program_);
     program_ = std::make_unique<frame::opengl::Program>("test");
     EXPECT_TRUE(program_);
-    auto program_ptr = dynamic_cast<frame::opengl::Program *>(program_.get());
+    auto program_ptr = dynamic_cast<frame::opengl::Program*>(program_.get());
     ASSERT_TRUE(program_ptr);
     frame::opengl::Shader vertex_shader(
         frame::opengl::ShaderEnum::VERTEX_SHADER);
@@ -31,7 +31,7 @@ TEST_F(ProgramTest, CheckUseAndLinkProgramTest)
 {
     EXPECT_FALSE(program_);
     program_ = std::make_unique<frame::opengl::Program>("test");
-    auto program_ptr = dynamic_cast<frame::opengl::Program *>(program_.get());
+    auto program_ptr = dynamic_cast<frame::opengl::Program*>(program_.get());
     EXPECT_TRUE(program_);
     EXPECT_TRUE(program_ptr);
     frame::opengl::Shader vertex_shader(

@@ -41,7 +41,7 @@ class Shader
      * @brief Load a from a shader source.
      * @param source: Content of the shader in text form.
      */
-    bool LoadFromSource(const std::string &source);
+    bool LoadFromSource(const std::string& source);
 
   public:
     /**

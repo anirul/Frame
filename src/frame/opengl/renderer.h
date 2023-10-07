@@ -26,7 +26,7 @@ class Renderer : public RendererInterface
      * @param level: The level to render.
      * @param viewport: The viewport.
      */
-    Renderer(LevelInterface &level, glm::uvec4 viewport);
+    Renderer(LevelInterface& level, glm::uvec4 viewport);
 
   public:
     /**
@@ -97,11 +97,11 @@ class Renderer : public RendererInterface
      * seconds.
      */
     void RenderMesh(
-        StaticMeshInterface &static_mesh,
-        MaterialInterface &material,
-        const glm::mat4 &projection,
-        const glm::mat4 &view = glm::mat4(1.0f),
-        const glm::mat4 &model = glm::mat4(1.0f),
+        StaticMeshInterface& static_mesh,
+        MaterialInterface& material,
+        const glm::mat4& projection,
+        const glm::mat4& view = glm::mat4(1.0f),
+        const glm::mat4& model = glm::mat4(1.0f),
         double dt = 0.0) override;
     /**
      * @brief Render a node given an id and the id of a material at dt time.
@@ -115,8 +115,8 @@ class Renderer : public RendererInterface
     void RenderNode(
         EntityId node_id,
         EntityId material_id,
-        const glm::mat4 &projection,
-        const glm::mat4 &view,
+        const glm::mat4& projection,
+        const glm::mat4& view,
         double dt = 0.0) override;
     /**
      * @brief Render all meshes at a dt time.
@@ -124,8 +124,8 @@ class Renderer : public RendererInterface
      * seconds.
      */
     void RenderAllMeshes(
-        const glm::mat4 &projection,
-        const glm::mat4 &view,
+        const glm::mat4& projection,
+        const glm::mat4& view,
         double dt = 0.0) override;
     /**
      * @brief Display to the screen at dt time.
@@ -140,9 +140,9 @@ class Renderer : public RendererInterface
     void SetDepthTest(bool enable) override;
 
   private:
-    LevelInterface &level_;
+    LevelInterface& level_;
     EntityId last_program_id_ = NullId;
-    Logger &logger_ = Logger::GetInstance();
+    Logger& logger_ = Logger::GetInstance();
     // Projection / View / Model matrices.
     glm::mat4 projection_ = glm::mat4(1.0f);
     glm::mat4 view_ = glm::mat4(1.0f);
@@ -160,7 +160,7 @@ class Renderer : public RendererInterface
     bool first_render_ = true;
     // The render callback it will be called once per mesh.
     RenderCallback callback_ =
-        [](UniformInterface &, StaticMeshInterface &, MaterialInterface &) {};
+        [](UniformInterface&, StaticMeshInterface&, MaterialInterface&) {};
 };
 
 } // End namespace frame::opengl.

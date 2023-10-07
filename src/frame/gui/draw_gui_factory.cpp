@@ -6,9 +6,9 @@ namespace frame::gui
 {
 
 std::unique_ptr<frame::gui::DrawGuiInterface> CreateDrawGui(
-    WindowInterface &window)
+    WindowInterface& window)
 {
-    auto &device = window.GetDevice();
+    auto& device = window.GetDevice();
     switch (device.GetDeviceEnum())
     {
     case RenderingAPIEnum::OPENGL:

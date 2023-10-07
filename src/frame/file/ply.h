@@ -20,14 +20,14 @@ class Ply
      *        buffers.
      * @param file_name: File to be open.
      */
-    Ply(const std::filesystem::path &file_name);
+    Ply(const std::filesystem::path& file_name);
 
   public:
     /**
      * @brief Get the coordinate vector.
      * @return The coordinate vector.
      */
-    const std::vector<glm::vec3> &GetVertices() const
+    const std::vector<glm::vec3>& GetVertices() const
     {
         return vertices_;
     }
@@ -35,7 +35,7 @@ class Ply
      * @brief Get the normal vector (optional).
      * @return The normal vector.
      */
-    const std::vector<glm::vec3> &GetNormals() const
+    const std::vector<glm::vec3>& GetNormals() const
     {
         return normals_;
     }
@@ -43,7 +43,7 @@ class Ply
      * @brief Get color vector (optional).
      * @return The color vector.
      */
-    const std::vector<glm::vec3> &GetColors() const
+    const std::vector<glm::vec3>& GetColors() const
     {
         return colors_;
     }
@@ -51,7 +51,7 @@ class Ply
      * @brief Get texture coordinates vector (optional).
      * @return The texture coordinates vector.
      */
-    const std::vector<glm::vec2> &GetTextureCoordinates() const
+    const std::vector<glm::vec2>& GetTextureCoordinates() const
     {
         return texture_coordinates_;
     }
@@ -59,7 +59,7 @@ class Ply
      * @brief Get indices of the meshes (optional).
      * @return The indices of points.
      */
-    const std::vector<std::uint32_t> &GetIndices() const
+    const std::vector<std::uint32_t>& GetIndices() const
     {
         return indices_;
     }
@@ -70,7 +70,7 @@ class Ply
     std::vector<glm::vec3> colors_ = {};
     std::vector<glm::vec2> texture_coordinates_ = {};
     std::vector<std::uint32_t> indices_ = {};
-    Logger &logger_ = Logger::GetInstance();
+    Logger& logger_ = Logger::GetInstance();
 };
 
 } // End namespace frame::file.

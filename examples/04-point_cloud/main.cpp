@@ -37,9 +37,9 @@ int WINAPI WinMain(
 try
 {
     int ac = __argc;
-    char **av = __argv;
+    char** av = __argv;
 #else
-int main(int ac, char **av)
+int main(int ac, char** av)
 try
 {
 #endif
@@ -49,9 +49,9 @@ try
         frame::DrawingTargetEnum::WINDOW,
         frame::RenderingAPIEnum::OPENGL,
         size);
-    frame::gui::WindowResolution *ptr_window_resolution = nullptr;
-    frame::gui::WindowCamera *ptr_window_camera = nullptr;
-    frame::gui::WindowCubemap *ptr_window_cubemap = nullptr;
+    frame::gui::WindowResolution* ptr_window_resolution = nullptr;
+    frame::gui::WindowCamera* ptr_window_camera = nullptr;
+    frame::gui::WindowCubemap* ptr_window_cubemap = nullptr;
     auto gui_window = frame::gui::CreateDrawGui(*win.get());
     {
         auto gui_resolution = std::make_unique<frame::gui::WindowResolution>(
@@ -75,7 +75,7 @@ try
         win->GetDevice(),
         absl::GetFlag(FLAGS_move_mult),
         absl::GetFlag(FLAGS_zoom_mult)));
-    auto &device = win->GetDevice();
+    auto& device = win->GetDevice();
     frame::common::Application app(std::move(win));
     std::vector<bool> check_end;
     bool do_once = true;

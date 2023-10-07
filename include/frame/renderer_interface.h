@@ -54,11 +54,11 @@ struct RendererInterface
      *        seconds.
      */
     virtual void RenderMesh(
-        StaticMeshInterface &static_mesh,
-        MaterialInterface &material,
-        const glm::mat4 &projection,
-        const glm::mat4 &view = glm::mat4(1.0f),
-        const glm::mat4 &model_mat = glm::mat4(1.0f),
+        StaticMeshInterface& static_mesh,
+        MaterialInterface& material,
+        const glm::mat4& projection,
+        const glm::mat4& view = glm::mat4(1.0f),
+        const glm::mat4& model_mat = glm::mat4(1.0f),
         double dt = 0.0) = 0;
     /**
      * @brief Render a node given an id and the id of a material at dt time.
@@ -72,8 +72,8 @@ struct RendererInterface
     virtual void RenderNode(
         EntityId node_id,
         EntityId material_id,
-        const glm::mat4 &projection,
-        const glm::mat4 &view,
+        const glm::mat4& projection,
+        const glm::mat4& view,
         double dt = 0.0) = 0;
     /**
      * @brief Render all meshes at a dt time.
@@ -81,8 +81,8 @@ struct RendererInterface
      *        seconds.
      */
     virtual void RenderAllMeshes(
-        const glm::mat4 &projection,
-        const glm::mat4 &view,
+        const glm::mat4& projection,
+        const glm::mat4& view,
         double dt = 0.0) = 0;
     /**
      * @brief Display to the screen at dt time.
@@ -103,7 +103,7 @@ struct RendererInterface
      * @param material: The render material ref.
      */
     using RenderCallback = std::function<void(
-        UniformInterface &, StaticMeshInterface &, MaterialInterface &)>;
+        UniformInterface&, StaticMeshInterface&, MaterialInterface&)>;
     /**
      * @brief Set the mesh render callback.
      * @param callback: The callback to be added to the render.

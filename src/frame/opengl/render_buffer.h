@@ -69,7 +69,7 @@ class RenderBuffer : public BindInterface
   private:
     unsigned int render_id_ = 0;
     mutable bool locked_bind_ = false;
-    const Logger &logger_ = Logger::GetInstance();
+    const Logger& logger_ = Logger::GetInstance();
 };
 
 } // End namespace frame::opengl.

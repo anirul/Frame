@@ -9,7 +9,7 @@
 namespace frame::proto
 {
 
-template <typename T> T LoadProtoFromJson(const std::string &json)
+template <typename T> T LoadProtoFromJson(const std::string& json)
 {
     T proto{};
     google::protobuf::util::JsonParseOptions options{};
@@ -26,7 +26,7 @@ template <typename T> T LoadProtoFromJson(const std::string &json)
 }
 
 template <typename T>
-T LoadProtoFromJsonFile(const std::filesystem::path &filename)
+T LoadProtoFromJsonFile(const std::filesystem::path& filename)
 {
     // Empty case (no such file return an empty structure).
     if (filename.empty())

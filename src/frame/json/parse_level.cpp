@@ -18,7 +18,7 @@ namespace
 {
 
 std::unique_ptr<LevelInterface> LevelProto(
-    glm::uvec2 size, const proto::Level &proto_level)
+    glm::uvec2 size, const proto::Level& proto_level)
 {
     // TODO(anirul): Check we are in OPENGL mode?
     auto logger = Logger::GetInstance();
@@ -37,7 +37,7 @@ std::unique_ptr<LevelInterface> LevelProto(
     level->SetDefaultStaticMeshQuadId(quad_id);
 
     // Load textures from proto.
-    for (const auto &proto_texture : proto_level.textures())
+    for (const auto& proto_texture : proto_level.textures())
     {
         std::unique_ptr<TextureInterface> texture =
             ParseBasicTexture(proto_texture, size);
@@ -68,7 +68,7 @@ std::unique_ptr<LevelInterface> LevelProto(
     }
 
     // Load programs from proto.
-    for (const auto &proto_program : proto_level.programs())
+    for (const auto& proto_program : proto_level.programs())
     {
         auto program = ParseProgramOpenGL(proto_program, *level.get());
         if (!program)
@@ -85,7 +85,7 @@ std::unique_ptr<LevelInterface> LevelProto(
     }
 
     // Load material from proto.
-    for (const auto &proto_material : proto_level.materials())
+    for (const auto& proto_material : proto_level.materials())
     {
         auto maybe_material = ParseMaterialOpenGL(proto_material, *level.get());
         if (!maybe_material)
@@ -113,20 +113,20 @@ std::unique_ptr<LevelInterface> LevelProto(
 } // End namespace.
 
 std::unique_ptr<LevelInterface> ParseLevel(
-    glm::uvec2 size, const proto::Level &proto_level)
+    glm::uvec2 size, const proto::Level& proto_level)
 {
     return LevelProto(size, proto_level);
 }
 
 std::unique_ptr<frame::LevelInterface> ParseLevel(
-    glm::uvec2 size, const std::string &content)
+    glm::uvec2 size, const std::string& content)
 {
     auto proto_level = LoadProtoFromJson<Level>(content);
     return LevelProto(size, proto_level);
 }
 
 std::unique_ptr<LevelInterface> ParseLevel(
-    glm::uvec2 size, const std::filesystem::path &path)
+    glm::uvec2 size, const std::filesystem::path& path)
 {
     std::ifstream ifs(path.string().c_str());
     std::string content(std::istreambuf_iterator<char>(ifs), {});

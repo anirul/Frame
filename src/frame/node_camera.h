@@ -25,7 +25,7 @@ class NodeCamera : public NodeInterface
      * @param far_clip: Far clipping plane (back distance to be drawn).
      */
     NodeCamera(
-        std::function<NodeInterface *(const std::string &)> func,
+        std::function<NodeInterface*(const std::string&)> func,
         const glm::vec3 position = glm::vec3{0.f, 0.f, 0.f},
         const glm::vec3 target = glm::vec3{0.f, 0.f, -1.f},
         const glm::vec3 up = glm::vec3{0.f, 1.f, 0.f},
@@ -58,7 +58,7 @@ class NodeCamera : public NodeInterface
      * @brief Get camera associated with this camera node.
      * @return Camera pointer.
      */
-    Camera &GetCamera()
+    Camera& GetCamera()
     {
         return *camera_.get();
     }
@@ -66,7 +66,7 @@ class NodeCamera : public NodeInterface
      * @brief Get camera associated with this camera node (const version).
      * @return Const camera pointer.
      */
-    const Camera &GetCamera() const
+    const Camera& GetCamera() const
     {
         return *camera_.get();
     }

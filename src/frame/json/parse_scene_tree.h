@@ -15,6 +15,6 @@ namespace frame::proto
  * @return True if success and false if error.
  */
 [[nodiscard]] bool ParseSceneTreeFile(
-    const SceneTree &proto_scene_tree, LevelInterface &level);
+    const SceneTree& proto_scene_tree, LevelInterface& level);
 
 } // End namespace frame::proto.

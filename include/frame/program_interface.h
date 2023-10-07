@@ -61,7 +61,7 @@ struct ProgramInterface : public NameInterface
      *        root.
      * @param Set the temporary scene root.
      */
-    virtual void SetTemporarySceneRoot(const std::string &name) = 0;
+    virtual void SetTemporarySceneRoot(const std::string& name) = 0;
     /**
      * @brief Get scene root id.
      * @return Id of the scene root.
@@ -80,7 +80,7 @@ struct ProgramInterface : public NameInterface
      *        matrices (model, view, projection) but also time and other
      *        uniform that could be needed.
      */
-    virtual void Use(const UniformInterface &uniform_interface) const = 0;
+    virtual void Use(const UniformInterface& uniform_interface) const = 0;
     /**
      * @brief Use the program, a little bit like bind.
      */
@@ -97,55 +97,55 @@ struct ProgramInterface : public NameInterface
      * @param name: Name of the uniform.
      * @param value: Boolean.
      */
-    virtual void Uniform(const std::string &name, bool value) const = 0;
+    virtual void Uniform(const std::string& name, bool value) const = 0;
     /**
      * @brief Create a uniform from a string and an int.
      * @param name: Name of the uniform.
      * @param value: Integer.
      */
-    virtual void Uniform(const std::string &name, int value) const = 0;
+    virtual void Uniform(const std::string& name, int value) const = 0;
     /**
      * @brief Create a uniform from a string and a float.
      * @param name: Name of the uniform.
      * @param value: Float.
      */
-    virtual void Uniform(const std::string &name, float value) const = 0;
+    virtual void Uniform(const std::string& name, float value) const = 0;
     /**
      * @brief Create a uniform from a string and a vector2.
      * @param name: Name of the uniform.
      * @param value: Vector2.
      */
     virtual void Uniform(
-        const std::string &name, const glm::vec2 vec2) const = 0;
+        const std::string& name, const glm::vec2 vec2) const = 0;
     /**
      * @brief Create a uniform from a string and a vector3.
      * @param name: Name of the uniform.
      * @param value: Vector3.
      */
     virtual void Uniform(
-        const std::string &name, const glm::vec3 vec3) const = 0;
+        const std::string& name, const glm::vec3 vec3) const = 0;
     /**
      * @brief Create a uniform from a string and a vector4.
      * @param name: Name of the uniform.
      * @param value: Vector4.
      */
     virtual void Uniform(
-        const std::string &name, const glm::vec4 vec4) const = 0;
+        const std::string& name, const glm::vec4 vec4) const = 0;
     /**
      * @brief Create a uniform from a string and a matrix.
      * @param name: Name of the uniform.
      * @param value: Matrix.
      */
     virtual void Uniform(
-        const std::string &name, const glm::mat4 mat) const = 0;
+        const std::string& name, const glm::mat4 mat) const = 0;
     /**
      * @brief Create a uniform from a string and a vector.
      * @param name: Name of the uniform.
      * @param vector: Vector to be inputed into the uniform.
      */
     virtual void Uniform(
-        const std::string &name,
-        const std::vector<float> &vector,
+        const std::string& name,
+        const std::vector<float>& vector,
         glm::uvec2 size = {0, 0}) const = 0;
     /**
      * @brief Create a uniform from a string and a vector.
@@ -153,15 +153,15 @@ struct ProgramInterface : public NameInterface
      * @param vector: Vector to be inputed into the uniform.
      */
     virtual void Uniform(
-        const std::string &name,
-        const std::vector<std::int32_t> &vector,
+        const std::string& name,
+        const std::vector<std::int32_t>& vector,
         glm::uvec2 size = {0, 0}) const = 0;
     /**
      * @brief Check if the program has the uniform passed as name.
      * @param name: Name of the uniform.
      * @return True if present false otherwise.
      */
-    virtual bool HasUniform(const std::string &name) const = 0;
+    virtual bool HasUniform(const std::string& name) const = 0;
 };
 
 } // End namespace frame.

@@ -12,14 +12,14 @@ namespace frame::proto
 {
 
 std::unique_ptr<frame::ProgramInterface> ParseProgramOpenGL(
-    const Program &proto_program, LevelInterface &level)
+    const Program& proto_program, LevelInterface& level)
 {
-    Logger &logger = Logger::GetInstance();
+    Logger& logger = Logger::GetInstance();
     // Create the program.
     auto program = opengl::file::LoadProgram(proto_program.shader());
     if (!program)
         return nullptr;
-    for (const auto &texture_name : proto_program.input_texture_names())
+    for (const auto& texture_name : proto_program.input_texture_names())
     {
         auto maybe_texture_id = level.GetIdFromName(texture_name);
         if (!maybe_texture_id)
@@ -28,7 +28,7 @@ std::unique_ptr<frame::ProgramInterface> ParseProgramOpenGL(
         // Check this is a texture.
         program->AddInputTextureId(texture_id);
     }
-    for (const auto &texture_name : proto_program.output_texture_names())
+    for (const auto& texture_name : proto_program.output_texture_names())
     {
         auto maybe_texture_id = level.GetIdFromName(texture_name);
         if (!maybe_texture_id)
@@ -66,7 +66,7 @@ std::unique_ptr<frame::ProgramInterface> ParseProgramOpenGL(
             "No way {}?",
             static_cast<int>(proto_program.input_scene_type().value())));
     }
-    for (const auto &parameter : proto_program.parameters())
+    for (const auto& parameter : proto_program.parameters())
     {
         switch (parameter.value_oneof_case())
         {

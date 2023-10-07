@@ -16,8 +16,8 @@ namespace
 constexpr std::array<std::string_view, 2> avoid_elements = {"build", "Build"};
 
 const std::filesystem::path FindElement(
-    const std::filesystem::path &file,
-    std::function<bool(const std::filesystem::path &)> test)
+    const std::filesystem::path& file,
+    std::function<bool(const std::filesystem::path&)> test)
 {
     // Find the current path to the executing path.
     std::filesystem::path path = std::filesystem::current_path();
@@ -34,7 +34,7 @@ const std::filesystem::path FindElement(
             // Search for build (it create a bunch of asset and other
             // element that will confuse the search for the file and path).
             bool found = false;
-            for (const auto &element : avoid_elements)
+            for (const auto& element : avoid_elements)
             {
                 if (new_path.string().find(element) != std::string::npos)
                 {
@@ -56,16 +56,16 @@ const std::filesystem::path FindElement(
 namespace frame::file
 {
 
-const std::filesystem::path FindDirectory(const std::filesystem::path &file)
+const std::filesystem::path FindDirectory(const std::filesystem::path& file)
 {
-    return FindElement(file, [](const std::filesystem::path &p) {
+    return FindElement(file, [](const std::filesystem::path& p) {
         return std::filesystem::is_directory(p);
     });
 }
 
-const std::filesystem::path FindFile(const std::filesystem::path &file)
+const std::filesystem::path FindFile(const std::filesystem::path& file)
 {
-    return FindElement(file, [](const std::filesystem::path &p) {
+    return FindElement(file, [](const std::filesystem::path& p) {
         return std::filesystem::is_regular_file(p);
     });
 }

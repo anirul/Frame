@@ -27,7 +27,7 @@ class Material : public MaterialInterface
      * @param level: Pointer to the local level.
      * @return Id of the program (can be the linked program).
      */
-    EntityId GetProgramId(const LevelInterface *level = nullptr) const override;
+    EntityId GetProgramId(const LevelInterface* level = nullptr) const override;
     /**
      * @brief Store local program id.
      * @param id: the stored program id.
@@ -37,13 +37,13 @@ class Material : public MaterialInterface
      * @brief Store the program name.
      * @param name: Program name.
      */
-    void SetProgramName(const std::string &name) override;
+    void SetProgramName(const std::string& name) override;
     /**
      * @brief Store a texture reference associated to a given name.
      * @param id: Texture reference id.
      * @param name: Associated name (shader name).
      */
-    bool AddTextureId(EntityId id, const std::string &name) override;
+    bool AddTextureId(EntityId id, const std::string& name) override;
     /**
      * @brief Check if the texture is in the material.
      * @param id: Texture to be checked.
@@ -90,7 +90,7 @@ class Material : public MaterialInterface
      * @brief Set name from the name interface.
      * @param name: New name to be set.
      */
-    void SetName(const std::string &name) override
+    void SetName(const std::string& name) override
     {
         name_ = name;
     }

@@ -15,7 +15,7 @@ class WindowCubemap : public GuiWindowInterface
      * @brief Constructor
      * @param name: The name of the window.
      */
-    WindowCubemap(const std::string &name);
+    WindowCubemap(const std::string& name);
 
   public:
     //! @brief Draw callback setting.
@@ -29,7 +29,7 @@ class WindowCubemap : public GuiWindowInterface
      * @brief Set the name of the window.
      * @param name: The name of the window.
      */
-    void SetName(const std::string &name) override;
+    void SetName(const std::string& name) override;
     /**
      * @brief Check if this is the end of the software.
      * @return True if this is the end false if not.
@@ -39,7 +39,7 @@ class WindowCubemap : public GuiWindowInterface
      * @brief Change the sky-box cube map path.
      * @param level: The level where to change the cube map path.
      */
-    void ChangeLevel(frame::proto::Level &level);
+    void ChangeLevel(frame::proto::Level& level);
 
   protected:
     /**
@@ -51,7 +51,7 @@ class WindowCubemap : public GuiWindowInterface
      * @brief Load a cube map to a level.
      * @param path: The path of the cube map.
      */
-    void SaveCubemapPath(const std::filesystem::path &path);
+    void SaveCubemapPath(const std::filesystem::path& path);
 
   private:
     std::string name_;

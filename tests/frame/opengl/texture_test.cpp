@@ -32,8 +32,8 @@ TEST_F(TextureTest, GetSizeTextureByteTest)
     ASSERT_TRUE(maybe_texture);
     texture_ = std::move(maybe_texture.value());
     ASSERT_TRUE(texture_);
-    auto *opengl_texture =
-        dynamic_cast<frame::opengl::Texture *>(texture_.get());
+    auto* opengl_texture =
+        dynamic_cast<frame::opengl::Texture*>(texture_.get());
     EXPECT_NE(0, opengl_texture->GetId());
     auto pair = glm::uvec2(1024, 1024);
     EXPECT_EQ(pair, texture_->GetSize());
@@ -55,8 +55,8 @@ TEST_F(TextureTest, CreateHDRTextureHalfTest)
     ASSERT_TRUE(maybe_texture);
     texture_ = std::move(maybe_texture.value());
     ASSERT_TRUE(texture_);
-    auto *opengl_texture =
-        dynamic_cast<frame::opengl::Texture *>(texture_.get());
+    auto* opengl_texture =
+        dynamic_cast<frame::opengl::Texture*>(texture_.get());
     EXPECT_NE(0, opengl_texture->GetId());
     auto pair = glm::uvec2(3200, 1600);
     EXPECT_EQ(pair, texture_->GetSize());
@@ -74,8 +74,8 @@ TEST_F(TextureTest, CreateHDRTextureFloatTest)
     ASSERT_TRUE(maybe_texture);
     texture_ = std::move(maybe_texture.value());
     ASSERT_TRUE(texture_);
-    auto *opengl_texture =
-        dynamic_cast<frame::opengl::Texture *>(texture_.get());
+    auto* opengl_texture =
+        dynamic_cast<frame::opengl::Texture*>(texture_.get());
     EXPECT_NE(0, opengl_texture->GetId());
     auto pair = glm::uvec2(3200, 1600);
     EXPECT_EQ(pair, texture_->GetSize());

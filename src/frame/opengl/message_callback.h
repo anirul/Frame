@@ -21,7 +21,7 @@ void GLAPIENTRY MessageCallback(
     GLuint id,
     GLenum severity,
     GLsizei length,
-    const GLchar *message,
-    const void *userParam);
+    const GLchar* message,
+    const void* userParam);
 
 } // End namespace frame::opengl.

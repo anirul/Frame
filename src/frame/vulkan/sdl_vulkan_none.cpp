@@ -47,7 +47,7 @@ SDLVulkanNone::SDLVulkanNone(glm::uvec2 size) : size_(size)
         throw std::runtime_error(fmt::format(
             "Could not get the extension count: {}", SDL_GetError()));
     }
-    std::vector<const char *> extensions(extension_count);
+    std::vector<const char*> extensions(extension_count);
     SDL_Vulkan_GetInstanceExtensions(
         sdl_window_, &extension_count, extensions.data());
     if (extension_count == 0)
@@ -57,7 +57,7 @@ SDLVulkanNone::SDLVulkanNone(glm::uvec2 size) : size_(size)
     }
     // Add the extension to have the debug layers.
     extensions.push_back("VK_EXT_debug_utils");
-    for (const auto &extension : extensions)
+    for (const auto& extension : extensions)
     {
         logger_->info("Extension: {}", extension);
     }
@@ -116,20 +116,20 @@ SDLVulkanNone::~SDLVulkanNone()
 
 void SDLVulkanNone::Run(std::function<void()> /* lambda*/)
 {
-    for (const auto &plugin_interface : device_->GetPluginPtrs())
+    for (const auto& plugin_interface : device_->GetPluginPtrs())
     {
         plugin_interface->Startup(size_);
     }
     if (input_interface_)
         input_interface_->NextFrame();
     device_->Display(0.0);
-    for (const auto &plugin_interface : device_->GetPluginPtrs())
+    for (const auto& plugin_interface : device_->GetPluginPtrs())
     {
         plugin_interface->Update(*device_.get(), 0.0);
     }
 }
 
-void *SDLVulkanNone::GetGraphicContext() const
+void* SDLVulkanNone::GetGraphicContext() const
 {
     return vk_unique_instance_.get();
 }

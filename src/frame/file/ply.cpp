@@ -14,10 +14,10 @@ namespace
 // Template to replace <T> type with the correct float type.
 template <typename T>
 void GetElementInternal(
-    happly::PLYData &ply,
-    const std::string &name,
+    happly::PLYData& ply,
+    const std::string& name,
     int i,
-    std::vector<std::vector<float>> &result)
+    std::vector<std::vector<float>>& result)
 {
     if (ply.getElement("vertex").hasPropertyType<T>(name))
     {
@@ -29,7 +29,7 @@ void GetElementInternal(
                 return static_cast<float>(t);
             });
         }
-        catch (const std::exception &e)
+        catch (const std::exception& e)
         {
             Logger::GetInstance()->warn(e.what());
         }
@@ -39,10 +39,10 @@ void GetElementInternal(
 // Template Specialization for std::uint8_t type (/ 255).
 template <>
 void GetElementInternal<std::uint8_t>(
-    happly::PLYData &ply,
-    const std::string &name,
+    happly::PLYData& ply,
+    const std::string& name,
     int i,
-    std::vector<std::vector<float>> &result)
+    std::vector<std::vector<float>>& result)
 {
     if (ply.getElement("vertex").hasPropertyType<std::uint8_t>(name))
     {
@@ -55,7 +55,7 @@ void GetElementInternal<std::uint8_t>(
                     return static_cast<float>(uc) / 255.0f;
                 });
         }
-        catch (const std::exception &e)
+        catch (const std::exception& e)
         {
             Logger::GetInstance()->warn(e.what());
         }
@@ -65,9 +65,9 @@ void GetElementInternal<std::uint8_t>(
 // Template get float arrays of size <SIZE>.
 template <std::size_t SIZE>
 void GetElementFloat(
-    happly::PLYData &ply,
-    const std::array<std::string, SIZE> &names,
-    std::vector<std::vector<float>> &result)
+    happly::PLYData& ply,
+    const std::array<std::string, SIZE>& names,
+    std::vector<std::vector<float>>& result)
 {
     if (result.size() != SIZE)
         throw std::runtime_error(fmt::format(
@@ -83,7 +83,7 @@ void GetElementFloat(
 }
 
 std::vector<glm::vec2> GetElementVertexPropertyVec2(
-    happly::PLYData &ply, const std::array<std::string, 2> &names)
+    happly::PLYData& ply, const std::array<std::string, 2>& names)
 {
     std::vector<glm::vec2> result;
     std::vector<std::vector<float>> float_vec = {};
@@ -97,7 +97,7 @@ std::vector<glm::vec2> GetElementVertexPropertyVec2(
 }
 
 std::vector<glm::vec3> GetElementVertexPropertyVec3(
-    happly::PLYData &ply, const std::array<std::string, 3> &names)
+    happly::PLYData& ply, const std::array<std::string, 3>& names)
 {
     std::vector<glm::vec3> result;
     std::vector<std::vector<float>> float_vec = {};
@@ -112,7 +112,7 @@ std::vector<glm::vec3> GetElementVertexPropertyVec3(
 }
 
 std::vector<glm::vec4> GetElementVertexPropertyVec4(
-    happly::PLYData &ply, const std::array<std::string, 4> &names)
+    happly::PLYData& ply, const std::array<std::string, 4>& names)
 {
     std::vector<glm::vec4> result;
     std::vector<std::vector<float>> float_vec = {};
@@ -131,7 +131,7 @@ std::vector<glm::vec4> GetElementVertexPropertyVec4(
 
 } // namespace
 
-Ply::Ply(const std::filesystem::path &file_name)
+Ply::Ply(const std::filesystem::path& file_name)
 {
     logger_->info("Opening file: {}", file_name.string());
     happly::PLYData ply_in(file_name.string());
@@ -152,15 +152,15 @@ Ply::Ply(const std::filesystem::path &file_name)
     try
     {
         std::vector<std::vector<std::size_t>> indices = ply_in.getFaceIndices();
-        for (const auto &element : indices)
+        for (const auto& element : indices)
         {
-            for (const auto &value : element)
+            for (const auto& value : element)
             {
                 indices_.push_back(static_cast<std::uint32_t>(value));
             }
         }
     }
-    catch (const std::exception &e)
+    catch (const std::exception& e)
     {
         logger_->warn(e.what());
     }

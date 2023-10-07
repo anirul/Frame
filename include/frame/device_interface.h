@@ -26,23 +26,23 @@ class DeviceInterface
      * @param color: A vec4 containing the color you want to clear to.
      */
     virtual void Clear(
-        const glm::vec4 &color = glm::vec4(.2f, 0.f, .2f, 1.0f)) const = 0;
+        const glm::vec4& color = glm::vec4(.2f, 0.f, .2f, 1.0f)) const = 0;
     /**
      * @brief Startup the scene.
      * @param level: The level you want to start the scene with.
      */
-    virtual void Startup(std::unique_ptr<LevelInterface> &&level) = 0;
+    virtual void Startup(std::unique_ptr<LevelInterface>&& level) = 0;
     /**
      * @brief Add a drawing interface.
      * @param draw_interface: Move a draw interface to the window object.
      */
     virtual void AddPlugin(
-        std::unique_ptr<PluginInterface> &&plugin_interface) = 0;
+        std::unique_ptr<PluginInterface>&& plugin_interface) = 0;
     /**
      * @brief Get a list of plugin.
      * @return A list of pointer to plugin.
      */
-    virtual std::vector<PluginInterface *> GetPluginPtrs() = 0;
+    virtual std::vector<PluginInterface*> GetPluginPtrs() = 0;
     /**
      * @brief Get name and id of plugin.
      * @return A map containing names and id of plugin.
@@ -52,7 +52,7 @@ class DeviceInterface
      * @brief Remove a drawing interface.
      * @param index: The index of the draw interface to remove.
      */
-    virtual void RemovePluginByName(const std::string &name) = 0;
+    virtual void RemovePluginByName(const std::string& name) = 0;
     /**
      * @brief Display to the screen.
      * @param dt: Delta time from the beginning of the software in seconds.
@@ -74,17 +74,17 @@ class DeviceInterface
      * @brief  Get the current level.
      * @return A pointer to the level.
      */
-    virtual LevelInterface &GetLevel() = 0;
+    virtual LevelInterface& GetLevel() = 0;
     /**
      * @brief Get a device context on the underlying graphic API.
      * @return A device context on the underlying graphic API.
      */
-    virtual void *GetDeviceContext() const = 0;
+    virtual void* GetDeviceContext() const = 0;
     /**
      * @brief Make a screenshot of current frame.
      * @param file: File name to write the screenshot to (*.png).
      */
-    virtual void ScreenShot(const std::string &file) const = 0;
+    virtual void ScreenShot(const std::string& file) const = 0;
     /**
      * @brief Set the stereo mode (by default this is NONE), interocular
      *        distance and focus point.
@@ -126,14 +126,14 @@ class DeviceInterface
      * @param vector: A vector that is moved into the device and level.
      */
     virtual std::unique_ptr<BufferInterface> CreatePointBuffer(
-        std::vector<float> &&vector) = 0;
+        std::vector<float>&& vector) = 0;
     /**
      * @brief Create an index buffer from a vector of unsigned integer.
      * @param device: A pointer to a device.
      * @param vector: A vector that is moved into the device and level.
      */
     virtual std::unique_ptr<BufferInterface> CreateIndexBuffer(
-        std::vector<std::uint32_t> &&vector) = 0;
+        std::vector<std::uint32_t>&& vector) = 0;
     /**
      * @brief Create a static mesh from a vector of floats and a vector of
      *        float.
@@ -142,14 +142,14 @@ class DeviceInterface
      * @return A unique pointer to a static mesh.
      */
     virtual std::unique_ptr<StaticMeshInterface> CreateStaticMesh(
-        const StaticMeshParameter &static_mesh_parameter) = 0;
+        const StaticMeshParameter& static_mesh_parameter) = 0;
     /**
      * @brief Create a 2d texture from a structure.
      * @param parameters: Parameters for the creation of the texture.
      * @return A unique pointer to a 2d texture.
      */
     virtual std::unique_ptr<TextureInterface> CreateTexture(
-        const TextureParameter &texture_parameter) = 0;
+        const TextureParameter& texture_parameter) = 0;
 };
 
 } // End namespace frame.

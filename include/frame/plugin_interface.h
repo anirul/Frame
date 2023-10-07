@@ -33,7 +33,7 @@ class PluginInterface : public NameInterface
      * @param event: The event to be polled.
      * @return Is the loop continuing?
      */
-    virtual bool PollEvent(void *event) = 0;
+    virtual bool PollEvent(void* event) = 0;
     /**
      * @brief Called before rendering.
      * @param uniform[in, out]: The uniform data.
@@ -43,17 +43,17 @@ class PluginInterface : public NameInterface
      * @param material: The material associated with the mesh.
      */
     virtual void PreRender(
-        UniformInterface &uniform,
-        DeviceInterface &device,
-        StaticMeshInterface &static_mesh,
-        MaterialInterface &material) = 0;
+        UniformInterface& uniform,
+        DeviceInterface& device,
+        StaticMeshInterface& static_mesh,
+        MaterialInterface& material) = 0;
     /**
      * @brief Called to update variables, called after the main render
      *        phase.
      * @param level: The level.
      * @return Is the loop continuing?
      */
-    virtual bool Update(DeviceInterface &device, double dt = 0.0) = 0;
+    virtual bool Update(DeviceInterface& device, double dt = 0.0) = 0;
     //! @brief Called to cleanup at the end.
     virtual void End() = 0;
 };

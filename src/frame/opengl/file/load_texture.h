@@ -20,7 +20,7 @@ namespace frame::opengl::file
  * @return A unique pointer to the texture interface (or null in case of
  *         failure).
  */
-std::unique_ptr<TextureInterface> LoadTextureFromVec4(const glm::vec4 &vec4);
+std::unique_ptr<TextureInterface> LoadTextureFromVec4(const glm::vec4& vec4);
 /**
  * @brief Load texture from a float.
  * @param f: A float.
@@ -39,7 +39,7 @@ std::unique_ptr<TextureInterface> LoadTextureFromFloat(float f);
  *         failure).
  */
 std::unique_ptr<TextureInterface> LoadTextureFromFile(
-    const std::filesystem::path &file,
+    const std::filesystem::path& file,
     proto::PixelElementSize pixel_element_size = proto::PixelElementSize_BYTE(),
     proto::PixelStructure pixel_structure = proto::PixelStructure_RGB());
 /**
@@ -53,7 +53,7 @@ std::unique_ptr<TextureInterface> LoadTextureFromFile(
  *         failure).
  */
 std::unique_ptr<TextureInterface> LoadCubeMapTextureFromFile(
-    const std::filesystem::path &file,
+    const std::filesystem::path& file,
     proto::PixelElementSize pixel_element_size = proto::PixelElementSize_BYTE(),
     proto::PixelStructure pixel_structure = proto::PixelStructure_RGB());
 /**
@@ -67,7 +67,7 @@ std::unique_ptr<TextureInterface> LoadCubeMapTextureFromFile(
  *         failure).
  */
 std::unique_ptr<TextureInterface> LoadCubeMapTextureFromFiles(
-    const std::array<std::filesystem::path, 6> &files,
+    const std::array<std::filesystem::path, 6>& files,
     proto::PixelElementSize pixel_element_size = proto::PixelElementSize_BYTE(),
     proto::PixelStructure pixel_structure = proto::PixelStructure_RGB());
 

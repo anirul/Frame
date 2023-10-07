@@ -21,9 +21,9 @@ namespace frame::opengl::file
  *         in case OBJ file).
  */
 std::vector<EntityId> LoadStaticMeshesFromFile(
-    LevelInterface &level,
-    const std::filesystem::path &file,
-    const std::string &name,
-    const std::string &material_name = "");
+    LevelInterface& level,
+    const std::filesystem::path& file,
+    const std::string& name,
+    const std::string& material_name = "");
 
 } // namespace frame::opengl::file

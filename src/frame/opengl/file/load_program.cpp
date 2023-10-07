@@ -10,7 +10,7 @@ namespace frame::opengl::file
 {
 
 // TODO(anirul): Should be moved to the device.
-std::unique_ptr<frame::ProgramInterface> LoadProgram(const std::string &name)
+std::unique_ptr<frame::ProgramInterface> LoadProgram(const std::string& name)
 {
     std::string vertex_file =
         std::string("asset/shader/opengl/" + name + ".vert");
@@ -21,9 +21,9 @@ std::unique_ptr<frame::ProgramInterface> LoadProgram(const std::string &name)
 
 // TODO(anirul): Should be moved to the device.
 std::unique_ptr<frame::ProgramInterface> LoadProgram(
-    const std::string &name,
-    const std::string &vertex_file,
-    const std::string &fragment_file)
+    const std::string& name,
+    const std::string& vertex_file,
+    const std::string& fragment_file)
 {
     std::ifstream vertex_ifs{
         frame::file::FindFile(std::filesystem::path(vertex_file))};

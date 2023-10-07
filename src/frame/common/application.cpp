@@ -5,7 +5,7 @@
 namespace frame::common
 {
 
-Application::Application(std::unique_ptr<frame::WindowInterface> &&window)
+Application::Application(std::unique_ptr<frame::WindowInterface>&& window)
     : window_(std::move(window))
 {
     assert(window_);
@@ -14,7 +14,7 @@ Application::Application(std::unique_ptr<frame::WindowInterface> &&window)
 void Application::Startup(std::filesystem::path path)
 {
     assert(window_);
-    auto &device = window_->GetDevice();
+    auto& device = window_->GetDevice();
     if (!plugin_name_.empty())
     {
         device.RemovePluginByName(plugin_name_);
@@ -25,10 +25,10 @@ void Application::Startup(std::filesystem::path path)
     device.AddPlugin(std::move(plugin));
 }
 
-void Application::Startup(std::unique_ptr<frame::LevelInterface> &&level)
+void Application::Startup(std::unique_ptr<frame::LevelInterface>&& level)
 {
     assert(window_);
-    auto &device = window_->GetDevice();
+    auto& device = window_->GetDevice();
     if (!plugin_name_.empty())
     {
         device.RemovePluginByName(plugin_name_);

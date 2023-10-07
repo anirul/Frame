@@ -34,7 +34,7 @@ class MaterialInterface : public NameInterface
      * @return Id of the program (can be the linked program).
      */
     virtual EntityId GetProgramId(
-        const LevelInterface *level = nullptr) const = 0;
+        const LevelInterface* level = nullptr) const = 0;
     /**
      * @brief Store local program id.
      * @param id: the stored program id.
@@ -44,13 +44,13 @@ class MaterialInterface : public NameInterface
      * @brief Store the program name.
      * @param name: Program name.
      */
-    virtual void SetProgramName(const std::string &name) = 0;
+    virtual void SetProgramName(const std::string& name) = 0;
     /**
      * @brief Store a texture reference associated to a given name.
      * @param id: Texture reference id.
      * @param name: Associated name (shader name).
      */
-    virtual bool AddTextureId(EntityId id, const std::string &name) = 0;
+    virtual bool AddTextureId(EntityId id, const std::string& name) = 0;
     /**
      * @brief Check if the texture is in the material.
      * @param id: Texture to be checked.

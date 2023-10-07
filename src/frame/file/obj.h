@@ -46,7 +46,7 @@ class ObjMesh
      * @brief Will return the list of vertices.
      * @return Vector of vertices.
      */
-    const std::vector<ObjVertex> &GetVertices() const
+    const std::vector<ObjVertex>& GetVertices() const
     {
         return points_;
     }
@@ -54,7 +54,7 @@ class ObjMesh
      * @brief Will return the list of indices.
      * @return Vector of indices.
      */
-    const std::vector<int> &GetIndices() const
+    const std::vector<int>& GetIndices() const
     {
         return indices_;
     }
@@ -107,14 +107,14 @@ class Obj
      * @brief Constructor parse from an OBJ file.
      * @param file_name: File to be open.
      */
-    Obj(const std::filesystem::path &file_name);
+    Obj(const std::filesystem::path& file_name);
 
   public:
     /**
      * @brief Get meshes, they are suppose to be sorted by material.
      * @return The meshes that are in the file.
      */
-    const std::vector<ObjMesh> &GetMeshes() const
+    const std::vector<ObjMesh>& GetMeshes() const
     {
         return meshes_;
     }
@@ -123,7 +123,7 @@ class Obj
      *        (*.mtl).
      * @return The materials that are in the file.
      */
-    const std::vector<ObjMaterial> &GetMaterials() const
+    const std::vector<ObjMaterial>& GetMaterials() const
     {
         return materials_;
     }
@@ -131,7 +131,7 @@ class Obj
   protected:
     std::vector<ObjMesh> meshes_ = {};
     std::vector<ObjMaterial> materials_ = {};
-    Logger &logger_ = Logger::GetInstance();
+    Logger& logger_ = Logger::GetInstance();
 };
 
 } // End namespace frame::file.

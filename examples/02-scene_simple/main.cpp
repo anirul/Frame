@@ -26,19 +26,19 @@ int WINAPI WinMain(
 try
 {
 #else
-int main(int ac, char **av)
+int main(int ac, char** av)
 try
 {
 #endif
     glm::uvec2 size = {1280, 720};
     bool end = true;
 
-    frame::gui::WindowResolution *ptr_window_resolution = nullptr;
+    frame::gui::WindowResolution* ptr_window_resolution = nullptr;
     auto win = frame::CreateNewWindow(
         frame::DrawingTargetEnum::WINDOW,
         frame::RenderingAPIEnum::OPENGL,
         size);
-    auto &device = win->GetDevice();
+    auto& device = win->GetDevice();
     auto gui_window = frame::gui::CreateDrawGui(*win.get());
     auto gui_resolution = std::make_unique<frame::gui::WindowResolution>(
         "Resolution", size, win->GetDesktopSize(), win->GetPixelPerInch());

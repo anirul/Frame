@@ -50,7 +50,7 @@ const glm::mat4 projection_cubemap =
     glm::perspective(glm::radians(90.0f), 1.0f, 0.01f, 10.0f);
 } // namespace
 
-Renderer::Renderer(LevelInterface &level, glm::uvec4 viewport)
+Renderer::Renderer(LevelInterface& level, glm::uvec4 viewport)
     : level_(level), viewport_(viewport)
 {
     // TODO(anirul): Check viewport!!!
@@ -77,7 +77,7 @@ Renderer::Renderer(LevelInterface &level, glm::uvec4 viewport)
         throw std::runtime_error("No output texture id.");
     }
     auto out_texture_id = maybe_out_texture_id;
-    auto &out_texture = level_.GetTextureFromId(out_texture_id);
+    auto& out_texture = level_.GetTextureFromId(out_texture_id);
     // Get material from level as material was moved away.
     level_.GetMaterialFromId(display_material_id_)
         .SetProgramId(display_program_id_);
@@ -91,17 +91,17 @@ Renderer::Renderer(LevelInterface &level, glm::uvec4 viewport)
 void Renderer::RenderNode(
     EntityId node_id,
     EntityId material_id,
-    const glm::mat4 &projection,
-    const glm::mat4 &view,
+    const glm::mat4& projection,
+    const glm::mat4& view,
     double dt /* = 0.0*/)
 {
     // Bail out in case of no node.
     if (node_id == NullId)
         return;
     // Check current node.
-    auto &node = level_.GetSceneNodeFromId(node_id);
+    auto& node = level_.GetSceneNodeFromId(node_id);
     // Try to cast to a node static mesh.
-    auto &node_static_mesh = dynamic_cast<NodeStaticMesh &>(node);
+    auto& node_static_mesh = dynamic_cast<NodeStaticMesh&>(node);
     auto mesh_id = node.GetLocalMesh();
     // In case no mesh then this is a clear event.
     if (!mesh_id)
@@ -116,27 +116,27 @@ void Renderer::RenderNode(
             glClear(bit_field);
         return;
     }
-    auto &static_mesh = level_.GetStaticMeshFromId(mesh_id);
+    auto& static_mesh = level_.GetStaticMeshFromId(mesh_id);
     // Try to find the material for the mesh.
     if (material_id == NullId)
     {
         throw std::runtime_error("No material?");
     }
-    MaterialInterface &material = level_.GetMaterialFromId(material_id);
+    MaterialInterface& material = level_.GetMaterialFromId(material_id);
     RenderMesh(
         static_mesh, material, projection, view, node.GetLocalModel(dt), dt);
 }
 
 void Renderer::RenderMesh(
-    StaticMeshInterface &static_mesh,
-    MaterialInterface &material,
-    const glm::mat4 &projection,
-    const glm::mat4 &view,
-    const glm::mat4 &model /* = glm::mat4(1.0f)*/,
+    StaticMeshInterface& static_mesh,
+    MaterialInterface& material,
+    const glm::mat4& projection,
+    const glm::mat4& view,
+    const glm::mat4& model /* = glm::mat4(1.0f)*/,
     double dt /* = 0.0*/)
 {
     auto program_id = material.GetProgramId();
-    auto &program = level_.GetProgramFromId(program_id);
+    auto& program = level_.GetProgramFromId(program_id);
     last_program_id_ = program_id;
     assert(program.GetOutputTextureIds().size());
 
@@ -147,18 +147,18 @@ void Renderer::RenderMesh(
     program.Use(uniform_wrapper);
 
     auto texture_out_ids = program.GetOutputTextureIds();
-    auto &texture_ref = level_.GetTextureFromId(*texture_out_ids.cbegin());
+    auto& texture_ref = level_.GetTextureFromId(*texture_out_ids.cbegin());
     auto size = texture_ref.GetSize();
 
     glViewport(viewport_.x, viewport_.y, viewport_.z, viewport_.w);
 
     ScopedBind scoped_frame(frame_buffer_);
     int i = 0;
-    for (const auto &texture_id : program.GetOutputTextureIds())
+    for (const auto& texture_id : program.GetOutputTextureIds())
     {
         if (level_.GetTextureFromId(texture_id).IsCubeMap())
         {
-            auto &opengl_texture = dynamic_cast<TextureCubeMap &>(
+            auto& opengl_texture = dynamic_cast<TextureCubeMap&>(
                 level_.GetTextureFromId(texture_id));
             // TODO(anirul): Check the mipmap level (last parameter)!
             frame_buffer_.AttachTexture(
@@ -169,8 +169,8 @@ void Renderer::RenderMesh(
         }
         else
         {
-            auto &opengl_texture =
-                dynamic_cast<Texture &>(level_.GetTextureFromId(texture_id));
+            auto& opengl_texture =
+                dynamic_cast<Texture&>(level_.GetTextureFromId(texture_id));
             // TODO(anirul): Check the mipmap level (last parameter)!
             frame_buffer_.AttachTexture(
                 opengl_texture.GetId(),
@@ -184,7 +184,7 @@ void Renderer::RenderMesh(
         static_cast<std::uint32_t>(texture_out_ids.size()));
 
     std::map<std::string, std::vector<std::int32_t>> uniform_include;
-    for (const auto &id : material.GetIds())
+    for (const auto& id : material.GetIds())
     {
         EntityId texture_id = NullId;
         if (level_.GetEnumTypeFromId(id) == EntityTypeEnum::TEXTURE)
@@ -199,28 +199,28 @@ void Renderer::RenderMesh(
         }
         // TODO(anirul): Why? id and not texture id?
         const auto p = material.EnableTextureId(id);
-        auto &texture = level_.GetTextureFromId(texture_id);
+        auto& texture = level_.GetTextureFromId(texture_id);
         if (texture.IsCubeMap())
         {
-            auto &gl_texture = dynamic_cast<TextureCubeMap &>(
+            auto& gl_texture = dynamic_cast<TextureCubeMap&>(
                 level_.GetTextureFromId(texture_id));
             gl_texture.Bind(p.second);
             program.Uniform(p.first, p.second);
         }
         else
         {
-            auto &gl_texture =
-                dynamic_cast<Texture &>(level_.GetTextureFromId(texture_id));
+            auto& gl_texture =
+                dynamic_cast<Texture&>(level_.GetTextureFromId(texture_id));
             gl_texture.Bind(p.second);
             program.Uniform(p.first, p.second);
         }
     }
 
-    auto &gl_static_mesh = dynamic_cast<StaticMesh &>(static_mesh);
+    auto& gl_static_mesh = dynamic_cast<StaticMesh&>(static_mesh);
     glBindVertexArray(gl_static_mesh.GetId());
 
-    auto &index_buffer = level_.GetBufferFromId(static_mesh.GetIndexBufferId());
-    auto &gl_index_buffer = dynamic_cast<Buffer &>(index_buffer);
+    auto& index_buffer = level_.GetBufferFromId(static_mesh.GetIndexBufferId());
+    auto& gl_index_buffer = dynamic_cast<Buffer&>(index_buffer);
     // This was crashing the driver so...
     if (static_mesh.GetIndexSize())
     {
@@ -269,17 +269,17 @@ void Renderer::RenderMesh(
         {
             texture_id = id + 1;
         }
-        auto &texture = level_.GetTextureFromId(texture_id);
+        auto& texture = level_.GetTextureFromId(texture_id);
         if (texture.IsCubeMap())
         {
-            auto &gl_texture = dynamic_cast<TextureCubeMap &>(
+            auto& gl_texture = dynamic_cast<TextureCubeMap&>(
                 level_.GetTextureFromId(texture_id));
             gl_texture.UnBind();
         }
         else
         {
-            auto &gl_texture =
-                dynamic_cast<Texture &>(level_.GetTextureFromId(texture_id));
+            auto& gl_texture =
+                dynamic_cast<Texture&>(level_.GetTextureFromId(texture_id));
             gl_texture.UnBind();
         }
     }
@@ -296,23 +296,23 @@ void Renderer::Display(double dt /* = 0.0*/)
     auto maybe_quad_id = level_.GetDefaultStaticMeshQuadId();
     if (maybe_quad_id == NullId)
         throw std::runtime_error("No quad id.");
-    auto &quad = level_.GetStaticMeshFromId(maybe_quad_id);
-    auto &program = level_.GetProgramFromId(display_program_id_);
+    auto& quad = level_.GetStaticMeshFromId(maybe_quad_id);
+    auto& program = level_.GetProgramFromId(display_program_id_);
     UniformWrapper uniform_wrapper{};
     program.Use(uniform_wrapper);
-    auto &material = level_.GetMaterialFromId(display_material_id_);
+    auto& material = level_.GetMaterialFromId(display_material_id_);
     for (const auto id : material.GetIds())
     {
-        auto &opengl_texture =
-            dynamic_cast<Texture &>(level_.GetTextureFromId(id));
+        auto& opengl_texture =
+            dynamic_cast<Texture&>(level_.GetTextureFromId(id));
         const auto p = material.EnableTextureId(id);
         opengl_texture.Bind(p.second);
         program.Uniform(p.first, p.second);
     }
-    auto &gl_quad = dynamic_cast<StaticMesh &>(quad);
+    auto& gl_quad = dynamic_cast<StaticMesh&>(quad);
     glBindVertexArray(gl_quad.GetId());
-    auto &index_buffer = level_.GetBufferFromId(quad.GetIndexBufferId());
-    auto &gl_index_buffer = dynamic_cast<Buffer &>(index_buffer);
+    auto& index_buffer = level_.GetBufferFromId(quad.GetIndexBufferId());
+    auto& gl_index_buffer = dynamic_cast<Buffer&>(index_buffer);
 
     gl_index_buffer.Bind();
     glDrawElements(
@@ -327,8 +327,8 @@ void Renderer::Display(double dt /* = 0.0*/)
 
     for (const auto id : material.GetIds())
     {
-        auto &opengl_texture =
-            dynamic_cast<Texture &>(level_.GetTextureFromId(id));
+        auto& opengl_texture =
+            dynamic_cast<Texture&>(level_.GetTextureFromId(id));
         opengl_texture.UnBind();
     }
     material.DisableAll();
@@ -347,11 +347,11 @@ void Renderer::SetDepthTest(bool enable)
 }
 
 void Renderer::RenderAllMeshes(
-    const glm::mat4 &projection, const glm::mat4 &view, double dt /*= 0.0*/)
+    const glm::mat4& projection, const glm::mat4& view, double dt /*= 0.0*/)
 {
     // This will ensure that it is only true once.
     auto first_render = std::exchange(first_render_, false);
-    for (const auto &p : level_.GetStaticMeshMaterialIds())
+    for (const auto& p : level_.GetStaticMeshMaterialIds())
     {
         auto [material_id, render_time_enum] = p.second;
         // Check this is a pre render action and this is the first render.
@@ -361,10 +361,10 @@ void Renderer::RenderAllMeshes(
             if (first_render)
             {
                 // Now this get the image size from the environment map.
-                auto &material = level_.GetMaterialFromId(material_id);
+                auto& material = level_.GetMaterialFromId(material_id);
                 auto ids = material.GetIds();
                 assert(!ids.empty());
-                auto &texture = level_.GetTextureFromId(ids[0]);
+                auto& texture = level_.GetTextureFromId(ids[0]);
                 auto size = texture.GetSize();
                 viewport_ = glm::ivec4(0, 0, size.x / 2, size.y / 2);
                 for (std::uint32_t i = 0; i < 6; ++i)

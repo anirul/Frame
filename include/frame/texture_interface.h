@@ -49,9 +49,9 @@ struct TextureParameter
      *        an empty vector. You have to multiply the size by the pixel
      *        element size to get the size of the vector.
      */
-    void *data_ptr = nullptr;
+    void* data_ptr = nullptr;
     //! @brief In case of cube map you need 6 planes of array pointers.
-    std::array<void *, 6> array_data_ptr = {
+    std::array<void*, 6> array_data_ptr = {
         nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
     //! @brief Is it a cube map or a normal 2d texture.
     TextureTypeEnum map_type = TextureTypeEnum::TEXTURE_2D;
@@ -175,7 +175,7 @@ struct TextureInterface : public NameInterface
      * @param size: Size of the image.
      */
     virtual void Update(
-        std::vector<std::uint8_t> &&vector,
+        std::vector<std::uint8_t>&& vector,
         glm::uvec2 size,
         std::uint8_t bytes_per_pixel) = 0;
 };

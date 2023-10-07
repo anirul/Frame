@@ -6,7 +6,7 @@
 namespace frame::opengl
 {
 
-bool Material::AddTextureId(EntityId id, const std::string &name)
+bool Material::AddTextureId(EntityId id, const std::string& name)
 {
     RemoveTextureId(id);
     return id_name_map_.insert({id, name}).second;
@@ -32,7 +32,7 @@ const std::pair<std::string, int> Material::EnableTextureId(EntityId id) const
     if (!HasTextureId(id))
         throw std::runtime_error("No texture id: " + std::to_string(id));
     // Check it is not already enabled.
-    for (const auto &i : id_array_)
+    for (const auto& i : id_array_)
     {
         if (i == id)
         {
@@ -58,7 +58,7 @@ void Material::DisableTextureId(EntityId id) const
     if (!HasTextureId(id))
         throw std::runtime_error("No texture id: " + std::to_string(id));
     // Disable it.
-    for (auto &i : id_array_)
+    for (auto& i : id_array_)
     {
         if (i == id)
         {
@@ -85,7 +85,7 @@ void Material::DisableAll() const
 const std::vector<EntityId> Material::GetIds() const
 {
     std::vector<EntityId> vec;
-    for (const auto &p : id_name_map_)
+    for (const auto& p : id_name_map_)
     {
         vec.push_back(p.first);
     }
@@ -93,7 +93,7 @@ const std::vector<EntityId> Material::GetIds() const
 }
 
 frame::EntityId Material::GetProgramId(
-    const LevelInterface *level /*= nullptr*/) const
+    const LevelInterface* level /*= nullptr*/) const
 {
     if (program_id_)
         return program_id_;
@@ -114,7 +114,7 @@ void Material::SetProgramId(EntityId id)
     program_id_ = id;
 }
 
-void Material::SetProgramName(const std::string &name)
+void Material::SetProgramName(const std::string& name)
 {
     program_name_ = name;
 }

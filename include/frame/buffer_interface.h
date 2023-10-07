@@ -18,22 +18,22 @@ struct BufferInterface : public NameInterface
      * @param size: In bytes of the memory.
      * @param data: Pointer to the memory.
      */
-    virtual void Copy(size_t size, const void *data = nullptr) const = 0;
+    virtual void Copy(size_t size, const void* data = nullptr) const = 0;
     /**
      * @brief Copy a vector to a buffer.
      * @param vector: in vector to be copied in the buffer.
      */
-    virtual void Copy(const std::vector<float> &vector) const = 0;
+    virtual void Copy(const std::vector<float>& vector) const = 0;
     /**
      * @brief Copy a vector to a buffer.
      * @param vector: in vector to be copied in the buffer.
      */
-    virtual void Copy(const std::vector<std::uint32_t> &vector) const = 0;
+    virtual void Copy(const std::vector<std::uint32_t>& vector) const = 0;
     /**
      * @brief Copy a vector to a buffer.
      * @param vector: in vector to be copied in the buffer.
      */
-    virtual void Copy(const std::vector<std::uint8_t> &vector) const = 0;
+    virtual void Copy(const std::vector<std::uint8_t>& vector) const = 0;
     /**
      * @brief Clear the buffer.
      */

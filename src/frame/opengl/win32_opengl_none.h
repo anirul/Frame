@@ -22,11 +22,11 @@ class Win32OpenGLNone : public WindowInterface
 
   public:
     void Run(std::function<void()> lambda) override;
-    void *GetGraphicContext() const override;
+    void* GetGraphicContext() const override;
 
   public:
     void SetInputInterface(
-        std::unique_ptr<InputInterface> &&input_interface) override
+        std::unique_ptr<InputInterface>&& input_interface) override
     {
         input_interface_ = std::move(input_interface);
     }
@@ -34,11 +34,11 @@ class Win32OpenGLNone : public WindowInterface
     {
         throw std::runtime_error("Not implemented.");
     }
-    void SetUniqueDevice(std::unique_ptr<DeviceInterface> &&device) override
+    void SetUniqueDevice(std::unique_ptr<DeviceInterface>&& device) override
     {
         device_ = std::move(device);
     }
-    DeviceInterface &GetUniqueDevice() override
+    DeviceInterface& GetUniqueDevice() override
     {
         return *device_.get();
     }
@@ -50,11 +50,11 @@ class Win32OpenGLNone : public WindowInterface
     {
         return {0, 0};
     }
-    void *GetWindowContext() const override
+    void* GetWindowContext() const override
     {
         return nullptr;
     }
-    void SetWindowTitle(const std::string &title) const override
+    void SetWindowTitle(const std::string& title) const override
     {
     }
     void Resize(glm::uvec2 size, FullScreenEnum fullscreen_enum)
@@ -75,7 +75,7 @@ class Win32OpenGLNone : public WindowInterface
     glm::uvec2 size_;
     std::unique_ptr<DeviceInterface> device_ = nullptr;
     std::unique_ptr<InputInterface> input_interface_ = nullptr;
-    frame::Logger &logger_ = frame::Logger::GetInstance();
+    frame::Logger& logger_ = frame::Logger::GetInstance();
 #if defined(_WIN32) || defined(_WIN64)
     HWND hwnd_dummy_; //< The dummy window.
     HDC hdc_;         //< The device context.

@@ -23,7 +23,7 @@ class SDLOpenGLWindow : public WindowInterface
 
   public:
     void SetInputInterface(
-        std::unique_ptr<InputInterface> &&input_interface) override
+        std::unique_ptr<InputInterface>&& input_interface) override
     {
         input_interface_ = std::move(input_interface);
     }
@@ -31,11 +31,11 @@ class SDLOpenGLWindow : public WindowInterface
     {
         key_callbacks_.insert({key, func});
     }
-    void SetUniqueDevice(std::unique_ptr<DeviceInterface> &&device) override
+    void SetUniqueDevice(std::unique_ptr<DeviceInterface>&& device) override
     {
         device_ = std::move(device);
     }
-    DeviceInterface &GetDevice() override
+    DeviceInterface& GetDevice() override
     {
         return *device_.get();
     }
@@ -51,24 +51,24 @@ class SDLOpenGLWindow : public WindowInterface
     {
         return desktop_size_;
     }
-    void *GetWindowContext() const override
+    void* GetWindowContext() const override
     {
         return sdl_window_;
     }
-    void SetWindowTitle(const std::string &title) const override
+    void SetWindowTitle(const std::string& title) const override
     {
         SDL_SetWindowTitle(sdl_window_, title.c_str());
     }
 
   public:
     void Run(std::function<void()> lambda) override;
-    void *GetGraphicContext() const override;
+    void* GetGraphicContext() const override;
     void Resize(glm::uvec2 size, FullScreenEnum fullscreen_enum) override;
     FullScreenEnum GetFullScreenEnum() const override;
     glm::vec2 GetPixelPerInch(std::uint32_t screen = 0) const override;
 
   protected:
-    bool RunEvent(const SDL_Event &event, const double dt);
+    bool RunEvent(const SDL_Event& event, const double dt);
     const char SDLButtonToChar(const Uint8 button) const;
     // Can only be called ONCE per frame!
     const double GetFrameDt(const double t) const;
@@ -85,12 +85,12 @@ class SDLOpenGLWindow : public WindowInterface
     FullScreenEnum fullscreen_enum_ = FullScreenEnum::WINDOW;
     std::unique_ptr<DeviceInterface> device_ = nullptr;
     std::unique_ptr<InputInterface> input_interface_ = nullptr;
-    SDL_Window *sdl_window_ = nullptr;
+    SDL_Window* sdl_window_ = nullptr;
     std::map<std::int32_t, std::function<bool()>> key_callbacks_ = {};
 #if defined(_WIN32) || defined(_WIN64)
     HWND hwnd_ = nullptr;
 #endif
-    frame::Logger &logger_ = frame::Logger::GetInstance();
+    frame::Logger& logger_ = frame::Logger::GetInstance();
 };
 
 } // namespace frame::opengl

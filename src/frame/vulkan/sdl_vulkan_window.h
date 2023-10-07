@@ -24,7 +24,7 @@ class SDLVulkanWindow : public WindowInterface
 
   public:
     void SetInputInterface(
-        std::unique_ptr<InputInterface> &&input_interface) override
+        std::unique_ptr<InputInterface>&& input_interface) override
     {
         input_interface_ = std::move(input_interface);
     }
@@ -32,11 +32,11 @@ class SDLVulkanWindow : public WindowInterface
     {
         throw std::runtime_error("Not implemented yet!");
     }
-    void SetUniqueDevice(std::unique_ptr<DeviceInterface> &&device) override
+    void SetUniqueDevice(std::unique_ptr<DeviceInterface>&& device) override
     {
         device_ = std::move(device);
     }
-    DeviceInterface &GetDevice() override
+    DeviceInterface& GetDevice() override
     {
         return *device_.get();
     }
@@ -52,11 +52,11 @@ class SDLVulkanWindow : public WindowInterface
     {
         return desktop_size_;
     }
-    void *GetWindowContext() const override
+    void* GetWindowContext() const override
     {
         return sdl_window_;
     }
-    void SetWindowTitle(const std::string &title) const override
+    void SetWindowTitle(const std::string& title) const override
     {
         SDL_SetWindowTitle(sdl_window_, title.c_str());
     }
@@ -67,22 +67,22 @@ class SDLVulkanWindow : public WindowInterface
 
   public:
     void Run(std::function<void()> lambda = [] {}) override;
-    void *GetGraphicContext() const override;
+    void* GetGraphicContext() const override;
     void Resize(glm::uvec2 size, FullScreenEnum fullscreen_enum) override;
     FullScreenEnum GetFullScreenEnum() const override;
 
   public:
-    vk::DispatchLoaderDynamic &GetVulkanDispatch()
+    vk::DispatchLoaderDynamic& GetVulkanDispatch()
     {
         return vk_dispatch_loader_dynamic_;
     }
-    vk::SurfaceKHR &GetVulkanSurfaceKHR()
+    vk::SurfaceKHR& GetVulkanSurfaceKHR()
     {
         return vk_surface_.get();
     }
 
   protected:
-    bool RunEvent(const SDL_Event &event, const double dt);
+    bool RunEvent(const SDL_Event& event, const double dt);
     const char SDLButtonToChar(const Uint8 button) const;
     // Can only be called ONCE per frame!
     const double GetFrameDt(const double t) const;
@@ -99,11 +99,11 @@ class SDLVulkanWindow : public WindowInterface
     FullScreenEnum fullscreen_enum_ = FullScreenEnum::WINDOW;
     std::unique_ptr<DeviceInterface> device_ = nullptr;
     std::unique_ptr<InputInterface> input_interface_ = nullptr;
-    SDL_Window *sdl_window_ = nullptr;
+    SDL_Window* sdl_window_ = nullptr;
 #if defined(_WIN32) || defined(_WIN64)
     HWND hwnd_ = nullptr;
 #endif
-    frame::Logger &logger_ = frame::Logger::GetInstance();
+    frame::Logger& logger_ = frame::Logger::GetInstance();
     vk::UniqueInstance vk_unique_instance_;
     vk::DispatchLoaderDynamic vk_dispatch_loader_dynamic_;
     vk::UniqueSurfaceKHR vk_surface_;

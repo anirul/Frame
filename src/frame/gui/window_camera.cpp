@@ -25,7 +25,7 @@ bool WindowCamera::DrawCallback()
     static bool once = true;
     if (std::exchange(once, false))
     {
-        auto *viewport = ImGui::GetMainViewport();
+        auto* viewport = ImGui::GetMainViewport();
         RestoreCamera(viewport->Size.x / viewport->Size.y);
     }
     ImGui::Text(
@@ -39,7 +39,7 @@ bool WindowCamera::DrawCallback()
     ImGui::DragFloat("Near clip", &near_clip_);
     ImGui::DragFloat("Field of view (degrees)", &fov_degrees_);
     ImGui::Separator();
-    auto *viewport = ImGui::GetMainViewport();
+    auto* viewport = ImGui::GetMainViewport();
     float aspect_ratio = viewport->Size.x / viewport->Size.y;
     if (ImGui::Button("Reset"))
     {

@@ -36,7 +36,7 @@ class Draw : public frame::PluginInterface
     Draw(
         glm::uvec2 size,
         std::filesystem::path path,
-        frame::DeviceInterface &device)
+        frame::DeviceInterface& device)
         : size_(size), draw_type_based_(DrawTypeEnum::PATH), path_(path),
           device_(device)
     {
@@ -50,8 +50,8 @@ class Draw : public frame::PluginInterface
      */
     Draw(
         glm::uvec2 size,
-        std::unique_ptr<frame::LevelInterface> &&level,
-        frame::DeviceInterface &device)
+        std::unique_ptr<frame::LevelInterface>&& level,
+        frame::DeviceInterface& device)
         : size_(size), draw_type_based_(DrawTypeEnum::LEVEL),
           level_(std::move(level)), device_(device)
     {
@@ -72,10 +72,10 @@ class Draw : public frame::PluginInterface
      * @param material: The material associated with the mesh.
      */
     void PreRender(
-        UniformInterface &uniform,
-        DeviceInterface &device,
-        StaticMeshInterface &static_mesh,
-        MaterialInterface &material) override;
+        UniformInterface& uniform,
+        DeviceInterface& device,
+        StaticMeshInterface& static_mesh,
+        MaterialInterface& material) override;
     /**
      * @brief Called to update variables, called after the main render
      *        phase.
@@ -83,7 +83,7 @@ class Draw : public frame::PluginInterface
      * @param dt: Delta time between previous frame and present frame.
      * @return true: If the draw is still running.
      */
-    bool Update(DeviceInterface &device, double dt = 0.0) override;
+    bool Update(DeviceInterface& device, double dt = 0.0) override;
 
   public:
     /**
@@ -98,7 +98,7 @@ class Draw : public frame::PluginInterface
      * @brief Set name.
      * @return Name.
      */
-    void SetName(const std::string &name) override
+    void SetName(const std::string& name) override
     {
         name_ = name;
     }
@@ -108,7 +108,7 @@ class Draw : public frame::PluginInterface
      * @param event: The event to be passed to the draw.
      * @return Was it used or not.
      */
-    bool PollEvent(void *event) override
+    bool PollEvent(void* event) override
     {
         return false;
     }
@@ -127,7 +127,7 @@ class Draw : public frame::PluginInterface
     const DrawTypeEnum draw_type_based_;
     std::filesystem::path path_;
     std::unique_ptr<frame::LevelInterface> level_;
-    frame::DeviceInterface &device_;
+    frame::DeviceInterface& device_;
     std::string name_;
     double dt_ = 0.0;
 };

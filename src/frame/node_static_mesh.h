@@ -22,14 +22,14 @@ class NodeStaticMesh : public NodeInterface
      * @param static_mesh_id: Static mesh to be contained by the node.
      */
     NodeStaticMesh(
-        std::function<NodeInterface *(const std::string &)> func,
+        std::function<NodeInterface*(const std::string&)> func,
         EntityId static_mesh_id)
         : NodeInterface(func), static_mesh_id_(static_mesh_id)
     {
     }
     NodeStaticMesh(
-        std::function<NodeInterface *(const std::string &)> func,
-        const proto::CleanBuffer &clean_buffer)
+        std::function<NodeInterface*(const std::string&)> func,
+        const proto::CleanBuffer& clean_buffer)
         : NodeInterface(func), static_mesh_id_(NullId)
     {
         // Clean the back color and depth if needed.

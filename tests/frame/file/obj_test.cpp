@@ -21,7 +21,7 @@ TEST_F(ObjTest, ObjGetMeshesTest)
         frame::file::FindFile("asset/model/scene.obj"));
     EXPECT_TRUE(obj_);
     EXPECT_NE(0, obj_->GetMeshes().size());
-    for (const auto &element : obj_->GetMeshes())
+    for (const auto& element : obj_->GetMeshes())
     {
         EXPECT_NE(0, element.GetVertices().size());
         EXPECT_NE(0, element.GetIndices().size());
@@ -35,7 +35,7 @@ TEST_F(ObjTest, ObjGetMaterialTest)
         frame::file::FindFile("asset/model/scene.obj"));
     EXPECT_TRUE(obj_);
     EXPECT_NE(0, obj_->GetMeshes().size());
-    for (const auto &element : obj_->GetMeshes())
+    for (const auto& element : obj_->GetMeshes())
     {
         auto material_id = element.GetMaterialId();
         EXPECT_LT(material_id, obj_->GetMaterials().size());

@@ -20,7 +20,7 @@ class SDL2OpenGLDrawGui : public frame::gui::DrawGuiInterface
      * @brief Constructor.
      * @param window: The window to use.
      */
-    SDL2OpenGLDrawGui(frame::WindowInterface &window);
+    SDL2OpenGLDrawGui(frame::WindowInterface& window);
     //! @brief Destructor.
     virtual ~SDL2OpenGLDrawGui();
 
@@ -37,7 +37,7 @@ class SDL2OpenGLDrawGui : public frame::gui::DrawGuiInterface
      * @brief Set name.
      * @return Name.
      */
-    void SetName(const std::string &name) override
+    void SetName(const std::string& name) override
     {
         name_ = name;
     }
@@ -50,10 +50,10 @@ class SDL2OpenGLDrawGui : public frame::gui::DrawGuiInterface
      * @param material: The material associated with the mesh.
      */
     void PreRender(
-        UniformInterface &uniform,
-        DeviceInterface &device,
-        StaticMeshInterface &static_mesh,
-        MaterialInterface &material) override
+        UniformInterface& uniform,
+        DeviceInterface& device,
+        StaticMeshInterface& static_mesh,
+        MaterialInterface& material) override
     {
     }
     //! @brief Called to cleanup at the end.
@@ -83,13 +83,13 @@ class SDL2OpenGLDrawGui : public frame::gui::DrawGuiInterface
      * @param callback: A window callback that can add buttons, etc.
      */
     void AddWindow(
-        std::unique_ptr<frame::gui::GuiWindowInterface> &&callback) override;
+        std::unique_ptr<frame::gui::GuiWindowInterface>&& callback) override;
     /**
      * @brief Get a specific window (associated with a name).
      * @param name: The name of the window.
      * @return A pointer to the window.
      */
-    frame::gui::GuiWindowInterface &GetWindow(const std::string &name) override;
+    frame::gui::GuiWindowInterface& GetWindow(const std::string& name) override;
     /**
      * @brief Get all sub window name (title).
      * @return A list of all the sub windows.
@@ -99,7 +99,7 @@ class SDL2OpenGLDrawGui : public frame::gui::DrawGuiInterface
      * @brief Delete a sub window.
      * @param name: the name of the window to be deleted.
      */
-    void DeleteWindow(const std::string &name) override;
+    void DeleteWindow(const std::string& name) override;
     /**
      * @brief Initialize with the size of the out buffer.
      * @param size: Size of the out buffer.
@@ -111,18 +111,18 @@ class SDL2OpenGLDrawGui : public frame::gui::DrawGuiInterface
      * @param level: The level.
      * @return Is it still looping or not?
      */
-    bool Update(DeviceInterface &device, double dt = 0.0) override;
+    bool Update(DeviceInterface& device, double dt = 0.0) override;
     /**
      * @brief Poll event.
      * @param event: The event to be polled.
      */
-    bool PollEvent(void *event) override;
+    bool PollEvent(void* event) override;
 
   protected:
     std::map<std::string, std::unique_ptr<frame::gui::GuiWindowInterface>>
         callbacks_ = {};
-    WindowInterface &window_;
-    DeviceInterface &device_;
+    WindowInterface& window_;
+    DeviceInterface& device_;
     std::string name_;
     glm::uvec2 size_ = {0, 0};
     bool is_keyboard_passed_ = false;

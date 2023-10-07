@@ -24,7 +24,7 @@ int WINAPI WinMain(
 try
 {
 #else
-int main(int ac, char **av)
+int main(int ac, char** av)
 try
 {
 #endif

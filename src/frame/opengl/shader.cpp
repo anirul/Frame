@@ -14,10 +14,10 @@ Shader::~Shader()
     }
 }
 
-bool Shader::LoadFromSource(const std::string &source)
+bool Shader::LoadFromSource(const std::string& source)
 {
     id_ = glCreateShader(static_cast<unsigned int>(type_));
-    const char *c_source = source.c_str();
+    const char* c_source = source.c_str();
     glShaderSource(id_, 1, &c_source, nullptr);
     glCompileShader(id_);
     int result;

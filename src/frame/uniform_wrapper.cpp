@@ -6,9 +6,9 @@ namespace frame
 {
 
 UniformWrapper::UniformWrapper(
-    const glm::mat4 &projection,
-    const glm::mat4 &view,
-    const glm::mat4 &model,
+    const glm::mat4& projection,
+    const glm::mat4& view,
+    const glm::mat4& model,
     double time)
     : projection_(projection), view_(view), model_(model), time_(time)
 {
@@ -30,7 +30,7 @@ glm::mat4 UniformWrapper::GetModel() const
 }
 
 void UniformWrapper::SetValueFloat(
-    const std::string &name, const std::vector<float> &vector, glm::uvec2 size)
+    const std::string& name, const std::vector<float>& vector, glm::uvec2 size)
 {
     if (stream_value_float_map_.count(name))
     {
@@ -40,8 +40,8 @@ void UniformWrapper::SetValueFloat(
 }
 
 void UniformWrapper::SetValueInt(
-    const std::string &name,
-    const std::vector<std::int32_t> &vector,
+    const std::string& name,
+    const std::vector<std::int32_t>& vector,
     glm::uvec2 size)
 {
     if (stream_value_int_map_.count(name))
@@ -51,13 +51,13 @@ void UniformWrapper::SetValueInt(
     stream_value_int_map_.insert({name, {vector, size}});
 }
 
-std::vector<float> UniformWrapper::GetValueFloat(const std::string &name) const
+std::vector<float> UniformWrapper::GetValueFloat(const std::string& name) const
 {
     return stream_value_float_map_.at(name).value;
 }
 
 std::vector<std::int32_t> UniformWrapper::GetValueInt(
-    const std::string &name) const
+    const std::string& name) const
 {
     return stream_value_int_map_.at(name).value;
 }
@@ -65,7 +65,7 @@ std::vector<std::int32_t> UniformWrapper::GetValueInt(
 std::vector<std::string> UniformWrapper::GetFloatNames() const
 {
     std::vector<std::string> list;
-    for (const auto &[name, _] : stream_value_float_map_)
+    for (const auto& [name, _] : stream_value_float_map_)
     {
         list.push_back(name);
     }
@@ -75,19 +75,19 @@ std::vector<std::string> UniformWrapper::GetFloatNames() const
 std::vector<std::string> UniformWrapper::GetIntNames() const
 {
     std::vector<std::string> list;
-    for (const auto &[name, _] : stream_value_int_map_)
+    for (const auto& [name, _] : stream_value_int_map_)
     {
         list.push_back(name);
     }
     return list;
 }
 
-glm::uvec2 UniformWrapper::GetSizeFromFloat(const std::string &name) const
+glm::uvec2 UniformWrapper::GetSizeFromFloat(const std::string& name) const
 {
     return stream_value_float_map_.at(name).size;
 }
 
-glm::uvec2 UniformWrapper::GetSizeFromInt(const std::string &name) const
+glm::uvec2 UniformWrapper::GetSizeFromInt(const std::string& name) const
 {
     return stream_value_int_map_.at(name).size;
 }

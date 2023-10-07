@@ -23,16 +23,16 @@ void Draw::Startup(glm::uvec2 size)
     level_ = nullptr;
 }
 
-bool Draw::Update(DeviceInterface &device, double dt)
+bool Draw::Update(DeviceInterface& device, double dt)
 {
     return true;
 }
 
 void Draw::PreRender(
-    UniformInterface &uniform,
-    DeviceInterface &device,
-    StaticMeshInterface &static_mesh,
-    MaterialInterface &material)
+    UniformInterface& uniform,
+    DeviceInterface& device,
+    StaticMeshInterface& static_mesh,
+    MaterialInterface& material)
 {
 }
 

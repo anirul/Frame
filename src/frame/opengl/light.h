@@ -122,7 +122,7 @@ class LightManager
      * @brief Add a light to a manager.
      * @param light: Move enable light.
      */
-    void AddLight(std::unique_ptr<LightInterface> &&light)
+    void AddLight(std::unique_ptr<LightInterface>&& light)
     {
         lights_.push_back(std::move(light));
     }
@@ -144,7 +144,7 @@ class LightManager
      * @param i: Position of a light.
      * @return A pointer to a temporary light.
      */
-    const LightInterface *GetLight(int i) const
+    const LightInterface* GetLight(int i) const
     {
         return lights_.at(i).get();
     }
@@ -155,7 +155,7 @@ class LightManager
      * @param program: A pointer to a temporary program to register light
      * to.
      */
-    void RegisterToProgram(Program &program) const;
+    void RegisterToProgram(Program& program) const;
 
   protected:
     std::vector<std::unique_ptr<LightInterface>> lights_ = {};

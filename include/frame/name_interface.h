@@ -24,7 +24,7 @@ struct NameInterface
      * @brief Set name.
      * @return Name.
      */
-    virtual void SetName(const std::string &name) = 0;
+    virtual void SetName(const std::string& name) = 0;
 };
 
 } // End namespace frame.

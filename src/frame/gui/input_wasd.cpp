@@ -8,7 +8,7 @@ bool InputWasd::KeyPressed(char key, double dt)
     if (key == KEY_LSHIFT || key == KEY_RSHIFT)
         shift_ = true;
     const float inc = move_multiplication_ * static_cast<float>(dt);
-    auto &camera = device_.GetLevel().GetDefaultCamera();
+    auto& camera = device_.GetLevel().GetDefaultCamera();
     auto position = camera.GetPosition();
     auto right = camera.GetRight();
     auto up = camera.GetUp();
@@ -45,7 +45,7 @@ bool InputWasd::MouseMoved(glm::vec2 position, glm::vec2 relative, double dt)
     if (!mouse_active_)
         return true;
     const float inc = rotation_multiplication_ * static_cast<float>(dt);
-    auto &camera = device_.GetLevel().GetDefaultCamera();
+    auto& camera = device_.GetLevel().GetDefaultCamera();
     auto front = camera.GetFront();
     auto right = camera.GetRight();
     auto up = camera.GetUp();
