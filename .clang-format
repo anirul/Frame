@@ -6,3 +6,4 @@ ColumnLimit: 80
 AlignAfterOpenBracket: AlwaysBreak
 BinPackParameters: false
 BinPackArguments: false
+PointerAlignment: Left
