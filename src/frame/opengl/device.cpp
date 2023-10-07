@@ -17,7 +17,7 @@
 namespace frame::opengl
 {
 
-Device::Device(void *gl_context, glm::uvec2 size)
+Device::Device(void* gl_context, glm::uvec2 size)
     : gl_context_(gl_context), size_(size)
 {
     // This should maintain the culling to none.
@@ -41,12 +41,12 @@ Device::~Device()
     Cleanup();
 }
 
-void Device::Startup(std::unique_ptr<frame::LevelInterface> &&level)
+void Device::Startup(std::unique_ptr<frame::LevelInterface>&& level)
 {
     // Copy level into the local area.
     level_ = std::move(level);
     // Setup camera.
-    auto &camera = level_->GetDefaultCamera();
+    auto& camera = level_->GetDefaultCamera();
     camera.SetAspectRatio(
         static_cast<float>(size_.x) / static_cast<float>(size_.y));
     // Create a renderer.
@@ -54,10 +54,10 @@ void Device::Startup(std::unique_ptr<frame::LevelInterface> &&level)
         *level_.get(), glm::uvec4(0, 0, size_.x, size_.y));
     // Add a callback to allow plugins to be called at pre-render step.
     renderer_->SetMeshRenderCallback([this](
-                                         UniformInterface &uniform,
-                                         StaticMeshInterface &static_mesh,
-                                         MaterialInterface &material) {
-        for (auto *plugin : GetPluginPtrs())
+                                         UniformInterface& uniform,
+                                         StaticMeshInterface& static_mesh,
+                                         MaterialInterface& material) {
+        for (auto* plugin : GetPluginPtrs())
         {
             if (!plugin)
                 continue;
@@ -66,7 +66,7 @@ void Device::Startup(std::unique_ptr<frame::LevelInterface> &&level)
     });
 }
 
-void Device::AddPlugin(std::unique_ptr<PluginInterface> &&plugin_interface)
+void Device::AddPlugin(std::unique_ptr<PluginInterface>&& plugin_interface)
 {
     std::string plugin_name = plugin_interface->GetName();
     for (int i = 0; i < plugin_interfaces_.size(); ++i)
@@ -95,10 +95,10 @@ void Device::AddPlugin(std::unique_ptr<PluginInterface> &&plugin_interface)
     plugin_interfaces_.push_back(std::move(plugin_interface));
 }
 
-std::vector<PluginInterface *> Device::GetPluginPtrs()
+std::vector<PluginInterface*> Device::GetPluginPtrs()
 {
-    std::vector<PluginInterface *> plugin_ptrs;
-    for (auto &plugin_interface : plugin_interfaces_)
+    std::vector<PluginInterface*> plugin_ptrs;
+    for (auto& plugin_interface : plugin_interfaces_)
     {
         if (plugin_interface)
         {
@@ -111,7 +111,7 @@ std::vector<PluginInterface *> Device::GetPluginPtrs()
 std::vector<std::string> Device::GetPluginNames() const
 {
     std::vector<std::string> names;
-    for (const auto &plugin_interface : plugin_interfaces_)
+    for (const auto& plugin_interface : plugin_interfaces_)
     {
         if (plugin_interface)
         {
@@ -121,7 +121,7 @@ std::vector<std::string> Device::GetPluginNames() const
     return names;
 }
 
-void Device::RemovePluginByName(const std::string &name)
+void Device::RemovePluginByName(const std::string& name)
 {
     for (int i = 0; i < plugin_interfaces_.size(); ++i)
     {
@@ -142,14 +142,14 @@ void Device::Cleanup()
 }
 
 void Device::Clear(
-    const glm::vec4 &color /* = glm::vec4(.2f, 0.f, .2f, 1.0f*/) const
+    const glm::vec4& color /* = glm::vec4(.2f, 0.f, .2f, 1.0f*/) const
 {
     glClearColor(color.r, color.g, color.b, color.a);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void Device::DisplayCamera(
-    const Camera &camera, glm::uvec4 viewport, double time)
+    const Camera& camera, glm::uvec4 viewport, double time)
 {
     renderer_->SetViewport(viewport);
     renderer_->RenderAllMeshes(
@@ -157,8 +157,8 @@ void Device::DisplayCamera(
 }
 
 void Device::DisplayLeftRightCamera(
-    const Camera &camera_left,
-    const Camera &camera_right,
+    const Camera& camera_left,
+    const Camera& camera_right,
     glm::uvec4 viewport_left,
     glm::uvec4 viewport_right,
     double time)
@@ -183,7 +183,7 @@ void Device::Display(double dt /*= 0.0*/)
     // Get the holder of the camera.
     auto camera_holder_id = level_->GetDefaultCameraId();
     auto enum_type = level_->GetEnumTypeFromId(camera_holder_id);
-    auto &node = level_->GetSceneNodeFromId(camera_holder_id);
+    auto& node = level_->GetSceneNodeFromId(camera_holder_id);
     auto matrix_node = node.GetLocalModel(dt);
     auto inverse_model = glm::inverse(matrix_node);
     Camera default_camera = level_->GetDefaultCamera();
@@ -239,13 +239,13 @@ void Device::Display(double dt /*= 0.0*/)
     renderer_->Display(dt);
 }
 
-void Device::ScreenShot(const std::string &file) const
+void Device::ScreenShot(const std::string& file) const
 {
     auto maybe_texture_id = level_->GetDefaultOutputTextureId();
     if (!maybe_texture_id)
         throw std::runtime_error("no default texture.");
     auto texture_id = maybe_texture_id;
-    auto &texture = level_->GetTextureFromId(texture_id);
+    auto& texture = level_->GetTextureFromId(texture_id);
     proto::PixelElementSize pixel_element_size{};
     pixel_element_size.set_value(texture.GetPixelElementSize());
     proto::PixelStructure pixel_structure{};
@@ -258,26 +258,26 @@ void Device::ScreenShot(const std::string &file) const
 }
 
 std::unique_ptr<frame::BufferInterface> Device::CreatePointBuffer(
-    std::vector<float> &&vector)
+    std::vector<float>&& vector)
 {
     return opengl::CreatePointBuffer(std::move(vector));
 }
 
 std::unique_ptr<frame::BufferInterface> Device::CreateIndexBuffer(
-    std::vector<std::uint32_t> &&vector)
+    std::vector<std::uint32_t>&& vector)
 {
     return opengl::CreateIndexBuffer(std::move(vector));
 }
 
 std::unique_ptr<frame::StaticMeshInterface> Device::CreateStaticMesh(
-    const StaticMeshParameter &static_mesh_parameter)
+    const StaticMeshParameter& static_mesh_parameter)
 {
     return std::make_unique<opengl::StaticMesh>(
         GetLevel(), static_mesh_parameter);
 }
 
 std::unique_ptr<frame::TextureInterface> Device::CreateTexture(
-    const TextureParameter &texture_parameter)
+    const TextureParameter& texture_parameter)
 {
     switch (texture_parameter.map_type)
     {

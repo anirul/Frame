@@ -26,7 +26,7 @@ struct NodeInterface : public NameInterface
      * @param func: This function return the ID from a string (it will need
      *        a level passed in the capture list).
      */
-    NodeInterface(std::function<NodeInterface *(const std::string &)> func)
+    NodeInterface(std::function<NodeInterface*(const std::string&)> func)
     {
         func_ = func;
     }
@@ -69,7 +69,7 @@ struct NodeInterface : public NameInterface
      * @brief Set the parent node name.
      * @param parent: Set the name of the parent name node.
      */
-    void SetParentName(const std::string &parent)
+    void SetParentName(const std::string& parent)
     {
         parent_name_ = parent;
     }
@@ -85,14 +85,14 @@ struct NodeInterface : public NameInterface
      * @brief Set name from the name interface.
      * @param name: New name to be set.
      */
-    void SetName(const std::string &name) override
+    void SetName(const std::string& name) override
     {
         name_ = name;
     }
 
   protected:
-    std::function<NodeInterface *(const std::string &)> func_ =
-        [](const std::string &) -> NodeInterface * { return nullptr; };
+    std::function<NodeInterface*(const std::string&)> func_ =
+        [](const std::string&) -> NodeInterface* { return nullptr; };
     std::string parent_name_;
     std::string name_;
 };

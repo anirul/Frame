@@ -62,7 +62,7 @@ TEST_F(ImageTest, CreateCubeMapPointerImageTest)
     EXPECT_EQ(
         frame::proto::PixelStructure_RGB_ALPHA(), image_->GetPixelStructure());
     {
-        const float *pointer = static_cast<float *>(image_->Data());
+        const float* pointer = static_cast<float*>(image_->Data());
         const auto size = image_->GetSize();
         // Check against a random position (should be around the middle).
         const auto x = 1600;

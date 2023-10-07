@@ -9,7 +9,7 @@ namespace frame::gui
 {
 
 WindowResolution::WindowResolution(
-    const std::string &name,
+    const std::string& name,
     glm::uvec2 size,
     glm::uvec2 border_less_size,
     glm::vec2 pixel_per_inch)
@@ -23,7 +23,7 @@ WindowResolution::WindowResolution(
             resolution_selected_ = i;
         }
     }
-    for (const auto &value : resolutions_)
+    for (const auto& value : resolutions_)
     {
         resolution_items_.push_back(fmt::format(
             "{} - {}x{}", value.name, value.values.x, value.values.y));
@@ -118,7 +118,7 @@ std::string WindowResolution::GetName() const
     return name_;
 }
 
-void WindowResolution::SetName(const std::string &name)
+void WindowResolution::SetName(const std::string& name)
 {
     name_ = name;
 }

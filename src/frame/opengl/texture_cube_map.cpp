@@ -53,7 +53,7 @@ TextureCubeMap::~TextureCubeMap()
     glDeleteTextures(1, &texture_id_);
 }
 
-TextureCubeMap::TextureCubeMap(const TextureParameter &texture_parameter)
+TextureCubeMap::TextureCubeMap(const TextureParameter& texture_parameter)
     : TextureCubeMap(
           texture_parameter.pixel_element_size,
           texture_parameter.pixel_structure)
@@ -401,7 +401,7 @@ std::vector<float> TextureCubeMap::GetTextureFloat() const
 }
 
 void TextureCubeMap::Update(
-    std::vector<std::uint8_t> &&vector,
+    std::vector<std::uint8_t>&& vector,
     glm::uvec2 size,
     std::uint8_t bytes_per_pixel)
 {

@@ -23,7 +23,7 @@ class Program : public ProgramInterface
 {
   public:
     //! @brief Constructor create the program.
-    Program(const std::string &name);
+    Program(const std::string& name);
     //! @brief Destructor destroy objects.
     virtual ~Program();
 
@@ -40,7 +40,7 @@ class Program : public ProgramInterface
      * @brief Set name from the name interface.
      * @param name: New name to be set.
      */
-    void SetName(const std::string &name) override
+    void SetName(const std::string& name) override
     {
         name_ = name;
     }
@@ -87,7 +87,7 @@ class Program : public ProgramInterface
      * root.
      * @param Set the temporary scene root.
      */
-    void SetTemporarySceneRoot(const std::string &name) override;
+    void SetTemporarySceneRoot(const std::string& name) override;
     /**
      * @brief Get scene root id.
      * @return Id of the scene root.
@@ -102,7 +102,7 @@ class Program : public ProgramInterface
      * @brief Attach shader to a program.
      * @param shader: Add a shader to the program.
      */
-    void AddShader(const Shader &shader);
+    void AddShader(const Shader& shader);
     //! @brief Link shaders to a program.
     void LinkShader() override;
     /**
@@ -116,7 +116,7 @@ class Program : public ProgramInterface
      * matrices (model, view, projection) but also time and other uniform
      * that could be needed.
      */
-    void Use(const UniformInterface &uniform_interface) const override;
+    void Use(const UniformInterface& uniform_interface) const override;
     /**
      * @brief Use the program, a little bit like bind.
      */
@@ -128,43 +128,43 @@ class Program : public ProgramInterface
      * @param name: Name of the uniform.
      * @param value: Boolean.
      */
-    void Uniform(const std::string &name, bool value) const override;
+    void Uniform(const std::string& name, bool value) const override;
     /**
      * @brief Create a uniform from a string and an int.
      * @param name: Name of the uniform.
      * @param value: Integer.
      */
-    void Uniform(const std::string &name, int value) const override;
+    void Uniform(const std::string& name, int value) const override;
     /**
      * @brief Create a uniform from a string and a float.
      * @param name: Name of the uniform.
      * @param value: Float.
      */
-    void Uniform(const std::string &name, float value) const override;
+    void Uniform(const std::string& name, float value) const override;
     /**
      * @brief Create a uniform from a string and a vector2.
      * @param name: Name of the uniform.
      * @param value: Vector2.
      */
-    void Uniform(const std::string &name, const glm::vec2 vec2) const override;
+    void Uniform(const std::string& name, const glm::vec2 vec2) const override;
     /**
      * @brief Create a uniform from a string and a vector3.
      * @param name: Name of the uniform.
      * @param value: Vector3.
      */
-    void Uniform(const std::string &name, const glm::vec3 vec3) const override;
+    void Uniform(const std::string& name, const glm::vec3 vec3) const override;
     /**
      * @brief Create a uniform from a string and a vector4.
      * @param name: Name of the uniform.
      * @param value: Vector4.
      */
-    void Uniform(const std::string &name, const glm::vec4 vec4) const override;
+    void Uniform(const std::string& name, const glm::vec4 vec4) const override;
     /**
      * @brief Create a uniform from a string and a matrix.
      * @param name: Name of the uniform.
      * @param value: Matrix.
      */
-    void Uniform(const std::string &name, const glm::mat4 mat) const override;
+    void Uniform(const std::string& name, const glm::mat4 mat) const override;
     /**
      * @brief Create a uniform from a string and a vector.
      * For now this is checking the size of the vector to input in the
@@ -174,8 +174,8 @@ class Program : public ProgramInterface
      * @param size: Size of the vector (ex: 3x3 for a mat3).
      */
     void Uniform(
-        const std::string &name,
-        const std::vector<float> &vector,
+        const std::string& name,
+        const std::vector<float>& vector,
         glm::uvec2 size = {0, 0}) const override;
     /**
      * @brief Create a uniform from a string and a vector.
@@ -186,15 +186,15 @@ class Program : public ProgramInterface
      * @param size: Size of the vector (ex: 3x3 for a mat3).
      */
     void Uniform(
-        const std::string &name,
-        const std::vector<std::int32_t> &vector,
+        const std::string& name,
+        const std::vector<std::int32_t>& vector,
         glm::uvec2 size = {0, 0}) const override;
     /**
      * @brief Check if the program has the uniform passed as name.
      * @param name: Name of the uniform.
      * @return True if present false otherwise.
      */
-    bool HasUniform(const std::string &name) const override;
+    bool HasUniform(const std::string& name) const override;
 
   protected:
     /**
@@ -202,13 +202,13 @@ class Program : public ProgramInterface
      * @param name: Name of the uniform.
      * @return Id of the uniform.
      */
-    int GetMemoizeUniformLocation(const std::string &name) const;
+    int GetMemoizeUniformLocation(const std::string& name) const;
     /**
      * @brief Test if the uniform is in the uniform list.
      * @param name: Uniform to be tested.
      * @return True if the uniform is in the list.
      */
-    bool IsUniformInList(const std::string &name) const;
+    bool IsUniformInList(const std::string& name) const;
     /**
      * @brief Throw an exception in case this texture is already in the
      * program.
@@ -231,7 +231,7 @@ class Program : public ProgramInterface
         GLenum type;
         std::string name;
     };
-    const Logger &logger_ = Logger::GetInstance();
+    const Logger& logger_ = Logger::GetInstance();
     mutable std::map<std::string, int> memoize_map_ = {};
     mutable std::map<std::string, proto::Uniform::UniformEnum>
         uniform_float_variable_map_ = {};
@@ -253,8 +253,8 @@ class Program : public ProgramInterface
  * @param value: Enum value of the uniform (see proto declaration for that).
  */
 std::unique_ptr<frame::ProgramInterface> CreateProgram(
-    const std::string &name,
-    std::istream &vertex_shader_code,
-    std::istream &pixel_shader_code);
+    const std::string& name,
+    std::istream& vertex_shader_code,
+    std::istream& pixel_shader_code);
 
 } // End namespace frame::opengl.

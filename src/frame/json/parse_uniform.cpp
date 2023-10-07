@@ -5,23 +5,23 @@
 namespace frame::proto
 {
 
-glm::vec2 ParseUniform(const UniformVector2 &uniform_vec2)
+glm::vec2 ParseUniform(const UniformVector2& uniform_vec2)
 {
     return {uniform_vec2.x(), uniform_vec2.y()};
 }
 
-glm::vec3 ParseUniform(const UniformVector3 &uniform_vec3)
+glm::vec3 ParseUniform(const UniformVector3& uniform_vec3)
 {
     return {uniform_vec3.x(), uniform_vec3.y(), uniform_vec3.z()};
 }
 
-glm::vec4 ParseUniform(const UniformVector4 &uniform_vec4)
+glm::vec4 ParseUniform(const UniformVector4& uniform_vec4)
 {
     return {
         uniform_vec4.x(), uniform_vec4.y(), uniform_vec4.z(), uniform_vec4.w()};
 }
 
-glm::mat4 ParseUniform(const UniformMatrix4 &uniform_mat4)
+glm::mat4 ParseUniform(const UniformMatrix4& uniform_mat4)
 {
     return glm::mat4(
         uniform_mat4.m11(),
@@ -42,16 +42,16 @@ glm::mat4 ParseUniform(const UniformMatrix4 &uniform_mat4)
         uniform_mat4.m44());
 }
 
-glm::quat ParseUniform(const UniformQuaternion &uniform_quat)
+glm::quat ParseUniform(const UniformQuaternion& uniform_quat)
 {
     return {
         uniform_quat.w(), uniform_quat.x(), uniform_quat.y(), uniform_quat.z()};
 }
 
 void RegisterUniformFromProto(
-    const Uniform &uniform,
-    const UniformInterface &uniform_interface,
-    const ProgramInterface &program_interface)
+    const Uniform& uniform,
+    const UniformInterface& uniform_interface,
+    const ProgramInterface& program_interface)
 {
     switch (uniform.value_oneof_case())
     {
@@ -127,10 +127,10 @@ void RegisterUniformFromProto(
 }
 
 void RegisterUniformEnumFromProto(
-    const std::string &name,
-    const Uniform::UniformEnum &uniform_enum,
-    const UniformInterface &uniform_interface,
-    const ProgramInterface &program_interface)
+    const std::string& name,
+    const Uniform::UniformEnum& uniform_enum,
+    const UniformInterface& uniform_interface,
+    const ProgramInterface& program_interface)
 {
     switch (uniform_enum)
     {
@@ -162,7 +162,7 @@ void RegisterUniformEnumFromProto(
         break;
     }
     case Uniform::FLOAT_TIME_S: {
-        static Logger &logger_ = Logger::GetInstance();
+        static Logger& logger_ = Logger::GetInstance();
         logger_->info(
             "set {} := {}",
             name,

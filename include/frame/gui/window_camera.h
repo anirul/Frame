@@ -9,10 +9,10 @@ namespace frame::gui
 class WindowCamera : public frame::gui::GuiWindowInterface
 {
   public:
-    WindowCamera(const std::string &name) : name_(name)
+    WindowCamera(const std::string& name) : name_(name)
     {
     }
-    void SetName(const std::string &name) override
+    void SetName(const std::string& name) override
     {
         name_ = name;
     }
@@ -20,11 +20,11 @@ class WindowCamera : public frame::gui::GuiWindowInterface
     {
         return name_;
     }
-    void SetCameraPtr(frame::Camera *camera)
+    void SetCameraPtr(frame::Camera* camera)
     {
         camera_ptr_ = camera;
     }
-    frame::Camera *GetCameraPtr() const
+    frame::Camera* GetCameraPtr() const
     {
         return camera_ptr_;
     }
@@ -55,7 +55,7 @@ class WindowCamera : public frame::gui::GuiWindowInterface
     float near_clip_ = 0.1f;
     bool end_ = true;
     std::string name_;
-    frame::Camera *camera_ptr_ = nullptr;
+    frame::Camera* camera_ptr_ = nullptr;
     frame::Camera camera_saved_;
     frame::Camera reset_camera_;
 };

@@ -20,7 +20,7 @@ class InputWasd : public InputInterface
      *        in movement mode.
      */
     InputWasd(
-        DeviceInterface &device,
+        DeviceInterface& device,
         float move_multiplication,
         float rotation_multiplication)
         : device_(device), move_multiplication_(move_multiplication),
@@ -43,7 +43,7 @@ class InputWasd : public InputInterface
     void NextFrame() override;
 
   private:
-    DeviceInterface &device_;
+    DeviceInterface& device_;
     bool shift_ = false;
     bool mouse_active_ = false;
     float move_multiplication_ = 20.0f;

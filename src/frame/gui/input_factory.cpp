@@ -10,7 +10,7 @@ namespace frame::gui
 {
 
 std::unique_ptr<frame::InputInterface> CreateInputWasd(
-    DeviceInterface &device,
+    DeviceInterface& device,
     float move_multiplication,
     float rotation_multiplication)
 {
@@ -19,7 +19,7 @@ std::unique_ptr<frame::InputInterface> CreateInputWasd(
 }
 
 std::unique_ptr<InputInterface> CreateInputWasdMouse(
-    DeviceInterface &device,
+    DeviceInterface& device,
     float move_multiplication,
     float rotation_multiplication,
     float translation_multiplication,
@@ -34,7 +34,7 @@ std::unique_ptr<InputInterface> CreateInputWasdMouse(
 }
 
 std::unique_ptr<InputInterface> CreateInputArcball(
-    DeviceInterface &device,
+    DeviceInterface& device,
     glm::vec3 pivot,
     float move_multiplication,
     float zoom_multiplication)

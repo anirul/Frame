@@ -32,7 +32,7 @@ class Device : public DeviceInterface
   public:
     //! @brief Constructor will initialize the GL context and make the GLEW
     //! init.
-    Device(void *gl_context, glm::uvec2 size);
+    Device(void* gl_context, glm::uvec2 size);
     //! @brief Destructor this is where the memory is freed.
     virtual ~Device();
 
@@ -56,22 +56,22 @@ class Device : public DeviceInterface
      * parameter is alpha.
      */
     void Clear(
-        const glm::vec4 &color = glm::vec4(.2f, 0.f, .2f, 1.0f)) const final;
+        const glm::vec4& color = glm::vec4(.2f, 0.f, .2f, 1.0f)) const final;
     /**
      * @brief Startup the scene.
      * @param level: Move the level into the scene.
      */
-    void Startup(std::unique_ptr<LevelInterface> &&level) final;
+    void Startup(std::unique_ptr<LevelInterface>&& level) final;
     /**
      * @brief Add a plugin interface.
      * @param plugin_interface: The plugin interface to be moved.
      */
-    void AddPlugin(std::unique_ptr<PluginInterface> &&plugin_interface) final;
+    void AddPlugin(std::unique_ptr<PluginInterface>&& plugin_interface) final;
     /**
      * @brief Get a list of plugin.
      * @return A list of pointer to plugin.
      */
-    std::vector<PluginInterface *> GetPluginPtrs() final;
+    std::vector<PluginInterface*> GetPluginPtrs() final;
     /**
      * @brief Get plugin names.
      * @return A list of plugin names.
@@ -81,7 +81,7 @@ class Device : public DeviceInterface
      * @brief Remove a plugin by name.
      * @param name: The name of the plugin to remove.
      */
-    void RemovePluginByName(const std::string &name) final;
+    void RemovePluginByName(const std::string& name) final;
     /** @brief Cleanup the mess. */
     void Cleanup() final;
     /**
@@ -104,14 +104,14 @@ class Device : public DeviceInterface
      * @param file: File name of the screenshot (usually with the *.png)
      * extension it will be dropped at the path where the software is run.
      */
-    void ScreenShot(const std::string &file) const final;
+    void ScreenShot(const std::string& file) const final;
 
   public:
     /**
      * @brief Get the current level.
      * @return a temporary pointer to the current level being run.
      */
-    LevelInterface &GetLevel() final
+    LevelInterface& GetLevel() final
     {
         return *level_.get();
     }
@@ -120,7 +120,7 @@ class Device : public DeviceInterface
      * @return A pointer to the current context (this is used by the
      * windowing system).
      */
-    void *GetDeviceContext() const final
+    void* GetDeviceContext() const final
     {
         return gl_context_;
     }
@@ -163,34 +163,34 @@ class Device : public DeviceInterface
      * @param vector: A vector that is moved into the device and level.
      */
     std::unique_ptr<BufferInterface> CreatePointBuffer(
-        std::vector<float> &&vector) final;
+        std::vector<float>&& vector) final;
     /**
      * @brief Create an index buffer from a vector of unsigned integer.
      * @param device: A pointer to a device.
      * @param vector: A vector that is moved into the device and level.
      */
     std::unique_ptr<BufferInterface> CreateIndexBuffer(
-        std::vector<std::uint32_t> &&vector) final;
+        std::vector<std::uint32_t>&& vector) final;
     /**
      * @brief Create a static mesh from a vector of floats.
      * @param vector: A vector that is moved into the device and level.
      * @param point_buffer_size: The size of a point in float.
      */
     std::unique_ptr<StaticMeshInterface> CreateStaticMesh(
-        const StaticMeshParameter &static_mesh_parameter) final;
+        const StaticMeshParameter& static_mesh_parameter) final;
     /**
      * @brief Create a 2d texture from a structure.
      * @param parameters: Parameters for the creation of the texture.
      * @return A unique pointer to a 2d texture.
      */
     std::unique_ptr<TextureInterface> CreateTexture(
-        const TextureParameter &texture_parameter) final;
+        const TextureParameter& texture_parameter) final;
 
   protected:
-    void DisplayCamera(const Camera &camera, glm::uvec4 viewport, double time);
+    void DisplayCamera(const Camera& camera, glm::uvec4 viewport, double time);
     void DisplayLeftRightCamera(
-        const Camera &camera_left,
-        const Camera &camera_right,
+        const Camera& camera_left,
+        const Camera& camera_right,
         glm::uvec4 viewport_left,
         glm::uvec4 viewport_right,
         double time);
@@ -201,7 +201,7 @@ class Device : public DeviceInterface
     // Storage of the plugin.
     std::vector<std::unique_ptr<PluginInterface>> plugin_interfaces_ = {};
     // Open GL context.
-    void *gl_context_ = nullptr;
+    void* gl_context_ = nullptr;
     glm::uvec2 size_ = {0, 0};
     const proto::PixelElementSize pixel_element_size_ =
         proto::PixelElementSize_HALF();
@@ -213,7 +213,7 @@ class Device : public DeviceInterface
     glm::vec3 focus_point_ = glm::vec3(0.0f);
     bool invert_left_right_ = false;
     // Logger for the device.
-    const Logger &logger_ = Logger::GetInstance();
+    const Logger& logger_ = Logger::GetInstance();
 };
 
 } // End namespace frame::opengl.

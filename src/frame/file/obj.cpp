@@ -11,7 +11,7 @@
 namespace frame::file
 {
 
-Obj::Obj(const std::filesystem::path &file_name)
+Obj::Obj(const std::filesystem::path& file_name)
 {
 #ifdef TINY_OBJ_LOADER_V2
     tinyobj::ObjReaderConfig reader_config;
@@ -36,9 +36,9 @@ Obj::Obj(const std::filesystem::path &file_name)
             "Warning parsing file {}: {}", total_path, reader.Warning());
     }
 
-    auto &attrib = reader.GetAttrib();
-    auto &shapes = reader.GetShapes();
-    auto &materials = reader.GetMaterials();
+    auto& attrib = reader.GetAttrib();
+    auto& shapes = reader.GetShapes();
+    auto& materials = reader.GetMaterials();
 #else
     tinyobj::attrib_t attrib;
     std::vector<tinyobj::shape_t> shapes;
@@ -151,7 +151,7 @@ Obj::Obj(const std::filesystem::path &file_name)
         }
     }
 
-    for (const auto &material : materials)
+    for (const auto& material : materials)
     {
         ObjMaterial obj_material{};
         obj_material.name = material.name;

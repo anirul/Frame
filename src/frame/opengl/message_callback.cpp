@@ -88,10 +88,10 @@ void GLAPIENTRY MessageCallback(
     GLuint id,
     GLenum severity,
     GLsizei length,
-    const GLchar *message,
-    const void *userParam)
+    const GLchar* message,
+    const void* userParam)
 {
-    Logger &logger = Logger::GetInstance();
+    Logger& logger = Logger::GetInstance();
     std::string str_message = fmt::format(
         "GL: {} (source [{}], type [{}], severity [{}])",
         message,

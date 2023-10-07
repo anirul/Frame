@@ -30,7 +30,7 @@ class NodeLight : public NodeInterface
      * @param color: Color of the light in vec3 format.
      */
     NodeLight(
-        std::function<NodeInterface *(const std::string &)> func,
+        std::function<NodeInterface*(const std::string&)> func,
         const glm::vec3 color)
         : NodeInterface(func), light_type_(NodeLightEnum::AMBIENT),
           color_(color)
@@ -46,7 +46,7 @@ class NodeLight : public NodeInterface
      * @param color: Color of the light in vec3 format.
      */
     NodeLight(
-        std::function<NodeInterface *(const std::string &)> func,
+        std::function<NodeInterface*(const std::string&)> func,
         const frame::NodeLightEnum light_type,
         const glm::vec3 position_or_direction,
         const glm::vec3 color);
@@ -61,7 +61,7 @@ class NodeLight : public NodeInterface
      * @param dot_outer_limit: Outer limit of the total light in dot format.
      */
     NodeLight(
-        std::function<NodeInterface *(const std::string &)> func,
+        std::function<NodeInterface*(const std::string&)> func,
         const glm::vec3 position,
         const glm::vec3 direction,
         const glm::vec3 color,

@@ -35,13 +35,13 @@ class DrawGuiInterface : public PluginInterface
      * @brief Add sub window to the main window.
      * @param callback: A window callback that can add buttons, etc.
      */
-    virtual void AddWindow(std::unique_ptr<GuiWindowInterface> &&callback) = 0;
+    virtual void AddWindow(std::unique_ptr<GuiWindowInterface>&& callback) = 0;
     /**
      * @brief Get a specific window (associated with a name).
      * @param name: The name of the window.
      * @return A pointer to the window.
      */
-    virtual GuiWindowInterface &GetWindow(const std::string &name) = 0;
+    virtual GuiWindowInterface& GetWindow(const std::string& name) = 0;
     /**
      * @brief Get all sub window name (title).
      * @return A list of all the sub windows.
@@ -51,7 +51,7 @@ class DrawGuiInterface : public PluginInterface
      * @brief Delete a sub window.
      * @param name: the name of the window to be deleted.
      */
-    virtual void DeleteWindow(const std::string &name) = 0;
+    virtual void DeleteWindow(const std::string& name) = 0;
     /**
      * @brief Is the draw gui active?
      * @param enable: True if enable.

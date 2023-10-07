@@ -8,7 +8,7 @@
 namespace frame::opengl
 {
 
-GLenum ConvertToGLType(const frame::proto::PixelElementSize &pixel_element_size)
+GLenum ConvertToGLType(const frame::proto::PixelElementSize& pixel_element_size)
 {
     switch (pixel_element_size.value())
     {
@@ -27,7 +27,7 @@ GLenum ConvertToGLType(const frame::proto::PixelElementSize &pixel_element_size)
     }
 }
 
-GLenum ConvertToGLType(const frame::proto::PixelStructure &pixel_structure)
+GLenum ConvertToGLType(const frame::proto::PixelStructure& pixel_structure)
 {
     switch (pixel_structure.value())
     {
@@ -51,8 +51,8 @@ GLenum ConvertToGLType(const frame::proto::PixelStructure &pixel_structure)
 }
 
 GLenum ConvertToGLType(
-    const frame::proto::PixelElementSize &pixel_element_size,
-    const frame::proto::PixelStructure &pixel_structure)
+    const frame::proto::PixelElementSize& pixel_element_size,
+    const frame::proto::PixelStructure& pixel_structure)
 {
     switch (pixel_element_size.value())
     {

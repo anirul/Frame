@@ -78,10 +78,10 @@ void FillProgramMultiTextureMipmap(
     int max_mipmap = (mipmap <= 0) ? 1 : mipmap;
     if (max_mipmap > 1)
     {
-        for (const auto &texture_id : texture_out_ids)
+        for (const auto& texture_id : texture_out_ids)
         {
             auto texture = level->GetTextureFromId(texture_id);
-            auto *opengl_texture = dynamic_cast<Texture *>(texture);
+            auto* opengl_texture = dynamic_cast<Texture*>(texture);
             opengl_texture->Bind();
             texture->EnableMipmap();
         }
@@ -97,10 +97,10 @@ void FillProgramMultiTextureMipmap(
         temporary_size.second = static_cast<std::uint32_t>(size.second * fact);
         glViewport(0, 0, temporary_size.first, temporary_size.second);
         int i = 0;
-        for (const auto &texture_id : program->GetOutputTextureIds())
+        for (const auto& texture_id : program->GetOutputTextureIds())
         {
-            auto *opengl_texture =
-                dynamic_cast<Texture *>(level->GetTextureFromId(texture_id));
+            auto* opengl_texture =
+                dynamic_cast<Texture*>(level->GetTextureFromId(texture_id));
             frame.AttachTexture(
                 opengl_texture->GetId(),
                 FrameBuffer::GetFrameColorAttachment(i),
@@ -153,10 +153,10 @@ void FillProgramMultiTextureCubeMapMipmap(
     int max_mipmap = (mipmap <= 0) ? 1 : mipmap;
     if (max_mipmap > 1)
     {
-        for (const auto &texture_id : texture_out_ids)
+        for (const auto& texture_id : texture_out_ids)
         {
             auto texture = level->GetTextureFromId(texture_id);
-            auto *opengl_texture = dynamic_cast<Texture *>(texture);
+            auto* opengl_texture = dynamic_cast<Texture*>(texture);
             opengl_texture->Bind();
             texture->EnableMipmap();
         }
@@ -174,13 +174,13 @@ void FillProgramMultiTextureCubeMapMipmap(
         frame.AttachRender(render);
         glViewport(0, 0, temporary_size.first, temporary_size.second);
         int cubemap_element = 0;
-        for (const auto &view : views_cubemap)
+        for (const auto& view : views_cubemap)
         {
             int i = 0;
-            for (const auto &texture_id : program->GetOutputTextureIds())
+            for (const auto& texture_id : program->GetOutputTextureIds())
             {
-                auto *opengl_texture = dynamic_cast<Texture *>(
-                    level->GetTextureFromId(texture_id));
+                auto* opengl_texture =
+                    dynamic_cast<Texture*>(level->GetTextureFromId(texture_id));
                 frame.AttachTexture(
                     opengl_texture->GetId(),
                     FrameBuffer::GetFrameColorAttachment(i),

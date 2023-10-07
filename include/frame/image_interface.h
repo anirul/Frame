@@ -30,12 +30,12 @@ struct ImageInterface
      * @brief Get a pointer to the underlying structure.
      * @return A void pointer to the data structure.
      */
-    virtual const void *Data() const = 0;
+    virtual const void* Data() const = 0;
     /**
      * @brief Get a pointer to the underlying structure.
      * @return A void pointer to the data structure.
      */
-    virtual void *Data() = 0;
+    virtual void* Data() = 0;
     /**
      * @brief Get pixel element size (BYTE/SHOT/HALF/FLOAT).
      * @return The proto pixel element size.
@@ -50,7 +50,7 @@ struct ImageInterface
      * @brief Save an image to a file.
      * @param file: The file to save the image to.
      */
-    virtual void SaveImageToFile(const std::string &file) const = 0;
+    virtual void SaveImageToFile(const std::string& file) const = 0;
     /**
      * @brief Set the data pointer to the class, used to be able to save to
      *        HDD.
@@ -59,7 +59,7 @@ struct ImageInterface
      * @warning Note that the class won't be the owner of the pointer so it
      *          won't free it when destroyed!
      */
-    virtual void SetData(void *data) = 0;
+    virtual void SetData(void* data) = 0;
 };
 
 } // End namespace frame.

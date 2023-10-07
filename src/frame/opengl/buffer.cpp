@@ -33,7 +33,7 @@ void Buffer::UnBind() const
     glBindBuffer(static_cast<GLenum>(buffer_type_), 0);
 }
 
-void Buffer::Copy(const std::size_t size, const void *data /*= nullptr*/) const
+void Buffer::Copy(const std::size_t size, const void* data /*= nullptr*/) const
 {
     Bind();
     glBufferData(
@@ -44,7 +44,7 @@ void Buffer::Copy(const std::size_t size, const void *data /*= nullptr*/) const
     UnBind();
 }
 
-void Buffer::Copy(const std::vector<float> &vector) const
+void Buffer::Copy(const std::vector<float>& vector) const
 {
     Bind();
     glBufferData(
@@ -55,7 +55,7 @@ void Buffer::Copy(const std::vector<float> &vector) const
     UnBind();
 }
 
-void Buffer::Copy(const std::vector<unsigned int> &vector) const
+void Buffer::Copy(const std::vector<unsigned int>& vector) const
 {
     Bind();
     glBufferData(
@@ -66,7 +66,7 @@ void Buffer::Copy(const std::vector<unsigned int> &vector) const
     UnBind();
 }
 
-void Buffer::Copy(const std::vector<std::uint8_t> &vector) const
+void Buffer::Copy(const std::vector<std::uint8_t>& vector) const
 {
     Bind();
     glBufferData(
@@ -84,7 +84,7 @@ std::size_t Buffer::GetSize() const
     glGetBufferParameteriv(
         static_cast<GLenum>(buffer_type_),
         GL_BUFFER_SIZE,
-        reinterpret_cast<GLint *>(&size));
+        reinterpret_cast<GLint*>(&size));
     UnBind();
     return size[0];
 }
@@ -102,7 +102,7 @@ void Buffer::Clear() const
 }
 
 std::unique_ptr<frame::BufferInterface> CreatePointBuffer(
-    std::vector<float> &&vector)
+    std::vector<float>&& vector)
 {
     auto point_buffer = std::make_unique<Buffer>();
     point_buffer->Copy(vector);
@@ -110,7 +110,7 @@ std::unique_ptr<frame::BufferInterface> CreatePointBuffer(
 }
 
 std::unique_ptr<frame::BufferInterface> CreateIndexBuffer(
-    std::vector<std::uint32_t> &&vector)
+    std::vector<std::uint32_t>&& vector)
 {
     auto index_buffer =
         std::make_unique<Buffer>(BufferTypeEnum::ELEMENT_ARRAY_BUFFER);

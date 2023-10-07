@@ -32,7 +32,7 @@ class Logger
      *        of the logger function (see singleton).
      * @return A reference to the internal instance of the logger.
      */
-    static Logger &GetInstance();
+    static Logger& GetInstance();
     /**
      * @brief A surcharged operator arrow that allow you to access the
      *        logger functionality.

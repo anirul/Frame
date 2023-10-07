@@ -21,12 +21,12 @@ namespace frame::file
 {
 
 Image::Image(
-    const std::filesystem::path &file,
+    const std::filesystem::path& file,
     proto::PixelElementSize pixel_element_size /*= PixelElementSize::BYTE*/,
     proto::PixelStructure pixel_structure /*= PixelStructure::RGB*/)
     : pixel_element_size_(pixel_element_size), pixel_structure_(pixel_structure)
 {
-    const auto &logger = frame::Logger::GetInstance();
+    const auto& logger = frame::Logger::GetInstance();
     logger->info("Openning image: [{}].", file.string());
     int channels;
     int desired_channels = {static_cast<int>(pixel_structure.value())};
@@ -93,11 +93,11 @@ Image::Image(
     free_ = false;
 }
 
-void Image::SaveImageToFile(const std::string &file) const
+void Image::SaveImageToFile(const std::string& file) const
 {
     // For OpenGL it seams...
     stbi_flip_vertically_on_write(true);
-    const auto &logger = frame::Logger::GetInstance();
+    const auto& logger = frame::Logger::GetInstance();
     logger->info("Saving [{}]...", file);
     if (!image_)
         throw std::runtime_error("no pointer to be saved?");
@@ -110,7 +110,7 @@ void Image::SaveImageToFile(const std::string &file) const
         size_.x * pixel_structure_.value());
 }
 
-void Image::SetData(void *data)
+void Image::SetData(void* data)
 {
     if (free_)
         stbi_image_free(image_);

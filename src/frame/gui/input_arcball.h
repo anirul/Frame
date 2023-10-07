@@ -20,7 +20,7 @@ class InputArcball : public InputInterface
      *        in movement mode.
      */
     InputArcball(
-        DeviceInterface &device,
+        DeviceInterface& device,
         glm::vec3 pivot,
         float move_multiplication,
         float zoom_multiplication)
@@ -45,7 +45,7 @@ class InputArcball : public InputInterface
     void NextFrame() override;
 
   private:
-    DeviceInterface &device_;
+    DeviceInterface& device_;
     bool mouse_active_ = false;
     float move_multiplication_ = 1.0f;
     float zoom_multiplication_ = 1.0f;

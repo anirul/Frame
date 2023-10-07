@@ -70,28 +70,28 @@ SDLOpenGLNone::~SDLOpenGLNone()
 
 void SDLOpenGLNone::Run(std::function<void()> lambda)
 {
-    for (const auto &plugin_interface : device_->GetPluginPtrs())
+    for (const auto& plugin_interface : device_->GetPluginPtrs())
     {
         plugin_interface->Startup(size_);
     }
     if (input_interface_)
         input_interface_->NextFrame();
     device_->Display(0.0);
-    for (const auto &plugin_interface : device_->GetPluginPtrs())
+    for (const auto& plugin_interface : device_->GetPluginPtrs())
     {
         plugin_interface->Update(*device_.get(), 0.0);
     }
     lambda();
 }
 
-void *SDLOpenGLNone::GetGraphicContext() const
+void* SDLOpenGLNone::GetGraphicContext() const
 {
     std::pair<int, int> gl_version;
-    frame::Logger &logger = frame::Logger::GetInstance();
+    frame::Logger& logger = frame::Logger::GetInstance();
 
     // GL context.
-    void *gl_context =
-        SDL_GL_CreateContext(static_cast<SDL_Window *>(GetWindowContext()));
+    void* gl_context =
+        SDL_GL_CreateContext(static_cast<SDL_Window*>(GetWindowContext()));
     if (!gl_context)
     {
         std::string error = SDL_GetError();
@@ -101,7 +101,7 @@ void *SDLOpenGLNone::GetGraphicContext() const
 
     SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &gl_version.first);
     SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &gl_version.second);
-    logger->info(reinterpret_cast<const char *>(glGetString(GL_RENDERER)));
+    logger->info(reinterpret_cast<const char*>(glGetString(GL_RENDERER)));
 
     // Vsync off.
     SDL_GL_SetSwapInterval(0);
@@ -117,7 +117,7 @@ void *SDLOpenGLNone::GetGraphicContext() const
     {
         throw std::runtime_error(fmt::format(
             "GLEW problems : {}",
-            reinterpret_cast<const char *>(glewGetErrorString(result))));
+            reinterpret_cast<const char*>(glewGetErrorString(result))));
     }
 
     // During init, enable debug output

@@ -22,7 +22,7 @@ class WindowResolution : public GuiWindowInterface
      * @param size: The initial size of the window.
      */
     WindowResolution(
-        const std::string &name,
+        const std::string& name,
         glm::uvec2 size,
         glm::uvec2 border_less_size,
         glm::vec2 pixel_per_inch);
@@ -41,7 +41,7 @@ class WindowResolution : public GuiWindowInterface
      * @brief Set the name of the window.
      * @param name: The name of the window.
      */
-    void SetName(const std::string &name) override;
+    void SetName(const std::string& name) override;
     /**
      * @brief Get the window size.
      * This will vary according to what full screen mode is selected!

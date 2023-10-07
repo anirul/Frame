@@ -47,7 +47,7 @@ class Image : public ImageInterface
      *        RGBA).
      */
     Image(
-        const std::filesystem::path &file,
+        const std::filesystem::path& file,
         proto::PixelElementSize pixel_element_size =
             proto::PixelElementSize_BYTE(),
         proto::PixelStructure pixel_structure = proto::PixelStructure_RGB());
@@ -75,7 +75,7 @@ class Image : public ImageInterface
      * @brief Get a pointer to the underlying structure.
      * @return A void pointer to the data structure.
      */
-    const void *Data() const override
+    const void* Data() const override
     {
         return image_;
     }
@@ -83,7 +83,7 @@ class Image : public ImageInterface
      * @brief Get a pointer to the underlying structure.
      * @return A void pointer to the data structure.
      */
-    void *Data() override
+    void* Data() override
     {
         return image_;
     }
@@ -109,7 +109,7 @@ class Image : public ImageInterface
      * @brief Save an image to a file.
      * @param file: The file to save the image to.
      */
-    void SaveImageToFile(const std::string &file) const override;
+    void SaveImageToFile(const std::string& file) const override;
     /**
      * @brief Set the data pointer to the class, used to be able to save to
      *        HDD.
@@ -118,12 +118,12 @@ class Image : public ImageInterface
      * @warning Note that the class won't be the owner of the pointer so it
      *          won't free it when destroyed!
      */
-    void SetData(void *data) override;
+    void SetData(void* data) override;
 
   private:
     glm::ivec2 size_ = glm::ivec2(0, 0);
     bool free_ = false;
-    void *image_ = nullptr;
+    void* image_ = nullptr;
     const proto::PixelElementSize pixel_element_size_;
     const proto::PixelStructure pixel_structure_;
 };

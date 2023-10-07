@@ -25,7 +25,7 @@ Camera::Camera(
     UpdateCameraVectors();
 }
 
-Camera::Camera(const Camera &camera)
+Camera::Camera(const Camera& camera)
 {
     SetCameraMode(camera.GetCameraMode());
     SetFovRadians(camera.GetFovRadians());
@@ -38,7 +38,7 @@ Camera::Camera(const Camera &camera)
     UpdateCameraVectors();
 }
 
-frame::Camera &Camera::operator=(const Camera &camera)
+frame::Camera& Camera::operator=(const Camera& camera)
 {
     SetCameraMode(camera.GetCameraMode());
     SetFovRadians(camera.GetFovRadians());

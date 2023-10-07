@@ -50,13 +50,13 @@ class Camera
      * @brief Copy constructor.
      * @param camera: The camera from which this one will be created.
      */
-    Camera(const Camera &camera);
+    Camera(const Camera& camera);
     /**
      * @brief Copy assignment operator.
      * @param camera: The camera from which this one will be created.
      * @return The camera that was created.
      */
-    Camera &operator=(const Camera &camera);
+    Camera& operator=(const Camera& camera);
 
   public:
     /**

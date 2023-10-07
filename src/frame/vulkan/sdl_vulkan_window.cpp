@@ -48,7 +48,7 @@ SDLVulkanWindow::SDLVulkanWindow(glm::uvec2 size) : size_(size)
         throw std::runtime_error(fmt::format(
             "Could not get the extension count: {}", SDL_GetError()));
     }
-    std::vector<const char *> extensions(extension_count);
+    std::vector<const char*> extensions(extension_count);
     SDL_Vulkan_GetInstanceExtensions(
         sdl_window_, &extension_count, extensions.data());
     if (extension_count == 0)
@@ -57,7 +57,7 @@ SDLVulkanWindow::SDLVulkanWindow(glm::uvec2 size) : size_(size)
             "Could not get the extension count: {}", SDL_GetError()));
     }
     extensions.push_back("VK_EXT_debug_utils");
-    for (const auto &extension : extensions)
+    for (const auto& extension : extensions)
     {
         logger_->info("Extension: {}", extension);
     }
@@ -123,7 +123,7 @@ SDLVulkanWindow::~SDLVulkanWindow()
 void SDLVulkanWindow::Run(std::function<void()> lambda /* = []{}*/)
 {
     // Called only once at the beginning.
-    for (const auto &plugin_interface : device_->GetPluginPtrs())
+    for (const auto& plugin_interface : device_->GetPluginPtrs())
     {
         // In case this is a removed one it will be nulled.
         if (plugin_interface)
@@ -148,7 +148,7 @@ void SDLVulkanWindow::Run(std::function<void()> lambda /* = []{}*/)
         while (SDL_PollEvent(&event))
         {
             bool skip = false;
-            for (const auto &plugin_interface : device_->GetPluginPtrs())
+            for (const auto& plugin_interface : device_->GetPluginPtrs())
             {
                 if (plugin_interface)
                 {
@@ -169,7 +169,7 @@ void SDLVulkanWindow::Run(std::function<void()> lambda /* = []{}*/)
         device_->Display(time.count());
 
         // Draw the Scene not used?
-        for (const auto &plugin_interface : device_->GetPluginPtrs())
+        for (const auto& plugin_interface : device_->GetPluginPtrs())
         {
             if (plugin_interface)
             {
@@ -189,7 +189,7 @@ void SDLVulkanWindow::Run(std::function<void()> lambda /* = []{}*/)
     } while (loop);
 }
 
-void *SDLVulkanWindow::GetGraphicContext() const
+void* SDLVulkanWindow::GetGraphicContext() const
 {
     return vk_unique_instance_.get();
 }
@@ -230,14 +230,14 @@ frame::FullScreenEnum SDLVulkanWindow::GetFullScreenEnum() const
     return fullscreen_enum_;
 }
 
-bool SDLVulkanWindow::RunEvent(const SDL_Event &event, const double dt)
+bool SDLVulkanWindow::RunEvent(const SDL_Event& event, const double dt)
 {
     if (event.type == SDL_QUIT)
         return false;
     bool has_window_plugin = false;
-    for (PluginInterface *plugin : device_->GetPluginPtrs())
+    for (PluginInterface* plugin : device_->GetPluginPtrs())
     {
-        if (dynamic_cast<frame::gui::DrawGuiInterface *>(plugin))
+        if (dynamic_cast<frame::gui::DrawGuiInterface*>(plugin))
             has_window_plugin = true;
     }
     if (event.type == SDL_KEYDOWN)
@@ -247,10 +247,10 @@ bool SDLVulkanWindow::RunEvent(const SDL_Event &event, const double dt)
         case SDLK_ESCAPE: {
             if (has_window_plugin)
             {
-                for (PluginInterface *plugin : device_->GetPluginPtrs())
+                for (PluginInterface* plugin : device_->GetPluginPtrs())
                 {
-                    auto *window_plugin =
-                        dynamic_cast<frame::gui::DrawGuiInterface *>(plugin);
+                    auto* window_plugin =
+                        dynamic_cast<frame::gui::DrawGuiInterface*>(plugin);
                     if (window_plugin)
                     {
                         auto is_visible = window_plugin->IsVisible();

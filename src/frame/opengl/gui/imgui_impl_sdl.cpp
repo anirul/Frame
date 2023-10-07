@@ -121,18 +121,18 @@
 // SDL Data
 struct ImGui_ImplSDL2_Data
 {
-    SDL_Window *Window;
-    SDL_Renderer *Renderer;
+    SDL_Window* Window;
+    SDL_Renderer* Renderer;
     Uint64 Time;
     int MouseButtonsDown;
-    SDL_Cursor *MouseCursors[ImGuiMouseCursor_COUNT];
+    SDL_Cursor* MouseCursors[ImGuiMouseCursor_COUNT];
     int PendingMouseLeaveFrame;
-    char *ClipboardTextData;
+    char* ClipboardTextData;
     bool MouseCanUseGlobalState;
 
     ImGui_ImplSDL2_Data()
     {
-        memset((void *)this, 0, sizeof(*this));
+        memset((void*)this, 0, sizeof(*this));
     }
 };
 
@@ -144,24 +144,24 @@ struct ImGui_ImplSDL2_Data
 // this backend.
 // FIXME: some shared resources (mouse cursor shape, gamepad) are mishandled
 // when using multi-context.
-static ImGui_ImplSDL2_Data *ImGui_ImplSDL2_GetBackendData()
+static ImGui_ImplSDL2_Data* ImGui_ImplSDL2_GetBackendData()
 {
     return ImGui::GetCurrentContext()
-               ? (ImGui_ImplSDL2_Data *)ImGui::GetIO().BackendPlatformUserData
+               ? (ImGui_ImplSDL2_Data*)ImGui::GetIO().BackendPlatformUserData
                : NULL;
 }
 
 // Functions
-static const char *ImGui_ImplSDL2_GetClipboardText(void *)
+static const char* ImGui_ImplSDL2_GetClipboardText(void*)
 {
-    ImGui_ImplSDL2_Data *bd = ImGui_ImplSDL2_GetBackendData();
+    ImGui_ImplSDL2_Data* bd = ImGui_ImplSDL2_GetBackendData();
     if (bd->ClipboardTextData)
         SDL_free(bd->ClipboardTextData);
     bd->ClipboardTextData = SDL_GetClipboardText();
     return bd->ClipboardTextData;
 }
 
-static void ImGui_ImplSDL2_SetClipboardText(void *, const char *text)
+static void ImGui_ImplSDL2_SetClipboardText(void*, const char* text)
 {
     SDL_SetClipboardText(text);
 }
@@ -386,7 +386,7 @@ static ImGuiKey ImGui_ImplSDL2_KeycodeToImGuiKey(int keycode)
 
 static void ImGui_ImplSDL2_UpdateKeyModifiers(SDL_Keymod sdl_key_mods)
 {
-    ImGuiIO &io = ImGui::GetIO();
+    ImGuiIO& io = ImGui::GetIO();
     io.AddKeyEvent(ImGuiKey_ModCtrl, (sdl_key_mods & KMOD_CTRL) != 0);
     io.AddKeyEvent(ImGuiKey_ModShift, (sdl_key_mods & KMOD_SHIFT) != 0);
     io.AddKeyEvent(ImGuiKey_ModAlt, (sdl_key_mods & KMOD_ALT) != 0);
@@ -403,10 +403,10 @@ static void ImGui_ImplSDL2_UpdateKeyModifiers(SDL_Keymod sdl_key_mods)
 // your application based on those two flags. If you have multiple SDL events
 // and some of them are not meant to be used by dear imgui, you may need to
 // filter events based on their windowID field.
-bool ImGui_ImplSDL2_ProcessEvent(const SDL_Event *event)
+bool ImGui_ImplSDL2_ProcessEvent(const SDL_Event* event)
 {
-    ImGuiIO &io = ImGui::GetIO();
-    ImGui_ImplSDL2_Data *bd = ImGui_ImplSDL2_GetBackendData();
+    ImGuiIO& io = ImGui::GetIO();
+    ImGui_ImplSDL2_Data* bd = ImGui_ImplSDL2_GetBackendData();
 
     switch (event->type)
     {
@@ -502,9 +502,9 @@ bool ImGui_ImplSDL2_ProcessEvent(const SDL_Event *event)
     return false;
 }
 
-static bool ImGui_ImplSDL2_Init(SDL_Window *window, SDL_Renderer *renderer)
+static bool ImGui_ImplSDL2_Init(SDL_Window* window, SDL_Renderer* renderer)
 {
-    ImGuiIO &io = ImGui::GetIO();
+    ImGuiIO& io = ImGui::GetIO();
     IM_ASSERT(
         io.BackendPlatformUserData == NULL &&
         "Already initialized a platform backend!");
@@ -515,8 +515,8 @@ static bool ImGui_ImplSDL2_Init(SDL_Window *window, SDL_Renderer *renderer)
     // instead of a black-list)
     bool mouse_can_use_global_state = false;
 #if SDL_HAS_CAPTURE_AND_GLOBAL_MOUSE
-    const char *sdl_backend = SDL_GetCurrentVideoDriver();
-    const char *global_mouse_whitelist[] = {
+    const char* sdl_backend = SDL_GetCurrentVideoDriver();
+    const char* global_mouse_whitelist[] = {
         "windows", "cocoa", "x11", "DIVE", "VMAN"};
     for (int n = 0; n < IM_ARRAYSIZE(global_mouse_whitelist); n++)
         if (strncmp(
@@ -527,8 +527,8 @@ static bool ImGui_ImplSDL2_Init(SDL_Window *window, SDL_Renderer *renderer)
 #endif
 
     // Setup backend capabilities flags
-    ImGui_ImplSDL2_Data *bd = IM_NEW(ImGui_ImplSDL2_Data)();
-    io.BackendPlatformUserData = (void *)bd;
+    ImGui_ImplSDL2_Data* bd = IM_NEW(ImGui_ImplSDL2_Data)();
+    io.BackendPlatformUserData = (void*)bd;
     io.BackendPlatformName = "imgui_impl_sdl";
     io.BackendFlags |=
         ImGuiBackendFlags_HasMouseCursors; // We can honor GetMouseCursor()
@@ -571,7 +571,7 @@ static bool ImGui_ImplSDL2_Init(SDL_Window *window, SDL_Renderer *renderer)
     SDL_VERSION(&info.version);
     if (SDL_GetWindowWMInfo(window, &info))
         ImGui::GetMainViewport()->PlatformHandleRaw =
-            (void *)info.info.win.window;
+            (void*)info.info.win.window;
 #else
     (void)window;
 #endif
@@ -591,13 +591,13 @@ static bool ImGui_ImplSDL2_Init(SDL_Window *window, SDL_Renderer *renderer)
     return true;
 }
 
-bool ImGui_ImplSDL2_InitForOpenGL(SDL_Window *window, void *sdl_gl_context)
+bool ImGui_ImplSDL2_InitForOpenGL(SDL_Window* window, void* sdl_gl_context)
 {
     IM_UNUSED(sdl_gl_context); // Viewport branch will need this.
     return ImGui_ImplSDL2_Init(window, NULL);
 }
 
-bool ImGui_ImplSDL2_InitForVulkan(SDL_Window *window)
+bool ImGui_ImplSDL2_InitForVulkan(SDL_Window* window)
 {
 #if !SDL_HAS_VULKAN
     IM_ASSERT(0 && "Unsupported");
@@ -605,7 +605,7 @@ bool ImGui_ImplSDL2_InitForVulkan(SDL_Window *window)
     return ImGui_ImplSDL2_Init(window, NULL);
 }
 
-bool ImGui_ImplSDL2_InitForD3D(SDL_Window *window)
+bool ImGui_ImplSDL2_InitForD3D(SDL_Window* window)
 {
 #if !defined(_WIN32)
     IM_ASSERT(0 && "Unsupported");
@@ -613,23 +613,23 @@ bool ImGui_ImplSDL2_InitForD3D(SDL_Window *window)
     return ImGui_ImplSDL2_Init(window, NULL);
 }
 
-bool ImGui_ImplSDL2_InitForMetal(SDL_Window *window)
+bool ImGui_ImplSDL2_InitForMetal(SDL_Window* window)
 {
     return ImGui_ImplSDL2_Init(window, NULL);
 }
 
 bool ImGui_ImplSDL2_InitForSDLRenderer(
-    SDL_Window *window, SDL_Renderer *renderer)
+    SDL_Window* window, SDL_Renderer* renderer)
 {
     return ImGui_ImplSDL2_Init(window, renderer);
 }
 
 void ImGui_ImplSDL2_Shutdown()
 {
-    ImGui_ImplSDL2_Data *bd = ImGui_ImplSDL2_GetBackendData();
+    ImGui_ImplSDL2_Data* bd = ImGui_ImplSDL2_GetBackendData();
     IM_ASSERT(
         bd != NULL && "No platform backend to shutdown, or already shutdown?");
-    ImGuiIO &io = ImGui::GetIO();
+    ImGuiIO& io = ImGui::GetIO();
 
     if (bd->ClipboardTextData)
         SDL_free(bd->ClipboardTextData);
@@ -644,8 +644,8 @@ void ImGui_ImplSDL2_Shutdown()
 
 static void ImGui_ImplSDL2_UpdateMouseData()
 {
-    ImGui_ImplSDL2_Data *bd = ImGui_ImplSDL2_GetBackendData();
-    ImGuiIO &io = ImGui::GetIO();
+    ImGui_ImplSDL2_Data* bd = ImGui_ImplSDL2_GetBackendData();
+    ImGuiIO& io = ImGui::GetIO();
 
     // We forward mouse input when hovered or captured (via SDL_MOUSEMOTION) or
     // when focused (below)
@@ -653,7 +653,7 @@ static void ImGui_ImplSDL2_UpdateMouseData()
     // SDL_CaptureMouse() let the OS know e.g. that our imgui drag outside the
     // SDL window boundaries shouldn't e.g. trigger other operations outside
     SDL_CaptureMouse(bd->MouseButtonsDown != 0 ? SDL_TRUE : SDL_FALSE);
-    SDL_Window *focused_window = SDL_GetKeyboardFocus();
+    SDL_Window* focused_window = SDL_GetKeyboardFocus();
     const bool is_app_focused = (bd->Window == focused_window);
 #else
     const bool is_app_focused =
@@ -685,10 +685,10 @@ static void ImGui_ImplSDL2_UpdateMouseData()
 
 static void ImGui_ImplSDL2_UpdateMouseCursor()
 {
-    ImGuiIO &io = ImGui::GetIO();
+    ImGuiIO& io = ImGui::GetIO();
     if (io.ConfigFlags & ImGuiConfigFlags_NoMouseCursorChange)
         return;
-    ImGui_ImplSDL2_Data *bd = ImGui_ImplSDL2_GetBackendData();
+    ImGui_ImplSDL2_Data* bd = ImGui_ImplSDL2_GetBackendData();
 
     ImGuiMouseCursor imgui_cursor = ImGui::GetMouseCursor();
     if (io.MouseDrawCursor || imgui_cursor == ImGuiMouseCursor_None)
@@ -709,13 +709,13 @@ static void ImGui_ImplSDL2_UpdateMouseCursor()
 
 static void ImGui_ImplSDL2_UpdateGamepads()
 {
-    ImGuiIO &io = ImGui::GetIO();
+    ImGuiIO& io = ImGui::GetIO();
     if ((io.ConfigFlags & ImGuiConfigFlags_NavEnableGamepad) == 0)
         return;
 
     // Get gamepad
     io.BackendFlags &= ~ImGuiBackendFlags_HasGamepad;
-    SDL_GameController *game_controller = SDL_GameControllerOpen(0);
+    SDL_GameController* game_controller = SDL_GameControllerOpen(0);
     if (!game_controller)
         return;
     io.BackendFlags |= ImGuiBackendFlags_HasGamepad;
@@ -728,13 +728,14 @@ static void ImGui_ImplSDL2_UpdateGamepads()
             KEY_NO,                                                            \
             SDL_GameControllerGetButton(game_controller, BUTTON_NO) != 0);     \
     }
-#define MAP_ANALOG(KEY_NO, AXIS_NO, V0, V1)                                     \
-    {                                                                           \
-        float vn =                                                              \
-            (float)(SDL_GameControllerGetAxis(game_controller, AXIS_NO) - V0) / \
-            (float)(V1 - V0);                                                   \
-        vn = IM_SATURATE(vn);                                                   \
-        io.AddKeyAnalogEvent(KEY_NO, vn > 0.1f, vn);                            \
+#define MAP_ANALOG(KEY_NO, AXIS_NO, V0, V1)                                    \
+    {                                                                          \
+        float vn =                                                             \
+            (float)(SDL_GameControllerGetAxis(game_controller, AXIS_NO) -      \
+                    V0) /                                                      \
+            (float)(V1 - V0);                                                  \
+        vn = IM_SATURATE(vn);                                                  \
+        io.AddKeyAnalogEvent(KEY_NO, vn > 0.1f, vn);                           \
     }
     const int thumb_dead_zone =
         8000; // SDL_gamecontroller.h suggests using this value.
@@ -807,9 +808,9 @@ static void ImGui_ImplSDL2_UpdateGamepads()
 
 void ImGui_ImplSDL2_NewFrame()
 {
-    ImGui_ImplSDL2_Data *bd = ImGui_ImplSDL2_GetBackendData();
+    ImGui_ImplSDL2_Data* bd = ImGui_ImplSDL2_GetBackendData();
     IM_ASSERT(bd != NULL && "Did you call ImGui_ImplSDL2_Init()?");
-    ImGuiIO &io = ImGui::GetIO();
+    ImGuiIO& io = ImGui::GetIO();
 
     // Setup display size (every frame to accommodate for window resizing)
     int w, h;

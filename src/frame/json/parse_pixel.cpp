@@ -73,12 +73,12 @@ PixelStructure PixelStructure_BGR_ALPHA()
     return pixel_structure;
 }
 
-bool operator==(const PixelStructure &l, const PixelStructure &r)
+bool operator==(const PixelStructure& l, const PixelStructure& r)
 {
     return l.value() == r.value();
 }
 
-bool operator==(const PixelElementSize &l, const PixelElementSize &r)
+bool operator==(const PixelElementSize& l, const PixelElementSize& r)
 {
     return l.value() == r.value();
 }

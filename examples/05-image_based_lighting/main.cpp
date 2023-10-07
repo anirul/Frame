@@ -21,9 +21,9 @@ int WINAPI WinMain(
 try
 {
     int ac = __argc;
-    char **av = __argv;
+    char** av = __argv;
 #else
-int main(int ac, char **av)
+int main(int ac, char** av)
 try
 {
 #endif
@@ -36,7 +36,7 @@ try
     app.Run();
     return 0;
 }
-catch (const std::exception &e)
+catch (const std::exception& e)
 {
 #if defined(_WIN32) || defined(_WIN64)
     MessageBoxA(nullptr, e.what(), "Error", MB_OK | MB_ICONERROR);

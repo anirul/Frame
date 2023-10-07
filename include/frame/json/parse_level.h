@@ -16,7 +16,7 @@ namespace frame::proto
  * @return A unique pointer to a level interface.
  */
 std::unique_ptr<LevelInterface> ParseLevel(
-    glm::uvec2 size, const std::filesystem::path &path);
+    glm::uvec2 size, const std::filesystem::path& path);
 /**
  * @brief Parse a level as a proto represented as a string to an level.
  * @param size: Screen size.
@@ -24,13 +24,13 @@ std::unique_ptr<LevelInterface> ParseLevel(
  * @return A unique pointer to a level interface.
  */
 std::unique_ptr<LevelInterface> ParseLevel(
-    glm::uvec2 size, const std::string &content);
+    glm::uvec2 size, const std::string& content);
 /**
  * @brief Parse a level as a proto.
  * @param size: Screen size.
  * @param proto: Parsed protocol buffer.
  */
 std::unique_ptr<LevelInterface> ParseLevel(
-    glm::uvec2 size, const proto::Level &proto);
+    glm::uvec2 size, const proto::Level& proto);
 
 } // End namespace frame::proto.

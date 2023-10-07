@@ -57,7 +57,7 @@ const std::set<std::string> half_extention = {"hdr", "dds"};
 
 // Taken from cpp reference.
 std::size_t ReplaceAll(
-    std::string &inout,
+    std::string& inout,
     const std::string_view what,
     const std::string_view with)
 {
@@ -72,7 +72,7 @@ std::size_t ReplaceAll(
 }
 
 std::string FillLevel(
-    const std::string &initial, const std::map<std::string, std::string> &map)
+    const std::string& initial, const std::map<std::string, std::string>& map)
 {
     std::string out = initial;
     for (auto [from, to] : map)
@@ -94,7 +94,7 @@ std::uint32_t PowerFloor(std::uint32_t x)
 } // End namespace.
 
 std::unique_ptr<frame::TextureInterface> LoadTextureFromFile(
-    const std::filesystem::path &file,
+    const std::filesystem::path& file,
     proto::PixelElementSize
         pixel_element_size /*= proto::PixelElementSize_BYTE()*/,
     proto::PixelStructure pixel_structure /*= proto::PixelStructure_RGB()*/)
@@ -106,12 +106,12 @@ std::unique_ptr<frame::TextureInterface> LoadTextureFromFile(
 }
 
 std::unique_ptr<frame::TextureInterface> LoadCubeMapTextureFromFile(
-    const std::filesystem::path &file,
+    const std::filesystem::path& file,
     proto::PixelElementSize
         pixel_element_size /*= proto::PixelElementSize_BYTE()*/,
     proto::PixelStructure pixel_structure /*= proto::PixelStructure_RGB()*/)
 {
-    auto &logger = Logger::GetInstance();
+    auto& logger = Logger::GetInstance();
     auto equirectangular =
         LoadTextureFromFile(file, pixel_element_size, pixel_structure);
     if (!equirectangular)
@@ -148,15 +148,15 @@ std::unique_ptr<frame::TextureInterface> LoadCubeMapTextureFromFile(
         logger->info("Could not get the id of \"OutputTexture\".");
         return nullptr;
     }
-    auto &out_texture_ref = level->GetTextureFromId(out_texture_id);
+    auto& out_texture_ref = level->GetTextureFromId(out_texture_id);
     Renderer renderer(*level.get(), {0, 0, cube_pair_res.x, cube_pair_res.y});
-    auto &mesh_ref =
+    auto& mesh_ref =
         level->GetStaticMeshFromId(level->GetDefaultStaticMeshCubeId());
     auto material_id = level->GetIdFromName("EquirectangularMaterial");
     if (!material_id)
         throw std::runtime_error(
             "No material id found for [EquirectangularMaterial].");
-    MaterialInterface &material_ref = level->GetMaterialFromId(material_id);
+    MaterialInterface& material_ref = level->GetMaterialFromId(material_id);
     for (std::uint32_t i = 0; i < 6; ++i)
     {
         renderer.SetCubeMapTarget(GetTextureFrameFromPosition(i));
@@ -175,7 +175,7 @@ std::unique_ptr<frame::TextureInterface> LoadCubeMapTextureFromFile(
 }
 
 std::unique_ptr<frame::TextureInterface> LoadCubeMapTextureFromFiles(
-    const std::array<std::filesystem::path, 6> &files,
+    const std::array<std::filesystem::path, 6>& files,
     proto::PixelElementSize
         pixel_element_size /*= proto::PixelElementSize_BYTE()*/,
     proto::PixelStructure pixel_structure /*= proto::PixelStructure_RGB()*/)
@@ -187,7 +187,7 @@ std::unique_ptr<frame::TextureInterface> LoadCubeMapTextureFromFiles(
     }
     std::pair<std::uint32_t, std::uint32_t> img_size;
     std::array<std::unique_ptr<frame::file::Image>, 6> images;
-    std::array<void *, 6> pointers = {};
+    std::array<void*, 6> pointers = {};
     TextureParameter texture_parameter = {pixel_element_size, pixel_structure};
     texture_parameter.map_type = TextureTypeEnum::CUBMAP;
     for (int i = 0; i < pointers.size(); ++i)
@@ -200,14 +200,14 @@ std::unique_ptr<frame::TextureInterface> LoadCubeMapTextureFromFiles(
     return std::make_unique<opengl::TextureCubeMap>(texture_parameter);
 }
 
-std::unique_ptr<TextureInterface> LoadTextureFromVec4(const glm::vec4 &vec4)
+std::unique_ptr<TextureInterface> LoadTextureFromVec4(const glm::vec4& vec4)
 {
     std::array<float, 4> ar = {vec4.x, vec4.y, vec4.z, vec4.w};
     TextureParameter texture_parameter = {
         proto::PixelElementSize_FLOAT(),
         proto::PixelStructure_RGB_ALPHA(),
         {1, 1},
-        (void *)&ar};
+        (void*)&ar};
     return std::make_unique<frame::opengl::Texture>(texture_parameter);
 }
 
@@ -217,7 +217,7 @@ std::unique_ptr<TextureInterface> LoadTextureFromFloat(float f)
         frame::proto::PixelElementSize_FLOAT(),
         frame::proto::PixelStructure_GREY(),
         {1, 1},
-        (void *)&f};
+        (void*)&f};
     return std::make_unique<frame::opengl::Texture>(texture_parameter);
 }
 

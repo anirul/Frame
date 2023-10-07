@@ -25,9 +25,9 @@ class UniformWrapper : public UniformInterface
      * @param Camera pointer.
      */
     UniformWrapper(
-        const glm::mat4 &projection,
-        const glm::mat4 &view,
-        const glm::mat4 &model,
+        const glm::mat4& projection,
+        const glm::mat4& view,
+        const glm::mat4& model,
         double dt);
 
   public:
@@ -87,8 +87,8 @@ class UniformWrapper : public UniformInterface
      * @param size: The size of the vector.
      */
     void SetValueFloat(
-        const std::string &name,
-        const std::vector<float> &vector,
+        const std::string& name,
+        const std::vector<float>& vector,
         glm::uvec2 size) override;
     /**
      * @brief Set value int.
@@ -97,22 +97,22 @@ class UniformWrapper : public UniformInterface
      * @param size: The size of the vector.
      */
     void SetValueInt(
-        const std::string &name,
-        const std::vector<std::int32_t> &vector,
+        const std::string& name,
+        const std::vector<std::int32_t>& vector,
         glm::uvec2 size) override;
     /**
      * @brief Get the value of a stream.
      * @param name: Name of the stream.
      * @return The vector that correspond to the value of a stream.
      */
-    std::vector<float> GetValueFloat(const std::string &name) const override;
+    std::vector<float> GetValueFloat(const std::string& name) const override;
     /**
      * @brief Get the value of a stream.
      * @param name: Name of the stream.
      * @return The vector that correspond to the value of a stream.
      */
     std::vector<std::int32_t> GetValueInt(
-        const std::string &name) const override;
+        const std::string& name) const override;
     /**
      * @brief Get a list of names for the float uniform plugin.
      * @return The list of names for the float uniform plugin.
@@ -128,13 +128,13 @@ class UniformWrapper : public UniformInterface
      * @param name: Name of the stream.
      * @return The vector that correspond to the value of a stream.
      */
-    glm::uvec2 GetSizeFromFloat(const std::string &name) const override;
+    glm::uvec2 GetSizeFromFloat(const std::string& name) const override;
     /**
      * @brief Get the value of a stream.
      * @param name: Name of the stream.
      * @return The vector that correspond to the value of a stream.
      */
-    glm::uvec2 GetSizeFromInt(const std::string &name) const override;
+    glm::uvec2 GetSizeFromInt(const std::string& name) const override;
     /**
      * @brief Get the delta time.
      * @return The delta time.

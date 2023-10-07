@@ -10,7 +10,7 @@
 namespace
 {
 
-void CheckParameters(const frame::proto::Texture &proto_texture)
+void CheckParameters(const frame::proto::Texture& proto_texture)
 {
     // Get the pixel element size.
     constexpr auto INVALID_ELEMENT_SIZE =
@@ -32,7 +32,7 @@ namespace frame::proto
 {
 
 std::unique_ptr<frame::TextureInterface> ParseTexture(
-    const Texture &proto_texture, glm::uvec2 size)
+    const Texture& proto_texture, glm::uvec2 size)
 {
     glm::uvec2 texture_size = size;
     if (proto_texture.size().x() < 0)
@@ -58,7 +58,7 @@ std::unique_ptr<frame::TextureInterface> ParseTexture(
     texture_parameter.size = texture_size;
     if (!proto_texture.pixels().empty())
     {
-        texture_parameter.data_ptr = (void *)proto_texture.pixels().data();
+        texture_parameter.data_ptr = (void*)proto_texture.pixels().data();
         texture = std::make_unique<frame::opengl::Texture>(texture_parameter);
     }
     else
@@ -78,7 +78,7 @@ std::unique_ptr<frame::TextureInterface> ParseTexture(
 }
 
 std::unique_ptr<TextureInterface> ParseCubeMapTexture(
-    const Texture &proto_texture, glm::uvec2 size)
+    const Texture& proto_texture, glm::uvec2 size)
 {
     glm::uvec2 texture_size = size;
     if (proto_texture.size().x() < 0)
@@ -121,7 +121,7 @@ std::unique_ptr<TextureInterface> ParseCubeMapTexture(
 }
 
 std::unique_ptr<TextureInterface> ParseTextureFile(
-    const proto::Texture &proto_texture)
+    const proto::Texture& proto_texture)
 {
     return opengl::file::LoadTextureFromFile(
         file::FindFile(std::filesystem::path(proto_texture.file_name())),
@@ -130,7 +130,7 @@ std::unique_ptr<TextureInterface> ParseTextureFile(
 }
 
 std::unique_ptr<TextureInterface> ParseCubeMapTextureFile(
-    const proto::Texture &proto_texture)
+    const proto::Texture& proto_texture)
 {
     return opengl::file::LoadCubeMapTextureFromFile(
         file::FindFile(std::filesystem::path(proto_texture.file_name())),
@@ -139,7 +139,7 @@ std::unique_ptr<TextureInterface> ParseCubeMapTextureFile(
 }
 
 std::unique_ptr<TextureInterface> ParseCubeMapTextureFiles(
-    const proto::Texture &proto_texture)
+    const proto::Texture& proto_texture)
 {
     std::array<std::filesystem::path, 6> name_array = {
         file::FindFile(
@@ -161,7 +161,7 @@ std::unique_ptr<TextureInterface> ParseCubeMapTextureFiles(
 }
 
 std::unique_ptr<frame::TextureInterface> ParseBasicTexture(
-    const proto::Texture &proto_texture, glm::uvec2 size)
+    const proto::Texture& proto_texture, glm::uvec2 size)
 {
     CheckParameters(proto_texture);
     if (proto_texture.has_file_name() && !proto_texture.cubemap())

@@ -32,7 +32,7 @@ TEST_F(DeviceTest, AddOnePluginTest)
         window_->GetDevice().GetDeviceEnum(), frame::RenderingAPIEnum::OPENGL);
     auto plugin = std::make_unique<test::PluginMock>();
     EXPECT_CALL(*plugin, GetName).WillRepeatedly(Return("test"));
-    auto &device = window_->GetDevice();
+    auto& device = window_->GetDevice();
     device.AddPlugin(std::move(plugin));
     EXPECT_EQ(1, device.GetPluginPtrs().size());
     EXPECT_EQ(std::vector<std::string>{"test"}, device.GetPluginNames());
@@ -44,7 +44,7 @@ TEST_F(DeviceTest, AddManySamePluginTest)
 {
     EXPECT_TRUE(window_);
     window_->GetDevice().Startup(std::move(level_));
-    auto &device = window_->GetDevice();
+    auto& device = window_->GetDevice();
     EXPECT_EQ(
         window_->GetDevice().GetDeviceEnum(), frame::RenderingAPIEnum::OPENGL);
     for (int i = 0; i < 8; ++i)
@@ -63,7 +63,7 @@ TEST_F(DeviceTest, AddManyDifferentPluginTest)
 {
     EXPECT_TRUE(window_);
     window_->GetDevice().Startup(std::move(level_));
-    auto &device = window_->GetDevice();
+    auto& device = window_->GetDevice();
     EXPECT_EQ(
         window_->GetDevice().GetDeviceEnum(), frame::RenderingAPIEnum::OPENGL);
     for (int i = 0; i < 8; ++i)

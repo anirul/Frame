@@ -27,7 +27,7 @@ bool InputArcball::MouseMoved(glm::vec2 position, glm::vec2 relative, double dt)
     if (!mouse_active_)
         return true;
     auto window_size = device_.GetSize();
-    auto &camera = device_.GetLevel().GetDefaultCamera();
+    auto& camera = device_.GetLevel().GetDefaultCamera();
     glm::vec4 cam_position = glm::vec4(camera.GetPosition(), 1.0f);
     glm::vec4 cam_front = glm::normalize(glm::vec4(camera.GetFront(), 1.0f));
     glm::vec2 delta_angle(2.0f * pi / window_size.x, pi / window_size.y);
@@ -64,7 +64,7 @@ bool InputArcball::MouseReleased(char button, double dt)
 
 bool InputArcball::WheelMoved(float relative, double dt)
 {
-    auto &camera = device_.GetLevel().GetDefaultCamera();
+    auto& camera = device_.GetLevel().GetDefaultCamera();
     float new_fov = camera.GetFovDegrees() + relative * zoom_multiplication_;
     if (new_fov < 1.0f)
         new_fov = 1.0f;

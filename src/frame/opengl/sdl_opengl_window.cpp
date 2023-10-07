@@ -57,7 +57,7 @@ SDLOpenGLWindow::~SDLOpenGLWindow()
 void SDLOpenGLWindow::Run(std::function<void()> lambda)
 {
     // Called only once at the beginning.
-    for (const auto &plugin_interface : device_->GetPluginPtrs())
+    for (const auto& plugin_interface : device_->GetPluginPtrs())
     {
         // In case this is a removed one it will be nulled.
         if (plugin_interface)
@@ -83,7 +83,7 @@ void SDLOpenGLWindow::Run(std::function<void()> lambda)
         while (SDL_PollEvent(&event))
         {
             bool skip = false;
-            for (const auto &plugin_interface : device_->GetPluginPtrs())
+            for (const auto& plugin_interface : device_->GetPluginPtrs())
             {
                 if (plugin_interface)
                 {
@@ -104,7 +104,7 @@ void SDLOpenGLWindow::Run(std::function<void()> lambda)
         device_->Display(time.count());
 
         // Draw the Scene not used?
-        for (const auto &plugin_interface : device_->GetPluginPtrs())
+        for (const auto& plugin_interface : device_->GetPluginPtrs())
         {
             if (plugin_interface)
             {
@@ -126,14 +126,14 @@ void SDLOpenGLWindow::Run(std::function<void()> lambda)
     } while (loop);
 }
 
-bool SDLOpenGLWindow::RunEvent(const SDL_Event &event, const double dt)
+bool SDLOpenGLWindow::RunEvent(const SDL_Event& event, const double dt)
 {
     if (event.type == SDL_QUIT)
         return false;
     bool has_window_plugin = false;
-    for (PluginInterface *plugin : device_->GetPluginPtrs())
+    for (PluginInterface* plugin : device_->GetPluginPtrs())
     {
-        if (dynamic_cast<frame::gui::DrawGuiInterface *>(plugin))
+        if (dynamic_cast<frame::gui::DrawGuiInterface*>(plugin))
             has_window_plugin = true;
     }
     if (event.type == SDL_KEYDOWN)
@@ -143,10 +143,10 @@ bool SDLOpenGLWindow::RunEvent(const SDL_Event &event, const double dt)
         case SDLK_ESCAPE: {
             if (has_window_plugin)
             {
-                for (PluginInterface *plugin : device_->GetPluginPtrs())
+                for (PluginInterface* plugin : device_->GetPluginPtrs())
                 {
-                    auto *window_plugin =
-                        dynamic_cast<frame::gui::DrawGuiInterface *>(plugin);
+                    auto* window_plugin =
+                        dynamic_cast<frame::gui::DrawGuiInterface*>(plugin);
                     if (window_plugin)
                     {
                         auto is_visible = window_plugin->IsVisible();
@@ -226,10 +226,10 @@ const double SDLOpenGLWindow::GetFrameDt(const double t) const
     return ret;
 }
 
-void *SDLOpenGLWindow::GetGraphicContext() const
+void* SDLOpenGLWindow::GetGraphicContext() const
 {
     std::pair<int, int> gl_version;
-    frame::Logger &logger = frame::Logger::GetInstance();
+    frame::Logger& logger = frame::Logger::GetInstance();
 
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
@@ -261,8 +261,8 @@ void *SDLOpenGLWindow::GetGraphicContext() const
 #endif
 
     // GL context.
-    void *gl_context =
-        SDL_GL_CreateContext(static_cast<SDL_Window *>(GetWindowContext()));
+    void* gl_context =
+        SDL_GL_CreateContext(static_cast<SDL_Window*>(GetWindowContext()));
     if (!gl_context)
     {
         std::string error = SDL_GetError();
@@ -272,7 +272,7 @@ void *SDLOpenGLWindow::GetGraphicContext() const
 
     SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &gl_version.first);
     SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &gl_version.second);
-    logger->info(reinterpret_cast<const char *>(glGetString(GL_RENDERER)));
+    logger->info(reinterpret_cast<const char*>(glGetString(GL_RENDERER)));
 
     // Vsync off.
     SDL_GL_SetSwapInterval(0);
@@ -288,7 +288,7 @@ void *SDLOpenGLWindow::GetGraphicContext() const
     {
         throw std::runtime_error(fmt::format(
             "GLEW problems : {}",
-            reinterpret_cast<const char *>(glewGetErrorString(result))));
+            reinterpret_cast<const char*>(glewGetErrorString(result))));
     }
 
     // During init, enable debug output

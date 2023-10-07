@@ -19,10 +19,10 @@ namespace frame::proto
 namespace
 {
 
-std::function<NodeInterface *(const std::string &name)> GetFunctor(
-    LevelInterface &level)
+std::function<NodeInterface*(const std::string& name)> GetFunctor(
+    LevelInterface& level)
 {
-    return [&level](const std::string &name) -> NodeInterface * {
+    return [&level](const std::string& name) -> NodeInterface* {
         auto maybe_id = level.GetIdFromName(name);
         if (!maybe_id)
         {
@@ -34,7 +34,7 @@ std::function<NodeInterface *(const std::string &name)> GetFunctor(
 }
 
 [[nodiscard]] bool ParseSceneMatrix(
-    LevelInterface &level, const SceneMatrix &proto_scene_matrix)
+    LevelInterface& level, const SceneMatrix& proto_scene_matrix)
 {
     std::unique_ptr<NodeMatrix> scene_matrix = nullptr;
     if (proto_scene_matrix.has_matrix())
@@ -59,7 +59,7 @@ std::function<NodeInterface *(const std::string &name)> GetFunctor(
 }
 
 [[nodiscard]] bool ParseSceneStaticMeshClearBuffer(
-    LevelInterface &level, const SceneStaticMesh &proto_scene_static_mesh)
+    LevelInterface& level, const SceneStaticMesh& proto_scene_static_mesh)
 {
     auto node_interface = std::make_unique<NodeStaticMesh>(
         GetFunctor(level), proto_scene_static_mesh.clean_buffer());
@@ -73,7 +73,7 @@ std::function<NodeInterface *(const std::string &name)> GetFunctor(
 }
 
 [[nodiscard]] bool ParseSceneStaticMeshMeshEnum(
-    LevelInterface &level, const SceneStaticMesh &proto_scene_static_mesh)
+    LevelInterface& level, const SceneStaticMesh& proto_scene_static_mesh)
 {
     if (proto_scene_static_mesh.mesh_enum() == SceneStaticMesh::INVALID)
     {
@@ -112,7 +112,7 @@ std::function<NodeInterface *(const std::string &name)> GetFunctor(
             level.GetStaticMeshFromId(mesh_id).GetName()));
     }
     const EntityId material_id = maybe_material_id;
-    auto &mesh = level.GetStaticMeshFromId(mesh_id);
+    auto& mesh = level.GetStaticMeshFromId(mesh_id);
     mesh.SetRenderPrimitive(proto_scene_static_mesh.render_primitive_enum());
     std::unique_ptr<NodeInterface> node_interface =
         std::make_unique<NodeStaticMesh>(GetFunctor(level), mesh_id);
@@ -127,7 +127,7 @@ std::function<NodeInterface *(const std::string &name)> GetFunctor(
 }
 
 [[nodiscard]] bool ParseSceneStaticMeshFileName(
-    LevelInterface &level, const SceneStaticMesh &proto_scene_static_mesh)
+    LevelInterface& level, const SceneStaticMesh& proto_scene_static_mesh)
 {
     auto vec_node_mesh_id = opengl::file::LoadStaticMeshesFromFile(
         level,
@@ -139,8 +139,8 @@ std::function<NodeInterface *(const std::string &name)> GetFunctor(
     int i = 0;
     for (const auto node_mesh_id : vec_node_mesh_id)
     {
-        auto &node = level.GetSceneNodeFromId(node_mesh_id);
-        auto &mesh = level.GetStaticMeshFromId(node.GetLocalMesh());
+        auto& node = level.GetSceneNodeFromId(node_mesh_id);
+        auto& mesh = level.GetStaticMeshFromId(node.GetLocalMesh());
         mesh.SetRenderPrimitive(
             proto_scene_static_mesh.render_primitive_enum());
         auto str = fmt::format("{}.{}", proto_scene_static_mesh.name(), i);
@@ -152,7 +152,7 @@ std::function<NodeInterface *(const std::string &name)> GetFunctor(
 }
 
 [[nodiscard]] bool ParseSceneStaticMeshStreamInput(
-    LevelInterface &level, const SceneStaticMesh &proto_scene_static_mesh)
+    LevelInterface& level, const SceneStaticMesh& proto_scene_static_mesh)
 {
     assert(proto_scene_static_mesh.has_multi_plugin());
     auto point_buffer = std::make_unique<opengl::Buffer>(
@@ -195,7 +195,7 @@ std::function<NodeInterface *(const std::string &name)> GetFunctor(
     const EntityId material_id = maybe_material_id;
 
     // Create the node corresponding to the mesh.
-    auto &mesh_ref = level.GetStaticMeshFromId(mesh_id);
+    auto& mesh_ref = level.GetStaticMeshFromId(mesh_id);
     mesh_ref.SetRenderPrimitive(
         proto_scene_static_mesh.render_primitive_enum());
     std::unique_ptr<NodeInterface> node_interface =
@@ -211,7 +211,7 @@ std::function<NodeInterface *(const std::string &name)> GetFunctor(
 }
 
 [[nodiscard]] bool ParseSceneStaticMesh(
-    LevelInterface &level, const SceneStaticMesh &proto_scene_static_mesh)
+    LevelInterface& level, const SceneStaticMesh& proto_scene_static_mesh)
 {
     // 1st case this is a clean static mesh node.
     if (proto_scene_static_mesh.has_clean_buffer())
@@ -237,7 +237,7 @@ std::function<NodeInterface *(const std::string &name)> GetFunctor(
 }
 
 [[nodiscard]] bool ParseSceneCamera(
-    LevelInterface &level, const frame::proto::SceneCamera &proto_scene_camera)
+    LevelInterface& level, const frame::proto::SceneCamera& proto_scene_camera)
 {
     if (proto_scene_camera.fov_degrees() == 0.0)
     {
@@ -259,7 +259,7 @@ std::function<NodeInterface *(const std::string &name)> GetFunctor(
 }
 
 [[nodiscard]] bool ParseSceneLight(
-    LevelInterface &level, const proto::SceneLight &proto_scene_light)
+    LevelInterface& level, const proto::SceneLight& proto_scene_light)
 {
     switch (proto_scene_light.light_type())
     {
@@ -300,26 +300,26 @@ std::function<NodeInterface *(const std::string &name)> GetFunctor(
 } // End namespace.
 
 [[nodiscard]] bool ParseSceneTreeFile(
-    const SceneTree &proto_scene_tree, LevelInterface &level)
+    const SceneTree& proto_scene_tree, LevelInterface& level)
 {
     level.SetDefaultCameraName(proto_scene_tree.default_camera_name());
     level.SetDefaultRootSceneNodeName(proto_scene_tree.default_root_name());
-    for (const auto &proto_matrix : proto_scene_tree.scene_matrices())
+    for (const auto& proto_matrix : proto_scene_tree.scene_matrices())
     {
         if (!ParseSceneMatrix(level, proto_matrix))
             return false;
     }
-    for (const auto &proto_static_mesh : proto_scene_tree.scene_static_meshes())
+    for (const auto& proto_static_mesh : proto_scene_tree.scene_static_meshes())
     {
         if (!ParseSceneStaticMesh(level, proto_static_mesh))
             return false;
     }
-    for (const auto &proto_camera : proto_scene_tree.scene_cameras())
+    for (const auto& proto_camera : proto_scene_tree.scene_cameras())
     {
         if (!ParseSceneCamera(level, proto_camera))
             return false;
     }
-    for (const auto &proto_light : proto_scene_tree.scene_lights())
+    for (const auto& proto_light : proto_scene_tree.scene_lights())
     {
         if (!ParseSceneLight(level, proto_light))
             return false;

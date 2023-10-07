@@ -68,22 +68,22 @@ class Buffer : public BindInterface, public BufferInterface
      * @param data: Data pointer to the data to be copied (void*).
      */
     void Copy(
-        const std::size_t size, const void *data = nullptr) const override;
+        const std::size_t size, const void* data = nullptr) const override;
     /**
      * @brief Copy a vector to a buffer.
      * @param vector: in vector to be copied in the buffer.
      */
-    void Copy(const std::vector<float> &vector) const override;
+    void Copy(const std::vector<float>& vector) const override;
     /**
      * @brief Copy a vector to a buffer.
      * @param vector: in vector to be copied in the buffer.
      */
-    void Copy(const std::vector<unsigned int> &vector) const override;
+    void Copy(const std::vector<unsigned int>& vector) const override;
     /**
      * @brief Copy a vector to a buffer.
      * @param vector: in vector to be copied in the buffer.
      */
-    void Copy(const std::vector<std::uint8_t> &vector) const override;
+    void Copy(const std::vector<std::uint8_t>& vector) const override;
     /**
      * @brief Clear the buffer.
      */
@@ -144,7 +144,7 @@ class Buffer : public BindInterface, public BufferInterface
      * @brief This is the set part of the name interface.
      * @param name: The name of the object.
      */
-    void SetName(const std::string &name) override
+    void SetName(const std::string& name) override
     {
         name_ = name;
     }
@@ -162,13 +162,13 @@ class Buffer : public BindInterface, public BufferInterface
  * @param device: A pointer to a device.
  * @param vector: A vector that is moved into the device and level.
  */
-std::unique_ptr<BufferInterface> CreatePointBuffer(std::vector<float> &&vector);
+std::unique_ptr<BufferInterface> CreatePointBuffer(std::vector<float>&& vector);
 /**
  * @brief Create an index buffer from a vector of unsigned integer.
  * @param device: A pointer to a device.
  * @param vector: A vector that is moved into the device and level.
  */
 std::unique_ptr<BufferInterface> CreateIndexBuffer(
-    std::vector<std::uint32_t> &&vector);
+    std::vector<std::uint32_t>&& vector);
 
 } // End namespace frame::opengl.

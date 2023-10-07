@@ -6,7 +6,7 @@ namespace frame::opengl
 {
 
 ScopedBind::ScopedBind(
-    const BindInterface &bind_locked, const unsigned int slot /*= 0*/)
+    const BindInterface& bind_locked, const unsigned int slot /*= 0*/)
     : bind_locked_(bind_locked)
 {
     bind_locked_.Bind(slot);

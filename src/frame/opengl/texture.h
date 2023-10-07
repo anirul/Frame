@@ -33,7 +33,7 @@ class Texture : public TextureInterface, public BindInterface
      * @brief Default constructor.
      * @param Parameter for creating the texture.
      */
-    Texture(const TextureParameter &texture_parameter);
+    Texture(const TextureParameter& texture_parameter);
     //! @brief Destructor this will free memory on the GPU also!
     virtual ~Texture();
 
@@ -146,7 +146,7 @@ class Texture : public TextureInterface, public BindInterface
      *        texture.
      */
     void Update(
-        std::vector<std::uint8_t> &&vector,
+        std::vector<std::uint8_t>&& vector,
         glm::uvec2 size,
         std::uint8_t bytes_per_pixel) override;
 
@@ -204,7 +204,7 @@ class Texture : public TextureInterface, public BindInterface
      * @brief Set name from the name interface.
      * @param name: New name to be set.
      */
-    void SetName(const std::string &name) override
+    void SetName(const std::string& name) override
     {
         name_ = name;
     }
@@ -232,7 +232,7 @@ class Texture : public TextureInterface, public BindInterface
      *        first!
      * @param data: pixel used to fill up (or null for don't care).
      */
-    void CreateTexture(const void *data = nullptr);
+    void CreateTexture(const void* data = nullptr);
     //! @brief Lock the bind for RAII interface to the bind interface.
     void LockedBind() const override
     {

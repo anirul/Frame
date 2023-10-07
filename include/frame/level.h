@@ -48,7 +48,7 @@ class Level : public LevelInterface
      * @param id: The id to get the scene node from.
      * @return A pointer to the node or null.
      */
-    NodeInterface &GetSceneNodeFromId(EntityId id) const override
+    NodeInterface& GetSceneNodeFromId(EntityId id) const override
     {
         return *id_scene_node_map_.at(id).get();
     }
@@ -57,7 +57,7 @@ class Level : public LevelInterface
      * @param id: The id to get the texture from.
      * @return A pointer to the texture or null.
      */
-    TextureInterface &GetTextureFromId(EntityId id) const override
+    TextureInterface& GetTextureFromId(EntityId id) const override
     {
         return *id_texture_map_.at(id).get();
     }
@@ -66,7 +66,7 @@ class Level : public LevelInterface
      * @param id: The id to get the program from.
      * @return A pointer to the program or null.
      */
-    ProgramInterface &GetProgramFromId(EntityId id) const override
+    ProgramInterface& GetProgramFromId(EntityId id) const override
     {
         return *id_program_map_.at(id).get();
     }
@@ -75,7 +75,7 @@ class Level : public LevelInterface
      * @param id: The id to get the material from.
      * @return A pointer to a material or null.
      */
-    MaterialInterface &GetMaterialFromId(EntityId id) const override
+    MaterialInterface& GetMaterialFromId(EntityId id) const override
     {
         return *id_material_map_.at(id).get();
     }
@@ -84,7 +84,7 @@ class Level : public LevelInterface
      * @param id: The id to get the buffer from.
      * @return A pointer to a buffer or null.
      */
-    BufferInterface &GetBufferFromId(EntityId id) const override
+    BufferInterface& GetBufferFromId(EntityId id) const override
     {
         return *id_buffer_map_.at(id).get();
     }
@@ -93,7 +93,7 @@ class Level : public LevelInterface
      * @param id: The id to get the static mesh from.
      * @return A pointer to a static mesh or null.
      */
-    StaticMeshInterface &GetStaticMeshFromId(EntityId id) const override
+    StaticMeshInterface& GetStaticMeshFromId(EntityId id) const override
     {
         return *id_static_mesh_map_.at(id).get();
     }
@@ -122,7 +122,7 @@ class Level : public LevelInterface
      *        is loaded after).
      * @param name: Name of the camera to be loaded.
      */
-    void SetDefaultCameraName(const std::string &name) override
+    void SetDefaultCameraName(const std::string& name) override
     {
         default_camera_name_ = name;
     }
@@ -130,7 +130,7 @@ class Level : public LevelInterface
      * @brief Set the default texture name.
      * @param name: Name of the scene root.
      */
-    void SetDefaultTextureName(const std::string &name) override
+    void SetDefaultTextureName(const std::string& name) override
     {
         default_texture_name_ = name;
     }
@@ -148,7 +148,7 @@ class Level : public LevelInterface
      *        root node is not loaded in a deterministic order).
      * @param name: Name of the scene root.
      */
-    void SetDefaultRootSceneNodeName(const std::string &name) override
+    void SetDefaultRootSceneNodeName(const std::string& name) override
     {
         default_root_scene_node_name_ = name;
     }
@@ -197,7 +197,7 @@ class Level : public LevelInterface
      * @brief Set name.
      * @return Name.
      */
-    void SetName(const std::string &name) override
+    void SetName(const std::string& name) override
     {
         name_ = name;
     }
@@ -218,7 +218,7 @@ class Level : public LevelInterface
      * @param name: The name string of the element.
      * @return Id of the element or error.
      */
-    EntityId GetIdFromName(const std::string &name) const override;
+    EntityId GetIdFromName(const std::string& name) const override;
     /**
      * @brief Get the name of an element given an id.
      * @param id: Id of the element to get the name.
@@ -230,32 +230,32 @@ class Level : public LevelInterface
      * @param scene_node: Move a scene node to the scene tree.
      * @return Assigned entity id or error.
      */
-    EntityId AddSceneNode(std::unique_ptr<NodeInterface> &&scene_node) override;
+    EntityId AddSceneNode(std::unique_ptr<NodeInterface>&& scene_node) override;
     /**
      * @brief Add a texture to the level.
      * @param texture: Move a texture in the level.
      * @return Assigned entity id or error.
      */
-    EntityId AddTexture(std::unique_ptr<TextureInterface> &&texture) override;
+    EntityId AddTexture(std::unique_ptr<TextureInterface>&& texture) override;
     /**
      * @brief Add a program to the level.
      * @param program: Move a program in the level.
      * @return Assigned entity id or error.
      */
-    EntityId AddProgram(std::unique_ptr<ProgramInterface> &&program) override;
+    EntityId AddProgram(std::unique_ptr<ProgramInterface>&& program) override;
     /**
      * @brief Add a material to the level.
      * @param material: Move a material in the level.
      * @return Assigned entity id or error.
      */
     EntityId AddMaterial(
-        std::unique_ptr<MaterialInterface> &&material) override;
+        std::unique_ptr<MaterialInterface>&& material) override;
     /**
      * @brief Add a buffer to the level.
      * @param buffer: Move a buffer in the level.
      * @return Assigned entity id or error.
      */
-    EntityId AddBuffer(std::unique_ptr<BufferInterface> &&buffer) override;
+    EntityId AddBuffer(std::unique_ptr<BufferInterface>&& buffer) override;
     /**
      * @brief Remove a buffer from the level.
      * @param buffer: The buffer id to be removed.
@@ -267,7 +267,7 @@ class Level : public LevelInterface
      * @return Assigned entity id or error.
      */
     EntityId AddStaticMesh(
-        std::unique_ptr<StaticMeshInterface> &&static_mesh) override;
+        std::unique_ptr<StaticMeshInterface>&& static_mesh) override;
     /**
      * @brief Get the list of children from an id in the node list.
      * @param id: The node id you want to get the children.
@@ -298,7 +298,7 @@ class Level : public LevelInterface
      * @brief Get the default camera from the level.
      * @return A pointer to the default camera.
      */
-    Camera &GetDefaultCamera() override;
+    Camera& GetDefaultCamera() override;
     /**
      * @brief Replace a texture to a new texture given as a vector.
      * @param vector: The new vector containing the new texture.
@@ -307,7 +307,7 @@ class Level : public LevelInterface
      * @param id: The id of the texture to be replaced.
      */
     void ReplaceTexture(
-        std::vector<std::uint8_t> &&vector,
+        std::vector<std::uint8_t>&& vector,
         glm::uvec2 size,
         std::uint8_t bytes_per_pixel,
         EntityId id) override;
@@ -318,7 +318,7 @@ class Level : public LevelInterface
      * @param id: The id to replace the mesh.
      */
     void ReplaceMesh(
-        std::unique_ptr<StaticMeshInterface> &&mesh, EntityId id) override;
+        std::unique_ptr<StaticMeshInterface>&& mesh, EntityId id) override;
 
   protected:
     /**
@@ -371,7 +371,7 @@ class Level : public LevelInterface
     }
 
   protected:
-    Logger &logger_ = Logger::GetInstance();
+    Logger& logger_ = Logger::GetInstance();
     mutable EntityId next_id_maker_ = NullId;
     EntityId quad_id_ = 0;
     EntityId cube_id_ = 0;

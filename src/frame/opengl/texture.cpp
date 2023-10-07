@@ -19,7 +19,7 @@
 namespace frame::opengl
 {
 
-Texture::Texture(const TextureParameter &texture_parameter)
+Texture::Texture(const TextureParameter& texture_parameter)
     : size_(texture_parameter.size),
       pixel_element_size_(texture_parameter.pixel_element_size),
       pixel_structure_(texture_parameter.pixel_structure)
@@ -28,7 +28,7 @@ Texture::Texture(const TextureParameter &texture_parameter)
     CreateTexture(texture_parameter.data_ptr);
 }
 
-void Texture::CreateTexture(const void *data /* = nullptr*/)
+void Texture::CreateTexture(const void* data /* = nullptr*/)
 {
     glGenTextures(1, &texture_id_);
     ScopedBind scoped_bind(*this);
@@ -320,7 +320,7 @@ std::vector<float> Texture::GetTextureFloat() const
 }
 
 void Texture::Update(
-    std::vector<std::uint8_t> &&vector,
+    std::vector<std::uint8_t>&& vector,
     glm::uvec2 size,
     std::uint8_t bytes_per_pixel)
 {

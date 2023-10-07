@@ -33,7 +33,7 @@ EntityId Level::GetDefaultStaticMeshCubeId() const
     return NullId;
 }
 
-EntityId Level::GetIdFromName(const std::string &name) const
+EntityId Level::GetIdFromName(const std::string& name) const
 {
     if (name.empty())
     {
@@ -44,7 +44,7 @@ EntityId Level::GetIdFromName(const std::string &name) const
     {
         return name_id_map_.at(name);
     }
-    catch (std::out_of_range &ex)
+    catch (std::out_of_range& ex)
     {
         logger_->warn(ex.what());
         return NullId;
@@ -57,14 +57,14 @@ std::optional<std::string> Level::GetNameFromId(EntityId id) const
     {
         return id_name_map_.at(id);
     }
-    catch (std::out_of_range &ex)
+    catch (std::out_of_range& ex)
     {
         logger_->warn(ex.what());
         return std::nullopt;
     }
 }
 
-EntityId Level::AddSceneNode(std::unique_ptr<NodeInterface> &&scene_node)
+EntityId Level::AddSceneNode(std::unique_ptr<NodeInterface>&& scene_node)
 {
     EntityId id = GetSceneNodeNewId();
     std::string name = scene_node->GetName();
@@ -81,7 +81,7 @@ EntityId Level::AddSceneNode(std::unique_ptr<NodeInterface> &&scene_node)
     return id;
 }
 
-EntityId Level::AddTexture(std::unique_ptr<TextureInterface> &&texture)
+EntityId Level::AddTexture(std::unique_ptr<TextureInterface>&& texture)
 {
     EntityId id = GetTextureNewId();
     std::string name = texture->GetName();
@@ -98,7 +98,7 @@ EntityId Level::AddTexture(std::unique_ptr<TextureInterface> &&texture)
     return id;
 }
 
-EntityId Level::AddProgram(std::unique_ptr<ProgramInterface> &&program)
+EntityId Level::AddProgram(std::unique_ptr<ProgramInterface>&& program)
 {
     EntityId id = GetProgramNewId();
     std::string name = program->GetName();
@@ -114,7 +114,7 @@ EntityId Level::AddProgram(std::unique_ptr<ProgramInterface> &&program)
     return id;
 }
 
-EntityId Level::AddMaterial(std::unique_ptr<MaterialInterface> &&material)
+EntityId Level::AddMaterial(std::unique_ptr<MaterialInterface>&& material)
 {
     EntityId id = GetMaterialNewId();
     std::string name = material->GetName();
@@ -130,7 +130,7 @@ EntityId Level::AddMaterial(std::unique_ptr<MaterialInterface> &&material)
     return id;
 }
 
-EntityId Level::AddBuffer(std::unique_ptr<BufferInterface> &&buffer)
+EntityId Level::AddBuffer(std::unique_ptr<BufferInterface>&& buffer)
 {
     EntityId id = GetBufferNewId();
     std::string name = buffer->GetName();
@@ -161,7 +161,7 @@ void Level::RemoveBuffer(EntityId buffer_id)
 }
 
 EntityId Level::AddStaticMesh(
-    std::unique_ptr<StaticMeshInterface> &&static_mesh)
+    std::unique_ptr<StaticMeshInterface>&& static_mesh)
 {
     EntityId id = GetStaticMeshNewId();
     std::string name = static_mesh->GetName();
@@ -184,9 +184,9 @@ std::optional<std::vector<frame::EntityId>> Level::GetChildList(
     std::vector<EntityId> list;
     try
     {
-        const auto &node = id_scene_node_map_.at(id);
+        const auto& node = id_scene_node_map_.at(id);
         // Check who has node as a parent.
-        for (const auto &id_node : id_scene_node_map_)
+        for (const auto& id_node : id_scene_node_map_)
         {
             // In case this is node then add it to the list.
             if (id_node.second->GetParentName() == node->GetName())
@@ -195,7 +195,7 @@ std::optional<std::vector<frame::EntityId>> Level::GetChildList(
             }
         }
     }
-    catch (std::out_of_range &ex)
+    catch (std::out_of_range& ex)
     {
         logger_->warn(ex.what());
         return std::nullopt;
@@ -211,7 +211,7 @@ EntityId Level::GetParentId(EntityId id) const
         auto maybe_id = GetIdFromName(name);
         return maybe_id;
     }
-    catch (std::out_of_range &ex)
+    catch (std::out_of_range& ex)
     {
         logger_->warn(ex.what());
         return NullId;
@@ -221,7 +221,7 @@ EntityId Level::GetParentId(EntityId id) const
 std::vector<frame::EntityId> Level::GetAllTextures() const
 {
     std::vector<EntityId> list;
-    for (const auto &id_texture : id_texture_map_)
+    for (const auto& id_texture : id_texture_map_)
     {
         list.push_back(id_texture.first);
     }
@@ -237,17 +237,17 @@ std::unique_ptr<frame::TextureInterface> Level::ExtractTexture(EntityId id)
     return std::move(node_texture.mapped());
 }
 
-frame::Camera &Level::GetDefaultCamera()
+frame::Camera& Level::GetDefaultCamera()
 {
     auto camera_id = GetDefaultCameraId();
     assert(camera_id);
-    auto &node_interface = GetSceneNodeFromId(camera_id);
-    auto &node_camera = dynamic_cast<NodeCamera &>(node_interface);
+    auto& node_interface = GetSceneNodeFromId(camera_id);
+    auto& node_camera = dynamic_cast<NodeCamera&>(node_interface);
     return node_camera.GetCamera();
 }
 
 void Level::ReplaceTexture(
-    std::vector<std::uint8_t> &&vector,
+    std::vector<std::uint8_t>&& vector,
     glm::uvec2 size,
     std::uint8_t bytes_per_pixel,
     EntityId id)
@@ -257,7 +257,7 @@ void Level::ReplaceTexture(
         throw std::runtime_error(
             "trying to replace {} but no texture there yet?");
     }
-    auto &texture = id_texture_map_.at(id);
+    auto& texture = id_texture_map_.at(id);
     if (!texture)
     {
         throw std::runtime_error(
@@ -267,7 +267,7 @@ void Level::ReplaceTexture(
 }
 
 void Level::ReplaceMesh(
-    std::unique_ptr<StaticMeshInterface> &&mesh, EntityId id)
+    std::unique_ptr<StaticMeshInterface>&& mesh, EntityId id)
 {
     if (!id_static_mesh_map_.count(id))
     {

@@ -29,7 +29,7 @@ struct WindowInterface
      * @param input_interface: Move a input interface to the window object.
      */
     virtual void SetInputInterface(
-        std::unique_ptr<InputInterface> &&input_interface) = 0;
+        std::unique_ptr<InputInterface>&& input_interface) = 0;
     /**
      * @brief Add a callback for a key.
      * @param key: The key to add a callback for.
@@ -43,12 +43,12 @@ struct WindowInterface
      *        one you are using see : DirectX, OpenGL, etc...).
      * @param device: Move a device to the window object.
      */
-    virtual void SetUniqueDevice(std::unique_ptr<DeviceInterface> &&device) = 0;
+    virtual void SetUniqueDevice(std::unique_ptr<DeviceInterface>&& device) = 0;
     /**
      * @brief Get the current device the one that was assign to this window.
      * @return A pointer to a device interface.
      */
-    virtual DeviceInterface &GetDevice() = 0;
+    virtual DeviceInterface& GetDevice() = 0;
     /**
      * @brief Get the size of the window (useful to make a buffer).
      * @return A size {x, y} of the window.
@@ -70,17 +70,17 @@ struct WindowInterface
      *        be a Windows HWND, a Linux window or ?).
      * @return A pointer to an underlying window context.
      */
-    virtual void *GetWindowContext() const = 0;
+    virtual void* GetWindowContext() const = 0;
     /**
      * @brief Return an graphic context.
      * @return A pointer to an graphic context.
      */
-    virtual void *GetGraphicContext() const = 0;
+    virtual void* GetGraphicContext() const = 0;
     /**
      * @brief Set the window title (the name of the window).
      * @param title: Window title.
      */
-    virtual void SetWindowTitle(const std::string &title) const = 0;
+    virtual void SetWindowTitle(const std::string& title) const = 0;
     /**
      * @brief Resize the window.
      * @param fullscreen_enum: Is it full screen or not?

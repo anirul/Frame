@@ -25,8 +25,8 @@ TEST_F(TextureCubeMapTest, CreateTextureCubeMapTest)
                 frame::file::FindFile("asset/cubemap/positive_z.png"),
                 frame::file::FindFile("asset/cubemap/negative_z.png")}));
     ASSERT_TRUE(texture_);
-    auto *opengl_texture =
-        dynamic_cast<frame::opengl::TextureCubeMap *>(texture_.get());
+    auto* opengl_texture =
+        dynamic_cast<frame::opengl::TextureCubeMap*>(texture_.get());
     ASSERT_NE(nullptr, opengl_texture);
     ASSERT_NE(0, opengl_texture->GetId());
     EXPECT_EQ(1024, texture_->GetSize().x);
@@ -46,8 +46,8 @@ TEST_F(TextureCubeMapTest, CreateEquirectangularTextureCubeMapTest)
             frame::file::FindFile("asset/cubemap/hamarikyu.hdr"),
             frame::proto::PixelElementSize_FLOAT()));
     ASSERT_TRUE(texture_);
-    auto *opengl_texture =
-        dynamic_cast<frame::opengl::TextureCubeMap *>(texture_.get());
+    auto* opengl_texture =
+        dynamic_cast<frame::opengl::TextureCubeMap*>(texture_.get());
     ASSERT_NE(nullptr, opengl_texture);
     ASSERT_NE(0, opengl_texture->GetId());
     EXPECT_EQ(1024, texture_->GetSize().x);

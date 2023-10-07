@@ -14,13 +14,13 @@
 namespace frame::opengl::gui
 {
 
-SDL2OpenGLDrawGui::SDL2OpenGLDrawGui(frame::WindowInterface &window)
+SDL2OpenGLDrawGui::SDL2OpenGLDrawGui(frame::WindowInterface& window)
     : window_(window), device_(window_.GetDevice())
 {
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGuiIO &io = ImGui::GetIO();
+    ImGuiIO& io = ImGui::GetIO();
     // Enable Keyboard Controls
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
     // Enable Docking
@@ -33,7 +33,7 @@ SDL2OpenGLDrawGui::SDL2OpenGLDrawGui(frame::WindowInterface &window)
     ImGui::StyleColorsDark();
     // ImGui::StyleColorsLight();
 
-    ImGuiStyle &style = ImGui::GetStyle();
+    ImGuiStyle& style = ImGui::GetStyle();
     style.WindowRounding = 5.0f;
     io.Fonts->AddFontFromFileTTF(
         file::FindFile("asset/font/poppins/Poppins-Light.ttf").string().c_str(),
@@ -41,7 +41,7 @@ SDL2OpenGLDrawGui::SDL2OpenGLDrawGui(frame::WindowInterface &window)
 
     // Setup Platform/Renderer back ends
     ImGui_ImplSDL2_InitForOpenGL(
-        static_cast<SDL_Window *>(window_.GetWindowContext()),
+        static_cast<SDL_Window*>(window_.GetWindowContext()),
         device_.GetDeviceContext());
     ImGui_ImplOpenGL3_Init("#version 450");
 }
@@ -59,23 +59,23 @@ void SDL2OpenGLDrawGui::Startup(glm::uvec2 size)
     size_ = size;
 }
 
-bool SDL2OpenGLDrawGui::Update(DeviceInterface &device, double dt)
+bool SDL2OpenGLDrawGui::Update(DeviceInterface& device, double dt)
 {
     // Local variables.
     bool returned_value = true;
     is_keyboard_passed_ = false;
-    ImGuiIO &io = ImGui::GetIO();
+    ImGuiIO& io = ImGui::GetIO();
     io.ConfigWindowsMoveFromTitleBarOnly = true;
 
     // Start the Dear ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL2_NewFrame(
-        static_cast<SDL_Window *>(window_.GetWindowContext()));
+        static_cast<SDL_Window*>(window_.GetWindowContext()));
     ImGui::NewFrame();
 
     if (!is_visible_)
     {
-        ImGuiViewport *viewport = ImGui::GetMainViewport();
+        ImGuiViewport* viewport = ImGui::GetMainViewport();
         ImGui::SetNextWindowPos(viewport->WorkPos);
         ImGui::SetNextWindowSize(viewport->WorkSize);
         ImGui::SetNextWindowViewport(viewport->ID);
@@ -84,7 +84,7 @@ bool SDL2OpenGLDrawGui::Update(DeviceInterface &device, double dt)
     {
         ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
         // Make the other window visible.
-        for (const auto &pair : callbacks_)
+        for (const auto& pair : callbacks_)
         {
             // Call the callback!
             ImGui::Begin(pair.second->GetName().c_str());
@@ -95,15 +95,15 @@ bool SDL2OpenGLDrawGui::Update(DeviceInterface &device, double dt)
     }
 
     // Go through all texture and create a window for each of them.
-    for (const EntityId &id : device.GetLevel().GetAllTextures())
+    for (const EntityId& id : device.GetLevel().GetAllTextures())
     {
-        frame::TextureInterface &texture_interface =
+        frame::TextureInterface& texture_interface =
             device.GetLevel().GetTextureFromId(id);
         if (texture_interface.IsCubeMap())
             continue;
-        opengl::Texture &texture = dynamic_cast<opengl::Texture &>(
+        opengl::Texture& texture = dynamic_cast<opengl::Texture&>(
             device.GetLevel().GetTextureFromId(id));
-        auto &level = device.GetLevel();
+        auto& level = device.GetLevel();
         bool is_default_output = level.GetIdFromName(texture.GetName()) ==
                                  level.GetDefaultOutputTextureId();
         if (is_default_output)
@@ -180,7 +180,7 @@ bool SDL2OpenGLDrawGui::Update(DeviceInterface &device, double dt)
         ImGui::UpdatePlatformWindows();
         ImGui::RenderPlatformWindowsDefault();
         SDL_GL_MakeCurrent(
-            static_cast<SDL_Window *>(window_.GetWindowContext()),
+            static_cast<SDL_Window*>(window_.GetWindowContext()),
             window_.GetGraphicContext());
     }
 
@@ -188,7 +188,7 @@ bool SDL2OpenGLDrawGui::Update(DeviceInterface &device, double dt)
 }
 
 void SDL2OpenGLDrawGui::AddWindow(
-    std::unique_ptr<frame::gui::GuiWindowInterface> &&callback)
+    std::unique_ptr<frame::gui::GuiWindowInterface>&& callback)
 {
     std::string name = callback->GetName();
     if (name.empty())
@@ -201,35 +201,35 @@ void SDL2OpenGLDrawGui::AddWindow(
 std::vector<std::string> SDL2OpenGLDrawGui::GetWindowTitles() const
 {
     std::vector<std::string> name_list;
-    for (const auto &[name, _] : callbacks_)
+    for (const auto& [name, _] : callbacks_)
     {
         name_list.push_back(name);
     }
     return name_list;
 }
 
-void SDL2OpenGLDrawGui::DeleteWindow(const std::string &name)
+void SDL2OpenGLDrawGui::DeleteWindow(const std::string& name)
 {
     callbacks_.erase(name);
 }
 
-bool SDL2OpenGLDrawGui::PollEvent(void *event)
+bool SDL2OpenGLDrawGui::PollEvent(void* event)
 {
     // Allow to click on close window.
-    if (static_cast<SDL_Event *>(event)->type == SDL_QUIT)
+    if (static_cast<SDL_Event*>(event)->type == SDL_QUIT)
         return false;
     // Process the event in ImGui (has to be done or you won't be able to
     // handle the main window).
-    ImGui_ImplSDL2_ProcessEvent(static_cast<SDL_Event *>(event));
+    ImGui_ImplSDL2_ProcessEvent(static_cast<SDL_Event*>(event));
     // This is the main window (receiving the input for) so skip.
     if (is_keyboard_passed_)
         return false;
-    auto &io = ImGui::GetIO();
+    auto& io = ImGui::GetIO();
     return io.WantCaptureMouse || io.WantCaptureKeyboard;
 }
 
-frame::gui::GuiWindowInterface &SDL2OpenGLDrawGui::GetWindow(
-    const std::string &name)
+frame::gui::GuiWindowInterface& SDL2OpenGLDrawGui::GetWindow(
+    const std::string& name)
 {
     return *callbacks_.at(name).get();
 }

@@ -4,10 +4,10 @@ namespace frame::vulkan
 {
 
 Device::Device(
-    void *vk_instance,
+    void* vk_instance,
     glm::uvec2 size,
-    vk::SurfaceKHR &surface,
-    vk::DispatchLoaderDynamic &dispatch)
+    vk::SurfaceKHR& surface,
+    vk::DispatchLoaderDynamic& dispatch)
     : vk_instance_(static_cast<VkInstance>(vk_instance)), size_(size),
       vk_surface_(surface), vk_dispatch_loader_(dispatch)
 {
@@ -20,12 +20,12 @@ Device::Device(
     }
     // Check and select physical device properties.
     int last_best_score = 0;
-    for (const auto &physical_device : physical_devices)
+    for (const auto& physical_device : physical_devices)
     {
         int score = 0;
         logger_->info(
             "Physical Device: {}",
-            static_cast<char *>(physical_device.getProperties().deviceName));
+            static_cast<char*>(physical_device.getProperties().deviceName));
         if (physical_device.getProperties().deviceType ==
             vk::PhysicalDeviceType::eDiscreteGpu)
         {
@@ -51,7 +51,7 @@ Device::Device(
         vk_physical_device_.getQueueFamilyProperties(vk_dispatch_loader_);
     int i = 0;
     int selected_index = -1;
-    for (auto &queue_family : queue_families)
+    for (auto& queue_family : queue_families)
     {
         if (queue_family.queueFlags & vk::QueueFlagBits::eGraphics)
         {
@@ -85,22 +85,22 @@ void Device::SetStereo(
 }
 
 void Device::Clear(
-    const glm::vec4 &color /*= glm::vec4(.2f, 0.f, .2f, 1.0f)*/) const
+    const glm::vec4& color /*= glm::vec4(.2f, 0.f, .2f, 1.0f)*/) const
 {
     throw std::runtime_error("Not implemented!");
 }
 
-void Device::Startup(std::unique_ptr<LevelInterface> &&level)
+void Device::Startup(std::unique_ptr<LevelInterface>&& level)
 {
     throw std::runtime_error("Not implemented!");
 }
 
-void Device::AddPlugin(std::unique_ptr<PluginInterface> &&plugin_interface)
+void Device::AddPlugin(std::unique_ptr<PluginInterface>&& plugin_interface)
 {
     throw std::runtime_error("Not implemented!");
 }
 
-std::vector<PluginInterface *> Device::GetPluginPtrs()
+std::vector<PluginInterface*> Device::GetPluginPtrs()
 {
     throw std::runtime_error("Not implemented!");
 }
@@ -110,7 +110,7 @@ std::vector<std::string> Device::GetPluginNames() const
     throw std::runtime_error("Not implemented!");
 }
 
-void Device::RemovePluginByName(const std::string &name)
+void Device::RemovePluginByName(const std::string& name)
 {
     throw std::runtime_error("Not implemented!");
 }
@@ -135,31 +135,31 @@ void Device::Display(double dt /*= 0.0*/)
     throw std::runtime_error("Not implemented!");
 }
 
-void Device::ScreenShot(const std::string &file) const
+void Device::ScreenShot(const std::string& file) const
 {
     throw std::runtime_error("Not implemented!");
 }
 
 std::unique_ptr<frame::BufferInterface> Device::CreatePointBuffer(
-    std::vector<float> &&vector)
+    std::vector<float>&& vector)
 {
     throw std::runtime_error("Not implemented!");
 }
 
 std::unique_ptr<frame::BufferInterface> Device::CreateIndexBuffer(
-    std::vector<std::uint32_t> &&vector)
+    std::vector<std::uint32_t>&& vector)
 {
     throw std::runtime_error("Not implemented!");
 }
 
 std::unique_ptr<frame::StaticMeshInterface> Device::CreateStaticMesh(
-    const StaticMeshParameter &static_mesh_parameter)
+    const StaticMeshParameter& static_mesh_parameter)
 {
     throw std::runtime_error("Not implemented!");
 }
 
 std::unique_ptr<frame::TextureInterface> Device::CreateTexture(
-    const TextureParameter &texture_parameter)
+    const TextureParameter& texture_parameter)
 {
     throw std::runtime_error("Not implemented!");
 }

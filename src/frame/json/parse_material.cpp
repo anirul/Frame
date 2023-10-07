@@ -6,7 +6,7 @@ namespace frame::proto
 {
 
 std::optional<std::unique_ptr<frame::MaterialInterface>> ParseMaterialOpenGL(
-    const frame::proto::Material &proto_material, LevelInterface &level)
+    const frame::proto::Material& proto_material, LevelInterface& level)
 {
     const std::size_t texture_size = proto_material.texture_names_size();
     const std::size_t inner_size = proto_material.inner_names_size();

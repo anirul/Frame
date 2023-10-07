@@ -90,28 +90,28 @@ Win32OpenGLNone::~Win32OpenGLNone()
 
 void Win32OpenGLNone::Run(std::function<void()> lambda)
 {
-    for (const auto &plugin_interface : device_->GetPluginPtrs())
+    for (const auto& plugin_interface : device_->GetPluginPtrs())
     {
         plugin_interface->Startup(size_);
     }
     if (input_interface_)
         input_interface_->NextFrame();
     device_->Display(0.0);
-    for (const auto &plugin_interface : device_->GetPluginPtrs())
+    for (const auto& plugin_interface : device_->GetPluginPtrs())
     {
         plugin_interface->Update(*device_.get(), 0.0);
     }
     lambda();
 }
 
-void *Win32OpenGLNone::GetGraphicContext() const
+void* Win32OpenGLNone::GetGraphicContext() const
 {
     // Initialize GLEW.
     GLenum error = GLEW_OK;
     if (GLEW_OK != (error = glewInit()))
     {
         throw std::runtime_error(
-            reinterpret_cast<const char *>(glewGetErrorString(error)));
+            reinterpret_cast<const char*>(glewGetErrorString(error)));
     }
 
     // During init, enable debug output
@@ -119,11 +119,11 @@ void *Win32OpenGLNone::GetGraphicContext() const
     glDebugMessageCallback(MessageCallback, nullptr);
 
     // Check OpenGL versions.
-    const char *version = (const char *)glGetString(GL_VERSION);
+    const char* version = (const char*)glGetString(GL_VERSION);
     logger_->info(fmt::format("Version  : {}", version));
-    const char *vendor = (const char *)glGetString(GL_VENDOR);
+    const char* vendor = (const char*)glGetString(GL_VENDOR);
     logger_->info(fmt::format("Vendor   : {}", vendor));
-    const char *renderer = (const char *)glGetString(GL_RENDERER);
+    const char* renderer = (const char*)glGetString(GL_RENDERER);
     logger_->info(fmt::format("Renderer : {}", renderer));
 
 #if defined(_WIN32) || defined(_WIN64)
