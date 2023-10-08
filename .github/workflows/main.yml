@@ -19,8 +19,8 @@ jobs:
       run: |
         git clone https://github.com/microsoft/vcpkg.git
         cd vcpkg
-        bootstrap-vcpkg.bat
-        vcpkg integrate install
+        ./bootstrap-vcpkg.bat
+        ./vcpkg integrate install
 
     # No need for a manual vcpkg install step, the manifest mode will handle it
 
