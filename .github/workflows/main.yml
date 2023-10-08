@@ -1,0 +1,53 @@
+name: C++ CI with vcpkg and gtest
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: self-hosted
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        lfs: true
+
+    - name: Git-lfs pull
+      run: |
+        git lfs pull
+        
+    #- name: Install Vulkan SDK
+    #  run: |
+    #    Invoke-WebRequest -Uri "https://sdk.lunarg.com/sdk/download/1.3.261.1/windows/VulkanSDK-1.3.261.1-Installer.exe" -OutFile "VulkanSDKInstaller.exe"
+    #    Start-Process ./VulkanSDKInstaller.exe -ArgumentList "/S" -NoNewWindow -Wait
+      
+    - name: Setup vcpkg
+      run: |
+        git clone https://github.com/microsoft/vcpkg.git
+        cd vcpkg
+        ./bootstrap-vcpkg.bat
+        ./vcpkg integrate install
+
+    # No need for a manual vcpkg install step, the manifest mode will handle it
+
+    - name: Create Build Environment using CMake
+      shell: cmd
+      run: |
+        mkdir build
+        cd build
+        cmake -DCMAKE_TOOLCHAIN_FILE=C:/actions-runner/_work/Frame/Frame/vcpkg/scripts/buildsystems/vcpkg.cmake -A x64 ..
+
+    - name: Build with CMake
+      shell: cmd
+      run: |
+        cd build
+        cmake --build . --config Release
+        
+    - name: Run tests using gtest
+      shell: cmd
+      run: |
+        .\build\tests\Release\FrameFileTest.exe
+        .\build\tests\Release\FrameJsonTest.exe
+        .\build\tests\Release\FrameOpenGLTest.exe
+        .\build\tests\frame\opengl\file\tests\Release\FrameOpenGLFileTest.exe
+        .\build\tests\frame\tests\Release\FrameTest.exe
