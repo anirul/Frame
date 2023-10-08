@@ -7,6 +7,11 @@ jobs:
     runs-on: self-hosted
 
     steps:
+    - name: Get git-lfs
+      run: |
+        Invoke-WebRequest -Uri "https://github.com/git-lfs/git-lfs/releases/download/v3.4.0/git-lfs-windows-v3.4.0.exe"
+        Start-Process ./git-lfs-windows-v3.4.0.exe -ArgumentList "/S" -NoNewWindow -Wait
+    
     - name: Checkout code
       uses: actions/checkout@v4
       with:
