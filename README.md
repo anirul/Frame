@@ -1,63 +1,51 @@
 # Frame
 
-3D engine example it use OpenGL and soon it will be using (Vulkan or DirectX
-12). It take models in obj forms and images that can be read by stb (jpg, png,
-hdr,...).
+Welcome to Frame, a versatile 3D engine harnessing the power of OpenGL, with forthcoming support for Vulkan or DirectX 12. Designed to facilitate an immersive dive into computer graphics, Frame accepts models in OBJ format and images readable by stb (jpg, png, hdr, and more).
 
 ![A Scene rendering made with ShaderGL.](https://github.com/anirul/Frame/raw/master/examples/scene_rendering.png)
 
-## Requirements
+## Getting Started
 
-- *GIT* needed if you want to get the sources.
-- *A compiler* needed for compilation.
-  - Visual Studio Community edition should be enough.
-  - You could also use clang or gcc...
-- *cmake* you can get it [here](https://cmake.org/).
-- *VCPKG* you can get it [here](https://github.com/Microsoft/vcpkg/)
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
-## VCPKG
+### Prerequisites
 
-This project use *VCPKG* again so you should be able to build it! Basically
-you have to install and setup *VCPKG*, you can get it
-[here](https://github.com/Microsoft/vcpkg/). Use the `./boostrap.bat` or the
-OS specific command to have it instlled on you OS.
+What you need to build and run Frame:
 
-Then you can install all the required packages, you can use the command line
-tools provided later:
+- *GIT* - Essential for cloning the repository. You can download it here.
+- *Compiler* - Necessary for building the project. Options include:
+  - Visual Studio (Community Edition is sufficient)
+  - Alternatives like clang or gcc
+- *CMake* - Required for creating the build system. Download it [here](https://cmake.org/).
+- *VCPKG* - Frame uses VCPKG for managing C++ libraries. Set it up using instructions from the official [VCPKG GitHub](https://github.com/Microsoft/vcpkg/).
 
-- abseil
-- glm
-- gtest
-- happly
-- imgui
-- opengl
-- protobuf
-- sdl2
-- spdlog
-- stb
-- tinyobjloader
+### Setting Up VCPKG
 
-## Building
+After installing VCPKG following the instructions [here](https://github.com/Microsoft/vcpkg/), use the command line to install the necessary packages:
 
-To your install path using this commands.
-
-```shell
-[...]Frame> mkdir build
-[...]Frame> cd build
-[...]Frame/build> cmake .. -DCMAKE_TOOLCHAIN_FILE="[...]\vcpkg\scripts\buildsystems\vcpkg.cmake"
+```
+./vcpkg install abseil glm gtest happly imgui opengl protobuf sdl2 spdlog stb tinyobjloader
 ```
 
-Then you can either use the *Visual Studio* from your OS or use the command 
-line.
+Or you can use the cmake to get the list of dependencies from the `vcpkg.json`.
+
+### Building Frame
+
+Navigate to your Frame directory and use the following commands to build the project:
 
 ```shell
-Frame/build> cmake --build .
+cd path-to-frame
+mkdir build
+cd build
+cmake .. -DCMAKE_TOOLCHAIN_FILE="path-to-vcpkg\scripts\buildsystems\vcpkg.cmake"
 ```
 
-### makefiles
+After setting up, you can build the project using Visual Studio or via the command line with the following command:
 
-You can just use the `make` command.
+```shell
+cmake --build .
+```
 
-## Examples
+## Dive in with Examples
 
-You can have a look at various examples [here](examples/README.md).
+Explore various practical examples to get accustomed to what Frame is capable of! Check them out [here](examples/README.md).
