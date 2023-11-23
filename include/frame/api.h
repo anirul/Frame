@@ -9,6 +9,7 @@ namespace frame
  */
 enum class RenderingAPIEnum
 {
+	DELTADRAW,		// A software renderer.
     OPENGL,
     VULKAN,
     // From: https://sourceforge.net/p/predef/wiki/OperatingSystems/

@@ -65,6 +65,7 @@ target_link_libraries(Frame
 
 set_property(TARGET Frame PROPERTY FOLDER "Frame")
 
+add_subdirectory(deltadraw)
 add_subdirectory(opengl)
 add_subdirectory(vulkan)
 
