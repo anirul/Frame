@@ -22,7 +22,9 @@ std::unique_ptr<WindowInterface> CreateSDL2VulkanWindow(glm::uvec2 size)
     auto& dispatch = window->GetVulkanDispatch();
     auto& surface = window->GetVulkanSurfaceKHR();
     if (!context)
+    {
         return nullptr;
+    }
     window->SetUniqueDevice(
         std::make_unique<Device>(context, size, surface, dispatch));
     return window;
@@ -35,7 +37,9 @@ std::unique_ptr<WindowInterface> CreateSDL2VulkanNone(glm::uvec2 size)
     auto& dispatch = window->GetVulkanDispatch();
     auto& surface = window->GetVulkanSurfaceKHR();
     if (!context)
+    {
         return nullptr;
+    }
     window->SetUniqueDevice(
         std::make_unique<Device>(context, size, surface, dispatch));
     return window;

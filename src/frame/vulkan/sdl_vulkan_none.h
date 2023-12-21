@@ -1,14 +1,9 @@
 #pragma once
 
 #include <SDL2/SDL.h>
-
-#include <vulkan/vulkan.hpp>
-#if defined(_WIN32) || defined(_WIN64)
-#include <SDL2/SDL_syswm.h>
-#endif
 #include <fmt/core.h>
-
 #include <stdexcept>
+#include <vulkan/vulkan_raii.hpp>
 
 #include "frame/logger.h"
 #include "frame/window_interface.h"
@@ -77,25 +72,16 @@ class SDLVulkanNone : public WindowInterface
         return DrawingTargetEnum::NONE;
     }
 
-  public:
-    vk::DispatchLoaderDynamic& GetVulkanDispatch()
-    {
-        return vk_dispatch_loader_dynamic_;
-    }
-    vk::SurfaceKHR& GetVulkanSurfaceKHR()
-    {
-        return vk_surface_.get();
-    }
-
   private:
     glm::uvec2 size_;
     std::unique_ptr<DeviceInterface> device_ = nullptr;
     std::unique_ptr<InputInterface> input_interface_ = nullptr;
     SDL_Window* sdl_window_ = nullptr;
     frame::Logger& logger_ = frame::Logger::GetInstance();
-    vk::UniqueInstance vk_unique_instance_;
-    vk::DispatchLoaderDynamic vk_dispatch_loader_dynamic_;
-    vk::UniqueSurfaceKHR vk_surface_;
+    vk::raii::Context vk_context_;
+    // Trick around the fact that they don't have a default constructor.
+    std::optional<vk::raii::Instance> vk_instance_;
+    std::optional<vk::raii::SurfaceKHR> vk_surface_KHR_;
 };
 
 } // namespace frame::vulkan.

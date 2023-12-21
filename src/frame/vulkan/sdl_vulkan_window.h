@@ -1,13 +1,12 @@
 #pragma once
 
 #include <SDL2/SDL.h>
-
-#include <vulkan/vulkan.hpp>
+// Some windows declarations.
 #if defined(_WIN32) || defined(_WIN64)
 #include <SDL2/SDL_syswm.h>
 #endif
+#include <vulkan/vulkan_raii.hpp>
 #include <fmt/core.h>
-
 #include <stdexcept>
 
 #include "frame/logger.h"
@@ -71,16 +70,6 @@ class SDLVulkanWindow : public WindowInterface
     void Resize(glm::uvec2 size, FullScreenEnum fullscreen_enum) override;
     FullScreenEnum GetFullScreenEnum() const override;
 
-  public:
-    vk::DispatchLoaderDynamic& GetVulkanDispatch()
-    {
-        return vk_dispatch_loader_dynamic_;
-    }
-    vk::SurfaceKHR& GetVulkanSurfaceKHR()
-    {
-        return vk_surface_.get();
-    }
-
   protected:
     bool RunEvent(const SDL_Event& event, const double dt);
     const char SDLButtonToChar(const Uint8 button) const;
@@ -104,9 +93,9 @@ class SDLVulkanWindow : public WindowInterface
     HWND hwnd_ = nullptr;
 #endif
     frame::Logger& logger_ = frame::Logger::GetInstance();
-    vk::UniqueInstance vk_unique_instance_;
-    vk::DispatchLoaderDynamic vk_dispatch_loader_dynamic_;
-    vk::UniqueSurfaceKHR vk_surface_;
+    vk::raii::Context vk_context_;
+    std::optional<vk::raii::Instance> vk_instance_;
+    std::optional<vk::raii::SurfaceKHR> vk_surface_KHR_;
 };
 
 } // namespace frame::vulkan.

@@ -23,7 +23,7 @@ struct NodeInterface : public NameInterface
      * @brief Constructor for NodeInterface, it take a function as a
      *        parameter this function return the ID from a string (it will
      *        need a level passed in the capture list).
-     * @param func: This function return the ID from a string (it will need
+     * @param func: This function return the node from a string (it will need
      *        a level passed in the capture list).
      */
     NodeInterface(std::function<NodeInterface*(const std::string&)> func)

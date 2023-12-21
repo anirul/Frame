@@ -28,7 +28,7 @@ SDLVulkanWindow::SDLVulkanWindow(glm::uvec2 size) : size_(size)
 
     // Create an SDL window to use as a surface for Vulkan.
     sdl_window_ = SDL_CreateWindow(
-        "Vulkan Headless",
+        "Vulkan Window",
         SDL_WINDOWPOS_UNDEFINED,
         SDL_WINDOWPOS_UNDEFINED,
         size_.x,
@@ -40,70 +40,38 @@ SDLVulkanWindow::SDLVulkanWindow(glm::uvec2 size) : size_(size)
             fmt::format("Couldn't initialize window: {}", SDL_GetError()));
     }
 
-    // Get the required extensions for creating a Vulkan surface.
-    uint32_t extension_count = 0;
-    SDL_Vulkan_GetInstanceExtensions(sdl_window_, &extension_count, nullptr);
-    if (extension_count == 0)
-    {
-        throw std::runtime_error(fmt::format(
-            "Could not get the extension count: {}", SDL_GetError()));
-    }
-    std::vector<const char*> extensions(extension_count);
+    std::vector<const char*> sdlExtensions;
+    unsigned int sdlExtensionCount = 0;
+    SDL_Vulkan_GetInstanceExtensions(sdl_window_, &sdlExtensionCount, nullptr);
+    sdlExtensions.resize(sdlExtensionCount);
     SDL_Vulkan_GetInstanceExtensions(
-        sdl_window_, &extension_count, extensions.data());
-    if (extension_count == 0)
-    {
-        throw std::runtime_error(fmt::format(
-            "Could not get the extension count: {}", SDL_GetError()));
-    }
-    extensions.push_back("VK_EXT_debug_utils");
-    for (const auto& extension : extensions)
-    {
-        logger_->info("Extension: {}", extension);
-    }
+        sdl_window_, &sdlExtensionCount, sdlExtensions.data());
 
-    vk::ApplicationInfo application_info(
-        "Frame",
-        VK_MAKE_VERSION(0, 5, 1),
-        "SDL - Vulkan - Window",
-        VK_MAKE_VERSION(0, 5, 1),
+    vk::ApplicationInfo appInfo(
+        "Frame Vulkan",
+        VK_MAKE_VERSION(1, 0, 0),
+        "Frame (SDL Vulkan None)",
+        VK_MAKE_VERSION(1, 0, 0),
         VK_API_VERSION_1_3);
 
-    vk::InstanceCreateInfo instance_create_info(
+    vk::InstanceCreateInfo instanceCreateInfo(
         {},
-        &application_info,
+        &appInfo,
         0,
         nullptr,
-        static_cast<std::uint32_t>(extensions.size()),
-        extensions.data());
+        static_cast<uint32_t>(sdlExtensions.size()),
+        sdlExtensions.data());
 
-    vk_unique_instance_ = vk::createInstanceUnique(instance_create_info);
-    vk_dispatch_loader_dynamic_.init(
-        *vk_unique_instance_, vkGetInstanceProcAddr);
-    auto result = vk_unique_instance_->createDebugUtilsMessengerEXT(
-        vk::DebugUtilsMessengerCreateInfoEXT(
-            {},
-            vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose |
-                vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning |
-                vk::DebugUtilsMessageSeverityFlagBitsEXT::eError,
-            vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral |
-                vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation |
-                vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance,
-            DebugCallback),
-        nullptr,
-        vk_dispatch_loader_dynamic_);
+    vk_instance_ = vk::raii::Instance(vk_context_, instanceCreateInfo);
 
-    // Create the surface.
-    // CHECKME(anirul): What happen in case of a resize?
-    VkSurfaceKHR vk_surface;
-    if (SDL_Vulkan_CreateSurface(
-            sdl_window_, *vk_unique_instance_, &vk_surface) != SDL_TRUE)
+    // Select Physical Device
+    std::vector<vk::raii::PhysicalDevice> physicalDevices =
+        vk_instance_.value().enumeratePhysicalDevices();
+    if (physicalDevices.empty())
     {
-        throw std::runtime_error(fmt::format(
-            "Error while create vulkan surface: {}", SDL_GetError()));
+        throw std::runtime_error("Failed to find GPUs with Vulkan support!");
     }
-    vk_surface_ = vk::UniqueSurfaceKHR(vk_surface);
-
+    vk::raii::PhysicalDevice& physicalDevice = physicalDevices[0];
     // Get the hwnd.
 #if defined(_WIN32) || defined(_WIN64)
     SDL_SysWMinfo wmInfo;
@@ -191,7 +159,12 @@ void SDLVulkanWindow::Run(std::function<void()> lambda /* = []{}*/)
 
 void* SDLVulkanWindow::GetGraphicContext() const
 {
-    return vk_unique_instance_.get();
+    if (vk_instance_)
+    {
+        return vk_instance_.value().operator*();
+    }
+    throw std::runtime_error(
+        "Try to access an uninitialized pointer to a vulkan instance.");
 }
 
 void SDLVulkanWindow::Resize(glm::uvec2 size, FullScreenEnum fullscreen_enum)
