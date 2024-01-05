@@ -40,38 +40,6 @@ SDLVulkanWindow::SDLVulkanWindow(glm::uvec2 size) : size_(size)
             fmt::format("Couldn't initialize window: {}", SDL_GetError()));
     }
 
-    std::vector<const char*> sdlExtensions;
-    unsigned int sdlExtensionCount = 0;
-    SDL_Vulkan_GetInstanceExtensions(sdl_window_, &sdlExtensionCount, nullptr);
-    sdlExtensions.resize(sdlExtensionCount);
-    SDL_Vulkan_GetInstanceExtensions(
-        sdl_window_, &sdlExtensionCount, sdlExtensions.data());
-
-    vk::ApplicationInfo appInfo(
-        "Frame Vulkan",
-        VK_MAKE_VERSION(1, 0, 0),
-        "Frame (SDL Vulkan None)",
-        VK_MAKE_VERSION(1, 0, 0),
-        VK_API_VERSION_1_3);
-
-    vk::InstanceCreateInfo instanceCreateInfo(
-        {},
-        &appInfo,
-        0,
-        nullptr,
-        static_cast<uint32_t>(sdlExtensions.size()),
-        sdlExtensions.data());
-
-    vk_instance_ = vk::raii::Instance(vk_context_, instanceCreateInfo);
-
-    // Select Physical Device
-    std::vector<vk::raii::PhysicalDevice> physicalDevices =
-        vk_instance_.value().enumeratePhysicalDevices();
-    if (physicalDevices.empty())
-    {
-        throw std::runtime_error("Failed to find GPUs with Vulkan support!");
-    }
-    vk::raii::PhysicalDevice& physicalDevice = physicalDevices[0];
     // Get the hwnd.
 #if defined(_WIN32) || defined(_WIN64)
     SDL_SysWMinfo wmInfo;
@@ -79,6 +47,12 @@ SDLVulkanWindow::SDLVulkanWindow(glm::uvec2 size) : size_(size)
     SDL_GetWindowWMInfo(sdl_window_, &wmInfo);
     hwnd_ = wmInfo.info.win.window;
 #endif
+    // Query the desktop size, used in full screen desktop mode.
+    int i = SDL_GetWindowDisplayIndex(sdl_window_);
+    SDL_Rect j;
+    SDL_GetDisplayBounds(i, &j);
+    desktop_size_.x = j.w;
+    desktop_size_.y = j.h;
 }
 
 SDLVulkanWindow::~SDLVulkanWindow()
@@ -86,6 +60,45 @@ SDLVulkanWindow::~SDLVulkanWindow()
     // Destroy the surface and instance when finished
     SDL_DestroyWindow(sdl_window_);
     SDL_Quit();
+}
+
+vk::InstanceCreateInfo SDLVulkanWindow::GetInstanceCreateInfo(
+    vk::ApplicationInfo app_info) const
+{
+    static std::vector<const char*> sdl_extensions{};
+    std::uint32_t sdl_extension_count = 0;
+    SDL_Vulkan_GetInstanceExtensions(
+        sdl_window_, &sdl_extension_count, nullptr);
+    sdl_extensions.resize(sdl_extension_count);
+    SDL_Vulkan_GetInstanceExtensions(
+        sdl_window_, &sdl_extension_count, sdl_extensions.data());
+#ifdef _DEBUG
+    // Enable the debug callback extension.
+    sdl_extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+#endif
+    static std::vector<const char*> layers{};
+#ifdef _DEBUG
+    layers.push_back("VK_LAYER_KHRONOS_validation");
+#endif
+    return vk::InstanceCreateInfo(
+        {},
+        &app_info,
+        static_cast<uint32_t>(layers.size()),
+        layers.data(),
+        static_cast<uint32_t>(sdl_extensions.size()),
+        sdl_extensions.data());
+}
+
+void SDLVulkanWindow::SetUniqueDevice(std::unique_ptr<DeviceInterface>&& device)
+{
+    device_ = std::move(device);
+    vulkan::Device* vulkan_device =
+        dynamic_cast<vulkan::Device*>(device_.get());
+    if (!vulkan_device)
+    {
+        std::runtime_error("Device is not a vulkan device.");
+    }
+    vulkan_device->Init(GetInstanceCreateInfo());
 }
 
 void SDLVulkanWindow::Run(std::function<void()> lambda /* = []{}*/)
@@ -159,12 +172,7 @@ void SDLVulkanWindow::Run(std::function<void()> lambda /* = []{}*/)
 
 void* SDLVulkanWindow::GetGraphicContext() const
 {
-    if (vk_instance_)
-    {
-        return vk_instance_.value().operator*();
-    }
-    throw std::runtime_error(
-        "Try to access an uninitialized pointer to a vulkan instance.");
+    return sdl_window_;
 }
 
 void SDLVulkanWindow::Resize(glm::uvec2 size, FullScreenEnum fullscreen_enum)

@@ -11,11 +11,13 @@
 
 #include "frame/logger.h"
 #include "frame/window_interface.h"
+#include "frame/vulkan/vulkan_window_interface.h"
+#include "frame/vulkan/device.h"
 
 namespace frame::vulkan
 {
 
-class SDLVulkanWindow : public WindowInterface
+class SDLVulkanWindow : public VulkanWindowInterface
 {
   public:
     SDLVulkanWindow(glm::uvec2 size);
@@ -31,11 +33,7 @@ class SDLVulkanWindow : public WindowInterface
     {
         throw std::runtime_error("Not implemented yet!");
     }
-    void SetUniqueDevice(std::unique_ptr<DeviceInterface>&& device) override
-    {
-        device_ = std::move(device);
-    }
-    DeviceInterface& GetDevice() override
+	DeviceInterface& GetDevice() override
     {
         return *device_.get();
     }
@@ -69,6 +67,14 @@ class SDLVulkanWindow : public WindowInterface
     void* GetGraphicContext() const override;
     void Resize(glm::uvec2 size, FullScreenEnum fullscreen_enum) override;
     FullScreenEnum GetFullScreenEnum() const override;
+    vk::InstanceCreateInfo GetInstanceCreateInfo(
+        vk::ApplicationInfo app_info = {
+            "Frame Vulkan",
+            VK_MAKE_VERSION(1, 0, 0),
+            "Frame (SDL Vulkan Window)",
+            VK_MAKE_VERSION(1, 0, 0),
+            VK_API_VERSION_1_3}) const override;
+    void SetUniqueDevice(std::unique_ptr<DeviceInterface>&& device) override;
 
   protected:
     bool RunEvent(const SDL_Event& event, const double dt);
@@ -93,8 +99,6 @@ class SDLVulkanWindow : public WindowInterface
     HWND hwnd_ = nullptr;
 #endif
     frame::Logger& logger_ = frame::Logger::GetInstance();
-    vk::raii::Context vk_context_;
-    std::optional<vk::raii::Instance> vk_instance_;
     std::optional<vk::raii::SurfaceKHR> vk_surface_KHR_;
 };
 

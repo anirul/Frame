@@ -3,76 +3,39 @@
 namespace frame::vulkan
 {
 
-Device::Device(
-    void* vk_instance,
-    glm::uvec2 size,
-    vk::SurfaceKHR& surface,
-    vk::DispatchLoaderDynamic& dispatch)
-    : vk_instance_(static_cast<VkInstance>(vk_instance)), size_(size),
-      vk_surface_(surface), vk_dispatch_loader_(dispatch)
+Device::Device(glm::uvec2 size) : size_(size)
 {
-    logger_->info("Creating Vulkan Device");
-    std::vector<vk::PhysicalDevice> physical_devices =
-        vk_instance_.enumeratePhysicalDevices();
-    if (physical_devices.empty())
+    // Log the Vulkan version.
+    logger_->info("Creating Vulkan Device ({}, {})", size.x, size.y);
+    auto api_version = vk_context_.enumerateInstanceVersion();
+    logger_->info(
+        "Vulkan version: {}.{} total: {}",
+        VK_VERSION_MAJOR(api_version),
+        VK_VERSION_MINOR(api_version),
+        api_version);
+    // List all available extensions.
+    std::vector<vk::ExtensionProperties> availableExtensions =
+        vk::enumerateInstanceExtensionProperties();
+    logger_->info("Available Extensions:");
+    for (const auto& extension : availableExtensions)
     {
-        throw std::runtime_error("No Vulkan Physical Device found");
+        std::string extension_name = extension.extensionName;
+        logger_->info("\t[{}]", extension_name);
     }
-    // Check and select physical device properties.
-    int last_best_score = 0;
-    for (const auto& physical_device : physical_devices)
+    // List all available layers.
+    std::vector<vk::LayerProperties> availableLayers =
+        vk::enumerateInstanceLayerProperties();
+    logger_->info("Available Layers:");
+    for (const auto& layer : availableLayers)
     {
-        int score = 0;
-        logger_->info(
-            "Physical Device: {}",
-            static_cast<char*>(physical_device.getProperties().deviceName));
-        if (physical_device.getProperties().deviceType ==
-            vk::PhysicalDeviceType::eDiscreteGpu)
-        {
-            logger_->info("\tis a GPU");
-            score += 10000;
-        }
-        score += physical_device.getProperties().limits.maxImageDimension2D;
-        if (physical_device.getFeatures().geometryShader)
-        {
-            if (score > last_best_score)
-            {
-                last_best_score = score;
-                vk_physical_device_ = physical_device;
-            }
-        }
+        std::string layer_name = layer.layerName;
+        logger_->info("\t[{}]", layer_name);
     }
-    if (!vk_physical_device_)
-    {
-        throw std::runtime_error("No Vulkan Physical Device found");
-    }
-    // Select a queue family.
-    std::vector<vk::QueueFamilyProperties> queue_families =
-        vk_physical_device_.getQueueFamilyProperties(vk_dispatch_loader_);
-    int i = 0;
-    int selected_index = -1;
-    for (auto& queue_family : queue_families)
-    {
-        if (queue_family.queueFlags & vk::QueueFlagBits::eGraphics)
-        {
-            selected_index = i;
-        }
-        i++;
-    }
-    if (selected_index == -1)
-    {
-        throw std::runtime_error("No Vulkan Queue Family found");
-    }
-    // Get the device.
-    vk::DeviceQueueCreateInfo device_queue_create_info(
-        {}, selected_index, 1, &queue_family_priority_);
-    vk::DeviceCreateInfo device_create_info({}, 1, &device_queue_create_info);
-    vk_unique_device_ = vk_physical_device_.createDeviceUnique(
-        device_create_info, nullptr, vk_dispatch_loader_);
 }
 
 Device::~Device()
 {
+    logger_->info("Destroying Vulkan Device");
 }
 
 void Device::SetStereo(
@@ -82,6 +45,34 @@ void Device::SetStereo(
     bool invert_left_right)
 {
     throw std::runtime_error("Not implemented!");
+}
+
+void Device::Init(vk::InstanceCreateInfo instance_create_info)
+{
+    logger_->info("Initializing Vulkan Device");
+    // Create the instance.
+    vk_instance_.emplace(vk_context_, instance_create_info);
+    // Get all vk::PhysicalDeviceGroupProperties from a vk::raii::Instance
+    // instance.
+    std::vector<vk::PhysicalDeviceGroupProperties>
+        physical_device_group_properties =
+            vk_instance_.value().enumeratePhysicalDeviceGroups();
+    logger_->info(
+        "Number of physical devices: {}",
+        physical_device_group_properties.size());
+    for (const auto& physical_device_group : physical_device_group_properties)
+    {
+        logger_->info(
+            "\t- group({})", physical_device_group.physicalDeviceCount);
+        for (std::uint32_t i = 0; i < physical_device_group.physicalDeviceCount;
+             ++i)
+        {
+            std::string device_name = physical_device_group.physicalDevices[i]
+                                          .getProperties()
+                                          .deviceName;
+            logger_->info("\t\t- {}", device_name);
+        }
+    }
 }
 
 void Device::Clear(

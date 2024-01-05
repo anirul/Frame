@@ -5,6 +5,8 @@
 #include "frame/camera.h"
 #include "frame/device_interface.h"
 #include "frame/logger.h"
+#include "frame/vulkan/vulkan_window_interface.h"
+#include "frame/window_interface.h"
 
 namespace frame::vulkan
 {
@@ -18,20 +20,19 @@ class Device : public DeviceInterface
   public:
     /**
      * @brief Constructor will initialize the Vulkan context.
-     * @param vk_instance: The vk::Instance passed as a void*.
+     * @param sdl_vulkan_window: Window interface to the windowing system.
      * @param size: Window size.
-     * @param surface: Surface for the drawing.
-     * @param dispatch: Dispatch from vulkan.
      */
-    Device(
-        void* vk_instance,
-        glm::uvec2 size,
-        vk::SurfaceKHR& surface,
-        vk::DispatchLoaderDynamic& dispatch);
+    Device(glm::uvec2 size);
     //! @brief Destructor this is where the memory is freed.
     virtual ~Device();
 
   public:
+    /**
+     * @brief Initialize the device by passing the instance create info.
+     * @param instance_create_info: The instance create info.
+     */
+    void Init(vk::InstanceCreateInfo instance_create_info);
     /**
      * @brief Set the stereo mode (by default this is NONE), interocular
      *        distance and focus point.
@@ -77,6 +78,11 @@ class Device : public DeviceInterface
      * @param name: The name of the plugin to remove.
      */
     void RemovePluginByName(const std::string& name) final;
+    /**
+     * @brief Display to the screen.
+     * @param dt: Delta time from the beginning of the software in seconds.
+     */
+    void Display(double dt = 0.0) final;
     /** @brief Cleanup the mess. */
     void Cleanup() final;
     /**
@@ -89,11 +95,6 @@ class Device : public DeviceInterface
      * @return The size of the window.
      */
     glm::uvec2 GetSize() const final;
-    /**
-     * @brief Display to the screen.
-     * @param dt: Delta time from the beginning of the software in seconds.
-     */
-    void Display(double dt = 0.0) final;
     /**
      * @brief Make a screen shot to a file.
      * @param file: File name of the screenshot (usually with the *.png)
@@ -140,13 +141,12 @@ class Device : public DeviceInterface
         return *level_.get();
     }
     /**
-     * @brief Get the current context.
-     * @return A pointer to the current context (this is used by the
-     *         windowing system).
+     * @brief Get a device context on the underlying graphic API.
+     * @return A device context on the underlying graphic API.
      */
     void* GetDeviceContext() const final
     {
-        return vk_instance_;
+        throw std::runtime_error("Not implemented!");
     }
     /**
      * @brief Get the enum describing the stereo situation.
@@ -187,13 +187,6 @@ class Device : public DeviceInterface
     std::unique_ptr<LevelInterface> level_ = nullptr;
     // Storage of the plugin.
     std::vector<std::unique_ptr<PluginInterface>> plugin_interfaces_ = {};
-    // Vulkan stuff.
-    vk::Instance vk_instance_ = {};
-    vk::PhysicalDevice vk_physical_device_ = {};
-    float queue_family_priority_ = 1.0f;
-    vk::UniqueHandle<vk::Device, vk::DispatchLoaderDynamic> vk_unique_device_;
-    vk::SurfaceKHR& vk_surface_;
-    vk::DispatchLoaderDynamic& vk_dispatch_loader_;
     // Size.
     glm::uvec2 size_ = {0, 0};
     const proto::PixelElementSize pixel_element_size_ =
@@ -207,6 +200,9 @@ class Device : public DeviceInterface
     bool invert_left_right_ = false;
     // Logger for the device.
     const Logger& logger_ = Logger::GetInstance();
+    // Vulkan crap.
+    vk::raii::Context vk_context_;
+	std::optional<vk::raii::Instance> vk_instance_;
 };
 
 } // End namespace frame::vulkan.

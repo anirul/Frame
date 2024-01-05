@@ -6,12 +6,13 @@
 #include <vulkan/vulkan_raii.hpp>
 
 #include "frame/logger.h"
+#include "frame/vulkan/vulkan_window_interface.h"
 #include "frame/window_interface.h"
 
 namespace frame::vulkan
 {
 
-class SDLVulkanNone : public WindowInterface
+class SDLVulkanNone : public VulkanWindowInterface
 {
   public:
     SDLVulkanNone(glm::uvec2 size);
@@ -20,6 +21,14 @@ class SDLVulkanNone : public WindowInterface
   public:
     void Run(std::function<void()> lambda) override;
     void* GetGraphicContext() const override;
+    vk::InstanceCreateInfo GetInstanceCreateInfo(
+        vk::ApplicationInfo app_info = {
+            "Frame Vulkan",
+            VK_MAKE_VERSION(1, 0, 0),
+            "Frame (SDL Vulkan None)",
+            VK_MAKE_VERSION(1, 0, 0),
+            VK_API_VERSION_1_3}) const override;
+    void SetUniqueDevice(std::unique_ptr<DeviceInterface>&& device) override;
 
   public:
     void SetInputInterface(
@@ -30,10 +39,6 @@ class SDLVulkanNone : public WindowInterface
     void AddKeyCallback(std::int32_t key, std::function<bool()> func) override
     {
         throw std::runtime_error("Not implemented yet!");
-    }
-    void SetUniqueDevice(std::unique_ptr<DeviceInterface>&& device) override
-    {
-        device_ = std::move(device);
     }
     DeviceInterface& GetDevice() override
     {
@@ -78,10 +83,6 @@ class SDLVulkanNone : public WindowInterface
     std::unique_ptr<InputInterface> input_interface_ = nullptr;
     SDL_Window* sdl_window_ = nullptr;
     frame::Logger& logger_ = frame::Logger::GetInstance();
-    vk::raii::Context vk_context_;
-    // Trick around the fact that they don't have a default constructor.
-    std::optional<vk::raii::Instance> vk_instance_;
-    std::optional<vk::raii::SurfaceKHR> vk_surface_KHR_;
 };
 
 } // namespace frame::vulkan.
