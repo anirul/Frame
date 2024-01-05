@@ -203,6 +203,8 @@ class Device : public DeviceInterface
     // Vulkan crap.
     vk::raii::Context vk_context_;
 	std::optional<vk::raii::Instance> vk_instance_;
+    std::optional<vk::raii::PhysicalDevice> vk_physical_device_;
+	std::optional<vk::raii::Device> vk_device_;
 };
 
 } // End namespace frame::vulkan.

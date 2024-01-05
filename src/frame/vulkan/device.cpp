@@ -20,7 +20,7 @@ Device::Device(glm::uvec2 size) : size_(size)
     for (const auto& extension : availableExtensions)
     {
         std::string extension_name = extension.extensionName;
-        logger_->info("\t[{}]", extension_name);
+        logger_->info("\t{}", extension_name);
     }
     // List all available layers.
     std::vector<vk::LayerProperties> availableLayers =
@@ -29,7 +29,7 @@ Device::Device(glm::uvec2 size) : size_(size)
     for (const auto& layer : availableLayers)
     {
         std::string layer_name = layer.layerName;
-        logger_->info("\t[{}]", layer_name);
+        logger_->info("\t{}", layer_name);
     }
 }
 
@@ -52,27 +52,53 @@ void Device::Init(vk::InstanceCreateInfo instance_create_info)
     logger_->info("Initializing Vulkan Device");
     // Create the instance.
     vk_instance_.emplace(vk_context_, instance_create_info);
-    // Get all vk::PhysicalDeviceGroupProperties from a vk::raii::Instance
-    // instance.
-    std::vector<vk::PhysicalDeviceGroupProperties>
-        physical_device_group_properties =
-            vk_instance_.value().enumeratePhysicalDeviceGroups();
-    logger_->info(
-        "Number of physical devices: {}",
-        physical_device_group_properties.size());
-    for (const auto& physical_device_group : physical_device_group_properties)
+    // Get the physical devices.
+    vk::raii::PhysicalDevices physical_devices(vk_instance_.value());
+    std::uint32_t selected_physical_device_index = -1;
+    vk::PhysicalDeviceFeatures device_features;
+    for (std::uint32_t i = 0; i < physical_devices.size(); ++i)
     {
-        logger_->info(
-            "\t- group({})", physical_device_group.physicalDeviceCount);
-        for (std::uint32_t i = 0; i < physical_device_group.physicalDeviceCount;
-             ++i)
+        auto properties = physical_devices[i].getProperties();
+        auto features = physical_devices[i].getFeatures();
+        std::string device_name = properties.deviceName;
+        logger_->info("\t{}", device_name);
+        // TODO(anirul): make the checks.
+        selected_physical_device_index = i;
+        device_features = features;
+    }
+    if (selected_physical_device_index == -1)
+    {
+        throw std::runtime_error("No physical device found!");
+    }
+    vk_physical_device_.emplace(
+        std::move(
+        physical_devices[selected_physical_device_index]));
+    // Get the queue family properties.
+    std::vector<vk::QueueFamilyProperties> queue_family_properties =
+        vk_physical_device_.value().getQueueFamilyProperties();
+    std::uint32_t selected_queue_family_index = -1;
+    for (std::uint32_t i = 0; i < queue_family_properties.size(); ++i)
+    {
+        auto queue_flags = queue_family_properties[i].queueFlags;
+        if (queue_flags & vk::QueueFlagBits::eGraphics)
         {
-            std::string device_name = physical_device_group.physicalDevices[i]
-                                          .getProperties()
-                                          .deviceName;
-            logger_->info("\t\t- {}", device_name);
+            selected_queue_family_index = i;
+            break;
         }
     }
+    if (selected_queue_family_index == -1)
+    {
+        throw std::runtime_error("No queue family found!");
+    }
+    float queque_priority = 1.0f;
+    vk::DeviceQueueCreateInfo queue_create_info(
+        {},
+        selected_queue_family_index,
+        1,
+        &queque_priority);
+    // Create the device.
+    vk::DeviceCreateInfo device_create_info({}, queue_create_info, {}, {}, &device_features);
+    vk_device_.emplace(vk_physical_device_.value(), device_create_info);
 }
 
 void Device::Clear(
