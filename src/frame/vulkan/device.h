@@ -31,8 +31,24 @@ class Device : public DeviceInterface
     /**
      * @brief Initialize the device by passing the instance create info.
      * @param instance_create_info: The instance create info.
+	 * 
+     * This is called from the set unique device function in the window part you
+     * should not call this.
      */
     void Init(vk::InstanceCreateInfo instance_create_info);
+    /**
+	 * @brief Get the current instance.
+	 *
+	 * This move the instance from the class to the external world!
+	 */
+	vk::raii::Instance MoveInstance();
+	/**
+	 * @brief Emplace the instance to the class.
+	 * @param instance: The instance to emplace.
+	 */
+	void EmplaceInstance(vk::raii::Instance&& instance);
+	
+  public:
     /**
      * @brief Set the stereo mode (by default this is NONE), interocular
      *        distance and focus point.
@@ -49,7 +65,7 @@ class Device : public DeviceInterface
     /**
      * @brief Clear the Screen.
      * @param color: Take a vec4 and make it into a color [0, 1] the last
-     * parameter is alpha.
+     *	      parameter is alpha.
      */
     void Clear(
         const glm::vec4& color = glm::vec4(.2f, 0.f, .2f, 1.0f)) const final;
@@ -202,9 +218,11 @@ class Device : public DeviceInterface
     const Logger& logger_ = Logger::GetInstance();
     // Vulkan crap.
     vk::raii::Context vk_context_;
-	std::optional<vk::raii::Instance> vk_instance_;
+    std::optional<vk::raii::Instance> vk_instance_;
     std::optional<vk::raii::PhysicalDevice> vk_physical_device_;
-	std::optional<vk::raii::Device> vk_device_;
+    std::optional<vk::raii::Device> vk_device_;
+    std::optional<vk::raii::CommandPool> vk_command_pool_;
+    std::optional<vk::raii::DebugUtilsMessengerEXT> vk_debug_utils_messager_;
 };
 
 } // End namespace frame::vulkan.

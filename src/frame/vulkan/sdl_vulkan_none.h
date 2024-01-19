@@ -83,6 +83,7 @@ class SDLVulkanNone : public VulkanWindowInterface
     std::unique_ptr<InputInterface> input_interface_ = nullptr;
     SDL_Window* sdl_window_ = nullptr;
     frame::Logger& logger_ = frame::Logger::GetInstance();
+    std::optional<vk::raii::SurfaceKHR> surface_khr_;
 };
 
 } // namespace frame::vulkan.

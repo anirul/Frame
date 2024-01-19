@@ -1,4 +1,5 @@
 #include "frame/vulkan/device.h"
+#include "frame/vulkan/debug_callback.h"
 
 namespace frame::vulkan
 {
@@ -52,6 +53,20 @@ void Device::Init(vk::InstanceCreateInfo instance_create_info)
     logger_->info("Initializing Vulkan Device");
     // Create the instance.
     vk_instance_.emplace(vk_context_, instance_create_info);
+#ifdef _DEBUG
+    // Create a debug info callback.
+    vk::DebugUtilsMessengerCreateInfoEXT debug_info(
+        {},
+        vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose |
+            vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning |
+            vk::DebugUtilsMessageSeverityFlagBitsEXT::eError,
+        vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral |
+            vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation |
+            vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance,
+        &DebugCallback);
+    vk_debug_utils_messager_.emplace(vk_instance_.value(), debug_info);
+#endif
+    // Create a debug info callback.
     // Get the physical devices.
     vk::raii::PhysicalDevices physical_devices(vk_instance_.value());
     std::uint32_t selected_physical_device_index = -1;
@@ -71,8 +86,7 @@ void Device::Init(vk::InstanceCreateInfo instance_create_info)
         throw std::runtime_error("No physical device found!");
     }
     vk_physical_device_.emplace(
-        std::move(
-        physical_devices[selected_physical_device_index]));
+        std::move(physical_devices[selected_physical_device_index]));
     // Get the queue family properties.
     std::vector<vk::QueueFamilyProperties> queue_family_properties =
         vk_physical_device_.value().getQueueFamilyProperties();
@@ -90,15 +104,37 @@ void Device::Init(vk::InstanceCreateInfo instance_create_info)
     {
         throw std::runtime_error("No queue family found!");
     }
-    float queque_priority = 1.0f;
+    float queue_priority = 1.0f;
     vk::DeviceQueueCreateInfo queue_create_info(
-        {},
-        selected_queue_family_index,
-        1,
-        &queque_priority);
+        {}, selected_queue_family_index, 1, &queue_priority);
     // Create the device.
-    vk::DeviceCreateInfo device_create_info({}, queue_create_info, {}, {}, &device_features);
+    vk::DeviceCreateInfo device_create_info(
+        {}, queue_create_info, {}, {}, &device_features);
     vk_device_.emplace(vk_physical_device_.value(), device_create_info);
+    // Finally create the command pool.
+    vk::CommandPoolCreateInfo command_pool_create_info(
+        {}, selected_queue_family_index);
+    vk_command_pool_.emplace(vk_device_.value(), command_pool_create_info);
+}
+
+vk::raii::Instance Device::MoveInstance()
+{
+    if (!vk_instance_.has_value())
+    {
+        throw std::runtime_error("Vulkan instance not initialized!");
+    }
+    vk::raii::Instance raii_instance = std::move(vk_instance_.value());
+    vk_instance_ = std::nullopt;
+    return std::move(raii_instance);
+}
+
+void Device::EmplaceInstance(vk::raii::Instance&& instance)
+{
+    if (vk_instance_.has_value())
+    {
+        throw std::runtime_error("Vulkan instance already initialized!");
+    }
+    vk_instance_.emplace(std::move(instance));
 }
 
 void Device::Clear(
