@@ -39,7 +39,7 @@ try
         frame::RenderingAPIEnum::OPENGL,
         size);
     auto& device = win->GetDevice();
-    auto gui_window = frame::gui::CreateDrawGui(*win.get());
+    auto gui_window = frame::gui::CreateDrawGui(*win.get(), {}, 20.0f);
     auto gui_resolution = std::make_unique<frame::gui::WindowResolution>(
         "Resolution", size, win->GetDesktopSize(), win->GetPixelPerInch());
     ptr_window_resolution = gui_resolution.get();

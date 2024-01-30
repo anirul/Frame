@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <filesystem>
 
 #include "frame/device_interface.h"
 #include "frame/gui/draw_gui_interface.h"
@@ -19,8 +20,12 @@ class SDL2OpenGLDrawGui : public frame::gui::DrawGuiInterface
     /**
      * @brief Constructor.
      * @param window: The window to use.
+	 * @param font_path: The path to the font.
      */
-    SDL2OpenGLDrawGui(frame::WindowInterface& window);
+    SDL2OpenGLDrawGui(
+		frame::WindowInterface& window,
+		const std::filesystem::path& font_path,
+		float font_size);
     //! @brief Destructor.
     virtual ~SDL2OpenGLDrawGui();
 
@@ -121,12 +126,14 @@ class SDL2OpenGLDrawGui : public frame::gui::DrawGuiInterface
   protected:
     std::map<std::string, std::unique_ptr<frame::gui::GuiWindowInterface>>
         callbacks_ = {};
+	std::filesystem::path font_path_;
     WindowInterface& window_;
     DeviceInterface& device_;
     std::string name_;
     glm::uvec2 size_ = {0, 0};
     bool is_keyboard_passed_ = false;
     bool is_visible_ = true;
+	float font_size_ = 20.0f;
 };
 
 } // End namespace frame::opengl::gui.

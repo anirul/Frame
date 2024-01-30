@@ -14,8 +14,14 @@
 namespace frame::opengl::gui
 {
 
-SDL2OpenGLDrawGui::SDL2OpenGLDrawGui(frame::WindowInterface& window)
-    : window_(window), device_(window_.GetDevice())
+SDL2OpenGLDrawGui::SDL2OpenGLDrawGui(
+    frame::WindowInterface& window,
+    const std::filesystem::path& font_path,
+    float font_size)
+    : window_(window),
+      device_(window_.GetDevice()),
+      font_path_(font_path),
+      font_size_(font_size)
 {
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
@@ -35,9 +41,15 @@ SDL2OpenGLDrawGui::SDL2OpenGLDrawGui(frame::WindowInterface& window)
 
     ImGuiStyle& style = ImGui::GetStyle();
     style.WindowRounding = 5.0f;
-    io.Fonts->AddFontFromFileTTF(
-        file::FindFile("asset/font/poppins/Poppins-Light.ttf").string().c_str(),
-        20.0f);
+    if (font_path_.empty())
+    {
+        io.Fonts->AddFontDefault();
+    }
+    else
+    {
+        io.Fonts->AddFontFromFileTTF(
+            reinterpret_cast<const char*>(font_path_.c_str()), font_size_);
+    }
 
     // Setup Platform/Renderer back ends
     ImGui_ImplSDL2_InitForOpenGL(
