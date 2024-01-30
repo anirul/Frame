@@ -71,7 +71,7 @@ void SDLVulkanNone::SetUniqueDevice(std::unique_ptr<DeviceInterface>&& device)
         dynamic_cast<vulkan::Device*>(device_.get());
     if (!vulkan_device)
     {
-        std::runtime_error("Device is not a vulkan device.");
+        throw std::runtime_error("Device is not a vulkan device.");
     }
 
     vulkan_device->Init(GetInstanceCreateInfo());

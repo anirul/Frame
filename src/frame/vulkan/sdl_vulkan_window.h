@@ -99,7 +99,7 @@ class SDLVulkanWindow : public VulkanWindowInterface
     HWND hwnd_ = nullptr;
 #endif
     frame::Logger& logger_ = frame::Logger::GetInstance();
-    std::optional<vk::raii::SurfaceKHR> vk_surface_KHR_;
+    std::optional<vk::raii::SurfaceKHR> surface_khr_;
 };
 
 } // namespace frame::vulkan.

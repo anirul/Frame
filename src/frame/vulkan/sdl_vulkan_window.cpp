@@ -99,6 +99,15 @@ void SDLVulkanWindow::SetUniqueDevice(std::unique_ptr<DeviceInterface>&& device)
         throw std::runtime_error("Device is not a vulkan device.");
     }
     vulkan_device->Init(GetInstanceCreateInfo());
+    VkSurfaceKHR c_surface;
+    vk::raii::Instance instance = vulkan_device->MoveInstance();
+    if (!SDL_Vulkan_CreateSurface(sdl_window_, *instance, &c_surface))
+    {
+        throw std::runtime_error(
+            fmt::format("Couldn't create surface: {}", SDL_GetError()));
+    }
+    surface_khr_.emplace(instance, c_surface);
+    vulkan_device->EmplaceInstance(std::move(instance));
 }
 
 void SDLVulkanWindow::Run(std::function<void()> lambda /* = []{}*/)
