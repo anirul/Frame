@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
 
 namespace frame

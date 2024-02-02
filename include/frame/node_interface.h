@@ -1,6 +1,7 @@
 #pragma once
 
 #include <functional>
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
 #include <memory>
 #include <string>
