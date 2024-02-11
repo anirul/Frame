@@ -61,6 +61,10 @@ const std::vector<std::string>& Logger::GetLastLogs(std::uint32_t max_log) const
             display_logs_.reserve(max_log);
         }
         const auto& logs = gui_logger_sink->GetLogs();
+        if (logs.size() <= max_log)
+        {
+            return logs;
+        }
         display_logs_.clear();
         for (std::size_t i = logs.size() - max_log; i < logs.size(); ++i)
         {
