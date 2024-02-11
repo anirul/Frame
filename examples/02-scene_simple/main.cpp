@@ -14,6 +14,7 @@
 #include "frame/file/image_stb.h"
 #include "frame/gui/draw_gui_factory.h"
 #include "frame/gui/window_resolution.h"
+#include "frame/gui/window_logger.h"
 #include "frame/window_factory.h"
 
 // From: https://sourceforge.net/p/predef/wiki/OperatingSystems/
@@ -44,6 +45,7 @@ try
         "Resolution", size, win->GetDesktopSize(), win->GetPixelPerInch());
     ptr_window_resolution = gui_resolution.get();
     gui_window->AddWindow(std::move(gui_resolution));
+    gui_window->AddWindow(std::make_unique<frame::gui::WindowLogger>("Logger"));
     win->GetDevice().AddPlugin(std::move(gui_window));
     frame::common::Application app(std::move(win));
     do

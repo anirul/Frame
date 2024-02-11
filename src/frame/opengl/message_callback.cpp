@@ -112,7 +112,8 @@ void GLAPIENTRY MessageCallback(
     }
     else
     {
-        logger->info(str_message);
+        // CHECKME(anirul): This is a lot of noise.
+        // logger->info(str_message);
     }
 }
 
