@@ -13,7 +13,8 @@ WindowLogger::WindowLogger(const std::string& name)
 
 bool WindowLogger::DrawCallback()
 {
-    for (const auto& message : logger_.GetLogs())
+    ImGui::BeginChild("Scrolling");
+    for (const auto& message : logger_.GetLastLogs(100))
     {
         ImGui::TextUnformatted(message.c_str());
     }
@@ -21,6 +22,7 @@ bool WindowLogger::DrawCallback()
     {
         ImGui::SetScrollHereY(1.0f);
     }
+    ImGui::EndChild();
     return true;
 }
 

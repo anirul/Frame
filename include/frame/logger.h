@@ -83,7 +83,7 @@ class Logger
      * added.
 	 * @return A vector of strings that contains the logs.
      */
-    const std::vector<std::string>& GetLogs() const;
+    const std::vector<std::string>& GetLastLogs(std::uint32_t max_log) const;
 	/// @brief Clear the logs.
     void ClearLogs();
 
@@ -91,6 +91,7 @@ class Logger
     std::shared_ptr<spdlog::logger> logger_ptr_ = nullptr;
     std::shared_ptr<spdlog::sinks::base_sink<std::mutex>> gui_logger_sink_ =
         nullptr;
+	mutable std::vector<std::string> display_logs_;
 };
 
 } // End namespace frame.

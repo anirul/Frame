@@ -50,13 +50,23 @@ const std::shared_ptr<spdlog::logger> Logger::operator->() const
     return logger_ptr_;
 }
 
-const std::vector<std::string>& Logger::GetLogs() const
+const std::vector<std::string>& Logger::GetLastLogs(std::uint32_t max_log) const
 {
     auto gui_logger_sink =
         std::dynamic_pointer_cast<frame::gui::GuiLoggerSink>(gui_logger_sink_);
     if (gui_logger_sink)
     {
-        return gui_logger_sink->GetLogs();
+        if (display_logs_.capacity() != max_log)
+        {
+            display_logs_.reserve(max_log);
+        }
+        const auto& logs = gui_logger_sink->GetLogs();
+        display_logs_.clear();
+        for (std::size_t i = logs.size() - max_log; i < logs.size(); ++i)
+        {
+            display_logs_.push_back(logs[i]);
+        }
+        return display_logs_;
     }
     else
     {
