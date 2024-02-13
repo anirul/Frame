@@ -15,7 +15,7 @@ bool WindowLogger::DrawCallback()
     ImGui::BeginChild("Scrolling");
     for (const auto& log_message : logger_.GetLastLogs(100))
     {
-        ImGui::TextUnformatted(log_message.message.c_str());
+        LogWithColor(log_message);
     }
     if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
     {
