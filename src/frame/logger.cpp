@@ -50,7 +50,7 @@ const std::shared_ptr<spdlog::logger> Logger::operator->() const
     return logger_ptr_;
 }
 
-const std::vector<std::string>& Logger::GetLastLogs(std::uint32_t max_log) const
+const std::vector<LogMessage>& Logger::GetLastLogs(std::uint32_t max_log) const
 {
     auto gui_logger_sink =
         std::dynamic_pointer_cast<frame::gui::GuiLoggerSink>(gui_logger_sink_);

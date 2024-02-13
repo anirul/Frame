@@ -34,9 +34,13 @@ class WindowLogger : public GuiWindowInterface
      */
     bool End() const override;
 
+  protected:
+    //! @brief Log with color.
+    void LogWithColor(const LogMessage& log_message) const;
+
   private:
     frame::Logger& logger_ = frame::Logger::GetInstance();
-	std::string name_;
+    std::string name_;
 };
 
 } // namespace frame::gui

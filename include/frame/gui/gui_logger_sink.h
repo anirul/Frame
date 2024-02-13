@@ -4,6 +4,8 @@
 #include <spdlog/sinks/base_sink.h>
 #include <string>
 
+#include "frame/logger.h"
+
 namespace frame::gui
 {
 
@@ -33,7 +35,7 @@ class GuiLoggerSink : public spdlog::sinks::base_sink<std::mutex>
         spdlog::sinks::base_sink<std::mutex>::formatter_->format(
             msg, formatted);
         std::string formatted_message(msg.payload.begin(), msg.payload.end());
-		logs.push_back(std::move(formatted_message));
+        logs.push_back({msg.level, std::move(formatted_message)});
     }
     void flush_() override
     {
@@ -41,7 +43,7 @@ class GuiLoggerSink : public spdlog::sinks::base_sink<std::mutex>
 
   public:
     /// @brief Get the logs that have been generated.
-    const std::vector<std::string>& GetLogs() const
+    const std::vector<LogMessage>& GetLogs() const
     {
         return logs;
     }
@@ -52,7 +54,7 @@ class GuiLoggerSink : public spdlog::sinks::base_sink<std::mutex>
     }
 
   private:
-    std::vector<std::string> logs;
+    std::vector<LogMessage> logs;
 };
 
 } // namespace frame::gui.

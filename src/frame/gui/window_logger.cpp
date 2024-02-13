@@ -5,8 +5,7 @@
 namespace frame::gui
 {
 
-WindowLogger::WindowLogger(const std::string& name)
-    : name_(name)
+WindowLogger::WindowLogger(const std::string& name) : name_(name)
 {
     SetName(name);
 }
@@ -14,9 +13,9 @@ WindowLogger::WindowLogger(const std::string& name)
 bool WindowLogger::DrawCallback()
 {
     ImGui::BeginChild("Scrolling");
-    for (const auto& message : logger_.GetLastLogs(100))
+    for (const auto& log_message : logger_.GetLastLogs(100))
     {
-        ImGui::TextUnformatted(message.c_str());
+        ImGui::TextUnformatted(log_message.message.c_str());
     }
     if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
     {
@@ -39,6 +38,39 @@ void WindowLogger::SetName(const std::string& name)
 bool WindowLogger::End() const
 {
     return false;
+}
+
+void WindowLogger::LogWithColor(const LogMessage& log_message) const
+{
+    switch (log_message.level)
+    {
+    case spdlog::level::trace:
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));
+        break;
+    case spdlog::level::debug:
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 1.0f, 0.0f, 1.0f));
+        break;
+    case spdlog::level::info:
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+        break;
+    case spdlog::level::warn:
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 0.5f, 1.0f));
+        break;
+    case spdlog::level::err:
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.5f, 0.5f, 1.0f));
+        break;
+    case spdlog::level::critical:
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+        break;
+    case spdlog::level::off:
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+        break;
+    default:
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+        break;
+    }
+    ImGui::TextUnformatted(log_message.message.c_str());
+    ImGui::PopStyleColor();
 }
 
 } // namespace frame::gui.
