@@ -2,9 +2,9 @@
 
 #include <functional>
 
+#include "frame/gui/gui_window_interface.h"
 #include "frame/name_interface.h"
 #include "frame/plugin_interface.h"
-#include "frame/gui/gui_window_interface.h"
 
 namespace frame::gui
 {
@@ -22,7 +22,16 @@ class DrawGuiInterface : public PluginInterface
      * @brief Add sub window to the main window.
      * @param callback: A window callback that can add buttons, etc.
      */
-    virtual void AddWindow(std::unique_ptr<GuiWindowInterface>&& callback) = 0;
+    virtual void AddWindow(std::unique_ptr<GuiWindowInterface> callback) = 0;
+    /**
+     * @brief Add a modal window.
+     * @param callback: A window callback that can add buttons, etc.
+	 * 
+	 * If the callback return is 0 the callback stay and if it is other it is
+	 * removed. This will trigger an internal boolean that will decide if the
+	 * modal is active or not.
+     */
+    virtual void AddModalWindow(std::unique_ptr<GuiWindowInterface> callback) = 0;
     /**
      * @brief Get a specific window (associated with a name).
      * @param name: The name of the window.

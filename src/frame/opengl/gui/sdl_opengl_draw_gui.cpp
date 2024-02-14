@@ -137,6 +137,26 @@ bool SDL2OpenGLDrawGui::Update(DeviceInterface& device, double dt)
         {
             ImGui::Begin(texture.GetName().c_str());
         }
+        if (is_default_output && modal_callback_)
+        {
+            if (!start_modal_)
+            {
+                ImGui::OpenPopup(modal_callback_->GetName().c_str());
+                start_modal_ = true;
+            }
+            ImGui::BeginPopupModal(
+                modal_callback_->GetName().c_str(),
+                nullptr,
+                ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove);
+            modal_callback_->DrawCallback();
+            if (modal_callback_->End())
+            {
+                start_modal_ = false;
+                ImGui::CloseCurrentPopup();
+                modal_callback_.reset();
+            }
+            ImGui::EndPopup();
+        }
         // Check if you should enable default window keyboard and mouse.
         if (ImGui::IsWindowHovered() && is_default_output)
         {
@@ -200,7 +220,7 @@ bool SDL2OpenGLDrawGui::Update(DeviceInterface& device, double dt)
 }
 
 void SDL2OpenGLDrawGui::AddWindow(
-    std::unique_ptr<frame::gui::GuiWindowInterface>&& callback)
+    std::unique_ptr<frame::gui::GuiWindowInterface> callback)
 {
     std::string name = callback->GetName();
     if (name.empty())
@@ -208,6 +228,11 @@ void SDL2OpenGLDrawGui::AddWindow(
         throw std::runtime_error("Cannot create a sub window without a name!");
     }
     callbacks_.insert({name, std::move(callback)});
+}
+
+void SDL2OpenGLDrawGui::AddModalWindow(std::unique_ptr<frame::gui::GuiWindowInterface> callback)
+{
+    modal_callback_ = std::move(callback);
 }
 
 std::vector<std::string> SDL2OpenGLDrawGui::GetWindowTitles() const

@@ -35,7 +35,10 @@ class WindowLogger : public GuiWindowInterface
     bool End() const override;
 
   protected:
-    //! @brief Log with color.
+    /**
+	 * @brief Log with color.
+	 * @param log_message: The log message to log.
+	 */
     void LogWithColor(const LogMessage& log_message) const;
 
   private:

@@ -16,6 +16,7 @@
 #include "frame/gui/window_resolution.h"
 #include "frame/gui/window_logger.h"
 #include "frame/window_factory.h"
+#include "modal_info.h"
 
 // From: https://sourceforge.net/p/predef/wiki/OperatingSystems/
 #if defined(_WIN32) || defined(_WIN64)
@@ -45,7 +46,11 @@ try
         "Resolution", size, win->GetDesktopSize(), win->GetPixelPerInch());
     ptr_window_resolution = gui_resolution.get();
     gui_window->AddWindow(std::move(gui_resolution));
-    gui_window->AddWindow(std::make_unique<frame::gui::WindowLogger>("Logger"));
+    gui_window->AddWindow(
+        std::make_unique<frame::gui::WindowLogger>("Logger"));
+    // gui_window->SetVisible(false);
+    gui_window->AddModalWindow(
+        std::make_unique<ModalInfo>("Info", "This is a test modal window."));
     win->GetDevice().AddPlugin(std::move(gui_window));
     frame::common::Application app(std::move(win));
     do

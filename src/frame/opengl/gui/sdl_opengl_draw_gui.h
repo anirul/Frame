@@ -88,13 +88,24 @@ class SDL2OpenGLDrawGui : public frame::gui::DrawGuiInterface
      * @param callback: A window callback that can add buttons, etc.
      */
     void AddWindow(
-        std::unique_ptr<frame::gui::GuiWindowInterface>&& callback) override;
+		std::unique_ptr<frame::gui::GuiWindowInterface> callback) override;
+    /**
+     * @brief Add a modal window.
+     * @param callback: A window callback that can add buttons, etc.
+     *
+     * If the callback return is 0 the callback stay and if it is other it is
+     * removed. This will trigger an internal boolean that will decide if the
+     * modal is active or not.
+     */
+    void AddModalWindow(
+		std::unique_ptr<frame::gui::GuiWindowInterface> callback) override;
     /**
      * @brief Get a specific window (associated with a name).
      * @param name: The name of the window.
      * @return A pointer to the window.
      */
-    frame::gui::GuiWindowInterface& GetWindow(const std::string& name) override;
+    frame::gui::GuiWindowInterface& GetWindow(
+		const std::string& name) override;
     /**
      * @brief Get all sub window name (title).
      * @return A list of all the sub windows.
@@ -126,6 +137,8 @@ class SDL2OpenGLDrawGui : public frame::gui::DrawGuiInterface
   protected:
     std::map<std::string, std::unique_ptr<frame::gui::GuiWindowInterface>>
         callbacks_ = {};
+	std::unique_ptr<frame::gui::GuiWindowInterface> modal_callback_ = nullptr;
+	bool start_modal_ = false;
 	std::filesystem::path font_path_;
     WindowInterface& window_;
     DeviceInterface& device_;
