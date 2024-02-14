@@ -5,10 +5,16 @@
 namespace frame::common
 {
 
-Application::Application(std::unique_ptr<frame::WindowInterface>&& window)
+Application::Application(std::unique_ptr<frame::WindowInterface> window)
     : window_(std::move(window))
 {
     assert(window_);
+}
+
+frame::WindowInterface& Application::GetWindow()
+{
+    assert(window_);
+    return *window_;
 }
 
 void Application::Startup(std::filesystem::path path)
@@ -25,7 +31,7 @@ void Application::Startup(std::filesystem::path path)
     device.AddPlugin(std::move(plugin));
 }
 
-void Application::Startup(std::unique_ptr<frame::LevelInterface>&& level)
+void Application::Startup(std::unique_ptr<frame::LevelInterface> level)
 {
     assert(window_);
     auto& device = window_->GetDevice();

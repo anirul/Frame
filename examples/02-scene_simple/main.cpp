@@ -9,12 +9,14 @@
 #include <windows.h>
 #endif
 
+#include <imgui.h>
+
 #include "frame/common/application.h"
 #include "frame/file/file_system.h"
 #include "frame/file/image_stb.h"
 #include "frame/gui/draw_gui_factory.h"
-#include "frame/gui/window_resolution.h"
 #include "frame/gui/window_logger.h"
+#include "frame/gui/window_resolution.h"
 #include "frame/window_factory.h"
 #include "modal_info.h"
 
@@ -46,9 +48,12 @@ try
         "Resolution", size, win->GetDesktopSize(), win->GetPixelPerInch());
     ptr_window_resolution = gui_resolution.get();
     gui_window->AddWindow(std::move(gui_resolution));
-    gui_window->AddWindow(
-        std::make_unique<frame::gui::WindowLogger>("Logger"));
+    gui_window->AddWindow(std::make_unique<frame::gui::WindowLogger>("Logger"));
+    // Set the main window in full.
     // gui_window->SetVisible(false);
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.Colors[ImGuiCol_PopupBg] = ImVec4(
+        0.1f, 0.5f, 0.1f, 0.9f); // Dark background with some transparency
     gui_window->AddModalWindow(
         std::make_unique<ModalInfo>("Info", "This is a test modal window."));
     win->GetDevice().AddPlugin(std::move(gui_window));
