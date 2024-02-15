@@ -48,7 +48,8 @@ SDL2OpenGLDrawGui::SDL2OpenGLDrawGui(
     else
     {
         io.Fonts->AddFontFromFileTTF(
-            reinterpret_cast<const char*>(font_path_.c_str()), font_size_);
+            reinterpret_cast<const char*>(font_path_.u8string().c_str()),
+            font_size_);
     }
 
     // Setup Platform/Renderer back ends
