@@ -23,6 +23,8 @@ SDL2OpenGLDrawGui::SDL2OpenGLDrawGui(
       font_path_(font_path),
       font_size_(font_size)
 {
+    // Set the name this is a way to find the plugin.
+    SetName("DrawGuiInterface");
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
