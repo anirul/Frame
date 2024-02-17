@@ -36,6 +36,10 @@ class SDLVulkanNone : public WindowInterface
     {
         throw std::runtime_error("Not implemented yet!");
     }
+	void RemoveKeyCallback(std::int32_t key) override
+	{
+		throw std::runtime_error("Not implemented yet!");
+	}
     void SetUniqueDevice(std::unique_ptr<DeviceInterface>&& device) override
     {
         device_ = std::move(device);
