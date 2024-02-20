@@ -66,8 +66,7 @@ void WindowLogger::LogWithColor(const LogMessage& log_message) const
         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
         break;
     default:
-        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
-        break;
+        throw std::runtime_error("Unknown log level!");
     }
     ImGui::TextUnformatted(log_message.message.c_str());
     ImGui::PopStyleColor();

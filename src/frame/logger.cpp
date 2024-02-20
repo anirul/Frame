@@ -56,19 +56,16 @@ const std::vector<LogMessage>& Logger::GetLastLogs(std::uint32_t max_log) const
         std::dynamic_pointer_cast<frame::gui::GuiLoggerSink>(gui_logger_sink_);
     if (gui_logger_sink)
     {
-        if (display_logs_.capacity() != max_log)
-        {
-            display_logs_.reserve(max_log);
-        }
         const auto& logs = gui_logger_sink->GetLogs();
         if (logs.size() <= max_log)
         {
             return logs;
         }
         display_logs_.clear();
-        for (std::size_t i = logs.size() - max_log; i < logs.size(); ++i)
+        std::size_t start = logs.size() - max_log;
+        for (std::size_t i = 0; i < max_log; ++i)
         {
-            display_logs_.push_back(logs[i]);
+            display_logs_.push_back(logs[start + i]);
         }
         return display_logs_;
     }
