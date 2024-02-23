@@ -42,6 +42,36 @@ glm::mat4 ParseUniform(const UniformMatrix4& uniform_mat4)
         uniform_mat4.m44());
 }
 
+std::vector<glm::vec2> ParseUniform(const UniformVector2s& uniform_vec2s)
+{
+    std::vector<glm::vec2> vec2s;
+    for (const auto& vec2 : uniform_vec2s.values())
+    {
+        vec2s.push_back(ParseUniform(vec2));
+    }
+    return vec2s;
+}
+
+std::vector<glm::vec3> ParseUniform(const UniformVector3s& uniform_vec3s)
+{
+    std::vector<glm::vec3> vec3s;
+    for (const auto& vec3 : uniform_vec3s.values())
+    {
+        vec3s.push_back(ParseUniform(vec3));
+    }
+    return vec3s;
+}
+
+std::vector<glm::vec4> ParseUniform(const UniformVector4s& uniform_vec4s)
+{
+    std::vector<glm::vec4> vec4s;
+    for (const auto& vec4 : uniform_vec4s.values())
+    {
+        vec4s.push_back(ParseUniform(vec4));
+    }
+    return vec4s;
+}
+
 glm::quat ParseUniform(const UniformQuaternion& uniform_quat)
 {
     return {
