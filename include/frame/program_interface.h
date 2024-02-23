@@ -146,6 +146,30 @@ struct ProgramInterface : public NameInterface
      */
     virtual void Uniform(
         const std::string& name,
+        const std::vector<glm::vec2>& vector) const = 0;
+    /**
+	 * @brief Create a uniform from a string and a vector.
+	 * @param name: Name of the uniform.
+	 * @param vector: Vector to be inputed into the uniform.
+	 */
+    virtual void Uniform(
+		const std::string& name,
+		const std::vector<glm::vec3>& vector) const = 0;
+    /**
+	 * @brief Create a uniform from a string and a vector.
+	 * @param name: Name of the uniform.
+	 * @param vector: Vector to be inputed into the uniform.
+	 */
+    virtual void Uniform(
+		const std::string& name,
+		const std::vector<glm::vec4>& vector) const = 0;
+    /**
+     * @brief Create a uniform from a string and a vector.
+     * @param name: Name of the uniform.
+     * @param vector: Vector to be inputed into the uniform.
+     */
+    virtual void Uniform(
+        const std::string& name,
         const std::vector<float>& vector,
         glm::uvec2 size = {0, 0}) const = 0;
     /**
