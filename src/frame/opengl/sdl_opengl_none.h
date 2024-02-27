@@ -27,7 +27,7 @@ class SDLOpenGLNone : public WindowInterface
 
   public:
     void SetInputInterface(
-        std::unique_ptr<InputInterface>&& input_interface) override
+        std::unique_ptr<InputInterface> input_interface) override
     {
         input_interface_ = std::move(input_interface);
     }
@@ -39,7 +39,7 @@ class SDLOpenGLNone : public WindowInterface
 	{
 		throw std::runtime_error("Not implemented.");
 	}
-    void SetUniqueDevice(std::unique_ptr<DeviceInterface>&& device) override
+    void SetUniqueDevice(std::unique_ptr<DeviceInterface> device) override
     {
         device_ = std::move(device);
     }

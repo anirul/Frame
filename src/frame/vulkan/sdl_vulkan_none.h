@@ -28,7 +28,7 @@ class SDLVulkanNone : public WindowInterface
 
   public:
     void SetInputInterface(
-        std::unique_ptr<InputInterface>&& input_interface) override
+        std::unique_ptr<InputInterface> input_interface) override
     {
         input_interface_ = std::move(input_interface);
     }
@@ -40,7 +40,7 @@ class SDLVulkanNone : public WindowInterface
 	{
 		throw std::runtime_error("Not implemented yet!");
 	}
-    void SetUniqueDevice(std::unique_ptr<DeviceInterface>&& device) override
+    void SetUniqueDevice(std::unique_ptr<DeviceInterface> device) override
     {
         device_ = std::move(device);
     }
