@@ -12,7 +12,7 @@ class ModalInfo : public frame::gui::GuiWindowInterface
     }
     bool DrawCallback() override
     {
-        ImGui::Text(text_.c_str());
+        ImGui::TextUnformatted(text_.c_str());
         if (ImGui::Button("Ok"))
         {
             end_ = true;
