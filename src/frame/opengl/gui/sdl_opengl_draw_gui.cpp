@@ -58,7 +58,11 @@ SDL2OpenGLDrawGui::SDL2OpenGLDrawGui(
     ImGui_ImplSDL2_InitForOpenGL(
         static_cast<SDL_Window*>(window_.GetWindowContext()),
         device_.GetDeviceContext());
+#ifdef _WIN32 || _WIN64
     ImGui_ImplOpenGL3_Init("#version 450");
+#else
+    ImGui_ImplOpenGL3_Init("#version 330");
+#endif
 }
 
 SDL2OpenGLDrawGui::~SDL2OpenGLDrawGui()
