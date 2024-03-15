@@ -144,6 +144,8 @@ class SDL2OpenGLDrawGui : public frame::gui::DrawGuiInterface
     DeviceInterface& device_;
     std::string name_;
     glm::uvec2 size_ = {0, 0};
+	glm::uvec2 next_window_position_ = {0, 0};
+	glm::uvec2 original_image_size_ = {0, 0};
     bool is_keyboard_passed_ = false;
     bool is_visible_ = true;
 	float font_size_ = 20.0f;

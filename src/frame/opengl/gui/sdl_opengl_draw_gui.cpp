@@ -128,6 +128,20 @@ bool SDL2OpenGLDrawGui::Update(DeviceInterface& device, double dt)
         if (is_default_output)
         {
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+            original_image_size_ = texture.GetSize();
+        }
+        // This is in window addition to the main window.
+        bool is_invisible_window = name_[0] == '#' && name_[1] == '#';
+        if (is_invisible_window && is_default_output)
+        {
+            ImGui::SetNextWindowPos(
+                ImVec2(
+                    static_cast<float>(next_window_position_.x),
+                    static_cast<float>(next_window_position_.y)));
+            ImGui::SetNextWindowSize(
+                ImVec2(
+                    static_cast<float>(original_image_size_.x),
+                    static_cast<float>(original_image_size_.y)));
         }
         // If the window are not visible and it is not the main window then
         // bail out.
@@ -151,18 +165,21 @@ bool SDL2OpenGLDrawGui::Update(DeviceInterface& device, double dt)
                 ImGui::OpenPopup(modal_callback_->GetName().c_str());
                 start_modal_ = true;
             }
-            ImGui::BeginPopupModal(
-                modal_callback_->GetName().c_str(),
-                nullptr,
-                ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove);
-            modal_callback_->DrawCallback();
-            if (modal_callback_->End())
+            if (ImGui::BeginPopupModal(
+                    modal_callback_->GetName().c_str(),
+                    nullptr,
+                    ImGuiWindowFlags_AlwaysAutoResize |
+                    ImGuiWindowFlags_NoMove))
             {
-                start_modal_ = false;
-                ImGui::CloseCurrentPopup();
-                modal_callback_.reset();
+                modal_callback_->DrawCallback();
+                if (modal_callback_->End())
+                {
+                    start_modal_ = false;
+                    ImGui::CloseCurrentPopup();
+                    modal_callback_.reset();
+                }
+                ImGui::EndPopup();
             }
-            ImGui::EndPopup();
         }
         // Check if you should enable default window keyboard and mouse.
         if (ImGui::IsWindowHovered() && is_default_output)
