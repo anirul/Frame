@@ -25,6 +25,7 @@ jobs:
       run: |
         git clone https://github.com/microsoft/vcpkg.git
         cd vcpkg
+        git checkout 2014.02.14
         ./bootstrap-vcpkg.bat
         ./vcpkg integrate install
 
