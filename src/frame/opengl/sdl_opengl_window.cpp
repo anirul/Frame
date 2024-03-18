@@ -143,12 +143,6 @@ bool SDLOpenGLWindow::RunEvent(const SDL_Event& event, const double dt)
     }
     if (event.type == SDL_KEYDOWN)
     {
-        switch (event.key.keysym.sym)
-        {
-        case SDLK_PRINTSCREEN:
-            device_->ScreenShot("ScreenShot.png");
-            return true;
-        }
         if (key_callbacks_.count(event.key.keysym.sym))
         {
             return key_callbacks_[event.key.keysym.sym]();
