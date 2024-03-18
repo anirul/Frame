@@ -182,7 +182,9 @@ bool SDL2OpenGLDrawGui::Update(DeviceInterface& device, double dt)
             }
         }
         // Check if you should enable default window keyboard and mouse.
-        if (ImGui::IsWindowHovered() && is_default_output)
+        if (ImGui::IsWindowHovered() &&
+            is_default_output &&
+            !is_keyboard_passed_locked_)
         {
             is_keyboard_passed_ = true;
         }

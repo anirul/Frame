@@ -26,12 +26,13 @@ class DrawGuiInterface : public PluginInterface
     /**
      * @brief Add a modal window.
      * @param callback: A window callback that can add buttons, etc.
-	 * 
-	 * If the callback return is 0 the callback stay and if it is other it is
-	 * removed. This will trigger an internal boolean that will decide if the
-	 * modal is active or not.
+     *
+     * If the callback return is 0 the callback stay and if it is other it is
+     * removed. This will trigger an internal boolean that will decide if the
+     * modal is active or not.
      */
-    virtual void AddModalWindow(std::unique_ptr<GuiWindowInterface> callback) = 0;
+    virtual void AddModalWindow(
+        std::unique_ptr<GuiWindowInterface> callback) = 0;
     /**
      * @brief Get a specific window (associated with a name).
      * @param name: The name of the window.
@@ -58,6 +59,18 @@ class DrawGuiInterface : public PluginInterface
      * @return True if enable.
      */
     virtual bool IsVisible() const = 0;
+    /**
+     * @brief Poll event.
+     * @param event: The event to be polled.
+     * @return True if the event is captured.
+     */
+    virtual void SetKeyboardPassed(bool is_keyboard_passed) = 0;
+    /**
+     * @brief Poll event.
+     * @param event: The event to be polled.
+     * @return True if the event is captured.
+     */
+    virtual bool IsKeyboardPassed() const = 0;
 };
 
 } // End namespace frame::gui.

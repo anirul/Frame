@@ -84,6 +84,24 @@ class SDL2OpenGLDrawGui : public frame::gui::DrawGuiInterface
 
   public:
     /**
+     * @brief Poll event.
+     * @param event: The event to be polled.
+     * @return True if the event is captured.
+     */
+    void SetKeyboardPassed(bool is_keyboard_passed) override
+	{
+		is_keyboard_passed_locked_ = is_keyboard_passed;
+	}
+    /**
+     * @brief Poll event.
+     * @param event: The event to be polled.
+     * @return True if the event is captured.
+     */
+    bool IsKeyboardPassed() const override
+    {
+		return is_keyboard_passed_locked_;
+    }
+    /**
      * @brief Add sub window to the main window.
      * @param callback: A window callback that can add buttons, etc.
      */
@@ -146,6 +164,7 @@ class SDL2OpenGLDrawGui : public frame::gui::DrawGuiInterface
     glm::uvec2 size_ = {0, 0};
 	glm::uvec2 next_window_position_ = {0, 0};
 	glm::uvec2 original_image_size_ = {0, 0};
+	bool is_keyboard_passed_locked_ = false;
     bool is_keyboard_passed_ = false;
     bool is_visible_ = true;
 	float font_size_ = 20.0f;
