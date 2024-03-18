@@ -1,0 +1,77 @@
+# build the Frame code on linux and run the test
+# copy from https://github.com/actions/starter-workflows/blob/main/ci/cmake-single-platform.yml
+name: CMake on multiple platforms
+
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      # Set fail-fast to false to ensure that feedback is delivered for all matrix combinations. Consider changing this to true when your workflow is stable.
+      fail-fast: true
+      # Matrix not used, missing windows knowledge to do build it
+      # clang compiler not working with ubuntu because issue with std lib and clang (tested with clang15)
+      matrix:
+        os: [ubuntu-latest]
+        build_type: [Release]
+        c_compiler: [gcc]
+        cpp_compiler: [g++]
+        triplet: [x64-linux-release]
+        include:
+          - os: ubuntu-latest
+            c_compiler: gcc
+            cpp_compiler: g++
+            triplet: x64-linux-release
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        lfs: true
+        submodules: true
+    - name: Set reusable strings
+      # Turn repeated input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
+      id: strings
+      shell: bash
+      run: |
+        echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+    - name: apt install
+      if: ${{ matrix.os == 'ubuntu-latest' }}
+      run: |
+        sudo apt update 
+        sudo apt install -y libxmu-dev libxi-dev libgl-dev libglx-dev libgles-dev \
+         build-essential libx11-xcb-dev libegl1-mesa-dev libopengl-dev \
+        libxkbcommon-dev libwayland-dev libxrandr-dev mesa-vulkan-drivers libglu1-mesa-dev libdrm-dev libegl-dev libglm-dev 
+      # the dependency list is too big but at least it works
+      # https://packages.ubuntu.com/search
+    - name: vcpkg build
+      id: vcpkg
+      uses: johnwason/vcpkg-action@v6 #cache build so improve the build time a lot
+      with:
+        manifest-dir: ${{ github.workspace }} # Set to directory containing vcpkg.json
+        triplet: "${{ matrix.triplet }}"
+        token: ${{ github.token }}
+        github-binarycache: true
+        cache-key: "${{ matrix.triplet }}" # TODO must use sha1 of vcpkg.json and triplet
+    - name: Configure CMake
+      run: >
+        cmake -B ${{ steps.strings.outputs.build-output-dir }}
+        -DBUILD_SKIP_CLIENT=ON
+        ${{ steps.vcpkg.outputs.vcpkg-cmake-config }}
+        -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
+        -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
+        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        -S ${{ github.workspace }} ; 
+    - name: Build
+      # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
+      run: >
+        CC="${{ matrix.c_compiler }}" CXX="${{ matrix.cpp_compiler }}" cmake 
+        --build ${{ steps.strings.outputs.build-output-dir }} --verbose -j 4  
+    - name: Show files after
+      run: ls -ltrR ${{ github.workspace }}
+    - name: Run tests
+      working-directory: ${{ steps.strings.outputs.build-output-dir }}
+      run:  xvfb-run ctest --build-config ${{ matrix.build_type }}
