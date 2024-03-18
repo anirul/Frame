@@ -286,7 +286,7 @@ bool SDL2OpenGLDrawGui::PollEvent(void* event)
     if (is_keyboard_passed_)
         return false;
     auto& io = ImGui::GetIO();
-    return (is_keyboard_passed_locked_)
+    return (!is_keyboard_passed_locked_)
             ? io.WantCaptureMouse || io.WantCaptureKeyboard
             : false;
 }
