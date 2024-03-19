@@ -103,11 +103,11 @@ bool SDL2OpenGLDrawGui::Update(DeviceInterface& device, double dt)
     {
         ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
         // Make the other window visible.
-        for (const auto& pair : callbacks_)
+        for (const auto& pair : window_callbacks_)
         {
             // Call the callback!
-            ImGui::Begin(pair.second->GetName().c_str());
-            if (!pair.second->DrawCallback())
+            ImGui::Begin(pair.second.callback->GetName().c_str());
+            if (!pair.second.callback->DrawCallback())
                 returned_value = false;
             ImGui::End();
         }
@@ -130,19 +130,7 @@ bool SDL2OpenGLDrawGui::Update(DeviceInterface& device, double dt)
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
             original_image_size_ = texture.GetSize();
         }
-        // This is in window addition to the main window.
-        bool is_invisible_window = name_[0] == '#' && name_[1] == '#';
-        if (is_invisible_window && is_default_output)
-        {
-            ImGui::SetNextWindowPos(
-                ImVec2(
-                    static_cast<float>(next_window_position_.x),
-                    static_cast<float>(next_window_position_.y)));
-            ImGui::SetNextWindowSize(
-                ImVec2(
-                    static_cast<float>(original_image_size_.x),
-                    static_cast<float>(original_image_size_.y)));
-        }
+       
         // If the window are not visible and it is not the main window then
         // bail out.
         if (!is_visible_ && !is_default_output)
@@ -224,6 +212,30 @@ bool SDL2OpenGLDrawGui::Update(DeviceInterface& device, double dt)
         }
     }
 
+    if (!is_visible_)
+    {
+        for (const auto& pair : overlay_callbacks_)
+        {
+            ImGui::SetNextWindowPos(
+                ImVec2(
+                    static_cast<float>(pair.second.position.x),
+                    static_cast<float>(pair.second.position.y)));
+            ImGui::SetNextWindowSize(
+                ImVec2(
+                    static_cast<float>(pair.second.size.x),
+                    static_cast<float>(pair.second.size.y)));
+            // Setup overlay window with appropriate flags
+            ImGui::Begin(
+                pair.first.c_str(),
+                nullptr,
+                ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar |
+                ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove |
+                ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoInputs);
+            pair.second.callback->DrawCallback();
+            ImGui::End();
+        }
+    }
+
     // Rendering
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -251,10 +263,27 @@ void SDL2OpenGLDrawGui::AddWindow(
     {
         throw std::runtime_error("Cannot create a sub window without a name!");
     }
-    callbacks_.insert({name, std::move(callback)});
+    window_callbacks_.insert(
+        {name, {std::move(callback), {0.0f, 0.0f}, {0.0f, 0.0f}}});
 }
 
-void SDL2OpenGLDrawGui::AddModalWindow(std::unique_ptr<frame::gui::GuiWindowInterface> callback)
+void SDL2OpenGLDrawGui::AddOverlayWindow(
+    glm::vec2 position,
+    glm::vec2 size,
+    std::unique_ptr<frame::gui::GuiWindowInterface> callback)
+{
+    std::string name = callback->GetName();
+    if (name.empty())
+    {
+        throw std::runtime_error(
+            "Cannot create a sub window without a name!");
+    }
+    overlay_callbacks_.insert(
+        {name, {std::move(callback), position, size}});
+}
+
+void SDL2OpenGLDrawGui::AddModalWindow(
+    std::unique_ptr<frame::gui::GuiWindowInterface> callback)
 {
     modal_callback_ = std::move(callback);
 }
@@ -262,7 +291,7 @@ void SDL2OpenGLDrawGui::AddModalWindow(std::unique_ptr<frame::gui::GuiWindowInte
 std::vector<std::string> SDL2OpenGLDrawGui::GetWindowTitles() const
 {
     std::vector<std::string> name_list;
-    for (const auto& [name, _] : callbacks_)
+    for (const auto& [name, _] : window_callbacks_)
     {
         name_list.push_back(name);
     }
@@ -271,7 +300,14 @@ std::vector<std::string> SDL2OpenGLDrawGui::GetWindowTitles() const
 
 void SDL2OpenGLDrawGui::DeleteWindow(const std::string& name)
 {
-    callbacks_.erase(name);
+    if (window_callbacks_.contains(name))
+    {
+        window_callbacks_.erase(name);
+    }
+    if (overlay_callbacks_.contains(name))
+    {
+        overlay_callbacks_.erase(name);
+    }
 }
 
 bool SDL2OpenGLDrawGui::PollEvent(void* event)
@@ -294,7 +330,15 @@ bool SDL2OpenGLDrawGui::PollEvent(void* event)
 frame::gui::GuiWindowInterface& SDL2OpenGLDrawGui::GetWindow(
     const std::string& name)
 {
-    return *callbacks_.at(name).get();
+    if (window_callbacks_.contains(name))
+    {
+        return *window_callbacks_.at(name).callback.get();
+    }
+    if (overlay_callbacks_.contains(name))
+    {
+        return *overlay_callbacks_.at(name).callback.get();
+    }
+    throw std::runtime_error("Cannot find the window with the name: " + name);
 }
 
 } // End namespace frame::opengl::gui.

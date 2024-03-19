@@ -24,6 +24,19 @@ class DrawGuiInterface : public PluginInterface
      */
     virtual void AddWindow(std::unique_ptr<GuiWindowInterface> callback) = 0;
     /**
+     * @brief Add a overlay window.
+     * @param position: The position of the window.
+     * @param callback: A window callback that can add buttons, etc.
+     *
+     * Overlay window are drawn on top of the main window and are not
+     * affected. Also note that they are only display when the main window
+     * is fullscreen.
+     */
+    virtual void AddOverlayWindow(
+        glm::vec2 position,
+        glm::vec2 size,
+		std::unique_ptr<GuiWindowInterface> callback) = 0;
+    /**
      * @brief Add a modal window.
      * @param callback: A window callback that can add buttons, etc.
      *
@@ -46,7 +59,7 @@ class DrawGuiInterface : public PluginInterface
     virtual std::vector<std::string> GetWindowTitles() const = 0;
     /**
      * @brief Delete a sub window.
-     * @param name: the name of the window to be deleted.
+     * @param name: the name of the window or overlay to be deleted.
      */
     virtual void DeleteWindow(const std::string& name) = 0;
     /**

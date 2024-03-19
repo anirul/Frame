@@ -108,6 +108,19 @@ class SDL2OpenGLDrawGui : public frame::gui::DrawGuiInterface
     void AddWindow(
 		std::unique_ptr<frame::gui::GuiWindowInterface> callback) override;
     /**
+     * @brief Add a overlay window.
+     * @param position: The position of the window.
+     * @param callback: A window callback that can add buttons, etc.
+     *
+     * Overlay window are drawn on top of the main window and are not
+     * affected. Also note that they are only display when the main window
+     * is fullscreen.
+     */
+    void AddOverlayWindow(
+        glm::vec2 position,
+		glm::vec2 size,
+		std::unique_ptr<frame::gui::GuiWindowInterface> callback) override;
+    /**
      * @brief Add a modal window.
      * @param callback: A window callback that can add buttons, etc.
      *
@@ -153,8 +166,13 @@ class SDL2OpenGLDrawGui : public frame::gui::DrawGuiInterface
     bool PollEvent(void* event) override;
 
   protected:
-    std::map<std::string, std::unique_ptr<frame::gui::GuiWindowInterface>>
-        callbacks_ = {};
+    struct CallbackData {
+		std::unique_ptr<frame::gui::GuiWindowInterface> callback = nullptr;
+        glm::vec2 position = { 0.0f, 0.0f };
+        glm::vec2 size = { 0.0f, 0.0f };
+    };
+    std::map<std::string, CallbackData> window_callbacks_ = {};
+    std::map<std::string, CallbackData> overlay_callbacks_ = {};
 	std::unique_ptr<frame::gui::GuiWindowInterface> modal_callback_ = nullptr;
 	bool start_modal_ = false;
 	std::filesystem::path font_path_;
