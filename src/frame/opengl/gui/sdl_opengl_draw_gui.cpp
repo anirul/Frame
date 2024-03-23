@@ -263,8 +263,11 @@ void SDL2OpenGLDrawGui::AddWindow(
     {
         throw std::runtime_error("Cannot create a sub window without a name!");
     }
-    window_callbacks_.insert(
-        {name, {std::move(callback), {0.0f, 0.0f}, {0.0f, 0.0f}}});
+    CallbackData callback_data;
+    callback_data.callback = std::move(callback);
+    callback_data.position = glm::vec2(0.0f, 0.0f);
+    callback_data.size = glm::vec2(0.0f, 0.0f);
+    window_callbacks_.emplace(name, std::move(callback_data));
 }
 
 void SDL2OpenGLDrawGui::AddOverlayWindow(
@@ -278,8 +281,11 @@ void SDL2OpenGLDrawGui::AddOverlayWindow(
         throw std::runtime_error(
             "Cannot create a sub window without a name!");
     }
-    overlay_callbacks_.insert(
-        {name, {std::move(callback), position, size}});
+    CallbackData callback_data;
+    callback_data.callback = std::move(callback);
+    callback_data.position = position;
+    callback_data.size = size;
+    overlay_callbacks_.emplace(name, std::move(callback_data));
 }
 
 void SDL2OpenGLDrawGui::AddModalWindow(
