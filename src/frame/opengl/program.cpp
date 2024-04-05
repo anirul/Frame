@@ -6,6 +6,7 @@
 #include <regex>
 #include <stdexcept>
 #include <string_view>
+#include <glm/gtc/type_ptr.hpp>
 
 #include "frame/logger.h"
 
@@ -136,6 +137,51 @@ void Program::Uniform(const std::string& name, const glm::mat4 mat) const
 {
     glUniformMatrix4fv(
         GetMemoizeUniformLocation(name), 1, GL_FALSE, &mat[0][0]);
+}
+
+void Program::Uniform(
+    const std::string& name,
+    const std::vector<glm::vec2>& vector) const
+{
+    if (vector.size() == 0)
+    {
+        logger_->warn("Entered a uniform [{}] without size.", name);
+        return;
+    }
+    glUniform2fv(
+        GetMemoizeUniformLocation(name),
+        static_cast<GLsizei>(vector.size()),
+        glm::value_ptr(vector[0]));
+}
+
+void Program::Uniform(
+    const std::string& name,
+    const std::vector<glm::vec3>& vector) const
+{
+    if (vector.size() == 0)
+    {
+        logger_->warn("Entered a uniform [{}] without size.", name);
+        return;
+    }
+    glUniform3fv(
+        GetMemoizeUniformLocation(name),
+        static_cast<GLsizei>(vector.size()),
+        glm::value_ptr(vector[0]));
+}
+
+void Program::Uniform(
+    const std::string& name,
+    const std::vector<glm::vec4>& vector) const
+{
+    if (vector.size() == 0)
+    {
+        logger_->warn("Entered a uniform [{}] without size.", name);
+        return;
+    }
+    glUniform4fv(
+        GetMemoizeUniformLocation(name),
+        static_cast<GLsizei>(vector.size()),
+        glm::value_ptr(vector[0]));
 }
 
 void Program::Uniform(

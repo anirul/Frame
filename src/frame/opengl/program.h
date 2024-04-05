@@ -167,6 +167,30 @@ class Program : public ProgramInterface
     void Uniform(const std::string& name, const glm::mat4 mat) const override;
     /**
      * @brief Create a uniform from a string and a vector.
+     * @param name: Name of the uniform.
+     * @param vector: Vector to be inputed into the uniform.
+     */
+    void Uniform(
+        const std::string& name,
+        const std::vector<glm::vec2>& vector) const override;
+    /**
+     * @brief Create a uniform from a string and a vector.
+     * @param name: Name of the uniform.
+     * @param vector: Vector to be inputed into the uniform.
+     */
+    void Uniform(
+        const std::string& name,
+        const std::vector<glm::vec3>& vector) const override;
+    /**
+     * @brief Create a uniform from a string and a vector.
+     * @param name: Name of the uniform.
+     * @param vector: Vector to be inputed into the uniform.
+     */
+    void Uniform(
+        const std::string& name,
+        const std::vector<glm::vec4>& vector) const override;
+    /**
+     * @brief Create a uniform from a string and a vector.
      * For now this is checking the size of the vector to input in the
      * corresponding matrix.
      * @param name: Name of the uniform.

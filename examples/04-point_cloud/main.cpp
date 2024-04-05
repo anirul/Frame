@@ -52,7 +52,7 @@ try
     frame::gui::WindowResolution* ptr_window_resolution = nullptr;
     frame::gui::WindowCamera* ptr_window_camera = nullptr;
     frame::gui::WindowCubemap* ptr_window_cubemap = nullptr;
-    auto gui_window = frame::gui::CreateDrawGui(*win.get());
+    auto gui_window = frame::gui::CreateDrawGui(*win.get(), {}, 20.0f);
     {
         auto gui_resolution = std::make_unique<frame::gui::WindowResolution>(
             "Resolution", size, win->GetDesktopSize(), win->GetPixelPerInch());

@@ -21,3 +21,5 @@
 #if defined(_WIN32) || defined(_WIN64)
 #pragma warning(pop)
 #endif
+
+#define GLM_ENABLE_EXPERIMENTAL

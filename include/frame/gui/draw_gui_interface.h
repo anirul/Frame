@@ -2,25 +2,12 @@
 
 #include <functional>
 
+#include "frame/gui/gui_window_interface.h"
 #include "frame/name_interface.h"
 #include "frame/plugin_interface.h"
 
 namespace frame::gui
 {
-
-/**
- * @class GuiWindowInterface
- * @brief Draw GUI Window interface.
- *
- * It has a name interface that will be used as a pointer to the window.
- */
-struct GuiWindowInterface : public NameInterface
-{
-    //! @brief Draw callback setting.
-    virtual bool DrawCallback() = 0;
-    //! @brief Is it the end of the gui?
-    virtual bool End() const = 0;
-};
 
 /**
  * @class DrawGuiInterface
@@ -35,7 +22,30 @@ class DrawGuiInterface : public PluginInterface
      * @brief Add sub window to the main window.
      * @param callback: A window callback that can add buttons, etc.
      */
-    virtual void AddWindow(std::unique_ptr<GuiWindowInterface>&& callback) = 0;
+    virtual void AddWindow(std::unique_ptr<GuiWindowInterface> callback) = 0;
+    /**
+     * @brief Add a overlay window.
+     * @param position: The position of the window.
+     * @param callback: A window callback that can add buttons, etc.
+     *
+     * Overlay window are drawn on top of the main window and are not
+     * affected. Also note that they are only display when the main window
+     * is fullscreen.
+     */
+    virtual void AddOverlayWindow(
+        glm::vec2 position,
+        glm::vec2 size,
+		std::unique_ptr<GuiWindowInterface> callback) = 0;
+    /**
+     * @brief Add a modal window.
+     * @param callback: A window callback that can add buttons, etc.
+     *
+     * If the callback return is 0 the callback stay and if it is other it is
+     * removed. This will trigger an internal boolean that will decide if the
+     * modal is active or not.
+     */
+    virtual void AddModalWindow(
+        std::unique_ptr<GuiWindowInterface> callback) = 0;
     /**
      * @brief Get a specific window (associated with a name).
      * @param name: The name of the window.
@@ -49,7 +59,7 @@ class DrawGuiInterface : public PluginInterface
     virtual std::vector<std::string> GetWindowTitles() const = 0;
     /**
      * @brief Delete a sub window.
-     * @param name: the name of the window to be deleted.
+     * @param name: the name of the window or overlay to be deleted.
      */
     virtual void DeleteWindow(const std::string& name) = 0;
     /**
@@ -62,6 +72,18 @@ class DrawGuiInterface : public PluginInterface
      * @return True if enable.
      */
     virtual bool IsVisible() const = 0;
+    /**
+     * @brief Poll event.
+     * @param event: The event to be polled.
+     * @return True if the event is captured.
+     */
+    virtual void SetKeyboardPassed(bool is_keyboard_passed) = 0;
+    /**
+     * @brief Poll event.
+     * @param event: The event to be polled.
+     * @return True if the event is captured.
+     */
+    virtual bool IsKeyboardPassed() const = 0;
 };
 
 } // End namespace frame::gui.

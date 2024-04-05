@@ -3,6 +3,7 @@
 #include <any>
 #include <array>
 #include <cinttypes>
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
 #include <utility>
 

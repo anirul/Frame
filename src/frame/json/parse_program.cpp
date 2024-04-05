@@ -66,6 +66,7 @@ std::unique_ptr<frame::ProgramInterface> ParseProgramOpenGL(
             "No way {}?",
             static_cast<int>(proto_program.input_scene_type().value())));
     }
+    program->Use();
     for (const auto& parameter : proto_program.parameters())
     {
         switch (parameter.value_oneof_case())
@@ -94,6 +95,18 @@ std::unique_ptr<frame::ProgramInterface> ParseProgramOpenGL(
             program->Uniform(
                 parameter.name(), ParseUniform(parameter.uniform_mat4()));
             break;
+        case Uniform::kUniformVec2S:
+            program->Uniform(
+                parameter.name(), ParseUniform(parameter.uniform_vec2s()));
+            break;
+        case Uniform::kUniformVec3S:
+            program->Uniform(
+                parameter.name(), ParseUniform(parameter.uniform_vec3s()));
+            break;
+        case Uniform::kUniformVec4S:
+            program->Uniform(
+                parameter.name(), ParseUniform(parameter.uniform_vec4s()));
+            break;
         case Uniform::kUniformFloatPlugin:
             break;
         case Uniform::kUniformIntPlugin:
@@ -104,6 +117,7 @@ std::unique_ptr<frame::ProgramInterface> ParseProgramOpenGL(
                 static_cast<int>(parameter.value_oneof_case())));
         }
     }
+    program->UnUse();
     return program;
 }
 

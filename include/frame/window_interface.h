@@ -29,7 +29,7 @@ struct WindowInterface
      * @param input_interface: Move a input interface to the window object.
      */
     virtual void SetInputInterface(
-        std::unique_ptr<InputInterface>&& input_interface) = 0;
+        std::unique_ptr<InputInterface> input_interface) = 0;
     /**
      * @brief Add a callback for a key.
      * @param key: The key to add a callback for.
@@ -39,11 +39,16 @@ struct WindowInterface
     virtual void AddKeyCallback(
         std::int32_t key, std::function<bool()> func) = 0;
     /**
+     * @brief Remove a callback to a key.
+     * @param key: The key to remove the callback from.
+     */
+    virtual void RemoveKeyCallback(std::int32_t key) = 0;
+    /**
      * @brief Set the unique device (this is suppose to be variable to the
      *        one you are using see : DirectX, OpenGL, etc...).
      * @param device: Move a device to the window object.
      */
-    virtual void SetUniqueDevice(std::unique_ptr<DeviceInterface>&& device) = 0;
+    virtual void SetUniqueDevice(std::unique_ptr<DeviceInterface> device) = 0;
     /**
      * @brief Get the current device the one that was assign to this window.
      * @return A pointer to a device interface.

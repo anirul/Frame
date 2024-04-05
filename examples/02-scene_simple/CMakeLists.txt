@@ -3,6 +3,7 @@
 add_executable(02_SceneSimple
   WIN32
     main.cpp
+    modal_info.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../asset/json/scene_simple.json
 )
 

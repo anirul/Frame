@@ -92,15 +92,18 @@ void SDLOpenGLWindow::Run(std::function<void()> lambda)
                 }
             }
             if (skip)
+            {
                 continue;
+            }
             if (!RunEvent(event, dt))
             {
                 loop = false;
             }
         }
         if (input_interface_)
+        {
             input_interface_->NextFrame();
-
+        }
         device_->Display(time.count());
 
         // Draw the Scene not used?
@@ -122,7 +125,9 @@ void SDLOpenGLWindow::Run(std::function<void()> lambda)
 
         // TODO(anirul): Fix me to check which device this is.
         if (device_)
+        {
             SDL_GL_SwapWindow(sdl_window_);
+        }
     } while (loop);
 }
 
@@ -138,29 +143,6 @@ bool SDLOpenGLWindow::RunEvent(const SDL_Event& event, const double dt)
     }
     if (event.type == SDL_KEYDOWN)
     {
-        switch (event.key.keysym.sym)
-        {
-        case SDLK_ESCAPE: {
-            if (has_window_plugin)
-            {
-                for (PluginInterface* plugin : device_->GetPluginPtrs())
-                {
-                    auto* window_plugin =
-                        dynamic_cast<frame::gui::DrawGuiInterface*>(plugin);
-                    if (window_plugin)
-                    {
-                        auto is_visible = window_plugin->IsVisible();
-                        window_plugin->SetVisible(!is_visible);
-                    }
-                }
-                return true;
-            }
-            return false;
-        }
-        case SDLK_PRINTSCREEN:
-            device_->ScreenShot("ScreenShot.png");
-            return true;
-        }
         if (key_callbacks_.count(event.key.keysym.sym))
         {
             return key_callbacks_[event.key.keysym.sym]();

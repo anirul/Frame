@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <filesystem>
 
 #include "frame/device_interface.h"
 #include "frame/gui/draw_gui_interface.h"
@@ -19,8 +20,12 @@ class SDL2OpenGLDrawGui : public frame::gui::DrawGuiInterface
     /**
      * @brief Constructor.
      * @param window: The window to use.
+	 * @param font_path: The path to the font.
      */
-    SDL2OpenGLDrawGui(frame::WindowInterface& window);
+    SDL2OpenGLDrawGui(
+		frame::WindowInterface& window,
+		const std::filesystem::path& font_path,
+		float font_size);
     //! @brief Destructor.
     virtual ~SDL2OpenGLDrawGui();
 
@@ -79,17 +84,59 @@ class SDL2OpenGLDrawGui : public frame::gui::DrawGuiInterface
 
   public:
     /**
+     * @brief Poll event.
+     * @param event: The event to be polled.
+     * @return True if the event is captured.
+     */
+    void SetKeyboardPassed(bool is_keyboard_passed) override
+	{
+		is_keyboard_passed_locked_ = is_keyboard_passed;
+	}
+    /**
+     * @brief Poll event.
+     * @param event: The event to be polled.
+     * @return True if the event is captured.
+     */
+    bool IsKeyboardPassed() const override
+    {
+		return is_keyboard_passed_locked_;
+    }
+    /**
      * @brief Add sub window to the main window.
      * @param callback: A window callback that can add buttons, etc.
      */
     void AddWindow(
-        std::unique_ptr<frame::gui::GuiWindowInterface>&& callback) override;
+		std::unique_ptr<frame::gui::GuiWindowInterface> callback) override;
+    /**
+     * @brief Add a overlay window.
+     * @param position: The position of the window.
+     * @param callback: A window callback that can add buttons, etc.
+     *
+     * Overlay window are drawn on top of the main window and are not
+     * affected. Also note that they are only display when the main window
+     * is fullscreen.
+     */
+    void AddOverlayWindow(
+        glm::vec2 position,
+		glm::vec2 size,
+		std::unique_ptr<frame::gui::GuiWindowInterface> callback) override;
+    /**
+     * @brief Add a modal window.
+     * @param callback: A window callback that can add buttons, etc.
+     *
+     * If the callback return is 0 the callback stay and if it is other it is
+     * removed. This will trigger an internal boolean that will decide if the
+     * modal is active or not.
+     */
+    void AddModalWindow(
+		std::unique_ptr<frame::gui::GuiWindowInterface> callback) override;
     /**
      * @brief Get a specific window (associated with a name).
      * @param name: The name of the window.
      * @return A pointer to the window.
      */
-    frame::gui::GuiWindowInterface& GetWindow(const std::string& name) override;
+    frame::gui::GuiWindowInterface& GetWindow(
+		const std::string& name) override;
     /**
      * @brief Get all sub window name (title).
      * @return A list of all the sub windows.
@@ -119,14 +166,26 @@ class SDL2OpenGLDrawGui : public frame::gui::DrawGuiInterface
     bool PollEvent(void* event) override;
 
   protected:
-    std::map<std::string, std::unique_ptr<frame::gui::GuiWindowInterface>>
-        callbacks_ = {};
+    struct CallbackData {
+		std::unique_ptr<frame::gui::GuiWindowInterface> callback = nullptr;
+        glm::vec2 position = { 0.0f, 0.0f };
+        glm::vec2 size = { 0.0f, 0.0f };
+    };
+    std::map<std::string, CallbackData> window_callbacks_ = {};
+    std::map<std::string, CallbackData> overlay_callbacks_ = {};
+	std::unique_ptr<frame::gui::GuiWindowInterface> modal_callback_ = nullptr;
+	bool start_modal_ = false;
+	std::filesystem::path font_path_;
     WindowInterface& window_;
     DeviceInterface& device_;
     std::string name_;
     glm::uvec2 size_ = {0, 0};
+	glm::uvec2 next_window_position_ = {0, 0};
+	glm::uvec2 original_image_size_ = {0, 0};
+	bool is_keyboard_passed_locked_ = false;
     bool is_keyboard_passed_ = false;
     bool is_visible_ = true;
+	float font_size_ = 20.0f;
 };
 
 } // End namespace frame::opengl::gui.

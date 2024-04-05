@@ -1,5 +1,6 @@
 #pragma once
 
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
 #include <glm/gtx/quaternion.hpp>
 
@@ -47,6 +48,24 @@ glm::vec4 ParseUniform(const UniformVector4& uniform_vec4);
  * @return Glm mat4 output.
  */
 glm::mat4 ParseUniform(const UniformMatrix4& uniform_mat4);
+/**
+ * @brief Specialization into vector types.
+ * @param uniform_vec2s: Uniform vector 2s input.
+ * @return Glm vec2s output.
+ */
+std::vector<glm::vec2> ParseUniform(const UniformVector2s& uniform_vec2s);
+/**
+ * @brief Specialization into vector types.
+ * @param uniform_vec3s: Uniform vector 3s input.
+ * @return Glm vec3s output.
+ */
+std::vector<glm::vec3> ParseUniform(const UniformVector3s& uniform_vec3s);
+/**
+ * @brief Specialization into vector types.
+ * @param uniform_vec4s: Uniform vector 4s input.
+ * @return Glm vec4s output.
+ */
+std::vector<glm::vec4> ParseUniform(const UniformVector4s& uniform_vec4s);
 /**
  * @brief Specialization into glm types (quat).
  * @param uniform_quat: Uniform quaternion input.

@@ -14,9 +14,17 @@
 namespace frame::opengl::gui
 {
 
-SDL2OpenGLDrawGui::SDL2OpenGLDrawGui(frame::WindowInterface& window)
-    : window_(window), device_(window_.GetDevice())
+SDL2OpenGLDrawGui::SDL2OpenGLDrawGui(
+    frame::WindowInterface& window,
+    const std::filesystem::path& font_path,
+    float font_size)
+    : window_(window),
+      device_(window_.GetDevice()),
+      font_path_(font_path),
+      font_size_(font_size)
 {
+    // Set the name this is a way to find the plugin.
+    SetName("DrawGuiInterface");
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -35,15 +43,26 @@ SDL2OpenGLDrawGui::SDL2OpenGLDrawGui(frame::WindowInterface& window)
 
     ImGuiStyle& style = ImGui::GetStyle();
     style.WindowRounding = 5.0f;
-    io.Fonts->AddFontFromFileTTF(
-        file::FindFile("asset/font/poppins/Poppins-Light.ttf").string().c_str(),
-        20.0f);
+    if (font_path_.empty())
+    {
+        io.Fonts->AddFontDefault();
+    }
+    else
+    {
+        io.Fonts->AddFontFromFileTTF(
+            reinterpret_cast<const char*>(font_path_.u8string().c_str()),
+            font_size_);
+    }
 
     // Setup Platform/Renderer back ends
     ImGui_ImplSDL2_InitForOpenGL(
         static_cast<SDL_Window*>(window_.GetWindowContext()),
         device_.GetDeviceContext());
+#if defined(_WIN32) || defined(_WIN64)
     ImGui_ImplOpenGL3_Init("#version 450");
+#else
+    ImGui_ImplOpenGL3_Init("#version 330");
+#endif
 }
 
 SDL2OpenGLDrawGui::~SDL2OpenGLDrawGui()
@@ -84,11 +103,11 @@ bool SDL2OpenGLDrawGui::Update(DeviceInterface& device, double dt)
     {
         ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
         // Make the other window visible.
-        for (const auto& pair : callbacks_)
+        for (const auto& pair : window_callbacks_)
         {
             // Call the callback!
-            ImGui::Begin(pair.second->GetName().c_str());
-            if (!pair.second->DrawCallback())
+            ImGui::Begin(pair.second.callback->GetName().c_str());
+            if (!pair.second.callback->DrawCallback())
                 returned_value = false;
             ImGui::End();
         }
@@ -109,7 +128,9 @@ bool SDL2OpenGLDrawGui::Update(DeviceInterface& device, double dt)
         if (is_default_output)
         {
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+            original_image_size_ = texture.GetSize();
         }
+       
         // If the window are not visible and it is not the main window then
         // bail out.
         if (!is_visible_ && !is_default_output)
@@ -125,8 +146,31 @@ bool SDL2OpenGLDrawGui::Update(DeviceInterface& device, double dt)
         {
             ImGui::Begin(texture.GetName().c_str());
         }
+        if (is_default_output && modal_callback_)
+        {
+            if (!start_modal_)
+            {
+                ImGui::OpenPopup(modal_callback_->GetName().c_str());
+                start_modal_ = true;
+            }
+            if (ImGui::BeginPopupModal(
+                    modal_callback_->GetName().c_str(),
+                    nullptr,
+                    ImGuiWindowFlags_AlwaysAutoResize |
+                    ImGuiWindowFlags_NoMove))
+            {
+                modal_callback_->DrawCallback();
+                if (modal_callback_->End())
+                {
+                    start_modal_ = false;
+                    ImGui::CloseCurrentPopup();
+                    modal_callback_.reset();
+                }
+                ImGui::EndPopup();
+            }
+        }
         // Check if you should enable default window keyboard and mouse.
-        if (ImGui::IsWindowHovered() && is_default_output)
+        if (ImGui::IsWindowHovered() && is_default_output )
         {
             is_keyboard_passed_ = true;
         }
@@ -168,6 +212,30 @@ bool SDL2OpenGLDrawGui::Update(DeviceInterface& device, double dt)
         }
     }
 
+    if (!is_visible_)
+    {
+        for (const auto& pair : overlay_callbacks_)
+        {
+            ImGui::SetNextWindowPos(
+                ImVec2(
+                    static_cast<float>(pair.second.position.x),
+                    static_cast<float>(pair.second.position.y)));
+            ImGui::SetNextWindowSize(
+                ImVec2(
+                    static_cast<float>(pair.second.size.x),
+                    static_cast<float>(pair.second.size.y)));
+            // Setup overlay window with appropriate flags
+            ImGui::Begin(
+                pair.first.c_str(),
+                nullptr,
+                ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar |
+                ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove |
+                ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoInputs);
+            pair.second.callback->DrawCallback();
+            ImGui::End();
+        }
+    }
+
     // Rendering
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -188,20 +256,48 @@ bool SDL2OpenGLDrawGui::Update(DeviceInterface& device, double dt)
 }
 
 void SDL2OpenGLDrawGui::AddWindow(
-    std::unique_ptr<frame::gui::GuiWindowInterface>&& callback)
+    std::unique_ptr<frame::gui::GuiWindowInterface> callback)
 {
     std::string name = callback->GetName();
     if (name.empty())
     {
         throw std::runtime_error("Cannot create a sub window without a name!");
     }
-    callbacks_.insert({name, std::move(callback)});
+    CallbackData callback_data;
+    callback_data.callback = std::move(callback);
+    callback_data.position = glm::vec2(0.0f, 0.0f);
+    callback_data.size = glm::vec2(0.0f, 0.0f);
+    window_callbacks_.emplace(name, std::move(callback_data));
+}
+
+void SDL2OpenGLDrawGui::AddOverlayWindow(
+    glm::vec2 position,
+    glm::vec2 size,
+    std::unique_ptr<frame::gui::GuiWindowInterface> callback)
+{
+    std::string name = callback->GetName();
+    if (name.empty())
+    {
+        throw std::runtime_error(
+            "Cannot create a sub window without a name!");
+    }
+    CallbackData callback_data;
+    callback_data.callback = std::move(callback);
+    callback_data.position = position;
+    callback_data.size = size;
+    overlay_callbacks_.emplace(name, std::move(callback_data));
+}
+
+void SDL2OpenGLDrawGui::AddModalWindow(
+    std::unique_ptr<frame::gui::GuiWindowInterface> callback)
+{
+    modal_callback_ = std::move(callback);
 }
 
 std::vector<std::string> SDL2OpenGLDrawGui::GetWindowTitles() const
 {
     std::vector<std::string> name_list;
-    for (const auto& [name, _] : callbacks_)
+    for (const auto& [name, _] : window_callbacks_)
     {
         name_list.push_back(name);
     }
@@ -210,7 +306,14 @@ std::vector<std::string> SDL2OpenGLDrawGui::GetWindowTitles() const
 
 void SDL2OpenGLDrawGui::DeleteWindow(const std::string& name)
 {
-    callbacks_.erase(name);
+    if (window_callbacks_.contains(name))
+    {
+        window_callbacks_.erase(name);
+    }
+    if (overlay_callbacks_.contains(name))
+    {
+        overlay_callbacks_.erase(name);
+    }
 }
 
 bool SDL2OpenGLDrawGui::PollEvent(void* event)
@@ -225,13 +328,23 @@ bool SDL2OpenGLDrawGui::PollEvent(void* event)
     if (is_keyboard_passed_)
         return false;
     auto& io = ImGui::GetIO();
-    return io.WantCaptureMouse || io.WantCaptureKeyboard;
+    return (!is_keyboard_passed_locked_)
+            ? io.WantCaptureMouse || io.WantCaptureKeyboard
+            : false;
 }
 
 frame::gui::GuiWindowInterface& SDL2OpenGLDrawGui::GetWindow(
     const std::string& name)
 {
-    return *callbacks_.at(name).get();
+    if (window_callbacks_.contains(name))
+    {
+        return *window_callbacks_.at(name).callback.get();
+    }
+    if (overlay_callbacks_.contains(name))
+    {
+        return *overlay_callbacks_.at(name).callback.get();
+    }
+    throw std::runtime_error("Cannot find the window with the name: " + name);
 }
 
 } // End namespace frame::opengl::gui.

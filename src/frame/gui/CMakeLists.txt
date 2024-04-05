@@ -4,8 +4,11 @@ add_library(FrameGui
   STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/gui/draw_gui_interface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/gui/draw_gui_factory.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/gui/gui_logger_sink.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/gui/gui_window_interface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/gui/window_camera.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/gui/window_cubemap.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/gui/window_logger.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/gui/window_resolution.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/gui/input_factory.h
     draw_gui_factory.cpp
@@ -18,6 +21,7 @@ add_library(FrameGui
     input_wasd_mouse.h
     window_camera.cpp
     window_cubemap.cpp
+    window_logger.cpp
     window_resolution.cpp
 )
 

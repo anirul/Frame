@@ -22,7 +22,12 @@ class Application
      * @param window: The unique pointer to the window (should have been
      *        created prior).
      */
-    Application(std::unique_ptr<frame::WindowInterface>&& window);
+    Application(std::unique_ptr<frame::WindowInterface> window);
+    /**
+     * @brief Get the Window object.
+     * @return The window.
+     */
+    frame::WindowInterface& GetWindow();
     /**
      * @brief Startup this will initialized the inner level of the window
      *        according to a path.
@@ -34,7 +39,7 @@ class Application
      * @brief Same as previously but this use a level.
      * @param level: A unique pointer to a level.
      */
-    void Startup(std::unique_ptr<frame::LevelInterface>&& level);
+    void Startup(std::unique_ptr<frame::LevelInterface> level);
     /**
      * @brief A helper function that call the inner resize of the window.
      * @param size: The new size of the window.

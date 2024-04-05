@@ -23,7 +23,7 @@ class SDLOpenGLWindow : public WindowInterface
 
   public:
     void SetInputInterface(
-        std::unique_ptr<InputInterface>&& input_interface) override
+        std::unique_ptr<InputInterface> input_interface) override
     {
         input_interface_ = std::move(input_interface);
     }
@@ -31,7 +31,11 @@ class SDLOpenGLWindow : public WindowInterface
     {
         key_callbacks_.insert({key, func});
     }
-    void SetUniqueDevice(std::unique_ptr<DeviceInterface>&& device) override
+	void RemoveKeyCallback(std::int32_t key) override
+	{
+		key_callbacks_.erase(key);
+	}
+    void SetUniqueDevice(std::unique_ptr<DeviceInterface> device) override
     {
         device_ = std::move(device);
     }
