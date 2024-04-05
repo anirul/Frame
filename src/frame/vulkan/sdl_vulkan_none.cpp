@@ -64,7 +64,7 @@ vk::InstanceCreateInfo SDLVulkanNone::GetInstanceCreateInfo(
         sdl_extensions.data());
 }
 
-void SDLVulkanNone::SetUniqueDevice(std::unique_ptr<DeviceInterface>&& device)
+void SDLVulkanNone::SetUniqueDevice(std::unique_ptr<DeviceInterface> device)
 {
     device_ = std::move(device);
     vulkan::Device* vulkan_device =

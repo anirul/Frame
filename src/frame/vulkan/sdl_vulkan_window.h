@@ -33,10 +33,10 @@ class SDLVulkanWindow : public VulkanWindowInterface
     {
         throw std::runtime_error("Not implemented yet!");
     }
-    void SetUniqueDevice(std::unique_ptr<DeviceInterface>&& device) override
-    {
-        device_ = std::move(device);
-    }
+	void RemoveKeyCallback(std::int32_t key) override
+	{
+		throw std::runtime_error("Not implemented yet!");
+	}
     DeviceInterface& GetDevice() override
     {
         return *device_.get();
@@ -78,7 +78,7 @@ class SDLVulkanWindow : public VulkanWindowInterface
             "Frame (SDL Vulkan Window)",
             VK_MAKE_VERSION(1, 0, 0),
             VK_API_VERSION_1_3}) const override;
-    void SetUniqueDevice(std::unique_ptr<DeviceInterface>&& device) override;
+    void SetUniqueDevice(std::unique_ptr<DeviceInterface> device) override;
 
   protected:
     bool RunEvent(const SDL_Event& event, const double dt);
