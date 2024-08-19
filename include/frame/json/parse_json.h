@@ -9,7 +9,8 @@
 namespace frame::proto
 {
 
-template <typename T> T LoadProtoFromJson(const std::string& json)
+template <typename T>
+T LoadProtoFromJson(const std::string& json)
 {
     T proto{};
     google::protobuf::util::JsonParseOptions options{};
@@ -20,7 +21,7 @@ template <typename T> T LoadProtoFromJson(const std::string& json)
     {
         throw std::runtime_error(
             "Couldn't parse json status error: " +
-            status.message().as_string());
+            status.ToString());
     }
     return proto;
 }

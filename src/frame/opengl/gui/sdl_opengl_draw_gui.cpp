@@ -101,7 +101,7 @@ bool SDL2OpenGLDrawGui::Update(DeviceInterface& device, double dt)
     }
     else
     {
-        ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
+        ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
         // Make the other window visible.
         for (const auto& pair : window_callbacks_)
         {
