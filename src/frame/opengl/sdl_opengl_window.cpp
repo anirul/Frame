@@ -2,6 +2,7 @@
 
 // Needed under windows to get the PPI.
 #if defined(_WIN32) || defined(_WIN64)
+#define NOMIXMAX
 #include <shellscalingapi.h>
 #include <shtypes.h>
 #pragma comment(lib, "Shcore.lib")
