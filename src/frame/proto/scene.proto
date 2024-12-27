@@ -98,7 +98,7 @@ message SceneCamera {
 }
 
 // Light
-// Next 9
+// Next 11
 message SceneLight {
 	// This is the name of the light.
 	string name = 1;
@@ -106,15 +106,15 @@ message SceneLight {
 	string parent = 2;
 	
 	// Light type this is what the light can be.
-	enum Enum {
-		INVALID = 0;
-		AMBIENT = 1;
-		POINT = 2;
-		DIRECTIONAL = 3;
-		SPOT = 4;
+	enum LightTypeEnum {
+		INVALID_LIGHT = 0;
+		AMBIENT_LIGHT = 1;
+		POINT_LIGHT = 2;
+		DIRECTIONAL_LIGHT = 3;
+		SPOT_LIGHT = 4;
 	}
 	// The light type of this light.
-	Enum light_type = 3;
+	LightTypeEnum light_type = 3;
 	
 	// Position of the light.
 	// not considered in case this is AMBIENT, DIRECTIONAL.
@@ -131,6 +131,17 @@ message SceneLight {
 
 	// Color of the light.
 	UniformVector3 color = 8;
+
+	enum ShadowTypeEnum {
+		NO_SHADOW = 0;
+		HARD_SHADOW = 1;
+		SOFT_SHADOW = 2;
+	}
+
+	// Shadow type for the light.
+	ShadowTypeEnum shadow_type = 9;
+	// Name of an existing texture to render the shadow depth into.
+	string shadow_texture = 10;
 }
 
 // Scene definition.

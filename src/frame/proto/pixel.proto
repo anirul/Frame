@@ -35,6 +35,7 @@ message PixelStructure {
 		RGB_ALPHA			= 4;
         BGR					= 5;
         BGR_ALPHA			= 6;
+		DEPTH				= 7;
 	}
 	Enum value = 1;
 }

@@ -37,6 +37,14 @@ class LightPoint : public LightInterface
         return LightTypeEnum::POINT_LIGHT;
     }
     /**
+     * @brief Get the type of the shadow, coming from the light interface.
+     * @return Return the type of the shadow.
+     */
+    const ShadowTypeEnum GetShadowType() const override
+    {
+		return ShadowTypeEnum::NO_SHADOW;
+	}
+    /**
      * @brief Get the position of the light, coming from the light
      * interface.
      * @return Return the position of a light.
@@ -86,6 +94,14 @@ class LightDirectional : public LightInterface
     const LightTypeEnum GetType() const override
     {
         return LightTypeEnum::DIRECTIONAL_LIGHT;
+    }
+	/**
+     * @brief Get the type of the shadow, coming from the light interface.
+     * @return Return the type of the shadow.
+     */
+	const ShadowTypeEnum GetShadowType() const override
+    {
+        return ShadowTypeEnum::NO_SHADOW;
     }
     /**
      * @brief Get the position of the light, coming from the light

@@ -1,5 +1,6 @@
 #pragma once
 
+#define NOMINMAX
 #include <SDL2/SDL.h>
 
 #include <vulkan/vulkan.hpp>

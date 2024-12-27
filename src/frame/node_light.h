@@ -3,19 +3,11 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
 
+#include "frame/light_interface.h"
 #include "frame/node_interface.h"
 
 namespace frame
 {
-
-enum class NodeLightEnum : std::uint8_t
-{
-    INVALID = 0,
-    AMBIENT = 1,
-    POINT = 2,
-    DIRECTIONAL = 3,
-    SPOT = 4
-};
 
 /**
  * @class NodeLight
@@ -29,11 +21,12 @@ class NodeLight : public NodeInterface
      * @param func: This function return the ID from a string (it will need
      *        a level passed in the capture list).
      * @param color: Color of the light in vec3 format.
+	 * @remark No shadow as this is the ambient light.
      */
     NodeLight(
         std::function<NodeInterface*(const std::string&)> func,
         const glm::vec3 color)
-        : NodeInterface(func), light_type_(NodeLightEnum::AMBIENT),
+        : NodeInterface(func), light_type_(LightTypeEnum::AMBIENT_LIGHT),
           color_(color)
     {
     }
@@ -48,9 +41,27 @@ class NodeLight : public NodeInterface
      */
     NodeLight(
         std::function<NodeInterface*(const std::string&)> func,
-        const frame::NodeLightEnum light_type,
+        const frame::LightTypeEnum light_type,
         const glm::vec3 position_or_direction,
         const glm::vec3 color);
+    /**
+     * @brief Create a point or directional light with shadow.
+     * @param func: This function return the ID from a string (it will need
+     *        a level passed in the capture list).
+     * @param light_type: Light type of the light.
+	 * @param shadow_type: Type of shadow used.
+	 * @param shadow_texture: Name of the texture to render for the shadows.
+     * @param position_or_direction: Position (if point light) or direction
+     *        (if directional light).
+     * @param color: Color of the light in vec3 format.
+     */
+    NodeLight(
+		std::function<NodeInterface*(const std::string&)> func,
+		const frame::LightTypeEnum light_type,
+		const frame::ShadowTypeEnum shadow_type,
+        const std::string& shadow_texture,
+		const glm::vec3 position_or_direction,
+		const glm::vec3 color);
     /**
      * @brief Create a spot light.
      * @param func: This function return the ID from a string (it will need
@@ -63,6 +74,27 @@ class NodeLight : public NodeInterface
      */
     NodeLight(
         std::function<NodeInterface*(const std::string&)> func,
+        const glm::vec3 position,
+        const glm::vec3 direction,
+        const glm::vec3 color,
+        const float dot_inner_limit,
+        const float dot_outer_limit);
+    /**
+     * @brief Create a spot light.
+     * @param func: This function return the ID from a string (it will need
+     *        a level passed in the capture list).
+ 	 * @param shadow_type: Type of shadow used.
+     * @param shadow_texture: Name of the texture to render for the shadows.
+     * @param position: Position of the spot light.
+     * @param direction: Direction of the spot light.
+     * @param color: Color in a vec3 format.
+     * @param dot_inner_limit: Inner limit of the total light in dot format.
+     * @param dot_outer_limit: Outer limit of the total light in dot format.
+     */
+    NodeLight(
+        std::function<NodeInterface*(const std::string&)> func,
+		ShadowTypeEnum shadow_type,
+		const std::string& shadow_texture,
         const glm::vec3 position,
         const glm::vec3 direction,
         const glm::vec3 color,
@@ -85,7 +117,7 @@ class NodeLight : public NodeInterface
      * @brief Get the light type.
      * @return The light type (see the NodeLightEnum).
      */
-    const NodeLightEnum GetType() const
+    const LightTypeEnum GetType() const
     {
         return light_type_;
     }
@@ -131,7 +163,9 @@ class NodeLight : public NodeInterface
     }
 
   private:
-    NodeLightEnum light_type_ = NodeLightEnum::INVALID;
+    LightTypeEnum light_type_ = LightTypeEnum::INVALID_LIGHT;
+	ShadowTypeEnum shadow_type_ = ShadowTypeEnum::NO_SHADOW;
+    std::string shadow_texture_ = "";
     glm::vec3 position_ = glm::vec3(0.0f);
     glm::vec3 direction_ = glm::vec3(0.0f);
     glm::vec3 color_ = glm::vec3(1.0f);

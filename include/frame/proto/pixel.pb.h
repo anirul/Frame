@@ -157,6 +157,7 @@ enum PixelStructure_Enum : int {
   PixelStructure_Enum_RGB_ALPHA = 4,
   PixelStructure_Enum_BGR = 5,
   PixelStructure_Enum_BGR_ALPHA = 6,
+  PixelStructure_Enum_DEPTH = 7,
   PixelStructure_Enum_PixelStructure_Enum_INT_MIN_SENTINEL_DO_NOT_USE_ =
       std::numeric_limits<::int32_t>::min(),
   PixelStructure_Enum_PixelStructure_Enum_INT_MAX_SENTINEL_DO_NOT_USE_ =
@@ -166,8 +167,8 @@ enum PixelStructure_Enum : int {
 bool PixelStructure_Enum_IsValid(int value);
 extern const uint32_t PixelStructure_Enum_internal_data_[];
 constexpr PixelStructure_Enum PixelStructure_Enum_Enum_MIN = static_cast<PixelStructure_Enum>(0);
-constexpr PixelStructure_Enum PixelStructure_Enum_Enum_MAX = static_cast<PixelStructure_Enum>(6);
-constexpr int PixelStructure_Enum_Enum_ARRAYSIZE = 6 + 1;
+constexpr PixelStructure_Enum PixelStructure_Enum_Enum_MAX = static_cast<PixelStructure_Enum>(7);
+constexpr int PixelStructure_Enum_Enum_ARRAYSIZE = 7 + 1;
 const ::google::protobuf::EnumDescriptor*
 PixelStructure_Enum_descriptor();
 template <typename T>
@@ -180,7 +181,7 @@ const std::string& PixelStructure_Enum_Name(T value) {
 template <>
 inline const std::string& PixelStructure_Enum_Name(PixelStructure_Enum value) {
   return ::google::protobuf::internal::NameOfDenseEnum<PixelStructure_Enum_descriptor,
-                                                 0, 6>(
+                                                 0, 7>(
       static_cast<int>(value));
 }
 inline bool PixelStructure_Enum_Parse(absl::string_view name, PixelStructure_Enum* value) {
@@ -366,6 +367,7 @@ class PixelStructure final :
   static constexpr Enum RGB_ALPHA = PixelStructure_Enum_RGB_ALPHA;
   static constexpr Enum BGR = PixelStructure_Enum_BGR;
   static constexpr Enum BGR_ALPHA = PixelStructure_Enum_BGR_ALPHA;
+  static constexpr Enum DEPTH = PixelStructure_Enum_DEPTH;
   static inline bool Enum_IsValid(int value) {
     return PixelStructure_Enum_IsValid(value);
   }

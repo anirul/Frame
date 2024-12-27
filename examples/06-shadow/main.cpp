@@ -31,7 +31,7 @@ try
         frame::DrawingTargetEnum::WINDOW,
         frame::RenderingAPIEnum::OPENGL,
         {1280, 720}));
-    app.Startup(frame::file::FindFile("asset/json/image_based_lighting.json"));
+    app.Startup(frame::file::FindFile("asset/json/shadow.json"));
     app.Run();
     return 0;
 }

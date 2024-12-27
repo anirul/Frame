@@ -34,7 +34,8 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
 }
 
 [[nodiscard]] bool ParseSceneMatrix(
-    LevelInterface& level, const SceneMatrix& proto_scene_matrix)
+    LevelInterface& level,
+    const SceneMatrix& proto_scene_matrix)
 {
     std::unique_ptr<NodeMatrix> scene_matrix = nullptr;
     if (proto_scene_matrix.has_matrix())
@@ -59,7 +60,8 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
 }
 
 [[nodiscard]] bool ParseSceneStaticMeshClearBuffer(
-    LevelInterface& level, const SceneStaticMesh& proto_scene_static_mesh)
+    LevelInterface& level,
+    const SceneStaticMesh& proto_scene_static_mesh)
 {
     auto node_interface = std::make_unique<NodeStaticMesh>(
         GetFunctor(level), proto_scene_static_mesh.clean_buffer());
@@ -73,7 +75,8 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
 }
 
 [[nodiscard]] bool ParseSceneStaticMeshMeshEnum(
-    LevelInterface& level, const SceneStaticMesh& proto_scene_static_mesh)
+    LevelInterface& level,
+    const SceneStaticMesh& proto_scene_static_mesh)
 {
     if (proto_scene_static_mesh.mesh_enum() == SceneStaticMesh::INVALID)
     {
@@ -127,7 +130,8 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
 }
 
 [[nodiscard]] bool ParseSceneStaticMeshFileName(
-    LevelInterface& level, const SceneStaticMesh& proto_scene_static_mesh)
+    LevelInterface& level,
+    const SceneStaticMesh& proto_scene_static_mesh)
 {
     auto vec_node_mesh_id = opengl::file::LoadStaticMeshesFromFile(
         level,
@@ -152,7 +156,8 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
 }
 
 [[nodiscard]] bool ParseSceneStaticMeshStreamInput(
-    LevelInterface& level, const SceneStaticMesh& proto_scene_static_mesh)
+    LevelInterface& level,
+    const SceneStaticMesh& proto_scene_static_mesh)
 {
     assert(proto_scene_static_mesh.has_multi_plugin());
     auto point_buffer = std::make_unique<opengl::Buffer>(
@@ -211,7 +216,8 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
 }
 
 [[nodiscard]] bool ParseSceneStaticMesh(
-    LevelInterface& level, const SceneStaticMesh& proto_scene_static_mesh)
+    LevelInterface& level,
+    const SceneStaticMesh& proto_scene_static_mesh)
 {
     // 1st case this is a clean static mesh node.
     if (proto_scene_static_mesh.has_clean_buffer())
@@ -237,7 +243,8 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
 }
 
 [[nodiscard]] bool ParseSceneCamera(
-    LevelInterface& level, const frame::proto::SceneCamera& proto_scene_camera)
+    LevelInterface& level,
+    const frame::proto::SceneCamera& proto_scene_camera)
 {
     if (proto_scene_camera.fov_degrees() == 0.0)
     {
@@ -259,35 +266,72 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
 }
 
 [[nodiscard]] bool ParseSceneLight(
-    LevelInterface& level, const proto::SceneLight& proto_scene_light)
+    LevelInterface& level,
+    const proto::SceneLight& proto_scene_light)
 {
     switch (proto_scene_light.light_type())
     {
-    case proto::SceneLight::POINT: {
-        std::unique_ptr<NodeInterface> node_light =
-            std::make_unique<frame::NodeLight>(
-                GetFunctor(level),
-                NodeLightEnum::POINT,
-                ParseUniform(proto_scene_light.position()),
-                ParseUniform(proto_scene_light.color()));
-        auto maybe_node_id = level.AddSceneNode(std::move(node_light));
-        return static_cast<bool>(maybe_node_id);
+    case proto::SceneLight::POINT_LIGHT:
+    {
+        EntityId node_id = NullId;
+        if (proto_scene_light.shadow_type() == proto::SceneLight::NO_SHADOW)
+        {
+            std::unique_ptr<NodeInterface> node_light =
+                std::make_unique<frame::NodeLight>(
+                    GetFunctor(level),
+                    LightTypeEnum::POINT_LIGHT,
+                    ParseUniform(proto_scene_light.position()),
+                    ParseUniform(proto_scene_light.color()));
+            node_id = level.AddSceneNode(std::move(node_light));
+        }
+        else
+        {
+            std::unique_ptr<NodeInterface> node_light =
+                std::make_unique<frame::NodeLight>(
+                    GetFunctor(level),
+                    LightTypeEnum::POINT_LIGHT,
+                    static_cast<ShadowTypeEnum>(
+                        proto_scene_light.shadow_type()),
+                    proto_scene_light.shadow_texture(),
+                    ParseUniform(proto_scene_light.position()),
+                    ParseUniform(proto_scene_light.color()));
+            node_id = level.AddSceneNode(std::move(node_light));
+        }
+        return static_cast<bool>(node_id);
     }
-    case proto::SceneLight::DIRECTIONAL: {
-        std::unique_ptr<NodeInterface> node_light =
-            std::make_unique<frame::NodeLight>(
-                GetFunctor(level),
-                NodeLightEnum::DIRECTIONAL,
-                ParseUniform(proto_scene_light.direction()),
-                ParseUniform(proto_scene_light.color()));
-        auto maybe_node_id = level.AddSceneNode(std::move(node_light));
-        return static_cast<bool>(maybe_node_id);
+    case proto::SceneLight::DIRECTIONAL_LIGHT:
+    {
+        EntityId node_id = NullId;
+        if (proto_scene_light.shadow_type() == proto::SceneLight::NO_SHADOW)
+        {
+            std::unique_ptr<NodeInterface> node_light =
+                std::make_unique<frame::NodeLight>(
+                    GetFunctor(level),
+                    LightTypeEnum::DIRECTIONAL_LIGHT,
+                    ParseUniform(proto_scene_light.direction()),
+                    ParseUniform(proto_scene_light.color()));
+            node_id = level.AddSceneNode(std::move(node_light));
+        }
+        else
+        {
+            std::unique_ptr<NodeInterface> node_light =
+                std::make_unique<frame::NodeLight>(
+                    GetFunctor(level),
+                    LightTypeEnum::DIRECTIONAL_LIGHT,
+                    static_cast<ShadowTypeEnum>(
+                        proto_scene_light.shadow_type()),
+                    proto_scene_light.shadow_texture(),
+                    ParseUniform(proto_scene_light.direction()),
+                    ParseUniform(proto_scene_light.color()));
+            node_id = level.AddSceneNode(std::move(node_light));
+        }
+        return static_cast<bool>(node_id);
     }
-    case proto::SceneLight::AMBIENT:
+    case proto::SceneLight::AMBIENT_LIGHT:
         [[fallthrough]];
-    case proto::SceneLight::SPOT:
+    case proto::SceneLight::SPOT_LIGHT:
         [[fallthrough]];
-    case proto::SceneLight::INVALID:
+    case proto::SceneLight::INVALID_LIGHT:
         [[fallthrough]];
     default:
         throw std::runtime_error(fmt::format(
@@ -300,7 +344,8 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
 } // End namespace.
 
 [[nodiscard]] bool ParseSceneTreeFile(
-    const SceneTree& proto_scene_tree, LevelInterface& level)
+    const SceneTree& proto_scene_tree,
+    LevelInterface& level)
 {
     level.SetDefaultCameraName(proto_scene_tree.default_camera_name());
     level.SetDefaultRootSceneNodeName(proto_scene_tree.default_root_name());

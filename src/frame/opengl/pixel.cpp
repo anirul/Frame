@@ -43,6 +43,8 @@ GLenum ConvertToGLType(const frame::proto::PixelStructure& pixel_structure)
         return GL_BGR;
     case frame::proto::PixelStructure::BGR_ALPHA:
         return GL_BGRA;
+    case frame::proto::PixelStructure::DEPTH:
+        return GL_DEPTH_COMPONENT;
     default:
         throw std::runtime_error(
             "unknown structure : " +

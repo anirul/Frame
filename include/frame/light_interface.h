@@ -6,12 +6,26 @@
 
 namespace frame
 {
-
+/**
+ * @brief This has to correspond to proto::SceneLight::LightTypeEnum!
+ */
 enum class LightTypeEnum : std::uint8_t
 {
-    POINT_LIGHT,
-    DIRECTIONAL_LIGHT,
-    SPOT_LIGHT,
+    INVALID_LIGHT		= 0,
+    AMBIENT_LIGHT		= 1,
+    POINT_LIGHT			= 2,
+    DIRECTIONAL_LIGHT	= 3,
+    SPOT_LIGHT			= 4,
+};
+
+/**
+ * @brief This has to correspond to proto::SceneLight::ShadowTypeEnum!
+ */
+enum class ShadowTypeEnum : std::uint8_t
+{
+	NO_SHADOW			= 0,
+	HARD_SHADOW			= 1,
+	SOFT_SHADOW			= 2
 };
 
 /**
@@ -27,6 +41,11 @@ struct LightInterface
      * @return Return the type of the light.
      */
     virtual const LightTypeEnum GetType() const = 0;
+    /**
+     * @brief Get the type of the shadow.
+     * @return Return the type of the shadow.
+     */
+    virtual const ShadowTypeEnum GetShadowType() const = 0;
     /**
      * @brief Get the position of the light or the direction in case this is
      *        a directional light.

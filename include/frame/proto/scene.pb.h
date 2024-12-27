@@ -186,41 +186,75 @@ inline bool SceneStaticMesh_RenderTimeEnum_Parse(absl::string_view name, SceneSt
   return ::google::protobuf::internal::ParseNamedEnum<SceneStaticMesh_RenderTimeEnum>(
       SceneStaticMesh_RenderTimeEnum_descriptor(), name, value);
 }
-enum SceneLight_Enum : int {
-  SceneLight_Enum_INVALID = 0,
-  SceneLight_Enum_AMBIENT = 1,
-  SceneLight_Enum_POINT = 2,
-  SceneLight_Enum_DIRECTIONAL = 3,
-  SceneLight_Enum_SPOT = 4,
-  SceneLight_Enum_SceneLight_Enum_INT_MIN_SENTINEL_DO_NOT_USE_ =
+enum SceneLight_LightTypeEnum : int {
+  SceneLight_LightTypeEnum_INVALID_LIGHT = 0,
+  SceneLight_LightTypeEnum_AMBIENT_LIGHT = 1,
+  SceneLight_LightTypeEnum_POINT_LIGHT = 2,
+  SceneLight_LightTypeEnum_DIRECTIONAL_LIGHT = 3,
+  SceneLight_LightTypeEnum_SPOT_LIGHT = 4,
+  SceneLight_LightTypeEnum_SceneLight_LightTypeEnum_INT_MIN_SENTINEL_DO_NOT_USE_ =
       std::numeric_limits<::int32_t>::min(),
-  SceneLight_Enum_SceneLight_Enum_INT_MAX_SENTINEL_DO_NOT_USE_ =
+  SceneLight_LightTypeEnum_SceneLight_LightTypeEnum_INT_MAX_SENTINEL_DO_NOT_USE_ =
       std::numeric_limits<::int32_t>::max(),
 };
 
-bool SceneLight_Enum_IsValid(int value);
-extern const uint32_t SceneLight_Enum_internal_data_[];
-constexpr SceneLight_Enum SceneLight_Enum_Enum_MIN = static_cast<SceneLight_Enum>(0);
-constexpr SceneLight_Enum SceneLight_Enum_Enum_MAX = static_cast<SceneLight_Enum>(4);
-constexpr int SceneLight_Enum_Enum_ARRAYSIZE = 4 + 1;
+bool SceneLight_LightTypeEnum_IsValid(int value);
+extern const uint32_t SceneLight_LightTypeEnum_internal_data_[];
+constexpr SceneLight_LightTypeEnum SceneLight_LightTypeEnum_LightTypeEnum_MIN = static_cast<SceneLight_LightTypeEnum>(0);
+constexpr SceneLight_LightTypeEnum SceneLight_LightTypeEnum_LightTypeEnum_MAX = static_cast<SceneLight_LightTypeEnum>(4);
+constexpr int SceneLight_LightTypeEnum_LightTypeEnum_ARRAYSIZE = 4 + 1;
 const ::google::protobuf::EnumDescriptor*
-SceneLight_Enum_descriptor();
+SceneLight_LightTypeEnum_descriptor();
 template <typename T>
-const std::string& SceneLight_Enum_Name(T value) {
-  static_assert(std::is_same<T, SceneLight_Enum>::value ||
+const std::string& SceneLight_LightTypeEnum_Name(T value) {
+  static_assert(std::is_same<T, SceneLight_LightTypeEnum>::value ||
                     std::is_integral<T>::value,
-                "Incorrect type passed to Enum_Name().");
-  return SceneLight_Enum_Name(static_cast<SceneLight_Enum>(value));
+                "Incorrect type passed to LightTypeEnum_Name().");
+  return SceneLight_LightTypeEnum_Name(static_cast<SceneLight_LightTypeEnum>(value));
 }
 template <>
-inline const std::string& SceneLight_Enum_Name(SceneLight_Enum value) {
-  return ::google::protobuf::internal::NameOfDenseEnum<SceneLight_Enum_descriptor,
+inline const std::string& SceneLight_LightTypeEnum_Name(SceneLight_LightTypeEnum value) {
+  return ::google::protobuf::internal::NameOfDenseEnum<SceneLight_LightTypeEnum_descriptor,
                                                  0, 4>(
       static_cast<int>(value));
 }
-inline bool SceneLight_Enum_Parse(absl::string_view name, SceneLight_Enum* value) {
-  return ::google::protobuf::internal::ParseNamedEnum<SceneLight_Enum>(
-      SceneLight_Enum_descriptor(), name, value);
+inline bool SceneLight_LightTypeEnum_Parse(absl::string_view name, SceneLight_LightTypeEnum* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<SceneLight_LightTypeEnum>(
+      SceneLight_LightTypeEnum_descriptor(), name, value);
+}
+enum SceneLight_ShadowTypeEnum : int {
+  SceneLight_ShadowTypeEnum_NO_SHADOW = 0,
+  SceneLight_ShadowTypeEnum_HARD_SHADOW = 1,
+  SceneLight_ShadowTypeEnum_SOFT_SHADOW = 2,
+  SceneLight_ShadowTypeEnum_SceneLight_ShadowTypeEnum_INT_MIN_SENTINEL_DO_NOT_USE_ =
+      std::numeric_limits<::int32_t>::min(),
+  SceneLight_ShadowTypeEnum_SceneLight_ShadowTypeEnum_INT_MAX_SENTINEL_DO_NOT_USE_ =
+      std::numeric_limits<::int32_t>::max(),
+};
+
+bool SceneLight_ShadowTypeEnum_IsValid(int value);
+extern const uint32_t SceneLight_ShadowTypeEnum_internal_data_[];
+constexpr SceneLight_ShadowTypeEnum SceneLight_ShadowTypeEnum_ShadowTypeEnum_MIN = static_cast<SceneLight_ShadowTypeEnum>(0);
+constexpr SceneLight_ShadowTypeEnum SceneLight_ShadowTypeEnum_ShadowTypeEnum_MAX = static_cast<SceneLight_ShadowTypeEnum>(2);
+constexpr int SceneLight_ShadowTypeEnum_ShadowTypeEnum_ARRAYSIZE = 2 + 1;
+const ::google::protobuf::EnumDescriptor*
+SceneLight_ShadowTypeEnum_descriptor();
+template <typename T>
+const std::string& SceneLight_ShadowTypeEnum_Name(T value) {
+  static_assert(std::is_same<T, SceneLight_ShadowTypeEnum>::value ||
+                    std::is_integral<T>::value,
+                "Incorrect type passed to ShadowTypeEnum_Name().");
+  return SceneLight_ShadowTypeEnum_Name(static_cast<SceneLight_ShadowTypeEnum>(value));
+}
+template <>
+inline const std::string& SceneLight_ShadowTypeEnum_Name(SceneLight_ShadowTypeEnum value) {
+  return ::google::protobuf::internal::NameOfDenseEnum<SceneLight_ShadowTypeEnum_descriptor,
+                                                 0, 2>(
+      static_cast<int>(value));
+}
+inline bool SceneLight_ShadowTypeEnum_Parse(absl::string_view name, SceneLight_ShadowTypeEnum* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<SceneLight_ShadowTypeEnum>(
+      SceneLight_ShadowTypeEnum_descriptor(), name, value);
 }
 
 // ===================================================================
@@ -591,27 +625,48 @@ class SceneLight final :
 
   // nested types ----------------------------------------------------
 
-  using Enum = SceneLight_Enum;
-  static constexpr Enum INVALID = SceneLight_Enum_INVALID;
-  static constexpr Enum AMBIENT = SceneLight_Enum_AMBIENT;
-  static constexpr Enum POINT = SceneLight_Enum_POINT;
-  static constexpr Enum DIRECTIONAL = SceneLight_Enum_DIRECTIONAL;
-  static constexpr Enum SPOT = SceneLight_Enum_SPOT;
-  static inline bool Enum_IsValid(int value) {
-    return SceneLight_Enum_IsValid(value);
+  using LightTypeEnum = SceneLight_LightTypeEnum;
+  static constexpr LightTypeEnum INVALID_LIGHT = SceneLight_LightTypeEnum_INVALID_LIGHT;
+  static constexpr LightTypeEnum AMBIENT_LIGHT = SceneLight_LightTypeEnum_AMBIENT_LIGHT;
+  static constexpr LightTypeEnum POINT_LIGHT = SceneLight_LightTypeEnum_POINT_LIGHT;
+  static constexpr LightTypeEnum DIRECTIONAL_LIGHT = SceneLight_LightTypeEnum_DIRECTIONAL_LIGHT;
+  static constexpr LightTypeEnum SPOT_LIGHT = SceneLight_LightTypeEnum_SPOT_LIGHT;
+  static inline bool LightTypeEnum_IsValid(int value) {
+    return SceneLight_LightTypeEnum_IsValid(value);
   }
-  static constexpr Enum Enum_MIN = SceneLight_Enum_Enum_MIN;
-  static constexpr Enum Enum_MAX = SceneLight_Enum_Enum_MAX;
-  static constexpr int Enum_ARRAYSIZE = SceneLight_Enum_Enum_ARRAYSIZE;
-  static inline const ::google::protobuf::EnumDescriptor* Enum_descriptor() {
-    return SceneLight_Enum_descriptor();
+  static constexpr LightTypeEnum LightTypeEnum_MIN = SceneLight_LightTypeEnum_LightTypeEnum_MIN;
+  static constexpr LightTypeEnum LightTypeEnum_MAX = SceneLight_LightTypeEnum_LightTypeEnum_MAX;
+  static constexpr int LightTypeEnum_ARRAYSIZE = SceneLight_LightTypeEnum_LightTypeEnum_ARRAYSIZE;
+  static inline const ::google::protobuf::EnumDescriptor* LightTypeEnum_descriptor() {
+    return SceneLight_LightTypeEnum_descriptor();
   }
   template <typename T>
-  static inline const std::string& Enum_Name(T value) {
-    return SceneLight_Enum_Name(value);
+  static inline const std::string& LightTypeEnum_Name(T value) {
+    return SceneLight_LightTypeEnum_Name(value);
   }
-  static inline bool Enum_Parse(absl::string_view name, Enum* value) {
-    return SceneLight_Enum_Parse(name, value);
+  static inline bool LightTypeEnum_Parse(absl::string_view name, LightTypeEnum* value) {
+    return SceneLight_LightTypeEnum_Parse(name, value);
+  }
+
+  using ShadowTypeEnum = SceneLight_ShadowTypeEnum;
+  static constexpr ShadowTypeEnum NO_SHADOW = SceneLight_ShadowTypeEnum_NO_SHADOW;
+  static constexpr ShadowTypeEnum HARD_SHADOW = SceneLight_ShadowTypeEnum_HARD_SHADOW;
+  static constexpr ShadowTypeEnum SOFT_SHADOW = SceneLight_ShadowTypeEnum_SOFT_SHADOW;
+  static inline bool ShadowTypeEnum_IsValid(int value) {
+    return SceneLight_ShadowTypeEnum_IsValid(value);
+  }
+  static constexpr ShadowTypeEnum ShadowTypeEnum_MIN = SceneLight_ShadowTypeEnum_ShadowTypeEnum_MIN;
+  static constexpr ShadowTypeEnum ShadowTypeEnum_MAX = SceneLight_ShadowTypeEnum_ShadowTypeEnum_MAX;
+  static constexpr int ShadowTypeEnum_ARRAYSIZE = SceneLight_ShadowTypeEnum_ShadowTypeEnum_ARRAYSIZE;
+  static inline const ::google::protobuf::EnumDescriptor* ShadowTypeEnum_descriptor() {
+    return SceneLight_ShadowTypeEnum_descriptor();
+  }
+  template <typename T>
+  static inline const std::string& ShadowTypeEnum_Name(T value) {
+    return SceneLight_ShadowTypeEnum_Name(value);
+  }
+  static inline bool ShadowTypeEnum_Parse(absl::string_view name, ShadowTypeEnum* value) {
+    return SceneLight_ShadowTypeEnum_Parse(name, value);
   }
 
   // accessors -------------------------------------------------------
@@ -619,12 +674,14 @@ class SceneLight final :
   enum : int {
     kNameFieldNumber = 1,
     kParentFieldNumber = 2,
+    kShadowTextureFieldNumber = 10,
     kPositionFieldNumber = 4,
     kDirectionFieldNumber = 5,
     kColorFieldNumber = 8,
     kLightTypeFieldNumber = 3,
     kDotInnerLimitFieldNumber = 6,
     kDotOuterLimitFieldNumber = 7,
+    kShadowTypeFieldNumber = 9,
   };
   // string name = 1;
   void clear_name() ;
@@ -656,6 +713,22 @@ class SceneLight final :
   inline PROTOBUF_ALWAYS_INLINE void _internal_set_parent(
       const std::string& value);
   std::string* _internal_mutable_parent();
+
+  public:
+  // string shadow_texture = 10;
+  void clear_shadow_texture() ;
+  const std::string& shadow_texture() const;
+  template <typename Arg_ = const std::string&, typename... Args_>
+  void set_shadow_texture(Arg_&& arg, Args_... args);
+  std::string* mutable_shadow_texture();
+  PROTOBUF_NODISCARD std::string* release_shadow_texture();
+  void set_allocated_shadow_texture(std::string* value);
+
+  private:
+  const std::string& _internal_shadow_texture() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_shadow_texture(
+      const std::string& value);
+  std::string* _internal_mutable_shadow_texture();
 
   public:
   // .frame.proto.UniformVector3 position = 4;
@@ -703,14 +776,14 @@ class SceneLight final :
   ::frame::proto::UniformVector3* _internal_mutable_color();
 
   public:
-  // .frame.proto.SceneLight.Enum light_type = 3;
+  // .frame.proto.SceneLight.LightTypeEnum light_type = 3;
   void clear_light_type() ;
-  ::frame::proto::SceneLight_Enum light_type() const;
-  void set_light_type(::frame::proto::SceneLight_Enum value);
+  ::frame::proto::SceneLight_LightTypeEnum light_type() const;
+  void set_light_type(::frame::proto::SceneLight_LightTypeEnum value);
 
   private:
-  ::frame::proto::SceneLight_Enum _internal_light_type() const;
-  void _internal_set_light_type(::frame::proto::SceneLight_Enum value);
+  ::frame::proto::SceneLight_LightTypeEnum _internal_light_type() const;
+  void _internal_set_light_type(::frame::proto::SceneLight_LightTypeEnum value);
 
   public:
   // float dot_inner_limit = 6;
@@ -733,14 +806,24 @@ class SceneLight final :
   void _internal_set_dot_outer_limit(float value);
 
   public:
+  // .frame.proto.SceneLight.ShadowTypeEnum shadow_type = 9;
+  void clear_shadow_type() ;
+  ::frame::proto::SceneLight_ShadowTypeEnum shadow_type() const;
+  void set_shadow_type(::frame::proto::SceneLight_ShadowTypeEnum value);
+
+  private:
+  ::frame::proto::SceneLight_ShadowTypeEnum _internal_shadow_type() const;
+  void _internal_set_shadow_type(::frame::proto::SceneLight_ShadowTypeEnum value);
+
+  public:
   // @@protoc_insertion_point(class_scope:frame.proto.SceneLight)
  private:
   class _Internal;
 
   friend class ::google::protobuf::internal::TcParser;
   static const ::google::protobuf::internal::TcParseTable<
-      3, 8, 3,
-      49, 2>
+      4, 10, 3,
+      63, 2>
       _table_;
   friend class ::google::protobuf::MessageLite;
   friend class ::google::protobuf::Arena;
@@ -760,12 +843,14 @@ class SceneLight final :
     mutable ::google::protobuf::internal::CachedSize _cached_size_;
     ::google::protobuf::internal::ArenaStringPtr name_;
     ::google::protobuf::internal::ArenaStringPtr parent_;
+    ::google::protobuf::internal::ArenaStringPtr shadow_texture_;
     ::frame::proto::UniformVector3* position_;
     ::frame::proto::UniformVector3* direction_;
     ::frame::proto::UniformVector3* color_;
     int light_type_;
     float dot_inner_limit_;
     float dot_outer_limit_;
+    int shadow_type_;
     PROTOBUF_TSAN_DECLARE_MEMBER
   };
   union { Impl_ _impl_; };
@@ -3112,24 +3197,24 @@ inline void SceneLight::set_allocated_parent(std::string* value) {
   // @@protoc_insertion_point(field_set_allocated:frame.proto.SceneLight.parent)
 }
 
-// .frame.proto.SceneLight.Enum light_type = 3;
+// .frame.proto.SceneLight.LightTypeEnum light_type = 3;
 inline void SceneLight::clear_light_type() {
   PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
   _impl_.light_type_ = 0;
 }
-inline ::frame::proto::SceneLight_Enum SceneLight::light_type() const {
+inline ::frame::proto::SceneLight_LightTypeEnum SceneLight::light_type() const {
   // @@protoc_insertion_point(field_get:frame.proto.SceneLight.light_type)
   return _internal_light_type();
 }
-inline void SceneLight::set_light_type(::frame::proto::SceneLight_Enum value) {
+inline void SceneLight::set_light_type(::frame::proto::SceneLight_LightTypeEnum value) {
   _internal_set_light_type(value);
   // @@protoc_insertion_point(field_set:frame.proto.SceneLight.light_type)
 }
-inline ::frame::proto::SceneLight_Enum SceneLight::_internal_light_type() const {
+inline ::frame::proto::SceneLight_LightTypeEnum SceneLight::_internal_light_type() const {
   PROTOBUF_TSAN_READ(&_impl_._tsan_detect_race);
-  return static_cast<::frame::proto::SceneLight_Enum>(_impl_.light_type_);
+  return static_cast<::frame::proto::SceneLight_LightTypeEnum>(_impl_.light_type_);
 }
-inline void SceneLight::_internal_set_light_type(::frame::proto::SceneLight_Enum value) {
+inline void SceneLight::_internal_set_light_type(::frame::proto::SceneLight_LightTypeEnum value) {
   PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
   ;
   _impl_.light_type_ = value;
@@ -3452,6 +3537,82 @@ inline void SceneLight::set_allocated_color(::frame::proto::UniformVector3* valu
 
   _impl_.color_ = reinterpret_cast<::frame::proto::UniformVector3*>(value);
   // @@protoc_insertion_point(field_set_allocated:frame.proto.SceneLight.color)
+}
+
+// .frame.proto.SceneLight.ShadowTypeEnum shadow_type = 9;
+inline void SceneLight::clear_shadow_type() {
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  _impl_.shadow_type_ = 0;
+}
+inline ::frame::proto::SceneLight_ShadowTypeEnum SceneLight::shadow_type() const {
+  // @@protoc_insertion_point(field_get:frame.proto.SceneLight.shadow_type)
+  return _internal_shadow_type();
+}
+inline void SceneLight::set_shadow_type(::frame::proto::SceneLight_ShadowTypeEnum value) {
+  _internal_set_shadow_type(value);
+  // @@protoc_insertion_point(field_set:frame.proto.SceneLight.shadow_type)
+}
+inline ::frame::proto::SceneLight_ShadowTypeEnum SceneLight::_internal_shadow_type() const {
+  PROTOBUF_TSAN_READ(&_impl_._tsan_detect_race);
+  return static_cast<::frame::proto::SceneLight_ShadowTypeEnum>(_impl_.shadow_type_);
+}
+inline void SceneLight::_internal_set_shadow_type(::frame::proto::SceneLight_ShadowTypeEnum value) {
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  ;
+  _impl_.shadow_type_ = value;
+}
+
+// string shadow_texture = 10;
+inline void SceneLight::clear_shadow_texture() {
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  _impl_.shadow_texture_.ClearToEmpty();
+}
+inline const std::string& SceneLight::shadow_texture() const
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:frame.proto.SceneLight.shadow_texture)
+  return _internal_shadow_texture();
+}
+template <typename Arg_, typename... Args_>
+inline PROTOBUF_ALWAYS_INLINE void SceneLight::set_shadow_texture(Arg_&& arg,
+                                                     Args_... args) {
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  ;
+  _impl_.shadow_texture_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
+  // @@protoc_insertion_point(field_set:frame.proto.SceneLight.shadow_texture)
+}
+inline std::string* SceneLight::mutable_shadow_texture() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  std::string* _s = _internal_mutable_shadow_texture();
+  // @@protoc_insertion_point(field_mutable:frame.proto.SceneLight.shadow_texture)
+  return _s;
+}
+inline const std::string& SceneLight::_internal_shadow_texture() const {
+  PROTOBUF_TSAN_READ(&_impl_._tsan_detect_race);
+  return _impl_.shadow_texture_.Get();
+}
+inline void SceneLight::_internal_set_shadow_texture(const std::string& value) {
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  ;
+  _impl_.shadow_texture_.Set(value, GetArena());
+}
+inline std::string* SceneLight::_internal_mutable_shadow_texture() {
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  ;
+  return _impl_.shadow_texture_.Mutable( GetArena());
+}
+inline std::string* SceneLight::release_shadow_texture() {
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  // @@protoc_insertion_point(field_release:frame.proto.SceneLight.shadow_texture)
+  return _impl_.shadow_texture_.Release();
+}
+inline void SceneLight::set_allocated_shadow_texture(std::string* value) {
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  _impl_.shadow_texture_.SetAllocated(value, GetArena());
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+        if (_impl_.shadow_texture_.IsDefault()) {
+          _impl_.shadow_texture_.Set("", GetArena());
+        }
+  #endif  // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.SceneLight.shadow_texture)
 }
 
 // -------------------------------------------------------------------
@@ -3791,10 +3952,16 @@ inline const EnumDescriptor* GetEnumDescriptor<::frame::proto::SceneStaticMesh_R
   return ::frame::proto::SceneStaticMesh_RenderTimeEnum_descriptor();
 }
 template <>
-struct is_proto_enum<::frame::proto::SceneLight_Enum> : std::true_type {};
+struct is_proto_enum<::frame::proto::SceneLight_LightTypeEnum> : std::true_type {};
 template <>
-inline const EnumDescriptor* GetEnumDescriptor<::frame::proto::SceneLight_Enum>() {
-  return ::frame::proto::SceneLight_Enum_descriptor();
+inline const EnumDescriptor* GetEnumDescriptor<::frame::proto::SceneLight_LightTypeEnum>() {
+  return ::frame::proto::SceneLight_LightTypeEnum_descriptor();
+}
+template <>
+struct is_proto_enum<::frame::proto::SceneLight_ShadowTypeEnum> : std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor<::frame::proto::SceneLight_ShadowTypeEnum>() {
+  return ::frame::proto::SceneLight_ShadowTypeEnum_descriptor();
 }
 
 }  // namespace protobuf
