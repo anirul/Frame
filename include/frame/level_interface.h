@@ -5,7 +5,7 @@
 #include <unordered_map>
 
 #include "frame/buffer_interface.h"
-#include "frame/camera.h"
+#include "frame/camera_interface.h"
 #include "frame/entity_id.h"
 #include "frame/material_interface.h"
 #include "frame/node_interface.h"
@@ -69,10 +69,9 @@ class LevelInterface : public NameInterface
      * @brief Get a vector of static mesh id and corresponding material id.
      * @return Vector of static mesh id and corresponding material id.
      */
-    virtual std::vector<std::pair<
-        EntityId,
-        std::tuple<EntityId, proto::SceneStaticMesh::RenderTimeEnum>>>
-    GetStaticMeshMaterialIds() const = 0;
+    virtual std::vector<std::pair<EntityId, EntityId>> GetStaticMeshMaterialIds(
+        proto::SceneStaticMesh::RenderTimeEnum render_time_enum =
+            proto::SceneStaticMesh::SCENE_RENDER_TIME) const = 0;
     /**
      * @brief Get the id of an element from a name string.
      * @param name: The name string of the element.
@@ -208,7 +207,7 @@ class LevelInterface : public NameInterface
         EntityId node_id,
         EntityId material_id,
         proto::SceneStaticMesh::RenderTimeEnum render_time_enum =
-            proto::SceneStaticMesh::PER_FRAME) = 0;
+            proto::SceneStaticMesh::SCENE_RENDER_TIME) = 0;
     /**
      * @brief Get all texture from the level.
      * @return A vector of texture ids.
@@ -226,7 +225,7 @@ class LevelInterface : public NameInterface
      * @brief Get the default camera from the level.
      * @return A pointer to the default camera.
      */
-    virtual Camera& GetDefaultCamera() = 0;
+    virtual CameraInterface& GetDefaultCamera() = 0;
     /**
      * @brief Get enum type from Id.
      * @param id: Id to be returned.

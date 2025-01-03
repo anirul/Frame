@@ -102,13 +102,9 @@ class Level : public LevelInterface
      * @return Vector of static mesh id and corresponding material id and
      * RenderTimeEnum.
      */
-    std::vector<std::pair<
-        EntityId,
-        std::tuple<EntityId, proto::SceneStaticMesh::RenderTimeEnum>>>
-    GetStaticMeshMaterialIds() const override
-    {
-        return mesh_material_ids_;
-    }
+    std::vector<std::pair<EntityId, EntityId>> GetStaticMeshMaterialIds(
+        proto::SceneStaticMesh::RenderTimeEnum render_time_enum =
+            proto::SceneStaticMesh::SCENE_RENDER_TIME) const override;
     /**
      * @brief Get the default output texture id.
      * @return Id of the default output texture.
@@ -171,11 +167,7 @@ class Level : public LevelInterface
         EntityId node_id,
         EntityId material_id,
         proto::SceneStaticMesh::RenderTimeEnum render_time_enum =
-            proto::SceneStaticMesh::PER_FRAME) override
-    {
-        mesh_material_ids_.push_back(
-            {node_id, {material_id, render_time_enum}});
-    }
+            proto::SceneStaticMesh::SCENE_RENDER_TIME) override;
     /**
      * @brief Get enum type from Id.
      * @param id: Id to be returned.
@@ -298,7 +290,7 @@ class Level : public LevelInterface
      * @brief Get the default camera from the level.
      * @return A pointer to the default camera.
      */
-    Camera& GetDefaultCamera() override;
+    CameraInterface& GetDefaultCamera() override;
     /**
      * @brief Replace a texture to a new texture given as a vector.
      * @param vector: The new vector containing the new texture.
@@ -380,23 +372,23 @@ class Level : public LevelInterface
     std::string default_root_scene_node_name_;
     std::string default_camera_name_;
     // These are storage so unique ptr interface.
-    std::map<EntityId, std::unique_ptr<NodeInterface>> id_scene_node_map_ = {};
-    std::map<EntityId, std::unique_ptr<TextureInterface>> id_texture_map_ = {};
-    std::map<EntityId, std::unique_ptr<ProgramInterface>> id_program_map_ = {};
-    std::map<EntityId, std::unique_ptr<MaterialInterface>> id_material_map_ =
-        {};
-    std::map<EntityId, std::unique_ptr<BufferInterface>> id_buffer_map_ = {};
+    std::map<EntityId, std::unique_ptr<NodeInterface>> id_scene_node_map_;
+    std::map<EntityId, std::unique_ptr<TextureInterface>> id_texture_map_;
+    std::map<EntityId, std::unique_ptr<ProgramInterface>> id_program_map_;
+    std::map<EntityId, std::unique_ptr<MaterialInterface>> id_material_map_;
+    std::map<EntityId, std::unique_ptr<BufferInterface>> id_buffer_map_;
     std::map<EntityId, std::unique_ptr<StaticMeshInterface>>
-        id_static_mesh_map_ = {};
+		id_static_mesh_map_;
     // These are storage specifiers.
-    std::set<std::string> string_set_ = {};
-    std::map<std::string, EntityId> name_id_map_ = {};
-    std::map<EntityId, std::string> id_name_map_ = {};
-    std::map<EntityId, EntityTypeEnum> id_enum_map_ = {};
-    std::vector<std::pair<
-        EntityId,
-        std::tuple<EntityId, proto::SceneStaticMesh::RenderTimeEnum>>>
-        mesh_material_ids_ = {};
+    std::set<std::string> string_set_;
+    std::map<std::string, EntityId> name_id_map_;
+    std::map<EntityId, std::string> id_name_map_;
+    std::map<EntityId, EntityTypeEnum> id_enum_map_;
+    std::vector<std::pair<EntityId, EntityId>> mesh_material_scene_render_ids_;
+    std::vector<std::pair<EntityId, EntityId>> mesh_material_pre_render_ids_;
+    std::vector<std::pair<EntityId, EntityId>>
+		mesh_material_post_proccess_ids_;
+    std::vector<std::pair<EntityId, EntityId>> mesh_material_skybox_ids_;
 };
 
 } // End namespace frame.

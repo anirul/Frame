@@ -49,8 +49,8 @@ try
     gui_window->AddWindow(std::make_unique<frame::gui::WindowLogger>("Logger"));
     // Set the main window in full.
     // gui_window->SetVisible(false);
-    gui_window->AddModalWindow(
-        std::make_unique<ModalInfo>("Info", "This is a test modal window."));
+    // gui_window->AddModalWindow(
+    //    std::make_unique<ModalInfo>("Info", "This is a test modal window."));
     win->GetDevice().AddPlugin(std::move(gui_window));
     frame::common::Application app(std::move(win));
     do
@@ -65,7 +65,8 @@ try
             ptr_window_resolution->GetInterocularDistance(),
             ptr_window_resolution->GetFocusPoint(),
             ptr_window_resolution->IsInvertLeftRight());
-    } while (!ptr_window_resolution->End());
+    }
+    while (!ptr_window_resolution->End());
     return 0;
 }
 catch (std::exception ex)

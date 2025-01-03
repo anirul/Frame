@@ -7,6 +7,7 @@
 #include <sstream>
 #include <stdexcept>
 
+#include "frame/camera.h"
 #include "frame/file/image.h"
 #include "frame/level.h"
 #include "frame/opengl/frame_buffer.h"
@@ -149,29 +150,48 @@ void Device::Clear(
 }
 
 void Device::DisplayCamera(
-    const Camera& camera, glm::uvec4 viewport, double time)
+    const CameraInterface& camera, glm::uvec4 viewport, double time)
 {
+    if (!renderer_)
+        throw std::runtime_error("No Renderer.");
+    renderer_->SetDeltaTime(time);
+    renderer_->PreRender();
     renderer_->SetViewport(viewport);
-    renderer_->RenderAllMeshes(
-        camera.ComputeProjection(), camera.ComputeView(), time);
+    renderer_->RenderShadows(camera);
+    renderer_->RenderSkybox(camera);
+    renderer_->RenderScene(camera);
+    renderer_->PostProcess();
 }
 
 void Device::DisplayLeftRightCamera(
-    const Camera& camera_left,
-    const Camera& camera_right,
+    const CameraInterface& camera_left,
+    const CameraInterface& camera_right,
     glm::uvec4 viewport_left,
     glm::uvec4 viewport_right,
     double time)
 {
+    if (!renderer_)
+        throw std::runtime_error("No Renderer.");
+    renderer_->SetDeltaTime(time);
+    renderer_->PreRender();
+    renderer_->SetViewport(viewport_left);
+    renderer_->RenderShadows(camera_left);
+    renderer_->RenderSkybox(camera_left);
     if (invert_left_right_)
     {
-        DisplayCamera(camera_right, viewport_left, time);
-        DisplayCamera(camera_left, viewport_right, time);
+        renderer_->SetViewport(viewport_right);
+        renderer_->RenderScene(camera_left);
+        renderer_->SetViewport(viewport_left);
+        renderer_->RenderScene(camera_right);
+        renderer_->PostProcess();
     }
     else
     {
-        DisplayCamera(camera_left, viewport_left, time);
-        DisplayCamera(camera_right, viewport_right, time);
+        renderer_->SetViewport(viewport_left);
+        renderer_->RenderScene(camera_left);
+        renderer_->SetViewport(viewport_right);
+        renderer_->RenderScene(camera_right);
+        renderer_->PostProcess();
     }
 }
 
@@ -186,20 +206,20 @@ void Device::Display(double dt /*= 0.0*/)
     auto& node = level_->GetSceneNodeFromId(camera_holder_id);
     auto matrix_node = node.GetLocalModel(dt);
     auto inverse_model = glm::inverse(matrix_node);
-    Camera default_camera = level_->GetDefaultCamera();
+    CameraInterface& default_camera = level_->GetDefaultCamera();
     default_camera.SetFront(
         default_camera.GetFront() * glm::mat3(inverse_model));
     default_camera.SetPosition(glm::vec3(
         glm::vec4(default_camera.GetPosition(), 1.0) * inverse_model));
     // Compute left and right cameras.
-    Camera left_camera = default_camera;
+    Camera left_camera{default_camera};
     left_camera.SetPosition(
         left_camera.GetPosition() -
         left_camera.GetRight() * interocular_distance_ * 0.5f);
     glm::vec3 left_camera_direction =
         default_camera.GetPosition() + focus_point_ - left_camera.GetPosition();
     left_camera.SetFront(glm::normalize(left_camera_direction));
-    Camera right_camera = default_camera;
+    Camera right_camera{default_camera};
     right_camera.SetPosition(
         right_camera.GetPosition() +
         right_camera.GetRight() * interocular_distance_ * 0.5f);
@@ -235,8 +255,7 @@ void Device::Display(double dt /*= 0.0*/)
     // Reset viewport.
     renderer_->SetViewport(glm::uvec4(0, 0, size_.x, size_.y));
     // Final display.
-    // CHECKME(anirul): Is this still needed?
-    renderer_->Display(dt);
+    renderer_->PresentFinal();
 }
 
 void Device::ScreenShot(const std::string& file) const

@@ -179,7 +179,7 @@ StaticMesh::StaticMesh(
     // Index buffer.
     if (!index_buffer_id_)
     {
-        if (render_primitive_enum_ != proto::SceneStaticMesh::POINT)
+        if (render_primitive_enum_ != proto::SceneStaticMesh::POINT_PRIMITIVE)
         {
             throw std::runtime_error(
                 "No index buffer and render type is not set to point.");
@@ -341,7 +341,8 @@ EntityId CreateQuadStaticMesh(LevelInterface& level)
     parameter.normal_buffer_id = maybe_normal_buffer_id;
     parameter.texture_buffer_id = maybe_texture_buffer_id;
     parameter.index_buffer_id = maybe_index_buffer_id;
-    parameter.render_primitive_enum = proto::SceneStaticMesh::TRIANGLE;
+    parameter.render_primitive_enum =
+        proto::SceneStaticMesh::TRIANGLE_PRIMITIVE;
     auto mesh = std::make_unique<StaticMesh>(level, parameter);
     mesh->SetName(fmt::format("QuadMesh.{}", count));
     return level.AddStaticMesh(std::move(mesh));
@@ -523,7 +524,8 @@ EntityId CreateCubeStaticMesh(LevelInterface& level)
     parameter.normal_buffer_id = maybe_normal_buffer_id;
     parameter.texture_buffer_id = maybe_texture_buffer_id;
     parameter.index_buffer_id = maybe_index_buffer_id;
-    parameter.render_primitive_enum = proto::SceneStaticMesh::TRIANGLE;
+    parameter.render_primitive_enum =
+        proto::SceneStaticMesh::TRIANGLE_PRIMITIVE;
     auto mesh = std::make_unique<StaticMesh>(level, parameter);
     mesh->SetName(fmt::format("CubeMesh.{}", count));
     return level.AddStaticMesh(std::move(mesh));

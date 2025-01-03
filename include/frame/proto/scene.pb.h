@@ -86,9 +86,9 @@ namespace protobuf {
 namespace frame {
 namespace proto {
 enum SceneStaticMesh_RenderPrimitiveEnum : int {
-  SceneStaticMesh_RenderPrimitiveEnum_TRIANGLE = 0,
-  SceneStaticMesh_RenderPrimitiveEnum_POINT = 1,
-  SceneStaticMesh_RenderPrimitiveEnum_LINE = 2,
+  SceneStaticMesh_RenderPrimitiveEnum_TRIANGLE_PRIMITIVE = 0,
+  SceneStaticMesh_RenderPrimitiveEnum_POINT_PRIMITIVE = 1,
+  SceneStaticMesh_RenderPrimitiveEnum_LINE_PRIMITIVE = 2,
   SceneStaticMesh_RenderPrimitiveEnum_SceneStaticMesh_RenderPrimitiveEnum_INT_MIN_SENTINEL_DO_NOT_USE_ =
       std::numeric_limits<::int32_t>::min(),
   SceneStaticMesh_RenderPrimitiveEnum_SceneStaticMesh_RenderPrimitiveEnum_INT_MAX_SENTINEL_DO_NOT_USE_ =
@@ -154,8 +154,11 @@ inline bool SceneStaticMesh_MeshEnum_Parse(absl::string_view name, SceneStaticMe
       SceneStaticMesh_MeshEnum_descriptor(), name, value);
 }
 enum SceneStaticMesh_RenderTimeEnum : int {
-  SceneStaticMesh_RenderTimeEnum_PER_FRAME = 0,
-  SceneStaticMesh_RenderTimeEnum_PRE_RENDER = 1,
+  SceneStaticMesh_RenderTimeEnum_SCENE_RENDER_TIME = 0,
+  SceneStaticMesh_RenderTimeEnum_PRE_RENDER_TIME = 1,
+  SceneStaticMesh_RenderTimeEnum_POST_PROCESS_TIME = 2,
+  SceneStaticMesh_RenderTimeEnum_SKYBOX_RENDER_TIME = 3,
+  SceneStaticMesh_RenderTimeEnum_SHADOW_RENDER_TIME = 4,
   SceneStaticMesh_RenderTimeEnum_SceneStaticMesh_RenderTimeEnum_INT_MIN_SENTINEL_DO_NOT_USE_ =
       std::numeric_limits<::int32_t>::min(),
   SceneStaticMesh_RenderTimeEnum_SceneStaticMesh_RenderTimeEnum_INT_MAX_SENTINEL_DO_NOT_USE_ =
@@ -165,8 +168,8 @@ enum SceneStaticMesh_RenderTimeEnum : int {
 bool SceneStaticMesh_RenderTimeEnum_IsValid(int value);
 extern const uint32_t SceneStaticMesh_RenderTimeEnum_internal_data_[];
 constexpr SceneStaticMesh_RenderTimeEnum SceneStaticMesh_RenderTimeEnum_RenderTimeEnum_MIN = static_cast<SceneStaticMesh_RenderTimeEnum>(0);
-constexpr SceneStaticMesh_RenderTimeEnum SceneStaticMesh_RenderTimeEnum_RenderTimeEnum_MAX = static_cast<SceneStaticMesh_RenderTimeEnum>(1);
-constexpr int SceneStaticMesh_RenderTimeEnum_RenderTimeEnum_ARRAYSIZE = 1 + 1;
+constexpr SceneStaticMesh_RenderTimeEnum SceneStaticMesh_RenderTimeEnum_RenderTimeEnum_MAX = static_cast<SceneStaticMesh_RenderTimeEnum>(4);
+constexpr int SceneStaticMesh_RenderTimeEnum_RenderTimeEnum_ARRAYSIZE = 4 + 1;
 const ::google::protobuf::EnumDescriptor*
 SceneStaticMesh_RenderTimeEnum_descriptor();
 template <typename T>
@@ -179,7 +182,7 @@ const std::string& SceneStaticMesh_RenderTimeEnum_Name(T value) {
 template <>
 inline const std::string& SceneStaticMesh_RenderTimeEnum_Name(SceneStaticMesh_RenderTimeEnum value) {
   return ::google::protobuf::internal::NameOfDenseEnum<SceneStaticMesh_RenderTimeEnum_descriptor,
-                                                 0, 1>(
+                                                 0, 4>(
       static_cast<int>(value));
 }
 inline bool SceneStaticMesh_RenderTimeEnum_Parse(absl::string_view name, SceneStaticMesh_RenderTimeEnum* value) {
@@ -1294,9 +1297,9 @@ class SceneStaticMesh final :
   // nested types ----------------------------------------------------
 
   using RenderPrimitiveEnum = SceneStaticMesh_RenderPrimitiveEnum;
-  static constexpr RenderPrimitiveEnum TRIANGLE = SceneStaticMesh_RenderPrimitiveEnum_TRIANGLE;
-  static constexpr RenderPrimitiveEnum POINT = SceneStaticMesh_RenderPrimitiveEnum_POINT;
-  static constexpr RenderPrimitiveEnum LINE = SceneStaticMesh_RenderPrimitiveEnum_LINE;
+  static constexpr RenderPrimitiveEnum TRIANGLE_PRIMITIVE = SceneStaticMesh_RenderPrimitiveEnum_TRIANGLE_PRIMITIVE;
+  static constexpr RenderPrimitiveEnum POINT_PRIMITIVE = SceneStaticMesh_RenderPrimitiveEnum_POINT_PRIMITIVE;
+  static constexpr RenderPrimitiveEnum LINE_PRIMITIVE = SceneStaticMesh_RenderPrimitiveEnum_LINE_PRIMITIVE;
   static inline bool RenderPrimitiveEnum_IsValid(int value) {
     return SceneStaticMesh_RenderPrimitiveEnum_IsValid(value);
   }
@@ -1336,8 +1339,11 @@ class SceneStaticMesh final :
   }
 
   using RenderTimeEnum = SceneStaticMesh_RenderTimeEnum;
-  static constexpr RenderTimeEnum PER_FRAME = SceneStaticMesh_RenderTimeEnum_PER_FRAME;
-  static constexpr RenderTimeEnum PRE_RENDER = SceneStaticMesh_RenderTimeEnum_PRE_RENDER;
+  static constexpr RenderTimeEnum SCENE_RENDER_TIME = SceneStaticMesh_RenderTimeEnum_SCENE_RENDER_TIME;
+  static constexpr RenderTimeEnum PRE_RENDER_TIME = SceneStaticMesh_RenderTimeEnum_PRE_RENDER_TIME;
+  static constexpr RenderTimeEnum POST_PROCESS_TIME = SceneStaticMesh_RenderTimeEnum_POST_PROCESS_TIME;
+  static constexpr RenderTimeEnum SKYBOX_RENDER_TIME = SceneStaticMesh_RenderTimeEnum_SKYBOX_RENDER_TIME;
+  static constexpr RenderTimeEnum SHADOW_RENDER_TIME = SceneStaticMesh_RenderTimeEnum_SHADOW_RENDER_TIME;
   static inline bool RenderTimeEnum_IsValid(int value) {
     return SceneStaticMesh_RenderTimeEnum_IsValid(value);
   }

@@ -40,7 +40,7 @@ struct StaticMeshParameter
     EntityId index_buffer_id = NullId;
     //! @brief The kind of draw that the mesh is.
     proto::SceneStaticMesh::RenderPrimitiveEnum render_primitive_enum =
-        proto::SceneStaticMesh::TRIANGLE;
+        proto::SceneStaticMesh::TRIANGLE_PRIMITIVE;
     //! @brief what kind of buffer will be generated (no point of course).
     enum class StaticMeshParameterEnum
     {

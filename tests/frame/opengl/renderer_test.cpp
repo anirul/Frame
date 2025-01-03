@@ -23,7 +23,7 @@ TEST_F(RendererTest, RenderingDisplayTest)
         *level_.get(),
         glm::uvec4(0, 0, window_->GetSize().x, window_->GetSize().y));
     EXPECT_TRUE(renderer_);
-    renderer_->Display();
+    renderer_->PresentFinal();
 }
 
 } // End namespace test.

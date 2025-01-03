@@ -154,24 +154,6 @@
         "mesh_enum": "CUBE"
       },
       {
-        "name": "ClearDepthBuffer",
-        "clean_buffer": {
-          "values": [ "CLEAR_DEPTH" ]
-        }
-      },
-      {
-        "name": "ShadowPath",
-        "parent": "mesh_holder",
-        "file_name": "apple.obj",
-        "material_name": "ShadowMaterial"
-      },
-      {
-        "name": "ClearDepthBuffer",
-        "clean_buffer": {
-          "values": [ "CLEAR_DEPTH", "CLEAR_COLOR" ]
-        }
-      },
-      {
         "name": "AppleMesh",
         "parent": "mesh_holder",
         "file_name": "apple.obj",

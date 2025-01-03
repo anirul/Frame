@@ -25,6 +25,19 @@ Camera::Camera(
     UpdateCameraVectors();
 }
 
+Camera::Camera(const CameraInterface& camera_interface)
+{
+    SetCameraMode(camera_interface.GetCameraMode());
+    SetFovRadians(camera_interface.GetFovRadians());
+    SetAspectRatio(camera_interface.GetAspectRatio());
+    SetNearClip(camera_interface.GetNearClip());
+    SetFarClip(camera_interface.GetFarClip());
+    SetPosition(camera_interface.GetPosition());
+    SetFront(camera_interface.GetFront());
+    SetUp(camera_interface.GetUp());
+    UpdateCameraVectors();
+}
+
 Camera::Camera(const Camera& camera)
 {
     SetCameraMode(camera.GetCameraMode());

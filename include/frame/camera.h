@@ -3,22 +3,17 @@
 #include <array>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
+#include "frame/camera_interface.h"
 
 namespace frame
 {
-
-enum class CameraModeEnum
-{
-    FREE_ARCBALL,
-    Y_AXIS_ALIGNED_ARCBALL
-};
 
 /**
  * @class Camera
  * @brief This is an implementation of a camera class it is done in regard
  *        to computer graphics.
  */
-class Camera
+class Camera : public CameraInterface
 {
   public:
     /**
@@ -32,7 +27,7 @@ class Camera
      * @param front: Direction the camera is facing to (normalized).
      * @param up: Direction of the up for the camera (normalized).
      * @param fov_degrees: Field of view (angle in degrees of the vertical
-     *        field of view).
+     * field of view).
      * @param aspect_ratio: Aspect ratio of the screen (weight on height).
      * @param near_clip: Near clipping plane (front distance to be drawn).
      * @param far_clip: Far clipping plane (back distance to be drawn).
@@ -47,6 +42,12 @@ class Camera
         float near_clip = 0.1f,
         float far_clip = 1000.0f,
         CameraModeEnum camera_mode = CameraModeEnum::Y_AXIS_ALIGNED_ARCBALL);
+    /**
+     * @brief Constructor it will create a camera according to a camera
+	 * interface.
+     * @param camera_interface: The camera interface to create the camera from.
+	 */
+    Camera(const CameraInterface& camera_interface);
     /**
      * @brief Copy constructor.
      * @param camera: The camera from which this one will be created.
@@ -64,39 +65,39 @@ class Camera
      * @brief Compute the view matrix.
      * @return A mat4 of the view matrix.
      */
-    glm::mat4 ComputeView() const;
+    glm::mat4 ComputeView() const override;
     /**
      * @brief Compute the projection matrix.
      * @return A mat4 of the projection matrix.
      */
-    glm::mat4 ComputeProjection() const;
+    glm::mat4 ComputeProjection() const override;
     /**
      * @brief Update the front vector (normalized) and update the whole
      *        camera accordingly.
      * @param vec: Front vector of the camera.
      * @return True if the camera is gimbal locked.
      */
-    bool SetFront(glm::vec3 vec);
+    bool SetFront(glm::vec3 vec) override;
     /**
      * @brief Set position of the camera and update the whole camera
      *        accordingly.
      * @param vec: Position vector of the camera.
      */
-    void SetPosition(glm::vec3 vec);
+    void SetPosition(glm::vec3 vec) override;
     /**
      * @brief Set the up position of the camera and update the whole camera
      * accordingly.
      * @param vec: Up vector of the camera (normalized).
      * @return True if the camera is gimbal locked.
      */
-    bool SetUp(glm::vec3 vec);
+    bool SetUp(glm::vec3 vec) override;
 
   public:
     /**
      * @brief Set the field of view in radians.
      * @param fov: Field of view in radians.
      */
-    void SetFovRadians(float fov)
+    void SetFovRadians(float fov) override
     {
         fov_rad_ = fov;
     }
@@ -104,7 +105,7 @@ class Camera
      * @brief Set the field of view in degrees.
      * @param fov: Field of view in degrees
      */
-    void SetFovDegrees(float fov)
+    void SetFovDegrees(float fov) override
     {
         fov_rad_ = glm::radians(fov);
     }
@@ -112,15 +113,15 @@ class Camera
      * @brief Set aspect ratio (horizontal on vertical).
      * @param aspect_ratio: Aspect ratio of the camera.
      */
-    void SetAspectRatio(float aspect_ratio)
+    void SetAspectRatio(float aspect_ratio) override
     {
         aspect_ratio_ = aspect_ratio;
     }
     /**
-     * @brief Set near clipping plane distance.
-     * @param near_clip: Set the boundary of the close rendering frustum.
+     * @brief Set aspect ratio (horizontal on vertical).
+     * @param aspect_ratio: Aspect ratio of the camera.
      */
-    void SetNearClip(float near_clip)
+    void SetNearClip(float near_clip) override
     {
         near_clip_ = near_clip;
     }
@@ -128,7 +129,7 @@ class Camera
      * @brief Set far clipping plane distance.
      * @param far_clip: Set the far boundary of the rendering frustum.
      */
-    void SetFarClip(float far_clip)
+    void SetFarClip(float far_clip) override
     {
         far_clip_ = far_clip;
     }
@@ -136,7 +137,7 @@ class Camera
      * @brief Get front vector (normalized).
      * @return Front vector (normalized).
      */
-    glm::vec3 GetFront() const
+    glm::vec3 GetFront() const override
     {
         return front_;
     }
@@ -144,7 +145,7 @@ class Camera
      * @brief Get position vector.
      * @return Position vector.
      */
-    glm::vec3 GetPosition() const
+    glm::vec3 GetPosition() const override
     {
         return position_;
     }
@@ -152,7 +153,7 @@ class Camera
      * @brief Get right vector (normalized).
      * @return Right vector (normalized).
      */
-    glm::vec3 GetRight() const
+    glm::vec3 GetRight() const override
     {
         return right_;
     }
@@ -160,7 +161,7 @@ class Camera
      * @brief Get up vector (normalized).
      * @return Up vector (normalized).
      */
-    glm::vec3 GetUp() const
+    glm::vec3 GetUp() const override
     {
         return up_;
     }
@@ -168,7 +169,7 @@ class Camera
      * @brief Get vertical field of view in radians.
      * @return Vertical field of view in radians.
      */
-    float GetFovRadians() const
+    float GetFovRadians() const override
     {
         return fov_rad_;
     }
@@ -176,7 +177,7 @@ class Camera
      * @brief Get vertical field of view in degrees.
      * @return Vertical field of view in degrees.
      */
-    float GetFovDegrees() const
+    float GetFovDegrees() const override
     {
         return glm::degrees(fov_rad_);
     }
@@ -184,7 +185,7 @@ class Camera
      * @brief Get aspect ration (horizontal on vertical).
      * @return Aspect ration (horizontal on vertical).
      */
-    float GetAspectRatio() const
+    float GetAspectRatio() const override
     {
         return aspect_ratio_;
     }
@@ -192,7 +193,7 @@ class Camera
      * @brief Get near clipping plane distance.
      * @return Near clipping plane distance.
      */
-    float GetNearClip() const
+    float GetNearClip() const override
     {
         return near_clip_;
     }
@@ -200,7 +201,7 @@ class Camera
      * @brief Get far clipping plane distance.
      * @return Far clipping plane distance.
      */
-    float GetFarClip() const
+    float GetFarClip() const override
     {
         return far_clip_;
     }
@@ -209,7 +210,7 @@ class Camera
      * @param mode: Set the mode the camera is in, by default this is axis
      * aligned!
      */
-    void SetCameraMode(CameraModeEnum camera_mode)
+    void SetCameraMode(CameraModeEnum camera_mode) override
     {
         camera_mode_ = camera_mode;
     }
@@ -217,7 +218,7 @@ class Camera
      * @brief Get the camera mode.
      * @return The camera mode.
      */
-    CameraModeEnum GetCameraMode() const
+    CameraModeEnum GetCameraMode() const override
     {
         return camera_mode_;
     }

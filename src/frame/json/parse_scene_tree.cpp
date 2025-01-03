@@ -187,7 +187,7 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
     parameter.normal_buffer_id = normal_buffer_id;
     parameter.color_buffer_id = color_buffer_id;
     parameter.index_buffer_id = index_buffer_id;
-    parameter.render_primitive_enum = proto::SceneStaticMesh::POINT;
+    parameter.render_primitive_enum = proto::SceneStaticMesh::POINT_PRIMITIVE;
     auto mesh = std::make_unique<opengl::StaticMesh>(level, parameter);
     mesh->SetName("mesh." + proto_scene_static_mesh.name());
     auto mesh_id = level.AddStaticMesh(std::move(mesh));

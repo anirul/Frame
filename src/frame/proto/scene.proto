@@ -34,9 +34,9 @@ message SceneStaticMesh {
 
 	// Different kind of rendering possible.
 	enum RenderPrimitiveEnum {
-		TRIANGLE			= 0; //< default!
-		POINT				= 1;
-		LINE				= 2;
+		TRIANGLE_PRIMITIVE	= 0; //< default!
+		POINT_PRIMITIVE		= 1;
+		LINE_PRIMITIVE		= 2;
 	}
 	// What kind of rendering is required (default = triangle).
 	RenderPrimitiveEnum render_primitive_enum = 8;
@@ -65,9 +65,16 @@ message SceneStaticMesh {
     // Render time enum.
 	enum RenderTimeEnum {
         // This will be rendered at all frames (this is default).
-        PER_FRAME = 0;
+        SCENE_RENDER_TIME = 0;
         // This will be pre-rendered only once at the beginning.
-        PRE_RENDER = 1;
+        PRE_RENDER_TIME = 1;
+		// This will be post-rendered at the end of every frame.
+		POST_PROCESS_TIME = 2;
+		// This is the time we render the skybox.
+		SKYBOX_RENDER_TIME = 3;
+		// Shadow render time (this is used internally and should not be used
+		// as a descriptor in the scene).
+		SHADOW_RENDER_TIME = 4;
 	}
 
     // When should it be rendered (default = PER_FRAME).

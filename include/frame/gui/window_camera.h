@@ -20,11 +20,11 @@ class WindowCamera : public frame::gui::GuiWindowInterface
     {
         return name_;
     }
-    void SetCameraPtr(frame::Camera* camera)
+    void SetCameraPtr(frame::CameraInterface* camera)
     {
         camera_ptr_ = camera;
     }
-    frame::Camera* GetCameraPtr() const
+    frame::CameraInterface* GetCameraPtr() const
     {
         return camera_ptr_;
     }
@@ -55,7 +55,7 @@ class WindowCamera : public frame::gui::GuiWindowInterface
     float near_clip_ = 0.1f;
     bool end_ = true;
     std::string name_;
-    frame::Camera* camera_ptr_ = nullptr;
+    frame::CameraInterface* camera_ptr_ = nullptr;
     frame::Camera camera_saved_;
     frame::Camera reset_camera_;
 };

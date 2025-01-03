@@ -15,6 +15,48 @@ Level::~Level()
     id_static_mesh_map_.clear();
 }
 
+std::vector<std::pair<EntityId, EntityId>> Level::GetStaticMeshMaterialIds(
+    proto::SceneStaticMesh::RenderTimeEnum render_time_enum) const
+{
+    switch (render_time_enum)
+    {
+    case proto::SceneStaticMesh::PRE_RENDER_TIME:
+        return mesh_material_pre_render_ids_;
+    case proto::SceneStaticMesh::SCENE_RENDER_TIME:
+        return mesh_material_scene_render_ids_;
+    case proto::SceneStaticMesh::POST_PROCESS_TIME:
+        return mesh_material_post_proccess_ids_;
+    case proto::SceneStaticMesh::SKYBOX_RENDER_TIME:
+        return mesh_material_skybox_ids_;
+    default:
+        throw std::runtime_error("Unknown render time?");
+    }
+}
+
+void Level::AddMeshMaterialId(
+    EntityId node_id,
+    EntityId material_id,
+    proto::SceneStaticMesh::RenderTimeEnum render_time_enum)
+{
+    switch (render_time_enum)
+    {
+    case proto::SceneStaticMesh::PRE_RENDER_TIME:
+        mesh_material_pre_render_ids_.push_back({node_id, material_id});
+        break;
+    case proto::SceneStaticMesh::SCENE_RENDER_TIME:
+        mesh_material_scene_render_ids_.push_back({node_id, material_id});
+        break;
+    case proto::SceneStaticMesh::POST_PROCESS_TIME:
+        mesh_material_post_proccess_ids_.push_back({node_id, material_id});
+        break;
+    case proto::SceneStaticMesh::SKYBOX_RENDER_TIME:
+        mesh_material_skybox_ids_.push_back({node_id, material_id});
+        break;
+    default:
+        throw std::runtime_error("Unknown render time?");
+    }
+}
+
 EntityId Level::GetDefaultStaticMeshQuadId() const
 {
     if (quad_id_)
@@ -237,7 +279,7 @@ std::unique_ptr<frame::TextureInterface> Level::ExtractTexture(EntityId id)
     return std::move(node_texture.mapped());
 }
 
-frame::Camera& Level::GetDefaultCamera()
+frame::CameraInterface& Level::GetDefaultCamera()
 {
     auto camera_id = GetDefaultCameraId();
     assert(camera_id);

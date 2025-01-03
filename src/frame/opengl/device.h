@@ -8,7 +8,7 @@
 #include <memory>
 #include <optional>
 
-#include "frame/camera.h"
+#include "frame/camera_interface.h"
 #include "frame/device_interface.h"
 #include "frame/logger.h"
 #include "frame/node_camera.h"
@@ -187,10 +187,11 @@ class Device : public DeviceInterface
         const TextureParameter& texture_parameter) final;
 
   protected:
-    void DisplayCamera(const Camera& camera, glm::uvec4 viewport, double time);
+    void DisplayCamera(
+		const CameraInterface& camera, glm::uvec4 viewport, double time);
     void DisplayLeftRightCamera(
-        const Camera& camera_left,
-        const Camera& camera_right,
+        const CameraInterface& camera_left,
+        const CameraInterface& camera_right,
         glm::uvec4 viewport_left,
         glm::uvec4 viewport_right,
         double time);

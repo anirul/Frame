@@ -116,30 +116,30 @@
       {
         "name": "root",
         "matrix": {
-          "m11": "1",
-          "m22": "1",
-          "m33": "1",
-          "m44": "1"
+          "m11": 1,
+          "m22": 1,
+          "m33": 1,
+          "m44": 1
         }
       },
       {
         "name": "mesh_holder",
         "parent": "root",
         "quaternion": {
-          "x": "0.0",
-          "y": "0.1979232",
-          "z": "0.1484424",
-          "w": "0.9689124"
+          "x": 0.0,
+          "y": 0.1979232,
+          "z": 0.1484424,
+          "w": 0.9689124
         }
       },
       {
         "name": "skybox_holder",
         "parent": "root",
         "quaternion": {
-          "x": "0",
-          "y": "0.0499792",
-          "z": "0.0",
-          "w": "0.9987503"
+          "x": 0,
+          "y": 0.0499792,
+          "z": 0.0,
+          "w": 0.9987503
         }
       }
     ],
@@ -148,49 +148,52 @@
         "name": "InitCleanBuffer",
         "clean_buffer": {
           "values": [ "CLEAR_COLOR", "CLEAR_DEPTH" ]
-        }
+        },
+        "render_time_enum": "PER_FRAME_TIME"
       },
       {
         "name": "CubeMapMesh",
         "parent": "skybox_holder",
         "material_name": "CubeMapMaterial",
-        "mesh_enum": "CUBE"
+        "mesh_enum": "CUBE",
+        "render_time_enum": "PER_FRAME_TIME"
       },
       {
         "name": "ClearDepthBuffer",
         "clean_buffer": {
           "values": [ "CLEAR_DEPTH" ]
-        }
+        },
+        "render_time_enum": "PER_FRAME_TIME"
       },
       {
         "name": "AppleMesh",
         "parent": "mesh_holder",
         "file_name": "apple.obj",
-        "material_name": "SceneSimpleMaterial"
+        "material_name": "SceneSimpleMaterial",
+        "render_time_enum": "PER_FRAME_TIME"
       }
     ],
     "scene_cameras": [
       {
         "name": "camera",
         "parent": "root",
-        "aspect_ratio": "1.3333",
-        "fov_degrees": "65.0",
-        "near_clip": "0.01",
-        "far_clip": "1000.0",
+        "fov_degrees": 65.0,
+        "near_clip": 0.01,
+        "far_clip": 1000,
         "position": {
-          "x": "0.0",
-          "y": "0.0",
-          "z": "-2.0"
+          "x": 0,
+          "y": 0,
+          "z": -2
         },
         "target": {
-          "x": "0.0",
-          "y": "0.0",
-          "z": "1.0"
+          "x": 0,
+          "y": 0,
+          "z": 1
         },
         "up": {
-          "x": "0.0",
-          "y": "1.0",
-          "z": "0.0"
+          "x": 0,
+          "y": 1,
+          "z": 0
         }
       }
     ],
@@ -198,7 +201,7 @@
       {
         "name": "sun",
         "parent": "root",
-        "light_type": "DIRECTIONAL",
+        "light_type": "DIRECTIONAL_LIGHT",
         "position": {
           "x": "-1.0",
           "y": "1.0",

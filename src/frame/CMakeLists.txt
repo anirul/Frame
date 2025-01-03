@@ -6,6 +6,7 @@ add_library(Frame
     ${CMAKE_CURRENT_SOURCE_DIR}/../../include/frame/api.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../include/frame/buffer_interface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../include/frame/camera.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../include/frame/camera_interface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../include/frame/device_interface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../include/frame/entity_id.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../include/frame/image_interface.h

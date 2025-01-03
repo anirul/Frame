@@ -128,6 +128,15 @@
         {
           "name": "model",
           "uniform_enum": "MODEL_MAT4"
+        },
+        {
+          "name": "env_map_model",
+          "uniform_mat4": {
+            "m11": "1",
+            "m22": "1",
+            "m33": "1",
+            "m44": "1"
+          }
         }
       ]
     }
@@ -139,10 +148,10 @@
       {
         "name": "root",
         "matrix": {
-          "m11": 1.0,
-          "m22": 1.0,
-          "m33": 1.0,
-          "m44": 1.0
+          "m11": 1,
+          "m22": 1,
+          "m33": 1,
+          "m44": 1
         }
       },
       {
@@ -156,7 +165,7 @@
         }
       },
       {
-        "name": "camera_holder",
+        "name": "env_holder",
         "parent": "root",
         "quaternion": {
           "x": 0,
@@ -171,41 +180,45 @@
         "name": "ComputeIrradianceMap",
         "parent": "root",
         "mesh_enum": "CUBE",
-        "render_time_enum": "PRE_RENDER",
-        "material_name": "IrradianceMaterial"
+        "material_name": "IrradianceMaterial",
+        "render_time_enum": "PRE_RENDER_TIME"
       },
       {
         "name": "InitCleanBuffer",
         "clean_buffer": {
           "values": [ "CLEAR_COLOR", "CLEAR_DEPTH" ]
-        }
+        },
+        "render_time_enum": "SKYBOX_RENDER_TIME"
       },
       {
         "name": "CubeMapMesh",
-        "parent": "root",
+        "parent": "env_holder",
         "material_name": "CubeMapMaterial",
-        "mesh_enum": "CUBE"
+        "mesh_enum": "CUBE",
+        "render_time_enum": "SKYBOX_RENDER_TIME"
       },
       {
         "name": "ClearDepthBuffer",
         "clean_buffer": {
-          "values": [ "CLEAR_DEPTH" ]
-        }
+          "values": [ "CLEAR_COLOR", "CLEAR_DEPTH" ]
+        },
+        "render_time_enum": "SCENE_RENDER_TIME"
       },
       {
         "name": "AppleMesh",
         "parent": "mesh_holder",
         "file_name": "apple.obj",
-        "material_name": "ImageBasedLightingMaterial"
+        "material_name": "ImageBasedLightingMaterial",
+        "render_time_enum": "SCENE_RENDER_TIME"
       }
     ],
     "scene_cameras": [
       {
         "name": "camera",
-        "parent": "camera_holder",
+        "parent": "root",
         "fov_degrees": 65.0,
         "near_clip": 0.01,
-        "far_clip": 1000.0,
+        "far_clip": 1000,
         "position": {
           "x": 0,
           "y": 0,
