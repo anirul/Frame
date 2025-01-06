@@ -7,6 +7,7 @@
 #include "frame/buffer_interface.h"
 #include "frame/camera_interface.h"
 #include "frame/entity_id.h"
+#include "frame/light_interface.h"
 #include "frame/material_interface.h"
 #include "frame/node_interface.h"
 #include "frame/program_interface.h"
@@ -65,6 +66,12 @@ class LevelInterface : public NameInterface
      * @return A pointer to a static mesh or null.
      */
     virtual StaticMeshInterface& GetStaticMeshFromId(EntityId id) const = 0;
+    /**
+     * @brief Get all light from the level.
+     * @param id: The id to get the light from.
+     * @return A reference to a light.
+     */
+    virtual LightInterface& GetLightFromId(EntityId id) const = 0;
     /**
      * @brief Get a vector of static mesh id and corresponding material id.
      * @return Vector of static mesh id and corresponding material id.
@@ -198,6 +205,12 @@ class LevelInterface : public NameInterface
     virtual EntityId AddStaticMesh(
         std::unique_ptr<StaticMeshInterface>&& static_mesh) = 0;
     /**
+     * @brief Add a light to the level.
+     * @param light: Move a light in the level.
+     * @return Assigned entity id or error.
+     */
+    virtual EntityId AddLight(std::unique_ptr<LightInterface>&& light) = 0;
+    /**
      * @brief Add a mesh and a material id (used for rendering by mesh later
      *        on).
      * @param node_id: Mesh node id.
@@ -212,7 +225,12 @@ class LevelInterface : public NameInterface
      * @brief Get all texture from the level.
      * @return A vector of texture ids.
      */
-    virtual std::vector<EntityId> GetAllTextures() const = 0;
+    virtual std::vector<EntityId> GetTextures() const = 0;
+    /**
+     * @brief Get all light from the level.
+     * @return A vector of light ids.
+     */
+    virtual std::vector<EntityId> GetLights() const = 0;
     /**
      * @brief Extract a texture (move it) from the level to outside (used in
      * special cases).

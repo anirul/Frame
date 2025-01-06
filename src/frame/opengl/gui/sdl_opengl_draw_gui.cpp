@@ -114,7 +114,7 @@ bool SDL2OpenGLDrawGui::Update(DeviceInterface& device, double dt)
     }
 
     // Go through all texture and create a window for each of them.
-    for (const EntityId& id : device.GetLevel().GetAllTextures())
+    for (const EntityId& id : device.GetLevel().GetTextures())
     {
         frame::TextureInterface& texture_interface =
             device.GetLevel().GetTextureFromId(id);

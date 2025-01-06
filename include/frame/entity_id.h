@@ -19,6 +19,7 @@ enum class EntityTypeEnum : std::uint8_t
     BUFFER = 5,
     STATIC_MESH = 6,
     PLUGIN = 7,
+    LIGHT = 8,
 };
 
 /**

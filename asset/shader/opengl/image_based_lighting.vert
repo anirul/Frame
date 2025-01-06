@@ -11,7 +11,7 @@ out vec2 fragTexCoord;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
-uniform mat4 env_map_model;
+uniform mat4 env_map_model = mat4(1.0);
 
 void main()
 {

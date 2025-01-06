@@ -22,7 +22,7 @@ struct NameInterface
     virtual std::string GetName() const = 0;
     /**
      * @brief Set name.
-     * @return Name.
+     * @param name: Name.
      */
     virtual void SetName(const std::string& name) = 0;
 };

@@ -26,7 +26,8 @@ class NodeLight : public NodeInterface
     NodeLight(
         std::function<NodeInterface*(const std::string&)> func,
         const glm::vec3 color)
-        : NodeInterface(func), light_type_(LightTypeEnum::AMBIENT_LIGHT),
+        : NodeInterface(func),
+		  light_type_(LightTypeEnum::AMBIENT_LIGHT),
           color_(color)
     {
     }
@@ -117,7 +118,7 @@ class NodeLight : public NodeInterface
      * @brief Get the light type.
      * @return The light type (see the NodeLightEnum).
      */
-    const LightTypeEnum GetType() const
+    LightTypeEnum GetType() const
     {
         return light_type_;
     }
@@ -125,7 +126,7 @@ class NodeLight : public NodeInterface
      * @brief Get the light position.
      * @return the light position.
      */
-    const glm::vec3 GetPosition() const
+    glm::vec3 GetPosition() const
     {
         return position_;
     }
@@ -133,7 +134,7 @@ class NodeLight : public NodeInterface
      * @brief Get the light direction.
      * @return the light direction.
      */
-    const glm::vec3 GetDirection() const
+    glm::vec3 GetDirection() const
     {
         return direction_;
     }
@@ -141,7 +142,7 @@ class NodeLight : public NodeInterface
      * @brief Get the light color.
      * @return the light color.
      */
-    const glm::vec3 GetColor() const
+    glm::vec3 GetColor() const
     {
         return color_;
     }
@@ -149,7 +150,7 @@ class NodeLight : public NodeInterface
      * @brief Get the inner limit in dot format.
      * @return the inner limit in dot format.
      */
-    const float GetDotInner() const
+    float GetDotInner() const
     {
         return dot_inner_limit_;
     }
@@ -157,7 +158,7 @@ class NodeLight : public NodeInterface
      * @brief Get the outer limit in dot format.
      * @return the outer limit in dot format.
      */
-    const float GetDotOuter() const
+    float GetDotOuter() const
     {
         return dot_outer_limit_;
     }

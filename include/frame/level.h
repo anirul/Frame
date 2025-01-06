@@ -98,6 +98,15 @@ class Level : public LevelInterface
         return *id_static_mesh_map_.at(id).get();
     }
     /**
+     * @brief Get all light from the level.
+     * @param id: The id to get the light from.
+     * @return A reference to a light.
+     */
+    LightInterface& GetLightFromId(EntityId id) const override
+	{
+		return *id_light_map_.at(id).get();
+	}
+    /**
      * @brief Get a vector of static mesh id and corresponding material id.
      * @return Vector of static mesh id and corresponding material id and
      * RenderTimeEnum.
@@ -249,6 +258,12 @@ class Level : public LevelInterface
      */
     EntityId AddBuffer(std::unique_ptr<BufferInterface>&& buffer) override;
     /**
+     * @brief Add a light to the level.
+     * @param light: Move a light in the level.
+     * @return Assigned entity id or error.
+     */
+    EntityId AddLight(std::unique_ptr<LightInterface>&& light) override;
+    /**
      * @brief Remove a buffer from the level.
      * @param buffer: The buffer id to be removed.
      */
@@ -277,7 +292,12 @@ class Level : public LevelInterface
      * @brief Get all texture from the level.
      * @return A vector of texture ids.
      */
-    std::vector<EntityId> GetAllTextures() const override;
+    std::vector<EntityId> GetTextures() const override;
+    /**
+     * @brief Get all light from the level.
+     * @return A vector of light ids.
+     */
+    std::vector<EntityId> GetLights() const override;
     /**
      * @brief Extract a texture (move it) from the level to outside (used in
      *        special cases).
@@ -361,6 +381,14 @@ class Level : public LevelInterface
     {
         return ++next_id_maker_;
     }
+    /**
+     * @brief Increase the internal counter and return the value.
+     * @return Current counter + 1.
+     */
+    EntityId GetLightNewId() const
+    {
+        return ++next_id_maker_;
+	}
 
   protected:
     Logger& logger_ = Logger::GetInstance();
@@ -379,6 +407,7 @@ class Level : public LevelInterface
     std::map<EntityId, std::unique_ptr<BufferInterface>> id_buffer_map_;
     std::map<EntityId, std::unique_ptr<StaticMeshInterface>>
 		id_static_mesh_map_;
+    std::map<EntityId, std::unique_ptr<LightInterface>> id_light_map_;
     // These are storage specifiers.
     std::set<std::string> string_set_;
     std::map<std::string, EntityId> name_id_map_;

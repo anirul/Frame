@@ -4,6 +4,8 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
 
+#include "frame/name_interface.h"
+
 namespace frame
 {
 /**
@@ -32,7 +34,7 @@ enum class ShadowTypeEnum : std::uint8_t
  * @class LightInterface
  * @brief Light Interface is generic point of light in a scene.
  */
-struct LightInterface
+struct LightInterface : public NameInterface
 {
     //! @brief Virtual destructor.
     virtual ~LightInterface() = default;
@@ -48,7 +50,7 @@ struct LightInterface
     virtual const ShadowTypeEnum GetShadowType() const = 0;
     /**
      * @brief Get the position of the light or the direction in case this is
-     *        a directional light.
+     * a directional light.
      * @return Return the position of a light.
      */
     virtual const glm::vec3 GetVector() const = 0;

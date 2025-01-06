@@ -17,6 +17,8 @@ namespace frame::opengl
  * @class Renderer
  * @brief This is the renderer class this is the class that is doing the
  * rendering part.
+ *
+ * Thinking about removing the level dependency and passing it as a parameter?
  */
 class Renderer : public RendererInterface
 {

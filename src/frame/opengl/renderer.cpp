@@ -393,9 +393,11 @@ void Renderer::PreRender()
 void Renderer::RenderShadows(const CameraInterface& camera)
 {
     render_time_ = proto::SceneStaticMesh::SHADOW_RENDER_TIME;
-    // This is not implemented yet.
     // For every light in the level.
-    // For every mesh / material pair in the scene.
+    for (const auto& light : level_.GetLights())
+    {
+        // For every mesh / material pair in the scene.    
+    }
 }
 
 void Renderer::RenderSkybox(const CameraInterface& camera)

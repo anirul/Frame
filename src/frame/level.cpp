@@ -188,6 +188,22 @@ EntityId Level::AddBuffer(std::unique_ptr<BufferInterface>&& buffer)
     return id;
 }
 
+EntityId Level::AddLight(std::unique_ptr<LightInterface>&& light)
+{
+    EntityId id = GetLightNewId();
+    std::string name = light->GetName();
+    // CHECKME(anirul): maybe this should return std::nullopt.
+    if (string_set_.count(name))
+    {
+        throw std::runtime_error("Name: " + name + " is already in!");
+    }
+    id_light_map_.insert({id, std::move(light)});
+    id_name_map_.insert({id, name});
+    name_id_map_.insert({name, id});
+    id_enum_map_.insert({id, EntityTypeEnum::LIGHT});
+    return id;
+}
+
 void Level::RemoveBuffer(EntityId buffer_id)
 {
     if (!id_buffer_map_.count(buffer_id))
@@ -260,12 +276,22 @@ EntityId Level::GetParentId(EntityId id) const
     }
 }
 
-std::vector<frame::EntityId> Level::GetAllTextures() const
+std::vector<frame::EntityId> Level::GetTextures() const
 {
     std::vector<EntityId> list;
     for (const auto& id_texture : id_texture_map_)
     {
         list.push_back(id_texture.first);
+    }
+    return list;
+}
+
+std::vector<frame::EntityId> Level::GetLights() const
+{
+    std::vector<EntityId> list;
+    for (const auto& id_light : id_light_map_)
+    {
+        list.push_back(id_light.first);
     }
     return list;
 }
