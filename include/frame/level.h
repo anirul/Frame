@@ -167,6 +167,22 @@ class Level : public LevelInterface
         return GetIdFromName(default_camera_name_);
     }
     /**
+     * @brief Get the default material id of the shadow material.
+     * @return An id or an error.
+     */
+    EntityId GetDefaultShadowMaterialId() const override
+    {
+        return default_shadow_material_id_;
+	}
+    /**
+     * @brief Set the default material id of the shadow material.
+     * @param id: Id of the shadow material.
+     */
+    void SetDefaultShadowMaterialId(EntityId id) override
+    {
+		default_shadow_material_id_ = id;
+    }
+    /**
      * @brief Add a mesh and a material id (used for rendering by mesh later
      *        on).
      * @param node_id: Mesh node id.
@@ -395,6 +411,7 @@ class Level : public LevelInterface
     mutable EntityId next_id_maker_ = NullId;
     EntityId quad_id_ = 0;
     EntityId cube_id_ = 0;
+    EntityId default_shadow_material_id_ = 0;
     std::string name_;
     std::string default_texture_name_;
     std::string default_root_scene_node_name_;

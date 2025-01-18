@@ -5,6 +5,7 @@
 #include <string>
 
 #include "frame/light_interface.h"
+#include "frame/camera_interface.h"
 #include "frame/opengl/program.h"
 
 namespace frame::opengl
@@ -55,7 +56,7 @@ class LightPoint : public LightInterface
      * @brief Get the type of the light, coming from the light interface.
      * @return Return the type of the light.
      */
-    const LightTypeEnum GetType() const override
+    LightTypeEnum GetType() const override
     {
         return LightTypeEnum::POINT_LIGHT;
     }
@@ -63,7 +64,7 @@ class LightPoint : public LightInterface
      * @brief Get the type of the shadow, coming from the light interface.
      * @return Return the type of the shadow.
      */
-    const ShadowTypeEnum GetShadowType() const override
+    ShadowTypeEnum GetShadowType() const override
     {
 		return shadow_type_enum_;
 	}
@@ -72,7 +73,7 @@ class LightPoint : public LightInterface
      * interface.
      * @return Return the position of a light.
      */
-    const glm::vec3 GetVector() const override
+    glm::vec3 GetVector() const override
     {
         return position_;
     }
@@ -80,10 +81,18 @@ class LightPoint : public LightInterface
      * @brief Get the color intensity, coming from the light interface.
      * @return Return the color of the light.
      */
-    const glm::vec3 GetColorIntensity() const override
+    glm::vec3 GetColorIntensity() const override
     {
         return color_intensity_;
     }
+
+  public:
+    /**
+     * @brief Get the shadow view.
+     * @param camera: Camera use to render the scene.
+     * @return Return the shadow view.
+     */
+    glm::mat4 ComputeView(const CameraInterface& camera) const;
 
   protected:
     glm::vec3 position_;
@@ -137,7 +146,7 @@ class LightDirectional : public LightInterface
      * @brief Get the type of the light, coming from the light interface.
      * @return Return the type of the light.
      */
-    const LightTypeEnum GetType() const override
+    LightTypeEnum GetType() const override
     {
         return LightTypeEnum::DIRECTIONAL_LIGHT;
     }
@@ -145,7 +154,7 @@ class LightDirectional : public LightInterface
      * @brief Get the type of the shadow, coming from the light interface.
      * @return Return the type of the shadow.
      */
-	const ShadowTypeEnum GetShadowType() const override
+	ShadowTypeEnum GetShadowType() const override
     {
         return shadow_type_enum_;
     }
@@ -154,7 +163,7 @@ class LightDirectional : public LightInterface
      * interface.
      * @return Return the position of a light.
      */
-    const glm::vec3 GetVector() const override
+    glm::vec3 GetVector() const override
     {
         return direction_;
     }
@@ -162,10 +171,18 @@ class LightDirectional : public LightInterface
      * @brief Get the color intensity, coming from the light interface.
      * @return Return the color of the light.
      */
-    const glm::vec3 GetColorIntensity() const override
+    glm::vec3 GetColorIntensity() const override
     {
         return color_intensity_;
     }
+
+  public:
+    /**
+     * @brief Get the shadow view.
+     * @param camera: Camera use to render the scene.
+     * @return Return the shadow view.
+     */
+    glm::mat4 ComputeView(const CameraInterface& camera) const;
 
   protected:
     glm::vec3 direction_;

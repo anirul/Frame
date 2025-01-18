@@ -8,6 +8,9 @@
 
 namespace frame
 {
+
+class CameraInterface;
+
 /**
  * @brief This has to correspond to proto::SceneLight::LightTypeEnum!
  */
@@ -42,23 +45,29 @@ struct LightInterface : public NameInterface
      * @brief Get the type of the light.
      * @return Return the type of the light.
      */
-    virtual const LightTypeEnum GetType() const = 0;
+    virtual LightTypeEnum GetType() const = 0;
     /**
      * @brief Get the type of the shadow.
      * @return Return the type of the shadow.
      */
-    virtual const ShadowTypeEnum GetShadowType() const = 0;
+    virtual ShadowTypeEnum GetShadowType() const = 0;
     /**
      * @brief Get the position of the light or the direction in case this is
      * a directional light.
      * @return Return the position of a light.
      */
-    virtual const glm::vec3 GetVector() const = 0;
+    virtual glm::vec3 GetVector() const = 0;
     /**
      * @brief Get the color intensity.
      * @return Return the color of the light.
      */
-    virtual const glm::vec3 GetColorIntensity() const = 0;
+    virtual glm::vec3 GetColorIntensity() const = 0;
+    /**
+     * @brief Get the shadow view.
+     * @param camera: Camera use to render the scene.
+     * @return Return the shadow view.
+     */
+    virtual glm::mat4 ComputeView(const CameraInterface& camera) const = 0;
 };
 
 } // End namespace frame.

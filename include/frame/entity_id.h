@@ -7,7 +7,7 @@ namespace frame
 
 /**
  * @brief The description of what object is on the other side of the entity
- *        id.
+ * id.
  */
 enum class EntityTypeEnum : std::uint8_t
 {
@@ -24,13 +24,13 @@ enum class EntityTypeEnum : std::uint8_t
 
 /**
  * @brief This is used by the code to have an abstraction from pointer to
- *        structure see data based programming. All object are represented
- *        by Id that are stored in the level structure.
+ * structure see data based programming. All object are represented by Id
+ * that are stored in the level structure.
  */
 using EntityId = std::int64_t;
 /**
  * @brief This is an error in case you have a null id this mean there is
- *        nothing there or an error.
+ * nothing there or an error.
  */
 constexpr EntityId NullId = 0;
 

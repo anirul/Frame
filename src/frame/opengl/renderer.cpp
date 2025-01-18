@@ -398,24 +398,68 @@ void Renderer::RenderShadows(const CameraInterface& camera)
     // For every light in the level.
     for (const auto& light_id : level_.GetLights())
     {
+        EntityId shadow_material_id = level_.GetDefaultShadowMaterialId();
+        if (shadow_material_id == NullId)
+        {
+            throw std::runtime_error("No shadow material id.");
+        }
+        // Clear the depth buffer only once per light.
+        glClear(GL_DEPTH_BUFFER_BIT);
         auto& light = level_.GetLightFromId(light_id);
         // Check if light has shadow.
         if (light.GetShadowType() == ShadowTypeEnum::NO_SHADOW)
         {
             continue;
         }
-        
-        // For every mesh / material pair in the scene.
-        for (const auto& p : level_.GetStaticMeshMaterialIds(
-                 proto::SceneStaticMesh::SHADOW_RENDER_TIME))
+
+        if (light.GetType() == LightTypeEnum::DIRECTIONAL_LIGHT)
         {
-            auto& mesh = level_.GetStaticMeshFromId(p.first);
-            auto& material = level_.GetMaterialFromId(p.second);
-            // Skip transparent object.
-            if (mesh.GetShadowEffect() ==
-                    proto::SceneStaticMesh::TRANSPARENT_SHADOW_EFFECT)
+            // For every mesh / material pair in the scene.
+            for (const auto& p : level_.GetStaticMeshMaterialIds(
+                     proto::SceneStaticMesh::SHADOW_RENDER_TIME))
             {
-                continue;
+                auto& mesh = level_.GetStaticMeshFromId(p.first);
+                // Skip object that doesn't cast shadow.
+                if (mesh.GetShadowEffect() ==
+                    proto::SceneStaticMesh::TRANSPARENT_SHADOW_EFFECT)
+                {
+                    continue;
+                }
+                // Render it acording to the light position.
+                glm::mat4 proj =
+                    glm::ortho(-50.f, 50.f, -50.f, 50.f, 0.1f, 1000.f);
+                glm::mat4 view = light.ComputeView(camera);
+                RenderNode(p.first, shadow_material_id, proj, view);
+            }
+            // TODO add the depth map to the light shadow map list.
+        }
+        if (light.GetType() == LightTypeEnum::POINT_LIGHT)
+        {
+            for (int i = 0; i < 6; ++i)
+            {
+                // For every mesh / material pair in the scene.
+                for (const auto& p : level_.GetStaticMeshMaterialIds(
+                         proto::SceneStaticMesh::SHADOW_RENDER_TIME))
+                {
+                    auto& mesh = level_.GetStaticMeshFromId(p.first);
+                    // Skip object that doesn't cast shadow.
+                    if (mesh.GetShadowEffect() ==
+                        proto::SceneStaticMesh::TRANSPARENT_SHADOW_EFFECT)
+                    {
+                        continue;
+                    }
+                    // Render it acording to the light position.
+                    // If you want that single “camera-based” pass:
+                    glm::mat4 proj =
+                        glm::perspective(
+                            glm::radians(90.f), 1.f, 0.1f, 1000.f);
+                    glm::mat4 rotation = views_cubemap[i];
+                    glm::mat4 translation =
+                        glm::translate(glm::mat4(1.0f), -light.GetVector());
+                    glm::mat4 view = rotation * translation;
+                    RenderNode(p.first, shadow_material_id, proj, view);
+                }
+                // TODO add the depth map to the light shadow map list.
             }
         }
     }

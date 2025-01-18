@@ -17,7 +17,7 @@ class UniformInterface;
 /**
  * @class PluginInterface
  * @brief This is the plugin interface that will be used for Stream and
- *        other plugin.
+ * other plugin.
  */
 class PluginInterface : public NameInterface
 {
@@ -50,7 +50,7 @@ class PluginInterface : public NameInterface
         MaterialInterface& material) = 0;
     /**
      * @brief Called to update variables, called after the main render
-     *        phase.
+     * phase.
      * @param level: The level.
      * @return Is the loop continuing?
      */

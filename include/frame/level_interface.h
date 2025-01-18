@@ -126,6 +126,16 @@ class LevelInterface : public NameInterface
      */
     virtual EntityId GetDefaultCameraId() const = 0;
     /**
+     * @brief Get the default material id of the shadow material.
+     * @return An id or an error.
+     */
+    virtual EntityId GetDefaultShadowMaterialId() const = 0;
+    /**
+     * @brief Set the default material id of the shadow material.
+     * @param id: Id of the shadow material.
+     */
+    virtual void SetDefaultShadowMaterialId(EntityId id) = 0;
+    /**
      * @brief Get the list of children from an id in the node list.
      * @param id: The node id you want to get the children.
      * @return The node id children id(s).
