@@ -209,8 +209,9 @@ void Renderer::RenderMesh(
         auto& texture = level_.GetTextureFromId(texture_id);
         if (texture.IsCubeMap())
         {
-            auto& gl_texture = dynamic_cast<TextureCubeMap&>(
-                level_.GetTextureFromId(texture_id));
+            auto& gl_texture =
+                dynamic_cast<TextureCubeMap&>(
+                    level_.GetTextureFromId(texture_id));
             gl_texture.Bind(p.second);
             program.Uniform(p.first, p.second);
         }
@@ -226,7 +227,8 @@ void Renderer::RenderMesh(
     auto& gl_static_mesh = dynamic_cast<StaticMesh&>(static_mesh);
     glBindVertexArray(gl_static_mesh.GetId());
 
-    auto& index_buffer = level_.GetBufferFromId(static_mesh.GetIndexBufferId());
+    auto& index_buffer = level_.GetBufferFromId(
+        static_mesh.GetIndexBufferId());
     auto& gl_index_buffer = dynamic_cast<Buffer&>(index_buffer);
     // This was crashing the driver so...
     if (static_mesh.GetIndexSize())
@@ -394,9 +396,28 @@ void Renderer::RenderShadows(const CameraInterface& camera)
 {
     render_time_ = proto::SceneStaticMesh::SHADOW_RENDER_TIME;
     // For every light in the level.
-    for (const auto& light : level_.GetLights())
+    for (const auto& light_id : level_.GetLights())
     {
-        // For every mesh / material pair in the scene.    
+        auto& light = level_.GetLightFromId(light_id);
+        // Check if light has shadow.
+        if (light.GetShadowType() == ShadowTypeEnum::NO_SHADOW)
+        {
+            continue;
+        }
+        
+        // For every mesh / material pair in the scene.
+        for (const auto& p : level_.GetStaticMeshMaterialIds(
+                 proto::SceneStaticMesh::SHADOW_RENDER_TIME))
+        {
+            auto& mesh = level_.GetStaticMeshFromId(p.first);
+            auto& material = level_.GetMaterialFromId(p.second);
+            // Skip transparent object.
+            if (mesh.GetShadowEffect() ==
+                    proto::SceneStaticMesh::TRANSPARENT_SHADOW_EFFECT)
+            {
+                continue;
+            }
+        }
     }
 }
 

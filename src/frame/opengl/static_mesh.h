@@ -114,6 +114,14 @@ class StaticMesh : public BindInterface, public StaticMeshInterface
     {
         return render_primitive_enum_;
     }
+    /**
+     * @brief Get the shadow effect.
+     * @return Get the shadow effect.
+     */
+    proto::SceneStaticMesh::ShadowEffectEnum GetShadowEffect() const override
+    {
+        return shadow_effect_enum_;
+    }
     //! @brief Lock the bind for RAII interface to the bind interface.
     void LockedBind() const override
     {
@@ -187,6 +195,7 @@ class StaticMesh : public BindInterface, public StaticMeshInterface
     EntityId index_buffer_id_ = NullId;
     std::size_t index_size_ = 0;
     unsigned int vertex_array_object_ = 0;
+    proto::SceneStaticMesh::ShadowEffectEnum shadow_effect_enum_ = {};
     proto::SceneStaticMesh::RenderPrimitiveEnum render_primitive_enum_ = {};
     float point_size_ = 1.0f;
     std::string name_;

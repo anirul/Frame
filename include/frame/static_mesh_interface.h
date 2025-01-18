@@ -16,9 +16,7 @@ namespace frame
  */
 struct StaticMeshParameter
 {
-    /**
-     * @brief Buffer of points (this has to be present cannot be generated).
-     */
+    //! @brief Buffer of points (this has to be present cannot be generated).
     EntityId point_buffer_id = NullId;
     //! @brief Buffer of points size (should be 3).
     std::uint32_t point_buffer_size = 3;
@@ -34,13 +32,14 @@ struct StaticMeshParameter
     EntityId texture_buffer_id = NullId;
     //! @brief Texture coordinates size (should be 2).
     std::uint32_t texture_buffer_size = 2;
-    /**
-     * @brief Index of the points 3 per triangle 2 per line and 1 per point.
-     */
+    //! @brief Index of the points 3 per triangle 2 per line and 1 per point.
     EntityId index_buffer_id = NullId;
     //! @brief The kind of draw that the mesh is.
     proto::SceneStaticMesh::RenderPrimitiveEnum render_primitive_enum =
         proto::SceneStaticMesh::TRIANGLE_PRIMITIVE;
+    //! @brief The shadow effect type.
+    proto::SceneStaticMesh::ShadowEffectEnum shadow_effect_enum =
+        proto::SceneStaticMesh::OPAQUE_SHADOW_EFFECT;
     //! @brief what kind of buffer will be generated (no point of course).
     enum class StaticMeshParameterEnum
     {
@@ -115,8 +114,14 @@ class StaticMeshInterface : public NameInterface
      * @brief Get the static mesh render primitive.
      * @return Get the render primitive.
      */
-    virtual proto::SceneStaticMesh::RenderPrimitiveEnum GetRenderPrimitive()
-        const = 0;
+    virtual proto::SceneStaticMesh::RenderPrimitiveEnum
+		GetRenderPrimitive() const = 0;
+    /**
+     * @brief Get the shadow effect.
+     * @return Get the shadow effect.
+     */
+    virtual proto::SceneStaticMesh::ShadowEffectEnum
+		GetShadowEffect() const = 0;
 };
 
 } // End namespace frame.

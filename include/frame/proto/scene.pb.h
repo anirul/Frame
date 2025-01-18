@@ -189,6 +189,39 @@ inline bool SceneStaticMesh_RenderTimeEnum_Parse(absl::string_view name, SceneSt
   return ::google::protobuf::internal::ParseNamedEnum<SceneStaticMesh_RenderTimeEnum>(
       SceneStaticMesh_RenderTimeEnum_descriptor(), name, value);
 }
+enum SceneStaticMesh_ShadowEffectEnum : int {
+  SceneStaticMesh_ShadowEffectEnum_OPAQUE_SHADOW_EFFECT = 0,
+  SceneStaticMesh_ShadowEffectEnum_TRANSPARENT_SHADOW_EFFECT = 1,
+  SceneStaticMesh_ShadowEffectEnum_SceneStaticMesh_ShadowEffectEnum_INT_MIN_SENTINEL_DO_NOT_USE_ =
+      std::numeric_limits<::int32_t>::min(),
+  SceneStaticMesh_ShadowEffectEnum_SceneStaticMesh_ShadowEffectEnum_INT_MAX_SENTINEL_DO_NOT_USE_ =
+      std::numeric_limits<::int32_t>::max(),
+};
+
+bool SceneStaticMesh_ShadowEffectEnum_IsValid(int value);
+extern const uint32_t SceneStaticMesh_ShadowEffectEnum_internal_data_[];
+constexpr SceneStaticMesh_ShadowEffectEnum SceneStaticMesh_ShadowEffectEnum_ShadowEffectEnum_MIN = static_cast<SceneStaticMesh_ShadowEffectEnum>(0);
+constexpr SceneStaticMesh_ShadowEffectEnum SceneStaticMesh_ShadowEffectEnum_ShadowEffectEnum_MAX = static_cast<SceneStaticMesh_ShadowEffectEnum>(1);
+constexpr int SceneStaticMesh_ShadowEffectEnum_ShadowEffectEnum_ARRAYSIZE = 1 + 1;
+const ::google::protobuf::EnumDescriptor*
+SceneStaticMesh_ShadowEffectEnum_descriptor();
+template <typename T>
+const std::string& SceneStaticMesh_ShadowEffectEnum_Name(T value) {
+  static_assert(std::is_same<T, SceneStaticMesh_ShadowEffectEnum>::value ||
+                    std::is_integral<T>::value,
+                "Incorrect type passed to ShadowEffectEnum_Name().");
+  return SceneStaticMesh_ShadowEffectEnum_Name(static_cast<SceneStaticMesh_ShadowEffectEnum>(value));
+}
+template <>
+inline const std::string& SceneStaticMesh_ShadowEffectEnum_Name(SceneStaticMesh_ShadowEffectEnum value) {
+  return ::google::protobuf::internal::NameOfDenseEnum<SceneStaticMesh_ShadowEffectEnum_descriptor,
+                                                 0, 1>(
+      static_cast<int>(value));
+}
+inline bool SceneStaticMesh_ShadowEffectEnum_Parse(absl::string_view name, SceneStaticMesh_ShadowEffectEnum* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<SceneStaticMesh_ShadowEffectEnum>(
+      SceneStaticMesh_ShadowEffectEnum_descriptor(), name, value);
+}
 enum SceneLight_LightTypeEnum : int {
   SceneLight_LightTypeEnum_INVALID_LIGHT = 0,
   SceneLight_LightTypeEnum_AMBIENT_LIGHT = 1,
@@ -1361,6 +1394,26 @@ class SceneStaticMesh final :
     return SceneStaticMesh_RenderTimeEnum_Parse(name, value);
   }
 
+  using ShadowEffectEnum = SceneStaticMesh_ShadowEffectEnum;
+  static constexpr ShadowEffectEnum OPAQUE_SHADOW_EFFECT = SceneStaticMesh_ShadowEffectEnum_OPAQUE_SHADOW_EFFECT;
+  static constexpr ShadowEffectEnum TRANSPARENT_SHADOW_EFFECT = SceneStaticMesh_ShadowEffectEnum_TRANSPARENT_SHADOW_EFFECT;
+  static inline bool ShadowEffectEnum_IsValid(int value) {
+    return SceneStaticMesh_ShadowEffectEnum_IsValid(value);
+  }
+  static constexpr ShadowEffectEnum ShadowEffectEnum_MIN = SceneStaticMesh_ShadowEffectEnum_ShadowEffectEnum_MIN;
+  static constexpr ShadowEffectEnum ShadowEffectEnum_MAX = SceneStaticMesh_ShadowEffectEnum_ShadowEffectEnum_MAX;
+  static constexpr int ShadowEffectEnum_ARRAYSIZE = SceneStaticMesh_ShadowEffectEnum_ShadowEffectEnum_ARRAYSIZE;
+  static inline const ::google::protobuf::EnumDescriptor* ShadowEffectEnum_descriptor() {
+    return SceneStaticMesh_ShadowEffectEnum_descriptor();
+  }
+  template <typename T>
+  static inline const std::string& ShadowEffectEnum_Name(T value) {
+    return SceneStaticMesh_ShadowEffectEnum_Name(value);
+  }
+  static inline bool ShadowEffectEnum_Parse(absl::string_view name, ShadowEffectEnum* value) {
+    return SceneStaticMesh_ShadowEffectEnum_Parse(name, value);
+  }
+
   // accessors -------------------------------------------------------
 
   enum : int {
@@ -1369,6 +1422,7 @@ class SceneStaticMesh final :
     kMaterialNameFieldNumber = 5,
     kRenderPrimitiveEnumFieldNumber = 8,
     kRenderTimeEnumFieldNumber = 11,
+    kShadowEffectEnumFieldNumber = 12,
     kCleanBufferFieldNumber = 7,
     kMeshEnumFieldNumber = 6,
     kFileNameFieldNumber = 3,
@@ -1440,6 +1494,16 @@ class SceneStaticMesh final :
   private:
   ::frame::proto::SceneStaticMesh_RenderTimeEnum _internal_render_time_enum() const;
   void _internal_set_render_time_enum(::frame::proto::SceneStaticMesh_RenderTimeEnum value);
+
+  public:
+  // .frame.proto.SceneStaticMesh.ShadowEffectEnum shadow_effect_enum = 12;
+  void clear_shadow_effect_enum() ;
+  ::frame::proto::SceneStaticMesh_ShadowEffectEnum shadow_effect_enum() const;
+  void set_shadow_effect_enum(::frame::proto::SceneStaticMesh_ShadowEffectEnum value);
+
+  private:
+  ::frame::proto::SceneStaticMesh_ShadowEffectEnum _internal_shadow_effect_enum() const;
+  void _internal_set_shadow_effect_enum(::frame::proto::SceneStaticMesh_ShadowEffectEnum value);
 
   public:
   // .frame.proto.CleanBuffer clean_buffer = 7;
@@ -1523,7 +1587,7 @@ class SceneStaticMesh final :
 
   friend class ::google::protobuf::internal::TcParser;
   static const ::google::protobuf::internal::TcParseTable<
-      3, 9, 2,
+      3, 10, 2,
       76, 2>
       _table_;
   friend class ::google::protobuf::MessageLite;
@@ -1545,6 +1609,7 @@ class SceneStaticMesh final :
     ::google::protobuf::internal::ArenaStringPtr material_name_;
     int render_primitive_enum_;
     int render_time_enum_;
+    int shadow_effect_enum_;
     union MeshOneofUnion {
       constexpr MeshOneofUnion() : _constinit_{} {}
         ::google::protobuf::internal::ConstantInitialized _constinit_;
@@ -2607,6 +2672,29 @@ inline void SceneStaticMesh::_internal_set_render_time_enum(::frame::proto::Scen
   PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
   ;
   _impl_.render_time_enum_ = value;
+}
+
+// .frame.proto.SceneStaticMesh.ShadowEffectEnum shadow_effect_enum = 12;
+inline void SceneStaticMesh::clear_shadow_effect_enum() {
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  _impl_.shadow_effect_enum_ = 0;
+}
+inline ::frame::proto::SceneStaticMesh_ShadowEffectEnum SceneStaticMesh::shadow_effect_enum() const {
+  // @@protoc_insertion_point(field_get:frame.proto.SceneStaticMesh.shadow_effect_enum)
+  return _internal_shadow_effect_enum();
+}
+inline void SceneStaticMesh::set_shadow_effect_enum(::frame::proto::SceneStaticMesh_ShadowEffectEnum value) {
+  _internal_set_shadow_effect_enum(value);
+  // @@protoc_insertion_point(field_set:frame.proto.SceneStaticMesh.shadow_effect_enum)
+}
+inline ::frame::proto::SceneStaticMesh_ShadowEffectEnum SceneStaticMesh::_internal_shadow_effect_enum() const {
+  PROTOBUF_TSAN_READ(&_impl_._tsan_detect_race);
+  return static_cast<::frame::proto::SceneStaticMesh_ShadowEffectEnum>(_impl_.shadow_effect_enum_);
+}
+inline void SceneStaticMesh::_internal_set_shadow_effect_enum(::frame::proto::SceneStaticMesh_ShadowEffectEnum value) {
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  ;
+  _impl_.shadow_effect_enum_ = value;
 }
 
 inline bool SceneStaticMesh::has_mesh_oneof() const {
@@ -3956,6 +4044,12 @@ struct is_proto_enum<::frame::proto::SceneStaticMesh_RenderTimeEnum> : std::true
 template <>
 inline const EnumDescriptor* GetEnumDescriptor<::frame::proto::SceneStaticMesh_RenderTimeEnum>() {
   return ::frame::proto::SceneStaticMesh_RenderTimeEnum_descriptor();
+}
+template <>
+struct is_proto_enum<::frame::proto::SceneStaticMesh_ShadowEffectEnum> : std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor<::frame::proto::SceneStaticMesh_ShadowEffectEnum>() {
+  return ::frame::proto::SceneStaticMesh_ShadowEffectEnum_descriptor();
 }
 template <>
 struct is_proto_enum<::frame::proto::SceneLight_LightTypeEnum> : std::true_type {};

@@ -216,8 +216,7 @@ class LightManager
   public:
     /**
      * @brief This is where you register light to a program.
-     * @param program: A pointer to a temporary program to register light
-     * to.
+     * @param program: A pointer to a temporary program to register light to.
      */
     void RegisterToProgram(Program& program) const;
 

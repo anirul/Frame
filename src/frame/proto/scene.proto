@@ -25,7 +25,7 @@ message SceneMatrix {
 }
 
 // Static Mesh.
-// Next 12
+// Next 13
 message SceneStaticMesh {
 	// This is the name of the mesh.
 	string name = 1;
@@ -79,6 +79,17 @@ message SceneStaticMesh {
 
     // When should it be rendered (default = PER_FRAME).
     RenderTimeEnum render_time_enum = 11;
+
+	// Shadow effect enum.
+	enum ShadowEffectEnum {
+		// Opaque effect normal object behaviour (default).
+		OPAQUE_SHADOW_EFFECT = 0;
+		// No effect light go through.
+		TRANSPARENT_SHADOW_EFFECT = 1;
+	}
+
+	// Shadow effect (default = OPAQUE_EFFECT_SHADOW).
+	ShadowEffectEnum shadow_effect_enum = 12;
 }
 
 // Camera

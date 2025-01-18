@@ -17,22 +17,22 @@ enum class ShaderEnum
 /**
  * @class Shader
  * @brief Shader class to hold the shader and make the compilation and
- *        parsing of it.
+ * parsing of it.
  */
 class Shader
 {
   public:
     /**
      * @brief Constructor that create a shader from a type (no source no
-     *        compilation yet).
+     * compilation yet).
      * @param type: Shader type see the enum.
      */
     Shader(const ShaderEnum type) : type_(type)
     {
     }
     /**
-     *  @brief Destructor this is where the memory is freed and so is the
-     *         shader.
+     * @brief Destructor this is where the memory is freed and so is the
+     * shader.
      */
     virtual ~Shader();
 

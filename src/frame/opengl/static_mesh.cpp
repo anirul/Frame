@@ -21,6 +21,7 @@ StaticMesh::StaticMesh(
       texture_buffer_id_(parameter.texture_buffer_id),
       texture_buffer_size_(parameter.texture_buffer_size),
       index_buffer_id_(parameter.index_buffer_id),
+      shadow_effect_enum_(parameter.shadow_effect_enum),
       render_primitive_enum_(parameter.render_primitive_enum)
 {
     if (!point_buffer_id_)
