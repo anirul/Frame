@@ -187,7 +187,7 @@ bool SDL2OpenGLDrawGui::Update(DeviceInterface& device, double dt)
 #pragma warning(push)
 #pragma warning(disable : 4312)
 #endif
-        ImTextureID gl_id = reinterpret_cast<ImTextureID>(texture.GetId());
+        ImTextureID gl_id = static_cast<ImTextureID>(texture.GetId());
 #if defined(_WIN32) || defined(_WIN64)
 #pragma warning(pop)
 #endif
