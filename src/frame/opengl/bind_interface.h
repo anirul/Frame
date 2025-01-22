@@ -16,7 +16,7 @@ struct BindInterface
      * @brief Bind the underlying interface to the current context.
      * @param slot: in case needed (see textures) the slot can be specified.
      */
-    virtual void Bind(const unsigned int slot = 0) const = 0;
+    virtual void Bind(unsigned int slot = 0) const = 0;
     //! @brief Unbind free the resource from the current context.
     virtual void UnBind() const = 0;
     //! @brief same as Bind but used by the auto lock system see scoped bind

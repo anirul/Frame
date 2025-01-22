@@ -54,7 +54,7 @@ class FrameBuffer : public BindInterface
      * with frame buffers.
      * @param slot: Should be ignored.
      */
-    void Bind(const unsigned int slot = 0) const override;
+    void Bind(unsigned int slot = 0) const override;
     //! @brief From the bind interface this will unbind the current frame
     //! buffer from the context.
     void UnBind() const override;
@@ -78,22 +78,22 @@ class FrameBuffer : public BindInterface
      */
     void AttachTexture(
         unsigned int texture_id,
-        const FrameColorAttachment frame_color_attachment =
+        FrameColorAttachment frame_color_attachment =
             FrameColorAttachment::COLOR_ATTACHMENT0,
-        const FrameTextureType frame_texture_type =
+        FrameTextureType frame_texture_type =
             FrameTextureType::TEXTURE_2D,
-        const int mipmap = 0) const;
+        int mipmap = 0) const;
     /**
      * @brief Define an array of buffers into which outputs from the
      * fragment shader data will be written.
      * @param size: Which draw buffer should be drawn upon [1, 8].
      */
-    void DrawBuffers(const std::uint32_t size = 1);
+    void DrawBuffers(std::uint32_t size = 1);
     /**
      * @brief For debug return a string of a potential error.
      * @return String that contain the error (if any).
      */
-    const std::string GetStatus() const;
+    std::string GetStatus() const;
 
   public:
     /**
@@ -101,13 +101,13 @@ class FrameBuffer : public BindInterface
      * @param i: OpenGL frame color attachment.
      * @return Frame color attachment in local system.
      */
-    static FrameColorAttachment GetFrameColorAttachment(const int i);
+    static FrameColorAttachment GetFrameColorAttachment(int i);
     /**
      * @brief Convert from OpenGL to frame texture type.
      * @param i: OpenGL frame texture type.
      * @return Frame texture type in local system.
      */
-    static FrameTextureType GetFrameTextureType(const int i);
+    static FrameTextureType GetFrameTextureType(int i);
     /**
      * @brief Convert from proto texture frame to frame texture type.
      * @param texture_frame: Proto texture frame.
@@ -140,10 +140,10 @@ class FrameBuffer : public BindInterface
   protected:
     // This was here from the error interface (not used anymore) but it is
     // still used inside.
-    const std::pair<bool, std::string> GetError() const;
+    std::pair<bool, std::string> GetError() const;
     // Convert from the internal frame texture type to the OpenGL type.
-    const int GetFrameTextureType(
-        const FrameTextureType frame_texture_type) const;
+    int GetFrameTextureType(
+        FrameTextureType frame_texture_type) const;
 
   protected:
     friend class ScopedBind;

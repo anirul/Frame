@@ -137,8 +137,8 @@ class Renderer : public RendererInterface
     // Viewport top left and bottom right.
     glm::uvec4 viewport_;
     // Frame & Render buffers.
-    FrameBuffer frame_buffer_{};
-    RenderBuffer render_buffer_{};
+    std::unique_ptr<FrameBuffer> frame_buffer_{nullptr};
+    std::unique_ptr<RenderBuffer> render_buffer_{nullptr};
     // Display ids.
     EntityId display_program_id_ = 0;
     EntityId display_material_id_ = 0;

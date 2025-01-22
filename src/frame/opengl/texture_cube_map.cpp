@@ -63,7 +63,7 @@ TextureCubeMap::TextureCubeMap(const TextureParameter& texture_parameter)
     CreateTextureCubeMap(texture_parameter.array_data_ptr);
 }
 
-void TextureCubeMap::Bind(const unsigned int slot /*= 0*/) const
+void TextureCubeMap::Bind(unsigned int slot /*= 0*/) const
 {
     assert(slot < GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS);
     if (locked_bind_)
@@ -84,8 +84,7 @@ void TextureCubeMap::EnableMipmap() const
     glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 }
 
-void TextureCubeMap::SetMinFilter(
-    const proto::TextureFilter::Enum texture_filter)
+void TextureCubeMap::SetMinFilter(proto::TextureFilter::Enum texture_filter)
 {
     Bind();
     glTexParameteri(
@@ -104,8 +103,7 @@ frame::proto::TextureFilter::Enum TextureCubeMap::GetMinFilter() const
     return ConvertFromGLType(filter);
 }
 
-void TextureCubeMap::SetMagFilter(
-    const proto::TextureFilter::Enum texture_filter)
+void TextureCubeMap::SetMagFilter(proto::TextureFilter::Enum texture_filter)
 {
     Bind();
     glTexParameteri(
@@ -124,7 +122,7 @@ frame::proto::TextureFilter::Enum TextureCubeMap::GetMagFilter() const
     return ConvertFromGLType(filter);
 }
 
-void TextureCubeMap::SetWrapS(const proto::TextureFilter::Enum texture_filter)
+void TextureCubeMap::SetWrapS(proto::TextureFilter::Enum texture_filter)
 {
     Bind();
     glTexParameteri(
@@ -143,7 +141,7 @@ frame::proto::TextureFilter::Enum TextureCubeMap::GetWrapS() const
     return ConvertFromGLType(filter);
 }
 
-void TextureCubeMap::SetWrapT(const proto::TextureFilter::Enum texture_filter)
+void TextureCubeMap::SetWrapT(proto::TextureFilter::Enum texture_filter)
 {
     Bind();
     glTexParameteri(
@@ -162,7 +160,7 @@ frame::proto::TextureFilter::Enum TextureCubeMap::GetWrapT() const
     return ConvertFromGLType(filter);
 }
 
-void TextureCubeMap::SetWrapR(const proto::TextureFilter::Enum texture_filter)
+void TextureCubeMap::SetWrapR(proto::TextureFilter::Enum texture_filter)
 {
     Bind();
     glTexParameteri(
@@ -275,7 +273,7 @@ void TextureCubeMap::CreateFrameAndRenderBuffer()
     frame_->DrawBuffers(1);
 }
 
-void TextureCubeMap::Clear(const glm::vec4 color)
+void TextureCubeMap::Clear(glm::vec4 color)
 {
     // First time this is called this will create a frame and a render.
     Bind();

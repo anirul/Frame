@@ -21,7 +21,7 @@ FrameBuffer::~FrameBuffer()
     glDeleteFramebuffers(1, &frame_id_);
 }
 
-void FrameBuffer::Bind(const unsigned int slot /*= 0*/) const
+void FrameBuffer::Bind(unsigned int slot /*= 0*/) const
 {
     assert(slot == 0);
     if (locked_bind_)
@@ -54,13 +54,11 @@ void FrameBuffer::AttachRender(const RenderBuffer& render) const
 
 void FrameBuffer::AttachTexture(
     unsigned int texture_id,
-    const FrameColorAttachment frame_color_attachment /*=
-            FrameColorAttachment::COLOR_ATTACHMENT0*/
-    ,
-    const FrameTextureType frame_texture_type /*=
-            FrameTextureType::TEXTURE_2D*/
-    ,
-    const int mipmap /*= 0*/) const
+    FrameColorAttachment frame_color_attachment /*=
+            FrameColorAttachment::COLOR_ATTACHMENT0*/,
+    FrameTextureType frame_texture_type /*=
+            FrameTextureType::TEXTURE_2D*/,
+    int mipmap /*= 0*/) const
 {
     Bind();
     glFramebufferTexture2D(
@@ -72,7 +70,7 @@ void FrameBuffer::AttachTexture(
     UnBind();
 }
 
-FrameColorAttachment FrameBuffer::GetFrameColorAttachment(const int i)
+FrameColorAttachment FrameBuffer::GetFrameColorAttachment(int i)
 {
     switch (i)
     {
@@ -97,8 +95,8 @@ FrameColorAttachment FrameBuffer::GetFrameColorAttachment(const int i)
     }
 }
 
-const int FrameBuffer::GetFrameTextureType(
-    const FrameTextureType frame_texture_type) const
+int FrameBuffer::GetFrameTextureType(
+    FrameTextureType frame_texture_type) const
 {
     int value = static_cast<int>(frame_texture_type);
     if (value >= 0)
@@ -108,7 +106,7 @@ const int FrameBuffer::GetFrameTextureType(
     return GL_TEXTURE_2D;
 }
 
-FrameTextureType FrameBuffer::GetFrameTextureType(const int i)
+FrameTextureType FrameBuffer::GetFrameTextureType(int i)
 {
     return static_cast<FrameTextureType>(i);
 }
@@ -137,7 +135,7 @@ frame::opengl::FrameTextureType FrameBuffer::GetFrameTextureType(
     }
 }
 
-void FrameBuffer::DrawBuffers(const std::uint32_t size /*= 1*/)
+void FrameBuffer::DrawBuffers(std::uint32_t size /*= 1*/)
 {
     Bind();
     assert(size < 9);
@@ -151,7 +149,7 @@ void FrameBuffer::DrawBuffers(const std::uint32_t size /*= 1*/)
     UnBind();
 }
 
-const std::pair<bool, std::string> FrameBuffer::GetError() const
+std::pair<bool, std::string> FrameBuffer::GetError() const
 {
     Bind();
     std::pair<bool, std::string> status_error;
@@ -191,7 +189,7 @@ const std::pair<bool, std::string> FrameBuffer::GetError() const
     }
 }
 
-const std::string FrameBuffer::GetStatus() const
+std::string FrameBuffer::GetStatus() const
 {
     Bind();
     std::stringstream ss;

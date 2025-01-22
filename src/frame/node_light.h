@@ -83,7 +83,7 @@ class NodeLight : public NodeInterface
     /**
      * @brief Create a spot light.
      * @param func: This function return the ID from a string (it will need
-     *        a level passed in the capture list).
+     * a level passed in the capture list).
  	 * @param shadow_type: Type of shadow used.
      * @param shadow_texture: Name of the texture to render for the shadows.
      * @param position: Position of the spot light.

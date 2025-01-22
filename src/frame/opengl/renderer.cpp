@@ -54,10 +54,12 @@ const glm::mat4 projection_cubemap =
 Renderer::Renderer(LevelInterface& level, glm::uvec4 viewport)
     : level_(level), viewport_(viewport)
 {
+    frame_buffer_ = std::make_unique<FrameBuffer>();
+    render_buffer_ = std::make_unique<RenderBuffer>();
     // TODO(anirul): Check viewport!!!
-    render_buffer_.CreateStorage(
+    render_buffer_->CreateStorage(
         {viewport_.z - viewport_.x, viewport_.w - viewport_.y});
-    frame_buffer_.AttachRender(render_buffer_);
+    frame_buffer_->AttachRender(*render_buffer_);
     auto program = file::LoadProgram("display");
     if (!program)
         throw std::runtime_error("No program!");
@@ -158,7 +160,7 @@ void Renderer::RenderMesh(
 
     glViewport(viewport_.x, viewport_.y, viewport_.z, viewport_.w);
 
-    ScopedBind scoped_frame(frame_buffer_);
+    ScopedBind scoped_frame(*frame_buffer_);
     int i = 0;
     for (const auto& texture_id : program.GetOutputTextureIds())
     {
@@ -168,7 +170,7 @@ void Renderer::RenderMesh(
                 dynamic_cast<TextureCubeMap&>(level_.GetTextureFromId(
                     texture_id));
             // TODO(anirul): Check the mipmap level (last parameter)!
-            frame_buffer_.AttachTexture(
+            frame_buffer_->AttachTexture(
                 opengl_texture.GetId(),
                 FrameBuffer::GetFrameColorAttachment(i),
                 FrameBuffer::GetFrameTextureType(texture_frame_),
@@ -179,7 +181,7 @@ void Renderer::RenderMesh(
             auto& opengl_texture =
                 dynamic_cast<Texture&>(level_.GetTextureFromId(texture_id));
             // TODO(anirul): Check the mipmap level (last parameter)!
-            frame_buffer_.AttachTexture(
+            frame_buffer_->AttachTexture(
                 opengl_texture.GetId(),
                 FrameBuffer::GetFrameColorAttachment(i),
                 FrameTextureType::TEXTURE_2D,
@@ -187,7 +189,7 @@ void Renderer::RenderMesh(
         }
         i++;
     }
-    frame_buffer_.DrawBuffers(
+    frame_buffer_->DrawBuffers(
         static_cast<std::uint32_t>(texture_out_ids.size()));
 
     std::map<std::string, std::vector<std::int32_t>> uniform_include;
@@ -403,17 +405,41 @@ void Renderer::RenderShadows(const CameraInterface& camera)
         {
             throw std::runtime_error("No shadow material id.");
         }
-        // Clear the depth buffer only once per light.
-        glClear(GL_DEPTH_BUFFER_BIT);
         auto& light = level_.GetLightFromId(light_id);
         // Check if light has shadow.
         if (light.GetShadowType() == ShadowTypeEnum::NO_SHADOW)
         {
             continue;
         }
-
+        auto texture_name = light.GetShadowMapTextureName();
+        auto texture_id = level_.GetIdFromName(texture_name);
+        if (texture_id == NullId)
+        {
+            throw std::runtime_error(fmt::format(
+                "Couldn't find texture {} for light {}",
+                texture_name,
+                light.GetName()));
+        }
+        // Save the current context.
+        std::unique_ptr<FrameBuffer> temp_frame_buffer =
+            std::move(frame_buffer_);
+        auto temp_viewport = viewport_;
+        frame_buffer_ = std::make_unique<FrameBuffer>();
+        auto& texture_interface = level_.GetTextureFromId(texture_id);
+        auto size = texture_interface.GetSize();
+        viewport_ = glm::ivec4(0, 0, size.x, size.y);
         if (light.GetType() == LightTypeEnum::DIRECTIONAL_LIGHT)
         {
+            Texture& depth_texture =
+                dynamic_cast<Texture&>(level_.GetTextureFromId(texture_id));
+            frame_buffer_->AttachTexture(
+                depth_texture.GetId(),
+                static_cast<FrameColorAttachment>(GL_DEPTH_ATTACHMENT),
+                FrameTextureType::TEXTURE_2D);
+            frame_buffer_->Bind();
+            glDrawBuffer(GL_NONE);
+            glReadBuffer(GL_NONE);
+            glClear(GL_DEPTH_BUFFER_BIT);
             // For every mesh / material pair in the scene.
             for (const auto& p : level_.GetStaticMeshMaterialIds(
                      proto::SceneStaticMesh::SHADOW_RENDER_TIME))
@@ -428,13 +454,29 @@ void Renderer::RenderShadows(const CameraInterface& camera)
                 // Render it acording to the light position.
                 glm::mat4 proj =
                     glm::ortho(-50.f, 50.f, -50.f, 50.f, 0.1f, 1000.f);
-                glm::mat4 view = light.ComputeView(camera);
+                glm::vec3 dir = glm::normalize(light.GetVector());
+                glm::vec3 up = glm::normalize(camera.GetUp());
+                glm::vec3 center = camera.GetPosition();
+                float distance = 100.0f;
+                glm::vec3 eye = center - dir * distance;
+                glm::mat4 view = glm::lookAt(eye, center, up);
                 RenderNode(p.first, shadow_material_id, proj, view);
             }
-            // TODO add the depth map to the light shadow map list.
+            frame_buffer_->UnBind();
         }
         if (light.GetType() == LightTypeEnum::POINT_LIGHT)
         {
+            TextureCubeMap& depth_texture =
+                dynamic_cast<TextureCubeMap&>(
+                    level_.GetTextureFromId(texture_id));
+            frame_buffer_->AttachTexture(
+                depth_texture.GetId(),
+                static_cast<FrameColorAttachment>(GL_DEPTH_ATTACHMENT),
+                FrameTextureType::TEXTURE_2D);
+            frame_buffer_->Bind();
+            glDrawBuffer(GL_NONE);
+            glReadBuffer(GL_NONE);
+            glClear(GL_DEPTH_BUFFER_BIT);
             for (int i = 0; i < 6; ++i)
             {
                 // For every mesh / material pair in the scene.
@@ -459,9 +501,13 @@ void Renderer::RenderShadows(const CameraInterface& camera)
                     glm::mat4 view = rotation * translation;
                     RenderNode(p.first, shadow_material_id, proj, view);
                 }
-                // TODO add the depth map to the light shadow map list.
             }
+            frame_buffer_->UnBind();
         }
+        // Restore the context.
+        viewport_ = temp_viewport;
+        frame_buffer_.reset();
+        frame_buffer_ = std::move(temp_frame_buffer);
     }
 }
 

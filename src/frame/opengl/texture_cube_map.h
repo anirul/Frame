@@ -83,7 +83,7 @@ class TextureCubeMap : public TextureInterface, public BindInterface
      * @brief Clear the texture (this is highly inefficient).
      * @param color: Color to paint the texture to.
      */
-    void Clear(const glm::vec4 color) override;
+    void Clear(glm::vec4 color) override;
     /**
      * @brief Enable mip map, this allow a recursive level of texture faster
      *        for rendering.
@@ -94,7 +94,7 @@ class TextureCubeMap : public TextureInterface, public BindInterface
      *        the current context.
      * @param slot: Slot to be binded.
      */
-    void Bind(const unsigned int slot = 0) const override;
+    void Bind(unsigned int slot = 0) const override;
     /**
      * @brief From the bind interface this will unbind the current texture
      *        from the context.
@@ -104,7 +104,7 @@ class TextureCubeMap : public TextureInterface, public BindInterface
      * @brief Set the minification filter.
      * @param texture_filter: Usually and by default GL_LINEAR.
      */
-    void SetMinFilter(const proto::TextureFilter::Enum texture_filter) override;
+    void SetMinFilter(proto::TextureFilter::Enum texture_filter) override;
     /**
      * @brief Get the minification filter.
      * @return The value of the minification filter.
@@ -114,7 +114,7 @@ class TextureCubeMap : public TextureInterface, public BindInterface
      * @brief Set the magnification filter.
      * @param texture_filter: Usually and by default GL_LINEAR.
      */
-    void SetMagFilter(const proto::TextureFilter::Enum texture_filter) override;
+    void SetMagFilter(proto::TextureFilter::Enum texture_filter) override;
     /**
      * @brief Get the magnification filter.
      * @return The value of the magnification filter.
@@ -127,7 +127,7 @@ class TextureCubeMap : public TextureInterface, public BindInterface
      * @param texture_filter: Could be any of (REPEAT, CLAMP_TO_EDGE,
      *        MIRRORED_REPEAT).
      */
-    void SetWrapS(const proto::TextureFilter::Enum texture_filter) override;
+    void SetWrapS(proto::TextureFilter::Enum texture_filter) override;
     /**
      * @brief Get the wrapping on the s size of the texture (horizontal).
      * @return The way the texture is wrap could be any of (REPEAT,
@@ -141,7 +141,7 @@ class TextureCubeMap : public TextureInterface, public BindInterface
      * @param texture_filter: Could be any of (REPEAT, CLAMP_TO_EDGE,
      *        MIRRORED_REPEAT).
      */
-    void SetWrapT(const proto::TextureFilter::Enum texture_filter) override;
+    void SetWrapT(proto::TextureFilter::Enum texture_filter) override;
     /**
      * @brief Get the wrapping on the t size of the texture (vertical).
      * @return The way the texture is wrap could be any of (REPEAT,
@@ -155,7 +155,7 @@ class TextureCubeMap : public TextureInterface, public BindInterface
      * @param texture_filter: Could be any of (REPEAT, CLAMP_TO_EDGE,
      * MIRRORED_REPEAT).
      */
-    void SetWrapR(const proto::TextureFilter::Enum texture_filter);
+    void SetWrapR(proto::TextureFilter::Enum texture_filter);
     /**
      * @brief Get the wrapping on the t size of the texture (vertical).
      * @return The way the texture is wrap could be any of (REPEAT,
@@ -200,7 +200,7 @@ class TextureCubeMap : public TextureInterface, public BindInterface
     }
     /**
      * @brief Return the texture cube map OpenGL id, from the bind
-     *        interface.
+     * interface.
      * @return Get the OpenGL id of the texture.
      */
     unsigned int GetId() const override
@@ -217,7 +217,7 @@ class TextureCubeMap : public TextureInterface, public BindInterface
     }
     /**
      * @brief Get the pixel element size individual element (BYTE, SHORT,
-     *        LONG, FLOAT).
+     * LONG, FLOAT).
      * @return The pixel element size.
      */
     proto::PixelElementSize::Enum GetPixelElementSize() const override
@@ -236,11 +236,11 @@ class TextureCubeMap : public TextureInterface, public BindInterface
   protected:
     /**
      * @brief Protected constructor this is a way to create a simple
-     *        structure from inside the class.
+     * structure from inside the class.
      * @param pixel_element_size: Size of one of the element in a pixel
-     *        (BYTE, SHORT, HALF, FLOAT).
+     * (BYTE, SHORT, HALF, FLOAT).
      * @param pixel_element_structure: Structure of a pixel (R, RG, RGB,
-     *        RGBA).
+     * RGBA).
      */
     TextureCubeMap(
         const proto::PixelElementSize pixel_element_size =
@@ -253,7 +253,7 @@ class TextureCubeMap : public TextureInterface, public BindInterface
     }
     /**
      * @brief Fill a texture with a data pointer, the size has to be set
-     *        first!
+     * first!
      * @param data: pixel used to fill up (or null for don't care).
      */
     void CreateTextureCubeMap(

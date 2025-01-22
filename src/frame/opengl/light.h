@@ -5,7 +5,6 @@
 #include <string>
 
 #include "frame/light_interface.h"
-#include "frame/camera_interface.h"
 #include "frame/opengl/program.h"
 
 namespace frame::opengl
@@ -85,20 +84,29 @@ class LightPoint : public LightInterface
     {
         return color_intensity_;
     }
-
-  public:
     /**
-     * @brief Get the shadow view.
-     * @param camera: Camera use to render the scene.
-     * @return Return the shadow view.
+     * @brief Set the shadow map texture name.
+     * @param name: Name of the shadow map texture.
      */
-    glm::mat4 ComputeView(const CameraInterface& camera) const;
+    void SetShadowMapTextureName(const std::string& name)
+    {
+        shadow_map_texture_name_ = name;
+	}
+    /**
+     * @brief Get the shadow map texture name.
+     * @return Name of the shadow map texture.
+     */
+    std::string GetShadowMapTextureName() const
+    {
+        return shadow_map_texture_name_;
+    }
 
   protected:
     glm::vec3 position_;
     glm::vec3 color_intensity_;
     ShadowTypeEnum shadow_type_enum_ = ShadowTypeEnum::NO_SHADOW;
-	std::string name_;
+    std::string name_;
+    std::string shadow_map_texture_name_;
 };
 
 /**
@@ -175,20 +183,29 @@ class LightDirectional : public LightInterface
     {
         return color_intensity_;
     }
-
-  public:
     /**
-     * @brief Get the shadow view.
-     * @param camera: Camera use to render the scene.
-     * @return Return the shadow view.
+     * @brief Set the shadow map texture name.
+     * @param name: Name of the shadow map texture.
      */
-    glm::mat4 ComputeView(const CameraInterface& camera) const;
+    void SetShadowMapTextureName(const std::string& name)
+    {
+        shadow_map_texture_name_ = name;
+    }
+    /**
+     * @brief Get the shadow map texture name.
+     * @return Name of the shadow map texture.
+     */
+    std::string GetShadowMapTextureName() const
+    {
+        return shadow_map_texture_name_;
+    }
 
   protected:
     glm::vec3 direction_;
     glm::vec3 color_intensity_;
     ShadowTypeEnum shadow_type_enum_ = ShadowTypeEnum::NO_SHADOW;
 	std::string name_;
+    std::string shadow_map_texture_name_;
 };
 
 /**

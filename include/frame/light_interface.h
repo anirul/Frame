@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cinttypes>
+#include <string>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
 
@@ -8,8 +9,6 @@
 
 namespace frame
 {
-
-class CameraInterface;
 
 /**
  * @brief This has to correspond to proto::SceneLight::LightTypeEnum!
@@ -63,11 +62,15 @@ struct LightInterface : public NameInterface
      */
     virtual glm::vec3 GetColorIntensity() const = 0;
     /**
-     * @brief Get the shadow view.
-     * @param camera: Camera use to render the scene.
-     * @return Return the shadow view.
+     * @brief Set the shadow map texture name.
+     * @param name: Name of the shadow map texture.
      */
-    virtual glm::mat4 ComputeView(const CameraInterface& camera) const = 0;
+    virtual void SetShadowMapTextureName(const std::string& name) = 0;
+    /**
+     * @brief Get the shadow map texture name.
+     * @return Name of the shadow map texture.
+     */
+    virtual std::string GetShadowMapTextureName() const = 0;
 };
 
 } // End namespace frame.

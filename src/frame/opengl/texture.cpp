@@ -25,7 +25,17 @@ Texture::Texture(const TextureParameter& texture_parameter)
       pixel_structure_(texture_parameter.pixel_structure)
 {
     assert(texture_parameter.map_type == TextureTypeEnum::TEXTURE_2D);
-    CreateTexture(texture_parameter.data_ptr);
+    if (texture_parameter.pixel_structure.value() ==
+        proto::PixelStructure::DEPTH)
+    {
+        CreateDepthTexture(
+            texture_parameter.size,
+            texture_parameter.pixel_element_size);
+    }
+    else
+    {
+        CreateTexture(texture_parameter.data_ptr);
+    }
 }
 
 void Texture::CreateTexture(const void* data /* = nullptr*/)
@@ -50,12 +60,36 @@ void Texture::CreateTexture(const void* data /* = nullptr*/)
         data);
 }
 
+void Texture::CreateDepthTexture(
+    glm::uvec2 size,
+    proto::PixelElementSize pixel_element_size /* =
+        proto::PixelElementSize_FLOAT()*/)
+{
+    size_ = size;
+    glGenTextures(1, &texture_id_);
+    ScopedBind scoped_bind(*this);
+    SetMinFilter(proto::TextureFilter::NEAREST);
+    SetMagFilter(proto::TextureFilter::NEAREST);
+    SetWrapS(proto::TextureFilter::CLAMP_TO_EDGE);
+    SetWrapT(proto::TextureFilter::CLAMP_TO_EDGE);
+    glTexImage2D(
+        GL_TEXTURE_2D,
+        0,
+        GL_DEPTH_COMPONENT32F,
+        static_cast<GLsizei>(size_.x),
+        static_cast<GLsizei>(size_.y),
+        0,
+        GL_DEPTH_COMPONENT,
+        GL_FLOAT,
+        nullptr);
+}
+
 Texture::~Texture()
 {
     glDeleteTextures(1, &texture_id_);
 }
 
-void Texture::Bind(const unsigned int slot /*= 0*/) const
+void Texture::Bind(unsigned int slot /*= 0*/) const
 {
     if (locked_bind_)
         return;
@@ -76,7 +110,7 @@ void Texture::EnableMipmap() const
     glGenerateMipmap(GL_TEXTURE_2D);
 }
 
-void Texture::SetMinFilter(const proto::TextureFilter::Enum texture_filter)
+void Texture::SetMinFilter(proto::TextureFilter::Enum texture_filter)
 {
     Bind();
     glTexParameteri(
@@ -93,7 +127,7 @@ proto::TextureFilter::Enum Texture::GetMinFilter() const
     return ConvertFromGLType(filter);
 }
 
-void Texture::SetMagFilter(const proto::TextureFilter::Enum texture_filter)
+void Texture::SetMagFilter(proto::TextureFilter::Enum texture_filter)
 {
     Bind();
     glTexParameteri(
@@ -110,7 +144,7 @@ proto::TextureFilter::Enum Texture::GetMagFilter() const
     return ConvertFromGLType(filter);
 }
 
-void Texture::SetWrapS(const proto::TextureFilter::Enum texture_filter)
+void Texture::SetWrapS(proto::TextureFilter::Enum texture_filter)
 {
     Bind();
     glTexParameteri(
@@ -127,7 +161,7 @@ proto::TextureFilter::Enum Texture::GetWrapS() const
     return ConvertFromGLType(filter);
 }
 
-void Texture::SetWrapT(const proto::TextureFilter::Enum texture_filter)
+void Texture::SetWrapT(proto::TextureFilter::Enum texture_filter)
 {
     Bind();
     glTexParameteri(
@@ -154,7 +188,7 @@ void Texture::CreateFrameAndRenderBuffer()
     frame_->DrawBuffers(1);
 }
 
-void Texture::Clear(const glm::vec4 color)
+void Texture::Clear(glm::vec4 color)
 {
     // First time this is called this will create a frame and a render.
     Bind();
