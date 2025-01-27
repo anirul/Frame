@@ -18,7 +18,9 @@ std::unique_ptr<frame::ProgramInterface> ParseProgramOpenGL(
     // Create the program.
     auto program = opengl::file::LoadProgram(proto_program.shader());
     if (!program)
+    {
         return nullptr;
+    }
     for (const auto& texture_name : proto_program.input_texture_names())
     {
         auto maybe_texture_id = level.GetIdFromName(texture_name);
@@ -112,7 +114,7 @@ std::unique_ptr<frame::ProgramInterface> ParseProgramOpenGL(
         case Uniform::kUniformIntPlugin:
             break;
         default:
-            throw std::runtime_error(fmt::format(
+            throw std::runtime_error(std::format(
                 "No handle for parameter {}#?",
                 static_cast<int>(parameter.value_oneof_case())));
         }

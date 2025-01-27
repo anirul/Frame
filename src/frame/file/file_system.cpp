@@ -1,7 +1,5 @@
 #include "frame/file/file_system.h"
 
-#include <fmt/core.h>
-
 #include <array>
 #include <cstdlib>
 #include <filesystem>
@@ -48,7 +46,7 @@ const std::filesystem::path FindElement(
         }
     }
     throw std::runtime_error(
-        fmt::format("Could not find any element: [{}].", file.string()));
+        std::format("Could not find any element: [{}].", file.string()));
 }
 
 } // End namespace.

@@ -2,6 +2,8 @@
 
 add_custom_target(AssetShaderOpenGL
   SOURCES
+    apple_shadow.frag
+    apple_shadow.vert
     blur.frag
     blur.vert
     brightness.frag
@@ -42,6 +44,8 @@ add_custom_target(AssetShaderOpenGL
     screen_space_ambient_occlusion.vert
     scene_simple.frag
     scene_simple.vert
+    shadow.frag
+    shadow.vert
     vector_addition.frag
     vector_addition.vert
     vector_multiply.frag
