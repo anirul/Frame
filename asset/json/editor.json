@@ -1,10 +1,10 @@
 {
-  "name": "SceneSimple",
+  "name": "FrameEditor",
   "default_texture_name": "albedo",
   "materials": [
     {
-      "name": "SceneSimpleMaterial",
-      "program_name": "SceneSimpleProgram",
+      "name": "FrameEditorMaterial",
+      "program_name": "FrameEditorProgram",
       "texture_names": [ "apple_texture" ],
       "inner_names": [ "Color" ]
     },
@@ -38,7 +38,7 @@
       ]
     },
     {
-      "name": "SceneSimpleProgram",
+      "name": "FrameEditorProgram",
       "output_texture_names": [
         "albedo",
         "zbuffer"
@@ -169,7 +169,7 @@
         "name": "AppleMesh",
         "parent": "mesh_holder",
         "file_name": "apple.obj",
-        "material_name": "SceneSimpleMaterial",
+        "material_name": "FrameEditorMaterial",
         "render_time_enum": "SCENE_RENDER_TIME"
       }
     ],
