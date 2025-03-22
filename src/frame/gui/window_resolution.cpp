@@ -12,9 +12,13 @@ WindowResolution::WindowResolution(
     const std::string& name,
     glm::uvec2 size,
     glm::uvec2 border_less_size,
-    glm::vec2 pixel_per_inch)
-    : size_(size), border_less_size_(border_less_size), hppi_(pixel_per_inch.x),
-      vppi_(pixel_per_inch.y)
+    glm::vec2 pixel_per_inch,
+    bool enable_stereo) :
+    size_(size),
+    border_less_size_(border_less_size),
+    hppi_(pixel_per_inch.x),
+    vppi_(pixel_per_inch.y),
+    enable_stereo_(enable_stereo)
 {
     for (int i = 0; i < resolutions_.size(); ++i)
     {
@@ -74,29 +78,32 @@ bool WindowResolution::DrawCallback()
         }
         ImGui::EndCombo();
     }
-    ImGui::Separator();
-    if (ImGui::BeginCombo(
-            "Stereo selection", stereo_items_[stereo_selected_].c_str()))
+    if (enable_stereo_)
     {
-        for (int i = 0; i < stereo_items_.size(); ++i)
+        ImGui::Separator();
+        if (ImGui::BeginCombo(
+                "Stereo selection", stereo_items_[stereo_selected_].c_str()))
         {
-            const bool is_selected = (stereo_selected_ == i);
-            if (ImGui::Selectable(stereo_items_[i].c_str(), is_selected))
+            for (int i = 0; i < stereo_items_.size(); ++i)
             {
-                stereo_selected_ = i;
+                const bool is_selected = (stereo_selected_ == i);
+                if (ImGui::Selectable(stereo_items_[i].c_str(), is_selected))
+                {
+                    stereo_selected_ = i;
+                }
+                if (is_selected)
+                {
+                    ImGui::SetItemDefaultFocus();
+                }
             }
-            if (is_selected)
-            {
-                ImGui::SetItemDefaultFocus();
-            }
+            ImGui::EndCombo();
         }
-        ImGui::EndCombo();
+        ImGui::DragFloat(
+            "Interocular distance", &interocular_distance_, 0.0f, 1.0f, 0.001f);
+        ImGui::DragFloat3(
+            "Focus point", glm::value_ptr(focus_point_), 0.0f, 1000.0f, 0.1f);
+        ImGui::Checkbox("Invert Left and Right", &invert_left_right_);
     }
-    ImGui::DragFloat(
-        "Interocular distance", &interocular_distance_, 0.0f, 1.0f, 0.001f);
-    ImGui::DragFloat3(
-        "Focus point", glm::value_ptr(focus_point_), 0.0f, 1000.0f, 0.1f);
-    ImGui::Checkbox("Invert Left and Right", &invert_left_right_);
     ImGui::Separator();
     ImGui::Text("%s", fmt::format("Horizontal PPI: {}", hppi_).c_str());
     ImGui::Text("%s", fmt::format("Vertical PPI: {}", vppi_).c_str());

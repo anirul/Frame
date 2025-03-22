@@ -25,7 +25,8 @@ class WindowResolution : public GuiWindowInterface
         const std::string& name,
         glm::uvec2 size,
         glm::uvec2 border_less_size,
-        glm::vec2 pixel_per_inch);
+        glm::vec2 pixel_per_inch,
+		bool enable_stereo = false);
     //! @brief Virtual destructor.
     virtual ~WindowResolution() = default;
 
@@ -143,6 +144,7 @@ class WindowResolution : public GuiWindowInterface
     glm::vec3 focus_point_ = glm::vec3(0, 0, 1);
     std::string name_;
     bool end_ = true;
+    bool enable_stereo_ = false;
 };
 
 } // End namespace frame::gui.

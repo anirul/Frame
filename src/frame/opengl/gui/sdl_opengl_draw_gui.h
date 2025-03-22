@@ -5,6 +5,7 @@
 
 #include "frame/device_interface.h"
 #include "frame/gui/draw_gui_interface.h"
+#include "frame/gui/gui_menu_bar_interface.h"
 #include "frame/window_interface.h"
 
 namespace frame::opengl::gui
@@ -148,6 +149,25 @@ class SDL2OpenGLDrawGui : public frame::gui::DrawGuiInterface
      */
     void DeleteWindow(const std::string& name) override;
     /**
+     * @brief Set a menu bar to the main window.
+     * @param callback: A menu bar for the main window.
+     *
+     * If the callback return is 0 the callback stay and if it is other it is
+     * removed. This will trigger an internal boolean that will decide if the
+     * modal is active or not.
+     */
+    void SetMenuBar(
+		std::unique_ptr<frame::gui::GuiMenuBarInterface> callback) override;
+    /**
+     * @brief Get the menu bar.
+     * @return The menu bar.
+     */
+    frame::gui::GuiMenuBarInterface& GetMenuBar() override;
+    /**
+     * @Remove the menu bar.
+     */
+    void RemoveMenuBar() override;
+    /**
      * @brief Initialize with the size of the out buffer.
      * @param size: Size of the out buffer.
      */
@@ -174,6 +194,8 @@ class SDL2OpenGLDrawGui : public frame::gui::DrawGuiInterface
     std::map<std::string, CallbackData> window_callbacks_ = {};
     std::map<std::string, CallbackData> overlay_callbacks_ = {};
 	std::unique_ptr<frame::gui::GuiWindowInterface> modal_callback_ = nullptr;
+    std::unique_ptr<frame::gui::GuiMenuBarInterface> menubar_callback_ =
+		nullptr;
 	bool start_modal_ = false;
 	std::filesystem::path font_path_;
     WindowInterface& window_;

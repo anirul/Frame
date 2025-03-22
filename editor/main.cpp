@@ -16,6 +16,7 @@
 #include "frame/gui/window_logger.h"
 #include "frame/gui/window_resolution.h"
 #include "frame/window_factory.h"
+#include "menubar.h"
 
 // From: https://sourceforge.net/p/predef/wiki/OperatingSystems/
 #if defined(_WIN32) || defined(_WIN64)
@@ -44,6 +45,7 @@ try
     auto gui_resolution = std::make_unique<frame::gui::WindowResolution>(
         "Resolution", size, win->GetDesktopSize(), win->GetPixelPerInch());
     ptr_window_resolution = gui_resolution.get();
+    gui_window->SetMenuBar(std::make_unique<frame::gui::Menubar>("Menu"));
     gui_window->AddWindow(std::move(gui_resolution));
     gui_window->AddWindow(std::make_unique<frame::gui::WindowLogger>("Logger"));
     // Set the main window in full.

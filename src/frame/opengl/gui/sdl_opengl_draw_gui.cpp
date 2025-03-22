@@ -113,6 +113,18 @@ bool SDL2OpenGLDrawGui::Update(DeviceInterface& device, double dt)
         }
     }
 
+    if (menubar_callback_)
+    {
+        if (ImGui::BeginMainMenuBar())
+        {
+            if (!menubar_callback_->DrawCallback())
+            {
+                returned_value = false;
+            }
+            ImGui::EndMainMenuBar();
+        }
+    }
+
     // Go through all texture and create a window for each of them.
     for (const EntityId& id : device.GetLevel().GetTextures())
     {
@@ -314,6 +326,22 @@ void SDL2OpenGLDrawGui::DeleteWindow(const std::string& name)
     {
         overlay_callbacks_.erase(name);
     }
+}
+
+void SDL2OpenGLDrawGui::SetMenuBar(
+    std::unique_ptr<frame::gui::GuiMenuBarInterface> callback)
+{
+    menubar_callback_ = std::move(callback);
+}
+
+frame::gui::GuiMenuBarInterface& SDL2OpenGLDrawGui::GetMenuBar()
+{
+    return *menubar_callback_.get();
+}
+
+void SDL2OpenGLDrawGui::RemoveMenuBar()
+{
+    menubar_callback_.reset();
 }
 
 bool SDL2OpenGLDrawGui::PollEvent(void* event)

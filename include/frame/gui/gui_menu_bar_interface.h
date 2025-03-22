@@ -11,9 +11,12 @@ namespace frame::gui
  */
 class GuiMenuBarInterface : public NameInterface
 {
-	//! @brief Draw callback setting.
+  public:
+    //! @brief Virtual destructor.
+    virtual ~GuiMenuBarInterface() = default;
+    //! @brief Draw callback setting.
     virtual bool DrawCallback() = 0;
-	//! @brief Is it the end of the gui?
+    //! @brief Is it the end of the gui?
     virtual bool End() const = 0;
 };
 

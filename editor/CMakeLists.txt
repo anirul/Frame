@@ -3,6 +3,8 @@
 add_executable(FrameEditor
   WIN32
     main.cpp
+    menubar.cpp
+    menubar.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../asset/json/editor.json
 )
 
