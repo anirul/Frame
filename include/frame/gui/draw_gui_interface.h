@@ -3,6 +3,7 @@
 #include <functional>
 
 #include "frame/gui/gui_window_interface.h"
+#include "frame/gui/gui_menu_bar_interface.h"
 #include "frame/name_interface.h"
 #include "frame/plugin_interface.h"
 
@@ -62,6 +63,24 @@ class DrawGuiInterface : public PluginInterface
      * @param name: the name of the window or overlay to be deleted.
      */
     virtual void DeleteWindow(const std::string& name) = 0;
+    /**
+	 * @brief Set a menu bar to the main window.
+	 * @param callback: A menu bar for the main window.
+	 * 
+     * If the callback return is 0 the callback stay and if it is other it is
+     * removed. This will trigger an internal boolean that will decide if the
+     * modal is active or not.
+     */
+    virtual void SetMenuBar(std::unique_ptr<GuiMenuBarInterface> callback) = 0;
+    /**
+	 * @brief Get the menu bar.
+	 * @return The menu bar.
+	 */
+    virtual GuiMenuBarInterface& GetMenuBar() = 0;
+    /**
+	 * @Remove the menu bar.
+	 */
+    virtual void RemoveMenuBar() = 0;
     /**
      * @brief Is the draw gui active?
      * @param enable: True if enable.

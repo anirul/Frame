@@ -5,6 +5,7 @@ add_library(FrameGui
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/gui/draw_gui_interface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/gui/draw_gui_factory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/gui/gui_logger_sink.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/gui/gui_menu_bar_interface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/gui/gui_window_interface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/gui/window_camera.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/gui/window_cubemap.h
