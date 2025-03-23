@@ -17,6 +17,7 @@
 #include "frame/gui/window_resolution.h"
 #include "frame/window_factory.h"
 #include "menubar.h"
+#include "view_windows.h"
 
 // From: https://sourceforge.net/p/predef/wiki/OperatingSystems/
 #if defined(_WIN32) || defined(_WIN64)
@@ -35,56 +36,33 @@ try
     glm::uvec2 size = {1280, 720};
     bool end = true;
 
-    frame::gui::WindowResolution* ptr_window_resolution = nullptr;
+    const frame::gui::WindowResolution* ptr_window_resolution = nullptr;
     auto win = frame::CreateNewWindow(
         frame::DrawingTargetEnum::WINDOW,
         frame::RenderingAPIEnum::OPENGL,
         size);
     auto& device = win->GetDevice();
     auto gui_window = frame::gui::CreateDrawGui(*win.get(), {}, 20.0f);
-    auto gui_resolution = std::make_unique<frame::gui::WindowResolution>(
-        "Resolution", size, win->GetDesktopSize(), win->GetPixelPerInch());
-    ptr_window_resolution = gui_resolution.get();
-    gui_window->SetMenuBar(std::make_unique<frame::gui::Menubar>(
-        "Menu",
-        [draw_gui_window = gui_window.get(), size, window = win.get()](
-            const std::string& name)
-        {
-            draw_gui_window->AddWindow(
-                std::make_unique<frame::gui::WindowResolution>(
-                    name,
-                    size,
-                    window->GetDesktopSize(),
-                    window->GetPixelPerInch()));
-        },
-        [draw_gui_window = gui_window.get()](
-            const std::string& name)
-        {
-            draw_gui_window->DeleteWindow(name);
-        },
-        [draw_gui_window = gui_window.get()](const std::string& name)
-        {
-            draw_gui_window->AddWindow(
-                std::make_unique<frame::gui::WindowLogger>(name));
-        },
-        [draw_gui_window = gui_window.get()](const std::string& name) {
-            draw_gui_window->DeleteWindow(name);
-        }));
+    frame::gui::ViewWindows view_windows(
+        gui_window.get(), size, win->GetDesktopSize(), win->GetPixelPerInch());
+    gui_window->SetMenuBar(
+        std::make_unique<frame::gui::Menubar>("Menu", view_windows));
     // Set the main window in full.
     win->GetDevice().AddPlugin(std::move(gui_window));
     frame::common::Application app(std::move(win));
+    ptr_window_resolution = view_windows.GetWindowResolution();
     do
     {
         app.Startup(frame::file::FindFile("asset/json/editor.json"));
         app.Run();
-        app.Resize(
-            ptr_window_resolution->GetSize(),
-            ptr_window_resolution->GetFullScreen());
-        device.SetStereo(
-            ptr_window_resolution->GetStereo(),
-            ptr_window_resolution->GetInterocularDistance(),
-            ptr_window_resolution->GetFocusPoint(),
-            ptr_window_resolution->IsInvertLeftRight());
+        if (view_windows.GetWindowResolution())
+        {
+            ptr_window_resolution =
+                view_windows.GetWindowResolution();
+            app.Resize(
+                ptr_window_resolution->GetSize(),
+                ptr_window_resolution->GetFullScreen());
+        }
     }
     while (!ptr_window_resolution->End());
     return 0;

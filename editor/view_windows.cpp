@@ -1,0 +1,47 @@
+#include "view_windows.h"
+#include "frame/gui/window_logger.h"
+
+namespace frame::gui
+{
+
+ViewWindows::ViewWindows(
+    DrawGuiInterface* draw_gui,
+    glm::uvec2 size,
+    glm::uvec2 desktop_size,
+    glm::uvec2 pixel_per_inch)
+    : draw_gui_(draw_gui),
+      size_(size),
+      desktop_size_(desktop_size),
+      pixel_per_inch_(pixel_per_inch)
+{
+}
+
+void ViewWindows::CreateLogger(const std::string& name)
+{
+    draw_gui_->AddWindow(std::make_unique<WindowLogger>(name));
+}
+
+void ViewWindows::DeleteLogger(const std::string& name)
+{
+    draw_gui_->DeleteWindow(name);
+}
+
+void ViewWindows::CreateResolution(const std::string& name)
+{
+    std::unique_ptr<WindowResolution> unique_window_resolution =
+        std::make_unique<WindowResolution>(
+            name,
+            size_,
+            desktop_size_,
+            pixel_per_inch_);
+    ptr_window_resolution_ = unique_window_resolution.get();
+    draw_gui_->AddWindow(std::move(unique_window_resolution));
+}
+
+void ViewWindows::DeleteResolution(const std::string& name)
+{
+    ptr_window_resolution_ = nullptr;
+    draw_gui_->DeleteWindow(name);
+}
+
+} // End namespace frame::gui.

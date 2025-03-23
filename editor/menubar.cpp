@@ -9,14 +9,8 @@ namespace frame::gui
 
 Menubar::Menubar(
     const std::string& name,
-    std::function<void(const std::string&)> create_logger_func,
-    std::function<void(const std::string&)> delete_logger_func,
-    std::function<void(const std::string&)> create_resolution_func,
-    std::function<void(const std::string&)> delete_resolution_func)
-    : create_logger_func_(create_logger_func),
-      delete_logger_func_(delete_logger_func),
-      create_resolution_func_(create_resolution_func),
-      delete_resolution_func_(delete_resolution_func)
+    ViewWindows& view_windows)
+    : name_(name), view_windows_(view_windows)
 {
     SetName(name);
 }
@@ -80,22 +74,22 @@ void Menubar::MenuView()
         {
             if (show_resolution_)
             {
-                create_logger_func_("Resolution");
+                view_windows_.CreateResolution("Resolution");
             }
             else
             {
-                delete_logger_func_("Resolution");
+                view_windows_.DeleteResolution("Resolution");
             }
         }
         if (ImGui::MenuItem("Show Log", "Ctrl+L", &show_logger_))
         {
             if (show_logger_)
             {
-                create_resolution_func_("Logger");
+                view_windows_.CreateLogger("Logger");
             }
             else
             {
-                delete_resolution_func_("Logger");
+                view_windows_.DeleteLogger("Logger");
             }
         }
         ImGui::EndMenu();
