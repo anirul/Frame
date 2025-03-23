@@ -45,9 +45,31 @@ try
     auto gui_resolution = std::make_unique<frame::gui::WindowResolution>(
         "Resolution", size, win->GetDesktopSize(), win->GetPixelPerInch());
     ptr_window_resolution = gui_resolution.get();
-    gui_window->SetMenuBar(std::make_unique<frame::gui::Menubar>("Menu"));
-    gui_window->AddWindow(std::move(gui_resolution));
-    gui_window->AddWindow(std::make_unique<frame::gui::WindowLogger>("Logger"));
+    gui_window->SetMenuBar(std::make_unique<frame::gui::Menubar>(
+        "Menu",
+        [draw_gui_window = gui_window.get(), size, window = win.get()](
+            const std::string& name)
+        {
+            draw_gui_window->AddWindow(
+                std::make_unique<frame::gui::WindowResolution>(
+                    name,
+                    size,
+                    window->GetDesktopSize(),
+                    window->GetPixelPerInch()));
+        },
+        [draw_gui_window = gui_window.get()](
+            const std::string& name)
+        {
+            draw_gui_window->DeleteWindow(name);
+        },
+        [draw_gui_window = gui_window.get()](const std::string& name)
+        {
+            draw_gui_window->AddWindow(
+                std::make_unique<frame::gui::WindowLogger>(name));
+        },
+        [draw_gui_window = gui_window.get()](const std::string& name) {
+            draw_gui_window->DeleteWindow(name);
+        }));
     // Set the main window in full.
     win->GetDevice().AddPlugin(std::move(gui_window));
     frame::common::Application app(std::move(win));

@@ -1,11 +1,22 @@
 #include "menubar.h"
 
 #include <imgui.h>
+#include "frame/gui/window_logger.h"
+#include "frame/gui/window_resolution.h"
 
 namespace frame::gui
 {
 
-Menubar::Menubar(const std::string& name)
+Menubar::Menubar(
+    const std::string& name,
+    std::function<void(const std::string&)> create_logger_func,
+    std::function<void(const std::string&)> delete_logger_func,
+    std::function<void(const std::string&)> create_resolution_func,
+    std::function<void(const std::string&)> delete_resolution_func)
+    : create_logger_func_(create_logger_func),
+      delete_logger_func_(delete_logger_func),
+      create_resolution_func_(create_resolution_func),
+      delete_resolution_func_(delete_resolution_func)
 {
     SetName(name);
 }
@@ -65,9 +76,27 @@ void Menubar::MenuView()
         {
         }
         ImGui::Separator();
+        if (ImGui::MenuItem("Show Resolution", "Ctrl+R", &show_resolution_))
+        {
+            if (show_resolution_)
+            {
+                create_logger_func_("Resolution");
+            }
+            else
+            {
+                delete_logger_func_("Resolution");
+            }
+        }
         if (ImGui::MenuItem("Show Log", "Ctrl+L", &show_logger_))
         {
-            show_logger_ = !show_logger_;
+            if (show_logger_)
+            {
+                create_resolution_func_("Logger");
+            }
+            else
+            {
+                delete_resolution_func_("Logger");
+            }
         }
         ImGui::EndMenu();
     }

@@ -5,6 +5,8 @@ add_executable(FrameEditor
     main.cpp
     menubar.cpp
     menubar.h
+    view_windows.cpp
+    view_windows.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../asset/json/editor.json
 )
 
