@@ -14,7 +14,7 @@
 namespace frame::opengl::gui
 {
 
-SDL2OpenGLDrawGui::SDL2OpenGLDrawGui(
+SDLOpenGLDrawGui::SDLOpenGLDrawGui(
     frame::WindowInterface& window,
     const std::filesystem::path& font_path,
     float font_size)
@@ -59,13 +59,13 @@ SDL2OpenGLDrawGui::SDL2OpenGLDrawGui(
         static_cast<SDL_Window*>(window_.GetWindowContext()),
         device_.GetDeviceContext());
 #if defined(_WIN32) || defined(_WIN64)
-    ImGui_ImplOpenGL3_Init("#version 450");
+    ImGui_ImplOpenGL3_Init("#version 130");
 #else
     ImGui_ImplOpenGL3_Init("#version 330");
 #endif
 }
 
-SDL2OpenGLDrawGui::~SDL2OpenGLDrawGui()
+SDLOpenGLDrawGui::~SDLOpenGLDrawGui()
 {
     // Cleanup
     ImGui_ImplOpenGL3_Shutdown();
@@ -73,17 +73,18 @@ SDL2OpenGLDrawGui::~SDL2OpenGLDrawGui()
     ImGui::DestroyContext();
 }
 
-void SDL2OpenGLDrawGui::Startup(glm::uvec2 size)
+void SDLOpenGLDrawGui::Startup(glm::uvec2 size)
 {
     size_ = size;
 }
 
-bool SDL2OpenGLDrawGui::Update(DeviceInterface& device, double dt)
+bool SDLOpenGLDrawGui::Update(DeviceInterface& device, double dt)
 {
     // Local variables.
     bool returned_value = true;
     is_keyboard_passed_ = false;
     ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
     io.ConfigWindowsMoveFromTitleBarOnly = true;
 
     // Start the Dear ImGui frame
@@ -256,17 +257,24 @@ bool SDL2OpenGLDrawGui::Update(DeviceInterface& device, double dt)
 
     if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
     {
+        SDL_Window* backup_window =
+            static_cast<SDL_Window*>(window_.GetWindowContext());
+        SDL_GLContext backup_context =
+            static_cast<SDL_GLContext>(window_.GetGraphicContext());
+
+        assert(backup_window);
+        assert(backup_context);
+
         ImGui::UpdatePlatformWindows();
         ImGui::RenderPlatformWindowsDefault();
-        SDL_GL_MakeCurrent(
-            static_cast<SDL_Window*>(window_.GetWindowContext()),
-            static_cast<SDL_GLContext>(window_.GetGraphicContext()));
+
+        SDL_GL_MakeCurrent(backup_window, backup_context);
     }
 
     return returned_value;
 }
 
-void SDL2OpenGLDrawGui::AddWindow(
+void SDLOpenGLDrawGui::AddWindow(
     std::unique_ptr<frame::gui::GuiWindowInterface> callback)
 {
     std::string name = callback->GetName();
@@ -281,7 +289,7 @@ void SDL2OpenGLDrawGui::AddWindow(
     window_callbacks_.emplace(name, std::move(callback_data));
 }
 
-void SDL2OpenGLDrawGui::AddOverlayWindow(
+void SDLOpenGLDrawGui::AddOverlayWindow(
     glm::vec2 position,
     glm::vec2 size,
     std::unique_ptr<frame::gui::GuiWindowInterface> callback)
@@ -299,13 +307,13 @@ void SDL2OpenGLDrawGui::AddOverlayWindow(
     overlay_callbacks_.emplace(name, std::move(callback_data));
 }
 
-void SDL2OpenGLDrawGui::AddModalWindow(
+void SDLOpenGLDrawGui::AddModalWindow(
     std::unique_ptr<frame::gui::GuiWindowInterface> callback)
 {
     modal_callback_ = std::move(callback);
 }
 
-std::vector<std::string> SDL2OpenGLDrawGui::GetWindowTitles() const
+std::vector<std::string> SDLOpenGLDrawGui::GetWindowTitles() const
 {
     std::vector<std::string> name_list;
     for (const auto& [name, _] : window_callbacks_)
@@ -315,7 +323,7 @@ std::vector<std::string> SDL2OpenGLDrawGui::GetWindowTitles() const
     return name_list;
 }
 
-void SDL2OpenGLDrawGui::DeleteWindow(const std::string& name)
+void SDLOpenGLDrawGui::DeleteWindow(const std::string& name)
 {
     if (window_callbacks_.contains(name))
     {
@@ -327,23 +335,23 @@ void SDL2OpenGLDrawGui::DeleteWindow(const std::string& name)
     }
 }
 
-void SDL2OpenGLDrawGui::SetMenuBar(
+void SDLOpenGLDrawGui::SetMenuBar(
     std::unique_ptr<frame::gui::GuiMenuBarInterface> callback)
 {
     menubar_callback_ = std::move(callback);
 }
 
-frame::gui::GuiMenuBarInterface& SDL2OpenGLDrawGui::GetMenuBar()
+frame::gui::GuiMenuBarInterface& SDLOpenGLDrawGui::GetMenuBar()
 {
     return *menubar_callback_.get();
 }
 
-void SDL2OpenGLDrawGui::RemoveMenuBar()
+void SDLOpenGLDrawGui::RemoveMenuBar()
 {
     menubar_callback_.reset();
 }
 
-bool SDL2OpenGLDrawGui::PollEvent(void* event)
+bool SDLOpenGLDrawGui::PollEvent(void* event)
 {
     // Allow to click on close window.
     if (static_cast<SDL_Event*>(event)->type == SDL_EVENT_QUIT)
@@ -360,7 +368,7 @@ bool SDL2OpenGLDrawGui::PollEvent(void* event)
             : false;
 }
 
-frame::gui::GuiWindowInterface& SDL2OpenGLDrawGui::GetWindow(
+frame::gui::GuiWindowInterface& SDLOpenGLDrawGui::GetWindow(
     const std::string& name)
 {
     if (window_callbacks_.contains(name))

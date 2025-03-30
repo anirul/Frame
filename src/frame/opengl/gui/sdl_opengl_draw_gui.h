@@ -12,10 +12,10 @@ namespace frame::opengl::gui
 {
 
 /**
- * @class SDL2OpenGLDrawGui
- * @brief Draw GUI elements using SDL2 and OpenGL.
+ * @class SDLOpenGLDrawGui
+ * @brief Draw GUI elements using SDL and OpenGL.
  */
-class SDL2OpenGLDrawGui : public frame::gui::DrawGuiInterface
+class SDLOpenGLDrawGui : public frame::gui::DrawGuiInterface
 {
   public:
     /**
@@ -23,12 +23,12 @@ class SDL2OpenGLDrawGui : public frame::gui::DrawGuiInterface
      * @param window: The window to use.
 	 * @param font_path: The path to the font.
      */
-    SDL2OpenGLDrawGui(
+    SDLOpenGLDrawGui(
 		frame::WindowInterface& window,
 		const std::filesystem::path& font_path,
 		float font_size);
     //! @brief Destructor.
-    virtual ~SDL2OpenGLDrawGui();
+    virtual ~SDLOpenGLDrawGui();
 
   public:
     /**

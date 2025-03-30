@@ -17,7 +17,7 @@ namespace frame::opengl
 
 SDLOpenGLWindow::SDLOpenGLWindow(glm::uvec2 size) : size_(size)
 {
-    if (SDL_Init(SDL_INIT_VIDEO) != 0)
+    if (!SDL_Init(SDL_INIT_VIDEO))
     {
         throw std::runtime_error("Couldn't initialize SDL3.");
     }

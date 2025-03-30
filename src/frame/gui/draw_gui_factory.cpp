@@ -12,7 +12,7 @@ std::unique_ptr<frame::gui::DrawGuiInterface> CreateDrawGui(
     switch (device.GetDeviceEnum())
     {
     case RenderingAPIEnum::OPENGL:
-        return std::make_unique<frame::opengl::gui::SDL2OpenGLDrawGui>(
+        return std::make_unique<frame::opengl::gui::SDLOpenGLDrawGui>(
             window, font_path, font_size);
     default:
         return nullptr;

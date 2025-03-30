@@ -57,7 +57,6 @@ target_link_libraries(Frame
     absl::flags_parse
     absl::strings
     FrameJson
-    FrameVulkan
     SDL3::SDL3
     spdlog::spdlog
     glm::glm

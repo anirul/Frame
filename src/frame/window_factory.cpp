@@ -4,7 +4,9 @@
 
 #include "frame/api.h"
 #include "frame/opengl/window_factory.h"
+#ifdef FRAME_HAS_VULKAN
 #include "frame/vulkan/window_factory.h"
+#endif
 
 namespace frame
 {
@@ -21,8 +23,10 @@ std::unique_ptr<frame::WindowInterface> CreateNewWindow(
         {
         case RenderingAPIEnum::OPENGL:
             return frame::opengl::CreateSDLOpenGLNone(size);
+#ifdef FRAME_HAS_VULKAN
         case RenderingAPIEnum::VULKAN:
             return frame::vulkan::CreateSDLVulkanNone(size);
+#endif
         default:
             throw std::runtime_error("Unsupported device enum.");
         }
@@ -31,8 +35,10 @@ std::unique_ptr<frame::WindowInterface> CreateNewWindow(
         {
         case RenderingAPIEnum::OPENGL:
             return frame::opengl::CreateSDLOpenGLWindow(size);
+#ifdef FRAME_HAS_VULKAN
         case RenderingAPIEnum::VULKAN:
             return frame::vulkan::CreateSDLVulkanWindow(size);
+#endif
         default:
             throw std::runtime_error("Unsupported device enum.");
         }
