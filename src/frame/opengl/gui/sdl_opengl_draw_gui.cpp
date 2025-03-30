@@ -1,15 +1,15 @@
 #include "frame/opengl/gui/sdl_opengl_draw_gui.h"
 
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
 #include <fmt/core.h>
+#include <imgui.h>
+#include <imgui_impl_sdl3.h>
+#include <imgui_impl_opengl3.h>
 
 #include "frame/device_interface.h"
 #include "frame/file/file_system.h"
 #include "frame/opengl/texture.h"
 #include "frame/window_interface.h"
-#include "imgui.h"
-#include "imgui_impl_opengl3.h"
-#include "imgui_impl_sdl.h"
 
 namespace frame::opengl::gui
 {
@@ -55,7 +55,7 @@ SDL2OpenGLDrawGui::SDL2OpenGLDrawGui(
     }
 
     // Setup Platform/Renderer back ends
-    ImGui_ImplSDL2_InitForOpenGL(
+    ImGui_ImplSDL3_InitForOpenGL(
         static_cast<SDL_Window*>(window_.GetWindowContext()),
         device_.GetDeviceContext());
 #if defined(_WIN32) || defined(_WIN64)
@@ -69,7 +69,7 @@ SDL2OpenGLDrawGui::~SDL2OpenGLDrawGui()
 {
     // Cleanup
     ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplSDL2_Shutdown();
+    ImGui_ImplSDL3_Shutdown();
     ImGui::DestroyContext();
 }
 
@@ -88,8 +88,7 @@ bool SDL2OpenGLDrawGui::Update(DeviceInterface& device, double dt)
 
     // Start the Dear ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplSDL2_NewFrame(
-        static_cast<SDL_Window*>(window_.GetWindowContext()));
+    ImGui_ImplSDL3_NewFrame();
     ImGui::NewFrame();
 
     if (!is_visible_)
@@ -261,7 +260,7 @@ bool SDL2OpenGLDrawGui::Update(DeviceInterface& device, double dt)
         ImGui::RenderPlatformWindowsDefault();
         SDL_GL_MakeCurrent(
             static_cast<SDL_Window*>(window_.GetWindowContext()),
-            window_.GetGraphicContext());
+            static_cast<SDL_GLContext>(window_.GetGraphicContext()));
     }
 
     return returned_value;
@@ -347,11 +346,11 @@ void SDL2OpenGLDrawGui::RemoveMenuBar()
 bool SDL2OpenGLDrawGui::PollEvent(void* event)
 {
     // Allow to click on close window.
-    if (static_cast<SDL_Event*>(event)->type == SDL_QUIT)
+    if (static_cast<SDL_Event*>(event)->type == SDL_EVENT_QUIT)
         return false;
     // Process the event in ImGui (has to be done or you won't be able to
     // handle the main window).
-    ImGui_ImplSDL2_ProcessEvent(static_cast<SDL_Event*>(event));
+    ImGui_ImplSDL3_ProcessEvent(static_cast<SDL_Event*>(event));
     // This is the main window (receiving the input for) so skip.
     if (is_keyboard_passed_)
         return false;

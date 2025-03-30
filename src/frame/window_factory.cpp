@@ -20,9 +20,9 @@ std::unique_ptr<frame::WindowInterface> CreateNewWindow(
         switch (rendering_api_enum)
         {
         case RenderingAPIEnum::OPENGL:
-            return frame::opengl::CreateSDL2OpenGLNone(size);
+            return frame::opengl::CreateSDLOpenGLNone(size);
         case RenderingAPIEnum::VULKAN:
-            return frame::vulkan::CreateSDL2VulkanNone(size);
+            return frame::vulkan::CreateSDLVulkanNone(size);
         default:
             throw std::runtime_error("Unsupported device enum.");
         }
@@ -30,9 +30,9 @@ std::unique_ptr<frame::WindowInterface> CreateNewWindow(
         switch (rendering_api_enum)
         {
         case RenderingAPIEnum::OPENGL:
-            return frame::opengl::CreateSDL2OpenGLWindow(size);
+            return frame::opengl::CreateSDLOpenGLWindow(size);
         case RenderingAPIEnum::VULKAN:
-            return frame::vulkan::CreateSDL2VulkanWindow(size);
+            return frame::vulkan::CreateSDLVulkanWindow(size);
         default:
             throw std::runtime_error("Unsupported device enum.");
         }

@@ -1,8 +1,7 @@
 #include "frame/vulkan/sdl_vulkan_none.h"
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_vulkan.h>
-
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_vulkan.h>
 #include <vulkan/vulkan.hpp>
 
 #include "frame/vulkan/debug_callback.h"
@@ -19,17 +18,9 @@ SDLVulkanNone::SDLVulkanNone(glm::uvec2 size) : size_(size)
             fmt::format("Couldn't initialize SDL: {}", SDL_GetError()));
     }
 
-    if (SDL_Vulkan_LoadLibrary(nullptr) == -1)
-    {
-        throw std::runtime_error(
-            fmt::format("Couldn't load Vulkan library: {}", SDL_GetError()));
-    }
-
     // Create an SDL window to use as a surface for Vulkan.
     sdl_window_ = SDL_CreateWindow(
         "Vulkan Headless",
-        SDL_WINDOWPOS_UNDEFINED,
-        SDL_WINDOWPOS_UNDEFINED,
         size_.x,
         size_.y,
         SDL_WINDOW_HIDDEN | SDL_WINDOW_VULKAN);
@@ -41,22 +32,23 @@ SDLVulkanNone::SDLVulkanNone(glm::uvec2 size) : size_(size)
 
     // Get the required extensions for creating a Vulkan surface.
     uint32_t extension_count = 0;
-    SDL_Vulkan_GetInstanceExtensions(sdl_window_, &extension_count, nullptr);
+    std::vector<const char*> extensions;
+    const char* const* extention_c =
+        SDL_Vulkan_GetInstanceExtensions(&extension_count);
+    for (uint32_t i = 0; i < extension_count; i++)
+    {
+        extensions.push_back(extention_c[i]);
+    }
     if (extension_count == 0)
     {
         throw std::runtime_error(fmt::format(
             "Could not get the extension count: {}", SDL_GetError()));
     }
-    std::vector<const char*> extensions(extension_count);
-    SDL_Vulkan_GetInstanceExtensions(
-        sdl_window_, &extension_count, extensions.data());
-    if (extension_count == 0)
-    {
-        throw std::runtime_error(fmt::format(
-            "Could not get the extension count: {}", SDL_GetError()));
-    }
+
+#ifdef VK_EXT_ENABLE_DEBUG_EXTENSION
     // Add the extension to have the debug layers.
     extensions.push_back("VK_EXT_debug_utils");
+#endif
     for (const auto& extension : extensions)
     {
         logger_->info("Extension: {}", extension);
@@ -77,26 +69,27 @@ SDLVulkanNone::SDLVulkanNone(glm::uvec2 size) : size_(size)
         extensions.data());
 
     vk_unique_instance_ = vk::createInstanceUnique(instance_create_info);
-    vk_dispatch_loader_dynamic_.init(
-        *vk_unique_instance_, vkGetInstanceProcAddr);
-    auto result = vk_unique_instance_->createDebugUtilsMessengerEXT(
+#ifdef VK_EXT_ENABLE_DEBUG_EXTENSION
+    auto vk_debug_utils_messenger_create_info =
         vk::DebugUtilsMessengerCreateInfoEXT(
             {},
             vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose |
-                vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning |
-                vk::DebugUtilsMessageSeverityFlagBitsEXT::eError,
+            vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning |
+            vk::DebugUtilsMessageSeverityFlagBitsEXT::eError,
             vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral |
-                vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation |
-                vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance,
-            DebugCallback),
-        nullptr,
-        vk_dispatch_loader_dynamic_);
+            vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation |
+            vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance,
+            vk::PFN_DebugUtilsMessengerCallbackEXT(DebugCallback));
+    auto result =
+        vk_unique_instance_->createDebugUtilsMessengerEXT(
+            vk_debug_utils_messenger_create_info);
+#endif
 
     // Create the surface.
     // CHECKME(anirul): What happen in case of a resize?
     VkSurfaceKHR vk_surface;
-    if (SDL_Vulkan_CreateSurface(
-            sdl_window_, *vk_unique_instance_, &vk_surface) != SDL_TRUE)
+    if (!SDL_Vulkan_CreateSurface(
+            sdl_window_, *vk_unique_instance_, nullptr, &vk_surface))
     {
         throw std::runtime_error(fmt::format(
             "Error while create vulkan surface: {}", SDL_GetError()));

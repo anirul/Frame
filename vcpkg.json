@@ -22,6 +22,8 @@
     "spdlog",
     "stb",
     "tinyobjloader",
-    "vulkan"
+    {
+      "name": "vulkan"
+    }
   ]
 }

@@ -1,14 +1,12 @@
 #pragma once
 
-#define NOMINMAX
 #include <GL/glew.h>
-#include <SDL2/SDL.h>
-#if defined(_WIN32) || defined(_WIN64)
-#include <SDL2/SDL_syswm.h>
-#endif
-#include <fmt/core.h>
-
+#include <SDL3/SDL.h>
 #include <stdexcept>
+#if defined(_WIN32) || defined(_WIN64)
+#define NOMINMAX
+#include <windows.h>
+#endif
 
 #include "frame/logger.h"
 #include "frame/window_interface.h"
