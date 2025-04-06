@@ -6,7 +6,9 @@ namespace frame::gui
 {
 
 std::unique_ptr<frame::gui::DrawGuiInterface> CreateDrawGui(
-    WindowInterface& window, const std::filesystem::path& font_path, float font_size)
+    WindowInterface& window,
+    const std::filesystem::path& font_path,
+    float font_size)
 {
     auto& device = window.GetDevice();
     switch (device.GetDeviceEnum())

@@ -52,7 +52,7 @@ SDLOpenGLWindow::SDLOpenGLWindow(glm::uvec2 size) : size_(size)
     {
         throw std::runtime_error("Couldn't start a window in SDL3.");
     }
-    logger_->info("Created an SDL2 window.");
+    logger_->info("Created an SDL3 window.");
 
     // Now create GL context
     gl_context_ = SDL_GL_CreateContext(sdl_window_);
@@ -258,15 +258,16 @@ void* SDLOpenGLWindow::GetGraphicContext() const
 
     SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &gl_version.first);
     SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &gl_version.second);
-    logger->info(reinterpret_cast<const char*>(glGetString(GL_RENDERER)));
+    static bool s_once = false;
+    if (!s_once)
+    {
+        s_once = true;
+        logger->info(
+            "OpenGL version: {}.{}", gl_version.first, gl_version.second);
+    }
     
     // Vsync off.
     SDL_GL_SetSwapInterval(0);
-    
-    logger->info(
-        "Started SDL OpenGL version {}.{}.",
-        gl_version.first,
-        gl_version.second);
 
     // Initialize GLEW to find the 'glDebugMessageCallback' function.
     glewExperimental = GL_TRUE;
