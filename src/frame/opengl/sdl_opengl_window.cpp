@@ -21,6 +21,28 @@ SDLOpenGLWindow::SDLOpenGLWindow(glm::uvec2 size) : size_(size)
     {
         throw std::runtime_error("Couldn't initialize SDL3.");
     }
+
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+#if defined(_WIN32) || defined(_WIN64)
+    SDL_GL_SetAttribute(
+        SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
+    SDL_GL_SetAttribute(
+        SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 5);
+#endif
+#if defined(__linux__)
+    SDL_GL_SetAttribute(
+        SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
+    SDL_GL_SetAttribute(
+        SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+#endif
+
     sdl_window_ = SDL_CreateWindow(
         "SDL OpenGL",
         size_.x,
@@ -31,6 +53,16 @@ SDLOpenGLWindow::SDLOpenGLWindow(glm::uvec2 size) : size_(size)
         throw std::runtime_error("Couldn't start a window in SDL3.");
     }
     logger_->info("Created an SDL2 window.");
+
+    // Now create GL context
+    gl_context_ = SDL_GL_CreateContext(sdl_window_);
+    if (!gl_context_)
+        throw std::runtime_error(
+            fmt::format("Failed to create GL context: {}", SDL_GetError()));
+
+    // Set as current
+    SDL_GL_MakeCurrent(sdl_window_, gl_context_);
+
 #if defined(_WIN32) || defined(_WIN64)
     // Get the window handler.
     hwnd_ = FindWindowA(nullptr, SDL_GetWindowTitle(sdl_window_));
@@ -216,39 +248,8 @@ void* SDLOpenGLWindow::GetGraphicContext() const
     std::pair<int, int> gl_version;
     frame::Logger& logger = frame::Logger::GetInstance();
 
-    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-    // CHECKME(anirul): Is this still relevant?
-#if defined(__APPLE__)
-    SDL_GL_SetAttribute(
-        SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
-    SDL_GL_SetAttribute(
-        SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
-#endif
-#if defined(_WIN32) || defined(_WIN64)
-    SDL_GL_SetAttribute(
-        SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
-    SDL_GL_SetAttribute(
-        SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 5);
-#endif
-#if defined(__linux__)
-    SDL_GL_SetAttribute(
-        SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
-    SDL_GL_SetAttribute(
-        SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
-#endif
-
     // GL context.
-    void* gl_context =
-        SDL_GL_CreateContext(static_cast<SDL_Window*>(GetWindowContext()));
-    if (!gl_context)
+    if (!gl_context_)
     {
         std::string error = SDL_GetError();
         logger->error(error);
@@ -258,16 +259,17 @@ void* SDLOpenGLWindow::GetGraphicContext() const
     SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &gl_version.first);
     SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &gl_version.second);
     logger->info(reinterpret_cast<const char*>(glGetString(GL_RENDERER)));
-
+    
     // Vsync off.
     SDL_GL_SetSwapInterval(0);
-
+    
     logger->info(
         "Started SDL OpenGL version {}.{}.",
         gl_version.first,
         gl_version.second);
 
     // Initialize GLEW to find the 'glDebugMessageCallback' function.
+    glewExperimental = GL_TRUE;
     auto result = glewInit();
     if (result != GLEW_OK)
     {
@@ -280,7 +282,7 @@ void* SDLOpenGLWindow::GetGraphicContext() const
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(MessageCallback, nullptr);
 
-    return gl_context;
+    return gl_context_;
 }
 
 void SDLOpenGLWindow::Resize(glm::uvec2 size, FullScreenEnum fullscreen_enum)
