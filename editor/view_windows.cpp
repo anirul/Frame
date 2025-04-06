@@ -1,5 +1,7 @@
 #include "view_windows.h"
+
 #include "frame/gui/window_logger.h"
+#include "frame/opengl/texture.h"
 
 namespace frame::gui
 {
@@ -81,6 +83,10 @@ void ViewWindows::ShowResolutionWindow()
 void ViewWindows::ShowTexturesWindow(DeviceInterface& device)
 {
     auto& level = device.GetLevel();
+    for (auto id : level.GetTextures())
+    {
+        
+    }
 }
 
 } // End namespace frame::gui.

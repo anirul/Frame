@@ -26,16 +26,13 @@ int WINAPI WinMain(
     _In_opt_ HINSTANCE hPrevInstance,
     _In_ LPSTR lpCmdLine,
     _In_ int nShowCmd)
-try
-{
 #else
 int main(int ac, char** av)
+#endif
 try
 {
-#endif
     glm::uvec2 size = {1280, 720};
     bool end = true;
-
     const frame::gui::WindowResolution* ptr_window_resolution = nullptr;
     auto win = frame::CreateNewWindow(
         frame::DrawingTargetEnum::WINDOW,

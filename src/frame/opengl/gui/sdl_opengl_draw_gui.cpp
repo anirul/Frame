@@ -145,6 +145,10 @@ bool SDLOpenGLDrawGui::Update(DeviceInterface& device, double dt)
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
             original_image_size_ = texture.GetSize();
         }
+        else
+        {
+            continue;
+        }
        
         // If the window are not visible and it is not the main window then
         // bail out.
