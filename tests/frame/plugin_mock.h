@@ -24,6 +24,7 @@ class PluginMock : public frame::PluginInterface
     MOCK_METHOD(void, End, (), (override));
     MOCK_METHOD(std::string, GetName, (), (const, override));
     MOCK_METHOD(void, SetName, (const std::string&), (override));
+    MOCK_METHOD(frame::DeviceInterface&, GetDevice, (), (override));
 };
 
 } // End namespace test.

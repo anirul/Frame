@@ -7,6 +7,7 @@
 #include <shtypes.h>
 #pragma comment(lib, "Shcore.lib")
 #endif
+#include <format>
 
 #include "frame/gui/draw_gui_interface.h"
 #include "frame/opengl/gui/sdl_opengl_draw_gui.h"
@@ -57,8 +58,10 @@ SDLOpenGLWindow::SDLOpenGLWindow(glm::uvec2 size) : size_(size)
     // Now create GL context
     gl_context_ = SDL_GL_CreateContext(sdl_window_);
     if (!gl_context_)
+    {
         throw std::runtime_error(
             fmt::format("Failed to create GL context: {}", SDL_GetError()));
+    }
 
     // Set as current
     SDL_GL_MakeCurrent(sdl_window_, gl_context_);
@@ -73,6 +76,23 @@ SDLOpenGLWindow::SDLOpenGLWindow(glm::uvec2 size) : size_(size)
     SDL_GetWindowSize(sdl_window_, &w, &h);
     desktop_size_.x = w;
     desktop_size_.y = h;
+    
+    // Vsync off.
+    SDL_GL_SetSwapInterval(0);
+
+    // Initialize GLEW to find the 'glDebugMessageCallback' function.
+    glewExperimental = GL_TRUE;
+    auto result = glewInit();
+    if (result != GLEW_OK)
+    {
+        throw std::runtime_error(std::format(
+            "GLEW problems : {}",
+            reinterpret_cast<const char*>(glewGetErrorString(result))));
+    }
+
+    // During init, enable debug output
+    glEnable(GL_DEBUG_OUTPUT);
+    glDebugMessageCallback(MessageCallback, nullptr);
 }
 
 SDLOpenGLWindow::~SDLOpenGLWindow()
@@ -223,15 +243,25 @@ const char SDLOpenGLWindow::SDLButtonToChar(const Uint8 button) const
 {
     char ret = 0;
     if (button & SDL_BUTTON_LEFT)
+    {
         ret += 1;
+    }
     if (button & SDL_BUTTON_RIGHT)
+    {
         ret += 2;
+    }
     if (button & SDL_BUTTON_MIDDLE)
+    {
         ret += 4;
+    }
     if (button & SDL_BUTTON_X1)
+    {
         ret += 8;
+    }
     if (button & SDL_BUTTON_X2)
+    {
         ret += 16;
+    }
     return ret;
 }
 
@@ -265,23 +295,6 @@ void* SDLOpenGLWindow::GetGraphicContext() const
         logger->info(
             "OpenGL version: {}.{}", gl_version.first, gl_version.second);
     }
-    
-    // Vsync off.
-    SDL_GL_SetSwapInterval(0);
-
-    // Initialize GLEW to find the 'glDebugMessageCallback' function.
-    glewExperimental = GL_TRUE;
-    auto result = glewInit();
-    if (result != GLEW_OK)
-    {
-        throw std::runtime_error(fmt::format(
-            "GLEW problems : {}",
-            reinterpret_cast<const char*>(glewGetErrorString(result))));
-    }
-
-    // During init, enable debug output
-    glEnable(GL_DEBUG_OUTPUT);
-    glDebugMessageCallback(MessageCallback, nullptr);
 
     return gl_context_;
 }
@@ -357,8 +370,7 @@ namespace
 
 std::vector<glm::vec2> s_ppi_vec = {};
 
-// This is a callback to receive the monitor and then to compute the
-// PPI.
+// This is a callback to receive the monitor and then to compute the PPI.
 BOOL MonitorEnumProc(HMONITOR hmonitor, HDC hdc, LPRECT p_rect, LPARAM param)
 {
     std::uint32_t hppi = 0;

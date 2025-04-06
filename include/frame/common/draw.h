@@ -116,6 +116,14 @@ class Draw : public frame::PluginInterface
     void End() override
     {
     }
+    /**
+     * @brief Get the device interface
+     * @return The device interface.
+     */
+    DeviceInterface& GetDevice() override
+    {
+        return device_;
+	}
 
   private:
     glm::uvec2 size_ = {0, 0};

@@ -44,4 +44,43 @@ void ViewWindows::DeleteResolution(const std::string& name)
     draw_gui_->DeleteWindow(name);
 }
 
+void ViewWindows::ShowLoggerWindow()
+{
+    if (!window_state_.contains("Logger"))
+    {
+        window_state_["Logger"] = false;
+    }
+    if (window_state_["Logger"])
+    {
+        DeleteLogger("Logger");
+    }
+    else
+    {
+        CreateLogger("Logger");   
+    }
+    window_state_["Logger"] = !window_state_["Logger"];
+}
+
+void ViewWindows::ShowResolutionWindow()
+{
+    if (!window_state_.contains("Resolution"))
+    {
+        window_state_["Resolution"] = false;
+    }
+    if (window_state_["Resolution"])
+    {
+        DeleteResolution("Resolution");
+    }
+    else
+    {
+        CreateResolution("Resolution");
+    }
+    window_state_["Resolution"] = !window_state_["Resolution"];
+}
+
+void ViewWindows::ShowTexturesWindow(DeviceInterface& device)
+{
+    auto& level = device.GetLevel();
+}
+
 } // End namespace frame::gui.

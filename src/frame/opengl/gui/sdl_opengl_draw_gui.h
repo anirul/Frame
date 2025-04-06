@@ -103,6 +103,16 @@ class SDLOpenGLDrawGui : public frame::gui::DrawGuiInterface
 		return is_keyboard_passed_locked_;
     }
     /**
+     * @brief Get the device.
+     * @return The device.
+     */
+    DeviceInterface& GetDevice() override
+    {
+        return device_;
+    }
+
+  public:
+    /**
      * @brief Add sub window to the main window.
      * @param callback: A window callback that can add buttons, etc.
      */

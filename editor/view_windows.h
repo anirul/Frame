@@ -2,6 +2,7 @@
 
 #include <glm/glm.hpp>
 #include <string>
+#include <map>
 
 #include "frame/api.h"
 #include "frame/gui/draw_gui_interface.h"
@@ -30,10 +31,9 @@ class ViewWindows
     virtual ~ViewWindows() = default;
 
   public:
-    void CreateLogger(const std::string& name);
-    void DeleteLogger(const std::string& name);
-    void CreateResolution(const std::string& name);
-    void DeleteResolution(const std::string& name);
+    void ShowLoggerWindow();
+    void ShowResolutionWindow();
+    void ShowTexturesWindow(DeviceInterface& device);
 
   public:
     const WindowResolution* GetWindowResolution() const
@@ -41,7 +41,16 @@ class ViewWindows
         return ptr_window_resolution_;
     }
 
+  protected:
+    void CreateLogger(const std::string& name);
+    void DeleteLogger(const std::string& name);
+    void CreateResolution(const std::string& name);
+    void DeleteResolution(const std::string& name);
+    void CreateTexture(const std::string& name);
+    void DeleteTexture(const std::string& name);
+
   private:
+    std::map<std::string, bool> window_state_;
     DrawGuiInterface* draw_gui_;
     glm::uvec2 size_;
     glm::uvec2 desktop_size_;

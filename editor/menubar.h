@@ -23,7 +23,8 @@ class Menubar : public GuiMenuBarInterface
      */
     Menubar(
 		const std::string& name,
-        ViewWindows& view_windows);
+        ViewWindows& view_windows,
+		DeviceInterface& device);
     //! @brief Virtual destructor.
     virtual ~Menubar() = default;
 
@@ -57,6 +58,7 @@ class Menubar : public GuiMenuBarInterface
     bool show_logger_ = false;
     bool show_resolution_ = false;
     ViewWindows& view_windows_;
+	DeviceInterface& device_;
 };
 
 }

@@ -46,7 +46,8 @@ try
     frame::gui::ViewWindows view_windows(
         gui_window.get(), size, win->GetDesktopSize(), win->GetPixelPerInch());
     gui_window->SetMenuBar(
-        std::make_unique<frame::gui::Menubar>("Menu", view_windows));
+        std::make_unique<frame::gui::Menubar>(
+            "Menu", view_windows, gui_window->GetDevice()));
     // Set the main window in full.
     win->GetDevice().AddPlugin(std::move(gui_window));
     frame::common::Application app(std::move(win));

@@ -55,6 +55,11 @@ class PluginInterface : public NameInterface
      * @return Is the loop continuing?
      */
     virtual bool Update(DeviceInterface& device, double dt = 0.0) = 0;
+    /**
+     * @brief Get the device.
+     * @return The device.
+     */
+    virtual DeviceInterface& GetDevice() = 0;
     //! @brief Called to cleanup at the end.
     virtual void End() = 0;
 };

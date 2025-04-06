@@ -1,10 +1,10 @@
 #include "frame/opengl/gui/sdl_opengl_draw_gui.h"
 
 #include <SDL3/SDL.h>
-#include <fmt/core.h>
 #include <imgui.h>
 #include <imgui_impl_sdl3.h>
 #include <imgui_impl_opengl3.h>
+#include <format>
 
 #include "frame/device_interface.h"
 #include "frame/file/file_system.h"
@@ -131,12 +131,15 @@ bool SDLOpenGLDrawGui::Update(DeviceInterface& device, double dt)
         frame::TextureInterface& texture_interface =
             device.GetLevel().GetTextureFromId(id);
         if (texture_interface.IsCubeMap())
+        {
             continue;
+        }
         opengl::Texture& texture = dynamic_cast<opengl::Texture&>(
             device.GetLevel().GetTextureFromId(id));
         auto& level = device.GetLevel();
-        bool is_default_output = level.GetIdFromName(texture.GetName()) ==
-                                 level.GetDefaultOutputTextureId();
+        bool is_default_output =
+            level.GetIdFromName(texture.GetName()) ==
+            level.GetDefaultOutputTextureId();
         if (is_default_output)
         {
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
@@ -146,17 +149,24 @@ bool SDLOpenGLDrawGui::Update(DeviceInterface& device, double dt)
         // If the window are not visible and it is not the main window then
         // bail out.
         if (!is_visible_ && !is_default_output)
+        {
             continue;
+        }
         if (!is_visible_ && is_default_output)
         {
             ImGui::Begin(
-                fmt::format("{} - <fullscreen>", texture.GetName()).c_str(),
+                std::format("{} - <fullscreen>", texture.GetName()).c_str(),
                 nullptr,
                 ImGuiWindowFlags_NoDecoration);
         }
         else
         {
-            ImGui::Begin(texture.GetName().c_str());
+            std::string str_type =
+                is_default_output
+                    ? std::string("default")
+                    : std::string("texture");
+            ImGui::Begin(
+                std::format("{} - [{}]", str_type, texture.GetName()).c_str());
         }
         if (is_default_output && modal_callback_)
         {

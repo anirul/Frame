@@ -5,6 +5,7 @@
 #include "frame/gui/gui_window_interface.h"
 #include "frame/gui/gui_menu_bar_interface.h"
 #include "frame/name_interface.h"
+#include "frame/device_interface.h"
 #include "frame/plugin_interface.h"
 
 namespace frame::gui
