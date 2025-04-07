@@ -15,16 +15,15 @@ WindowTexture::WindowTexture(
     TextureInterface& texture_interface)
     : texture_interface_(texture_interface)
 {
-    name_ = std::format("texture - [{}]", texture_interface_.GetName());
+    std::string str_type =
+        texture_interface_.IsCubeMap() ? "cubemap" : "texture";
+    name_ = std::format("{} - [{}]", str_type, texture_interface_.GetName());
 }
-
-WindowTexture::~WindowTexture() = default;
 
 bool WindowTexture::DrawCallback()
 {
     frame::opengl::Texture& texture =
         dynamic_cast<frame::opengl::Texture&>(texture_interface_);
-    ImGui::Begin(std::format("texture - [{}]", name_).c_str());
     // Get the window width.
     ImVec2 content_window = ImGui::GetContentRegionAvail();
     auto size = texture.GetSize();
@@ -56,7 +55,22 @@ bool WindowTexture::DrawCallback()
     }
     // Draw the image.
     ImGui::Image(gl_id, window_range, ImVec2(0, 1), ImVec2(1, 0));
-    ImGui::End();
+    return true;
+}
+
+bool WindowTexture::End() const
+{
+    return false;
+}
+
+std::string WindowTexture::GetName() const
+{
+    return name_;
+}
+
+void WindowTexture::SetName(const std::string& name)
+{
+    name_ = name;
 }
 
 } // End namespace frame::gui.

@@ -1,7 +1,14 @@
 #include "view_windows.h"
 
+#include <SDL3/SDL.h>
+#include <format>
+#include <imgui.h>
+#include <imgui_impl_opengl3.h>
+#include <imgui_impl_sdl3.h>
+
 #include "frame/gui/window_logger.h"
 #include "frame/opengl/texture.h"
+#include "window_texture.h"
 
 namespace frame::gui
 {
@@ -85,7 +92,34 @@ void ViewWindows::ShowTexturesWindow(DeviceInterface& device)
     auto& level = device.GetLevel();
     for (auto id : level.GetTextures())
     {
-        
+        frame::TextureInterface& texture_interface =
+            device.GetLevel().GetTextureFromId(id);
+        std::string str_type =
+            texture_interface.IsCubeMap() ? "cubemap" : "texture";
+        if (!window_state_.contains(texture_interface.GetName()))
+        {
+            window_state_[texture_interface.GetName()] = false;
+        }
+        if (ImGui::MenuItem(
+                std::format(
+                    "{} - [{}]",
+                    str_type,
+                    texture_interface.GetName(), id).c_str(),
+                "",
+                &window_state_[texture_interface.GetName()]))
+        {
+            if (window_state_[texture_interface.GetName()])
+            {
+                draw_gui_->AddWindow(
+                    std::make_unique<WindowTexture>(texture_interface));
+            }
+            else
+            {
+                draw_gui_->DeleteWindow(
+                    std::format(
+                        "{} - [{}]", str_type, texture_interface.GetName()));
+            }
+        }
     }
 }
 
