@@ -125,7 +125,7 @@ bool SDLOpenGLDrawGui::Update(DeviceInterface& device, double dt)
         }
     }
 
-    // Go through all texture and create a window for each of them.
+    // Go through all texture and create a window for the main output.
     for (const EntityId& id : device.GetLevel().GetTextures())
     {
         frame::TextureInterface& texture_interface =
@@ -140,6 +140,7 @@ bool SDLOpenGLDrawGui::Update(DeviceInterface& device, double dt)
         bool is_default_output =
             level.GetIdFromName(texture.GetName()) ==
             level.GetDefaultOutputTextureId();
+        // This is not the default window so skip.
         if (!is_default_output)
         {
             continue;
@@ -150,7 +151,7 @@ bool SDLOpenGLDrawGui::Update(DeviceInterface& device, double dt)
         if (!is_visible_)
         {
             ImGui::Begin(
-                std::format("{} - <fullscreen>", texture.GetName()).c_str(),
+                std::format("<fullscreen> - [{}]", texture.GetName()).c_str(),
                 nullptr,
                 ImGuiWindowFlags_NoDecoration);
         }
@@ -256,21 +257,20 @@ bool SDLOpenGLDrawGui::Update(DeviceInterface& device, double dt)
     io.DisplaySize =
         ImVec2(static_cast<float>(size_.x), static_cast<float>(size_.y));
 
+    SDL_Window* backup_window =
+        static_cast<SDL_Window*>(window_.GetWindowContext());
+    SDL_GLContext backup_context =
+        static_cast<SDL_GLContext>(window_.GetGraphicContext());
+
+    assert(backup_window);
+    assert(backup_context);
     if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
     {
-        SDL_Window* backup_window =
-            static_cast<SDL_Window*>(window_.GetWindowContext());
-        SDL_GLContext backup_context =
-            static_cast<SDL_GLContext>(window_.GetGraphicContext());
-
-        assert(backup_window);
-        assert(backup_context);
 
         ImGui::UpdatePlatformWindows();
         ImGui::RenderPlatformWindowsDefault();
-
-        SDL_GL_MakeCurrent(backup_window, backup_context);
     }
+    SDL_GL_MakeCurrent(backup_window, backup_context);
 
     return returned_value;
 }

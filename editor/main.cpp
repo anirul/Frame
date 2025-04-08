@@ -33,7 +33,6 @@ try
 {
     glm::uvec2 size = {1280, 720};
     bool end = true;
-    const frame::gui::WindowResolution* ptr_window_resolution = nullptr;
     auto win = frame::CreateNewWindow(
         frame::DrawingTargetEnum::WINDOW,
         frame::RenderingAPIEnum::OPENGL,
@@ -48,21 +47,18 @@ try
     // Set the main window in full.
     win->GetDevice().AddPlugin(std::move(gui_window));
     frame::common::Application app(std::move(win));
-    ptr_window_resolution = view_windows.GetWindowResolution();
     do
     {
         app.Startup(frame::file::FindFile("asset/json/editor.json"));
         app.Run();
         if (view_windows.GetWindowResolution())
         {
-            ptr_window_resolution =
-                view_windows.GetWindowResolution();
             app.Resize(
-                ptr_window_resolution->GetSize(),
-                ptr_window_resolution->GetFullScreen());
+                view_windows.GetWindowResolution()->GetSize(),
+                view_windows.GetWindowResolution()->GetFullScreen());
         }
-    }
-    while (!ptr_window_resolution->End());
+    } while (view_windows.GetWindowResolution() &&
+             !view_windows.GetWindowResolution()->End());
     return 0;
 }
 catch (std::exception ex)
