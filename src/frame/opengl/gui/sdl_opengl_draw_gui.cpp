@@ -140,23 +140,14 @@ bool SDLOpenGLDrawGui::Update(DeviceInterface& device, double dt)
         bool is_default_output =
             level.GetIdFromName(texture.GetName()) ==
             level.GetDefaultOutputTextureId();
-        if (is_default_output)
-        {
-            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-            original_image_size_ = texture.GetSize();
-        }
-        else
+        if (!is_default_output)
         {
             continue;
         }
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+        original_image_size_ = texture.GetSize();
        
-        // If the window are not visible and it is not the main window then
-        // bail out.
-        if (!is_visible_ && !is_default_output)
-        {
-            continue;
-        }
-        if (!is_visible_ && is_default_output)
+        if (!is_visible_)
         {
             ImGui::Begin(
                 std::format("{} - <fullscreen>", texture.GetName()).c_str(),
@@ -165,14 +156,10 @@ bool SDLOpenGLDrawGui::Update(DeviceInterface& device, double dt)
         }
         else
         {
-            std::string str_type =
-                is_default_output
-                    ? std::string("default")
-                    : std::string("texture");
             ImGui::Begin(
-                std::format("{} - [{}]", str_type, texture.GetName()).c_str());
+                std::format("default - [{}]", texture.GetName()).c_str());
         }
-        if (is_default_output && modal_callback_)
+        if (modal_callback_)
         {
             if (!start_modal_)
             {
@@ -196,7 +183,7 @@ bool SDLOpenGLDrawGui::Update(DeviceInterface& device, double dt)
             }
         }
         // Check if you should enable default window keyboard and mouse.
-        if (ImGui::IsWindowHovered() && is_default_output )
+        if (ImGui::IsWindowHovered())
         {
             is_keyboard_passed_ = true;
         }
