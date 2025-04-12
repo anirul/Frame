@@ -9,9 +9,9 @@ namespace frame::gui
 
 Menubar::Menubar(
     const std::string& name,
-    ViewWindows& view_windows,
+    MenubarView& menubar_view,
     DeviceInterface& device)
-    : name_(name), view_windows_(view_windows), device_(device)
+    : name_(name), menubar_view_(menubar_view), device_(device)
 {
     SetName(name);
 }
@@ -73,16 +73,16 @@ void Menubar::MenuView()
         ImGui::Separator();
         if (ImGui::MenuItem("Show Resolution", "Ctrl+R", &show_resolution_))
         {
-            view_windows_.ShowResolutionWindow();
+            menubar_view_.ShowResolutionWindow();
         }
         if (ImGui::MenuItem("Show Log", "Ctrl+L", &show_logger_))
         {
-            view_windows_.ShowLoggerWindow();
+            menubar_view_.ShowLoggerWindow();
         }
         ImGui::Separator();
         if (ImGui::BeginMenu("Texture"))
         {
-            view_windows_.ShowTexturesWindow(device_);
+            menubar_view_.ShowTexturesWindow(device_);
             ImGui::EndMenu();
         }
         ImGui::EndMenu();

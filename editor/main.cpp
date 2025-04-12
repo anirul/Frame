@@ -17,7 +17,7 @@
 #include "frame/gui/window_resolution.h"
 #include "frame/window_factory.h"
 #include "menubar.h"
-#include "view_windows.h"
+#include "menubar_view.h"
 
 // From: https://sourceforge.net/p/predef/wiki/OperatingSystems/
 #if defined(_WIN32) || defined(_WIN64)
@@ -39,11 +39,11 @@ try
         size);
     auto& device = win->GetDevice();
     auto gui_window = frame::gui::CreateDrawGui(*win.get(), {}, 20.0f);
-    frame::gui::ViewWindows view_windows(
+    frame::gui::MenubarView menubar_view(
         gui_window.get(), size, win->GetDesktopSize(), win->GetPixelPerInch());
     gui_window->SetMenuBar(
         std::make_unique<frame::gui::Menubar>(
-            "Menu", view_windows, gui_window->GetDevice()));
+            "Menu", menubar_view, gui_window->GetDevice()));
     // Set the main window in full.
     win->GetDevice().AddPlugin(std::move(gui_window));
     frame::common::Application app(std::move(win));
@@ -51,14 +51,14 @@ try
     {
         app.Startup(frame::file::FindFile("asset/json/editor.json"));
         app.Run();
-        if (view_windows.GetWindowResolution())
+        if (menubar_view.GetWindowResolution())
         {
             app.Resize(
-                view_windows.GetWindowResolution()->GetSize(),
-                view_windows.GetWindowResolution()->GetFullScreen());
+                menubar_view.GetWindowResolution()->GetSize(),
+                menubar_view.GetWindowResolution()->GetFullScreen());
         }
-    } while (view_windows.GetWindowResolution() &&
-             !view_windows.GetWindowResolution()->End());
+    } while (menubar_view.GetWindowResolution() &&
+             !menubar_view.GetWindowResolution()->End());
     return 0;
 }
 catch (std::exception ex)

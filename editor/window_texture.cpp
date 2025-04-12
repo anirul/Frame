@@ -11,13 +11,17 @@
 namespace frame::gui
 {
 
-WindowTexture::WindowTexture(
-    TextureInterface& texture_interface)
-    : texture_interface_(texture_interface)
+WindowTexture::WindowTexture(TextureInterface& texture_interface) :
+    name_(""),
+    size_(0, 0),
+    texture_interface_(texture_interface)
 {
-    std::string str_type =
-        texture_interface_.IsCubeMap() ? "cubemap" : "texture";
-    name_ = std::format("{} - [{}]", str_type, texture_interface_.GetName());
+    if (texture_interface_.IsCubeMap())
+    {
+        throw std::runtime_error(
+            "Cannot create a window for a cubemap texture!");
+    }
+    name_ = std::format("texture - [{}]", texture_interface_.GetName());
 }
 
 bool WindowTexture::DrawCallback()
@@ -53,7 +57,7 @@ bool WindowTexture::DrawCallback()
         window_range =
             ImVec2(content_window.x, content_window.x / aspect_ratio);
     }
-    ImVec2 window_size = ImGui::GetWindowSize();
+    ImVec2 window_size = ImGui::GetContentRegionAvail();
     size_ = glm::uvec2(window_size.x, window_size.y);
     // Draw the image.
     ImGui::Image(gl_id, window_range, ImVec2(0, 1), ImVec2(1, 0));

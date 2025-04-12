@@ -15,20 +15,20 @@ namespace frame::gui
  * @class View Windows
  * @brief A container for the view windows.
  */
-class ViewWindows
+class MenubarView
 {
   public:
     /**
      * @brief Default constructor.
      * @param name: The name of the window.
      */
-    ViewWindows(
+    MenubarView(
 		DrawGuiInterface* draw_gui,
 		glm::uvec2 size,
 		glm::uvec2 desktop_size,
 		glm::uvec2 pixel_per_inch);
     //! @brief Virtual destructor.
-    virtual ~ViewWindows() = default;
+    virtual ~MenubarView() = default;
 
   public:
     void ShowLoggerWindow();

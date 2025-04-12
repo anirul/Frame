@@ -1,4 +1,4 @@
-#include "view_windows.h"
+#include "menubar_view.h"
 
 #include <SDL3/SDL.h>
 #include <format>
@@ -13,7 +13,7 @@
 namespace frame::gui
 {
 
-ViewWindows::ViewWindows(
+MenubarView::MenubarView(
     DrawGuiInterface* draw_gui,
     glm::uvec2 size,
     glm::uvec2 desktop_size,
@@ -25,17 +25,17 @@ ViewWindows::ViewWindows(
 {
 }
 
-void ViewWindows::CreateLogger(const std::string& name)
+void MenubarView::CreateLogger(const std::string& name)
 {
     draw_gui_->AddWindow(std::make_unique<WindowLogger>(name));
 }
 
-void ViewWindows::DeleteLogger(const std::string& name)
+void MenubarView::DeleteLogger(const std::string& name)
 {
     draw_gui_->DeleteWindow(name);
 }
 
-void ViewWindows::CreateResolution(const std::string& name)
+void MenubarView::CreateResolution(const std::string& name)
 {
     std::unique_ptr<WindowResolution> unique_window_resolution =
         std::make_unique<WindowResolution>(
@@ -47,13 +47,13 @@ void ViewWindows::CreateResolution(const std::string& name)
     draw_gui_->AddWindow(std::move(unique_window_resolution));
 }
 
-void ViewWindows::DeleteResolution(const std::string& name)
+void MenubarView::DeleteResolution(const std::string& name)
 {
     ptr_window_resolution_ = nullptr;
     draw_gui_->DeleteWindow(name);
 }
 
-void ViewWindows::ShowLoggerWindow()
+void MenubarView::ShowLoggerWindow()
 {
     if (!window_state_.contains("Logger"))
     {
@@ -70,7 +70,7 @@ void ViewWindows::ShowLoggerWindow()
     window_state_["Logger"] = !window_state_["Logger"];
 }
 
-void ViewWindows::ShowResolutionWindow()
+void MenubarView::ShowResolutionWindow()
 {
     if (!window_state_.contains("Resolution"))
     {
@@ -87,7 +87,7 @@ void ViewWindows::ShowResolutionWindow()
     window_state_["Resolution"] = !window_state_["Resolution"];
 }
 
-void ViewWindows::ShowTexturesWindow(DeviceInterface& device)
+void MenubarView::ShowTexturesWindow(DeviceInterface& device)
 {
     auto& level = device.GetLevel();
     for (auto id : level.GetTextures())
