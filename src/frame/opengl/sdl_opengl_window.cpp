@@ -85,9 +85,10 @@ SDLOpenGLWindow::SDLOpenGLWindow(glm::uvec2 size) : size_(size)
     auto result = glewInit();
     if (result != GLEW_OK)
     {
-        throw std::runtime_error(std::format(
-            "GLEW problems : {}",
-            reinterpret_cast<const char*>(glewGetErrorString(result))));
+        throw std::runtime_error(
+            std::format(
+                "GLEW problems : {}",
+                reinterpret_cast<const char*>(glewGetErrorString(result))));
     }
 
     // During init, enable debug output
@@ -171,6 +172,8 @@ void SDLOpenGLWindow::Run(std::function<void()> lambda)
             }
         }
 
+        SDL_GL_MakeCurrent(sdl_window_, gl_context_);
+
         SetWindowTitle(
             "SDL OpenGL - " + std::to_string(static_cast<float>(GetFPS(dt))));
         previous_count = time.count();
@@ -181,7 +184,8 @@ void SDLOpenGLWindow::Run(std::function<void()> lambda)
         {
             SDL_GL_SwapWindow(sdl_window_);
         }
-    } while (loop);
+    }
+    while (loop);
 }
 
 bool SDLOpenGLWindow::RunEvent(const SDL_Event& event, const double dt)
@@ -194,7 +198,9 @@ bool SDLOpenGLWindow::RunEvent(const SDL_Event& event, const double dt)
     for (PluginInterface* plugin : device_->GetPluginPtrs())
     {
         if (dynamic_cast<frame::gui::DrawGuiInterface*>(plugin))
+        {
             has_window_plugin = true;
+        }
     }
     if (event.type == SDL_EVENT_KEY_DOWN)
     {
@@ -344,8 +350,9 @@ void SDLOpenGLWindow::Resize(glm::uvec2 size, FullScreenEnum fullscreen_enum)
 
         if (!SDL_SetWindowFullscreenMode(sdl_window_, mode_ptr))
         {
-            throw std::runtime_error(fmt::format(
-                "Error switching fullscreen mode: {}", SDL_GetError()));
+            throw std::runtime_error(
+                std::format(
+                    "Error switching fullscreen mode: {}", SDL_GetError()));
         }
 
         // Only resize in windowed mode — fullscreen modes will auto-resize the

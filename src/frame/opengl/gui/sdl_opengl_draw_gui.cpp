@@ -125,7 +125,7 @@ bool SDLOpenGLDrawGui::Update(DeviceInterface& device, double dt)
         }
     }
 
-    // Go through all texture and create a window for each of them.
+    // Go through all texture and create a window for the main output.
     for (const EntityId& id : device.GetLevel().GetTextures())
     {
         frame::TextureInterface& texture_interface =
@@ -140,39 +140,27 @@ bool SDLOpenGLDrawGui::Update(DeviceInterface& device, double dt)
         bool is_default_output =
             level.GetIdFromName(texture.GetName()) ==
             level.GetDefaultOutputTextureId();
-        if (is_default_output)
-        {
-            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-            original_image_size_ = texture.GetSize();
-        }
-        else
+        // This is not the default window so skip.
+        if (!is_default_output)
         {
             continue;
         }
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+        original_image_size_ = texture.GetSize();
        
-        // If the window are not visible and it is not the main window then
-        // bail out.
-        if (!is_visible_ && !is_default_output)
-        {
-            continue;
-        }
-        if (!is_visible_ && is_default_output)
+        if (!is_visible_)
         {
             ImGui::Begin(
-                std::format("{} - <fullscreen>", texture.GetName()).c_str(),
+                std::format("<fullscreen> - [{}]", texture.GetName()).c_str(),
                 nullptr,
                 ImGuiWindowFlags_NoDecoration);
         }
         else
         {
-            std::string str_type =
-                is_default_output
-                    ? std::string("default")
-                    : std::string("texture");
             ImGui::Begin(
-                std::format("{} - [{}]", str_type, texture.GetName()).c_str());
+                std::format("default - [{}]", texture.GetName()).c_str());
         }
-        if (is_default_output && modal_callback_)
+        if (modal_callback_)
         {
             if (!start_modal_)
             {
@@ -196,7 +184,7 @@ bool SDLOpenGLDrawGui::Update(DeviceInterface& device, double dt)
             }
         }
         // Check if you should enable default window keyboard and mouse.
-        if (ImGui::IsWindowHovered() && is_default_output )
+        if (ImGui::IsWindowHovered())
         {
             is_keyboard_passed_ = true;
         }
@@ -269,21 +257,20 @@ bool SDLOpenGLDrawGui::Update(DeviceInterface& device, double dt)
     io.DisplaySize =
         ImVec2(static_cast<float>(size_.x), static_cast<float>(size_.y));
 
+    SDL_Window* backup_window =
+        static_cast<SDL_Window*>(window_.GetWindowContext());
+    SDL_GLContext backup_context =
+        static_cast<SDL_GLContext>(window_.GetGraphicContext());
+
+    assert(backup_window);
+    assert(backup_context);
     if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
     {
-        SDL_Window* backup_window =
-            static_cast<SDL_Window*>(window_.GetWindowContext());
-        SDL_GLContext backup_context =
-            static_cast<SDL_GLContext>(window_.GetGraphicContext());
-
-        assert(backup_window);
-        assert(backup_context);
 
         ImGui::UpdatePlatformWindows();
         ImGui::RenderPlatformWindowsDefault();
-
-        SDL_GL_MakeCurrent(backup_window, backup_context);
     }
+    SDL_GL_MakeCurrent(backup_window, backup_context);
 
     return returned_value;
 }
