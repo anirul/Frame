@@ -12,6 +12,7 @@ add_library(FrameGui
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/gui/window_file_dialog.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/gui/window_logger.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/gui/window_resolution.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/gui/window_texture.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/gui/input_factory.h
     draw_gui_factory.cpp
     input_arcball.cpp
@@ -26,6 +27,7 @@ add_library(FrameGui
     window_file_dialog.cpp
     window_logger.cpp
     window_resolution.cpp
+    window_texture.cpp
 )
 
 target_include_directories(FrameGui

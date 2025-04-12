@@ -8,7 +8,7 @@
 
 #include "frame/gui/window_logger.h"
 #include "frame/opengl/texture.h"
-#include "window_texture.h"
+#include "frame/gui/window_texture.h"
 
 namespace frame::gui
 {

@@ -1,4 +1,4 @@
-#include "window_texture.h"
+#include "frame/gui/window_texture.h"
 
 #include <SDL3/SDL.h>
 #include <imgui.h>
