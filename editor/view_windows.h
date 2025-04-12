@@ -46,8 +46,6 @@ class ViewWindows
     void DeleteLogger(const std::string& name);
     void CreateResolution(const std::string& name);
     void DeleteResolution(const std::string& name);
-    void CreateTexture(const std::string& name);
-    void DeleteTexture(const std::string& name);
 
   private:
     std::map<std::string, bool> window_state_;

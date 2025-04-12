@@ -48,6 +48,7 @@ class WindowTexture : public GuiWindowInterface
 
   private:
     std::string name_;
+    glm::uvec2 size_;
     TextureInterface& texture_interface_;
 };
 

@@ -53,9 +53,16 @@ bool WindowTexture::DrawCallback()
         window_range =
             ImVec2(content_window.x, content_window.x / aspect_ratio);
     }
+    ImVec2 window_size = ImGui::GetWindowSize();
+    size_ = glm::uvec2(window_size.x, window_size.y);
     // Draw the image.
     ImGui::Image(gl_id, window_range, ImVec2(0, 1), ImVec2(1, 0));
     return true;
+}
+
+glm::uvec2 WindowTexture::GetSize() const
+{
+    return size_;
 }
 
 bool WindowTexture::End() const
