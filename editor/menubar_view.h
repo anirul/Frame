@@ -34,11 +34,15 @@ class MenubarView
     void ShowLoggerWindow();
     void ShowResolutionWindow();
     void ShowTexturesWindow(DeviceInterface& device);
-
+    
   public:
     const WindowResolution* GetWindowResolution() const
     {
         return ptr_window_resolution_;
+    }
+    DrawGuiInterface* GetDrawGui() const
+    {
+        return draw_gui_;
     }
 
   protected:

@@ -3,6 +3,7 @@
 #include <imgui.h>
 #include "frame/gui/window_logger.h"
 #include "frame/gui/window_resolution.h"
+#include "frame/gui/window_file_dialog.h"
 
 namespace frame::gui
 {
@@ -22,16 +23,27 @@ void Menubar::MenuFile()
     {
         if (ImGui::MenuItem("New Project", "Ctrl+N"))
         {
+            menubar_view_.GetDrawGui()->AddModalWindow(
+                std::make_unique<WindowFileDialog>(
+                    "json", FileDialogEnum::NEW));
         }
         if (ImGui::MenuItem("Open Project", "Ctrl+O"))
         {
+            menubar_view_.GetDrawGui()->AddModalWindow(
+                std::make_unique<WindowFileDialog>(
+                    "json", FileDialogEnum::OPEN));
+
         }
         ImGui::Separator();
         if (ImGui::MenuItem("Save Project", "Ctrl+S"))
         {
+            // TODO(anirul): Save project.
         }
         if (ImGui::MenuItem("Save Project As...", "Ctrl+Shift+S"))
         {
+            menubar_view_.GetDrawGui()->AddModalWindow(
+                std::make_unique<WindowFileDialog>(
+                    "json", FileDialogEnum::SAVE_AS));
         }
         ImGui::Separator();
         if (ImGui::MenuItem("Exit", "Alt+F4"))
