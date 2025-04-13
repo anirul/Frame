@@ -4,6 +4,7 @@
 #include "frame/gui/window_logger.h"
 #include "frame/gui/window_resolution.h"
 #include "frame/gui/window_file_dialog.h"
+#include "frame/logger.h"
 
 namespace frame::gui
 {
@@ -25,13 +26,23 @@ void Menubar::MenuFile()
         {
             menubar_view_.GetDrawGui()->AddModalWindow(
                 std::make_unique<WindowFileDialog>(
-                    "json", FileDialogEnum::NEW));
+                    "json",
+                    FileDialogEnum::NEW,
+                    [this](const std::string& file_name)
+                    {
+                        SetFileName(file_name, FileDialogEnum::NEW);
+                    }));
         }
         if (ImGui::MenuItem("Open Project", "Ctrl+O"))
         {
             menubar_view_.GetDrawGui()->AddModalWindow(
                 std::make_unique<WindowFileDialog>(
-                    "json", FileDialogEnum::OPEN));
+                    "json",
+                    FileDialogEnum::OPEN,
+                    [this](const std::string& file_name)
+                    {
+                        SetFileName(file_name, FileDialogEnum::OPEN);
+                    }));
 
         }
         ImGui::Separator();
@@ -43,7 +54,12 @@ void Menubar::MenuFile()
         {
             menubar_view_.GetDrawGui()->AddModalWindow(
                 std::make_unique<WindowFileDialog>(
-                    "json", FileDialogEnum::SAVE_AS));
+                    "json",
+                    FileDialogEnum::SAVE_AS,
+                    [this](const std::string& file_name)
+                    {
+                        SetFileName(file_name, FileDialogEnum::SAVE_AS);
+                    }));
         }
         ImGui::Separator();
         if (ImGui::MenuItem("Exit", "Alt+F4"))
@@ -122,6 +138,26 @@ void Menubar::SetName(const std::string& name)
 bool Menubar::End() const
 {
     return end_;
+}
+
+void Menubar::SetFileName(
+    const std::string& file_name, FileDialogEnum file_dialog_enum)
+{
+    switch (file_dialog_enum)
+    {
+    case FileDialogEnum::NEW:
+        Logger::GetInstance()->info(
+            std::format("New project file: {}", file_name));
+        break;
+    case FileDialogEnum::OPEN:
+        Logger::GetInstance()->info(
+            std::format("Open project file: {}", file_name));
+        break;
+    case FileDialogEnum::SAVE_AS:
+        Logger::GetInstance()->info(
+            std::format("Save project file as: {}", file_name));
+        break;
+    }
 }
 
 } // End namespace frame::gui.

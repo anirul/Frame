@@ -26,10 +26,12 @@ class WindowFileDialog : public GuiWindowInterface
     /**
      * @brief Default constructor.
      * @param extention: The file extention.
-     * @param size: The initial size of the window.
+     * @param file_dialog_enum: Type of dialog (new, open, save as).
      */
     WindowFileDialog(
-		const std::string& extension, FileDialogEnum file_dialog_enum);
+		const std::string& extension,
+		FileDialogEnum file_dialog_enum,
+		std::function<void(const std::string&)> get_file);
     //! @brief Virtual destructor.
     virtual ~WindowFileDialog() = default;
 
@@ -52,21 +54,12 @@ class WindowFileDialog : public GuiWindowInterface
      */
     void SetName(const std::string& name) override;
 
-  public:
-    /**
-     * @brief Get the file name.
-     * @return The file name.
-     */
-    std::string GetFileName() const
-    {
-        return file_name_;
-    }
-
   private:
     std::string name_;
     std::string extension_;
     std::string file_name_;
     FileDialogEnum file_dialog_enum_;
+    std::function<void(const std::string&)> get_file_;
 	bool end_ = false;
 };
 

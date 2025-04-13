@@ -5,6 +5,7 @@
 
 #include "frame/api.h"
 #include "frame/gui/gui_menu_bar_interface.h"
+#include "frame/gui/window_file_dialog.h"
 #include "menubar_view.h"
 
 namespace frame::gui
@@ -46,6 +47,13 @@ class Menubar : public GuiMenuBarInterface
      * @return True if this is the end false if not.
      */
     bool End() const override;
+    /**
+     * @brief Set the file name.
+     * @param file_name: The name of the file.
+     * @param file_dialog_enum: The type of file dialog.
+     */
+    void SetFileName(
+        const std::string& file_name, FileDialogEnum file_dialog_enum);
 
   protected:
     void MenuFile();

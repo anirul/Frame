@@ -12,9 +12,13 @@ namespace frame::gui
 
 // Constructor: Initialize the dialog with a file extension filter and mode.
 WindowFileDialog::WindowFileDialog(
-    const std::string& extension, FileDialogEnum file_dialog_enum)
-    : name_("File Dialog"), extension_(extension),
-      file_dialog_enum_(file_dialog_enum)
+    const std::string& extension,
+    FileDialogEnum file_dialog_enum,
+    std::function<void(const std::string&)> get_file)
+    : name_("File Dialog"),
+      extension_(extension),
+      file_dialog_enum_(file_dialog_enum),
+      get_file_(get_file)
 {
     switch (file_dialog_enum_)
     {
@@ -122,6 +126,39 @@ bool WindowFileDialog::DrawCallback()
 
     // Separator between the file browser and the bottom controls.
     ImGui::Separator();
+
+    // If we're in NEW mode, and the file_buffer doesn't already start with the
+    // current directory...
+    if (file_dialog_enum_ == FileDialogEnum::NEW)
+    {
+        std::string current_dir = current_path.string();
+        std::string current_buffer(file_buffer);
+        // Check if file_buffer already contains the current directory (use
+        // find() == 0 to check prefix).
+        if (current_buffer.empty() || current_buffer.find(current_dir) != 0)
+        {
+            // For example, if file_buffer is empty, prefill it with the full
+            // path plus a file separator.
+            std::string new_full_path = current_dir;
+            if (new_full_path.back() != '/' && new_full_path.back() != '\\')
+            {
+#if defined(_WIN32) || defined(_WIN64)
+                new_full_path.push_back('\\');
+#else
+                new_full_path.push_back('/');
+#endif
+            }
+            // If the user typed something (e.g. a file name without path),
+            // append it.
+            new_full_path += current_buffer;
+            // Copy back to file_buffer (using std::copy_n for safety).
+            size_t len =
+                std::min(new_full_path.size(), sizeof(file_buffer) - 1);
+            std::copy_n(new_full_path.begin(), len, file_buffer);
+            file_buffer[len] = '\0';
+        }
+    }
+
     // Input field for the file name/path.
     ImGui::InputText("File Name", file_buffer, sizeof(file_buffer));
 
@@ -130,21 +167,27 @@ bool WindowFileDialog::DrawCallback()
     case FileDialogEnum::NEW:
         if (ImGui::Button("New File"))
         {
-            file_name_ = (std::strlen(file_buffer)) ? file_buffer : file_name_;
+            file_name_ =
+                (std::strlen(file_buffer)) ? file_buffer : file_name_;
+            get_file_(file_name_);
             end_ = true;
         }
         break;
     case FileDialogEnum::OPEN:
         if (ImGui::Button("Open File"))
         {
-            file_name_ = (std::strlen(file_buffer)) ? file_buffer : file_name_;
+            file_name_ =
+                (std::strlen(file_buffer)) ? file_buffer : file_name_;
+            get_file_(file_name_);
             end_ = true;
         }
         break;
     case FileDialogEnum::SAVE_AS:
         if (ImGui::Button("Save As"))
         {
-            file_name_ = (std::strlen(file_buffer)) ? file_buffer : file_name_;
+            file_name_ =
+                (std::strlen(file_buffer)) ? file_buffer : file_name_;
+            get_file_(file_name_);
             end_ = true;
         }
         break;

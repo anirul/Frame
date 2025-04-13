@@ -28,24 +28,15 @@ bool WindowTexture::DrawCallback()
 {
     frame::opengl::Texture& texture =
         dynamic_cast<frame::opengl::Texture&>(texture_interface_);
-    // Get the window width.
+
+    // Get the available content region (assuming zero window padding)
     ImVec2 content_window = ImGui::GetContentRegionAvail();
-    auto size = texture.GetSize();
-    // Compute the aspect ratio.
+
+    // Compute the final size (window_range) as you already do.
+    auto texture_size = texture.GetSize();
     float aspect_ratio =
-        static_cast<float>(size.x) / static_cast<float>(size.y);
-    // Cast the opengl windows id.
-    // I disable the warning C4312 from unsigned int to void* casting to
-    // a bigger space.
-#if defined(_WIN32) || defined(_WIN64)
-#pragma warning(push)
-#pragma warning(disable : 4312)
-#endif
+        static_cast<float>(texture_size.x) / static_cast<float>(texture_size.y);
     ImTextureID gl_id = static_cast<ImTextureID>(texture.GetId());
-#if defined(_WIN32) || defined(_WIN64)
-#pragma warning(pop)
-#endif
-    // Compute the final size.
     ImVec2 window_range{};
     if (content_window.x / aspect_ratio > content_window.y)
     {
@@ -57,16 +48,19 @@ bool WindowTexture::DrawCallback()
         window_range =
             ImVec2(content_window.x, content_window.x / aspect_ratio);
     }
-    ImVec2 window_size = ImGui::GetContentRegionAvail();
-    size_ = glm::uvec2(window_size.x, window_size.y);
+
+    // Compute offset for centering:
+    ImVec2 image_offset;
+    image_offset.x = (content_window.x - window_range.x) * 0.5f;
+    image_offset.y = (content_window.y - window_range.y) * 0.5f;
+
+    // Set the cursor position to the computed offset.
+    ImGui::SetCursorPos(image_offset);
+
     // Draw the image.
     ImGui::Image(gl_id, window_range, ImVec2(0, 1), ImVec2(1, 0));
-    return true;
-}
 
-glm::uvec2 WindowTexture::GetSize() const
-{
-    return size_;
+    return true;
 }
 
 bool WindowTexture::End() const

@@ -266,7 +266,6 @@ bool SDLOpenGLDrawGui::Update(DeviceInterface& device, double dt)
     assert(backup_context);
     if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
     {
-
         ImGui::UpdatePlatformWindows();
         ImGui::RenderPlatformWindowsDefault();
     }

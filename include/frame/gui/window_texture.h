@@ -25,6 +25,11 @@ class WindowTexture : public GuiWindowInterface
     //! @brief Draw callback setting.
     bool DrawCallback() override;
     /**
+     * @brief Check if this is the end of the software.
+     * @return True if this is the end false if not.
+     */
+    bool End() const override;
+    /**
      * @brief Get the name of the window.
      * @return The name of the window.
      */
@@ -34,17 +39,6 @@ class WindowTexture : public GuiWindowInterface
      * @param name: The name of the window.
      */
     void SetName(const std::string& name) override;
-    /**
-     * @brief Get the window size.
-     * This will vary according to what full screen mode is selected!
-     * @return The size of the window.
-     */
-    glm::uvec2 GetSize() const;
-    /**
-     * @brief Check if this is the end of the software.
-     * @return True if this is the end false if not.
-     */
-    bool End() const override;
 
   private:
     std::string name_;
