@@ -17,6 +17,7 @@
 #include "frame/gui/window_resolution.h"
 #include "frame/window_factory.h"
 #include "menubar.h"
+#include "menubar_file.h"
 #include "menubar_view.h"
 
 // From: https://sourceforge.net/p/predef/wiki/OperatingSystems/
@@ -40,17 +41,25 @@ try
     auto& device = win->GetDevice();
     auto gui_window = frame::gui::CreateDrawGui(*win.get(), {}, 20.0f);
     frame::gui::MenubarView menubar_view(
-        gui_window.get(), size, win->GetDesktopSize(), win->GetPixelPerInch());
+        device,
+        *gui_window.get(),
+        size,
+        win->GetDesktopSize(),
+        win->GetPixelPerInch());
+    frame::gui::MenubarFile menubar_file(
+        device, *gui_window.get(), "asset/json/editor.json");
     gui_window->SetMenuBar(
         std::make_unique<frame::gui::Menubar>(
-            "Menu", menubar_view, gui_window->GetDevice()));
+            "Menu", menubar_file, menubar_view, gui_window->GetDevice()));
     // Set the main window in full.
-    win->GetDevice().AddPlugin(std::move(gui_window));
+    device.AddPlugin(std::move(gui_window));
     frame::common::Application app(std::move(win));
     do
     {
-        app.Startup(frame::file::FindFile("asset/json/editor.json"));
-        app.Run();
+        app.Startup(frame::file::FindFile(menubar_file.GetFileName()));
+        while (app.Run([&menubar_file] { return !menubar_file.HasChanged(); }))
+        {
+        }
         if (menubar_view.GetWindowResolution())
         {
             app.Resize(

@@ -23,7 +23,8 @@ class MenubarView
      * @param name: The name of the window.
      */
     MenubarView(
-		DrawGuiInterface* draw_gui,
+		DeviceInterface& device,
+		DrawGuiInterface& draw_gui,
 		glm::uvec2 size,
 		glm::uvec2 desktop_size,
 		glm::uvec2 pixel_per_inch);
@@ -40,7 +41,7 @@ class MenubarView
     {
         return ptr_window_resolution_;
     }
-    DrawGuiInterface* GetDrawGui() const
+    DrawGuiInterface& GetDrawGui() const
     {
         return draw_gui_;
     }
@@ -53,7 +54,8 @@ class MenubarView
 
   private:
     std::map<std::string, bool> window_state_;
-    DrawGuiInterface* draw_gui_;
+    DeviceInterface& device_;
+    DrawGuiInterface& draw_gui_;
     glm::uvec2 size_;
     glm::uvec2 desktop_size_;
     glm::uvec2 pixel_per_inch_;

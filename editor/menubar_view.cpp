@@ -14,11 +14,13 @@ namespace frame::gui
 {
 
 MenubarView::MenubarView(
-    DrawGuiInterface* draw_gui,
+    DeviceInterface& device,
+    DrawGuiInterface& draw_gui,
     glm::uvec2 size,
     glm::uvec2 desktop_size,
     glm::uvec2 pixel_per_inch)
-    : draw_gui_(draw_gui),
+    : device_(device),
+      draw_gui_(draw_gui),
       size_(size),
       desktop_size_(desktop_size),
       pixel_per_inch_(pixel_per_inch)
@@ -27,12 +29,12 @@ MenubarView::MenubarView(
 
 void MenubarView::CreateLogger(const std::string& name)
 {
-    draw_gui_->AddWindow(std::make_unique<WindowLogger>(name));
+    draw_gui_.AddWindow(std::make_unique<WindowLogger>(name));
 }
 
 void MenubarView::DeleteLogger(const std::string& name)
 {
-    draw_gui_->DeleteWindow(name);
+    draw_gui_.DeleteWindow(name);
 }
 
 void MenubarView::CreateResolution(const std::string& name)
@@ -44,13 +46,13 @@ void MenubarView::CreateResolution(const std::string& name)
             desktop_size_,
             pixel_per_inch_);
     ptr_window_resolution_ = unique_window_resolution.get();
-    draw_gui_->AddWindow(std::move(unique_window_resolution));
+    draw_gui_.AddWindow(std::move(unique_window_resolution));
 }
 
 void MenubarView::DeleteResolution(const std::string& name)
 {
     ptr_window_resolution_ = nullptr;
-    draw_gui_->DeleteWindow(name);
+    draw_gui_.DeleteWindow(name);
 }
 
 void MenubarView::ShowLoggerWindow()
@@ -110,12 +112,12 @@ void MenubarView::ShowTexturesWindow(DeviceInterface& device)
         {
             if (window_state_[texture_interface.GetName()])
             {
-                draw_gui_->AddWindow(
+                draw_gui_.AddWindow(
                     std::make_unique<WindowTexture>(texture_interface));
             }
             else
             {
-                draw_gui_->DeleteWindow(
+                draw_gui_.DeleteWindow(
                     std::format(
                         "{} - [{}]", str_type, texture_interface.GetName()));
             }
