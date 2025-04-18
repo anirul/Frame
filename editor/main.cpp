@@ -57,9 +57,7 @@ try
     do
     {
         app.Startup(frame::file::FindFile(menubar_file.GetFileName()));
-        while (app.Run([&menubar_file] { return !menubar_file.HasChanged(); }))
-        {
-        }
+        app.Run();
         if (menubar_view.GetWindowResolution())
         {
             app.Resize(
