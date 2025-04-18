@@ -7,6 +7,7 @@
 #include "frame/gui/gui_menu_bar_interface.h"
 #include "frame/gui/window_file_dialog.h"
 #include "menubar_view.h"
+#include "menubar_file.h"
 
 namespace frame::gui
 {
@@ -23,7 +24,8 @@ class Menubar : public GuiMenuBarInterface
      * @param name: The name of the window.
      */
     Menubar(
-		const std::string& name,
+        const std::string& name,
+        MenubarFile& menubar_file,
         MenubarView& menubar_view,
 		DeviceInterface& device);
     //! @brief Virtual destructor.
@@ -65,6 +67,7 @@ class Menubar : public GuiMenuBarInterface
     bool end_ = true;
     bool show_logger_ = false;
     bool show_resolution_ = false;
+    MenubarFile& menubar_file_;
     MenubarView& menubar_view_;
 	DeviceInterface& device_;
 };

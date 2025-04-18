@@ -15,6 +15,7 @@ namespace frame::gui
  */
 enum class FileDialogEnum
 {
+	UNKNOWN = 0,
 	NEW,
     OPEN,
     SAVE_AS,

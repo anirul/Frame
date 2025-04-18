@@ -11,9 +11,13 @@ namespace frame::gui
 
 Menubar::Menubar(
     const std::string& name,
+    MenubarFile& menubar_file,
     MenubarView& menubar_view,
     DeviceInterface& device)
-    : name_(name), menubar_view_(menubar_view), device_(device)
+    : name_(name),
+      menubar_file_(menubar_file),
+      menubar_view_(menubar_view),
+      device_(device)
 {
     SetName(name);
 }
@@ -24,42 +28,20 @@ void Menubar::MenuFile()
     {
         if (ImGui::MenuItem("New Project", "Ctrl+N"))
         {
-            menubar_view_.GetDrawGui()->AddModalWindow(
-                std::make_unique<WindowFileDialog>(
-                    "json",
-                    FileDialogEnum::NEW,
-                    [this](const std::string& file_name)
-                    {
-                        SetFileName(file_name, FileDialogEnum::NEW);
-                    }));
+            menubar_file_.ShowNewProject();
         }
         if (ImGui::MenuItem("Open Project", "Ctrl+O"))
         {
-            menubar_view_.GetDrawGui()->AddModalWindow(
-                std::make_unique<WindowFileDialog>(
-                    "json",
-                    FileDialogEnum::OPEN,
-                    [this](const std::string& file_name)
-                    {
-                        SetFileName(file_name, FileDialogEnum::OPEN);
-                    }));
-
+            menubar_file_.ShowOpenProject();
         }
         ImGui::Separator();
         if (ImGui::MenuItem("Save Project", "Ctrl+S"))
         {
-            // TODO(anirul): Save project.
+            // TODO(anirul): Complete me!
         }
         if (ImGui::MenuItem("Save Project As...", "Ctrl+Shift+S"))
         {
-            menubar_view_.GetDrawGui()->AddModalWindow(
-                std::make_unique<WindowFileDialog>(
-                    "json",
-                    FileDialogEnum::SAVE_AS,
-                    [this](const std::string& file_name)
-                    {
-                        SetFileName(file_name, FileDialogEnum::SAVE_AS);
-                    }));
+            menubar_file_.ShowSaveAsProject();
         }
         ImGui::Separator();
         if (ImGui::MenuItem("Exit", "Alt+F4"))
