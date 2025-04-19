@@ -64,7 +64,7 @@ class SDLOpenGLWindow : public WindowInterface
     }
 
   public:
-    void Run(std::function<void()> lambda) override;
+    WindowReturnEnum Run(std::function<bool()> lambda) override;
     void* GetGraphicContext() const override;
     void Resize(glm::uvec2 size, FullScreenEnum fullscreen_enum) override;
     FullScreenEnum GetFullScreenEnum() const override;

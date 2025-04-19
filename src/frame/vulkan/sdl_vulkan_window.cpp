@@ -112,7 +112,8 @@ SDLVulkanWindow::~SDLVulkanWindow()
     SDL_Quit();
 }
 
-void SDLVulkanWindow::Run(std::function<void()> lambda /* = []{}*/)
+WindowReturnEnum SDLVulkanWindow::Run(
+    std::function<bool()> lambda /* = []{ return true; }*/)
 {
     // Called only once at the beginning.
     for (const auto& plugin_interface : device_->GetPluginPtrs())
@@ -124,8 +125,7 @@ void SDLVulkanWindow::Run(std::function<void()> lambda /* = []{}*/)
             plugin_interface->Startup(size_);
         }
     }
-    // While Run return true continue.
-    bool loop = true;
+    WindowReturnEnum window_return_enum = WindowReturnEnum::CONTINUE;
     // Timing counter.
     auto start = std::chrono::system_clock::now();
     do
@@ -145,14 +145,16 @@ void SDLVulkanWindow::Run(std::function<void()> lambda /* = []{}*/)
                 if (plugin_interface)
                 {
                     if (plugin_interface->PollEvent(&event))
+                    {
                         skip = true;
+                    }
                 }
             }
             if (skip)
                 continue;
             if (!RunEvent(event, dt))
             {
-                loop = false;
+                window_return_enum = WindowReturnEnum::QUIT;
             }
         }
         if (input_interface_)
@@ -167,18 +169,21 @@ void SDLVulkanWindow::Run(std::function<void()> lambda /* = []{}*/)
             {
                 if (!plugin_interface->Update(*device_.get(), time.count()))
                 {
-                    loop = false;
+                    window_return_enum = WindowReturnEnum::RESTART;
                 }
             }
         }
 
         SetWindowTitle(
             "SDL Vulkan - " + std::to_string(static_cast<float>(GetFPS(dt))));
-        lambda();
+        if (!lambda())
+        {
+            window_return_enum = WindowReturnEnum::RESTART;
+        }
 
         // Swap the window.
         throw std::runtime_error("Implement swap window.");
-    } while (loop);
+    } while (window_return_enum == WindowReturnEnum::CONTINUE);
 }
 
 void* SDLVulkanWindow::GetGraphicContext() const

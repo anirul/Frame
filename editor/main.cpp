@@ -54,18 +54,25 @@ try
     // Set the main window in full.
     device.AddPlugin(std::move(gui_window));
     frame::common::Application app(std::move(win));
+    bool loop = true;
     do
     {
         app.Startup(frame::file::FindFile(menubar_file.GetFileName()));
-        app.Run();
+        if (app.Run(
+            [&menubar_file] { return !menubar_file.HasChanged(); }) ==
+            frame::WindowReturnEnum::QUIT)
+        {
+            return 0;
+        }
         if (menubar_view.GetWindowResolution())
         {
             app.Resize(
                 menubar_view.GetWindowResolution()->GetSize(),
                 menubar_view.GetWindowResolution()->GetFullScreen());
+            loop = menubar_view.GetWindowResolution()->End();
         }
-    } while (menubar_view.GetWindowResolution() &&
-             !menubar_view.GetWindowResolution()->End());
+    }
+    while (loop);
     return 0;
 }
 catch (std::exception ex)

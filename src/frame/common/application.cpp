@@ -52,10 +52,10 @@ void Application::Resize(glm::uvec2 size, FullScreenEnum fullscreen_enum)
     window_->Resize(size, fullscreen_enum);
 }
 
-void Application::Run(std::function<void()> lambda)
+WindowReturnEnum Application::Run(std::function<bool()> lambda)
 {
     assert(window_);
-    window_->Run(lambda);
+    return window_->Run(lambda);
 }
 
 } // End namespace frame::common.

@@ -12,6 +12,14 @@
 namespace frame
 {
 
+enum class WindowReturnEnum
+{
+	UKNOWN,
+	CONTINUE,
+	QUIT,
+	RESTART,
+};
+
 /**
  * @class WindowInterface
  * @brief Interface to a window this is specific to a platform.
@@ -22,8 +30,12 @@ struct WindowInterface
 {
     //! Virtual destructor.
     virtual ~WindowInterface() = default;
-    //! @brief Run the windows interface this will take the current thread.
-    virtual void Run(std::function<void()> lambda = [] {}) = 0;
+    /**
+	 * @brief Run the windows interface this will take the current thread.
+	 * @param lambda: A lambda that return false in case you want to exit.
+	 * @return The reason of the exit from the Run function.
+	 */
+    virtual WindowReturnEnum Run(std::function<bool()> lambda) = 0;
     /**
      * @brief Set the input interface (see above).
      * @param input_interface: Move a input interface to the window object.

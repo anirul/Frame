@@ -46,6 +46,7 @@ void MenubarFile::ShowNewProject()
             {
                 file_name_ = file_name;
                 file_dialog_enum_ = FileDialogEnum::NEW;
+                changed_ = true;
             }));
 }
 
@@ -59,6 +60,7 @@ void MenubarFile::ShowOpenProject()
             {
                 file_name_ = file_name;
                 file_dialog_enum_ = FileDialogEnum::OPEN;
+                changed_ = true;
             }));
 }
 
@@ -72,6 +74,7 @@ void MenubarFile::ShowSaveAsProject()
             {
                 file_name_ = file_name;
                 file_dialog_enum_ = FileDialogEnum::SAVE_AS;
+                changed_ = true;
             }));
 }
 

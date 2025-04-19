@@ -108,7 +108,7 @@ SDLOpenGLWindow::~SDLOpenGLWindow()
     SDL_Quit();
 }
 
-void SDLOpenGLWindow::Run(std::function<void()> lambda)
+WindowReturnEnum SDLOpenGLWindow::Run(std::function<bool()> lambda)
 {
     // Called only once at the beginning.
     for (const auto& plugin_interface : device_->GetPluginPtrs())
@@ -120,8 +120,7 @@ void SDLOpenGLWindow::Run(std::function<void()> lambda)
             plugin_interface->Startup(size_);
         }
     }
-    // While Run return true continue.
-    bool loop = true;
+    WindowReturnEnum window_return_enum = WindowReturnEnum::CONTINUE;
     double previous_count = 0.0;
     // Timing counter.
     auto start = std::chrono::system_clock::now();
@@ -142,7 +141,9 @@ void SDLOpenGLWindow::Run(std::function<void()> lambda)
                 if (plugin_interface)
                 {
                     if (plugin_interface->PollEvent(&event))
+                    {
                         skip = true;
+                    }
                 }
             }
             if (skip)
@@ -151,7 +152,7 @@ void SDLOpenGLWindow::Run(std::function<void()> lambda)
             }
             if (!RunEvent(event, dt))
             {
-                loop = false;
+                window_return_enum = WindowReturnEnum::QUIT;
             }
         }
         if (input_interface_)
@@ -167,7 +168,7 @@ void SDLOpenGLWindow::Run(std::function<void()> lambda)
             {
                 if (!plugin_interface->Update(*device_.get(), time.count()))
                 {
-                    loop = false;
+                    window_return_enum = WindowReturnEnum::QUIT;
                 }
             }
         }
@@ -177,7 +178,10 @@ void SDLOpenGLWindow::Run(std::function<void()> lambda)
         SetWindowTitle(
             "SDL OpenGL - " + std::to_string(static_cast<float>(GetFPS(dt))));
         previous_count = time.count();
-        lambda();
+        if (!lambda())
+        {
+            window_return_enum = WindowReturnEnum::RESTART;
+        }
 
         // TODO(anirul): Fix me to check which device this is.
         if (device_)
@@ -185,7 +189,8 @@ void SDLOpenGLWindow::Run(std::function<void()> lambda)
             SDL_GL_SwapWindow(sdl_window_);
         }
     }
-    while (loop);
+    while (window_return_enum == WindowReturnEnum::CONTINUE);
+    return window_return_enum;
 }
 
 bool SDLOpenGLWindow::RunEvent(const SDL_Event& event, const double dt)

@@ -69,7 +69,7 @@ SDLOpenGLNone::~SDLOpenGLNone()
     SDL_Quit();
 }
 
-void SDLOpenGLNone::Run(std::function<void()> lambda)
+WindowReturnEnum SDLOpenGLNone::Run(std::function<bool()> lambda)
 {
     for (const auto& plugin_interface : device_->GetPluginPtrs())
     {
@@ -83,6 +83,7 @@ void SDLOpenGLNone::Run(std::function<void()> lambda)
         plugin_interface->Update(*device_.get(), 0.0);
     }
     lambda();
+    return WindowReturnEnum::UKNOWN;
 }
 
 void* SDLOpenGLNone::GetGraphicContext() const

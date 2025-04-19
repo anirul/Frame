@@ -107,7 +107,7 @@ SDLVulkanNone::~SDLVulkanNone()
     SDL_Quit();
 }
 
-void SDLVulkanNone::Run(std::function<void()> /* lambda*/)
+WindowReturnEnum SDLVulkanNone::Run(std::function<bool()> /* lambda*/)
 {
     for (const auto& plugin_interface : device_->GetPluginPtrs())
     {
@@ -120,6 +120,7 @@ void SDLVulkanNone::Run(std::function<void()> /* lambda*/)
     {
         plugin_interface->Update(*device_.get(), 0.0);
     }
+    return WindowReturnEnum::UKNOWN;
 }
 
 void* SDLVulkanNone::GetGraphicContext() const
