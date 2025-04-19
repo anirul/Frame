@@ -13,7 +13,7 @@
 #include "frame/opengl/frame_buffer.h"
 #include "frame/opengl/render_buffer.h"
 #include "frame/opengl/renderer.h"
-#include "frame/opengl/texture_cube_map.h"
+#include "frame/opengl/cubemap.h"
 
 namespace frame::opengl
 {
@@ -306,7 +306,7 @@ std::unique_ptr<frame::TextureInterface> Device::CreateTexture(
     case TextureTypeEnum::TEXTURE_2D:
         return std::make_unique<Texture>(texture_parameter);
     case TextureTypeEnum::CUBMAP:
-        return std::make_unique<TextureCubeMap>(texture_parameter);
+        return std::make_unique<Cubemap>(texture_parameter);
     case TextureTypeEnum::TEXTURE_3D:
         throw std::runtime_error("No 3D texture implemented yet!");
     default:

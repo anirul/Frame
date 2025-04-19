@@ -12,7 +12,7 @@
 #include "frame/opengl/material.h"
 #include "frame/opengl/static_mesh.h"
 #include "frame/opengl/texture.h"
-#include "frame/opengl/texture_cube_map.h"
+#include "frame/opengl/cubemap.h"
 #include "frame/uniform_wrapper.h"
 
 namespace frame::opengl
@@ -167,7 +167,7 @@ void Renderer::RenderMesh(
         if (level_.GetTextureFromId(texture_id).IsCubeMap())
         {
             auto& opengl_texture =
-                dynamic_cast<TextureCubeMap&>(level_.GetTextureFromId(
+                dynamic_cast<Cubemap&>(level_.GetTextureFromId(
                     texture_id));
             // TODO(anirul): Check the mipmap level (last parameter)!
             frame_buffer_->AttachTexture(
@@ -212,7 +212,7 @@ void Renderer::RenderMesh(
         if (texture.IsCubeMap())
         {
             auto& gl_texture =
-                dynamic_cast<TextureCubeMap&>(
+                dynamic_cast<Cubemap&>(
                     level_.GetTextureFromId(texture_id));
             gl_texture.Bind(p.second);
             program.Uniform(p.first, p.second);
@@ -283,7 +283,7 @@ void Renderer::RenderMesh(
         auto& texture = level_.GetTextureFromId(texture_id);
         if (texture.IsCubeMap())
         {
-            auto& gl_texture = dynamic_cast<TextureCubeMap&>(
+            auto& gl_texture = dynamic_cast<Cubemap&>(
                 level_.GetTextureFromId(texture_id));
             gl_texture.UnBind();
         }
@@ -466,8 +466,8 @@ void Renderer::RenderShadows(const CameraInterface& camera)
         }
         if (light.GetType() == LightTypeEnum::POINT_LIGHT)
         {
-            TextureCubeMap& depth_texture =
-                dynamic_cast<TextureCubeMap&>(
+            Cubemap& depth_texture =
+                dynamic_cast<Cubemap&>(
                     level_.GetTextureFromId(texture_id));
             frame_buffer_->AttachTexture(
                 depth_texture.GetId(),

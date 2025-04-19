@@ -14,7 +14,7 @@
 #include "frame/opengl/renderer.h"
 #include "frame/opengl/static_mesh.h"
 #include "frame/opengl/texture.h"
-#include "frame/opengl/texture_cube_map.h"
+#include "frame/opengl/cubemap.h"
 #include "frame/window_factory.h"
 
 namespace frame::opengl::file
@@ -197,7 +197,7 @@ std::unique_ptr<frame::TextureInterface> LoadCubeMapTextureFromFiles(
         texture_parameter.array_data_ptr[i] = images[i]->Data();
     }
     texture_parameter.size = images[0]->GetSize();
-    return std::make_unique<opengl::TextureCubeMap>(texture_parameter);
+    return std::make_unique<opengl::Cubemap>(texture_parameter);
 }
 
 std::unique_ptr<TextureInterface> LoadTextureFromVec4(const glm::vec4& vec4)

@@ -5,7 +5,7 @@
 #include "frame/file/file_system.h"
 #include "frame/opengl/file/load_texture.h"
 #include "frame/opengl/texture.h"
-#include "frame/opengl/texture_cube_map.h"
+#include "frame/opengl/cubemap.h"
 
 namespace
 {
@@ -107,7 +107,7 @@ std::unique_ptr<TextureInterface> ParseCubeMapTexture(
     texture_parameter.pixel_structure = proto_texture.pixel_structure();
     texture_parameter.map_type = TextureTypeEnum::CUBMAP;
     texture_parameter.size = texture_size;
-    texture = std::make_unique<opengl::TextureCubeMap>(texture_parameter);
+    texture = std::make_unique<opengl::Cubemap>(texture_parameter);
     constexpr auto INVALID_TEXTURE = frame::proto::TextureFilter::INVALID;
     if (proto_texture.min_filter().value() != INVALID_TEXTURE)
         texture->SetMinFilter(proto_texture.min_filter().value());

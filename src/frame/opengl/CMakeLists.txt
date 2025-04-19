@@ -31,8 +31,8 @@ add_library(FrameOpenGL
     shader.h
     texture.cpp
     texture.h
-    texture_cube_map.cpp
-    texture_cube_map.h
+    cubemap.cpp
+    cubemap.h
     sdl_opengl_none.cpp
     sdl_opengl_none.h
     sdl_opengl_window.cpp

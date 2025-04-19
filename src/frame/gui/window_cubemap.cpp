@@ -5,7 +5,7 @@
 #include <filesystem>
 
 #include "frame/file/file_system.h"
-#include "frame/opengl/texture_cube_map.h"
+#include "frame/opengl/cubemap.h"
 #include "frame/level_interface.h"
 
 namespace frame::gui
@@ -23,8 +23,8 @@ WindowCubemap::WindowCubemap(TextureInterface& texture_interface)
 
 bool WindowCubemap::DrawCallback()
 {
-    frame::opengl::TextureCubeMap& texture_cubemap =
-        dynamic_cast<frame::opengl::TextureCubeMap&>(texture_interface_);
+    opengl::Cubemap& texture_cubemap =
+        dynamic_cast<opengl::Cubemap&>(texture_interface_);
 
     return true;
 }
