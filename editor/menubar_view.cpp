@@ -128,20 +128,47 @@ void MenubarView::ShowTexturesWindow(DeviceInterface& device)
 void MenubarView::Reset()
 {
     for (std::string window_name : draw_gui_.GetWindowTitles())
-    try
     {
-        WindowTexture& window_texture =
-            dynamic_cast<WindowTexture&>(draw_gui_.GetWindow(window_name));
-        draw_gui_.DeleteWindow(window_name);
+        if (window_name.starts_with("texture - "))
+        {
+            try
+            {
+                WindowTexture& window_texture = dynamic_cast<WindowTexture&>(
+                    draw_gui_.GetWindow(window_name));
+                draw_gui_.DeleteWindow(window_name);
+                auto maybe_name = ExtractStringBracket(window_name);
+                if (maybe_name)
+                {
+                    window_state_[maybe_name.value()] = false;
+                }
+                else
+                {
+                    frame::Logger::GetInstance()->error(
+                        std::format(
+                            "Couldn't parse the string {}.", window_name));
+                }
+            }
+            catch (const std::bad_cast& ex)
+            {
+                frame::Logger::GetInstance()->warn(std::format(
+                    "Counldn't cast window named {} to a window texture {}.",
+                    window_name,
+                    ex.what()));
+            }
+        }
     }
-    catch (const std::bad_cast& ex)
+}
+
+std::optional<std::string> MenubarView::ExtractStringBracket(
+    const std::string& str) const
+{
+    auto open = str.find('[');
+    auto close = str.find(']', open == std::string::npos ? 0 : open);
+    if (open != std::string::npos && close != std::string::npos && close > open)
     {
-        frame::Logger::GetInstance()->warn(
-            std::format(
-                "Counldn't cast window named {} to a window texture {}.",
-                window_name,
-                ex.what()));
+        return str.substr(open + 1, close - open - 1);
     }
+    return std::nullopt;
 }
 
 } // End namespace frame::gui.

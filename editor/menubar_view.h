@@ -52,6 +52,8 @@ class MenubarView
     void DeleteLogger(const std::string& name);
     void CreateResolution(const std::string& name);
     void DeleteResolution(const std::string& name);
+    std::optional<std::string> ExtractStringBracket(
+		const std::string& str) const;
 
   private:
     std::map<std::string, bool> window_state_;
