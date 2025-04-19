@@ -1,4 +1,4 @@
-#include "frame/opengl/texture_cube_map.h"
+#include "frame/opengl/cubemap.h"
 
 #include <GL/glew.h>
 
@@ -48,22 +48,22 @@ proto::TextureFrame GetTextureFrameFromPosition(int i)
     return texture_frame;
 }
 
-TextureCubeMap::~TextureCubeMap()
+Cubemap::~Cubemap()
 {
     glDeleteTextures(1, &texture_id_);
 }
 
-TextureCubeMap::TextureCubeMap(const TextureParameter& texture_parameter)
-    : TextureCubeMap(
+Cubemap::Cubemap(const TextureParameter& texture_parameter)
+    : Cubemap(
           texture_parameter.pixel_element_size,
           texture_parameter.pixel_structure)
 {
     assert(texture_parameter.map_type == TextureTypeEnum::CUBMAP);
     size_ = texture_parameter.size;
-    CreateTextureCubeMap(texture_parameter.array_data_ptr);
+    CreateCubemap(texture_parameter.array_data_ptr);
 }
 
-void TextureCubeMap::Bind(unsigned int slot /*= 0*/) const
+void Cubemap::Bind(unsigned int slot /*= 0*/) const
 {
     assert(slot < GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS);
     if (locked_bind_)
@@ -72,19 +72,19 @@ void TextureCubeMap::Bind(unsigned int slot /*= 0*/) const
     glBindTexture(GL_TEXTURE_CUBE_MAP, texture_id_);
 }
 
-void TextureCubeMap::UnBind() const
+void Cubemap::UnBind() const
 {
     if (locked_bind_)
         return;
     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }
 
-void TextureCubeMap::EnableMipmap() const
+void Cubemap::EnableMipmap() const
 {
     glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 }
 
-void TextureCubeMap::SetMinFilter(proto::TextureFilter::Enum texture_filter)
+void Cubemap::SetMinFilter(proto::TextureFilter::Enum texture_filter)
 {
     Bind();
     glTexParameteri(
@@ -94,7 +94,7 @@ void TextureCubeMap::SetMinFilter(proto::TextureFilter::Enum texture_filter)
     UnBind();
 }
 
-frame::proto::TextureFilter::Enum TextureCubeMap::GetMinFilter() const
+frame::proto::TextureFilter::Enum Cubemap::GetMinFilter() const
 {
     GLint filter;
     Bind();
@@ -103,7 +103,7 @@ frame::proto::TextureFilter::Enum TextureCubeMap::GetMinFilter() const
     return ConvertFromGLType(filter);
 }
 
-void TextureCubeMap::SetMagFilter(proto::TextureFilter::Enum texture_filter)
+void Cubemap::SetMagFilter(proto::TextureFilter::Enum texture_filter)
 {
     Bind();
     glTexParameteri(
@@ -113,7 +113,7 @@ void TextureCubeMap::SetMagFilter(proto::TextureFilter::Enum texture_filter)
     UnBind();
 }
 
-frame::proto::TextureFilter::Enum TextureCubeMap::GetMagFilter() const
+frame::proto::TextureFilter::Enum Cubemap::GetMagFilter() const
 {
     GLint filter;
     Bind();
@@ -122,7 +122,7 @@ frame::proto::TextureFilter::Enum TextureCubeMap::GetMagFilter() const
     return ConvertFromGLType(filter);
 }
 
-void TextureCubeMap::SetWrapS(proto::TextureFilter::Enum texture_filter)
+void Cubemap::SetWrapS(proto::TextureFilter::Enum texture_filter)
 {
     Bind();
     glTexParameteri(
@@ -132,7 +132,7 @@ void TextureCubeMap::SetWrapS(proto::TextureFilter::Enum texture_filter)
     UnBind();
 }
 
-frame::proto::TextureFilter::Enum TextureCubeMap::GetWrapS() const
+frame::proto::TextureFilter::Enum Cubemap::GetWrapS() const
 {
     GLint filter;
     Bind();
@@ -141,7 +141,7 @@ frame::proto::TextureFilter::Enum TextureCubeMap::GetWrapS() const
     return ConvertFromGLType(filter);
 }
 
-void TextureCubeMap::SetWrapT(proto::TextureFilter::Enum texture_filter)
+void Cubemap::SetWrapT(proto::TextureFilter::Enum texture_filter)
 {
     Bind();
     glTexParameteri(
@@ -151,7 +151,7 @@ void TextureCubeMap::SetWrapT(proto::TextureFilter::Enum texture_filter)
     UnBind();
 }
 
-frame::proto::TextureFilter::Enum TextureCubeMap::GetWrapT() const
+frame::proto::TextureFilter::Enum Cubemap::GetWrapT() const
 {
     GLint filter;
     Bind();
@@ -160,7 +160,7 @@ frame::proto::TextureFilter::Enum TextureCubeMap::GetWrapT() const
     return ConvertFromGLType(filter);
 }
 
-void TextureCubeMap::SetWrapR(proto::TextureFilter::Enum texture_filter)
+void Cubemap::SetWrapR(proto::TextureFilter::Enum texture_filter)
 {
     Bind();
     glTexParameteri(
@@ -170,7 +170,7 @@ void TextureCubeMap::SetWrapR(proto::TextureFilter::Enum texture_filter)
     UnBind();
 }
 
-proto::TextureFilter::Enum TextureCubeMap::GetWrapR() const
+proto::TextureFilter::Enum Cubemap::GetWrapR() const
 {
     GLint filter;
     Bind();
@@ -179,7 +179,7 @@ proto::TextureFilter::Enum TextureCubeMap::GetWrapR() const
     return ConvertFromGLType(filter);
 }
 
-void TextureCubeMap::CreateTextureCubeMap(
+void Cubemap::CreateCubemap(
         const std::array<void*, 6> cube_map/* =
             { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr }*/)
 {
@@ -205,7 +205,7 @@ void TextureCubeMap::CreateTextureCubeMap(
     }
 }
 
-int TextureCubeMap::ConvertToGLType(
+int Cubemap::ConvertToGLType(
     const proto::TextureFilter::Enum texture_filter) const
 {
     switch (texture_filter)
@@ -235,7 +235,7 @@ int TextureCubeMap::ConvertToGLType(
     }
 }
 
-frame::proto::TextureFilter::Enum TextureCubeMap::ConvertFromGLType(
+frame::proto::TextureFilter::Enum Cubemap::ConvertFromGLType(
     int gl_filter) const
 {
     switch (gl_filter)
@@ -263,7 +263,7 @@ frame::proto::TextureFilter::Enum TextureCubeMap::ConvertFromGLType(
         "invalid texture filter : " + std::to_string(gl_filter));
 }
 
-void TextureCubeMap::CreateFrameAndRenderBuffer()
+void Cubemap::CreateFrameAndRenderBuffer()
 {
     frame_ = std::make_unique<FrameBuffer>();
     render_ = std::make_unique<RenderBuffer>();
@@ -273,7 +273,7 @@ void TextureCubeMap::CreateFrameAndRenderBuffer()
     frame_->DrawBuffers(1);
 }
 
-void TextureCubeMap::Clear(glm::vec4 color)
+void Cubemap::Clear(glm::vec4 color)
 {
     // First time this is called this will create a frame and a render.
     Bind();
@@ -286,7 +286,7 @@ void TextureCubeMap::Clear(glm::vec4 color)
     UnBind();
 }
 
-std::vector<std::uint8_t> TextureCubeMap::GetTextureByte() const
+std::vector<std::uint8_t> Cubemap::GetTextureByte() const
 {
     auto format = opengl::ConvertToGLType(pixel_structure_);
     auto type = opengl::ConvertToGLType(pixel_element_size_);
@@ -314,7 +314,7 @@ std::vector<std::uint8_t> TextureCubeMap::GetTextureByte() const
     return result;
 }
 
-std::vector<std::uint16_t> TextureCubeMap::GetTextureWord() const
+std::vector<std::uint16_t> Cubemap::GetTextureWord() const
 {
     auto format = opengl::ConvertToGLType(pixel_structure_);
     auto type = opengl::ConvertToGLType(pixel_element_size_);
@@ -342,7 +342,7 @@ std::vector<std::uint16_t> TextureCubeMap::GetTextureWord() const
     return result;
 }
 
-std::vector<std::uint32_t> TextureCubeMap::GetTextureDWord() const
+std::vector<std::uint32_t> Cubemap::GetTextureDWord() const
 {
     auto format = opengl::ConvertToGLType(pixel_structure_);
     auto type = opengl::ConvertToGLType(pixel_element_size_);
@@ -370,7 +370,7 @@ std::vector<std::uint32_t> TextureCubeMap::GetTextureDWord() const
     return result;
 }
 
-std::vector<float> TextureCubeMap::GetTextureFloat() const
+std::vector<float> Cubemap::GetTextureFloat() const
 {
     auto format = opengl::ConvertToGLType(pixel_structure_);
     auto type = opengl::ConvertToGLType(pixel_element_size_);
@@ -398,7 +398,7 @@ std::vector<float> TextureCubeMap::GetTextureFloat() const
     return result;
 }
 
-void TextureCubeMap::Update(
+void Cubemap::Update(
     std::vector<std::uint8_t>&& vector,
     glm::uvec2 size,
     std::uint8_t bytes_per_pixel)

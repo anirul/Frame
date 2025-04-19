@@ -5,29 +5,27 @@
 #include <filesystem>
 
 #include "frame/file/file_system.h"
+#include "frame/opengl/cubemap.h"
 #include "frame/level_interface.h"
 
 namespace frame::gui
 {
 
-WindowCubemap::WindowCubemap(const std::string& name) : name_(name)
+WindowCubemap::WindowCubemap(TextureInterface& texture_interface)
+    : name_(""), size_(0, 0), texture_interface_(texture_interface)
 {
+    if (!texture_interface_.IsCubeMap())
+    {
+        throw std::runtime_error("Cannot create a normal texture!");
+    }
+    name_ = std::format("cubemap - [{}]", texture_interface_.GetName());
 }
 
 bool WindowCubemap::DrawCallback()
 {
-    ImGui::Text("Select cubemap: ");
-    std::vector<std::filesystem::path> cubemaps = GetCubemaps();
-    for (auto& cubemap : cubemaps)
-    {
-        if (ImGui::Button(cubemap.filename().string().c_str()))
-        {
-            SaveCubemapPath(cubemap);
-            end_ = false;
-            return false;
-        }
-    }
-    end_ = true;
+    opengl::Cubemap& texture_cubemap =
+        dynamic_cast<opengl::Cubemap&>(texture_interface_);
+
     return true;
 }
 
@@ -43,46 +41,7 @@ void WindowCubemap::SetName(const std::string& name)
 
 bool WindowCubemap::End() const
 {
-    return end_;
-}
-
-std::vector<std::filesystem::path> WindowCubemap::GetCubemaps()
-{
-    std::vector<std::filesystem::path> matching_files;
-    auto directory = file::FindDirectory("asset/cubemap");
-    std::string extension = ".hdr";
-    if (std::filesystem::exists(directory) &&
-        std::filesystem::is_directory(directory))
-    {
-        for (const auto& entry : std::filesystem::directory_iterator(directory))
-        {
-            if (entry.is_regular_file() &&
-                entry.path().extension() == extension)
-            {
-                matching_files.push_back(entry.path());
-            }
-        }
-    }
-    return matching_files;
-}
-
-void WindowCubemap::SaveCubemapPath(const std::filesystem::path& path)
-{
-    cubemap_path_ = path;
-}
-
-void WindowCubemap::ChangeLevel(frame::proto::Level& level)
-{
-    if (!cubemap_path_.empty())
-    {
-        for (auto& texture : *level.mutable_textures())
-        {
-            if (texture.name() == "skybox")
-            {
-                texture.set_file_name(cubemap_path_.string());
-            }
-        }
-    }
+    return false;
 }
 
 } // End namespace frame::gui.

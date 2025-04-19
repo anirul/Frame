@@ -30,8 +30,10 @@ class RenderBuffer : public BindInterface
      * @param slot: Optional not use in this context.
      */
     void Bind(const unsigned int slot = 0) const override;
-    //! @brief Unbind the render buffer from the current context, this come
-    //! from the bind interface.
+    /**
+     * @brief Unbind the render buffer from the current context, this come
+     * from the bind interface.
+     */
     void UnBind() const override;
     /**
      * @brief Create a storage in the render buffer, this will bind and

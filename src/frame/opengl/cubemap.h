@@ -30,20 +30,20 @@ namespace frame::opengl
 proto::TextureFrame GetTextureFrameFromPosition(int i);
 
 /**
- * @class TextureCubeMap
+ * @class Cubemap
  * @brief The same as texture but in a cube map perfect for environment
  *        maps.
  */
-class TextureCubeMap : public TextureInterface, public BindInterface
+class Cubemap : public TextureInterface, public BindInterface
 {
   public:
     /**
      * @brief Create a texture from a texture parameter structure.
      * @param texture_parameter: Texture parameter structure.
      */
-    TextureCubeMap(const TextureParameter& texture_parameter);
+    Cubemap(const TextureParameter& texture_parameter);
     //! @brief Destroy texture also on GPU side.
-    ~TextureCubeMap();
+    ~Cubemap();
 
   public:
     /**
@@ -242,7 +242,7 @@ class TextureCubeMap : public TextureInterface, public BindInterface
      * @param pixel_element_structure: Structure of a pixel (R, RG, RGB,
      * RGBA).
      */
-    TextureCubeMap(
+    Cubemap(
         const proto::PixelElementSize pixel_element_size =
             proto::PixelElementSize_BYTE(),
         const proto::PixelStructure pixel_structure =
@@ -256,7 +256,7 @@ class TextureCubeMap : public TextureInterface, public BindInterface
      * first!
      * @param data: pixel used to fill up (or null for don't care).
      */
-    void CreateTextureCubeMap(
+    void CreateCubemap(
         const std::array<void*, 6> cube_map = {
             nullptr, nullptr, nullptr, nullptr, nullptr, nullptr});
     //! @brief Lock the bind for RAII interface to the bind interface.
