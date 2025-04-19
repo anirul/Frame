@@ -7,7 +7,7 @@
 #include "frame/file/file_system.h"
 #include "frame/json/parse_texture.h"
 #include "frame/opengl/file/load_texture.h"
-#include "frame/opengl/texture_cube_map.h"
+#include "frame/opengl/cubemap.h"
 
 namespace test
 {

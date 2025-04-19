@@ -124,7 +124,7 @@ WindowReturnEnum SDLOpenGLWindow::Run(std::function<bool()> lambda)
     double previous_count = 0.0;
     // Timing counter.
     auto start = std::chrono::system_clock::now();
-    do
+    while (window_return_enum == WindowReturnEnum::CONTINUE)
     {
         // Compute the time difference from previous frame.
         auto end = std::chrono::system_clock::now();
@@ -189,7 +189,6 @@ WindowReturnEnum SDLOpenGLWindow::Run(std::function<bool()> lambda)
             SDL_GL_SwapWindow(sdl_window_);
         }
     }
-    while (window_return_enum == WindowReturnEnum::CONTINUE);
     return window_return_enum;
 }
 

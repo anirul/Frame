@@ -155,7 +155,9 @@ void Device::DisplayCamera(
     const CameraInterface& camera, glm::uvec4 viewport, double time)
 {
     if (!renderer_)
+    {
         throw std::runtime_error("No Renderer.");
+    }
     renderer_->SetDeltaTime(time);
     renderer_->PreRender();
     renderer_->SetViewport(viewport);
@@ -173,7 +175,9 @@ void Device::DisplayLeftRightCamera(
     double time)
 {
     if (!renderer_)
+    {
         throw std::runtime_error("No Renderer.");
+    }
     renderer_->SetDeltaTime(time);
     renderer_->PreRender();
     renderer_->SetViewport(viewport_left);

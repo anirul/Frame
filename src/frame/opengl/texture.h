@@ -208,6 +208,15 @@ class Texture : public TextureInterface, public BindInterface
     {
         name_ = name;
     }
+    /**
+     * @brief Get the texture parameters used at creation, usefull for
+     * serialization.
+     * @return Texture parameters used at creation.
+     */
+    const TextureParameter& GetTextureParameter() const override
+	{
+        return texture_parameter_;
+	}
 
   protected:
     /**
@@ -269,6 +278,7 @@ class Texture : public TextureInterface, public BindInterface
     std::unique_ptr<RenderBuffer> render_ = nullptr;
     std::unique_ptr<FrameBuffer> frame_ = nullptr;
     std::string name_;
+    TextureParameter texture_parameter_;
 };
 
 } // End namespace frame::opengl.

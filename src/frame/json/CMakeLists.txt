@@ -7,6 +7,7 @@ add_library(FrameJson
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/json/parse_pixel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/json/proto.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/json/serialize_json.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/json/serialize_level.h
     parse_material.cpp
     parse_material.h
     parse_pixel.cpp
@@ -19,6 +20,9 @@ add_library(FrameJson
     parse_uniform.cpp
     parse_uniform.h
     parse_level.cpp
+    serialize_texture.cpp
+    serialize_texture.h
+    serialize_level.cpp
 )
 
 target_include_directories(FrameJson 

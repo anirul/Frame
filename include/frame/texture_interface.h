@@ -68,6 +68,12 @@ struct TextureInterface : public NameInterface
     //! @brief Virtual destructor.
     virtual ~TextureInterface() = default;
     /**
+	 * @brief Get the texture parameters used at creation, usefull for
+	 * serialization.
+	 * @return Texture parameters used at creation.
+	 */
+    virtual const TextureParameter& GetTextureParameter() const = 0;
+    /**
      * @brief Get the pixel structure (R, RG, RGB, RGBA).
      * @return the pixel structure.
      */
