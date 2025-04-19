@@ -4,6 +4,7 @@
 #include <absl/strings/string_view.h>
 
 #include <regex>
+#include <format>
 #include <stdexcept>
 #include <string_view>
 #include <glm/gtc/type_ptr.hpp>
@@ -36,9 +37,9 @@ void Program::LinkShader()
     GLenum error = glGetError();
     if (error != GL_NO_ERROR)
     {
-        std::string error_str = fmt::format(
+        std::string error_str = std::format(
             "Failed to link program [{}], ",
-            reinterpret_cast<const char*>(gluErrorString(error)));
+            error);
         GLint program_status = 0;
         glGetProgramiv(program_id_, GL_LINK_STATUS, &program_status);
         if (program_status != GL_TRUE)
@@ -369,7 +370,7 @@ int Program::GetMemoizeUniformLocation(const std::string& name) const
             throw std::runtime_error(fmt::format(
                 "Could not get a location for uniform [{}] error: {}.",
                 name,
-                reinterpret_cast<const char*>(gluErrorString(error))));
+                error));
         }
         memoize_map_.insert({name, location});
     }

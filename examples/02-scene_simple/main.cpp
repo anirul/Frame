@@ -60,11 +60,6 @@ try
         app.Resize(
             ptr_window_resolution->GetSize(),
             ptr_window_resolution->GetFullScreen());
-        device.SetStereo(
-            ptr_window_resolution->GetStereo(),
-            ptr_window_resolution->GetInterocularDistance(),
-            ptr_window_resolution->GetFocusPoint(),
-            ptr_window_resolution->IsInvertLeftRight());
     }
     while (!ptr_window_resolution->End());
     return 0;

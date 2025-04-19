@@ -48,8 +48,11 @@ class Application
     void Resize(glm::uvec2 size, FullScreenEnum fullscreen_enum);
     /**
      * @brief Run the application.
+	 * @param lambda: A lambda that is launch at every frame return true to
+	 * continue false otherwise.
+	 * @return The reason for the exit.
      */
-    void Run(std::function<void()> lambda = [] {});
+    WindowReturnEnum Run(std::function<bool()> lambda = [] { return true; });
 
   protected:
     std::unique_ptr<frame::WindowInterface> window_ = nullptr;

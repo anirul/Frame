@@ -54,17 +54,19 @@ void Device::Startup(std::unique_ptr<frame::LevelInterface>&& level)
     renderer_ = std::make_unique<Renderer>(
         *level_.get(), glm::uvec4(0, 0, size_.x, size_.y));
     // Add a callback to allow plugins to be called at pre-render step.
-    renderer_->SetMeshRenderCallback([this](
-                                         UniformInterface& uniform,
-                                         StaticMeshInterface& static_mesh,
-                                         MaterialInterface& material) {
-        for (auto* plugin : GetPluginPtrs())
+    renderer_->SetMeshRenderCallback(
+        [this](
+            UniformInterface& uniform,
+            StaticMeshInterface& static_mesh,
+            MaterialInterface& material)
         {
-            if (!plugin)
-                continue;
-            plugin->PreRender(uniform, *this, static_mesh, material);
-        }
-    });
+            for (auto* plugin : GetPluginPtrs())
+            {
+                if (!plugin)
+                    continue;
+                plugin->PreRender(uniform, *this, static_mesh, material);
+            }
+        });
 }
 
 void Device::AddPlugin(std::unique_ptr<PluginInterface>&& plugin_interface)
@@ -217,15 +219,16 @@ void Device::Display(double dt /*= 0.0*/)
         left_camera.GetPosition() -
         left_camera.GetRight() * interocular_distance_ * 0.5f);
     glm::vec3 left_camera_direction =
-        default_camera.GetPosition() + focus_point_ - left_camera.GetPosition();
+        default_camera.GetPosition() + focus_point_
+        - left_camera.GetPosition();
     left_camera.SetFront(glm::normalize(left_camera_direction));
     Camera right_camera{default_camera};
     right_camera.SetPosition(
         right_camera.GetPosition() +
         right_camera.GetRight() * interocular_distance_ * 0.5f);
-    glm::vec3 right_camera_direction = default_camera.GetPosition() +
-                                       focus_point_ -
-                                       right_camera.GetPosition();
+    glm::vec3 right_camera_direction =
+        default_camera.GetPosition() + focus_point_
+        - right_camera.GetPosition();
     right_camera.SetFront(glm::normalize(right_camera_direction));
     switch (stereo_enum_)
     {

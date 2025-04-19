@@ -1,14 +1,12 @@
 #pragma once
 
-#define NOMINMAX
 #include <GL/glew.h>
-#include <SDL2/SDL.h>
-#if defined(_WIN32) || defined(_WIN64)
-#include <SDL2/SDL_syswm.h>
-#endif
-#include <fmt/core.h>
-
+#include <SDL3/SDL.h>
 #include <stdexcept>
+#if defined(_WIN32) || defined(_WIN64)
+#define NOMINMAX
+#include <windows.h>
+#endif
 
 #include "frame/logger.h"
 #include "frame/window_interface.h"
@@ -66,7 +64,7 @@ class SDLOpenGLWindow : public WindowInterface
     }
 
   public:
-    void Run(std::function<void()> lambda) override;
+    WindowReturnEnum Run(std::function<bool()> lambda) override;
     void* GetGraphicContext() const override;
     void Resize(glm::uvec2 size, FullScreenEnum fullscreen_enum) override;
     FullScreenEnum GetFullScreenEnum() const override;
@@ -90,7 +88,8 @@ class SDLOpenGLWindow : public WindowInterface
     FullScreenEnum fullscreen_enum_ = FullScreenEnum::WINDOW;
     std::unique_ptr<DeviceInterface> device_ = nullptr;
     std::unique_ptr<InputInterface> input_interface_ = nullptr;
-    SDL_Window* sdl_window_ = nullptr;
+    SDL_Window* sdl_window_;
+    SDL_GLContext gl_context_;
     std::map<std::int32_t, std::function<bool()>> key_callbacks_ = {};
 #if defined(_WIN32) || defined(_WIN64)
     HWND hwnd_ = nullptr;

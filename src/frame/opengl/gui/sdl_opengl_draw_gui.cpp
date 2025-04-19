@@ -1,20 +1,20 @@
 #include "frame/opengl/gui/sdl_opengl_draw_gui.h"
 
-#include <SDL2/SDL.h>
-#include <fmt/core.h>
+#include <SDL3/SDL.h>
+#include <imgui.h>
+#include <imgui_impl_sdl3.h>
+#include <imgui_impl_opengl3.h>
+#include <format>
 
 #include "frame/device_interface.h"
 #include "frame/file/file_system.h"
 #include "frame/opengl/texture.h"
 #include "frame/window_interface.h"
-#include "imgui.h"
-#include "imgui_impl_opengl3.h"
-#include "imgui_impl_sdl.h"
 
 namespace frame::opengl::gui
 {
 
-SDL2OpenGLDrawGui::SDL2OpenGLDrawGui(
+SDLOpenGLDrawGui::SDLOpenGLDrawGui(
     frame::WindowInterface& window,
     const std::filesystem::path& font_path,
     float font_size)
@@ -55,41 +55,41 @@ SDL2OpenGLDrawGui::SDL2OpenGLDrawGui(
     }
 
     // Setup Platform/Renderer back ends
-    ImGui_ImplSDL2_InitForOpenGL(
+    ImGui_ImplSDL3_InitForOpenGL(
         static_cast<SDL_Window*>(window_.GetWindowContext()),
         device_.GetDeviceContext());
 #if defined(_WIN32) || defined(_WIN64)
-    ImGui_ImplOpenGL3_Init("#version 450");
+    ImGui_ImplOpenGL3_Init("#version 130");
 #else
     ImGui_ImplOpenGL3_Init("#version 330");
 #endif
 }
 
-SDL2OpenGLDrawGui::~SDL2OpenGLDrawGui()
+SDLOpenGLDrawGui::~SDLOpenGLDrawGui()
 {
     // Cleanup
     ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplSDL2_Shutdown();
+    ImGui_ImplSDL3_Shutdown();
     ImGui::DestroyContext();
 }
 
-void SDL2OpenGLDrawGui::Startup(glm::uvec2 size)
+void SDLOpenGLDrawGui::Startup(glm::uvec2 size)
 {
     size_ = size;
 }
 
-bool SDL2OpenGLDrawGui::Update(DeviceInterface& device, double dt)
+bool SDLOpenGLDrawGui::Update(DeviceInterface& device, double dt)
 {
     // Local variables.
     bool returned_value = true;
     is_keyboard_passed_ = false;
     ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
     io.ConfigWindowsMoveFromTitleBarOnly = true;
 
     // Start the Dear ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplSDL2_NewFrame(
-        static_cast<SDL_Window*>(window_.GetWindowContext()));
+    ImGui_ImplSDL3_NewFrame();
     ImGui::NewFrame();
 
     if (!is_visible_)
@@ -113,40 +113,54 @@ bool SDL2OpenGLDrawGui::Update(DeviceInterface& device, double dt)
         }
     }
 
-    // Go through all texture and create a window for each of them.
+    if (menubar_callback_)
+    {
+        if (ImGui::BeginMainMenuBar())
+        {
+            if (!menubar_callback_->DrawCallback())
+            {
+                returned_value = false;
+            }
+            ImGui::EndMainMenuBar();
+        }
+    }
+
+    // Go through all texture and create a window for the main output.
     for (const EntityId& id : device.GetLevel().GetTextures())
     {
         frame::TextureInterface& texture_interface =
             device.GetLevel().GetTextureFromId(id);
         if (texture_interface.IsCubeMap())
+        {
             continue;
+        }
         opengl::Texture& texture = dynamic_cast<opengl::Texture&>(
             device.GetLevel().GetTextureFromId(id));
         auto& level = device.GetLevel();
-        bool is_default_output = level.GetIdFromName(texture.GetName()) ==
-                                 level.GetDefaultOutputTextureId();
-        if (is_default_output)
+        bool is_default_output =
+            level.GetIdFromName(texture.GetName()) ==
+            level.GetDefaultOutputTextureId();
+        // This is not the default window so skip.
+        if (!is_default_output)
         {
-            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-            original_image_size_ = texture.GetSize();
-        }
-       
-        // If the window are not visible and it is not the main window then
-        // bail out.
-        if (!is_visible_ && !is_default_output)
             continue;
-        if (!is_visible_ && is_default_output)
+        }
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+        original_image_size_ = texture.GetSize();
+       
+        if (!is_visible_)
         {
             ImGui::Begin(
-                fmt::format("{} - <fullscreen>", texture.GetName()).c_str(),
+                std::format("<fullscreen> - [{}]", texture.GetName()).c_str(),
                 nullptr,
                 ImGuiWindowFlags_NoDecoration);
         }
         else
         {
-            ImGui::Begin(texture.GetName().c_str());
+            ImGui::Begin(
+                std::format("default - [{}]", texture.GetName()).c_str());
         }
-        if (is_default_output && modal_callback_)
+        if (modal_callback_)
         {
             if (!start_modal_)
             {
@@ -170,7 +184,7 @@ bool SDL2OpenGLDrawGui::Update(DeviceInterface& device, double dt)
             }
         }
         // Check if you should enable default window keyboard and mouse.
-        if (ImGui::IsWindowHovered() && is_default_output )
+        if (ImGui::IsWindowHovered())
         {
             is_keyboard_passed_ = true;
         }
@@ -243,19 +257,24 @@ bool SDL2OpenGLDrawGui::Update(DeviceInterface& device, double dt)
     io.DisplaySize =
         ImVec2(static_cast<float>(size_.x), static_cast<float>(size_.y));
 
+    SDL_Window* backup_window =
+        static_cast<SDL_Window*>(window_.GetWindowContext());
+    SDL_GLContext backup_context =
+        static_cast<SDL_GLContext>(window_.GetGraphicContext());
+
+    assert(backup_window);
+    assert(backup_context);
     if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
     {
         ImGui::UpdatePlatformWindows();
         ImGui::RenderPlatformWindowsDefault();
-        SDL_GL_MakeCurrent(
-            static_cast<SDL_Window*>(window_.GetWindowContext()),
-            window_.GetGraphicContext());
     }
+    SDL_GL_MakeCurrent(backup_window, backup_context);
 
     return returned_value;
 }
 
-void SDL2OpenGLDrawGui::AddWindow(
+void SDLOpenGLDrawGui::AddWindow(
     std::unique_ptr<frame::gui::GuiWindowInterface> callback)
 {
     std::string name = callback->GetName();
@@ -270,7 +289,7 @@ void SDL2OpenGLDrawGui::AddWindow(
     window_callbacks_.emplace(name, std::move(callback_data));
 }
 
-void SDL2OpenGLDrawGui::AddOverlayWindow(
+void SDLOpenGLDrawGui::AddOverlayWindow(
     glm::vec2 position,
     glm::vec2 size,
     std::unique_ptr<frame::gui::GuiWindowInterface> callback)
@@ -288,13 +307,13 @@ void SDL2OpenGLDrawGui::AddOverlayWindow(
     overlay_callbacks_.emplace(name, std::move(callback_data));
 }
 
-void SDL2OpenGLDrawGui::AddModalWindow(
+void SDLOpenGLDrawGui::AddModalWindow(
     std::unique_ptr<frame::gui::GuiWindowInterface> callback)
 {
     modal_callback_ = std::move(callback);
 }
 
-std::vector<std::string> SDL2OpenGLDrawGui::GetWindowTitles() const
+std::vector<std::string> SDLOpenGLDrawGui::GetWindowTitles() const
 {
     std::vector<std::string> name_list;
     for (const auto& [name, _] : window_callbacks_)
@@ -304,7 +323,7 @@ std::vector<std::string> SDL2OpenGLDrawGui::GetWindowTitles() const
     return name_list;
 }
 
-void SDL2OpenGLDrawGui::DeleteWindow(const std::string& name)
+void SDLOpenGLDrawGui::DeleteWindow(const std::string& name)
 {
     if (window_callbacks_.contains(name))
     {
@@ -316,14 +335,30 @@ void SDL2OpenGLDrawGui::DeleteWindow(const std::string& name)
     }
 }
 
-bool SDL2OpenGLDrawGui::PollEvent(void* event)
+void SDLOpenGLDrawGui::SetMenuBar(
+    std::unique_ptr<frame::gui::GuiMenuBarInterface> callback)
+{
+    menubar_callback_ = std::move(callback);
+}
+
+frame::gui::GuiMenuBarInterface& SDLOpenGLDrawGui::GetMenuBar()
+{
+    return *menubar_callback_.get();
+}
+
+void SDLOpenGLDrawGui::RemoveMenuBar()
+{
+    menubar_callback_.reset();
+}
+
+bool SDLOpenGLDrawGui::PollEvent(void* event)
 {
     // Allow to click on close window.
-    if (static_cast<SDL_Event*>(event)->type == SDL_QUIT)
+    if (static_cast<SDL_Event*>(event)->type == SDL_EVENT_QUIT)
         return false;
     // Process the event in ImGui (has to be done or you won't be able to
     // handle the main window).
-    ImGui_ImplSDL2_ProcessEvent(static_cast<SDL_Event*>(event));
+    ImGui_ImplSDL3_ProcessEvent(static_cast<SDL_Event*>(event));
     // This is the main window (receiving the input for) so skip.
     if (is_keyboard_passed_)
         return false;
@@ -333,7 +368,7 @@ bool SDL2OpenGLDrawGui::PollEvent(void* event)
             : false;
 }
 
-frame::gui::GuiWindowInterface& SDL2OpenGLDrawGui::GetWindow(
+frame::gui::GuiWindowInterface& SDLOpenGLDrawGui::GetWindow(
     const std::string& name)
 {
     if (window_callbacks_.contains(name))

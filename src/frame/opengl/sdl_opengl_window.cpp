@@ -7,6 +7,7 @@
 #include <shtypes.h>
 #pragma comment(lib, "Shcore.lib")
 #endif
+#include <format>
 
 #include "frame/gui/draw_gui_interface.h"
 #include "frame/opengl/gui/sdl_opengl_draw_gui.h"
@@ -17,45 +18,97 @@ namespace frame::opengl
 
 SDLOpenGLWindow::SDLOpenGLWindow(glm::uvec2 size) : size_(size)
 {
-    if (SDL_Init(SDL_INIT_VIDEO) != 0)
-        throw std::runtime_error("Couldn't initialize SDL2.");
+    if (!SDL_Init(SDL_INIT_VIDEO))
+    {
+        throw std::runtime_error("Couldn't initialize SDL3.");
+    }
+
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+#if defined(_WIN32) || defined(_WIN64)
+    SDL_GL_SetAttribute(
+        SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
+    SDL_GL_SetAttribute(
+        SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 5);
+#endif
+#if defined(__linux__)
+    SDL_GL_SetAttribute(
+        SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
+    SDL_GL_SetAttribute(
+        SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+#endif
+
     sdl_window_ = SDL_CreateWindow(
         "SDL OpenGL",
-        SDL_WINDOWPOS_UNDEFINED,
-        SDL_WINDOWPOS_UNDEFINED,
         size_.x,
         size_.y,
         SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
     if (!sdl_window_)
     {
-        throw std::runtime_error("Couldn't start a window in SDL2.");
+        throw std::runtime_error("Couldn't start a window in SDL3.");
     }
-    logger_->info("Created an SDL2 window.");
+    logger_->info("Created an SDL3 window.");
+
+    // Now create GL context
+    gl_context_ = SDL_GL_CreateContext(sdl_window_);
+    if (!gl_context_)
+    {
+        throw std::runtime_error(
+            fmt::format("Failed to create GL context: {}", SDL_GetError()));
+    }
+
+    // Set as current
+    SDL_GL_MakeCurrent(sdl_window_, gl_context_);
+
 #if defined(_WIN32) || defined(_WIN64)
     // Get the window handler.
-    SDL_SysWMinfo wmInfo;
-    SDL_VERSION(&wmInfo.version);
-    SDL_GetWindowWMInfo(sdl_window_, &wmInfo);
-    hwnd_ = wmInfo.info.win.window;
+    hwnd_ = FindWindowA(nullptr, SDL_GetWindowTitle(sdl_window_));
 #endif
     // Query the desktop size, used in full screen desktop mode.
-    int i = SDL_GetWindowDisplayIndex(sdl_window_);
-    SDL_Rect j;
-    SDL_GetDisplayBounds(i, &j);
-    desktop_size_.x = j.w;
-    desktop_size_.y = j.h;
+    int w;
+    int h;
+    SDL_GetWindowSize(sdl_window_, &w, &h);
+    desktop_size_.x = w;
+    desktop_size_.y = h;
+    
+    // Vsync off.
+    SDL_GL_SetSwapInterval(0);
+
+    // Initialize GLEW to find the 'glDebugMessageCallback' function.
+    glewExperimental = GL_TRUE;
+    auto result = glewInit();
+    if (result != GLEW_OK)
+    {
+        throw std::runtime_error(
+            std::format(
+                "GLEW problems : {}",
+                reinterpret_cast<const char*>(glewGetErrorString(result))));
+    }
+
+    // During init, enable debug output
+    glEnable(GL_DEBUG_OUTPUT);
+    glDebugMessageCallback(MessageCallback, nullptr);
 }
 
 SDLOpenGLWindow::~SDLOpenGLWindow()
 {
     // TODO(anirul): Fix me to check which device this is.
     if (device_)
-        SDL_GL_DeleteContext(device_->GetDeviceContext());
+    {
+        SDL_GL_DestroyContext(
+            static_cast<SDL_GLContext>(device_->GetDeviceContext()));
+    }
     SDL_DestroyWindow(sdl_window_);
     SDL_Quit();
 }
 
-void SDLOpenGLWindow::Run(std::function<void()> lambda)
+WindowReturnEnum SDLOpenGLWindow::Run(std::function<bool()> lambda)
 {
     // Called only once at the beginning.
     for (const auto& plugin_interface : device_->GetPluginPtrs())
@@ -67,8 +120,7 @@ void SDLOpenGLWindow::Run(std::function<void()> lambda)
             plugin_interface->Startup(size_);
         }
     }
-    // While Run return true continue.
-    bool loop = true;
+    WindowReturnEnum window_return_enum = WindowReturnEnum::CONTINUE;
     double previous_count = 0.0;
     // Timing counter.
     auto start = std::chrono::system_clock::now();
@@ -89,7 +141,9 @@ void SDLOpenGLWindow::Run(std::function<void()> lambda)
                 if (plugin_interface)
                 {
                     if (plugin_interface->PollEvent(&event))
+                    {
                         skip = true;
+                    }
                 }
             }
             if (skip)
@@ -98,7 +152,7 @@ void SDLOpenGLWindow::Run(std::function<void()> lambda)
             }
             if (!RunEvent(event, dt))
             {
-                loop = false;
+                window_return_enum = WindowReturnEnum::QUIT;
             }
         }
         if (input_interface_)
@@ -114,69 +168,80 @@ void SDLOpenGLWindow::Run(std::function<void()> lambda)
             {
                 if (!plugin_interface->Update(*device_.get(), time.count()))
                 {
-                    loop = false;
+                    window_return_enum = WindowReturnEnum::QUIT;
                 }
             }
         }
 
+        SDL_GL_MakeCurrent(sdl_window_, gl_context_);
+
         SetWindowTitle(
             "SDL OpenGL - " + std::to_string(static_cast<float>(GetFPS(dt))));
         previous_count = time.count();
-        lambda();
+        if (!lambda())
+        {
+            window_return_enum = WindowReturnEnum::RESTART;
+        }
 
         // TODO(anirul): Fix me to check which device this is.
         if (device_)
         {
             SDL_GL_SwapWindow(sdl_window_);
         }
-    } while (loop);
+    }
+    while (window_return_enum == WindowReturnEnum::CONTINUE);
+    return window_return_enum;
 }
 
 bool SDLOpenGLWindow::RunEvent(const SDL_Event& event, const double dt)
 {
-    if (event.type == SDL_QUIT)
+    if (event.type == SDL_EVENT_QUIT)
+    {
         return false;
+    }
     bool has_window_plugin = false;
     for (PluginInterface* plugin : device_->GetPluginPtrs())
     {
         if (dynamic_cast<frame::gui::DrawGuiInterface*>(plugin))
-            has_window_plugin = true;
-    }
-    if (event.type == SDL_KEYDOWN)
-    {
-        if (key_callbacks_.count(event.key.keysym.sym))
         {
-            return key_callbacks_[event.key.keysym.sym]();
+            has_window_plugin = true;
+        }
+    }
+    if (event.type == SDL_EVENT_KEY_DOWN)
+    {
+        if (key_callbacks_.count(event.key.key))
+        {
+            return key_callbacks_[event.key.key]();
         }
     }
     if (input_interface_)
     {
-        if (event.type == SDL_KEYDOWN)
+        if (event.type == SDL_EVENT_KEY_DOWN)
         {
-            return input_interface_->KeyPressed(event.key.keysym.sym, dt);
+            return input_interface_->KeyPressed(event.key.key, dt);
         }
-        if (event.type == SDL_KEYUP)
+        if (event.type == SDL_EVENT_KEY_UP)
         {
-            return input_interface_->KeyReleased(event.key.keysym.sym, dt);
+            return input_interface_->KeyReleased(event.key.key, dt);
         }
-        if (event.type == SDL_MOUSEMOTION)
+        if (event.type == SDL_EVENT_MOUSE_MOTION)
         {
             return input_interface_->MouseMoved(
                 glm::vec2(event.motion.x, event.motion.y),
                 glm::vec2(event.motion.xrel, event.motion.yrel),
                 dt);
         }
-        if (event.type == SDL_MOUSEBUTTONDOWN)
+        if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN)
         {
             return input_interface_->MousePressed(
                 SDLButtonToChar(event.button.button), dt);
         }
-        if (event.type == SDL_MOUSEBUTTONUP)
+        if (event.type == SDL_EVENT_MOUSE_BUTTON_UP)
         {
             return input_interface_->MouseReleased(
                 SDLButtonToChar(event.button.button), dt);
         }
-        if (event.type == SDL_MOUSEWHEEL && event.wheel.y != 0)
+        if (event.type == SDL_EVENT_MOUSE_WHEEL && event.wheel.y != 0)
         {
             return input_interface_->WheelMoved(
                 static_cast<float>(event.wheel.y), dt);
@@ -189,15 +254,25 @@ const char SDLOpenGLWindow::SDLButtonToChar(const Uint8 button) const
 {
     char ret = 0;
     if (button & SDL_BUTTON_LEFT)
+    {
         ret += 1;
+    }
     if (button & SDL_BUTTON_RIGHT)
+    {
         ret += 2;
+    }
     if (button & SDL_BUTTON_MIDDLE)
+    {
         ret += 4;
+    }
     if (button & SDL_BUTTON_X1)
+    {
         ret += 8;
+    }
     if (button & SDL_BUTTON_X2)
+    {
         ret += 16;
+    }
     return ret;
 }
 
@@ -214,39 +289,8 @@ void* SDLOpenGLWindow::GetGraphicContext() const
     std::pair<int, int> gl_version;
     frame::Logger& logger = frame::Logger::GetInstance();
 
-    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-    // CHECKME(anirul): Is this still relevant?
-#if defined(__APPLE__)
-    SDL_GL_SetAttribute(
-        SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
-    SDL_GL_SetAttribute(
-        SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
-#endif
-#if defined(_WIN32) || defined(_WIN64)
-    SDL_GL_SetAttribute(
-        SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
-    SDL_GL_SetAttribute(
-        SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 5);
-#endif
-#if defined(__linux__)
-    SDL_GL_SetAttribute(
-        SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
-    SDL_GL_SetAttribute(
-        SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
-#endif
-
     // GL context.
-    void* gl_context =
-        SDL_GL_CreateContext(static_cast<SDL_Window*>(GetWindowContext()));
-    if (!gl_context)
+    if (!gl_context_)
     {
         std::string error = SDL_GetError();
         logger->error(error);
@@ -255,30 +299,15 @@ void* SDLOpenGLWindow::GetGraphicContext() const
 
     SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &gl_version.first);
     SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &gl_version.second);
-    logger->info(reinterpret_cast<const char*>(glGetString(GL_RENDERER)));
-
-    // Vsync off.
-    SDL_GL_SetSwapInterval(0);
-
-    logger->info(
-        "Started SDL OpenGL version {}.{}.",
-        gl_version.first,
-        gl_version.second);
-
-    // Initialize GLEW to find the 'glDebugMessageCallback' function.
-    auto result = glewInit();
-    if (result != GLEW_OK)
+    static bool s_once = false;
+    if (!s_once)
     {
-        throw std::runtime_error(fmt::format(
-            "GLEW problems : {}",
-            reinterpret_cast<const char*>(glewGetErrorString(result))));
+        s_once = true;
+        logger->info(
+            "OpenGL version: {}.{}", gl_version.first, gl_version.second);
     }
 
-    // During init, enable debug output
-    glEnable(GL_DEBUG_OUTPUT);
-    glDebugMessageCallback(MessageCallback, nullptr);
-
-    return gl_context;
+    return gl_context_;
 }
 
 void SDLOpenGLWindow::Resize(glm::uvec2 size, FullScreenEnum fullscreen_enum)
@@ -287,28 +316,58 @@ void SDLOpenGLWindow::Resize(glm::uvec2 size, FullScreenEnum fullscreen_enum)
     if (fullscreen_enum_ != fullscreen_enum)
     {
         fullscreen_enum_ = fullscreen_enum;
-        SDL_WindowFlags flags = static_cast<SDL_WindowFlags>(0);
+
+        const SDL_DisplayMode* mode_ptr = nullptr;
+        SDL_DisplayMode fullscreen_mode{};
+
         if (fullscreen_enum_ == FullScreenEnum::WINDOW)
         {
-            flags = static_cast<SDL_WindowFlags>(0);
+            mode_ptr = nullptr;
         }
-        if (fullscreen_enum_ == FullScreenEnum::FULLSCREEN)
+        else if (fullscreen_enum_ == FullScreenEnum::FULLSCREEN)
         {
-            flags = SDL_WindowFlags::SDL_WINDOW_FULLSCREEN;
+            SDL_DisplayID display = SDL_GetDisplayForWindow(sdl_window_);
+            if (!display)
+            {
+                throw std::runtime_error(fmt::format(
+                    "SDL_GetDisplayForWindow failed: {}", SDL_GetError()));
+            }
+
+            SDL_Rect bounds;
+            if (!SDL_GetDisplayBounds(display, &bounds))
+            {
+                throw std::runtime_error(fmt::format(
+                    "SDL_GetDisplayBounds failed: {}", SDL_GetError()));
+            }
+
+            // Use desired resolution if needed
+            fullscreen_mode.w = bounds.w;
+            fullscreen_mode.h = bounds.h;
+            mode_ptr = &fullscreen_mode;
         }
-        if (fullscreen_enum_ == FullScreenEnum::FULLSCREEN_DESKTOP)
+        else if (fullscreen_enum_ == FullScreenEnum::FULLSCREEN_DESKTOP)
         {
-            flags = SDL_WindowFlags::SDL_WINDOW_FULLSCREEN_DESKTOP;
+            fullscreen_mode.w = 0;
+            fullscreen_mode.h = 0;
+            fullscreen_mode.refresh_rate = 0;
+            mode_ptr = &fullscreen_mode;
         }
-        // Change window mode.
-        if (SDL_SetWindowFullscreen(sdl_window_, flags) < 0)
+
+        if (!SDL_SetWindowFullscreenMode(sdl_window_, mode_ptr))
         {
-            throw std::runtime_error(fmt::format(
-                "Error switching to fullscreen mode: {}", SDL_GetError()));
+            throw std::runtime_error(
+                std::format(
+                    "Error switching fullscreen mode: {}", SDL_GetError()));
         }
-        // Only resize when changing window mode.
-        SDL_SetWindowSize(sdl_window_, size_.x, size_.y);
+
+        // Only resize in windowed mode — fullscreen modes will auto-resize the
+        // window
+        if (fullscreen_enum_ == FullScreenEnum::WINDOW)
+        {
+            SDL_SetWindowSize(sdl_window_, size_.x, size_.y);
+        }
     }
+
     device_->Resize(size_);
 }
 
@@ -323,8 +382,7 @@ namespace
 
 std::vector<glm::vec2> s_ppi_vec = {};
 
-// This is a callback to receive the monitor and then to compute the
-// PPI.
+// This is a callback to receive the monitor and then to compute the PPI.
 BOOL MonitorEnumProc(HMONITOR hmonitor, HDC hdc, LPRECT p_rect, LPARAM param)
 {
     std::uint32_t hppi = 0;

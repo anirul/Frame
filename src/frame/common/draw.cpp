@@ -18,7 +18,9 @@ void Draw::Startup(glm::uvec2 size)
         level_ = frame::proto::ParseLevel(size_, path_);
     }
     if (!level_)
+    {
         throw std::runtime_error("No level?");
+    }
     device_.Startup(std::move(level_));
     level_ = nullptr;
 }

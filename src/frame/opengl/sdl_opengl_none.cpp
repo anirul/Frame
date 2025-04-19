@@ -9,7 +9,7 @@ namespace frame::opengl
 
 SDLOpenGLNone::SDLOpenGLNone(glm::uvec2 size) : size_(size)
 {
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_NOPARACHUTE) != 0)
+    if (SDL_Init(SDL_INIT_VIDEO) != 0)
     {
         throw std::runtime_error(
             fmt::format("Couldn't initialize SDL2: {}", SDL_GetError()));
@@ -46,8 +46,6 @@ SDLOpenGLNone::SDLOpenGLNone(glm::uvec2 size) : size_(size)
 
     sdl_window_ = SDL_CreateWindow(
         "SDL OpenGL",
-        SDL_WINDOWPOS_UNDEFINED,
-        SDL_WINDOWPOS_UNDEFINED,
         size_.x,
         size_.y,
         SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN);
@@ -63,12 +61,15 @@ SDLOpenGLNone::~SDLOpenGLNone()
 {
     // TODO(anirul): Fix me to check which device this is.
     if (device_)
-        SDL_GL_DeleteContext(device_->GetDeviceContext());
+    {
+        SDL_GL_DestroyContext(
+            static_cast<SDL_GLContext>(device_->GetDeviceContext()));
+    }
     SDL_DestroyWindow(sdl_window_);
     SDL_Quit();
 }
 
-void SDLOpenGLNone::Run(std::function<void()> lambda)
+WindowReturnEnum SDLOpenGLNone::Run(std::function<bool()> lambda)
 {
     for (const auto& plugin_interface : device_->GetPluginPtrs())
     {
@@ -82,6 +83,7 @@ void SDLOpenGLNone::Run(std::function<void()> lambda)
         plugin_interface->Update(*device_.get(), 0.0);
     }
     lambda();
+    return WindowReturnEnum::UKNOWN;
 }
 
 void* SDLOpenGLNone::GetGraphicContext() const

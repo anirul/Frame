@@ -63,7 +63,7 @@ target_link_libraries(FrameOpenGL
     GLEW::GLEW
     glm::glm
     protobuf::libprotobuf
-    SDL2::SDL2
+    SDL3::SDL3
     spdlog::spdlog
 )
 

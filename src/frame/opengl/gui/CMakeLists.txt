@@ -2,11 +2,6 @@
 
 add_library(FrameOpenGLGui
   STATIC
-    imgui_impl_opengl3.cpp
-    imgui_impl_opengl3.h
-    imgui_impl_opengl3_loader.h
-    imgui_impl_sdl.cpp
-    imgui_impl_sdl.h
     sdl_opengl_draw_gui.cpp
     sdl_opengl_draw_gui.h
 )
@@ -29,7 +24,7 @@ target_link_libraries(FrameOpenGLGui
     glm::glm
     imgui::imgui
     protobuf::libprotobuf
-    SDL2::SDL2
+    SDL3::SDL3
     spdlog::spdlog
 )
 

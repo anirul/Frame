@@ -6,10 +6,10 @@ namespace frame::vulkan
 Device::Device(
     void* vk_instance,
     glm::uvec2 size,
-    vk::SurfaceKHR& surface,
-    vk::DispatchLoaderDynamic& dispatch)
-    : vk_instance_(static_cast<VkInstance>(vk_instance)), size_(size),
-      vk_surface_(surface), vk_dispatch_loader_(dispatch)
+    vk::SurfaceKHR& surface)
+    : vk_instance_(static_cast<VkInstance>(vk_instance)),
+      size_(size),
+      vk_surface_(surface)
 {
     logger_->info("Creating Vulkan Device");
     std::vector<vk::PhysicalDevice> physical_devices =
@@ -47,8 +47,7 @@ Device::Device(
         throw std::runtime_error("No Vulkan Physical Device found");
     }
     // Select a queue family.
-    std::vector<vk::QueueFamilyProperties> queue_families =
-        vk_physical_device_.getQueueFamilyProperties(vk_dispatch_loader_);
+    std::vector<vk::QueueFamilyProperties> queue_families = {};
     int i = 0;
     int selected_index = -1;
     for (auto& queue_family : queue_families)
@@ -67,8 +66,7 @@ Device::Device(
     vk::DeviceQueueCreateInfo device_queue_create_info(
         {}, selected_index, 1, &queue_family_priority_);
     vk::DeviceCreateInfo device_create_info({}, 1, &device_queue_create_info);
-    vk_unique_device_ = vk_physical_device_.createDeviceUnique(
-        device_create_info, nullptr, vk_dispatch_loader_);
+    vk_unique_device_ = vk_physical_device_.createDeviceUnique(device_create_info);
 }
 
 Device::~Device()

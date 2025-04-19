@@ -2,10 +2,7 @@
 
 #define NOMINMAX
 #include <GL/glew.h>
-#include <SDL2/SDL.h>
-#if defined(_WIN32) || defined(_WIN64)
-#include <SDL2/SDL_syswm.h>
-#endif
+#include <SDL3/SDL.h>
 #include <fmt/core.h>
 
 #include <stdexcept>
@@ -23,7 +20,7 @@ class SDLOpenGLNone : public WindowInterface
     virtual ~SDLOpenGLNone();
 
   public:
-    void Run(std::function<void()> lambda) override;
+    WindowReturnEnum Run(std::function<bool()> lambda) override;
     void* GetGraphicContext() const override;
 
   public:

@@ -26,8 +26,7 @@ class Device : public DeviceInterface
     Device(
         void* vk_instance,
         glm::uvec2 size,
-        vk::SurfaceKHR& surface,
-        vk::DispatchLoaderDynamic& dispatch);
+        vk::SurfaceKHR& surface);
     //! @brief Destructor this is where the memory is freed.
     virtual ~Device();
 
@@ -191,9 +190,8 @@ class Device : public DeviceInterface
     vk::Instance vk_instance_ = {};
     vk::PhysicalDevice vk_physical_device_ = {};
     float queue_family_priority_ = 1.0f;
-    vk::UniqueHandle<vk::Device, vk::DispatchLoaderDynamic> vk_unique_device_;
+    vk::UniqueDevice vk_unique_device_;
     vk::SurfaceKHR& vk_surface_;
-    vk::DispatchLoaderDynamic& vk_dispatch_loader_;
     // Size.
     glm::uvec2 size_ = {0, 0};
     const proto::PixelElementSize pixel_element_size_ =

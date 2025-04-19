@@ -11,17 +11,19 @@
     "happly",
     {
       "name": "imgui",
-      "features": [ "opengl3-binding", "sdl2-binding", "docking-experimental" ]
+      "features": [ "opengl3-binding", "sdl3-binding", "docking-experimental" ]
     },
     "opengl",
     "protobuf",
     {
-      "name": "sdl2",
+      "name": "sdl3",
       "features": [ "vulkan" ]
     },
     "spdlog",
     "stb",
     "tinyobjloader",
-    "vulkan"
+    {
+      "name": "vulkan"
+    }
   ]
 }

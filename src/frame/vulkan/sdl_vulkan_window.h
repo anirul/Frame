@@ -1,14 +1,11 @@
 #pragma once
 
-#define NOMINMAX
-#include <SDL2/SDL.h>
-
+#include <SDL3/SDL.h>
 #include <vulkan/vulkan.hpp>
 #if defined(_WIN32) || defined(_WIN64)
-#include <SDL2/SDL_syswm.h>
+#define NOMINMAX
+#include <Windows.h>
 #endif
-#include <fmt/core.h>
-
 #include <stdexcept>
 
 #include "frame/logger.h"
@@ -71,16 +68,13 @@ class SDLVulkanWindow : public WindowInterface
     }
 
   public:
-    void Run(std::function<void()> lambda = [] {}) override;
+    WindowReturnEnum Run(
+		std::function<bool()> lambda = [] { return true; }) override;
     void* GetGraphicContext() const override;
     void Resize(glm::uvec2 size, FullScreenEnum fullscreen_enum) override;
     FullScreenEnum GetFullScreenEnum() const override;
 
   public:
-    vk::DispatchLoaderDynamic& GetVulkanDispatch()
-    {
-        return vk_dispatch_loader_dynamic_;
-    }
     vk::SurfaceKHR& GetVulkanSurfaceKHR()
     {
         return vk_surface_.get();
@@ -110,7 +104,6 @@ class SDLVulkanWindow : public WindowInterface
 #endif
     frame::Logger& logger_ = frame::Logger::GetInstance();
     vk::UniqueInstance vk_unique_instance_;
-    vk::DispatchLoaderDynamic vk_dispatch_loader_dynamic_;
     vk::UniqueSurfaceKHR vk_surface_;
 };
 
