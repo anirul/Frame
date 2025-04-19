@@ -35,6 +35,7 @@ class MenubarView
     void ShowLoggerWindow();
     void ShowResolutionWindow();
     void ShowTexturesWindow(DeviceInterface& device);
+    void Reset();
     
   public:
     const WindowResolution* GetWindowResolution() const

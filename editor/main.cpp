@@ -55,24 +55,32 @@ try
     device.AddPlugin(std::move(gui_window));
     frame::common::Application app(std::move(win));
     bool loop = true;
-    do
+    while (loop)
     {
         app.Startup(frame::file::FindFile(menubar_file.GetFileName()));
-        if (app.Run(
-            [&menubar_file] { return !menubar_file.HasChanged(); }) ==
-            frame::WindowReturnEnum::QUIT)
+        switch (app.Run([&menubar_file] { return !menubar_file.HasChanged(); }))
         {
+        case frame::WindowReturnEnum::QUIT:
             return 0;
-        }
-        if (menubar_view.GetWindowResolution())
-        {
-            app.Resize(
-                menubar_view.GetWindowResolution()->GetSize(),
-                menubar_view.GetWindowResolution()->GetFullScreen());
-            loop = menubar_view.GetWindowResolution()->End();
+        case frame::WindowReturnEnum::RESTART:
+            if (menubar_view.GetWindowResolution())
+            {
+                app.Resize(
+                    menubar_view.GetWindowResolution()->GetSize(),
+                    menubar_view.GetWindowResolution()->GetFullScreen());
+                loop = menubar_view.GetWindowResolution()->End();
+            }
+            else
+            {
+                menubar_view.Reset();
+            }
+            break;
+        default:
+            frame::Logger::GetInstance()->warn(
+                std::format("Weird window return enum?"));
+            break;
         }
     }
-    while (loop);
     return 0;
 }
 catch (std::exception ex)

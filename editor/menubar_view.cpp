@@ -125,4 +125,23 @@ void MenubarView::ShowTexturesWindow(DeviceInterface& device)
     }
 }
 
+void MenubarView::Reset()
+{
+    for (std::string window_name : draw_gui_.GetWindowTitles())
+    try
+    {
+        WindowTexture& window_texture =
+            dynamic_cast<WindowTexture&>(draw_gui_.GetWindow(window_name));
+        draw_gui_.DeleteWindow(window_name);
+    }
+    catch (const std::bad_cast& ex)
+    {
+        frame::Logger::GetInstance()->warn(
+            std::format(
+                "Counldn't cast window named {} to a window texture {}.",
+                window_name,
+                ex.what()));
+    }
+}
+
 } // End namespace frame::gui.
