@@ -1,4 +1,4 @@
-#include "frame/opengl/texture_cube_map_test.h"
+#include "frame/opengl/cubemap_test.h"
 
 #include <GL/glew.h>
 
@@ -7,12 +7,12 @@
 #include "frame/file/file_system.h"
 #include "frame/json/parse_texture.h"
 #include "frame/opengl/file/load_texture.h"
-#include "frame/opengl/texture_cube_map.h"
+#include "frame/opengl/cubemap.h"
 
 namespace test
 {
 
-TEST_F(TextureCubeMapTest, CreateTextureCubeMapTest)
+TEST_F(CubemapTest, CreateCubemapTest)
 {
     ASSERT_FALSE(texture_);
     EXPECT_NO_THROW(
@@ -26,7 +26,7 @@ TEST_F(TextureCubeMapTest, CreateTextureCubeMapTest)
                 frame::file::FindFile("asset/cubemap/negative_z.png")}));
     ASSERT_TRUE(texture_);
     auto* opengl_texture =
-        dynamic_cast<frame::opengl::TextureCubeMap*>(texture_.get());
+        dynamic_cast<frame::opengl::Cubemap*>(texture_.get());
     ASSERT_NE(nullptr, opengl_texture);
     ASSERT_NE(0, opengl_texture->GetId());
     EXPECT_EQ(1024, texture_->GetSize().x);
@@ -38,7 +38,7 @@ TEST_F(TextureCubeMapTest, CreateTextureCubeMapTest)
     EXPECT_EQ(0xff, *p.second);
 }
 
-TEST_F(TextureCubeMapTest, CreateEquirectangularTextureCubeMapTest)
+TEST_F(CubemapTest, CreateEquirectangularCubemapTest)
 {
     ASSERT_FALSE(texture_);
     EXPECT_NO_THROW(
@@ -47,7 +47,7 @@ TEST_F(TextureCubeMapTest, CreateEquirectangularTextureCubeMapTest)
             frame::proto::PixelElementSize_FLOAT()));
     ASSERT_TRUE(texture_);
     auto* opengl_texture =
-        dynamic_cast<frame::opengl::TextureCubeMap*>(texture_.get());
+        dynamic_cast<frame::opengl::Cubemap*>(texture_.get());
     ASSERT_NE(nullptr, opengl_texture);
     ASSERT_NE(0, opengl_texture->GetId());
     EXPECT_EQ(1024, texture_->GetSize().x);

@@ -8,6 +8,7 @@
 #pragma comment(lib, "Shcore.lib")
 #endif
 #include <format>
+#include <SDL3/SDL_video.h>
 
 #include "frame/gui/draw_gui_interface.h"
 #include "frame/opengl/gui/sdl_opengl_draw_gui.h"
@@ -446,16 +447,17 @@ glm::vec2 SDLOpenGLWindow::GetPixelPerInch(std::uint32_t screen /*= 0*/) const
     }
     return s_ppi_vec[screen];
 #else // Not windows.
-    float hppi = 0.0f;
-    float vppi = 0.0f;
-    float dppi = 0.0f;
-    // Use the SDL function this should work on Linux?
-    if (SDL_GetDisplayDPI(screen, &dppi, &hppi, &vppi))
+    SDL_DisplayID display = SDL_GetPrimaryDisplay();
+    float scale = SDL_GetDisplayContentScale(display);
+    if (scale != 0.0f)
     {
-        throw std::runtime_error(
-            fmt::format("Error in GetPixelPerInch: {}", SDL_GetError()));
+        float dpi = scale * 96.0f; // 96 is the base DPI on many desktop systems
+        return glm::vec2(dpi, dpi);
+    } 
+    else
+    {
+        throw std::runtime_error("Error couldn't get the DPI");
     }
-    return glm::vec2(hppi, vppi);
 #endif
 }
 
