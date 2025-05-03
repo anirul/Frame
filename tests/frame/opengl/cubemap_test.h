@@ -8,10 +8,10 @@
 namespace test
 {
 
-class TextureCubeMapTest : public testing::Test
+class CubemapTest : public testing::Test
 {
   public:
-    TextureCubeMapTest()
+    CubemapTest()
         : window_(frame::CreateNewWindow(frame::DrawingTargetEnum::NONE))
     {
     }
