@@ -111,11 +111,17 @@ std::optional<glm::mat4> Renderer::RenderNode(
         GLbitfield bit_field = 0;
         std::uint32_t clean_buffer = node_static_mesh.GetCleanBuffer();
         if (clean_buffer | proto::CleanBuffer::CLEAR_COLOR)
+        {
             bit_field += GL_COLOR_BUFFER_BIT;
+        }
         if (clean_buffer | proto::CleanBuffer::CLEAR_DEPTH)
+        {
             bit_field += GL_DEPTH_BUFFER_BIT;
+        }
         if (bit_field)
+        {
             glClear(bit_field);
+        }
         return std::nullopt;
     }
     auto& static_mesh = level_.GetStaticMeshFromId(mesh_id);

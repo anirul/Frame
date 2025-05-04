@@ -1,16 +1,16 @@
 #include "program.h"
 
-#include <GL/glew.h>
-#include <absl/strings/match.h>
-#include <absl/strings/string_view.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
 #include <format>
 #include <memory>
 #include <regex>
 #include <stdexcept>
 #include <string_view>
+
+#include <GL/glew.h>
+#include <absl/strings/match.h>
+#include <absl/strings/string_view.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include "frame/logger.h"
 #include "frame/uniform.h"
@@ -63,12 +63,14 @@ void Program::LinkShader()
 void Program::Use() const
 {
     glUseProgram(program_id_);
+    is_used_ = true;
 }
 
 void Program::Use(
     const UniformCollectionInterface& uniform_collection_interface)
 {
     glUseProgram(program_id_);
+    is_used_ = true;
     for (const auto& name : uniform_collection_interface.GetUniformNames())
     {
         if (HasUniform(name))
@@ -119,7 +121,8 @@ void Program::AddUniform(std::unique_ptr<UniformInterface>&& uniform_interface)
     }
     case proto::Uniform::FLOAT_VECTOR3: {
         glm::vec3 value = uniform_ptr->GetVec3();
-        glUniform3f(GetMemoizeUniformLocation(name), value.x, value.y, value.z);
+        glUniform3f(
+            GetMemoizeUniformLocation(name), value.x, value.y, value.z);
         break;
     }
     case proto::Uniform::FLOAT_VECTOR4: {
@@ -142,7 +145,8 @@ void Program::AddUniform(std::unique_ptr<UniformInterface>&& uniform_interface)
     }
     case proto::Uniform::INT_VECTOR3: {
         glm::ivec3 value = uniform_ptr->GetIVec3();
-        glUniform3i(GetMemoizeUniformLocation(name), value.x, value.y, value.z);
+        glUniform3i(
+            GetMemoizeUniformLocation(name), value.x, value.y, value.z);
         break;
     }
     case proto::Uniform::INT_VECTOR4: {
@@ -174,10 +178,11 @@ void Program::AddUniform(std::unique_ptr<UniformInterface>&& uniform_interface)
         break;
     }
     default:
-        throw std::runtime_error(fmt::format(
+        logger_->error(fmt::format(
             "Unknown uniform type [{}] for uniform [{}].",
             static_cast<int>(uniform_ptr->GetType()),
             name));
+        break;
     }
 }
 
@@ -192,6 +197,11 @@ void Program::RemoveUniform(const std::string& name)
 
 int Program::GetMemoizeUniformLocation(const std::string& name) const
 {
+    if (!is_used_)
+    {
+        throw std::runtime_error(
+            "Program is not used, cannot get uniform location.");
+    }
     if (!memoize_map_.count(name))
     {
         while (glGetError() != GL_NO_ERROR)
@@ -288,6 +298,7 @@ void Program::SetSceneRoot(EntityId scene_root)
 void Program::UnUse() const
 {
     glUseProgram(0);
+    is_used_ = false;
 }
 
 void Program::CreateUniformList()
@@ -296,6 +307,7 @@ void Program::CreateUniformList()
     GLint count = 0;
     glGetProgramiv(program_id_, GL_ACTIVE_UNIFORMS, &count);
     logger_->info("Uniform [{}] count: {}", name_, count);
+    Use();
     for (GLuint i = 0; i < static_cast<GLuint>(count); ++i)
     {
         constexpr GLsizei max_size = 256;
@@ -407,8 +419,7 @@ void Program::CreateUniformList()
         }
         case GL_SAMPLER_CUBE:
             [[fallthrough]];
-        case GL_SAMPLER_2D:
-        {
+        case GL_SAMPLER_2D: {
             int value = -1;
             glGetUniformiv(
                 program_id_, GetMemoizeUniformLocation(name_str), &value);
@@ -416,10 +427,12 @@ void Program::CreateUniformList()
             break;
         }
         default:
-            throw std::runtime_error(std::format("Unknown uniform type: {}", type));
+            logger_->error(
+                std::format("Unknown uniform name: {} type: {}", name, type));
         }
         AddUniform(std::move(uniform_interface));
     }
+    UnUse();
 }
 
 std::vector<std::string> Program::GetUniformNameList() const
