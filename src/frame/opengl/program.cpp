@@ -1,5 +1,6 @@
 #include "program.h"
 
+#include <GL/glew.h>
 #include <absl/strings/match.h>
 #include <absl/strings/string_view.h>
 #include <glm/glm.hpp>
@@ -172,6 +173,11 @@ void Program::AddUniform(std::unique_ptr<UniformInterface>&& uniform_interface)
             GetMemoizeUniformLocation(name), 1, GL_FALSE, &value[0][0]);
         break;
     }
+    default:
+        throw std::runtime_error(fmt::format(
+            "Unknown uniform type [{}] for uniform [{}].",
+            static_cast<int>(uniform_ptr->GetType()),
+            name));
     }
 }
 
@@ -184,31 +190,14 @@ void Program::RemoveUniform(const std::string& name)
     }
 }
 
-bool Program::IsUniformInList(const std::string& name) const
-{
-    const auto vector = GetUniformNameList();
-    if (std::none_of(
-            vector.cbegin(), vector.cend(), [name](const std::string& inner) {
-                return absl::StrContains(inner, name);
-            }))
-    {
-        return false;
-    }
-    return true;
-}
-
 int Program::GetMemoizeUniformLocation(const std::string& name) const
 {
     if (!memoize_map_.count(name))
     {
-#ifdef _DEBUG
-        if (!IsUniformInList(name))
+        while (glGetError() != GL_NO_ERROR)
         {
-            throw std::runtime_error(
-                fmt::format("Could not find a uniform [{}].", name));
+            // Clear the error.
         }
-        logger_->info("GetMemoizeUniformLocation [{}].", name);
-#endif // _DEBUG
         int location = glGetUniformLocation(program_id_, name.c_str());
         if (location == -1)
         {
@@ -301,7 +290,7 @@ void Program::UnUse() const
     glUseProgram(0);
 }
 
-void Program::CreateUniformList() const
+void Program::CreateUniformList()
 {
     uniform_map_.clear();
     GLint count = 0;
@@ -416,8 +405,20 @@ void Program::CreateUniformList() const
             uniform_interface = std::make_unique<Uniform>(name_str, value);
             break;
         }
+        case GL_SAMPLER_CUBE:
+            [[fallthrough]];
+        case GL_SAMPLER_2D:
+        {
+            int value = -1;
+            glGetUniformiv(
+                program_id_, GetMemoizeUniformLocation(name_str), &value);
+            uniform_interface = std::make_unique<Uniform>(name_str, value);
+            break;
         }
-        uniform_map_.emplace(name_str, std::move(uniform_interface));
+        default:
+            throw std::runtime_error(std::format("Unknown uniform type: {}", type));
+        }
+        AddUniform(std::move(uniform_interface));
     }
 }
 

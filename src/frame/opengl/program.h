@@ -156,12 +156,6 @@ class Program : public ProgramInterface
      */
     int GetMemoizeUniformLocation(const std::string& name) const;
     /**
-     * @brief Test if the uniform is in the uniform list.
-     * @param name: Uniform to be tested.
-     * @return True if the uniform is in the list.
-     */
-    bool IsUniformInList(const std::string& name) const;
-    /**
      * @brief Throw an exception in case this texture is already in the
      * program.
      * @param texture_id: Texture id to be tested.
@@ -170,7 +164,7 @@ class Program : public ProgramInterface
     /**
      * @brief Create the uniform value list (internal).
      */
-    void CreateUniformList() const;
+    void CreateUniformList();
 
   private:
     const Logger& logger_ = Logger::GetInstance();
