@@ -56,7 +56,7 @@ void Device::Startup(std::unique_ptr<frame::LevelInterface>&& level)
     // Add a callback to allow plugins to be called at pre-render step.
     renderer_->SetMeshRenderCallback(
         [this](
-            UniformInterface& uniform,
+            UniformCollectionInterface& uniform,
             StaticMeshInterface& static_mesh,
             MaterialInterface& material)
         {

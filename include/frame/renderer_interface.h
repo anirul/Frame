@@ -104,7 +104,7 @@ struct RendererInterface
      */
     using RenderCallback =
 		std::function<void(
-			UniformInterface&,
+			UniformCollectionInterface&,
 			StaticMeshInterface&,
 			MaterialInterface&)>;
     /**

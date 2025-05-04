@@ -7,6 +7,7 @@
 #include "frame/json/parse_uniform.h"
 #include "frame/opengl/file/load_program.h"
 #include "frame/opengl/program.h"
+#include "frame/uniform.h"
 
 namespace frame::proto
 {
@@ -75,40 +76,69 @@ std::unique_ptr<frame::ProgramInterface> ParseProgramOpenGL(
         {
         case Uniform::kUniformEnum:
             break;
-        case Uniform::kUniformInt:
-            program->Uniform(parameter.name(), parameter.uniform_int());
+        case Uniform::kUniformInt: {
+            std::unique_ptr<UniformInterface> uniform_interface =
+                std::make_unique<frame::Uniform>(
+                    parameter.name(), parameter.uniform_int());
+            program->AddUniform(std::move(uniform_interface));
             break;
-        case Uniform::kUniformFloat:
-            program->Uniform(parameter.name(), parameter.uniform_float());
+        }
+        case Uniform::kUniformFloat: {
+            std::unique_ptr<UniformInterface> uniform_interface =
+                std::make_unique<frame::Uniform>(
+                    parameter.name(), parameter.uniform_float());
+            program->AddUniform(std::move(uniform_interface));
             break;
-        case Uniform::kUniformVec2:
-            program->Uniform(
-                parameter.name(), ParseUniform(parameter.uniform_vec2()));
+        }
+        case Uniform::kUniformVec2: {
+            std::unique_ptr<UniformInterface> uniform_interface =
+                std::make_unique<frame::Uniform>(
+                    parameter.name(), ParseUniform(parameter.uniform_vec2()));
+            program->AddUniform(std::move(uniform_interface));
             break;
-        case Uniform::kUniformVec3:
-            program->Uniform(
-                parameter.name(), ParseUniform(parameter.uniform_vec3()));
+        }
+        case Uniform::kUniformVec3: {
+            std::unique_ptr<UniformInterface> uniform_interface =
+                std::make_unique<frame::Uniform>(
+                    parameter.name(), ParseUniform(parameter.uniform_vec3()));
+            program->AddUniform(std::move(uniform_interface));
             break;
-        case Uniform::kUniformVec4:
-            program->Uniform(
-                parameter.name(), ParseUniform(parameter.uniform_vec4()));
+        }
+        case Uniform::kUniformVec4: {
+            std::unique_ptr<UniformInterface> uniform_interface =
+                std::make_unique<frame::Uniform>(
+                    parameter.name(), ParseUniform(parameter.uniform_vec4()));
+            program->AddUniform(std::move(uniform_interface));
             break;
-        case Uniform::kUniformMat4:
-            program->Uniform(
-                parameter.name(), ParseUniform(parameter.uniform_mat4()));
+        }
+        case Uniform::kUniformMat4: {
+            std::unique_ptr<UniformInterface> uniform_interface =
+                std::make_unique<frame::Uniform>(
+                    parameter.name(), ParseUniform(parameter.uniform_mat4()));
+            program->AddUniform(std::move(uniform_interface));
             break;
-        case Uniform::kUniformVec2S:
-            program->Uniform(
-                parameter.name(), ParseUniform(parameter.uniform_vec2s()));
+        }
+        case Uniform::kUniformVec2S: {
+            std::unique_ptr<UniformInterface> uniform_interface =
+                std::make_unique<frame::Uniform>(
+                    parameter.name(), ParseUniform(parameter.uniform_vec2()));
+            program->AddUniform(std::move(uniform_interface));
             break;
-        case Uniform::kUniformVec3S:
-            program->Uniform(
-                parameter.name(), ParseUniform(parameter.uniform_vec3s()));
+        }
+        case Uniform::kUniformVec3S: {
+            std::unique_ptr<UniformInterface> uniform_interface =
+                std::make_unique<frame::Uniform>(
+                    parameter.name(), ParseUniform(parameter.uniform_vec3()));
+            program->AddUniform(std::move(uniform_interface));
             break;
-        case Uniform::kUniformVec4S:
-            program->Uniform(
-                parameter.name(), ParseUniform(parameter.uniform_vec4s()));
+        }
+        case Uniform::kUniformVec4S: {
+            std::unique_ptr<UniformInterface> uniform_interface =
+                std::make_unique<frame::Uniform>(
+                    parameter.name(), ParseUniform(parameter.uniform_vec4()));
+            program->AddUniform(std::move(uniform_interface));
             break;
+        }
         case Uniform::kUniformFloatPlugin:
             break;
         case Uniform::kUniformIntPlugin:

@@ -9,8 +9,25 @@ package frame.proto;
 // These are parameters that are passed to the shader.
 // Next 21
 message Uniform {
+	enum TypeEnum {
+		INVALID_TYPE = 0;
+		INT = 1;
+		INT_VECTOR2 = 11;
+		INT_VECTOR3 = 12;
+		INT_VECTOR4 = 13;
+		INT_MATRIX2 = 14;
+		INT_MATRIX3 = 15;
+		INT_MATRIX4 = 16;
+		FLOAT = 2;
+		FLOAT_VECTOR2 = 21;
+		FLOAT_VECTOR3 = 22;
+		FLOAT_VECTOR4 = 23;
+		FLOAT_MATRIX2 = 24;
+		FLOAT_MATRIX3 = 25;
+		FLOAT_MATRIX4 = 26;
+	}
 	enum UniformEnum {
-		INVALID = 0;
+		INVALID_UNIFORM = 0;
 		PROJECTION_MAT4 = 1;
 		PROJECTION_INV_MAT4 = 2;
 		VIEW_MAT4 = 3;
@@ -21,6 +38,8 @@ message Uniform {
 	}
 	// Name of the uniform (should be the same as declared in the shader!).
 	string name = 1;
+	// Type of the uniform (should be the same as declared in the shader!).
+	TypeEnum type = 3;
 	// Value of the uniform (same as before).
 	oneof value_oneof {
 		int32 uniform_int = 2;

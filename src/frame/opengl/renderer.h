@@ -119,7 +119,7 @@ class Renderer : public RendererInterface
      * @param material_id: Material id to be used.
      * @param projection: Projection matrix used.
      * @param view: View matrix used.
-	 * @return the computed model matrix.
+     * @return the computed model matrix.
      */
     std::optional<glm::mat4> RenderNode(
         EntityId node_id,
@@ -146,8 +146,9 @@ class Renderer : public RendererInterface
     frame::proto::TextureFrame texture_frame_;
     bool first_render_ = true;
     // The render callback it will be called once per mesh.
-    RenderCallback callback_ =
-        [](UniformInterface&, StaticMeshInterface&, MaterialInterface&) {};
+    RenderCallback callback_ = [](UniformCollectionInterface&,
+                                  StaticMeshInterface&,
+                                  MaterialInterface&) {};
 };
 
 } // End namespace frame::opengl.

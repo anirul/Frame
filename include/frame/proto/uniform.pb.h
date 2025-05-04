@@ -68,8 +68,54 @@ namespace protobuf {
 
 namespace frame {
 namespace proto {
+enum Uniform_TypeEnum : int {
+  Uniform_TypeEnum_INVALID_TYPE = 0,
+  Uniform_TypeEnum_INT = 1,
+  Uniform_TypeEnum_INT_VECTOR2 = 11,
+  Uniform_TypeEnum_INT_VECTOR3 = 12,
+  Uniform_TypeEnum_INT_VECTOR4 = 13,
+  Uniform_TypeEnum_INT_MATRIX2 = 14,
+  Uniform_TypeEnum_INT_MATRIX3 = 15,
+  Uniform_TypeEnum_INT_MATRIX4 = 16,
+  Uniform_TypeEnum_FLOAT = 2,
+  Uniform_TypeEnum_FLOAT_VECTOR2 = 21,
+  Uniform_TypeEnum_FLOAT_VECTOR3 = 22,
+  Uniform_TypeEnum_FLOAT_VECTOR4 = 23,
+  Uniform_TypeEnum_FLOAT_MATRIX2 = 24,
+  Uniform_TypeEnum_FLOAT_MATRIX3 = 25,
+  Uniform_TypeEnum_FLOAT_MATRIX4 = 26,
+  Uniform_TypeEnum_Uniform_TypeEnum_INT_MIN_SENTINEL_DO_NOT_USE_ =
+      std::numeric_limits<::int32_t>::min(),
+  Uniform_TypeEnum_Uniform_TypeEnum_INT_MAX_SENTINEL_DO_NOT_USE_ =
+      std::numeric_limits<::int32_t>::max(),
+};
+
+bool Uniform_TypeEnum_IsValid(int value);
+extern const uint32_t Uniform_TypeEnum_internal_data_[];
+constexpr Uniform_TypeEnum Uniform_TypeEnum_TypeEnum_MIN = static_cast<Uniform_TypeEnum>(0);
+constexpr Uniform_TypeEnum Uniform_TypeEnum_TypeEnum_MAX = static_cast<Uniform_TypeEnum>(26);
+constexpr int Uniform_TypeEnum_TypeEnum_ARRAYSIZE = 26 + 1;
+const ::google::protobuf::EnumDescriptor*
+Uniform_TypeEnum_descriptor();
+template <typename T>
+const std::string& Uniform_TypeEnum_Name(T value) {
+  static_assert(std::is_same<T, Uniform_TypeEnum>::value ||
+                    std::is_integral<T>::value,
+                "Incorrect type passed to TypeEnum_Name().");
+  return Uniform_TypeEnum_Name(static_cast<Uniform_TypeEnum>(value));
+}
+template <>
+inline const std::string& Uniform_TypeEnum_Name(Uniform_TypeEnum value) {
+  return ::google::protobuf::internal::NameOfDenseEnum<Uniform_TypeEnum_descriptor,
+                                                 0, 26>(
+      static_cast<int>(value));
+}
+inline bool Uniform_TypeEnum_Parse(absl::string_view name, Uniform_TypeEnum* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<Uniform_TypeEnum>(
+      Uniform_TypeEnum_descriptor(), name, value);
+}
 enum Uniform_UniformEnum : int {
-  Uniform_UniformEnum_INVALID = 0,
+  Uniform_UniformEnum_INVALID_UNIFORM = 0,
   Uniform_UniformEnum_PROJECTION_MAT4 = 1,
   Uniform_UniformEnum_PROJECTION_INV_MAT4 = 2,
   Uniform_UniformEnum_VIEW_MAT4 = 3,
@@ -276,8 +322,40 @@ class Uniform final : public ::google::protobuf::Message
  public:
   ::google::protobuf::Metadata GetMetadata() const;
   // nested types ----------------------------------------------------
+  using TypeEnum = Uniform_TypeEnum;
+  static constexpr TypeEnum INVALID_TYPE = Uniform_TypeEnum_INVALID_TYPE;
+  static constexpr TypeEnum INT = Uniform_TypeEnum_INT;
+  static constexpr TypeEnum INT_VECTOR2 = Uniform_TypeEnum_INT_VECTOR2;
+  static constexpr TypeEnum INT_VECTOR3 = Uniform_TypeEnum_INT_VECTOR3;
+  static constexpr TypeEnum INT_VECTOR4 = Uniform_TypeEnum_INT_VECTOR4;
+  static constexpr TypeEnum INT_MATRIX2 = Uniform_TypeEnum_INT_MATRIX2;
+  static constexpr TypeEnum INT_MATRIX3 = Uniform_TypeEnum_INT_MATRIX3;
+  static constexpr TypeEnum INT_MATRIX4 = Uniform_TypeEnum_INT_MATRIX4;
+  static constexpr TypeEnum FLOAT = Uniform_TypeEnum_FLOAT;
+  static constexpr TypeEnum FLOAT_VECTOR2 = Uniform_TypeEnum_FLOAT_VECTOR2;
+  static constexpr TypeEnum FLOAT_VECTOR3 = Uniform_TypeEnum_FLOAT_VECTOR3;
+  static constexpr TypeEnum FLOAT_VECTOR4 = Uniform_TypeEnum_FLOAT_VECTOR4;
+  static constexpr TypeEnum FLOAT_MATRIX2 = Uniform_TypeEnum_FLOAT_MATRIX2;
+  static constexpr TypeEnum FLOAT_MATRIX3 = Uniform_TypeEnum_FLOAT_MATRIX3;
+  static constexpr TypeEnum FLOAT_MATRIX4 = Uniform_TypeEnum_FLOAT_MATRIX4;
+  static inline bool TypeEnum_IsValid(int value) {
+    return Uniform_TypeEnum_IsValid(value);
+  }
+  static constexpr TypeEnum TypeEnum_MIN = Uniform_TypeEnum_TypeEnum_MIN;
+  static constexpr TypeEnum TypeEnum_MAX = Uniform_TypeEnum_TypeEnum_MAX;
+  static constexpr int TypeEnum_ARRAYSIZE = Uniform_TypeEnum_TypeEnum_ARRAYSIZE;
+  static inline const ::google::protobuf::EnumDescriptor* TypeEnum_descriptor() {
+    return Uniform_TypeEnum_descriptor();
+  }
+  template <typename T>
+  static inline const std::string& TypeEnum_Name(T value) {
+    return Uniform_TypeEnum_Name(value);
+  }
+  static inline bool TypeEnum_Parse(absl::string_view name, TypeEnum* value) {
+    return Uniform_TypeEnum_Parse(name, value);
+  }
   using UniformEnum = Uniform_UniformEnum;
-  static constexpr UniformEnum INVALID = Uniform_UniformEnum_INVALID;
+  static constexpr UniformEnum INVALID_UNIFORM = Uniform_UniformEnum_INVALID_UNIFORM;
   static constexpr UniformEnum PROJECTION_MAT4 = Uniform_UniformEnum_PROJECTION_MAT4;
   static constexpr UniformEnum PROJECTION_INV_MAT4 = Uniform_UniformEnum_PROJECTION_INV_MAT4;
   static constexpr UniformEnum VIEW_MAT4 = Uniform_UniformEnum_VIEW_MAT4;
@@ -305,6 +383,7 @@ class Uniform final : public ::google::protobuf::Message
   // accessors -------------------------------------------------------
   enum : int {
     kNameFieldNumber = 1,
+    kTypeFieldNumber = 3,
     kUniformIntFieldNumber = 2,
     kUniformFloatFieldNumber = 4,
     kUniformFloatPluginFieldNumber = 19,
@@ -337,6 +416,16 @@ class Uniform final : public ::google::protobuf::Message
   inline PROTOBUF_ALWAYS_INLINE void _internal_set_name(
       const std::string& value);
   std::string* _internal_mutable_name();
+
+  public:
+  // .frame.proto.Uniform.TypeEnum type = 3;
+  void clear_type() ;
+  ::frame::proto::Uniform_TypeEnum type() const;
+  void set_type(::frame::proto::Uniform_TypeEnum value);
+
+  private:
+  ::frame::proto::Uniform_TypeEnum _internal_type() const;
+  void _internal_set_type(::frame::proto::Uniform_TypeEnum value);
 
   public:
   // int32 uniform_int = 2;
@@ -664,7 +753,7 @@ class Uniform final : public ::google::protobuf::Message
   inline void clear_has_value_oneof();
   friend class ::google::protobuf::internal::TcParser;
   static const ::google::protobuf::internal::TcParseTable<
-      0, 18, 14,
+      2, 19, 14,
       48, 2>
       _table_;
 
@@ -683,6 +772,7 @@ class Uniform final : public ::google::protobuf::Message
                           ::google::protobuf::Arena* arena, const Impl_& from,
                           const Uniform& from_msg);
     ::google::protobuf::internal::ArenaStringPtr name_;
+    int type_;
     union ValueOneofUnion {
       constexpr ValueOneofUnion() : _constinit_{} {}
       ::google::protobuf::internal::ConstantInitialized _constinit_;
@@ -774,6 +864,28 @@ inline void Uniform::set_allocated_name(std::string* value) {
     _impl_.name_.Set("", GetArena());
   }
   // @@protoc_insertion_point(field_set_allocated:frame.proto.Uniform.name)
+}
+
+// .frame.proto.Uniform.TypeEnum type = 3;
+inline void Uniform::clear_type() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.type_ = 0;
+}
+inline ::frame::proto::Uniform_TypeEnum Uniform::type() const {
+  // @@protoc_insertion_point(field_get:frame.proto.Uniform.type)
+  return _internal_type();
+}
+inline void Uniform::set_type(::frame::proto::Uniform_TypeEnum value) {
+  _internal_set_type(value);
+  // @@protoc_insertion_point(field_set:frame.proto.Uniform.type)
+}
+inline ::frame::proto::Uniform_TypeEnum Uniform::_internal_type() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return static_cast<::frame::proto::Uniform_TypeEnum>(_impl_.type_);
+}
+inline void Uniform::_internal_set_type(::frame::proto::Uniform_TypeEnum value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.type_ = value;
 }
 
 // int32 uniform_int = 2;
@@ -1848,6 +1960,12 @@ inline Uniform::ValueOneofCase Uniform::value_oneof_case() const {
 namespace google {
 namespace protobuf {
 
+template <>
+struct is_proto_enum<::frame::proto::Uniform_TypeEnum> : std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor<::frame::proto::Uniform_TypeEnum>() {
+  return ::frame::proto::Uniform_TypeEnum_descriptor();
+}
 template <>
 struct is_proto_enum<::frame::proto::Uniform_UniformEnum> : std::true_type {};
 template <>

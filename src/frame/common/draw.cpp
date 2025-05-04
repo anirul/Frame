@@ -31,7 +31,7 @@ bool Draw::Update(DeviceInterface& device, double dt)
 }
 
 void Draw::PreRender(
-    UniformInterface& uniform,
+    UniformCollectionInterface& uniform_collection_interface,
     DeviceInterface& device,
     StaticMeshInterface& static_mesh,
     MaterialInterface& material)

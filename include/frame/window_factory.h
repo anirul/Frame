@@ -12,7 +12,7 @@ namespace frame
  * This could not be named create window as windows is already defining it
  * as a macro.
  *
- * @param window_enum: The window API you want to use [NONE, SDL2, ...].
+ * @param window_enum: The window API you want to use [NONE, SDL3, ...].
  * @param device_enum: The device API you want to use [OPENGL, ...].
  * @param size: The size of the window.
  * @return A unique pointer to a window.
@@ -20,6 +20,6 @@ namespace frame
 std::unique_ptr<WindowInterface> CreateNewWindow(
     DrawingTargetEnum drawing_target_enum = DrawingTargetEnum::WINDOW,
     RenderingAPIEnum rendering_api_enum = RenderingAPIEnum::OPENGL,
-    glm::uvec2 size = {1980, 720});
+    glm::uvec2 size = {1280, 720});
 
 } // End namespace frame.

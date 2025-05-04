@@ -6,7 +6,8 @@
 
 #include "frame/json/proto.h"
 #include "frame/program_interface.h"
-#include "frame/uniform_interface.h"
+#include "frame/uniform.h"
+#include "frame/uniform_collection_interface.h"
 
 namespace frame::proto
 {
@@ -82,26 +83,28 @@ template <typename T, typename U>
 void ParseUniformVec(
     const std::string& name,
     const U& uniform_vec,
-    const ProgramInterface& program_interface)
+    ProgramInterface& program_interface)
 {
     std::uint32_t counter = 0;
     for (const T& uniform_val : uniform_vec.values())
     {
-        program_interface.Uniform(
-            name + '[' + std::to_string(counter++) + ']',
-            ParseUniform(uniform_val));
+        std::unique_ptr<frame::UniformInterface> uniform_interface =
+            std::make_unique<frame::Uniform>(
+                name + '[' + std::to_string(counter++) + ']',
+                ParseUniform(uniform_val));
+        program_interface.AddUniform(std::move(uniform_interface));
     }
 }
 /**
  * @brief Register the uniform in the program.
  * @param uniform: Proto uniform entry.
- * @param uniform_interface: Reference to a uniform interface.
+ * @param uniform_collection_interface: Reference to a uniform interface.
  * @param program_interface: Reference to a program interface.
  */
 void RegisterUniformFromProto(
     const frame::proto::Uniform& uniform,
-    const UniformInterface& uniform_interface,
-    const ProgramInterface& program_interface);
+    const UniformCollectionInterface& uniform_collection_interface,
+    ProgramInterface& program_interface);
 /**
  * @brief Register the uniform enum in the program.
  * @param name: Uniform name.
@@ -112,8 +115,8 @@ void RegisterUniformFromProto(
 void RegisterUniformEnumFromProto(
     const std::string& name,
     const frame::proto::Uniform::UniformEnum& uniform_enum,
-    const UniformInterface& uniform_interface,
-    const ProgramInterface& program_interface);
+    const UniformCollectionInterface& uniform_interface,
+    ProgramInterface& program_interface);
 /**
  * @brief Convert frame proto size into pair.
  * @param size: Proto size param.

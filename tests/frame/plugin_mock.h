@@ -2,6 +2,7 @@
 
 #include <gmock/gmock.h>
 
+#include "frame/uniform_collection_interface.h"
 #include "frame/plugin_interface.h"
 
 namespace test
@@ -15,7 +16,7 @@ class PluginMock : public frame::PluginInterface
     MOCK_METHOD(
         void,
         PreRender,
-        (frame::UniformInterface&,
+        (frame::UniformCollectionInterface&,
          frame::DeviceInterface&,
          frame::StaticMeshInterface&,
          frame::MaterialInterface&),
