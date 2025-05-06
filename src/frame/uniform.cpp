@@ -1,5 +1,3 @@
-#pragma once
-
 #include "frame/uniform.h"
 
 namespace frame
