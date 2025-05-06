@@ -98,7 +98,7 @@ void Program::AddUniform(std::unique_ptr<UniformInterface>&& uniform_interface)
 {
     auto it = uniform_map_.find(uniform_interface->GetName());
     std::string name = uniform_interface->GetName();
-    if (it != uniform_map_.end())
+    if (it == uniform_map_.end())
     {
         uniform_map_.emplace(name, std::move(uniform_interface));
     }
