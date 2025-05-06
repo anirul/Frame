@@ -43,42 +43,6 @@ glm::mat4 ParseUniform(const UniformMatrix4& uniform_mat4)
         uniform_mat4.m44());
 }
 
-std::vector<glm::vec2> ParseUniform(const UniformVector2s& uniform_vec2s)
-{
-    std::vector<glm::vec2> vec2s;
-    for (const auto& vec2 : uniform_vec2s.values())
-    {
-        vec2s.push_back(ParseUniform(vec2));
-    }
-    return vec2s;
-}
-
-std::vector<glm::vec3> ParseUniform(const UniformVector3s& uniform_vec3s)
-{
-    std::vector<glm::vec3> vec3s;
-    for (const auto& vec3 : uniform_vec3s.values())
-    {
-        vec3s.push_back(ParseUniform(vec3));
-    }
-    return vec3s;
-}
-
-std::vector<glm::vec4> ParseUniform(const UniformVector4s& uniform_vec4s)
-{
-    std::vector<glm::vec4> vec4s;
-    for (const auto& vec4 : uniform_vec4s.values())
-    {
-        vec4s.push_back(ParseUniform(vec4));
-    }
-    return vec4s;
-}
-
-glm::quat ParseUniform(const UniformQuaternion& uniform_quat)
-{
-    return {
-        uniform_quat.w(), uniform_quat.x(), uniform_quat.y(), uniform_quat.z()};
-}
-
 void RegisterUniformFromProto(
     const Uniform& uniform,
     const UniformCollectionInterface& uniform_collection_interface,
@@ -144,26 +108,6 @@ void RegisterUniformFromProto(
     case Uniform::kUniformFloats: {
         ParseUniformVec<float>(
             uniform.name(), uniform.uniform_floats(), program_interface);
-        return;
-    }
-    case Uniform::kUniformVec2S: {
-        ParseUniformVec<UniformVector2>(
-            uniform.name(), uniform.uniform_vec2s(), program_interface);
-        return;
-    }
-    case Uniform::kUniformVec3S: {
-        ParseUniformVec<UniformVector3>(
-            uniform.name(), uniform.uniform_vec3s(), program_interface);
-        return;
-    }
-    case Uniform::kUniformVec4S: {
-        ParseUniformVec<UniformVector4>(
-            uniform.name(), uniform.uniform_vec4s(), program_interface);
-        return;
-    }
-    case Uniform::kUniformMat4S: {
-        ParseUniformVec<UniformMatrix4>(
-            uniform.name(), uniform.uniform_mat4s(), program_interface);
         return;
     }
     default:

@@ -10,31 +10,12 @@ Uniform::Uniform(const std::string& name, int value)
     value_int_.push_back(value);
 }
 
-Uniform::Uniform(const std::string& name, glm::ivec2 value)
-    : name_(name), type_(proto::Uniform::INT_VECTOR2),
-      uniform_enum_(proto::Uniform::INVALID_UNIFORM), size_(1, 1)
+Uniform::Uniform(
+    const std::string& name, glm::uvec2 size, const std::vector<int>& list)
+    : name_(name), type_(proto::Uniform::INTS),
+      uniform_enum_(proto::Uniform::INVALID_UNIFORM), size_(size)
 {
-    value_int_.push_back(value.x);
-    value_int_.push_back(value.y);
-}
-
-Uniform::Uniform(const std::string& name, glm::ivec3 value)
-    : name_(name), type_(proto::Uniform::INT_VECTOR3),
-      uniform_enum_(proto::Uniform::INVALID_UNIFORM), size_(1, 1)
-{
-    value_int_.push_back(value.x);
-    value_int_.push_back(value.y);
-    value_int_.push_back(value.z);
-}
-
-Uniform::Uniform(const std::string& name, glm::ivec4 value)
-    : name_(name), type_(proto::Uniform::INT_VECTOR4),
-      uniform_enum_(proto::Uniform::INVALID_UNIFORM), size_(1, 1)
-{
-    value_int_.push_back(value.x);
-    value_int_.push_back(value.y);
-    value_int_.push_back(value.z);
-    value_int_.push_back(value.w);
+    value_int_.assign(list.begin(), list.end());
 }
 
 Uniform::Uniform(const std::string& name, float value)
@@ -42,6 +23,14 @@ Uniform::Uniform(const std::string& name, float value)
       uniform_enum_(proto::Uniform::INVALID_UNIFORM), size_(1, 1)
 {
     value_float_.push_back(value);
+}
+
+Uniform::Uniform(
+    const std::string& name, glm::uvec2 size, const std::vector<float>& list)
+    : name_(name), type_(proto::Uniform::INTS),
+      uniform_enum_(proto::Uniform::INVALID_UNIFORM), size_(size)
+{
+    value_float_.assign(list.begin(), list.end());
 }
 
 Uniform::Uniform(const std::string& name, glm::vec2 value)
@@ -69,31 +58,6 @@ Uniform::Uniform(const std::string& name, glm::vec4 value)
     value_float_.push_back(value.y);
     value_float_.push_back(value.z);
     value_float_.push_back(value.w);
-}
-
-Uniform::Uniform(const std::string& name, glm::mat2 value)
-    : name_(name), type_(proto::Uniform::FLOAT_MATRIX2),
-      uniform_enum_(proto::Uniform::INVALID_UNIFORM), size_(1, 1)
-{
-    value_float_.push_back(value[0][0]);
-    value_float_.push_back(value[0][1]);
-    value_float_.push_back(value[1][0]);
-    value_float_.push_back(value[1][1]);
-}
-
-Uniform::Uniform(const std::string& name, glm::mat3 value)
-    : name_(name), type_(proto::Uniform::FLOAT_MATRIX3),
-      uniform_enum_(proto::Uniform::INVALID_UNIFORM), size_(1, 1)
-{
-    value_float_.push_back(value[0][0]);
-    value_float_.push_back(value[0][1]);
-    value_float_.push_back(value[0][2]);
-    value_float_.push_back(value[1][0]);
-    value_float_.push_back(value[1][1]);
-    value_float_.push_back(value[1][2]);
-    value_float_.push_back(value[2][0]);
-    value_float_.push_back(value[2][1]);
-    value_float_.push_back(value[2][2]);
 }
 
 Uniform::Uniform(const std::string& name, glm::mat4 value)

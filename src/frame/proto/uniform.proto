@@ -11,20 +11,14 @@ package frame.proto;
 message Uniform {
 	enum TypeEnum {
 		INVALID_TYPE = 0;
-		INT = 1;
-		INT_VECTOR2 = 11;
-		INT_VECTOR3 = 12;
-		INT_VECTOR4 = 13;
-		INT_MATRIX2 = 14;
-		INT_MATRIX3 = 15;
-		INT_MATRIX4 = 16;
-		FLOAT = 2;
-		FLOAT_VECTOR2 = 21;
-		FLOAT_VECTOR3 = 22;
-		FLOAT_VECTOR4 = 23;
-		FLOAT_MATRIX2 = 24;
-		FLOAT_MATRIX3 = 25;
-		FLOAT_MATRIX4 = 26;
+		INT = 10;
+		INTS = 11;
+		FLOAT = 20;
+		FLOATS = 21;
+		FLOAT_VECTOR2 = 22;
+		FLOAT_VECTOR3 = 23;
+		FLOAT_VECTOR4 = 24;
+		FLOAT_MATRIX4 = 34;
 	}
 	enum UniformEnum {
 		INVALID_UNIFORM = 0;
@@ -53,14 +47,8 @@ message Uniform {
 		UniformVector2 uniform_vec2 = 6;
 		UniformVector3 uniform_vec3 = 7;
 		UniformVector4 uniform_vec4 = 8;
-		UniformQuaternion uniform_quat = 9;
 		UniformMatrix4 uniform_mat4 = 10;
 		UniformInts uniform_ints = 11;
 		UniformFloats uniform_floats = 13;
-		UniformVector2s uniform_vec2s = 14;
-		UniformVector3s uniform_vec3s = 15;
-		UniformVector4s uniform_vec4s = 16;
-		UniformQuaternions uniform_quats = 17;
-		UniformMatrix4s uniform_mat4s = 18;
 	}
 }

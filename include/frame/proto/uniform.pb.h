@@ -70,20 +70,14 @@ namespace frame {
 namespace proto {
 enum Uniform_TypeEnum : int {
   Uniform_TypeEnum_INVALID_TYPE = 0,
-  Uniform_TypeEnum_INT = 1,
-  Uniform_TypeEnum_INT_VECTOR2 = 11,
-  Uniform_TypeEnum_INT_VECTOR3 = 12,
-  Uniform_TypeEnum_INT_VECTOR4 = 13,
-  Uniform_TypeEnum_INT_MATRIX2 = 14,
-  Uniform_TypeEnum_INT_MATRIX3 = 15,
-  Uniform_TypeEnum_INT_MATRIX4 = 16,
-  Uniform_TypeEnum_FLOAT = 2,
-  Uniform_TypeEnum_FLOAT_VECTOR2 = 21,
-  Uniform_TypeEnum_FLOAT_VECTOR3 = 22,
-  Uniform_TypeEnum_FLOAT_VECTOR4 = 23,
-  Uniform_TypeEnum_FLOAT_MATRIX2 = 24,
-  Uniform_TypeEnum_FLOAT_MATRIX3 = 25,
-  Uniform_TypeEnum_FLOAT_MATRIX4 = 26,
+  Uniform_TypeEnum_INT = 10,
+  Uniform_TypeEnum_INTS = 11,
+  Uniform_TypeEnum_FLOAT = 20,
+  Uniform_TypeEnum_FLOATS = 21,
+  Uniform_TypeEnum_FLOAT_VECTOR2 = 22,
+  Uniform_TypeEnum_FLOAT_VECTOR3 = 23,
+  Uniform_TypeEnum_FLOAT_VECTOR4 = 24,
+  Uniform_TypeEnum_FLOAT_MATRIX4 = 34,
   Uniform_TypeEnum_Uniform_TypeEnum_INT_MIN_SENTINEL_DO_NOT_USE_ =
       std::numeric_limits<::int32_t>::min(),
   Uniform_TypeEnum_Uniform_TypeEnum_INT_MAX_SENTINEL_DO_NOT_USE_ =
@@ -93,8 +87,8 @@ enum Uniform_TypeEnum : int {
 bool Uniform_TypeEnum_IsValid(int value);
 extern const uint32_t Uniform_TypeEnum_internal_data_[];
 constexpr Uniform_TypeEnum Uniform_TypeEnum_TypeEnum_MIN = static_cast<Uniform_TypeEnum>(0);
-constexpr Uniform_TypeEnum Uniform_TypeEnum_TypeEnum_MAX = static_cast<Uniform_TypeEnum>(26);
-constexpr int Uniform_TypeEnum_TypeEnum_ARRAYSIZE = 26 + 1;
+constexpr Uniform_TypeEnum Uniform_TypeEnum_TypeEnum_MAX = static_cast<Uniform_TypeEnum>(34);
+constexpr int Uniform_TypeEnum_TypeEnum_ARRAYSIZE = 34 + 1;
 const ::google::protobuf::EnumDescriptor*
 Uniform_TypeEnum_descriptor();
 template <typename T>
@@ -102,13 +96,7 @@ const std::string& Uniform_TypeEnum_Name(T value) {
   static_assert(std::is_same<T, Uniform_TypeEnum>::value ||
                     std::is_integral<T>::value,
                 "Incorrect type passed to TypeEnum_Name().");
-  return Uniform_TypeEnum_Name(static_cast<Uniform_TypeEnum>(value));
-}
-template <>
-inline const std::string& Uniform_TypeEnum_Name(Uniform_TypeEnum value) {
-  return ::google::protobuf::internal::NameOfDenseEnum<Uniform_TypeEnum_descriptor,
-                                                 0, 26>(
-      static_cast<int>(value));
+  return ::google::protobuf::internal::NameOfEnum(Uniform_TypeEnum_descriptor(), value);
 }
 inline bool Uniform_TypeEnum_Parse(absl::string_view name, Uniform_TypeEnum* value) {
   return ::google::protobuf::internal::ParseNamedEnum<Uniform_TypeEnum>(
@@ -223,15 +211,9 @@ class Uniform final : public ::google::protobuf::Message
     kUniformVec2 = 6,
     kUniformVec3 = 7,
     kUniformVec4 = 8,
-    kUniformQuat = 9,
     kUniformMat4 = 10,
     kUniformInts = 11,
     kUniformFloats = 13,
-    kUniformVec2S = 14,
-    kUniformVec3S = 15,
-    kUniformVec4S = 16,
-    kUniformQuats = 17,
-    kUniformMat4S = 18,
     VALUE_ONEOF_NOT_SET = 0,
   };
   static inline const Uniform* internal_default_instance() {
@@ -325,18 +307,12 @@ class Uniform final : public ::google::protobuf::Message
   using TypeEnum = Uniform_TypeEnum;
   static constexpr TypeEnum INVALID_TYPE = Uniform_TypeEnum_INVALID_TYPE;
   static constexpr TypeEnum INT = Uniform_TypeEnum_INT;
-  static constexpr TypeEnum INT_VECTOR2 = Uniform_TypeEnum_INT_VECTOR2;
-  static constexpr TypeEnum INT_VECTOR3 = Uniform_TypeEnum_INT_VECTOR3;
-  static constexpr TypeEnum INT_VECTOR4 = Uniform_TypeEnum_INT_VECTOR4;
-  static constexpr TypeEnum INT_MATRIX2 = Uniform_TypeEnum_INT_MATRIX2;
-  static constexpr TypeEnum INT_MATRIX3 = Uniform_TypeEnum_INT_MATRIX3;
-  static constexpr TypeEnum INT_MATRIX4 = Uniform_TypeEnum_INT_MATRIX4;
+  static constexpr TypeEnum INTS = Uniform_TypeEnum_INTS;
   static constexpr TypeEnum FLOAT = Uniform_TypeEnum_FLOAT;
+  static constexpr TypeEnum FLOATS = Uniform_TypeEnum_FLOATS;
   static constexpr TypeEnum FLOAT_VECTOR2 = Uniform_TypeEnum_FLOAT_VECTOR2;
   static constexpr TypeEnum FLOAT_VECTOR3 = Uniform_TypeEnum_FLOAT_VECTOR3;
   static constexpr TypeEnum FLOAT_VECTOR4 = Uniform_TypeEnum_FLOAT_VECTOR4;
-  static constexpr TypeEnum FLOAT_MATRIX2 = Uniform_TypeEnum_FLOAT_MATRIX2;
-  static constexpr TypeEnum FLOAT_MATRIX3 = Uniform_TypeEnum_FLOAT_MATRIX3;
   static constexpr TypeEnum FLOAT_MATRIX4 = Uniform_TypeEnum_FLOAT_MATRIX4;
   static inline bool TypeEnum_IsValid(int value) {
     return Uniform_TypeEnum_IsValid(value);
@@ -392,15 +368,9 @@ class Uniform final : public ::google::protobuf::Message
     kUniformVec2FieldNumber = 6,
     kUniformVec3FieldNumber = 7,
     kUniformVec4FieldNumber = 8,
-    kUniformQuatFieldNumber = 9,
     kUniformMat4FieldNumber = 10,
     kUniformIntsFieldNumber = 11,
     kUniformFloatsFieldNumber = 13,
-    kUniformVec2SFieldNumber = 14,
-    kUniformVec3SFieldNumber = 15,
-    kUniformVec4SFieldNumber = 16,
-    kUniformQuatsFieldNumber = 17,
-    kUniformMat4SFieldNumber = 18,
   };
   // string name = 1;
   void clear_name() ;
@@ -556,25 +526,6 @@ class Uniform final : public ::google::protobuf::Message
   ::frame::proto::UniformVector4* _internal_mutable_uniform_vec4();
 
   public:
-  // .frame.proto.UniformQuaternion uniform_quat = 9;
-  bool has_uniform_quat() const;
-  private:
-  bool _internal_has_uniform_quat() const;
-
-  public:
-  void clear_uniform_quat() ;
-  const ::frame::proto::UniformQuaternion& uniform_quat() const;
-  PROTOBUF_NODISCARD ::frame::proto::UniformQuaternion* release_uniform_quat();
-  ::frame::proto::UniformQuaternion* mutable_uniform_quat();
-  void set_allocated_uniform_quat(::frame::proto::UniformQuaternion* value);
-  void unsafe_arena_set_allocated_uniform_quat(::frame::proto::UniformQuaternion* value);
-  ::frame::proto::UniformQuaternion* unsafe_arena_release_uniform_quat();
-
-  private:
-  const ::frame::proto::UniformQuaternion& _internal_uniform_quat() const;
-  ::frame::proto::UniformQuaternion* _internal_mutable_uniform_quat();
-
-  public:
   // .frame.proto.UniformMatrix4 uniform_mat4 = 10;
   bool has_uniform_mat4() const;
   private:
@@ -632,101 +583,6 @@ class Uniform final : public ::google::protobuf::Message
   ::frame::proto::UniformFloats* _internal_mutable_uniform_floats();
 
   public:
-  // .frame.proto.UniformVector2s uniform_vec2s = 14;
-  bool has_uniform_vec2s() const;
-  private:
-  bool _internal_has_uniform_vec2s() const;
-
-  public:
-  void clear_uniform_vec2s() ;
-  const ::frame::proto::UniformVector2s& uniform_vec2s() const;
-  PROTOBUF_NODISCARD ::frame::proto::UniformVector2s* release_uniform_vec2s();
-  ::frame::proto::UniformVector2s* mutable_uniform_vec2s();
-  void set_allocated_uniform_vec2s(::frame::proto::UniformVector2s* value);
-  void unsafe_arena_set_allocated_uniform_vec2s(::frame::proto::UniformVector2s* value);
-  ::frame::proto::UniformVector2s* unsafe_arena_release_uniform_vec2s();
-
-  private:
-  const ::frame::proto::UniformVector2s& _internal_uniform_vec2s() const;
-  ::frame::proto::UniformVector2s* _internal_mutable_uniform_vec2s();
-
-  public:
-  // .frame.proto.UniformVector3s uniform_vec3s = 15;
-  bool has_uniform_vec3s() const;
-  private:
-  bool _internal_has_uniform_vec3s() const;
-
-  public:
-  void clear_uniform_vec3s() ;
-  const ::frame::proto::UniformVector3s& uniform_vec3s() const;
-  PROTOBUF_NODISCARD ::frame::proto::UniformVector3s* release_uniform_vec3s();
-  ::frame::proto::UniformVector3s* mutable_uniform_vec3s();
-  void set_allocated_uniform_vec3s(::frame::proto::UniformVector3s* value);
-  void unsafe_arena_set_allocated_uniform_vec3s(::frame::proto::UniformVector3s* value);
-  ::frame::proto::UniformVector3s* unsafe_arena_release_uniform_vec3s();
-
-  private:
-  const ::frame::proto::UniformVector3s& _internal_uniform_vec3s() const;
-  ::frame::proto::UniformVector3s* _internal_mutable_uniform_vec3s();
-
-  public:
-  // .frame.proto.UniformVector4s uniform_vec4s = 16;
-  bool has_uniform_vec4s() const;
-  private:
-  bool _internal_has_uniform_vec4s() const;
-
-  public:
-  void clear_uniform_vec4s() ;
-  const ::frame::proto::UniformVector4s& uniform_vec4s() const;
-  PROTOBUF_NODISCARD ::frame::proto::UniformVector4s* release_uniform_vec4s();
-  ::frame::proto::UniformVector4s* mutable_uniform_vec4s();
-  void set_allocated_uniform_vec4s(::frame::proto::UniformVector4s* value);
-  void unsafe_arena_set_allocated_uniform_vec4s(::frame::proto::UniformVector4s* value);
-  ::frame::proto::UniformVector4s* unsafe_arena_release_uniform_vec4s();
-
-  private:
-  const ::frame::proto::UniformVector4s& _internal_uniform_vec4s() const;
-  ::frame::proto::UniformVector4s* _internal_mutable_uniform_vec4s();
-
-  public:
-  // .frame.proto.UniformQuaternions uniform_quats = 17;
-  bool has_uniform_quats() const;
-  private:
-  bool _internal_has_uniform_quats() const;
-
-  public:
-  void clear_uniform_quats() ;
-  const ::frame::proto::UniformQuaternions& uniform_quats() const;
-  PROTOBUF_NODISCARD ::frame::proto::UniformQuaternions* release_uniform_quats();
-  ::frame::proto::UniformQuaternions* mutable_uniform_quats();
-  void set_allocated_uniform_quats(::frame::proto::UniformQuaternions* value);
-  void unsafe_arena_set_allocated_uniform_quats(::frame::proto::UniformQuaternions* value);
-  ::frame::proto::UniformQuaternions* unsafe_arena_release_uniform_quats();
-
-  private:
-  const ::frame::proto::UniformQuaternions& _internal_uniform_quats() const;
-  ::frame::proto::UniformQuaternions* _internal_mutable_uniform_quats();
-
-  public:
-  // .frame.proto.UniformMatrix4s uniform_mat4s = 18;
-  bool has_uniform_mat4s() const;
-  private:
-  bool _internal_has_uniform_mat4s() const;
-
-  public:
-  void clear_uniform_mat4s() ;
-  const ::frame::proto::UniformMatrix4s& uniform_mat4s() const;
-  PROTOBUF_NODISCARD ::frame::proto::UniformMatrix4s* release_uniform_mat4s();
-  ::frame::proto::UniformMatrix4s* mutable_uniform_mat4s();
-  void set_allocated_uniform_mat4s(::frame::proto::UniformMatrix4s* value);
-  void unsafe_arena_set_allocated_uniform_mat4s(::frame::proto::UniformMatrix4s* value);
-  ::frame::proto::UniformMatrix4s* unsafe_arena_release_uniform_mat4s();
-
-  private:
-  const ::frame::proto::UniformMatrix4s& _internal_uniform_mat4s() const;
-  ::frame::proto::UniformMatrix4s* _internal_mutable_uniform_mat4s();
-
-  public:
   void clear_value_oneof();
   ValueOneofCase value_oneof_case() const;
   // @@protoc_insertion_point(class_scope:frame.proto.Uniform)
@@ -740,21 +596,15 @@ class Uniform final : public ::google::protobuf::Message
   void set_has_uniform_vec2();
   void set_has_uniform_vec3();
   void set_has_uniform_vec4();
-  void set_has_uniform_quat();
   void set_has_uniform_mat4();
   void set_has_uniform_ints();
   void set_has_uniform_floats();
-  void set_has_uniform_vec2s();
-  void set_has_uniform_vec3s();
-  void set_has_uniform_vec4s();
-  void set_has_uniform_quats();
-  void set_has_uniform_mat4s();
   inline bool has_value_oneof() const;
   inline void clear_has_value_oneof();
   friend class ::google::protobuf::internal::TcParser;
   static const ::google::protobuf::internal::TcParseTable<
-      2, 19, 14,
-      48, 2>
+      2, 13, 8,
+      40, 2>
       _table_;
 
   friend class ::google::protobuf::MessageLite;
@@ -784,15 +634,9 @@ class Uniform final : public ::google::protobuf::Message
       ::frame::proto::UniformVector2* uniform_vec2_;
       ::frame::proto::UniformVector3* uniform_vec3_;
       ::frame::proto::UniformVector4* uniform_vec4_;
-      ::frame::proto::UniformQuaternion* uniform_quat_;
       ::frame::proto::UniformMatrix4* uniform_mat4_;
       ::frame::proto::UniformInts* uniform_ints_;
       ::frame::proto::UniformFloats* uniform_floats_;
-      ::frame::proto::UniformVector2s* uniform_vec2s_;
-      ::frame::proto::UniformVector3s* uniform_vec3s_;
-      ::frame::proto::UniformVector4s* uniform_vec4s_;
-      ::frame::proto::UniformQuaternions* uniform_quats_;
-      ::frame::proto::UniformMatrix4s* uniform_mat4s_;
     } value_oneof_;
     ::google::protobuf::internal::CachedSize _cached_size_;
     ::uint32_t _oneof_case_[1];
@@ -1327,74 +1171,6 @@ inline ::frame::proto::UniformVector4* Uniform::mutable_uniform_vec4() ABSL_ATTR
   return _msg;
 }
 
-// .frame.proto.UniformQuaternion uniform_quat = 9;
-inline bool Uniform::has_uniform_quat() const {
-  return value_oneof_case() == kUniformQuat;
-}
-inline bool Uniform::_internal_has_uniform_quat() const {
-  return value_oneof_case() == kUniformQuat;
-}
-inline void Uniform::set_has_uniform_quat() {
-  _impl_._oneof_case_[0] = kUniformQuat;
-}
-inline ::frame::proto::UniformQuaternion* Uniform::release_uniform_quat() {
-  // @@protoc_insertion_point(field_release:frame.proto.Uniform.uniform_quat)
-  if (value_oneof_case() == kUniformQuat) {
-    clear_has_value_oneof();
-    auto* temp = _impl_.value_oneof_.uniform_quat_;
-    if (GetArena() != nullptr) {
-      temp = ::google::protobuf::internal::DuplicateIfNonNull(temp);
-    }
-    _impl_.value_oneof_.uniform_quat_ = nullptr;
-    return temp;
-  } else {
-    return nullptr;
-  }
-}
-inline const ::frame::proto::UniformQuaternion& Uniform::_internal_uniform_quat() const {
-  return value_oneof_case() == kUniformQuat ? *_impl_.value_oneof_.uniform_quat_ : reinterpret_cast<::frame::proto::UniformQuaternion&>(::frame::proto::_UniformQuaternion_default_instance_);
-}
-inline const ::frame::proto::UniformQuaternion& Uniform::uniform_quat() const ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:frame.proto.Uniform.uniform_quat)
-  return _internal_uniform_quat();
-}
-inline ::frame::proto::UniformQuaternion* Uniform::unsafe_arena_release_uniform_quat() {
-  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.Uniform.uniform_quat)
-  if (value_oneof_case() == kUniformQuat) {
-    clear_has_value_oneof();
-    auto* temp = _impl_.value_oneof_.uniform_quat_;
-    _impl_.value_oneof_.uniform_quat_ = nullptr;
-    return temp;
-  } else {
-    return nullptr;
-  }
-}
-inline void Uniform::unsafe_arena_set_allocated_uniform_quat(::frame::proto::UniformQuaternion* value) {
-  // We rely on the oneof clear method to free the earlier contents
-  // of this oneof. We can directly use the pointer we're given to
-  // set the new value.
-  clear_value_oneof();
-  if (value) {
-    set_has_uniform_quat();
-    _impl_.value_oneof_.uniform_quat_ = value;
-  }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.Uniform.uniform_quat)
-}
-inline ::frame::proto::UniformQuaternion* Uniform::_internal_mutable_uniform_quat() {
-  if (value_oneof_case() != kUniformQuat) {
-    clear_value_oneof();
-    set_has_uniform_quat();
-    _impl_.value_oneof_.uniform_quat_ =
-        ::google::protobuf::Message::DefaultConstruct<::frame::proto::UniformQuaternion>(GetArena());
-  }
-  return _impl_.value_oneof_.uniform_quat_;
-}
-inline ::frame::proto::UniformQuaternion* Uniform::mutable_uniform_quat() ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  ::frame::proto::UniformQuaternion* _msg = _internal_mutable_uniform_quat();
-  // @@protoc_insertion_point(field_mutable:frame.proto.Uniform.uniform_quat)
-  return _msg;
-}
-
 // .frame.proto.UniformMatrix4 uniform_mat4 = 10;
 inline bool Uniform::has_uniform_mat4() const {
   return value_oneof_case() == kUniformMat4;
@@ -1596,346 +1372,6 @@ inline ::frame::proto::UniformFloats* Uniform::_internal_mutable_uniform_floats(
 inline ::frame::proto::UniformFloats* Uniform::mutable_uniform_floats() ABSL_ATTRIBUTE_LIFETIME_BOUND {
   ::frame::proto::UniformFloats* _msg = _internal_mutable_uniform_floats();
   // @@protoc_insertion_point(field_mutable:frame.proto.Uniform.uniform_floats)
-  return _msg;
-}
-
-// .frame.proto.UniformVector2s uniform_vec2s = 14;
-inline bool Uniform::has_uniform_vec2s() const {
-  return value_oneof_case() == kUniformVec2S;
-}
-inline bool Uniform::_internal_has_uniform_vec2s() const {
-  return value_oneof_case() == kUniformVec2S;
-}
-inline void Uniform::set_has_uniform_vec2s() {
-  _impl_._oneof_case_[0] = kUniformVec2S;
-}
-inline ::frame::proto::UniformVector2s* Uniform::release_uniform_vec2s() {
-  // @@protoc_insertion_point(field_release:frame.proto.Uniform.uniform_vec2s)
-  if (value_oneof_case() == kUniformVec2S) {
-    clear_has_value_oneof();
-    auto* temp = _impl_.value_oneof_.uniform_vec2s_;
-    if (GetArena() != nullptr) {
-      temp = ::google::protobuf::internal::DuplicateIfNonNull(temp);
-    }
-    _impl_.value_oneof_.uniform_vec2s_ = nullptr;
-    return temp;
-  } else {
-    return nullptr;
-  }
-}
-inline const ::frame::proto::UniformVector2s& Uniform::_internal_uniform_vec2s() const {
-  return value_oneof_case() == kUniformVec2S ? *_impl_.value_oneof_.uniform_vec2s_ : reinterpret_cast<::frame::proto::UniformVector2s&>(::frame::proto::_UniformVector2s_default_instance_);
-}
-inline const ::frame::proto::UniformVector2s& Uniform::uniform_vec2s() const ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:frame.proto.Uniform.uniform_vec2s)
-  return _internal_uniform_vec2s();
-}
-inline ::frame::proto::UniformVector2s* Uniform::unsafe_arena_release_uniform_vec2s() {
-  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.Uniform.uniform_vec2s)
-  if (value_oneof_case() == kUniformVec2S) {
-    clear_has_value_oneof();
-    auto* temp = _impl_.value_oneof_.uniform_vec2s_;
-    _impl_.value_oneof_.uniform_vec2s_ = nullptr;
-    return temp;
-  } else {
-    return nullptr;
-  }
-}
-inline void Uniform::unsafe_arena_set_allocated_uniform_vec2s(::frame::proto::UniformVector2s* value) {
-  // We rely on the oneof clear method to free the earlier contents
-  // of this oneof. We can directly use the pointer we're given to
-  // set the new value.
-  clear_value_oneof();
-  if (value) {
-    set_has_uniform_vec2s();
-    _impl_.value_oneof_.uniform_vec2s_ = value;
-  }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.Uniform.uniform_vec2s)
-}
-inline ::frame::proto::UniformVector2s* Uniform::_internal_mutable_uniform_vec2s() {
-  if (value_oneof_case() != kUniformVec2S) {
-    clear_value_oneof();
-    set_has_uniform_vec2s();
-    _impl_.value_oneof_.uniform_vec2s_ =
-        ::google::protobuf::Message::DefaultConstruct<::frame::proto::UniformVector2s>(GetArena());
-  }
-  return _impl_.value_oneof_.uniform_vec2s_;
-}
-inline ::frame::proto::UniformVector2s* Uniform::mutable_uniform_vec2s() ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  ::frame::proto::UniformVector2s* _msg = _internal_mutable_uniform_vec2s();
-  // @@protoc_insertion_point(field_mutable:frame.proto.Uniform.uniform_vec2s)
-  return _msg;
-}
-
-// .frame.proto.UniformVector3s uniform_vec3s = 15;
-inline bool Uniform::has_uniform_vec3s() const {
-  return value_oneof_case() == kUniformVec3S;
-}
-inline bool Uniform::_internal_has_uniform_vec3s() const {
-  return value_oneof_case() == kUniformVec3S;
-}
-inline void Uniform::set_has_uniform_vec3s() {
-  _impl_._oneof_case_[0] = kUniformVec3S;
-}
-inline ::frame::proto::UniformVector3s* Uniform::release_uniform_vec3s() {
-  // @@protoc_insertion_point(field_release:frame.proto.Uniform.uniform_vec3s)
-  if (value_oneof_case() == kUniformVec3S) {
-    clear_has_value_oneof();
-    auto* temp = _impl_.value_oneof_.uniform_vec3s_;
-    if (GetArena() != nullptr) {
-      temp = ::google::protobuf::internal::DuplicateIfNonNull(temp);
-    }
-    _impl_.value_oneof_.uniform_vec3s_ = nullptr;
-    return temp;
-  } else {
-    return nullptr;
-  }
-}
-inline const ::frame::proto::UniformVector3s& Uniform::_internal_uniform_vec3s() const {
-  return value_oneof_case() == kUniformVec3S ? *_impl_.value_oneof_.uniform_vec3s_ : reinterpret_cast<::frame::proto::UniformVector3s&>(::frame::proto::_UniformVector3s_default_instance_);
-}
-inline const ::frame::proto::UniformVector3s& Uniform::uniform_vec3s() const ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:frame.proto.Uniform.uniform_vec3s)
-  return _internal_uniform_vec3s();
-}
-inline ::frame::proto::UniformVector3s* Uniform::unsafe_arena_release_uniform_vec3s() {
-  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.Uniform.uniform_vec3s)
-  if (value_oneof_case() == kUniformVec3S) {
-    clear_has_value_oneof();
-    auto* temp = _impl_.value_oneof_.uniform_vec3s_;
-    _impl_.value_oneof_.uniform_vec3s_ = nullptr;
-    return temp;
-  } else {
-    return nullptr;
-  }
-}
-inline void Uniform::unsafe_arena_set_allocated_uniform_vec3s(::frame::proto::UniformVector3s* value) {
-  // We rely on the oneof clear method to free the earlier contents
-  // of this oneof. We can directly use the pointer we're given to
-  // set the new value.
-  clear_value_oneof();
-  if (value) {
-    set_has_uniform_vec3s();
-    _impl_.value_oneof_.uniform_vec3s_ = value;
-  }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.Uniform.uniform_vec3s)
-}
-inline ::frame::proto::UniformVector3s* Uniform::_internal_mutable_uniform_vec3s() {
-  if (value_oneof_case() != kUniformVec3S) {
-    clear_value_oneof();
-    set_has_uniform_vec3s();
-    _impl_.value_oneof_.uniform_vec3s_ =
-        ::google::protobuf::Message::DefaultConstruct<::frame::proto::UniformVector3s>(GetArena());
-  }
-  return _impl_.value_oneof_.uniform_vec3s_;
-}
-inline ::frame::proto::UniformVector3s* Uniform::mutable_uniform_vec3s() ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  ::frame::proto::UniformVector3s* _msg = _internal_mutable_uniform_vec3s();
-  // @@protoc_insertion_point(field_mutable:frame.proto.Uniform.uniform_vec3s)
-  return _msg;
-}
-
-// .frame.proto.UniformVector4s uniform_vec4s = 16;
-inline bool Uniform::has_uniform_vec4s() const {
-  return value_oneof_case() == kUniformVec4S;
-}
-inline bool Uniform::_internal_has_uniform_vec4s() const {
-  return value_oneof_case() == kUniformVec4S;
-}
-inline void Uniform::set_has_uniform_vec4s() {
-  _impl_._oneof_case_[0] = kUniformVec4S;
-}
-inline ::frame::proto::UniformVector4s* Uniform::release_uniform_vec4s() {
-  // @@protoc_insertion_point(field_release:frame.proto.Uniform.uniform_vec4s)
-  if (value_oneof_case() == kUniformVec4S) {
-    clear_has_value_oneof();
-    auto* temp = _impl_.value_oneof_.uniform_vec4s_;
-    if (GetArena() != nullptr) {
-      temp = ::google::protobuf::internal::DuplicateIfNonNull(temp);
-    }
-    _impl_.value_oneof_.uniform_vec4s_ = nullptr;
-    return temp;
-  } else {
-    return nullptr;
-  }
-}
-inline const ::frame::proto::UniformVector4s& Uniform::_internal_uniform_vec4s() const {
-  return value_oneof_case() == kUniformVec4S ? *_impl_.value_oneof_.uniform_vec4s_ : reinterpret_cast<::frame::proto::UniformVector4s&>(::frame::proto::_UniformVector4s_default_instance_);
-}
-inline const ::frame::proto::UniformVector4s& Uniform::uniform_vec4s() const ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:frame.proto.Uniform.uniform_vec4s)
-  return _internal_uniform_vec4s();
-}
-inline ::frame::proto::UniformVector4s* Uniform::unsafe_arena_release_uniform_vec4s() {
-  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.Uniform.uniform_vec4s)
-  if (value_oneof_case() == kUniformVec4S) {
-    clear_has_value_oneof();
-    auto* temp = _impl_.value_oneof_.uniform_vec4s_;
-    _impl_.value_oneof_.uniform_vec4s_ = nullptr;
-    return temp;
-  } else {
-    return nullptr;
-  }
-}
-inline void Uniform::unsafe_arena_set_allocated_uniform_vec4s(::frame::proto::UniformVector4s* value) {
-  // We rely on the oneof clear method to free the earlier contents
-  // of this oneof. We can directly use the pointer we're given to
-  // set the new value.
-  clear_value_oneof();
-  if (value) {
-    set_has_uniform_vec4s();
-    _impl_.value_oneof_.uniform_vec4s_ = value;
-  }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.Uniform.uniform_vec4s)
-}
-inline ::frame::proto::UniformVector4s* Uniform::_internal_mutable_uniform_vec4s() {
-  if (value_oneof_case() != kUniformVec4S) {
-    clear_value_oneof();
-    set_has_uniform_vec4s();
-    _impl_.value_oneof_.uniform_vec4s_ =
-        ::google::protobuf::Message::DefaultConstruct<::frame::proto::UniformVector4s>(GetArena());
-  }
-  return _impl_.value_oneof_.uniform_vec4s_;
-}
-inline ::frame::proto::UniformVector4s* Uniform::mutable_uniform_vec4s() ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  ::frame::proto::UniformVector4s* _msg = _internal_mutable_uniform_vec4s();
-  // @@protoc_insertion_point(field_mutable:frame.proto.Uniform.uniform_vec4s)
-  return _msg;
-}
-
-// .frame.proto.UniformQuaternions uniform_quats = 17;
-inline bool Uniform::has_uniform_quats() const {
-  return value_oneof_case() == kUniformQuats;
-}
-inline bool Uniform::_internal_has_uniform_quats() const {
-  return value_oneof_case() == kUniformQuats;
-}
-inline void Uniform::set_has_uniform_quats() {
-  _impl_._oneof_case_[0] = kUniformQuats;
-}
-inline ::frame::proto::UniformQuaternions* Uniform::release_uniform_quats() {
-  // @@protoc_insertion_point(field_release:frame.proto.Uniform.uniform_quats)
-  if (value_oneof_case() == kUniformQuats) {
-    clear_has_value_oneof();
-    auto* temp = _impl_.value_oneof_.uniform_quats_;
-    if (GetArena() != nullptr) {
-      temp = ::google::protobuf::internal::DuplicateIfNonNull(temp);
-    }
-    _impl_.value_oneof_.uniform_quats_ = nullptr;
-    return temp;
-  } else {
-    return nullptr;
-  }
-}
-inline const ::frame::proto::UniformQuaternions& Uniform::_internal_uniform_quats() const {
-  return value_oneof_case() == kUniformQuats ? *_impl_.value_oneof_.uniform_quats_ : reinterpret_cast<::frame::proto::UniformQuaternions&>(::frame::proto::_UniformQuaternions_default_instance_);
-}
-inline const ::frame::proto::UniformQuaternions& Uniform::uniform_quats() const ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:frame.proto.Uniform.uniform_quats)
-  return _internal_uniform_quats();
-}
-inline ::frame::proto::UniformQuaternions* Uniform::unsafe_arena_release_uniform_quats() {
-  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.Uniform.uniform_quats)
-  if (value_oneof_case() == kUniformQuats) {
-    clear_has_value_oneof();
-    auto* temp = _impl_.value_oneof_.uniform_quats_;
-    _impl_.value_oneof_.uniform_quats_ = nullptr;
-    return temp;
-  } else {
-    return nullptr;
-  }
-}
-inline void Uniform::unsafe_arena_set_allocated_uniform_quats(::frame::proto::UniformQuaternions* value) {
-  // We rely on the oneof clear method to free the earlier contents
-  // of this oneof. We can directly use the pointer we're given to
-  // set the new value.
-  clear_value_oneof();
-  if (value) {
-    set_has_uniform_quats();
-    _impl_.value_oneof_.uniform_quats_ = value;
-  }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.Uniform.uniform_quats)
-}
-inline ::frame::proto::UniformQuaternions* Uniform::_internal_mutable_uniform_quats() {
-  if (value_oneof_case() != kUniformQuats) {
-    clear_value_oneof();
-    set_has_uniform_quats();
-    _impl_.value_oneof_.uniform_quats_ =
-        ::google::protobuf::Message::DefaultConstruct<::frame::proto::UniformQuaternions>(GetArena());
-  }
-  return _impl_.value_oneof_.uniform_quats_;
-}
-inline ::frame::proto::UniformQuaternions* Uniform::mutable_uniform_quats() ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  ::frame::proto::UniformQuaternions* _msg = _internal_mutable_uniform_quats();
-  // @@protoc_insertion_point(field_mutable:frame.proto.Uniform.uniform_quats)
-  return _msg;
-}
-
-// .frame.proto.UniformMatrix4s uniform_mat4s = 18;
-inline bool Uniform::has_uniform_mat4s() const {
-  return value_oneof_case() == kUniformMat4S;
-}
-inline bool Uniform::_internal_has_uniform_mat4s() const {
-  return value_oneof_case() == kUniformMat4S;
-}
-inline void Uniform::set_has_uniform_mat4s() {
-  _impl_._oneof_case_[0] = kUniformMat4S;
-}
-inline ::frame::proto::UniformMatrix4s* Uniform::release_uniform_mat4s() {
-  // @@protoc_insertion_point(field_release:frame.proto.Uniform.uniform_mat4s)
-  if (value_oneof_case() == kUniformMat4S) {
-    clear_has_value_oneof();
-    auto* temp = _impl_.value_oneof_.uniform_mat4s_;
-    if (GetArena() != nullptr) {
-      temp = ::google::protobuf::internal::DuplicateIfNonNull(temp);
-    }
-    _impl_.value_oneof_.uniform_mat4s_ = nullptr;
-    return temp;
-  } else {
-    return nullptr;
-  }
-}
-inline const ::frame::proto::UniformMatrix4s& Uniform::_internal_uniform_mat4s() const {
-  return value_oneof_case() == kUniformMat4S ? *_impl_.value_oneof_.uniform_mat4s_ : reinterpret_cast<::frame::proto::UniformMatrix4s&>(::frame::proto::_UniformMatrix4s_default_instance_);
-}
-inline const ::frame::proto::UniformMatrix4s& Uniform::uniform_mat4s() const ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:frame.proto.Uniform.uniform_mat4s)
-  return _internal_uniform_mat4s();
-}
-inline ::frame::proto::UniformMatrix4s* Uniform::unsafe_arena_release_uniform_mat4s() {
-  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.Uniform.uniform_mat4s)
-  if (value_oneof_case() == kUniformMat4S) {
-    clear_has_value_oneof();
-    auto* temp = _impl_.value_oneof_.uniform_mat4s_;
-    _impl_.value_oneof_.uniform_mat4s_ = nullptr;
-    return temp;
-  } else {
-    return nullptr;
-  }
-}
-inline void Uniform::unsafe_arena_set_allocated_uniform_mat4s(::frame::proto::UniformMatrix4s* value) {
-  // We rely on the oneof clear method to free the earlier contents
-  // of this oneof. We can directly use the pointer we're given to
-  // set the new value.
-  clear_value_oneof();
-  if (value) {
-    set_has_uniform_mat4s();
-    _impl_.value_oneof_.uniform_mat4s_ = value;
-  }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.Uniform.uniform_mat4s)
-}
-inline ::frame::proto::UniformMatrix4s* Uniform::_internal_mutable_uniform_mat4s() {
-  if (value_oneof_case() != kUniformMat4S) {
-    clear_value_oneof();
-    set_has_uniform_mat4s();
-    _impl_.value_oneof_.uniform_mat4s_ =
-        ::google::protobuf::Message::DefaultConstruct<::frame::proto::UniformMatrix4s>(GetArena());
-  }
-  return _impl_.value_oneof_.uniform_mat4s_;
-}
-inline ::frame::proto::UniformMatrix4s* Uniform::mutable_uniform_mat4s() ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  ::frame::proto::UniformMatrix4s* _msg = _internal_mutable_uniform_mat4s();
-  // @@protoc_insertion_point(field_mutable:frame.proto.Uniform.uniform_mat4s)
   return _msg;
 }
 

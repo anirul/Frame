@@ -279,9 +279,9 @@ EntityId Level::GetParentId(EntityId id) const
 std::vector<frame::EntityId> Level::GetTextures() const
 {
     std::vector<EntityId> list;
-    for (const auto& id_texture : id_texture_map_)
+    for (const auto& [texture_id, _] : id_texture_map_)
     {
-        list.push_back(id_texture.first);
+        list.push_back(texture_id);
     }
     return list;
 }
@@ -289,9 +289,19 @@ std::vector<frame::EntityId> Level::GetTextures() const
 std::vector<frame::EntityId> Level::GetLights() const
 {
     std::vector<EntityId> list;
-    for (const auto& id_light : id_light_map_)
+    for (const auto& [light_id, _] : id_light_map_)
     {
-        list.push_back(id_light.first);
+        list.push_back(light_id);
+    }
+    return list;
+}
+
+std::vector<frame::EntityId> Level::GetPrograms() const
+{
+    std::vector<EntityId> list;
+    for (const auto& [program_id, _] : id_program_map_)
+    {
+        list.push_back(program_id);
     }
     return list;
 }

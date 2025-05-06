@@ -24,20 +24,21 @@ class Uniform : public UniformInterface
      * @param value: The value of the uniform.
      */
     Uniform(const std::string& name, int value);
-    Uniform(const std::string& name, glm::ivec2 value);
-    Uniform(const std::string& name, glm::ivec3 value);
-    Uniform(const std::string& name, glm::ivec4 value);
+    Uniform(
+        const std::string& name, glm::uvec2 size, const std::vector<int>& list);
     Uniform(const std::string& name, float value);
+    Uniform(
+        const std::string& name,
+        glm::uvec2 size,
+        const std::vector<float>& list);
     Uniform(const std::string& name, glm::vec2 value);
     Uniform(const std::string& name, glm::vec3 value);
     Uniform(const std::string& name, glm::vec4 value);
-    Uniform(const std::string& name, glm::mat2 value);
-    Uniform(const std::string& name, glm::mat3 value);
     Uniform(const std::string& name, glm::mat4 value);
     /**
-	 * @brief Copy constructor.
+     * @brief Copy constructor.
      * @param uniform_interface: The uniform interface to copy.
-	 */
+     */
     Uniform(const UniformInterface& uniform_interface);
 
   public:

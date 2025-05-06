@@ -98,20 +98,6 @@ TEST_F(ParseUniformTest, ParseUniformMat4Test)
     EXPECT_FLOAT_EQ(0.44f, mat4[3][3]);
 }
 
-TEST_F(ParseUniformTest, ParseUniformQuaternionTest)
-{
-    frame::proto::UniformQuaternion uniform_quaternion{};
-    uniform_quaternion.set_x(0.1f);
-    uniform_quaternion.set_y(0.2f);
-    uniform_quaternion.set_z(0.3f);
-    uniform_quaternion.set_w(0.4f);
-    glm::quat quat = frame::proto::ParseUniform(uniform_quaternion);
-    EXPECT_FLOAT_EQ(0.1f, quat.x);
-    EXPECT_FLOAT_EQ(0.2f, quat.y);
-    EXPECT_FLOAT_EQ(0.3f, quat.z);
-    EXPECT_FLOAT_EQ(0.4f, quat.w);
-}
-
 // TODO(anirul): Add test for the remaining functions.
 
 } // End namespace test.

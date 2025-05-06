@@ -65,9 +65,10 @@ std::unique_ptr<frame::ProgramInterface> ParseProgramOpenGL(
     }
     case SceneType::NONE:
     default:
-        throw std::runtime_error(fmt::format(
-            "No way {}?",
-            static_cast<int>(proto_program.input_scene_type().value())));
+        throw std::runtime_error(
+            fmt::format(
+                "No way {}?",
+                static_cast<int>(proto_program.input_scene_type().value())));
     }
     program->Use();
     for (const auto& parameter : proto_program.parameters())
@@ -83,11 +84,35 @@ std::unique_ptr<frame::ProgramInterface> ParseProgramOpenGL(
             program->AddUniform(std::move(uniform_interface));
             break;
         }
+        case Uniform::kUniformInts: {
+            UniformInts uniform_ints = parameter.uniform_ints();
+            glm::uvec2 glm_size =
+                glm::uvec2(uniform_ints.size().x(), uniform_ints.size().y());
+            std::vector<int> int_list;
+            int_list.assign(
+                uniform_ints.values().begin(), uniform_ints.values().end());
+            std::unique_ptr<UniformInterface> uniform_interface =
+                std::make_unique<frame::Uniform>(
+                    parameter.name(), glm_size, int_list);
+            break;
+        }
         case Uniform::kUniformFloat: {
             std::unique_ptr<UniformInterface> uniform_interface =
                 std::make_unique<frame::Uniform>(
                     parameter.name(), parameter.uniform_float());
             program->AddUniform(std::move(uniform_interface));
+            break;
+        }
+        case Uniform::kUniformFloats: {
+            UniformFloats uniform_floats = parameter.uniform_floats();
+            glm::uvec2 glm_size = glm::uvec2(
+                uniform_floats.size().x(), uniform_floats.size().y());
+            std::vector<float> float_list;
+            float_list.assign(
+                uniform_floats.values().begin(), uniform_floats.values().end());
+            std::unique_ptr<UniformInterface> uniform_interface =
+                std::make_unique<frame::Uniform>(
+                    parameter.name(), glm_size, float_list);
             break;
         }
         case Uniform::kUniformVec2: {
@@ -118,35 +143,15 @@ std::unique_ptr<frame::ProgramInterface> ParseProgramOpenGL(
             program->AddUniform(std::move(uniform_interface));
             break;
         }
-        case Uniform::kUniformVec2S: {
-            std::unique_ptr<UniformInterface> uniform_interface =
-                std::make_unique<frame::Uniform>(
-                    parameter.name(), ParseUniform(parameter.uniform_vec2()));
-            program->AddUniform(std::move(uniform_interface));
-            break;
-        }
-        case Uniform::kUniformVec3S: {
-            std::unique_ptr<UniformInterface> uniform_interface =
-                std::make_unique<frame::Uniform>(
-                    parameter.name(), ParseUniform(parameter.uniform_vec3()));
-            program->AddUniform(std::move(uniform_interface));
-            break;
-        }
-        case Uniform::kUniformVec4S: {
-            std::unique_ptr<UniformInterface> uniform_interface =
-                std::make_unique<frame::Uniform>(
-                    parameter.name(), ParseUniform(parameter.uniform_vec4()));
-            program->AddUniform(std::move(uniform_interface));
-            break;
-        }
         case Uniform::kUniformFloatPlugin:
             break;
         case Uniform::kUniformIntPlugin:
             break;
         default:
-            throw std::runtime_error(std::format(
-                "No handle for parameter {}#?",
-                static_cast<int>(parameter.value_oneof_case())));
+            throw std::runtime_error(
+                std::format(
+                    "No handle for parameter {}#?",
+                    static_cast<int>(parameter.value_oneof_case())));
         }
     }
     program->UnUse();

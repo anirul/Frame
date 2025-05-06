@@ -492,19 +492,19 @@ class SceneMatrix final : public ::google::protobuf::Message
   ::frame::proto::UniformMatrix4* _internal_mutable_matrix();
 
   public:
-  // .frame.proto.UniformQuaternion quaternion = 4;
+  // .frame.proto.UniformVector4 quaternion = 4;
   bool has_quaternion() const;
   void clear_quaternion() ;
-  const ::frame::proto::UniformQuaternion& quaternion() const;
-  PROTOBUF_NODISCARD ::frame::proto::UniformQuaternion* release_quaternion();
-  ::frame::proto::UniformQuaternion* mutable_quaternion();
-  void set_allocated_quaternion(::frame::proto::UniformQuaternion* value);
-  void unsafe_arena_set_allocated_quaternion(::frame::proto::UniformQuaternion* value);
-  ::frame::proto::UniformQuaternion* unsafe_arena_release_quaternion();
+  const ::frame::proto::UniformVector4& quaternion() const;
+  PROTOBUF_NODISCARD ::frame::proto::UniformVector4* release_quaternion();
+  ::frame::proto::UniformVector4* mutable_quaternion();
+  void set_allocated_quaternion(::frame::proto::UniformVector4* value);
+  void unsafe_arena_set_allocated_quaternion(::frame::proto::UniformVector4* value);
+  ::frame::proto::UniformVector4* unsafe_arena_release_quaternion();
 
   private:
-  const ::frame::proto::UniformQuaternion& _internal_quaternion() const;
-  ::frame::proto::UniformQuaternion* _internal_mutable_quaternion();
+  const ::frame::proto::UniformVector4& _internal_quaternion() const;
+  ::frame::proto::UniformVector4* _internal_mutable_quaternion();
 
   public:
   // @@protoc_insertion_point(class_scope:frame.proto.SceneMatrix)
@@ -535,7 +535,7 @@ class SceneMatrix final : public ::google::protobuf::Message
     ::google::protobuf::internal::ArenaStringPtr name_;
     ::google::protobuf::internal::ArenaStringPtr parent_;
     ::frame::proto::UniformMatrix4* matrix_;
-    ::frame::proto::UniformQuaternion* quaternion_;
+    ::frame::proto::UniformVector4* quaternion_;
     PROTOBUF_TSAN_DECLARE_MEMBER
   };
   union { Impl_ _impl_; };
@@ -2166,27 +2166,27 @@ inline void SceneMatrix::set_allocated_matrix(::frame::proto::UniformMatrix4* va
   // @@protoc_insertion_point(field_set_allocated:frame.proto.SceneMatrix.matrix)
 }
 
-// .frame.proto.UniformQuaternion quaternion = 4;
+// .frame.proto.UniformVector4 quaternion = 4;
 inline bool SceneMatrix::has_quaternion() const {
   bool value = (_impl_._has_bits_[0] & 0x00000002u) != 0;
   PROTOBUF_ASSUME(!value || _impl_.quaternion_ != nullptr);
   return value;
 }
-inline const ::frame::proto::UniformQuaternion& SceneMatrix::_internal_quaternion() const {
+inline const ::frame::proto::UniformVector4& SceneMatrix::_internal_quaternion() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
-  const ::frame::proto::UniformQuaternion* p = _impl_.quaternion_;
-  return p != nullptr ? *p : reinterpret_cast<const ::frame::proto::UniformQuaternion&>(::frame::proto::_UniformQuaternion_default_instance_);
+  const ::frame::proto::UniformVector4* p = _impl_.quaternion_;
+  return p != nullptr ? *p : reinterpret_cast<const ::frame::proto::UniformVector4&>(::frame::proto::_UniformVector4_default_instance_);
 }
-inline const ::frame::proto::UniformQuaternion& SceneMatrix::quaternion() const ABSL_ATTRIBUTE_LIFETIME_BOUND {
+inline const ::frame::proto::UniformVector4& SceneMatrix::quaternion() const ABSL_ATTRIBUTE_LIFETIME_BOUND {
   // @@protoc_insertion_point(field_get:frame.proto.SceneMatrix.quaternion)
   return _internal_quaternion();
 }
-inline void SceneMatrix::unsafe_arena_set_allocated_quaternion(::frame::proto::UniformQuaternion* value) {
+inline void SceneMatrix::unsafe_arena_set_allocated_quaternion(::frame::proto::UniformVector4* value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   if (GetArena() == nullptr) {
     delete reinterpret_cast<::google::protobuf::MessageLite*>(_impl_.quaternion_);
   }
-  _impl_.quaternion_ = reinterpret_cast<::frame::proto::UniformQuaternion*>(value);
+  _impl_.quaternion_ = reinterpret_cast<::frame::proto::UniformVector4*>(value);
   if (value != nullptr) {
     _impl_._has_bits_[0] |= 0x00000002u;
   } else {
@@ -2194,11 +2194,11 @@ inline void SceneMatrix::unsafe_arena_set_allocated_quaternion(::frame::proto::U
   }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.SceneMatrix.quaternion)
 }
-inline ::frame::proto::UniformQuaternion* SceneMatrix::release_quaternion() {
+inline ::frame::proto::UniformVector4* SceneMatrix::release_quaternion() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
 
   _impl_._has_bits_[0] &= ~0x00000002u;
-  ::frame::proto::UniformQuaternion* released = _impl_.quaternion_;
+  ::frame::proto::UniformVector4* released = _impl_.quaternion_;
   _impl_.quaternion_ = nullptr;
   if (::google::protobuf::internal::DebugHardenForceCopyInRelease()) {
     auto* old = reinterpret_cast<::google::protobuf::MessageLite*>(released);
@@ -2213,30 +2213,30 @@ inline ::frame::proto::UniformQuaternion* SceneMatrix::release_quaternion() {
   }
   return released;
 }
-inline ::frame::proto::UniformQuaternion* SceneMatrix::unsafe_arena_release_quaternion() {
+inline ::frame::proto::UniformVector4* SceneMatrix::unsafe_arena_release_quaternion() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   // @@protoc_insertion_point(field_release:frame.proto.SceneMatrix.quaternion)
 
   _impl_._has_bits_[0] &= ~0x00000002u;
-  ::frame::proto::UniformQuaternion* temp = _impl_.quaternion_;
+  ::frame::proto::UniformVector4* temp = _impl_.quaternion_;
   _impl_.quaternion_ = nullptr;
   return temp;
 }
-inline ::frame::proto::UniformQuaternion* SceneMatrix::_internal_mutable_quaternion() {
+inline ::frame::proto::UniformVector4* SceneMatrix::_internal_mutable_quaternion() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   if (_impl_.quaternion_ == nullptr) {
-    auto* p = ::google::protobuf::Message::DefaultConstruct<::frame::proto::UniformQuaternion>(GetArena());
-    _impl_.quaternion_ = reinterpret_cast<::frame::proto::UniformQuaternion*>(p);
+    auto* p = ::google::protobuf::Message::DefaultConstruct<::frame::proto::UniformVector4>(GetArena());
+    _impl_.quaternion_ = reinterpret_cast<::frame::proto::UniformVector4*>(p);
   }
   return _impl_.quaternion_;
 }
-inline ::frame::proto::UniformQuaternion* SceneMatrix::mutable_quaternion() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+inline ::frame::proto::UniformVector4* SceneMatrix::mutable_quaternion() ABSL_ATTRIBUTE_LIFETIME_BOUND {
   _impl_._has_bits_[0] |= 0x00000002u;
-  ::frame::proto::UniformQuaternion* _msg = _internal_mutable_quaternion();
+  ::frame::proto::UniformVector4* _msg = _internal_mutable_quaternion();
   // @@protoc_insertion_point(field_mutable:frame.proto.SceneMatrix.quaternion)
   return _msg;
 }
-inline void SceneMatrix::set_allocated_quaternion(::frame::proto::UniformQuaternion* value) {
+inline void SceneMatrix::set_allocated_quaternion(::frame::proto::UniformVector4* value) {
   ::google::protobuf::Arena* message_arena = GetArena();
   ::google::protobuf::internal::TSanWrite(&_impl_);
   if (message_arena == nullptr) {
@@ -2253,7 +2253,7 @@ inline void SceneMatrix::set_allocated_quaternion(::frame::proto::UniformQuatern
     _impl_._has_bits_[0] &= ~0x00000002u;
   }
 
-  _impl_.quaternion_ = reinterpret_cast<::frame::proto::UniformQuaternion*>(value);
+  _impl_.quaternion_ = reinterpret_cast<::frame::proto::UniformVector4*>(value);
   // @@protoc_insertion_point(field_set_allocated:frame.proto.SceneMatrix.quaternion)
 }
 

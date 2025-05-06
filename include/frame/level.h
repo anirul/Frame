@@ -315,6 +315,11 @@ class Level : public LevelInterface
      */
     std::vector<EntityId> GetLights() const override;
     /**
+     * @brief Get all the program from level.
+     * @return A vector of program ids.
+     */
+    std::vector<EntityId> GetPrograms() const override;
+    /**
      * @brief Extract a texture (move it) from the level to outside (used in
      *        special cases).
      * @warning This will invalidate this entry!

@@ -20,9 +20,13 @@ add_library(FrameJson
     parse_uniform.cpp
     parse_uniform.h
     parse_level.cpp
+    serialize_program.cpp
+    serialize_program.h
     serialize_texture.cpp
     serialize_texture.h
     serialize_level.cpp
+    serialize_uniform.cpp
+    serialize_uniform.h
 )
 
 target_include_directories(FrameJson 

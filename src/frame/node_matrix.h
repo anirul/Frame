@@ -39,8 +39,9 @@ class NodeMatrix : public NodeInterface
      *        this will be transfered to a mat4 at creation).
      */
     NodeMatrix(
-        std::function<NodeInterface*(const std::string&)> func, glm::quat quat)
-        : NodeInterface(func), matrix_(glm::toMat4(quat)),
+        std::function<NodeInterface*(const std::string&)> func, glm::vec4 quat)
+        : NodeInterface(func),
+          matrix_(glm::toMat4(glm::quat(quat.w, quat.x, quat.y, quat.z))),
           enable_rotation_(true)
     {
     }

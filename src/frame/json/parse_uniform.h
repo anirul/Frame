@@ -51,30 +51,6 @@ glm::vec4 ParseUniform(const UniformVector4& uniform_vec4);
 glm::mat4 ParseUniform(const UniformMatrix4& uniform_mat4);
 /**
  * @brief Specialization into vector types.
- * @param uniform_vec2s: Uniform vector 2s input.
- * @return Glm vec2s output.
- */
-std::vector<glm::vec2> ParseUniform(const UniformVector2s& uniform_vec2s);
-/**
- * @brief Specialization into vector types.
- * @param uniform_vec3s: Uniform vector 3s input.
- * @return Glm vec3s output.
- */
-std::vector<glm::vec3> ParseUniform(const UniformVector3s& uniform_vec3s);
-/**
- * @brief Specialization into vector types.
- * @param uniform_vec4s: Uniform vector 4s input.
- * @return Glm vec4s output.
- */
-std::vector<glm::vec4> ParseUniform(const UniformVector4s& uniform_vec4s);
-/**
- * @brief Specialization into glm types (quat).
- * @param uniform_quat: Uniform quaternion input.
- * @return Glm quat output.
- */
-glm::quat ParseUniform(const UniformQuaternion& uniform_quat);
-/**
- * @brief Specialization into vector types.
  * @param name: Name of the uniform.
  * @param uniform_vec: The vector value.
  * @param program_interface: Program interface to set the uniform.

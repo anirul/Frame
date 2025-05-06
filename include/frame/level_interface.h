@@ -242,6 +242,11 @@ class LevelInterface : public NameInterface
      */
     virtual std::vector<EntityId> GetLights() const = 0;
     /**
+     * @brief Get all the program from the level.
+     * @return A vector of program ids.
+     */
+    virtual std::vector<EntityId> GetPrograms() const = 0;
+    /**
      * @brief Extract a texture (move it) from the level to outside (used in
      * special cases).
      * @warning This will invalidate this entry!

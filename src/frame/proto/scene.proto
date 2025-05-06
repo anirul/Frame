@@ -21,7 +21,7 @@ message SceneMatrix {
 	// Matrix.
 	UniformMatrix4 matrix = 3;
 	// Quaternion moving.
-	UniformQuaternion quaternion = 4;
+	UniformVector4 quaternion = 4;
 }
 
 // Static Mesh.
