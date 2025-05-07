@@ -29,6 +29,12 @@ class Material : public MaterialInterface
      */
     EntityId GetProgramId(const LevelInterface* level = nullptr) const override;
     /**
+     * @brief Get the inner name that correspond to a texture id.
+     * @param id: The id to check for corresponding string.
+     * @return The string.
+     */
+    std::string GetInnerName(EntityId id) const;
+    /**
      * @brief Store local program id.
      * @param id: the stored program id.
      */

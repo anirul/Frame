@@ -103,9 +103,9 @@ class Level : public LevelInterface
      * @return A reference to a light.
      */
     LightInterface& GetLightFromId(EntityId id) const override
-	{
-		return *id_light_map_.at(id).get();
-	}
+    {
+        return *id_light_map_.at(id).get();
+    }
     /**
      * @brief Get a vector of static mesh id and corresponding material id.
      * @return Vector of static mesh id and corresponding material id and
@@ -173,14 +173,14 @@ class Level : public LevelInterface
     EntityId GetDefaultShadowMaterialId() const override
     {
         return default_shadow_material_id_;
-	}
+    }
     /**
      * @brief Set the default material id of the shadow material.
      * @param id: Id of the shadow material.
      */
     void SetDefaultShadowMaterialId(EntityId id) override
     {
-		default_shadow_material_id_ = id;
+        default_shadow_material_id_ = id;
     }
     /**
      * @brief Add a mesh and a material id (used for rendering by mesh later
@@ -320,6 +320,11 @@ class Level : public LevelInterface
      */
     std::vector<EntityId> GetPrograms() const override;
     /**
+     * @brief Get all the material from the level.
+     * @return A vector of material ids.
+     */
+    std::vector<EntityId> GetMaterials() const override;
+    /**
      * @brief Extract a texture (move it) from the level to outside (used in
      *        special cases).
      * @warning This will invalidate this entry!
@@ -409,7 +414,7 @@ class Level : public LevelInterface
     EntityId GetLightNewId() const
     {
         return ++next_id_maker_;
-	}
+    }
 
   protected:
     Logger& logger_ = Logger::GetInstance();
@@ -428,7 +433,7 @@ class Level : public LevelInterface
     std::map<EntityId, std::unique_ptr<MaterialInterface>> id_material_map_;
     std::map<EntityId, std::unique_ptr<BufferInterface>> id_buffer_map_;
     std::map<EntityId, std::unique_ptr<StaticMeshInterface>>
-		id_static_mesh_map_;
+        id_static_mesh_map_;
     std::map<EntityId, std::unique_ptr<LightInterface>> id_light_map_;
     // These are storage specifiers.
     std::set<std::string> string_set_;
@@ -437,8 +442,7 @@ class Level : public LevelInterface
     std::map<EntityId, EntityTypeEnum> id_enum_map_;
     std::vector<std::pair<EntityId, EntityId>> mesh_material_scene_render_ids_;
     std::vector<std::pair<EntityId, EntityId>> mesh_material_pre_render_ids_;
-    std::vector<std::pair<EntityId, EntityId>>
-		mesh_material_post_proccess_ids_;
+    std::vector<std::pair<EntityId, EntityId>> mesh_material_post_proccess_ids_;
     std::vector<std::pair<EntityId, EntityId>> mesh_material_skybox_ids_;
 };
 

@@ -38,17 +38,18 @@ message Uniform {
 	oneof value_oneof {
 		int32 uniform_int = 2;
 		float uniform_float = 4;
-		Plugin uniform_float_plugin = 19;
-		Plugin uniform_int_plugin = 20;
-		// This value come from outside, this could be projection or camera.
-		// it will be set acording to the type of the enum.
-		UniformEnum uniform_enum = 5;
+		UniformInts uniform_ints = 11;
+		UniformFloats uniform_floats = 13;
 		// Vectors and Matrices.
 		UniformVector2 uniform_vec2 = 6;
 		UniformVector3 uniform_vec3 = 7;
 		UniformVector4 uniform_vec4 = 8;
 		UniformMatrix4 uniform_mat4 = 10;
-		UniformInts uniform_ints = 11;
-		UniformFloats uniform_floats = 13;
+		// Plugin part.
+		Plugin uniform_float_plugin = 19;
+		Plugin uniform_int_plugin = 20;
+		// This value come from outside, this could be projection or camera.
+		// it will be set acording to the type of the enum.
+		UniformEnum uniform_enum = 5;
 	}
 }

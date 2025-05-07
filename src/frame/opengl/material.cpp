@@ -17,6 +17,11 @@ bool Material::HasTextureId(EntityId id) const
     return static_cast<bool>(id_name_map_.count(id));
 }
 
+std::string Material::GetInnerName(EntityId id) const
+{
+    return id_name_map_.at(id);
+}
+
 bool Material::RemoveTextureId(EntityId id)
 {
     if (!HasTextureId(id))
@@ -96,7 +101,9 @@ frame::EntityId Material::GetProgramId(
     const LevelInterface* level /*= nullptr*/) const
 {
     if (program_id_)
+    {
         return program_id_;
+    }
     auto maybe_id = level->GetIdFromName(program_name_);
     if (maybe_id)
     {
@@ -109,7 +116,9 @@ frame::EntityId Material::GetProgramId(
 void Material::SetProgramId(EntityId id)
 {
     if (!id)
+    {
         throw std::runtime_error("Not a valid program id.");
+    }
     // TODO(anirul): Check that the program has a valid uniform!
     program_id_ = id;
 }

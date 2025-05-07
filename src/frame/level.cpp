@@ -306,6 +306,16 @@ std::vector<frame::EntityId> Level::GetPrograms() const
     return list;
 }
 
+std::vector<frame::EntityId> Level::GetMaterials() const
+{
+    std::vector<EntityId> list;
+    for (const auto& [material_id, _] : id_material_map_)
+    {
+        list.push_back(material_id);
+    }
+    return list;
+}
+
 std::unique_ptr<frame::TextureInterface> Level::ExtractTexture(EntityId id)
 {
     auto node_texture = id_texture_map_.extract(id);
@@ -349,10 +359,11 @@ void Level::ReplaceMesh(
 {
     if (!id_static_mesh_map_.count(id))
     {
-        throw std::runtime_error(fmt::format(
-            "trying to replace {} by {} but no mesh there yet?",
-            mesh->GetName(),
-            id));
+        throw std::runtime_error(
+            fmt::format(
+                "trying to replace {} by {} but no mesh there yet?",
+                mesh->GetName(),
+                id));
     }
     id_static_mesh_map_.erase(id);
     id_static_mesh_map_.emplace(id, std::move(mesh));
