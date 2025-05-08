@@ -140,8 +140,7 @@ class LevelInterface : public NameInterface
      * @param id: The node id you want to get the children.
      * @return The node id children id(s).
      */
-    virtual std::optional<std::vector<EntityId>> GetChildList(
-        const EntityId id) const = 0;
+    virtual std::vector<EntityId> GetChildList(const EntityId id) const = 0;
     /**
      * @brief Get the parent of a given node id.
      * @param id: The current node we are searching for the parent.

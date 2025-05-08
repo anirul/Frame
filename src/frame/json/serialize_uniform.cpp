@@ -4,6 +4,55 @@
 namespace frame::proto
 {
 
+proto::UniformVector2 SerializeUniformVector2(glm::vec2 vec)
+{
+    proto::UniformVector2 proto_uniform_vector2;
+    proto_uniform_vector2.set_x(vec.x);
+    proto_uniform_vector2.set_y(vec.y);
+    return proto_uniform_vector2;
+}
+
+proto::UniformVector3 SerializeUniformVector3(glm::vec3 vec)
+{
+    proto::UniformVector3 proto_uniform_vector3;
+    proto_uniform_vector3.set_x(vec.x);
+    proto_uniform_vector3.set_y(vec.y);
+    proto_uniform_vector3.set_z(vec.z);
+    return proto_uniform_vector3;
+}
+
+proto::UniformVector4 SerializeUniformVector4(glm::vec4 vec)
+{
+    proto::UniformVector4 proto_uniform_vector4;
+    proto_uniform_vector4.set_w(vec.w);
+    proto_uniform_vector4.set_x(vec.x);
+    proto_uniform_vector4.set_y(vec.y);
+    proto_uniform_vector4.set_z(vec.z);
+    return proto_uniform_vector4;
+}
+
+proto::UniformMatrix4 SerializeUniformMatrix4(glm::mat4 mat)
+{
+    proto::UniformMatrix4 proto_uniform_matrix4;
+    proto_uniform_matrix4.set_m11(mat[0][0]);
+    proto_uniform_matrix4.set_m12(mat[0][1]);
+    proto_uniform_matrix4.set_m13(mat[0][2]);
+    proto_uniform_matrix4.set_m14(mat[0][3]);
+    proto_uniform_matrix4.set_m21(mat[1][0]);
+    proto_uniform_matrix4.set_m22(mat[1][1]);
+    proto_uniform_matrix4.set_m23(mat[1][2]);
+    proto_uniform_matrix4.set_m24(mat[1][3]);
+    proto_uniform_matrix4.set_m31(mat[2][0]);
+    proto_uniform_matrix4.set_m32(mat[2][1]);
+    proto_uniform_matrix4.set_m33(mat[2][2]);
+    proto_uniform_matrix4.set_m34(mat[2][3]);
+    proto_uniform_matrix4.set_m41(mat[3][0]);
+    proto_uniform_matrix4.set_m42(mat[3][1]);
+    proto_uniform_matrix4.set_m43(mat[3][2]);
+    proto_uniform_matrix4.set_m44(mat[3][3]);
+    return proto_uniform_matrix4;
+}
+
 proto::Uniform SerializeUniform(const UniformInterface& uniform_interface)
 {
     proto::Uniform proto_uniform;
@@ -77,51 +126,22 @@ proto::Uniform SerializeUniform(const UniformInterface& uniform_interface)
         proto_uniform.mutable_uniform_floats()->CopyFrom(proto_uniform_floats);
         break;
     }
-    case proto::Uniform::FLOAT_VECTOR2: {
-        proto::UniformVector2 proto_uniform_vector2;
-        proto_uniform_vector2.set_x(uniform_interface.GetVec2().x);
-        proto_uniform_vector2.set_y(uniform_interface.GetVec2().y);
-        proto_uniform.mutable_uniform_vec2()->CopyFrom(proto_uniform_vector2);
+    case proto::Uniform::FLOAT_VECTOR2:
+        proto_uniform.mutable_uniform_vec2()->CopyFrom(
+            SerializeUniformVector2(uniform_interface.GetVec2()));
         break;
-    }
-    case proto::Uniform::FLOAT_VECTOR3: {
-        proto::UniformVector3 proto_uniform_vector3;
-        proto_uniform_vector3.set_x(uniform_interface.GetVec3().x);
-        proto_uniform_vector3.set_y(uniform_interface.GetVec3().y);
-        proto_uniform_vector3.set_z(uniform_interface.GetVec3().z);
-        proto_uniform.mutable_uniform_vec3()->CopyFrom(proto_uniform_vector3);
+    case proto::Uniform::FLOAT_VECTOR3:
+        proto_uniform.mutable_uniform_vec3()->CopyFrom(
+            SerializeUniformVector3(uniform_interface.GetVec3()));
         break;
-    }
-    case proto::Uniform::FLOAT_VECTOR4: {
-        proto::UniformVector4 proto_uniform_vector4;
-        proto_uniform_vector4.set_x(uniform_interface.GetVec4().x);
-        proto_uniform_vector4.set_y(uniform_interface.GetVec4().y);
-        proto_uniform_vector4.set_z(uniform_interface.GetVec4().z);
-        proto_uniform_vector4.set_w(uniform_interface.GetVec4().w);
-        proto_uniform.mutable_uniform_vec3()->CopyFrom(proto_uniform_vector4);
+    case proto::Uniform::FLOAT_VECTOR4:
+        proto_uniform.mutable_uniform_vec3()->CopyFrom(
+            SerializeUniformVector4(uniform_interface.GetVec4()));
         break;
-    }
-    case proto::Uniform::FLOAT_MATRIX4: {
-        proto::UniformMatrix4 proto_uniform_matrix4;
-        proto_uniform_matrix4.set_m11(uniform_interface.GetMat4()[0][0]);
-        proto_uniform_matrix4.set_m12(uniform_interface.GetMat4()[0][1]);
-        proto_uniform_matrix4.set_m13(uniform_interface.GetMat4()[0][2]);
-        proto_uniform_matrix4.set_m14(uniform_interface.GetMat4()[0][3]);
-        proto_uniform_matrix4.set_m21(uniform_interface.GetMat4()[1][0]);
-        proto_uniform_matrix4.set_m22(uniform_interface.GetMat4()[1][1]);
-        proto_uniform_matrix4.set_m23(uniform_interface.GetMat4()[1][2]);
-        proto_uniform_matrix4.set_m24(uniform_interface.GetMat4()[1][3]);
-        proto_uniform_matrix4.set_m31(uniform_interface.GetMat4()[2][0]);
-        proto_uniform_matrix4.set_m32(uniform_interface.GetMat4()[2][1]);
-        proto_uniform_matrix4.set_m33(uniform_interface.GetMat4()[2][2]);
-        proto_uniform_matrix4.set_m34(uniform_interface.GetMat4()[2][3]);
-        proto_uniform_matrix4.set_m41(uniform_interface.GetMat4()[3][0]);
-        proto_uniform_matrix4.set_m42(uniform_interface.GetMat4()[3][1]);
-        proto_uniform_matrix4.set_m43(uniform_interface.GetMat4()[3][2]);
-        proto_uniform_matrix4.set_m44(uniform_interface.GetMat4()[3][3]);
-        proto_uniform.mutable_uniform_mat4()->CopyFrom(proto_uniform_matrix4);
+    case proto::Uniform::FLOAT_MATRIX4:
+        proto_uniform.mutable_uniform_mat4()->CopyFrom(
+            SerializeUniformMatrix4(uniform_interface.GetMat4()));
         break;
-    }
     default:
         break;
     }

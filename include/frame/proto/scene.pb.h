@@ -349,6 +349,11 @@ class SceneMatrix final : public ::google::protobuf::Message
   static const SceneMatrix& default_instance() {
     return *internal_default_instance();
   }
+  enum MatrixOneofCase {
+    kMatrix = 3,
+    kQuaternion = 4,
+    MATRIX_ONEOF_NOT_SET = 0,
+  };
   static inline const SceneMatrix* internal_default_instance() {
     return reinterpret_cast<const SceneMatrix*>(
         &_SceneMatrix_default_instance_);
@@ -479,6 +484,10 @@ class SceneMatrix final : public ::google::protobuf::Message
   public:
   // .frame.proto.UniformMatrix4 matrix = 3;
   bool has_matrix() const;
+  private:
+  bool _internal_has_matrix() const;
+
+  public:
   void clear_matrix() ;
   const ::frame::proto::UniformMatrix4& matrix() const;
   PROTOBUF_NODISCARD ::frame::proto::UniformMatrix4* release_matrix();
@@ -494,6 +503,10 @@ class SceneMatrix final : public ::google::protobuf::Message
   public:
   // .frame.proto.UniformVector4 quaternion = 4;
   bool has_quaternion() const;
+  private:
+  bool _internal_has_quaternion() const;
+
+  public:
   void clear_quaternion() ;
   const ::frame::proto::UniformVector4& quaternion() const;
   PROTOBUF_NODISCARD ::frame::proto::UniformVector4* release_quaternion();
@@ -507,12 +520,18 @@ class SceneMatrix final : public ::google::protobuf::Message
   ::frame::proto::UniformVector4* _internal_mutable_quaternion();
 
   public:
+  void clear_matrix_oneof();
+  MatrixOneofCase matrix_oneof_case() const;
   // @@protoc_insertion_point(class_scope:frame.proto.SceneMatrix)
  private:
   class _Internal;
+  void set_has_matrix();
+  void set_has_quaternion();
+  inline bool has_matrix_oneof() const;
+  inline void clear_has_matrix_oneof();
   friend class ::google::protobuf::internal::TcParser;
   static const ::google::protobuf::internal::TcParseTable<
-      2, 4, 2,
+      1, 4, 2,
       42, 2>
       _table_;
 
@@ -530,12 +549,16 @@ class SceneMatrix final : public ::google::protobuf::Message
     inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
                           ::google::protobuf::Arena* arena, const Impl_& from,
                           const SceneMatrix& from_msg);
-    ::google::protobuf::internal::HasBits<1> _has_bits_;
-    ::google::protobuf::internal::CachedSize _cached_size_;
     ::google::protobuf::internal::ArenaStringPtr name_;
     ::google::protobuf::internal::ArenaStringPtr parent_;
-    ::frame::proto::UniformMatrix4* matrix_;
-    ::frame::proto::UniformVector4* quaternion_;
+    union MatrixOneofUnion {
+      constexpr MatrixOneofUnion() : _constinit_{} {}
+      ::google::protobuf::internal::ConstantInitialized _constinit_;
+      ::frame::proto::UniformMatrix4* matrix_;
+      ::frame::proto::UniformVector4* quaternion_;
+    } matrix_oneof_;
+    ::google::protobuf::internal::CachedSize _cached_size_;
+    ::uint32_t _oneof_case_[1];
     PROTOBUF_TSAN_DECLARE_MEMBER
   };
   union { Impl_ _impl_; };
@@ -2077,186 +2100,149 @@ inline void SceneMatrix::set_allocated_parent(std::string* value) {
 
 // .frame.proto.UniformMatrix4 matrix = 3;
 inline bool SceneMatrix::has_matrix() const {
-  bool value = (_impl_._has_bits_[0] & 0x00000001u) != 0;
-  PROTOBUF_ASSUME(!value || _impl_.matrix_ != nullptr);
-  return value;
+  return matrix_oneof_case() == kMatrix;
+}
+inline bool SceneMatrix::_internal_has_matrix() const {
+  return matrix_oneof_case() == kMatrix;
+}
+inline void SceneMatrix::set_has_matrix() {
+  _impl_._oneof_case_[0] = kMatrix;
+}
+inline ::frame::proto::UniformMatrix4* SceneMatrix::release_matrix() {
+  // @@protoc_insertion_point(field_release:frame.proto.SceneMatrix.matrix)
+  if (matrix_oneof_case() == kMatrix) {
+    clear_has_matrix_oneof();
+    auto* temp = _impl_.matrix_oneof_.matrix_;
+    if (GetArena() != nullptr) {
+      temp = ::google::protobuf::internal::DuplicateIfNonNull(temp);
+    }
+    _impl_.matrix_oneof_.matrix_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
 }
 inline const ::frame::proto::UniformMatrix4& SceneMatrix::_internal_matrix() const {
-  ::google::protobuf::internal::TSanRead(&_impl_);
-  const ::frame::proto::UniformMatrix4* p = _impl_.matrix_;
-  return p != nullptr ? *p : reinterpret_cast<const ::frame::proto::UniformMatrix4&>(::frame::proto::_UniformMatrix4_default_instance_);
+  return matrix_oneof_case() == kMatrix ? *_impl_.matrix_oneof_.matrix_ : reinterpret_cast<::frame::proto::UniformMatrix4&>(::frame::proto::_UniformMatrix4_default_instance_);
 }
 inline const ::frame::proto::UniformMatrix4& SceneMatrix::matrix() const ABSL_ATTRIBUTE_LIFETIME_BOUND {
   // @@protoc_insertion_point(field_get:frame.proto.SceneMatrix.matrix)
   return _internal_matrix();
 }
-inline void SceneMatrix::unsafe_arena_set_allocated_matrix(::frame::proto::UniformMatrix4* value) {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  if (GetArena() == nullptr) {
-    delete reinterpret_cast<::google::protobuf::MessageLite*>(_impl_.matrix_);
-  }
-  _impl_.matrix_ = reinterpret_cast<::frame::proto::UniformMatrix4*>(value);
-  if (value != nullptr) {
-    _impl_._has_bits_[0] |= 0x00000001u;
+inline ::frame::proto::UniformMatrix4* SceneMatrix::unsafe_arena_release_matrix() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.SceneMatrix.matrix)
+  if (matrix_oneof_case() == kMatrix) {
+    clear_has_matrix_oneof();
+    auto* temp = _impl_.matrix_oneof_.matrix_;
+    _impl_.matrix_oneof_.matrix_ = nullptr;
+    return temp;
   } else {
-    _impl_._has_bits_[0] &= ~0x00000001u;
+    return nullptr;
+  }
+}
+inline void SceneMatrix::unsafe_arena_set_allocated_matrix(::frame::proto::UniformMatrix4* value) {
+  // We rely on the oneof clear method to free the earlier contents
+  // of this oneof. We can directly use the pointer we're given to
+  // set the new value.
+  clear_matrix_oneof();
+  if (value) {
+    set_has_matrix();
+    _impl_.matrix_oneof_.matrix_ = value;
   }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.SceneMatrix.matrix)
 }
-inline ::frame::proto::UniformMatrix4* SceneMatrix::release_matrix() {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-
-  _impl_._has_bits_[0] &= ~0x00000001u;
-  ::frame::proto::UniformMatrix4* released = _impl_.matrix_;
-  _impl_.matrix_ = nullptr;
-  if (::google::protobuf::internal::DebugHardenForceCopyInRelease()) {
-    auto* old = reinterpret_cast<::google::protobuf::MessageLite*>(released);
-    released = ::google::protobuf::internal::DuplicateIfNonNull(released);
-    if (GetArena() == nullptr) {
-      delete old;
-    }
-  } else {
-    if (GetArena() != nullptr) {
-      released = ::google::protobuf::internal::DuplicateIfNonNull(released);
-    }
-  }
-  return released;
-}
-inline ::frame::proto::UniformMatrix4* SceneMatrix::unsafe_arena_release_matrix() {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  // @@protoc_insertion_point(field_release:frame.proto.SceneMatrix.matrix)
-
-  _impl_._has_bits_[0] &= ~0x00000001u;
-  ::frame::proto::UniformMatrix4* temp = _impl_.matrix_;
-  _impl_.matrix_ = nullptr;
-  return temp;
-}
 inline ::frame::proto::UniformMatrix4* SceneMatrix::_internal_mutable_matrix() {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  if (_impl_.matrix_ == nullptr) {
-    auto* p = ::google::protobuf::Message::DefaultConstruct<::frame::proto::UniformMatrix4>(GetArena());
-    _impl_.matrix_ = reinterpret_cast<::frame::proto::UniformMatrix4*>(p);
+  if (matrix_oneof_case() != kMatrix) {
+    clear_matrix_oneof();
+    set_has_matrix();
+    _impl_.matrix_oneof_.matrix_ =
+        ::google::protobuf::Message::DefaultConstruct<::frame::proto::UniformMatrix4>(GetArena());
   }
-  return _impl_.matrix_;
+  return _impl_.matrix_oneof_.matrix_;
 }
 inline ::frame::proto::UniformMatrix4* SceneMatrix::mutable_matrix() ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  _impl_._has_bits_[0] |= 0x00000001u;
   ::frame::proto::UniformMatrix4* _msg = _internal_mutable_matrix();
   // @@protoc_insertion_point(field_mutable:frame.proto.SceneMatrix.matrix)
   return _msg;
 }
-inline void SceneMatrix::set_allocated_matrix(::frame::proto::UniformMatrix4* value) {
-  ::google::protobuf::Arena* message_arena = GetArena();
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  if (message_arena == nullptr) {
-    delete reinterpret_cast<::google::protobuf::MessageLite*>(_impl_.matrix_);
-  }
-
-  if (value != nullptr) {
-    ::google::protobuf::Arena* submessage_arena = reinterpret_cast<::google::protobuf::MessageLite*>(value)->GetArena();
-    if (message_arena != submessage_arena) {
-      value = ::google::protobuf::internal::GetOwnedMessage(message_arena, value, submessage_arena);
-    }
-    _impl_._has_bits_[0] |= 0x00000001u;
-  } else {
-    _impl_._has_bits_[0] &= ~0x00000001u;
-  }
-
-  _impl_.matrix_ = reinterpret_cast<::frame::proto::UniformMatrix4*>(value);
-  // @@protoc_insertion_point(field_set_allocated:frame.proto.SceneMatrix.matrix)
-}
 
 // .frame.proto.UniformVector4 quaternion = 4;
 inline bool SceneMatrix::has_quaternion() const {
-  bool value = (_impl_._has_bits_[0] & 0x00000002u) != 0;
-  PROTOBUF_ASSUME(!value || _impl_.quaternion_ != nullptr);
-  return value;
+  return matrix_oneof_case() == kQuaternion;
+}
+inline bool SceneMatrix::_internal_has_quaternion() const {
+  return matrix_oneof_case() == kQuaternion;
+}
+inline void SceneMatrix::set_has_quaternion() {
+  _impl_._oneof_case_[0] = kQuaternion;
+}
+inline ::frame::proto::UniformVector4* SceneMatrix::release_quaternion() {
+  // @@protoc_insertion_point(field_release:frame.proto.SceneMatrix.quaternion)
+  if (matrix_oneof_case() == kQuaternion) {
+    clear_has_matrix_oneof();
+    auto* temp = _impl_.matrix_oneof_.quaternion_;
+    if (GetArena() != nullptr) {
+      temp = ::google::protobuf::internal::DuplicateIfNonNull(temp);
+    }
+    _impl_.matrix_oneof_.quaternion_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
 }
 inline const ::frame::proto::UniformVector4& SceneMatrix::_internal_quaternion() const {
-  ::google::protobuf::internal::TSanRead(&_impl_);
-  const ::frame::proto::UniformVector4* p = _impl_.quaternion_;
-  return p != nullptr ? *p : reinterpret_cast<const ::frame::proto::UniformVector4&>(::frame::proto::_UniformVector4_default_instance_);
+  return matrix_oneof_case() == kQuaternion ? *_impl_.matrix_oneof_.quaternion_ : reinterpret_cast<::frame::proto::UniformVector4&>(::frame::proto::_UniformVector4_default_instance_);
 }
 inline const ::frame::proto::UniformVector4& SceneMatrix::quaternion() const ABSL_ATTRIBUTE_LIFETIME_BOUND {
   // @@protoc_insertion_point(field_get:frame.proto.SceneMatrix.quaternion)
   return _internal_quaternion();
 }
-inline void SceneMatrix::unsafe_arena_set_allocated_quaternion(::frame::proto::UniformVector4* value) {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  if (GetArena() == nullptr) {
-    delete reinterpret_cast<::google::protobuf::MessageLite*>(_impl_.quaternion_);
-  }
-  _impl_.quaternion_ = reinterpret_cast<::frame::proto::UniformVector4*>(value);
-  if (value != nullptr) {
-    _impl_._has_bits_[0] |= 0x00000002u;
+inline ::frame::proto::UniformVector4* SceneMatrix::unsafe_arena_release_quaternion() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.SceneMatrix.quaternion)
+  if (matrix_oneof_case() == kQuaternion) {
+    clear_has_matrix_oneof();
+    auto* temp = _impl_.matrix_oneof_.quaternion_;
+    _impl_.matrix_oneof_.quaternion_ = nullptr;
+    return temp;
   } else {
-    _impl_._has_bits_[0] &= ~0x00000002u;
+    return nullptr;
+  }
+}
+inline void SceneMatrix::unsafe_arena_set_allocated_quaternion(::frame::proto::UniformVector4* value) {
+  // We rely on the oneof clear method to free the earlier contents
+  // of this oneof. We can directly use the pointer we're given to
+  // set the new value.
+  clear_matrix_oneof();
+  if (value) {
+    set_has_quaternion();
+    _impl_.matrix_oneof_.quaternion_ = value;
   }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.SceneMatrix.quaternion)
 }
-inline ::frame::proto::UniformVector4* SceneMatrix::release_quaternion() {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-
-  _impl_._has_bits_[0] &= ~0x00000002u;
-  ::frame::proto::UniformVector4* released = _impl_.quaternion_;
-  _impl_.quaternion_ = nullptr;
-  if (::google::protobuf::internal::DebugHardenForceCopyInRelease()) {
-    auto* old = reinterpret_cast<::google::protobuf::MessageLite*>(released);
-    released = ::google::protobuf::internal::DuplicateIfNonNull(released);
-    if (GetArena() == nullptr) {
-      delete old;
-    }
-  } else {
-    if (GetArena() != nullptr) {
-      released = ::google::protobuf::internal::DuplicateIfNonNull(released);
-    }
-  }
-  return released;
-}
-inline ::frame::proto::UniformVector4* SceneMatrix::unsafe_arena_release_quaternion() {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  // @@protoc_insertion_point(field_release:frame.proto.SceneMatrix.quaternion)
-
-  _impl_._has_bits_[0] &= ~0x00000002u;
-  ::frame::proto::UniformVector4* temp = _impl_.quaternion_;
-  _impl_.quaternion_ = nullptr;
-  return temp;
-}
 inline ::frame::proto::UniformVector4* SceneMatrix::_internal_mutable_quaternion() {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  if (_impl_.quaternion_ == nullptr) {
-    auto* p = ::google::protobuf::Message::DefaultConstruct<::frame::proto::UniformVector4>(GetArena());
-    _impl_.quaternion_ = reinterpret_cast<::frame::proto::UniformVector4*>(p);
+  if (matrix_oneof_case() != kQuaternion) {
+    clear_matrix_oneof();
+    set_has_quaternion();
+    _impl_.matrix_oneof_.quaternion_ =
+        ::google::protobuf::Message::DefaultConstruct<::frame::proto::UniformVector4>(GetArena());
   }
-  return _impl_.quaternion_;
+  return _impl_.matrix_oneof_.quaternion_;
 }
 inline ::frame::proto::UniformVector4* SceneMatrix::mutable_quaternion() ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  _impl_._has_bits_[0] |= 0x00000002u;
   ::frame::proto::UniformVector4* _msg = _internal_mutable_quaternion();
   // @@protoc_insertion_point(field_mutable:frame.proto.SceneMatrix.quaternion)
   return _msg;
 }
-inline void SceneMatrix::set_allocated_quaternion(::frame::proto::UniformVector4* value) {
-  ::google::protobuf::Arena* message_arena = GetArena();
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  if (message_arena == nullptr) {
-    delete reinterpret_cast<::google::protobuf::MessageLite*>(_impl_.quaternion_);
-  }
 
-  if (value != nullptr) {
-    ::google::protobuf::Arena* submessage_arena = reinterpret_cast<::google::protobuf::MessageLite*>(value)->GetArena();
-    if (message_arena != submessage_arena) {
-      value = ::google::protobuf::internal::GetOwnedMessage(message_arena, value, submessage_arena);
-    }
-    _impl_._has_bits_[0] |= 0x00000002u;
-  } else {
-    _impl_._has_bits_[0] &= ~0x00000002u;
-  }
-
-  _impl_.quaternion_ = reinterpret_cast<::frame::proto::UniformVector4*>(value);
-  // @@protoc_insertion_point(field_set_allocated:frame.proto.SceneMatrix.quaternion)
+inline bool SceneMatrix::has_matrix_oneof() const {
+  return matrix_oneof_case() != MATRIX_ONEOF_NOT_SET;
 }
-
+inline void SceneMatrix::clear_has_matrix_oneof() {
+  _impl_._oneof_case_[0] = MATRIX_ONEOF_NOT_SET;
+}
+inline SceneMatrix::MatrixOneofCase SceneMatrix::matrix_oneof_case() const {
+  return SceneMatrix::MatrixOneofCase(_impl_._oneof_case_[0]);
+}
 // -------------------------------------------------------------------
 
 // SceneStaticMesh

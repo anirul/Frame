@@ -18,10 +18,13 @@ message SceneMatrix {
 	string name = 1;
 	// Give the name of the parent (if present).
 	string parent = 2;
-	// Matrix.
-	UniformMatrix4 matrix = 3;
-	// Quaternion moving.
-	UniformVector4 quaternion = 4;
+	// Could be a matrix or a quaternion (in case a move element).
+	oneof matrix_oneof {
+		// Matrix.
+		UniformMatrix4 matrix = 3;
+		// Quaternion moving.
+		UniformVector4 quaternion = 4;
+	}
 }
 
 // Static Mesh.

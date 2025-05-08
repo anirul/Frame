@@ -296,8 +296,7 @@ class Level : public LevelInterface
      * @param id: The node id you want to get the children.
      * @return The node id children id(s).
      */
-    std::optional<std::vector<EntityId>> GetChildList(
-        EntityId id) const override;
+    std::vector<EntityId> GetChildList(EntityId id) const override;
     /**
      * @brief Get the parent of a given node id.
      * @param id: The current node we are searching for the parent.

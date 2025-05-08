@@ -236,8 +236,7 @@ EntityId Level::AddStaticMesh(
     return id;
 }
 
-std::optional<std::vector<frame::EntityId>> Level::GetChildList(
-    EntityId id) const
+std::vector<frame::EntityId> Level::GetChildList(EntityId id) const
 {
     std::vector<EntityId> list;
     try
@@ -256,7 +255,6 @@ std::optional<std::vector<frame::EntityId>> Level::GetChildList(
     catch (std::out_of_range& ex)
     {
         logger_->warn(ex.what());
-        return std::nullopt;
     }
     return list;
 }
