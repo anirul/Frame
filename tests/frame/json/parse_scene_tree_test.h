@@ -17,7 +17,7 @@ class ParseSceneTreeTest : public testing::Test
     ParseSceneTreeTest()
     {
         window_ = frame::CreateNewWindow(frame::DrawingTargetEnum::NONE);
-        proto_level_ = frame::proto::LoadProtoFromJsonFile<frame::proto::Level>(
+        proto_level_ = frame::json::LoadProtoFromJsonFile<frame::proto::Level>(
             frame::file::FindFile("asset/json/scene_tree_test.json"));
     }
 

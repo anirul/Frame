@@ -13,6 +13,15 @@
 namespace frame
 {
 
+enum class NodeTypeEnum
+{
+    NODE_UKNOWN = 0,
+    NODE_MATRIX = 1,
+    NODE_STATIC_MESH = 2,
+    NODE_LIGHT = 3,
+    NODE_CAMERA = 4,
+};
+
 /**
  * @class NodeInterface
  * @brief Interface to visit the scene node.
@@ -40,6 +49,11 @@ struct NodeInterface : public NameInterface
      * @return A mat4 representing the local model matrix.
      */
     virtual glm::mat4 GetLocalModel(double dt) const = 0;
+    /**
+     * @brief Return the node type of this node.
+     * @return The node type.
+     */
+    virtual NodeTypeEnum GetNodeType() const = 0;
 
   public:
     /**

@@ -6,7 +6,7 @@
 #include "frame/json/proto.h"
 #include "frame/level_interface.h"
 
-namespace frame::proto
+namespace frame::json
 {
 
 /**
@@ -33,4 +33,4 @@ std::unique_ptr<LevelInterface> ParseLevel(
 std::unique_ptr<LevelInterface> ParseLevel(
     glm::uvec2 size, const proto::Level& proto);
 
-} // End namespace frame::proto.
+} // End namespace frame::json.

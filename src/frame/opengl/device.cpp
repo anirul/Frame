@@ -56,7 +56,7 @@ void Device::Startup(std::unique_ptr<frame::LevelInterface>&& level)
     // Add a callback to allow plugins to be called at pre-render step.
     renderer_->SetMeshRenderCallback(
         [this](
-            UniformInterface& uniform,
+            UniformCollectionInterface& uniform,
             StaticMeshInterface& static_mesh,
             MaterialInterface& material)
         {
@@ -155,7 +155,9 @@ void Device::DisplayCamera(
     const CameraInterface& camera, glm::uvec4 viewport, double time)
 {
     if (!renderer_)
+    {
         throw std::runtime_error("No Renderer.");
+    }
     renderer_->SetDeltaTime(time);
     renderer_->PreRender();
     renderer_->SetViewport(viewport);
@@ -173,7 +175,9 @@ void Device::DisplayLeftRightCamera(
     double time)
 {
     if (!renderer_)
+    {
         throw std::runtime_error("No Renderer.");
+    }
     renderer_->SetDeltaTime(time);
     renderer_->PreRender();
     renderer_->SetViewport(viewport_left);

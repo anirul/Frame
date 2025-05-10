@@ -1,86 +1,87 @@
 #include "frame/json/parse_pixel.h"
 
-namespace frame::proto
+namespace frame::json
 {
 
-PixelElementSize PixelElementSize_BYTE()
+proto::PixelElementSize PixelElementSize_BYTE()
 {
-    PixelElementSize pixel_element_size{};
-    pixel_element_size.set_value(PixelElementSize::BYTE);
+    proto::PixelElementSize pixel_element_size{};
+    pixel_element_size.set_value(proto::PixelElementSize::BYTE);
     return pixel_element_size;
 }
 
-PixelElementSize PixelElementSize_SHORT()
+proto::PixelElementSize PixelElementSize_SHORT()
 {
-    PixelElementSize pixel_element_size{};
-    pixel_element_size.set_value(PixelElementSize::SHORT);
+    proto::PixelElementSize pixel_element_size{};
+    pixel_element_size.set_value(proto::PixelElementSize::SHORT);
     return pixel_element_size;
 }
 
-PixelElementSize PixelElementSize_HALF()
+proto::PixelElementSize PixelElementSize_HALF()
 {
-    PixelElementSize pixel_element_size{};
-    pixel_element_size.set_value(PixelElementSize::HALF);
+    proto::PixelElementSize pixel_element_size{};
+    pixel_element_size.set_value(proto::PixelElementSize::HALF);
     return pixel_element_size;
 }
 
-PixelElementSize PixelElementSize_FLOAT()
+proto::PixelElementSize PixelElementSize_FLOAT()
 {
-    PixelElementSize pixel_element_size{};
-    pixel_element_size.set_value(PixelElementSize::FLOAT);
+    proto::PixelElementSize pixel_element_size{};
+    pixel_element_size.set_value(proto::PixelElementSize::FLOAT);
     return pixel_element_size;
 }
 
-PixelStructure PixelStructure_GREY()
+proto::PixelStructure PixelStructure_GREY()
 {
-    PixelStructure pixel_structure{};
-    pixel_structure.set_value(PixelStructure::GREY);
+    proto::PixelStructure pixel_structure{};
+    pixel_structure.set_value(proto::PixelStructure::GREY);
     return pixel_structure;
 }
 
-PixelStructure PixelStructure_GREY_ALPHA()
+proto::PixelStructure PixelStructure_GREY_ALPHA()
 {
-    PixelStructure pixel_structure{};
-    pixel_structure.set_value(PixelStructure::GREY_ALPHA);
+    proto::PixelStructure pixel_structure{};
+    pixel_structure.set_value(proto::PixelStructure::GREY_ALPHA);
     return pixel_structure;
 }
 
-PixelStructure PixelStructure_RGB()
+proto::PixelStructure PixelStructure_RGB()
 {
-    PixelStructure pixel_structure{};
-    pixel_structure.set_value(PixelStructure::RGB);
+    proto::PixelStructure pixel_structure{};
+    pixel_structure.set_value(proto::PixelStructure::RGB);
     return pixel_structure;
 }
 
-PixelStructure PixelStructure_RGB_ALPHA()
+proto::PixelStructure PixelStructure_RGB_ALPHA()
 {
-    PixelStructure pixel_structure{};
-    pixel_structure.set_value(PixelStructure::RGB_ALPHA);
+    proto::PixelStructure pixel_structure{};
+    pixel_structure.set_value(proto::PixelStructure::RGB_ALPHA);
     return pixel_structure;
 }
 
-PixelStructure PixelStructure_BGR()
+proto::PixelStructure PixelStructure_BGR()
 {
-    PixelStructure pixel_structure{};
-    pixel_structure.set_value(PixelStructure::BGR);
+    proto::PixelStructure pixel_structure{};
+    pixel_structure.set_value(proto::PixelStructure::BGR);
     return pixel_structure;
 }
 
-PixelStructure PixelStructure_BGR_ALPHA()
+proto::PixelStructure PixelStructure_BGR_ALPHA()
 {
-    PixelStructure pixel_structure{};
-    pixel_structure.set_value(PixelStructure::BGR_ALPHA);
+    proto::PixelStructure pixel_structure{};
+    pixel_structure.set_value(proto::PixelStructure::BGR_ALPHA);
     return pixel_structure;
 }
 
-bool operator==(const PixelStructure& l, const PixelStructure& r)
+bool operator==(const proto::PixelStructure& l, const proto::PixelStructure& r)
 {
     return l.value() == r.value();
 }
 
-bool operator==(const PixelElementSize& l, const PixelElementSize& r)
+bool operator==(
+    const proto::PixelElementSize& l, const proto::PixelElementSize& r)
 {
     return l.value() == r.value();
 }
 
-} // End namespace frame::proto.
+} // End namespace frame::json.

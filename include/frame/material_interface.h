@@ -36,6 +36,12 @@ class MaterialInterface : public NameInterface
     virtual EntityId GetProgramId(
         const LevelInterface* level = nullptr) const = 0;
     /**
+     * @brief Get the inner name that correspond to a texture id.
+     * @param id: The id to check for corresponding string.
+     * @return The string.
+     */
+    virtual std::string GetInnerName(EntityId id) const = 0;
+    /**
      * @brief Store local program id.
      * @param id: the stored program id.
      */

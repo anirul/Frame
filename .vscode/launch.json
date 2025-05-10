@@ -5,9 +5,18 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(Windows) Attach",
-            "type": "cppvsdbg",
-            "request": "attach",
+            "name": "Debug: FrameEditor",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/bin/FrameEditor",
+            "args":[],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",
+            "preLaunchTask": "make (debug)"
         }
     ],
     "env": {

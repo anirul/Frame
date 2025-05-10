@@ -21,13 +21,12 @@ class NodeLight : public NodeInterface
      * @param func: This function return the ID from a string (it will need
      *        a level passed in the capture list).
      * @param color: Color of the light in vec3 format.
-	 * @remark No shadow as this is the ambient light.
+     * @remark No shadow as this is the ambient light.
      */
     NodeLight(
         std::function<NodeInterface*(const std::string&)> func,
         const glm::vec3 color)
-        : NodeInterface(func),
-		  light_type_(LightTypeEnum::AMBIENT_LIGHT),
+        : NodeInterface(func), light_type_(LightTypeEnum::AMBIENT_LIGHT),
           color_(color)
     {
     }
@@ -50,19 +49,19 @@ class NodeLight : public NodeInterface
      * @param func: This function return the ID from a string (it will need
      *        a level passed in the capture list).
      * @param light_type: Light type of the light.
-	 * @param shadow_type: Type of shadow used.
-	 * @param shadow_texture: Name of the texture to render for the shadows.
+     * @param shadow_type: Type of shadow used.
+     * @param shadow_texture: Name of the texture to render for the shadows.
      * @param position_or_direction: Position (if point light) or direction
      *        (if directional light).
      * @param color: Color of the light in vec3 format.
      */
     NodeLight(
-		std::function<NodeInterface*(const std::string&)> func,
-		const frame::LightTypeEnum light_type,
-		const frame::ShadowTypeEnum shadow_type,
+        std::function<NodeInterface*(const std::string&)> func,
+        const frame::LightTypeEnum light_type,
+        const frame::ShadowTypeEnum shadow_type,
         const std::string& shadow_texture,
-		const glm::vec3 position_or_direction,
-		const glm::vec3 color);
+        const glm::vec3 position_or_direction,
+        const glm::vec3 color);
     /**
      * @brief Create a spot light.
      * @param func: This function return the ID from a string (it will need
@@ -84,7 +83,7 @@ class NodeLight : public NodeInterface
      * @brief Create a spot light.
      * @param func: This function return the ID from a string (it will need
      * a level passed in the capture list).
- 	 * @param shadow_type: Type of shadow used.
+     * @param shadow_type: Type of shadow used.
      * @param shadow_texture: Name of the texture to render for the shadows.
      * @param position: Position of the spot light.
      * @param direction: Direction of the spot light.
@@ -94,8 +93,8 @@ class NodeLight : public NodeInterface
      */
     NodeLight(
         std::function<NodeInterface*(const std::string&)> func,
-		ShadowTypeEnum shadow_type,
-		const std::string& shadow_texture,
+        ShadowTypeEnum shadow_type,
+        const std::string& shadow_texture,
         const glm::vec3 position,
         const glm::vec3 direction,
         const glm::vec3 color,
@@ -114,6 +113,14 @@ class NodeLight : public NodeInterface
     glm::mat4 GetLocalModel(const double dt) const override;
 
   public:
+    /**
+     * @brief Return the node type of this node.
+     * @return The node type.
+     */
+    NodeTypeEnum GetNodeType() const override
+    {
+        return NodeTypeEnum::NODE_LIGHT;
+    }
     /**
      * @brief Get the light type.
      * @return The light type (see the NodeLightEnum).
@@ -165,7 +172,7 @@ class NodeLight : public NodeInterface
 
   private:
     LightTypeEnum light_type_ = LightTypeEnum::INVALID_LIGHT;
-	ShadowTypeEnum shadow_type_ = ShadowTypeEnum::NO_SHADOW;
+    ShadowTypeEnum shadow_type_ = ShadowTypeEnum::NO_SHADOW;
     std::string shadow_texture_ = "";
     glm::vec3 position_ = glm::vec3(0.0f);
     glm::vec3 direction_ = glm::vec3(0.0f);

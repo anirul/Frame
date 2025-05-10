@@ -29,6 +29,7 @@
 #include "google/protobuf/repeated_field.h"  // IWYU pragma: export
 #include "google/protobuf/extension_set.h"  // IWYU pragma: export
 #include "google/protobuf/unknown_field_set.h"
+#include "size.pb.h"
 // @@protoc_insertion_point(includes)
 
 // Must be included last.
@@ -65,30 +66,15 @@ extern UniformMatrix4DefaultTypeInternal _UniformMatrix4_default_instance_;
 class UniformMatrix4s;
 struct UniformMatrix4sDefaultTypeInternal;
 extern UniformMatrix4sDefaultTypeInternal _UniformMatrix4s_default_instance_;
-class UniformQuaternion;
-struct UniformQuaternionDefaultTypeInternal;
-extern UniformQuaternionDefaultTypeInternal _UniformQuaternion_default_instance_;
-class UniformQuaternions;
-struct UniformQuaternionsDefaultTypeInternal;
-extern UniformQuaternionsDefaultTypeInternal _UniformQuaternions_default_instance_;
 class UniformVector2;
 struct UniformVector2DefaultTypeInternal;
 extern UniformVector2DefaultTypeInternal _UniformVector2_default_instance_;
-class UniformVector2s;
-struct UniformVector2sDefaultTypeInternal;
-extern UniformVector2sDefaultTypeInternal _UniformVector2s_default_instance_;
 class UniformVector3;
 struct UniformVector3DefaultTypeInternal;
 extern UniformVector3DefaultTypeInternal _UniformVector3_default_instance_;
-class UniformVector3s;
-struct UniformVector3sDefaultTypeInternal;
-extern UniformVector3sDefaultTypeInternal _UniformVector3s_default_instance_;
 class UniformVector4;
 struct UniformVector4DefaultTypeInternal;
 extern UniformVector4DefaultTypeInternal _UniformVector4_default_instance_;
-class UniformVector4s;
-struct UniformVector4sDefaultTypeInternal;
-extern UniformVector4sDefaultTypeInternal _UniformVector4s_default_instance_;
 }  // namespace proto
 }  // namespace frame
 namespace google {
@@ -746,232 +732,6 @@ class UniformVector2 final : public ::google::protobuf::Message
 };
 // -------------------------------------------------------------------
 
-class UniformQuaternion final : public ::google::protobuf::Message
-/* @@protoc_insertion_point(class_definition:frame.proto.UniformQuaternion) */ {
- public:
-  inline UniformQuaternion() : UniformQuaternion(nullptr) {}
-  ~UniformQuaternion() PROTOBUF_FINAL;
-
-#if defined(PROTOBUF_CUSTOM_VTABLE)
-  void operator delete(UniformQuaternion* msg, std::destroying_delete_t) {
-    SharedDtor(*msg);
-    ::google::protobuf::internal::SizedDelete(msg, sizeof(UniformQuaternion));
-  }
-#endif
-
-  template <typename = void>
-  explicit PROTOBUF_CONSTEXPR UniformQuaternion(
-      ::google::protobuf::internal::ConstantInitialized);
-
-  inline UniformQuaternion(const UniformQuaternion& from) : UniformQuaternion(nullptr, from) {}
-  inline UniformQuaternion(UniformQuaternion&& from) noexcept
-      : UniformQuaternion(nullptr, std::move(from)) {}
-  inline UniformQuaternion& operator=(const UniformQuaternion& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  inline UniformQuaternion& operator=(UniformQuaternion&& from) noexcept {
-    if (this == &from) return *this;
-    if (::google::protobuf::internal::CanMoveWithInternalSwap(GetArena(), from.GetArena())) {
-      InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const
-      ABSL_ATTRIBUTE_LIFETIME_BOUND {
-    return _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance);
-  }
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields()
-      ABSL_ATTRIBUTE_LIFETIME_BOUND {
-    return _internal_metadata_.mutable_unknown_fields<::google::protobuf::UnknownFieldSet>();
-  }
-
-  static const ::google::protobuf::Descriptor* descriptor() {
-    return GetDescriptor();
-  }
-  static const ::google::protobuf::Descriptor* GetDescriptor() {
-    return default_instance().GetMetadata().descriptor;
-  }
-  static const ::google::protobuf::Reflection* GetReflection() {
-    return default_instance().GetMetadata().reflection;
-  }
-  static const UniformQuaternion& default_instance() {
-    return *internal_default_instance();
-  }
-  static inline const UniformQuaternion* internal_default_instance() {
-    return reinterpret_cast<const UniformQuaternion*>(
-        &_UniformQuaternion_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages = 3;
-  friend void swap(UniformQuaternion& a, UniformQuaternion& b) { a.Swap(&b); }
-  inline void Swap(UniformQuaternion* other) {
-    if (other == this) return;
-    if (::google::protobuf::internal::CanUseInternalSwap(GetArena(), other->GetArena())) {
-      InternalSwap(other);
-    } else {
-      ::google::protobuf::internal::GenericSwap(this, other);
-    }
-  }
-  void UnsafeArenaSwap(UniformQuaternion* other) {
-    if (other == this) return;
-    ABSL_DCHECK(GetArena() == other->GetArena());
-    InternalSwap(other);
-  }
-
-  // implements Message ----------------------------------------------
-
-  UniformQuaternion* New(::google::protobuf::Arena* arena = nullptr) const {
-    return ::google::protobuf::Message::DefaultConstruct<UniformQuaternion>(arena);
-  }
-  using ::google::protobuf::Message::CopyFrom;
-  void CopyFrom(const UniformQuaternion& from);
-  using ::google::protobuf::Message::MergeFrom;
-  void MergeFrom(const UniformQuaternion& from) { UniformQuaternion::MergeImpl(*this, from); }
-
-  private:
-  static void MergeImpl(
-      ::google::protobuf::MessageLite& to_msg,
-      const ::google::protobuf::MessageLite& from_msg);
-
-  public:
-  bool IsInitialized() const {
-    return true;
-  }
-  ABSL_ATTRIBUTE_REINITIALIZES void Clear() PROTOBUF_FINAL;
-  #if defined(PROTOBUF_CUSTOM_VTABLE)
-  private:
-  static ::size_t ByteSizeLong(const ::google::protobuf::MessageLite& msg);
-  static ::uint8_t* _InternalSerialize(
-      const MessageLite& msg, ::uint8_t* target,
-      ::google::protobuf::io::EpsCopyOutputStream* stream);
-
-  public:
-  ::size_t ByteSizeLong() const { return ByteSizeLong(*this); }
-  ::uint8_t* _InternalSerialize(
-      ::uint8_t* target,
-      ::google::protobuf::io::EpsCopyOutputStream* stream) const {
-    return _InternalSerialize(*this, target, stream);
-  }
-  #else   // PROTOBUF_CUSTOM_VTABLE
-  ::size_t ByteSizeLong() const final;
-  ::uint8_t* _InternalSerialize(
-      ::uint8_t* target,
-      ::google::protobuf::io::EpsCopyOutputStream* stream) const final;
-  #endif  // PROTOBUF_CUSTOM_VTABLE
-  int GetCachedSize() const { return _impl_._cached_size_.Get(); }
-
-  private:
-  void SharedCtor(::google::protobuf::Arena* arena);
-  static void SharedDtor(MessageLite& self);
-  void InternalSwap(UniformQuaternion* other);
- private:
-  template <typename T>
-  friend ::absl::string_view(
-      ::google::protobuf::internal::GetAnyMessageName)();
-  static ::absl::string_view FullMessageName() { return "frame.proto.UniformQuaternion"; }
-
- protected:
-  explicit UniformQuaternion(::google::protobuf::Arena* arena);
-  UniformQuaternion(::google::protobuf::Arena* arena, const UniformQuaternion& from);
-  UniformQuaternion(::google::protobuf::Arena* arena, UniformQuaternion&& from) noexcept
-      : UniformQuaternion(arena) {
-    *this = ::std::move(from);
-  }
-  const ::google::protobuf::internal::ClassData* GetClassData() const PROTOBUF_FINAL;
-  static void* PlacementNew_(const void*, void* mem,
-                             ::google::protobuf::Arena* arena);
-  static constexpr auto InternalNewImpl_();
-  static const ::google::protobuf::internal::ClassDataFull _class_data_;
-
- public:
-  ::google::protobuf::Metadata GetMetadata() const;
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-  enum : int {
-    kWFieldNumber = 1,
-    kXFieldNumber = 2,
-    kYFieldNumber = 3,
-    kZFieldNumber = 4,
-  };
-  // float w = 1;
-  void clear_w() ;
-  float w() const;
-  void set_w(float value);
-
-  private:
-  float _internal_w() const;
-  void _internal_set_w(float value);
-
-  public:
-  // float x = 2;
-  void clear_x() ;
-  float x() const;
-  void set_x(float value);
-
-  private:
-  float _internal_x() const;
-  void _internal_set_x(float value);
-
-  public:
-  // float y = 3;
-  void clear_y() ;
-  float y() const;
-  void set_y(float value);
-
-  private:
-  float _internal_y() const;
-  void _internal_set_y(float value);
-
-  public:
-  // float z = 4;
-  void clear_z() ;
-  float z() const;
-  void set_z(float value);
-
-  private:
-  float _internal_z() const;
-  void _internal_set_z(float value);
-
-  public:
-  // @@protoc_insertion_point(class_scope:frame.proto.UniformQuaternion)
- private:
-  class _Internal;
-  friend class ::google::protobuf::internal::TcParser;
-  static const ::google::protobuf::internal::TcParseTable<
-      2, 4, 0,
-      0, 2>
-      _table_;
-
-  friend class ::google::protobuf::MessageLite;
-  friend class ::google::protobuf::Arena;
-  template <typename T>
-  friend class ::google::protobuf::Arena::InternalHelper;
-  using InternalArenaConstructable_ = void;
-  using DestructorSkippable_ = void;
-  struct Impl_ {
-    inline explicit constexpr Impl_(
-        ::google::protobuf::internal::ConstantInitialized) noexcept;
-    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
-                          ::google::protobuf::Arena* arena);
-    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
-                          ::google::protobuf::Arena* arena, const Impl_& from,
-                          const UniformQuaternion& from_msg);
-    float w_;
-    float x_;
-    float y_;
-    float z_;
-    ::google::protobuf::internal::CachedSize _cached_size_;
-    PROTOBUF_TSAN_DECLARE_MEMBER
-  };
-  union { Impl_ _impl_; };
-  friend struct ::TableStruct_math_2eproto;
-};
-// -------------------------------------------------------------------
-
 class UniformMatrix4 final : public ::google::protobuf::Message
 /* @@protoc_insertion_point(class_definition:frame.proto.UniformMatrix4) */ {
  public:
@@ -1031,7 +791,7 @@ class UniformMatrix4 final : public ::google::protobuf::Message
     return reinterpret_cast<const UniformMatrix4*>(
         &_UniformMatrix4_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 4;
+  static constexpr int kIndexInFileMessages = 3;
   friend void swap(UniformMatrix4& a, UniformMatrix4& b) { a.Swap(&b); }
   inline void Swap(UniformMatrix4* other) {
     if (other == this) return;
@@ -1342,1191 +1102,6 @@ class UniformMatrix4 final : public ::google::protobuf::Message
 };
 // -------------------------------------------------------------------
 
-class UniformInts final : public ::google::protobuf::Message
-/* @@protoc_insertion_point(class_definition:frame.proto.UniformInts) */ {
- public:
-  inline UniformInts() : UniformInts(nullptr) {}
-  ~UniformInts() PROTOBUF_FINAL;
-
-#if defined(PROTOBUF_CUSTOM_VTABLE)
-  void operator delete(UniformInts* msg, std::destroying_delete_t) {
-    SharedDtor(*msg);
-    ::google::protobuf::internal::SizedDelete(msg, sizeof(UniformInts));
-  }
-#endif
-
-  template <typename = void>
-  explicit PROTOBUF_CONSTEXPR UniformInts(
-      ::google::protobuf::internal::ConstantInitialized);
-
-  inline UniformInts(const UniformInts& from) : UniformInts(nullptr, from) {}
-  inline UniformInts(UniformInts&& from) noexcept
-      : UniformInts(nullptr, std::move(from)) {}
-  inline UniformInts& operator=(const UniformInts& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  inline UniformInts& operator=(UniformInts&& from) noexcept {
-    if (this == &from) return *this;
-    if (::google::protobuf::internal::CanMoveWithInternalSwap(GetArena(), from.GetArena())) {
-      InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const
-      ABSL_ATTRIBUTE_LIFETIME_BOUND {
-    return _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance);
-  }
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields()
-      ABSL_ATTRIBUTE_LIFETIME_BOUND {
-    return _internal_metadata_.mutable_unknown_fields<::google::protobuf::UnknownFieldSet>();
-  }
-
-  static const ::google::protobuf::Descriptor* descriptor() {
-    return GetDescriptor();
-  }
-  static const ::google::protobuf::Descriptor* GetDescriptor() {
-    return default_instance().GetMetadata().descriptor;
-  }
-  static const ::google::protobuf::Reflection* GetReflection() {
-    return default_instance().GetMetadata().reflection;
-  }
-  static const UniformInts& default_instance() {
-    return *internal_default_instance();
-  }
-  static inline const UniformInts* internal_default_instance() {
-    return reinterpret_cast<const UniformInts*>(
-        &_UniformInts_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages = 5;
-  friend void swap(UniformInts& a, UniformInts& b) { a.Swap(&b); }
-  inline void Swap(UniformInts* other) {
-    if (other == this) return;
-    if (::google::protobuf::internal::CanUseInternalSwap(GetArena(), other->GetArena())) {
-      InternalSwap(other);
-    } else {
-      ::google::protobuf::internal::GenericSwap(this, other);
-    }
-  }
-  void UnsafeArenaSwap(UniformInts* other) {
-    if (other == this) return;
-    ABSL_DCHECK(GetArena() == other->GetArena());
-    InternalSwap(other);
-  }
-
-  // implements Message ----------------------------------------------
-
-  UniformInts* New(::google::protobuf::Arena* arena = nullptr) const {
-    return ::google::protobuf::Message::DefaultConstruct<UniformInts>(arena);
-  }
-  using ::google::protobuf::Message::CopyFrom;
-  void CopyFrom(const UniformInts& from);
-  using ::google::protobuf::Message::MergeFrom;
-  void MergeFrom(const UniformInts& from) { UniformInts::MergeImpl(*this, from); }
-
-  private:
-  static void MergeImpl(
-      ::google::protobuf::MessageLite& to_msg,
-      const ::google::protobuf::MessageLite& from_msg);
-
-  public:
-  bool IsInitialized() const {
-    return true;
-  }
-  ABSL_ATTRIBUTE_REINITIALIZES void Clear() PROTOBUF_FINAL;
-  #if defined(PROTOBUF_CUSTOM_VTABLE)
-  private:
-  static ::size_t ByteSizeLong(const ::google::protobuf::MessageLite& msg);
-  static ::uint8_t* _InternalSerialize(
-      const MessageLite& msg, ::uint8_t* target,
-      ::google::protobuf::io::EpsCopyOutputStream* stream);
-
-  public:
-  ::size_t ByteSizeLong() const { return ByteSizeLong(*this); }
-  ::uint8_t* _InternalSerialize(
-      ::uint8_t* target,
-      ::google::protobuf::io::EpsCopyOutputStream* stream) const {
-    return _InternalSerialize(*this, target, stream);
-  }
-  #else   // PROTOBUF_CUSTOM_VTABLE
-  ::size_t ByteSizeLong() const final;
-  ::uint8_t* _InternalSerialize(
-      ::uint8_t* target,
-      ::google::protobuf::io::EpsCopyOutputStream* stream) const final;
-  #endif  // PROTOBUF_CUSTOM_VTABLE
-  int GetCachedSize() const { return _impl_._cached_size_.Get(); }
-
-  private:
-  void SharedCtor(::google::protobuf::Arena* arena);
-  static void SharedDtor(MessageLite& self);
-  void InternalSwap(UniformInts* other);
- private:
-  template <typename T>
-  friend ::absl::string_view(
-      ::google::protobuf::internal::GetAnyMessageName)();
-  static ::absl::string_view FullMessageName() { return "frame.proto.UniformInts"; }
-
- protected:
-  explicit UniformInts(::google::protobuf::Arena* arena);
-  UniformInts(::google::protobuf::Arena* arena, const UniformInts& from);
-  UniformInts(::google::protobuf::Arena* arena, UniformInts&& from) noexcept
-      : UniformInts(arena) {
-    *this = ::std::move(from);
-  }
-  const ::google::protobuf::internal::ClassData* GetClassData() const PROTOBUF_FINAL;
-  static void* PlacementNew_(const void*, void* mem,
-                             ::google::protobuf::Arena* arena);
-  static constexpr auto InternalNewImpl_();
-  static const ::google::protobuf::internal::ClassDataFull _class_data_;
-
- public:
-  ::google::protobuf::Metadata GetMetadata() const;
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-  enum : int {
-    kValuesFieldNumber = 1,
-  };
-  // repeated int32 values = 1;
-  int values_size() const;
-  private:
-  int _internal_values_size() const;
-
-  public:
-  void clear_values() ;
-  ::int32_t values(int index) const;
-  void set_values(int index, ::int32_t value);
-  void add_values(::int32_t value);
-  const ::google::protobuf::RepeatedField<::int32_t>& values() const;
-  ::google::protobuf::RepeatedField<::int32_t>* mutable_values();
-
-  private:
-  const ::google::protobuf::RepeatedField<::int32_t>& _internal_values() const;
-  ::google::protobuf::RepeatedField<::int32_t>* _internal_mutable_values();
-
-  public:
-  // @@protoc_insertion_point(class_scope:frame.proto.UniformInts)
- private:
-  class _Internal;
-  friend class ::google::protobuf::internal::TcParser;
-  static const ::google::protobuf::internal::TcParseTable<
-      0, 1, 0,
-      0, 2>
-      _table_;
-
-  friend class ::google::protobuf::MessageLite;
-  friend class ::google::protobuf::Arena;
-  template <typename T>
-  friend class ::google::protobuf::Arena::InternalHelper;
-  using InternalArenaConstructable_ = void;
-  using DestructorSkippable_ = void;
-  struct Impl_ {
-    inline explicit constexpr Impl_(
-        ::google::protobuf::internal::ConstantInitialized) noexcept;
-    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
-                          ::google::protobuf::Arena* arena);
-    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
-                          ::google::protobuf::Arena* arena, const Impl_& from,
-                          const UniformInts& from_msg);
-    ::google::protobuf::RepeatedField<::int32_t> values_;
-    ::google::protobuf::internal::CachedSize _values_cached_byte_size_;
-    ::google::protobuf::internal::CachedSize _cached_size_;
-    PROTOBUF_TSAN_DECLARE_MEMBER
-  };
-  union { Impl_ _impl_; };
-  friend struct ::TableStruct_math_2eproto;
-};
-// -------------------------------------------------------------------
-
-class UniformFloats final : public ::google::protobuf::Message
-/* @@protoc_insertion_point(class_definition:frame.proto.UniformFloats) */ {
- public:
-  inline UniformFloats() : UniformFloats(nullptr) {}
-  ~UniformFloats() PROTOBUF_FINAL;
-
-#if defined(PROTOBUF_CUSTOM_VTABLE)
-  void operator delete(UniformFloats* msg, std::destroying_delete_t) {
-    SharedDtor(*msg);
-    ::google::protobuf::internal::SizedDelete(msg, sizeof(UniformFloats));
-  }
-#endif
-
-  template <typename = void>
-  explicit PROTOBUF_CONSTEXPR UniformFloats(
-      ::google::protobuf::internal::ConstantInitialized);
-
-  inline UniformFloats(const UniformFloats& from) : UniformFloats(nullptr, from) {}
-  inline UniformFloats(UniformFloats&& from) noexcept
-      : UniformFloats(nullptr, std::move(from)) {}
-  inline UniformFloats& operator=(const UniformFloats& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  inline UniformFloats& operator=(UniformFloats&& from) noexcept {
-    if (this == &from) return *this;
-    if (::google::protobuf::internal::CanMoveWithInternalSwap(GetArena(), from.GetArena())) {
-      InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const
-      ABSL_ATTRIBUTE_LIFETIME_BOUND {
-    return _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance);
-  }
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields()
-      ABSL_ATTRIBUTE_LIFETIME_BOUND {
-    return _internal_metadata_.mutable_unknown_fields<::google::protobuf::UnknownFieldSet>();
-  }
-
-  static const ::google::protobuf::Descriptor* descriptor() {
-    return GetDescriptor();
-  }
-  static const ::google::protobuf::Descriptor* GetDescriptor() {
-    return default_instance().GetMetadata().descriptor;
-  }
-  static const ::google::protobuf::Reflection* GetReflection() {
-    return default_instance().GetMetadata().reflection;
-  }
-  static const UniformFloats& default_instance() {
-    return *internal_default_instance();
-  }
-  static inline const UniformFloats* internal_default_instance() {
-    return reinterpret_cast<const UniformFloats*>(
-        &_UniformFloats_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages = 6;
-  friend void swap(UniformFloats& a, UniformFloats& b) { a.Swap(&b); }
-  inline void Swap(UniformFloats* other) {
-    if (other == this) return;
-    if (::google::protobuf::internal::CanUseInternalSwap(GetArena(), other->GetArena())) {
-      InternalSwap(other);
-    } else {
-      ::google::protobuf::internal::GenericSwap(this, other);
-    }
-  }
-  void UnsafeArenaSwap(UniformFloats* other) {
-    if (other == this) return;
-    ABSL_DCHECK(GetArena() == other->GetArena());
-    InternalSwap(other);
-  }
-
-  // implements Message ----------------------------------------------
-
-  UniformFloats* New(::google::protobuf::Arena* arena = nullptr) const {
-    return ::google::protobuf::Message::DefaultConstruct<UniformFloats>(arena);
-  }
-  using ::google::protobuf::Message::CopyFrom;
-  void CopyFrom(const UniformFloats& from);
-  using ::google::protobuf::Message::MergeFrom;
-  void MergeFrom(const UniformFloats& from) { UniformFloats::MergeImpl(*this, from); }
-
-  private:
-  static void MergeImpl(
-      ::google::protobuf::MessageLite& to_msg,
-      const ::google::protobuf::MessageLite& from_msg);
-
-  public:
-  bool IsInitialized() const {
-    return true;
-  }
-  ABSL_ATTRIBUTE_REINITIALIZES void Clear() PROTOBUF_FINAL;
-  #if defined(PROTOBUF_CUSTOM_VTABLE)
-  private:
-  static ::size_t ByteSizeLong(const ::google::protobuf::MessageLite& msg);
-  static ::uint8_t* _InternalSerialize(
-      const MessageLite& msg, ::uint8_t* target,
-      ::google::protobuf::io::EpsCopyOutputStream* stream);
-
-  public:
-  ::size_t ByteSizeLong() const { return ByteSizeLong(*this); }
-  ::uint8_t* _InternalSerialize(
-      ::uint8_t* target,
-      ::google::protobuf::io::EpsCopyOutputStream* stream) const {
-    return _InternalSerialize(*this, target, stream);
-  }
-  #else   // PROTOBUF_CUSTOM_VTABLE
-  ::size_t ByteSizeLong() const final;
-  ::uint8_t* _InternalSerialize(
-      ::uint8_t* target,
-      ::google::protobuf::io::EpsCopyOutputStream* stream) const final;
-  #endif  // PROTOBUF_CUSTOM_VTABLE
-  int GetCachedSize() const { return _impl_._cached_size_.Get(); }
-
-  private:
-  void SharedCtor(::google::protobuf::Arena* arena);
-  static void SharedDtor(MessageLite& self);
-  void InternalSwap(UniformFloats* other);
- private:
-  template <typename T>
-  friend ::absl::string_view(
-      ::google::protobuf::internal::GetAnyMessageName)();
-  static ::absl::string_view FullMessageName() { return "frame.proto.UniformFloats"; }
-
- protected:
-  explicit UniformFloats(::google::protobuf::Arena* arena);
-  UniformFloats(::google::protobuf::Arena* arena, const UniformFloats& from);
-  UniformFloats(::google::protobuf::Arena* arena, UniformFloats&& from) noexcept
-      : UniformFloats(arena) {
-    *this = ::std::move(from);
-  }
-  const ::google::protobuf::internal::ClassData* GetClassData() const PROTOBUF_FINAL;
-  static void* PlacementNew_(const void*, void* mem,
-                             ::google::protobuf::Arena* arena);
-  static constexpr auto InternalNewImpl_();
-  static const ::google::protobuf::internal::ClassDataFull _class_data_;
-
- public:
-  ::google::protobuf::Metadata GetMetadata() const;
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-  enum : int {
-    kValuesFieldNumber = 1,
-  };
-  // repeated float values = 1;
-  int values_size() const;
-  private:
-  int _internal_values_size() const;
-
-  public:
-  void clear_values() ;
-  float values(int index) const;
-  void set_values(int index, float value);
-  void add_values(float value);
-  const ::google::protobuf::RepeatedField<float>& values() const;
-  ::google::protobuf::RepeatedField<float>* mutable_values();
-
-  private:
-  const ::google::protobuf::RepeatedField<float>& _internal_values() const;
-  ::google::protobuf::RepeatedField<float>* _internal_mutable_values();
-
-  public:
-  // @@protoc_insertion_point(class_scope:frame.proto.UniformFloats)
- private:
-  class _Internal;
-  friend class ::google::protobuf::internal::TcParser;
-  static const ::google::protobuf::internal::TcParseTable<
-      0, 1, 0,
-      0, 2>
-      _table_;
-
-  friend class ::google::protobuf::MessageLite;
-  friend class ::google::protobuf::Arena;
-  template <typename T>
-  friend class ::google::protobuf::Arena::InternalHelper;
-  using InternalArenaConstructable_ = void;
-  using DestructorSkippable_ = void;
-  struct Impl_ {
-    inline explicit constexpr Impl_(
-        ::google::protobuf::internal::ConstantInitialized) noexcept;
-    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
-                          ::google::protobuf::Arena* arena);
-    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
-                          ::google::protobuf::Arena* arena, const Impl_& from,
-                          const UniformFloats& from_msg);
-    ::google::protobuf::RepeatedField<float> values_;
-    ::google::protobuf::internal::CachedSize _cached_size_;
-    PROTOBUF_TSAN_DECLARE_MEMBER
-  };
-  union { Impl_ _impl_; };
-  friend struct ::TableStruct_math_2eproto;
-};
-// -------------------------------------------------------------------
-
-class UniformVector4s final : public ::google::protobuf::Message
-/* @@protoc_insertion_point(class_definition:frame.proto.UniformVector4s) */ {
- public:
-  inline UniformVector4s() : UniformVector4s(nullptr) {}
-  ~UniformVector4s() PROTOBUF_FINAL;
-
-#if defined(PROTOBUF_CUSTOM_VTABLE)
-  void operator delete(UniformVector4s* msg, std::destroying_delete_t) {
-    SharedDtor(*msg);
-    ::google::protobuf::internal::SizedDelete(msg, sizeof(UniformVector4s));
-  }
-#endif
-
-  template <typename = void>
-  explicit PROTOBUF_CONSTEXPR UniformVector4s(
-      ::google::protobuf::internal::ConstantInitialized);
-
-  inline UniformVector4s(const UniformVector4s& from) : UniformVector4s(nullptr, from) {}
-  inline UniformVector4s(UniformVector4s&& from) noexcept
-      : UniformVector4s(nullptr, std::move(from)) {}
-  inline UniformVector4s& operator=(const UniformVector4s& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  inline UniformVector4s& operator=(UniformVector4s&& from) noexcept {
-    if (this == &from) return *this;
-    if (::google::protobuf::internal::CanMoveWithInternalSwap(GetArena(), from.GetArena())) {
-      InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const
-      ABSL_ATTRIBUTE_LIFETIME_BOUND {
-    return _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance);
-  }
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields()
-      ABSL_ATTRIBUTE_LIFETIME_BOUND {
-    return _internal_metadata_.mutable_unknown_fields<::google::protobuf::UnknownFieldSet>();
-  }
-
-  static const ::google::protobuf::Descriptor* descriptor() {
-    return GetDescriptor();
-  }
-  static const ::google::protobuf::Descriptor* GetDescriptor() {
-    return default_instance().GetMetadata().descriptor;
-  }
-  static const ::google::protobuf::Reflection* GetReflection() {
-    return default_instance().GetMetadata().reflection;
-  }
-  static const UniformVector4s& default_instance() {
-    return *internal_default_instance();
-  }
-  static inline const UniformVector4s* internal_default_instance() {
-    return reinterpret_cast<const UniformVector4s*>(
-        &_UniformVector4s_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages = 9;
-  friend void swap(UniformVector4s& a, UniformVector4s& b) { a.Swap(&b); }
-  inline void Swap(UniformVector4s* other) {
-    if (other == this) return;
-    if (::google::protobuf::internal::CanUseInternalSwap(GetArena(), other->GetArena())) {
-      InternalSwap(other);
-    } else {
-      ::google::protobuf::internal::GenericSwap(this, other);
-    }
-  }
-  void UnsafeArenaSwap(UniformVector4s* other) {
-    if (other == this) return;
-    ABSL_DCHECK(GetArena() == other->GetArena());
-    InternalSwap(other);
-  }
-
-  // implements Message ----------------------------------------------
-
-  UniformVector4s* New(::google::protobuf::Arena* arena = nullptr) const {
-    return ::google::protobuf::Message::DefaultConstruct<UniformVector4s>(arena);
-  }
-  using ::google::protobuf::Message::CopyFrom;
-  void CopyFrom(const UniformVector4s& from);
-  using ::google::protobuf::Message::MergeFrom;
-  void MergeFrom(const UniformVector4s& from) { UniformVector4s::MergeImpl(*this, from); }
-
-  private:
-  static void MergeImpl(
-      ::google::protobuf::MessageLite& to_msg,
-      const ::google::protobuf::MessageLite& from_msg);
-
-  public:
-  bool IsInitialized() const {
-    return true;
-  }
-  ABSL_ATTRIBUTE_REINITIALIZES void Clear() PROTOBUF_FINAL;
-  #if defined(PROTOBUF_CUSTOM_VTABLE)
-  private:
-  static ::size_t ByteSizeLong(const ::google::protobuf::MessageLite& msg);
-  static ::uint8_t* _InternalSerialize(
-      const MessageLite& msg, ::uint8_t* target,
-      ::google::protobuf::io::EpsCopyOutputStream* stream);
-
-  public:
-  ::size_t ByteSizeLong() const { return ByteSizeLong(*this); }
-  ::uint8_t* _InternalSerialize(
-      ::uint8_t* target,
-      ::google::protobuf::io::EpsCopyOutputStream* stream) const {
-    return _InternalSerialize(*this, target, stream);
-  }
-  #else   // PROTOBUF_CUSTOM_VTABLE
-  ::size_t ByteSizeLong() const final;
-  ::uint8_t* _InternalSerialize(
-      ::uint8_t* target,
-      ::google::protobuf::io::EpsCopyOutputStream* stream) const final;
-  #endif  // PROTOBUF_CUSTOM_VTABLE
-  int GetCachedSize() const { return _impl_._cached_size_.Get(); }
-
-  private:
-  void SharedCtor(::google::protobuf::Arena* arena);
-  static void SharedDtor(MessageLite& self);
-  void InternalSwap(UniformVector4s* other);
- private:
-  template <typename T>
-  friend ::absl::string_view(
-      ::google::protobuf::internal::GetAnyMessageName)();
-  static ::absl::string_view FullMessageName() { return "frame.proto.UniformVector4s"; }
-
- protected:
-  explicit UniformVector4s(::google::protobuf::Arena* arena);
-  UniformVector4s(::google::protobuf::Arena* arena, const UniformVector4s& from);
-  UniformVector4s(::google::protobuf::Arena* arena, UniformVector4s&& from) noexcept
-      : UniformVector4s(arena) {
-    *this = ::std::move(from);
-  }
-  const ::google::protobuf::internal::ClassData* GetClassData() const PROTOBUF_FINAL;
-  static void* PlacementNew_(const void*, void* mem,
-                             ::google::protobuf::Arena* arena);
-  static constexpr auto InternalNewImpl_();
-  static const ::google::protobuf::internal::ClassDataFull _class_data_;
-
- public:
-  ::google::protobuf::Metadata GetMetadata() const;
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-  enum : int {
-    kValuesFieldNumber = 1,
-  };
-  // repeated .frame.proto.UniformVector4 values = 1;
-  int values_size() const;
-  private:
-  int _internal_values_size() const;
-
-  public:
-  void clear_values() ;
-  ::frame::proto::UniformVector4* mutable_values(int index);
-  ::google::protobuf::RepeatedPtrField<::frame::proto::UniformVector4>* mutable_values();
-
-  private:
-  const ::google::protobuf::RepeatedPtrField<::frame::proto::UniformVector4>& _internal_values() const;
-  ::google::protobuf::RepeatedPtrField<::frame::proto::UniformVector4>* _internal_mutable_values();
-  public:
-  const ::frame::proto::UniformVector4& values(int index) const;
-  ::frame::proto::UniformVector4* add_values();
-  const ::google::protobuf::RepeatedPtrField<::frame::proto::UniformVector4>& values() const;
-  // @@protoc_insertion_point(class_scope:frame.proto.UniformVector4s)
- private:
-  class _Internal;
-  friend class ::google::protobuf::internal::TcParser;
-  static const ::google::protobuf::internal::TcParseTable<
-      0, 1, 1,
-      0, 2>
-      _table_;
-
-  friend class ::google::protobuf::MessageLite;
-  friend class ::google::protobuf::Arena;
-  template <typename T>
-  friend class ::google::protobuf::Arena::InternalHelper;
-  using InternalArenaConstructable_ = void;
-  using DestructorSkippable_ = void;
-  struct Impl_ {
-    inline explicit constexpr Impl_(
-        ::google::protobuf::internal::ConstantInitialized) noexcept;
-    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
-                          ::google::protobuf::Arena* arena);
-    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
-                          ::google::protobuf::Arena* arena, const Impl_& from,
-                          const UniformVector4s& from_msg);
-    ::google::protobuf::RepeatedPtrField< ::frame::proto::UniformVector4 > values_;
-    ::google::protobuf::internal::CachedSize _cached_size_;
-    PROTOBUF_TSAN_DECLARE_MEMBER
-  };
-  union { Impl_ _impl_; };
-  friend struct ::TableStruct_math_2eproto;
-};
-// -------------------------------------------------------------------
-
-class UniformVector3s final : public ::google::protobuf::Message
-/* @@protoc_insertion_point(class_definition:frame.proto.UniformVector3s) */ {
- public:
-  inline UniformVector3s() : UniformVector3s(nullptr) {}
-  ~UniformVector3s() PROTOBUF_FINAL;
-
-#if defined(PROTOBUF_CUSTOM_VTABLE)
-  void operator delete(UniformVector3s* msg, std::destroying_delete_t) {
-    SharedDtor(*msg);
-    ::google::protobuf::internal::SizedDelete(msg, sizeof(UniformVector3s));
-  }
-#endif
-
-  template <typename = void>
-  explicit PROTOBUF_CONSTEXPR UniformVector3s(
-      ::google::protobuf::internal::ConstantInitialized);
-
-  inline UniformVector3s(const UniformVector3s& from) : UniformVector3s(nullptr, from) {}
-  inline UniformVector3s(UniformVector3s&& from) noexcept
-      : UniformVector3s(nullptr, std::move(from)) {}
-  inline UniformVector3s& operator=(const UniformVector3s& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  inline UniformVector3s& operator=(UniformVector3s&& from) noexcept {
-    if (this == &from) return *this;
-    if (::google::protobuf::internal::CanMoveWithInternalSwap(GetArena(), from.GetArena())) {
-      InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const
-      ABSL_ATTRIBUTE_LIFETIME_BOUND {
-    return _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance);
-  }
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields()
-      ABSL_ATTRIBUTE_LIFETIME_BOUND {
-    return _internal_metadata_.mutable_unknown_fields<::google::protobuf::UnknownFieldSet>();
-  }
-
-  static const ::google::protobuf::Descriptor* descriptor() {
-    return GetDescriptor();
-  }
-  static const ::google::protobuf::Descriptor* GetDescriptor() {
-    return default_instance().GetMetadata().descriptor;
-  }
-  static const ::google::protobuf::Reflection* GetReflection() {
-    return default_instance().GetMetadata().reflection;
-  }
-  static const UniformVector3s& default_instance() {
-    return *internal_default_instance();
-  }
-  static inline const UniformVector3s* internal_default_instance() {
-    return reinterpret_cast<const UniformVector3s*>(
-        &_UniformVector3s_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages = 8;
-  friend void swap(UniformVector3s& a, UniformVector3s& b) { a.Swap(&b); }
-  inline void Swap(UniformVector3s* other) {
-    if (other == this) return;
-    if (::google::protobuf::internal::CanUseInternalSwap(GetArena(), other->GetArena())) {
-      InternalSwap(other);
-    } else {
-      ::google::protobuf::internal::GenericSwap(this, other);
-    }
-  }
-  void UnsafeArenaSwap(UniformVector3s* other) {
-    if (other == this) return;
-    ABSL_DCHECK(GetArena() == other->GetArena());
-    InternalSwap(other);
-  }
-
-  // implements Message ----------------------------------------------
-
-  UniformVector3s* New(::google::protobuf::Arena* arena = nullptr) const {
-    return ::google::protobuf::Message::DefaultConstruct<UniformVector3s>(arena);
-  }
-  using ::google::protobuf::Message::CopyFrom;
-  void CopyFrom(const UniformVector3s& from);
-  using ::google::protobuf::Message::MergeFrom;
-  void MergeFrom(const UniformVector3s& from) { UniformVector3s::MergeImpl(*this, from); }
-
-  private:
-  static void MergeImpl(
-      ::google::protobuf::MessageLite& to_msg,
-      const ::google::protobuf::MessageLite& from_msg);
-
-  public:
-  bool IsInitialized() const {
-    return true;
-  }
-  ABSL_ATTRIBUTE_REINITIALIZES void Clear() PROTOBUF_FINAL;
-  #if defined(PROTOBUF_CUSTOM_VTABLE)
-  private:
-  static ::size_t ByteSizeLong(const ::google::protobuf::MessageLite& msg);
-  static ::uint8_t* _InternalSerialize(
-      const MessageLite& msg, ::uint8_t* target,
-      ::google::protobuf::io::EpsCopyOutputStream* stream);
-
-  public:
-  ::size_t ByteSizeLong() const { return ByteSizeLong(*this); }
-  ::uint8_t* _InternalSerialize(
-      ::uint8_t* target,
-      ::google::protobuf::io::EpsCopyOutputStream* stream) const {
-    return _InternalSerialize(*this, target, stream);
-  }
-  #else   // PROTOBUF_CUSTOM_VTABLE
-  ::size_t ByteSizeLong() const final;
-  ::uint8_t* _InternalSerialize(
-      ::uint8_t* target,
-      ::google::protobuf::io::EpsCopyOutputStream* stream) const final;
-  #endif  // PROTOBUF_CUSTOM_VTABLE
-  int GetCachedSize() const { return _impl_._cached_size_.Get(); }
-
-  private:
-  void SharedCtor(::google::protobuf::Arena* arena);
-  static void SharedDtor(MessageLite& self);
-  void InternalSwap(UniformVector3s* other);
- private:
-  template <typename T>
-  friend ::absl::string_view(
-      ::google::protobuf::internal::GetAnyMessageName)();
-  static ::absl::string_view FullMessageName() { return "frame.proto.UniformVector3s"; }
-
- protected:
-  explicit UniformVector3s(::google::protobuf::Arena* arena);
-  UniformVector3s(::google::protobuf::Arena* arena, const UniformVector3s& from);
-  UniformVector3s(::google::protobuf::Arena* arena, UniformVector3s&& from) noexcept
-      : UniformVector3s(arena) {
-    *this = ::std::move(from);
-  }
-  const ::google::protobuf::internal::ClassData* GetClassData() const PROTOBUF_FINAL;
-  static void* PlacementNew_(const void*, void* mem,
-                             ::google::protobuf::Arena* arena);
-  static constexpr auto InternalNewImpl_();
-  static const ::google::protobuf::internal::ClassDataFull _class_data_;
-
- public:
-  ::google::protobuf::Metadata GetMetadata() const;
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-  enum : int {
-    kValuesFieldNumber = 1,
-  };
-  // repeated .frame.proto.UniformVector3 values = 1;
-  int values_size() const;
-  private:
-  int _internal_values_size() const;
-
-  public:
-  void clear_values() ;
-  ::frame::proto::UniformVector3* mutable_values(int index);
-  ::google::protobuf::RepeatedPtrField<::frame::proto::UniformVector3>* mutable_values();
-
-  private:
-  const ::google::protobuf::RepeatedPtrField<::frame::proto::UniformVector3>& _internal_values() const;
-  ::google::protobuf::RepeatedPtrField<::frame::proto::UniformVector3>* _internal_mutable_values();
-  public:
-  const ::frame::proto::UniformVector3& values(int index) const;
-  ::frame::proto::UniformVector3* add_values();
-  const ::google::protobuf::RepeatedPtrField<::frame::proto::UniformVector3>& values() const;
-  // @@protoc_insertion_point(class_scope:frame.proto.UniformVector3s)
- private:
-  class _Internal;
-  friend class ::google::protobuf::internal::TcParser;
-  static const ::google::protobuf::internal::TcParseTable<
-      0, 1, 1,
-      0, 2>
-      _table_;
-
-  friend class ::google::protobuf::MessageLite;
-  friend class ::google::protobuf::Arena;
-  template <typename T>
-  friend class ::google::protobuf::Arena::InternalHelper;
-  using InternalArenaConstructable_ = void;
-  using DestructorSkippable_ = void;
-  struct Impl_ {
-    inline explicit constexpr Impl_(
-        ::google::protobuf::internal::ConstantInitialized) noexcept;
-    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
-                          ::google::protobuf::Arena* arena);
-    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
-                          ::google::protobuf::Arena* arena, const Impl_& from,
-                          const UniformVector3s& from_msg);
-    ::google::protobuf::RepeatedPtrField< ::frame::proto::UniformVector3 > values_;
-    ::google::protobuf::internal::CachedSize _cached_size_;
-    PROTOBUF_TSAN_DECLARE_MEMBER
-  };
-  union { Impl_ _impl_; };
-  friend struct ::TableStruct_math_2eproto;
-};
-// -------------------------------------------------------------------
-
-class UniformVector2s final : public ::google::protobuf::Message
-/* @@protoc_insertion_point(class_definition:frame.proto.UniformVector2s) */ {
- public:
-  inline UniformVector2s() : UniformVector2s(nullptr) {}
-  ~UniformVector2s() PROTOBUF_FINAL;
-
-#if defined(PROTOBUF_CUSTOM_VTABLE)
-  void operator delete(UniformVector2s* msg, std::destroying_delete_t) {
-    SharedDtor(*msg);
-    ::google::protobuf::internal::SizedDelete(msg, sizeof(UniformVector2s));
-  }
-#endif
-
-  template <typename = void>
-  explicit PROTOBUF_CONSTEXPR UniformVector2s(
-      ::google::protobuf::internal::ConstantInitialized);
-
-  inline UniformVector2s(const UniformVector2s& from) : UniformVector2s(nullptr, from) {}
-  inline UniformVector2s(UniformVector2s&& from) noexcept
-      : UniformVector2s(nullptr, std::move(from)) {}
-  inline UniformVector2s& operator=(const UniformVector2s& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  inline UniformVector2s& operator=(UniformVector2s&& from) noexcept {
-    if (this == &from) return *this;
-    if (::google::protobuf::internal::CanMoveWithInternalSwap(GetArena(), from.GetArena())) {
-      InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const
-      ABSL_ATTRIBUTE_LIFETIME_BOUND {
-    return _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance);
-  }
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields()
-      ABSL_ATTRIBUTE_LIFETIME_BOUND {
-    return _internal_metadata_.mutable_unknown_fields<::google::protobuf::UnknownFieldSet>();
-  }
-
-  static const ::google::protobuf::Descriptor* descriptor() {
-    return GetDescriptor();
-  }
-  static const ::google::protobuf::Descriptor* GetDescriptor() {
-    return default_instance().GetMetadata().descriptor;
-  }
-  static const ::google::protobuf::Reflection* GetReflection() {
-    return default_instance().GetMetadata().reflection;
-  }
-  static const UniformVector2s& default_instance() {
-    return *internal_default_instance();
-  }
-  static inline const UniformVector2s* internal_default_instance() {
-    return reinterpret_cast<const UniformVector2s*>(
-        &_UniformVector2s_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages = 7;
-  friend void swap(UniformVector2s& a, UniformVector2s& b) { a.Swap(&b); }
-  inline void Swap(UniformVector2s* other) {
-    if (other == this) return;
-    if (::google::protobuf::internal::CanUseInternalSwap(GetArena(), other->GetArena())) {
-      InternalSwap(other);
-    } else {
-      ::google::protobuf::internal::GenericSwap(this, other);
-    }
-  }
-  void UnsafeArenaSwap(UniformVector2s* other) {
-    if (other == this) return;
-    ABSL_DCHECK(GetArena() == other->GetArena());
-    InternalSwap(other);
-  }
-
-  // implements Message ----------------------------------------------
-
-  UniformVector2s* New(::google::protobuf::Arena* arena = nullptr) const {
-    return ::google::protobuf::Message::DefaultConstruct<UniformVector2s>(arena);
-  }
-  using ::google::protobuf::Message::CopyFrom;
-  void CopyFrom(const UniformVector2s& from);
-  using ::google::protobuf::Message::MergeFrom;
-  void MergeFrom(const UniformVector2s& from) { UniformVector2s::MergeImpl(*this, from); }
-
-  private:
-  static void MergeImpl(
-      ::google::protobuf::MessageLite& to_msg,
-      const ::google::protobuf::MessageLite& from_msg);
-
-  public:
-  bool IsInitialized() const {
-    return true;
-  }
-  ABSL_ATTRIBUTE_REINITIALIZES void Clear() PROTOBUF_FINAL;
-  #if defined(PROTOBUF_CUSTOM_VTABLE)
-  private:
-  static ::size_t ByteSizeLong(const ::google::protobuf::MessageLite& msg);
-  static ::uint8_t* _InternalSerialize(
-      const MessageLite& msg, ::uint8_t* target,
-      ::google::protobuf::io::EpsCopyOutputStream* stream);
-
-  public:
-  ::size_t ByteSizeLong() const { return ByteSizeLong(*this); }
-  ::uint8_t* _InternalSerialize(
-      ::uint8_t* target,
-      ::google::protobuf::io::EpsCopyOutputStream* stream) const {
-    return _InternalSerialize(*this, target, stream);
-  }
-  #else   // PROTOBUF_CUSTOM_VTABLE
-  ::size_t ByteSizeLong() const final;
-  ::uint8_t* _InternalSerialize(
-      ::uint8_t* target,
-      ::google::protobuf::io::EpsCopyOutputStream* stream) const final;
-  #endif  // PROTOBUF_CUSTOM_VTABLE
-  int GetCachedSize() const { return _impl_._cached_size_.Get(); }
-
-  private:
-  void SharedCtor(::google::protobuf::Arena* arena);
-  static void SharedDtor(MessageLite& self);
-  void InternalSwap(UniformVector2s* other);
- private:
-  template <typename T>
-  friend ::absl::string_view(
-      ::google::protobuf::internal::GetAnyMessageName)();
-  static ::absl::string_view FullMessageName() { return "frame.proto.UniformVector2s"; }
-
- protected:
-  explicit UniformVector2s(::google::protobuf::Arena* arena);
-  UniformVector2s(::google::protobuf::Arena* arena, const UniformVector2s& from);
-  UniformVector2s(::google::protobuf::Arena* arena, UniformVector2s&& from) noexcept
-      : UniformVector2s(arena) {
-    *this = ::std::move(from);
-  }
-  const ::google::protobuf::internal::ClassData* GetClassData() const PROTOBUF_FINAL;
-  static void* PlacementNew_(const void*, void* mem,
-                             ::google::protobuf::Arena* arena);
-  static constexpr auto InternalNewImpl_();
-  static const ::google::protobuf::internal::ClassDataFull _class_data_;
-
- public:
-  ::google::protobuf::Metadata GetMetadata() const;
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-  enum : int {
-    kValuesFieldNumber = 1,
-  };
-  // repeated .frame.proto.UniformVector2 values = 1;
-  int values_size() const;
-  private:
-  int _internal_values_size() const;
-
-  public:
-  void clear_values() ;
-  ::frame::proto::UniformVector2* mutable_values(int index);
-  ::google::protobuf::RepeatedPtrField<::frame::proto::UniformVector2>* mutable_values();
-
-  private:
-  const ::google::protobuf::RepeatedPtrField<::frame::proto::UniformVector2>& _internal_values() const;
-  ::google::protobuf::RepeatedPtrField<::frame::proto::UniformVector2>* _internal_mutable_values();
-  public:
-  const ::frame::proto::UniformVector2& values(int index) const;
-  ::frame::proto::UniformVector2* add_values();
-  const ::google::protobuf::RepeatedPtrField<::frame::proto::UniformVector2>& values() const;
-  // @@protoc_insertion_point(class_scope:frame.proto.UniformVector2s)
- private:
-  class _Internal;
-  friend class ::google::protobuf::internal::TcParser;
-  static const ::google::protobuf::internal::TcParseTable<
-      0, 1, 1,
-      0, 2>
-      _table_;
-
-  friend class ::google::protobuf::MessageLite;
-  friend class ::google::protobuf::Arena;
-  template <typename T>
-  friend class ::google::protobuf::Arena::InternalHelper;
-  using InternalArenaConstructable_ = void;
-  using DestructorSkippable_ = void;
-  struct Impl_ {
-    inline explicit constexpr Impl_(
-        ::google::protobuf::internal::ConstantInitialized) noexcept;
-    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
-                          ::google::protobuf::Arena* arena);
-    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
-                          ::google::protobuf::Arena* arena, const Impl_& from,
-                          const UniformVector2s& from_msg);
-    ::google::protobuf::RepeatedPtrField< ::frame::proto::UniformVector2 > values_;
-    ::google::protobuf::internal::CachedSize _cached_size_;
-    PROTOBUF_TSAN_DECLARE_MEMBER
-  };
-  union { Impl_ _impl_; };
-  friend struct ::TableStruct_math_2eproto;
-};
-// -------------------------------------------------------------------
-
-class UniformQuaternions final : public ::google::protobuf::Message
-/* @@protoc_insertion_point(class_definition:frame.proto.UniformQuaternions) */ {
- public:
-  inline UniformQuaternions() : UniformQuaternions(nullptr) {}
-  ~UniformQuaternions() PROTOBUF_FINAL;
-
-#if defined(PROTOBUF_CUSTOM_VTABLE)
-  void operator delete(UniformQuaternions* msg, std::destroying_delete_t) {
-    SharedDtor(*msg);
-    ::google::protobuf::internal::SizedDelete(msg, sizeof(UniformQuaternions));
-  }
-#endif
-
-  template <typename = void>
-  explicit PROTOBUF_CONSTEXPR UniformQuaternions(
-      ::google::protobuf::internal::ConstantInitialized);
-
-  inline UniformQuaternions(const UniformQuaternions& from) : UniformQuaternions(nullptr, from) {}
-  inline UniformQuaternions(UniformQuaternions&& from) noexcept
-      : UniformQuaternions(nullptr, std::move(from)) {}
-  inline UniformQuaternions& operator=(const UniformQuaternions& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  inline UniformQuaternions& operator=(UniformQuaternions&& from) noexcept {
-    if (this == &from) return *this;
-    if (::google::protobuf::internal::CanMoveWithInternalSwap(GetArena(), from.GetArena())) {
-      InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const
-      ABSL_ATTRIBUTE_LIFETIME_BOUND {
-    return _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance);
-  }
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields()
-      ABSL_ATTRIBUTE_LIFETIME_BOUND {
-    return _internal_metadata_.mutable_unknown_fields<::google::protobuf::UnknownFieldSet>();
-  }
-
-  static const ::google::protobuf::Descriptor* descriptor() {
-    return GetDescriptor();
-  }
-  static const ::google::protobuf::Descriptor* GetDescriptor() {
-    return default_instance().GetMetadata().descriptor;
-  }
-  static const ::google::protobuf::Reflection* GetReflection() {
-    return default_instance().GetMetadata().reflection;
-  }
-  static const UniformQuaternions& default_instance() {
-    return *internal_default_instance();
-  }
-  static inline const UniformQuaternions* internal_default_instance() {
-    return reinterpret_cast<const UniformQuaternions*>(
-        &_UniformQuaternions_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages = 10;
-  friend void swap(UniformQuaternions& a, UniformQuaternions& b) { a.Swap(&b); }
-  inline void Swap(UniformQuaternions* other) {
-    if (other == this) return;
-    if (::google::protobuf::internal::CanUseInternalSwap(GetArena(), other->GetArena())) {
-      InternalSwap(other);
-    } else {
-      ::google::protobuf::internal::GenericSwap(this, other);
-    }
-  }
-  void UnsafeArenaSwap(UniformQuaternions* other) {
-    if (other == this) return;
-    ABSL_DCHECK(GetArena() == other->GetArena());
-    InternalSwap(other);
-  }
-
-  // implements Message ----------------------------------------------
-
-  UniformQuaternions* New(::google::protobuf::Arena* arena = nullptr) const {
-    return ::google::protobuf::Message::DefaultConstruct<UniformQuaternions>(arena);
-  }
-  using ::google::protobuf::Message::CopyFrom;
-  void CopyFrom(const UniformQuaternions& from);
-  using ::google::protobuf::Message::MergeFrom;
-  void MergeFrom(const UniformQuaternions& from) { UniformQuaternions::MergeImpl(*this, from); }
-
-  private:
-  static void MergeImpl(
-      ::google::protobuf::MessageLite& to_msg,
-      const ::google::protobuf::MessageLite& from_msg);
-
-  public:
-  bool IsInitialized() const {
-    return true;
-  }
-  ABSL_ATTRIBUTE_REINITIALIZES void Clear() PROTOBUF_FINAL;
-  #if defined(PROTOBUF_CUSTOM_VTABLE)
-  private:
-  static ::size_t ByteSizeLong(const ::google::protobuf::MessageLite& msg);
-  static ::uint8_t* _InternalSerialize(
-      const MessageLite& msg, ::uint8_t* target,
-      ::google::protobuf::io::EpsCopyOutputStream* stream);
-
-  public:
-  ::size_t ByteSizeLong() const { return ByteSizeLong(*this); }
-  ::uint8_t* _InternalSerialize(
-      ::uint8_t* target,
-      ::google::protobuf::io::EpsCopyOutputStream* stream) const {
-    return _InternalSerialize(*this, target, stream);
-  }
-  #else   // PROTOBUF_CUSTOM_VTABLE
-  ::size_t ByteSizeLong() const final;
-  ::uint8_t* _InternalSerialize(
-      ::uint8_t* target,
-      ::google::protobuf::io::EpsCopyOutputStream* stream) const final;
-  #endif  // PROTOBUF_CUSTOM_VTABLE
-  int GetCachedSize() const { return _impl_._cached_size_.Get(); }
-
-  private:
-  void SharedCtor(::google::protobuf::Arena* arena);
-  static void SharedDtor(MessageLite& self);
-  void InternalSwap(UniformQuaternions* other);
- private:
-  template <typename T>
-  friend ::absl::string_view(
-      ::google::protobuf::internal::GetAnyMessageName)();
-  static ::absl::string_view FullMessageName() { return "frame.proto.UniformQuaternions"; }
-
- protected:
-  explicit UniformQuaternions(::google::protobuf::Arena* arena);
-  UniformQuaternions(::google::protobuf::Arena* arena, const UniformQuaternions& from);
-  UniformQuaternions(::google::protobuf::Arena* arena, UniformQuaternions&& from) noexcept
-      : UniformQuaternions(arena) {
-    *this = ::std::move(from);
-  }
-  const ::google::protobuf::internal::ClassData* GetClassData() const PROTOBUF_FINAL;
-  static void* PlacementNew_(const void*, void* mem,
-                             ::google::protobuf::Arena* arena);
-  static constexpr auto InternalNewImpl_();
-  static const ::google::protobuf::internal::ClassDataFull _class_data_;
-
- public:
-  ::google::protobuf::Metadata GetMetadata() const;
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-  enum : int {
-    kValuesFieldNumber = 1,
-  };
-  // repeated .frame.proto.UniformQuaternion values = 1;
-  int values_size() const;
-  private:
-  int _internal_values_size() const;
-
-  public:
-  void clear_values() ;
-  ::frame::proto::UniformQuaternion* mutable_values(int index);
-  ::google::protobuf::RepeatedPtrField<::frame::proto::UniformQuaternion>* mutable_values();
-
-  private:
-  const ::google::protobuf::RepeatedPtrField<::frame::proto::UniformQuaternion>& _internal_values() const;
-  ::google::protobuf::RepeatedPtrField<::frame::proto::UniformQuaternion>* _internal_mutable_values();
-  public:
-  const ::frame::proto::UniformQuaternion& values(int index) const;
-  ::frame::proto::UniformQuaternion* add_values();
-  const ::google::protobuf::RepeatedPtrField<::frame::proto::UniformQuaternion>& values() const;
-  // @@protoc_insertion_point(class_scope:frame.proto.UniformQuaternions)
- private:
-  class _Internal;
-  friend class ::google::protobuf::internal::TcParser;
-  static const ::google::protobuf::internal::TcParseTable<
-      0, 1, 1,
-      0, 2>
-      _table_;
-
-  friend class ::google::protobuf::MessageLite;
-  friend class ::google::protobuf::Arena;
-  template <typename T>
-  friend class ::google::protobuf::Arena::InternalHelper;
-  using InternalArenaConstructable_ = void;
-  using DestructorSkippable_ = void;
-  struct Impl_ {
-    inline explicit constexpr Impl_(
-        ::google::protobuf::internal::ConstantInitialized) noexcept;
-    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
-                          ::google::protobuf::Arena* arena);
-    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
-                          ::google::protobuf::Arena* arena, const Impl_& from,
-                          const UniformQuaternions& from_msg);
-    ::google::protobuf::RepeatedPtrField< ::frame::proto::UniformQuaternion > values_;
-    ::google::protobuf::internal::CachedSize _cached_size_;
-    PROTOBUF_TSAN_DECLARE_MEMBER
-  };
-  union { Impl_ _impl_; };
-  friend struct ::TableStruct_math_2eproto;
-};
-// -------------------------------------------------------------------
-
 class UniformMatrix4s final : public ::google::protobuf::Message
 /* @@protoc_insertion_point(class_definition:frame.proto.UniformMatrix4s) */ {
  public:
@@ -2586,7 +1161,7 @@ class UniformMatrix4s final : public ::google::protobuf::Message
     return reinterpret_cast<const UniformMatrix4s*>(
         &_UniformMatrix4s_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 11;
+  static constexpr int kIndexInFileMessages = 6;
   friend void swap(UniformMatrix4s& a, UniformMatrix4s& b) { a.Swap(&b); }
   inline void Swap(UniformMatrix4s* other) {
     if (other == this) return;
@@ -2717,6 +1292,439 @@ class UniformMatrix4s final : public ::google::protobuf::Message
                           const UniformMatrix4s& from_msg);
     ::google::protobuf::RepeatedPtrField< ::frame::proto::UniformMatrix4 > values_;
     ::google::protobuf::internal::CachedSize _cached_size_;
+    PROTOBUF_TSAN_DECLARE_MEMBER
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_math_2eproto;
+};
+// -------------------------------------------------------------------
+
+class UniformInts final : public ::google::protobuf::Message
+/* @@protoc_insertion_point(class_definition:frame.proto.UniformInts) */ {
+ public:
+  inline UniformInts() : UniformInts(nullptr) {}
+  ~UniformInts() PROTOBUF_FINAL;
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+  void operator delete(UniformInts* msg, std::destroying_delete_t) {
+    SharedDtor(*msg);
+    ::google::protobuf::internal::SizedDelete(msg, sizeof(UniformInts));
+  }
+#endif
+
+  template <typename = void>
+  explicit PROTOBUF_CONSTEXPR UniformInts(
+      ::google::protobuf::internal::ConstantInitialized);
+
+  inline UniformInts(const UniformInts& from) : UniformInts(nullptr, from) {}
+  inline UniformInts(UniformInts&& from) noexcept
+      : UniformInts(nullptr, std::move(from)) {}
+  inline UniformInts& operator=(const UniformInts& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline UniformInts& operator=(UniformInts&& from) noexcept {
+    if (this == &from) return *this;
+    if (::google::protobuf::internal::CanMoveWithInternalSwap(GetArena(), from.GetArena())) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance);
+  }
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields()
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.mutable_unknown_fields<::google::protobuf::UnknownFieldSet>();
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::google::protobuf::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::google::protobuf::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const UniformInts& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const UniformInts* internal_default_instance() {
+    return reinterpret_cast<const UniformInts*>(
+        &_UniformInts_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages = 4;
+  friend void swap(UniformInts& a, UniformInts& b) { a.Swap(&b); }
+  inline void Swap(UniformInts* other) {
+    if (other == this) return;
+    if (::google::protobuf::internal::CanUseInternalSwap(GetArena(), other->GetArena())) {
+      InternalSwap(other);
+    } else {
+      ::google::protobuf::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(UniformInts* other) {
+    if (other == this) return;
+    ABSL_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  UniformInts* New(::google::protobuf::Arena* arena = nullptr) const {
+    return ::google::protobuf::Message::DefaultConstruct<UniformInts>(arena);
+  }
+  using ::google::protobuf::Message::CopyFrom;
+  void CopyFrom(const UniformInts& from);
+  using ::google::protobuf::Message::MergeFrom;
+  void MergeFrom(const UniformInts& from) { UniformInts::MergeImpl(*this, from); }
+
+  private:
+  static void MergeImpl(
+      ::google::protobuf::MessageLite& to_msg,
+      const ::google::protobuf::MessageLite& from_msg);
+
+  public:
+  bool IsInitialized() const {
+    return true;
+  }
+  ABSL_ATTRIBUTE_REINITIALIZES void Clear() PROTOBUF_FINAL;
+  #if defined(PROTOBUF_CUSTOM_VTABLE)
+  private:
+  static ::size_t ByteSizeLong(const ::google::protobuf::MessageLite& msg);
+  static ::uint8_t* _InternalSerialize(
+      const MessageLite& msg, ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream);
+
+  public:
+  ::size_t ByteSizeLong() const { return ByteSizeLong(*this); }
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+    return _InternalSerialize(*this, target, stream);
+  }
+  #else   // PROTOBUF_CUSTOM_VTABLE
+  ::size_t ByteSizeLong() const final;
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const final;
+  #endif  // PROTOBUF_CUSTOM_VTABLE
+  int GetCachedSize() const { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::google::protobuf::Arena* arena);
+  static void SharedDtor(MessageLite& self);
+  void InternalSwap(UniformInts* other);
+ private:
+  template <typename T>
+  friend ::absl::string_view(
+      ::google::protobuf::internal::GetAnyMessageName)();
+  static ::absl::string_view FullMessageName() { return "frame.proto.UniformInts"; }
+
+ protected:
+  explicit UniformInts(::google::protobuf::Arena* arena);
+  UniformInts(::google::protobuf::Arena* arena, const UniformInts& from);
+  UniformInts(::google::protobuf::Arena* arena, UniformInts&& from) noexcept
+      : UniformInts(arena) {
+    *this = ::std::move(from);
+  }
+  const ::google::protobuf::internal::ClassData* GetClassData() const PROTOBUF_FINAL;
+  static void* PlacementNew_(const void*, void* mem,
+                             ::google::protobuf::Arena* arena);
+  static constexpr auto InternalNewImpl_();
+  static const ::google::protobuf::internal::ClassDataFull _class_data_;
+
+ public:
+  ::google::protobuf::Metadata GetMetadata() const;
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+  enum : int {
+    kValuesFieldNumber = 1,
+    kSizeFieldNumber = 2,
+  };
+  // repeated int32 values = 1;
+  int values_size() const;
+  private:
+  int _internal_values_size() const;
+
+  public:
+  void clear_values() ;
+  ::int32_t values(int index) const;
+  void set_values(int index, ::int32_t value);
+  void add_values(::int32_t value);
+  const ::google::protobuf::RepeatedField<::int32_t>& values() const;
+  ::google::protobuf::RepeatedField<::int32_t>* mutable_values();
+
+  private:
+  const ::google::protobuf::RepeatedField<::int32_t>& _internal_values() const;
+  ::google::protobuf::RepeatedField<::int32_t>* _internal_mutable_values();
+
+  public:
+  // .frame.proto.Size size = 2;
+  bool has_size() const;
+  void clear_size() ;
+  const ::frame::proto::Size& size() const;
+  PROTOBUF_NODISCARD ::frame::proto::Size* release_size();
+  ::frame::proto::Size* mutable_size();
+  void set_allocated_size(::frame::proto::Size* value);
+  void unsafe_arena_set_allocated_size(::frame::proto::Size* value);
+  ::frame::proto::Size* unsafe_arena_release_size();
+
+  private:
+  const ::frame::proto::Size& _internal_size() const;
+  ::frame::proto::Size* _internal_mutable_size();
+
+  public:
+  // @@protoc_insertion_point(class_scope:frame.proto.UniformInts)
+ private:
+  class _Internal;
+  friend class ::google::protobuf::internal::TcParser;
+  static const ::google::protobuf::internal::TcParseTable<
+      1, 2, 1,
+      0, 2>
+      _table_;
+
+  friend class ::google::protobuf::MessageLite;
+  friend class ::google::protobuf::Arena;
+  template <typename T>
+  friend class ::google::protobuf::Arena::InternalHelper;
+  using InternalArenaConstructable_ = void;
+  using DestructorSkippable_ = void;
+  struct Impl_ {
+    inline explicit constexpr Impl_(
+        ::google::protobuf::internal::ConstantInitialized) noexcept;
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena);
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena, const Impl_& from,
+                          const UniformInts& from_msg);
+    ::google::protobuf::internal::HasBits<1> _has_bits_;
+    ::google::protobuf::internal::CachedSize _cached_size_;
+    ::google::protobuf::RepeatedField<::int32_t> values_;
+    ::google::protobuf::internal::CachedSize _values_cached_byte_size_;
+    ::frame::proto::Size* size_;
+    PROTOBUF_TSAN_DECLARE_MEMBER
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_math_2eproto;
+};
+// -------------------------------------------------------------------
+
+class UniformFloats final : public ::google::protobuf::Message
+/* @@protoc_insertion_point(class_definition:frame.proto.UniformFloats) */ {
+ public:
+  inline UniformFloats() : UniformFloats(nullptr) {}
+  ~UniformFloats() PROTOBUF_FINAL;
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+  void operator delete(UniformFloats* msg, std::destroying_delete_t) {
+    SharedDtor(*msg);
+    ::google::protobuf::internal::SizedDelete(msg, sizeof(UniformFloats));
+  }
+#endif
+
+  template <typename = void>
+  explicit PROTOBUF_CONSTEXPR UniformFloats(
+      ::google::protobuf::internal::ConstantInitialized);
+
+  inline UniformFloats(const UniformFloats& from) : UniformFloats(nullptr, from) {}
+  inline UniformFloats(UniformFloats&& from) noexcept
+      : UniformFloats(nullptr, std::move(from)) {}
+  inline UniformFloats& operator=(const UniformFloats& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline UniformFloats& operator=(UniformFloats&& from) noexcept {
+    if (this == &from) return *this;
+    if (::google::protobuf::internal::CanMoveWithInternalSwap(GetArena(), from.GetArena())) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance);
+  }
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields()
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.mutable_unknown_fields<::google::protobuf::UnknownFieldSet>();
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::google::protobuf::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::google::protobuf::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const UniformFloats& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const UniformFloats* internal_default_instance() {
+    return reinterpret_cast<const UniformFloats*>(
+        &_UniformFloats_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages = 5;
+  friend void swap(UniformFloats& a, UniformFloats& b) { a.Swap(&b); }
+  inline void Swap(UniformFloats* other) {
+    if (other == this) return;
+    if (::google::protobuf::internal::CanUseInternalSwap(GetArena(), other->GetArena())) {
+      InternalSwap(other);
+    } else {
+      ::google::protobuf::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(UniformFloats* other) {
+    if (other == this) return;
+    ABSL_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  UniformFloats* New(::google::protobuf::Arena* arena = nullptr) const {
+    return ::google::protobuf::Message::DefaultConstruct<UniformFloats>(arena);
+  }
+  using ::google::protobuf::Message::CopyFrom;
+  void CopyFrom(const UniformFloats& from);
+  using ::google::protobuf::Message::MergeFrom;
+  void MergeFrom(const UniformFloats& from) { UniformFloats::MergeImpl(*this, from); }
+
+  private:
+  static void MergeImpl(
+      ::google::protobuf::MessageLite& to_msg,
+      const ::google::protobuf::MessageLite& from_msg);
+
+  public:
+  bool IsInitialized() const {
+    return true;
+  }
+  ABSL_ATTRIBUTE_REINITIALIZES void Clear() PROTOBUF_FINAL;
+  #if defined(PROTOBUF_CUSTOM_VTABLE)
+  private:
+  static ::size_t ByteSizeLong(const ::google::protobuf::MessageLite& msg);
+  static ::uint8_t* _InternalSerialize(
+      const MessageLite& msg, ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream);
+
+  public:
+  ::size_t ByteSizeLong() const { return ByteSizeLong(*this); }
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+    return _InternalSerialize(*this, target, stream);
+  }
+  #else   // PROTOBUF_CUSTOM_VTABLE
+  ::size_t ByteSizeLong() const final;
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const final;
+  #endif  // PROTOBUF_CUSTOM_VTABLE
+  int GetCachedSize() const { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::google::protobuf::Arena* arena);
+  static void SharedDtor(MessageLite& self);
+  void InternalSwap(UniformFloats* other);
+ private:
+  template <typename T>
+  friend ::absl::string_view(
+      ::google::protobuf::internal::GetAnyMessageName)();
+  static ::absl::string_view FullMessageName() { return "frame.proto.UniformFloats"; }
+
+ protected:
+  explicit UniformFloats(::google::protobuf::Arena* arena);
+  UniformFloats(::google::protobuf::Arena* arena, const UniformFloats& from);
+  UniformFloats(::google::protobuf::Arena* arena, UniformFloats&& from) noexcept
+      : UniformFloats(arena) {
+    *this = ::std::move(from);
+  }
+  const ::google::protobuf::internal::ClassData* GetClassData() const PROTOBUF_FINAL;
+  static void* PlacementNew_(const void*, void* mem,
+                             ::google::protobuf::Arena* arena);
+  static constexpr auto InternalNewImpl_();
+  static const ::google::protobuf::internal::ClassDataFull _class_data_;
+
+ public:
+  ::google::protobuf::Metadata GetMetadata() const;
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+  enum : int {
+    kValuesFieldNumber = 1,
+    kSizeFieldNumber = 2,
+  };
+  // repeated float values = 1;
+  int values_size() const;
+  private:
+  int _internal_values_size() const;
+
+  public:
+  void clear_values() ;
+  float values(int index) const;
+  void set_values(int index, float value);
+  void add_values(float value);
+  const ::google::protobuf::RepeatedField<float>& values() const;
+  ::google::protobuf::RepeatedField<float>* mutable_values();
+
+  private:
+  const ::google::protobuf::RepeatedField<float>& _internal_values() const;
+  ::google::protobuf::RepeatedField<float>* _internal_mutable_values();
+
+  public:
+  // .frame.proto.Size size = 2;
+  bool has_size() const;
+  void clear_size() ;
+  const ::frame::proto::Size& size() const;
+  PROTOBUF_NODISCARD ::frame::proto::Size* release_size();
+  ::frame::proto::Size* mutable_size();
+  void set_allocated_size(::frame::proto::Size* value);
+  void unsafe_arena_set_allocated_size(::frame::proto::Size* value);
+  ::frame::proto::Size* unsafe_arena_release_size();
+
+  private:
+  const ::frame::proto::Size& _internal_size() const;
+  ::frame::proto::Size* _internal_mutable_size();
+
+  public:
+  // @@protoc_insertion_point(class_scope:frame.proto.UniformFloats)
+ private:
+  class _Internal;
+  friend class ::google::protobuf::internal::TcParser;
+  static const ::google::protobuf::internal::TcParseTable<
+      1, 2, 1,
+      0, 2>
+      _table_;
+
+  friend class ::google::protobuf::MessageLite;
+  friend class ::google::protobuf::Arena;
+  template <typename T>
+  friend class ::google::protobuf::Arena::InternalHelper;
+  using InternalArenaConstructable_ = void;
+  using DestructorSkippable_ = void;
+  struct Impl_ {
+    inline explicit constexpr Impl_(
+        ::google::protobuf::internal::ConstantInitialized) noexcept;
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena);
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena, const Impl_& from,
+                          const UniformFloats& from_msg);
+    ::google::protobuf::internal::HasBits<1> _has_bits_;
+    ::google::protobuf::internal::CachedSize _cached_size_;
+    ::google::protobuf::RepeatedField<float> values_;
+    ::frame::proto::Size* size_;
     PROTOBUF_TSAN_DECLARE_MEMBER
   };
   union { Impl_ _impl_; };
@@ -2943,98 +1951,6 @@ inline float UniformVector4::_internal_w() const {
 inline void UniformVector4::_internal_set_w(float value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.w_ = value;
-}
-
-// -------------------------------------------------------------------
-
-// UniformQuaternion
-
-// float w = 1;
-inline void UniformQuaternion::clear_w() {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.w_ = 0;
-}
-inline float UniformQuaternion::w() const {
-  // @@protoc_insertion_point(field_get:frame.proto.UniformQuaternion.w)
-  return _internal_w();
-}
-inline void UniformQuaternion::set_w(float value) {
-  _internal_set_w(value);
-  // @@protoc_insertion_point(field_set:frame.proto.UniformQuaternion.w)
-}
-inline float UniformQuaternion::_internal_w() const {
-  ::google::protobuf::internal::TSanRead(&_impl_);
-  return _impl_.w_;
-}
-inline void UniformQuaternion::_internal_set_w(float value) {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.w_ = value;
-}
-
-// float x = 2;
-inline void UniformQuaternion::clear_x() {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.x_ = 0;
-}
-inline float UniformQuaternion::x() const {
-  // @@protoc_insertion_point(field_get:frame.proto.UniformQuaternion.x)
-  return _internal_x();
-}
-inline void UniformQuaternion::set_x(float value) {
-  _internal_set_x(value);
-  // @@protoc_insertion_point(field_set:frame.proto.UniformQuaternion.x)
-}
-inline float UniformQuaternion::_internal_x() const {
-  ::google::protobuf::internal::TSanRead(&_impl_);
-  return _impl_.x_;
-}
-inline void UniformQuaternion::_internal_set_x(float value) {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.x_ = value;
-}
-
-// float y = 3;
-inline void UniformQuaternion::clear_y() {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.y_ = 0;
-}
-inline float UniformQuaternion::y() const {
-  // @@protoc_insertion_point(field_get:frame.proto.UniformQuaternion.y)
-  return _internal_y();
-}
-inline void UniformQuaternion::set_y(float value) {
-  _internal_set_y(value);
-  // @@protoc_insertion_point(field_set:frame.proto.UniformQuaternion.y)
-}
-inline float UniformQuaternion::_internal_y() const {
-  ::google::protobuf::internal::TSanRead(&_impl_);
-  return _impl_.y_;
-}
-inline void UniformQuaternion::_internal_set_y(float value) {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.y_ = value;
-}
-
-// float z = 4;
-inline void UniformQuaternion::clear_z() {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.z_ = 0;
-}
-inline float UniformQuaternion::z() const {
-  // @@protoc_insertion_point(field_get:frame.proto.UniformQuaternion.z)
-  return _internal_z();
-}
-inline void UniformQuaternion::set_z(float value) {
-  _internal_set_z(value);
-  // @@protoc_insertion_point(field_set:frame.proto.UniformQuaternion.z)
-}
-inline float UniformQuaternion::_internal_z() const {
-  ::google::protobuf::internal::TSanRead(&_impl_);
-  return _impl_.z_;
-}
-inline void UniformQuaternion::_internal_set_z(float value) {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.z_ = value;
 }
 
 // -------------------------------------------------------------------
@@ -3442,6 +2358,97 @@ inline ::google::protobuf::RepeatedField<::int32_t>* UniformInts::_internal_muta
   return &_impl_.values_;
 }
 
+// .frame.proto.Size size = 2;
+inline bool UniformInts::has_size() const {
+  bool value = (_impl_._has_bits_[0] & 0x00000001u) != 0;
+  PROTOBUF_ASSUME(!value || _impl_.size_ != nullptr);
+  return value;
+}
+inline const ::frame::proto::Size& UniformInts::_internal_size() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  const ::frame::proto::Size* p = _impl_.size_;
+  return p != nullptr ? *p : reinterpret_cast<const ::frame::proto::Size&>(::frame::proto::_Size_default_instance_);
+}
+inline const ::frame::proto::Size& UniformInts::size() const ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:frame.proto.UniformInts.size)
+  return _internal_size();
+}
+inline void UniformInts::unsafe_arena_set_allocated_size(::frame::proto::Size* value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  if (GetArena() == nullptr) {
+    delete reinterpret_cast<::google::protobuf::MessageLite*>(_impl_.size_);
+  }
+  _impl_.size_ = reinterpret_cast<::frame::proto::Size*>(value);
+  if (value != nullptr) {
+    _impl_._has_bits_[0] |= 0x00000001u;
+  } else {
+    _impl_._has_bits_[0] &= ~0x00000001u;
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.UniformInts.size)
+}
+inline ::frame::proto::Size* UniformInts::release_size() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+
+  _impl_._has_bits_[0] &= ~0x00000001u;
+  ::frame::proto::Size* released = _impl_.size_;
+  _impl_.size_ = nullptr;
+  if (::google::protobuf::internal::DebugHardenForceCopyInRelease()) {
+    auto* old = reinterpret_cast<::google::protobuf::MessageLite*>(released);
+    released = ::google::protobuf::internal::DuplicateIfNonNull(released);
+    if (GetArena() == nullptr) {
+      delete old;
+    }
+  } else {
+    if (GetArena() != nullptr) {
+      released = ::google::protobuf::internal::DuplicateIfNonNull(released);
+    }
+  }
+  return released;
+}
+inline ::frame::proto::Size* UniformInts::unsafe_arena_release_size() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  // @@protoc_insertion_point(field_release:frame.proto.UniformInts.size)
+
+  _impl_._has_bits_[0] &= ~0x00000001u;
+  ::frame::proto::Size* temp = _impl_.size_;
+  _impl_.size_ = nullptr;
+  return temp;
+}
+inline ::frame::proto::Size* UniformInts::_internal_mutable_size() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  if (_impl_.size_ == nullptr) {
+    auto* p = ::google::protobuf::Message::DefaultConstruct<::frame::proto::Size>(GetArena());
+    _impl_.size_ = reinterpret_cast<::frame::proto::Size*>(p);
+  }
+  return _impl_.size_;
+}
+inline ::frame::proto::Size* UniformInts::mutable_size() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  _impl_._has_bits_[0] |= 0x00000001u;
+  ::frame::proto::Size* _msg = _internal_mutable_size();
+  // @@protoc_insertion_point(field_mutable:frame.proto.UniformInts.size)
+  return _msg;
+}
+inline void UniformInts::set_allocated_size(::frame::proto::Size* value) {
+  ::google::protobuf::Arena* message_arena = GetArena();
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  if (message_arena == nullptr) {
+    delete reinterpret_cast<::google::protobuf::MessageLite*>(_impl_.size_);
+  }
+
+  if (value != nullptr) {
+    ::google::protobuf::Arena* submessage_arena = reinterpret_cast<::google::protobuf::MessageLite*>(value)->GetArena();
+    if (message_arena != submessage_arena) {
+      value = ::google::protobuf::internal::GetOwnedMessage(message_arena, value, submessage_arena);
+    }
+    _impl_._has_bits_[0] |= 0x00000001u;
+  } else {
+    _impl_._has_bits_[0] &= ~0x00000001u;
+  }
+
+  _impl_.size_ = reinterpret_cast<::frame::proto::Size*>(value);
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.UniformInts.size)
+}
+
 // -------------------------------------------------------------------
 
 // UniformFloats
@@ -3491,216 +2498,95 @@ inline ::google::protobuf::RepeatedField<float>* UniformFloats::_internal_mutabl
   return &_impl_.values_;
 }
 
-// -------------------------------------------------------------------
-
-// UniformVector2s
-
-// repeated .frame.proto.UniformVector2 values = 1;
-inline int UniformVector2s::_internal_values_size() const {
-  return _internal_values().size();
+// .frame.proto.Size size = 2;
+inline bool UniformFloats::has_size() const {
+  bool value = (_impl_._has_bits_[0] & 0x00000001u) != 0;
+  PROTOBUF_ASSUME(!value || _impl_.size_ != nullptr);
+  return value;
 }
-inline int UniformVector2s::values_size() const {
-  return _internal_values_size();
-}
-inline void UniformVector2s::clear_values() {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.values_.Clear();
-}
-inline ::frame::proto::UniformVector2* UniformVector2s::mutable_values(int index)
-    ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_mutable:frame.proto.UniformVector2s.values)
-  return _internal_mutable_values()->Mutable(index);
-}
-inline ::google::protobuf::RepeatedPtrField<::frame::proto::UniformVector2>* UniformVector2s::mutable_values()
-    ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_mutable_list:frame.proto.UniformVector2s.values)
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  return _internal_mutable_values();
-}
-inline const ::frame::proto::UniformVector2& UniformVector2s::values(int index) const
-    ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:frame.proto.UniformVector2s.values)
-  return _internal_values().Get(index);
-}
-inline ::frame::proto::UniformVector2* UniformVector2s::add_values() ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  ::frame::proto::UniformVector2* _add = _internal_mutable_values()->Add();
-  // @@protoc_insertion_point(field_add:frame.proto.UniformVector2s.values)
-  return _add;
-}
-inline const ::google::protobuf::RepeatedPtrField<::frame::proto::UniformVector2>& UniformVector2s::values() const
-    ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_list:frame.proto.UniformVector2s.values)
-  return _internal_values();
-}
-inline const ::google::protobuf::RepeatedPtrField<::frame::proto::UniformVector2>&
-UniformVector2s::_internal_values() const {
+inline const ::frame::proto::Size& UniformFloats::_internal_size() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
-  return _impl_.values_;
+  const ::frame::proto::Size* p = _impl_.size_;
+  return p != nullptr ? *p : reinterpret_cast<const ::frame::proto::Size&>(::frame::proto::_Size_default_instance_);
 }
-inline ::google::protobuf::RepeatedPtrField<::frame::proto::UniformVector2>*
-UniformVector2s::_internal_mutable_values() {
-  ::google::protobuf::internal::TSanRead(&_impl_);
-  return &_impl_.values_;
+inline const ::frame::proto::Size& UniformFloats::size() const ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:frame.proto.UniformFloats.size)
+  return _internal_size();
 }
-
-// -------------------------------------------------------------------
-
-// UniformVector3s
-
-// repeated .frame.proto.UniformVector3 values = 1;
-inline int UniformVector3s::_internal_values_size() const {
-  return _internal_values().size();
-}
-inline int UniformVector3s::values_size() const {
-  return _internal_values_size();
-}
-inline void UniformVector3s::clear_values() {
+inline void UniformFloats::unsafe_arena_set_allocated_size(::frame::proto::Size* value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.values_.Clear();
+  if (GetArena() == nullptr) {
+    delete reinterpret_cast<::google::protobuf::MessageLite*>(_impl_.size_);
+  }
+  _impl_.size_ = reinterpret_cast<::frame::proto::Size*>(value);
+  if (value != nullptr) {
+    _impl_._has_bits_[0] |= 0x00000001u;
+  } else {
+    _impl_._has_bits_[0] &= ~0x00000001u;
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.UniformFloats.size)
 }
-inline ::frame::proto::UniformVector3* UniformVector3s::mutable_values(int index)
-    ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_mutable:frame.proto.UniformVector3s.values)
-  return _internal_mutable_values()->Mutable(index);
-}
-inline ::google::protobuf::RepeatedPtrField<::frame::proto::UniformVector3>* UniformVector3s::mutable_values()
-    ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_mutable_list:frame.proto.UniformVector3s.values)
+inline ::frame::proto::Size* UniformFloats::release_size() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  return _internal_mutable_values();
-}
-inline const ::frame::proto::UniformVector3& UniformVector3s::values(int index) const
-    ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:frame.proto.UniformVector3s.values)
-  return _internal_values().Get(index);
-}
-inline ::frame::proto::UniformVector3* UniformVector3s::add_values() ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  ::frame::proto::UniformVector3* _add = _internal_mutable_values()->Add();
-  // @@protoc_insertion_point(field_add:frame.proto.UniformVector3s.values)
-  return _add;
-}
-inline const ::google::protobuf::RepeatedPtrField<::frame::proto::UniformVector3>& UniformVector3s::values() const
-    ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_list:frame.proto.UniformVector3s.values)
-  return _internal_values();
-}
-inline const ::google::protobuf::RepeatedPtrField<::frame::proto::UniformVector3>&
-UniformVector3s::_internal_values() const {
-  ::google::protobuf::internal::TSanRead(&_impl_);
-  return _impl_.values_;
-}
-inline ::google::protobuf::RepeatedPtrField<::frame::proto::UniformVector3>*
-UniformVector3s::_internal_mutable_values() {
-  ::google::protobuf::internal::TSanRead(&_impl_);
-  return &_impl_.values_;
-}
 
-// -------------------------------------------------------------------
+  _impl_._has_bits_[0] &= ~0x00000001u;
+  ::frame::proto::Size* released = _impl_.size_;
+  _impl_.size_ = nullptr;
+  if (::google::protobuf::internal::DebugHardenForceCopyInRelease()) {
+    auto* old = reinterpret_cast<::google::protobuf::MessageLite*>(released);
+    released = ::google::protobuf::internal::DuplicateIfNonNull(released);
+    if (GetArena() == nullptr) {
+      delete old;
+    }
+  } else {
+    if (GetArena() != nullptr) {
+      released = ::google::protobuf::internal::DuplicateIfNonNull(released);
+    }
+  }
+  return released;
+}
+inline ::frame::proto::Size* UniformFloats::unsafe_arena_release_size() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  // @@protoc_insertion_point(field_release:frame.proto.UniformFloats.size)
 
-// UniformVector4s
+  _impl_._has_bits_[0] &= ~0x00000001u;
+  ::frame::proto::Size* temp = _impl_.size_;
+  _impl_.size_ = nullptr;
+  return temp;
+}
+inline ::frame::proto::Size* UniformFloats::_internal_mutable_size() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  if (_impl_.size_ == nullptr) {
+    auto* p = ::google::protobuf::Message::DefaultConstruct<::frame::proto::Size>(GetArena());
+    _impl_.size_ = reinterpret_cast<::frame::proto::Size*>(p);
+  }
+  return _impl_.size_;
+}
+inline ::frame::proto::Size* UniformFloats::mutable_size() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  _impl_._has_bits_[0] |= 0x00000001u;
+  ::frame::proto::Size* _msg = _internal_mutable_size();
+  // @@protoc_insertion_point(field_mutable:frame.proto.UniformFloats.size)
+  return _msg;
+}
+inline void UniformFloats::set_allocated_size(::frame::proto::Size* value) {
+  ::google::protobuf::Arena* message_arena = GetArena();
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  if (message_arena == nullptr) {
+    delete reinterpret_cast<::google::protobuf::MessageLite*>(_impl_.size_);
+  }
 
-// repeated .frame.proto.UniformVector4 values = 1;
-inline int UniformVector4s::_internal_values_size() const {
-  return _internal_values().size();
-}
-inline int UniformVector4s::values_size() const {
-  return _internal_values_size();
-}
-inline void UniformVector4s::clear_values() {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.values_.Clear();
-}
-inline ::frame::proto::UniformVector4* UniformVector4s::mutable_values(int index)
-    ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_mutable:frame.proto.UniformVector4s.values)
-  return _internal_mutable_values()->Mutable(index);
-}
-inline ::google::protobuf::RepeatedPtrField<::frame::proto::UniformVector4>* UniformVector4s::mutable_values()
-    ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_mutable_list:frame.proto.UniformVector4s.values)
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  return _internal_mutable_values();
-}
-inline const ::frame::proto::UniformVector4& UniformVector4s::values(int index) const
-    ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:frame.proto.UniformVector4s.values)
-  return _internal_values().Get(index);
-}
-inline ::frame::proto::UniformVector4* UniformVector4s::add_values() ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  ::frame::proto::UniformVector4* _add = _internal_mutable_values()->Add();
-  // @@protoc_insertion_point(field_add:frame.proto.UniformVector4s.values)
-  return _add;
-}
-inline const ::google::protobuf::RepeatedPtrField<::frame::proto::UniformVector4>& UniformVector4s::values() const
-    ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_list:frame.proto.UniformVector4s.values)
-  return _internal_values();
-}
-inline const ::google::protobuf::RepeatedPtrField<::frame::proto::UniformVector4>&
-UniformVector4s::_internal_values() const {
-  ::google::protobuf::internal::TSanRead(&_impl_);
-  return _impl_.values_;
-}
-inline ::google::protobuf::RepeatedPtrField<::frame::proto::UniformVector4>*
-UniformVector4s::_internal_mutable_values() {
-  ::google::protobuf::internal::TSanRead(&_impl_);
-  return &_impl_.values_;
-}
+  if (value != nullptr) {
+    ::google::protobuf::Arena* submessage_arena = reinterpret_cast<::google::protobuf::MessageLite*>(value)->GetArena();
+    if (message_arena != submessage_arena) {
+      value = ::google::protobuf::internal::GetOwnedMessage(message_arena, value, submessage_arena);
+    }
+    _impl_._has_bits_[0] |= 0x00000001u;
+  } else {
+    _impl_._has_bits_[0] &= ~0x00000001u;
+  }
 
-// -------------------------------------------------------------------
-
-// UniformQuaternions
-
-// repeated .frame.proto.UniformQuaternion values = 1;
-inline int UniformQuaternions::_internal_values_size() const {
-  return _internal_values().size();
-}
-inline int UniformQuaternions::values_size() const {
-  return _internal_values_size();
-}
-inline void UniformQuaternions::clear_values() {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.values_.Clear();
-}
-inline ::frame::proto::UniformQuaternion* UniformQuaternions::mutable_values(int index)
-    ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_mutable:frame.proto.UniformQuaternions.values)
-  return _internal_mutable_values()->Mutable(index);
-}
-inline ::google::protobuf::RepeatedPtrField<::frame::proto::UniformQuaternion>* UniformQuaternions::mutable_values()
-    ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_mutable_list:frame.proto.UniformQuaternions.values)
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  return _internal_mutable_values();
-}
-inline const ::frame::proto::UniformQuaternion& UniformQuaternions::values(int index) const
-    ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:frame.proto.UniformQuaternions.values)
-  return _internal_values().Get(index);
-}
-inline ::frame::proto::UniformQuaternion* UniformQuaternions::add_values() ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  ::frame::proto::UniformQuaternion* _add = _internal_mutable_values()->Add();
-  // @@protoc_insertion_point(field_add:frame.proto.UniformQuaternions.values)
-  return _add;
-}
-inline const ::google::protobuf::RepeatedPtrField<::frame::proto::UniformQuaternion>& UniformQuaternions::values() const
-    ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_list:frame.proto.UniformQuaternions.values)
-  return _internal_values();
-}
-inline const ::google::protobuf::RepeatedPtrField<::frame::proto::UniformQuaternion>&
-UniformQuaternions::_internal_values() const {
-  ::google::protobuf::internal::TSanRead(&_impl_);
-  return _impl_.values_;
-}
-inline ::google::protobuf::RepeatedPtrField<::frame::proto::UniformQuaternion>*
-UniformQuaternions::_internal_mutable_values() {
-  ::google::protobuf::internal::TSanRead(&_impl_);
-  return &_impl_.values_;
+  _impl_.size_ = reinterpret_cast<::frame::proto::Size*>(value);
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.UniformFloats.size)
 }
 
 // -------------------------------------------------------------------

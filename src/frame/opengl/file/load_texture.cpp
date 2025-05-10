@@ -135,7 +135,7 @@ std::unique_ptr<frame::TextureInterface> LoadCubeMapTextureFromFile(
     std::ifstream ifs(
         frame::file::FindFile("asset/json/equirectangular.json").string());
     std::string inner_file_json((std::istreambuf_iterator<char>(ifs)), {});
-    auto level = frame::proto::ParseLevel(
+    auto level = json::ParseLevel(
         cube_pair_res, FillLevel(inner_file_json, filling_map));
     if (!level)
     {
@@ -204,8 +204,8 @@ std::unique_ptr<TextureInterface> LoadTextureFromVec4(const glm::vec4& vec4)
 {
     std::array<float, 4> ar = {vec4.x, vec4.y, vec4.z, vec4.w};
     TextureParameter texture_parameter = {
-        proto::PixelElementSize_FLOAT(),
-        proto::PixelStructure_RGB_ALPHA(),
+        json::PixelElementSize_FLOAT(),
+        json::PixelStructure_RGB_ALPHA(),
         {1, 1},
         (void*)&ar};
     return std::make_unique<frame::opengl::Texture>(texture_parameter);
@@ -214,8 +214,8 @@ std::unique_ptr<TextureInterface> LoadTextureFromVec4(const glm::vec4& vec4)
 std::unique_ptr<TextureInterface> LoadTextureFromFloat(float f)
 {
     TextureParameter texture_parameter = {
-        frame::proto::PixelElementSize_FLOAT(),
-        frame::proto::PixelStructure_GREY(),
+        json::PixelElementSize_FLOAT(),
+        json::PixelStructure_GREY(),
         {1, 1},
         (void*)&f};
     return std::make_unique<frame::opengl::Texture>(texture_parameter);

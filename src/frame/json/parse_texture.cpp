@@ -28,11 +28,11 @@ void CheckParameters(const frame::proto::Texture& proto_texture)
 
 } // End namespace.
 
-namespace frame::proto
+namespace frame::json
 {
 
 std::unique_ptr<frame::TextureInterface> ParseTexture(
-    const Texture& proto_texture, glm::uvec2 size)
+    const proto::Texture& proto_texture, glm::uvec2 size)
 {
     glm::uvec2 texture_size = size;
     if (proto_texture.size().x() < 0)
@@ -78,7 +78,7 @@ std::unique_ptr<frame::TextureInterface> ParseTexture(
 }
 
 std::unique_ptr<TextureInterface> ParseCubeMapTexture(
-    const Texture& proto_texture, glm::uvec2 size)
+    const proto::Texture& proto_texture, glm::uvec2 size)
 {
     glm::uvec2 texture_size = size;
     if (proto_texture.size().x() < 0)
@@ -183,4 +183,4 @@ std::unique_ptr<frame::TextureInterface> ParseBasicTexture(
     return ParseTexture(proto_texture, size);
 }
 
-} // End namespace frame::proto.
+} // End namespace frame::json.

@@ -7,6 +7,7 @@
 #include "frame/gui/draw_gui_interface.h"
 #include "frame/gui/gui_menu_bar_interface.h"
 #include "frame/window_interface.h"
+#include "frame/uniform_collection_interface.h"
 
 namespace frame::opengl::gui
 {
@@ -56,7 +57,7 @@ class SDLOpenGLDrawGui : public frame::gui::DrawGuiInterface
      * @param material: The material associated with the mesh.
      */
     void PreRender(
-        UniformInterface& uniform,
+        UniformCollectionInterface& uniform,
         DeviceInterface& device,
         StaticMeshInterface& static_mesh,
         MaterialInterface& material) override

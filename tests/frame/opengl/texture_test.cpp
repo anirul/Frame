@@ -51,7 +51,7 @@ TEST_F(TextureTest, CreateHDRTextureHalfTest)
     EXPECT_NO_THROW(
         maybe_texture = frame::opengl::file::LoadTextureFromFile(
             frame::file::FindFile("asset/cubemap/hamarikyu.hdr"),
-            frame::proto::PixelElementSize_HALF()));
+            frame::json::PixelElementSize_HALF()));
     ASSERT_TRUE(maybe_texture);
     texture_ = std::move(maybe_texture.value());
     ASSERT_TRUE(texture_);
@@ -70,7 +70,7 @@ TEST_F(TextureTest, CreateHDRTextureFloatTest)
     EXPECT_NO_THROW(
         maybe_texture = frame::opengl::file::LoadTextureFromFile(
             frame::file::FindFile("asset/cubemap/hamarikyu.hdr"),
-            frame::proto::PixelElementSize_FLOAT()));
+            frame::json::PixelElementSize_FLOAT()));
     ASSERT_TRUE(maybe_texture);
     texture_ = std::move(maybe_texture.value());
     ASSERT_TRUE(texture_);

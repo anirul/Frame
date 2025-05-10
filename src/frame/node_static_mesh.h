@@ -55,6 +55,14 @@ class NodeStaticMesh : public NodeInterface
 
   public:
     /**
+     * @brief Return the node type of this node.
+     * @return The node type.
+     */
+    NodeTypeEnum GetNodeType() const override
+    {
+        return NodeTypeEnum::NODE_STATIC_MESH;
+    }
+    /**
      * @brief Get local mesh return the local attached mesh.
      * @return Id of the local attached mesh.
      */

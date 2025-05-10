@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+import "size.proto";
+
 package frame.proto;
 
 // Float vector (support both vecX type and matX type).
@@ -26,15 +28,6 @@ message UniformVector4 {
 	float y = 2;
 	float z = 3;
 	float w = 4;
-}
-
-// 4	-> Quat
-// Next 5
-message UniformQuaternion {
-	float w = 1;
-	float x = 2;
-	float y = 3;
-	float z = 4;
 }
 
 // 16   -> mat4
@@ -64,31 +57,13 @@ message UniformMatrix4 {
 // Next 2
 message UniformInts {
 	repeated int32 values = 1;
+	Size size = 2;
 }
 
 // Next 2
 message UniformFloats {
 	repeated float values = 1;
-}
-
-// Next 2
-message UniformVector2s {
-	repeated UniformVector2 values = 1;
-}
-
-// Next 2
-message UniformVector3s {
-	repeated UniformVector3 values = 1;
-}
-
-// Next 2
-message UniformVector4s {
-	repeated UniformVector4 values = 1;
-}
-
-// Next 2
-message UniformQuaternions {
-	repeated UniformQuaternion values = 1;
+	Size size = 2;
 }
 
 // Next 2

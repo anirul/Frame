@@ -35,8 +35,8 @@ class Image : public ImageInterface
     Image(
         glm::uvec2 size,
         proto::PixelElementSize pixel_element_size =
-            proto::PixelElementSize_BYTE(),
-        proto::PixelStructure pixel_structure = proto::PixelStructure_RGB());
+            json::PixelElementSize_BYTE(),
+        proto::PixelStructure pixel_structure = json::PixelStructure_RGB());
     /**
      * @brief Constructor this will build a image from a file and image
      *        specs, this will be use to load an image from the HDD.
@@ -49,8 +49,8 @@ class Image : public ImageInterface
     Image(
         const std::filesystem::path& file,
         proto::PixelElementSize pixel_element_size =
-            proto::PixelElementSize_BYTE(),
-        proto::PixelStructure pixel_structure = proto::PixelStructure_RGB());
+            json::PixelElementSize_BYTE(),
+        proto::PixelStructure pixel_structure = json::PixelStructure_RGB());
     //! Virtual destructor.
     ~Image();
 

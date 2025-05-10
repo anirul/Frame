@@ -236,8 +236,7 @@ EntityId Level::AddStaticMesh(
     return id;
 }
 
-std::optional<std::vector<frame::EntityId>> Level::GetChildList(
-    EntityId id) const
+std::vector<frame::EntityId> Level::GetChildList(EntityId id) const
 {
     std::vector<EntityId> list;
     try
@@ -256,7 +255,6 @@ std::optional<std::vector<frame::EntityId>> Level::GetChildList(
     catch (std::out_of_range& ex)
     {
         logger_->warn(ex.what());
-        return std::nullopt;
     }
     return list;
 }
@@ -279,9 +277,9 @@ EntityId Level::GetParentId(EntityId id) const
 std::vector<frame::EntityId> Level::GetTextures() const
 {
     std::vector<EntityId> list;
-    for (const auto& id_texture : id_texture_map_)
+    for (const auto& [texture_id, _] : id_texture_map_)
     {
-        list.push_back(id_texture.first);
+        list.push_back(texture_id);
     }
     return list;
 }
@@ -289,9 +287,29 @@ std::vector<frame::EntityId> Level::GetTextures() const
 std::vector<frame::EntityId> Level::GetLights() const
 {
     std::vector<EntityId> list;
-    for (const auto& id_light : id_light_map_)
+    for (const auto& [light_id, _] : id_light_map_)
     {
-        list.push_back(id_light.first);
+        list.push_back(light_id);
+    }
+    return list;
+}
+
+std::vector<frame::EntityId> Level::GetPrograms() const
+{
+    std::vector<EntityId> list;
+    for (const auto& [program_id, _] : id_program_map_)
+    {
+        list.push_back(program_id);
+    }
+    return list;
+}
+
+std::vector<frame::EntityId> Level::GetMaterials() const
+{
+    std::vector<EntityId> list;
+    for (const auto& [material_id, _] : id_material_map_)
+    {
+        list.push_back(material_id);
     }
     return list;
 }
@@ -339,10 +357,11 @@ void Level::ReplaceMesh(
 {
     if (!id_static_mesh_map_.count(id))
     {
-        throw std::runtime_error(fmt::format(
-            "trying to replace {} by {} but no mesh there yet?",
-            mesh->GetName(),
-            id));
+        throw std::runtime_error(
+            fmt::format(
+                "trying to replace {} by {} but no mesh there yet?",
+                mesh->GetName(),
+                id));
     }
     id_static_mesh_map_.erase(id);
     id_static_mesh_map_.emplace(id, std::move(mesh));

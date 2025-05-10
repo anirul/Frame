@@ -7,11 +7,11 @@ namespace test
 
 TEST_F(ParseUniformTest, ParseUniformSimpleTest)
 {
-    bool b = frame::proto::ParseUniform(true);
+    bool b = frame::json::ParseUniform(true);
     EXPECT_EQ(true, b);
-    int i = frame::proto::ParseUniform(1);
+    int i = frame::json::ParseUniform(1);
     EXPECT_EQ(1, i);
-    float f = frame::proto::ParseUniform(0.1f);
+    float f = frame::json::ParseUniform(0.1f);
     EXPECT_FLOAT_EQ(0.1f, f);
 }
 
@@ -20,7 +20,7 @@ TEST_F(ParseUniformTest, ParseUniformVector2Test)
     frame::proto::UniformVector2 uniform_vector2{};
     uniform_vector2.set_x(0.1f);
     uniform_vector2.set_y(0.2f);
-    glm::vec2 vec2 = frame::proto::ParseUniform(uniform_vector2);
+    glm::vec2 vec2 = frame::json::ParseUniform(uniform_vector2);
     EXPECT_FLOAT_EQ(0.1f, vec2.x);
     EXPECT_FLOAT_EQ(0.2f, vec2.y);
 }
@@ -31,7 +31,7 @@ TEST_F(ParseUniformTest, ParseUniformVector3Test)
     uniform_vector3.set_x(0.1f);
     uniform_vector3.set_y(0.2f);
     uniform_vector3.set_z(0.3f);
-    glm::vec3 vec3 = frame::proto::ParseUniform(uniform_vector3);
+    glm::vec3 vec3 = frame::json::ParseUniform(uniform_vector3);
     EXPECT_FLOAT_EQ(0.1f, vec3.x);
     EXPECT_FLOAT_EQ(0.2f, vec3.y);
     EXPECT_FLOAT_EQ(0.3f, vec3.z);
@@ -44,7 +44,7 @@ TEST_F(ParseUniformTest, ParseUniformVector4Test)
     uniform_vector4.set_y(0.2f);
     uniform_vector4.set_z(0.3f);
     uniform_vector4.set_w(0.4f);
-    glm::vec4 vec4 = frame::proto::ParseUniform(uniform_vector4);
+    glm::vec4 vec4 = frame::json::ParseUniform(uniform_vector4);
     EXPECT_FLOAT_EQ(0.1f, vec4.x);
     EXPECT_FLOAT_EQ(0.2f, vec4.y);
     EXPECT_FLOAT_EQ(0.3f, vec4.z);
@@ -75,7 +75,7 @@ TEST_F(ParseUniformTest, ParseUniformMat4Test)
     uniform_matrix4.set_m43(0.43f);
     uniform_matrix4.set_m44(0.44f);
 
-    glm::mat4 mat4 = frame::proto::ParseUniform(uniform_matrix4);
+    glm::mat4 mat4 = frame::json::ParseUniform(uniform_matrix4);
 
     EXPECT_FLOAT_EQ(0.11f, mat4[0][0]);
     EXPECT_FLOAT_EQ(0.12f, mat4[0][1]);
@@ -96,20 +96,6 @@ TEST_F(ParseUniformTest, ParseUniformMat4Test)
     EXPECT_FLOAT_EQ(0.42f, mat4[3][1]);
     EXPECT_FLOAT_EQ(0.43f, mat4[3][2]);
     EXPECT_FLOAT_EQ(0.44f, mat4[3][3]);
-}
-
-TEST_F(ParseUniformTest, ParseUniformQuaternionTest)
-{
-    frame::proto::UniformQuaternion uniform_quaternion{};
-    uniform_quaternion.set_x(0.1f);
-    uniform_quaternion.set_y(0.2f);
-    uniform_quaternion.set_z(0.3f);
-    uniform_quaternion.set_w(0.4f);
-    glm::quat quat = frame::proto::ParseUniform(uniform_quaternion);
-    EXPECT_FLOAT_EQ(0.1f, quat.x);
-    EXPECT_FLOAT_EQ(0.2f, quat.y);
-    EXPECT_FLOAT_EQ(0.3f, quat.z);
-    EXPECT_FLOAT_EQ(0.4f, quat.w);
 }
 
 // TODO(anirul): Add test for the remaining functions.

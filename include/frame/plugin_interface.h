@@ -12,7 +12,7 @@ namespace frame
 class DeviceInterface;
 class MaterialInterface;
 class StaticMeshInterface;
-class UniformInterface;
+class UniformCollectionInterface;
 
 /**
  * @class PluginInterface
@@ -44,7 +44,7 @@ class PluginInterface : public NameInterface
      * @param material: The material associated with the mesh.
      */
     virtual void PreRender(
-        UniformInterface& uniform,
+        UniformCollectionInterface& uniform,
         DeviceInterface& device,
         StaticMeshInterface& static_mesh,
         MaterialInterface& material) = 0;

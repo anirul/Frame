@@ -1,99 +1,94 @@
 #pragma once
 
+#include <GL/glew.h>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
 #include <memory>
+#include <vector>
+#include "frame/json/proto.h"
+#include "name_interface.h"
 
 namespace frame
 {
 
 /**
  * @class UniformInterface
- * @brief Get access to essential part of the rendering uniform system.
+ * @brief An interface to a uniform.
  *
- * This class (and a derived version of it) is to be passed to the rendering
- * system to be able to get the enum uniform.
+ * This class is an abstractiion of a uniform. It is used to be returned by
+ * the uniform collection as a reference to a sisngle uniform.
  */
-class UniformInterface
+class UniformInterface : public NameInterface
 {
   public:
     //! @brief Virtual destructor.
     virtual ~UniformInterface() = default;
+    //! @brief Get the name of the uniform.
+    virtual std::string GetName() const = 0;
+    //! @brief Set the name of the uniform.
+    virtual void SetName(const std::string& name) = 0;
     /**
-     * @brief Get the projection matrix.
-     * @return The projection matrix.
+     * @brief Get the type of the uniform.
+     * @param value: The type of the uniform (should correspond to the GLenum).
      */
-    virtual glm::mat4 GetProjection() const = 0;
+    virtual proto::Uniform::TypeEnum GetType() const = 0;
     /**
-     * @brief Get the view matrix.
-     * @return The view matrix.
+     * @brief Set the type of the uniform.
+     * @return the type of the uniform.
      */
-    virtual glm::mat4 GetView() const = 0;
+    virtual void SetType(proto::Uniform::TypeEnum value) = 0;
     /**
-     * @brief Get the model matrix.
-     * @return The model matrix.
+     * @brief Get the uniform enum, in case the type enum is INVALID.
+     * @return The uniform enum.
      */
-    virtual glm::mat4 GetModel() const = 0;
+    virtual proto::Uniform::UniformEnum GetUniformEnum() const = 0;
     /**
-     * @brief Get the delta time.
-     * @return The delta time.
+     * @brief Set the uniform enum, type enum is INVALID.
+     * @param value: The uniform enum.
      */
-    virtual double GetDeltaTime() const = 0;
+    virtual void SetUniformEnum(proto::Uniform::UniformEnum value) = 0;
     /**
-     * @brief Set value float.
-     * @param name: Connection name.
-     * @param vector: Values.
-     * @param size: The size of the vector.
+     * @brief Get the size of the uniform.
+     * @return The size of the uniform.
      */
-    virtual void SetValueFloat(
-        const std::string& name,
-        const std::vector<float>& vector,
-        glm::uvec2 size) = 0;
+    virtual glm::uvec2 GetSize() const = 0;
     /**
-     * @brief Set value int.
-     * @param name: Connection name.
-     * @param vector: Values.
-     * @param size: The size of the vector.
+     * @brief Set the size of the uniform.
+     * @param size: The size of the uniform.
      */
-    virtual void SetValueInt(
-        const std::string& name,
-        const std::vector<std::int32_t>& vector,
-        glm::uvec2 size) = 0;
+    virtual void SetSize(glm::uvec2 size) = 0;
     /**
-     * @brief Get a list of names for the float uniform plugin.
-     * @return The list of names for the float uniform plugin.
+     * @brief Get the value of the uniform.
+     * @return The value of the uniform.
      */
-    virtual std::vector<std::string> GetFloatNames() const = 0;
+    virtual std::vector<std::int32_t> GetInts() const = 0;
     /**
-     * @brief Get a list of names for the int uniform plugin.
-     * @return The list of names for the int uniform plugin.
+     * @brief Set the value of the uniform.
+     * @param value: The value of the uniform.
      */
-    virtual std::vector<std::string> GetIntNames() const = 0;
+    virtual void SetInts(const std::vector<std::int32_t>& value) = 0;
     /**
-     * @brief Get a value.
-     * @param name: Connection name.
-     * @return The vector that correspond to the value.
+     * @brief Get the value of the uniform.
+     * @return The value of the uniform.
      */
-    virtual std::vector<float> GetValueFloat(const std::string& name) const = 0;
+    virtual std::vector<float> GetFloats() const = 0;
     /**
-     * @brief Get a value.
-     * @param name: Connection name.
-     * @return The vector that correspond to the value.
+     * @brief Set the value of the uniform.
+     * @param value: The value of the uniform.
      */
-    virtual std::vector<std::int32_t> GetValueInt(
-        const std::string& name) const = 0;
-    /**
-     * @brief Get the size of a value.
-     * @param name: Connection name.
-     * @return The size of value.
-     */
-    virtual glm::uvec2 GetSizeFromFloat(const std::string& name) const = 0;
-    /**
-     * @brief Get the size of a value.
-     * @param name: Connection name.
-     * @return The size of value.
-     */
-    virtual glm::uvec2 GetSizeFromInt(const std::string& name) const = 0;
+    virtual void SetFloats(const std::vector<float>& value) = 0;
+    //! @brief Get a float value.
+    virtual float GetFloat() const = 0;
+    //! @brief Get a int value.
+    virtual int GetInt() const = 0;
+    //! @brief Get a vec2 value.
+    virtual glm::vec2 GetVec2() const = 0;
+    //! @brief Get a vec3 value.
+    virtual glm::vec3 GetVec3() const = 0;
+    //! @brief Get a vec4 value.
+    virtual glm::vec4 GetVec4() const = 0;
+    //! @brief Get a mat4 value.
+    virtual glm::mat4 GetMat4() const = 0;
 };
 
 } // End namespace frame.

@@ -205,7 +205,7 @@ class Device : public DeviceInterface
     void* gl_context_ = nullptr;
     glm::uvec2 size_ = {0, 0};
     const proto::PixelElementSize pixel_element_size_ =
-        proto::PixelElementSize_HALF();
+        json::PixelElementSize_HALF();
     // Rendering pipeline.
     std::unique_ptr<Renderer> renderer_ = nullptr;
     // Stereo mode.

@@ -53,11 +53,12 @@ Cubemap::~Cubemap()
     glDeleteTextures(1, &texture_id_);
 }
 
-Cubemap::Cubemap(const TextureParameter& texture_parameter)
-    : Cubemap(
-          texture_parameter.pixel_element_size,
-          texture_parameter.pixel_structure)
+Cubemap::Cubemap(const TextureParameter& texture_parameter) :
+    Cubemap(
+        texture_parameter.pixel_element_size,
+        texture_parameter.pixel_structure)
 {
+    texture_parameter_ = texture_parameter;
     assert(texture_parameter.map_type == TextureTypeEnum::CUBMAP);
     size_ = texture_parameter.size;
     CreateCubemap(texture_parameter.array_data_ptr);

@@ -208,6 +208,15 @@ class Texture : public TextureInterface, public BindInterface
     {
         name_ = name;
     }
+    /**
+     * @brief Get the texture parameters used at creation, usefull for
+     * serialization.
+     * @return Texture parameters used at creation.
+     */
+    const TextureParameter& GetTextureParameter() const override
+	{
+        return texture_parameter_;
+	}
 
   protected:
     /**
@@ -220,9 +229,9 @@ class Texture : public TextureInterface, public BindInterface
      */
     Texture(
         const proto::PixelElementSize pixel_element_size =
-            proto::PixelElementSize_BYTE(),
+            json::PixelElementSize_BYTE(),
         const proto::PixelStructure pixel_structure =
-            proto::PixelStructure_RGB())
+            json::PixelStructure_RGB())
         : pixel_element_size_(pixel_element_size),
           pixel_structure_(pixel_structure)
     {
@@ -242,7 +251,7 @@ class Texture : public TextureInterface, public BindInterface
     void CreateDepthTexture(
         glm::uvec2 size,
 		proto::PixelElementSize pixel_element_size =
-			proto::PixelElementSize_FLOAT());
+			json::PixelElementSize_FLOAT());
     //! @brief Lock the bind for RAII interface to the bind interface.
     void LockedBind() const override
     {
@@ -269,6 +278,7 @@ class Texture : public TextureInterface, public BindInterface
     std::unique_ptr<RenderBuffer> render_ = nullptr;
     std::unique_ptr<FrameBuffer> frame_ = nullptr;
     std::string name_;
+    TextureParameter texture_parameter_;
 };
 
 } // End namespace frame::opengl.

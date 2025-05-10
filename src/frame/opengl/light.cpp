@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include "frame/uniform.h"
 
 namespace frame::opengl
 {
@@ -17,15 +18,22 @@ void LightManager::RegisterToProgram(Program& program) const
     int i = 0;
     for (const auto& light : lights_)
     {
-        program.Uniform(
-            "light_position[" + std::to_string(i) + "]",
-            lights_[i]->GetVector());
-        program.Uniform(
-            "light_color[" + std::to_string(i) + "]",
-            lights_[i]->GetColorIntensity());
+        std::unique_ptr<UniformInterface> position_interface =
+            std::make_unique<Uniform>(
+                "light_position[" + std::to_string(i) + "]",
+                light->GetVector());
+        program.AddUniform(std::move(position_interface));
+        std::unique_ptr<UniformInterface> color_interface =
+            std::make_unique<Uniform>(
+                "light_direction[" + std::to_string(i) + "]",
+                light->GetColorIntensity());
+        program.AddUniform(std::move(color_interface));
         ++i;
     }
-    program.Uniform("light_max", static_cast<int>(lights_.size()));
+    std::unique_ptr<UniformInterface> light_max_interface =
+        std::make_unique<Uniform>(
+            "light_max", static_cast<int>(lights_.size()));
+    program.AddUniform(std::move(light_max_interface));
     program.UnUse();
 }
 

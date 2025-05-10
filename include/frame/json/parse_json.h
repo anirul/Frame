@@ -6,7 +6,7 @@
 #include <fstream>
 #include <string>
 
-namespace frame::proto
+namespace frame::json
 {
 
 template <typename T>
@@ -42,4 +42,4 @@ T LoadProtoFromJsonFile(const std::filesystem::path& filename)
     return LoadProtoFromJson<T>(contents);
 }
 
-} // End namespace frame::proto.
+} // End namespace frame::json.

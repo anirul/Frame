@@ -72,7 +72,7 @@ class Draw : public frame::PluginInterface
      * @param material: The material associated with the mesh.
      */
     void PreRender(
-        UniformInterface& uniform,
+        UniformCollectionInterface& uniform_collection_interface,
         DeviceInterface& device,
         StaticMeshInterface& static_mesh,
         MaterialInterface& material) override;

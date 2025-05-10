@@ -23,7 +23,7 @@ class RendererTest : public testing::Test
   public:
     bool LoadDefaultLevel()
     {
-        auto level = frame::proto::ParseLevel(
+        auto level = frame::json::ParseLevel(
             size_, frame::file::FindFile("asset/json/renderer_test.json"));
         if (level)
         {

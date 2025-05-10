@@ -5,7 +5,7 @@
 #include "frame/json/proto.h"
 #include "frame/level_interface.h"
 
-namespace frame::proto
+namespace frame::json
 {
 
 /**
@@ -15,6 +15,6 @@ namespace frame::proto
  * @return True if success and false if error.
  */
 [[nodiscard]] bool ParseSceneTreeFile(
-    const SceneTree& proto_scene_tree, LevelInterface& level);
+    const proto::SceneTree& proto_scene_tree, LevelInterface& level);
 
-} // End namespace frame::proto.
+} // End namespace frame::json.

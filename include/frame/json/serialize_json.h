@@ -6,7 +6,7 @@
 #include <fstream>
 #include <stdexcept>
 
-namespace frame::proto
+namespace frame::json
 {
 
 template<typename T>
@@ -48,4 +48,4 @@ void SaveProtoToJsonFile(const T& proto, const std::filesystem::path& filename)
 	}
 }
 
-} 
+} // End namespace frame::json.

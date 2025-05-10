@@ -55,16 +55,16 @@ std::optional<EntityId> LoadMaterialFromObj(
                            ? LoadTextureFromVec4(material_obj.ambient_vec4)
                            : LoadTextureFromString(
                                  material_obj.ambient_str,
-                                 proto::PixelElementSize_BYTE(),
-                                 proto::PixelStructure_RGB());
+                                 json::PixelElementSize_BYTE(),
+                                 json::PixelStructure_RGB());
     if (!maybe_color)
         return std::nullopt;
     auto maybe_normal = (material_obj.normal_str.empty())
                             ? LoadTextureFromVec4(glm::vec4(0.f, 0.f, 0.f, 1.f))
                             : LoadTextureFromString(
                                   material_obj.normal_str,
-                                  proto::PixelElementSize_BYTE(),
-                                  proto::PixelStructure_RGB());
+                                  json::PixelElementSize_BYTE(),
+                                  json::PixelStructure_RGB());
     if (!maybe_normal)
         return std::nullopt;
     auto maybe_roughness =
@@ -72,16 +72,16 @@ std::optional<EntityId> LoadMaterialFromObj(
             ? LoadTextureFromFloat(material_obj.roughness_val)
             : LoadTextureFromString(
                   material_obj.roughness_str,
-                  proto::PixelElementSize_BYTE(),
-                  proto::PixelStructure_GREY());
+                  json::PixelElementSize_BYTE(),
+                  json::PixelStructure_GREY());
     if (!maybe_roughness)
         return std::nullopt;
     auto maybe_metallic = (material_obj.metallic_str.empty())
                               ? LoadTextureFromFloat(material_obj.metallic_val)
                               : LoadTextureFromString(
                                     material_obj.metallic_str,
-                                    proto::PixelElementSize_BYTE(),
-                                    proto::PixelStructure_GREY());
+                                    json::PixelElementSize_BYTE(),
+                                    json::PixelStructure_GREY());
     if (!maybe_metallic)
         return std::nullopt;
     // Create names for textures.

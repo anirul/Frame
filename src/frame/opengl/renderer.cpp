@@ -8,12 +8,12 @@
 
 #include "frame/node_matrix.h"
 #include "frame/node_static_mesh.h"
+#include "frame/opengl/cubemap.h"
 #include "frame/opengl/file/load_program.h"
 #include "frame/opengl/material.h"
 #include "frame/opengl/static_mesh.h"
 #include "frame/opengl/texture.h"
-#include "frame/opengl/cubemap.h"
-#include "frame/uniform_wrapper.h"
+#include "frame/uniform_collection_wrapper.h"
 
 namespace frame::opengl
 {
@@ -111,11 +111,17 @@ std::optional<glm::mat4> Renderer::RenderNode(
         GLbitfield bit_field = 0;
         std::uint32_t clean_buffer = node_static_mesh.GetCleanBuffer();
         if (clean_buffer | proto::CleanBuffer::CLEAR_COLOR)
+        {
             bit_field += GL_COLOR_BUFFER_BIT;
+        }
         if (clean_buffer | proto::CleanBuffer::CLEAR_DEPTH)
+        {
             bit_field += GL_DEPTH_BUFFER_BIT;
+        }
         if (bit_field)
+        {
             glClear(bit_field);
+        }
         return std::nullopt;
     }
     auto& static_mesh = level_.GetStaticMeshFromId(mesh_id);
@@ -142,17 +148,17 @@ void Renderer::RenderMesh(
     assert(program.GetOutputTextureIds().size());
 
     // In case the camera doesn't exist it will create a basic one.
-    UniformWrapper uniform_wrapper(projection, view, model, delta_time_);
+    UniformCollectionWrapper uniform_collection_wrapper(
+        projection, view, model, delta_time_);
     if (render_time_ == proto::SceneStaticMesh::SCENE_RENDER_TIME)
     {
-        std::vector<float> env_map_vec(
-            glm::value_ptr(env_map_model_),
-            glm::value_ptr(env_map_model_) + 16);
-        uniform_wrapper.SetValueFloat("env_map_model", env_map_vec, {4, 4});
+        std::unique_ptr<UniformInterface> env_map_uniform =
+            std::make_unique<Uniform>("env_map_model", env_map_model_);
+        uniform_collection_wrapper.AddUniform(std::move(env_map_uniform));
     }
     // Go through the callback.
-    callback_(uniform_wrapper, static_mesh, material);
-    program.Use(uniform_wrapper);
+    callback_(uniform_collection_wrapper, static_mesh, material);
+    program.Use(uniform_collection_wrapper);
 
     auto texture_out_ids = program.GetOutputTextureIds();
     auto& texture_ref = level_.GetTextureFromId(*texture_out_ids.cbegin());
@@ -167,8 +173,7 @@ void Renderer::RenderMesh(
         if (level_.GetTextureFromId(texture_id).IsCubeMap())
         {
             auto& opengl_texture =
-                dynamic_cast<Cubemap&>(level_.GetTextureFromId(
-                    texture_id));
+                dynamic_cast<Cubemap&>(level_.GetTextureFromId(texture_id));
             // TODO(anirul): Check the mipmap level (last parameter)!
             frame_buffer_->AttachTexture(
                 opengl_texture.GetId(),
@@ -212,25 +217,24 @@ void Renderer::RenderMesh(
         if (texture.IsCubeMap())
         {
             auto& gl_texture =
-                dynamic_cast<Cubemap&>(
-                    level_.GetTextureFromId(texture_id));
+                dynamic_cast<Cubemap&>(level_.GetTextureFromId(texture_id));
             gl_texture.Bind(p.second);
-            program.Uniform(p.first, p.second);
         }
         else
         {
             auto& gl_texture =
                 dynamic_cast<Texture&>(level_.GetTextureFromId(texture_id));
             gl_texture.Bind(p.second);
-            program.Uniform(p.first, p.second);
         }
+        std::unique_ptr<UniformInterface> uniform_interface =
+            std::make_unique<Uniform>(p.first, p.second);
+        program.AddUniform(std::move(uniform_interface));
     }
 
     auto& gl_static_mesh = dynamic_cast<StaticMesh&>(static_mesh);
     glBindVertexArray(gl_static_mesh.GetId());
 
-    auto& index_buffer = level_.GetBufferFromId(
-        static_mesh.GetIndexBufferId());
+    auto& index_buffer = level_.GetBufferFromId(static_mesh.GetIndexBufferId());
     auto& gl_index_buffer = dynamic_cast<Buffer&>(index_buffer);
     // This was crashing the driver so...
     if (static_mesh.GetIndexSize())
@@ -283,8 +287,8 @@ void Renderer::RenderMesh(
         auto& texture = level_.GetTextureFromId(texture_id);
         if (texture.IsCubeMap())
         {
-            auto& gl_texture = dynamic_cast<Cubemap&>(
-                level_.GetTextureFromId(texture_id));
+            auto& gl_texture =
+                dynamic_cast<Cubemap&>(level_.GetTextureFromId(texture_id));
             gl_texture.UnBind();
         }
         else
@@ -309,8 +313,8 @@ void Renderer::PresentFinal()
         throw std::runtime_error("No quad id.");
     auto& quad = level_.GetStaticMeshFromId(maybe_quad_id);
     auto& program = level_.GetProgramFromId(display_program_id_);
-    UniformWrapper uniform_wrapper{};
-    program.Use(uniform_wrapper);
+    UniformCollectionWrapper uniform_collection_wrapper{};
+    program.Use(uniform_collection_wrapper);
     auto& material = level_.GetMaterialFromId(display_material_id_);
     for (const auto id : material.GetIds())
     {
@@ -318,7 +322,9 @@ void Renderer::PresentFinal()
             dynamic_cast<Texture&>(level_.GetTextureFromId(id));
         const auto p = material.EnableTextureId(id);
         opengl_texture.Bind(p.second);
-        program.Uniform(p.first, p.second);
+        std::unique_ptr<UniformInterface> uniform_interface =
+            std::make_unique<Uniform>(p.first, p.second);
+        program.AddUniform(std::move(uniform_interface));
     }
     auto& gl_quad = dynamic_cast<StaticMesh&>(quad);
     glBindVertexArray(gl_quad.GetId());
@@ -380,10 +386,7 @@ void Renderer::PreRender()
             {
                 SetCubeMapTarget(GetTextureFrameFromPosition(i));
                 RenderNode(
-                    p.first,
-                    material_id,
-                    projection_cubemap,
-                    views_cubemap[i]);
+                    p.first, material_id, projection_cubemap, views_cubemap[i]);
             }
             // Again why?
             SetCubeMapTarget(GetTextureFrameFromPosition(0));
@@ -467,8 +470,7 @@ void Renderer::RenderShadows(const CameraInterface& camera)
         if (light.GetType() == LightTypeEnum::POINT_LIGHT)
         {
             Cubemap& depth_texture =
-                dynamic_cast<Cubemap&>(
-                    level_.GetTextureFromId(texture_id));
+                dynamic_cast<Cubemap&>(level_.GetTextureFromId(texture_id));
             frame_buffer_->AttachTexture(
                 depth_texture.GetId(),
                 static_cast<FrameColorAttachment>(GL_DEPTH_ATTACHMENT),
@@ -493,8 +495,7 @@ void Renderer::RenderShadows(const CameraInterface& camera)
                     // Render it acording to the light position.
                     // If you want that single “camera-based” pass:
                     glm::mat4 proj =
-                        glm::perspective(
-                            glm::radians(90.f), 1.f, 0.1f, 1000.f);
+                        glm::perspective(glm::radians(90.f), 1.f, 0.1f, 1000.f);
                     glm::mat4 rotation = views_cubemap[i];
                     glm::mat4 translation =
                         glm::translate(glm::mat4(1.0f), -light.GetVector());

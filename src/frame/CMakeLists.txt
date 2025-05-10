@@ -24,6 +24,7 @@ add_library(Frame
     ${CMAKE_CURRENT_SOURCE_DIR}/../../include/frame/static_mesh_interface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../include/frame/texture_interface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../include/frame/uniform_interface.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../include/frame/uniform_collection_interface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../include/frame/window_factory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../include/frame/window_interface.h
     # Based in this directory.
@@ -38,8 +39,10 @@ add_library(Frame
     node_matrix.h
     node_static_mesh.cpp
     node_static_mesh.h
-    uniform_wrapper.cpp
-    uniform_wrapper.h
+    uniform.cpp
+    uniform.h
+    uniform_collection_wrapper.cpp
+    uniform_collection_wrapper.h
     window_factory.cpp
 )
 

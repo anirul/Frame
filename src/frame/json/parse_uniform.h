@@ -6,9 +6,10 @@
 
 #include "frame/json/proto.h"
 #include "frame/program_interface.h"
-#include "frame/uniform_interface.h"
+#include "frame/uniform.h"
+#include "frame/uniform_collection_interface.h"
 
-namespace frame::proto
+namespace frame::json
 {
 
 /**
@@ -29,49 +30,25 @@ template <typename T> T ParseUniform(const T& uniform_val)
  * @param uniform_vec2: Uniform vector 2 input.
  * @return Glm vec2 output.
  */
-glm::vec2 ParseUniform(const UniformVector2& uniform_vec2);
+glm::vec2 ParseUniform(const proto::UniformVector2& uniform_vec2);
 /**
  * @brief Specialization into glm types (vec3).
  * @param uniform_vec3: Uniform vector 3 input.
  * @return Glm vec3 output.
  */
-glm::vec3 ParseUniform(const UniformVector3& uniform_vec3);
+glm::vec3 ParseUniform(const proto::UniformVector3& uniform_vec3);
 /**
  * @brief Specialization into glm types (vec4).
  * @param uniform_vec4: Uniform vector 4 input.
  * @return Glm vec4 output.
  */
-glm::vec4 ParseUniform(const UniformVector4& uniform_vec4);
+glm::vec4 ParseUniform(const proto::UniformVector4& uniform_vec4);
 /**
  * @brief Specialization into glm types (mat4).
  * @param uniform_mat4: Uniform matrix input.
  * @return Glm mat4 output.
  */
-glm::mat4 ParseUniform(const UniformMatrix4& uniform_mat4);
-/**
- * @brief Specialization into vector types.
- * @param uniform_vec2s: Uniform vector 2s input.
- * @return Glm vec2s output.
- */
-std::vector<glm::vec2> ParseUniform(const UniformVector2s& uniform_vec2s);
-/**
- * @brief Specialization into vector types.
- * @param uniform_vec3s: Uniform vector 3s input.
- * @return Glm vec3s output.
- */
-std::vector<glm::vec3> ParseUniform(const UniformVector3s& uniform_vec3s);
-/**
- * @brief Specialization into vector types.
- * @param uniform_vec4s: Uniform vector 4s input.
- * @return Glm vec4s output.
- */
-std::vector<glm::vec4> ParseUniform(const UniformVector4s& uniform_vec4s);
-/**
- * @brief Specialization into glm types (quat).
- * @param uniform_quat: Uniform quaternion input.
- * @return Glm quat output.
- */
-glm::quat ParseUniform(const UniformQuaternion& uniform_quat);
+glm::mat4 ParseUniform(const proto::UniformMatrix4& uniform_mat4);
 /**
  * @brief Specialization into vector types.
  * @param name: Name of the uniform.
@@ -82,26 +59,28 @@ template <typename T, typename U>
 void ParseUniformVec(
     const std::string& name,
     const U& uniform_vec,
-    const ProgramInterface& program_interface)
+    ProgramInterface& program_interface)
 {
     std::uint32_t counter = 0;
     for (const T& uniform_val : uniform_vec.values())
     {
-        program_interface.Uniform(
-            name + '[' + std::to_string(counter++) + ']',
-            ParseUniform(uniform_val));
+        std::unique_ptr<frame::UniformInterface> uniform_interface =
+            std::make_unique<frame::Uniform>(
+                name + '[' + std::to_string(counter++) + ']',
+                ParseUniform(uniform_val));
+        program_interface.AddUniform(std::move(uniform_interface));
     }
 }
 /**
  * @brief Register the uniform in the program.
  * @param uniform: Proto uniform entry.
- * @param uniform_interface: Reference to a uniform interface.
+ * @param uniform_collection_interface: Reference to a uniform interface.
  * @param program_interface: Reference to a program interface.
  */
 void RegisterUniformFromProto(
     const frame::proto::Uniform& uniform,
-    const UniformInterface& uniform_interface,
-    const ProgramInterface& program_interface);
+    const UniformCollectionInterface& uniform_collection_interface,
+    ProgramInterface& program_interface);
 /**
  * @brief Register the uniform enum in the program.
  * @param name: Uniform name.
@@ -112,8 +91,8 @@ void RegisterUniformFromProto(
 void RegisterUniformEnumFromProto(
     const std::string& name,
     const frame::proto::Uniform::UniformEnum& uniform_enum,
-    const UniformInterface& uniform_interface,
-    const ProgramInterface& program_interface);
+    const UniformCollectionInterface& uniform_interface,
+    ProgramInterface& program_interface);
 /**
  * @brief Convert frame proto size into pair.
  * @param size: Proto size param.
@@ -122,4 +101,4 @@ void RegisterUniformEnumFromProto(
 std::pair<std::uint32_t, std::uint32_t> ParseSizeInt(
     const frame::proto::Size size);
 
-} // namespace frame::proto
+} // namespace frame::json.

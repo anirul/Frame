@@ -34,11 +34,12 @@ class GuiLoggerSink : public spdlog::sinks::base_sink<std::mutex>
         spdlog::memory_buf_t formatted;
         spdlog::sinks::base_sink<std::mutex>::formatter_->format(
             msg, formatted);
-        const auto time = std::chrono::current_zone()
-                              ->to_local(std::chrono::system_clock::now());
+        const auto time = std::chrono::current_zone()->to_local(
+            std::chrono::system_clock::now());
         const auto current_milli{
             duration_cast<std::chrono::milliseconds>(time.time_since_epoch())
-                .count() % 1000};
+                .count() %
+            1000};
         const auto time_p = std::format("{:%X}.{:03} ", time, current_milli);
         std::string formatted_message(msg.payload.begin(), msg.payload.end());
         logs.push_back({msg.level, std::move(time_p + formatted_message)});

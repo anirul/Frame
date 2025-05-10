@@ -39,8 +39,9 @@ class NodeMatrix : public NodeInterface
      *        this will be transfered to a mat4 at creation).
      */
     NodeMatrix(
-        std::function<NodeInterface*(const std::string&)> func, glm::quat quat)
-        : NodeInterface(func), matrix_(glm::toMat4(quat)),
+        std::function<NodeInterface*(const std::string&)> func, glm::vec4 quat)
+        : NodeInterface(func),
+          matrix_(glm::toMat4(glm::quat(quat.w, quat.x, quat.y, quat.z))),
           enable_rotation_(true)
     {
     }
@@ -78,6 +79,14 @@ class NodeMatrix : public NodeInterface
 
   public:
     /**
+     * @brief Return the node type of this node.
+     * @return The node type.
+     */
+    NodeTypeEnum GetNodeType() const override
+    {
+        return NodeTypeEnum::NODE_MATRIX;
+    }
+    /**
      * @brief Set local matrix (could be used if you want to move something
      *        around).
      * @param matrix: The new matrix.
@@ -85,6 +94,30 @@ class NodeMatrix : public NodeInterface
     void SetMatrix(glm::mat4 matrix)
     {
         matrix_ = matrix;
+    }
+    /**
+     * @brief Get local matrix
+     * @return The local matrix.
+     */
+    glm::mat4 GetMatrix() const
+    {
+        return matrix_;
+    }
+    /**
+     * @brief In case rotation is enabled it return the quaternion.
+     * @return The quaternion for the rotation.
+     */
+    glm::quat GetQuaternion() const
+    {
+        return glm::normalize(glm::quat_cast(matrix_));
+    }
+    /**
+     * @brief Is rotation enabled?
+     * @return True if rotation is enabled.
+     */
+    bool IsRotationEnabled() const
+    {
+        return enable_rotation_;
     }
 
   protected:

@@ -7,12 +7,13 @@
 #include "frame/json/parse_uniform.h"
 #include "frame/opengl/file/load_program.h"
 #include "frame/opengl/program.h"
+#include "frame/uniform.h"
 
-namespace frame::proto
+namespace frame::json
 {
 
 std::unique_ptr<frame::ProgramInterface> ParseProgramOpenGL(
-    const Program& proto_program, LevelInterface& level)
+    const proto::Program& proto_program, LevelInterface& level)
 {
     Logger& logger = Logger::GetInstance();
     // Create the program.
@@ -42,7 +43,7 @@ std::unique_ptr<frame::ProgramInterface> ParseProgramOpenGL(
     program->SetSceneRoot(0);
     switch (proto_program.input_scene_type().value())
     {
-    case SceneType::QUAD: {
+    case proto::SceneType::QUAD: {
         auto maybe_quad_id = level.GetDefaultStaticMeshQuadId();
         if (!maybe_quad_id)
             return nullptr;
@@ -50,7 +51,7 @@ std::unique_ptr<frame::ProgramInterface> ParseProgramOpenGL(
         program->SetSceneRoot(quad_id);
         break;
     }
-    case SceneType::CUBE: {
+    case proto::SceneType::CUBE: {
         auto maybe_cube_id = level.GetDefaultStaticMeshCubeId();
         if (!maybe_cube_id)
             return nullptr;
@@ -58,69 +59,103 @@ std::unique_ptr<frame::ProgramInterface> ParseProgramOpenGL(
         program->SetSceneRoot(cube_id);
         break;
     }
-    case SceneType::SCENE: {
+    case proto::SceneType::SCENE: {
         program->SetTemporarySceneRoot(proto_program.input_scene_root_name());
         break;
     }
-    case SceneType::NONE:
+    case proto::SceneType::NONE:
     default:
-        throw std::runtime_error(fmt::format(
-            "No way {}?",
-            static_cast<int>(proto_program.input_scene_type().value())));
+        throw std::runtime_error(
+            fmt::format(
+                "No way {}?",
+                static_cast<int>(proto_program.input_scene_type().value())));
     }
     program->Use();
     for (const auto& parameter : proto_program.parameters())
     {
         switch (parameter.value_oneof_case())
         {
-        case Uniform::kUniformEnum:
+        case proto::Uniform::kUniformEnum:
             break;
-        case Uniform::kUniformInt:
-            program->Uniform(parameter.name(), parameter.uniform_int());
+        case proto::Uniform::kUniformInt: {
+            std::unique_ptr<UniformInterface> uniform_interface =
+                std::make_unique<frame::Uniform>(
+                    parameter.name(), parameter.uniform_int());
+            program->AddUniform(std::move(uniform_interface));
             break;
-        case Uniform::kUniformFloat:
-            program->Uniform(parameter.name(), parameter.uniform_float());
+        }
+        case proto::Uniform::kUniformInts: {
+            proto::UniformInts uniform_ints = parameter.uniform_ints();
+            glm::uvec2 glm_size =
+                glm::uvec2(uniform_ints.size().x(), uniform_ints.size().y());
+            std::vector<int> int_list;
+            int_list.assign(
+                uniform_ints.values().begin(), uniform_ints.values().end());
+            std::unique_ptr<UniformInterface> uniform_interface =
+                std::make_unique<frame::Uniform>(
+                    parameter.name(), glm_size, int_list);
             break;
-        case Uniform::kUniformVec2:
-            program->Uniform(
-                parameter.name(), ParseUniform(parameter.uniform_vec2()));
+        }
+        case proto::Uniform::kUniformFloat: {
+            std::unique_ptr<UniformInterface> uniform_interface =
+                std::make_unique<frame::Uniform>(
+                    parameter.name(), parameter.uniform_float());
+            program->AddUniform(std::move(uniform_interface));
             break;
-        case Uniform::kUniformVec3:
-            program->Uniform(
-                parameter.name(), ParseUniform(parameter.uniform_vec3()));
+        }
+        case proto::Uniform::kUniformFloats: {
+            proto::UniformFloats uniform_floats = parameter.uniform_floats();
+            glm::uvec2 glm_size = glm::uvec2(
+                uniform_floats.size().x(), uniform_floats.size().y());
+            std::vector<float> float_list;
+            float_list.assign(
+                uniform_floats.values().begin(), uniform_floats.values().end());
+            std::unique_ptr<UniformInterface> uniform_interface =
+                std::make_unique<frame::Uniform>(
+                    parameter.name(), glm_size, float_list);
             break;
-        case Uniform::kUniformVec4:
-            program->Uniform(
-                parameter.name(), ParseUniform(parameter.uniform_vec4()));
+        }
+        case proto::Uniform::kUniformVec2: {
+            std::unique_ptr<UniformInterface> uniform_interface =
+                std::make_unique<frame::Uniform>(
+                    parameter.name(), ParseUniform(parameter.uniform_vec2()));
+            program->AddUniform(std::move(uniform_interface));
             break;
-        case Uniform::kUniformMat4:
-            program->Uniform(
-                parameter.name(), ParseUniform(parameter.uniform_mat4()));
+        }
+        case proto::Uniform::kUniformVec3: {
+            std::unique_ptr<UniformInterface> uniform_interface =
+                std::make_unique<frame::Uniform>(
+                    parameter.name(), ParseUniform(parameter.uniform_vec3()));
+            program->AddUniform(std::move(uniform_interface));
             break;
-        case Uniform::kUniformVec2S:
-            program->Uniform(
-                parameter.name(), ParseUniform(parameter.uniform_vec2s()));
+        }
+        case proto::Uniform::kUniformVec4: {
+            std::unique_ptr<UniformInterface> uniform_interface =
+                std::make_unique<frame::Uniform>(
+                    parameter.name(), ParseUniform(parameter.uniform_vec4()));
+            program->AddUniform(std::move(uniform_interface));
             break;
-        case Uniform::kUniformVec3S:
-            program->Uniform(
-                parameter.name(), ParseUniform(parameter.uniform_vec3s()));
+        }
+        case proto::Uniform::kUniformMat4: {
+            std::unique_ptr<UniformInterface> uniform_interface =
+                std::make_unique<frame::Uniform>(
+                    parameter.name(), ParseUniform(parameter.uniform_mat4()));
+            program->AddUniform(std::move(uniform_interface));
             break;
-        case Uniform::kUniformVec4S:
-            program->Uniform(
-                parameter.name(), ParseUniform(parameter.uniform_vec4s()));
+        }
+        case proto::Uniform::kUniformFloatPlugin:
             break;
-        case Uniform::kUniformFloatPlugin:
-            break;
-        case Uniform::kUniformIntPlugin:
+        case proto::Uniform::kUniformIntPlugin:
             break;
         default:
-            throw std::runtime_error(std::format(
-                "No handle for parameter {}#?",
-                static_cast<int>(parameter.value_oneof_case())));
+            throw std::runtime_error(
+                std::format(
+                    "No handle for parameter {}#?",
+                    static_cast<int>(parameter.value_oneof_case())));
         }
     }
     program->UnUse();
     return program;
 }
 
-} // End namespace frame::proto.
+} // End namespace frame::json.

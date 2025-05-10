@@ -34,14 +34,15 @@ class NodeCamera : public NodeInterface
         const float aspect_ratio = 16.0f / 9.0f,
         const float near_clip = 0.1f,
         const float far_clip = 1000.0f)
-        : NodeInterface(func), camera_(std::make_unique<Camera>(
-                                   position,
-                                   target,
-                                   up,
-                                   fov_degrees,
-                                   aspect_ratio,
-                                   near_clip,
-                                   far_clip))
+        : NodeInterface(func), camera_(
+                                   std::make_unique<Camera>(
+                                       position,
+                                       target,
+                                       up,
+                                       fov_degrees,
+                                       aspect_ratio,
+                                       near_clip,
+                                       far_clip))
     {
     }
     //! @brief Virtual destructor.
@@ -53,6 +54,16 @@ class NodeCamera : public NodeInterface
      * @return A mat4 representing the local model matrix.
      */
     glm::mat4 GetLocalModel(const double dt) const override;
+
+  public:
+    /**
+     * @brief Return the node type of this node.
+     * @return The node type.
+     */
+    NodeTypeEnum GetNodeType() const override
+    {
+        return NodeTypeEnum::NODE_CAMERA;
+    }
 
   public:
     /**

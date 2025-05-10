@@ -140,8 +140,7 @@ class LevelInterface : public NameInterface
      * @param id: The node id you want to get the children.
      * @return The node id children id(s).
      */
-    virtual std::optional<std::vector<EntityId>> GetChildList(
-        const EntityId id) const = 0;
+    virtual std::vector<EntityId> GetChildList(const EntityId id) const = 0;
     /**
      * @brief Get the parent of a given node id.
      * @param id: The current node we are searching for the parent.
@@ -241,6 +240,16 @@ class LevelInterface : public NameInterface
      * @return A vector of light ids.
      */
     virtual std::vector<EntityId> GetLights() const = 0;
+    /**
+     * @brief Get all the program from the level.
+     * @return A vector of program ids.
+     */
+    virtual std::vector<EntityId> GetPrograms() const = 0;
+    /**
+     * @brief Get all the material from the level.
+     * @return A vector of material ids.
+     */
+    virtual std::vector<EntityId> GetMaterials() const = 0;
     /**
      * @brief Extract a texture (move it) from the level to outside (used in
      * special cases).

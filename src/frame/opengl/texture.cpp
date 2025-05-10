@@ -19,10 +19,11 @@
 namespace frame::opengl
 {
 
-Texture::Texture(const TextureParameter& texture_parameter)
-    : size_(texture_parameter.size),
-      pixel_element_size_(texture_parameter.pixel_element_size),
-      pixel_structure_(texture_parameter.pixel_structure)
+Texture::Texture(const TextureParameter& texture_parameter) :
+    size_(texture_parameter.size),
+    pixel_element_size_(texture_parameter.pixel_element_size),
+    pixel_structure_(texture_parameter.pixel_structure),
+    texture_parameter_(texture_parameter)
 {
     assert(texture_parameter.map_type == TextureTypeEnum::TEXTURE_2D);
     if (texture_parameter.pixel_structure.value() ==
