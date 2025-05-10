@@ -18,7 +18,7 @@ class NodeStaticMesh : public NodeInterface
     /**
      * @brief Constructor for node that contain a mesh.
      * @param func: This function return the ID from a string (it will need
-     *        a level passed in the capture list).
+     * a level passed in the capture list).
      * @param static_mesh_id: Static mesh to be contained by the node.
      */
     NodeStaticMesh(
@@ -48,7 +48,7 @@ class NodeStaticMesh : public NodeInterface
     /**
      * @brief Compute the local model of current node.
      * @param dt: Delta time from the beginning of the software running in
-     *        seconds.
+     * seconds.
      * @return A mat4 representing the local model matrix.
      */
     glm::mat4 GetLocalModel(const double dt) const override;
@@ -63,6 +63,23 @@ class NodeStaticMesh : public NodeInterface
         return NodeTypeEnum::NODE_STATIC_MESH;
     }
     /**
+     * @brief Get the node render time type.
+     * @return the render time type.
+     */
+    proto::SceneStaticMesh::RenderTimeEnum GetRenderTimeType() const
+    {
+        return render_time_enum_;
+    }
+    /**
+     * @brief Set the node render time type.
+     * @param render_time_enum: The render time type.
+     */
+    void SetRenderTimeType(
+        proto::SceneStaticMesh::RenderTimeEnum render_time_enum)
+    {
+        render_time_enum_ = render_time_enum;
+    }
+    /**
      * @brief Get local mesh return the local attached mesh.
      * @return Id of the local attached mesh.
      */
@@ -74,7 +91,7 @@ class NodeStaticMesh : public NodeInterface
      * @brief Get clean buffer parameters.
      * @return Clean buffer.
      */
-    std::uint32_t GetCleanBuffer()
+    std::uint32_t GetCleanBuffer() const
     {
         return clean_buffer_;
     }
@@ -82,6 +99,8 @@ class NodeStaticMesh : public NodeInterface
   private:
     EntityId static_mesh_id_ = NullId;
     std::uint32_t clean_buffer_ = {};
+	proto::SceneStaticMesh::RenderTimeEnum render_time_enum_ =
+        proto::SceneStaticMesh::SCENE_RENDER_TIME;
 };
 
 } // End namespace frame.

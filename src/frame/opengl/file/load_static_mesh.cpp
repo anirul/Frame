@@ -314,7 +314,9 @@ std::vector<EntityId> LoadStaticMeshesFromObjFile(
     {
         auto maybe_id = level.GetIdFromName(material_name);
         if (maybe_id)
+        {
             material_ids.push_back(maybe_id);
+        }
     }
     logger->info("Found in obj<{}> : {} meshes.", file.string(), meshes.size());
     int mesh_counter = 0;
@@ -337,7 +339,9 @@ std::vector<EntityId> LoadStaticMeshesFromObjFile(
         ptr->SetName(fmt::format("Node.{}.{}", name, mesh_counter));
         auto maybe_id = level.AddSceneNode(std::move(ptr));
         if (!maybe_id)
+        {
             return {};
+        }
         level.AddMeshMaterialId(maybe_id, material_id);
         entity_id_vec.push_back(maybe_id);
         mesh_counter++;
@@ -393,12 +397,17 @@ std::vector<EntityId> LoadStaticMeshesFromFile(
     auto extension = file.extension();
     std::filesystem::path final_path = frame::file::FindFile(file);
     if (extension == ".obj")
+    {
         return LoadStaticMeshesFromObjFile(
             level, final_path, name, material_name);
+    }
     if (extension == ".ply")
+    {
         return {
             LoadStaticMeshFromPlyFile(level, final_path, name, material_name)};
-    return {};
+    }
+    throw std::runtime_error(
+        std::format("Unknown extention for file : {}", file.string()));
 }
 
 } // End namespace frame::opengl::file.

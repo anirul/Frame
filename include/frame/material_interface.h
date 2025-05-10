@@ -16,8 +16,8 @@ class LevelInterface;
 /**
  * @class MaterialInterface
  * @brief this is the support for material when rendering you need to have a
- *        material for each mesh so that you know which program to run on
- *        each pixel (fragment shader mostly).
+ * material for each mesh so that you know which program to run on each pixel
+ * (fragment shader mostly).
  *
  * For now this is not saving a local copy of the level so you'll have to
  * pass it through.

@@ -128,8 +128,10 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
     node_interface->SetName(proto_scene_static_mesh.name());
     node_interface->SetParentName(proto_scene_static_mesh.parent());
     auto maybe_scene_id = level.AddSceneNode(std::move(node_interface));
-    auto render_time_enum = proto_scene_static_mesh.render_time_enum();
-    level.AddMeshMaterialId(maybe_scene_id, material_id, render_time_enum);
+    level.AddMeshMaterialId(
+        maybe_scene_id,
+        material_id,
+        proto_scene_static_mesh.render_time_enum());
     if (!maybe_scene_id)
     {
         throw std::runtime_error("No scene Id.");
@@ -155,6 +157,7 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
     {
         auto& node = level.GetSceneNodeFromId(node_mesh_id);
         auto& mesh = level.GetStaticMeshFromId(node.GetLocalMesh());
+        mesh.SetFileName(proto_scene_static_mesh.file_name());
         mesh.SetRenderPrimitive(
             proto_scene_static_mesh.render_primitive_enum());
         auto str = fmt::format("{}.{}", proto_scene_static_mesh.name(), i);

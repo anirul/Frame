@@ -1,7 +1,6 @@
 #include "pixel.h"
 
 #include <GL/glew.h>
-
 #include <stdexcept>
 #include <string>
 

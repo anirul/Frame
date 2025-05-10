@@ -62,6 +62,16 @@ class StaticMeshInterface : public NameInterface
     //! @brief Virtual destructor.
     virtual ~StaticMeshInterface() = default;
     /**
+	 * @brief Get the file name of the static mesh.
+	 * @return The name of the file name.
+	 */
+    virtual std::string GetFileName() const = 0;
+    /**
+     * @brief Set the file name of the static mesh.
+	 * @param file_name: The file name.
+	 */
+    virtual void SetFileName(const std::string& file_name) = 0;
+    /**
      * @brief Get point buffer id.
      * @return Current point buffer id.
      */

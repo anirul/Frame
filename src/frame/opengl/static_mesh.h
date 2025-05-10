@@ -38,6 +38,22 @@ class StaticMesh : public BindInterface, public StaticMeshInterface
 
   public:
     /**
+     * @brief Get the file name of the static mesh.
+     * @return The name of the file name.
+     */
+    std::string GetFileName() const override
+    {
+        return file_name_;
+    }
+    /**
+     * @brief Set the file name of the static mesh.
+     * @param file_name: The file name.
+     */
+    void SetFileName(const std::string& file_name) override
+    {
+        file_name_ = file_name;
+	}
+    /**
      * @brief Get point buffer id.
      * @return Current point buffer id.
      */
@@ -199,6 +215,7 @@ class StaticMesh : public BindInterface, public StaticMeshInterface
     proto::SceneStaticMesh::RenderPrimitiveEnum render_primitive_enum_ = {};
     float point_size_ = 1.0f;
     std::string name_;
+	std::string file_name_;
 };
 
 /**
