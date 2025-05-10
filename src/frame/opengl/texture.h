@@ -229,9 +229,9 @@ class Texture : public TextureInterface, public BindInterface
      */
     Texture(
         const proto::PixelElementSize pixel_element_size =
-            proto::PixelElementSize_BYTE(),
+            json::PixelElementSize_BYTE(),
         const proto::PixelStructure pixel_structure =
-            proto::PixelStructure_RGB())
+            json::PixelStructure_RGB())
         : pixel_element_size_(pixel_element_size),
           pixel_structure_(pixel_structure)
     {
@@ -251,7 +251,7 @@ class Texture : public TextureInterface, public BindInterface
     void CreateDepthTexture(
         glm::uvec2 size,
 		proto::PixelElementSize pixel_element_size =
-			proto::PixelElementSize_FLOAT());
+			json::PixelElementSize_FLOAT());
     //! @brief Lock the bind for RAII interface to the bind interface.
     void LockedBind() const override
     {

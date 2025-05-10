@@ -3,7 +3,7 @@
 #include "frame/json/proto.h"
 #include "frame/uniform_interface.h"
 
-namespace frame::proto
+namespace frame::json
 {
 
 /**
@@ -38,4 +38,4 @@ proto::UniformMatrix4 SerializeUniformMatrix4(glm::mat4 mat);
 proto::Uniform SerializeUniform(
     const frame::UniformInterface& uniform_interface);
 
-} // namespace frame::proto
+} // End namespace frame::json.

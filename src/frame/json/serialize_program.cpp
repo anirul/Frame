@@ -5,7 +5,7 @@
 #include "frame/program_interface.h"
 #include <format>
 
-namespace frame::proto
+namespace frame::json
 {
 
 proto::Program SerializeProgram(
@@ -76,4 +76,4 @@ proto::Program SerializeProgram(
     return proto_program;
 }
 
-} // namespace frame::proto.
+} // namespace frame::json.

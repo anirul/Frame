@@ -3,26 +3,26 @@
 #include "frame/logger.h"
 #include "frame/uniform.h"
 
-namespace frame::proto
+namespace frame::json
 {
 
-glm::vec2 ParseUniform(const UniformVector2& uniform_vec2)
+glm::vec2 ParseUniform(const proto::UniformVector2& uniform_vec2)
 {
     return {uniform_vec2.x(), uniform_vec2.y()};
 }
 
-glm::vec3 ParseUniform(const UniformVector3& uniform_vec3)
+glm::vec3 ParseUniform(const proto::UniformVector3& uniform_vec3)
 {
     return {uniform_vec3.x(), uniform_vec3.y(), uniform_vec3.z()};
 }
 
-glm::vec4 ParseUniform(const UniformVector4& uniform_vec4)
+glm::vec4 ParseUniform(const proto::UniformVector4& uniform_vec4)
 {
     return {
         uniform_vec4.x(), uniform_vec4.y(), uniform_vec4.z(), uniform_vec4.w()};
 }
 
-glm::mat4 ParseUniform(const UniformMatrix4& uniform_mat4)
+glm::mat4 ParseUniform(const proto::UniformMatrix4& uniform_mat4)
 {
     return glm::mat4(
         uniform_mat4.m11(),
@@ -44,27 +44,27 @@ glm::mat4 ParseUniform(const UniformMatrix4& uniform_mat4)
 }
 
 void RegisterUniformFromProto(
-    const Uniform& uniform,
+    const proto::Uniform& uniform,
     const UniformCollectionInterface& uniform_collection_interface,
     ProgramInterface& program_interface)
 {
     switch (uniform.value_oneof_case())
     {
-    case Uniform::kUniformInt: {
+    case proto::Uniform::kUniformInt: {
         std::unique_ptr<frame::UniformInterface> uniform_interface =
             std::make_unique<frame::Uniform>(
                 uniform.name(), uniform.uniform_int());
         program_interface.AddUniform(std::move(uniform_interface));
         return;
     }
-    case Uniform::kUniformFloat: {
+    case proto::Uniform::kUniformFloat: {
         std::unique_ptr<frame::UniformInterface> uniform_interface =
             std::make_unique<frame::Uniform>(
                 uniform.name(), uniform.uniform_float());
         program_interface.AddUniform(std::move(uniform_interface));
         return;
     }
-    case Uniform::kUniformEnum: {
+    case proto::Uniform::kUniformEnum: {
         RegisterUniformEnumFromProto(
             uniform.name(),
             uniform.uniform_enum(),
@@ -72,40 +72,40 @@ void RegisterUniformFromProto(
             program_interface);
         return;
     }
-    case Uniform::kUniformVec2: {
+    case proto::Uniform::kUniformVec2: {
         std::unique_ptr<frame::UniformInterface> uniform_interface =
             std::make_unique<frame::Uniform>(
                 uniform.name(), ParseUniform(uniform.uniform_vec2()));
         program_interface.AddUniform(std::move(uniform_interface));
         return;
     }
-    case Uniform::kUniformVec3: {
+    case proto::Uniform::kUniformVec3: {
         std::unique_ptr<frame::UniformInterface> uniform_interface =
             std::make_unique<frame::Uniform>(
                 uniform.name(), ParseUniform(uniform.uniform_vec3()));
         program_interface.AddUniform(std::move(uniform_interface));
         return;
     }
-    case Uniform::kUniformVec4: {
+    case proto::Uniform::kUniformVec4: {
         std::unique_ptr<frame::UniformInterface> uniform_interface =
             std::make_unique<frame::Uniform>(
                 uniform.name(), ParseUniform(uniform.uniform_vec4()));
         program_interface.AddUniform(std::move(uniform_interface));
         return;
     }
-    case Uniform::kUniformMat4: {
+    case proto::Uniform::kUniformMat4: {
         std::unique_ptr<frame::UniformInterface> uniform_interface =
             std::make_unique<frame::Uniform>(
                 uniform.name(), ParseUniform(uniform.uniform_mat4()));
         program_interface.AddUniform(std::move(uniform_interface));
         return;
     }
-    case Uniform::kUniformInts: {
+    case proto::Uniform::kUniformInts: {
         ParseUniformVec<std::int32_t>(
             uniform.name(), uniform.uniform_ints(), program_interface);
         return;
     }
-    case Uniform::kUniformFloats: {
+    case proto::Uniform::kUniformFloats: {
         ParseUniformVec<float>(
             uniform.name(), uniform.uniform_floats(), program_interface);
         return;
@@ -117,13 +117,13 @@ void RegisterUniformFromProto(
 
 void RegisterUniformEnumFromProto(
     const std::string& name,
-    const Uniform::UniformEnum& uniform_enum,
+    const proto::Uniform::UniformEnum& uniform_enum,
     const UniformCollectionInterface& uniform_collection_interface,
     ProgramInterface& program_interface)
 {
     switch (uniform_enum)
     {
-    case Uniform::PROJECTION_MAT4: {
+    case proto::Uniform::PROJECTION_MAT4: {
         std::unique_ptr<frame::UniformInterface> uniform_interface =
             std::make_unique<frame::Uniform>(
                 name,
@@ -132,7 +132,7 @@ void RegisterUniformEnumFromProto(
         program_interface.AddUniform(std::move(uniform_interface));
         break;
     }
-    case Uniform::PROJECTION_INV_MAT4: {
+    case proto::Uniform::PROJECTION_INV_MAT4: {
         std::unique_ptr<frame::UniformInterface> uniform_interface =
             std::make_unique<frame::Uniform>(
                 name,
@@ -142,7 +142,7 @@ void RegisterUniformEnumFromProto(
         program_interface.AddUniform(std::move(uniform_interface));
         break;
     }
-    case Uniform::VIEW_MAT4: {
+    case proto::Uniform::VIEW_MAT4: {
         std::unique_ptr<frame::UniformInterface> uniform_interface =
             std::make_unique<frame::Uniform>(
                 name,
@@ -150,7 +150,7 @@ void RegisterUniformEnumFromProto(
         program_interface.AddUniform(std::move(uniform_interface));
         break;
     }
-    case Uniform::VIEW_INV_MAT4: {
+    case proto::Uniform::VIEW_INV_MAT4: {
         std::unique_ptr<frame::UniformInterface> uniform_interface =
             std::make_unique<frame::Uniform>(
                 name,
@@ -159,7 +159,7 @@ void RegisterUniformEnumFromProto(
         program_interface.AddUniform(std::move(uniform_interface));
         break;
     }
-    case Uniform::MODEL_MAT4: {
+    case proto::Uniform::MODEL_MAT4: {
         std::unique_ptr<frame::UniformInterface> uniform_interface =
             std::make_unique<frame::Uniform>(
                 name,
@@ -167,7 +167,7 @@ void RegisterUniformEnumFromProto(
         program_interface.AddUniform(std::move(uniform_interface));
         break;
     }
-    case Uniform::MODEL_INV_MAT4: {
+    case proto::Uniform::MODEL_INV_MAT4: {
         std::unique_ptr<frame::UniformInterface> uniform_interface =
             std::make_unique<frame::Uniform>(
                 name,
@@ -176,7 +176,7 @@ void RegisterUniformEnumFromProto(
         program_interface.AddUniform(std::move(uniform_interface));
         break;
     }
-    case Uniform::FLOAT_TIME_S: {
+    case proto::Uniform::FLOAT_TIME_S: {
         static Logger& logger_ = Logger::GetInstance();
         logger_->info(
             "set {} := {}",
@@ -197,7 +197,7 @@ void RegisterUniformEnumFromProto(
     }
 }
 
-std::pair<std::uint32_t, std::uint32_t> ParseSizeInt(const Size size)
+std::pair<std::uint32_t, std::uint32_t> ParseSizeInt(const proto::Size size)
 {
     return std::make_pair<std::uint32_t, std::uint32_t>(
         static_cast<std::uint32_t>(size.x()),

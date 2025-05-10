@@ -18,7 +18,7 @@ class DeviceTest : public ::testing::Test
     DeviceTest()
         : window_(frame::CreateNewWindow(frame::DrawingTargetEnum::NONE))
     {
-        auto level = frame::proto::ParseLevel(
+        auto level = frame::json::ParseLevel(
             size_, frame::file::FindFile("asset/json/device_test.json"));
         if (!level)
             throw std::runtime_error("Couldn't create level.");

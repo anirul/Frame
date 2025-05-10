@@ -1,7 +1,7 @@
 #include "frame/json/serialize_uniform.h"
 #include <google/protobuf/repeated_field.h>
 
-namespace frame::proto
+namespace frame::json
 {
 
 proto::UniformVector2 SerializeUniformVector2(glm::vec2 vec)
@@ -148,4 +148,4 @@ proto::Uniform SerializeUniform(const UniformInterface& uniform_interface)
     return proto_uniform;
 }
 
-} // namespace frame::proto
+} // End namespace frame::json.

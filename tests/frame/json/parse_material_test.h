@@ -17,7 +17,7 @@ class ParseMaterialTest : public testing::Test
     ParseMaterialTest()
         : window_(frame::CreateNewWindow(frame::DrawingTargetEnum::NONE))
     {
-        auto level = frame::proto::ParseLevel(
+        auto level = frame::json::ParseLevel(
             {320, 200}, frame::file::FindFile("asset/json/material_test.json"));
         if (!level)
             throw std::runtime_error("Couldn't create level.");

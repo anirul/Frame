@@ -34,12 +34,12 @@ enum class TextureTypeEnum
 struct TextureParameter
 {
     //! @brief Pixel element size, this should be the same as sizeof(T).
-    proto::PixelElementSize pixel_element_size = proto::PixelElementSize_BYTE();
+    proto::PixelElementSize pixel_element_size = json::PixelElementSize_BYTE();
     /**
      * @brief Pixel structure, this is the number of color you have in the
      *        texture 1 to 4.
      */
-    proto::PixelStructure pixel_structure = proto::PixelStructure_RGB();
+    proto::PixelStructure pixel_structure = json::PixelStructure_RGB();
     /**
      * @brief Texture size, in case of cubemap this is the value of a single
      *        plane.

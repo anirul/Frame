@@ -9,7 +9,7 @@ namespace test
 TEST_F(ParseSceneTreeTest, CreateParseSceneTreeTest)
 {
     level_ = std::make_unique<frame::Level>();
-    bool succeed = frame::proto::ParseSceneTreeFile(
+    bool succeed = frame::json::ParseSceneTreeFile(
         proto_level_.scene_tree(),
         dynamic_cast<frame::LevelInterface&>(*level_.get()));
     EXPECT_TRUE(succeed);

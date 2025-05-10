@@ -118,7 +118,7 @@ void Program::AddUniform(std::unique_ptr<UniformInterface>&& uniform_interface)
     case proto::Uniform::INTS:
         glUniform1iv(
             GetMemoizeUniformLocation(name),
-            uniform_ptr->GetInts().size(),
+            static_cast<GLsizei>(uniform_ptr->GetInts().size()),
             uniform_ptr->GetInts().data());
         break;
     case proto::Uniform::FLOAT:
@@ -127,7 +127,7 @@ void Program::AddUniform(std::unique_ptr<UniformInterface>&& uniform_interface)
     case proto::Uniform::FLOATS:
         glUniform1fv(
             GetMemoizeUniformLocation(name),
-            uniform_ptr->GetFloats().size(),
+            static_cast<GLsizei>(uniform_ptr->GetFloats().size()),
             uniform_ptr->GetFloats().data());
         break;
     case proto::Uniform::FLOAT_VECTOR2: {

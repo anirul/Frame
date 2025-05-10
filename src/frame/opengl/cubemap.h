@@ -253,9 +253,9 @@ class Cubemap : public TextureInterface, public BindInterface
      */
     Cubemap(
         const proto::PixelElementSize pixel_element_size =
-            proto::PixelElementSize_BYTE(),
+            json::PixelElementSize_BYTE(),
         const proto::PixelStructure pixel_structure =
-            proto::PixelStructure_RGB())
+            json::PixelStructure_RGB())
         : pixel_element_size_(pixel_element_size),
           pixel_structure_(pixel_structure)
     {

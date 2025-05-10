@@ -6,7 +6,7 @@
 #include "frame/json/serialize_texture.h"
 #include "frame/logger.h"
 
-namespace frame::proto
+namespace frame::json
 {
 
 proto::Level SerializeLevel(LevelInterface& level_interface)
@@ -45,4 +45,4 @@ proto::Level SerializeLevel(LevelInterface& level_interface)
     return proto_level;
 }
 
-} // End namespace frame::proto.
+} // End namespace frame::json.

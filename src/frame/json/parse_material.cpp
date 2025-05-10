@@ -2,7 +2,7 @@
 
 #include "frame/opengl/material.h"
 
-namespace frame::proto
+namespace frame::json
 {
 
 std::optional<std::unique_ptr<frame::MaterialInterface>> ParseMaterialOpenGL(
@@ -43,4 +43,4 @@ std::optional<std::unique_ptr<frame::MaterialInterface>> ParseMaterialOpenGL(
     return material;
 }
 
-} // End namespace frame::proto.
+} // End namespace frame::json.

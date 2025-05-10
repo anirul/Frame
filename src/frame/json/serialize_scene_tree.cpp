@@ -5,7 +5,7 @@
 #include "frame/node_matrix.h"
 #include "frame/node_static_mesh.h"
 
-namespace frame::proto
+namespace frame::json
 {
 
 proto::SceneLight::LightTypeEnum SerializeLightType(
@@ -164,4 +164,4 @@ proto::SceneTree SerializeSceneTree(const LevelInterface& level_interface)
     return proto_scene_tree;
 }
 
-} // namespace frame::proto
+} // End namespace frame::json.

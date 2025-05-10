@@ -3,7 +3,7 @@
 #include "frame/level_interface.h"
 #include "frame/json/proto.h"
 
-namespace frame::proto
+namespace frame::json
 {
 
 /**
@@ -13,4 +13,4 @@ namespace frame::proto
  */
 proto::Texture SerializeTexture(TextureInterface& texture_interface);
 
-} // End namespace frame::proto.
+} // End namespace frame::json.

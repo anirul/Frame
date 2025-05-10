@@ -2,7 +2,7 @@
 
 #include "frame/opengl/cubemap.h"
 
-namespace frame::proto
+namespace frame::json
 {
 
 proto::Texture SerializeTexture(TextureInterface& texture_interface)
@@ -16,4 +16,4 @@ proto::Texture SerializeTexture(TextureInterface& texture_interface)
     return proto_texture;
 }
 
-} // End namespace frame::proto.
+} // End namespace frame::json.

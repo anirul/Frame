@@ -44,7 +44,7 @@ TEST_F(CubemapTest, CreateEquirectangularCubemapTest)
     EXPECT_NO_THROW(
         texture_ = frame::opengl::file::LoadCubeMapTextureFromFile(
             frame::file::FindFile("asset/cubemap/hamarikyu.hdr"),
-            frame::proto::PixelElementSize_FLOAT()));
+            frame::json::PixelElementSize_FLOAT()));
     ASSERT_TRUE(texture_);
     auto* opengl_texture =
         dynamic_cast<frame::opengl::Cubemap*>(texture_.get());

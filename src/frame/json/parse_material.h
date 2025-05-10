@@ -6,7 +6,7 @@
 #include "frame/json/proto.h"
 #include "frame/level_interface.h"
 
-namespace frame::proto
+namespace frame::json
 {
 
 /**
@@ -18,4 +18,4 @@ namespace frame::proto
 std::optional<std::unique_ptr<MaterialInterface>> ParseMaterialOpenGL(
     const frame::proto::Material& proto_material, LevelInterface& level);
 
-} // End namespace frame::proto.
+} // End namespace frame::json.

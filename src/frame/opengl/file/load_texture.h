@@ -40,8 +40,8 @@ std::unique_ptr<TextureInterface> LoadTextureFromFloat(float f);
  */
 std::unique_ptr<TextureInterface> LoadTextureFromFile(
     const std::filesystem::path& file,
-    proto::PixelElementSize pixel_element_size = proto::PixelElementSize_BYTE(),
-    proto::PixelStructure pixel_structure = proto::PixelStructure_RGB());
+    proto::PixelElementSize pixel_element_size = json::PixelElementSize_BYTE(),
+    proto::PixelStructure pixel_structure = json::PixelStructure_RGB());
 /**
  * @brief Load texture cube map from a file (*.hdr).
  * @param file: An image file (should be accessible from the current
@@ -54,8 +54,8 @@ std::unique_ptr<TextureInterface> LoadTextureFromFile(
  */
 std::unique_ptr<TextureInterface> LoadCubeMapTextureFromFile(
     const std::filesystem::path& file,
-    proto::PixelElementSize pixel_element_size = proto::PixelElementSize_BYTE(),
-    proto::PixelStructure pixel_structure = proto::PixelStructure_RGB());
+    proto::PixelElementSize pixel_element_size = json::PixelElementSize_BYTE(),
+    proto::PixelStructure pixel_structure = json::PixelStructure_RGB());
 /**
  * @brief Load texture from files.
  * @param files: 6 images files (should be accessible from the current
@@ -68,7 +68,7 @@ std::unique_ptr<TextureInterface> LoadCubeMapTextureFromFile(
  */
 std::unique_ptr<TextureInterface> LoadCubeMapTextureFromFiles(
     const std::array<std::filesystem::path, 6>& files,
-    proto::PixelElementSize pixel_element_size = proto::PixelElementSize_BYTE(),
-    proto::PixelStructure pixel_structure = proto::PixelStructure_RGB());
+    proto::PixelElementSize pixel_element_size = json::PixelElementSize_BYTE(),
+    proto::PixelStructure pixel_structure = json::PixelStructure_RGB());
 
 } // namespace frame::opengl::file

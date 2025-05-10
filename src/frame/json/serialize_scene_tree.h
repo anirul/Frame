@@ -3,7 +3,7 @@
 #include "frame/json/proto.h"
 #include "frame/level_interface.h"
 
-namespace frame::proto
+namespace frame::json
 {
 
 /**
@@ -14,4 +14,4 @@ namespace frame::proto
  */
 proto::SceneTree SerializeSceneTree(const LevelInterface& level_interface);
 
-} // End namespace frame::proto.
+} // End namespace frame::json.

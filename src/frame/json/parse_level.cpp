@@ -11,7 +11,7 @@
 #include "frame/opengl/texture.h"
 #include "frame/program_interface.h"
 
-namespace frame::proto
+namespace frame::json
 {
 
 namespace
@@ -121,7 +121,7 @@ std::unique_ptr<LevelInterface> ParseLevel(
 std::unique_ptr<frame::LevelInterface> ParseLevel(
     glm::uvec2 size, const std::string& content)
 {
-    auto proto_level = LoadProtoFromJson<Level>(content);
+    auto proto_level = LoadProtoFromJson<proto::Level>(content);
     return LevelProto(size, proto_level);
 }
 
@@ -130,7 +130,7 @@ std::unique_ptr<LevelInterface> ParseLevel(
 {
     std::ifstream ifs(path.string().c_str());
     std::string content(std::istreambuf_iterator<char>(ifs), {});
-    auto proto_level = LoadProtoFromJson<Level>(content);
+    auto proto_level = LoadProtoFromJson<proto::Level>(content);
     return LevelProto(size, proto_level);
 }
 

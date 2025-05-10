@@ -1,6 +1,6 @@
 #include "frame/json/serialize_material.h"
 
-namespace frame::proto
+namespace frame::json
 {
 
 proto::Material SerializeMaterial(
@@ -34,4 +34,4 @@ proto::Material SerializeMaterial(
     return proto_material;
 }
 
-} // End namespace frame::proto.
+} // End namespace frame::json.

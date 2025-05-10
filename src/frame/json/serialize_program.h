@@ -4,7 +4,7 @@
 #include "frame/level_interface.h"
 #include "frame/program_interface.h"
 
-namespace frame::proto
+namespace frame::json
 {
 
 /**
@@ -17,4 +17,4 @@ proto::Program SerializeProgram(
     const frame::ProgramInterface& program_interface,
     const frame::LevelInterface& level_interface);
 
-} // namespace frame::proto
+} // namespace frame::json.

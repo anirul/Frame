@@ -104,11 +104,6 @@ class Uniform : public UniformInterface
     glm::vec3 GetVec3() const override;
     glm::vec4 GetVec4() const override;
     int GetInt() const override;
-    glm::ivec2 GetIVec2() const override;
-    glm::ivec3 GetIVec3() const override;
-    glm::ivec4 GetIVec4() const override;
-    glm::mat2 GetMat2() const override;
-    glm::mat3 GetMat3() const override;
     glm::mat4 GetMat4() const override;
 
   protected:

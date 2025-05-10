@@ -7,7 +7,7 @@
 #include "frame/level_interface.h"
 #include "frame/program_interface.h"
 
-namespace frame::proto
+namespace frame::json
 {
 
 /**
@@ -17,6 +17,6 @@ namespace frame::proto
  * @return A unique pointer to a program interface or error.
  */
 std::unique_ptr<ProgramInterface> ParseProgramOpenGL(
-    const frame::proto::Program& proto_program, LevelInterface& level);
+    const proto::Program& proto_program, LevelInterface& level);
 
-} // End namespace frame::proto.
+} // End namespace frame::json.

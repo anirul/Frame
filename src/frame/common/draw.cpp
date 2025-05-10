@@ -15,7 +15,7 @@ void Draw::Startup(glm::uvec2 size)
     if (draw_type_based_ == DrawTypeEnum::PATH)
     {
         // Load level from proto files.
-        level_ = frame::proto::ParseLevel(size_, path_);
+        level_ = frame::json::ParseLevel(size_, path_);
     }
     if (!level_)
     {

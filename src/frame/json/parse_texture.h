@@ -6,7 +6,7 @@
 #include "frame/json/proto.h"
 #include "frame/texture_interface.h"
 
-namespace frame::proto
+namespace frame::json
 {
 
 /**
@@ -48,4 +48,4 @@ std::unique_ptr<TextureInterface> ParseCubeMapTextureFile(
 std::unique_ptr<TextureInterface> ParseBasicTexture(
     const proto::Texture& proto_texture, glm::uvec2 size);
 
-} // End namespace frame::proto.
+} // End namespace frame::json.

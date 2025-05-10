@@ -78,11 +78,11 @@ try
         if (std::exchange(create_proto, false))
         {
             proto_level =
-                frame::proto::LoadProtoFromJsonFile<frame::proto::Level>(
+                frame::json::LoadProtoFromJsonFile<frame::proto::Level>(
                     frame::file::FindFile("asset/json/point_cloud.json"));
         }
         std::unique_ptr<frame::LevelInterface> level =
-            frame::proto::ParseLevel(size, proto_level);
+            frame::json::ParseLevel(size, proto_level);
         // All except first.
         if (!std::exchange(do_once, false))
         {

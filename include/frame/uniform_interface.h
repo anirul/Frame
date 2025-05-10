@@ -4,6 +4,8 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
 #include <memory>
+#include <vector>
+#include "frame/json/proto.h"
 #include "name_interface.h"
 
 namespace frame
@@ -75,19 +77,17 @@ class UniformInterface : public NameInterface
      * @param value: The value of the uniform.
      */
     virtual void SetFloats(const std::vector<float>& value) = 0;
-
-  public:
-    //! @brief Get the values if available.
+    //! @brief Get a float value.
     virtual float GetFloat() const = 0;
-    virtual glm::vec2 GetVec2() const = 0;
-    virtual glm::vec3 GetVec3() const = 0;
-    virtual glm::vec4 GetVec4() const = 0;
+    //! @brief Get a int value.
     virtual int GetInt() const = 0;
-    virtual glm::ivec2 GetIVec2() const = 0;
-    virtual glm::ivec3 GetIVec3() const = 0;
-    virtual glm::ivec4 GetIVec4() const = 0;
-    virtual glm::mat2 GetMat2() const = 0;
-    virtual glm::mat3 GetMat3() const = 0;
+    //! @brief Get a vec2 value.
+    virtual glm::vec2 GetVec2() const = 0;
+    //! @brief Get a vec3 value.
+    virtual glm::vec3 GetVec3() const = 0;
+    //! @brief Get a vec4 value.
+    virtual glm::vec4 GetVec4() const = 0;
+    //! @brief Get a mat4 value.
     virtual glm::mat4 GetMat4() const = 0;
 };
 

@@ -38,8 +38,8 @@ TEST_F(LoadTextureTest, LoadTextureFromFileTest)
 {
     auto texture = frame::opengl::file::LoadTextureFromFile(
         frame::file::FindFile("asset/cubemap/positive_x.png"),
-        frame::proto::PixelElementSize_BYTE(),
-        frame::proto::PixelStructure_RGB_ALPHA());
+        frame::json::PixelElementSize_BYTE(),
+        frame::json::PixelStructure_RGB_ALPHA());
     EXPECT_TRUE(texture);
     EXPECT_EQ(1024, texture->GetSize().x);
     EXPECT_EQ(1024, texture->GetSize().y);
@@ -61,8 +61,8 @@ TEST_F(LoadTextureTest, LoadCubeMapFromFilesTest)
          frame::file::FindFile("asset/cubemap/negative_y.png"),
          frame::file::FindFile("asset/cubemap/positive_z.png"),
          frame::file::FindFile("asset/cubemap/negative_z.png")},
-        frame::proto::PixelElementSize_BYTE(),
-        frame::proto::PixelStructure_RGB_ALPHA());
+        frame::json::PixelElementSize_BYTE(),
+        frame::json::PixelStructure_RGB_ALPHA());
     EXPECT_TRUE(texture);
     EXPECT_EQ(1024, texture->GetSize().x);
     EXPECT_EQ(1024, texture->GetSize().y);
