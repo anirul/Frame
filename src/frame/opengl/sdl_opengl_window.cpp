@@ -7,8 +7,8 @@
 #include <shtypes.h>
 #pragma comment(lib, "Shcore.lib")
 #endif
-#include <format>
 #include <SDL3/SDL_video.h>
+#include <format>
 
 #include "frame/gui/draw_gui_interface.h"
 #include "frame/opengl/gui/sdl_opengl_draw_gui.h"
@@ -21,7 +21,8 @@ SDLOpenGLWindow::SDLOpenGLWindow(glm::uvec2 size) : size_(size)
 {
     if (!SDL_Init(SDL_INIT_VIDEO))
     {
-        throw std::runtime_error("Couldn't initialize SDL3.");
+        throw std::runtime_error(
+            std::format("Couldn't initialize SDL3: {}", SDL_GetError()));
     }
 
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
@@ -42,7 +43,7 @@ SDLOpenGLWindow::SDLOpenGLWindow(glm::uvec2 size) : size_(size)
     SDL_GL_SetAttribute(
         SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 5);
 #endif
 
     sdl_window_ = SDL_CreateWindow(
@@ -77,7 +78,7 @@ SDLOpenGLWindow::SDLOpenGLWindow(glm::uvec2 size) : size_(size)
     SDL_GetWindowSize(sdl_window_, &w, &h);
     desktop_size_.x = w;
     desktop_size_.y = h;
-    
+
     // Vsync off.
     SDL_GL_SetSwapInterval(0);
 
@@ -86,10 +87,9 @@ SDLOpenGLWindow::SDLOpenGLWindow(glm::uvec2 size) : size_(size)
     auto result = glewInit();
     if (result != GLEW_OK)
     {
-        throw std::runtime_error(
-            std::format(
-                "GLEW problems : {}",
-                reinterpret_cast<const char*>(glewGetErrorString(result))));
+        throw std::runtime_error(std::format(
+            "GLEW problems : {}",
+            reinterpret_cast<const char*>(glewGetErrorString(result))));
     }
 
     // During init, enable debug output
@@ -355,9 +355,8 @@ void SDLOpenGLWindow::Resize(glm::uvec2 size, FullScreenEnum fullscreen_enum)
 
         if (!SDL_SetWindowFullscreenMode(sdl_window_, mode_ptr))
         {
-            throw std::runtime_error(
-                std::format(
-                    "Error switching fullscreen mode: {}", SDL_GetError()));
+            throw std::runtime_error(std::format(
+                "Error switching fullscreen mode: {}", SDL_GetError()));
         }
 
         // Only resize in windowed mode — fullscreen modes will auto-resize the
@@ -452,7 +451,7 @@ glm::vec2 SDLOpenGLWindow::GetPixelPerInch(std::uint32_t screen /*= 0*/) const
     {
         float dpi = scale * 96.0f; // 96 is the base DPI on many desktop systems
         return glm::vec2(dpi, dpi);
-    } 
+    }
     else
     {
         throw std::runtime_error("Error couldn't get the DPI");

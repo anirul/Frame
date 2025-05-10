@@ -83,6 +83,7 @@ class SDLOpenGLNone : public WindowInterface
     std::unique_ptr<DeviceInterface> device_ = nullptr;
     std::unique_ptr<InputInterface> input_interface_ = nullptr;
     SDL_Window* sdl_window_ = nullptr;
+    SDL_GLContext gl_context_;
     frame::Logger& logger_ = frame::Logger::GetInstance();
 };
 
