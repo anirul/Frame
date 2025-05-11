@@ -88,6 +88,22 @@ class NodeStaticMesh : public NodeInterface
         return static_mesh_id_;
     }
     /**
+	 * @brief Return the material id of the mesh.
+	 * @return Id of the material used by the mesh.
+	 */
+    EntityId GetMaterialId() const
+    {
+		return material_id_;
+    }
+    /**
+	 * @brief Set the material id of the mesh.
+	 * @param material_id : The material id.
+	 */
+    void SetMaterialId(EntityId material_id)
+    {
+		material_id_ = material_id;
+	}
+    /**
      * @brief Get clean buffer parameters.
      * @return Clean buffer.
      */
@@ -98,6 +114,7 @@ class NodeStaticMesh : public NodeInterface
 
   private:
     EntityId static_mesh_id_ = NullId;
+	EntityId material_id_ = NullId;
     std::uint32_t clean_buffer_ = {};
 	proto::SceneStaticMesh::RenderTimeEnum render_time_enum_ =
         proto::SceneStaticMesh::SCENE_RENDER_TIME;

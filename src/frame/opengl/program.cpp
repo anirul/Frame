@@ -87,9 +87,8 @@ const UniformInterface& Program::GetUniform(const std::string& name) const
 {
     if (!HasUniform(name))
     {
-        throw std::runtime_error(
-            fmt::format(
-                "Uniform [{}] not found in program [{}].", name, name_));
+        throw std::runtime_error(fmt::format(
+            "Uniform [{}] not found in program [{}].", name, name_));
     }
     auto it = uniform_map_.find(name);
     return *(it->second);
@@ -157,11 +156,10 @@ void Program::AddUniform(std::unique_ptr<UniformInterface>&& uniform_interface)
         break;
     }
     default:
-        logger_->error(
-            fmt::format(
-                "Unknown uniform type [{}] for uniform [{}].",
-                static_cast<int>(uniform_ptr->GetType()),
-                name));
+        logger_->error(fmt::format(
+            "Unknown uniform type [{}] for uniform [{}].",
+            static_cast<int>(uniform_ptr->GetType()),
+            name));
         break;
     }
 }
@@ -192,11 +190,10 @@ int Program::GetMemoizeUniformLocation(const std::string& name) const
         if (location == -1)
         {
             GLenum error = glGetError();
-            throw std::runtime_error(
-                fmt::format(
-                    "Could not get a location for uniform [{}] error: {}.",
-                    name,
-                    error));
+            throw std::runtime_error(fmt::format(
+                "Could not get a location for uniform [{}] error: {}.",
+                name,
+                error));
         }
         memoize_map_.insert({name, location});
     }
@@ -267,7 +264,9 @@ EntityId Program::GetSceneRoot() const
 {
     // TODO(anirul): Change me with an assert.
     if (!scene_root_)
-        throw std::runtime_error("Should not be null!");
+    {
+        throw std::runtime_error("Scene root should not be null!");
+    }
     return scene_root_;
 }
 

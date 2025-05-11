@@ -9,7 +9,26 @@
 namespace frame::json
 {
 
-proto::Level SerializeLevel(LevelInterface& level_interface)
+namespace
+{
+
+std::string GetMaterialNameFromProgramName(
+    const std::string& program_name, const proto::Level& proto_level)
+{
+    for (const auto& material : proto_level.materials())
+    {
+        if (material.program_name() == program_name)
+        {
+            return material.name();
+        }
+    }
+    throw std::runtime_error(std::format(
+        "Couldn't find material name from program name: [{}]?", program_name));
+}
+
+} // End anonymous namespace.
+
+proto::Level SerializeLevel(const LevelInterface& level_interface)
 {
     proto::Level proto_level;
     auto logger = Logger::GetInstance();
@@ -37,6 +56,11 @@ proto::Level SerializeLevel(LevelInterface& level_interface)
     {
         ProgramInterface& program_interface =
             level_interface.GetProgramFromId(program_id);
+        // Don't serialize display program."
+        if (program_interface.GetName() == "DisplayProgram")
+        {
+            continue;
+        }
         proto::Program proto_program =
             SerializeProgram(program_interface, level_interface);
         *proto_level.add_programs() = proto_program;

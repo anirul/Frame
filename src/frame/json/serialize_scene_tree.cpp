@@ -4,8 +4,12 @@
 #include "frame/node_light.h"
 #include "frame/node_matrix.h"
 #include "frame/node_static_mesh.h"
+#include <absl/strings/str_split.h>
 
 namespace frame::json
+{
+
+namespace
 {
 
 proto::SceneLight::LightTypeEnum SerializeLightType(
@@ -92,7 +96,6 @@ proto::SceneMatrix SerializeNodeMatrix(const NodeInterface& node_interface)
 void SerializeNodeStaticMeshEnum(
     proto::SceneStaticMesh& proto_scene_static_mesh,
     const NodeStaticMesh& node_static_mesh,
-    const proto::SceneStaticMesh::RenderTimeEnum render_time_enum,
     const LevelInterface& level_interface)
 {
     proto_scene_static_mesh.set_mesh_enum(proto::SceneStaticMesh::INVALID);
@@ -112,68 +115,39 @@ void SerializeNodeStaticMeshEnum(
             "Couldn't find any mesh for this node: [{}].",
             node_static_mesh.GetName()));
     }
-    auto mesh_ids_material_ids =
-        level_interface.GetStaticMeshMaterialIds(render_time_enum);
-    for (const auto& [mesh_id, material_id] : mesh_ids_material_ids)
-    {
-        if (mesh_id == node_static_mesh.GetLocalMesh())
-        {
-            auto maybe_material_name =
-                level_interface.GetNameFromId(material_id);
-            if (!maybe_material_name)
-            {
-                throw std::runtime_error(std::format(
-                    "Couldn't find any material for this mesh: [{}].",
-                    level_interface.GetStaticMeshFromId(mesh_id).GetName()));
-            }
-            proto_scene_static_mesh.set_material_name(
-                maybe_material_name.value());
-        }
-    }
-    if (proto_scene_static_mesh.material_name().empty())
+    auto maybe_name =
+        level_interface.GetNameFromId(node_static_mesh.GetMaterialId());
+    if (!maybe_name)
     {
         throw std::runtime_error(std::format(
             "Couldn't find any material for this mesh: [{}].",
-            level_interface.GetStaticMeshFromId(node_static_mesh.GetLocalMesh())
-                .GetName()));
+            node_static_mesh.GetName()));
     }
-    proto_scene_static_mesh.set_render_time_enum(render_time_enum);
+    proto_scene_static_mesh.set_material_name(maybe_name.value());
+    proto_scene_static_mesh.set_render_time_enum(
+        node_static_mesh.GetRenderTimeType());
 }
 
 void SerializeNodeStaticMeshFileName(
     proto::SceneStaticMesh& proto_scene_static_mesh,
     const std::string& mesh_name,
     const NodeStaticMesh& node_static_mesh,
-    const proto::SceneStaticMesh::RenderTimeEnum render_time_enum,
     const LevelInterface& level_interface)
 {
     proto_scene_static_mesh.set_file_name(mesh_name);
-    auto mesh_ids_material_ids =
-        level_interface.GetStaticMeshMaterialIds(render_time_enum);
-    for (const auto& [mesh_id, material_id] : mesh_ids_material_ids)
-    {
-        if (mesh_id == node_static_mesh.GetLocalMesh())
-        {
-            auto maybe_material_name =
-                level_interface.GetNameFromId(material_id);
-            if (!maybe_material_name)
-            {
-                throw std::runtime_error(std::format(
-                    "Couldn't find any material for this mesh: [{}].",
-                    level_interface.GetStaticMeshFromId(mesh_id).GetName()));
-            }
-            proto_scene_static_mesh.set_material_name(
-                maybe_material_name.value());
-        }
-    }
-    if (proto_scene_static_mesh.material_name().empty())
+    auto mesh_ids_material_ids = level_interface.GetStaticMeshMaterialIds(
+        node_static_mesh.GetRenderTimeType());
+    auto maybe_name =
+        level_interface.GetNameFromId(node_static_mesh.GetMaterialId());
+    if (!maybe_name)
     {
         throw std::runtime_error(std::format(
             "Couldn't find any material for this mesh: [{}].",
-            level_interface.GetStaticMeshFromId(node_static_mesh.GetLocalMesh())
-                .GetName()));
+            node_static_mesh.GetName()));
     }
-    proto_scene_static_mesh.set_render_time_enum(render_time_enum);
+    proto_scene_static_mesh.set_material_name(maybe_name.value());
+    proto_scene_static_mesh.set_render_time_enum(
+        node_static_mesh.GetRenderTimeType());
 }
 
 proto::CleanBuffer SerializeCleanBuffer(std::uint32_t clean_buffer)
@@ -224,10 +198,7 @@ proto::SceneStaticMesh SerializeNodeStaticMesh(
                 level_interface.GetDefaultStaticMeshQuadId())
         {
             SerializeNodeStaticMeshEnum(
-                proto_scene_static_mesh,
-                node_static_mesh,
-                render_time_enum,
-                level_interface);
+                proto_scene_static_mesh, node_static_mesh, level_interface);
         }
         // This case is the file_name version.
         if (!mesh_name.empty())
@@ -236,7 +207,6 @@ proto::SceneStaticMesh SerializeNodeStaticMesh(
                 proto_scene_static_mesh,
                 mesh_name,
                 node_static_mesh,
-                render_time_enum,
                 level_interface);
         }
         // TODO(anirul): handle the plugin case?
@@ -265,8 +235,8 @@ void SerializeNode(
             SerializeNodeMatrix(node_interface);
         break;
     case NodeTypeEnum::NODE_STATIC_MESH:
-        *proto_scene_tree.add_scene_static_meshes() =
-            SerializeNodeStaticMesh(node_interface, level_interface);
+        *proto_scene_tree.add_scene_static_meshes() = SerializeNodeStaticMesh(
+            node_interface, level_interface);
         break;
     case NodeTypeEnum::NODE_UKNOWN:
         [[fallthrough]];
@@ -280,6 +250,8 @@ void SerializeNode(
         SerializeNode(proto_scene_tree, id, level_interface);
     }
 }
+
+} // End anonymous namespace.
 
 proto::SceneTree SerializeSceneTree(const LevelInterface& level_interface)
 {

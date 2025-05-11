@@ -33,6 +33,7 @@ class MenubarFile
     void ShowNewProject();
     void ShowOpenProject();
     void ShowSaveAsProject();
+    void TrySaveFile();
 
   private:
     bool changed_ = false;

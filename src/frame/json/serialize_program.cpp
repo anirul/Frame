@@ -19,9 +19,8 @@ proto::Program SerializeProgram(
         auto maybe_name = level_interface.GetNameFromId(input_texture_id);
         if (!maybe_name)
         {
-            throw std::runtime_error(
-                std::format(
-                    "Invalid texture name at id[{}]?", input_texture_id));
+            throw std::runtime_error(std::format(
+                "Invalid texture name at id[{}]?", input_texture_id));
         }
         *proto_program.add_input_texture_names() = maybe_name.value();
     }
@@ -31,39 +30,45 @@ proto::Program SerializeProgram(
         auto maybe_name = level_interface.GetNameFromId(output_texture_id);
         if (!maybe_name)
         {
-            throw std::runtime_error(
-                std::format(
-                    "Invalid texture name at id[{}]?", output_texture_id));
+            throw std::runtime_error(std::format(
+                "Invalid texture name at id[{}]?", output_texture_id));
         }
         *proto_program.add_output_texture_names() = maybe_name.value();
     }
     proto::SceneType proto_scene_type;
-    auto id = program_interface.GetSceneRoot();
-    if (id == level_interface.GetDefaultStaticMeshQuadId())
+    if (program_interface.GetTemporarySceneRoot() == "")
     {
-        proto_scene_type.set_value(proto::SceneType::QUAD);
-    }
-    else if (id == level_interface.GetDefaultStaticMeshCubeId())
-    {
-        proto_scene_type.set_value(proto::SceneType::CUBE);
-    }
-    else if (id == level_interface.GetDefaultRootSceneNodeId())
-    {
-        proto_scene_type.set_value(proto::SceneType::SCENE);
-        auto maybe_name = level_interface.GetNameFromId(
-            level_interface.GetDefaultRootSceneNodeId());
-        if (!maybe_name)
+        auto id = program_interface.GetSceneRoot();
+        if (id == level_interface.GetDefaultStaticMeshQuadId())
         {
-            throw std::runtime_error(
-                std::format(
+            proto_scene_type.set_value(proto::SceneType::QUAD);
+        }
+        else if (id == level_interface.GetDefaultStaticMeshCubeId())
+        {
+            proto_scene_type.set_value(proto::SceneType::CUBE);
+        }
+        else if (id == level_interface.GetDefaultRootSceneNodeId())
+        {
+            proto_scene_type.set_value(proto::SceneType::SCENE);
+            auto maybe_name = level_interface.GetNameFromId(
+                level_interface.GetDefaultRootSceneNodeId());
+            if (!maybe_name)
+            {
+                throw std::runtime_error(std::format(
                     "No root element name id[{}]?",
                     level_interface.GetDefaultRootSceneNodeId()));
+            }
+            proto_program.set_input_scene_root_name(maybe_name.value());
         }
-        proto_program.set_input_scene_root_name(maybe_name.value());
-    }
-    else
+        else
+        {
+            proto_scene_type.set_value(proto::SceneType::NONE);
+        }
+    } else
     {
-        proto_scene_type.set_value(proto::SceneType::NONE);
+        proto_scene_type.set_value(proto::SceneType::SCENE);
+        *proto_program.mutable_input_scene_root_name() =
+            program_interface.GetTemporarySceneRoot();
     }
     *proto_program.mutable_input_scene_type() = proto_scene_type;
     for (const auto& uniform_name : program_interface.GetUniformNameList())

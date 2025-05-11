@@ -389,7 +389,7 @@ EntityId LoadStaticMeshFromPlyFile(
 } // End namespace.
 
 std::vector<EntityId> LoadStaticMeshesFromFile(
-    LevelInterface& level,
+    LevelInterface& level_interface,
     const std::filesystem::path& file,
     const std::string& name,
     const std::string& material_name /* = ""*/)
@@ -399,12 +399,12 @@ std::vector<EntityId> LoadStaticMeshesFromFile(
     if (extension == ".obj")
     {
         return LoadStaticMeshesFromObjFile(
-            level, final_path, name, material_name);
+            level_interface, final_path, name, material_name);
     }
     if (extension == ".ply")
     {
-        return {
-            LoadStaticMeshFromPlyFile(level, final_path, name, material_name)};
+        return {LoadStaticMeshFromPlyFile(
+            level_interface, final_path, name, material_name)};
     }
     throw std::runtime_error(
         std::format("Unknown extention for file : {}", file.string()));

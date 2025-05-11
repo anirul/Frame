@@ -73,6 +73,7 @@ try
             else
             {
                 menubar_view.Reset();
+                menubar_file.TrySaveFile();
             }
             break;
         default:
