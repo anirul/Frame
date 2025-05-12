@@ -90,7 +90,7 @@ class LevelInterface : public NameInterface
      * @param id: Id of the element to get the name.
      * @return Name of the element or error.
      */
-    virtual std::optional<std::string> GetNameFromId(EntityId id) const = 0;
+    virtual std::string GetNameFromId(EntityId id) const = 0;
     /**
      * @brief Get the default output texture id.
      * @return Id of the default output texture.

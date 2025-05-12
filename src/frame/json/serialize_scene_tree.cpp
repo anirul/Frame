@@ -115,15 +115,8 @@ void SerializeNodeStaticMeshEnum(
             "Couldn't find any mesh for this node: [{}].",
             node_static_mesh.GetName()));
     }
-    auto maybe_name =
-        level_interface.GetNameFromId(node_static_mesh.GetMaterialId());
-    if (!maybe_name)
-    {
-        throw std::runtime_error(std::format(
-            "Couldn't find any material for this mesh: [{}].",
-            node_static_mesh.GetName()));
-    }
-    proto_scene_static_mesh.set_material_name(maybe_name.value());
+    proto_scene_static_mesh.set_material_name(
+        node_static_mesh.GetMaterialName());
     proto_scene_static_mesh.set_render_time_enum(
         node_static_mesh.GetRenderTimeType());
 }
@@ -137,15 +130,8 @@ void SerializeNodeStaticMeshFileName(
     proto_scene_static_mesh.set_file_name(mesh_name);
     auto mesh_ids_material_ids = level_interface.GetStaticMeshMaterialIds(
         node_static_mesh.GetRenderTimeType());
-    auto maybe_name =
-        level_interface.GetNameFromId(node_static_mesh.GetMaterialId());
-    if (!maybe_name)
-    {
-        throw std::runtime_error(std::format(
-            "Couldn't find any material for this mesh: [{}].",
-            node_static_mesh.GetName()));
-    }
-    proto_scene_static_mesh.set_material_name(maybe_name.value());
+    proto_scene_static_mesh.set_material_name(
+        node_static_mesh.GetMaterialName());
     proto_scene_static_mesh.set_render_time_enum(
         node_static_mesh.GetRenderTimeType());
 }
@@ -256,21 +242,10 @@ void SerializeNode(
 proto::SceneTree SerializeSceneTree(const LevelInterface& level_interface)
 {
     proto::SceneTree proto_scene_tree;
-    auto maybe_camera_name =
-        level_interface.GetNameFromId(level_interface.GetDefaultCameraId());
-    if (!maybe_camera_name)
-    {
-        throw std::runtime_error(
-            "Couldn't get the name of the default camera?");
-    }
-    proto_scene_tree.set_default_camera_name(maybe_camera_name.value());
-    auto maybe_root_name = level_interface.GetNameFromId(
-        level_interface.GetDefaultRootSceneNodeId());
-    if (!maybe_root_name)
-    {
-        throw std::runtime_error("Couldn't get the default root name?");
-    }
-    proto_scene_tree.set_default_root_name(maybe_root_name.value());
+    proto_scene_tree.set_default_camera_name(
+        level_interface.GetNameFromId(level_interface.GetDefaultCameraId()));
+    proto_scene_tree.set_default_root_name(level_interface.GetNameFromId(
+        level_interface.GetDefaultRootSceneNodeId()));
     SerializeNode(
         proto_scene_tree,
         level_interface.GetDefaultRootSceneNodeId(),

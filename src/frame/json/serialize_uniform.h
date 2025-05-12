@@ -7,6 +7,12 @@ namespace frame::json
 {
 
 /**
+ * @brief serialize a glm::uvec2 into a proto::Size.
+ * @param uvec2 : Vector to be serialized.
+ * @return Proto serialized.
+ */
+proto::Size SerializeSize(glm::uvec2 uvec2);
+/**
  * @brief Serialize a glm::vec2 into a proto::UniformVector2.
  * @param vec : Vector to be serialized.
  * @return Proto serialized.

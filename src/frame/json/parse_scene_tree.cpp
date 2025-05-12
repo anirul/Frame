@@ -89,21 +89,11 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
     switch (proto_scene_static_mesh.mesh_enum())
     {
     case proto::SceneStaticMesh::CUBE: {
-        auto maybe_mesh_id = level.GetDefaultStaticMeshCubeId();
-        if (!maybe_mesh_id)
-        {
-            return false;
-        }
-        mesh_id = maybe_mesh_id;
+        mesh_id = level.GetDefaultStaticMeshCubeId();
         break;
     }
     case proto::SceneStaticMesh::QUAD: {
-        auto maybe_mesh_id = level.GetDefaultStaticMeshQuadId();
-        if (!maybe_mesh_id)
-        {
-            return false;
-        }
-        mesh_id = maybe_mesh_id;
+        mesh_id = level.GetDefaultStaticMeshQuadId();
         break;
     }
     default: {
@@ -112,31 +102,18 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
             static_cast<int>(proto_scene_static_mesh.mesh_enum())));
     }
     }
-    auto maybe_material_id =
-        level.GetIdFromName(proto_scene_static_mesh.material_name());
-    if (!maybe_material_id)
-    {
-        throw std::runtime_error(fmt::format(
-            "Couldn't find any material for this mesh: [{}].",
-            level.GetStaticMeshFromId(mesh_id).GetName()));
-    }
-    const EntityId material_id = maybe_material_id;
+    const EntityId material_id = level.GetIdFromName(proto_scene_static_mesh.material_name());
     auto& mesh = level.GetStaticMeshFromId(mesh_id);
     mesh.SetRenderPrimitive(proto_scene_static_mesh.render_primitive_enum());
     std::unique_ptr<NodeStaticMesh> node_interface =
         std::make_unique<NodeStaticMesh>(GetFunctor(level), mesh_id);
     node_interface->SetName(proto_scene_static_mesh.name());
     node_interface->SetParentName(proto_scene_static_mesh.parent());
-    node_interface->SetMaterialId(material_id);
-    auto maybe_scene_id = level.AddSceneNode(std::move(node_interface));
+    node_interface->SetMaterialName(proto_scene_static_mesh.material_name());
     level.AddMeshMaterialId(
-        maybe_scene_id,
+        level.AddSceneNode(std::move(node_interface)),
         material_id,
         proto_scene_static_mesh.render_time_enum());
-    if (!maybe_scene_id)
-    {
-        throw std::runtime_error("No scene Id.");
-    }
     return true;
 }
 
@@ -205,16 +182,8 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
     auto mesh = std::make_unique<opengl::StaticMesh>(level, parameter);
     mesh->SetName("mesh." + proto_scene_static_mesh.name());
     auto mesh_id = level.AddStaticMesh(std::move(mesh));
-
-    // Get the material id.
-    auto maybe_material_id =
+    const EntityId material_id =
         level.GetIdFromName(proto_scene_static_mesh.material_name());
-    if (!maybe_material_id)
-    {
-        return false;
-    }
-    const EntityId material_id = maybe_material_id;
-
     // Create the node corresponding to the mesh.
     auto& mesh_ref = level.GetStaticMeshFromId(mesh_id);
     mesh_ref.SetRenderPrimitive(
@@ -223,7 +192,7 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
         std::make_unique<NodeStaticMesh>(GetFunctor(level), mesh_id);
     node_interface->SetName(proto_scene_static_mesh.name());
     node_interface->SetParentName(proto_scene_static_mesh.parent());
-    node_interface->SetMaterialId(material_id);
+    node_interface->SetMaterialName(proto_scene_static_mesh.material_name());
     auto scene_id = level.AddSceneNode(std::move(node_interface));
     level.AddMeshMaterialId(
         scene_id, material_id, proto_scene_static_mesh.render_time_enum());

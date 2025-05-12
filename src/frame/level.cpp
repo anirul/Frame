@@ -93,17 +93,17 @@ EntityId Level::GetIdFromName(const std::string& name) const
     }
 }
 
-std::optional<std::string> Level::GetNameFromId(EntityId id) const
+std::string Level::GetNameFromId(EntityId id) const
 {
-    try
+    if (id == NullId)
     {
-        return id_name_map_.at(id);
+        throw std::runtime_error("Invalid id?");
     }
-    catch (std::out_of_range& ex)
+    if (!id_name_map_.count(id))
     {
-        logger_->warn(ex.what());
-        return std::nullopt;
+        throw std::runtime_error(std::format("No name for id[{}]", id));
     }
+    return id_name_map_.at(id);
 }
 
 EntityId Level::AddSceneNode(std::unique_ptr<NodeInterface>&& scene_node)
@@ -127,7 +127,6 @@ EntityId Level::AddTexture(std::unique_ptr<TextureInterface>&& texture)
 {
     EntityId id = GetTextureNewId();
     std::string name = texture->GetName();
-    // CHECKME(anirul): maybe this should return std::nullopt.
     if (string_set_.count(name))
     {
         throw std::runtime_error("Name: " + name + " is already in!");
@@ -144,7 +143,6 @@ EntityId Level::AddProgram(std::unique_ptr<ProgramInterface>&& program)
 {
     EntityId id = GetProgramNewId();
     std::string name = program->GetName();
-    // CHECKME(anirul): maybe this should return std::nullopt.
     if (string_set_.count(name))
     {
         throw std::runtime_error("Name: " + name + " is already in!");

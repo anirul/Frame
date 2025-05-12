@@ -16,24 +16,14 @@ proto::Program SerializeProgram(
     proto_program.set_name(program_interface.GetName());
     for (const auto& input_texture_id : program_interface.GetInputTextureIds())
     {
-        auto maybe_name = level_interface.GetNameFromId(input_texture_id);
-        if (!maybe_name)
-        {
-            throw std::runtime_error(std::format(
-                "Invalid texture name at id[{}]?", input_texture_id));
-        }
-        *proto_program.add_input_texture_names() = maybe_name.value();
+        *proto_program.add_input_texture_names() =
+            level_interface.GetNameFromId(input_texture_id);
     }
     for (const auto& output_texture_id :
          program_interface.GetOutputTextureIds())
     {
-        auto maybe_name = level_interface.GetNameFromId(output_texture_id);
-        if (!maybe_name)
-        {
-            throw std::runtime_error(std::format(
-                "Invalid texture name at id[{}]?", output_texture_id));
-        }
-        *proto_program.add_output_texture_names() = maybe_name.value();
+        *proto_program.add_output_texture_names() =
+            level_interface.GetNameFromId(output_texture_id);
     }
     proto::SceneType proto_scene_type;
     if (program_interface.GetTemporarySceneRoot() == "")
@@ -50,15 +40,9 @@ proto::Program SerializeProgram(
         else if (id == level_interface.GetDefaultRootSceneNodeId())
         {
             proto_scene_type.set_value(proto::SceneType::SCENE);
-            auto maybe_name = level_interface.GetNameFromId(
-                level_interface.GetDefaultRootSceneNodeId());
-            if (!maybe_name)
-            {
-                throw std::runtime_error(std::format(
-                    "No root element name id[{}]?",
+            proto_program.set_input_scene_root_name(
+                level_interface.GetNameFromId(
                     level_interface.GetDefaultRootSceneNodeId()));
-            }
-            proto_program.set_input_scene_root_name(maybe_name.value());
         }
         else
         {

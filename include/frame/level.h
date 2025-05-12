@@ -241,7 +241,7 @@ class Level : public LevelInterface
      * @param id: Id of the element to get the name.
      * @return Name of the element.
      */
-    std::optional<std::string> GetNameFromId(EntityId id) const override;
+    std::string GetNameFromId(EntityId id) const override;
     /**
      * @brief Add scene node to the scene tree.
      * @param scene_node: Move a scene node to the scene tree.

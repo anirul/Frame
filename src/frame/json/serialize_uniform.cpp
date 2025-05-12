@@ -4,6 +4,14 @@
 namespace frame::json
 {
 
+proto::Size SerializeSize(glm::uvec2 size)
+{
+    proto::Size proto_size;
+    proto_size.set_x(size.x);
+    proto_size.set_y(size.y);
+    return proto_size;
+}
+
 proto::UniformVector2 SerializeUniformVector2(glm::vec2 vec)
 {
     proto::UniformVector2 proto_uniform_vector2;
