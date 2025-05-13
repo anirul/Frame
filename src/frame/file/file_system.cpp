@@ -22,6 +22,9 @@ const std::filesystem::path FindElement(
     for (auto i : {0, 1, 2, 3, 4, 5, 6})
     {
         auto new_path = path;
+        for (auto j = 0; j < i; ++j)
+            new_path /= "../";
+        new_path /= file;
         if (test(new_path))
         {
             // Prune the path from relative elements.
@@ -41,9 +44,6 @@ const std::filesystem::path FindElement(
                 return new_path;
             }
         }
-        for (auto j = 0; j < i; ++j)
-            new_path /= "../";
-        new_path /= file;
     }
     throw std::runtime_error(
         std::format("Could not find any element: [{}].", file.string()));
