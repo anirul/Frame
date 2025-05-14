@@ -1,16 +1,32 @@
 {
     "version": "2.0.0",
-    "tasks":[
+    "tasks": [
         {
-            "label":"make (debug)",
-            "type":"shell",
-            "command":"make",
-            "args":[],
-            "options":{
-                "cwd": "${workspaceFolder}/build"
-            },
-            "problemMatcher":["$gcc"],
-            "group": "build"
+            "label": "CMake Configure",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "-S", "${workspaceFolder}",
+                "-B", "${workspaceFolder}/build",
+                "-G", "Ninja",
+                "-DCMAKE_BUILD_TYPE=Debug",
+                "-DCMAKE_TOOLCHAIN_FILE=/home/anirul/github/vcpkg/scripts/buildsystems/vcpkg.cmake",
+                "-DVCPKG_TARGET_TRIPLET=x64-linux"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "CMake Build",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "--build", "${workspaceFolder}/build",
+                "--config", "Debug"
+            ],
+            "group": "build",
+            "dependsOn": "CMake Configure",
+            "problemMatcher": "$gcc"
         }
     ]
 }
+  

@@ -1,0 +1,18 @@
+{
+    "version": 3,
+    "cmakeMinimumRequired": { "major": 3, "minor": 19 },
+    "configurePresets": [
+        {
+        "name": "default",
+        "generator": "Ninja",
+        "binaryDir": "${sourceDir}/build",
+        "cacheVariables": {
+            "CMAKE_EXPORT_COMPILE_COMMANDS": "TRUE",
+            "CMAKE_BUILD_TYPE": "Debug",
+            "CMAKE_TOOLCHAIN_FILE": "/home/anirul/github/vcpkg/scripts/buildsystems/vcpkg.cmake",
+            "VCPKG_TARGET_TRIPLET": "x64-linux"
+        }
+        }
+    ]
+}
+  

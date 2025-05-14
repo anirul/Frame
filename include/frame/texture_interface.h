@@ -37,23 +37,29 @@ struct TextureParameter
     proto::PixelElementSize pixel_element_size = json::PixelElementSize_BYTE();
     /**
      * @brief Pixel structure, this is the number of color you have in the
-     *        texture 1 to 4.
+     * texture 1 to 4.
      */
     proto::PixelStructure pixel_structure = json::PixelStructure_RGB();
     /**
      * @brief Texture size, in case of cubemap this is the value of a single
-     *        plane.
+     * plane.
      */
     glm::uvec2 size = glm::uvec2(1, 1);
+    //! @brief In case this is a relative size store it there.
+    glm::uvec2 relative_size = glm::uvec2(0, 0);
     /**
      * @brief Texture data, in case you don't want to provide it just pass
-     *        an empty vector. You have to multiply the size by the pixel
-     *        element size to get the size of the vector.
+     * an empty vector. You have to multiply the size by the pixel element size
+     * to get the size of the vector.
      */
     void* data_ptr = nullptr;
+    //! @brief In case it come from a file name.
+    std::string file_name;
     //! @brief In case of cube map you need 6 planes of array pointers.
     std::array<void*, 6> array_data_ptr = {
         nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
+    //! @brief In case it come from file names.
+    std::array<std::string, 6> array_file_names = {};
     //! @brief Is it a cube map or a normal 2d texture.
     TextureTypeEnum map_type = TextureTypeEnum::TEXTURE_2D;
 };
@@ -68,10 +74,10 @@ struct TextureInterface : public NameInterface
     //! @brief Virtual destructor.
     virtual ~TextureInterface() = default;
     /**
-	 * @brief Get the texture parameters used at creation, usefull for
-	 * serialization.
-	 * @return Texture parameters used at creation.
-	 */
+     * @brief Get the texture parameters used at creation, usefull for
+     * serialization.
+     * @return Texture parameters used at creation.
+     */
     virtual const TextureParameter& GetTextureParameter() const = 0;
     /**
      * @brief Get the pixel structure (R, RG, RGB, RGBA).

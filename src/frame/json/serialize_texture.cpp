@@ -1,7 +1,7 @@
 #include "frame/json/serialize_texture.h"
 
-#include "frame/opengl/cubemap.h"
 #include "frame/json/serialize_uniform.h"
+#include "frame/opengl/cubemap.h"
 
 namespace frame::json
 {
@@ -17,7 +17,43 @@ proto::Texture SerializeTextureFromParameter(
         texture_parameter.pixel_element_size;
     *proto_texture.mutable_pixel_structure() =
         texture_parameter.pixel_structure;
-    *proto_texture.mutable_size() = SerializeSize(texture_parameter.size);
+    if (texture_parameter.relative_size != glm::uvec2(0, 0))
+    {
+        *proto_texture.mutable_size() =
+            SerializeSize(texture_parameter.relative_size);
+    }
+    else
+    {
+        *proto_texture.mutable_size() = SerializeSize(texture_parameter.size);
+    }
+    if (!texture_parameter.file_name.empty())
+    {
+        proto_texture.set_file_name(texture_parameter.file_name);
+    }
+    if (!texture_parameter.array_file_names[0].empty())
+    {
+        if (texture_parameter.array_file_names.size() != 6)
+        {
+            throw std::runtime_error(
+                std::format(
+                    "Array files should have 6 files not {}?",
+                    texture_parameter.array_file_names.size()));
+        }
+        proto::CubeMapFiles proto_cubemap_files;
+        proto_cubemap_files.set_positive_x(
+            texture_parameter.array_file_names[0]);
+        proto_cubemap_files.set_negative_x(
+            texture_parameter.array_file_names[1]);
+        proto_cubemap_files.set_positive_y(
+            texture_parameter.array_file_names[2]);
+        proto_cubemap_files.set_negative_y(
+            texture_parameter.array_file_names[3]);
+        proto_cubemap_files.set_positive_z(
+            texture_parameter.array_file_names[4]);
+        proto_cubemap_files.set_negative_z(
+            texture_parameter.array_file_names[5]);
+        *proto_texture.mutable_file_names() = proto_cubemap_files;
+    }
     return proto_texture;
 }
 

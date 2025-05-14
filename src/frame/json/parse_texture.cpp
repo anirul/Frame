@@ -3,9 +3,9 @@
 #include <filesystem>
 
 #include "frame/file/file_system.h"
+#include "frame/opengl/cubemap.h"
 #include "frame/opengl/file/load_texture.h"
 #include "frame/opengl/texture.h"
-#include "frame/opengl/cubemap.h"
 
 namespace
 {
@@ -35,8 +35,10 @@ std::unique_ptr<frame::TextureInterface> ParseTexture(
     const proto::Texture& proto_texture, glm::uvec2 size)
 {
     glm::uvec2 texture_size = size;
+    glm::uvec2 relative_texture_size = glm::uvec2(0, 0);
     if (proto_texture.size().x() < 0)
     {
+        relative_texture_size.x = proto_texture.size().x();
         texture_size.x /= std::abs(proto_texture.size().x());
     }
     else
@@ -45,6 +47,7 @@ std::unique_ptr<frame::TextureInterface> ParseTexture(
     }
     if (proto_texture.size().y() < 0)
     {
+        relative_texture_size.y = proto_texture.size().y();
         texture_size.y /= std::abs(proto_texture.size().y());
     }
     else
@@ -56,6 +59,7 @@ std::unique_ptr<frame::TextureInterface> ParseTexture(
     texture_parameter.pixel_element_size = proto_texture.pixel_element_size();
     texture_parameter.pixel_structure = proto_texture.pixel_structure();
     texture_parameter.size = texture_size;
+    texture_parameter.relative_size = relative_texture_size;
     if (!proto_texture.pixels().empty())
     {
         texture_parameter.data_ptr = (void*)proto_texture.pixels().data();
@@ -67,13 +71,21 @@ std::unique_ptr<frame::TextureInterface> ParseTexture(
     }
     constexpr auto INVALID_TEXTURE = frame::proto::TextureFilter::INVALID;
     if (proto_texture.min_filter().value() != INVALID_TEXTURE)
+    {
         texture->SetMinFilter(proto_texture.min_filter().value());
+    }
     if (proto_texture.mag_filter().value() != INVALID_TEXTURE)
+    {
         texture->SetMagFilter(proto_texture.mag_filter().value());
+    }
     if (proto_texture.wrap_s().value() != INVALID_TEXTURE)
+    {
         texture->SetWrapS(proto_texture.wrap_s().value());
+    }
     if (proto_texture.wrap_t().value() != INVALID_TEXTURE)
+    {
         texture->SetWrapT(proto_texture.wrap_t().value());
+    }
     return texture;
 }
 
@@ -81,8 +93,10 @@ std::unique_ptr<TextureInterface> ParseCubeMapTexture(
     const proto::Texture& proto_texture, glm::uvec2 size)
 {
     glm::uvec2 texture_size = size;
+    glm::uvec2 relative_texture_size = size;
     if (proto_texture.size().x() < 0)
     {
+        relative_texture_size.x = proto_texture.size().x();
         texture_size.x /= std::abs(proto_texture.size().x());
     }
     else
@@ -91,6 +105,7 @@ std::unique_ptr<TextureInterface> ParseCubeMapTexture(
     }
     if (proto_texture.size().y() < 0)
     {
+        relative_texture_size.y = proto_texture.size().y();
         texture_size.y /= std::abs(proto_texture.size().y());
     }
     else
@@ -107,16 +122,25 @@ std::unique_ptr<TextureInterface> ParseCubeMapTexture(
     texture_parameter.pixel_structure = proto_texture.pixel_structure();
     texture_parameter.map_type = TextureTypeEnum::CUBMAP;
     texture_parameter.size = texture_size;
+    texture_parameter.relative_size = relative_texture_size;
     texture = std::make_unique<opengl::Cubemap>(texture_parameter);
     constexpr auto INVALID_TEXTURE = frame::proto::TextureFilter::INVALID;
     if (proto_texture.min_filter().value() != INVALID_TEXTURE)
+    {
         texture->SetMinFilter(proto_texture.min_filter().value());
+    }
     if (proto_texture.mag_filter().value() != INVALID_TEXTURE)
+    {
         texture->SetMagFilter(proto_texture.mag_filter().value());
+    }
     if (proto_texture.wrap_s().value() != INVALID_TEXTURE)
+    {
         texture->SetWrapS(proto_texture.wrap_s().value());
+    }
     if (proto_texture.wrap_t().value() != INVALID_TEXTURE)
+    {
         texture->SetWrapT(proto_texture.wrap_t().value());
+    }
     return texture;
 }
 

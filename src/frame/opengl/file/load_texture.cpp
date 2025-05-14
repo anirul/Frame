@@ -10,11 +10,11 @@
 #include "frame/json/parse_level.h"
 #include "frame/logger.h"
 #include "frame/node_matrix.h"
+#include "frame/opengl/cubemap.h"
 #include "frame/opengl/material.h"
 #include "frame/opengl/renderer.h"
 #include "frame/opengl/static_mesh.h"
 #include "frame/opengl/texture.h"
-#include "frame/opengl/cubemap.h"
 #include "frame/window_factory.h"
 
 namespace frame::opengl::file
@@ -100,8 +100,12 @@ std::unique_ptr<frame::TextureInterface> LoadTextureFromFile(
     proto::PixelStructure pixel_structure /*= proto::PixelStructure_RGB()*/)
 {
     frame::file::Image image(file, pixel_element_size, pixel_structure);
-    TextureParameter texture_parameter = {
-        pixel_element_size, pixel_structure, image.GetSize(), image.Data()};
+    TextureParameter texture_parameter;
+    texture_parameter.pixel_element_size = pixel_element_size;
+    texture_parameter.pixel_structure = pixel_structure;
+    texture_parameter.size = image.GetSize();
+    texture_parameter.data_ptr = image.Data();
+    texture_parameter.file_name = file.string();
     return std::make_unique<frame::opengl::Texture>(texture_parameter);
 }
 
@@ -170,7 +174,9 @@ std::unique_ptr<frame::TextureInterface> LoadCubeMapTextureFromFile(
     // Get the output image (cube map).
     auto maybe_output_id = level->GetIdFromName("OutputTexture");
     if (!maybe_output_id)
+    {
         return nullptr;
+    }
     return level->ExtractTexture(maybe_output_id);
 }
 
@@ -180,16 +186,17 @@ std::unique_ptr<frame::TextureInterface> LoadCubeMapTextureFromFiles(
         pixel_element_size /*= proto::PixelElementSize_BYTE()*/,
     proto::PixelStructure pixel_structure /*= proto::PixelStructure_RGB()*/)
 {
+    TextureParameter texture_parameter = {pixel_element_size, pixel_structure};
+    texture_parameter.map_type = TextureTypeEnum::CUBMAP;
     std::array<std::filesystem::path, 6> final_files = {};
     for (int i = 0; i < final_files.size(); ++i)
     {
+        texture_parameter.array_file_names[i] = files[i];
         final_files[i] = frame::file::FindFile(files[i]);
     }
     std::pair<std::uint32_t, std::uint32_t> img_size;
     std::array<std::unique_ptr<frame::file::Image>, 6> images;
     std::array<void*, 6> pointers = {};
-    TextureParameter texture_parameter = {pixel_element_size, pixel_structure};
-    texture_parameter.map_type = TextureTypeEnum::CUBMAP;
     for (int i = 0; i < pointers.size(); ++i)
     {
         images[i] = std::make_unique<frame::file::Image>(
@@ -203,21 +210,21 @@ std::unique_ptr<frame::TextureInterface> LoadCubeMapTextureFromFiles(
 std::unique_ptr<TextureInterface> LoadTextureFromVec4(const glm::vec4& vec4)
 {
     std::array<float, 4> ar = {vec4.x, vec4.y, vec4.z, vec4.w};
-    TextureParameter texture_parameter = {
-        json::PixelElementSize_FLOAT(),
-        json::PixelStructure_RGB_ALPHA(),
-        {1, 1},
-        (void*)&ar};
+    TextureParameter texture_parameter;
+    texture_parameter.pixel_element_size = json::PixelElementSize_FLOAT();
+    texture_parameter.pixel_structure = json::PixelStructure_RGB_ALPHA();
+    texture_parameter.size = {1, 1};
+    texture_parameter.data_ptr = (void*)&ar;
     return std::make_unique<frame::opengl::Texture>(texture_parameter);
 }
 
 std::unique_ptr<TextureInterface> LoadTextureFromFloat(float f)
 {
-    TextureParameter texture_parameter = {
-        json::PixelElementSize_FLOAT(),
-        json::PixelStructure_GREY(),
-        {1, 1},
-        (void*)&f};
+    TextureParameter texture_parameter;
+    texture_parameter.pixel_element_size = json::PixelElementSize_FLOAT();
+    texture_parameter.pixel_structure = json::PixelStructure_GREY();
+    texture_parameter.size = {1, 1};
+    texture_parameter.data_ptr = (void*)&f;
     return std::make_unique<frame::opengl::Texture>(texture_parameter);
 }
 
