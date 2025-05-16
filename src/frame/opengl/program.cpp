@@ -395,6 +395,12 @@ bool Program::HasUniform(const std::string& name) const
     return true;
 }
 
+void Program::AddUniformEnum(
+    const std::string& name, proto::Uniform::UniformEnum uniform_enum)
+{
+    name_uniform_enums_.insert({name, uniform_enum});
+}
+
 std::string Program::GetTemporarySceneRoot() const
 {
     return temporary_scene_root_;
@@ -464,6 +470,7 @@ std::unique_ptr<ProgramInterface> CreateProgram(
     }
     program->AddShader(vertex);
     program->AddShader(fragment);
+    // Need to add the uniform enum list for serialization.
     for (const auto& uniform : proto_program.parameters())
     {
         if (uniform.has_uniform_enum())

@@ -17,7 +17,7 @@ std::unique_ptr<frame::ProgramInterface> ParseProgramOpenGL(
 {
     Logger& logger = Logger::GetInstance();
     // Create the program.
-    auto program = opengl::file::LoadProgram(proto_program.shader());
+    auto program = opengl::file::LoadProgram(proto_program);
     if (!program)
     {
         return nullptr;

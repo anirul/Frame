@@ -7,15 +7,22 @@ namespace test
 
 TEST_F(LoadProgramTest, LoadFromNameTest)
 {
-    ASSERT_TRUE(frame::opengl::file::LoadProgram("blur"));
+    frame::proto::Program proto_program;
+    proto_program.set_name("blur");
+    proto_program.set_shader("blur");
+    ASSERT_TRUE(frame::opengl::file::LoadProgram(proto_program));
 }
 
 TEST_F(LoadProgramTest, LoadFromFileTest)
 {
-    ASSERT_TRUE(frame::opengl::file::LoadProgram(
-        "blur",
-        "asset/shader/opengl/blur.vert",
-        "asset/shader/opengl/blur.frag"));
+    frame::proto::Program proto_program;
+    proto_program.set_name("blur");
+    proto_program.set_shader("blur");
+    ASSERT_TRUE(
+        frame::opengl::file::LoadProgram(
+            proto_program,
+            "asset/shader/opengl/blur.vert",
+            "asset/shader/opengl/blur.frag"));
 }
 
 } // End namespace test.

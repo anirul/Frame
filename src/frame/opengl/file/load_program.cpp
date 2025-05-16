@@ -30,7 +30,7 @@ std::unique_ptr<frame::ProgramInterface> LoadProgram(
         frame::file::FindFile(std::filesystem::path(vertex_file))};
     std::ifstream fragment_ifs{
         frame::file::FindFile(std::filesystem::path(fragment_file))};
-    return CreateProgram(name, vertex_ifs, fragment_ifs);
+    return CreateProgram(proto_program, vertex_ifs, fragment_ifs);
 }
 
 } // namespace frame::opengl::file

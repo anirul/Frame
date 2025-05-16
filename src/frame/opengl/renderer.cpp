@@ -60,7 +60,10 @@ Renderer::Renderer(LevelInterface& level, glm::uvec4 viewport)
     render_buffer_->CreateStorage(
         {viewport_.z - viewport_.x, viewport_.w - viewport_.y});
     frame_buffer_->AttachRender(*render_buffer_);
-    auto program = file::LoadProgram("display");
+    proto::Program proto_program;
+    proto_program.set_name("display");
+    proto_program.set_shader("display");
+    auto program = file::LoadProgram(proto_program);
     if (!program)
         throw std::runtime_error("No program!");
     auto material = std::make_unique<Material>();
