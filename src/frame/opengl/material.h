@@ -63,18 +63,17 @@ class Material : public MaterialInterface
      */
     bool RemoveTextureId(EntityId id) override;
     /**
-     * @brief Get ids of a material.
+     * @brief Get texture ids of a material.
      * @return Return the list of texture ids.
      */
-    const std::vector<EntityId> GetIds() const final;
+    std::vector<EntityId> GetTextureIds() const final;
     /**
      * @brief Enable a texture to be used by the context.
      * @param id: Id of the texture to be enabled.
      * @return Return the name and the binding slot of a texture (to be
      * passed to the program).
      */
-    const std::pair<std::string, int> EnableTextureId(
-        EntityId id) const override;
+    std::pair<std::string, int> EnableTextureId(EntityId id) const override;
     /**
      * @brief Unbind the texture and remove it from the list.
      * @param id: Texture id.

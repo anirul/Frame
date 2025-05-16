@@ -48,7 +48,8 @@ proto::Program SerializeProgram(
         {
             proto_scene_type.set_value(proto::SceneType::NONE);
         }
-    } else
+    }
+    else
     {
         proto_scene_type.set_value(proto::SceneType::SCENE);
         *proto_program.mutable_input_scene_root_name() =
@@ -58,9 +59,13 @@ proto::Program SerializeProgram(
     for (const auto& uniform_name : program_interface.GetUniformNameList())
     {
         proto::Uniform proto_uniform;
-        proto_uniform =
-            SerializeUniform(program_interface.GetUniform(uniform_name));
-        *proto_program.add_parameters() = proto_uniform;
+        proto_uniform = SerializeUniform(
+            program_interface.GetUniform(uniform_name), level_interface);
+        // Could return an empty name in case it was found in the materials.
+        if (proto_uniform.name() != "")
+        {
+            *proto_program.add_parameters() = proto_uniform;
+        }
     }
     return proto_program;
 }

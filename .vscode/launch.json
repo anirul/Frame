@@ -2,34 +2,34 @@
     "version": "0.2.0",
     "configurations": [
         {
-        "name": "CMake: Debug Active Target",
-        "type": "cppdbg",
-        "request": "launch",
-        "program": "${command:cmake.launchTargetPath}",
-        "cwd": "${workspaceFolder}",
-        "preLaunchTask": "CMake Build",
-        "MIMode": "gdb",
-        "miDebuggerPath": "/usr/bin/gdb",
-        "stopAtEntry": false,
-        "externalConsole": false,
+            "name": "CMake: Debug Active Target",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${command:cmake.launchTargetPath}",
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "CMake Build",
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",
+            "stopAtEntry": false,
+            "externalConsole": false,
 
-        "setupCommands": [
-            {
-            "description": "Break on C++ exception throws",
-            "text": "catch throw",
-            "ignoreFailures": false
-            },
-            {
-            "description": "Also break when exceptions are caught",
-            "text": "catch catch",
-            "ignoreFailures": true
-            },
-            {
-            "description": "Enable pretty-printing for STL",
-            "text": "-enable-pretty-printing",
-            "ignoreFailures": true
-            }
-        ]
+            "setupCommands": [
+                {
+                    "description": "Break on C++ exception throws",
+                    "text": "catch throw",
+                    "ignoreFailures": false
+                },
+                {
+                    "description": "Also break when exceptions are caught",
+                    "text": "catch catch",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Enable pretty-printing for STL",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
         }
     ]
 }

@@ -13,7 +13,8 @@ namespace frame::opengl::file
  * @param name: Program name.
  * @return A unique pointer to a program interface or an error.
  */
-std::unique_ptr<ProgramInterface> LoadProgram(const std::string& name);
+std::unique_ptr<ProgramInterface> LoadProgram(
+    const proto::Program proto_program);
 /**
  * @brief Load from 2 file names one for vertex and one for fragment.
  * @param name: Program name.
@@ -24,7 +25,7 @@ std::unique_ptr<ProgramInterface> LoadProgram(const std::string& name);
  * @return A unique pointer to a program interface or an error.
  */
 std::unique_ptr<ProgramInterface> LoadProgram(
-    const std::string& name,
+    const proto::Program& proto_program,
     const std::string& vertex_file,
     const std::string& fragment_file);
 

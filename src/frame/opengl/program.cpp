@@ -87,8 +87,9 @@ const UniformInterface& Program::GetUniform(const std::string& name) const
 {
     if (!HasUniform(name))
     {
-        throw std::runtime_error(fmt::format(
-            "Uniform [{}] not found in program [{}].", name, name_));
+        throw std::runtime_error(
+            fmt::format(
+                "Uniform [{}] not found in program [{}].", name, name_));
     }
     auto it = uniform_map_.find(name);
     return *(it->second);
@@ -156,10 +157,11 @@ void Program::AddUniform(std::unique_ptr<UniformInterface>&& uniform_interface)
         break;
     }
     default:
-        logger_->error(fmt::format(
-            "Unknown uniform type [{}] for uniform [{}].",
-            static_cast<int>(uniform_ptr->GetType()),
-            name));
+        logger_->error(
+            fmt::format(
+                "Unknown uniform type [{}] for uniform [{}].",
+                static_cast<int>(uniform_ptr->GetType()),
+                name));
         break;
     }
 }
@@ -190,10 +192,11 @@ int Program::GetMemoizeUniformLocation(const std::string& name) const
         if (location == -1)
         {
             GLenum error = glGetError();
-            throw std::runtime_error(fmt::format(
-                "Could not get a location for uniform [{}] error: {}.",
-                name,
-                error));
+            throw std::runtime_error(
+                fmt::format(
+                    "Could not get a location for uniform [{}] error: {}.",
+                    name,
+                    error));
         }
         memoize_map_.insert({name, location});
     }
@@ -428,6 +431,46 @@ std::unique_ptr<ProgramInterface> CreateProgram(
     }
     program->AddShader(vertex);
     program->AddShader(fragment);
+    program->LinkShader();
+#ifdef _DEBUG
+    logger->info("with pointer := {}", static_cast<void*>(program.get()));
+#endif // _DEBUG
+    return std::move(program);
+}
+
+std::unique_ptr<ProgramInterface> CreateProgram(
+    const proto::Program& proto_program,
+    std::istream& vertex_shader_code,
+    std::istream& pixel_shader_code)
+{
+    std::string vertex_source(
+        std::istreambuf_iterator<char>(vertex_shader_code), {});
+    std::string pixel_source(
+        std::istreambuf_iterator<char>(pixel_shader_code), {});
+#ifdef _DEBUG
+    auto& logger = Logger::GetInstance();
+    logger->info("Creating program");
+#endif // _DEBUG
+    auto program = std::make_unique<Program>(proto_program.name());
+    Shader vertex(ShaderEnum::VERTEX_SHADER);
+    Shader fragment(ShaderEnum::FRAGMENT_SHADER);
+    if (!vertex.LoadFromSource(vertex_source))
+    {
+        throw std::runtime_error(vertex.GetErrorMessage());
+    }
+    if (!fragment.LoadFromSource(pixel_source))
+    {
+        throw std::runtime_error(fragment.GetErrorMessage());
+    }
+    program->AddShader(vertex);
+    program->AddShader(fragment);
+    for (const auto& uniform : proto_program.parameters())
+    {
+        if (uniform.has_uniform_enum())
+        {
+            program->AddUniformEnum(uniform.name(), uniform.uniform_enum());
+        }
+    }
     program->LinkShader();
 #ifdef _DEBUG
     logger->info("with pointer := {}", static_cast<void*>(program.get()));

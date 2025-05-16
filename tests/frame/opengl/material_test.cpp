@@ -48,7 +48,7 @@ TEST_F(MaterialTest, CheckAddRemoveTextureTest)
     EXPECT_FALSE(material_->RemoveTextureId(id_false));
     EXPECT_TRUE(material_->RemoveTextureId(id1));
     material_->AddTextureId(id1, "PositiveX");
-    EXPECT_EQ(2, material_->GetIds().size());
+    EXPECT_EQ(2, material_->GetTextureIds().size());
 }
 
 } // End namespace test.

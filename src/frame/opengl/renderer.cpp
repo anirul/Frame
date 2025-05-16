@@ -198,7 +198,7 @@ void Renderer::RenderMesh(
         static_cast<std::uint32_t>(texture_out_ids.size()));
 
     std::map<std::string, std::vector<std::int32_t>> uniform_include;
-    for (const auto& id : material.GetIds())
+    for (const auto& id : material.GetTextureIds())
     {
         EntityId texture_id = NullId;
         if (level_.GetEnumTypeFromId(id) == EntityTypeEnum::TEXTURE)
@@ -267,17 +267,18 @@ void Renderer::RenderMesh(
                 nullptr);
             break;
         default:
-            throw std::runtime_error(fmt::format(
-                "Couldn't draw primitive {}",
-                proto::SceneStaticMesh_RenderPrimitiveEnum_Name(
-                    static_mesh.GetRenderPrimitive())));
+            throw std::runtime_error(
+                fmt::format(
+                    "Couldn't draw primitive {}",
+                    proto::SceneStaticMesh_RenderPrimitiveEnum_Name(
+                        static_mesh.GetRenderPrimitive())));
         }
         gl_index_buffer.UnBind();
     }
     program.UnUse();
     glBindVertexArray(0);
 
-    for (const auto id : material.GetIds())
+    for (const auto id : material.GetTextureIds())
     {
         EntityId texture_id = id;
         if (level_.GetEnumTypeFromId(id) != EntityTypeEnum::TEXTURE)
@@ -316,7 +317,7 @@ void Renderer::PresentFinal()
     UniformCollectionWrapper uniform_collection_wrapper{};
     program.Use(uniform_collection_wrapper);
     auto& material = level_.GetMaterialFromId(display_material_id_);
-    for (const auto id : material.GetIds())
+    for (const auto id : material.GetTextureIds())
     {
         auto& opengl_texture =
             dynamic_cast<Texture&>(level_.GetTextureFromId(id));
@@ -342,7 +343,7 @@ void Renderer::PresentFinal()
     program.UnUse();
     glBindVertexArray(0);
 
-    for (const auto id : material.GetIds())
+    for (const auto id : material.GetTextureIds())
     {
         auto& opengl_texture =
             dynamic_cast<Texture&>(level_.GetTextureFromId(id));
@@ -377,7 +378,7 @@ void Renderer::PreRender()
             auto temp_viewport = viewport_;
             // Now this get the image size from the environment map.
             auto& material = level_.GetMaterialFromId(material_id);
-            auto ids = material.GetIds();
+            auto ids = material.GetTextureIds();
             assert(!ids.empty());
             auto& texture = level_.GetTextureFromId(ids[0]);
             auto size = texture.GetSize();
@@ -418,10 +419,11 @@ void Renderer::RenderShadows(const CameraInterface& camera)
         auto texture_id = level_.GetIdFromName(texture_name);
         if (texture_id == NullId)
         {
-            throw std::runtime_error(fmt::format(
-                "Couldn't find texture {} for light {}",
-                texture_name,
-                light.GetName()));
+            throw std::runtime_error(
+                fmt::format(
+                    "Couldn't find texture {} for light {}",
+                    texture_name,
+                    light.GetName()));
         }
         // Save the current context.
         std::unique_ptr<FrameBuffer> temp_frame_buffer =

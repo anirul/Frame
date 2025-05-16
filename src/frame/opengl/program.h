@@ -147,6 +147,14 @@ class Program : public ProgramInterface
      * @return True if present false otherwise.
      */
     bool HasUniform(const std::string& name) const override;
+    /**
+     * @brief Add uniform enum.
+     * @param name: Uniform name.
+     * @param uniform_enum: Enum associated to the uniform.
+     */
+    void AddUniformEnum(
+        const std::string& name,
+        proto::Uniform::UniformEnum uniform_enum) override;
 
   protected:
     /**
@@ -178,7 +186,7 @@ class Program : public ProgramInterface
     EntityId scene_root_ = 0;
     std::vector<EntityId> input_texture_ids_ = {};
     std::vector<EntityId> output_texture_ids_ = {};
-	mutable bool is_used_ = false;
+    mutable bool is_used_ = false;
 };
 
 /**
@@ -188,6 +196,15 @@ class Program : public ProgramInterface
  */
 std::unique_ptr<frame::ProgramInterface> CreateProgram(
     const std::string& name,
+    std::istream& vertex_shader_code,
+    std::istream& pixel_shader_code);
+/**
+ * @brief Create a program from two streams.
+ * @param name: Name of the uniform.
+ * @param value: Enum value of the uniform (see proto declaration for that).
+ */
+std::unique_ptr<frame::ProgramInterface> CreateProgram(
+    const proto::Program proto_program,
     std::istream& vertex_shader_code,
     std::istream& pixel_shader_code);
 

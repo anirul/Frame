@@ -29,7 +29,7 @@ class MaterialInterface : public NameInterface
     virtual ~MaterialInterface() = default;
     /**
      * @brief This is getting the program id from a level or from the local
-     *        stored one.
+     * stored one.
      * @param level: Pointer to the local level.
      * @return Id of the program (can be the linked program).
      */
@@ -70,18 +70,17 @@ class MaterialInterface : public NameInterface
      */
     virtual bool RemoveTextureId(EntityId id) = 0;
     /**
-     * @brief Get ids of a material.
+     * @brief Get texture ids of a material.
      * @return Return the list of texture ids.
      */
-    virtual const std::vector<EntityId> GetIds() const = 0;
+    virtual std::vector<EntityId> GetTextureIds() const = 0;
     /**
      * @brief Enable a texture to be used by the context.
      * @param id: Id of the texture to be enabled.
      * @return Return the name and the binding slot of a texture (to be
-     *         passed to the program).
+     * passed to the program).
      */
-    virtual const std::pair<std::string, int> EnableTextureId(
-        EntityId id) const = 0;
+    virtual std::pair<std::string, int> EnableTextureId(EntityId id) const = 0;
     /**
      * @brief Unbind the texture and remove it from the list.
      * @param id: Texture id.

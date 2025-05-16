@@ -68,4 +68,21 @@ const std::filesystem::path FindFile(const std::filesystem::path& file)
     });
 }
 
+std::string PurifyFilePath(const std::filesystem::path& file)
+{
+    auto base = std::filesystem::current_path();
+    auto relative = std::filesystem::relative(file, base);
+    std::string selection = relative.generic_string();
+    if (selection.empty() || selection.front() != '/')
+    {
+        selection.insert(selection.begin(), '/');
+    }
+    // if somehow there's a leading slash, drop it:
+    if (!selection.empty() && (selection[0] == '/' || selection[0] == '\\'))
+    {
+        selection.erase(0, 1);
+    }
+    return selection;
+}
+
 } // End namespace frame::file.

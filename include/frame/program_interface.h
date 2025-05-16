@@ -117,6 +117,13 @@ struct ProgramInterface : public NameInterface
      * @return True if present false otherwise.
      */
     virtual bool HasUniform(const std::string& name) const = 0;
+    /**
+     * @brief Add uniform enum.
+     * @param name: Uniform name.
+     * @param uniform_enum: Enum associated to the uniform.
+     */
+    virtual void AddUniformEnum(
+        const std::string& name, proto::Uniform::UniformEnum uniform_enum) = 0;
 };
 
 } // End namespace frame.

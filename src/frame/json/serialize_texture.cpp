@@ -1,5 +1,6 @@
 #include "frame/json/serialize_texture.h"
 
+#include "frame/file/file_system.h"
 #include "frame/json/serialize_uniform.h"
 #include "frame/opengl/cubemap.h"
 
@@ -17,18 +18,12 @@ proto::Texture SerializeTextureFromParameter(
         texture_parameter.pixel_element_size;
     *proto_texture.mutable_pixel_structure() =
         texture_parameter.pixel_structure;
-    if (texture_parameter.relative_size != glm::uvec2(0, 0))
-    {
-        *proto_texture.mutable_size() =
-            SerializeSize(texture_parameter.relative_size);
-    }
-    else
-    {
-        *proto_texture.mutable_size() = SerializeSize(texture_parameter.size);
-    }
     if (!texture_parameter.file_name.empty())
     {
-        proto_texture.set_file_name(texture_parameter.file_name);
+        proto_texture.set_file_name(
+            file::PurifyFilePath(
+                std::filesystem::path(texture_parameter.file_name)));
+        return proto_texture;
     }
     if (!texture_parameter.array_file_names[0].empty())
     {
@@ -41,18 +36,34 @@ proto::Texture SerializeTextureFromParameter(
         }
         proto::CubeMapFiles proto_cubemap_files;
         proto_cubemap_files.set_positive_x(
-            texture_parameter.array_file_names[0]);
+            file::PurifyFilePath(
+                std::filesystem::path(texture_parameter.array_file_names[0])));
         proto_cubemap_files.set_negative_x(
-            texture_parameter.array_file_names[1]);
+            file::PurifyFilePath(
+                std::filesystem::path(texture_parameter.array_file_names[1])));
         proto_cubemap_files.set_positive_y(
-            texture_parameter.array_file_names[2]);
+            file::PurifyFilePath(
+                std::filesystem::path(texture_parameter.array_file_names[2])));
         proto_cubemap_files.set_negative_y(
-            texture_parameter.array_file_names[3]);
+            file::PurifyFilePath(
+                std::filesystem::path(texture_parameter.array_file_names[3])));
         proto_cubemap_files.set_positive_z(
-            texture_parameter.array_file_names[4]);
+            file::PurifyFilePath(
+                std::filesystem::path(texture_parameter.array_file_names[4])));
         proto_cubemap_files.set_negative_z(
-            texture_parameter.array_file_names[5]);
+            file::PurifyFilePath(
+                std::filesystem::path(texture_parameter.array_file_names[5])));
         *proto_texture.mutable_file_names() = proto_cubemap_files;
+        return proto_texture;
+    }
+    if (texture_parameter.relative_size != glm::uvec2(0, 0))
+    {
+        *proto_texture.mutable_size() =
+            SerializeSize(texture_parameter.relative_size);
+    }
+    else
+    {
+        *proto_texture.mutable_size() = SerializeSize(texture_parameter.size);
     }
     return proto_texture;
 }

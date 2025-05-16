@@ -61,9 +61,24 @@ proto::UniformMatrix4 SerializeUniformMatrix4(glm::mat4 mat)
     return proto_uniform_matrix4;
 }
 
-proto::Uniform SerializeUniform(const UniformInterface& uniform_interface)
+proto::Uniform SerializeUniform(
+    const UniformInterface& uniform_interface,
+    const LevelInterface& level_interface)
 {
     proto::Uniform proto_uniform;
+    for (const auto material_id : level_interface.GetMaterials())
+    {
+        auto& material_interface =
+            level_interface.GetMaterialFromId(material_id);
+        for (auto texture_id : material_interface.GetTextureIds())
+        {
+            if (material_interface.GetInnerName(texture_id) ==
+                uniform_interface.GetName())
+            {
+                return proto_uniform;
+            }
+        }
+    }
     proto_uniform.set_name(uniform_interface.GetName());
     switch (uniform_interface.GetType())
     {

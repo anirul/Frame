@@ -92,6 +92,14 @@ Uniform::Uniform(const UniformInterface& uniform_interface)
     value_float_ = uniform_interface.GetFloats();
 }
 
+Uniform::Uniform(
+    const std::string& name,
+    const proto::Uniform::UniformEnum& proto_uniform_enum)
+{
+    type_ = proto::Uniform::INVALID_TYPE;
+    uniform_enum_ = proto_uniform_enum;
+}
+
 std::string Uniform::GetName() const
 {
     return name_;

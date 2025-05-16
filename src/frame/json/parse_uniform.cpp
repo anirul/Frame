@@ -178,11 +178,6 @@ void RegisterUniformEnumFromProto(
     }
     case proto::Uniform::FLOAT_TIME_S: {
         static Logger& logger_ = Logger::GetInstance();
-        logger_->info(
-            "set {} := {}",
-            name,
-            static_cast<float>(
-                uniform_collection_interface.GetUniform("time").GetFloat()));
         std::unique_ptr<frame::UniformInterface> uniform_interface =
             std::make_unique<frame::Uniform>(
                 name,
@@ -204,4 +199,4 @@ std::pair<std::uint32_t, std::uint32_t> ParseSizeInt(const proto::Size size)
         static_cast<std::uint32_t>(size.y()));
 }
 
-} // namespace frame::proto
+} // namespace frame::json
