@@ -205,7 +205,7 @@ std::unique_ptr<frame::ProgramInterface> CreateProgram(
  * @param value: Enum value of the uniform (see proto declaration for that).
  */
 std::unique_ptr<frame::ProgramInterface> CreateProgram(
-    const proto::Program proto_program,
+    const proto::Program& proto_program,
     std::istream& vertex_shader_code,
     std::istream& pixel_shader_code);
 

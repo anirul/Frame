@@ -191,7 +191,7 @@ std::unique_ptr<frame::TextureInterface> LoadCubeMapTextureFromFiles(
     std::array<std::filesystem::path, 6> final_files = {};
     for (int i = 0; i < final_files.size(); ++i)
     {
-        texture_parameter.array_file_names[i] = files[i];
+        texture_parameter.array_file_names[i] = files[i].string();
         final_files[i] = frame::file::FindFile(files[i]);
     }
     std::pair<std::uint32_t, std::uint32_t> img_size;
