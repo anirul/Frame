@@ -28,7 +28,7 @@ NodeMatrix::NodeMatrix(
 NodeMatrix::NodeMatrix(
     std::function<NodeInterface*(const std::string&)> func,
     glm::vec4 quat,
-    bool rotation = false)
+    bool rotation)
     : NodeInterface(func)
 {
     data_.mutable_quaternion()->CopyFrom(json::SerializeUniformVector4(quat));
@@ -42,7 +42,7 @@ NodeMatrix::NodeMatrix(
     }
 }
 
-NodeMatrix::NodeMatrix(glm::mat4 matrix, bool rotation = false)
+NodeMatrix::NodeMatrix(glm::mat4 matrix, bool rotation)
     : NodeInterface([](std::string) { return nullptr; })
 {
     data_.mutable_matrix()->CopyFrom(json::SerializeUniformMatrix4(matrix));
@@ -56,7 +56,7 @@ NodeMatrix::NodeMatrix(glm::mat4 matrix, bool rotation = false)
     }
 }
 
-NodeMatrix::NodeMatrix(glm::vec4 quat, bool rotation = false)
+NodeMatrix::NodeMatrix(glm::vec4 quat, bool rotation)
     : NodeInterface([](std::string) { return nullptr; })
 {
     data_.mutable_quaternion()->CopyFrom(json::SerializeUniformVector4(quat));

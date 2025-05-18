@@ -96,6 +96,8 @@ class Texture : public TextureInterface, public BindInterface
         std::vector<std::uint8_t>&& vector,
         glm::uvec2 size,
         std::uint8_t bytes_per_pixel) override;
+    //! @brief Enable mipmap generation.
+    void EnableMipmap() override;
 
   public:
     /**
@@ -106,15 +108,6 @@ class Texture : public TextureInterface, public BindInterface
     {
         return texture_id_;
     }
-    /**
-     * @brief Get the texture parameters used at creation, usefull for
-     * serialization.
-     * @return Texture parameters used at creation.
-     */
-    const TextureParameter& GetTextureParameter() const override
-	{
-        return texture_parameter_;
-	}
 
   protected:
     /**
@@ -130,9 +123,9 @@ class Texture : public TextureInterface, public BindInterface
             json::PixelElementSize_BYTE(),
         const proto::PixelStructure pixel_structure =
             json::PixelStructure_RGB())
-        : pixel_element_size_(pixel_element_size),
-          pixel_structure_(pixel_structure)
     {
+        data_.mutable_pixel_element_size()->CopyFrom(pixel_element_size);
+        data_.mutable_pixel_structure()->CopyFrom(pixel_structure);
     }
     /**
      * @brief Fill a texture with a data pointer, the size has to be set
@@ -144,12 +137,12 @@ class Texture : public TextureInterface, public BindInterface
      * @brief Create a depth texture.
      * @param size: Size of the texture.
      * @param pixel_element_size: Size of the pixel element (this should be
-	 * FLOAT).
-	 */
+     * FLOAT).
+     */
     void CreateDepthTexture(
         glm::uvec2 size,
-		proto::PixelElementSize pixel_element_size =
-			json::PixelElementSize_FLOAT());
+        proto::PixelElementSize pixel_element_size =
+            json::PixelElementSize_FLOAT());
     //! @brief Lock the bind for RAII interface to the bind interface.
     void LockedBind() const override
     {
@@ -169,14 +162,9 @@ class Texture : public TextureInterface, public BindInterface
 
   private:
     unsigned int texture_id_ = 0;
-    glm::uvec2 size_ = glm::uvec2(0, 0);
-    const proto::PixelElementSize pixel_element_size_;
-    const proto::PixelStructure pixel_structure_;
     mutable bool locked_bind_ = false;
     std::unique_ptr<RenderBuffer> render_ = nullptr;
     std::unique_ptr<FrameBuffer> frame_ = nullptr;
-    std::string name_;
-    TextureParameter texture_parameter_;
 };
 
 } // End namespace frame::opengl.

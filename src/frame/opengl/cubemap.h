@@ -96,20 +96,6 @@ class Cubemap : public TextureInterface, public BindInterface
      */
     void UnBind() const override;
     /**
-     * @brief Set the wrapping on the t size of the texture (vertical) this
-     *        will decide how the texture is treated in case you overflow in
-     *        this direction.
-     * @param texture_filter: Could be any of (REPEAT, CLAMP_TO_EDGE,
-     * MIRRORED_REPEAT).
-     */
-    void SetWrapR(proto::TextureFilter::Enum texture_filter);
-    /**
-     * @brief Get the wrapping on the t size of the texture (vertical).
-     * @return The way the texture is wrap could be any of (REPEAT,
-     *         CLAMP_TO_EDGE, MIRRORED_REPEAT).
-     */
-    proto::TextureFilter::Enum GetWrapR() const;
-    /**
      * @brief Copy the texture input to the texture.
      * @param vector: Vector of uint32_t containing the RGBA values of the
      * texture.
@@ -119,6 +105,8 @@ class Cubemap : public TextureInterface, public BindInterface
         std::vector<std::uint8_t>&& vector,
         glm::uvec2 size,
         std::uint8_t bytes_per_pixel) override;
+    //! @brief Enable mipmap generation.
+    void EnableMipmap() override;
 
   public:
     /**
@@ -130,15 +118,6 @@ class Cubemap : public TextureInterface, public BindInterface
     {
         return texture_id_;
     }
-    /**
-     * @brief Get the texture parameters used at creation, usefull for
-     * serialization.
-     * @return Texture parameters used at creation.
-     */
-    const TextureParameter& GetTextureParameter() const override
-	{
-        return texture_parameter_;
-	}
 
   protected:
     /**
@@ -154,9 +133,9 @@ class Cubemap : public TextureInterface, public BindInterface
             json::PixelElementSize_BYTE(),
         const proto::PixelStructure pixel_structure =
             json::PixelStructure_RGB())
-        : pixel_element_size_(pixel_element_size),
-          pixel_structure_(pixel_structure)
     {
+        data_.mutable_pixel_element_size()->CopyFrom(pixel_element_size);
+        data_.mutable_pixel_structure()->CopyFrom(pixel_structure);
     }
     /**
      * @brief Fill a texture with a data pointer, the size has to be set
@@ -185,14 +164,10 @@ class Cubemap : public TextureInterface, public BindInterface
 
   private:
     unsigned int texture_id_ = 0;
-    glm::uvec2 size_ = glm::uvec2(0, 0);
-    const proto::PixelElementSize pixel_element_size_;
-    const proto::PixelStructure pixel_structure_;
     mutable bool locked_bind_ = false;
     std::unique_ptr<RenderBuffer> render_ = nullptr;
     std::unique_ptr<FrameBuffer> frame_ = nullptr;
     std::string name_;
-    TextureParameter texture_parameter_;
 };
 
 } // End namespace frame::opengl.

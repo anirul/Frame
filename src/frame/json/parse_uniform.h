@@ -74,7 +74,7 @@ void ParseUniformVec(
             std::make_unique<frame::Uniform>(
                 name + '[' + std::to_string(counter++) + ']',
                 ParseUniform(uniform_val));
-        // program_interface.AddUniform(std::move(uniform_interface));
+        program_interface.AddUniform(std::move(uniform_interface));
     }
 }
 /**

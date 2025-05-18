@@ -12,6 +12,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "frame/json/parse_uniform.h"
 #include "frame/logger.h"
 #include "frame/uniform.h"
 
@@ -87,9 +88,8 @@ const UniformInterface& Program::GetUniform(const std::string& name) const
 {
     if (!HasUniform(name))
     {
-        throw std::runtime_error(
-            fmt::format(
-                "Uniform [{}] not found in program [{}].", name, name_));
+        throw std::runtime_error(fmt::format(
+            "Uniform [{}] not found in program [{}].", name, name_));
     }
     auto it = uniform_map_.find(name);
     return *(it->second);
@@ -108,40 +108,51 @@ void Program::AddUniform(std::unique_ptr<UniformInterface>&& uniform_interface)
         uniform_map_[name] = std::move(uniform_interface);
     }
     auto* uniform_ptr = uniform_map_[name].get();
-    switch (uniform_ptr->GetType())
+    switch (uniform_ptr->GetData().type())
     {
     case proto::Uniform::INVALID_TYPE:
         break;
     case proto::Uniform::INT:
-        glUniform1i(GetMemoizeUniformLocation(name), uniform_ptr->GetInt());
+        glUniform1i(
+            GetMemoizeUniformLocation(name),
+            uniform_ptr->GetData().uniform_int());
         break;
-    case proto::Uniform::INTS:
+    case proto::Uniform::INTS: {
+        auto& uniform_ints = uniform_ptr->GetData().uniform_ints();
         glUniform1iv(
             GetMemoizeUniformLocation(name),
-            static_cast<GLsizei>(uniform_ptr->GetInts().size()),
-            uniform_ptr->GetInts().data());
+            static_cast<GLsizei>(
+                uniform_ints.size().x() * uniform_ints.size().y()),
+            uniform_ints.values().data());
         break;
+    }
     case proto::Uniform::FLOAT:
-        glUniform1f(GetMemoizeUniformLocation(name), uniform_ptr->GetFloat());
+        glUniform1f(
+            GetMemoizeUniformLocation(name),
+            uniform_ptr->GetData().uniform_float());
         break;
-    case proto::Uniform::FLOATS:
+    case proto::Uniform::FLOATS: {
+        auto& uniform_floats = uniform_ptr->GetData().uniform_floats();
         glUniform1fv(
             GetMemoizeUniformLocation(name),
-            static_cast<GLsizei>(uniform_ptr->GetFloats().size()),
-            uniform_ptr->GetFloats().data());
-        break;
+            static_cast<GLsizei>(
+                uniform_floats.size().x() * uniform_floats.size().y()),
+            uniform_floats.values().data());
+        break; 
+    }
     case proto::Uniform::FLOAT_VECTOR2: {
-        glm::vec2 value = uniform_ptr->GetVec2();
+        glm::vec2 value =
+            json::ParseUniform(uniform_ptr->GetData().uniform_vec2());
         glUniform2f(GetMemoizeUniformLocation(name), value.x, value.y);
         break;
     }
     case proto::Uniform::FLOAT_VECTOR3: {
-        glm::vec3 value = uniform_ptr->GetVec3();
+        glm::vec3 value = json::ParseUniform(uniform_ptr->GetData().uniform_vec3());
         glUniform3f(GetMemoizeUniformLocation(name), value.x, value.y, value.z);
         break;
     }
     case proto::Uniform::FLOAT_VECTOR4: {
-        glm::vec4 value = uniform_ptr->GetVec4();
+        glm::vec4 value = json::ParseUniform(uniform_ptr->GetData().uniform_vec4());
         glUniform4f(
             GetMemoizeUniformLocation(name),
             value.x,
@@ -151,17 +162,16 @@ void Program::AddUniform(std::unique_ptr<UniformInterface>&& uniform_interface)
         break;
     }
     case proto::Uniform::FLOAT_MATRIX4: {
-        glm::mat4 value = uniform_ptr->GetMat4();
+        glm::mat4 value = json::ParseUniform(uniform_ptr->GetData().uniform_mat4());
         glUniformMatrix4fv(
             GetMemoizeUniformLocation(name), 1, GL_FALSE, &value[0][0]);
         break;
     }
     default:
-        logger_->error(
-            fmt::format(
-                "Unknown uniform type [{}] for uniform [{}].",
-                static_cast<int>(uniform_ptr->GetType()),
-                name));
+        logger_->error(fmt::format(
+            "Unknown uniform type [{}] for uniform [{}].",
+            static_cast<int>(uniform_ptr->GetData().type()),
+            name));
         break;
     }
 }
@@ -192,11 +202,10 @@ int Program::GetMemoizeUniformLocation(const std::string& name) const
         if (location == -1)
         {
             GLenum error = glGetError();
-            throw std::runtime_error(
-                fmt::format(
-                    "Could not get a location for uniform [{}] error: {}.",
-                    name,
-                    error));
+            throw std::runtime_error(fmt::format(
+                "Could not get a location for uniform [{}] error: {}.",
+                name,
+                error));
         }
         memoize_map_.insert({name, location});
     }
@@ -471,7 +480,10 @@ std::unique_ptr<ProgramInterface> CreateProgram(
     {
         if (uniform.has_uniform_enum())
         {
-            program->AddUniformEnum(uniform.name(), uniform.uniform_enum());
+            std::unique_ptr<UniformInterface> uniform_interface =
+                std::make_unique<Uniform>(
+                    uniform.name(), uniform.uniform_enum());
+            program->AddUniform(std::move(uniform_interface));
         }
     }
     program->LinkShader();

@@ -16,17 +16,17 @@ Level::~Level()
 }
 
 std::vector<std::pair<EntityId, EntityId>> Level::GetStaticMeshMaterialIds(
-    proto::SceneStaticMesh::RenderTimeEnum render_time_enum) const
+    proto::NodeStaticMesh::RenderTimeEnum render_time_enum) const
 {
     switch (render_time_enum)
     {
-    case proto::SceneStaticMesh::PRE_RENDER_TIME:
+    case proto::NodeStaticMesh::PRE_RENDER_TIME:
         return mesh_material_pre_render_ids_;
-    case proto::SceneStaticMesh::SCENE_RENDER_TIME:
+    case proto::NodeStaticMesh::SCENE_RENDER_TIME:
         return mesh_material_scene_render_ids_;
-    case proto::SceneStaticMesh::POST_PROCESS_TIME:
+    case proto::NodeStaticMesh::POST_PROCESS_TIME:
         return mesh_material_post_proccess_ids_;
-    case proto::SceneStaticMesh::SKYBOX_RENDER_TIME:
+    case proto::NodeStaticMesh::SKYBOX_RENDER_TIME:
         return mesh_material_skybox_ids_;
     default:
         throw std::runtime_error("Unknown render time?");
@@ -36,20 +36,20 @@ std::vector<std::pair<EntityId, EntityId>> Level::GetStaticMeshMaterialIds(
 void Level::AddMeshMaterialId(
     EntityId node_id,
     EntityId material_id,
-    proto::SceneStaticMesh::RenderTimeEnum render_time_enum)
+    proto::NodeStaticMesh::RenderTimeEnum render_time_enum)
 {
     switch (render_time_enum)
     {
-    case proto::SceneStaticMesh::PRE_RENDER_TIME:
+    case proto::NodeStaticMesh::PRE_RENDER_TIME:
         mesh_material_pre_render_ids_.push_back({node_id, material_id});
         break;
-    case proto::SceneStaticMesh::SCENE_RENDER_TIME:
+    case proto::NodeStaticMesh::SCENE_RENDER_TIME:
         mesh_material_scene_render_ids_.push_back({node_id, material_id});
         break;
-    case proto::SceneStaticMesh::POST_PROCESS_TIME:
+    case proto::NodeStaticMesh::POST_PROCESS_TIME:
         mesh_material_post_proccess_ids_.push_back({node_id, material_id});
         break;
-    case proto::SceneStaticMesh::SKYBOX_RENDER_TIME:
+    case proto::NodeStaticMesh::SKYBOX_RENDER_TIME:
         mesh_material_skybox_ids_.push_back({node_id, material_id});
         break;
     default:

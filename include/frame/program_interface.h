@@ -90,6 +90,33 @@ struct ProgramInterface : public Serialize<proto::Program>
     virtual void Use() const = 0;
     //! @brief Stop using the program, a little bit like unbind.
     virtual void UnUse() const = 0;
+    /**
+     * @brief Get the list of uniforms needed by the program.
+     * @return Vector of string that represent the names of uniforms.
+     */
+    virtual std::vector<std::string> GetUniformNameList() const = 0;
+    /**
+     * @brief Get the uniform.
+     * @param name: Name of the uniform.
+     * @return The uniform.
+     */
+    virtual const UniformInterface& GetUniform(const std::string& name) const = 0;
+    /**
+     * @brief Set the uniform.
+     * @param uniform: The uniform to set.
+     */
+    virtual void AddUniform(std::unique_ptr<UniformInterface>&& uniform) = 0;
+    /**
+     * @brief Remove a uniform from the collection.
+     * @param name: The name of the uniform to be removed.
+     */
+    virtual void RemoveUniform(const std::string& name) = 0;
+    /**
+     * @brief Check if the program has the uniform passed as name.
+     * @param name: Name of the uniform.
+     * @return True if present false otherwise.
+     */
+    virtual bool HasUniform(const std::string& name) const = 0;
 };
 
 } // End namespace frame.

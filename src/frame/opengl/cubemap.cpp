@@ -8,6 +8,7 @@
 #include <stdexcept>
 
 #include "frame/json/parse_uniform.h"
+#include "frame/json/serialize_uniform.h"
 #include "frame/level.h"
 #include "frame/opengl/file/load_program.h"
 #include "frame/opengl/frame_buffer.h"
@@ -59,9 +60,8 @@ Cubemap::Cubemap(const TextureParameter& texture_parameter)
           texture_parameter.pixel_element_size,
           texture_parameter.pixel_structure)
 {
-    texture_parameter_ = texture_parameter;
     assert(texture_parameter.map_type == TextureTypeEnum::CUBMAP);
-    size_ = texture_parameter.size;
+    data_.mutable_size()->CopyFrom(json::SerializeSize(texture_parameter.size));
     CreateCubemap(texture_parameter.array_data_ptr);
 }
 
@@ -112,12 +112,13 @@ void Cubemap::CreateCubemap(
         glTexImage2D(
             GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
             0,
-            opengl::ConvertToGLType(pixel_element_size_, pixel_structure_),
-            static_cast<GLsizei>(size_.x),
-            static_cast<GLsizei>(size_.y),
+            opengl::ConvertToGLType(
+                data_.pixel_element_size(), data_.pixel_structure()),
+            static_cast<GLsizei>(data_.size().x()),
+            static_cast<GLsizei>(data_.size().y()),
             0,
-            opengl::ConvertToGLType(pixel_structure_),
-            opengl::ConvertToGLType(pixel_element_size_),
+            opengl::ConvertToGLType(data_.pixel_structure()),
+            opengl::ConvertToGLType(data_.pixel_element_size()),
             cube_map[i]);
     }
 }
@@ -184,7 +185,7 @@ void Cubemap::CreateFrameAndRenderBuffer()
 {
     frame_ = std::make_unique<FrameBuffer>();
     render_ = std::make_unique<RenderBuffer>();
-    render_->CreateStorage(size_);
+    render_->CreateStorage(json::ParseSize(data_.size()));
     frame_->AttachRender(*render_);
     frame_->AttachTexture(GetId());
     frame_->DrawBuffers(1);
@@ -197,7 +198,7 @@ void Cubemap::Clear(glm::vec4 color)
     if (!frame_)
         CreateFrameAndRenderBuffer();
     ScopedBind scoped_frame(*frame_);
-    glViewport(0, 0, size_.x, size_.y);
+    glViewport(0, 0, data_.size().x(), data_.size().y());
     GLfloat clear_color[4] = {color.r, color.g, color.b, color.a};
     glClearBufferfv(GL_COLOR, 0, clear_color);
     UnBind();
@@ -205,13 +206,14 @@ void Cubemap::Clear(glm::vec4 color)
 
 std::vector<std::uint8_t> Cubemap::GetTextureByte() const
 {
-    auto format = opengl::ConvertToGLType(pixel_structure_);
-    auto type = opengl::ConvertToGLType(pixel_element_size_);
+    auto format = opengl::ConvertToGLType(data_.pixel_structure());
+    auto type = opengl::ConvertToGLType(data_.pixel_element_size());
     if (type != GL_UNSIGNED_BYTE)
     {
         throw std::runtime_error(
             "Invalid format should be unsigned byte is : " +
-            proto::PixelElementSize_Enum_Name(pixel_element_size_.value()));
+            proto::PixelElementSize_Enum_Name(
+                data_.pixel_element_size().value()));
     }
     auto size = json::ParseSize(data_.size());
     auto pixel_structure = data_.pixel_structure().value();
@@ -233,13 +235,14 @@ std::vector<std::uint8_t> Cubemap::GetTextureByte() const
 
 std::vector<std::uint16_t> Cubemap::GetTextureWord() const
 {
-    auto format = opengl::ConvertToGLType(pixel_structure_);
-    auto type = opengl::ConvertToGLType(pixel_element_size_);
+    auto format = opengl::ConvertToGLType(data_.pixel_structure());
+    auto type = opengl::ConvertToGLType(data_.pixel_element_size());
     if (type != GL_UNSIGNED_SHORT)
     {
         throw std::runtime_error(
             "Invalid format should be unsigned short is : " +
-            proto::PixelElementSize_Enum_Name(pixel_element_size_.value()));
+            proto::PixelElementSize_Enum_Name(
+                data_.pixel_element_size().value()));
     }
     auto size = json::ParseSize(data_.size());
     auto pixel_structure = data_.pixel_structure().value();
@@ -261,13 +264,14 @@ std::vector<std::uint16_t> Cubemap::GetTextureWord() const
 
 std::vector<std::uint32_t> Cubemap::GetTextureDWord() const
 {
-    auto format = opengl::ConvertToGLType(pixel_structure_);
-    auto type = opengl::ConvertToGLType(pixel_element_size_);
+    auto format = opengl::ConvertToGLType(data_.pixel_structure());
+    auto type = opengl::ConvertToGLType(data_.pixel_element_size());
     if (type != GL_UNSIGNED_INT)
     {
         throw std::runtime_error(
             "Invalid format should be unsigned int is : " +
-            proto::PixelElementSize_Enum_Name(pixel_element_size_.value()));
+            proto::PixelElementSize_Enum_Name(
+                data_.pixel_element_size().value()));
     }
     auto size = json::ParseSize(data_.size());
     auto pixel_structure = data_.pixel_structure().value();
@@ -289,13 +293,14 @@ std::vector<std::uint32_t> Cubemap::GetTextureDWord() const
 
 std::vector<float> Cubemap::GetTextureFloat() const
 {
-    auto format = opengl::ConvertToGLType(pixel_structure_);
-    auto type = opengl::ConvertToGLType(pixel_element_size_);
+    auto format = opengl::ConvertToGLType(data_.pixel_structure());
+    auto type = opengl::ConvertToGLType(data_.pixel_element_size());
     if (type != GL_FLOAT)
     {
         throw std::runtime_error(
             "Invalid format should be float is : " +
-            proto::PixelElementSize_Enum_Name(pixel_element_size_.value()));
+            proto::PixelElementSize_Enum_Name(
+                data_.pixel_element_size().value()));
     }
     auto size = json::ParseSize(data_.size());
     auto pixel_structure = data_.pixel_structure().value();
@@ -321,6 +326,12 @@ void Cubemap::Update(
     std::uint8_t bytes_per_pixel)
 {
     throw std::runtime_error("Not implemented yet!");
+}
+
+void Cubemap::EnableMipmap()
+{
+    data_.set_mipmap(true);
+    glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 }
 
 } // End namespace frame::opengl.

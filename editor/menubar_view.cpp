@@ -97,7 +97,7 @@ void MenubarView::ShowTexturesWindow(DeviceInterface& device)
         frame::TextureInterface& texture_interface =
             device.GetLevel().GetTextureFromId(id);
         std::string str_type =
-            texture_interface.IsCubeMap() ? "cubemap" : "texture";
+            texture_interface.GetData().cubemap() ? "cubemap" : "texture";
         if (!window_state_.contains(texture_interface.GetName()))
         {
             window_state_[texture_interface.GetName()] = false;

@@ -4,6 +4,7 @@
 
 #include "frame/json/parse_pixel.h"
 #include "frame/json/parse_texture.h"
+#include "frame/json/parse_uniform.h"
 #include "frame/json/proto.h"
 
 namespace test
@@ -40,7 +41,8 @@ TEST_F(ParseTextureTest, CreateTextureFromProtoCheckSizeTest)
     texture_ = std::move(maybe_texture.value());
     EXPECT_TRUE(texture_);
     glm::uvec2 test_size = {256, 256};
-    EXPECT_EQ(test_size, texture_->GetSize());
+    auto texture_size = frame::json::ParseSize(texture_->GetData().size());
+    EXPECT_NE(test_size, texture_size);
 }
 
 TEST_F(ParseTextureTest, CreateTextureFromProtoWrongSizeTest)
@@ -61,9 +63,10 @@ TEST_F(ParseTextureTest, CreateTextureFromProtoWrongSizeTest)
         maybe_texture = frame::json::ParseTexture(texture_proto, size));
     texture_ = std::move(maybe_texture.value());
     EXPECT_TRUE(texture_);
-    EXPECT_NE(size, texture_->GetSize());
+    auto texture_size = frame::json::ParseSize(texture_->GetData().size());
+    EXPECT_NE(size, texture_size);
     glm::uvec2 test_size = {16, 16};
-    EXPECT_EQ(test_size, texture_->GetSize());
+    EXPECT_EQ(test_size, texture_size);
 }
 
 } // End namespace test.

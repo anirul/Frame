@@ -102,6 +102,11 @@ class Program : public ProgramInterface
     void Use() const override;
     //! @brief Stop using the program, a little bit like unbind.
     void UnUse() const override;
+    /**
+     * @brief Set the uniform.
+     * @param uniform: The uniform to set.
+     */
+    void AddUniform(std::unique_ptr<UniformInterface>&& uniform) override;
 
   protected:
     /**
@@ -120,6 +125,28 @@ class Program : public ProgramInterface
      * @brief Create the uniform value list (internal).
      */
     void CreateUniformList();
+    /**
+     * @brief Get the list of uniforms needed by the program.
+     * @return Vector of string that represent the names of uniforms.
+     */
+    std::vector<std::string> GetUniformNameList() const override;
+    /**
+     * @brief Get the uniform.
+     * @param name: Name of the uniform.
+     * @return The uniform.
+     */
+    const UniformInterface& GetUniform(const std::string& name) const override;
+    /**
+     * @brief Remove a uniform from the collection.
+     * @param name: The name of the uniform to be removed.
+     */
+    void RemoveUniform(const std::string& name) override;
+    /**
+     * @brief Check if the program has the uniform passed as name.
+     * @param name: Name of the uniform.
+     * @return True if present false otherwise.
+     */
+    bool HasUniform(const std::string& name) const override;
 
   private:
     const Logger& logger_ = Logger::GetInstance();
@@ -134,8 +161,8 @@ class Program : public ProgramInterface
     std::vector<EntityId> input_texture_ids_ = {};
     std::vector<EntityId> output_texture_ids_ = {};
     std::map<std::string, proto::Uniform::UniformEnum> name_uniform_enums_;
-	std::string shader_name_;
-	bool serialize_enable_ = false;
+    std::string shader_name_;
+    bool serialize_enable_ = false;
     mutable bool is_used_ = false;
 };
 

@@ -75,12 +75,6 @@ struct TextureInterface : public Serialize<proto::Texture>
     //! @brief Virtual destructor.
     virtual ~TextureInterface() = default;
     /**
-     * @brief Get the texture parameters used at creation, usefull for
-     * serialization.
-     * @return Texture parameters used at creation.
-     */
-    virtual const TextureParameter& GetTextureParameter() const = 0;
-    /**
      * @brief Clear the texture (this is highly inefficient).
      * @param color: Color to paint the texture to.
      */
@@ -116,6 +110,8 @@ struct TextureInterface : public Serialize<proto::Texture>
         std::vector<std::uint8_t>&& vector,
         glm::uvec2 size,
         std::uint8_t bytes_per_pixel) = 0;
+    //! @brief Enable mipmap generation.
+    virtual void EnableMipmap() = 0;
 };
 
 } // End namespace frame.
