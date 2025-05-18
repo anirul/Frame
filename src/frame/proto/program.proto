@@ -34,6 +34,6 @@ message Program {
 	string input_scene_root_name = 5;
 	// Shader name (used to find the shader).
 	string shader = 6;
-	// Additionnal parameters for the shader.
-	repeated Uniform parameters = 7;
+	// Additionnal uniforms for the shader.
+	repeated Uniform uniforms = 7;
 }

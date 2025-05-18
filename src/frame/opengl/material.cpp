@@ -123,9 +123,4 @@ void Material::SetProgramId(EntityId id)
     program_id_ = id;
 }
 
-void Material::SetProgramName(const std::string& name)
-{
-    program_name_ = name;
-}
-
 } // End namespace frame::opengl.

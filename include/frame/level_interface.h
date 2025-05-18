@@ -77,8 +77,8 @@ class LevelInterface : public NameInterface
      * @return Vector of static mesh id and corresponding material id.
      */
     virtual std::vector<std::pair<EntityId, EntityId>> GetStaticMeshMaterialIds(
-        proto::SceneStaticMesh::RenderTimeEnum render_time_enum =
-            proto::SceneStaticMesh::SCENE_RENDER_TIME) const = 0;
+        proto::NodeStaticMesh::RenderTimeEnum render_time_enum =
+            proto::NodeStaticMesh::SCENE_RENDER_TIME) const = 0;
     /**
      * @brief Get the id of an element from a name string.
      * @param name: The name string of the element.
@@ -228,8 +228,8 @@ class LevelInterface : public NameInterface
     virtual void AddMeshMaterialId(
         EntityId node_id,
         EntityId material_id,
-        proto::SceneStaticMesh::RenderTimeEnum render_time_enum =
-            proto::SceneStaticMesh::SCENE_RENDER_TIME) = 0;
+        proto::NodeStaticMesh::RenderTimeEnum render_time_enum =
+            proto::NodeStaticMesh::SCENE_RENDER_TIME) = 0;
     /**
      * @brief Get all texture from the level.
      * @return A vector of texture ids.

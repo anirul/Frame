@@ -21,6 +21,8 @@ add_library(Frame
     ${CMAKE_CURRENT_SOURCE_DIR}/../../include/frame/plugin_interface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../include/frame/program_interface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../include/frame/renderer_interface.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../include/frame/serialize_interface.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../include/frame/serialize.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../include/frame/static_mesh_interface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../include/frame/texture_interface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../include/frame/uniform_interface.h

@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "frame/node_interface.h"
+#include "frame/serialize.h"
 
 namespace frame
 {
@@ -12,7 +13,8 @@ namespace frame
  * @brief Node for static mesh container. This will hold a static mesh and
  *        associated material.
  */
-class NodeStaticMesh : public NodeInterface
+class NodeStaticMesh : public NodeInterface,
+                       public Serialize<proto::NodeStaticMesh>
 {
   public:
     /**
@@ -32,14 +34,7 @@ class NodeStaticMesh : public NodeInterface
         const proto::CleanBuffer& clean_buffer)
         : NodeInterface(func), static_mesh_id_(NullId)
     {
-        // Clean the back color and depth if needed.
-        for (std::uint32_t flag : clean_buffer.values())
-        {
-            if (flag == proto::CleanBuffer::CLEAR_COLOR)
-                clean_buffer_ |= proto::CleanBuffer::CLEAR_COLOR;
-            if (flag == proto::CleanBuffer::CLEAR_DEPTH)
-                clean_buffer_ |= proto::CleanBuffer::CLEAR_DEPTH;
-        }
+	    *data_.mutable_clean_buffer() = clean_buffer;
     }
     //! @brief Virtual destructor.
     ~NodeStaticMesh() override = default;
@@ -63,23 +58,6 @@ class NodeStaticMesh : public NodeInterface
         return NodeTypeEnum::NODE_STATIC_MESH;
     }
     /**
-     * @brief Get the node render time type.
-     * @return the render time type.
-     */
-    proto::SceneStaticMesh::RenderTimeEnum GetRenderTimeType() const
-    {
-        return render_time_enum_;
-    }
-    /**
-     * @brief Set the node render time type.
-     * @param render_time_enum: The render time type.
-     */
-    void SetRenderTimeType(
-        proto::SceneStaticMesh::RenderTimeEnum render_time_enum)
-    {
-        render_time_enum_ = render_time_enum;
-    }
-    /**
      * @brief Get local mesh return the local attached mesh.
      * @return Id of the local attached mesh.
      */
@@ -87,37 +65,9 @@ class NodeStaticMesh : public NodeInterface
     {
         return static_mesh_id_;
     }
-    /**
-	 * @brief Return the material name of the mesh.
-	 * @return Name of the material used by the mesh.
-	 */
-    std::string GetMaterialName() const
-    {
-		return material_name_;
-    }
-    /**
-	 * @brief Set the material name of the mesh.
-	 * @param material_name : The material name.
-	 */
-    void SetMaterialName(const std::string& material_name)
-    {
-		material_name_ = material_name;
-	}
-    /**
-     * @brief Get clean buffer parameters.
-     * @return Clean buffer.
-     */
-    std::uint32_t GetCleanBuffer() const
-    {
-        return clean_buffer_;
-    }
 
   private:
     EntityId static_mesh_id_ = NullId;
-	std::string material_name_;
-    std::uint32_t clean_buffer_ = {};
-	proto::SceneStaticMesh::RenderTimeEnum render_time_enum_ =
-        proto::SceneStaticMesh::SCENE_RENDER_TIME;
 };
 
 } // End namespace frame.

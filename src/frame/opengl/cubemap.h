@@ -85,11 +85,6 @@ class Cubemap : public TextureInterface, public BindInterface
      */
     void Clear(glm::vec4 color) override;
     /**
-     * @brief Enable mip map, this allow a recursive level of texture faster
-     *        for rendering.
-     */
-    void EnableMipmap() const override;
-    /**
      * @brief From the bind interface this will bind the texture at slot to
      *        the current context.
      * @param slot: Slot to be binded.
@@ -100,54 +95,6 @@ class Cubemap : public TextureInterface, public BindInterface
      *        from the context.
      */
     void UnBind() const override;
-    /**
-     * @brief Set the minification filter.
-     * @param texture_filter: Usually and by default GL_LINEAR.
-     */
-    void SetMinFilter(proto::TextureFilter::Enum texture_filter) override;
-    /**
-     * @brief Get the minification filter.
-     * @return The value of the minification filter.
-     */
-    proto::TextureFilter::Enum GetMinFilter() const override;
-    /**
-     * @brief Set the magnification filter.
-     * @param texture_filter: Usually and by default GL_LINEAR.
-     */
-    void SetMagFilter(proto::TextureFilter::Enum texture_filter) override;
-    /**
-     * @brief Get the magnification filter.
-     * @return The value of the magnification filter.
-     */
-    proto::TextureFilter::Enum GetMagFilter() const override;
-    /**
-     * @brief Set the wrapping on the s size of the texture (horizontal)
-     *        this will decide how the texture is treated in case you
-     *        overflow in this direction.
-     * @param texture_filter: Could be any of (REPEAT, CLAMP_TO_EDGE,
-     *        MIRRORED_REPEAT).
-     */
-    void SetWrapS(proto::TextureFilter::Enum texture_filter) override;
-    /**
-     * @brief Get the wrapping on the s size of the texture (horizontal).
-     * @return The way the texture is wrap could be any of (REPEAT,
-     *         CLAMP_TO_EDGE, MIRRORED_REPEAT).
-     */
-    proto::TextureFilter::Enum GetWrapS() const override;
-    /**
-     * @brief Set the wrapping on the t size of the texture (vertical) this
-     *        will decide how the texture is treated in case you overflow in
-     *        this direction.
-     * @param texture_filter: Could be any of (REPEAT, CLAMP_TO_EDGE,
-     *        MIRRORED_REPEAT).
-     */
-    void SetWrapT(proto::TextureFilter::Enum texture_filter) override;
-    /**
-     * @brief Get the wrapping on the t size of the texture (vertical).
-     * @return The way the texture is wrap could be any of (REPEAT,
-     *         CLAMP_TO_EDGE, MIRRORED_REPEAT).
-     */
-    proto::TextureFilter::Enum GetWrapT() const override;
     /**
      * @brief Set the wrapping on the t size of the texture (vertical) this
      *        will decide how the texture is treated in case you overflow in
@@ -175,30 +122,6 @@ class Cubemap : public TextureInterface, public BindInterface
 
   public:
     /**
-     * @brief Get name from the name interface.
-     * @return The name of the object.
-     */
-    std::string GetName() const override
-    {
-        return name_;
-    }
-    /**
-     * @brief Set name from the name interface.
-     * @param name: New name to be set.
-     */
-    void SetName(const std::string& name) override
-    {
-        name_ = name;
-    }
-    /**
-     * @brief Will respond true as this is a cube map.
-     * @return True this is a cube map.
-     */
-    bool IsCubeMap() const final
-    {
-        return true;
-    }
-    /**
      * @brief Return the texture cube map OpenGL id, from the bind
      * interface.
      * @return Get the OpenGL id of the texture.
@@ -206,31 +129,6 @@ class Cubemap : public TextureInterface, public BindInterface
     unsigned int GetId() const override
     {
         return texture_id_;
-    }
-    /**
-     * @brief Get the texture cube map size.
-     * @return A single side size in pixel.
-     */
-    glm::uvec2 GetSize() const override
-    {
-        return size_;
-    }
-    /**
-     * @brief Get the pixel element size individual element (BYTE, SHORT,
-     * LONG, FLOAT).
-     * @return The pixel element size.
-     */
-    proto::PixelElementSize::Enum GetPixelElementSize() const override
-    {
-        return pixel_element_size_.value();
-    }
-    /**
-     * @brief Get the pixel structure (R, RG, RGB, RGBA).
-     * @return the pixel structure.
-     */
-    proto::PixelStructure::Enum GetPixelStructure() const override
-    {
-        return pixel_structure_.value();
     }
     /**
      * @brief Get the texture parameters used at creation, usefull for

@@ -30,24 +30,6 @@ class Program : public ProgramInterface
 
   public:
     /**
-     * @brief Get name from the name interface.
-     * @return The name of the object.
-     */
-    std::string GetName() const override
-    {
-        return name_;
-    }
-    /**
-     * @brief Set name from the name interface.
-     * @param name: New name to be set.
-     */
-    void SetName(const std::string& name) override
-    {
-        name_ = name;
-    }
-
-  public:
-    /**
      * @brief Set input texture id.
      * @param id: Add the texture id into the input program.
      */
@@ -107,27 +89,6 @@ class Program : public ProgramInterface
     //! @brief Link shaders to a program.
     void LinkShader() override;
     /**
-     * @brief Get the list of uniforms needed by the program.
-     * @return Vector of string that represent the names of uniforms.
-     */
-    std::vector<std::string> GetUniformNameList() const override;
-    /**
-     * @brief Get the uniform.
-     * @param name: Name of the uniform.
-     * @return The uniform.
-     */
-    const UniformInterface& GetUniform(const std::string& name) const override;
-    /**
-     * @brief Set the uniform.
-     * @param uniform: The uniform to set.
-     */
-    void AddUniform(std::unique_ptr<UniformInterface>&& uniform) override;
-    /**
-     * @brief Remove a uniform from the collection.
-     * @param name: The name of the uniform to be removed.
-     */
-    void RemoveUniform(const std::string& name) override;
-    /**
      * @brief Use the program, a little bit like bind.
      * @param uniform_interface: The way to communicate the uniform like
      * matrices (model, view, projection) but also time and other uniform
@@ -141,20 +102,6 @@ class Program : public ProgramInterface
     void Use() const override;
     //! @brief Stop using the program, a little bit like unbind.
     void UnUse() const override;
-    /**
-     * @brief Check if the program has the uniform passed as name.
-     * @param name: Name of the uniform.
-     * @return True if present false otherwise.
-     */
-    bool HasUniform(const std::string& name) const override;
-    /**
-     * @brief Add uniform enum.
-     * @param name: Uniform name.
-     * @param uniform_enum: Enum associated to the uniform.
-     */
-    void AddUniformEnum(
-        const std::string& name,
-        proto::Uniform::UniformEnum uniform_enum) override;
 
   protected:
     /**
@@ -187,6 +134,8 @@ class Program : public ProgramInterface
     std::vector<EntityId> input_texture_ids_ = {};
     std::vector<EntityId> output_texture_ids_ = {};
     std::map<std::string, proto::Uniform::UniformEnum> name_uniform_enums_;
+	std::string shader_name_;
+	bool serialize_enable_ = false;
     mutable bool is_used_ = false;
 };
 
@@ -197,6 +146,7 @@ class Program : public ProgramInterface
  */
 std::unique_ptr<frame::ProgramInterface> CreateProgram(
     const std::string& name,
+    const std::string& shader_name,
     std::istream& vertex_shader_code,
     std::istream& pixel_shader_code);
 /**

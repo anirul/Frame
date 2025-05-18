@@ -112,8 +112,8 @@ class Level : public LevelInterface
      * RenderTimeEnum.
      */
     std::vector<std::pair<EntityId, EntityId>> GetStaticMeshMaterialIds(
-        proto::SceneStaticMesh::RenderTimeEnum render_time_enum =
-            proto::SceneStaticMesh::SCENE_RENDER_TIME) const override;
+        proto::NodeStaticMesh::RenderTimeEnum render_time_enum =
+            proto::NodeStaticMesh::SCENE_RENDER_TIME) const override;
     /**
      * @brief Get the default output texture id.
      * @return Id of the default output texture.
@@ -191,8 +191,8 @@ class Level : public LevelInterface
     void AddMeshMaterialId(
         EntityId node_id,
         EntityId material_id,
-        proto::SceneStaticMesh::RenderTimeEnum render_time_enum =
-            proto::SceneStaticMesh::SCENE_RENDER_TIME) override;
+        proto::NodeStaticMesh::RenderTimeEnum render_time_enum =
+            proto::NodeStaticMesh::SCENE_RENDER_TIME) override;
     /**
      * @brief Get enum type from Id.
      * @param id: Id to be returned.

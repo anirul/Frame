@@ -77,7 +77,7 @@ proto::Texture SerializeTexture(TextureInterface& texture_interface)
     proto::Texture proto_texture =
         SerializeTextureFromParameter(texture_interface.GetTextureParameter());
     proto_texture.set_name(texture_interface.GetName());
-    proto_texture.set_cubemap(texture_interface.IsCubeMap());
+    proto_texture.set_cubemap(texture_interface.GetData().cubemap());
     // TODO(anirul): Get the file names?
     return proto_texture;
 }

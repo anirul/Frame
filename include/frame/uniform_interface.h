@@ -6,7 +6,7 @@
 #include <memory>
 #include <vector>
 #include "frame/json/proto.h"
-#include "name_interface.h"
+#include "frame/serialize.h"
 
 namespace frame
 {
@@ -18,77 +18,11 @@ namespace frame
  * This class is an abstractiion of a uniform. It is used to be returned by
  * the uniform collection as a reference to a sisngle uniform.
  */
-class UniformInterface : public NameInterface
+class UniformInterface : public Serialize<proto::Uniform>
 {
   public:
     //! @brief Virtual destructor.
     virtual ~UniformInterface() = default;
-    //! @brief Get the name of the uniform.
-    virtual std::string GetName() const = 0;
-    //! @brief Set the name of the uniform.
-    virtual void SetName(const std::string& name) = 0;
-    /**
-     * @brief Get the type of the uniform.
-     * @param value: The type of the uniform (should correspond to the GLenum).
-     */
-    virtual proto::Uniform::TypeEnum GetType() const = 0;
-    /**
-     * @brief Set the type of the uniform.
-     * @return the type of the uniform.
-     */
-    virtual void SetType(proto::Uniform::TypeEnum value) = 0;
-    /**
-     * @brief Get the uniform enum, in case the type enum is INVALID.
-     * @return The uniform enum.
-     */
-    virtual proto::Uniform::UniformEnum GetUniformEnum() const = 0;
-    /**
-     * @brief Set the uniform enum, type enum is INVALID.
-     * @param value: The uniform enum.
-     */
-    virtual void SetUniformEnum(proto::Uniform::UniformEnum value) = 0;
-    /**
-     * @brief Get the size of the uniform.
-     * @return The size of the uniform.
-     */
-    virtual glm::uvec2 GetSize() const = 0;
-    /**
-     * @brief Set the size of the uniform.
-     * @param size: The size of the uniform.
-     */
-    virtual void SetSize(glm::uvec2 size) = 0;
-    /**
-     * @brief Get the value of the uniform.
-     * @return The value of the uniform.
-     */
-    virtual std::vector<std::int32_t> GetInts() const = 0;
-    /**
-     * @brief Set the value of the uniform.
-     * @param value: The value of the uniform.
-     */
-    virtual void SetInts(const std::vector<std::int32_t>& value) = 0;
-    /**
-     * @brief Get the value of the uniform.
-     * @return The value of the uniform.
-     */
-    virtual std::vector<float> GetFloats() const = 0;
-    /**
-     * @brief Set the value of the uniform.
-     * @param value: The value of the uniform.
-     */
-    virtual void SetFloats(const std::vector<float>& value) = 0;
-    //! @brief Get a float value.
-    virtual float GetFloat() const = 0;
-    //! @brief Get a int value.
-    virtual int GetInt() const = 0;
-    //! @brief Get a vec2 value.
-    virtual glm::vec2 GetVec2() const = 0;
-    //! @brief Get a vec3 value.
-    virtual glm::vec3 GetVec3() const = 0;
-    //! @brief Get a vec4 value.
-    virtual glm::vec4 GetVec4() const = 0;
-    //! @brief Get a mat4 value.
-    virtual glm::mat4 GetMat4() const = 0;
 };
 
 } // End namespace frame.

@@ -12,31 +12,31 @@ namespace frame::json
 namespace
 {
 
-proto::SceneLight::LightTypeEnum SerializeLightType(
+proto::NodeLight::LightTypeEnum SerializeLightType(
     frame::LightTypeEnum light_type)
 {
     switch (light_type)
     {
     case frame::LightTypeEnum::AMBIENT_LIGHT:
-        return proto::SceneLight::AMBIENT_LIGHT;
+        return proto::NodeLight::AMBIENT_LIGHT;
     case frame::LightTypeEnum::DIRECTIONAL_LIGHT:
-        return proto::SceneLight::DIRECTIONAL_LIGHT;
+        return proto::NodeLight::DIRECTIONAL_LIGHT;
     case frame::LightTypeEnum::INVALID_LIGHT:
-        return proto::SceneLight::INVALID_LIGHT;
+        return proto::NodeLight::INVALID_LIGHT;
     case frame::LightTypeEnum::POINT_LIGHT:
-        return proto::SceneLight::POINT_LIGHT;
+        return proto::NodeLight::POINT_LIGHT;
     case frame::LightTypeEnum::SPOT_LIGHT:
-        return proto::SceneLight::SPOT_LIGHT;
+        return proto::NodeLight::SPOT_LIGHT;
     }
     throw std::runtime_error("Unknown error???");
 }
 
-proto::SceneCamera SerializeNodeCamera(const NodeInterface& node_interface)
+proto::NodeCamera SerializeNodeCamera(const NodeInterface& node_interface)
 {
-    proto::SceneCamera proto_scene_camera;
+    proto::NodeCamera proto_scene_camera;
     const NodeCamera& node_camera =
         dynamic_cast<const NodeCamera&>(node_interface);
-    proto_scene_camera.set_name(node_camera.GetName());
+    proto_scene_camera.set_name(node_camera.GetData().name());
     proto_scene_camera.set_parent(node_camera.GetParentName());
     const Camera& camera = node_camera.GetCamera();
     proto::UniformVector3 position =
@@ -53,87 +53,83 @@ proto::SceneCamera SerializeNodeCamera(const NodeInterface& node_interface)
     return proto_scene_camera;
 }
 
-proto::SceneLight SerializeNodeLight(const NodeInterface& node_interface)
+proto::NodeLight SerializeNodeLight(const NodeInterface& node_interface)
 {
-    proto::SceneLight proto_scene_light;
+    proto::NodeLight proto_scene_light;
     const NodeLight& node_light =
         dynamic_cast<const NodeLight&>(node_interface);
-    proto_scene_light.set_name(node_light.GetName());
+    proto_scene_light.set_name(node_light.GetData().name());
     proto_scene_light.set_parent(node_light.GetParentName());
-    proto_scene_light.set_light_type(SerializeLightType(node_light.GetType()));
+    proto_scene_light.set_light_type(node_light.GetData().light_type());
     *proto_scene_light.mutable_position() =
-        SerializeUniformVector3(node_light.GetPosition());
+        node_light.GetData().position();
     *proto_scene_light.mutable_direction() =
-        SerializeUniformVector3(node_light.GetDirection());
-    proto_scene_light.set_dot_inner_limit(node_light.GetDotInner());
-    proto_scene_light.set_dot_outer_limit(node_light.GetDotOuter());
-    *proto_scene_light.mutable_color() =
-        SerializeUniformVector3(node_light.GetColor());
+        node_light.GetData().direction();
+    proto_scene_light.set_dot_inner_limit(node_light.GetData().dot_inner_limit());
+    proto_scene_light.set_dot_outer_limit(node_light.GetData().dot_outer_limit());
+    *proto_scene_light.mutable_color() = node_light.GetData().color();
     return proto_scene_light;
 }
 
-proto::SceneMatrix SerializeNodeMatrix(const NodeInterface& node_interface)
+proto::NodeMatrix SerializeNodeMatrix(const NodeInterface& node_interface)
 {
-    proto::SceneMatrix proto_scene_matrix;
+    proto::NodeMatrix proto_scene_matrix;
     const NodeMatrix& node_matrix =
         dynamic_cast<const NodeMatrix&>(node_interface);
-    proto_scene_matrix.set_name(node_matrix.GetName());
+    proto_scene_matrix.set_name(node_matrix.GetData().name());
     proto_scene_matrix.set_parent(node_matrix.GetParentName());
-    if (node_matrix.IsRotationEnabled())
+    if (node_matrix.GetData().matrix_type_enum() == proto::NodeMatrix::ROTATION_MATRIX)
     {
-        glm::quat glm_quat = node_matrix.GetQuaternion();
-        *proto_scene_matrix.mutable_quaternion() = SerializeUniformVector4(
-            glm::vec4(glm_quat.x, glm_quat.y, glm_quat.z, glm_quat.w));
+        *proto_scene_matrix.mutable_quaternion() = node_matrix.GetData().quaternion();
     }
     else
     {
-        *proto_scene_matrix.mutable_matrix() =
-            SerializeUniformMatrix4(node_matrix.GetMatrix());
+        *proto_scene_matrix.mutable_matrix() = node_matrix.GetData().matrix();
     }
     return proto_scene_matrix;
 }
 
 void SerializeNodeStaticMeshEnum(
-    proto::SceneStaticMesh& proto_scene_static_mesh,
+    proto::NodeStaticMesh& proto_node_static_mesh,
     const NodeStaticMesh& node_static_mesh,
     const LevelInterface& level_interface)
 {
-    proto_scene_static_mesh.set_mesh_enum(proto::SceneStaticMesh::INVALID);
+    proto_node_static_mesh.set_mesh_enum(proto::NodeStaticMesh::INVALID);
     if (node_static_mesh.GetLocalMesh() ==
         level_interface.GetDefaultStaticMeshCubeId())
     {
-        proto_scene_static_mesh.set_mesh_enum(proto::SceneStaticMesh::CUBE);
+        proto_node_static_mesh.set_mesh_enum(proto::NodeStaticMesh::CUBE);
     }
     if (node_static_mesh.GetLocalMesh() ==
         level_interface.GetDefaultStaticMeshQuadId())
     {
-        proto_scene_static_mesh.set_mesh_enum(proto::SceneStaticMesh::QUAD);
+        proto_node_static_mesh.set_mesh_enum(proto::NodeStaticMesh::QUAD);
     }
-    if (proto_scene_static_mesh.mesh_enum() == proto::SceneStaticMesh::INVALID)
+    if (proto_node_static_mesh.mesh_enum() == proto::NodeStaticMesh::INVALID)
     {
         throw std::runtime_error(std::format(
             "Couldn't find any mesh for this node: [{}].",
-            node_static_mesh.GetName()));
+            node_static_mesh.GetData().name()));
     }
-    proto_scene_static_mesh.set_material_name(
-        node_static_mesh.GetMaterialName());
-    proto_scene_static_mesh.set_render_time_enum(
-        node_static_mesh.GetRenderTimeType());
+    proto_node_static_mesh.set_material_name(
+        node_static_mesh.GetData().material_name());
+    proto_node_static_mesh.set_render_time_enum(
+        node_static_mesh.GetData().render_time_enum());
 }
 
 void SerializeNodeStaticMeshFileName(
-    proto::SceneStaticMesh& proto_scene_static_mesh,
+    proto::NodeStaticMesh& proto_node_static_mesh,
     const std::string& mesh_name,
     const NodeStaticMesh& node_static_mesh,
     const LevelInterface& level_interface)
 {
-    proto_scene_static_mesh.set_file_name(mesh_name);
+    proto_node_static_mesh.set_file_name(mesh_name);
     auto mesh_ids_material_ids = level_interface.GetStaticMeshMaterialIds(
-        node_static_mesh.GetRenderTimeType());
-    proto_scene_static_mesh.set_material_name(
-        node_static_mesh.GetMaterialName());
-    proto_scene_static_mesh.set_render_time_enum(
-        node_static_mesh.GetRenderTimeType());
+        node_static_mesh.GetData().render_time_enum());
+    proto_node_static_mesh.set_material_name(
+        node_static_mesh.GetData().material_name());
+    proto_node_static_mesh.set_render_time_enum(
+        node_static_mesh.GetData().render_time_enum());
 }
 
 proto::CleanBuffer SerializeCleanBuffer(std::uint32_t clean_buffer)
@@ -150,32 +146,32 @@ proto::CleanBuffer SerializeCleanBuffer(std::uint32_t clean_buffer)
     return proto_clean_buffer;
 }
 
-proto::SceneStaticMesh SerializeNodeStaticMesh(
+proto::NodeStaticMesh SerializeNodeStaticMesh(
     const NodeInterface& node_interface, const LevelInterface& level_interface)
 {
-    proto::SceneStaticMesh proto_scene_static_mesh;
+    proto::NodeStaticMesh proto_node_static_mesh;
     const NodeStaticMesh& node_static_mesh =
         dynamic_cast<const NodeStaticMesh&>(node_interface);
-    proto_scene_static_mesh.set_name(node_static_mesh.GetName());
-    proto_scene_static_mesh.set_parent(node_static_mesh.GetParentName());
+    proto_node_static_mesh.set_name(node_static_mesh.GetData().name());
+    proto_node_static_mesh.set_parent(node_static_mesh.GetParentName());
     std::string mesh_name =
         level_interface.GetStaticMeshFromId(node_static_mesh.GetLocalMesh())
-            .GetFileName();
+            .GetData()
+            .file_name();
     const google::protobuf::EnumDescriptor* enum_descriptor =
-        proto::SceneStaticMesh::RenderTimeEnum_descriptor();
+        proto::NodeStaticMesh::RenderTimeEnum_descriptor();
     for (int i = 0; i < enum_descriptor->value_count(); ++i)
     {
         const google::protobuf::EnumValueDescriptor* enum_value =
             enum_descriptor->value(i);
-        proto::SceneStaticMesh::RenderTimeEnum render_time_enum =
-            static_cast<proto::SceneStaticMesh::RenderTimeEnum>(
+        proto::NodeStaticMesh::RenderTimeEnum render_time_enum =
+            static_cast<proto::NodeStaticMesh::RenderTimeEnum>(
                 enum_descriptor->value(i)->number());
         // Check if this is a clean buffer.
         if (node_static_mesh.GetLocalMesh() == NullId)
         {
-            *proto_scene_static_mesh.mutable_clean_buffer() =
-                json::SerializeCleanBuffer(node_static_mesh.GetCleanBuffer());
-            proto_scene_static_mesh.set_render_time_enum(render_time_enum);
+            *proto_node_static_mesh.mutable_clean_buffer() = node_static_mesh.GetData().clean_buffer();
+            proto_node_static_mesh.set_render_time_enum(render_time_enum);
         }
         // Now check for a mesh enum version.
         if (node_static_mesh.GetLocalMesh() ==
@@ -184,20 +180,20 @@ proto::SceneStaticMesh SerializeNodeStaticMesh(
                 level_interface.GetDefaultStaticMeshQuadId())
         {
             SerializeNodeStaticMeshEnum(
-                proto_scene_static_mesh, node_static_mesh, level_interface);
+                proto_node_static_mesh, node_static_mesh, level_interface);
         }
         // This case is the file_name version.
         if (!mesh_name.empty())
         {
             SerializeNodeStaticMeshFileName(
-                proto_scene_static_mesh,
+                proto_node_static_mesh,
                 mesh_name,
                 node_static_mesh,
                 level_interface);
         }
         // TODO(anirul): handle the plugin case?
     }
-    return proto_scene_static_mesh;
+    return proto_node_static_mesh;
 }
 
 void SerializeNode(

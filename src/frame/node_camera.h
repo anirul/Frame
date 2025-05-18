@@ -9,7 +9,7 @@
 namespace frame
 {
 
-class NodeCamera : public NodeInterface
+class NodeCamera : public NodeInterface, public Serialize<proto::NodeCamera>
 {
   public:
     /**

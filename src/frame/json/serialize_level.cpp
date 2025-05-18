@@ -56,8 +56,7 @@ proto::Level SerializeLevel(const LevelInterface& level_interface)
     {
         ProgramInterface& program_interface =
             level_interface.GetProgramFromId(program_id);
-        // Don't serialize display program."
-        if (program_interface.GetName() == "DisplayProgram")
+        if (!program_interface.SerializeEnable())
         {
             continue;
         }

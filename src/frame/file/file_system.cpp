@@ -19,29 +19,36 @@ const std::filesystem::path FindElement(
 {
     // Find the current path to the executing path.
     std::filesystem::path path = std::filesystem::current_path();
-    for (auto i : {0, 1, 2, 3, 4, 5, 6})
+    if (test(file))
     {
-        auto new_path = path;
-        for (auto j = 0; j < i; ++j)
-            new_path /= "../";
-        new_path /= file;
-        if (test(new_path))
+        return file;
+    }
+    else
+    {
+        for (auto i : {0, 1, 2, 3, 4, 5, 6})
         {
-            // Prune the path from relative elements.
-            new_path = new_path.lexically_normal();
-            // Search for build (it create a bunch of asset and other
-            // element that will confuse the search for the file and path).
-            bool found = false;
-            for (const auto& element : avoid_elements)
+            auto new_path = path;
+            for (auto j = 0; j < i; ++j)
+                new_path /= "../";
+            new_path /= file;
+            if (test(new_path))
             {
-                if (new_path.string().find(element) != std::string::npos)
+                // Prune the path from relative elements.
+                new_path = new_path.lexically_normal();
+                // Search for build (it create a bunch of asset and other
+                // element that will confuse the search for the file and path).
+                bool found = false;
+                for (const auto& element : avoid_elements)
                 {
-                    found = true;
+                    if (new_path.string().find(element) != std::string::npos)
+                    {
+                        found = true;
+                    }
                 }
-            }
-            if (!found)
-            {
-                return new_path;
+                if (!found)
+                {
+                    return new_path;
+                }
             }
         }
     }

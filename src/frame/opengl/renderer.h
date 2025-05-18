@@ -130,8 +130,8 @@ class Renderer : public RendererInterface
   private:
     LevelInterface& level_;
     double delta_time_ = 0.0;
-    proto::SceneStaticMesh::RenderTimeEnum render_time_ =
-        proto::SceneStaticMesh::SCENE_RENDER_TIME;
+    proto::NodeStaticMesh::RenderTimeEnum render_time_ =
+        proto::NodeStaticMesh::SCENE_RENDER_TIME;
     Logger& logger_ = Logger::GetInstance();
     glm::mat4 env_map_model_ = glm::mat4(1.0f);
     // Viewport top left and bottom right.

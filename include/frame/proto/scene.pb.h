@@ -57,18 +57,18 @@ extern const ::google::protobuf::internal::DescriptorTable
     descriptor_table_scene_2eproto;
 namespace frame {
 namespace proto {
-class SceneCamera;
-struct SceneCameraDefaultTypeInternal;
-extern SceneCameraDefaultTypeInternal _SceneCamera_default_instance_;
-class SceneLight;
-struct SceneLightDefaultTypeInternal;
-extern SceneLightDefaultTypeInternal _SceneLight_default_instance_;
-class SceneMatrix;
-struct SceneMatrixDefaultTypeInternal;
-extern SceneMatrixDefaultTypeInternal _SceneMatrix_default_instance_;
-class SceneStaticMesh;
-struct SceneStaticMeshDefaultTypeInternal;
-extern SceneStaticMeshDefaultTypeInternal _SceneStaticMesh_default_instance_;
+class NodeCamera;
+struct NodeCameraDefaultTypeInternal;
+extern NodeCameraDefaultTypeInternal _NodeCamera_default_instance_;
+class NodeLight;
+struct NodeLightDefaultTypeInternal;
+extern NodeLightDefaultTypeInternal _NodeLight_default_instance_;
+class NodeMatrix;
+struct NodeMatrixDefaultTypeInternal;
+extern NodeMatrixDefaultTypeInternal _NodeMatrix_default_instance_;
+class NodeStaticMesh;
+struct NodeStaticMeshDefaultTypeInternal;
+extern NodeStaticMeshDefaultTypeInternal _NodeStaticMesh_default_instance_;
 class SceneTree;
 struct SceneTreeDefaultTypeInternal;
 extern SceneTreeDefaultTypeInternal _SceneTree_default_instance_;
@@ -81,212 +81,245 @@ namespace protobuf {
 
 namespace frame {
 namespace proto {
-enum SceneStaticMesh_RenderPrimitiveEnum : int {
-  SceneStaticMesh_RenderPrimitiveEnum_TRIANGLE_PRIMITIVE = 0,
-  SceneStaticMesh_RenderPrimitiveEnum_POINT_PRIMITIVE = 1,
-  SceneStaticMesh_RenderPrimitiveEnum_LINE_PRIMITIVE = 2,
-  SceneStaticMesh_RenderPrimitiveEnum_SceneStaticMesh_RenderPrimitiveEnum_INT_MIN_SENTINEL_DO_NOT_USE_ =
+enum NodeMatrix_MatrixTypeEnum : int {
+  NodeMatrix_MatrixTypeEnum_STATIC_MATRIX = 0,
+  NodeMatrix_MatrixTypeEnum_ROTATION_MATRIX = 1,
+  NodeMatrix_MatrixTypeEnum_NodeMatrix_MatrixTypeEnum_INT_MIN_SENTINEL_DO_NOT_USE_ =
       std::numeric_limits<::int32_t>::min(),
-  SceneStaticMesh_RenderPrimitiveEnum_SceneStaticMesh_RenderPrimitiveEnum_INT_MAX_SENTINEL_DO_NOT_USE_ =
+  NodeMatrix_MatrixTypeEnum_NodeMatrix_MatrixTypeEnum_INT_MAX_SENTINEL_DO_NOT_USE_ =
       std::numeric_limits<::int32_t>::max(),
 };
 
-bool SceneStaticMesh_RenderPrimitiveEnum_IsValid(int value);
-extern const uint32_t SceneStaticMesh_RenderPrimitiveEnum_internal_data_[];
-constexpr SceneStaticMesh_RenderPrimitiveEnum SceneStaticMesh_RenderPrimitiveEnum_RenderPrimitiveEnum_MIN = static_cast<SceneStaticMesh_RenderPrimitiveEnum>(0);
-constexpr SceneStaticMesh_RenderPrimitiveEnum SceneStaticMesh_RenderPrimitiveEnum_RenderPrimitiveEnum_MAX = static_cast<SceneStaticMesh_RenderPrimitiveEnum>(2);
-constexpr int SceneStaticMesh_RenderPrimitiveEnum_RenderPrimitiveEnum_ARRAYSIZE = 2 + 1;
+bool NodeMatrix_MatrixTypeEnum_IsValid(int value);
+extern const uint32_t NodeMatrix_MatrixTypeEnum_internal_data_[];
+constexpr NodeMatrix_MatrixTypeEnum NodeMatrix_MatrixTypeEnum_MatrixTypeEnum_MIN = static_cast<NodeMatrix_MatrixTypeEnum>(0);
+constexpr NodeMatrix_MatrixTypeEnum NodeMatrix_MatrixTypeEnum_MatrixTypeEnum_MAX = static_cast<NodeMatrix_MatrixTypeEnum>(1);
+constexpr int NodeMatrix_MatrixTypeEnum_MatrixTypeEnum_ARRAYSIZE = 1 + 1;
 const ::google::protobuf::EnumDescriptor*
-SceneStaticMesh_RenderPrimitiveEnum_descriptor();
+NodeMatrix_MatrixTypeEnum_descriptor();
 template <typename T>
-const std::string& SceneStaticMesh_RenderPrimitiveEnum_Name(T value) {
-  static_assert(std::is_same<T, SceneStaticMesh_RenderPrimitiveEnum>::value ||
+const std::string& NodeMatrix_MatrixTypeEnum_Name(T value) {
+  static_assert(std::is_same<T, NodeMatrix_MatrixTypeEnum>::value ||
                     std::is_integral<T>::value,
-                "Incorrect type passed to RenderPrimitiveEnum_Name().");
-  return SceneStaticMesh_RenderPrimitiveEnum_Name(static_cast<SceneStaticMesh_RenderPrimitiveEnum>(value));
+                "Incorrect type passed to MatrixTypeEnum_Name().");
+  return NodeMatrix_MatrixTypeEnum_Name(static_cast<NodeMatrix_MatrixTypeEnum>(value));
 }
 template <>
-inline const std::string& SceneStaticMesh_RenderPrimitiveEnum_Name(SceneStaticMesh_RenderPrimitiveEnum value) {
-  return ::google::protobuf::internal::NameOfDenseEnum<SceneStaticMesh_RenderPrimitiveEnum_descriptor,
-                                                 0, 2>(
-      static_cast<int>(value));
-}
-inline bool SceneStaticMesh_RenderPrimitiveEnum_Parse(absl::string_view name, SceneStaticMesh_RenderPrimitiveEnum* value) {
-  return ::google::protobuf::internal::ParseNamedEnum<SceneStaticMesh_RenderPrimitiveEnum>(
-      SceneStaticMesh_RenderPrimitiveEnum_descriptor(), name, value);
-}
-enum SceneStaticMesh_MeshEnum : int {
-  SceneStaticMesh_MeshEnum_INVALID = 0,
-  SceneStaticMesh_MeshEnum_CUBE = 1,
-  SceneStaticMesh_MeshEnum_QUAD = 2,
-  SceneStaticMesh_MeshEnum_SceneStaticMesh_MeshEnum_INT_MIN_SENTINEL_DO_NOT_USE_ =
-      std::numeric_limits<::int32_t>::min(),
-  SceneStaticMesh_MeshEnum_SceneStaticMesh_MeshEnum_INT_MAX_SENTINEL_DO_NOT_USE_ =
-      std::numeric_limits<::int32_t>::max(),
-};
-
-bool SceneStaticMesh_MeshEnum_IsValid(int value);
-extern const uint32_t SceneStaticMesh_MeshEnum_internal_data_[];
-constexpr SceneStaticMesh_MeshEnum SceneStaticMesh_MeshEnum_MeshEnum_MIN = static_cast<SceneStaticMesh_MeshEnum>(0);
-constexpr SceneStaticMesh_MeshEnum SceneStaticMesh_MeshEnum_MeshEnum_MAX = static_cast<SceneStaticMesh_MeshEnum>(2);
-constexpr int SceneStaticMesh_MeshEnum_MeshEnum_ARRAYSIZE = 2 + 1;
-const ::google::protobuf::EnumDescriptor*
-SceneStaticMesh_MeshEnum_descriptor();
-template <typename T>
-const std::string& SceneStaticMesh_MeshEnum_Name(T value) {
-  static_assert(std::is_same<T, SceneStaticMesh_MeshEnum>::value ||
-                    std::is_integral<T>::value,
-                "Incorrect type passed to MeshEnum_Name().");
-  return SceneStaticMesh_MeshEnum_Name(static_cast<SceneStaticMesh_MeshEnum>(value));
-}
-template <>
-inline const std::string& SceneStaticMesh_MeshEnum_Name(SceneStaticMesh_MeshEnum value) {
-  return ::google::protobuf::internal::NameOfDenseEnum<SceneStaticMesh_MeshEnum_descriptor,
-                                                 0, 2>(
-      static_cast<int>(value));
-}
-inline bool SceneStaticMesh_MeshEnum_Parse(absl::string_view name, SceneStaticMesh_MeshEnum* value) {
-  return ::google::protobuf::internal::ParseNamedEnum<SceneStaticMesh_MeshEnum>(
-      SceneStaticMesh_MeshEnum_descriptor(), name, value);
-}
-enum SceneStaticMesh_RenderTimeEnum : int {
-  SceneStaticMesh_RenderTimeEnum_SCENE_RENDER_TIME = 0,
-  SceneStaticMesh_RenderTimeEnum_PRE_RENDER_TIME = 1,
-  SceneStaticMesh_RenderTimeEnum_POST_PROCESS_TIME = 2,
-  SceneStaticMesh_RenderTimeEnum_SKYBOX_RENDER_TIME = 3,
-  SceneStaticMesh_RenderTimeEnum_SHADOW_RENDER_TIME = 4,
-  SceneStaticMesh_RenderTimeEnum_SceneStaticMesh_RenderTimeEnum_INT_MIN_SENTINEL_DO_NOT_USE_ =
-      std::numeric_limits<::int32_t>::min(),
-  SceneStaticMesh_RenderTimeEnum_SceneStaticMesh_RenderTimeEnum_INT_MAX_SENTINEL_DO_NOT_USE_ =
-      std::numeric_limits<::int32_t>::max(),
-};
-
-bool SceneStaticMesh_RenderTimeEnum_IsValid(int value);
-extern const uint32_t SceneStaticMesh_RenderTimeEnum_internal_data_[];
-constexpr SceneStaticMesh_RenderTimeEnum SceneStaticMesh_RenderTimeEnum_RenderTimeEnum_MIN = static_cast<SceneStaticMesh_RenderTimeEnum>(0);
-constexpr SceneStaticMesh_RenderTimeEnum SceneStaticMesh_RenderTimeEnum_RenderTimeEnum_MAX = static_cast<SceneStaticMesh_RenderTimeEnum>(4);
-constexpr int SceneStaticMesh_RenderTimeEnum_RenderTimeEnum_ARRAYSIZE = 4 + 1;
-const ::google::protobuf::EnumDescriptor*
-SceneStaticMesh_RenderTimeEnum_descriptor();
-template <typename T>
-const std::string& SceneStaticMesh_RenderTimeEnum_Name(T value) {
-  static_assert(std::is_same<T, SceneStaticMesh_RenderTimeEnum>::value ||
-                    std::is_integral<T>::value,
-                "Incorrect type passed to RenderTimeEnum_Name().");
-  return SceneStaticMesh_RenderTimeEnum_Name(static_cast<SceneStaticMesh_RenderTimeEnum>(value));
-}
-template <>
-inline const std::string& SceneStaticMesh_RenderTimeEnum_Name(SceneStaticMesh_RenderTimeEnum value) {
-  return ::google::protobuf::internal::NameOfDenseEnum<SceneStaticMesh_RenderTimeEnum_descriptor,
-                                                 0, 4>(
-      static_cast<int>(value));
-}
-inline bool SceneStaticMesh_RenderTimeEnum_Parse(absl::string_view name, SceneStaticMesh_RenderTimeEnum* value) {
-  return ::google::protobuf::internal::ParseNamedEnum<SceneStaticMesh_RenderTimeEnum>(
-      SceneStaticMesh_RenderTimeEnum_descriptor(), name, value);
-}
-enum SceneStaticMesh_ShadowEffectEnum : int {
-  SceneStaticMesh_ShadowEffectEnum_OPAQUE_SHADOW_EFFECT = 0,
-  SceneStaticMesh_ShadowEffectEnum_TRANSPARENT_SHADOW_EFFECT = 1,
-  SceneStaticMesh_ShadowEffectEnum_SceneStaticMesh_ShadowEffectEnum_INT_MIN_SENTINEL_DO_NOT_USE_ =
-      std::numeric_limits<::int32_t>::min(),
-  SceneStaticMesh_ShadowEffectEnum_SceneStaticMesh_ShadowEffectEnum_INT_MAX_SENTINEL_DO_NOT_USE_ =
-      std::numeric_limits<::int32_t>::max(),
-};
-
-bool SceneStaticMesh_ShadowEffectEnum_IsValid(int value);
-extern const uint32_t SceneStaticMesh_ShadowEffectEnum_internal_data_[];
-constexpr SceneStaticMesh_ShadowEffectEnum SceneStaticMesh_ShadowEffectEnum_ShadowEffectEnum_MIN = static_cast<SceneStaticMesh_ShadowEffectEnum>(0);
-constexpr SceneStaticMesh_ShadowEffectEnum SceneStaticMesh_ShadowEffectEnum_ShadowEffectEnum_MAX = static_cast<SceneStaticMesh_ShadowEffectEnum>(1);
-constexpr int SceneStaticMesh_ShadowEffectEnum_ShadowEffectEnum_ARRAYSIZE = 1 + 1;
-const ::google::protobuf::EnumDescriptor*
-SceneStaticMesh_ShadowEffectEnum_descriptor();
-template <typename T>
-const std::string& SceneStaticMesh_ShadowEffectEnum_Name(T value) {
-  static_assert(std::is_same<T, SceneStaticMesh_ShadowEffectEnum>::value ||
-                    std::is_integral<T>::value,
-                "Incorrect type passed to ShadowEffectEnum_Name().");
-  return SceneStaticMesh_ShadowEffectEnum_Name(static_cast<SceneStaticMesh_ShadowEffectEnum>(value));
-}
-template <>
-inline const std::string& SceneStaticMesh_ShadowEffectEnum_Name(SceneStaticMesh_ShadowEffectEnum value) {
-  return ::google::protobuf::internal::NameOfDenseEnum<SceneStaticMesh_ShadowEffectEnum_descriptor,
+inline const std::string& NodeMatrix_MatrixTypeEnum_Name(NodeMatrix_MatrixTypeEnum value) {
+  return ::google::protobuf::internal::NameOfDenseEnum<NodeMatrix_MatrixTypeEnum_descriptor,
                                                  0, 1>(
       static_cast<int>(value));
 }
-inline bool SceneStaticMesh_ShadowEffectEnum_Parse(absl::string_view name, SceneStaticMesh_ShadowEffectEnum* value) {
-  return ::google::protobuf::internal::ParseNamedEnum<SceneStaticMesh_ShadowEffectEnum>(
-      SceneStaticMesh_ShadowEffectEnum_descriptor(), name, value);
+inline bool NodeMatrix_MatrixTypeEnum_Parse(absl::string_view name, NodeMatrix_MatrixTypeEnum* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<NodeMatrix_MatrixTypeEnum>(
+      NodeMatrix_MatrixTypeEnum_descriptor(), name, value);
 }
-enum SceneLight_LightTypeEnum : int {
-  SceneLight_LightTypeEnum_INVALID_LIGHT = 0,
-  SceneLight_LightTypeEnum_AMBIENT_LIGHT = 1,
-  SceneLight_LightTypeEnum_POINT_LIGHT = 2,
-  SceneLight_LightTypeEnum_DIRECTIONAL_LIGHT = 3,
-  SceneLight_LightTypeEnum_SPOT_LIGHT = 4,
-  SceneLight_LightTypeEnum_SceneLight_LightTypeEnum_INT_MIN_SENTINEL_DO_NOT_USE_ =
+enum NodeStaticMesh_RenderPrimitiveEnum : int {
+  NodeStaticMesh_RenderPrimitiveEnum_TRIANGLE_PRIMITIVE = 0,
+  NodeStaticMesh_RenderPrimitiveEnum_POINT_PRIMITIVE = 1,
+  NodeStaticMesh_RenderPrimitiveEnum_LINE_PRIMITIVE = 2,
+  NodeStaticMesh_RenderPrimitiveEnum_NodeStaticMesh_RenderPrimitiveEnum_INT_MIN_SENTINEL_DO_NOT_USE_ =
       std::numeric_limits<::int32_t>::min(),
-  SceneLight_LightTypeEnum_SceneLight_LightTypeEnum_INT_MAX_SENTINEL_DO_NOT_USE_ =
+  NodeStaticMesh_RenderPrimitiveEnum_NodeStaticMesh_RenderPrimitiveEnum_INT_MAX_SENTINEL_DO_NOT_USE_ =
       std::numeric_limits<::int32_t>::max(),
 };
 
-bool SceneLight_LightTypeEnum_IsValid(int value);
-extern const uint32_t SceneLight_LightTypeEnum_internal_data_[];
-constexpr SceneLight_LightTypeEnum SceneLight_LightTypeEnum_LightTypeEnum_MIN = static_cast<SceneLight_LightTypeEnum>(0);
-constexpr SceneLight_LightTypeEnum SceneLight_LightTypeEnum_LightTypeEnum_MAX = static_cast<SceneLight_LightTypeEnum>(4);
-constexpr int SceneLight_LightTypeEnum_LightTypeEnum_ARRAYSIZE = 4 + 1;
+bool NodeStaticMesh_RenderPrimitiveEnum_IsValid(int value);
+extern const uint32_t NodeStaticMesh_RenderPrimitiveEnum_internal_data_[];
+constexpr NodeStaticMesh_RenderPrimitiveEnum NodeStaticMesh_RenderPrimitiveEnum_RenderPrimitiveEnum_MIN = static_cast<NodeStaticMesh_RenderPrimitiveEnum>(0);
+constexpr NodeStaticMesh_RenderPrimitiveEnum NodeStaticMesh_RenderPrimitiveEnum_RenderPrimitiveEnum_MAX = static_cast<NodeStaticMesh_RenderPrimitiveEnum>(2);
+constexpr int NodeStaticMesh_RenderPrimitiveEnum_RenderPrimitiveEnum_ARRAYSIZE = 2 + 1;
 const ::google::protobuf::EnumDescriptor*
-SceneLight_LightTypeEnum_descriptor();
+NodeStaticMesh_RenderPrimitiveEnum_descriptor();
 template <typename T>
-const std::string& SceneLight_LightTypeEnum_Name(T value) {
-  static_assert(std::is_same<T, SceneLight_LightTypeEnum>::value ||
+const std::string& NodeStaticMesh_RenderPrimitiveEnum_Name(T value) {
+  static_assert(std::is_same<T, NodeStaticMesh_RenderPrimitiveEnum>::value ||
                     std::is_integral<T>::value,
-                "Incorrect type passed to LightTypeEnum_Name().");
-  return SceneLight_LightTypeEnum_Name(static_cast<SceneLight_LightTypeEnum>(value));
+                "Incorrect type passed to RenderPrimitiveEnum_Name().");
+  return NodeStaticMesh_RenderPrimitiveEnum_Name(static_cast<NodeStaticMesh_RenderPrimitiveEnum>(value));
 }
 template <>
-inline const std::string& SceneLight_LightTypeEnum_Name(SceneLight_LightTypeEnum value) {
-  return ::google::protobuf::internal::NameOfDenseEnum<SceneLight_LightTypeEnum_descriptor,
-                                                 0, 4>(
-      static_cast<int>(value));
-}
-inline bool SceneLight_LightTypeEnum_Parse(absl::string_view name, SceneLight_LightTypeEnum* value) {
-  return ::google::protobuf::internal::ParseNamedEnum<SceneLight_LightTypeEnum>(
-      SceneLight_LightTypeEnum_descriptor(), name, value);
-}
-enum SceneLight_ShadowTypeEnum : int {
-  SceneLight_ShadowTypeEnum_NO_SHADOW = 0,
-  SceneLight_ShadowTypeEnum_HARD_SHADOW = 1,
-  SceneLight_ShadowTypeEnum_SOFT_SHADOW = 2,
-  SceneLight_ShadowTypeEnum_SceneLight_ShadowTypeEnum_INT_MIN_SENTINEL_DO_NOT_USE_ =
-      std::numeric_limits<::int32_t>::min(),
-  SceneLight_ShadowTypeEnum_SceneLight_ShadowTypeEnum_INT_MAX_SENTINEL_DO_NOT_USE_ =
-      std::numeric_limits<::int32_t>::max(),
-};
-
-bool SceneLight_ShadowTypeEnum_IsValid(int value);
-extern const uint32_t SceneLight_ShadowTypeEnum_internal_data_[];
-constexpr SceneLight_ShadowTypeEnum SceneLight_ShadowTypeEnum_ShadowTypeEnum_MIN = static_cast<SceneLight_ShadowTypeEnum>(0);
-constexpr SceneLight_ShadowTypeEnum SceneLight_ShadowTypeEnum_ShadowTypeEnum_MAX = static_cast<SceneLight_ShadowTypeEnum>(2);
-constexpr int SceneLight_ShadowTypeEnum_ShadowTypeEnum_ARRAYSIZE = 2 + 1;
-const ::google::protobuf::EnumDescriptor*
-SceneLight_ShadowTypeEnum_descriptor();
-template <typename T>
-const std::string& SceneLight_ShadowTypeEnum_Name(T value) {
-  static_assert(std::is_same<T, SceneLight_ShadowTypeEnum>::value ||
-                    std::is_integral<T>::value,
-                "Incorrect type passed to ShadowTypeEnum_Name().");
-  return SceneLight_ShadowTypeEnum_Name(static_cast<SceneLight_ShadowTypeEnum>(value));
-}
-template <>
-inline const std::string& SceneLight_ShadowTypeEnum_Name(SceneLight_ShadowTypeEnum value) {
-  return ::google::protobuf::internal::NameOfDenseEnum<SceneLight_ShadowTypeEnum_descriptor,
+inline const std::string& NodeStaticMesh_RenderPrimitiveEnum_Name(NodeStaticMesh_RenderPrimitiveEnum value) {
+  return ::google::protobuf::internal::NameOfDenseEnum<NodeStaticMesh_RenderPrimitiveEnum_descriptor,
                                                  0, 2>(
       static_cast<int>(value));
 }
-inline bool SceneLight_ShadowTypeEnum_Parse(absl::string_view name, SceneLight_ShadowTypeEnum* value) {
-  return ::google::protobuf::internal::ParseNamedEnum<SceneLight_ShadowTypeEnum>(
-      SceneLight_ShadowTypeEnum_descriptor(), name, value);
+inline bool NodeStaticMesh_RenderPrimitiveEnum_Parse(absl::string_view name, NodeStaticMesh_RenderPrimitiveEnum* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<NodeStaticMesh_RenderPrimitiveEnum>(
+      NodeStaticMesh_RenderPrimitiveEnum_descriptor(), name, value);
+}
+enum NodeStaticMesh_MeshEnum : int {
+  NodeStaticMesh_MeshEnum_INVALID = 0,
+  NodeStaticMesh_MeshEnum_CUBE = 1,
+  NodeStaticMesh_MeshEnum_QUAD = 2,
+  NodeStaticMesh_MeshEnum_NodeStaticMesh_MeshEnum_INT_MIN_SENTINEL_DO_NOT_USE_ =
+      std::numeric_limits<::int32_t>::min(),
+  NodeStaticMesh_MeshEnum_NodeStaticMesh_MeshEnum_INT_MAX_SENTINEL_DO_NOT_USE_ =
+      std::numeric_limits<::int32_t>::max(),
+};
+
+bool NodeStaticMesh_MeshEnum_IsValid(int value);
+extern const uint32_t NodeStaticMesh_MeshEnum_internal_data_[];
+constexpr NodeStaticMesh_MeshEnum NodeStaticMesh_MeshEnum_MeshEnum_MIN = static_cast<NodeStaticMesh_MeshEnum>(0);
+constexpr NodeStaticMesh_MeshEnum NodeStaticMesh_MeshEnum_MeshEnum_MAX = static_cast<NodeStaticMesh_MeshEnum>(2);
+constexpr int NodeStaticMesh_MeshEnum_MeshEnum_ARRAYSIZE = 2 + 1;
+const ::google::protobuf::EnumDescriptor*
+NodeStaticMesh_MeshEnum_descriptor();
+template <typename T>
+const std::string& NodeStaticMesh_MeshEnum_Name(T value) {
+  static_assert(std::is_same<T, NodeStaticMesh_MeshEnum>::value ||
+                    std::is_integral<T>::value,
+                "Incorrect type passed to MeshEnum_Name().");
+  return NodeStaticMesh_MeshEnum_Name(static_cast<NodeStaticMesh_MeshEnum>(value));
+}
+template <>
+inline const std::string& NodeStaticMesh_MeshEnum_Name(NodeStaticMesh_MeshEnum value) {
+  return ::google::protobuf::internal::NameOfDenseEnum<NodeStaticMesh_MeshEnum_descriptor,
+                                                 0, 2>(
+      static_cast<int>(value));
+}
+inline bool NodeStaticMesh_MeshEnum_Parse(absl::string_view name, NodeStaticMesh_MeshEnum* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<NodeStaticMesh_MeshEnum>(
+      NodeStaticMesh_MeshEnum_descriptor(), name, value);
+}
+enum NodeStaticMesh_RenderTimeEnum : int {
+  NodeStaticMesh_RenderTimeEnum_SCENE_RENDER_TIME = 0,
+  NodeStaticMesh_RenderTimeEnum_PRE_RENDER_TIME = 1,
+  NodeStaticMesh_RenderTimeEnum_POST_PROCESS_TIME = 2,
+  NodeStaticMesh_RenderTimeEnum_SKYBOX_RENDER_TIME = 3,
+  NodeStaticMesh_RenderTimeEnum_SHADOW_RENDER_TIME = 4,
+  NodeStaticMesh_RenderTimeEnum_NodeStaticMesh_RenderTimeEnum_INT_MIN_SENTINEL_DO_NOT_USE_ =
+      std::numeric_limits<::int32_t>::min(),
+  NodeStaticMesh_RenderTimeEnum_NodeStaticMesh_RenderTimeEnum_INT_MAX_SENTINEL_DO_NOT_USE_ =
+      std::numeric_limits<::int32_t>::max(),
+};
+
+bool NodeStaticMesh_RenderTimeEnum_IsValid(int value);
+extern const uint32_t NodeStaticMesh_RenderTimeEnum_internal_data_[];
+constexpr NodeStaticMesh_RenderTimeEnum NodeStaticMesh_RenderTimeEnum_RenderTimeEnum_MIN = static_cast<NodeStaticMesh_RenderTimeEnum>(0);
+constexpr NodeStaticMesh_RenderTimeEnum NodeStaticMesh_RenderTimeEnum_RenderTimeEnum_MAX = static_cast<NodeStaticMesh_RenderTimeEnum>(4);
+constexpr int NodeStaticMesh_RenderTimeEnum_RenderTimeEnum_ARRAYSIZE = 4 + 1;
+const ::google::protobuf::EnumDescriptor*
+NodeStaticMesh_RenderTimeEnum_descriptor();
+template <typename T>
+const std::string& NodeStaticMesh_RenderTimeEnum_Name(T value) {
+  static_assert(std::is_same<T, NodeStaticMesh_RenderTimeEnum>::value ||
+                    std::is_integral<T>::value,
+                "Incorrect type passed to RenderTimeEnum_Name().");
+  return NodeStaticMesh_RenderTimeEnum_Name(static_cast<NodeStaticMesh_RenderTimeEnum>(value));
+}
+template <>
+inline const std::string& NodeStaticMesh_RenderTimeEnum_Name(NodeStaticMesh_RenderTimeEnum value) {
+  return ::google::protobuf::internal::NameOfDenseEnum<NodeStaticMesh_RenderTimeEnum_descriptor,
+                                                 0, 4>(
+      static_cast<int>(value));
+}
+inline bool NodeStaticMesh_RenderTimeEnum_Parse(absl::string_view name, NodeStaticMesh_RenderTimeEnum* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<NodeStaticMesh_RenderTimeEnum>(
+      NodeStaticMesh_RenderTimeEnum_descriptor(), name, value);
+}
+enum NodeStaticMesh_ShadowEffectEnum : int {
+  NodeStaticMesh_ShadowEffectEnum_OPAQUE_SHADOW_EFFECT = 0,
+  NodeStaticMesh_ShadowEffectEnum_TRANSPARENT_SHADOW_EFFECT = 1,
+  NodeStaticMesh_ShadowEffectEnum_NodeStaticMesh_ShadowEffectEnum_INT_MIN_SENTINEL_DO_NOT_USE_ =
+      std::numeric_limits<::int32_t>::min(),
+  NodeStaticMesh_ShadowEffectEnum_NodeStaticMesh_ShadowEffectEnum_INT_MAX_SENTINEL_DO_NOT_USE_ =
+      std::numeric_limits<::int32_t>::max(),
+};
+
+bool NodeStaticMesh_ShadowEffectEnum_IsValid(int value);
+extern const uint32_t NodeStaticMesh_ShadowEffectEnum_internal_data_[];
+constexpr NodeStaticMesh_ShadowEffectEnum NodeStaticMesh_ShadowEffectEnum_ShadowEffectEnum_MIN = static_cast<NodeStaticMesh_ShadowEffectEnum>(0);
+constexpr NodeStaticMesh_ShadowEffectEnum NodeStaticMesh_ShadowEffectEnum_ShadowEffectEnum_MAX = static_cast<NodeStaticMesh_ShadowEffectEnum>(1);
+constexpr int NodeStaticMesh_ShadowEffectEnum_ShadowEffectEnum_ARRAYSIZE = 1 + 1;
+const ::google::protobuf::EnumDescriptor*
+NodeStaticMesh_ShadowEffectEnum_descriptor();
+template <typename T>
+const std::string& NodeStaticMesh_ShadowEffectEnum_Name(T value) {
+  static_assert(std::is_same<T, NodeStaticMesh_ShadowEffectEnum>::value ||
+                    std::is_integral<T>::value,
+                "Incorrect type passed to ShadowEffectEnum_Name().");
+  return NodeStaticMesh_ShadowEffectEnum_Name(static_cast<NodeStaticMesh_ShadowEffectEnum>(value));
+}
+template <>
+inline const std::string& NodeStaticMesh_ShadowEffectEnum_Name(NodeStaticMesh_ShadowEffectEnum value) {
+  return ::google::protobuf::internal::NameOfDenseEnum<NodeStaticMesh_ShadowEffectEnum_descriptor,
+                                                 0, 1>(
+      static_cast<int>(value));
+}
+inline bool NodeStaticMesh_ShadowEffectEnum_Parse(absl::string_view name, NodeStaticMesh_ShadowEffectEnum* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<NodeStaticMesh_ShadowEffectEnum>(
+      NodeStaticMesh_ShadowEffectEnum_descriptor(), name, value);
+}
+enum NodeLight_LightTypeEnum : int {
+  NodeLight_LightTypeEnum_INVALID_LIGHT = 0,
+  NodeLight_LightTypeEnum_AMBIENT_LIGHT = 1,
+  NodeLight_LightTypeEnum_POINT_LIGHT = 2,
+  NodeLight_LightTypeEnum_DIRECTIONAL_LIGHT = 3,
+  NodeLight_LightTypeEnum_SPOT_LIGHT = 4,
+  NodeLight_LightTypeEnum_NodeLight_LightTypeEnum_INT_MIN_SENTINEL_DO_NOT_USE_ =
+      std::numeric_limits<::int32_t>::min(),
+  NodeLight_LightTypeEnum_NodeLight_LightTypeEnum_INT_MAX_SENTINEL_DO_NOT_USE_ =
+      std::numeric_limits<::int32_t>::max(),
+};
+
+bool NodeLight_LightTypeEnum_IsValid(int value);
+extern const uint32_t NodeLight_LightTypeEnum_internal_data_[];
+constexpr NodeLight_LightTypeEnum NodeLight_LightTypeEnum_LightTypeEnum_MIN = static_cast<NodeLight_LightTypeEnum>(0);
+constexpr NodeLight_LightTypeEnum NodeLight_LightTypeEnum_LightTypeEnum_MAX = static_cast<NodeLight_LightTypeEnum>(4);
+constexpr int NodeLight_LightTypeEnum_LightTypeEnum_ARRAYSIZE = 4 + 1;
+const ::google::protobuf::EnumDescriptor*
+NodeLight_LightTypeEnum_descriptor();
+template <typename T>
+const std::string& NodeLight_LightTypeEnum_Name(T value) {
+  static_assert(std::is_same<T, NodeLight_LightTypeEnum>::value ||
+                    std::is_integral<T>::value,
+                "Incorrect type passed to LightTypeEnum_Name().");
+  return NodeLight_LightTypeEnum_Name(static_cast<NodeLight_LightTypeEnum>(value));
+}
+template <>
+inline const std::string& NodeLight_LightTypeEnum_Name(NodeLight_LightTypeEnum value) {
+  return ::google::protobuf::internal::NameOfDenseEnum<NodeLight_LightTypeEnum_descriptor,
+                                                 0, 4>(
+      static_cast<int>(value));
+}
+inline bool NodeLight_LightTypeEnum_Parse(absl::string_view name, NodeLight_LightTypeEnum* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<NodeLight_LightTypeEnum>(
+      NodeLight_LightTypeEnum_descriptor(), name, value);
+}
+enum NodeLight_ShadowTypeEnum : int {
+  NodeLight_ShadowTypeEnum_NO_SHADOW = 0,
+  NodeLight_ShadowTypeEnum_HARD_SHADOW = 1,
+  NodeLight_ShadowTypeEnum_SOFT_SHADOW = 2,
+  NodeLight_ShadowTypeEnum_NodeLight_ShadowTypeEnum_INT_MIN_SENTINEL_DO_NOT_USE_ =
+      std::numeric_limits<::int32_t>::min(),
+  NodeLight_ShadowTypeEnum_NodeLight_ShadowTypeEnum_INT_MAX_SENTINEL_DO_NOT_USE_ =
+      std::numeric_limits<::int32_t>::max(),
+};
+
+bool NodeLight_ShadowTypeEnum_IsValid(int value);
+extern const uint32_t NodeLight_ShadowTypeEnum_internal_data_[];
+constexpr NodeLight_ShadowTypeEnum NodeLight_ShadowTypeEnum_ShadowTypeEnum_MIN = static_cast<NodeLight_ShadowTypeEnum>(0);
+constexpr NodeLight_ShadowTypeEnum NodeLight_ShadowTypeEnum_ShadowTypeEnum_MAX = static_cast<NodeLight_ShadowTypeEnum>(2);
+constexpr int NodeLight_ShadowTypeEnum_ShadowTypeEnum_ARRAYSIZE = 2 + 1;
+const ::google::protobuf::EnumDescriptor*
+NodeLight_ShadowTypeEnum_descriptor();
+template <typename T>
+const std::string& NodeLight_ShadowTypeEnum_Name(T value) {
+  static_assert(std::is_same<T, NodeLight_ShadowTypeEnum>::value ||
+                    std::is_integral<T>::value,
+                "Incorrect type passed to ShadowTypeEnum_Name().");
+  return NodeLight_ShadowTypeEnum_Name(static_cast<NodeLight_ShadowTypeEnum>(value));
+}
+template <>
+inline const std::string& NodeLight_ShadowTypeEnum_Name(NodeLight_ShadowTypeEnum value) {
+  return ::google::protobuf::internal::NameOfDenseEnum<NodeLight_ShadowTypeEnum_descriptor,
+                                                 0, 2>(
+      static_cast<int>(value));
+}
+inline bool NodeLight_ShadowTypeEnum_Parse(absl::string_view name, NodeLight_ShadowTypeEnum* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<NodeLight_ShadowTypeEnum>(
+      NodeLight_ShadowTypeEnum_descriptor(), name, value);
 }
 
 // ===================================================================
@@ -294,31 +327,31 @@ inline bool SceneLight_ShadowTypeEnum_Parse(absl::string_view name, SceneLight_S
 
 // -------------------------------------------------------------------
 
-class SceneMatrix final : public ::google::protobuf::Message
-/* @@protoc_insertion_point(class_definition:frame.proto.SceneMatrix) */ {
+class NodeMatrix final : public ::google::protobuf::Message
+/* @@protoc_insertion_point(class_definition:frame.proto.NodeMatrix) */ {
  public:
-  inline SceneMatrix() : SceneMatrix(nullptr) {}
-  ~SceneMatrix() PROTOBUF_FINAL;
+  inline NodeMatrix() : NodeMatrix(nullptr) {}
+  ~NodeMatrix() PROTOBUF_FINAL;
 
 #if defined(PROTOBUF_CUSTOM_VTABLE)
-  void operator delete(SceneMatrix* msg, std::destroying_delete_t) {
+  void operator delete(NodeMatrix* msg, std::destroying_delete_t) {
     SharedDtor(*msg);
-    ::google::protobuf::internal::SizedDelete(msg, sizeof(SceneMatrix));
+    ::google::protobuf::internal::SizedDelete(msg, sizeof(NodeMatrix));
   }
 #endif
 
   template <typename = void>
-  explicit PROTOBUF_CONSTEXPR SceneMatrix(
+  explicit PROTOBUF_CONSTEXPR NodeMatrix(
       ::google::protobuf::internal::ConstantInitialized);
 
-  inline SceneMatrix(const SceneMatrix& from) : SceneMatrix(nullptr, from) {}
-  inline SceneMatrix(SceneMatrix&& from) noexcept
-      : SceneMatrix(nullptr, std::move(from)) {}
-  inline SceneMatrix& operator=(const SceneMatrix& from) {
+  inline NodeMatrix(const NodeMatrix& from) : NodeMatrix(nullptr, from) {}
+  inline NodeMatrix(NodeMatrix&& from) noexcept
+      : NodeMatrix(nullptr, std::move(from)) {}
+  inline NodeMatrix& operator=(const NodeMatrix& from) {
     CopyFrom(from);
     return *this;
   }
-  inline SceneMatrix& operator=(SceneMatrix&& from) noexcept {
+  inline NodeMatrix& operator=(NodeMatrix&& from) noexcept {
     if (this == &from) return *this;
     if (::google::protobuf::internal::CanMoveWithInternalSwap(GetArena(), from.GetArena())) {
       InternalSwap(&from);
@@ -346,7 +379,7 @@ class SceneMatrix final : public ::google::protobuf::Message
   static const ::google::protobuf::Reflection* GetReflection() {
     return default_instance().GetMetadata().reflection;
   }
-  static const SceneMatrix& default_instance() {
+  static const NodeMatrix& default_instance() {
     return *internal_default_instance();
   }
   enum MatrixOneofCase {
@@ -354,13 +387,13 @@ class SceneMatrix final : public ::google::protobuf::Message
     kQuaternion = 4,
     MATRIX_ONEOF_NOT_SET = 0,
   };
-  static inline const SceneMatrix* internal_default_instance() {
-    return reinterpret_cast<const SceneMatrix*>(
-        &_SceneMatrix_default_instance_);
+  static inline const NodeMatrix* internal_default_instance() {
+    return reinterpret_cast<const NodeMatrix*>(
+        &_NodeMatrix_default_instance_);
   }
   static constexpr int kIndexInFileMessages = 0;
-  friend void swap(SceneMatrix& a, SceneMatrix& b) { a.Swap(&b); }
-  inline void Swap(SceneMatrix* other) {
+  friend void swap(NodeMatrix& a, NodeMatrix& b) { a.Swap(&b); }
+  inline void Swap(NodeMatrix* other) {
     if (other == this) return;
     if (::google::protobuf::internal::CanUseInternalSwap(GetArena(), other->GetArena())) {
       InternalSwap(other);
@@ -368,7 +401,7 @@ class SceneMatrix final : public ::google::protobuf::Message
       ::google::protobuf::internal::GenericSwap(this, other);
     }
   }
-  void UnsafeArenaSwap(SceneMatrix* other) {
+  void UnsafeArenaSwap(NodeMatrix* other) {
     if (other == this) return;
     ABSL_DCHECK(GetArena() == other->GetArena());
     InternalSwap(other);
@@ -376,13 +409,13 @@ class SceneMatrix final : public ::google::protobuf::Message
 
   // implements Message ----------------------------------------------
 
-  SceneMatrix* New(::google::protobuf::Arena* arena = nullptr) const {
-    return ::google::protobuf::Message::DefaultConstruct<SceneMatrix>(arena);
+  NodeMatrix* New(::google::protobuf::Arena* arena = nullptr) const {
+    return ::google::protobuf::Message::DefaultConstruct<NodeMatrix>(arena);
   }
   using ::google::protobuf::Message::CopyFrom;
-  void CopyFrom(const SceneMatrix& from);
+  void CopyFrom(const NodeMatrix& from);
   using ::google::protobuf::Message::MergeFrom;
-  void MergeFrom(const SceneMatrix& from) { SceneMatrix::MergeImpl(*this, from); }
+  void MergeFrom(const NodeMatrix& from) { NodeMatrix::MergeImpl(*this, from); }
 
   private:
   static void MergeImpl(
@@ -419,18 +452,18 @@ class SceneMatrix final : public ::google::protobuf::Message
   private:
   void SharedCtor(::google::protobuf::Arena* arena);
   static void SharedDtor(MessageLite& self);
-  void InternalSwap(SceneMatrix* other);
+  void InternalSwap(NodeMatrix* other);
  private:
   template <typename T>
   friend ::absl::string_view(
       ::google::protobuf::internal::GetAnyMessageName)();
-  static ::absl::string_view FullMessageName() { return "frame.proto.SceneMatrix"; }
+  static ::absl::string_view FullMessageName() { return "frame.proto.NodeMatrix"; }
 
  protected:
-  explicit SceneMatrix(::google::protobuf::Arena* arena);
-  SceneMatrix(::google::protobuf::Arena* arena, const SceneMatrix& from);
-  SceneMatrix(::google::protobuf::Arena* arena, SceneMatrix&& from) noexcept
-      : SceneMatrix(arena) {
+  explicit NodeMatrix(::google::protobuf::Arena* arena);
+  NodeMatrix(::google::protobuf::Arena* arena, const NodeMatrix& from);
+  NodeMatrix(::google::protobuf::Arena* arena, NodeMatrix&& from) noexcept
+      : NodeMatrix(arena) {
     *this = ::std::move(from);
   }
   const ::google::protobuf::internal::ClassData* GetClassData() const PROTOBUF_FINAL;
@@ -442,11 +475,31 @@ class SceneMatrix final : public ::google::protobuf::Message
  public:
   ::google::protobuf::Metadata GetMetadata() const;
   // nested types ----------------------------------------------------
+  using MatrixTypeEnum = NodeMatrix_MatrixTypeEnum;
+  static constexpr MatrixTypeEnum STATIC_MATRIX = NodeMatrix_MatrixTypeEnum_STATIC_MATRIX;
+  static constexpr MatrixTypeEnum ROTATION_MATRIX = NodeMatrix_MatrixTypeEnum_ROTATION_MATRIX;
+  static inline bool MatrixTypeEnum_IsValid(int value) {
+    return NodeMatrix_MatrixTypeEnum_IsValid(value);
+  }
+  static constexpr MatrixTypeEnum MatrixTypeEnum_MIN = NodeMatrix_MatrixTypeEnum_MatrixTypeEnum_MIN;
+  static constexpr MatrixTypeEnum MatrixTypeEnum_MAX = NodeMatrix_MatrixTypeEnum_MatrixTypeEnum_MAX;
+  static constexpr int MatrixTypeEnum_ARRAYSIZE = NodeMatrix_MatrixTypeEnum_MatrixTypeEnum_ARRAYSIZE;
+  static inline const ::google::protobuf::EnumDescriptor* MatrixTypeEnum_descriptor() {
+    return NodeMatrix_MatrixTypeEnum_descriptor();
+  }
+  template <typename T>
+  static inline const std::string& MatrixTypeEnum_Name(T value) {
+    return NodeMatrix_MatrixTypeEnum_Name(value);
+  }
+  static inline bool MatrixTypeEnum_Parse(absl::string_view name, MatrixTypeEnum* value) {
+    return NodeMatrix_MatrixTypeEnum_Parse(name, value);
+  }
 
   // accessors -------------------------------------------------------
   enum : int {
     kNameFieldNumber = 1,
     kParentFieldNumber = 2,
+    kMatrixTypeEnumFieldNumber = 5,
     kMatrixFieldNumber = 3,
     kQuaternionFieldNumber = 4,
   };
@@ -480,6 +533,16 @@ class SceneMatrix final : public ::google::protobuf::Message
   inline PROTOBUF_ALWAYS_INLINE void _internal_set_parent(
       const std::string& value);
   std::string* _internal_mutable_parent();
+
+  public:
+  // .frame.proto.NodeMatrix.MatrixTypeEnum matrix_type_enum = 5;
+  void clear_matrix_type_enum() ;
+  ::frame::proto::NodeMatrix_MatrixTypeEnum matrix_type_enum() const;
+  void set_matrix_type_enum(::frame::proto::NodeMatrix_MatrixTypeEnum value);
+
+  private:
+  ::frame::proto::NodeMatrix_MatrixTypeEnum _internal_matrix_type_enum() const;
+  void _internal_set_matrix_type_enum(::frame::proto::NodeMatrix_MatrixTypeEnum value);
 
   public:
   // .frame.proto.UniformMatrix4 matrix = 3;
@@ -522,7 +585,7 @@ class SceneMatrix final : public ::google::protobuf::Message
   public:
   void clear_matrix_oneof();
   MatrixOneofCase matrix_oneof_case() const;
-  // @@protoc_insertion_point(class_scope:frame.proto.SceneMatrix)
+  // @@protoc_insertion_point(class_scope:frame.proto.NodeMatrix)
  private:
   class _Internal;
   void set_has_matrix();
@@ -531,8 +594,8 @@ class SceneMatrix final : public ::google::protobuf::Message
   inline void clear_has_matrix_oneof();
   friend class ::google::protobuf::internal::TcParser;
   static const ::google::protobuf::internal::TcParseTable<
-      1, 4, 2,
-      42, 2>
+      3, 5, 2,
+      41, 2>
       _table_;
 
   friend class ::google::protobuf::MessageLite;
@@ -548,9 +611,10 @@ class SceneMatrix final : public ::google::protobuf::Message
                           ::google::protobuf::Arena* arena);
     inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
                           ::google::protobuf::Arena* arena, const Impl_& from,
-                          const SceneMatrix& from_msg);
+                          const NodeMatrix& from_msg);
     ::google::protobuf::internal::ArenaStringPtr name_;
     ::google::protobuf::internal::ArenaStringPtr parent_;
+    int matrix_type_enum_;
     union MatrixOneofUnion {
       constexpr MatrixOneofUnion() : _constinit_{} {}
       ::google::protobuf::internal::ConstantInitialized _constinit_;
@@ -566,31 +630,31 @@ class SceneMatrix final : public ::google::protobuf::Message
 };
 // -------------------------------------------------------------------
 
-class SceneLight final : public ::google::protobuf::Message
-/* @@protoc_insertion_point(class_definition:frame.proto.SceneLight) */ {
+class NodeLight final : public ::google::protobuf::Message
+/* @@protoc_insertion_point(class_definition:frame.proto.NodeLight) */ {
  public:
-  inline SceneLight() : SceneLight(nullptr) {}
-  ~SceneLight() PROTOBUF_FINAL;
+  inline NodeLight() : NodeLight(nullptr) {}
+  ~NodeLight() PROTOBUF_FINAL;
 
 #if defined(PROTOBUF_CUSTOM_VTABLE)
-  void operator delete(SceneLight* msg, std::destroying_delete_t) {
+  void operator delete(NodeLight* msg, std::destroying_delete_t) {
     SharedDtor(*msg);
-    ::google::protobuf::internal::SizedDelete(msg, sizeof(SceneLight));
+    ::google::protobuf::internal::SizedDelete(msg, sizeof(NodeLight));
   }
 #endif
 
   template <typename = void>
-  explicit PROTOBUF_CONSTEXPR SceneLight(
+  explicit PROTOBUF_CONSTEXPR NodeLight(
       ::google::protobuf::internal::ConstantInitialized);
 
-  inline SceneLight(const SceneLight& from) : SceneLight(nullptr, from) {}
-  inline SceneLight(SceneLight&& from) noexcept
-      : SceneLight(nullptr, std::move(from)) {}
-  inline SceneLight& operator=(const SceneLight& from) {
+  inline NodeLight(const NodeLight& from) : NodeLight(nullptr, from) {}
+  inline NodeLight(NodeLight&& from) noexcept
+      : NodeLight(nullptr, std::move(from)) {}
+  inline NodeLight& operator=(const NodeLight& from) {
     CopyFrom(from);
     return *this;
   }
-  inline SceneLight& operator=(SceneLight&& from) noexcept {
+  inline NodeLight& operator=(NodeLight&& from) noexcept {
     if (this == &from) return *this;
     if (::google::protobuf::internal::CanMoveWithInternalSwap(GetArena(), from.GetArena())) {
       InternalSwap(&from);
@@ -618,16 +682,16 @@ class SceneLight final : public ::google::protobuf::Message
   static const ::google::protobuf::Reflection* GetReflection() {
     return default_instance().GetMetadata().reflection;
   }
-  static const SceneLight& default_instance() {
+  static const NodeLight& default_instance() {
     return *internal_default_instance();
   }
-  static inline const SceneLight* internal_default_instance() {
-    return reinterpret_cast<const SceneLight*>(
-        &_SceneLight_default_instance_);
+  static inline const NodeLight* internal_default_instance() {
+    return reinterpret_cast<const NodeLight*>(
+        &_NodeLight_default_instance_);
   }
   static constexpr int kIndexInFileMessages = 3;
-  friend void swap(SceneLight& a, SceneLight& b) { a.Swap(&b); }
-  inline void Swap(SceneLight* other) {
+  friend void swap(NodeLight& a, NodeLight& b) { a.Swap(&b); }
+  inline void Swap(NodeLight* other) {
     if (other == this) return;
     if (::google::protobuf::internal::CanUseInternalSwap(GetArena(), other->GetArena())) {
       InternalSwap(other);
@@ -635,7 +699,7 @@ class SceneLight final : public ::google::protobuf::Message
       ::google::protobuf::internal::GenericSwap(this, other);
     }
   }
-  void UnsafeArenaSwap(SceneLight* other) {
+  void UnsafeArenaSwap(NodeLight* other) {
     if (other == this) return;
     ABSL_DCHECK(GetArena() == other->GetArena());
     InternalSwap(other);
@@ -643,13 +707,13 @@ class SceneLight final : public ::google::protobuf::Message
 
   // implements Message ----------------------------------------------
 
-  SceneLight* New(::google::protobuf::Arena* arena = nullptr) const {
-    return ::google::protobuf::Message::DefaultConstruct<SceneLight>(arena);
+  NodeLight* New(::google::protobuf::Arena* arena = nullptr) const {
+    return ::google::protobuf::Message::DefaultConstruct<NodeLight>(arena);
   }
   using ::google::protobuf::Message::CopyFrom;
-  void CopyFrom(const SceneLight& from);
+  void CopyFrom(const NodeLight& from);
   using ::google::protobuf::Message::MergeFrom;
-  void MergeFrom(const SceneLight& from) { SceneLight::MergeImpl(*this, from); }
+  void MergeFrom(const NodeLight& from) { NodeLight::MergeImpl(*this, from); }
 
   private:
   static void MergeImpl(
@@ -686,18 +750,18 @@ class SceneLight final : public ::google::protobuf::Message
   private:
   void SharedCtor(::google::protobuf::Arena* arena);
   static void SharedDtor(MessageLite& self);
-  void InternalSwap(SceneLight* other);
+  void InternalSwap(NodeLight* other);
  private:
   template <typename T>
   friend ::absl::string_view(
       ::google::protobuf::internal::GetAnyMessageName)();
-  static ::absl::string_view FullMessageName() { return "frame.proto.SceneLight"; }
+  static ::absl::string_view FullMessageName() { return "frame.proto.NodeLight"; }
 
  protected:
-  explicit SceneLight(::google::protobuf::Arena* arena);
-  SceneLight(::google::protobuf::Arena* arena, const SceneLight& from);
-  SceneLight(::google::protobuf::Arena* arena, SceneLight&& from) noexcept
-      : SceneLight(arena) {
+  explicit NodeLight(::google::protobuf::Arena* arena);
+  NodeLight(::google::protobuf::Arena* arena, const NodeLight& from);
+  NodeLight(::google::protobuf::Arena* arena, NodeLight&& from) noexcept
+      : NodeLight(arena) {
     *this = ::std::move(from);
   }
   const ::google::protobuf::internal::ClassData* GetClassData() const PROTOBUF_FINAL;
@@ -709,47 +773,47 @@ class SceneLight final : public ::google::protobuf::Message
  public:
   ::google::protobuf::Metadata GetMetadata() const;
   // nested types ----------------------------------------------------
-  using LightTypeEnum = SceneLight_LightTypeEnum;
-  static constexpr LightTypeEnum INVALID_LIGHT = SceneLight_LightTypeEnum_INVALID_LIGHT;
-  static constexpr LightTypeEnum AMBIENT_LIGHT = SceneLight_LightTypeEnum_AMBIENT_LIGHT;
-  static constexpr LightTypeEnum POINT_LIGHT = SceneLight_LightTypeEnum_POINT_LIGHT;
-  static constexpr LightTypeEnum DIRECTIONAL_LIGHT = SceneLight_LightTypeEnum_DIRECTIONAL_LIGHT;
-  static constexpr LightTypeEnum SPOT_LIGHT = SceneLight_LightTypeEnum_SPOT_LIGHT;
+  using LightTypeEnum = NodeLight_LightTypeEnum;
+  static constexpr LightTypeEnum INVALID_LIGHT = NodeLight_LightTypeEnum_INVALID_LIGHT;
+  static constexpr LightTypeEnum AMBIENT_LIGHT = NodeLight_LightTypeEnum_AMBIENT_LIGHT;
+  static constexpr LightTypeEnum POINT_LIGHT = NodeLight_LightTypeEnum_POINT_LIGHT;
+  static constexpr LightTypeEnum DIRECTIONAL_LIGHT = NodeLight_LightTypeEnum_DIRECTIONAL_LIGHT;
+  static constexpr LightTypeEnum SPOT_LIGHT = NodeLight_LightTypeEnum_SPOT_LIGHT;
   static inline bool LightTypeEnum_IsValid(int value) {
-    return SceneLight_LightTypeEnum_IsValid(value);
+    return NodeLight_LightTypeEnum_IsValid(value);
   }
-  static constexpr LightTypeEnum LightTypeEnum_MIN = SceneLight_LightTypeEnum_LightTypeEnum_MIN;
-  static constexpr LightTypeEnum LightTypeEnum_MAX = SceneLight_LightTypeEnum_LightTypeEnum_MAX;
-  static constexpr int LightTypeEnum_ARRAYSIZE = SceneLight_LightTypeEnum_LightTypeEnum_ARRAYSIZE;
+  static constexpr LightTypeEnum LightTypeEnum_MIN = NodeLight_LightTypeEnum_LightTypeEnum_MIN;
+  static constexpr LightTypeEnum LightTypeEnum_MAX = NodeLight_LightTypeEnum_LightTypeEnum_MAX;
+  static constexpr int LightTypeEnum_ARRAYSIZE = NodeLight_LightTypeEnum_LightTypeEnum_ARRAYSIZE;
   static inline const ::google::protobuf::EnumDescriptor* LightTypeEnum_descriptor() {
-    return SceneLight_LightTypeEnum_descriptor();
+    return NodeLight_LightTypeEnum_descriptor();
   }
   template <typename T>
   static inline const std::string& LightTypeEnum_Name(T value) {
-    return SceneLight_LightTypeEnum_Name(value);
+    return NodeLight_LightTypeEnum_Name(value);
   }
   static inline bool LightTypeEnum_Parse(absl::string_view name, LightTypeEnum* value) {
-    return SceneLight_LightTypeEnum_Parse(name, value);
+    return NodeLight_LightTypeEnum_Parse(name, value);
   }
-  using ShadowTypeEnum = SceneLight_ShadowTypeEnum;
-  static constexpr ShadowTypeEnum NO_SHADOW = SceneLight_ShadowTypeEnum_NO_SHADOW;
-  static constexpr ShadowTypeEnum HARD_SHADOW = SceneLight_ShadowTypeEnum_HARD_SHADOW;
-  static constexpr ShadowTypeEnum SOFT_SHADOW = SceneLight_ShadowTypeEnum_SOFT_SHADOW;
+  using ShadowTypeEnum = NodeLight_ShadowTypeEnum;
+  static constexpr ShadowTypeEnum NO_SHADOW = NodeLight_ShadowTypeEnum_NO_SHADOW;
+  static constexpr ShadowTypeEnum HARD_SHADOW = NodeLight_ShadowTypeEnum_HARD_SHADOW;
+  static constexpr ShadowTypeEnum SOFT_SHADOW = NodeLight_ShadowTypeEnum_SOFT_SHADOW;
   static inline bool ShadowTypeEnum_IsValid(int value) {
-    return SceneLight_ShadowTypeEnum_IsValid(value);
+    return NodeLight_ShadowTypeEnum_IsValid(value);
   }
-  static constexpr ShadowTypeEnum ShadowTypeEnum_MIN = SceneLight_ShadowTypeEnum_ShadowTypeEnum_MIN;
-  static constexpr ShadowTypeEnum ShadowTypeEnum_MAX = SceneLight_ShadowTypeEnum_ShadowTypeEnum_MAX;
-  static constexpr int ShadowTypeEnum_ARRAYSIZE = SceneLight_ShadowTypeEnum_ShadowTypeEnum_ARRAYSIZE;
+  static constexpr ShadowTypeEnum ShadowTypeEnum_MIN = NodeLight_ShadowTypeEnum_ShadowTypeEnum_MIN;
+  static constexpr ShadowTypeEnum ShadowTypeEnum_MAX = NodeLight_ShadowTypeEnum_ShadowTypeEnum_MAX;
+  static constexpr int ShadowTypeEnum_ARRAYSIZE = NodeLight_ShadowTypeEnum_ShadowTypeEnum_ARRAYSIZE;
   static inline const ::google::protobuf::EnumDescriptor* ShadowTypeEnum_descriptor() {
-    return SceneLight_ShadowTypeEnum_descriptor();
+    return NodeLight_ShadowTypeEnum_descriptor();
   }
   template <typename T>
   static inline const std::string& ShadowTypeEnum_Name(T value) {
-    return SceneLight_ShadowTypeEnum_Name(value);
+    return NodeLight_ShadowTypeEnum_Name(value);
   }
   static inline bool ShadowTypeEnum_Parse(absl::string_view name, ShadowTypeEnum* value) {
-    return SceneLight_ShadowTypeEnum_Parse(name, value);
+    return NodeLight_ShadowTypeEnum_Parse(name, value);
   }
 
   // accessors -------------------------------------------------------
@@ -858,14 +922,14 @@ class SceneLight final : public ::google::protobuf::Message
   ::frame::proto::UniformVector3* _internal_mutable_color();
 
   public:
-  // .frame.proto.SceneLight.LightTypeEnum light_type = 3;
+  // .frame.proto.NodeLight.LightTypeEnum light_type = 3;
   void clear_light_type() ;
-  ::frame::proto::SceneLight_LightTypeEnum light_type() const;
-  void set_light_type(::frame::proto::SceneLight_LightTypeEnum value);
+  ::frame::proto::NodeLight_LightTypeEnum light_type() const;
+  void set_light_type(::frame::proto::NodeLight_LightTypeEnum value);
 
   private:
-  ::frame::proto::SceneLight_LightTypeEnum _internal_light_type() const;
-  void _internal_set_light_type(::frame::proto::SceneLight_LightTypeEnum value);
+  ::frame::proto::NodeLight_LightTypeEnum _internal_light_type() const;
+  void _internal_set_light_type(::frame::proto::NodeLight_LightTypeEnum value);
 
   public:
   // float dot_inner_limit = 6;
@@ -888,23 +952,23 @@ class SceneLight final : public ::google::protobuf::Message
   void _internal_set_dot_outer_limit(float value);
 
   public:
-  // .frame.proto.SceneLight.ShadowTypeEnum shadow_type = 9;
+  // .frame.proto.NodeLight.ShadowTypeEnum shadow_type = 9;
   void clear_shadow_type() ;
-  ::frame::proto::SceneLight_ShadowTypeEnum shadow_type() const;
-  void set_shadow_type(::frame::proto::SceneLight_ShadowTypeEnum value);
+  ::frame::proto::NodeLight_ShadowTypeEnum shadow_type() const;
+  void set_shadow_type(::frame::proto::NodeLight_ShadowTypeEnum value);
 
   private:
-  ::frame::proto::SceneLight_ShadowTypeEnum _internal_shadow_type() const;
-  void _internal_set_shadow_type(::frame::proto::SceneLight_ShadowTypeEnum value);
+  ::frame::proto::NodeLight_ShadowTypeEnum _internal_shadow_type() const;
+  void _internal_set_shadow_type(::frame::proto::NodeLight_ShadowTypeEnum value);
 
   public:
-  // @@protoc_insertion_point(class_scope:frame.proto.SceneLight)
+  // @@protoc_insertion_point(class_scope:frame.proto.NodeLight)
  private:
   class _Internal;
   friend class ::google::protobuf::internal::TcParser;
   static const ::google::protobuf::internal::TcParseTable<
       4, 10, 3,
-      63, 2>
+      62, 2>
       _table_;
 
   friend class ::google::protobuf::MessageLite;
@@ -920,7 +984,7 @@ class SceneLight final : public ::google::protobuf::Message
                           ::google::protobuf::Arena* arena);
     inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
                           ::google::protobuf::Arena* arena, const Impl_& from,
-                          const SceneLight& from_msg);
+                          const NodeLight& from_msg);
     ::google::protobuf::internal::HasBits<1> _has_bits_;
     ::google::protobuf::internal::CachedSize _cached_size_;
     ::google::protobuf::internal::ArenaStringPtr name_;
@@ -940,31 +1004,31 @@ class SceneLight final : public ::google::protobuf::Message
 };
 // -------------------------------------------------------------------
 
-class SceneCamera final : public ::google::protobuf::Message
-/* @@protoc_insertion_point(class_definition:frame.proto.SceneCamera) */ {
+class NodeCamera final : public ::google::protobuf::Message
+/* @@protoc_insertion_point(class_definition:frame.proto.NodeCamera) */ {
  public:
-  inline SceneCamera() : SceneCamera(nullptr) {}
-  ~SceneCamera() PROTOBUF_FINAL;
+  inline NodeCamera() : NodeCamera(nullptr) {}
+  ~NodeCamera() PROTOBUF_FINAL;
 
 #if defined(PROTOBUF_CUSTOM_VTABLE)
-  void operator delete(SceneCamera* msg, std::destroying_delete_t) {
+  void operator delete(NodeCamera* msg, std::destroying_delete_t) {
     SharedDtor(*msg);
-    ::google::protobuf::internal::SizedDelete(msg, sizeof(SceneCamera));
+    ::google::protobuf::internal::SizedDelete(msg, sizeof(NodeCamera));
   }
 #endif
 
   template <typename = void>
-  explicit PROTOBUF_CONSTEXPR SceneCamera(
+  explicit PROTOBUF_CONSTEXPR NodeCamera(
       ::google::protobuf::internal::ConstantInitialized);
 
-  inline SceneCamera(const SceneCamera& from) : SceneCamera(nullptr, from) {}
-  inline SceneCamera(SceneCamera&& from) noexcept
-      : SceneCamera(nullptr, std::move(from)) {}
-  inline SceneCamera& operator=(const SceneCamera& from) {
+  inline NodeCamera(const NodeCamera& from) : NodeCamera(nullptr, from) {}
+  inline NodeCamera(NodeCamera&& from) noexcept
+      : NodeCamera(nullptr, std::move(from)) {}
+  inline NodeCamera& operator=(const NodeCamera& from) {
     CopyFrom(from);
     return *this;
   }
-  inline SceneCamera& operator=(SceneCamera&& from) noexcept {
+  inline NodeCamera& operator=(NodeCamera&& from) noexcept {
     if (this == &from) return *this;
     if (::google::protobuf::internal::CanMoveWithInternalSwap(GetArena(), from.GetArena())) {
       InternalSwap(&from);
@@ -992,16 +1056,16 @@ class SceneCamera final : public ::google::protobuf::Message
   static const ::google::protobuf::Reflection* GetReflection() {
     return default_instance().GetMetadata().reflection;
   }
-  static const SceneCamera& default_instance() {
+  static const NodeCamera& default_instance() {
     return *internal_default_instance();
   }
-  static inline const SceneCamera* internal_default_instance() {
-    return reinterpret_cast<const SceneCamera*>(
-        &_SceneCamera_default_instance_);
+  static inline const NodeCamera* internal_default_instance() {
+    return reinterpret_cast<const NodeCamera*>(
+        &_NodeCamera_default_instance_);
   }
   static constexpr int kIndexInFileMessages = 2;
-  friend void swap(SceneCamera& a, SceneCamera& b) { a.Swap(&b); }
-  inline void Swap(SceneCamera* other) {
+  friend void swap(NodeCamera& a, NodeCamera& b) { a.Swap(&b); }
+  inline void Swap(NodeCamera* other) {
     if (other == this) return;
     if (::google::protobuf::internal::CanUseInternalSwap(GetArena(), other->GetArena())) {
       InternalSwap(other);
@@ -1009,7 +1073,7 @@ class SceneCamera final : public ::google::protobuf::Message
       ::google::protobuf::internal::GenericSwap(this, other);
     }
   }
-  void UnsafeArenaSwap(SceneCamera* other) {
+  void UnsafeArenaSwap(NodeCamera* other) {
     if (other == this) return;
     ABSL_DCHECK(GetArena() == other->GetArena());
     InternalSwap(other);
@@ -1017,13 +1081,13 @@ class SceneCamera final : public ::google::protobuf::Message
 
   // implements Message ----------------------------------------------
 
-  SceneCamera* New(::google::protobuf::Arena* arena = nullptr) const {
-    return ::google::protobuf::Message::DefaultConstruct<SceneCamera>(arena);
+  NodeCamera* New(::google::protobuf::Arena* arena = nullptr) const {
+    return ::google::protobuf::Message::DefaultConstruct<NodeCamera>(arena);
   }
   using ::google::protobuf::Message::CopyFrom;
-  void CopyFrom(const SceneCamera& from);
+  void CopyFrom(const NodeCamera& from);
   using ::google::protobuf::Message::MergeFrom;
-  void MergeFrom(const SceneCamera& from) { SceneCamera::MergeImpl(*this, from); }
+  void MergeFrom(const NodeCamera& from) { NodeCamera::MergeImpl(*this, from); }
 
   private:
   static void MergeImpl(
@@ -1060,18 +1124,18 @@ class SceneCamera final : public ::google::protobuf::Message
   private:
   void SharedCtor(::google::protobuf::Arena* arena);
   static void SharedDtor(MessageLite& self);
-  void InternalSwap(SceneCamera* other);
+  void InternalSwap(NodeCamera* other);
  private:
   template <typename T>
   friend ::absl::string_view(
       ::google::protobuf::internal::GetAnyMessageName)();
-  static ::absl::string_view FullMessageName() { return "frame.proto.SceneCamera"; }
+  static ::absl::string_view FullMessageName() { return "frame.proto.NodeCamera"; }
 
  protected:
-  explicit SceneCamera(::google::protobuf::Arena* arena);
-  SceneCamera(::google::protobuf::Arena* arena, const SceneCamera& from);
-  SceneCamera(::google::protobuf::Arena* arena, SceneCamera&& from) noexcept
-      : SceneCamera(arena) {
+  explicit NodeCamera(::google::protobuf::Arena* arena);
+  NodeCamera(::google::protobuf::Arena* arena, const NodeCamera& from);
+  NodeCamera(::google::protobuf::Arena* arena, NodeCamera&& from) noexcept
+      : NodeCamera(arena) {
     *this = ::std::move(from);
   }
   const ::google::protobuf::internal::ClassData* GetClassData() const PROTOBUF_FINAL;
@@ -1213,13 +1277,13 @@ class SceneCamera final : public ::google::protobuf::Message
   void _internal_set_far_clip(float value);
 
   public:
-  // @@protoc_insertion_point(class_scope:frame.proto.SceneCamera)
+  // @@protoc_insertion_point(class_scope:frame.proto.NodeCamera)
  private:
   class _Internal;
   friend class ::google::protobuf::internal::TcParser;
   static const ::google::protobuf::internal::TcParseTable<
       4, 9, 3,
-      50, 2>
+      49, 2>
       _table_;
 
   friend class ::google::protobuf::MessageLite;
@@ -1235,7 +1299,7 @@ class SceneCamera final : public ::google::protobuf::Message
                           ::google::protobuf::Arena* arena);
     inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
                           ::google::protobuf::Arena* arena, const Impl_& from,
-                          const SceneCamera& from_msg);
+                          const NodeCamera& from_msg);
     ::google::protobuf::internal::HasBits<1> _has_bits_;
     ::google::protobuf::internal::CachedSize _cached_size_;
     ::google::protobuf::internal::ArenaStringPtr name_;
@@ -1254,31 +1318,31 @@ class SceneCamera final : public ::google::protobuf::Message
 };
 // -------------------------------------------------------------------
 
-class SceneStaticMesh final : public ::google::protobuf::Message
-/* @@protoc_insertion_point(class_definition:frame.proto.SceneStaticMesh) */ {
+class NodeStaticMesh final : public ::google::protobuf::Message
+/* @@protoc_insertion_point(class_definition:frame.proto.NodeStaticMesh) */ {
  public:
-  inline SceneStaticMesh() : SceneStaticMesh(nullptr) {}
-  ~SceneStaticMesh() PROTOBUF_FINAL;
+  inline NodeStaticMesh() : NodeStaticMesh(nullptr) {}
+  ~NodeStaticMesh() PROTOBUF_FINAL;
 
 #if defined(PROTOBUF_CUSTOM_VTABLE)
-  void operator delete(SceneStaticMesh* msg, std::destroying_delete_t) {
+  void operator delete(NodeStaticMesh* msg, std::destroying_delete_t) {
     SharedDtor(*msg);
-    ::google::protobuf::internal::SizedDelete(msg, sizeof(SceneStaticMesh));
+    ::google::protobuf::internal::SizedDelete(msg, sizeof(NodeStaticMesh));
   }
 #endif
 
   template <typename = void>
-  explicit PROTOBUF_CONSTEXPR SceneStaticMesh(
+  explicit PROTOBUF_CONSTEXPR NodeStaticMesh(
       ::google::protobuf::internal::ConstantInitialized);
 
-  inline SceneStaticMesh(const SceneStaticMesh& from) : SceneStaticMesh(nullptr, from) {}
-  inline SceneStaticMesh(SceneStaticMesh&& from) noexcept
-      : SceneStaticMesh(nullptr, std::move(from)) {}
-  inline SceneStaticMesh& operator=(const SceneStaticMesh& from) {
+  inline NodeStaticMesh(const NodeStaticMesh& from) : NodeStaticMesh(nullptr, from) {}
+  inline NodeStaticMesh(NodeStaticMesh&& from) noexcept
+      : NodeStaticMesh(nullptr, std::move(from)) {}
+  inline NodeStaticMesh& operator=(const NodeStaticMesh& from) {
     CopyFrom(from);
     return *this;
   }
-  inline SceneStaticMesh& operator=(SceneStaticMesh&& from) noexcept {
+  inline NodeStaticMesh& operator=(NodeStaticMesh&& from) noexcept {
     if (this == &from) return *this;
     if (::google::protobuf::internal::CanMoveWithInternalSwap(GetArena(), from.GetArena())) {
       InternalSwap(&from);
@@ -1306,7 +1370,7 @@ class SceneStaticMesh final : public ::google::protobuf::Message
   static const ::google::protobuf::Reflection* GetReflection() {
     return default_instance().GetMetadata().reflection;
   }
-  static const SceneStaticMesh& default_instance() {
+  static const NodeStaticMesh& default_instance() {
     return *internal_default_instance();
   }
   enum MeshOneofCase {
@@ -1316,13 +1380,13 @@ class SceneStaticMesh final : public ::google::protobuf::Message
     kMultiPlugin = 10,
     MESH_ONEOF_NOT_SET = 0,
   };
-  static inline const SceneStaticMesh* internal_default_instance() {
-    return reinterpret_cast<const SceneStaticMesh*>(
-        &_SceneStaticMesh_default_instance_);
+  static inline const NodeStaticMesh* internal_default_instance() {
+    return reinterpret_cast<const NodeStaticMesh*>(
+        &_NodeStaticMesh_default_instance_);
   }
   static constexpr int kIndexInFileMessages = 1;
-  friend void swap(SceneStaticMesh& a, SceneStaticMesh& b) { a.Swap(&b); }
-  inline void Swap(SceneStaticMesh* other) {
+  friend void swap(NodeStaticMesh& a, NodeStaticMesh& b) { a.Swap(&b); }
+  inline void Swap(NodeStaticMesh* other) {
     if (other == this) return;
     if (::google::protobuf::internal::CanUseInternalSwap(GetArena(), other->GetArena())) {
       InternalSwap(other);
@@ -1330,7 +1394,7 @@ class SceneStaticMesh final : public ::google::protobuf::Message
       ::google::protobuf::internal::GenericSwap(this, other);
     }
   }
-  void UnsafeArenaSwap(SceneStaticMesh* other) {
+  void UnsafeArenaSwap(NodeStaticMesh* other) {
     if (other == this) return;
     ABSL_DCHECK(GetArena() == other->GetArena());
     InternalSwap(other);
@@ -1338,13 +1402,13 @@ class SceneStaticMesh final : public ::google::protobuf::Message
 
   // implements Message ----------------------------------------------
 
-  SceneStaticMesh* New(::google::protobuf::Arena* arena = nullptr) const {
-    return ::google::protobuf::Message::DefaultConstruct<SceneStaticMesh>(arena);
+  NodeStaticMesh* New(::google::protobuf::Arena* arena = nullptr) const {
+    return ::google::protobuf::Message::DefaultConstruct<NodeStaticMesh>(arena);
   }
   using ::google::protobuf::Message::CopyFrom;
-  void CopyFrom(const SceneStaticMesh& from);
+  void CopyFrom(const NodeStaticMesh& from);
   using ::google::protobuf::Message::MergeFrom;
-  void MergeFrom(const SceneStaticMesh& from) { SceneStaticMesh::MergeImpl(*this, from); }
+  void MergeFrom(const NodeStaticMesh& from) { NodeStaticMesh::MergeImpl(*this, from); }
 
   private:
   static void MergeImpl(
@@ -1381,18 +1445,18 @@ class SceneStaticMesh final : public ::google::protobuf::Message
   private:
   void SharedCtor(::google::protobuf::Arena* arena);
   static void SharedDtor(MessageLite& self);
-  void InternalSwap(SceneStaticMesh* other);
+  void InternalSwap(NodeStaticMesh* other);
  private:
   template <typename T>
   friend ::absl::string_view(
       ::google::protobuf::internal::GetAnyMessageName)();
-  static ::absl::string_view FullMessageName() { return "frame.proto.SceneStaticMesh"; }
+  static ::absl::string_view FullMessageName() { return "frame.proto.NodeStaticMesh"; }
 
  protected:
-  explicit SceneStaticMesh(::google::protobuf::Arena* arena);
-  SceneStaticMesh(::google::protobuf::Arena* arena, const SceneStaticMesh& from);
-  SceneStaticMesh(::google::protobuf::Arena* arena, SceneStaticMesh&& from) noexcept
-      : SceneStaticMesh(arena) {
+  explicit NodeStaticMesh(::google::protobuf::Arena* arena);
+  NodeStaticMesh(::google::protobuf::Arena* arena, const NodeStaticMesh& from);
+  NodeStaticMesh(::google::protobuf::Arena* arena, NodeStaticMesh&& from) noexcept
+      : NodeStaticMesh(arena) {
     *this = ::std::move(from);
   }
   const ::google::protobuf::internal::ClassData* GetClassData() const PROTOBUF_FINAL;
@@ -1404,86 +1468,86 @@ class SceneStaticMesh final : public ::google::protobuf::Message
  public:
   ::google::protobuf::Metadata GetMetadata() const;
   // nested types ----------------------------------------------------
-  using RenderPrimitiveEnum = SceneStaticMesh_RenderPrimitiveEnum;
-  static constexpr RenderPrimitiveEnum TRIANGLE_PRIMITIVE = SceneStaticMesh_RenderPrimitiveEnum_TRIANGLE_PRIMITIVE;
-  static constexpr RenderPrimitiveEnum POINT_PRIMITIVE = SceneStaticMesh_RenderPrimitiveEnum_POINT_PRIMITIVE;
-  static constexpr RenderPrimitiveEnum LINE_PRIMITIVE = SceneStaticMesh_RenderPrimitiveEnum_LINE_PRIMITIVE;
+  using RenderPrimitiveEnum = NodeStaticMesh_RenderPrimitiveEnum;
+  static constexpr RenderPrimitiveEnum TRIANGLE_PRIMITIVE = NodeStaticMesh_RenderPrimitiveEnum_TRIANGLE_PRIMITIVE;
+  static constexpr RenderPrimitiveEnum POINT_PRIMITIVE = NodeStaticMesh_RenderPrimitiveEnum_POINT_PRIMITIVE;
+  static constexpr RenderPrimitiveEnum LINE_PRIMITIVE = NodeStaticMesh_RenderPrimitiveEnum_LINE_PRIMITIVE;
   static inline bool RenderPrimitiveEnum_IsValid(int value) {
-    return SceneStaticMesh_RenderPrimitiveEnum_IsValid(value);
+    return NodeStaticMesh_RenderPrimitiveEnum_IsValid(value);
   }
-  static constexpr RenderPrimitiveEnum RenderPrimitiveEnum_MIN = SceneStaticMesh_RenderPrimitiveEnum_RenderPrimitiveEnum_MIN;
-  static constexpr RenderPrimitiveEnum RenderPrimitiveEnum_MAX = SceneStaticMesh_RenderPrimitiveEnum_RenderPrimitiveEnum_MAX;
-  static constexpr int RenderPrimitiveEnum_ARRAYSIZE = SceneStaticMesh_RenderPrimitiveEnum_RenderPrimitiveEnum_ARRAYSIZE;
+  static constexpr RenderPrimitiveEnum RenderPrimitiveEnum_MIN = NodeStaticMesh_RenderPrimitiveEnum_RenderPrimitiveEnum_MIN;
+  static constexpr RenderPrimitiveEnum RenderPrimitiveEnum_MAX = NodeStaticMesh_RenderPrimitiveEnum_RenderPrimitiveEnum_MAX;
+  static constexpr int RenderPrimitiveEnum_ARRAYSIZE = NodeStaticMesh_RenderPrimitiveEnum_RenderPrimitiveEnum_ARRAYSIZE;
   static inline const ::google::protobuf::EnumDescriptor* RenderPrimitiveEnum_descriptor() {
-    return SceneStaticMesh_RenderPrimitiveEnum_descriptor();
+    return NodeStaticMesh_RenderPrimitiveEnum_descriptor();
   }
   template <typename T>
   static inline const std::string& RenderPrimitiveEnum_Name(T value) {
-    return SceneStaticMesh_RenderPrimitiveEnum_Name(value);
+    return NodeStaticMesh_RenderPrimitiveEnum_Name(value);
   }
   static inline bool RenderPrimitiveEnum_Parse(absl::string_view name, RenderPrimitiveEnum* value) {
-    return SceneStaticMesh_RenderPrimitiveEnum_Parse(name, value);
+    return NodeStaticMesh_RenderPrimitiveEnum_Parse(name, value);
   }
-  using MeshEnum = SceneStaticMesh_MeshEnum;
-  static constexpr MeshEnum INVALID = SceneStaticMesh_MeshEnum_INVALID;
-  static constexpr MeshEnum CUBE = SceneStaticMesh_MeshEnum_CUBE;
-  static constexpr MeshEnum QUAD = SceneStaticMesh_MeshEnum_QUAD;
+  using MeshEnum = NodeStaticMesh_MeshEnum;
+  static constexpr MeshEnum INVALID = NodeStaticMesh_MeshEnum_INVALID;
+  static constexpr MeshEnum CUBE = NodeStaticMesh_MeshEnum_CUBE;
+  static constexpr MeshEnum QUAD = NodeStaticMesh_MeshEnum_QUAD;
   static inline bool MeshEnum_IsValid(int value) {
-    return SceneStaticMesh_MeshEnum_IsValid(value);
+    return NodeStaticMesh_MeshEnum_IsValid(value);
   }
-  static constexpr MeshEnum MeshEnum_MIN = SceneStaticMesh_MeshEnum_MeshEnum_MIN;
-  static constexpr MeshEnum MeshEnum_MAX = SceneStaticMesh_MeshEnum_MeshEnum_MAX;
-  static constexpr int MeshEnum_ARRAYSIZE = SceneStaticMesh_MeshEnum_MeshEnum_ARRAYSIZE;
+  static constexpr MeshEnum MeshEnum_MIN = NodeStaticMesh_MeshEnum_MeshEnum_MIN;
+  static constexpr MeshEnum MeshEnum_MAX = NodeStaticMesh_MeshEnum_MeshEnum_MAX;
+  static constexpr int MeshEnum_ARRAYSIZE = NodeStaticMesh_MeshEnum_MeshEnum_ARRAYSIZE;
   static inline const ::google::protobuf::EnumDescriptor* MeshEnum_descriptor() {
-    return SceneStaticMesh_MeshEnum_descriptor();
+    return NodeStaticMesh_MeshEnum_descriptor();
   }
   template <typename T>
   static inline const std::string& MeshEnum_Name(T value) {
-    return SceneStaticMesh_MeshEnum_Name(value);
+    return NodeStaticMesh_MeshEnum_Name(value);
   }
   static inline bool MeshEnum_Parse(absl::string_view name, MeshEnum* value) {
-    return SceneStaticMesh_MeshEnum_Parse(name, value);
+    return NodeStaticMesh_MeshEnum_Parse(name, value);
   }
-  using RenderTimeEnum = SceneStaticMesh_RenderTimeEnum;
-  static constexpr RenderTimeEnum SCENE_RENDER_TIME = SceneStaticMesh_RenderTimeEnum_SCENE_RENDER_TIME;
-  static constexpr RenderTimeEnum PRE_RENDER_TIME = SceneStaticMesh_RenderTimeEnum_PRE_RENDER_TIME;
-  static constexpr RenderTimeEnum POST_PROCESS_TIME = SceneStaticMesh_RenderTimeEnum_POST_PROCESS_TIME;
-  static constexpr RenderTimeEnum SKYBOX_RENDER_TIME = SceneStaticMesh_RenderTimeEnum_SKYBOX_RENDER_TIME;
-  static constexpr RenderTimeEnum SHADOW_RENDER_TIME = SceneStaticMesh_RenderTimeEnum_SHADOW_RENDER_TIME;
+  using RenderTimeEnum = NodeStaticMesh_RenderTimeEnum;
+  static constexpr RenderTimeEnum SCENE_RENDER_TIME = NodeStaticMesh_RenderTimeEnum_SCENE_RENDER_TIME;
+  static constexpr RenderTimeEnum PRE_RENDER_TIME = NodeStaticMesh_RenderTimeEnum_PRE_RENDER_TIME;
+  static constexpr RenderTimeEnum POST_PROCESS_TIME = NodeStaticMesh_RenderTimeEnum_POST_PROCESS_TIME;
+  static constexpr RenderTimeEnum SKYBOX_RENDER_TIME = NodeStaticMesh_RenderTimeEnum_SKYBOX_RENDER_TIME;
+  static constexpr RenderTimeEnum SHADOW_RENDER_TIME = NodeStaticMesh_RenderTimeEnum_SHADOW_RENDER_TIME;
   static inline bool RenderTimeEnum_IsValid(int value) {
-    return SceneStaticMesh_RenderTimeEnum_IsValid(value);
+    return NodeStaticMesh_RenderTimeEnum_IsValid(value);
   }
-  static constexpr RenderTimeEnum RenderTimeEnum_MIN = SceneStaticMesh_RenderTimeEnum_RenderTimeEnum_MIN;
-  static constexpr RenderTimeEnum RenderTimeEnum_MAX = SceneStaticMesh_RenderTimeEnum_RenderTimeEnum_MAX;
-  static constexpr int RenderTimeEnum_ARRAYSIZE = SceneStaticMesh_RenderTimeEnum_RenderTimeEnum_ARRAYSIZE;
+  static constexpr RenderTimeEnum RenderTimeEnum_MIN = NodeStaticMesh_RenderTimeEnum_RenderTimeEnum_MIN;
+  static constexpr RenderTimeEnum RenderTimeEnum_MAX = NodeStaticMesh_RenderTimeEnum_RenderTimeEnum_MAX;
+  static constexpr int RenderTimeEnum_ARRAYSIZE = NodeStaticMesh_RenderTimeEnum_RenderTimeEnum_ARRAYSIZE;
   static inline const ::google::protobuf::EnumDescriptor* RenderTimeEnum_descriptor() {
-    return SceneStaticMesh_RenderTimeEnum_descriptor();
+    return NodeStaticMesh_RenderTimeEnum_descriptor();
   }
   template <typename T>
   static inline const std::string& RenderTimeEnum_Name(T value) {
-    return SceneStaticMesh_RenderTimeEnum_Name(value);
+    return NodeStaticMesh_RenderTimeEnum_Name(value);
   }
   static inline bool RenderTimeEnum_Parse(absl::string_view name, RenderTimeEnum* value) {
-    return SceneStaticMesh_RenderTimeEnum_Parse(name, value);
+    return NodeStaticMesh_RenderTimeEnum_Parse(name, value);
   }
-  using ShadowEffectEnum = SceneStaticMesh_ShadowEffectEnum;
-  static constexpr ShadowEffectEnum OPAQUE_SHADOW_EFFECT = SceneStaticMesh_ShadowEffectEnum_OPAQUE_SHADOW_EFFECT;
-  static constexpr ShadowEffectEnum TRANSPARENT_SHADOW_EFFECT = SceneStaticMesh_ShadowEffectEnum_TRANSPARENT_SHADOW_EFFECT;
+  using ShadowEffectEnum = NodeStaticMesh_ShadowEffectEnum;
+  static constexpr ShadowEffectEnum OPAQUE_SHADOW_EFFECT = NodeStaticMesh_ShadowEffectEnum_OPAQUE_SHADOW_EFFECT;
+  static constexpr ShadowEffectEnum TRANSPARENT_SHADOW_EFFECT = NodeStaticMesh_ShadowEffectEnum_TRANSPARENT_SHADOW_EFFECT;
   static inline bool ShadowEffectEnum_IsValid(int value) {
-    return SceneStaticMesh_ShadowEffectEnum_IsValid(value);
+    return NodeStaticMesh_ShadowEffectEnum_IsValid(value);
   }
-  static constexpr ShadowEffectEnum ShadowEffectEnum_MIN = SceneStaticMesh_ShadowEffectEnum_ShadowEffectEnum_MIN;
-  static constexpr ShadowEffectEnum ShadowEffectEnum_MAX = SceneStaticMesh_ShadowEffectEnum_ShadowEffectEnum_MAX;
-  static constexpr int ShadowEffectEnum_ARRAYSIZE = SceneStaticMesh_ShadowEffectEnum_ShadowEffectEnum_ARRAYSIZE;
+  static constexpr ShadowEffectEnum ShadowEffectEnum_MIN = NodeStaticMesh_ShadowEffectEnum_ShadowEffectEnum_MIN;
+  static constexpr ShadowEffectEnum ShadowEffectEnum_MAX = NodeStaticMesh_ShadowEffectEnum_ShadowEffectEnum_MAX;
+  static constexpr int ShadowEffectEnum_ARRAYSIZE = NodeStaticMesh_ShadowEffectEnum_ShadowEffectEnum_ARRAYSIZE;
   static inline const ::google::protobuf::EnumDescriptor* ShadowEffectEnum_descriptor() {
-    return SceneStaticMesh_ShadowEffectEnum_descriptor();
+    return NodeStaticMesh_ShadowEffectEnum_descriptor();
   }
   template <typename T>
   static inline const std::string& ShadowEffectEnum_Name(T value) {
-    return SceneStaticMesh_ShadowEffectEnum_Name(value);
+    return NodeStaticMesh_ShadowEffectEnum_Name(value);
   }
   static inline bool ShadowEffectEnum_Parse(absl::string_view name, ShadowEffectEnum* value) {
-    return SceneStaticMesh_ShadowEffectEnum_Parse(name, value);
+    return NodeStaticMesh_ShadowEffectEnum_Parse(name, value);
   }
 
   // accessors -------------------------------------------------------
@@ -1547,34 +1611,34 @@ class SceneStaticMesh final : public ::google::protobuf::Message
   std::string* _internal_mutable_material_name();
 
   public:
-  // .frame.proto.SceneStaticMesh.RenderPrimitiveEnum render_primitive_enum = 8;
+  // .frame.proto.NodeStaticMesh.RenderPrimitiveEnum render_primitive_enum = 8;
   void clear_render_primitive_enum() ;
-  ::frame::proto::SceneStaticMesh_RenderPrimitiveEnum render_primitive_enum() const;
-  void set_render_primitive_enum(::frame::proto::SceneStaticMesh_RenderPrimitiveEnum value);
+  ::frame::proto::NodeStaticMesh_RenderPrimitiveEnum render_primitive_enum() const;
+  void set_render_primitive_enum(::frame::proto::NodeStaticMesh_RenderPrimitiveEnum value);
 
   private:
-  ::frame::proto::SceneStaticMesh_RenderPrimitiveEnum _internal_render_primitive_enum() const;
-  void _internal_set_render_primitive_enum(::frame::proto::SceneStaticMesh_RenderPrimitiveEnum value);
+  ::frame::proto::NodeStaticMesh_RenderPrimitiveEnum _internal_render_primitive_enum() const;
+  void _internal_set_render_primitive_enum(::frame::proto::NodeStaticMesh_RenderPrimitiveEnum value);
 
   public:
-  // .frame.proto.SceneStaticMesh.RenderTimeEnum render_time_enum = 11;
+  // .frame.proto.NodeStaticMesh.RenderTimeEnum render_time_enum = 11;
   void clear_render_time_enum() ;
-  ::frame::proto::SceneStaticMesh_RenderTimeEnum render_time_enum() const;
-  void set_render_time_enum(::frame::proto::SceneStaticMesh_RenderTimeEnum value);
+  ::frame::proto::NodeStaticMesh_RenderTimeEnum render_time_enum() const;
+  void set_render_time_enum(::frame::proto::NodeStaticMesh_RenderTimeEnum value);
 
   private:
-  ::frame::proto::SceneStaticMesh_RenderTimeEnum _internal_render_time_enum() const;
-  void _internal_set_render_time_enum(::frame::proto::SceneStaticMesh_RenderTimeEnum value);
+  ::frame::proto::NodeStaticMesh_RenderTimeEnum _internal_render_time_enum() const;
+  void _internal_set_render_time_enum(::frame::proto::NodeStaticMesh_RenderTimeEnum value);
 
   public:
-  // .frame.proto.SceneStaticMesh.ShadowEffectEnum shadow_effect_enum = 12;
+  // .frame.proto.NodeStaticMesh.ShadowEffectEnum shadow_effect_enum = 12;
   void clear_shadow_effect_enum() ;
-  ::frame::proto::SceneStaticMesh_ShadowEffectEnum shadow_effect_enum() const;
-  void set_shadow_effect_enum(::frame::proto::SceneStaticMesh_ShadowEffectEnum value);
+  ::frame::proto::NodeStaticMesh_ShadowEffectEnum shadow_effect_enum() const;
+  void set_shadow_effect_enum(::frame::proto::NodeStaticMesh_ShadowEffectEnum value);
 
   private:
-  ::frame::proto::SceneStaticMesh_ShadowEffectEnum _internal_shadow_effect_enum() const;
-  void _internal_set_shadow_effect_enum(::frame::proto::SceneStaticMesh_ShadowEffectEnum value);
+  ::frame::proto::NodeStaticMesh_ShadowEffectEnum _internal_shadow_effect_enum() const;
+  void _internal_set_shadow_effect_enum(::frame::proto::NodeStaticMesh_ShadowEffectEnum value);
 
   public:
   // .frame.proto.CleanBuffer clean_buffer = 7;
@@ -1596,15 +1660,15 @@ class SceneStaticMesh final : public ::google::protobuf::Message
   ::frame::proto::CleanBuffer* _internal_mutable_clean_buffer();
 
   public:
-  // .frame.proto.SceneStaticMesh.MeshEnum mesh_enum = 6;
+  // .frame.proto.NodeStaticMesh.MeshEnum mesh_enum = 6;
   bool has_mesh_enum() const;
   void clear_mesh_enum() ;
-  ::frame::proto::SceneStaticMesh_MeshEnum mesh_enum() const;
-  void set_mesh_enum(::frame::proto::SceneStaticMesh_MeshEnum value);
+  ::frame::proto::NodeStaticMesh_MeshEnum mesh_enum() const;
+  void set_mesh_enum(::frame::proto::NodeStaticMesh_MeshEnum value);
 
   private:
-  ::frame::proto::SceneStaticMesh_MeshEnum _internal_mesh_enum() const;
-  void _internal_set_mesh_enum(::frame::proto::SceneStaticMesh_MeshEnum value);
+  ::frame::proto::NodeStaticMesh_MeshEnum _internal_mesh_enum() const;
+  void _internal_set_mesh_enum(::frame::proto::NodeStaticMesh_MeshEnum value);
 
   public:
   // string file_name = 3;
@@ -1645,7 +1709,7 @@ class SceneStaticMesh final : public ::google::protobuf::Message
   public:
   void clear_mesh_oneof();
   MeshOneofCase mesh_oneof_case() const;
-  // @@protoc_insertion_point(class_scope:frame.proto.SceneStaticMesh)
+  // @@protoc_insertion_point(class_scope:frame.proto.NodeStaticMesh)
  private:
   class _Internal;
   void set_has_clean_buffer();
@@ -1657,7 +1721,7 @@ class SceneStaticMesh final : public ::google::protobuf::Message
   friend class ::google::protobuf::internal::TcParser;
   static const ::google::protobuf::internal::TcParseTable<
       3, 10, 2,
-      76, 2>
+      75, 2>
       _table_;
 
   friend class ::google::protobuf::MessageLite;
@@ -1673,7 +1737,7 @@ class SceneStaticMesh final : public ::google::protobuf::Message
                           ::google::protobuf::Arena* arena);
     inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
                           ::google::protobuf::Arena* arena, const Impl_& from,
-                          const SceneStaticMesh& from_msg);
+                          const NodeStaticMesh& from_msg);
     ::google::protobuf::internal::ArenaStringPtr name_;
     ::google::protobuf::internal::ArenaStringPtr parent_;
     ::google::protobuf::internal::ArenaStringPtr material_name_;
@@ -1850,74 +1914,74 @@ class SceneTree final : public ::google::protobuf::Message
     kDefaultRootNameFieldNumber = 1,
     kDefaultCameraNameFieldNumber = 2,
   };
-  // repeated .frame.proto.SceneMatrix scene_matrices = 3;
+  // repeated .frame.proto.NodeMatrix scene_matrices = 3;
   int scene_matrices_size() const;
   private:
   int _internal_scene_matrices_size() const;
 
   public:
   void clear_scene_matrices() ;
-  ::frame::proto::SceneMatrix* mutable_scene_matrices(int index);
-  ::google::protobuf::RepeatedPtrField<::frame::proto::SceneMatrix>* mutable_scene_matrices();
+  ::frame::proto::NodeMatrix* mutable_scene_matrices(int index);
+  ::google::protobuf::RepeatedPtrField<::frame::proto::NodeMatrix>* mutable_scene_matrices();
 
   private:
-  const ::google::protobuf::RepeatedPtrField<::frame::proto::SceneMatrix>& _internal_scene_matrices() const;
-  ::google::protobuf::RepeatedPtrField<::frame::proto::SceneMatrix>* _internal_mutable_scene_matrices();
+  const ::google::protobuf::RepeatedPtrField<::frame::proto::NodeMatrix>& _internal_scene_matrices() const;
+  ::google::protobuf::RepeatedPtrField<::frame::proto::NodeMatrix>* _internal_mutable_scene_matrices();
   public:
-  const ::frame::proto::SceneMatrix& scene_matrices(int index) const;
-  ::frame::proto::SceneMatrix* add_scene_matrices();
-  const ::google::protobuf::RepeatedPtrField<::frame::proto::SceneMatrix>& scene_matrices() const;
-  // repeated .frame.proto.SceneStaticMesh scene_static_meshes = 4;
+  const ::frame::proto::NodeMatrix& scene_matrices(int index) const;
+  ::frame::proto::NodeMatrix* add_scene_matrices();
+  const ::google::protobuf::RepeatedPtrField<::frame::proto::NodeMatrix>& scene_matrices() const;
+  // repeated .frame.proto.NodeStaticMesh scene_static_meshes = 4;
   int scene_static_meshes_size() const;
   private:
   int _internal_scene_static_meshes_size() const;
 
   public:
   void clear_scene_static_meshes() ;
-  ::frame::proto::SceneStaticMesh* mutable_scene_static_meshes(int index);
-  ::google::protobuf::RepeatedPtrField<::frame::proto::SceneStaticMesh>* mutable_scene_static_meshes();
+  ::frame::proto::NodeStaticMesh* mutable_scene_static_meshes(int index);
+  ::google::protobuf::RepeatedPtrField<::frame::proto::NodeStaticMesh>* mutable_scene_static_meshes();
 
   private:
-  const ::google::protobuf::RepeatedPtrField<::frame::proto::SceneStaticMesh>& _internal_scene_static_meshes() const;
-  ::google::protobuf::RepeatedPtrField<::frame::proto::SceneStaticMesh>* _internal_mutable_scene_static_meshes();
+  const ::google::protobuf::RepeatedPtrField<::frame::proto::NodeStaticMesh>& _internal_scene_static_meshes() const;
+  ::google::protobuf::RepeatedPtrField<::frame::proto::NodeStaticMesh>* _internal_mutable_scene_static_meshes();
   public:
-  const ::frame::proto::SceneStaticMesh& scene_static_meshes(int index) const;
-  ::frame::proto::SceneStaticMesh* add_scene_static_meshes();
-  const ::google::protobuf::RepeatedPtrField<::frame::proto::SceneStaticMesh>& scene_static_meshes() const;
-  // repeated .frame.proto.SceneCamera scene_cameras = 5;
+  const ::frame::proto::NodeStaticMesh& scene_static_meshes(int index) const;
+  ::frame::proto::NodeStaticMesh* add_scene_static_meshes();
+  const ::google::protobuf::RepeatedPtrField<::frame::proto::NodeStaticMesh>& scene_static_meshes() const;
+  // repeated .frame.proto.NodeCamera scene_cameras = 5;
   int scene_cameras_size() const;
   private:
   int _internal_scene_cameras_size() const;
 
   public:
   void clear_scene_cameras() ;
-  ::frame::proto::SceneCamera* mutable_scene_cameras(int index);
-  ::google::protobuf::RepeatedPtrField<::frame::proto::SceneCamera>* mutable_scene_cameras();
+  ::frame::proto::NodeCamera* mutable_scene_cameras(int index);
+  ::google::protobuf::RepeatedPtrField<::frame::proto::NodeCamera>* mutable_scene_cameras();
 
   private:
-  const ::google::protobuf::RepeatedPtrField<::frame::proto::SceneCamera>& _internal_scene_cameras() const;
-  ::google::protobuf::RepeatedPtrField<::frame::proto::SceneCamera>* _internal_mutable_scene_cameras();
+  const ::google::protobuf::RepeatedPtrField<::frame::proto::NodeCamera>& _internal_scene_cameras() const;
+  ::google::protobuf::RepeatedPtrField<::frame::proto::NodeCamera>* _internal_mutable_scene_cameras();
   public:
-  const ::frame::proto::SceneCamera& scene_cameras(int index) const;
-  ::frame::proto::SceneCamera* add_scene_cameras();
-  const ::google::protobuf::RepeatedPtrField<::frame::proto::SceneCamera>& scene_cameras() const;
-  // repeated .frame.proto.SceneLight scene_lights = 6;
+  const ::frame::proto::NodeCamera& scene_cameras(int index) const;
+  ::frame::proto::NodeCamera* add_scene_cameras();
+  const ::google::protobuf::RepeatedPtrField<::frame::proto::NodeCamera>& scene_cameras() const;
+  // repeated .frame.proto.NodeLight scene_lights = 6;
   int scene_lights_size() const;
   private:
   int _internal_scene_lights_size() const;
 
   public:
   void clear_scene_lights() ;
-  ::frame::proto::SceneLight* mutable_scene_lights(int index);
-  ::google::protobuf::RepeatedPtrField<::frame::proto::SceneLight>* mutable_scene_lights();
+  ::frame::proto::NodeLight* mutable_scene_lights(int index);
+  ::google::protobuf::RepeatedPtrField<::frame::proto::NodeLight>* mutable_scene_lights();
 
   private:
-  const ::google::protobuf::RepeatedPtrField<::frame::proto::SceneLight>& _internal_scene_lights() const;
-  ::google::protobuf::RepeatedPtrField<::frame::proto::SceneLight>* _internal_mutable_scene_lights();
+  const ::google::protobuf::RepeatedPtrField<::frame::proto::NodeLight>& _internal_scene_lights() const;
+  ::google::protobuf::RepeatedPtrField<::frame::proto::NodeLight>* _internal_mutable_scene_lights();
   public:
-  const ::frame::proto::SceneLight& scene_lights(int index) const;
-  ::frame::proto::SceneLight* add_scene_lights();
-  const ::google::protobuf::RepeatedPtrField<::frame::proto::SceneLight>& scene_lights() const;
+  const ::frame::proto::NodeLight& scene_lights(int index) const;
+  ::frame::proto::NodeLight* add_scene_lights();
+  const ::google::protobuf::RepeatedPtrField<::frame::proto::NodeLight>& scene_lights() const;
   // string default_root_name = 1;
   void clear_default_root_name() ;
   const std::string& default_root_name() const;
@@ -1973,10 +2037,10 @@ class SceneTree final : public ::google::protobuf::Message
     inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
                           ::google::protobuf::Arena* arena, const Impl_& from,
                           const SceneTree& from_msg);
-    ::google::protobuf::RepeatedPtrField< ::frame::proto::SceneMatrix > scene_matrices_;
-    ::google::protobuf::RepeatedPtrField< ::frame::proto::SceneStaticMesh > scene_static_meshes_;
-    ::google::protobuf::RepeatedPtrField< ::frame::proto::SceneCamera > scene_cameras_;
-    ::google::protobuf::RepeatedPtrField< ::frame::proto::SceneLight > scene_lights_;
+    ::google::protobuf::RepeatedPtrField< ::frame::proto::NodeMatrix > scene_matrices_;
+    ::google::protobuf::RepeatedPtrField< ::frame::proto::NodeStaticMesh > scene_static_meshes_;
+    ::google::protobuf::RepeatedPtrField< ::frame::proto::NodeCamera > scene_cameras_;
+    ::google::protobuf::RepeatedPtrField< ::frame::proto::NodeLight > scene_lights_;
     ::google::protobuf::internal::ArenaStringPtr default_root_name_;
     ::google::protobuf::internal::ArenaStringPtr default_camera_name_;
     ::google::protobuf::internal::CachedSize _cached_size_;
@@ -2000,116 +2064,138 @@ class SceneTree final : public ::google::protobuf::Message
 #endif  // __GNUC__
 // -------------------------------------------------------------------
 
-// SceneMatrix
+// NodeMatrix
 
 // string name = 1;
-inline void SceneMatrix::clear_name() {
+inline void NodeMatrix::clear_name() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.name_.ClearToEmpty();
 }
-inline const std::string& SceneMatrix::name() const
+inline const std::string& NodeMatrix::name() const
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:frame.proto.SceneMatrix.name)
+  // @@protoc_insertion_point(field_get:frame.proto.NodeMatrix.name)
   return _internal_name();
 }
 template <typename Arg_, typename... Args_>
-inline PROTOBUF_ALWAYS_INLINE void SceneMatrix::set_name(Arg_&& arg,
+inline PROTOBUF_ALWAYS_INLINE void NodeMatrix::set_name(Arg_&& arg,
                                                      Args_... args) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.name_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
-  // @@protoc_insertion_point(field_set:frame.proto.SceneMatrix.name)
+  // @@protoc_insertion_point(field_set:frame.proto.NodeMatrix.name)
 }
-inline std::string* SceneMatrix::mutable_name() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+inline std::string* NodeMatrix::mutable_name() ABSL_ATTRIBUTE_LIFETIME_BOUND {
   std::string* _s = _internal_mutable_name();
-  // @@protoc_insertion_point(field_mutable:frame.proto.SceneMatrix.name)
+  // @@protoc_insertion_point(field_mutable:frame.proto.NodeMatrix.name)
   return _s;
 }
-inline const std::string& SceneMatrix::_internal_name() const {
+inline const std::string& NodeMatrix::_internal_name() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
   return _impl_.name_.Get();
 }
-inline void SceneMatrix::_internal_set_name(const std::string& value) {
+inline void NodeMatrix::_internal_set_name(const std::string& value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.name_.Set(value, GetArena());
 }
-inline std::string* SceneMatrix::_internal_mutable_name() {
+inline std::string* NodeMatrix::_internal_mutable_name() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   return _impl_.name_.Mutable( GetArena());
 }
-inline std::string* SceneMatrix::release_name() {
+inline std::string* NodeMatrix::release_name() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  // @@protoc_insertion_point(field_release:frame.proto.SceneMatrix.name)
+  // @@protoc_insertion_point(field_release:frame.proto.NodeMatrix.name)
   return _impl_.name_.Release();
 }
-inline void SceneMatrix::set_allocated_name(std::string* value) {
+inline void NodeMatrix::set_allocated_name(std::string* value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.name_.SetAllocated(value, GetArena());
   if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.name_.IsDefault()) {
     _impl_.name_.Set("", GetArena());
   }
-  // @@protoc_insertion_point(field_set_allocated:frame.proto.SceneMatrix.name)
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.NodeMatrix.name)
 }
 
 // string parent = 2;
-inline void SceneMatrix::clear_parent() {
+inline void NodeMatrix::clear_parent() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.parent_.ClearToEmpty();
 }
-inline const std::string& SceneMatrix::parent() const
+inline const std::string& NodeMatrix::parent() const
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:frame.proto.SceneMatrix.parent)
+  // @@protoc_insertion_point(field_get:frame.proto.NodeMatrix.parent)
   return _internal_parent();
 }
 template <typename Arg_, typename... Args_>
-inline PROTOBUF_ALWAYS_INLINE void SceneMatrix::set_parent(Arg_&& arg,
+inline PROTOBUF_ALWAYS_INLINE void NodeMatrix::set_parent(Arg_&& arg,
                                                      Args_... args) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.parent_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
-  // @@protoc_insertion_point(field_set:frame.proto.SceneMatrix.parent)
+  // @@protoc_insertion_point(field_set:frame.proto.NodeMatrix.parent)
 }
-inline std::string* SceneMatrix::mutable_parent() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+inline std::string* NodeMatrix::mutable_parent() ABSL_ATTRIBUTE_LIFETIME_BOUND {
   std::string* _s = _internal_mutable_parent();
-  // @@protoc_insertion_point(field_mutable:frame.proto.SceneMatrix.parent)
+  // @@protoc_insertion_point(field_mutable:frame.proto.NodeMatrix.parent)
   return _s;
 }
-inline const std::string& SceneMatrix::_internal_parent() const {
+inline const std::string& NodeMatrix::_internal_parent() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
   return _impl_.parent_.Get();
 }
-inline void SceneMatrix::_internal_set_parent(const std::string& value) {
+inline void NodeMatrix::_internal_set_parent(const std::string& value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.parent_.Set(value, GetArena());
 }
-inline std::string* SceneMatrix::_internal_mutable_parent() {
+inline std::string* NodeMatrix::_internal_mutable_parent() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   return _impl_.parent_.Mutable( GetArena());
 }
-inline std::string* SceneMatrix::release_parent() {
+inline std::string* NodeMatrix::release_parent() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  // @@protoc_insertion_point(field_release:frame.proto.SceneMatrix.parent)
+  // @@protoc_insertion_point(field_release:frame.proto.NodeMatrix.parent)
   return _impl_.parent_.Release();
 }
-inline void SceneMatrix::set_allocated_parent(std::string* value) {
+inline void NodeMatrix::set_allocated_parent(std::string* value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.parent_.SetAllocated(value, GetArena());
   if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.parent_.IsDefault()) {
     _impl_.parent_.Set("", GetArena());
   }
-  // @@protoc_insertion_point(field_set_allocated:frame.proto.SceneMatrix.parent)
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.NodeMatrix.parent)
+}
+
+// .frame.proto.NodeMatrix.MatrixTypeEnum matrix_type_enum = 5;
+inline void NodeMatrix::clear_matrix_type_enum() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.matrix_type_enum_ = 0;
+}
+inline ::frame::proto::NodeMatrix_MatrixTypeEnum NodeMatrix::matrix_type_enum() const {
+  // @@protoc_insertion_point(field_get:frame.proto.NodeMatrix.matrix_type_enum)
+  return _internal_matrix_type_enum();
+}
+inline void NodeMatrix::set_matrix_type_enum(::frame::proto::NodeMatrix_MatrixTypeEnum value) {
+  _internal_set_matrix_type_enum(value);
+  // @@protoc_insertion_point(field_set:frame.proto.NodeMatrix.matrix_type_enum)
+}
+inline ::frame::proto::NodeMatrix_MatrixTypeEnum NodeMatrix::_internal_matrix_type_enum() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return static_cast<::frame::proto::NodeMatrix_MatrixTypeEnum>(_impl_.matrix_type_enum_);
+}
+inline void NodeMatrix::_internal_set_matrix_type_enum(::frame::proto::NodeMatrix_MatrixTypeEnum value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.matrix_type_enum_ = value;
 }
 
 // .frame.proto.UniformMatrix4 matrix = 3;
-inline bool SceneMatrix::has_matrix() const {
+inline bool NodeMatrix::has_matrix() const {
   return matrix_oneof_case() == kMatrix;
 }
-inline bool SceneMatrix::_internal_has_matrix() const {
+inline bool NodeMatrix::_internal_has_matrix() const {
   return matrix_oneof_case() == kMatrix;
 }
-inline void SceneMatrix::set_has_matrix() {
+inline void NodeMatrix::set_has_matrix() {
   _impl_._oneof_case_[0] = kMatrix;
 }
-inline ::frame::proto::UniformMatrix4* SceneMatrix::release_matrix() {
-  // @@protoc_insertion_point(field_release:frame.proto.SceneMatrix.matrix)
+inline ::frame::proto::UniformMatrix4* NodeMatrix::release_matrix() {
+  // @@protoc_insertion_point(field_release:frame.proto.NodeMatrix.matrix)
   if (matrix_oneof_case() == kMatrix) {
     clear_has_matrix_oneof();
     auto* temp = _impl_.matrix_oneof_.matrix_;
@@ -2122,15 +2208,15 @@ inline ::frame::proto::UniformMatrix4* SceneMatrix::release_matrix() {
     return nullptr;
   }
 }
-inline const ::frame::proto::UniformMatrix4& SceneMatrix::_internal_matrix() const {
+inline const ::frame::proto::UniformMatrix4& NodeMatrix::_internal_matrix() const {
   return matrix_oneof_case() == kMatrix ? *_impl_.matrix_oneof_.matrix_ : reinterpret_cast<::frame::proto::UniformMatrix4&>(::frame::proto::_UniformMatrix4_default_instance_);
 }
-inline const ::frame::proto::UniformMatrix4& SceneMatrix::matrix() const ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:frame.proto.SceneMatrix.matrix)
+inline const ::frame::proto::UniformMatrix4& NodeMatrix::matrix() const ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:frame.proto.NodeMatrix.matrix)
   return _internal_matrix();
 }
-inline ::frame::proto::UniformMatrix4* SceneMatrix::unsafe_arena_release_matrix() {
-  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.SceneMatrix.matrix)
+inline ::frame::proto::UniformMatrix4* NodeMatrix::unsafe_arena_release_matrix() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.NodeMatrix.matrix)
   if (matrix_oneof_case() == kMatrix) {
     clear_has_matrix_oneof();
     auto* temp = _impl_.matrix_oneof_.matrix_;
@@ -2140,7 +2226,7 @@ inline ::frame::proto::UniformMatrix4* SceneMatrix::unsafe_arena_release_matrix(
     return nullptr;
   }
 }
-inline void SceneMatrix::unsafe_arena_set_allocated_matrix(::frame::proto::UniformMatrix4* value) {
+inline void NodeMatrix::unsafe_arena_set_allocated_matrix(::frame::proto::UniformMatrix4* value) {
   // We rely on the oneof clear method to free the earlier contents
   // of this oneof. We can directly use the pointer we're given to
   // set the new value.
@@ -2149,9 +2235,9 @@ inline void SceneMatrix::unsafe_arena_set_allocated_matrix(::frame::proto::Unifo
     set_has_matrix();
     _impl_.matrix_oneof_.matrix_ = value;
   }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.SceneMatrix.matrix)
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.NodeMatrix.matrix)
 }
-inline ::frame::proto::UniformMatrix4* SceneMatrix::_internal_mutable_matrix() {
+inline ::frame::proto::UniformMatrix4* NodeMatrix::_internal_mutable_matrix() {
   if (matrix_oneof_case() != kMatrix) {
     clear_matrix_oneof();
     set_has_matrix();
@@ -2160,24 +2246,24 @@ inline ::frame::proto::UniformMatrix4* SceneMatrix::_internal_mutable_matrix() {
   }
   return _impl_.matrix_oneof_.matrix_;
 }
-inline ::frame::proto::UniformMatrix4* SceneMatrix::mutable_matrix() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+inline ::frame::proto::UniformMatrix4* NodeMatrix::mutable_matrix() ABSL_ATTRIBUTE_LIFETIME_BOUND {
   ::frame::proto::UniformMatrix4* _msg = _internal_mutable_matrix();
-  // @@protoc_insertion_point(field_mutable:frame.proto.SceneMatrix.matrix)
+  // @@protoc_insertion_point(field_mutable:frame.proto.NodeMatrix.matrix)
   return _msg;
 }
 
 // .frame.proto.UniformVector4 quaternion = 4;
-inline bool SceneMatrix::has_quaternion() const {
+inline bool NodeMatrix::has_quaternion() const {
   return matrix_oneof_case() == kQuaternion;
 }
-inline bool SceneMatrix::_internal_has_quaternion() const {
+inline bool NodeMatrix::_internal_has_quaternion() const {
   return matrix_oneof_case() == kQuaternion;
 }
-inline void SceneMatrix::set_has_quaternion() {
+inline void NodeMatrix::set_has_quaternion() {
   _impl_._oneof_case_[0] = kQuaternion;
 }
-inline ::frame::proto::UniformVector4* SceneMatrix::release_quaternion() {
-  // @@protoc_insertion_point(field_release:frame.proto.SceneMatrix.quaternion)
+inline ::frame::proto::UniformVector4* NodeMatrix::release_quaternion() {
+  // @@protoc_insertion_point(field_release:frame.proto.NodeMatrix.quaternion)
   if (matrix_oneof_case() == kQuaternion) {
     clear_has_matrix_oneof();
     auto* temp = _impl_.matrix_oneof_.quaternion_;
@@ -2190,15 +2276,15 @@ inline ::frame::proto::UniformVector4* SceneMatrix::release_quaternion() {
     return nullptr;
   }
 }
-inline const ::frame::proto::UniformVector4& SceneMatrix::_internal_quaternion() const {
+inline const ::frame::proto::UniformVector4& NodeMatrix::_internal_quaternion() const {
   return matrix_oneof_case() == kQuaternion ? *_impl_.matrix_oneof_.quaternion_ : reinterpret_cast<::frame::proto::UniformVector4&>(::frame::proto::_UniformVector4_default_instance_);
 }
-inline const ::frame::proto::UniformVector4& SceneMatrix::quaternion() const ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:frame.proto.SceneMatrix.quaternion)
+inline const ::frame::proto::UniformVector4& NodeMatrix::quaternion() const ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:frame.proto.NodeMatrix.quaternion)
   return _internal_quaternion();
 }
-inline ::frame::proto::UniformVector4* SceneMatrix::unsafe_arena_release_quaternion() {
-  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.SceneMatrix.quaternion)
+inline ::frame::proto::UniformVector4* NodeMatrix::unsafe_arena_release_quaternion() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.NodeMatrix.quaternion)
   if (matrix_oneof_case() == kQuaternion) {
     clear_has_matrix_oneof();
     auto* temp = _impl_.matrix_oneof_.quaternion_;
@@ -2208,7 +2294,7 @@ inline ::frame::proto::UniformVector4* SceneMatrix::unsafe_arena_release_quatern
     return nullptr;
   }
 }
-inline void SceneMatrix::unsafe_arena_set_allocated_quaternion(::frame::proto::UniformVector4* value) {
+inline void NodeMatrix::unsafe_arena_set_allocated_quaternion(::frame::proto::UniformVector4* value) {
   // We rely on the oneof clear method to free the earlier contents
   // of this oneof. We can directly use the pointer we're given to
   // set the new value.
@@ -2217,9 +2303,9 @@ inline void SceneMatrix::unsafe_arena_set_allocated_quaternion(::frame::proto::U
     set_has_quaternion();
     _impl_.matrix_oneof_.quaternion_ = value;
   }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.SceneMatrix.quaternion)
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.NodeMatrix.quaternion)
 }
-inline ::frame::proto::UniformVector4* SceneMatrix::_internal_mutable_quaternion() {
+inline ::frame::proto::UniformVector4* NodeMatrix::_internal_mutable_quaternion() {
   if (matrix_oneof_case() != kQuaternion) {
     clear_matrix_oneof();
     set_has_quaternion();
@@ -2228,155 +2314,155 @@ inline ::frame::proto::UniformVector4* SceneMatrix::_internal_mutable_quaternion
   }
   return _impl_.matrix_oneof_.quaternion_;
 }
-inline ::frame::proto::UniformVector4* SceneMatrix::mutable_quaternion() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+inline ::frame::proto::UniformVector4* NodeMatrix::mutable_quaternion() ABSL_ATTRIBUTE_LIFETIME_BOUND {
   ::frame::proto::UniformVector4* _msg = _internal_mutable_quaternion();
-  // @@protoc_insertion_point(field_mutable:frame.proto.SceneMatrix.quaternion)
+  // @@protoc_insertion_point(field_mutable:frame.proto.NodeMatrix.quaternion)
   return _msg;
 }
 
-inline bool SceneMatrix::has_matrix_oneof() const {
+inline bool NodeMatrix::has_matrix_oneof() const {
   return matrix_oneof_case() != MATRIX_ONEOF_NOT_SET;
 }
-inline void SceneMatrix::clear_has_matrix_oneof() {
+inline void NodeMatrix::clear_has_matrix_oneof() {
   _impl_._oneof_case_[0] = MATRIX_ONEOF_NOT_SET;
 }
-inline SceneMatrix::MatrixOneofCase SceneMatrix::matrix_oneof_case() const {
-  return SceneMatrix::MatrixOneofCase(_impl_._oneof_case_[0]);
+inline NodeMatrix::MatrixOneofCase NodeMatrix::matrix_oneof_case() const {
+  return NodeMatrix::MatrixOneofCase(_impl_._oneof_case_[0]);
 }
 // -------------------------------------------------------------------
 
-// SceneStaticMesh
+// NodeStaticMesh
 
 // string name = 1;
-inline void SceneStaticMesh::clear_name() {
+inline void NodeStaticMesh::clear_name() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.name_.ClearToEmpty();
 }
-inline const std::string& SceneStaticMesh::name() const
+inline const std::string& NodeStaticMesh::name() const
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:frame.proto.SceneStaticMesh.name)
+  // @@protoc_insertion_point(field_get:frame.proto.NodeStaticMesh.name)
   return _internal_name();
 }
 template <typename Arg_, typename... Args_>
-inline PROTOBUF_ALWAYS_INLINE void SceneStaticMesh::set_name(Arg_&& arg,
+inline PROTOBUF_ALWAYS_INLINE void NodeStaticMesh::set_name(Arg_&& arg,
                                                      Args_... args) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.name_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
-  // @@protoc_insertion_point(field_set:frame.proto.SceneStaticMesh.name)
+  // @@protoc_insertion_point(field_set:frame.proto.NodeStaticMesh.name)
 }
-inline std::string* SceneStaticMesh::mutable_name() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+inline std::string* NodeStaticMesh::mutable_name() ABSL_ATTRIBUTE_LIFETIME_BOUND {
   std::string* _s = _internal_mutable_name();
-  // @@protoc_insertion_point(field_mutable:frame.proto.SceneStaticMesh.name)
+  // @@protoc_insertion_point(field_mutable:frame.proto.NodeStaticMesh.name)
   return _s;
 }
-inline const std::string& SceneStaticMesh::_internal_name() const {
+inline const std::string& NodeStaticMesh::_internal_name() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
   return _impl_.name_.Get();
 }
-inline void SceneStaticMesh::_internal_set_name(const std::string& value) {
+inline void NodeStaticMesh::_internal_set_name(const std::string& value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.name_.Set(value, GetArena());
 }
-inline std::string* SceneStaticMesh::_internal_mutable_name() {
+inline std::string* NodeStaticMesh::_internal_mutable_name() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   return _impl_.name_.Mutable( GetArena());
 }
-inline std::string* SceneStaticMesh::release_name() {
+inline std::string* NodeStaticMesh::release_name() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  // @@protoc_insertion_point(field_release:frame.proto.SceneStaticMesh.name)
+  // @@protoc_insertion_point(field_release:frame.proto.NodeStaticMesh.name)
   return _impl_.name_.Release();
 }
-inline void SceneStaticMesh::set_allocated_name(std::string* value) {
+inline void NodeStaticMesh::set_allocated_name(std::string* value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.name_.SetAllocated(value, GetArena());
   if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.name_.IsDefault()) {
     _impl_.name_.Set("", GetArena());
   }
-  // @@protoc_insertion_point(field_set_allocated:frame.proto.SceneStaticMesh.name)
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.NodeStaticMesh.name)
 }
 
 // string parent = 2;
-inline void SceneStaticMesh::clear_parent() {
+inline void NodeStaticMesh::clear_parent() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.parent_.ClearToEmpty();
 }
-inline const std::string& SceneStaticMesh::parent() const
+inline const std::string& NodeStaticMesh::parent() const
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:frame.proto.SceneStaticMesh.parent)
+  // @@protoc_insertion_point(field_get:frame.proto.NodeStaticMesh.parent)
   return _internal_parent();
 }
 template <typename Arg_, typename... Args_>
-inline PROTOBUF_ALWAYS_INLINE void SceneStaticMesh::set_parent(Arg_&& arg,
+inline PROTOBUF_ALWAYS_INLINE void NodeStaticMesh::set_parent(Arg_&& arg,
                                                      Args_... args) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.parent_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
-  // @@protoc_insertion_point(field_set:frame.proto.SceneStaticMesh.parent)
+  // @@protoc_insertion_point(field_set:frame.proto.NodeStaticMesh.parent)
 }
-inline std::string* SceneStaticMesh::mutable_parent() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+inline std::string* NodeStaticMesh::mutable_parent() ABSL_ATTRIBUTE_LIFETIME_BOUND {
   std::string* _s = _internal_mutable_parent();
-  // @@protoc_insertion_point(field_mutable:frame.proto.SceneStaticMesh.parent)
+  // @@protoc_insertion_point(field_mutable:frame.proto.NodeStaticMesh.parent)
   return _s;
 }
-inline const std::string& SceneStaticMesh::_internal_parent() const {
+inline const std::string& NodeStaticMesh::_internal_parent() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
   return _impl_.parent_.Get();
 }
-inline void SceneStaticMesh::_internal_set_parent(const std::string& value) {
+inline void NodeStaticMesh::_internal_set_parent(const std::string& value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.parent_.Set(value, GetArena());
 }
-inline std::string* SceneStaticMesh::_internal_mutable_parent() {
+inline std::string* NodeStaticMesh::_internal_mutable_parent() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   return _impl_.parent_.Mutable( GetArena());
 }
-inline std::string* SceneStaticMesh::release_parent() {
+inline std::string* NodeStaticMesh::release_parent() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  // @@protoc_insertion_point(field_release:frame.proto.SceneStaticMesh.parent)
+  // @@protoc_insertion_point(field_release:frame.proto.NodeStaticMesh.parent)
   return _impl_.parent_.Release();
 }
-inline void SceneStaticMesh::set_allocated_parent(std::string* value) {
+inline void NodeStaticMesh::set_allocated_parent(std::string* value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.parent_.SetAllocated(value, GetArena());
   if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.parent_.IsDefault()) {
     _impl_.parent_.Set("", GetArena());
   }
-  // @@protoc_insertion_point(field_set_allocated:frame.proto.SceneStaticMesh.parent)
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.NodeStaticMesh.parent)
 }
 
-// .frame.proto.SceneStaticMesh.RenderPrimitiveEnum render_primitive_enum = 8;
-inline void SceneStaticMesh::clear_render_primitive_enum() {
+// .frame.proto.NodeStaticMesh.RenderPrimitiveEnum render_primitive_enum = 8;
+inline void NodeStaticMesh::clear_render_primitive_enum() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.render_primitive_enum_ = 0;
 }
-inline ::frame::proto::SceneStaticMesh_RenderPrimitiveEnum SceneStaticMesh::render_primitive_enum() const {
-  // @@protoc_insertion_point(field_get:frame.proto.SceneStaticMesh.render_primitive_enum)
+inline ::frame::proto::NodeStaticMesh_RenderPrimitiveEnum NodeStaticMesh::render_primitive_enum() const {
+  // @@protoc_insertion_point(field_get:frame.proto.NodeStaticMesh.render_primitive_enum)
   return _internal_render_primitive_enum();
 }
-inline void SceneStaticMesh::set_render_primitive_enum(::frame::proto::SceneStaticMesh_RenderPrimitiveEnum value) {
+inline void NodeStaticMesh::set_render_primitive_enum(::frame::proto::NodeStaticMesh_RenderPrimitiveEnum value) {
   _internal_set_render_primitive_enum(value);
-  // @@protoc_insertion_point(field_set:frame.proto.SceneStaticMesh.render_primitive_enum)
+  // @@protoc_insertion_point(field_set:frame.proto.NodeStaticMesh.render_primitive_enum)
 }
-inline ::frame::proto::SceneStaticMesh_RenderPrimitiveEnum SceneStaticMesh::_internal_render_primitive_enum() const {
+inline ::frame::proto::NodeStaticMesh_RenderPrimitiveEnum NodeStaticMesh::_internal_render_primitive_enum() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
-  return static_cast<::frame::proto::SceneStaticMesh_RenderPrimitiveEnum>(_impl_.render_primitive_enum_);
+  return static_cast<::frame::proto::NodeStaticMesh_RenderPrimitiveEnum>(_impl_.render_primitive_enum_);
 }
-inline void SceneStaticMesh::_internal_set_render_primitive_enum(::frame::proto::SceneStaticMesh_RenderPrimitiveEnum value) {
+inline void NodeStaticMesh::_internal_set_render_primitive_enum(::frame::proto::NodeStaticMesh_RenderPrimitiveEnum value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.render_primitive_enum_ = value;
 }
 
 // .frame.proto.CleanBuffer clean_buffer = 7;
-inline bool SceneStaticMesh::has_clean_buffer() const {
+inline bool NodeStaticMesh::has_clean_buffer() const {
   return mesh_oneof_case() == kCleanBuffer;
 }
-inline bool SceneStaticMesh::_internal_has_clean_buffer() const {
+inline bool NodeStaticMesh::_internal_has_clean_buffer() const {
   return mesh_oneof_case() == kCleanBuffer;
 }
-inline void SceneStaticMesh::set_has_clean_buffer() {
+inline void NodeStaticMesh::set_has_clean_buffer() {
   _impl_._oneof_case_[0] = kCleanBuffer;
 }
-inline ::frame::proto::CleanBuffer* SceneStaticMesh::release_clean_buffer() {
-  // @@protoc_insertion_point(field_release:frame.proto.SceneStaticMesh.clean_buffer)
+inline ::frame::proto::CleanBuffer* NodeStaticMesh::release_clean_buffer() {
+  // @@protoc_insertion_point(field_release:frame.proto.NodeStaticMesh.clean_buffer)
   if (mesh_oneof_case() == kCleanBuffer) {
     clear_has_mesh_oneof();
     auto* temp = _impl_.mesh_oneof_.clean_buffer_;
@@ -2389,15 +2475,15 @@ inline ::frame::proto::CleanBuffer* SceneStaticMesh::release_clean_buffer() {
     return nullptr;
   }
 }
-inline const ::frame::proto::CleanBuffer& SceneStaticMesh::_internal_clean_buffer() const {
+inline const ::frame::proto::CleanBuffer& NodeStaticMesh::_internal_clean_buffer() const {
   return mesh_oneof_case() == kCleanBuffer ? *_impl_.mesh_oneof_.clean_buffer_ : reinterpret_cast<::frame::proto::CleanBuffer&>(::frame::proto::_CleanBuffer_default_instance_);
 }
-inline const ::frame::proto::CleanBuffer& SceneStaticMesh::clean_buffer() const ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:frame.proto.SceneStaticMesh.clean_buffer)
+inline const ::frame::proto::CleanBuffer& NodeStaticMesh::clean_buffer() const ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:frame.proto.NodeStaticMesh.clean_buffer)
   return _internal_clean_buffer();
 }
-inline ::frame::proto::CleanBuffer* SceneStaticMesh::unsafe_arena_release_clean_buffer() {
-  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.SceneStaticMesh.clean_buffer)
+inline ::frame::proto::CleanBuffer* NodeStaticMesh::unsafe_arena_release_clean_buffer() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.NodeStaticMesh.clean_buffer)
   if (mesh_oneof_case() == kCleanBuffer) {
     clear_has_mesh_oneof();
     auto* temp = _impl_.mesh_oneof_.clean_buffer_;
@@ -2407,7 +2493,7 @@ inline ::frame::proto::CleanBuffer* SceneStaticMesh::unsafe_arena_release_clean_
     return nullptr;
   }
 }
-inline void SceneStaticMesh::unsafe_arena_set_allocated_clean_buffer(::frame::proto::CleanBuffer* value) {
+inline void NodeStaticMesh::unsafe_arena_set_allocated_clean_buffer(::frame::proto::CleanBuffer* value) {
   // We rely on the oneof clear method to free the earlier contents
   // of this oneof. We can directly use the pointer we're given to
   // set the new value.
@@ -2416,9 +2502,9 @@ inline void SceneStaticMesh::unsafe_arena_set_allocated_clean_buffer(::frame::pr
     set_has_clean_buffer();
     _impl_.mesh_oneof_.clean_buffer_ = value;
   }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.SceneStaticMesh.clean_buffer)
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.NodeStaticMesh.clean_buffer)
 }
-inline ::frame::proto::CleanBuffer* SceneStaticMesh::_internal_mutable_clean_buffer() {
+inline ::frame::proto::CleanBuffer* NodeStaticMesh::_internal_mutable_clean_buffer() {
   if (mesh_oneof_case() != kCleanBuffer) {
     clear_mesh_oneof();
     set_has_clean_buffer();
@@ -2427,66 +2513,66 @@ inline ::frame::proto::CleanBuffer* SceneStaticMesh::_internal_mutable_clean_buf
   }
   return _impl_.mesh_oneof_.clean_buffer_;
 }
-inline ::frame::proto::CleanBuffer* SceneStaticMesh::mutable_clean_buffer() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+inline ::frame::proto::CleanBuffer* NodeStaticMesh::mutable_clean_buffer() ABSL_ATTRIBUTE_LIFETIME_BOUND {
   ::frame::proto::CleanBuffer* _msg = _internal_mutable_clean_buffer();
-  // @@protoc_insertion_point(field_mutable:frame.proto.SceneStaticMesh.clean_buffer)
+  // @@protoc_insertion_point(field_mutable:frame.proto.NodeStaticMesh.clean_buffer)
   return _msg;
 }
 
-// .frame.proto.SceneStaticMesh.MeshEnum mesh_enum = 6;
-inline bool SceneStaticMesh::has_mesh_enum() const {
+// .frame.proto.NodeStaticMesh.MeshEnum mesh_enum = 6;
+inline bool NodeStaticMesh::has_mesh_enum() const {
   return mesh_oneof_case() == kMeshEnum;
 }
-inline void SceneStaticMesh::set_has_mesh_enum() {
+inline void NodeStaticMesh::set_has_mesh_enum() {
   _impl_._oneof_case_[0] = kMeshEnum;
 }
-inline void SceneStaticMesh::clear_mesh_enum() {
+inline void NodeStaticMesh::clear_mesh_enum() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   if (mesh_oneof_case() == kMeshEnum) {
     _impl_.mesh_oneof_.mesh_enum_ = 0;
     clear_has_mesh_oneof();
   }
 }
-inline ::frame::proto::SceneStaticMesh_MeshEnum SceneStaticMesh::mesh_enum() const {
-  // @@protoc_insertion_point(field_get:frame.proto.SceneStaticMesh.mesh_enum)
+inline ::frame::proto::NodeStaticMesh_MeshEnum NodeStaticMesh::mesh_enum() const {
+  // @@protoc_insertion_point(field_get:frame.proto.NodeStaticMesh.mesh_enum)
   return _internal_mesh_enum();
 }
-inline void SceneStaticMesh::set_mesh_enum(::frame::proto::SceneStaticMesh_MeshEnum value) {
+inline void NodeStaticMesh::set_mesh_enum(::frame::proto::NodeStaticMesh_MeshEnum value) {
   if (mesh_oneof_case() != kMeshEnum) {
     clear_mesh_oneof();
     set_has_mesh_enum();
   }
   _impl_.mesh_oneof_.mesh_enum_ = value;
-  // @@protoc_insertion_point(field_set:frame.proto.SceneStaticMesh.mesh_enum)
+  // @@protoc_insertion_point(field_set:frame.proto.NodeStaticMesh.mesh_enum)
 }
-inline ::frame::proto::SceneStaticMesh_MeshEnum SceneStaticMesh::_internal_mesh_enum() const {
+inline ::frame::proto::NodeStaticMesh_MeshEnum NodeStaticMesh::_internal_mesh_enum() const {
   if (mesh_oneof_case() == kMeshEnum) {
-    return static_cast<::frame::proto::SceneStaticMesh_MeshEnum>(_impl_.mesh_oneof_.mesh_enum_);
+    return static_cast<::frame::proto::NodeStaticMesh_MeshEnum>(_impl_.mesh_oneof_.mesh_enum_);
   }
-  return static_cast<::frame::proto::SceneStaticMesh_MeshEnum>(0);
+  return static_cast<::frame::proto::NodeStaticMesh_MeshEnum>(0);
 }
 
 // string file_name = 3;
-inline bool SceneStaticMesh::has_file_name() const {
+inline bool NodeStaticMesh::has_file_name() const {
   return mesh_oneof_case() == kFileName;
 }
-inline void SceneStaticMesh::set_has_file_name() {
+inline void NodeStaticMesh::set_has_file_name() {
   _impl_._oneof_case_[0] = kFileName;
 }
-inline void SceneStaticMesh::clear_file_name() {
+inline void NodeStaticMesh::clear_file_name() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   if (mesh_oneof_case() == kFileName) {
     _impl_.mesh_oneof_.file_name_.Destroy();
     clear_has_mesh_oneof();
   }
 }
-inline const std::string& SceneStaticMesh::file_name() const
+inline const std::string& NodeStaticMesh::file_name() const
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:frame.proto.SceneStaticMesh.file_name)
+  // @@protoc_insertion_point(field_get:frame.proto.NodeStaticMesh.file_name)
   return _internal_file_name();
 }
 template <typename Arg_, typename... Args_>
-inline PROTOBUF_ALWAYS_INLINE void SceneStaticMesh::set_file_name(Arg_&& arg,
+inline PROTOBUF_ALWAYS_INLINE void NodeStaticMesh::set_file_name(Arg_&& arg,
                                                      Args_... args) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   if (mesh_oneof_case() != kFileName) {
@@ -2496,21 +2582,21 @@ inline PROTOBUF_ALWAYS_INLINE void SceneStaticMesh::set_file_name(Arg_&& arg,
     _impl_.mesh_oneof_.file_name_.InitDefault();
   }
   _impl_.mesh_oneof_.file_name_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
-  // @@protoc_insertion_point(field_set:frame.proto.SceneStaticMesh.file_name)
+  // @@protoc_insertion_point(field_set:frame.proto.NodeStaticMesh.file_name)
 }
-inline std::string* SceneStaticMesh::mutable_file_name() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+inline std::string* NodeStaticMesh::mutable_file_name() ABSL_ATTRIBUTE_LIFETIME_BOUND {
   std::string* _s = _internal_mutable_file_name();
-  // @@protoc_insertion_point(field_mutable:frame.proto.SceneStaticMesh.file_name)
+  // @@protoc_insertion_point(field_mutable:frame.proto.NodeStaticMesh.file_name)
   return _s;
 }
-inline const std::string& SceneStaticMesh::_internal_file_name() const {
+inline const std::string& NodeStaticMesh::_internal_file_name() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
   if (mesh_oneof_case() != kFileName) {
     return ::google::protobuf::internal::GetEmptyStringAlreadyInited();
   }
   return _impl_.mesh_oneof_.file_name_.Get();
 }
-inline void SceneStaticMesh::_internal_set_file_name(const std::string& value) {
+inline void NodeStaticMesh::_internal_set_file_name(const std::string& value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   if (mesh_oneof_case() != kFileName) {
     clear_mesh_oneof();
@@ -2520,7 +2606,7 @@ inline void SceneStaticMesh::_internal_set_file_name(const std::string& value) {
   }
   _impl_.mesh_oneof_.file_name_.Set(value, GetArena());
 }
-inline std::string* SceneStaticMesh::_internal_mutable_file_name() {
+inline std::string* NodeStaticMesh::_internal_mutable_file_name() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   if (mesh_oneof_case() != kFileName) {
     clear_mesh_oneof();
@@ -2530,16 +2616,16 @@ inline std::string* SceneStaticMesh::_internal_mutable_file_name() {
   }
   return _impl_.mesh_oneof_.file_name_.Mutable( GetArena());
 }
-inline std::string* SceneStaticMesh::release_file_name() {
+inline std::string* NodeStaticMesh::release_file_name() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  // @@protoc_insertion_point(field_release:frame.proto.SceneStaticMesh.file_name)
+  // @@protoc_insertion_point(field_release:frame.proto.NodeStaticMesh.file_name)
   if (mesh_oneof_case() != kFileName) {
     return nullptr;
   }
   clear_has_mesh_oneof();
   return _impl_.mesh_oneof_.file_name_.Release();
 }
-inline void SceneStaticMesh::set_allocated_file_name(std::string* value) {
+inline void NodeStaticMesh::set_allocated_file_name(std::string* value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   if (has_mesh_oneof()) {
     clear_mesh_oneof();
@@ -2548,21 +2634,21 @@ inline void SceneStaticMesh::set_allocated_file_name(std::string* value) {
     set_has_file_name();
     _impl_.mesh_oneof_.file_name_.InitAllocated(value, GetArena());
   }
-  // @@protoc_insertion_point(field_set_allocated:frame.proto.SceneStaticMesh.file_name)
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.NodeStaticMesh.file_name)
 }
 
 // .frame.proto.MultiPlugin multi_plugin = 10;
-inline bool SceneStaticMesh::has_multi_plugin() const {
+inline bool NodeStaticMesh::has_multi_plugin() const {
   return mesh_oneof_case() == kMultiPlugin;
 }
-inline bool SceneStaticMesh::_internal_has_multi_plugin() const {
+inline bool NodeStaticMesh::_internal_has_multi_plugin() const {
   return mesh_oneof_case() == kMultiPlugin;
 }
-inline void SceneStaticMesh::set_has_multi_plugin() {
+inline void NodeStaticMesh::set_has_multi_plugin() {
   _impl_._oneof_case_[0] = kMultiPlugin;
 }
-inline ::frame::proto::MultiPlugin* SceneStaticMesh::release_multi_plugin() {
-  // @@protoc_insertion_point(field_release:frame.proto.SceneStaticMesh.multi_plugin)
+inline ::frame::proto::MultiPlugin* NodeStaticMesh::release_multi_plugin() {
+  // @@protoc_insertion_point(field_release:frame.proto.NodeStaticMesh.multi_plugin)
   if (mesh_oneof_case() == kMultiPlugin) {
     clear_has_mesh_oneof();
     auto* temp = _impl_.mesh_oneof_.multi_plugin_;
@@ -2575,15 +2661,15 @@ inline ::frame::proto::MultiPlugin* SceneStaticMesh::release_multi_plugin() {
     return nullptr;
   }
 }
-inline const ::frame::proto::MultiPlugin& SceneStaticMesh::_internal_multi_plugin() const {
+inline const ::frame::proto::MultiPlugin& NodeStaticMesh::_internal_multi_plugin() const {
   return mesh_oneof_case() == kMultiPlugin ? *_impl_.mesh_oneof_.multi_plugin_ : reinterpret_cast<::frame::proto::MultiPlugin&>(::frame::proto::_MultiPlugin_default_instance_);
 }
-inline const ::frame::proto::MultiPlugin& SceneStaticMesh::multi_plugin() const ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:frame.proto.SceneStaticMesh.multi_plugin)
+inline const ::frame::proto::MultiPlugin& NodeStaticMesh::multi_plugin() const ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:frame.proto.NodeStaticMesh.multi_plugin)
   return _internal_multi_plugin();
 }
-inline ::frame::proto::MultiPlugin* SceneStaticMesh::unsafe_arena_release_multi_plugin() {
-  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.SceneStaticMesh.multi_plugin)
+inline ::frame::proto::MultiPlugin* NodeStaticMesh::unsafe_arena_release_multi_plugin() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.NodeStaticMesh.multi_plugin)
   if (mesh_oneof_case() == kMultiPlugin) {
     clear_has_mesh_oneof();
     auto* temp = _impl_.mesh_oneof_.multi_plugin_;
@@ -2593,7 +2679,7 @@ inline ::frame::proto::MultiPlugin* SceneStaticMesh::unsafe_arena_release_multi_
     return nullptr;
   }
 }
-inline void SceneStaticMesh::unsafe_arena_set_allocated_multi_plugin(::frame::proto::MultiPlugin* value) {
+inline void NodeStaticMesh::unsafe_arena_set_allocated_multi_plugin(::frame::proto::MultiPlugin* value) {
   // We rely on the oneof clear method to free the earlier contents
   // of this oneof. We can directly use the pointer we're given to
   // set the new value.
@@ -2602,9 +2688,9 @@ inline void SceneStaticMesh::unsafe_arena_set_allocated_multi_plugin(::frame::pr
     set_has_multi_plugin();
     _impl_.mesh_oneof_.multi_plugin_ = value;
   }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.SceneStaticMesh.multi_plugin)
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.NodeStaticMesh.multi_plugin)
 }
-inline ::frame::proto::MultiPlugin* SceneStaticMesh::_internal_mutable_multi_plugin() {
+inline ::frame::proto::MultiPlugin* NodeStaticMesh::_internal_mutable_multi_plugin() {
   if (mesh_oneof_case() != kMultiPlugin) {
     clear_mesh_oneof();
     set_has_multi_plugin();
@@ -2613,229 +2699,229 @@ inline ::frame::proto::MultiPlugin* SceneStaticMesh::_internal_mutable_multi_plu
   }
   return _impl_.mesh_oneof_.multi_plugin_;
 }
-inline ::frame::proto::MultiPlugin* SceneStaticMesh::mutable_multi_plugin() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+inline ::frame::proto::MultiPlugin* NodeStaticMesh::mutable_multi_plugin() ABSL_ATTRIBUTE_LIFETIME_BOUND {
   ::frame::proto::MultiPlugin* _msg = _internal_mutable_multi_plugin();
-  // @@protoc_insertion_point(field_mutable:frame.proto.SceneStaticMesh.multi_plugin)
+  // @@protoc_insertion_point(field_mutable:frame.proto.NodeStaticMesh.multi_plugin)
   return _msg;
 }
 
 // string material_name = 5;
-inline void SceneStaticMesh::clear_material_name() {
+inline void NodeStaticMesh::clear_material_name() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.material_name_.ClearToEmpty();
 }
-inline const std::string& SceneStaticMesh::material_name() const
+inline const std::string& NodeStaticMesh::material_name() const
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:frame.proto.SceneStaticMesh.material_name)
+  // @@protoc_insertion_point(field_get:frame.proto.NodeStaticMesh.material_name)
   return _internal_material_name();
 }
 template <typename Arg_, typename... Args_>
-inline PROTOBUF_ALWAYS_INLINE void SceneStaticMesh::set_material_name(Arg_&& arg,
+inline PROTOBUF_ALWAYS_INLINE void NodeStaticMesh::set_material_name(Arg_&& arg,
                                                      Args_... args) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.material_name_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
-  // @@protoc_insertion_point(field_set:frame.proto.SceneStaticMesh.material_name)
+  // @@protoc_insertion_point(field_set:frame.proto.NodeStaticMesh.material_name)
 }
-inline std::string* SceneStaticMesh::mutable_material_name() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+inline std::string* NodeStaticMesh::mutable_material_name() ABSL_ATTRIBUTE_LIFETIME_BOUND {
   std::string* _s = _internal_mutable_material_name();
-  // @@protoc_insertion_point(field_mutable:frame.proto.SceneStaticMesh.material_name)
+  // @@protoc_insertion_point(field_mutable:frame.proto.NodeStaticMesh.material_name)
   return _s;
 }
-inline const std::string& SceneStaticMesh::_internal_material_name() const {
+inline const std::string& NodeStaticMesh::_internal_material_name() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
   return _impl_.material_name_.Get();
 }
-inline void SceneStaticMesh::_internal_set_material_name(const std::string& value) {
+inline void NodeStaticMesh::_internal_set_material_name(const std::string& value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.material_name_.Set(value, GetArena());
 }
-inline std::string* SceneStaticMesh::_internal_mutable_material_name() {
+inline std::string* NodeStaticMesh::_internal_mutable_material_name() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   return _impl_.material_name_.Mutable( GetArena());
 }
-inline std::string* SceneStaticMesh::release_material_name() {
+inline std::string* NodeStaticMesh::release_material_name() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  // @@protoc_insertion_point(field_release:frame.proto.SceneStaticMesh.material_name)
+  // @@protoc_insertion_point(field_release:frame.proto.NodeStaticMesh.material_name)
   return _impl_.material_name_.Release();
 }
-inline void SceneStaticMesh::set_allocated_material_name(std::string* value) {
+inline void NodeStaticMesh::set_allocated_material_name(std::string* value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.material_name_.SetAllocated(value, GetArena());
   if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.material_name_.IsDefault()) {
     _impl_.material_name_.Set("", GetArena());
   }
-  // @@protoc_insertion_point(field_set_allocated:frame.proto.SceneStaticMesh.material_name)
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.NodeStaticMesh.material_name)
 }
 
-// .frame.proto.SceneStaticMesh.RenderTimeEnum render_time_enum = 11;
-inline void SceneStaticMesh::clear_render_time_enum() {
+// .frame.proto.NodeStaticMesh.RenderTimeEnum render_time_enum = 11;
+inline void NodeStaticMesh::clear_render_time_enum() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.render_time_enum_ = 0;
 }
-inline ::frame::proto::SceneStaticMesh_RenderTimeEnum SceneStaticMesh::render_time_enum() const {
-  // @@protoc_insertion_point(field_get:frame.proto.SceneStaticMesh.render_time_enum)
+inline ::frame::proto::NodeStaticMesh_RenderTimeEnum NodeStaticMesh::render_time_enum() const {
+  // @@protoc_insertion_point(field_get:frame.proto.NodeStaticMesh.render_time_enum)
   return _internal_render_time_enum();
 }
-inline void SceneStaticMesh::set_render_time_enum(::frame::proto::SceneStaticMesh_RenderTimeEnum value) {
+inline void NodeStaticMesh::set_render_time_enum(::frame::proto::NodeStaticMesh_RenderTimeEnum value) {
   _internal_set_render_time_enum(value);
-  // @@protoc_insertion_point(field_set:frame.proto.SceneStaticMesh.render_time_enum)
+  // @@protoc_insertion_point(field_set:frame.proto.NodeStaticMesh.render_time_enum)
 }
-inline ::frame::proto::SceneStaticMesh_RenderTimeEnum SceneStaticMesh::_internal_render_time_enum() const {
+inline ::frame::proto::NodeStaticMesh_RenderTimeEnum NodeStaticMesh::_internal_render_time_enum() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
-  return static_cast<::frame::proto::SceneStaticMesh_RenderTimeEnum>(_impl_.render_time_enum_);
+  return static_cast<::frame::proto::NodeStaticMesh_RenderTimeEnum>(_impl_.render_time_enum_);
 }
-inline void SceneStaticMesh::_internal_set_render_time_enum(::frame::proto::SceneStaticMesh_RenderTimeEnum value) {
+inline void NodeStaticMesh::_internal_set_render_time_enum(::frame::proto::NodeStaticMesh_RenderTimeEnum value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.render_time_enum_ = value;
 }
 
-// .frame.proto.SceneStaticMesh.ShadowEffectEnum shadow_effect_enum = 12;
-inline void SceneStaticMesh::clear_shadow_effect_enum() {
+// .frame.proto.NodeStaticMesh.ShadowEffectEnum shadow_effect_enum = 12;
+inline void NodeStaticMesh::clear_shadow_effect_enum() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.shadow_effect_enum_ = 0;
 }
-inline ::frame::proto::SceneStaticMesh_ShadowEffectEnum SceneStaticMesh::shadow_effect_enum() const {
-  // @@protoc_insertion_point(field_get:frame.proto.SceneStaticMesh.shadow_effect_enum)
+inline ::frame::proto::NodeStaticMesh_ShadowEffectEnum NodeStaticMesh::shadow_effect_enum() const {
+  // @@protoc_insertion_point(field_get:frame.proto.NodeStaticMesh.shadow_effect_enum)
   return _internal_shadow_effect_enum();
 }
-inline void SceneStaticMesh::set_shadow_effect_enum(::frame::proto::SceneStaticMesh_ShadowEffectEnum value) {
+inline void NodeStaticMesh::set_shadow_effect_enum(::frame::proto::NodeStaticMesh_ShadowEffectEnum value) {
   _internal_set_shadow_effect_enum(value);
-  // @@protoc_insertion_point(field_set:frame.proto.SceneStaticMesh.shadow_effect_enum)
+  // @@protoc_insertion_point(field_set:frame.proto.NodeStaticMesh.shadow_effect_enum)
 }
-inline ::frame::proto::SceneStaticMesh_ShadowEffectEnum SceneStaticMesh::_internal_shadow_effect_enum() const {
+inline ::frame::proto::NodeStaticMesh_ShadowEffectEnum NodeStaticMesh::_internal_shadow_effect_enum() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
-  return static_cast<::frame::proto::SceneStaticMesh_ShadowEffectEnum>(_impl_.shadow_effect_enum_);
+  return static_cast<::frame::proto::NodeStaticMesh_ShadowEffectEnum>(_impl_.shadow_effect_enum_);
 }
-inline void SceneStaticMesh::_internal_set_shadow_effect_enum(::frame::proto::SceneStaticMesh_ShadowEffectEnum value) {
+inline void NodeStaticMesh::_internal_set_shadow_effect_enum(::frame::proto::NodeStaticMesh_ShadowEffectEnum value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.shadow_effect_enum_ = value;
 }
 
-inline bool SceneStaticMesh::has_mesh_oneof() const {
+inline bool NodeStaticMesh::has_mesh_oneof() const {
   return mesh_oneof_case() != MESH_ONEOF_NOT_SET;
 }
-inline void SceneStaticMesh::clear_has_mesh_oneof() {
+inline void NodeStaticMesh::clear_has_mesh_oneof() {
   _impl_._oneof_case_[0] = MESH_ONEOF_NOT_SET;
 }
-inline SceneStaticMesh::MeshOneofCase SceneStaticMesh::mesh_oneof_case() const {
-  return SceneStaticMesh::MeshOneofCase(_impl_._oneof_case_[0]);
+inline NodeStaticMesh::MeshOneofCase NodeStaticMesh::mesh_oneof_case() const {
+  return NodeStaticMesh::MeshOneofCase(_impl_._oneof_case_[0]);
 }
 // -------------------------------------------------------------------
 
-// SceneCamera
+// NodeCamera
 
 // string name = 1;
-inline void SceneCamera::clear_name() {
+inline void NodeCamera::clear_name() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.name_.ClearToEmpty();
 }
-inline const std::string& SceneCamera::name() const
+inline const std::string& NodeCamera::name() const
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:frame.proto.SceneCamera.name)
+  // @@protoc_insertion_point(field_get:frame.proto.NodeCamera.name)
   return _internal_name();
 }
 template <typename Arg_, typename... Args_>
-inline PROTOBUF_ALWAYS_INLINE void SceneCamera::set_name(Arg_&& arg,
+inline PROTOBUF_ALWAYS_INLINE void NodeCamera::set_name(Arg_&& arg,
                                                      Args_... args) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.name_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
-  // @@protoc_insertion_point(field_set:frame.proto.SceneCamera.name)
+  // @@protoc_insertion_point(field_set:frame.proto.NodeCamera.name)
 }
-inline std::string* SceneCamera::mutable_name() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+inline std::string* NodeCamera::mutable_name() ABSL_ATTRIBUTE_LIFETIME_BOUND {
   std::string* _s = _internal_mutable_name();
-  // @@protoc_insertion_point(field_mutable:frame.proto.SceneCamera.name)
+  // @@protoc_insertion_point(field_mutable:frame.proto.NodeCamera.name)
   return _s;
 }
-inline const std::string& SceneCamera::_internal_name() const {
+inline const std::string& NodeCamera::_internal_name() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
   return _impl_.name_.Get();
 }
-inline void SceneCamera::_internal_set_name(const std::string& value) {
+inline void NodeCamera::_internal_set_name(const std::string& value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.name_.Set(value, GetArena());
 }
-inline std::string* SceneCamera::_internal_mutable_name() {
+inline std::string* NodeCamera::_internal_mutable_name() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   return _impl_.name_.Mutable( GetArena());
 }
-inline std::string* SceneCamera::release_name() {
+inline std::string* NodeCamera::release_name() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  // @@protoc_insertion_point(field_release:frame.proto.SceneCamera.name)
+  // @@protoc_insertion_point(field_release:frame.proto.NodeCamera.name)
   return _impl_.name_.Release();
 }
-inline void SceneCamera::set_allocated_name(std::string* value) {
+inline void NodeCamera::set_allocated_name(std::string* value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.name_.SetAllocated(value, GetArena());
   if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.name_.IsDefault()) {
     _impl_.name_.Set("", GetArena());
   }
-  // @@protoc_insertion_point(field_set_allocated:frame.proto.SceneCamera.name)
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.NodeCamera.name)
 }
 
 // string parent = 2;
-inline void SceneCamera::clear_parent() {
+inline void NodeCamera::clear_parent() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.parent_.ClearToEmpty();
 }
-inline const std::string& SceneCamera::parent() const
+inline const std::string& NodeCamera::parent() const
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:frame.proto.SceneCamera.parent)
+  // @@protoc_insertion_point(field_get:frame.proto.NodeCamera.parent)
   return _internal_parent();
 }
 template <typename Arg_, typename... Args_>
-inline PROTOBUF_ALWAYS_INLINE void SceneCamera::set_parent(Arg_&& arg,
+inline PROTOBUF_ALWAYS_INLINE void NodeCamera::set_parent(Arg_&& arg,
                                                      Args_... args) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.parent_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
-  // @@protoc_insertion_point(field_set:frame.proto.SceneCamera.parent)
+  // @@protoc_insertion_point(field_set:frame.proto.NodeCamera.parent)
 }
-inline std::string* SceneCamera::mutable_parent() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+inline std::string* NodeCamera::mutable_parent() ABSL_ATTRIBUTE_LIFETIME_BOUND {
   std::string* _s = _internal_mutable_parent();
-  // @@protoc_insertion_point(field_mutable:frame.proto.SceneCamera.parent)
+  // @@protoc_insertion_point(field_mutable:frame.proto.NodeCamera.parent)
   return _s;
 }
-inline const std::string& SceneCamera::_internal_parent() const {
+inline const std::string& NodeCamera::_internal_parent() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
   return _impl_.parent_.Get();
 }
-inline void SceneCamera::_internal_set_parent(const std::string& value) {
+inline void NodeCamera::_internal_set_parent(const std::string& value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.parent_.Set(value, GetArena());
 }
-inline std::string* SceneCamera::_internal_mutable_parent() {
+inline std::string* NodeCamera::_internal_mutable_parent() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   return _impl_.parent_.Mutable( GetArena());
 }
-inline std::string* SceneCamera::release_parent() {
+inline std::string* NodeCamera::release_parent() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  // @@protoc_insertion_point(field_release:frame.proto.SceneCamera.parent)
+  // @@protoc_insertion_point(field_release:frame.proto.NodeCamera.parent)
   return _impl_.parent_.Release();
 }
-inline void SceneCamera::set_allocated_parent(std::string* value) {
+inline void NodeCamera::set_allocated_parent(std::string* value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.parent_.SetAllocated(value, GetArena());
   if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.parent_.IsDefault()) {
     _impl_.parent_.Set("", GetArena());
   }
-  // @@protoc_insertion_point(field_set_allocated:frame.proto.SceneCamera.parent)
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.NodeCamera.parent)
 }
 
 // .frame.proto.UniformVector3 position = 3;
-inline bool SceneCamera::has_position() const {
+inline bool NodeCamera::has_position() const {
   bool value = (_impl_._has_bits_[0] & 0x00000001u) != 0;
   PROTOBUF_ASSUME(!value || _impl_.position_ != nullptr);
   return value;
 }
-inline const ::frame::proto::UniformVector3& SceneCamera::_internal_position() const {
+inline const ::frame::proto::UniformVector3& NodeCamera::_internal_position() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
   const ::frame::proto::UniformVector3* p = _impl_.position_;
   return p != nullptr ? *p : reinterpret_cast<const ::frame::proto::UniformVector3&>(::frame::proto::_UniformVector3_default_instance_);
 }
-inline const ::frame::proto::UniformVector3& SceneCamera::position() const ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:frame.proto.SceneCamera.position)
+inline const ::frame::proto::UniformVector3& NodeCamera::position() const ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:frame.proto.NodeCamera.position)
   return _internal_position();
 }
-inline void SceneCamera::unsafe_arena_set_allocated_position(::frame::proto::UniformVector3* value) {
+inline void NodeCamera::unsafe_arena_set_allocated_position(::frame::proto::UniformVector3* value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   if (GetArena() == nullptr) {
     delete reinterpret_cast<::google::protobuf::MessageLite*>(_impl_.position_);
@@ -2846,9 +2932,9 @@ inline void SceneCamera::unsafe_arena_set_allocated_position(::frame::proto::Uni
   } else {
     _impl_._has_bits_[0] &= ~0x00000001u;
   }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.SceneCamera.position)
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.NodeCamera.position)
 }
-inline ::frame::proto::UniformVector3* SceneCamera::release_position() {
+inline ::frame::proto::UniformVector3* NodeCamera::release_position() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
 
   _impl_._has_bits_[0] &= ~0x00000001u;
@@ -2867,16 +2953,16 @@ inline ::frame::proto::UniformVector3* SceneCamera::release_position() {
   }
   return released;
 }
-inline ::frame::proto::UniformVector3* SceneCamera::unsafe_arena_release_position() {
+inline ::frame::proto::UniformVector3* NodeCamera::unsafe_arena_release_position() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  // @@protoc_insertion_point(field_release:frame.proto.SceneCamera.position)
+  // @@protoc_insertion_point(field_release:frame.proto.NodeCamera.position)
 
   _impl_._has_bits_[0] &= ~0x00000001u;
   ::frame::proto::UniformVector3* temp = _impl_.position_;
   _impl_.position_ = nullptr;
   return temp;
 }
-inline ::frame::proto::UniformVector3* SceneCamera::_internal_mutable_position() {
+inline ::frame::proto::UniformVector3* NodeCamera::_internal_mutable_position() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   if (_impl_.position_ == nullptr) {
     auto* p = ::google::protobuf::Message::DefaultConstruct<::frame::proto::UniformVector3>(GetArena());
@@ -2884,13 +2970,13 @@ inline ::frame::proto::UniformVector3* SceneCamera::_internal_mutable_position()
   }
   return _impl_.position_;
 }
-inline ::frame::proto::UniformVector3* SceneCamera::mutable_position() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+inline ::frame::proto::UniformVector3* NodeCamera::mutable_position() ABSL_ATTRIBUTE_LIFETIME_BOUND {
   _impl_._has_bits_[0] |= 0x00000001u;
   ::frame::proto::UniformVector3* _msg = _internal_mutable_position();
-  // @@protoc_insertion_point(field_mutable:frame.proto.SceneCamera.position)
+  // @@protoc_insertion_point(field_mutable:frame.proto.NodeCamera.position)
   return _msg;
 }
-inline void SceneCamera::set_allocated_position(::frame::proto::UniformVector3* value) {
+inline void NodeCamera::set_allocated_position(::frame::proto::UniformVector3* value) {
   ::google::protobuf::Arena* message_arena = GetArena();
   ::google::protobuf::internal::TSanWrite(&_impl_);
   if (message_arena == nullptr) {
@@ -2908,25 +2994,25 @@ inline void SceneCamera::set_allocated_position(::frame::proto::UniformVector3* 
   }
 
   _impl_.position_ = reinterpret_cast<::frame::proto::UniformVector3*>(value);
-  // @@protoc_insertion_point(field_set_allocated:frame.proto.SceneCamera.position)
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.NodeCamera.position)
 }
 
 // .frame.proto.UniformVector3 target = 4;
-inline bool SceneCamera::has_target() const {
+inline bool NodeCamera::has_target() const {
   bool value = (_impl_._has_bits_[0] & 0x00000002u) != 0;
   PROTOBUF_ASSUME(!value || _impl_.target_ != nullptr);
   return value;
 }
-inline const ::frame::proto::UniformVector3& SceneCamera::_internal_target() const {
+inline const ::frame::proto::UniformVector3& NodeCamera::_internal_target() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
   const ::frame::proto::UniformVector3* p = _impl_.target_;
   return p != nullptr ? *p : reinterpret_cast<const ::frame::proto::UniformVector3&>(::frame::proto::_UniformVector3_default_instance_);
 }
-inline const ::frame::proto::UniformVector3& SceneCamera::target() const ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:frame.proto.SceneCamera.target)
+inline const ::frame::proto::UniformVector3& NodeCamera::target() const ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:frame.proto.NodeCamera.target)
   return _internal_target();
 }
-inline void SceneCamera::unsafe_arena_set_allocated_target(::frame::proto::UniformVector3* value) {
+inline void NodeCamera::unsafe_arena_set_allocated_target(::frame::proto::UniformVector3* value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   if (GetArena() == nullptr) {
     delete reinterpret_cast<::google::protobuf::MessageLite*>(_impl_.target_);
@@ -2937,9 +3023,9 @@ inline void SceneCamera::unsafe_arena_set_allocated_target(::frame::proto::Unifo
   } else {
     _impl_._has_bits_[0] &= ~0x00000002u;
   }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.SceneCamera.target)
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.NodeCamera.target)
 }
-inline ::frame::proto::UniformVector3* SceneCamera::release_target() {
+inline ::frame::proto::UniformVector3* NodeCamera::release_target() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
 
   _impl_._has_bits_[0] &= ~0x00000002u;
@@ -2958,16 +3044,16 @@ inline ::frame::proto::UniformVector3* SceneCamera::release_target() {
   }
   return released;
 }
-inline ::frame::proto::UniformVector3* SceneCamera::unsafe_arena_release_target() {
+inline ::frame::proto::UniformVector3* NodeCamera::unsafe_arena_release_target() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  // @@protoc_insertion_point(field_release:frame.proto.SceneCamera.target)
+  // @@protoc_insertion_point(field_release:frame.proto.NodeCamera.target)
 
   _impl_._has_bits_[0] &= ~0x00000002u;
   ::frame::proto::UniformVector3* temp = _impl_.target_;
   _impl_.target_ = nullptr;
   return temp;
 }
-inline ::frame::proto::UniformVector3* SceneCamera::_internal_mutable_target() {
+inline ::frame::proto::UniformVector3* NodeCamera::_internal_mutable_target() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   if (_impl_.target_ == nullptr) {
     auto* p = ::google::protobuf::Message::DefaultConstruct<::frame::proto::UniformVector3>(GetArena());
@@ -2975,13 +3061,13 @@ inline ::frame::proto::UniformVector3* SceneCamera::_internal_mutable_target() {
   }
   return _impl_.target_;
 }
-inline ::frame::proto::UniformVector3* SceneCamera::mutable_target() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+inline ::frame::proto::UniformVector3* NodeCamera::mutable_target() ABSL_ATTRIBUTE_LIFETIME_BOUND {
   _impl_._has_bits_[0] |= 0x00000002u;
   ::frame::proto::UniformVector3* _msg = _internal_mutable_target();
-  // @@protoc_insertion_point(field_mutable:frame.proto.SceneCamera.target)
+  // @@protoc_insertion_point(field_mutable:frame.proto.NodeCamera.target)
   return _msg;
 }
-inline void SceneCamera::set_allocated_target(::frame::proto::UniformVector3* value) {
+inline void NodeCamera::set_allocated_target(::frame::proto::UniformVector3* value) {
   ::google::protobuf::Arena* message_arena = GetArena();
   ::google::protobuf::internal::TSanWrite(&_impl_);
   if (message_arena == nullptr) {
@@ -2999,25 +3085,25 @@ inline void SceneCamera::set_allocated_target(::frame::proto::UniformVector3* va
   }
 
   _impl_.target_ = reinterpret_cast<::frame::proto::UniformVector3*>(value);
-  // @@protoc_insertion_point(field_set_allocated:frame.proto.SceneCamera.target)
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.NodeCamera.target)
 }
 
 // .frame.proto.UniformVector3 up = 5;
-inline bool SceneCamera::has_up() const {
+inline bool NodeCamera::has_up() const {
   bool value = (_impl_._has_bits_[0] & 0x00000004u) != 0;
   PROTOBUF_ASSUME(!value || _impl_.up_ != nullptr);
   return value;
 }
-inline const ::frame::proto::UniformVector3& SceneCamera::_internal_up() const {
+inline const ::frame::proto::UniformVector3& NodeCamera::_internal_up() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
   const ::frame::proto::UniformVector3* p = _impl_.up_;
   return p != nullptr ? *p : reinterpret_cast<const ::frame::proto::UniformVector3&>(::frame::proto::_UniformVector3_default_instance_);
 }
-inline const ::frame::proto::UniformVector3& SceneCamera::up() const ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:frame.proto.SceneCamera.up)
+inline const ::frame::proto::UniformVector3& NodeCamera::up() const ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:frame.proto.NodeCamera.up)
   return _internal_up();
 }
-inline void SceneCamera::unsafe_arena_set_allocated_up(::frame::proto::UniformVector3* value) {
+inline void NodeCamera::unsafe_arena_set_allocated_up(::frame::proto::UniformVector3* value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   if (GetArena() == nullptr) {
     delete reinterpret_cast<::google::protobuf::MessageLite*>(_impl_.up_);
@@ -3028,9 +3114,9 @@ inline void SceneCamera::unsafe_arena_set_allocated_up(::frame::proto::UniformVe
   } else {
     _impl_._has_bits_[0] &= ~0x00000004u;
   }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.SceneCamera.up)
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.NodeCamera.up)
 }
-inline ::frame::proto::UniformVector3* SceneCamera::release_up() {
+inline ::frame::proto::UniformVector3* NodeCamera::release_up() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
 
   _impl_._has_bits_[0] &= ~0x00000004u;
@@ -3049,16 +3135,16 @@ inline ::frame::proto::UniformVector3* SceneCamera::release_up() {
   }
   return released;
 }
-inline ::frame::proto::UniformVector3* SceneCamera::unsafe_arena_release_up() {
+inline ::frame::proto::UniformVector3* NodeCamera::unsafe_arena_release_up() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  // @@protoc_insertion_point(field_release:frame.proto.SceneCamera.up)
+  // @@protoc_insertion_point(field_release:frame.proto.NodeCamera.up)
 
   _impl_._has_bits_[0] &= ~0x00000004u;
   ::frame::proto::UniformVector3* temp = _impl_.up_;
   _impl_.up_ = nullptr;
   return temp;
 }
-inline ::frame::proto::UniformVector3* SceneCamera::_internal_mutable_up() {
+inline ::frame::proto::UniformVector3* NodeCamera::_internal_mutable_up() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   if (_impl_.up_ == nullptr) {
     auto* p = ::google::protobuf::Message::DefaultConstruct<::frame::proto::UniformVector3>(GetArena());
@@ -3066,13 +3152,13 @@ inline ::frame::proto::UniformVector3* SceneCamera::_internal_mutable_up() {
   }
   return _impl_.up_;
 }
-inline ::frame::proto::UniformVector3* SceneCamera::mutable_up() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+inline ::frame::proto::UniformVector3* NodeCamera::mutable_up() ABSL_ATTRIBUTE_LIFETIME_BOUND {
   _impl_._has_bits_[0] |= 0x00000004u;
   ::frame::proto::UniformVector3* _msg = _internal_mutable_up();
-  // @@protoc_insertion_point(field_mutable:frame.proto.SceneCamera.up)
+  // @@protoc_insertion_point(field_mutable:frame.proto.NodeCamera.up)
   return _msg;
 }
-inline void SceneCamera::set_allocated_up(::frame::proto::UniformVector3* value) {
+inline void NodeCamera::set_allocated_up(::frame::proto::UniformVector3* value) {
   ::google::protobuf::Arena* message_arena = GetArena();
   ::google::protobuf::internal::TSanWrite(&_impl_);
   if (message_arena == nullptr) {
@@ -3090,235 +3176,235 @@ inline void SceneCamera::set_allocated_up(::frame::proto::UniformVector3* value)
   }
 
   _impl_.up_ = reinterpret_cast<::frame::proto::UniformVector3*>(value);
-  // @@protoc_insertion_point(field_set_allocated:frame.proto.SceneCamera.up)
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.NodeCamera.up)
 }
 
 // float fov_degrees = 6;
-inline void SceneCamera::clear_fov_degrees() {
+inline void NodeCamera::clear_fov_degrees() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.fov_degrees_ = 0;
 }
-inline float SceneCamera::fov_degrees() const {
-  // @@protoc_insertion_point(field_get:frame.proto.SceneCamera.fov_degrees)
+inline float NodeCamera::fov_degrees() const {
+  // @@protoc_insertion_point(field_get:frame.proto.NodeCamera.fov_degrees)
   return _internal_fov_degrees();
 }
-inline void SceneCamera::set_fov_degrees(float value) {
+inline void NodeCamera::set_fov_degrees(float value) {
   _internal_set_fov_degrees(value);
-  // @@protoc_insertion_point(field_set:frame.proto.SceneCamera.fov_degrees)
+  // @@protoc_insertion_point(field_set:frame.proto.NodeCamera.fov_degrees)
 }
-inline float SceneCamera::_internal_fov_degrees() const {
+inline float NodeCamera::_internal_fov_degrees() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
   return _impl_.fov_degrees_;
 }
-inline void SceneCamera::_internal_set_fov_degrees(float value) {
+inline void NodeCamera::_internal_set_fov_degrees(float value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.fov_degrees_ = value;
 }
 
 // float aspect_ratio = 7;
-inline void SceneCamera::clear_aspect_ratio() {
+inline void NodeCamera::clear_aspect_ratio() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.aspect_ratio_ = 0;
 }
-inline float SceneCamera::aspect_ratio() const {
-  // @@protoc_insertion_point(field_get:frame.proto.SceneCamera.aspect_ratio)
+inline float NodeCamera::aspect_ratio() const {
+  // @@protoc_insertion_point(field_get:frame.proto.NodeCamera.aspect_ratio)
   return _internal_aspect_ratio();
 }
-inline void SceneCamera::set_aspect_ratio(float value) {
+inline void NodeCamera::set_aspect_ratio(float value) {
   _internal_set_aspect_ratio(value);
-  // @@protoc_insertion_point(field_set:frame.proto.SceneCamera.aspect_ratio)
+  // @@protoc_insertion_point(field_set:frame.proto.NodeCamera.aspect_ratio)
 }
-inline float SceneCamera::_internal_aspect_ratio() const {
+inline float NodeCamera::_internal_aspect_ratio() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
   return _impl_.aspect_ratio_;
 }
-inline void SceneCamera::_internal_set_aspect_ratio(float value) {
+inline void NodeCamera::_internal_set_aspect_ratio(float value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.aspect_ratio_ = value;
 }
 
 // float near_clip = 8;
-inline void SceneCamera::clear_near_clip() {
+inline void NodeCamera::clear_near_clip() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.near_clip_ = 0;
 }
-inline float SceneCamera::near_clip() const {
-  // @@protoc_insertion_point(field_get:frame.proto.SceneCamera.near_clip)
+inline float NodeCamera::near_clip() const {
+  // @@protoc_insertion_point(field_get:frame.proto.NodeCamera.near_clip)
   return _internal_near_clip();
 }
-inline void SceneCamera::set_near_clip(float value) {
+inline void NodeCamera::set_near_clip(float value) {
   _internal_set_near_clip(value);
-  // @@protoc_insertion_point(field_set:frame.proto.SceneCamera.near_clip)
+  // @@protoc_insertion_point(field_set:frame.proto.NodeCamera.near_clip)
 }
-inline float SceneCamera::_internal_near_clip() const {
+inline float NodeCamera::_internal_near_clip() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
   return _impl_.near_clip_;
 }
-inline void SceneCamera::_internal_set_near_clip(float value) {
+inline void NodeCamera::_internal_set_near_clip(float value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.near_clip_ = value;
 }
 
 // float far_clip = 9;
-inline void SceneCamera::clear_far_clip() {
+inline void NodeCamera::clear_far_clip() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.far_clip_ = 0;
 }
-inline float SceneCamera::far_clip() const {
-  // @@protoc_insertion_point(field_get:frame.proto.SceneCamera.far_clip)
+inline float NodeCamera::far_clip() const {
+  // @@protoc_insertion_point(field_get:frame.proto.NodeCamera.far_clip)
   return _internal_far_clip();
 }
-inline void SceneCamera::set_far_clip(float value) {
+inline void NodeCamera::set_far_clip(float value) {
   _internal_set_far_clip(value);
-  // @@protoc_insertion_point(field_set:frame.proto.SceneCamera.far_clip)
+  // @@protoc_insertion_point(field_set:frame.proto.NodeCamera.far_clip)
 }
-inline float SceneCamera::_internal_far_clip() const {
+inline float NodeCamera::_internal_far_clip() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
   return _impl_.far_clip_;
 }
-inline void SceneCamera::_internal_set_far_clip(float value) {
+inline void NodeCamera::_internal_set_far_clip(float value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.far_clip_ = value;
 }
 
 // -------------------------------------------------------------------
 
-// SceneLight
+// NodeLight
 
 // string name = 1;
-inline void SceneLight::clear_name() {
+inline void NodeLight::clear_name() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.name_.ClearToEmpty();
 }
-inline const std::string& SceneLight::name() const
+inline const std::string& NodeLight::name() const
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:frame.proto.SceneLight.name)
+  // @@protoc_insertion_point(field_get:frame.proto.NodeLight.name)
   return _internal_name();
 }
 template <typename Arg_, typename... Args_>
-inline PROTOBUF_ALWAYS_INLINE void SceneLight::set_name(Arg_&& arg,
+inline PROTOBUF_ALWAYS_INLINE void NodeLight::set_name(Arg_&& arg,
                                                      Args_... args) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.name_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
-  // @@protoc_insertion_point(field_set:frame.proto.SceneLight.name)
+  // @@protoc_insertion_point(field_set:frame.proto.NodeLight.name)
 }
-inline std::string* SceneLight::mutable_name() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+inline std::string* NodeLight::mutable_name() ABSL_ATTRIBUTE_LIFETIME_BOUND {
   std::string* _s = _internal_mutable_name();
-  // @@protoc_insertion_point(field_mutable:frame.proto.SceneLight.name)
+  // @@protoc_insertion_point(field_mutable:frame.proto.NodeLight.name)
   return _s;
 }
-inline const std::string& SceneLight::_internal_name() const {
+inline const std::string& NodeLight::_internal_name() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
   return _impl_.name_.Get();
 }
-inline void SceneLight::_internal_set_name(const std::string& value) {
+inline void NodeLight::_internal_set_name(const std::string& value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.name_.Set(value, GetArena());
 }
-inline std::string* SceneLight::_internal_mutable_name() {
+inline std::string* NodeLight::_internal_mutable_name() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   return _impl_.name_.Mutable( GetArena());
 }
-inline std::string* SceneLight::release_name() {
+inline std::string* NodeLight::release_name() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  // @@protoc_insertion_point(field_release:frame.proto.SceneLight.name)
+  // @@protoc_insertion_point(field_release:frame.proto.NodeLight.name)
   return _impl_.name_.Release();
 }
-inline void SceneLight::set_allocated_name(std::string* value) {
+inline void NodeLight::set_allocated_name(std::string* value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.name_.SetAllocated(value, GetArena());
   if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.name_.IsDefault()) {
     _impl_.name_.Set("", GetArena());
   }
-  // @@protoc_insertion_point(field_set_allocated:frame.proto.SceneLight.name)
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.NodeLight.name)
 }
 
 // string parent = 2;
-inline void SceneLight::clear_parent() {
+inline void NodeLight::clear_parent() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.parent_.ClearToEmpty();
 }
-inline const std::string& SceneLight::parent() const
+inline const std::string& NodeLight::parent() const
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:frame.proto.SceneLight.parent)
+  // @@protoc_insertion_point(field_get:frame.proto.NodeLight.parent)
   return _internal_parent();
 }
 template <typename Arg_, typename... Args_>
-inline PROTOBUF_ALWAYS_INLINE void SceneLight::set_parent(Arg_&& arg,
+inline PROTOBUF_ALWAYS_INLINE void NodeLight::set_parent(Arg_&& arg,
                                                      Args_... args) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.parent_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
-  // @@protoc_insertion_point(field_set:frame.proto.SceneLight.parent)
+  // @@protoc_insertion_point(field_set:frame.proto.NodeLight.parent)
 }
-inline std::string* SceneLight::mutable_parent() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+inline std::string* NodeLight::mutable_parent() ABSL_ATTRIBUTE_LIFETIME_BOUND {
   std::string* _s = _internal_mutable_parent();
-  // @@protoc_insertion_point(field_mutable:frame.proto.SceneLight.parent)
+  // @@protoc_insertion_point(field_mutable:frame.proto.NodeLight.parent)
   return _s;
 }
-inline const std::string& SceneLight::_internal_parent() const {
+inline const std::string& NodeLight::_internal_parent() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
   return _impl_.parent_.Get();
 }
-inline void SceneLight::_internal_set_parent(const std::string& value) {
+inline void NodeLight::_internal_set_parent(const std::string& value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.parent_.Set(value, GetArena());
 }
-inline std::string* SceneLight::_internal_mutable_parent() {
+inline std::string* NodeLight::_internal_mutable_parent() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   return _impl_.parent_.Mutable( GetArena());
 }
-inline std::string* SceneLight::release_parent() {
+inline std::string* NodeLight::release_parent() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  // @@protoc_insertion_point(field_release:frame.proto.SceneLight.parent)
+  // @@protoc_insertion_point(field_release:frame.proto.NodeLight.parent)
   return _impl_.parent_.Release();
 }
-inline void SceneLight::set_allocated_parent(std::string* value) {
+inline void NodeLight::set_allocated_parent(std::string* value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.parent_.SetAllocated(value, GetArena());
   if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.parent_.IsDefault()) {
     _impl_.parent_.Set("", GetArena());
   }
-  // @@protoc_insertion_point(field_set_allocated:frame.proto.SceneLight.parent)
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.NodeLight.parent)
 }
 
-// .frame.proto.SceneLight.LightTypeEnum light_type = 3;
-inline void SceneLight::clear_light_type() {
+// .frame.proto.NodeLight.LightTypeEnum light_type = 3;
+inline void NodeLight::clear_light_type() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.light_type_ = 0;
 }
-inline ::frame::proto::SceneLight_LightTypeEnum SceneLight::light_type() const {
-  // @@protoc_insertion_point(field_get:frame.proto.SceneLight.light_type)
+inline ::frame::proto::NodeLight_LightTypeEnum NodeLight::light_type() const {
+  // @@protoc_insertion_point(field_get:frame.proto.NodeLight.light_type)
   return _internal_light_type();
 }
-inline void SceneLight::set_light_type(::frame::proto::SceneLight_LightTypeEnum value) {
+inline void NodeLight::set_light_type(::frame::proto::NodeLight_LightTypeEnum value) {
   _internal_set_light_type(value);
-  // @@protoc_insertion_point(field_set:frame.proto.SceneLight.light_type)
+  // @@protoc_insertion_point(field_set:frame.proto.NodeLight.light_type)
 }
-inline ::frame::proto::SceneLight_LightTypeEnum SceneLight::_internal_light_type() const {
+inline ::frame::proto::NodeLight_LightTypeEnum NodeLight::_internal_light_type() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
-  return static_cast<::frame::proto::SceneLight_LightTypeEnum>(_impl_.light_type_);
+  return static_cast<::frame::proto::NodeLight_LightTypeEnum>(_impl_.light_type_);
 }
-inline void SceneLight::_internal_set_light_type(::frame::proto::SceneLight_LightTypeEnum value) {
+inline void NodeLight::_internal_set_light_type(::frame::proto::NodeLight_LightTypeEnum value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.light_type_ = value;
 }
 
 // .frame.proto.UniformVector3 position = 4;
-inline bool SceneLight::has_position() const {
+inline bool NodeLight::has_position() const {
   bool value = (_impl_._has_bits_[0] & 0x00000001u) != 0;
   PROTOBUF_ASSUME(!value || _impl_.position_ != nullptr);
   return value;
 }
-inline const ::frame::proto::UniformVector3& SceneLight::_internal_position() const {
+inline const ::frame::proto::UniformVector3& NodeLight::_internal_position() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
   const ::frame::proto::UniformVector3* p = _impl_.position_;
   return p != nullptr ? *p : reinterpret_cast<const ::frame::proto::UniformVector3&>(::frame::proto::_UniformVector3_default_instance_);
 }
-inline const ::frame::proto::UniformVector3& SceneLight::position() const ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:frame.proto.SceneLight.position)
+inline const ::frame::proto::UniformVector3& NodeLight::position() const ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:frame.proto.NodeLight.position)
   return _internal_position();
 }
-inline void SceneLight::unsafe_arena_set_allocated_position(::frame::proto::UniformVector3* value) {
+inline void NodeLight::unsafe_arena_set_allocated_position(::frame::proto::UniformVector3* value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   if (GetArena() == nullptr) {
     delete reinterpret_cast<::google::protobuf::MessageLite*>(_impl_.position_);
@@ -3329,9 +3415,9 @@ inline void SceneLight::unsafe_arena_set_allocated_position(::frame::proto::Unif
   } else {
     _impl_._has_bits_[0] &= ~0x00000001u;
   }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.SceneLight.position)
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.NodeLight.position)
 }
-inline ::frame::proto::UniformVector3* SceneLight::release_position() {
+inline ::frame::proto::UniformVector3* NodeLight::release_position() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
 
   _impl_._has_bits_[0] &= ~0x00000001u;
@@ -3350,16 +3436,16 @@ inline ::frame::proto::UniformVector3* SceneLight::release_position() {
   }
   return released;
 }
-inline ::frame::proto::UniformVector3* SceneLight::unsafe_arena_release_position() {
+inline ::frame::proto::UniformVector3* NodeLight::unsafe_arena_release_position() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  // @@protoc_insertion_point(field_release:frame.proto.SceneLight.position)
+  // @@protoc_insertion_point(field_release:frame.proto.NodeLight.position)
 
   _impl_._has_bits_[0] &= ~0x00000001u;
   ::frame::proto::UniformVector3* temp = _impl_.position_;
   _impl_.position_ = nullptr;
   return temp;
 }
-inline ::frame::proto::UniformVector3* SceneLight::_internal_mutable_position() {
+inline ::frame::proto::UniformVector3* NodeLight::_internal_mutable_position() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   if (_impl_.position_ == nullptr) {
     auto* p = ::google::protobuf::Message::DefaultConstruct<::frame::proto::UniformVector3>(GetArena());
@@ -3367,13 +3453,13 @@ inline ::frame::proto::UniformVector3* SceneLight::_internal_mutable_position() 
   }
   return _impl_.position_;
 }
-inline ::frame::proto::UniformVector3* SceneLight::mutable_position() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+inline ::frame::proto::UniformVector3* NodeLight::mutable_position() ABSL_ATTRIBUTE_LIFETIME_BOUND {
   _impl_._has_bits_[0] |= 0x00000001u;
   ::frame::proto::UniformVector3* _msg = _internal_mutable_position();
-  // @@protoc_insertion_point(field_mutable:frame.proto.SceneLight.position)
+  // @@protoc_insertion_point(field_mutable:frame.proto.NodeLight.position)
   return _msg;
 }
-inline void SceneLight::set_allocated_position(::frame::proto::UniformVector3* value) {
+inline void NodeLight::set_allocated_position(::frame::proto::UniformVector3* value) {
   ::google::protobuf::Arena* message_arena = GetArena();
   ::google::protobuf::internal::TSanWrite(&_impl_);
   if (message_arena == nullptr) {
@@ -3391,25 +3477,25 @@ inline void SceneLight::set_allocated_position(::frame::proto::UniformVector3* v
   }
 
   _impl_.position_ = reinterpret_cast<::frame::proto::UniformVector3*>(value);
-  // @@protoc_insertion_point(field_set_allocated:frame.proto.SceneLight.position)
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.NodeLight.position)
 }
 
 // .frame.proto.UniformVector3 direction = 5;
-inline bool SceneLight::has_direction() const {
+inline bool NodeLight::has_direction() const {
   bool value = (_impl_._has_bits_[0] & 0x00000002u) != 0;
   PROTOBUF_ASSUME(!value || _impl_.direction_ != nullptr);
   return value;
 }
-inline const ::frame::proto::UniformVector3& SceneLight::_internal_direction() const {
+inline const ::frame::proto::UniformVector3& NodeLight::_internal_direction() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
   const ::frame::proto::UniformVector3* p = _impl_.direction_;
   return p != nullptr ? *p : reinterpret_cast<const ::frame::proto::UniformVector3&>(::frame::proto::_UniformVector3_default_instance_);
 }
-inline const ::frame::proto::UniformVector3& SceneLight::direction() const ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:frame.proto.SceneLight.direction)
+inline const ::frame::proto::UniformVector3& NodeLight::direction() const ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:frame.proto.NodeLight.direction)
   return _internal_direction();
 }
-inline void SceneLight::unsafe_arena_set_allocated_direction(::frame::proto::UniformVector3* value) {
+inline void NodeLight::unsafe_arena_set_allocated_direction(::frame::proto::UniformVector3* value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   if (GetArena() == nullptr) {
     delete reinterpret_cast<::google::protobuf::MessageLite*>(_impl_.direction_);
@@ -3420,9 +3506,9 @@ inline void SceneLight::unsafe_arena_set_allocated_direction(::frame::proto::Uni
   } else {
     _impl_._has_bits_[0] &= ~0x00000002u;
   }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.SceneLight.direction)
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.NodeLight.direction)
 }
-inline ::frame::proto::UniformVector3* SceneLight::release_direction() {
+inline ::frame::proto::UniformVector3* NodeLight::release_direction() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
 
   _impl_._has_bits_[0] &= ~0x00000002u;
@@ -3441,16 +3527,16 @@ inline ::frame::proto::UniformVector3* SceneLight::release_direction() {
   }
   return released;
 }
-inline ::frame::proto::UniformVector3* SceneLight::unsafe_arena_release_direction() {
+inline ::frame::proto::UniformVector3* NodeLight::unsafe_arena_release_direction() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  // @@protoc_insertion_point(field_release:frame.proto.SceneLight.direction)
+  // @@protoc_insertion_point(field_release:frame.proto.NodeLight.direction)
 
   _impl_._has_bits_[0] &= ~0x00000002u;
   ::frame::proto::UniformVector3* temp = _impl_.direction_;
   _impl_.direction_ = nullptr;
   return temp;
 }
-inline ::frame::proto::UniformVector3* SceneLight::_internal_mutable_direction() {
+inline ::frame::proto::UniformVector3* NodeLight::_internal_mutable_direction() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   if (_impl_.direction_ == nullptr) {
     auto* p = ::google::protobuf::Message::DefaultConstruct<::frame::proto::UniformVector3>(GetArena());
@@ -3458,13 +3544,13 @@ inline ::frame::proto::UniformVector3* SceneLight::_internal_mutable_direction()
   }
   return _impl_.direction_;
 }
-inline ::frame::proto::UniformVector3* SceneLight::mutable_direction() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+inline ::frame::proto::UniformVector3* NodeLight::mutable_direction() ABSL_ATTRIBUTE_LIFETIME_BOUND {
   _impl_._has_bits_[0] |= 0x00000002u;
   ::frame::proto::UniformVector3* _msg = _internal_mutable_direction();
-  // @@protoc_insertion_point(field_mutable:frame.proto.SceneLight.direction)
+  // @@protoc_insertion_point(field_mutable:frame.proto.NodeLight.direction)
   return _msg;
 }
-inline void SceneLight::set_allocated_direction(::frame::proto::UniformVector3* value) {
+inline void NodeLight::set_allocated_direction(::frame::proto::UniformVector3* value) {
   ::google::protobuf::Arena* message_arena = GetArena();
   ::google::protobuf::internal::TSanWrite(&_impl_);
   if (message_arena == nullptr) {
@@ -3482,69 +3568,69 @@ inline void SceneLight::set_allocated_direction(::frame::proto::UniformVector3* 
   }
 
   _impl_.direction_ = reinterpret_cast<::frame::proto::UniformVector3*>(value);
-  // @@protoc_insertion_point(field_set_allocated:frame.proto.SceneLight.direction)
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.NodeLight.direction)
 }
 
 // float dot_inner_limit = 6;
-inline void SceneLight::clear_dot_inner_limit() {
+inline void NodeLight::clear_dot_inner_limit() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.dot_inner_limit_ = 0;
 }
-inline float SceneLight::dot_inner_limit() const {
-  // @@protoc_insertion_point(field_get:frame.proto.SceneLight.dot_inner_limit)
+inline float NodeLight::dot_inner_limit() const {
+  // @@protoc_insertion_point(field_get:frame.proto.NodeLight.dot_inner_limit)
   return _internal_dot_inner_limit();
 }
-inline void SceneLight::set_dot_inner_limit(float value) {
+inline void NodeLight::set_dot_inner_limit(float value) {
   _internal_set_dot_inner_limit(value);
-  // @@protoc_insertion_point(field_set:frame.proto.SceneLight.dot_inner_limit)
+  // @@protoc_insertion_point(field_set:frame.proto.NodeLight.dot_inner_limit)
 }
-inline float SceneLight::_internal_dot_inner_limit() const {
+inline float NodeLight::_internal_dot_inner_limit() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
   return _impl_.dot_inner_limit_;
 }
-inline void SceneLight::_internal_set_dot_inner_limit(float value) {
+inline void NodeLight::_internal_set_dot_inner_limit(float value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.dot_inner_limit_ = value;
 }
 
 // float dot_outer_limit = 7;
-inline void SceneLight::clear_dot_outer_limit() {
+inline void NodeLight::clear_dot_outer_limit() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.dot_outer_limit_ = 0;
 }
-inline float SceneLight::dot_outer_limit() const {
-  // @@protoc_insertion_point(field_get:frame.proto.SceneLight.dot_outer_limit)
+inline float NodeLight::dot_outer_limit() const {
+  // @@protoc_insertion_point(field_get:frame.proto.NodeLight.dot_outer_limit)
   return _internal_dot_outer_limit();
 }
-inline void SceneLight::set_dot_outer_limit(float value) {
+inline void NodeLight::set_dot_outer_limit(float value) {
   _internal_set_dot_outer_limit(value);
-  // @@protoc_insertion_point(field_set:frame.proto.SceneLight.dot_outer_limit)
+  // @@protoc_insertion_point(field_set:frame.proto.NodeLight.dot_outer_limit)
 }
-inline float SceneLight::_internal_dot_outer_limit() const {
+inline float NodeLight::_internal_dot_outer_limit() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
   return _impl_.dot_outer_limit_;
 }
-inline void SceneLight::_internal_set_dot_outer_limit(float value) {
+inline void NodeLight::_internal_set_dot_outer_limit(float value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.dot_outer_limit_ = value;
 }
 
 // .frame.proto.UniformVector3 color = 8;
-inline bool SceneLight::has_color() const {
+inline bool NodeLight::has_color() const {
   bool value = (_impl_._has_bits_[0] & 0x00000004u) != 0;
   PROTOBUF_ASSUME(!value || _impl_.color_ != nullptr);
   return value;
 }
-inline const ::frame::proto::UniformVector3& SceneLight::_internal_color() const {
+inline const ::frame::proto::UniformVector3& NodeLight::_internal_color() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
   const ::frame::proto::UniformVector3* p = _impl_.color_;
   return p != nullptr ? *p : reinterpret_cast<const ::frame::proto::UniformVector3&>(::frame::proto::_UniformVector3_default_instance_);
 }
-inline const ::frame::proto::UniformVector3& SceneLight::color() const ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:frame.proto.SceneLight.color)
+inline const ::frame::proto::UniformVector3& NodeLight::color() const ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:frame.proto.NodeLight.color)
   return _internal_color();
 }
-inline void SceneLight::unsafe_arena_set_allocated_color(::frame::proto::UniformVector3* value) {
+inline void NodeLight::unsafe_arena_set_allocated_color(::frame::proto::UniformVector3* value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   if (GetArena() == nullptr) {
     delete reinterpret_cast<::google::protobuf::MessageLite*>(_impl_.color_);
@@ -3555,9 +3641,9 @@ inline void SceneLight::unsafe_arena_set_allocated_color(::frame::proto::Uniform
   } else {
     _impl_._has_bits_[0] &= ~0x00000004u;
   }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.SceneLight.color)
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.NodeLight.color)
 }
-inline ::frame::proto::UniformVector3* SceneLight::release_color() {
+inline ::frame::proto::UniformVector3* NodeLight::release_color() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
 
   _impl_._has_bits_[0] &= ~0x00000004u;
@@ -3576,16 +3662,16 @@ inline ::frame::proto::UniformVector3* SceneLight::release_color() {
   }
   return released;
 }
-inline ::frame::proto::UniformVector3* SceneLight::unsafe_arena_release_color() {
+inline ::frame::proto::UniformVector3* NodeLight::unsafe_arena_release_color() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  // @@protoc_insertion_point(field_release:frame.proto.SceneLight.color)
+  // @@protoc_insertion_point(field_release:frame.proto.NodeLight.color)
 
   _impl_._has_bits_[0] &= ~0x00000004u;
   ::frame::proto::UniformVector3* temp = _impl_.color_;
   _impl_.color_ = nullptr;
   return temp;
 }
-inline ::frame::proto::UniformVector3* SceneLight::_internal_mutable_color() {
+inline ::frame::proto::UniformVector3* NodeLight::_internal_mutable_color() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   if (_impl_.color_ == nullptr) {
     auto* p = ::google::protobuf::Message::DefaultConstruct<::frame::proto::UniformVector3>(GetArena());
@@ -3593,13 +3679,13 @@ inline ::frame::proto::UniformVector3* SceneLight::_internal_mutable_color() {
   }
   return _impl_.color_;
 }
-inline ::frame::proto::UniformVector3* SceneLight::mutable_color() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+inline ::frame::proto::UniformVector3* NodeLight::mutable_color() ABSL_ATTRIBUTE_LIFETIME_BOUND {
   _impl_._has_bits_[0] |= 0x00000004u;
   ::frame::proto::UniformVector3* _msg = _internal_mutable_color();
-  // @@protoc_insertion_point(field_mutable:frame.proto.SceneLight.color)
+  // @@protoc_insertion_point(field_mutable:frame.proto.NodeLight.color)
   return _msg;
 }
-inline void SceneLight::set_allocated_color(::frame::proto::UniformVector3* value) {
+inline void NodeLight::set_allocated_color(::frame::proto::UniformVector3* value) {
   ::google::protobuf::Arena* message_arena = GetArena();
   ::google::protobuf::internal::TSanWrite(&_impl_);
   if (message_arena == nullptr) {
@@ -3617,77 +3703,77 @@ inline void SceneLight::set_allocated_color(::frame::proto::UniformVector3* valu
   }
 
   _impl_.color_ = reinterpret_cast<::frame::proto::UniformVector3*>(value);
-  // @@protoc_insertion_point(field_set_allocated:frame.proto.SceneLight.color)
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.NodeLight.color)
 }
 
-// .frame.proto.SceneLight.ShadowTypeEnum shadow_type = 9;
-inline void SceneLight::clear_shadow_type() {
+// .frame.proto.NodeLight.ShadowTypeEnum shadow_type = 9;
+inline void NodeLight::clear_shadow_type() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.shadow_type_ = 0;
 }
-inline ::frame::proto::SceneLight_ShadowTypeEnum SceneLight::shadow_type() const {
-  // @@protoc_insertion_point(field_get:frame.proto.SceneLight.shadow_type)
+inline ::frame::proto::NodeLight_ShadowTypeEnum NodeLight::shadow_type() const {
+  // @@protoc_insertion_point(field_get:frame.proto.NodeLight.shadow_type)
   return _internal_shadow_type();
 }
-inline void SceneLight::set_shadow_type(::frame::proto::SceneLight_ShadowTypeEnum value) {
+inline void NodeLight::set_shadow_type(::frame::proto::NodeLight_ShadowTypeEnum value) {
   _internal_set_shadow_type(value);
-  // @@protoc_insertion_point(field_set:frame.proto.SceneLight.shadow_type)
+  // @@protoc_insertion_point(field_set:frame.proto.NodeLight.shadow_type)
 }
-inline ::frame::proto::SceneLight_ShadowTypeEnum SceneLight::_internal_shadow_type() const {
+inline ::frame::proto::NodeLight_ShadowTypeEnum NodeLight::_internal_shadow_type() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
-  return static_cast<::frame::proto::SceneLight_ShadowTypeEnum>(_impl_.shadow_type_);
+  return static_cast<::frame::proto::NodeLight_ShadowTypeEnum>(_impl_.shadow_type_);
 }
-inline void SceneLight::_internal_set_shadow_type(::frame::proto::SceneLight_ShadowTypeEnum value) {
+inline void NodeLight::_internal_set_shadow_type(::frame::proto::NodeLight_ShadowTypeEnum value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.shadow_type_ = value;
 }
 
 // string shadow_texture = 10;
-inline void SceneLight::clear_shadow_texture() {
+inline void NodeLight::clear_shadow_texture() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.shadow_texture_.ClearToEmpty();
 }
-inline const std::string& SceneLight::shadow_texture() const
+inline const std::string& NodeLight::shadow_texture() const
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:frame.proto.SceneLight.shadow_texture)
+  // @@protoc_insertion_point(field_get:frame.proto.NodeLight.shadow_texture)
   return _internal_shadow_texture();
 }
 template <typename Arg_, typename... Args_>
-inline PROTOBUF_ALWAYS_INLINE void SceneLight::set_shadow_texture(Arg_&& arg,
+inline PROTOBUF_ALWAYS_INLINE void NodeLight::set_shadow_texture(Arg_&& arg,
                                                      Args_... args) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.shadow_texture_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
-  // @@protoc_insertion_point(field_set:frame.proto.SceneLight.shadow_texture)
+  // @@protoc_insertion_point(field_set:frame.proto.NodeLight.shadow_texture)
 }
-inline std::string* SceneLight::mutable_shadow_texture() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+inline std::string* NodeLight::mutable_shadow_texture() ABSL_ATTRIBUTE_LIFETIME_BOUND {
   std::string* _s = _internal_mutable_shadow_texture();
-  // @@protoc_insertion_point(field_mutable:frame.proto.SceneLight.shadow_texture)
+  // @@protoc_insertion_point(field_mutable:frame.proto.NodeLight.shadow_texture)
   return _s;
 }
-inline const std::string& SceneLight::_internal_shadow_texture() const {
+inline const std::string& NodeLight::_internal_shadow_texture() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
   return _impl_.shadow_texture_.Get();
 }
-inline void SceneLight::_internal_set_shadow_texture(const std::string& value) {
+inline void NodeLight::_internal_set_shadow_texture(const std::string& value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.shadow_texture_.Set(value, GetArena());
 }
-inline std::string* SceneLight::_internal_mutable_shadow_texture() {
+inline std::string* NodeLight::_internal_mutable_shadow_texture() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   return _impl_.shadow_texture_.Mutable( GetArena());
 }
-inline std::string* SceneLight::release_shadow_texture() {
+inline std::string* NodeLight::release_shadow_texture() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  // @@protoc_insertion_point(field_release:frame.proto.SceneLight.shadow_texture)
+  // @@protoc_insertion_point(field_release:frame.proto.NodeLight.shadow_texture)
   return _impl_.shadow_texture_.Release();
 }
-inline void SceneLight::set_allocated_shadow_texture(std::string* value) {
+inline void NodeLight::set_allocated_shadow_texture(std::string* value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.shadow_texture_.SetAllocated(value, GetArena());
   if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.shadow_texture_.IsDefault()) {
     _impl_.shadow_texture_.Set("", GetArena());
   }
-  // @@protoc_insertion_point(field_set_allocated:frame.proto.SceneLight.shadow_texture)
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.NodeLight.shadow_texture)
 }
 
 // -------------------------------------------------------------------
@@ -3790,7 +3876,7 @@ inline void SceneTree::set_allocated_default_camera_name(std::string* value) {
   // @@protoc_insertion_point(field_set_allocated:frame.proto.SceneTree.default_camera_name)
 }
 
-// repeated .frame.proto.SceneMatrix scene_matrices = 3;
+// repeated .frame.proto.NodeMatrix scene_matrices = 3;
 inline int SceneTree::_internal_scene_matrices_size() const {
   return _internal_scene_matrices().size();
 }
@@ -3801,45 +3887,45 @@ inline void SceneTree::clear_scene_matrices() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.scene_matrices_.Clear();
 }
-inline ::frame::proto::SceneMatrix* SceneTree::mutable_scene_matrices(int index)
+inline ::frame::proto::NodeMatrix* SceneTree::mutable_scene_matrices(int index)
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
   // @@protoc_insertion_point(field_mutable:frame.proto.SceneTree.scene_matrices)
   return _internal_mutable_scene_matrices()->Mutable(index);
 }
-inline ::google::protobuf::RepeatedPtrField<::frame::proto::SceneMatrix>* SceneTree::mutable_scene_matrices()
+inline ::google::protobuf::RepeatedPtrField<::frame::proto::NodeMatrix>* SceneTree::mutable_scene_matrices()
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
   // @@protoc_insertion_point(field_mutable_list:frame.proto.SceneTree.scene_matrices)
   ::google::protobuf::internal::TSanWrite(&_impl_);
   return _internal_mutable_scene_matrices();
 }
-inline const ::frame::proto::SceneMatrix& SceneTree::scene_matrices(int index) const
+inline const ::frame::proto::NodeMatrix& SceneTree::scene_matrices(int index) const
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
   // @@protoc_insertion_point(field_get:frame.proto.SceneTree.scene_matrices)
   return _internal_scene_matrices().Get(index);
 }
-inline ::frame::proto::SceneMatrix* SceneTree::add_scene_matrices() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+inline ::frame::proto::NodeMatrix* SceneTree::add_scene_matrices() ABSL_ATTRIBUTE_LIFETIME_BOUND {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  ::frame::proto::SceneMatrix* _add = _internal_mutable_scene_matrices()->Add();
+  ::frame::proto::NodeMatrix* _add = _internal_mutable_scene_matrices()->Add();
   // @@protoc_insertion_point(field_add:frame.proto.SceneTree.scene_matrices)
   return _add;
 }
-inline const ::google::protobuf::RepeatedPtrField<::frame::proto::SceneMatrix>& SceneTree::scene_matrices() const
+inline const ::google::protobuf::RepeatedPtrField<::frame::proto::NodeMatrix>& SceneTree::scene_matrices() const
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
   // @@protoc_insertion_point(field_list:frame.proto.SceneTree.scene_matrices)
   return _internal_scene_matrices();
 }
-inline const ::google::protobuf::RepeatedPtrField<::frame::proto::SceneMatrix>&
+inline const ::google::protobuf::RepeatedPtrField<::frame::proto::NodeMatrix>&
 SceneTree::_internal_scene_matrices() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
   return _impl_.scene_matrices_;
 }
-inline ::google::protobuf::RepeatedPtrField<::frame::proto::SceneMatrix>*
+inline ::google::protobuf::RepeatedPtrField<::frame::proto::NodeMatrix>*
 SceneTree::_internal_mutable_scene_matrices() {
   ::google::protobuf::internal::TSanRead(&_impl_);
   return &_impl_.scene_matrices_;
 }
 
-// repeated .frame.proto.SceneStaticMesh scene_static_meshes = 4;
+// repeated .frame.proto.NodeStaticMesh scene_static_meshes = 4;
 inline int SceneTree::_internal_scene_static_meshes_size() const {
   return _internal_scene_static_meshes().size();
 }
@@ -3850,45 +3936,45 @@ inline void SceneTree::clear_scene_static_meshes() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.scene_static_meshes_.Clear();
 }
-inline ::frame::proto::SceneStaticMesh* SceneTree::mutable_scene_static_meshes(int index)
+inline ::frame::proto::NodeStaticMesh* SceneTree::mutable_scene_static_meshes(int index)
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
   // @@protoc_insertion_point(field_mutable:frame.proto.SceneTree.scene_static_meshes)
   return _internal_mutable_scene_static_meshes()->Mutable(index);
 }
-inline ::google::protobuf::RepeatedPtrField<::frame::proto::SceneStaticMesh>* SceneTree::mutable_scene_static_meshes()
+inline ::google::protobuf::RepeatedPtrField<::frame::proto::NodeStaticMesh>* SceneTree::mutable_scene_static_meshes()
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
   // @@protoc_insertion_point(field_mutable_list:frame.proto.SceneTree.scene_static_meshes)
   ::google::protobuf::internal::TSanWrite(&_impl_);
   return _internal_mutable_scene_static_meshes();
 }
-inline const ::frame::proto::SceneStaticMesh& SceneTree::scene_static_meshes(int index) const
+inline const ::frame::proto::NodeStaticMesh& SceneTree::scene_static_meshes(int index) const
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
   // @@protoc_insertion_point(field_get:frame.proto.SceneTree.scene_static_meshes)
   return _internal_scene_static_meshes().Get(index);
 }
-inline ::frame::proto::SceneStaticMesh* SceneTree::add_scene_static_meshes() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+inline ::frame::proto::NodeStaticMesh* SceneTree::add_scene_static_meshes() ABSL_ATTRIBUTE_LIFETIME_BOUND {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  ::frame::proto::SceneStaticMesh* _add = _internal_mutable_scene_static_meshes()->Add();
+  ::frame::proto::NodeStaticMesh* _add = _internal_mutable_scene_static_meshes()->Add();
   // @@protoc_insertion_point(field_add:frame.proto.SceneTree.scene_static_meshes)
   return _add;
 }
-inline const ::google::protobuf::RepeatedPtrField<::frame::proto::SceneStaticMesh>& SceneTree::scene_static_meshes() const
+inline const ::google::protobuf::RepeatedPtrField<::frame::proto::NodeStaticMesh>& SceneTree::scene_static_meshes() const
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
   // @@protoc_insertion_point(field_list:frame.proto.SceneTree.scene_static_meshes)
   return _internal_scene_static_meshes();
 }
-inline const ::google::protobuf::RepeatedPtrField<::frame::proto::SceneStaticMesh>&
+inline const ::google::protobuf::RepeatedPtrField<::frame::proto::NodeStaticMesh>&
 SceneTree::_internal_scene_static_meshes() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
   return _impl_.scene_static_meshes_;
 }
-inline ::google::protobuf::RepeatedPtrField<::frame::proto::SceneStaticMesh>*
+inline ::google::protobuf::RepeatedPtrField<::frame::proto::NodeStaticMesh>*
 SceneTree::_internal_mutable_scene_static_meshes() {
   ::google::protobuf::internal::TSanRead(&_impl_);
   return &_impl_.scene_static_meshes_;
 }
 
-// repeated .frame.proto.SceneCamera scene_cameras = 5;
+// repeated .frame.proto.NodeCamera scene_cameras = 5;
 inline int SceneTree::_internal_scene_cameras_size() const {
   return _internal_scene_cameras().size();
 }
@@ -3899,45 +3985,45 @@ inline void SceneTree::clear_scene_cameras() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.scene_cameras_.Clear();
 }
-inline ::frame::proto::SceneCamera* SceneTree::mutable_scene_cameras(int index)
+inline ::frame::proto::NodeCamera* SceneTree::mutable_scene_cameras(int index)
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
   // @@protoc_insertion_point(field_mutable:frame.proto.SceneTree.scene_cameras)
   return _internal_mutable_scene_cameras()->Mutable(index);
 }
-inline ::google::protobuf::RepeatedPtrField<::frame::proto::SceneCamera>* SceneTree::mutable_scene_cameras()
+inline ::google::protobuf::RepeatedPtrField<::frame::proto::NodeCamera>* SceneTree::mutable_scene_cameras()
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
   // @@protoc_insertion_point(field_mutable_list:frame.proto.SceneTree.scene_cameras)
   ::google::protobuf::internal::TSanWrite(&_impl_);
   return _internal_mutable_scene_cameras();
 }
-inline const ::frame::proto::SceneCamera& SceneTree::scene_cameras(int index) const
+inline const ::frame::proto::NodeCamera& SceneTree::scene_cameras(int index) const
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
   // @@protoc_insertion_point(field_get:frame.proto.SceneTree.scene_cameras)
   return _internal_scene_cameras().Get(index);
 }
-inline ::frame::proto::SceneCamera* SceneTree::add_scene_cameras() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+inline ::frame::proto::NodeCamera* SceneTree::add_scene_cameras() ABSL_ATTRIBUTE_LIFETIME_BOUND {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  ::frame::proto::SceneCamera* _add = _internal_mutable_scene_cameras()->Add();
+  ::frame::proto::NodeCamera* _add = _internal_mutable_scene_cameras()->Add();
   // @@protoc_insertion_point(field_add:frame.proto.SceneTree.scene_cameras)
   return _add;
 }
-inline const ::google::protobuf::RepeatedPtrField<::frame::proto::SceneCamera>& SceneTree::scene_cameras() const
+inline const ::google::protobuf::RepeatedPtrField<::frame::proto::NodeCamera>& SceneTree::scene_cameras() const
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
   // @@protoc_insertion_point(field_list:frame.proto.SceneTree.scene_cameras)
   return _internal_scene_cameras();
 }
-inline const ::google::protobuf::RepeatedPtrField<::frame::proto::SceneCamera>&
+inline const ::google::protobuf::RepeatedPtrField<::frame::proto::NodeCamera>&
 SceneTree::_internal_scene_cameras() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
   return _impl_.scene_cameras_;
 }
-inline ::google::protobuf::RepeatedPtrField<::frame::proto::SceneCamera>*
+inline ::google::protobuf::RepeatedPtrField<::frame::proto::NodeCamera>*
 SceneTree::_internal_mutable_scene_cameras() {
   ::google::protobuf::internal::TSanRead(&_impl_);
   return &_impl_.scene_cameras_;
 }
 
-// repeated .frame.proto.SceneLight scene_lights = 6;
+// repeated .frame.proto.NodeLight scene_lights = 6;
 inline int SceneTree::_internal_scene_lights_size() const {
   return _internal_scene_lights().size();
 }
@@ -3948,39 +4034,39 @@ inline void SceneTree::clear_scene_lights() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.scene_lights_.Clear();
 }
-inline ::frame::proto::SceneLight* SceneTree::mutable_scene_lights(int index)
+inline ::frame::proto::NodeLight* SceneTree::mutable_scene_lights(int index)
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
   // @@protoc_insertion_point(field_mutable:frame.proto.SceneTree.scene_lights)
   return _internal_mutable_scene_lights()->Mutable(index);
 }
-inline ::google::protobuf::RepeatedPtrField<::frame::proto::SceneLight>* SceneTree::mutable_scene_lights()
+inline ::google::protobuf::RepeatedPtrField<::frame::proto::NodeLight>* SceneTree::mutable_scene_lights()
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
   // @@protoc_insertion_point(field_mutable_list:frame.proto.SceneTree.scene_lights)
   ::google::protobuf::internal::TSanWrite(&_impl_);
   return _internal_mutable_scene_lights();
 }
-inline const ::frame::proto::SceneLight& SceneTree::scene_lights(int index) const
+inline const ::frame::proto::NodeLight& SceneTree::scene_lights(int index) const
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
   // @@protoc_insertion_point(field_get:frame.proto.SceneTree.scene_lights)
   return _internal_scene_lights().Get(index);
 }
-inline ::frame::proto::SceneLight* SceneTree::add_scene_lights() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+inline ::frame::proto::NodeLight* SceneTree::add_scene_lights() ABSL_ATTRIBUTE_LIFETIME_BOUND {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  ::frame::proto::SceneLight* _add = _internal_mutable_scene_lights()->Add();
+  ::frame::proto::NodeLight* _add = _internal_mutable_scene_lights()->Add();
   // @@protoc_insertion_point(field_add:frame.proto.SceneTree.scene_lights)
   return _add;
 }
-inline const ::google::protobuf::RepeatedPtrField<::frame::proto::SceneLight>& SceneTree::scene_lights() const
+inline const ::google::protobuf::RepeatedPtrField<::frame::proto::NodeLight>& SceneTree::scene_lights() const
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
   // @@protoc_insertion_point(field_list:frame.proto.SceneTree.scene_lights)
   return _internal_scene_lights();
 }
-inline const ::google::protobuf::RepeatedPtrField<::frame::proto::SceneLight>&
+inline const ::google::protobuf::RepeatedPtrField<::frame::proto::NodeLight>&
 SceneTree::_internal_scene_lights() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
   return _impl_.scene_lights_;
 }
-inline ::google::protobuf::RepeatedPtrField<::frame::proto::SceneLight>*
+inline ::google::protobuf::RepeatedPtrField<::frame::proto::NodeLight>*
 SceneTree::_internal_mutable_scene_lights() {
   ::google::protobuf::internal::TSanRead(&_impl_);
   return &_impl_.scene_lights_;
@@ -3999,40 +4085,46 @@ namespace google {
 namespace protobuf {
 
 template <>
-struct is_proto_enum<::frame::proto::SceneStaticMesh_RenderPrimitiveEnum> : std::true_type {};
+struct is_proto_enum<::frame::proto::NodeMatrix_MatrixTypeEnum> : std::true_type {};
 template <>
-inline const EnumDescriptor* GetEnumDescriptor<::frame::proto::SceneStaticMesh_RenderPrimitiveEnum>() {
-  return ::frame::proto::SceneStaticMesh_RenderPrimitiveEnum_descriptor();
+inline const EnumDescriptor* GetEnumDescriptor<::frame::proto::NodeMatrix_MatrixTypeEnum>() {
+  return ::frame::proto::NodeMatrix_MatrixTypeEnum_descriptor();
 }
 template <>
-struct is_proto_enum<::frame::proto::SceneStaticMesh_MeshEnum> : std::true_type {};
+struct is_proto_enum<::frame::proto::NodeStaticMesh_RenderPrimitiveEnum> : std::true_type {};
 template <>
-inline const EnumDescriptor* GetEnumDescriptor<::frame::proto::SceneStaticMesh_MeshEnum>() {
-  return ::frame::proto::SceneStaticMesh_MeshEnum_descriptor();
+inline const EnumDescriptor* GetEnumDescriptor<::frame::proto::NodeStaticMesh_RenderPrimitiveEnum>() {
+  return ::frame::proto::NodeStaticMesh_RenderPrimitiveEnum_descriptor();
 }
 template <>
-struct is_proto_enum<::frame::proto::SceneStaticMesh_RenderTimeEnum> : std::true_type {};
+struct is_proto_enum<::frame::proto::NodeStaticMesh_MeshEnum> : std::true_type {};
 template <>
-inline const EnumDescriptor* GetEnumDescriptor<::frame::proto::SceneStaticMesh_RenderTimeEnum>() {
-  return ::frame::proto::SceneStaticMesh_RenderTimeEnum_descriptor();
+inline const EnumDescriptor* GetEnumDescriptor<::frame::proto::NodeStaticMesh_MeshEnum>() {
+  return ::frame::proto::NodeStaticMesh_MeshEnum_descriptor();
 }
 template <>
-struct is_proto_enum<::frame::proto::SceneStaticMesh_ShadowEffectEnum> : std::true_type {};
+struct is_proto_enum<::frame::proto::NodeStaticMesh_RenderTimeEnum> : std::true_type {};
 template <>
-inline const EnumDescriptor* GetEnumDescriptor<::frame::proto::SceneStaticMesh_ShadowEffectEnum>() {
-  return ::frame::proto::SceneStaticMesh_ShadowEffectEnum_descriptor();
+inline const EnumDescriptor* GetEnumDescriptor<::frame::proto::NodeStaticMesh_RenderTimeEnum>() {
+  return ::frame::proto::NodeStaticMesh_RenderTimeEnum_descriptor();
 }
 template <>
-struct is_proto_enum<::frame::proto::SceneLight_LightTypeEnum> : std::true_type {};
+struct is_proto_enum<::frame::proto::NodeStaticMesh_ShadowEffectEnum> : std::true_type {};
 template <>
-inline const EnumDescriptor* GetEnumDescriptor<::frame::proto::SceneLight_LightTypeEnum>() {
-  return ::frame::proto::SceneLight_LightTypeEnum_descriptor();
+inline const EnumDescriptor* GetEnumDescriptor<::frame::proto::NodeStaticMesh_ShadowEffectEnum>() {
+  return ::frame::proto::NodeStaticMesh_ShadowEffectEnum_descriptor();
 }
 template <>
-struct is_proto_enum<::frame::proto::SceneLight_ShadowTypeEnum> : std::true_type {};
+struct is_proto_enum<::frame::proto::NodeLight_LightTypeEnum> : std::true_type {};
 template <>
-inline const EnumDescriptor* GetEnumDescriptor<::frame::proto::SceneLight_ShadowTypeEnum>() {
-  return ::frame::proto::SceneLight_ShadowTypeEnum_descriptor();
+inline const EnumDescriptor* GetEnumDescriptor<::frame::proto::NodeLight_LightTypeEnum>() {
+  return ::frame::proto::NodeLight_LightTypeEnum_descriptor();
+}
+template <>
+struct is_proto_enum<::frame::proto::NodeLight_ShadowTypeEnum> : std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor<::frame::proto::NodeLight_ShadowTypeEnum>() {
+  return ::frame::proto::NodeLight_ShadowTypeEnum_descriptor();
 }
 
 }  // namespace protobuf

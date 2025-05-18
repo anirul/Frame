@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "frame/entity_id.h"
-#include "frame/name_interface.h"
+#include "frame/serialize.h"
 
 namespace frame
 {
@@ -22,7 +22,7 @@ class LevelInterface;
  * For now this is not saving a local copy of the level so you'll have to
  * pass it through.
  */
-class MaterialInterface : public NameInterface
+class MaterialInterface : public Serialize<proto::Material>
 {
   public:
     //! @brief Virtual destructor.
@@ -46,11 +46,6 @@ class MaterialInterface : public NameInterface
      * @param id: the stored program id.
      */
     virtual void SetProgramId(EntityId id) = 0;
-    /**
-     * @brief Store the program name.
-     * @param name: Program name.
-     */
-    virtual void SetProgramName(const std::string& name) = 0;
     /**
      * @brief Store a texture reference associated to a given name.
      * @param id: Texture reference id.

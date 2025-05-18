@@ -395,12 +395,6 @@ bool Program::HasUniform(const std::string& name) const
     return true;
 }
 
-void Program::AddUniformEnum(
-    const std::string& name, proto::Uniform::UniformEnum uniform_enum)
-{
-    name_uniform_enums_.insert({name, uniform_enum});
-}
-
 std::string Program::GetTemporarySceneRoot() const
 {
     return temporary_scene_root_;
@@ -413,6 +407,7 @@ void Program::SetTemporarySceneRoot(const std::string& name)
 
 std::unique_ptr<ProgramInterface> CreateProgram(
     const std::string& name,
+    const std::string& shader_name,
     std::istream& vertex_shader_code,
     std::istream& pixel_shader_code)
 {
@@ -438,10 +433,11 @@ std::unique_ptr<ProgramInterface> CreateProgram(
     program->AddShader(vertex);
     program->AddShader(fragment);
     program->LinkShader();
+    program->GetData().set_shader(shader_name);
 #ifdef _DEBUG
     logger->info("with pointer := {}", static_cast<void*>(program.get()));
 #endif // _DEBUG
-    return std::move(program);
+    return program;
 }
 
 std::unique_ptr<ProgramInterface> CreateProgram(
@@ -471,7 +467,7 @@ std::unique_ptr<ProgramInterface> CreateProgram(
     program->AddShader(vertex);
     program->AddShader(fragment);
     // Need to add the uniform enum list for serialization.
-    for (const auto& uniform : proto_program.parameters())
+    for (const auto& uniform : proto_program.uniforms())
     {
         if (uniform.has_uniform_enum())
         {
@@ -479,10 +475,11 @@ std::unique_ptr<ProgramInterface> CreateProgram(
         }
     }
     program->LinkShader();
+    program->GetData().set_shader(proto_program.shader());
 #ifdef _DEBUG
     logger->info("with pointer := {}", static_cast<void*>(program.get()));
 #endif // _DEBUG
-    return std::move(program);
+    return program;
 }
 
 } // End namespace frame::opengl.

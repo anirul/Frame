@@ -88,59 +88,6 @@ class Texture : public TextureInterface, public BindInterface
      */
     void Clear(glm::vec4 color) override;
     /**
-     * @brief Enable mipmap, this allow a recursive level of texture faster
-     *        for rendering.
-     */
-    void EnableMipmap() const override;
-    /**
-     * @brief Set the minification filter.
-     * @param texture_filter: Usually and by default GL_LINEAR.
-     */
-    void SetMinFilter(proto::TextureFilter::Enum texture_filter) override;
-    /**
-     * @brief Get the minification filter.
-     * @return The value of the minification filter.
-     */
-    proto::TextureFilter::Enum GetMinFilter() const override;
-    /**
-     * @brief Set the magnification filter.
-     * @param texture_filter: Usually and by default GL_LINEAR.
-     */
-    void SetMagFilter(proto::TextureFilter::Enum texture_filter) override;
-    /**
-     * @brief Get the magnification filter.
-     * @return The value of the magnification filter.
-     */
-    proto::TextureFilter::Enum GetMagFilter() const override;
-    /**
-     * @brief Set the wrapping on the s size of the texture (horizontal)
-     *        this will decide how the texture is treated in case you
-     *        overflow in this direction.
-     * @param texture_filter: Could be any of (REPEAT, CLAMP_TO_EDGE,
-     *        MIRRORED_REPEAT).
-     */
-    void SetWrapS(proto::TextureFilter::Enum texture_filter) override;
-    /**
-     * @brief Get the wrapping on the s size of the texture (horizontal).
-     * @return The way the texture is wrap could be any of (REPEAT,
-     *         CLAMP_TO_EDGE, MIRRORED_REPEAT).
-     */
-    proto::TextureFilter::Enum GetWrapS() const override;
-    /**
-     * @brief Set the wrapping on the t size of the texture (vertical) this
-     *        will decide how the texture is treated in case you overflow in
-     *        this direction.
-     * @param texture_filter: Could be any of (REPEAT, CLAMP_TO_EDGE,
-     *        MIRRORED_REPEAT).
-     */
-    void SetWrapT(proto::TextureFilter::Enum texture_filter) override;
-    /**
-     * @brief Get the wrapping on the t size of the texture (vertical).
-     * @return The way the texture is wrap could be any of (REPEAT,
-     *         CLAMP_TO_EDGE, MIRRORED_REPEAT).
-     */
-    proto::TextureFilter::Enum GetWrapT() const override;
-    /**
      * @brief Copy the texture input to the texture.
      * @param vector: Vector of uint32_t containing the RGBA values of the
      *        texture.
@@ -152,61 +99,12 @@ class Texture : public TextureInterface, public BindInterface
 
   public:
     /**
-     * @brief This return if the texture is a cube map or not.
-     * @return In this case this is false.
-     */
-    bool IsCubeMap() const final
-    {
-        return false;
-    }
-    /**
      * @brief Get the OpenGL id of the current texture.
      * @return Id of the OpenGL texture.
      */
     unsigned int GetId() const override
     {
         return texture_id_;
-    }
-    /**
-     * @brief Get the size of the current texture.
-     * @return The size of the texture.
-     */
-    glm::uvec2 GetSize() const override
-    {
-        return size_;
-    }
-    /**
-     * @brief Get the pixel element size individual element (BYTE, SHORT,
-     *        LONG, FLOAT).
-     * @return The pixel element size.
-     */
-    proto::PixelElementSize::Enum GetPixelElementSize() const override
-    {
-        return pixel_element_size_.value();
-    }
-    /**
-     * @brief Get the pixel structure (R, RG, RGB, RGBA).
-     * @return the pixel structure.
-     */
-    proto::PixelStructure::Enum GetPixelStructure() const override
-    {
-        return pixel_structure_.value();
-    }
-    /**
-     * @brief Get name from the name interface.
-     * @return The name of the object.
-     */
-    std::string GetName() const override
-    {
-        return name_;
-    }
-    /**
-     * @brief Set name from the name interface.
-     * @param name: New name to be set.
-     */
-    void SetName(const std::string& name) override
-    {
-        name_ = name;
     }
     /**
      * @brief Get the texture parameters used at creation, usefull for

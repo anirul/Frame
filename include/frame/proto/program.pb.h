@@ -470,7 +470,7 @@ class Program final : public ::google::protobuf::Message
   enum : int {
     kInputTextureNamesFieldNumber = 3,
     kOutputTextureNamesFieldNumber = 4,
-    kParametersFieldNumber = 7,
+    kUniformsFieldNumber = 7,
     kNameFieldNumber = 1,
     kInputSceneRootNameFieldNumber = 5,
     kShaderFieldNumber = 6,
@@ -520,23 +520,23 @@ class Program final : public ::google::protobuf::Message
   ::google::protobuf::RepeatedPtrField<std::string>* _internal_mutable_output_texture_names();
 
   public:
-  // repeated .frame.proto.Uniform parameters = 7;
-  int parameters_size() const;
+  // repeated .frame.proto.Uniform uniforms = 7;
+  int uniforms_size() const;
   private:
-  int _internal_parameters_size() const;
+  int _internal_uniforms_size() const;
 
   public:
-  void clear_parameters() ;
-  ::frame::proto::Uniform* mutable_parameters(int index);
-  ::google::protobuf::RepeatedPtrField<::frame::proto::Uniform>* mutable_parameters();
+  void clear_uniforms() ;
+  ::frame::proto::Uniform* mutable_uniforms(int index);
+  ::google::protobuf::RepeatedPtrField<::frame::proto::Uniform>* mutable_uniforms();
 
   private:
-  const ::google::protobuf::RepeatedPtrField<::frame::proto::Uniform>& _internal_parameters() const;
-  ::google::protobuf::RepeatedPtrField<::frame::proto::Uniform>* _internal_mutable_parameters();
+  const ::google::protobuf::RepeatedPtrField<::frame::proto::Uniform>& _internal_uniforms() const;
+  ::google::protobuf::RepeatedPtrField<::frame::proto::Uniform>* _internal_mutable_uniforms();
   public:
-  const ::frame::proto::Uniform& parameters(int index) const;
-  ::frame::proto::Uniform* add_parameters();
-  const ::google::protobuf::RepeatedPtrField<::frame::proto::Uniform>& parameters() const;
+  const ::frame::proto::Uniform& uniforms(int index) const;
+  ::frame::proto::Uniform* add_uniforms();
+  const ::google::protobuf::RepeatedPtrField<::frame::proto::Uniform>& uniforms() const;
   // string name = 1;
   void clear_name() ;
   const std::string& name() const;
@@ -627,7 +627,7 @@ class Program final : public ::google::protobuf::Message
     ::google::protobuf::internal::CachedSize _cached_size_;
     ::google::protobuf::RepeatedPtrField<std::string> input_texture_names_;
     ::google::protobuf::RepeatedPtrField<std::string> output_texture_names_;
-    ::google::protobuf::RepeatedPtrField< ::frame::proto::Uniform > parameters_;
+    ::google::protobuf::RepeatedPtrField< ::frame::proto::Uniform > uniforms_;
     ::google::protobuf::internal::ArenaStringPtr name_;
     ::google::protobuf::internal::ArenaStringPtr input_scene_root_name_;
     ::google::protobuf::internal::ArenaStringPtr shader_;
@@ -1048,49 +1048,49 @@ inline void Program::set_allocated_shader(std::string* value) {
   // @@protoc_insertion_point(field_set_allocated:frame.proto.Program.shader)
 }
 
-// repeated .frame.proto.Uniform parameters = 7;
-inline int Program::_internal_parameters_size() const {
-  return _internal_parameters().size();
+// repeated .frame.proto.Uniform uniforms = 7;
+inline int Program::_internal_uniforms_size() const {
+  return _internal_uniforms().size();
 }
-inline int Program::parameters_size() const {
-  return _internal_parameters_size();
+inline int Program::uniforms_size() const {
+  return _internal_uniforms_size();
 }
-inline ::frame::proto::Uniform* Program::mutable_parameters(int index)
+inline ::frame::proto::Uniform* Program::mutable_uniforms(int index)
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_mutable:frame.proto.Program.parameters)
-  return _internal_mutable_parameters()->Mutable(index);
+  // @@protoc_insertion_point(field_mutable:frame.proto.Program.uniforms)
+  return _internal_mutable_uniforms()->Mutable(index);
 }
-inline ::google::protobuf::RepeatedPtrField<::frame::proto::Uniform>* Program::mutable_parameters()
+inline ::google::protobuf::RepeatedPtrField<::frame::proto::Uniform>* Program::mutable_uniforms()
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_mutable_list:frame.proto.Program.parameters)
+  // @@protoc_insertion_point(field_mutable_list:frame.proto.Program.uniforms)
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  return _internal_mutable_parameters();
+  return _internal_mutable_uniforms();
 }
-inline const ::frame::proto::Uniform& Program::parameters(int index) const
+inline const ::frame::proto::Uniform& Program::uniforms(int index) const
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:frame.proto.Program.parameters)
-  return _internal_parameters().Get(index);
+  // @@protoc_insertion_point(field_get:frame.proto.Program.uniforms)
+  return _internal_uniforms().Get(index);
 }
-inline ::frame::proto::Uniform* Program::add_parameters() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+inline ::frame::proto::Uniform* Program::add_uniforms() ABSL_ATTRIBUTE_LIFETIME_BOUND {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  ::frame::proto::Uniform* _add = _internal_mutable_parameters()->Add();
-  // @@protoc_insertion_point(field_add:frame.proto.Program.parameters)
+  ::frame::proto::Uniform* _add = _internal_mutable_uniforms()->Add();
+  // @@protoc_insertion_point(field_add:frame.proto.Program.uniforms)
   return _add;
 }
-inline const ::google::protobuf::RepeatedPtrField<::frame::proto::Uniform>& Program::parameters() const
+inline const ::google::protobuf::RepeatedPtrField<::frame::proto::Uniform>& Program::uniforms() const
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_list:frame.proto.Program.parameters)
-  return _internal_parameters();
+  // @@protoc_insertion_point(field_list:frame.proto.Program.uniforms)
+  return _internal_uniforms();
 }
 inline const ::google::protobuf::RepeatedPtrField<::frame::proto::Uniform>&
-Program::_internal_parameters() const {
+Program::_internal_uniforms() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
-  return _impl_.parameters_;
+  return _impl_.uniforms_;
 }
 inline ::google::protobuf::RepeatedPtrField<::frame::proto::Uniform>*
-Program::_internal_mutable_parameters() {
+Program::_internal_mutable_uniforms() {
   ::google::protobuf::internal::TSanRead(&_impl_);
-  return &_impl_.parameters_;
+  return &_impl_.uniforms_;
 }
 
 #ifdef __GNUC__

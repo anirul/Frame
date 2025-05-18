@@ -8,6 +8,19 @@ namespace frame
 
 NodeLight::NodeLight(
     std::function<NodeInterface*(const std::string&)> func,
+    const glm::vec3 color)
+    : NodeInterface(func)
+{
+    data_.set_light_type(proto::NodeLight::AMBIENT_LIGHT);
+    proto::UniformVector3 proto_uniform_vector3;
+    proto_uniform_vector3.set_x(color.x);
+    proto_uniform_vector3.set_y(color.y);
+    proto_uniform_vector3.set_z(color.z);
+    data_.mutable_color()->CopyFrom(proto_uniform_vector3);
+}
+
+NodeLight::NodeLight(
+    std::function<NodeInterface*(const std::string&)> func,
     const LightTypeEnum light_type,
     const glm::vec3 position_or_direction,
     const glm::vec3 color) :
