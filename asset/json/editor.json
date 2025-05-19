@@ -22,7 +22,7 @@
       "output_texture_names": "albedo",
       "input_scene_type": { "value": "CUBE" },
       "shader": "cubemap",
-      "parameters": [
+      "uniforms": [
         {
           "name": "projection",
           "uniform_enum": "PROJECTION_MAT4"
@@ -46,7 +46,7 @@
       "input_scene_type": { "value": "SCENE" },
       "input_scene_root_name": "root",
       "shader": "scene_simple",
-      "parameters": [
+      "uniforms": [
         {
           "name": "projection",
           "uniform_enum": "PROJECTION_MAT4"
