@@ -14,7 +14,7 @@ namespace frame::gui
 WindowCubemap::WindowCubemap(TextureInterface& texture_interface)
     : name_(""), size_(0, 0), texture_interface_(texture_interface)
 {
-    if (!texture_interface_.IsCubeMap())
+    if (!texture_interface_.GetData().cubemap())
     {
         throw std::runtime_error("Cannot create a normal texture!");
     }

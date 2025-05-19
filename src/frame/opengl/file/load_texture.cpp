@@ -8,6 +8,7 @@
 #include "frame/file/file_system.h"
 #include "frame/file/image.h"
 #include "frame/json/parse_level.h"
+#include "frame/json/parse_uniform.h"
 #include "frame/logger.h"
 #include "frame/node_matrix.h"
 #include "frame/opengl/cubemap.h"
@@ -123,7 +124,7 @@ std::unique_ptr<frame::TextureInterface> LoadCubeMapTextureFromFile(
         logger->info("Could not load texture: [{}].", file.string());
         return nullptr;
     }
-    auto size = equirectangular->GetSize();
+    auto size = json::ParseSize(equirectangular->GetData().size());
     // Seams correct when you are less than 2048 in height you get 512.
     std::uint32_t cube_single_res = PowerFloor(size.y);
     glm::uvec2 cube_pair_res = {cube_single_res, cube_single_res};

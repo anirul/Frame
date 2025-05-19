@@ -26,7 +26,7 @@ enum class NodeTypeEnum
  * @class NodeInterface
  * @brief Interface to visit the scene node.
  */
-struct NodeInterface : public NameInterface
+struct NodeInterface
 {
   public:
     /**

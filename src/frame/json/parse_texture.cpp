@@ -72,19 +72,19 @@ std::unique_ptr<frame::TextureInterface> ParseTexture(
     constexpr auto INVALID_TEXTURE = frame::proto::TextureFilter::INVALID;
     if (proto_texture.min_filter().value() != INVALID_TEXTURE)
     {
-        texture->SetMinFilter(proto_texture.min_filter().value());
+        *texture->GetData().mutable_min_filter() = proto_texture.min_filter();
     }
     if (proto_texture.mag_filter().value() != INVALID_TEXTURE)
     {
-        texture->SetMagFilter(proto_texture.mag_filter().value());
+        *texture->GetData().mutable_mag_filter() = proto_texture.mag_filter();
     }
     if (proto_texture.wrap_s().value() != INVALID_TEXTURE)
     {
-        texture->SetWrapS(proto_texture.wrap_s().value());
+        *texture->GetData().mutable_wrap_s() = proto_texture.wrap_s();
     }
     if (proto_texture.wrap_t().value() != INVALID_TEXTURE)
     {
-        texture->SetWrapT(proto_texture.wrap_t().value());
+        *texture->GetData().mutable_wrap_t() = proto_texture.wrap_t();
     }
     return texture;
 }
@@ -127,19 +127,19 @@ std::unique_ptr<TextureInterface> ParseCubeMapTexture(
     constexpr auto INVALID_TEXTURE = frame::proto::TextureFilter::INVALID;
     if (proto_texture.min_filter().value() != INVALID_TEXTURE)
     {
-        texture->SetMinFilter(proto_texture.min_filter().value());
+        *texture->GetData().mutable_min_filter() = proto_texture.min_filter();
     }
     if (proto_texture.mag_filter().value() != INVALID_TEXTURE)
     {
-        texture->SetMagFilter(proto_texture.mag_filter().value());
+        *texture->GetData().mutable_mag_filter() = proto_texture.mag_filter();
     }
     if (proto_texture.wrap_s().value() != INVALID_TEXTURE)
     {
-        texture->SetWrapS(proto_texture.wrap_s().value());
+        *texture->GetData().mutable_wrap_s() = proto_texture.wrap_s();
     }
     if (proto_texture.wrap_t().value() != INVALID_TEXTURE)
     {
-        texture->SetWrapT(proto_texture.wrap_t().value());
+        *texture->GetData().mutable_wrap_t() = proto_texture.wrap_t();
     }
     return texture;
 }

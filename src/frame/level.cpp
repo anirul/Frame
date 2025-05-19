@@ -1,10 +1,14 @@
 #include "frame/level.h"
 
 #include <algorithm>
+#include <format>
 #include <numeric>
 
 #include "frame/device_interface.h"
 #include "frame/node_camera.h"
+#include "frame/node_light.h"
+#include "frame/node_matrix.h"
+#include "frame/node_static_mesh.h"
 
 namespace frame
 {
@@ -109,7 +113,7 @@ std::string Level::GetNameFromId(EntityId id) const
 EntityId Level::AddSceneNode(std::unique_ptr<NodeInterface>&& scene_node)
 {
     EntityId id = GetSceneNodeNewId();
-    std::string name = scene_node->GetName();
+    std::string name = GetNameFromNodeInterface(*scene_node);
     // CHECKME(anirul): maybe this should return std::nullopt.
     if (string_set_.count(name))
     {
@@ -244,7 +248,8 @@ std::vector<frame::EntityId> Level::GetChildList(EntityId id) const
         for (const auto& id_node : id_scene_node_map_)
         {
             // In case this is node then add it to the list.
-            if (id_node.second->GetParentName() == node->GetName())
+            if (id_node.second->GetParentName() ==
+                GetNameFromNodeInterface(*node))
             {
                 list.push_back(id_node.first);
             }
@@ -355,14 +360,31 @@ void Level::ReplaceMesh(
 {
     if (!id_static_mesh_map_.count(id))
     {
-        throw std::runtime_error(
-            fmt::format(
-                "trying to replace {} by {} but no mesh there yet?",
-                mesh->GetName(),
-                id));
+        throw std::runtime_error(fmt::format(
+            "trying to replace {} by {} but no mesh there yet?",
+            mesh->GetName(),
+            id));
     }
     id_static_mesh_map_.erase(id);
     id_static_mesh_map_.emplace(id, std::move(mesh));
+}
+
+std::string Level::GetNameFromNodeInterface(const NodeInterface& node) const
+{
+    switch (node.GetNodeType())
+    {
+    case NodeTypeEnum::NODE_MATRIX:
+        return dynamic_cast<const NodeMatrix&>(node).GetData().name();
+    case NodeTypeEnum::NODE_CAMERA:
+        return dynamic_cast<const NodeCamera&>(node).GetData().name();
+    case NodeTypeEnum::NODE_LIGHT:
+        return dynamic_cast<const NodeLight&>(node).GetData().name();
+    case NodeTypeEnum::NODE_STATIC_MESH:
+        return dynamic_cast<const NodeStaticMesh&>(node).GetData().name();
+    default:
+        throw std::runtime_error(std::format(
+            "Unknown node type [{}]?", static_cast<int>(node.GetNodeType())));
+    }
 }
 
 } // End namespace frame.

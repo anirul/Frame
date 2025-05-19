@@ -359,6 +359,14 @@ class Level : public LevelInterface
 
   protected:
     /**
+     * @brief Get the name from a node interface.
+     * @param node: The node interface to get the name from.
+     * @return The name of the node.
+	 */
+    std::string GetNameFromNodeInterface(const NodeInterface& node) const;
+
+  protected:
+    /**
      * @brief Increase the internal counter and return the value.
      * @return Current counter + 1.
      */
