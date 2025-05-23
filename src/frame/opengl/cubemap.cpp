@@ -21,48 +21,22 @@
 namespace frame::opengl
 {
 
-proto::TextureFrame GetTextureFrameFromPosition(int i)
-{
-    proto::TextureFrame texture_frame{};
-    switch (i)
-    {
-    case 0:
-        texture_frame.set_value(proto::TextureFrame::CUBE_MAP_POSITIVE_X);
-        break;
-    case 1:
-        texture_frame.set_value(proto::TextureFrame::CUBE_MAP_NEGATIVE_X);
-        break;
-    case 2:
-        texture_frame.set_value(proto::TextureFrame::CUBE_MAP_POSITIVE_Y);
-        break;
-    case 3:
-        texture_frame.set_value(proto::TextureFrame::CUBE_MAP_NEGATIVE_Y);
-        break;
-    case 4:
-        texture_frame.set_value(proto::TextureFrame::CUBE_MAP_POSITIVE_Z);
-        break;
-    case 5:
-        texture_frame.set_value(proto::TextureFrame::CUBE_MAP_NEGATIVE_Z);
-        break;
-    default:
-        throw std::runtime_error(fmt::format("Invalid entry {}.", i));
-    }
-    return texture_frame;
-}
-
 Cubemap::~Cubemap()
 {
     glDeleteTextures(1, &texture_id_);
 }
 
-Cubemap::Cubemap(const TextureParameter& texture_parameter)
-    : Cubemap(
-          texture_parameter.pixel_element_size,
-          texture_parameter.pixel_structure)
+Cubemap::Cubemap(const proto::Texture& proto_texture)
 {
-    assert(texture_parameter.map_type == TextureTypeEnum::CUBMAP);
-    data_.mutable_size()->CopyFrom(json::SerializeSize(texture_parameter.size));
-    CreateCubemap(texture_parameter.array_data_ptr);
+    data_ = proto_texture;
+    switch (proto_texture.texture_oneof_case())
+    {
+    case proto::Texture::kPixels:
+    case proto::Texture::kFileName:
+    case proto::Texture::kPlugin:
+    case proto::Texture::kFileNames:
+    default:
+    }
 }
 
 void Cubemap::Bind(unsigned int slot /*= 0*/) const
@@ -82,8 +56,7 @@ void Cubemap::UnBind() const
 }
 
 void Cubemap::CreateCubemap(
-        const std::array<void*, 6> cube_map/* =
-            { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr }*/)
+    const std::array<void*, 6> cube_map, glm::uvec2 size)
 {
     glGenTextures(1, &texture_id_);
     ScopedBind scoped_bind(*this);
@@ -332,6 +305,35 @@ void Cubemap::EnableMipmap()
 {
     data_.set_mipmap(true);
     glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+}
+
+proto::TextureFrame Cubemap::GetTextureFrameFromPosition(int i)
+{
+    proto::TextureFrame texture_frame{};
+    switch (i)
+    {
+    case 0:
+        texture_frame.set_value(proto::TextureFrame::CUBE_MAP_POSITIVE_X);
+        break;
+    case 1:
+        texture_frame.set_value(proto::TextureFrame::CUBE_MAP_NEGATIVE_X);
+        break;
+    case 2:
+        texture_frame.set_value(proto::TextureFrame::CUBE_MAP_POSITIVE_Y);
+        break;
+    case 3:
+        texture_frame.set_value(proto::TextureFrame::CUBE_MAP_NEGATIVE_Y);
+        break;
+    case 4:
+        texture_frame.set_value(proto::TextureFrame::CUBE_MAP_POSITIVE_Z);
+        break;
+    case 5:
+        texture_frame.set_value(proto::TextureFrame::CUBE_MAP_NEGATIVE_Z);
+        break;
+    default:
+        throw std::runtime_error(fmt::format("Invalid entry {}.", i));
+    }
+    return texture_frame;
 }
 
 } // End namespace frame::opengl.

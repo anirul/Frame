@@ -31,9 +31,9 @@ class Texture : public TextureInterface, public BindInterface
   public:
     /**
      * @brief Default constructor.
-     * @param Parameter for creating the texture.
+     * @param proto_texture: Proto that describe the texture.
      */
-    Texture(const TextureParameter& texture_parameter);
+    Texture(const proto::Texture& proto_texture);
     //! @brief Destructor this will free memory on the GPU also!
     virtual ~Texture();
 
@@ -130,9 +130,15 @@ class Texture : public TextureInterface, public BindInterface
     /**
      * @brief Fill a texture with a data pointer, the size has to be set
      * first!
-     * @param data: pixel used to fill up (or null for don't care).
+     * @param data: Pixel used to fill up (or null for don't care).
+     * @param size: Size of the image.
      */
-    void CreateTexture(const void* data = nullptr);
+    void CreateTexture(const void* data = nullptr, glm::uvec2 size = {0, 0});
+    /**
+     * @brief Create a texture from a file.
+     * @param file_name: File to be open for a texture.
+     */
+    void CreateTextureFromFile(const std::string& file_name);
     /**
      * @brief Create a depth texture.
      * @param size: Size of the texture.
@@ -165,6 +171,7 @@ class Texture : public TextureInterface, public BindInterface
     mutable bool locked_bind_ = false;
     std::unique_ptr<RenderBuffer> render_ = nullptr;
     std::unique_ptr<FrameBuffer> frame_ = nullptr;
+    glm::uvec2 inner_size;
 };
 
 } // End namespace frame::opengl.

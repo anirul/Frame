@@ -164,12 +164,12 @@ std::unique_ptr<frame::TextureInterface> LoadCubeMapTextureFromFile(
     MaterialInterface& material_ref = level->GetMaterialFromId(material_id);
     for (std::uint32_t i = 0; i < 6; ++i)
     {
-        renderer.SetCubeMapTarget(GetTextureFrameFromPosition(i));
+        renderer.SetCubeMapTarget(Cubemap::GetTextureFrameFromPosition(i));
         renderer.RenderMesh(
             mesh_ref, material_ref, projection_cubemap, views_cubemap[i]);
     }
     // FIXME(anirul): Why?
-    renderer.SetCubeMapTarget(GetTextureFrameFromPosition(0));
+    renderer.SetCubeMapTarget(Cubemap::GetTextureFrameFromPosition(0));
     renderer.RenderMesh(
         mesh_ref, material_ref, projection_cubemap, views_cubemap[0]);
     // Get the output image (cube map).

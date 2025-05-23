@@ -23,25 +23,19 @@ namespace frame::opengl
 {
 
 /**
- * @brief Get texture frame from position.
- * @param i: Position (+X, -X, +Y, -Y, +Z, -Z) [0, 5].
- * @return The texture frame.
- */
-proto::TextureFrame GetTextureFrameFromPosition(int i);
-
-/**
  * @class Cubemap
  * @brief The same as texture but in a cube map perfect for environment
- *        maps.
+ * maps.
  */
 class Cubemap : public TextureInterface, public BindInterface
 {
   public:
     /**
-     * @brief Create a texture from a texture parameter structure.
-     * @param texture_parameter: Texture parameter structure.
+     * @brief Create a texture from a proto.
+     * @param proto_parameter: The proto to guide in the creation of the
+     * texture.
      */
-    Cubemap(const TextureParameter& texture_parameter);
+    Cubemap(const proto::Texture& proto_texture);
     //! @brief Destroy texture also on GPU side.
     ~Cubemap();
 
@@ -76,7 +70,7 @@ class Cubemap : public TextureInterface, public BindInterface
     /**
      * @brief Get a copy of the texture output (32 bit float format).
      * @return A vector containing the pixel of the image in 32 bit float
-     *         format.
+     * format.
      */
     std::vector<float> GetTextureFloat() const override;
     /**
@@ -86,13 +80,13 @@ class Cubemap : public TextureInterface, public BindInterface
     void Clear(glm::vec4 color) override;
     /**
      * @brief From the bind interface this will bind the texture at slot to
-     *        the current context.
+     * the current context.
      * @param slot: Slot to be binded.
      */
     void Bind(unsigned int slot = 0) const override;
     /**
      * @brief From the bind interface this will unbind the current texture
-     *        from the context.
+     * from the context.
      */
     void UnBind() const override;
     /**
@@ -107,6 +101,14 @@ class Cubemap : public TextureInterface, public BindInterface
         std::uint8_t bytes_per_pixel) override;
     //! @brief Enable mipmap generation.
     void EnableMipmap() override;
+
+  public:
+    /**
+     * @brief Get texture frame from position.
+     * @param i: Position (+X, -X, +Y, -Y, +Z, -Z) [0, 5].
+     * @return The texture frame.
+     */
+    static proto::TextureFrame GetTextureFrameFromPosition(int i);
 
   public:
     /**
@@ -137,14 +139,6 @@ class Cubemap : public TextureInterface, public BindInterface
         data_.mutable_pixel_element_size()->CopyFrom(pixel_element_size);
         data_.mutable_pixel_structure()->CopyFrom(pixel_structure);
     }
-    /**
-     * @brief Fill a texture with a data pointer, the size has to be set
-     * first!
-     * @param data: pixel used to fill up (or null for don't care).
-     */
-    void CreateCubemap(
-        const std::array<void*, 6> cube_map = {
-            nullptr, nullptr, nullptr, nullptr, nullptr, nullptr});
     //! @brief Lock the bind for RAII interface to the bind interface.
     void LockedBind() const override
     {
@@ -160,6 +154,25 @@ class Cubemap : public TextureInterface, public BindInterface
     //! Create a render and a frame buffer for internal rendering (used in
     //! Clear).
     void CreateFrameAndRenderBuffer();
+    /**
+     * @brief Fill a texture with a data pointer, the size has to be set
+     * first!
+     * @param data: pixel used to fill up (or null for don't care).
+     */
+    void CreateCubemap(
+        const std::array<void*, 6> cube_map =
+            {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr},
+        glm::uvec2 size = {0, 0});
+    /**
+     * @brief Create a cubemap from a single file.
+     * @param file_name: File that will create the texture.
+     */
+    void CreateCubemapFromFile(const std::string& file_name);
+    /**
+     * @brief Create a cubemap from 6 files.
+     * @param file_names: Files that will create the texture.
+     */
+    void CreateCubemapFromFiles(const std::array<std::string, 6>& file_names);
     friend class ScopedBind;
 
   private:
@@ -167,7 +180,7 @@ class Cubemap : public TextureInterface, public BindInterface
     mutable bool locked_bind_ = false;
     std::unique_ptr<RenderBuffer> render_ = nullptr;
     std::unique_ptr<FrameBuffer> frame_ = nullptr;
-    std::string name_;
+    glm::uvec2 inner_size;
 };
 
 } // End namespace frame::opengl.

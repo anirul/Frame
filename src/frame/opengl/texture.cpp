@@ -7,6 +7,7 @@
 #include <functional>
 #include <stdexcept>
 
+#include "frame/file/image.h"
 #include "frame/json/parse_uniform.h"
 #include "frame/json/serialize_uniform.h"
 #include "frame/level.h"
@@ -21,28 +22,35 @@
 namespace frame::opengl
 {
 
-Texture::Texture(const TextureParameter& texture_parameter)
+Texture::Texture(const proto::Texture& proto_texture)
 {
-    assert(texture_parameter.map_type == TextureTypeEnum::TEXTURE_2D);
-    data_.mutable_size()->CopyFrom(json::SerializeSize(texture_parameter.size));
-    data_.mutable_pixel_element_size()->CopyFrom(
-        texture_parameter.pixel_element_size);
-    data_.mutable_pixel_structure()->CopyFrom(
-        texture_parameter.pixel_structure);
-    if (texture_parameter.pixel_structure.value() ==
-        proto::PixelStructure::DEPTH)
+    data_ = proto_texture;
+    switch (proto_texture.texture_oneof_case())
     {
-        CreateDepthTexture(
-            texture_parameter.size, texture_parameter.pixel_element_size);
-    }
-    else
-    {
-        CreateTexture(texture_parameter.data_ptr);
+    case proto::Texture::kPixels:
+        CreateTexture(data_.pixels().data(), json::ParseSize(data_.size()));
+        break;
+    case proto::Texture::kFileName:
+        CreateTextureFromFile(data_.file_name());
+        break;
+    case proto::Texture::kPlugin:
+        throw std::runtime_error("Don't know what to do there?");
+    case proto::Texture::kFileNames:
+        throw std::runtime_error("This is a Texture not a cubemap?");
+    default:
+        throw std::runtime_error(
+            std::format(
+                "Unknown type[{}]?",
+                static_cast<int>(proto_texture.texture_oneof_case())));
     }
 }
 
-void Texture::CreateTexture(const void* data /* = nullptr*/)
+void Texture::CreateTexture(const void* data, glm::uvec2 size)
 {
+    if (!size.x || !size.y)
+    {
+        inner_size = json::ParseSize(data_.size());
+    }
     glGenTextures(1, &texture_id_);
     ScopedBind scoped_bind(*this);
     proto::TextureFilter texture_filter;
@@ -75,12 +83,20 @@ void Texture::CreateTexture(const void* data /* = nullptr*/)
         0,
         opengl::ConvertToGLType(
             data_.pixel_element_size(), data_.pixel_structure()),
-        static_cast<GLsizei>(data_.size().x()),
-        static_cast<GLsizei>(data_.size().y()),
+        static_cast<GLsizei>(inner_size.x),
+        static_cast<GLsizei>(inner_size.y),
         0,
         format,
         type,
         data);
+}
+
+void Texture::CreateTextureFromFile(const std::string& file_name)
+{
+    frame::file::Image image(
+        file_name, data_.pixel_element_size(), data_.pixel_structure());
+    inner_size = image.GetSize();
+    CreateTexture(image.Data(), inner_size);
 }
 
 void Texture::CreateDepthTexture(
@@ -345,7 +361,8 @@ void Texture::Update(
     glTexImage2D(
         GL_TEXTURE_2D,
         0,
-        opengl::ConvertToGLType(data_.pixel_element_size(), data_.pixel_structure()),
+        opengl::ConvertToGLType(
+            data_.pixel_element_size(), data_.pixel_structure()),
         static_cast<GLsizei>(data_.size().x()),
         static_cast<GLsizei>(data_.size().y()),
         0,
