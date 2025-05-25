@@ -61,21 +61,21 @@ const std::filesystem::path FindElement(
 namespace frame::file
 {
 
-const std::filesystem::path FindDirectory(const std::filesystem::path& file)
+std::filesystem::path FindDirectory(std::filesystem::path file)
 {
     return FindElement(file, [](const std::filesystem::path& p) {
         return std::filesystem::is_directory(p);
     });
 }
 
-const std::filesystem::path FindFile(const std::filesystem::path& file)
+std::filesystem::path FindFile(std::filesystem::path file)
 {
     return FindElement(file, [](const std::filesystem::path& p) {
         return std::filesystem::is_regular_file(p);
     });
 }
 
-std::string PurifyFilePath(const std::filesystem::path& file)
+std::string PurifyFilePath(std::filesystem::path file)
 {
     auto base = std::filesystem::current_path();
     auto relative = std::filesystem::relative(file, base);

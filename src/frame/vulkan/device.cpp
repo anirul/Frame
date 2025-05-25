@@ -156,10 +156,4 @@ std::unique_ptr<frame::StaticMeshInterface> Device::CreateStaticMesh(
     throw std::runtime_error("Not implemented!");
 }
 
-std::unique_ptr<frame::TextureInterface> Device::CreateTexture(
-    const TextureParameter& texture_parameter)
-{
-    throw std::runtime_error("Not implemented!");
-}
-
 } // End namespace frame::vulkan.

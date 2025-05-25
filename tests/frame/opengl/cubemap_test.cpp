@@ -16,7 +16,7 @@ TEST_F(CubemapTest, CreateCubemapTest)
 {
     ASSERT_FALSE(texture_);
     EXPECT_NO_THROW(
-        texture_ = frame::opengl::file::LoadCubeMapTextureFromFiles(
+        texture_ = std::make_unique<frame::opengl::Cubemap>(
             std::array<std::filesystem::path, 6>{
                 frame::file::FindFile("asset/cubemap/positive_x.png"),
                 frame::file::FindFile("asset/cubemap/negative_x.png"),
@@ -42,7 +42,7 @@ TEST_F(CubemapTest, CreateEquirectangularCubemapTest)
 {
     ASSERT_FALSE(texture_);
     EXPECT_NO_THROW(
-        texture_ = frame::opengl::file::LoadCubeMapTextureFromFile(
+        texture_ = std::make_unique<frame::opengl::Cubemap>(
             frame::file::FindFile("asset/cubemap/hamarikyu.hdr"),
             frame::json::PixelElementSize_FLOAT()));
     ASSERT_TRUE(texture_);

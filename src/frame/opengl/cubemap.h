@@ -44,8 +44,9 @@ class Cubemap : public TextureInterface, public BindInterface
      */
     Cubemap(
         std::filesystem::path file_name,
-        proto::PixelElementSize pixel_element_size,
-        proto::PixelStructure pixel_strucutre);
+        proto::PixelElementSize pixel_element_size =
+            json::PixelElementSize_BYTE(),
+        proto::PixelStructure pixel_strucutre = json::PixelStructure_BGR());
     /**
      * @brief Create from 6 textures (cubemap).
      * @param file_names: 6 files to describe this new cubemap.
@@ -54,8 +55,9 @@ class Cubemap : public TextureInterface, public BindInterface
      */
     Cubemap(
         std::array<std::filesystem::path, 6> file_names,
-        proto::PixelElementSize pixel_element_size,
-        proto::PixelStructure pixel_strucutre);
+        proto::PixelElementSize pixel_element_size =
+            json::PixelElementSize_BYTE(),
+        proto::PixelStructure pixel_strucutre = json::PixelStructure_BGR());
     /**
      * @brief Create a texture from a pointer and a brief description of the
      * underlying structure.

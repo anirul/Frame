@@ -121,13 +121,6 @@ class Device : public DeviceInterface
      */
     std::unique_ptr<StaticMeshInterface> CreateStaticMesh(
         const StaticMeshParameter& static_mesh_parameter) final;
-    /**
-     * @brief Create a 2d texture from a structure.
-     * @param parameters: Parameters for the creation of the texture.
-     * @return A unique pointer to a 2d texture.
-     */
-    std::unique_ptr<TextureInterface> CreateTexture(
-        const TextureParameter& texture_parameter) final;
 
   public:
     /**

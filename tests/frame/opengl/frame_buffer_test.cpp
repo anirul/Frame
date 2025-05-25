@@ -1,5 +1,6 @@
 #include "frame/opengl/frame_buffer_test.h"
 
+#include "frame/json/serialize_uniform.h"
 #include "frame/opengl/texture.h"
 
 namespace test
@@ -47,9 +48,13 @@ TEST_F(FrameBufferTest, BindTextureFrameTest)
     frame::opengl::RenderBuffer render{};
     render.CreateStorage({1, 1});
     EXPECT_NO_THROW(frame_->AttachRender(render));
-    frame::TextureParameter texture_parameter = {};
-    texture_parameter.size = {8, 8};
-    frame::opengl::Texture texture(texture_parameter);
+    frame::proto::Texture proto_texture;
+    proto_texture.mutable_size()->CopyFrom(frame::json::SerializeSize({8, 8}));
+    proto_texture.mutable_pixel_element_size()->CopyFrom(
+        frame::json::PixelElementSize_BYTE());
+    proto_texture.mutable_pixel_structure()->CopyFrom(
+        frame::json::PixelStructure_BGR());
+    frame::opengl::Texture texture(proto_texture);
     EXPECT_NO_THROW(frame_->AttachTexture(texture.GetId()));
 }
 

@@ -7,6 +7,7 @@
 #include <functional>
 #include <stdexcept>
 
+#include "frame/file/file_system.h"
 #include "frame/file/image.h"
 #include "frame/json/parse_uniform.h"
 #include "frame/json/serialize_uniform.h"
@@ -45,10 +46,9 @@ Texture::Texture(const proto::Texture& proto_texture)
     case proto::Texture::kFileNames:
         throw std::runtime_error("This is a Texture not a cubemap?");
     default:
-        throw std::runtime_error(
-            std::format(
-                "Unknown type[{}]?",
-                static_cast<int>(proto_texture.texture_oneof_case())));
+        throw std::runtime_error(std::format(
+            "Unknown type[{}]?",
+            static_cast<int>(proto_texture.texture_oneof_case())));
     }
 }
 
@@ -76,7 +76,7 @@ void Texture::CreateTextureFromFile(
 {
     data_.mutable_pixel_element_size()->CopyFrom(pixel_element_size);
     data_.mutable_pixel_structure()->CopyFrom(pixel_structure);
-    data_.set_file_name(file_name);
+    data_.set_file_name(frame::file::PurifyFilePath(file_name));
     frame::file::Image image(
         file_name, data_.pixel_element_size(), data_.pixel_structure());
     CreateTextureFromPointer(
@@ -217,7 +217,7 @@ glm::uvec2 Texture::GetSize()
 
 void Texture::SetWindowSize(glm::uvec2 size)
 {
-    if (data_.size().x() < 0) 
+    if (data_.size().x() < 0)
     {
         inner_size_.x = size.x / std::abs(data_.size().x());
     }

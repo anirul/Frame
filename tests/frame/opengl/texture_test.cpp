@@ -1,12 +1,14 @@
 #include "frame/opengl/texture_test.h"
 
 #include <GL/glew.h>
+#include <memory>
 
 #include "frame/file/file_system.h"
+#include "frame/json/parse_pixel.h"
 #include "frame/json/parse_texture.h"
+#include "frame/json/parse_uniform.h"
 #include "frame/opengl/file/load_texture.h"
 #include "frame/opengl/texture.h"
-#include "frame/json/parse_uniform.h"
 
 namespace test
 {
@@ -14,24 +16,20 @@ namespace test
 TEST_F(TextureTest, CreateTextureTest)
 {
     ASSERT_FALSE(texture_);
-    std::optional<std::unique_ptr<frame::TextureInterface>> maybe_texture;
-    EXPECT_NO_THROW(
-        maybe_texture = frame::opengl::file::LoadTextureFromFile(
-            frame::file::FindFile("asset/cubemap/positive_x.png")));
-    ASSERT_TRUE(maybe_texture);
-    texture_ = std::move(maybe_texture.value());
+    texture_ = std::make_unique<frame::opengl::Texture>(
+        frame::file::FindFile("asset/cubemap/positive_x.png"),
+        frame::json::PixelElementSize_BYTE(),
+        frame::json::PixelStructure_RGB());
     ASSERT_TRUE(texture_);
 }
 
 TEST_F(TextureTest, GetSizeTextureByteTest)
 {
     ASSERT_FALSE(texture_);
-    std::optional<std::unique_ptr<frame::TextureInterface>> maybe_texture;
-    EXPECT_NO_THROW(
-        maybe_texture = frame::opengl::file::LoadTextureFromFile(
-            frame::file::FindFile("asset/cubemap/positive_x.png")));
-    ASSERT_TRUE(maybe_texture);
-    texture_ = std::move(maybe_texture.value());
+    texture_ = std::make_unique<frame::opengl::Texture>(
+        frame::file::FindFile("asset/cubemap/positive_x.png"),
+        frame::json::PixelElementSize_BYTE(),
+        frame::json::PixelStructure_RGB());
     ASSERT_TRUE(texture_);
     auto* opengl_texture =
         dynamic_cast<frame::opengl::Texture*>(texture_.get());
@@ -49,13 +47,10 @@ TEST_F(TextureTest, GetSizeTextureByteTest)
 TEST_F(TextureTest, CreateHDRTextureHalfTest)
 {
     ASSERT_FALSE(texture_);
-    std::optional<std::unique_ptr<frame::TextureInterface>> maybe_texture;
-    EXPECT_NO_THROW(
-        maybe_texture = frame::opengl::file::LoadTextureFromFile(
-            frame::file::FindFile("asset/cubemap/hamarikyu.hdr"),
-            frame::json::PixelElementSize_HALF()));
-    ASSERT_TRUE(maybe_texture);
-    texture_ = std::move(maybe_texture.value());
+    texture_ = std::make_unique<frame::opengl::Texture>(
+        frame::file::FindFile("asset/cubemap/hamarikyu.hdr"),
+        frame::json::PixelElementSize_HALF(),
+        frame::json::PixelStructure_RGB());
     ASSERT_TRUE(texture_);
     auto* opengl_texture =
         dynamic_cast<frame::opengl::Texture*>(texture_.get());
@@ -69,13 +64,10 @@ TEST_F(TextureTest, CreateHDRTextureHalfTest)
 TEST_F(TextureTest, CreateHDRTextureFloatTest)
 {
     ASSERT_FALSE(texture_);
-    std::optional<std::unique_ptr<frame::TextureInterface>> maybe_texture;
-    EXPECT_NO_THROW(
-        maybe_texture = frame::opengl::file::LoadTextureFromFile(
-            frame::file::FindFile("asset/cubemap/hamarikyu.hdr"),
-            frame::json::PixelElementSize_FLOAT()));
-    ASSERT_TRUE(maybe_texture);
-    texture_ = std::move(maybe_texture.value());
+    texture_ = std::make_unique<frame::opengl::Texture>(
+        frame::file::FindFile("asset/cubemap/hamarikyu.hdr"),
+        frame::json::PixelElementSize_FLOAT(),
+        frame::json::PixelStructure_RGB());
     ASSERT_TRUE(texture_);
     auto* opengl_texture =
         dynamic_cast<frame::opengl::Texture*>(texture_.get());

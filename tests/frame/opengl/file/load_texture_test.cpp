@@ -3,9 +3,10 @@
 #include <algorithm>
 
 #include "frame/file/file_system.h"
+#include "frame/json/parse_uniform.h"
+#include "frame/opengl/cubemap.h"
 #include "frame/opengl/file/load_texture.h"
 #include "frame/opengl/texture.h"
-#include "frame/json/parse_uniform.h"
 
 namespace test
 {
@@ -39,7 +40,7 @@ TEST_F(LoadTextureTest, LoadTextureFromVec4Test)
 
 TEST_F(LoadTextureTest, LoadTextureFromFileTest)
 {
-    auto texture = frame::opengl::file::LoadTextureFromFile(
+    auto texture = std::make_unique<frame::opengl::Texture>(
         frame::file::FindFile("asset/cubemap/positive_x.png"),
         frame::json::PixelElementSize_BYTE(),
         frame::json::PixelStructure_RGB_ALPHA());
@@ -58,13 +59,14 @@ TEST_F(LoadTextureTest, LoadTextureFromFileTest)
 
 TEST_F(LoadTextureTest, LoadCubeMapFromFilesTest)
 {
-    auto texture = frame::opengl::file::LoadCubeMapTextureFromFiles(
-        {frame::file::FindFile("asset/cubemap/positive_x.png"),
-         frame::file::FindFile("asset/cubemap/negative_x.png"),
-         frame::file::FindFile("asset/cubemap/positive_y.png"),
-         frame::file::FindFile("asset/cubemap/negative_y.png"),
-         frame::file::FindFile("asset/cubemap/positive_z.png"),
-         frame::file::FindFile("asset/cubemap/negative_z.png")},
+    auto texture = std::make_unique<frame::opengl::Cubemap>(
+        std::array<std::filesystem::path, 6>{
+            frame::file::FindFile("asset/cubemap/positive_x.png"),
+            frame::file::FindFile("asset/cubemap/negative_x.png"),
+            frame::file::FindFile("asset/cubemap/positive_y.png"),
+            frame::file::FindFile("asset/cubemap/negative_y.png"),
+            frame::file::FindFile("asset/cubemap/positive_z.png"),
+            frame::file::FindFile("asset/cubemap/negative_z.png")},
         frame::json::PixelElementSize_BYTE(),
         frame::json::PixelStructure_RGB_ALPHA());
     EXPECT_TRUE(texture);

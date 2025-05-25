@@ -396,14 +396,22 @@ void Renderer::PreRender()
             viewport_ = glm::ivec4(0, 0, size.x / 2, size.y / 2);
             for (std::uint32_t i = 0; i < 6; ++i)
             {
-                SetCubeMapTarget(GetTextureFrameFromPosition(i));
+                proto::TextureFrame texture_frame;
+                texture_frame.set_value(static_cast<proto::TextureFrame::Enum>(
+                    proto::TextureFrame::CUBE_MAP_POSITIVE_X + i));
+                SetCubeMapTarget(texture_frame);
                 RenderNode(
                     p.first, material_id, projection_cubemap, views_cubemap[i]);
             }
-            // Again why?
-            SetCubeMapTarget(GetTextureFrameFromPosition(0));
-            RenderNode(
-                p.first, material_id, projection_cubemap, views_cubemap[0]);
+            {
+                // Again why?
+                proto::TextureFrame texture_frame;
+                texture_frame.set_value(static_cast<proto::TextureFrame::Enum>(
+                    proto::TextureFrame::CUBE_MAP_POSITIVE_X));
+                SetCubeMapTarget(texture_frame);
+                RenderNode(
+                    p.first, material_id, projection_cubemap, views_cubemap[0]);
+            }
             viewport_ = temp_viewport;
         }
     }

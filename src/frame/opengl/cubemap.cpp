@@ -166,8 +166,7 @@ Cubemap::Cubemap(const proto::Texture& proto_texture)
             proto_texture.pixel_structure());
         break;
     default:
-        throw std::runtime_error(std::format(
-            "Unknown type [{}]?", proto_texture.texture_oneof_case()));
+        throw std::runtime_error(std::format("Unknown type?"));
     }
 }
 
@@ -266,7 +265,7 @@ void Cubemap::CreateCubemapFromFile(
 {
     data_.mutable_pixel_element_size()->CopyFrom(pixel_element_size);
     data_.mutable_pixel_structure()->CopyFrom(pixel_structure);
-    data_.set_file_name(file_name);
+    data_.set_file_name(frame::file::PurifyFilePath(file_name));
     frame::file::Image image(
         file_name, data_.pixel_element_size(), data_.pixel_structure());
     CreateCubemapFromPointer(
@@ -316,7 +315,7 @@ void Cubemap::CreateCubemapFromPointer(
     {
         throw std::runtime_error("Couldn't load cubemap from single ptr.");
     }
-    auto size = json::ParseSize(equirectangular->GetData().size());
+    auto equirectangular_size = equirectangular->GetSize();
     // Seams correct when you are less than 2048 in height you get 512.
     std::uint32_t cube_single_res = PowerFloor(size.y);
     glm::uvec2 cube_pair_res = {cube_single_res, cube_single_res};
