@@ -57,9 +57,9 @@ extern const ::google::protobuf::internal::DescriptorTable
     descriptor_table_texture_2eproto;
 namespace frame {
 namespace proto {
-class CubeMapFiles;
-struct CubeMapFilesDefaultTypeInternal;
-extern CubeMapFilesDefaultTypeInternal _CubeMapFiles_default_instance_;
+class CubemapFiles;
+struct CubemapFilesDefaultTypeInternal;
+extern CubemapFilesDefaultTypeInternal _CubemapFiles_default_instance_;
 class Texture;
 struct TextureDefaultTypeInternal;
 extern TextureDefaultTypeInternal _Texture_default_instance_;
@@ -598,31 +598,31 @@ class TextureFilter final : public ::google::protobuf::Message
 };
 // -------------------------------------------------------------------
 
-class CubeMapFiles final : public ::google::protobuf::Message
-/* @@protoc_insertion_point(class_definition:frame.proto.CubeMapFiles) */ {
+class CubemapFiles final : public ::google::protobuf::Message
+/* @@protoc_insertion_point(class_definition:frame.proto.CubemapFiles) */ {
  public:
-  inline CubeMapFiles() : CubeMapFiles(nullptr) {}
-  ~CubeMapFiles() PROTOBUF_FINAL;
+  inline CubemapFiles() : CubemapFiles(nullptr) {}
+  ~CubemapFiles() PROTOBUF_FINAL;
 
 #if defined(PROTOBUF_CUSTOM_VTABLE)
-  void operator delete(CubeMapFiles* msg, std::destroying_delete_t) {
+  void operator delete(CubemapFiles* msg, std::destroying_delete_t) {
     SharedDtor(*msg);
-    ::google::protobuf::internal::SizedDelete(msg, sizeof(CubeMapFiles));
+    ::google::protobuf::internal::SizedDelete(msg, sizeof(CubemapFiles));
   }
 #endif
 
   template <typename = void>
-  explicit PROTOBUF_CONSTEXPR CubeMapFiles(
+  explicit PROTOBUF_CONSTEXPR CubemapFiles(
       ::google::protobuf::internal::ConstantInitialized);
 
-  inline CubeMapFiles(const CubeMapFiles& from) : CubeMapFiles(nullptr, from) {}
-  inline CubeMapFiles(CubeMapFiles&& from) noexcept
-      : CubeMapFiles(nullptr, std::move(from)) {}
-  inline CubeMapFiles& operator=(const CubeMapFiles& from) {
+  inline CubemapFiles(const CubemapFiles& from) : CubemapFiles(nullptr, from) {}
+  inline CubemapFiles(CubemapFiles&& from) noexcept
+      : CubemapFiles(nullptr, std::move(from)) {}
+  inline CubemapFiles& operator=(const CubemapFiles& from) {
     CopyFrom(from);
     return *this;
   }
-  inline CubeMapFiles& operator=(CubeMapFiles&& from) noexcept {
+  inline CubemapFiles& operator=(CubemapFiles&& from) noexcept {
     if (this == &from) return *this;
     if (::google::protobuf::internal::CanMoveWithInternalSwap(GetArena(), from.GetArena())) {
       InternalSwap(&from);
@@ -650,16 +650,16 @@ class CubeMapFiles final : public ::google::protobuf::Message
   static const ::google::protobuf::Reflection* GetReflection() {
     return default_instance().GetMetadata().reflection;
   }
-  static const CubeMapFiles& default_instance() {
+  static const CubemapFiles& default_instance() {
     return *internal_default_instance();
   }
-  static inline const CubeMapFiles* internal_default_instance() {
-    return reinterpret_cast<const CubeMapFiles*>(
-        &_CubeMapFiles_default_instance_);
+  static inline const CubemapFiles* internal_default_instance() {
+    return reinterpret_cast<const CubemapFiles*>(
+        &_CubemapFiles_default_instance_);
   }
   static constexpr int kIndexInFileMessages = 2;
-  friend void swap(CubeMapFiles& a, CubeMapFiles& b) { a.Swap(&b); }
-  inline void Swap(CubeMapFiles* other) {
+  friend void swap(CubemapFiles& a, CubemapFiles& b) { a.Swap(&b); }
+  inline void Swap(CubemapFiles* other) {
     if (other == this) return;
     if (::google::protobuf::internal::CanUseInternalSwap(GetArena(), other->GetArena())) {
       InternalSwap(other);
@@ -667,7 +667,7 @@ class CubeMapFiles final : public ::google::protobuf::Message
       ::google::protobuf::internal::GenericSwap(this, other);
     }
   }
-  void UnsafeArenaSwap(CubeMapFiles* other) {
+  void UnsafeArenaSwap(CubemapFiles* other) {
     if (other == this) return;
     ABSL_DCHECK(GetArena() == other->GetArena());
     InternalSwap(other);
@@ -675,13 +675,13 @@ class CubeMapFiles final : public ::google::protobuf::Message
 
   // implements Message ----------------------------------------------
 
-  CubeMapFiles* New(::google::protobuf::Arena* arena = nullptr) const {
-    return ::google::protobuf::Message::DefaultConstruct<CubeMapFiles>(arena);
+  CubemapFiles* New(::google::protobuf::Arena* arena = nullptr) const {
+    return ::google::protobuf::Message::DefaultConstruct<CubemapFiles>(arena);
   }
   using ::google::protobuf::Message::CopyFrom;
-  void CopyFrom(const CubeMapFiles& from);
+  void CopyFrom(const CubemapFiles& from);
   using ::google::protobuf::Message::MergeFrom;
-  void MergeFrom(const CubeMapFiles& from) { CubeMapFiles::MergeImpl(*this, from); }
+  void MergeFrom(const CubemapFiles& from) { CubemapFiles::MergeImpl(*this, from); }
 
   private:
   static void MergeImpl(
@@ -718,18 +718,18 @@ class CubeMapFiles final : public ::google::protobuf::Message
   private:
   void SharedCtor(::google::protobuf::Arena* arena);
   static void SharedDtor(MessageLite& self);
-  void InternalSwap(CubeMapFiles* other);
+  void InternalSwap(CubemapFiles* other);
  private:
   template <typename T>
   friend ::absl::string_view(
       ::google::protobuf::internal::GetAnyMessageName)();
-  static ::absl::string_view FullMessageName() { return "frame.proto.CubeMapFiles"; }
+  static ::absl::string_view FullMessageName() { return "frame.proto.CubemapFiles"; }
 
  protected:
-  explicit CubeMapFiles(::google::protobuf::Arena* arena);
-  CubeMapFiles(::google::protobuf::Arena* arena, const CubeMapFiles& from);
-  CubeMapFiles(::google::protobuf::Arena* arena, CubeMapFiles&& from) noexcept
-      : CubeMapFiles(arena) {
+  explicit CubemapFiles(::google::protobuf::Arena* arena);
+  CubemapFiles(::google::protobuf::Arena* arena, const CubemapFiles& from);
+  CubemapFiles(::google::protobuf::Arena* arena, CubemapFiles&& from) noexcept
+      : CubemapFiles(arena) {
     *this = ::std::move(from);
   }
   const ::google::protobuf::internal::ClassData* GetClassData() const PROTOBUF_FINAL;
@@ -847,7 +847,7 @@ class CubeMapFiles final : public ::google::protobuf::Message
   std::string* _internal_mutable_negative_z();
 
   public:
-  // @@protoc_insertion_point(class_scope:frame.proto.CubeMapFiles)
+  // @@protoc_insertion_point(class_scope:frame.proto.CubemapFiles)
  private:
   class _Internal;
   friend class ::google::protobuf::internal::TcParser;
@@ -869,7 +869,7 @@ class CubeMapFiles final : public ::google::protobuf::Message
                           ::google::protobuf::Arena* arena);
     inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
                           ::google::protobuf::Arena* arena, const Impl_& from,
-                          const CubeMapFiles& from_msg);
+                          const CubemapFiles& from_msg);
     ::google::protobuf::internal::ArenaStringPtr positive_x_;
     ::google::protobuf::internal::ArenaStringPtr negative_x_;
     ::google::protobuf::internal::ArenaStringPtr positive_y_;
@@ -1268,23 +1268,23 @@ class Texture final : public ::google::protobuf::Message
   ::frame::proto::Plugin* _internal_mutable_plugin();
 
   public:
-  // .frame.proto.CubeMapFiles file_names = 15;
+  // .frame.proto.CubemapFiles file_names = 15;
   bool has_file_names() const;
   private:
   bool _internal_has_file_names() const;
 
   public:
   void clear_file_names() ;
-  const ::frame::proto::CubeMapFiles& file_names() const;
-  PROTOBUF_NODISCARD ::frame::proto::CubeMapFiles* release_file_names();
-  ::frame::proto::CubeMapFiles* mutable_file_names();
-  void set_allocated_file_names(::frame::proto::CubeMapFiles* value);
-  void unsafe_arena_set_allocated_file_names(::frame::proto::CubeMapFiles* value);
-  ::frame::proto::CubeMapFiles* unsafe_arena_release_file_names();
+  const ::frame::proto::CubemapFiles& file_names() const;
+  PROTOBUF_NODISCARD ::frame::proto::CubemapFiles* release_file_names();
+  ::frame::proto::CubemapFiles* mutable_file_names();
+  void set_allocated_file_names(::frame::proto::CubemapFiles* value);
+  void unsafe_arena_set_allocated_file_names(::frame::proto::CubemapFiles* value);
+  ::frame::proto::CubemapFiles* unsafe_arena_release_file_names();
 
   private:
-  const ::frame::proto::CubeMapFiles& _internal_file_names() const;
-  ::frame::proto::CubeMapFiles* _internal_mutable_file_names();
+  const ::frame::proto::CubemapFiles& _internal_file_names() const;
+  ::frame::proto::CubemapFiles* _internal_mutable_file_names();
 
   public:
   void clear_texture_oneof();
@@ -1338,7 +1338,7 @@ class Texture final : public ::google::protobuf::Message
       ::google::protobuf::internal::ArenaStringPtr pixels_;
       ::google::protobuf::internal::ArenaStringPtr file_name_;
       ::frame::proto::Plugin* plugin_;
-      ::frame::proto::CubeMapFiles* file_names_;
+      ::frame::proto::CubemapFiles* file_names_;
     } texture_oneof_;
     ::uint32_t _oneof_case_[1];
     PROTOBUF_TSAN_DECLARE_MEMBER
@@ -1413,294 +1413,294 @@ inline void TextureFrame::_internal_set_value(::frame::proto::TextureFrame_Enum 
 
 // -------------------------------------------------------------------
 
-// CubeMapFiles
+// CubemapFiles
 
 // string positive_x = 1;
-inline void CubeMapFiles::clear_positive_x() {
+inline void CubemapFiles::clear_positive_x() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.positive_x_.ClearToEmpty();
 }
-inline const std::string& CubeMapFiles::positive_x() const
+inline const std::string& CubemapFiles::positive_x() const
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:frame.proto.CubeMapFiles.positive_x)
+  // @@protoc_insertion_point(field_get:frame.proto.CubemapFiles.positive_x)
   return _internal_positive_x();
 }
 template <typename Arg_, typename... Args_>
-inline PROTOBUF_ALWAYS_INLINE void CubeMapFiles::set_positive_x(Arg_&& arg,
+inline PROTOBUF_ALWAYS_INLINE void CubemapFiles::set_positive_x(Arg_&& arg,
                                                      Args_... args) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.positive_x_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
-  // @@protoc_insertion_point(field_set:frame.proto.CubeMapFiles.positive_x)
+  // @@protoc_insertion_point(field_set:frame.proto.CubemapFiles.positive_x)
 }
-inline std::string* CubeMapFiles::mutable_positive_x() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+inline std::string* CubemapFiles::mutable_positive_x() ABSL_ATTRIBUTE_LIFETIME_BOUND {
   std::string* _s = _internal_mutable_positive_x();
-  // @@protoc_insertion_point(field_mutable:frame.proto.CubeMapFiles.positive_x)
+  // @@protoc_insertion_point(field_mutable:frame.proto.CubemapFiles.positive_x)
   return _s;
 }
-inline const std::string& CubeMapFiles::_internal_positive_x() const {
+inline const std::string& CubemapFiles::_internal_positive_x() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
   return _impl_.positive_x_.Get();
 }
-inline void CubeMapFiles::_internal_set_positive_x(const std::string& value) {
+inline void CubemapFiles::_internal_set_positive_x(const std::string& value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.positive_x_.Set(value, GetArena());
 }
-inline std::string* CubeMapFiles::_internal_mutable_positive_x() {
+inline std::string* CubemapFiles::_internal_mutable_positive_x() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   return _impl_.positive_x_.Mutable( GetArena());
 }
-inline std::string* CubeMapFiles::release_positive_x() {
+inline std::string* CubemapFiles::release_positive_x() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  // @@protoc_insertion_point(field_release:frame.proto.CubeMapFiles.positive_x)
+  // @@protoc_insertion_point(field_release:frame.proto.CubemapFiles.positive_x)
   return _impl_.positive_x_.Release();
 }
-inline void CubeMapFiles::set_allocated_positive_x(std::string* value) {
+inline void CubemapFiles::set_allocated_positive_x(std::string* value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.positive_x_.SetAllocated(value, GetArena());
   if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.positive_x_.IsDefault()) {
     _impl_.positive_x_.Set("", GetArena());
   }
-  // @@protoc_insertion_point(field_set_allocated:frame.proto.CubeMapFiles.positive_x)
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.CubemapFiles.positive_x)
 }
 
 // string negative_x = 2;
-inline void CubeMapFiles::clear_negative_x() {
+inline void CubemapFiles::clear_negative_x() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.negative_x_.ClearToEmpty();
 }
-inline const std::string& CubeMapFiles::negative_x() const
+inline const std::string& CubemapFiles::negative_x() const
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:frame.proto.CubeMapFiles.negative_x)
+  // @@protoc_insertion_point(field_get:frame.proto.CubemapFiles.negative_x)
   return _internal_negative_x();
 }
 template <typename Arg_, typename... Args_>
-inline PROTOBUF_ALWAYS_INLINE void CubeMapFiles::set_negative_x(Arg_&& arg,
+inline PROTOBUF_ALWAYS_INLINE void CubemapFiles::set_negative_x(Arg_&& arg,
                                                      Args_... args) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.negative_x_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
-  // @@protoc_insertion_point(field_set:frame.proto.CubeMapFiles.negative_x)
+  // @@protoc_insertion_point(field_set:frame.proto.CubemapFiles.negative_x)
 }
-inline std::string* CubeMapFiles::mutable_negative_x() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+inline std::string* CubemapFiles::mutable_negative_x() ABSL_ATTRIBUTE_LIFETIME_BOUND {
   std::string* _s = _internal_mutable_negative_x();
-  // @@protoc_insertion_point(field_mutable:frame.proto.CubeMapFiles.negative_x)
+  // @@protoc_insertion_point(field_mutable:frame.proto.CubemapFiles.negative_x)
   return _s;
 }
-inline const std::string& CubeMapFiles::_internal_negative_x() const {
+inline const std::string& CubemapFiles::_internal_negative_x() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
   return _impl_.negative_x_.Get();
 }
-inline void CubeMapFiles::_internal_set_negative_x(const std::string& value) {
+inline void CubemapFiles::_internal_set_negative_x(const std::string& value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.negative_x_.Set(value, GetArena());
 }
-inline std::string* CubeMapFiles::_internal_mutable_negative_x() {
+inline std::string* CubemapFiles::_internal_mutable_negative_x() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   return _impl_.negative_x_.Mutable( GetArena());
 }
-inline std::string* CubeMapFiles::release_negative_x() {
+inline std::string* CubemapFiles::release_negative_x() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  // @@protoc_insertion_point(field_release:frame.proto.CubeMapFiles.negative_x)
+  // @@protoc_insertion_point(field_release:frame.proto.CubemapFiles.negative_x)
   return _impl_.negative_x_.Release();
 }
-inline void CubeMapFiles::set_allocated_negative_x(std::string* value) {
+inline void CubemapFiles::set_allocated_negative_x(std::string* value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.negative_x_.SetAllocated(value, GetArena());
   if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.negative_x_.IsDefault()) {
     _impl_.negative_x_.Set("", GetArena());
   }
-  // @@protoc_insertion_point(field_set_allocated:frame.proto.CubeMapFiles.negative_x)
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.CubemapFiles.negative_x)
 }
 
 // string positive_y = 3;
-inline void CubeMapFiles::clear_positive_y() {
+inline void CubemapFiles::clear_positive_y() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.positive_y_.ClearToEmpty();
 }
-inline const std::string& CubeMapFiles::positive_y() const
+inline const std::string& CubemapFiles::positive_y() const
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:frame.proto.CubeMapFiles.positive_y)
+  // @@protoc_insertion_point(field_get:frame.proto.CubemapFiles.positive_y)
   return _internal_positive_y();
 }
 template <typename Arg_, typename... Args_>
-inline PROTOBUF_ALWAYS_INLINE void CubeMapFiles::set_positive_y(Arg_&& arg,
+inline PROTOBUF_ALWAYS_INLINE void CubemapFiles::set_positive_y(Arg_&& arg,
                                                      Args_... args) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.positive_y_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
-  // @@protoc_insertion_point(field_set:frame.proto.CubeMapFiles.positive_y)
+  // @@protoc_insertion_point(field_set:frame.proto.CubemapFiles.positive_y)
 }
-inline std::string* CubeMapFiles::mutable_positive_y() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+inline std::string* CubemapFiles::mutable_positive_y() ABSL_ATTRIBUTE_LIFETIME_BOUND {
   std::string* _s = _internal_mutable_positive_y();
-  // @@protoc_insertion_point(field_mutable:frame.proto.CubeMapFiles.positive_y)
+  // @@protoc_insertion_point(field_mutable:frame.proto.CubemapFiles.positive_y)
   return _s;
 }
-inline const std::string& CubeMapFiles::_internal_positive_y() const {
+inline const std::string& CubemapFiles::_internal_positive_y() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
   return _impl_.positive_y_.Get();
 }
-inline void CubeMapFiles::_internal_set_positive_y(const std::string& value) {
+inline void CubemapFiles::_internal_set_positive_y(const std::string& value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.positive_y_.Set(value, GetArena());
 }
-inline std::string* CubeMapFiles::_internal_mutable_positive_y() {
+inline std::string* CubemapFiles::_internal_mutable_positive_y() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   return _impl_.positive_y_.Mutable( GetArena());
 }
-inline std::string* CubeMapFiles::release_positive_y() {
+inline std::string* CubemapFiles::release_positive_y() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  // @@protoc_insertion_point(field_release:frame.proto.CubeMapFiles.positive_y)
+  // @@protoc_insertion_point(field_release:frame.proto.CubemapFiles.positive_y)
   return _impl_.positive_y_.Release();
 }
-inline void CubeMapFiles::set_allocated_positive_y(std::string* value) {
+inline void CubemapFiles::set_allocated_positive_y(std::string* value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.positive_y_.SetAllocated(value, GetArena());
   if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.positive_y_.IsDefault()) {
     _impl_.positive_y_.Set("", GetArena());
   }
-  // @@protoc_insertion_point(field_set_allocated:frame.proto.CubeMapFiles.positive_y)
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.CubemapFiles.positive_y)
 }
 
 // string negative_y = 4;
-inline void CubeMapFiles::clear_negative_y() {
+inline void CubemapFiles::clear_negative_y() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.negative_y_.ClearToEmpty();
 }
-inline const std::string& CubeMapFiles::negative_y() const
+inline const std::string& CubemapFiles::negative_y() const
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:frame.proto.CubeMapFiles.negative_y)
+  // @@protoc_insertion_point(field_get:frame.proto.CubemapFiles.negative_y)
   return _internal_negative_y();
 }
 template <typename Arg_, typename... Args_>
-inline PROTOBUF_ALWAYS_INLINE void CubeMapFiles::set_negative_y(Arg_&& arg,
+inline PROTOBUF_ALWAYS_INLINE void CubemapFiles::set_negative_y(Arg_&& arg,
                                                      Args_... args) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.negative_y_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
-  // @@protoc_insertion_point(field_set:frame.proto.CubeMapFiles.negative_y)
+  // @@protoc_insertion_point(field_set:frame.proto.CubemapFiles.negative_y)
 }
-inline std::string* CubeMapFiles::mutable_negative_y() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+inline std::string* CubemapFiles::mutable_negative_y() ABSL_ATTRIBUTE_LIFETIME_BOUND {
   std::string* _s = _internal_mutable_negative_y();
-  // @@protoc_insertion_point(field_mutable:frame.proto.CubeMapFiles.negative_y)
+  // @@protoc_insertion_point(field_mutable:frame.proto.CubemapFiles.negative_y)
   return _s;
 }
-inline const std::string& CubeMapFiles::_internal_negative_y() const {
+inline const std::string& CubemapFiles::_internal_negative_y() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
   return _impl_.negative_y_.Get();
 }
-inline void CubeMapFiles::_internal_set_negative_y(const std::string& value) {
+inline void CubemapFiles::_internal_set_negative_y(const std::string& value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.negative_y_.Set(value, GetArena());
 }
-inline std::string* CubeMapFiles::_internal_mutable_negative_y() {
+inline std::string* CubemapFiles::_internal_mutable_negative_y() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   return _impl_.negative_y_.Mutable( GetArena());
 }
-inline std::string* CubeMapFiles::release_negative_y() {
+inline std::string* CubemapFiles::release_negative_y() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  // @@protoc_insertion_point(field_release:frame.proto.CubeMapFiles.negative_y)
+  // @@protoc_insertion_point(field_release:frame.proto.CubemapFiles.negative_y)
   return _impl_.negative_y_.Release();
 }
-inline void CubeMapFiles::set_allocated_negative_y(std::string* value) {
+inline void CubemapFiles::set_allocated_negative_y(std::string* value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.negative_y_.SetAllocated(value, GetArena());
   if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.negative_y_.IsDefault()) {
     _impl_.negative_y_.Set("", GetArena());
   }
-  // @@protoc_insertion_point(field_set_allocated:frame.proto.CubeMapFiles.negative_y)
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.CubemapFiles.negative_y)
 }
 
 // string positive_z = 5;
-inline void CubeMapFiles::clear_positive_z() {
+inline void CubemapFiles::clear_positive_z() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.positive_z_.ClearToEmpty();
 }
-inline const std::string& CubeMapFiles::positive_z() const
+inline const std::string& CubemapFiles::positive_z() const
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:frame.proto.CubeMapFiles.positive_z)
+  // @@protoc_insertion_point(field_get:frame.proto.CubemapFiles.positive_z)
   return _internal_positive_z();
 }
 template <typename Arg_, typename... Args_>
-inline PROTOBUF_ALWAYS_INLINE void CubeMapFiles::set_positive_z(Arg_&& arg,
+inline PROTOBUF_ALWAYS_INLINE void CubemapFiles::set_positive_z(Arg_&& arg,
                                                      Args_... args) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.positive_z_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
-  // @@protoc_insertion_point(field_set:frame.proto.CubeMapFiles.positive_z)
+  // @@protoc_insertion_point(field_set:frame.proto.CubemapFiles.positive_z)
 }
-inline std::string* CubeMapFiles::mutable_positive_z() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+inline std::string* CubemapFiles::mutable_positive_z() ABSL_ATTRIBUTE_LIFETIME_BOUND {
   std::string* _s = _internal_mutable_positive_z();
-  // @@protoc_insertion_point(field_mutable:frame.proto.CubeMapFiles.positive_z)
+  // @@protoc_insertion_point(field_mutable:frame.proto.CubemapFiles.positive_z)
   return _s;
 }
-inline const std::string& CubeMapFiles::_internal_positive_z() const {
+inline const std::string& CubemapFiles::_internal_positive_z() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
   return _impl_.positive_z_.Get();
 }
-inline void CubeMapFiles::_internal_set_positive_z(const std::string& value) {
+inline void CubemapFiles::_internal_set_positive_z(const std::string& value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.positive_z_.Set(value, GetArena());
 }
-inline std::string* CubeMapFiles::_internal_mutable_positive_z() {
+inline std::string* CubemapFiles::_internal_mutable_positive_z() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   return _impl_.positive_z_.Mutable( GetArena());
 }
-inline std::string* CubeMapFiles::release_positive_z() {
+inline std::string* CubemapFiles::release_positive_z() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  // @@protoc_insertion_point(field_release:frame.proto.CubeMapFiles.positive_z)
+  // @@protoc_insertion_point(field_release:frame.proto.CubemapFiles.positive_z)
   return _impl_.positive_z_.Release();
 }
-inline void CubeMapFiles::set_allocated_positive_z(std::string* value) {
+inline void CubemapFiles::set_allocated_positive_z(std::string* value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.positive_z_.SetAllocated(value, GetArena());
   if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.positive_z_.IsDefault()) {
     _impl_.positive_z_.Set("", GetArena());
   }
-  // @@protoc_insertion_point(field_set_allocated:frame.proto.CubeMapFiles.positive_z)
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.CubemapFiles.positive_z)
 }
 
 // string negative_z = 6;
-inline void CubeMapFiles::clear_negative_z() {
+inline void CubemapFiles::clear_negative_z() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.negative_z_.ClearToEmpty();
 }
-inline const std::string& CubeMapFiles::negative_z() const
+inline const std::string& CubemapFiles::negative_z() const
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:frame.proto.CubeMapFiles.negative_z)
+  // @@protoc_insertion_point(field_get:frame.proto.CubemapFiles.negative_z)
   return _internal_negative_z();
 }
 template <typename Arg_, typename... Args_>
-inline PROTOBUF_ALWAYS_INLINE void CubeMapFiles::set_negative_z(Arg_&& arg,
+inline PROTOBUF_ALWAYS_INLINE void CubemapFiles::set_negative_z(Arg_&& arg,
                                                      Args_... args) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.negative_z_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
-  // @@protoc_insertion_point(field_set:frame.proto.CubeMapFiles.negative_z)
+  // @@protoc_insertion_point(field_set:frame.proto.CubemapFiles.negative_z)
 }
-inline std::string* CubeMapFiles::mutable_negative_z() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+inline std::string* CubemapFiles::mutable_negative_z() ABSL_ATTRIBUTE_LIFETIME_BOUND {
   std::string* _s = _internal_mutable_negative_z();
-  // @@protoc_insertion_point(field_mutable:frame.proto.CubeMapFiles.negative_z)
+  // @@protoc_insertion_point(field_mutable:frame.proto.CubemapFiles.negative_z)
   return _s;
 }
-inline const std::string& CubeMapFiles::_internal_negative_z() const {
+inline const std::string& CubemapFiles::_internal_negative_z() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
   return _impl_.negative_z_.Get();
 }
-inline void CubeMapFiles::_internal_set_negative_z(const std::string& value) {
+inline void CubemapFiles::_internal_set_negative_z(const std::string& value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.negative_z_.Set(value, GetArena());
 }
-inline std::string* CubeMapFiles::_internal_mutable_negative_z() {
+inline std::string* CubemapFiles::_internal_mutable_negative_z() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   return _impl_.negative_z_.Mutable( GetArena());
 }
-inline std::string* CubeMapFiles::release_negative_z() {
+inline std::string* CubemapFiles::release_negative_z() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  // @@protoc_insertion_point(field_release:frame.proto.CubeMapFiles.negative_z)
+  // @@protoc_insertion_point(field_release:frame.proto.CubemapFiles.negative_z)
   return _impl_.negative_z_.Release();
 }
-inline void CubeMapFiles::set_allocated_negative_z(std::string* value) {
+inline void CubemapFiles::set_allocated_negative_z(std::string* value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.negative_z_.SetAllocated(value, GetArena());
   if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.negative_z_.IsDefault()) {
     _impl_.negative_z_.Set("", GetArena());
   }
-  // @@protoc_insertion_point(field_set_allocated:frame.proto.CubeMapFiles.negative_z)
+  // @@protoc_insertion_point(field_set_allocated:frame.proto.CubemapFiles.negative_z)
 }
 
 // -------------------------------------------------------------------
@@ -2738,7 +2738,7 @@ inline ::frame::proto::Plugin* Texture::mutable_plugin() ABSL_ATTRIBUTE_LIFETIME
   return _msg;
 }
 
-// .frame.proto.CubeMapFiles file_names = 15;
+// .frame.proto.CubemapFiles file_names = 15;
 inline bool Texture::has_file_names() const {
   return texture_oneof_case() == kFileNames;
 }
@@ -2759,7 +2759,7 @@ inline void Texture::clear_file_names() {
     clear_has_texture_oneof();
   }
 }
-inline ::frame::proto::CubeMapFiles* Texture::release_file_names() {
+inline ::frame::proto::CubemapFiles* Texture::release_file_names() {
   // @@protoc_insertion_point(field_release:frame.proto.Texture.file_names)
   if (texture_oneof_case() == kFileNames) {
     clear_has_texture_oneof();
@@ -2773,14 +2773,14 @@ inline ::frame::proto::CubeMapFiles* Texture::release_file_names() {
     return nullptr;
   }
 }
-inline const ::frame::proto::CubeMapFiles& Texture::_internal_file_names() const {
-  return texture_oneof_case() == kFileNames ? *_impl_.texture_oneof_.file_names_ : reinterpret_cast<::frame::proto::CubeMapFiles&>(::frame::proto::_CubeMapFiles_default_instance_);
+inline const ::frame::proto::CubemapFiles& Texture::_internal_file_names() const {
+  return texture_oneof_case() == kFileNames ? *_impl_.texture_oneof_.file_names_ : reinterpret_cast<::frame::proto::CubemapFiles&>(::frame::proto::_CubemapFiles_default_instance_);
 }
-inline const ::frame::proto::CubeMapFiles& Texture::file_names() const ABSL_ATTRIBUTE_LIFETIME_BOUND {
+inline const ::frame::proto::CubemapFiles& Texture::file_names() const ABSL_ATTRIBUTE_LIFETIME_BOUND {
   // @@protoc_insertion_point(field_get:frame.proto.Texture.file_names)
   return _internal_file_names();
 }
-inline ::frame::proto::CubeMapFiles* Texture::unsafe_arena_release_file_names() {
+inline ::frame::proto::CubemapFiles* Texture::unsafe_arena_release_file_names() {
   // @@protoc_insertion_point(field_unsafe_arena_release:frame.proto.Texture.file_names)
   if (texture_oneof_case() == kFileNames) {
     clear_has_texture_oneof();
@@ -2791,7 +2791,7 @@ inline ::frame::proto::CubeMapFiles* Texture::unsafe_arena_release_file_names() 
     return nullptr;
   }
 }
-inline void Texture::unsafe_arena_set_allocated_file_names(::frame::proto::CubeMapFiles* value) {
+inline void Texture::unsafe_arena_set_allocated_file_names(::frame::proto::CubemapFiles* value) {
   // We rely on the oneof clear method to free the earlier contents
   // of this oneof. We can directly use the pointer we're given to
   // set the new value.
@@ -2802,17 +2802,17 @@ inline void Texture::unsafe_arena_set_allocated_file_names(::frame::proto::CubeM
   }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:frame.proto.Texture.file_names)
 }
-inline ::frame::proto::CubeMapFiles* Texture::_internal_mutable_file_names() {
+inline ::frame::proto::CubemapFiles* Texture::_internal_mutable_file_names() {
   if (texture_oneof_case() != kFileNames) {
     clear_texture_oneof();
     set_has_file_names();
     _impl_.texture_oneof_.file_names_ =
-        ::google::protobuf::Message::DefaultConstruct<::frame::proto::CubeMapFiles>(GetArena());
+        ::google::protobuf::Message::DefaultConstruct<::frame::proto::CubemapFiles>(GetArena());
   }
   return _impl_.texture_oneof_.file_names_;
 }
-inline ::frame::proto::CubeMapFiles* Texture::mutable_file_names() ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  ::frame::proto::CubeMapFiles* _msg = _internal_mutable_file_names();
+inline ::frame::proto::CubemapFiles* Texture::mutable_file_names() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  ::frame::proto::CubemapFiles* _msg = _internal_mutable_file_names();
   // @@protoc_insertion_point(field_mutable:frame.proto.Texture.file_names)
   return _msg;
 }

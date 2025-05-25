@@ -40,8 +40,7 @@ std::unique_ptr<frame::TextureInterface> ParseTexture(
         return ParseCubemap(proto_texture, size);
     }
     std::unique_ptr<TextureInterface> texture_interface =
-        std::make_unique<opengl::Texture>(proto_texture);
-    texture_interface->SetWindowSize(size);
+        std::make_unique<opengl::Texture>(proto_texture, size);
     return texture_interface;
 }
 
@@ -54,8 +53,7 @@ std::unique_ptr<TextureInterface> ParseCubemap(
         return ParseTexture(proto_texture, size);
     }
     std::unique_ptr<TextureInterface> texture_interface =
-        std::make_unique<opengl::Cubemap>(proto_texture);
-    texture_interface->SetWindowSize(size);
+        std::make_unique<opengl::Cubemap>(proto_texture, size);
     return texture_interface;
 }
 

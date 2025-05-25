@@ -54,7 +54,7 @@ TEST_F(FrameBufferTest, BindTextureFrameTest)
         frame::json::PixelElementSize_BYTE());
     proto_texture.mutable_pixel_structure()->CopyFrom(
         frame::json::PixelStructure_BGR());
-    frame::opengl::Texture texture(proto_texture);
+    frame::opengl::Texture texture(proto_texture, glm::uvec2{1, 1});
     EXPECT_NO_THROW(frame_->AttachTexture(texture.GetId()));
 }
 

@@ -104,9 +104,11 @@ void MenubarView::ShowTexturesWindow(DeviceInterface& device)
         }
         if (ImGui::MenuItem(
                 std::format(
-                    "{} - [{}]",
+                    "{} - [{}] - ({}, {})",
                     str_type,
-                    texture_interface.GetName(), id).c_str(),
+                    texture_interface.GetName(),
+                    std::to_string(texture_interface.GetSize().x),
+                    std::to_string(texture_interface.GetSize().y)).c_str(),
                 "",
                 &window_state_[texture_interface.GetName()]))
         {

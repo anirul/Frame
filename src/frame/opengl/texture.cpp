@@ -1,10 +1,10 @@
 #include "frame/opengl/texture.h"
 
 #include <GL/glew.h>
-
 #include <algorithm>
 #include <cassert>
 #include <functional>
+#include <google/protobuf/descriptor.h>
 #include <stdexcept>
 
 #include "frame/file/file_system.h"
@@ -23,15 +23,17 @@
 namespace frame::opengl
 {
 
-Texture::Texture(const proto::Texture& proto_texture)
+Texture::Texture(const proto::Texture& proto_texture, glm::uvec2 display_size)
 {
     data_ = proto_texture;
+    std::string name = proto_texture.name();
+    SetDisplaySize(display_size);
     switch (proto_texture.texture_oneof_case())
     {
     case proto::Texture::kPixels:
         CreateTextureFromPointer(
             data_.pixels().data(),
-            json::ParseSize(data_.size()),
+            GetSize(),
             data_.pixel_element_size(),
             data_.pixel_structure());
         break;
@@ -45,10 +47,22 @@ Texture::Texture(const proto::Texture& proto_texture)
         throw std::runtime_error("Don't know what to do there?");
     case proto::Texture::kFileNames:
         throw std::runtime_error("This is a Texture not a cubemap?");
-    default:
+    case 0:
+        CreateTextureFromPointer(
+            nullptr,
+            GetSize(),
+            data_.pixel_element_size(),
+            data_.pixel_structure());
+        break;
+    default: {
+        const auto enum_value = proto_texture.texture_oneof_case();
+        const auto* value_desc =
+            proto_texture.GetDescriptor()->FindFieldByNumber(enum_value);
         throw std::runtime_error(std::format(
-            "Unknown type[{}]?",
-            static_cast<int>(proto_texture.texture_oneof_case())));
+            "Unknown texture [{}] type [{}]?",
+            name,
+            value_desc ? value_desc->name() : "<unknown>"));
+    }
     }
 }
 
@@ -78,7 +92,10 @@ void Texture::CreateTextureFromFile(
     data_.mutable_pixel_structure()->CopyFrom(pixel_structure);
     data_.set_file_name(frame::file::PurifyFilePath(file_name));
     frame::file::Image image(
-        file_name, data_.pixel_element_size(), data_.pixel_structure());
+        frame::file::FindFile(file_name),
+        data_.pixel_element_size(),
+        data_.pixel_structure());
+    SetDisplaySize(image.GetSize());
     CreateTextureFromPointer(
         image.Data(), image.GetSize(), pixel_element_size, pixel_structure);
 }
@@ -215,15 +232,23 @@ glm::uvec2 Texture::GetSize()
     return inner_size_;
 }
 
-void Texture::SetWindowSize(glm::uvec2 size)
+void Texture::SetDisplaySize(glm::uvec2 display_size)
 {
-    if (data_.size().x() < 0)
+    if (display_size.x == 0)
     {
-        inner_size_.x = size.x / std::abs(data_.size().x());
+        inner_size_.x = data_.size().x();
     }
-    if (data_.size().y() < 0)
+    else if (data_.size().x() < 0)
     {
-        inner_size_.y = size.y / std::abs(data_.size().y());
+        inner_size_.x = display_size.x / std::abs(data_.size().x());
+    }
+    if (display_size.y == 0)
+    {
+        inner_size_.y = data_.size().y();
+    }
+    else if (data_.size().y() < 0)
+    {
+        inner_size_.y = display_size.y / std::abs(data_.size().y());
     }
 }
 

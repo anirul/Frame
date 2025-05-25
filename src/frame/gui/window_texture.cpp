@@ -19,7 +19,11 @@ WindowTexture::WindowTexture(TextureInterface& texture_interface)
         throw std::runtime_error(
             "Cannot create a window for a cubemap texture!");
     }
-    name_ = std::format("texture - [{}]", texture_interface_.GetName());
+    name_ = std::format(
+        "texture - [{}] - ({}, {})",
+        texture_interface_.GetName(),
+        texture_interface_.GetSize().x,
+        texture_interface_.GetSize().y);
 }
 
 bool WindowTexture::DrawCallback()
@@ -31,9 +35,9 @@ bool WindowTexture::DrawCallback()
     ImVec2 content_window = ImGui::GetContentRegionAvail();
 
     // Compute the final size (window_range) as you already do.
-    auto texture_size = texture.GetData().size();
-    float aspect_ratio = static_cast<float>(texture_size.x()) /
-                         static_cast<float>(texture_size.y());
+    auto texture_size = texture.GetSize();
+    float aspect_ratio = static_cast<float>(texture_size.x) /
+                         static_cast<float>(texture_size.y);
     ImTextureID gl_id = static_cast<ImTextureID>(texture.GetId());
     ImVec2 window_range{};
     if (content_window.x / aspect_ratio > content_window.y)

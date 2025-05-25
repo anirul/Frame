@@ -68,10 +68,10 @@ struct TextureInterface : public Serialize<proto::Texture>
 	 */
     virtual glm::uvec2 GetSize() = 0;
     /**
-	 * @brief Set the window size (in case the texture size is relative).
-	 * @param size: The window size.
+	 * @brief Set the display size (in case the texture size is relative).
+	 * @param display_size: The display size.
 	 */
-    virtual void SetWindowSize(glm::uvec2 size) = 0;
+    virtual void SetDisplaySize(glm::uvec2 display_size) = 0;
 };
 
 } // End namespace frame.

@@ -139,9 +139,10 @@ Cubemap::Cubemap(
     CreateCubemapFromPointers(ptrs, size, pixel_element_size, pixel_structure);
 }
 
-Cubemap::Cubemap(const proto::Texture& proto_texture)
+Cubemap::Cubemap(const proto::Texture& proto_texture, glm::uvec2 display_size)
 {
     data_ = proto_texture;
+    SetDisplaySize(display_size);
     switch (proto_texture.texture_oneof_case())
     {
     case proto::Texture::kPlugin:
@@ -156,12 +157,21 @@ Cubemap::Cubemap(const proto::Texture& proto_texture)
         break;
     case proto::Texture::kFileNames:
         CreateCubemapFromFiles(
-            {proto_texture.file_names().positive_x(),
-             proto_texture.file_names().negative_x(),
-             proto_texture.file_names().positive_y(),
-             proto_texture.file_names().negative_y(),
-             proto_texture.file_names().positive_z(),
-             proto_texture.file_names().negative_z()},
+            std::array<std::filesystem::path, 6>{
+                proto_texture.file_names().positive_x(),
+                proto_texture.file_names().negative_x(),
+                proto_texture.file_names().positive_y(),
+                proto_texture.file_names().negative_y(),
+                proto_texture.file_names().positive_z(),
+                proto_texture.file_names().negative_z()},
+            proto_texture.pixel_element_size(),
+            proto_texture.pixel_structure());
+        break;
+    case 0:
+        CreateCubemapFromPointers(
+            std::array<const void*, 6>{
+                nullptr, nullptr, nullptr, nullptr, nullptr, nullptr},
+            display_size,
             proto_texture.pixel_element_size(),
             proto_texture.pixel_structure());
         break;
@@ -267,7 +277,9 @@ void Cubemap::CreateCubemapFromFile(
     data_.mutable_pixel_structure()->CopyFrom(pixel_structure);
     data_.set_file_name(frame::file::PurifyFilePath(file_name));
     frame::file::Image image(
-        file_name, data_.pixel_element_size(), data_.pixel_structure());
+        frame::file::FindFile(file_name),
+        data_.pixel_element_size(),
+        data_.pixel_structure());
     CreateCubemapFromPointer(
         image.Data(),
         image.GetSize(),
@@ -282,19 +294,31 @@ void Cubemap::CreateCubemapFromFiles(
 {
     data_.mutable_pixel_element_size()->CopyFrom(pixel_element_size);
     data_.mutable_pixel_structure()->CopyFrom(pixel_structure);
-    std::vector<frame::file::Image> images;
-    for (const auto& file_name : file_names)
+    std::vector<std::unique_ptr<frame::file::Image>> images;
+    std::vector<std::filesystem::path> paths;
+    for (const std::filesystem::path& file_name : file_names)
     {
-        images.push_back(frame::file::Image(file_name));
+        paths.push_back(file_name);
+        auto image_ptr = std::make_unique<frame::file::Image>(
+            frame::file::FindFile(file_name));
+        images.push_back(std::move(image_ptr));
     }
+    proto::CubemapFiles cubemap_files;
+    cubemap_files.set_positive_x(frame::file::PurifyFilePath(paths[0]));
+    cubemap_files.set_negative_x(frame::file::PurifyFilePath(paths[1]));
+    cubemap_files.set_positive_y(frame::file::PurifyFilePath(paths[2]));
+    cubemap_files.set_negative_y(frame::file::PurifyFilePath(paths[3]));
+    cubemap_files.set_positive_z(frame::file::PurifyFilePath(paths[4]));
+    cubemap_files.set_negative_z(frame::file::PurifyFilePath(paths[5]));
+    data_.mutable_file_names()->CopyFrom(cubemap_files);
     CreateCubemapFromPointers(
-        {images[0].Data(),
-         images[1].Data(),
-         images[2].Data(),
-         images[3].Data(),
-         images[4].Data(),
-         images[5].Data()},
-        images[0].GetSize(),
+        {images[0]->Data(),
+         images[1]->Data(),
+         images[2]->Data(),
+         images[3]->Data(),
+         images[4]->Data(),
+         images[5]->Data()},
+        images[0]->GetSize(),
         pixel_element_size,
         pixel_structure);
 }
@@ -569,15 +593,23 @@ glm::uvec2 Cubemap::GetSize()
     return inner_size_;
 }
 
-void Cubemap::SetWindowSize(glm::uvec2 size)
+void Cubemap::SetDisplaySize(glm::uvec2 display_size)
 {
-    if (data_.size().x() < 0)
+    if (display_size.x == 0)
     {
-        inner_size_.x = size.x / std::abs(data_.size().x());
+        inner_size_.x = data_.size().x();
     }
-    if (data_.size().y() < 0)
+    else if (data_.size().x() < 0)
     {
-        inner_size_.y = size.y / std::abs(data_.size().y());
+        inner_size_.x = display_size.x / std::abs(data_.size().x());
+    }
+    if (display_size.y == 0)
+    {
+        inner_size_.y = data_.size().y();
+    }
+    else if (data_.size().y() < 0)
+    {
+        inner_size_.y = display_size.y / std::abs(data_.size().y());
     }
 }
 

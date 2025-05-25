@@ -21,7 +21,8 @@ std::unique_ptr<TextureInterface> LoadTextureFromVec4(const glm::vec4& vec4)
     proto_texture.mutable_size()->CopyFrom(json::SerializeSize({1, 1}));
     proto_texture.set_pixels(
         reinterpret_cast<const char*>(&vec4), sizeof(glm::vec4));
-    return std::make_unique<frame::opengl::Texture>(proto_texture);
+    return std::make_unique<frame::opengl::Texture>(
+        proto_texture, glm::uvec2{1, 1});
 }
 
 std::unique_ptr<TextureInterface> LoadTextureFromFloat(float f)
@@ -33,7 +34,8 @@ std::unique_ptr<TextureInterface> LoadTextureFromFloat(float f)
         json::PixelStructure_GREY());
     proto_texture.mutable_size()->CopyFrom(json::SerializeSize({1, 1}));
     proto_texture.set_pixels(reinterpret_cast<const char*>(&f), sizeof(float));
-    return std::make_unique<frame::opengl::Texture>(proto_texture);
+    return std::make_unique<frame::opengl::Texture>(
+        proto_texture, glm::uvec2{1, 1});
 }
 
 } // namespace frame::opengl::file

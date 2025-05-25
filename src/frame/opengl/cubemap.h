@@ -35,7 +35,9 @@ class Cubemap : public TextureInterface, public BindInterface
      * @param proto_parameter: The proto to guide in the creation of the
      * texture.
      */
-    Cubemap(const proto::Texture& proto_texture);
+    Cubemap(
+        const proto::Texture& proto_texture,
+        glm::uvec2 display_size = glm::uvec2{0, 0});
     /**
      * @brief Create a texture from a file.
      * @param file_name: A file to be loaded into the texture.
@@ -157,9 +159,9 @@ class Cubemap : public TextureInterface, public BindInterface
     /**
      * @brief Set the window size (in case the
      * texture size is relative).
-     * @param size: The window size.
+     * @param display_size: The window size.
      */
-    void SetWindowSize(glm::uvec2 size) override;
+    void SetDisplaySize(glm::uvec2 display_size) override;
 
   public:
     /**
