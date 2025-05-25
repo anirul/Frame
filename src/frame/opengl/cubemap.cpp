@@ -4,9 +4,13 @@
 
 #include <algorithm>
 #include <cassert>
+#include <fstream>
 #include <functional>
 #include <stdexcept>
 
+#include "frame/file/file_system.h"
+#include "frame/file/image.h"
+#include "frame/json/parse_level.h"
 #include "frame/json/parse_uniform.h"
 #include "frame/json/serialize_uniform.h"
 #include "frame/level.h"
@@ -21,9 +25,118 @@
 namespace frame::opengl
 {
 
+namespace
+{
+// Get the 6 view for the cube map.
+const std::array<glm::mat4, 6> views_cubemap = {
+    glm::lookAt(
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(-1.0f, 0.0f, 0.0f),
+        glm::vec3(0.0f, 1.0f, 0.0f)),
+    glm::lookAt(
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(1.0f, 0.0f, 0.0f),
+        glm::vec3(0.0f, 1.0f, 0.0f)),
+    glm::lookAt(
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(0.0f, -1.0f, 0.0f),
+        glm::vec3(0.0f, 0.0f, 1.0f)),
+    glm::lookAt(
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(0.0f, 1.0f, 0.0f),
+        glm::vec3(0.0f, 0.0f, -1.0f)),
+    glm::lookAt(
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(0.0f, 0.0f, 1.0f),
+        glm::vec3(0.0f, 1.0f, 0.0f)),
+    glm::lookAt(
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(0.0f, 0.0f, -1.0f),
+        glm::vec3(0.0f, 1.0f, 0.0f))};
+// Projection cube map.
+const glm::mat4 projection_cubemap =
+    glm::perspective(glm::radians(90.0f), 1.0f, 0.01f, 10.0f);
+const std::set<std::string> byte_extention = {"jpeg", "jpg"};
+const std::set<std::string> rgba_extention = {"png"};
+const std::set<std::string> half_extention = {"hdr", "dds"};
+
+// Taken from cpp reference.
+std::size_t ReplaceAll(
+    std::string& inout,
+    const std::string_view what,
+    const std::string_view with)
+{
+    std::size_t count = 0;
+    for (std::string::size_type pos = 0;
+         inout.npos != (pos = inout.find(what.data(), pos, what.length()));
+         pos += with.length(), ++count)
+    {
+        inout.replace(pos, what.length(), with.data(), with.length());
+    }
+    return count;
+}
+
+std::string FillLevel(
+    const std::string& initial, const std::map<std::string, std::string>& map)
+{
+    std::string out = initial;
+    for (auto [from, to] : map)
+    {
+        ReplaceAll(to, "\\", "/");
+        ReplaceAll(out, from, to);
+    }
+    return out;
+}
+
+std::uint32_t PowerFloor(std::uint32_t x)
+{
+    std::uint32_t power = 1;
+    while (x >>= 1)
+    {
+        power <<= 1;
+    }
+    return power;
+}
+
+} // End namespace.
+
 Cubemap::~Cubemap()
 {
     glDeleteTextures(1, &texture_id_);
+}
+
+Cubemap::Cubemap(
+    std::filesystem::path file_name,
+    proto::PixelElementSize pixel_element_size,
+    proto::PixelStructure pixel_structure)
+{
+    CreateCubemapFromFile(file_name, pixel_element_size, pixel_structure);
+}
+
+Cubemap::Cubemap(
+    std::array<std::filesystem::path, 6> file_names,
+    proto::PixelElementSize pixel_element_size,
+    proto::PixelStructure pixel_structure)
+{
+    CreateCubemapFromFiles(file_names, pixel_element_size, pixel_structure);
+}
+
+Cubemap::Cubemap(
+    const void* ptr,
+    glm::uvec2 size,
+    proto::PixelElementSize pixel_element_size,
+    proto::PixelStructure pixel_structure)
+{
+    CreateCubemapFromPointer(ptr, size, pixel_element_size, pixel_structure);
+}
+
+Cubemap::Cubemap(
+    std::array<const void*, 6> ptrs,
+    glm::uvec2 size,
+    proto::PixelElementSize pixel_element_size,
+    proto::PixelStructure pixel_structure)
+{
+    CreateCubemapFromPointers(ptrs, size, pixel_element_size, pixel_structure);
 }
 
 Cubemap::Cubemap(const proto::Texture& proto_texture)
@@ -31,11 +144,30 @@ Cubemap::Cubemap(const proto::Texture& proto_texture)
     data_ = proto_texture;
     switch (proto_texture.texture_oneof_case())
     {
-    case proto::Texture::kPixels:
-    case proto::Texture::kFileName:
     case proto::Texture::kPlugin:
+        [[fallthrough]];
+    case proto::Texture::kPixels:
+        throw std::runtime_error("Not supported yet.");
+    case proto::Texture::kFileName:
+        CreateCubemapFromFile(
+            proto_texture.file_name(),
+            proto_texture.pixel_element_size(),
+            proto_texture.pixel_structure());
+        break;
     case proto::Texture::kFileNames:
+        CreateCubemapFromFiles(
+            {proto_texture.file_names().positive_x(),
+             proto_texture.file_names().negative_x(),
+             proto_texture.file_names().positive_y(),
+             proto_texture.file_names().negative_y(),
+             proto_texture.file_names().positive_z(),
+             proto_texture.file_names().negative_z()},
+            proto_texture.pixel_element_size(),
+            proto_texture.pixel_structure());
+        break;
     default:
+        throw std::runtime_error(std::format(
+            "Unknown type [{}]?", proto_texture.texture_oneof_case()));
     }
 }
 
@@ -43,7 +175,9 @@ void Cubemap::Bind(unsigned int slot /*= 0*/) const
 {
     assert(slot < GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS);
     if (locked_bind_)
+    {
         return;
+    }
     glActiveTexture(GL_TEXTURE0 + slot);
     glBindTexture(GL_TEXTURE_CUBE_MAP, texture_id_);
 }
@@ -51,49 +185,10 @@ void Cubemap::Bind(unsigned int slot /*= 0*/) const
 void Cubemap::UnBind() const
 {
     if (locked_bind_)
-        return;
-    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-}
-
-void Cubemap::CreateCubemap(
-    const std::array<void*, 6> cube_map, glm::uvec2 size)
-{
-    glGenTextures(1, &texture_id_);
-    ScopedBind scoped_bind(*this);
-    glTexParameteri(
-        GL_TEXTURE_CUBE_MAP,
-        GL_TEXTURE_MIN_FILTER,
-        ConvertToGLType(proto::TextureFilter::LINEAR));
-    glTexParameteri(
-        GL_TEXTURE_CUBE_MAP,
-        GL_TEXTURE_MAG_FILTER,
-        ConvertToGLType(proto::TextureFilter::LINEAR));
-    glTexParameteri(
-        GL_TEXTURE_CUBE_MAP,
-        GL_TEXTURE_WRAP_S,
-        ConvertToGLType(proto::TextureFilter::CLAMP_TO_EDGE));
-    glTexParameteri(
-        GL_TEXTURE_CUBE_MAP,
-        GL_TEXTURE_WRAP_T,
-        ConvertToGLType(proto::TextureFilter::CLAMP_TO_EDGE));
-    glTexParameteri(
-        GL_TEXTURE_CUBE_MAP,
-        GL_TEXTURE_WRAP_R,
-        ConvertToGLType(proto::TextureFilter::CLAMP_TO_EDGE));
-    for (unsigned int i : {0, 1, 2, 3, 4, 5})
     {
-        glTexImage2D(
-            GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-            0,
-            opengl::ConvertToGLType(
-                data_.pixel_element_size(), data_.pixel_structure()),
-            static_cast<GLsizei>(data_.size().x()),
-            static_cast<GLsizei>(data_.size().y()),
-            0,
-            opengl::ConvertToGLType(data_.pixel_structure()),
-            opengl::ConvertToGLType(data_.pixel_element_size()),
-            cube_map[i]);
+        return;
     }
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }
 
 int Cubemap::ConvertToGLType(
@@ -164,14 +259,181 @@ void Cubemap::CreateFrameAndRenderBuffer()
     frame_->DrawBuffers(1);
 }
 
+void Cubemap::CreateCubemapFromFile(
+    std::filesystem::path file_name,
+    proto::PixelElementSize pixel_element_size,
+    proto::PixelStructure pixel_structure)
+{
+    data_.mutable_pixel_element_size()->CopyFrom(pixel_element_size);
+    data_.mutable_pixel_structure()->CopyFrom(pixel_structure);
+    data_.set_file_name(file_name);
+    frame::file::Image image(
+        file_name, data_.pixel_element_size(), data_.pixel_structure());
+    CreateCubemapFromPointer(
+        image.Data(),
+        image.GetSize(),
+        data_.pixel_element_size(),
+        data_.pixel_structure());
+}
+
+void Cubemap::CreateCubemapFromFiles(
+    std::array<std::filesystem::path, 6> file_names,
+    proto::PixelElementSize pixel_element_size,
+    proto::PixelStructure pixel_structure)
+{
+    data_.mutable_pixel_element_size()->CopyFrom(pixel_element_size);
+    data_.mutable_pixel_structure()->CopyFrom(pixel_structure);
+    std::vector<frame::file::Image> images;
+    for (const auto& file_name : file_names)
+    {
+        images.push_back(frame::file::Image(file_name));
+    }
+    CreateCubemapFromPointers(
+        {images[0].Data(),
+         images[1].Data(),
+         images[2].Data(),
+         images[3].Data(),
+         images[4].Data(),
+         images[5].Data()},
+        images[0].GetSize(),
+        pixel_element_size,
+        pixel_structure);
+}
+
+void Cubemap::CreateCubemapFromPointer(
+    const void* ptr,
+    glm::uvec2 size,
+    proto::PixelElementSize pixel_element_size,
+    proto::PixelStructure pixel_structure)
+{
+    data_.mutable_pixel_element_size()->CopyFrom(pixel_element_size);
+    data_.mutable_pixel_structure()->CopyFrom(pixel_structure);
+    auto& logger = Logger::GetInstance();
+    std::unique_ptr<TextureInterface> equirectangular =
+        std::make_unique<Texture>(
+            ptr, size, pixel_element_size, pixel_structure);
+    if (!equirectangular)
+    {
+        throw std::runtime_error("Couldn't load cubemap from single ptr.");
+    }
+    auto size = json::ParseSize(equirectangular->GetData().size());
+    // Seams correct when you are less than 2048 in height you get 512.
+    std::uint32_t cube_single_res = PowerFloor(size.y);
+    glm::uvec2 cube_pair_res = {cube_single_res, cube_single_res};
+    std::map<std::string, std::string> filling_map = {
+        {"<filename>", data_.file_name()},
+        {"<x>", std::to_string(cube_pair_res.x)},
+        {"<y>", std::to_string(cube_pair_res.y)},
+        {"<pixel_element_size>",
+         PixelElementSize_Enum_Name(pixel_element_size.value())},
+        {"<pixel_structure>",
+         PixelStructure_Enum_Name(pixel_structure.value())}};
+    // Now get it from external file.
+    // FIXME(anirul): Should make it a const string somewhere.
+    std::ifstream ifs(
+        frame::file::FindFile("asset/json/equirectangular.json").string());
+    std::string inner_file_json((std::istreambuf_iterator<char>(ifs)), {});
+    auto level = json::ParseLevel(
+        cube_pair_res, FillLevel(inner_file_json, filling_map));
+    if (!level)
+    {
+        throw std::runtime_error("Could not create level.");
+    }
+    auto out_texture_id = level->GetIdFromName("OutputTexture");
+    if (out_texture_id == NullId)
+    {
+        throw std::runtime_error("Could not get the id of \"OutputTexture\".");
+    }
+    auto& out_texture_ref = level->GetTextureFromId(out_texture_id);
+    Renderer renderer(*level.get(), {0, 0, cube_pair_res.x, cube_pair_res.y});
+    auto& mesh_ref =
+        level->GetStaticMeshFromId(level->GetDefaultStaticMeshCubeId());
+    auto material_id = level->GetIdFromName("EquirectangularMaterial");
+    if (!material_id)
+        throw std::runtime_error(
+            "No material id found for [EquirectangularMaterial].");
+    MaterialInterface& material_ref = level->GetMaterialFromId(material_id);
+    for (std::uint32_t i = 0; i < 6; ++i)
+    {
+        renderer.SetCubeMapTarget(Cubemap::GetTextureFrameFromPosition(i));
+        renderer.RenderMesh(
+            mesh_ref, material_ref, projection_cubemap, views_cubemap[i]);
+    }
+    // FIXME(anirul): Why?
+    renderer.SetCubeMapTarget(Cubemap::GetTextureFrameFromPosition(0));
+    renderer.RenderMesh(
+        mesh_ref, material_ref, projection_cubemap, views_cubemap[0]);
+    // Get the output image (cube map).
+    auto maybe_output_id = level->GetIdFromName("OutputTexture");
+    if (!maybe_output_id)
+    {
+        throw std::runtime_error("Couldn't create the cubemap?");
+    }
+    std::unique_ptr<TextureInterface> texture =
+        level->ExtractTexture(maybe_output_id);
+    Cubemap& cubemap = static_cast<Cubemap&>(*texture);
+    texture_id_ = cubemap.GetId();
+    cubemap.texture_id_ = 0;
+    inner_size_ = cube_pair_res;
+}
+
+void Cubemap::CreateCubemapFromPointers(
+    std::array<const void*, 6> cube_map,
+    glm::uvec2 size,
+    proto::PixelElementSize pixel_element_size,
+    proto::PixelStructure pixel_structure)
+{
+    data_.mutable_pixel_element_size()->CopyFrom(pixel_element_size);
+    data_.mutable_pixel_structure()->CopyFrom(pixel_structure);
+    inner_size_ = size;
+    glGenTextures(1, &texture_id_);
+    ScopedBind scoped_bind(*this);
+    glTexParameteri(
+        GL_TEXTURE_CUBE_MAP,
+        GL_TEXTURE_MIN_FILTER,
+        ConvertToGLType(proto::TextureFilter::LINEAR));
+    glTexParameteri(
+        GL_TEXTURE_CUBE_MAP,
+        GL_TEXTURE_MAG_FILTER,
+        ConvertToGLType(proto::TextureFilter::LINEAR));
+    glTexParameteri(
+        GL_TEXTURE_CUBE_MAP,
+        GL_TEXTURE_WRAP_S,
+        ConvertToGLType(proto::TextureFilter::CLAMP_TO_EDGE));
+    glTexParameteri(
+        GL_TEXTURE_CUBE_MAP,
+        GL_TEXTURE_WRAP_T,
+        ConvertToGLType(proto::TextureFilter::CLAMP_TO_EDGE));
+    glTexParameteri(
+        GL_TEXTURE_CUBE_MAP,
+        GL_TEXTURE_WRAP_R,
+        ConvertToGLType(proto::TextureFilter::CLAMP_TO_EDGE));
+    for (unsigned int i : {0, 1, 2, 3, 4, 5})
+    {
+        glTexImage2D(
+            GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+            0,
+            opengl::ConvertToGLType(
+                data_.pixel_element_size(), data_.pixel_structure()),
+            static_cast<GLsizei>(inner_size_.x),
+            static_cast<GLsizei>(inner_size_.y),
+            0,
+            opengl::ConvertToGLType(data_.pixel_structure()),
+            opengl::ConvertToGLType(data_.pixel_element_size()),
+            cube_map[i]);
+    }
+}
+
 void Cubemap::Clear(glm::vec4 color)
 {
     // First time this is called this will create a frame and a render.
     Bind();
     if (!frame_)
+    {
         CreateFrameAndRenderBuffer();
+    }
     ScopedBind scoped_frame(*frame_);
-    glViewport(0, 0, data_.size().x(), data_.size().y());
+    glViewport(0, 0, inner_size_.x, inner_size_.y);
     GLfloat clear_color[4] = {color.r, color.g, color.b, color.a};
     glClearBufferfv(GL_COLOR, 0, clear_color);
     UnBind();
@@ -188,11 +450,10 @@ std::vector<std::uint8_t> Cubemap::GetTextureByte() const
             proto::PixelElementSize_Enum_Name(
                 data_.pixel_element_size().value()));
     }
-    auto size = json::ParseSize(data_.size());
     auto pixel_structure = data_.pixel_structure().value();
     // 6 because of cubemap!
-    std::size_t image_size = static_cast<std::size_t>(size.x) *
-                             static_cast<std::size_t>(size.y) *
+    std::size_t image_size = static_cast<std::size_t>(inner_size_.x) *
+                             static_cast<std::size_t>(inner_size_.y) *
                              static_cast<std::size_t>(pixel_structure) * 6;
     std::vector<std::uint8_t> result = {};
     result.resize(image_size);
@@ -217,11 +478,10 @@ std::vector<std::uint16_t> Cubemap::GetTextureWord() const
             proto::PixelElementSize_Enum_Name(
                 data_.pixel_element_size().value()));
     }
-    auto size = json::ParseSize(data_.size());
     auto pixel_structure = data_.pixel_structure().value();
     // 6 because of cubemap!
-    std::size_t image_size = static_cast<std::size_t>(size.x) *
-                             static_cast<std::size_t>(size.y) *
+    std::size_t image_size = static_cast<std::size_t>(inner_size_.x) *
+                             static_cast<std::size_t>(inner_size_.y) *
                              static_cast<std::size_t>(pixel_structure) * 6;
     std::vector<std::uint16_t> result = {};
     result.resize(image_size);
@@ -246,11 +506,10 @@ std::vector<std::uint32_t> Cubemap::GetTextureDWord() const
             proto::PixelElementSize_Enum_Name(
                 data_.pixel_element_size().value()));
     }
-    auto size = json::ParseSize(data_.size());
     auto pixel_structure = data_.pixel_structure().value();
     // 6 because of cubemap!
-    std::size_t image_size = static_cast<std::size_t>(size.x) *
-                             static_cast<std::size_t>(size.y) *
+    std::size_t image_size = static_cast<std::size_t>(inner_size_.x) *
+                             static_cast<std::size_t>(inner_size_.y) *
                              static_cast<std::size_t>(pixel_structure) * 6;
     std::vector<std::uint32_t> result = {};
     result.resize(image_size);
@@ -275,11 +534,10 @@ std::vector<float> Cubemap::GetTextureFloat() const
             proto::PixelElementSize_Enum_Name(
                 data_.pixel_element_size().value()));
     }
-    auto size = json::ParseSize(data_.size());
     auto pixel_structure = data_.pixel_structure().value();
     // 6 because of cubemap!
-    std::size_t image_size = static_cast<std::size_t>(size.x) *
-                             static_cast<std::size_t>(size.y) *
+    std::size_t image_size = static_cast<std::size_t>(inner_size_.x) *
+                             static_cast<std::size_t>(inner_size_.y) *
                              static_cast<std::size_t>(pixel_structure) * 6;
     std::vector<float> result = {};
     result.resize(image_size);
@@ -305,6 +563,23 @@ void Cubemap::EnableMipmap()
 {
     data_.set_mipmap(true);
     glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+}
+
+glm::uvec2 Cubemap::GetSize()
+{
+    return inner_size_;
+}
+
+void Cubemap::SetWindowSize(glm::uvec2 size)
+{
+    if (data_.size().x() < 0)
+    {
+        inner_size_.x = size.x / std::abs(data_.size().x());
+    }
+    if (data_.size().y() < 0)
+    {
+        inner_size_.y = size.y / std::abs(data_.size().y());
+    }
 }
 
 proto::TextureFrame Cubemap::GetTextureFrameFromPosition(int i)

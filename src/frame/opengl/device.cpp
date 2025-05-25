@@ -303,22 +303,6 @@ std::unique_ptr<frame::StaticMeshInterface> Device::CreateStaticMesh(
         GetLevel(), static_mesh_parameter);
 }
 
-std::unique_ptr<frame::TextureInterface> Device::CreateTexture(
-    const TextureParameter& texture_parameter)
-{
-    switch (texture_parameter.map_type)
-    {
-    case TextureTypeEnum::TEXTURE_2D:
-        return std::make_unique<Texture>(texture_parameter);
-    case TextureTypeEnum::CUBMAP:
-        return std::make_unique<Cubemap>(texture_parameter);
-    case TextureTypeEnum::TEXTURE_3D:
-        throw std::runtime_error("No 3D texture implemented yet!");
-    default:
-        throw std::runtime_error("Unknown texture type?");
-    }
-}
-
 void Device::Resize(glm::uvec2 size)
 {
     Cleanup();

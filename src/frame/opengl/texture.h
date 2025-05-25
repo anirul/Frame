@@ -34,6 +34,29 @@ class Texture : public TextureInterface, public BindInterface
      * @param proto_texture: Proto that describe the texture.
      */
     Texture(const proto::Texture& proto_texture);
+    /**
+     * @brief Create a texture from a file.
+     * @param file_name: A file to be loaded into the texture.
+     * @param pixel_element_size: The element size of the texture.
+     * @param pixel_structure: The pixel structure of the texture.
+     */
+    Texture(
+        std::filesystem::path file_name,
+        proto::PixelElementSize pixel_element_size,
+        proto::PixelStructure pixel_strucutre);
+    /**
+     * @brief Create a texture from a pointer and a brief description of the
+     * underlying structure.
+     * @param ptr: The pointer to the underlying structure.
+     * @param size: The size of the texture.
+     * @param pixel_element_size: The element size of the texture.
+     * @param pixel_structure: The pixel structure of the texture.
+     */
+    Texture(
+        const void* ptr,
+        glm::uvec2 size,
+        proto::PixelElementSize pixel_element_size,
+        proto::PixelStructure pixel_structure);
     //! @brief Destructor this will free memory on the GPU also!
     virtual ~Texture();
 
@@ -98,6 +121,17 @@ class Texture : public TextureInterface, public BindInterface
         std::uint8_t bytes_per_pixel) override;
     //! @brief Enable mipmap generation.
     void EnableMipmap() override;
+    /**
+     * @brief Get the computed size (can be different from the stored one).
+     * @return The computed size.
+     */
+    glm::uvec2 GetSize() override;
+    /**
+     * @brief Set the window size (in case the
+     * texture size is relative).
+     * @param size: The window size.
+     */
+    void SetWindowSize(glm::uvec2 size) override;
 
   public:
     /**
@@ -128,17 +162,28 @@ class Texture : public TextureInterface, public BindInterface
         data_.mutable_pixel_structure()->CopyFrom(pixel_structure);
     }
     /**
-     * @brief Fill a texture with a data pointer, the size has to be set
-     * first!
-     * @param data: Pixel used to fill up (or null for don't care).
-     * @param size: Size of the image.
-     */
-    void CreateTexture(const void* data = nullptr, glm::uvec2 size = {0, 0});
-    /**
      * @brief Create a texture from a file.
      * @param file_name: File to be open for a texture.
+     * @param pixel_element_size: The element size of the texture.
+     * @param pixel_structure: The pixel structure of the texture.
      */
-    void CreateTextureFromFile(const std::string& file_name);
+    void CreateTextureFromFile(
+        std::filesystem::path file_name,
+        proto::PixelElementSize pixel_element_size,
+        proto::PixelStructure pixel_structure);
+    /**
+     * @brief Create a texture from a pointer and a brief description of the
+     * underlying structure.
+     * @param ptr: The pointer to the underlying structure.
+     * @param size: The size of the texture.
+     * @param pixel_element_size: The element size of the texture.
+     * @param pixel_structure: The pixel structure of the texture.
+     */
+    void CreateTextureFromPointer(
+        const void* ptr,
+        glm::uvec2 size,
+        proto::PixelElementSize pixel_element_size,
+        proto::PixelStructure pixel_structure);
     /**
      * @brief Create a depth texture.
      * @param size: Size of the texture.
@@ -171,7 +216,7 @@ class Texture : public TextureInterface, public BindInterface
     mutable bool locked_bind_ = false;
     std::unique_ptr<RenderBuffer> render_ = nullptr;
     std::unique_ptr<FrameBuffer> frame_ = nullptr;
-    glm::uvec2 inner_size;
+    glm::uvec2 inner_size_;
 };
 
 } // End namespace frame::opengl.

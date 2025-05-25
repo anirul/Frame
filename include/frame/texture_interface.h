@@ -62,6 +62,16 @@ struct TextureInterface : public Serialize<proto::Texture>
         std::uint8_t bytes_per_pixel) = 0;
     //! @brief Enable mipmap generation.
     virtual void EnableMipmap() = 0;
+    /**
+	 * @brief Get the computed size (can be different from the stored one).
+	 * @return The computed size.
+	 */
+    virtual glm::uvec2 GetSize() = 0;
+    /**
+	 * @brief Set the window size (in case the texture size is relative).
+	 * @param size: The window size.
+	 */
+    virtual void SetWindowSize(glm::uvec2 size) = 0;
 };
 
 } // End namespace frame.

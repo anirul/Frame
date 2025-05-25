@@ -36,6 +36,52 @@ class Cubemap : public TextureInterface, public BindInterface
      * texture.
      */
     Cubemap(const proto::Texture& proto_texture);
+    /**
+     * @brief Create a texture from a file.
+     * @param file_name: A file to be loaded into the texture.
+     * @param pixel_element_size: The element size of the texture.
+     * @param pixel_structure: The pixel structure of the texture.
+     */
+    Cubemap(
+        std::filesystem::path file_name,
+        proto::PixelElementSize pixel_element_size,
+        proto::PixelStructure pixel_strucutre);
+    /**
+     * @brief Create from 6 textures (cubemap).
+     * @param file_names: 6 files to describe this new cubemap.
+     * @param pixel_element_size: The element size of the texture.
+     * @param pixel_structure: The pixel structure of the texture.
+     */
+    Cubemap(
+        std::array<std::filesystem::path, 6> file_names,
+        proto::PixelElementSize pixel_element_size,
+        proto::PixelStructure pixel_strucutre);
+    /**
+     * @brief Create a texture from a pointer and a brief description of the
+     * underlying structure.
+     * @param ptr: The pointer to the underlying structure.
+     * @param size: The size of the texture.
+     * @param pixel_element_size: The element size of the texture.
+     * @param pixel_structure: The pixel structure of the texture.
+     */
+    Cubemap(
+        const void* ptr,
+        glm::uvec2 size,
+        proto::PixelElementSize pixel_element_size,
+        proto::PixelStructure pixel_structure);
+    /**
+     * @brief Create a texture from a pointer and a brief description of the
+     * underlying structure.
+     * @param ptrs: The pointers to the underlying structures.
+     * @param size: The size of the texture.
+     * @param pixel_element_size: The element size of the texture.
+     * @param pixel_structure: The pixel structure of the texture.
+     */
+    Cubemap(
+        std::array<const void*, 6> ptrs,
+        glm::uvec2 size,
+        proto::PixelElementSize pixel_element_size,
+        proto::PixelStructure pixel_structure);
     //! @brief Destroy texture also on GPU side.
     ~Cubemap();
 
@@ -101,6 +147,17 @@ class Cubemap : public TextureInterface, public BindInterface
         std::uint8_t bytes_per_pixel) override;
     //! @brief Enable mipmap generation.
     void EnableMipmap() override;
+    /**
+     * @brief Get the computed size (can be different from the stored one).
+     * @return The computed size.
+     */
+    glm::uvec2 GetSize() override;
+    /**
+     * @brief Set the window size (in case the
+     * texture size is relative).
+     * @param size: The window size.
+     */
+    void SetWindowSize(glm::uvec2 size) override;
 
   public:
     /**
@@ -155,24 +212,53 @@ class Cubemap : public TextureInterface, public BindInterface
     //! Clear).
     void CreateFrameAndRenderBuffer();
     /**
-     * @brief Fill a texture with a data pointer, the size has to be set
-     * first!
-     * @param data: pixel used to fill up (or null for don't care).
-     */
-    void CreateCubemap(
-        const std::array<void*, 6> cube_map =
-            {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr},
-        glm::uvec2 size = {0, 0});
-    /**
      * @brief Create a cubemap from a single file.
      * @param file_name: File that will create the texture.
+     * @param pixel_element_size: The element size of the texture.
+     * @param pixel_structure: The pixel structure of the texture.
      */
-    void CreateCubemapFromFile(const std::string& file_name);
+    void CreateCubemapFromFile(
+        std::filesystem::path file_name,
+        proto::PixelElementSize pixel_element_size,
+        proto::PixelStructure pixel_strucutre);
     /**
      * @brief Create a cubemap from 6 files.
      * @param file_names: Files that will create the texture.
+     * @param pixel_element_size: The element size of the texture.
+     * @param pixel_structure: The pixel structure of the texture.
      */
-    void CreateCubemapFromFiles(const std::array<std::string, 6>& file_names);
+    void CreateCubemapFromFiles(
+        std::array<std::filesystem::path, 6> file_names,
+        proto::PixelElementSize pixel_element_size,
+        proto::PixelStructure pixel_structure);
+    /**
+     * @brief Create a texture from a pointer and a brief description of the
+     * underlying structure.
+     * @param ptr: The pointer to the underlying structure.
+     * @param size: The size of the texture.
+     * @param pixel_element_size: The element size of the texture.
+     * @param pixel_structure: The pixel structure of the texture.
+     */
+    void CreateCubemapFromPointer(
+        const void* ptr,
+        glm::uvec2 size,
+        proto::PixelElementSize pixel_element_size,
+        proto::PixelStructure pixel_structure);
+    /**
+     * @brief Create a texture from a pointer and a brief description of the
+     * underlying structure.
+     * @param ptrs: The pointers to the underlying structures.
+     * @param size: The size of the texture.
+     * @param pixel_element_size: The element size of the texture.
+     * @param pixel_structure: The pixel structure of the texture.
+     */
+    void CreateCubemapFromPointers(
+        std::array<const void*, 6> ptrs,
+        glm::uvec2 size,
+        proto::PixelElementSize pixel_element_size,
+        proto::PixelStructure pixel_structure);
+
+  protected:
     friend class ScopedBind;
 
   private:
@@ -180,7 +266,7 @@ class Cubemap : public TextureInterface, public BindInterface
     mutable bool locked_bind_ = false;
     std::unique_ptr<RenderBuffer> render_ = nullptr;
     std::unique_ptr<FrameBuffer> frame_ = nullptr;
-    glm::uvec2 inner_size;
+    glm::uvec2 inner_size_;
 };
 
 } // End namespace frame::opengl.

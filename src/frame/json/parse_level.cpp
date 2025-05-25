@@ -40,7 +40,7 @@ std::unique_ptr<LevelInterface> LevelProto(
     for (const auto& proto_texture : proto_level.textures())
     {
         std::unique_ptr<TextureInterface> texture =
-            ParseBasicTexture(proto_texture, size);
+            ParseTexture(proto_texture, size);
         EntityId stream_id = NullId;
         EntityId texture_id = NullId;
         std::string texture_name = proto_texture.name();

@@ -28,10 +28,17 @@ Texture::Texture(const proto::Texture& proto_texture)
     switch (proto_texture.texture_oneof_case())
     {
     case proto::Texture::kPixels:
-        CreateTexture(data_.pixels().data(), json::ParseSize(data_.size()));
+        CreateTextureFromPointer(
+            data_.pixels().data(),
+            json::ParseSize(data_.size()),
+            data_.pixel_element_size(),
+            data_.pixel_structure());
         break;
     case proto::Texture::kFileName:
-        CreateTextureFromFile(data_.file_name());
+        CreateTextureFromFile(
+            data_.file_name(),
+            data_.pixel_element_size(),
+            data_.pixel_structure());
         break;
     case proto::Texture::kPlugin:
         throw std::runtime_error("Don't know what to do there?");
@@ -45,11 +52,52 @@ Texture::Texture(const proto::Texture& proto_texture)
     }
 }
 
-void Texture::CreateTexture(const void* data, glm::uvec2 size)
+Texture::Texture(
+    std::filesystem::path file_name,
+    proto::PixelElementSize pixel_element_size,
+    proto::PixelStructure pixel_structure)
 {
+    CreateTextureFromFile(file_name, pixel_element_size, pixel_structure);
+}
+
+Texture::Texture(
+    const void* ptr,
+    glm::uvec2 size,
+    proto::PixelElementSize pixel_element_size,
+    proto::PixelStructure pixel_structure)
+{
+    CreateTextureFromPointer(ptr, size, pixel_element_size, pixel_structure);
+}
+
+void Texture::CreateTextureFromFile(
+    std::filesystem::path file_name,
+    proto::PixelElementSize pixel_element_size,
+    proto::PixelStructure pixel_structure)
+{
+    data_.mutable_pixel_element_size()->CopyFrom(pixel_element_size);
+    data_.mutable_pixel_structure()->CopyFrom(pixel_structure);
+    data_.set_file_name(file_name);
+    frame::file::Image image(
+        file_name, data_.pixel_element_size(), data_.pixel_structure());
+    CreateTextureFromPointer(
+        image.Data(), image.GetSize(), pixel_element_size, pixel_structure);
+}
+
+void Texture::CreateTextureFromPointer(
+    const void* data,
+    glm::uvec2 size,
+    proto::PixelElementSize pixel_element_size,
+    proto::PixelStructure pixel_structure)
+{
+    data_.mutable_pixel_element_size()->CopyFrom(pixel_element_size);
+    data_.mutable_pixel_structure()->CopyFrom(pixel_structure);
     if (!size.x || !size.y)
     {
-        inner_size = json::ParseSize(data_.size());
+        inner_size_ = json::ParseSize(data_.size());
+    }
+    else
+    {
+        inner_size_ = size;
     }
     glGenTextures(1, &texture_id_);
     ScopedBind scoped_bind(*this);
@@ -83,20 +131,12 @@ void Texture::CreateTexture(const void* data, glm::uvec2 size)
         0,
         opengl::ConvertToGLType(
             data_.pixel_element_size(), data_.pixel_structure()),
-        static_cast<GLsizei>(inner_size.x),
-        static_cast<GLsizei>(inner_size.y),
+        static_cast<GLsizei>(inner_size_.x),
+        static_cast<GLsizei>(inner_size_.y),
         0,
         format,
         type,
         data);
-}
-
-void Texture::CreateTextureFromFile(const std::string& file_name)
-{
-    frame::file::Image image(
-        file_name, data_.pixel_element_size(), data_.pixel_structure());
-    inner_size = image.GetSize();
-    CreateTexture(image.Data(), inner_size);
 }
 
 void Texture::CreateDepthTexture(
@@ -104,6 +144,7 @@ void Texture::CreateDepthTexture(
     proto::PixelElementSize pixel_element_size /* =
         proto::PixelElementSize_FLOAT()*/)
 {
+    inner_size_ = size;
     data_.mutable_size()->CopyFrom(json::SerializeSize(size));
     glGenTextures(1, &texture_id_);
     ScopedBind scoped_bind(*this);
@@ -169,6 +210,23 @@ void Texture::EnableMipmap()
     glGenerateMipmap(GL_TEXTURE_2D);
 }
 
+glm::uvec2 Texture::GetSize()
+{
+    return inner_size_;
+}
+
+void Texture::SetWindowSize(glm::uvec2 size)
+{
+    if (data_.size().x() < 0) 
+    {
+        inner_size_.x = size.x / std::abs(data_.size().x());
+    }
+    if (data_.size().y() < 0)
+    {
+        inner_size_.y = size.y / std::abs(data_.size().y());
+    }
+}
+
 void Texture::CreateFrameAndRenderBuffer()
 {
     frame_ = std::make_unique<FrameBuffer>();
@@ -186,7 +244,7 @@ void Texture::Clear(glm::vec4 color)
     if (!frame_)
         CreateFrameAndRenderBuffer();
     ScopedBind scoped_frame(*frame_);
-    glViewport(0, 0, data_.size().x(), data_.size().y());
+    glViewport(0, 0, inner_size_.x, inner_size_.y);
     GLfloat clear_color[4] = {color.r, color.g, color.b, color.a};
     glClearBufferfv(GL_COLOR, 0, clear_color);
     UnBind();
@@ -264,10 +322,9 @@ std::vector<std::uint8_t> Texture::GetTextureByte() const
             proto::PixelElementSize_Enum_Name(
                 data_.pixel_element_size().value()));
     }
-    auto size = json::ParseSize(data_.size());
     auto pixel_structure = data_.pixel_structure().value();
-    std::size_t image_size = static_cast<std::size_t>(size.x) *
-                             static_cast<std::size_t>(size.y) *
+    std::size_t image_size = static_cast<std::size_t>(inner_size_.x) *
+                             static_cast<std::size_t>(inner_size_.y) *
                              static_cast<std::size_t>(pixel_structure);
     std::vector<std::uint8_t> result = {};
     result.resize(image_size);
@@ -288,10 +345,9 @@ std::vector<std::uint16_t> Texture::GetTextureWord() const
             proto::PixelElementSize_Enum_Name(
                 data_.pixel_element_size().value()));
     }
-    auto size = json::ParseSize(data_.size());
     auto pixel_structure = data_.pixel_structure().value();
-    std::size_t image_size = static_cast<std::size_t>(size.x) *
-                             static_cast<std::size_t>(size.y) *
+    std::size_t image_size = static_cast<std::size_t>(inner_size_.x) *
+                             static_cast<std::size_t>(inner_size_.y) *
                              static_cast<std::size_t>(pixel_structure);
     std::vector<std::uint16_t> result = {};
     result.resize(image_size);
@@ -312,10 +368,9 @@ std::vector<std::uint32_t> Texture::GetTextureDWord() const
             proto::PixelElementSize_Enum_Name(
                 data_.pixel_element_size().value()));
     }
-    auto size = json::ParseSize(data_.size());
     auto pixel_structure = data_.pixel_structure().value();
-    std::size_t image_size = static_cast<std::size_t>(size.x) *
-                             static_cast<std::size_t>(size.y) *
+    std::size_t image_size = static_cast<std::size_t>(inner_size_.x) *
+                             static_cast<std::size_t>(inner_size_.y) *
                              static_cast<std::size_t>(pixel_structure);
     std::vector<std::uint32_t> result = {};
     result.resize(image_size);
@@ -336,10 +391,9 @@ std::vector<float> Texture::GetTextureFloat() const
             proto::PixelElementSize_Enum_Name(
                 data_.pixel_element_size().value()));
     }
-    auto size = json::ParseSize(data_.size());
     auto pixel_structure = data_.pixel_structure().value();
-    std::size_t image_size = static_cast<std::size_t>(size.x) *
-                             static_cast<std::size_t>(size.y) *
+    std::size_t image_size = static_cast<std::size_t>(inner_size_.x) *
+                             static_cast<std::size_t>(inner_size_.y) *
                              static_cast<std::size_t>(pixel_structure);
     std::vector<float> result = {};
     result.resize(image_size);
@@ -363,8 +417,8 @@ void Texture::Update(
         0,
         opengl::ConvertToGLType(
             data_.pixel_element_size(), data_.pixel_structure()),
-        static_cast<GLsizei>(data_.size().x()),
-        static_cast<GLsizei>(data_.size().y()),
+        static_cast<GLsizei>(inner_size_.x),
+        static_cast<GLsizei>(inner_size_.y),
         0,
         format,
         type,

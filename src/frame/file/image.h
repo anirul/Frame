@@ -15,7 +15,7 @@ namespace frame::file
 /**
  * @class Image
  * @brief This class is the representation of an image that come (or go) to
- *        a file on the HDD.
+ * a file on the HDD.
  *
  * The idea is to load an image and save it on the GPU using the texture
  * class.
@@ -28,9 +28,9 @@ class Image : public ImageInterface
      * specs, this will be use to save image to the HDD.
      * @param size: Size of the image.
      * @param pixel_element_size: Size of one of the element in a pixel
-     *        (BYTE, SHORT, HALF, FLOAT).
+     * (BYTE, SHORT, HALF, FLOAT).
      * @param pixel_element_structure: Structure of a pixel (R, RG, RGB,
-     *        RGBA).
+     * RGBA).
      */
     Image(
         glm::uvec2 size,
@@ -39,12 +39,12 @@ class Image : public ImageInterface
         proto::PixelStructure pixel_structure = json::PixelStructure_RGB());
     /**
      * @brief Constructor this will build a image from a file and image
-     *        specs, this will be use to load an image from the HDD.
+     * specs, this will be use to load an image from the HDD.
      * @param size: Size of the image.
      * @param pixel_element_size: Size of one of the element in a pixel
-     *        (BYTE, SHORT, HALF, FLOAT).
+     * (BYTE, SHORT, HALF, FLOAT).
      * @param pixel_element_structure: Structure of a pixel (R, RG, RGB,
-     *        RGBA).
+     * RGBA).
      */
     Image(
         const std::filesystem::path& file,
@@ -112,11 +112,11 @@ class Image : public ImageInterface
     void SaveImageToFile(const std::string& file) const override;
     /**
      * @brief Set the data pointer to the class, used to be able to save to
-     *        HDD.
+     * HDD.
      * @param data: Pointer to the memory containing the RGB data of the
-     *        image.
+     * image.
      * @warning Note that the class won't be the owner of the pointer so it
-     *          won't free it when destroyed!
+     * won't free it when destroyed!
      */
     void SetData(void* data) override;
 
