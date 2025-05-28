@@ -144,19 +144,29 @@ bool SDLOpenGLDrawGui::Update(DeviceInterface& device, double dt)
             continue;
         }
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-        original_image_size_ = json::ParseSize(texture.GetData().size());
+        original_image_size_ = texture.GetSize();
 
         if (!is_visible_)
         {
             ImGui::Begin(
-                std::format("<fullscreen> - [{}]", texture.GetName()).c_str(),
+                std::format(
+                    "<fullscreen> - [{}] - ({}, {})",
+                    texture.GetName(),
+                    texture.GetSize().x,
+                    texture.GetSize().y)
+                    .c_str(),
                 nullptr,
                 ImGuiWindowFlags_NoDecoration);
         }
         else
         {
             ImGui::Begin(
-                std::format("default - [{}]", texture.GetName()).c_str());
+                std::format(
+                    "default - [{}] - ({}, {})",
+                    texture.GetName(),
+                    texture.GetSize().x,
+                    texture.GetSize().y)
+                    .c_str());
         }
         if (modal_callback_)
         {
