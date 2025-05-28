@@ -52,36 +52,35 @@ std::optional<EntityId> LoadMaterialFromObj(
 {
     // Load textures.
     auto color = (material_obj.ambient_str.empty())
-                           ? LoadTextureFromVec4(material_obj.ambient_vec4)
-                           : LoadTextureFromString(
-                                 material_obj.ambient_str,
-                                 json::PixelElementSize_BYTE(),
-                                 json::PixelStructure_RGB());
+                     ? LoadTextureFromVec4(material_obj.ambient_vec4)
+                     : LoadTextureFromString(
+                           material_obj.ambient_str,
+                           json::PixelElementSize_BYTE(),
+                           json::PixelStructure_RGB());
     if (!color)
         return std::nullopt;
     auto normal = (material_obj.normal_str.empty())
-                            ? LoadTextureFromVec4(glm::vec4(0.f, 0.f, 0.f, 1.f))
-                            : LoadTextureFromString(
-                                  material_obj.normal_str,
-                                  json::PixelElementSize_BYTE(),
-                                  json::PixelStructure_RGB());
+                      ? LoadTextureFromVec4(glm::vec4(0.f, 0.f, 0.f, 1.f))
+                      : LoadTextureFromString(
+                            material_obj.normal_str,
+                            json::PixelElementSize_BYTE(),
+                            json::PixelStructure_RGB());
     if (!normal)
         return std::nullopt;
-    auto roughness =
-        (material_obj.roughness_str.empty())
-            ? LoadTextureFromFloat(material_obj.roughness_val)
-            : LoadTextureFromString(
-                  material_obj.roughness_str,
-                  json::PixelElementSize_BYTE(),
-                  json::PixelStructure_GREY());
+    auto roughness = (material_obj.roughness_str.empty())
+                         ? LoadTextureFromFloat(material_obj.roughness_val)
+                         : LoadTextureFromString(
+                               material_obj.roughness_str,
+                               json::PixelElementSize_BYTE(),
+                               json::PixelStructure_GREY());
     if (!roughness)
         return std::nullopt;
     auto metallic = (material_obj.metallic_str.empty())
-                              ? LoadTextureFromFloat(material_obj.metallic_val)
-                              : LoadTextureFromString(
-                                    material_obj.metallic_str,
-                                    json::PixelElementSize_BYTE(),
-                                    json::PixelStructure_GREY());
+                        ? LoadTextureFromFloat(material_obj.metallic_val)
+                        : LoadTextureFromString(
+                              material_obj.metallic_str,
+                              json::PixelElementSize_BYTE(),
+                              json::PixelStructure_GREY());
     if (!metallic)
         return std::nullopt;
     // Create names for textures.
@@ -99,13 +98,11 @@ std::optional<EntityId> LoadMaterialFromObj(
     if (!normal_id)
         return std::nullopt;
     roughness->SetName(roughness_name);
-    auto roughness_id =
-        level.AddTexture(std::move(roughness));
+    auto roughness_id = level.AddTexture(std::move(roughness));
     if (!roughness_id)
         return std::nullopt;
     metallic->SetName(metallic_name);
-    auto metallic_id =
-        level.AddTexture(std::move(metallic));
+    auto metallic_id = level.AddTexture(std::move(metallic));
     if (!metallic_id)
         return std::nullopt;
     // Create the material.
@@ -301,7 +298,7 @@ EntityId LoadStaticMeshFromPly(
 
 std::vector<EntityId> LoadStaticMeshesFromObjFile(
     LevelInterface& level,
-    const std::filesystem::path& file,
+    std::filesystem::path file,
     const std::string& name,
     const std::string& material_name /* = ""*/)
 {
@@ -351,7 +348,7 @@ std::vector<EntityId> LoadStaticMeshesFromObjFile(
 
 EntityId LoadStaticMeshFromPlyFile(
     LevelInterface& level,
-    const std::filesystem::path& file,
+    std::filesystem::path file,
     const std::string& name,
     const std::string& material_name /* = ""*/)
 {
@@ -390,7 +387,7 @@ EntityId LoadStaticMeshFromPlyFile(
 
 std::vector<EntityId> LoadStaticMeshesFromFile(
     LevelInterface& level_interface,
-    const std::filesystem::path& file,
+    std::filesystem::path file,
     const std::string& name,
     const std::string& material_name /* = ""*/)
 {

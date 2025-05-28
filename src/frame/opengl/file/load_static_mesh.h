@@ -22,7 +22,7 @@ namespace frame::opengl::file
  */
 std::vector<EntityId> LoadStaticMeshesFromFile(
     LevelInterface& level,
-    const std::filesystem::path& file,
+    std::filesystem::path file,
     const std::string& name,
     const std::string& material_name = "");
 

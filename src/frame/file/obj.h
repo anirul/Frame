@@ -107,7 +107,8 @@ class Obj
      * @brief Constructor parse from an OBJ file.
      * @param file_name: File to be open.
      */
-    Obj(const std::filesystem::path& file_name);
+    Obj(std::filesystem::path file_name);
+    ~Obj();
 
   public:
     /**

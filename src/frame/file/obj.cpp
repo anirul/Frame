@@ -11,7 +11,7 @@
 namespace frame::file
 {
 
-Obj::Obj(const std::filesystem::path& file_name)
+Obj::Obj(std::filesystem::path file_name)
 {
 #ifdef TINY_OBJ_LOADER_V2
     tinyobj::ObjReaderConfig reader_config;
@@ -105,8 +105,9 @@ Obj::Obj(const std::filesystem::path& file_name)
                 int fv = shapes[s].mesh.num_face_vertices[f];
                 if (fv != 3)
                 {
-                    throw std::runtime_error(fmt::format(
-                        "The face should be 3 in size now {}.", fv));
+                    throw std::runtime_error(
+                        fmt::format(
+                            "The face should be 3 in size now {}.", fv));
                 }
                 // Loop over vertices in the face.
                 for (std::size_t v = 0; v < fv; v++)
@@ -179,5 +180,7 @@ Obj::Obj(const std::filesystem::path& file_name)
         materials_.emplace_back(obj_material);
     }
 }
+
+Obj::~Obj() = default;
 
 } // End namespace frame::file.

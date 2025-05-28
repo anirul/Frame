@@ -34,10 +34,10 @@ class NodeStaticMesh : public NodeInterface,
         const proto::CleanBuffer& clean_buffer)
         : NodeInterface(func), static_mesh_id_(NullId)
     {
-	    *data_.mutable_clean_buffer() = clean_buffer;
+        *data_.mutable_clean_buffer() = clean_buffer;
     }
     //! @brief Virtual destructor.
-    ~NodeStaticMesh() override = default;
+    ~NodeStaticMesh() override;
 
   public:
     /**

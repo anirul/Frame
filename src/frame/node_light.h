@@ -1,10 +1,10 @@
 #pragma once
 
 #define GLM_ENABLE_EXPERIMENTAL
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
 #include "frame/light_interface.h"
 #include "frame/node_interface.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 namespace frame
 {
@@ -97,7 +97,7 @@ class NodeLight : public NodeInterface, public Serialize<proto::NodeLight>
         const float dot_inner_limit,
         const float dot_outer_limit);
     //! @brief Virtual destructor.
-    ~NodeLight() override = default;
+    ~NodeLight() override;
 
   public:
     /**

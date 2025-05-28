@@ -8,6 +8,8 @@
 namespace frame
 {
 
+NodeLight::~NodeLight() = default;
+
 NodeLight::NodeLight(
     std::function<NodeInterface*(const std::string&)> func,
     const glm::vec3 color)
@@ -77,7 +79,8 @@ NodeLight::NodeLight(
     }
     if (shadow_type != ShadowTypeEnum::NO_SHADOW)
     {
-        data_.set_shadow_type(static_cast<proto::NodeLight::ShadowTypeEnum>(shadow_type));
+        data_.set_shadow_type(
+            static_cast<proto::NodeLight::ShadowTypeEnum>(shadow_type));
         data_.set_shadow_texture(shadow_texture);
     }
 }
@@ -92,7 +95,8 @@ NodeLight::NodeLight(
     : NodeInterface(func)
 {
     data_.set_light_type(
-        static_cast<proto::NodeLight::LightTypeEnum>(LightTypeEnum::SPOT_LIGHT));
+        static_cast<proto::NodeLight::LightTypeEnum>(
+            LightTypeEnum::SPOT_LIGHT));
     data_.mutable_position()->CopyFrom(json::SerializeUniformVector3(position));
     data_.mutable_direction()->CopyFrom(
         json::SerializeUniformVector3(direction));
@@ -112,8 +116,9 @@ NodeLight::NodeLight(
     const float dot_outer_limit)
     : NodeInterface(func)
 {
-    data_.set_light_type(static_cast<proto::NodeLight::LightTypeEnum>(
-        LightTypeEnum::SPOT_LIGHT));
+    data_.set_light_type(
+        static_cast<proto::NodeLight::LightTypeEnum>(
+            LightTypeEnum::SPOT_LIGHT));
     data_.mutable_position()->CopyFrom(json::SerializeUniformVector3(position));
     data_.mutable_direction()->CopyFrom(
         json::SerializeUniformVector3(direction));
@@ -135,8 +140,9 @@ glm::mat4 NodeLight::GetLocalModel(const double dt) const
         auto parent_node = func_(GetParentName());
         if (!parent_node)
         {
-            throw std::runtime_error(fmt::format(
-                "SceneLight func({}) returned nullptr", GetParentName()));
+            throw std::runtime_error(
+                fmt::format(
+                    "SceneLight func({}) returned nullptr", GetParentName()));
         }
         return parent_node->GetLocalModel(dt);
     }

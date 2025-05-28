@@ -49,8 +49,8 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
     }
     else
     {
-        scene_matrix =
-            std::make_unique<frame::NodeMatrix>(GetFunctor(level), glm::mat4(1.0f));
+        scene_matrix = std::make_unique<frame::NodeMatrix>(
+            GetFunctor(level), glm::mat4(1.0f));
     }
     scene_matrix->GetData().set_name(proto_scene_matrix.name());
     scene_matrix->SetParentName(proto_scene_matrix.parent());
@@ -59,8 +59,7 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
 }
 
 [[nodiscard]] bool ParseNodeStaticMeshClearBuffer(
-    LevelInterface& level,
-    const proto::NodeStaticMesh& proto_scene_static_mesh)
+    LevelInterface& level, const proto::NodeStaticMesh& proto_scene_static_mesh)
 {
     auto node_interface = std::make_unique<frame::NodeStaticMesh>(
         GetFunctor(level), proto_scene_static_mesh.clean_buffer());
@@ -76,13 +75,11 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
 }
 
 [[nodiscard]] bool ParseNodeStaticMeshMeshEnum(
-    LevelInterface& level,
-    const proto::NodeStaticMesh& proto_scene_static_mesh)
+    LevelInterface& level, const proto::NodeStaticMesh& proto_scene_static_mesh)
 {
     if (proto_scene_static_mesh.mesh_enum() == proto::NodeStaticMesh::INVALID)
     {
-        throw std::runtime_error(
-            "Didn't find any mesh file name or any enum.");
+        throw std::runtime_error("Didn't find any mesh file name or any enum.");
     }
     // In this case there is only one material per mesh.
     EntityId mesh_id = 0;
@@ -97,12 +94,14 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
         break;
     }
     default: {
-        throw std::runtime_error(fmt::format(
-            "unknown mesh enum value: {}",
-            static_cast<int>(proto_scene_static_mesh.mesh_enum())));
+        throw std::runtime_error(
+            fmt::format(
+                "unknown mesh enum value: {}",
+                static_cast<int>(proto_scene_static_mesh.mesh_enum())));
     }
     }
-    const EntityId material_id = level.GetIdFromName(proto_scene_static_mesh.material_name());
+    const EntityId material_id =
+        level.GetIdFromName(proto_scene_static_mesh.material_name());
     auto& mesh = level.GetStaticMeshFromId(mesh_id);
     mesh.GetData().set_render_primitive_enum(
         proto_scene_static_mesh.render_primitive_enum());
@@ -110,7 +109,8 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
         std::make_unique<NodeStaticMesh>(GetFunctor(level), mesh_id);
     node_interface->GetData().set_name(proto_scene_static_mesh.name());
     node_interface->SetParentName(proto_scene_static_mesh.parent());
-    node_interface->GetData().set_material_name(proto_scene_static_mesh.material_name());
+    node_interface->GetData().set_material_name(
+        proto_scene_static_mesh.material_name());
     level.AddMeshMaterialId(
         level.AddSceneNode(std::move(node_interface)),
         material_id,
@@ -119,12 +119,12 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
 }
 
 [[nodiscard]] bool ParseNodeStaticMeshFileName(
-    LevelInterface& level,
-    const proto::NodeStaticMesh& proto_scene_static_mesh)
+    LevelInterface& level, const proto::NodeStaticMesh& proto_scene_static_mesh)
 {
     auto vec_node_mesh_id = opengl::file::LoadStaticMeshesFromFile(
         level,
-        "asset/model/" + proto_scene_static_mesh.file_name(),
+        frame::file::FindFile(
+            "asset/model/" + proto_scene_static_mesh.file_name()),
         proto_scene_static_mesh.name(),
         proto_scene_static_mesh.material_name());
     if (vec_node_mesh_id.empty())
@@ -148,8 +148,7 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
 }
 
 [[nodiscard]] bool ParseNodeStaticMeshStreamInput(
-    LevelInterface& level,
-    const proto::NodeStaticMesh& proto_scene_static_mesh)
+    LevelInterface& level, const proto::NodeStaticMesh& proto_scene_static_mesh)
 {
     assert(proto_scene_static_mesh.has_multi_plugin());
     auto point_buffer = std::make_unique<opengl::Buffer>(
@@ -193,7 +192,8 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
         std::make_unique<NodeStaticMesh>(GetFunctor(level), mesh_id);
     node_interface->GetData().set_name(proto_scene_static_mesh.name());
     node_interface->SetParentName(proto_scene_static_mesh.parent());
-    node_interface->GetData().set_material_name(proto_scene_static_mesh.material_name());
+    node_interface->GetData().set_material_name(
+        proto_scene_static_mesh.material_name());
     auto scene_id = level.AddSceneNode(std::move(node_interface));
     level.AddMeshMaterialId(
         scene_id, material_id, proto_scene_static_mesh.render_time_enum());
@@ -205,8 +205,7 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
 }
 
 [[nodiscard]] bool ParseNodeStaticMesh(
-    LevelInterface& level,
-    const proto::NodeStaticMesh& proto_scene_static_mesh)
+    LevelInterface& level, const proto::NodeStaticMesh& proto_scene_static_mesh)
 {
     // 1st case this is a clean static mesh node.
     if (proto_scene_static_mesh.has_clean_buffer())
@@ -319,9 +318,10 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
     case proto::NodeLight::INVALID_LIGHT:
         [[fallthrough]];
     default:
-        throw std::runtime_error(fmt::format(
-            "Unknown scene light type {}",
-            static_cast<int>(proto_scene_light.light_type())));
+        throw std::runtime_error(
+            fmt::format(
+                "Unknown scene light type {}",
+                static_cast<int>(proto_scene_light.light_type())));
     }
     return false;
 }

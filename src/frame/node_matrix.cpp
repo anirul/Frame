@@ -8,6 +8,8 @@
 namespace frame
 {
 
+NodeMatrix::~NodeMatrix() = default;
+
 NodeMatrix::NodeMatrix(
     std::function<NodeInterface*(const std::string&)> func,
     glm::mat4 matrix,
@@ -82,8 +84,9 @@ glm::mat4 NodeMatrix::GetLocalModel(const double dt) const
         auto parent_node = func_(GetParentName());
         if (!parent_node)
         {
-            throw std::runtime_error(fmt::format(
-                "SceneMatrix func({}) returned nullptr", GetParentName()));
+            throw std::runtime_error(
+                fmt::format(
+                    "SceneMatrix func({}) returned nullptr", GetParentName()));
         }
         return parent_node->GetLocalModel(dt) * ComputeLocalRotation(dt);
     }

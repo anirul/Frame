@@ -55,7 +55,7 @@ class NodeMatrix : public NodeInterface, public Serialize<proto::NodeMatrix>
      */
     NodeMatrix(glm::vec4 quat, bool rotation = false);
     //! @brief Virtual destructor.
-    ~NodeMatrix() override = default;
+    ~NodeMatrix() override;
 
   public:
     /**

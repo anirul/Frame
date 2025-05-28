@@ -46,7 +46,7 @@ class NodeCamera : public NodeInterface, public Serialize<proto::NodeCamera>
     {
     }
     //! @brief Virtual destructor.
-    ~NodeCamera() override = default;
+    virtual ~NodeCamera() override;
 
   public:
     /**
