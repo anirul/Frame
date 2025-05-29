@@ -51,14 +51,6 @@ bool WindowTexture::DrawCallback()
             ImVec2(content_window.x, content_window.x / aspect_ratio);
     }
 
-    // Compute offset for centering:
-    ImVec2 image_offset;
-    image_offset.x = (content_window.x - window_range.x) * 0.5f;
-    image_offset.y = (content_window.y - window_range.y) * 0.5f;
-
-    // Set the cursor position to the computed offset.
-    ImGui::SetCursorPos(image_offset);
-
     // Draw the image.
     ImGui::Image(gl_id, window_range, ImVec2(0, 1), ImVec2(1, 0));
 

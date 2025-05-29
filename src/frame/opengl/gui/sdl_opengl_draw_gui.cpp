@@ -198,21 +198,15 @@ bool SDLOpenGLDrawGui::Update(DeviceInterface& device, double dt)
         }
         // Get the window width.
         ImVec2 content_window = ImGui::GetContentRegionAvail();
-        auto size = json::ParseSize(texture.GetData().size());
+        auto size = texture.GetSize();
         // Compute the aspect ratio.
         float aspect_ratio =
             static_cast<float>(size.x) / static_cast<float>(size.y);
         // Cast the opengl windows id.
         // I disable the warning C4312 from unsigned int to void* casting to
         // a bigger space.
-#if defined(_WIN32) || defined(_WIN64)
-#pragma warning(push)
-#pragma warning(disable : 4312)
-#endif
         ImTextureID gl_id = static_cast<ImTextureID>(texture.GetId());
-#if defined(_WIN32) || defined(_WIN64)
-#pragma warning(pop)
-#endif
+
         // Compute the final size.
         ImVec2 window_range{};
         if (content_window.x / aspect_ratio > content_window.y)
