@@ -15,7 +15,7 @@
       "output_texture_names": "billboard",
       "input_scene_type": { "value": "QUAD" },
       "shader": "ray_marching",
-      "parameters": [
+      "uniforms": [
         {
           "name": "time_s",
           "uniform_enum": "FLOAT_TIME_S"

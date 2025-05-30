@@ -113,6 +113,14 @@ class StaticMesh : public BindInterface, public StaticMeshInterface
     {
         return vertex_array_object_;
     }
+    /**
+     * @brief Check if depth buffer is cleared or not.
+     * @return Is depth buffer cleared?
+     */
+    bool IsClearBuffer() const override
+    {
+        return clear_depth_buffer_;
+    }
 
   public:
     /**

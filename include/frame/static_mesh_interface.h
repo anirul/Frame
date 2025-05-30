@@ -97,6 +97,11 @@ class StaticMeshInterface : public Serialize<proto::NodeStaticMesh>
      * @param level: The level corresponding to this mesh.
      */
     virtual void SetIndexSize(std::size_t index_size) = 0;
+    /**
+     * @brief Check if depth buffer is cleared or not.
+     * @return Is depth buffer cleared?
+     */
+    virtual bool IsClearBuffer() const = 0;
 };
 
 } // End namespace frame.

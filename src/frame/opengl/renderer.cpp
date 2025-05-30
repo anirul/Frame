@@ -309,12 +309,10 @@ void Renderer::RenderMesh(
         }
     }
     material.DisableAll();
-    for (const auto clean_item : static_mesh.GetData().clean_buffer().values())
+
+    if (static_mesh.IsClearBuffer())
     {
-        if (clean_item == proto::CleanBuffer::CLEAR_DEPTH)
-        {
-            glClear(GL_DEPTH_BUFFER_BIT);
-        }
+        glClear(GL_DEPTH_BUFFER_BIT);
     }
 }
 

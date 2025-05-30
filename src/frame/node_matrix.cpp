@@ -1,9 +1,13 @@
 #include "frame/node_matrix.h"
 
+#include <fmt/core.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <stdexcept>
+
 #include "frame/json/parse_uniform.h"
 #include "frame/json/serialize_uniform.h"
-#include <fmt/core.h>
-#include <stdexcept>
 
 namespace frame
 {
@@ -34,6 +38,9 @@ NodeMatrix::NodeMatrix(
     : NodeInterface(func)
 {
     data_.mutable_quaternion()->CopyFrom(json::SerializeUniformVector4(quat));
+    glm::quat q(quat.w, quat.x, quat.y, quat.z);
+    data_.mutable_matrix()->CopyFrom(
+        json::SerializeUniformMatrix4(glm::toMat4(q)));
     if (rotation)
     {
         data_.set_matrix_type_enum(proto::NodeMatrix::ROTATION_MATRIX);
@@ -62,6 +69,9 @@ NodeMatrix::NodeMatrix(glm::vec4 quat, bool rotation)
     : NodeInterface([](std::string) { return nullptr; })
 {
     data_.mutable_quaternion()->CopyFrom(json::SerializeUniformVector4(quat));
+    glm::quat q(quat.w, quat.x, quat.y, quat.z);
+    data_.mutable_matrix()->CopyFrom(
+        json::SerializeUniformMatrix4(glm::toMat4(q)));
     if (rotation)
     {
         data_.set_matrix_type_enum(proto::NodeMatrix::ROTATION_MATRIX);
@@ -84,9 +94,8 @@ glm::mat4 NodeMatrix::GetLocalModel(const double dt) const
         auto parent_node = func_(GetParentName());
         if (!parent_node)
         {
-            throw std::runtime_error(
-                fmt::format(
-                    "SceneMatrix func({}) returned nullptr", GetParentName()));
+            throw std::runtime_error(fmt::format(
+                "SceneMatrix func({}) returned nullptr", GetParentName()));
         }
         return parent_node->GetLocalModel(dt) * ComputeLocalRotation(dt);
     }

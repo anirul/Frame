@@ -203,10 +203,7 @@ bool SDLOpenGLDrawGui::Update(DeviceInterface& device, double dt)
         float aspect_ratio =
             static_cast<float>(size.x) / static_cast<float>(size.y);
         // Cast the opengl windows id.
-        // I disable the warning C4312 from unsigned int to void* casting to
-        // a bigger space.
         ImTextureID gl_id = static_cast<ImTextureID>(texture.GetId());
-
         // Compute the final size.
         ImVec2 window_range{};
         if (content_window.x / aspect_ratio > content_window.y)
