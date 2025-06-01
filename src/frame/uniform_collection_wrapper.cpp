@@ -60,7 +60,7 @@ void UniformCollectionWrapper::RemoveUniform(const std::string& name)
     }
 }
 
-const std::vector<std::string> UniformCollectionWrapper::GetUniformNames() const
+std::vector<std::string> UniformCollectionWrapper::GetUniformNames() const
 {
     std::vector<std::string> names;
     for (const auto& pair : value_map_)

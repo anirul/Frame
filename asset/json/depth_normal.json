@@ -35,7 +35,7 @@
       "output_texture_names": [ "normal_map" ],
       "input_scene_type": { "value": "QUAD" },
       "shader": "depth_normal",
-      "parameters": [
+      "uniforms": [
         {
           "name": "time_s",
           "uniform_enum": "FLOAT_TIME_S"
@@ -66,7 +66,7 @@
   "scene_tree": {
     "default_root_name": "root",
     "default_camera_name": "camera",
-    "scene_matrices": [
+    "node_matrices": [
       {
         "name": "root",
         "matrix": {
@@ -77,7 +77,7 @@
         }
       }
     ],
-    "scene_cameras": [
+    "node_cameras": [
       {
         "name": "camera",
         "parent": "root",
@@ -101,7 +101,7 @@
         }
       }
     ],
-    "scene_static_meshes": [
+    "node_static_meshes": [
       {
         "name": "ComputeNormalMesh",
         "parent": "root",

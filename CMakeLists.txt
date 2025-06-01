@@ -31,9 +31,10 @@ find_package(Vulkan REQUIRED)
 
 # Sources.
 add_subdirectory(asset/shader/opengl)
+add_subdirectory(asset/json)
 add_subdirectory(src/frame)
+add_subdirectory(editor)
+add_subdirectory(examples)
 set(CMAKE_CTEST_ARGUMENTS "--output-on-failure")
 enable_testing()
 add_subdirectory(tests/frame)
-add_subdirectory(editor)
-add_subdirectory(examples)

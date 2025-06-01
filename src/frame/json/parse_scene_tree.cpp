@@ -333,28 +333,28 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
 {
     level.SetDefaultCameraName(proto_scene_tree.default_camera_name());
     level.SetDefaultRootSceneNodeName(proto_scene_tree.default_root_name());
-    for (const auto& proto_matrix : proto_scene_tree.scene_matrices())
+    for (const auto& proto_matrix : proto_scene_tree.node_matrices())
     {
         if (!ParseNodeMatrix(level, proto_matrix))
         {
             return false;
         }
     }
-    for (const auto& proto_static_mesh : proto_scene_tree.scene_static_meshes())
+    for (const auto& proto_static_mesh : proto_scene_tree.node_static_meshes())
     {
         if (!ParseNodeStaticMesh(level, proto_static_mesh))
         {
             return false;
         }
     }
-    for (const auto& proto_camera : proto_scene_tree.scene_cameras())
+    for (const auto& proto_camera : proto_scene_tree.node_cameras())
     {
         if (!ParseNodeCamera(level, proto_camera))
         {
             return false;
         }
     }
-    for (const auto& proto_light : proto_scene_tree.scene_lights())
+    for (const auto& proto_light : proto_scene_tree.node_lights())
     {
         if (!ParseNodeLight(level, proto_light))
         {

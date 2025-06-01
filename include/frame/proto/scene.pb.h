@@ -1907,81 +1907,81 @@ class SceneTree final : public ::google::protobuf::Message
 
   // accessors -------------------------------------------------------
   enum : int {
-    kSceneMatricesFieldNumber = 3,
-    kSceneStaticMeshesFieldNumber = 4,
-    kSceneCamerasFieldNumber = 5,
-    kSceneLightsFieldNumber = 6,
+    kNodeMatricesFieldNumber = 3,
+    kNodeStaticMeshesFieldNumber = 4,
+    kNodeCamerasFieldNumber = 5,
+    kNodeLightsFieldNumber = 6,
     kDefaultRootNameFieldNumber = 1,
     kDefaultCameraNameFieldNumber = 2,
   };
-  // repeated .frame.proto.NodeMatrix scene_matrices = 3;
-  int scene_matrices_size() const;
+  // repeated .frame.proto.NodeMatrix node_matrices = 3;
+  int node_matrices_size() const;
   private:
-  int _internal_scene_matrices_size() const;
+  int _internal_node_matrices_size() const;
 
   public:
-  void clear_scene_matrices() ;
-  ::frame::proto::NodeMatrix* mutable_scene_matrices(int index);
-  ::google::protobuf::RepeatedPtrField<::frame::proto::NodeMatrix>* mutable_scene_matrices();
+  void clear_node_matrices() ;
+  ::frame::proto::NodeMatrix* mutable_node_matrices(int index);
+  ::google::protobuf::RepeatedPtrField<::frame::proto::NodeMatrix>* mutable_node_matrices();
 
   private:
-  const ::google::protobuf::RepeatedPtrField<::frame::proto::NodeMatrix>& _internal_scene_matrices() const;
-  ::google::protobuf::RepeatedPtrField<::frame::proto::NodeMatrix>* _internal_mutable_scene_matrices();
+  const ::google::protobuf::RepeatedPtrField<::frame::proto::NodeMatrix>& _internal_node_matrices() const;
+  ::google::protobuf::RepeatedPtrField<::frame::proto::NodeMatrix>* _internal_mutable_node_matrices();
   public:
-  const ::frame::proto::NodeMatrix& scene_matrices(int index) const;
-  ::frame::proto::NodeMatrix* add_scene_matrices();
-  const ::google::protobuf::RepeatedPtrField<::frame::proto::NodeMatrix>& scene_matrices() const;
-  // repeated .frame.proto.NodeStaticMesh scene_static_meshes = 4;
-  int scene_static_meshes_size() const;
+  const ::frame::proto::NodeMatrix& node_matrices(int index) const;
+  ::frame::proto::NodeMatrix* add_node_matrices();
+  const ::google::protobuf::RepeatedPtrField<::frame::proto::NodeMatrix>& node_matrices() const;
+  // repeated .frame.proto.NodeStaticMesh node_static_meshes = 4;
+  int node_static_meshes_size() const;
   private:
-  int _internal_scene_static_meshes_size() const;
+  int _internal_node_static_meshes_size() const;
 
   public:
-  void clear_scene_static_meshes() ;
-  ::frame::proto::NodeStaticMesh* mutable_scene_static_meshes(int index);
-  ::google::protobuf::RepeatedPtrField<::frame::proto::NodeStaticMesh>* mutable_scene_static_meshes();
+  void clear_node_static_meshes() ;
+  ::frame::proto::NodeStaticMesh* mutable_node_static_meshes(int index);
+  ::google::protobuf::RepeatedPtrField<::frame::proto::NodeStaticMesh>* mutable_node_static_meshes();
 
   private:
-  const ::google::protobuf::RepeatedPtrField<::frame::proto::NodeStaticMesh>& _internal_scene_static_meshes() const;
-  ::google::protobuf::RepeatedPtrField<::frame::proto::NodeStaticMesh>* _internal_mutable_scene_static_meshes();
+  const ::google::protobuf::RepeatedPtrField<::frame::proto::NodeStaticMesh>& _internal_node_static_meshes() const;
+  ::google::protobuf::RepeatedPtrField<::frame::proto::NodeStaticMesh>* _internal_mutable_node_static_meshes();
   public:
-  const ::frame::proto::NodeStaticMesh& scene_static_meshes(int index) const;
-  ::frame::proto::NodeStaticMesh* add_scene_static_meshes();
-  const ::google::protobuf::RepeatedPtrField<::frame::proto::NodeStaticMesh>& scene_static_meshes() const;
-  // repeated .frame.proto.NodeCamera scene_cameras = 5;
-  int scene_cameras_size() const;
+  const ::frame::proto::NodeStaticMesh& node_static_meshes(int index) const;
+  ::frame::proto::NodeStaticMesh* add_node_static_meshes();
+  const ::google::protobuf::RepeatedPtrField<::frame::proto::NodeStaticMesh>& node_static_meshes() const;
+  // repeated .frame.proto.NodeCamera node_cameras = 5;
+  int node_cameras_size() const;
   private:
-  int _internal_scene_cameras_size() const;
+  int _internal_node_cameras_size() const;
 
   public:
-  void clear_scene_cameras() ;
-  ::frame::proto::NodeCamera* mutable_scene_cameras(int index);
-  ::google::protobuf::RepeatedPtrField<::frame::proto::NodeCamera>* mutable_scene_cameras();
+  void clear_node_cameras() ;
+  ::frame::proto::NodeCamera* mutable_node_cameras(int index);
+  ::google::protobuf::RepeatedPtrField<::frame::proto::NodeCamera>* mutable_node_cameras();
 
   private:
-  const ::google::protobuf::RepeatedPtrField<::frame::proto::NodeCamera>& _internal_scene_cameras() const;
-  ::google::protobuf::RepeatedPtrField<::frame::proto::NodeCamera>* _internal_mutable_scene_cameras();
+  const ::google::protobuf::RepeatedPtrField<::frame::proto::NodeCamera>& _internal_node_cameras() const;
+  ::google::protobuf::RepeatedPtrField<::frame::proto::NodeCamera>* _internal_mutable_node_cameras();
   public:
-  const ::frame::proto::NodeCamera& scene_cameras(int index) const;
-  ::frame::proto::NodeCamera* add_scene_cameras();
-  const ::google::protobuf::RepeatedPtrField<::frame::proto::NodeCamera>& scene_cameras() const;
-  // repeated .frame.proto.NodeLight scene_lights = 6;
-  int scene_lights_size() const;
+  const ::frame::proto::NodeCamera& node_cameras(int index) const;
+  ::frame::proto::NodeCamera* add_node_cameras();
+  const ::google::protobuf::RepeatedPtrField<::frame::proto::NodeCamera>& node_cameras() const;
+  // repeated .frame.proto.NodeLight node_lights = 6;
+  int node_lights_size() const;
   private:
-  int _internal_scene_lights_size() const;
+  int _internal_node_lights_size() const;
 
   public:
-  void clear_scene_lights() ;
-  ::frame::proto::NodeLight* mutable_scene_lights(int index);
-  ::google::protobuf::RepeatedPtrField<::frame::proto::NodeLight>* mutable_scene_lights();
+  void clear_node_lights() ;
+  ::frame::proto::NodeLight* mutable_node_lights(int index);
+  ::google::protobuf::RepeatedPtrField<::frame::proto::NodeLight>* mutable_node_lights();
 
   private:
-  const ::google::protobuf::RepeatedPtrField<::frame::proto::NodeLight>& _internal_scene_lights() const;
-  ::google::protobuf::RepeatedPtrField<::frame::proto::NodeLight>* _internal_mutable_scene_lights();
+  const ::google::protobuf::RepeatedPtrField<::frame::proto::NodeLight>& _internal_node_lights() const;
+  ::google::protobuf::RepeatedPtrField<::frame::proto::NodeLight>* _internal_mutable_node_lights();
   public:
-  const ::frame::proto::NodeLight& scene_lights(int index) const;
-  ::frame::proto::NodeLight* add_scene_lights();
-  const ::google::protobuf::RepeatedPtrField<::frame::proto::NodeLight>& scene_lights() const;
+  const ::frame::proto::NodeLight& node_lights(int index) const;
+  ::frame::proto::NodeLight* add_node_lights();
+  const ::google::protobuf::RepeatedPtrField<::frame::proto::NodeLight>& node_lights() const;
   // string default_root_name = 1;
   void clear_default_root_name() ;
   const std::string& default_root_name() const;
@@ -2037,10 +2037,10 @@ class SceneTree final : public ::google::protobuf::Message
     inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
                           ::google::protobuf::Arena* arena, const Impl_& from,
                           const SceneTree& from_msg);
-    ::google::protobuf::RepeatedPtrField< ::frame::proto::NodeMatrix > scene_matrices_;
-    ::google::protobuf::RepeatedPtrField< ::frame::proto::NodeStaticMesh > scene_static_meshes_;
-    ::google::protobuf::RepeatedPtrField< ::frame::proto::NodeCamera > scene_cameras_;
-    ::google::protobuf::RepeatedPtrField< ::frame::proto::NodeLight > scene_lights_;
+    ::google::protobuf::RepeatedPtrField< ::frame::proto::NodeMatrix > node_matrices_;
+    ::google::protobuf::RepeatedPtrField< ::frame::proto::NodeStaticMesh > node_static_meshes_;
+    ::google::protobuf::RepeatedPtrField< ::frame::proto::NodeCamera > node_cameras_;
+    ::google::protobuf::RepeatedPtrField< ::frame::proto::NodeLight > node_lights_;
     ::google::protobuf::internal::ArenaStringPtr default_root_name_;
     ::google::protobuf::internal::ArenaStringPtr default_camera_name_;
     ::google::protobuf::internal::CachedSize _cached_size_;
@@ -3876,200 +3876,200 @@ inline void SceneTree::set_allocated_default_camera_name(std::string* value) {
   // @@protoc_insertion_point(field_set_allocated:frame.proto.SceneTree.default_camera_name)
 }
 
-// repeated .frame.proto.NodeMatrix scene_matrices = 3;
-inline int SceneTree::_internal_scene_matrices_size() const {
-  return _internal_scene_matrices().size();
+// repeated .frame.proto.NodeMatrix node_matrices = 3;
+inline int SceneTree::_internal_node_matrices_size() const {
+  return _internal_node_matrices().size();
 }
-inline int SceneTree::scene_matrices_size() const {
-  return _internal_scene_matrices_size();
+inline int SceneTree::node_matrices_size() const {
+  return _internal_node_matrices_size();
 }
-inline void SceneTree::clear_scene_matrices() {
+inline void SceneTree::clear_node_matrices() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.scene_matrices_.Clear();
+  _impl_.node_matrices_.Clear();
 }
-inline ::frame::proto::NodeMatrix* SceneTree::mutable_scene_matrices(int index)
+inline ::frame::proto::NodeMatrix* SceneTree::mutable_node_matrices(int index)
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_mutable:frame.proto.SceneTree.scene_matrices)
-  return _internal_mutable_scene_matrices()->Mutable(index);
+  // @@protoc_insertion_point(field_mutable:frame.proto.SceneTree.node_matrices)
+  return _internal_mutable_node_matrices()->Mutable(index);
 }
-inline ::google::protobuf::RepeatedPtrField<::frame::proto::NodeMatrix>* SceneTree::mutable_scene_matrices()
+inline ::google::protobuf::RepeatedPtrField<::frame::proto::NodeMatrix>* SceneTree::mutable_node_matrices()
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_mutable_list:frame.proto.SceneTree.scene_matrices)
+  // @@protoc_insertion_point(field_mutable_list:frame.proto.SceneTree.node_matrices)
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  return _internal_mutable_scene_matrices();
+  return _internal_mutable_node_matrices();
 }
-inline const ::frame::proto::NodeMatrix& SceneTree::scene_matrices(int index) const
+inline const ::frame::proto::NodeMatrix& SceneTree::node_matrices(int index) const
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:frame.proto.SceneTree.scene_matrices)
-  return _internal_scene_matrices().Get(index);
+  // @@protoc_insertion_point(field_get:frame.proto.SceneTree.node_matrices)
+  return _internal_node_matrices().Get(index);
 }
-inline ::frame::proto::NodeMatrix* SceneTree::add_scene_matrices() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+inline ::frame::proto::NodeMatrix* SceneTree::add_node_matrices() ABSL_ATTRIBUTE_LIFETIME_BOUND {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  ::frame::proto::NodeMatrix* _add = _internal_mutable_scene_matrices()->Add();
-  // @@protoc_insertion_point(field_add:frame.proto.SceneTree.scene_matrices)
+  ::frame::proto::NodeMatrix* _add = _internal_mutable_node_matrices()->Add();
+  // @@protoc_insertion_point(field_add:frame.proto.SceneTree.node_matrices)
   return _add;
 }
-inline const ::google::protobuf::RepeatedPtrField<::frame::proto::NodeMatrix>& SceneTree::scene_matrices() const
+inline const ::google::protobuf::RepeatedPtrField<::frame::proto::NodeMatrix>& SceneTree::node_matrices() const
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_list:frame.proto.SceneTree.scene_matrices)
-  return _internal_scene_matrices();
+  // @@protoc_insertion_point(field_list:frame.proto.SceneTree.node_matrices)
+  return _internal_node_matrices();
 }
 inline const ::google::protobuf::RepeatedPtrField<::frame::proto::NodeMatrix>&
-SceneTree::_internal_scene_matrices() const {
+SceneTree::_internal_node_matrices() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
-  return _impl_.scene_matrices_;
+  return _impl_.node_matrices_;
 }
 inline ::google::protobuf::RepeatedPtrField<::frame::proto::NodeMatrix>*
-SceneTree::_internal_mutable_scene_matrices() {
+SceneTree::_internal_mutable_node_matrices() {
   ::google::protobuf::internal::TSanRead(&_impl_);
-  return &_impl_.scene_matrices_;
+  return &_impl_.node_matrices_;
 }
 
-// repeated .frame.proto.NodeStaticMesh scene_static_meshes = 4;
-inline int SceneTree::_internal_scene_static_meshes_size() const {
-  return _internal_scene_static_meshes().size();
+// repeated .frame.proto.NodeStaticMesh node_static_meshes = 4;
+inline int SceneTree::_internal_node_static_meshes_size() const {
+  return _internal_node_static_meshes().size();
 }
-inline int SceneTree::scene_static_meshes_size() const {
-  return _internal_scene_static_meshes_size();
+inline int SceneTree::node_static_meshes_size() const {
+  return _internal_node_static_meshes_size();
 }
-inline void SceneTree::clear_scene_static_meshes() {
+inline void SceneTree::clear_node_static_meshes() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.scene_static_meshes_.Clear();
+  _impl_.node_static_meshes_.Clear();
 }
-inline ::frame::proto::NodeStaticMesh* SceneTree::mutable_scene_static_meshes(int index)
+inline ::frame::proto::NodeStaticMesh* SceneTree::mutable_node_static_meshes(int index)
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_mutable:frame.proto.SceneTree.scene_static_meshes)
-  return _internal_mutable_scene_static_meshes()->Mutable(index);
+  // @@protoc_insertion_point(field_mutable:frame.proto.SceneTree.node_static_meshes)
+  return _internal_mutable_node_static_meshes()->Mutable(index);
 }
-inline ::google::protobuf::RepeatedPtrField<::frame::proto::NodeStaticMesh>* SceneTree::mutable_scene_static_meshes()
+inline ::google::protobuf::RepeatedPtrField<::frame::proto::NodeStaticMesh>* SceneTree::mutable_node_static_meshes()
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_mutable_list:frame.proto.SceneTree.scene_static_meshes)
+  // @@protoc_insertion_point(field_mutable_list:frame.proto.SceneTree.node_static_meshes)
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  return _internal_mutable_scene_static_meshes();
+  return _internal_mutable_node_static_meshes();
 }
-inline const ::frame::proto::NodeStaticMesh& SceneTree::scene_static_meshes(int index) const
+inline const ::frame::proto::NodeStaticMesh& SceneTree::node_static_meshes(int index) const
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:frame.proto.SceneTree.scene_static_meshes)
-  return _internal_scene_static_meshes().Get(index);
+  // @@protoc_insertion_point(field_get:frame.proto.SceneTree.node_static_meshes)
+  return _internal_node_static_meshes().Get(index);
 }
-inline ::frame::proto::NodeStaticMesh* SceneTree::add_scene_static_meshes() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+inline ::frame::proto::NodeStaticMesh* SceneTree::add_node_static_meshes() ABSL_ATTRIBUTE_LIFETIME_BOUND {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  ::frame::proto::NodeStaticMesh* _add = _internal_mutable_scene_static_meshes()->Add();
-  // @@protoc_insertion_point(field_add:frame.proto.SceneTree.scene_static_meshes)
+  ::frame::proto::NodeStaticMesh* _add = _internal_mutable_node_static_meshes()->Add();
+  // @@protoc_insertion_point(field_add:frame.proto.SceneTree.node_static_meshes)
   return _add;
 }
-inline const ::google::protobuf::RepeatedPtrField<::frame::proto::NodeStaticMesh>& SceneTree::scene_static_meshes() const
+inline const ::google::protobuf::RepeatedPtrField<::frame::proto::NodeStaticMesh>& SceneTree::node_static_meshes() const
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_list:frame.proto.SceneTree.scene_static_meshes)
-  return _internal_scene_static_meshes();
+  // @@protoc_insertion_point(field_list:frame.proto.SceneTree.node_static_meshes)
+  return _internal_node_static_meshes();
 }
 inline const ::google::protobuf::RepeatedPtrField<::frame::proto::NodeStaticMesh>&
-SceneTree::_internal_scene_static_meshes() const {
+SceneTree::_internal_node_static_meshes() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
-  return _impl_.scene_static_meshes_;
+  return _impl_.node_static_meshes_;
 }
 inline ::google::protobuf::RepeatedPtrField<::frame::proto::NodeStaticMesh>*
-SceneTree::_internal_mutable_scene_static_meshes() {
+SceneTree::_internal_mutable_node_static_meshes() {
   ::google::protobuf::internal::TSanRead(&_impl_);
-  return &_impl_.scene_static_meshes_;
+  return &_impl_.node_static_meshes_;
 }
 
-// repeated .frame.proto.NodeCamera scene_cameras = 5;
-inline int SceneTree::_internal_scene_cameras_size() const {
-  return _internal_scene_cameras().size();
+// repeated .frame.proto.NodeCamera node_cameras = 5;
+inline int SceneTree::_internal_node_cameras_size() const {
+  return _internal_node_cameras().size();
 }
-inline int SceneTree::scene_cameras_size() const {
-  return _internal_scene_cameras_size();
+inline int SceneTree::node_cameras_size() const {
+  return _internal_node_cameras_size();
 }
-inline void SceneTree::clear_scene_cameras() {
+inline void SceneTree::clear_node_cameras() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.scene_cameras_.Clear();
+  _impl_.node_cameras_.Clear();
 }
-inline ::frame::proto::NodeCamera* SceneTree::mutable_scene_cameras(int index)
+inline ::frame::proto::NodeCamera* SceneTree::mutable_node_cameras(int index)
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_mutable:frame.proto.SceneTree.scene_cameras)
-  return _internal_mutable_scene_cameras()->Mutable(index);
+  // @@protoc_insertion_point(field_mutable:frame.proto.SceneTree.node_cameras)
+  return _internal_mutable_node_cameras()->Mutable(index);
 }
-inline ::google::protobuf::RepeatedPtrField<::frame::proto::NodeCamera>* SceneTree::mutable_scene_cameras()
+inline ::google::protobuf::RepeatedPtrField<::frame::proto::NodeCamera>* SceneTree::mutable_node_cameras()
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_mutable_list:frame.proto.SceneTree.scene_cameras)
+  // @@protoc_insertion_point(field_mutable_list:frame.proto.SceneTree.node_cameras)
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  return _internal_mutable_scene_cameras();
+  return _internal_mutable_node_cameras();
 }
-inline const ::frame::proto::NodeCamera& SceneTree::scene_cameras(int index) const
+inline const ::frame::proto::NodeCamera& SceneTree::node_cameras(int index) const
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:frame.proto.SceneTree.scene_cameras)
-  return _internal_scene_cameras().Get(index);
+  // @@protoc_insertion_point(field_get:frame.proto.SceneTree.node_cameras)
+  return _internal_node_cameras().Get(index);
 }
-inline ::frame::proto::NodeCamera* SceneTree::add_scene_cameras() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+inline ::frame::proto::NodeCamera* SceneTree::add_node_cameras() ABSL_ATTRIBUTE_LIFETIME_BOUND {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  ::frame::proto::NodeCamera* _add = _internal_mutable_scene_cameras()->Add();
-  // @@protoc_insertion_point(field_add:frame.proto.SceneTree.scene_cameras)
+  ::frame::proto::NodeCamera* _add = _internal_mutable_node_cameras()->Add();
+  // @@protoc_insertion_point(field_add:frame.proto.SceneTree.node_cameras)
   return _add;
 }
-inline const ::google::protobuf::RepeatedPtrField<::frame::proto::NodeCamera>& SceneTree::scene_cameras() const
+inline const ::google::protobuf::RepeatedPtrField<::frame::proto::NodeCamera>& SceneTree::node_cameras() const
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_list:frame.proto.SceneTree.scene_cameras)
-  return _internal_scene_cameras();
+  // @@protoc_insertion_point(field_list:frame.proto.SceneTree.node_cameras)
+  return _internal_node_cameras();
 }
 inline const ::google::protobuf::RepeatedPtrField<::frame::proto::NodeCamera>&
-SceneTree::_internal_scene_cameras() const {
+SceneTree::_internal_node_cameras() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
-  return _impl_.scene_cameras_;
+  return _impl_.node_cameras_;
 }
 inline ::google::protobuf::RepeatedPtrField<::frame::proto::NodeCamera>*
-SceneTree::_internal_mutable_scene_cameras() {
+SceneTree::_internal_mutable_node_cameras() {
   ::google::protobuf::internal::TSanRead(&_impl_);
-  return &_impl_.scene_cameras_;
+  return &_impl_.node_cameras_;
 }
 
-// repeated .frame.proto.NodeLight scene_lights = 6;
-inline int SceneTree::_internal_scene_lights_size() const {
-  return _internal_scene_lights().size();
+// repeated .frame.proto.NodeLight node_lights = 6;
+inline int SceneTree::_internal_node_lights_size() const {
+  return _internal_node_lights().size();
 }
-inline int SceneTree::scene_lights_size() const {
-  return _internal_scene_lights_size();
+inline int SceneTree::node_lights_size() const {
+  return _internal_node_lights_size();
 }
-inline void SceneTree::clear_scene_lights() {
+inline void SceneTree::clear_node_lights() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.scene_lights_.Clear();
+  _impl_.node_lights_.Clear();
 }
-inline ::frame::proto::NodeLight* SceneTree::mutable_scene_lights(int index)
+inline ::frame::proto::NodeLight* SceneTree::mutable_node_lights(int index)
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_mutable:frame.proto.SceneTree.scene_lights)
-  return _internal_mutable_scene_lights()->Mutable(index);
+  // @@protoc_insertion_point(field_mutable:frame.proto.SceneTree.node_lights)
+  return _internal_mutable_node_lights()->Mutable(index);
 }
-inline ::google::protobuf::RepeatedPtrField<::frame::proto::NodeLight>* SceneTree::mutable_scene_lights()
+inline ::google::protobuf::RepeatedPtrField<::frame::proto::NodeLight>* SceneTree::mutable_node_lights()
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_mutable_list:frame.proto.SceneTree.scene_lights)
+  // @@protoc_insertion_point(field_mutable_list:frame.proto.SceneTree.node_lights)
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  return _internal_mutable_scene_lights();
+  return _internal_mutable_node_lights();
 }
-inline const ::frame::proto::NodeLight& SceneTree::scene_lights(int index) const
+inline const ::frame::proto::NodeLight& SceneTree::node_lights(int index) const
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:frame.proto.SceneTree.scene_lights)
-  return _internal_scene_lights().Get(index);
+  // @@protoc_insertion_point(field_get:frame.proto.SceneTree.node_lights)
+  return _internal_node_lights().Get(index);
 }
-inline ::frame::proto::NodeLight* SceneTree::add_scene_lights() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+inline ::frame::proto::NodeLight* SceneTree::add_node_lights() ABSL_ATTRIBUTE_LIFETIME_BOUND {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  ::frame::proto::NodeLight* _add = _internal_mutable_scene_lights()->Add();
-  // @@protoc_insertion_point(field_add:frame.proto.SceneTree.scene_lights)
+  ::frame::proto::NodeLight* _add = _internal_mutable_node_lights()->Add();
+  // @@protoc_insertion_point(field_add:frame.proto.SceneTree.node_lights)
   return _add;
 }
-inline const ::google::protobuf::RepeatedPtrField<::frame::proto::NodeLight>& SceneTree::scene_lights() const
+inline const ::google::protobuf::RepeatedPtrField<::frame::proto::NodeLight>& SceneTree::node_lights() const
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_list:frame.proto.SceneTree.scene_lights)
-  return _internal_scene_lights();
+  // @@protoc_insertion_point(field_list:frame.proto.SceneTree.node_lights)
+  return _internal_node_lights();
 }
 inline const ::google::protobuf::RepeatedPtrField<::frame::proto::NodeLight>&
-SceneTree::_internal_scene_lights() const {
+SceneTree::_internal_node_lights() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
-  return _impl_.scene_lights_;
+  return _impl_.node_lights_;
 }
 inline ::google::protobuf::RepeatedPtrField<::frame::proto::NodeLight>*
-SceneTree::_internal_mutable_scene_lights() {
+SceneTree::_internal_mutable_node_lights() {
   ::google::protobuf::internal::TSanRead(&_impl_);
-  return &_impl_.scene_lights_;
+  return &_impl_.node_lights_;
 }
 
 #ifdef __GNUC__

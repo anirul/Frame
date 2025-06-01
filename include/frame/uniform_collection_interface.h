@@ -42,7 +42,7 @@ class UniformCollectionInterface
      * @brief Get the uniform names.
      * @return The uniform names.
      */
-    virtual const std::vector<std::string> GetUniformNames() const = 0;
+    virtual std::vector<std::string> GetUniformNames() const = 0;
 };
 
 } // End namespace frame.

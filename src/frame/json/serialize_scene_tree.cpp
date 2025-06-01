@@ -205,19 +205,19 @@ void SerializeNode(
     switch (node_interface.GetNodeType())
     {
     case NodeTypeEnum::NODE_CAMERA:
-        *proto_scene_tree.add_scene_cameras() =
+        *proto_scene_tree.add_node_cameras() =
             SerializeNodeCamera(node_interface);
         break;
     case NodeTypeEnum::NODE_LIGHT:
-        *proto_scene_tree.add_scene_lights() =
+        *proto_scene_tree.add_node_lights() =
             SerializeNodeLight(node_interface);
         break;
     case NodeTypeEnum::NODE_MATRIX:
-        *proto_scene_tree.add_scene_matrices() =
+        *proto_scene_tree.add_node_matrices() =
             SerializeNodeMatrix(node_interface);
         break;
     case NodeTypeEnum::NODE_STATIC_MESH:
-        *proto_scene_tree.add_scene_static_meshes() = SerializeNodeStaticMesh(
+        *proto_scene_tree.add_node_static_meshes() = SerializeNodeStaticMesh(
             node_interface, level_interface);
         break;
     case NodeTypeEnum::NODE_UKNOWN:

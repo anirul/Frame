@@ -16,7 +16,7 @@
   "scene_tree": {
     "default_root_name": "root",
     "default_camera_name": "camera",
-    "scene_matrices": [
+    "node_matrices": [
       {
         "name": "root",
         "quaternion": {
@@ -27,7 +27,7 @@
         }
       }
     ],
-    "scene_cameras": [
+    "node_cameras": [
       {
         "name": "camera",
         "parent": "root",
