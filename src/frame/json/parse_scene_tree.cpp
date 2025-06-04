@@ -37,21 +37,43 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
     LevelInterface& level, const proto::NodeMatrix& proto_scene_matrix)
 {
     std::unique_ptr<frame::NodeMatrix> scene_matrix = nullptr;
+    // Determine if the node should behave as a rotation matrix. Older scene
+    // files didn't specify the matrix_type_enum but provided a quaternion when
+    // rotation was expected, so infer the rotation flag from either the proto
+    // field or the presence of a quaternion.
+    bool rotation = proto_scene_matrix.matrix_type_enum() ==
+                        proto::NodeMatrix::ROTATION_MATRIX ||
+                    proto_scene_matrix.has_quaternion();
+
     if (proto_scene_matrix.has_matrix())
     {
         scene_matrix = std::make_unique<frame::NodeMatrix>(
-            GetFunctor(level), ParseUniform(proto_scene_matrix.matrix()));
+            GetFunctor(level),
+            ParseUniform(proto_scene_matrix.matrix()),
+            rotation);
     }
     else if (proto_scene_matrix.has_quaternion())
     {
         scene_matrix = std::make_unique<frame::NodeMatrix>(
-            GetFunctor(level), ParseUniform(proto_scene_matrix.quaternion()));
+            GetFunctor(level),
+            ParseUniform(proto_scene_matrix.quaternion()),
+            rotation);
     }
     else
     {
         scene_matrix = std::make_unique<frame::NodeMatrix>(
-            GetFunctor(level), glm::mat4(1.0f));
+            GetFunctor(level), glm::mat4(1.0f), rotation);
     }
+
+    // In case the proto explicitly requested a rotation matrix but we passed
+    // "rotation" as false to the constructor (shouldn't happen, but for
+    // clarity), force the type here.
+    if (rotation)
+    {
+        scene_matrix->GetData().set_matrix_type_enum(
+            proto::NodeMatrix::ROTATION_MATRIX);
+    }
+
     scene_matrix->GetData().set_name(proto_scene_matrix.name());
     scene_matrix->SetParentName(proto_scene_matrix.parent());
     auto maybe_scene_id = level.AddSceneNode(std::move(scene_matrix));
