@@ -115,7 +115,9 @@ class Program : public ProgramInterface
      * linking where all uniforms reported by OpenGL must be inserted
      * unconditionally.
      *
-     * @param uniform Interface to add to the program.
+     * Unknown uniform types yield a null pointer and are silently skipped.
+     *
+     * @param uniform Interface to add to the program. May be nullptr.
      * @param bypass_check If true the presence check is bypassed.
      */
     void AddUniformInternal(
@@ -136,6 +138,8 @@ class Program : public ProgramInterface
     void ThrowIsInTextureIds(EntityId texture_id) const;
     /**
      * @brief Create the uniform value list (internal).
+     *
+     * Unknown uniform types reported by OpenGL are skipped.
      */
     void CreateUniformList();
     /**

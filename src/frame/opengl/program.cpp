@@ -104,6 +104,11 @@ void Program::AddUniform(std::unique_ptr<UniformInterface>&& uniform_interface)
 void Program::AddUniformInternal(
     std::unique_ptr<UniformInterface>&& uniform_interface, bool bypass_check)
 {
+    if (!uniform_interface)
+    {
+        // Unknown types yield a null pointer; skip them silently.
+        return;
+    }
     std::string name = uniform_interface->GetName();
     if (!bypass_check && !HasUniform(name))
     {
@@ -398,7 +403,10 @@ void Program::CreateUniformList()
             logger_->error(
                 std::format("Unknown uniform name: {} type: {}", name, type));
         }
-        AddUniformInternal(std::move(uniform_interface), true);
+        if (uniform_interface)
+        {
+            AddUniformInternal(std::move(uniform_interface), true);
+        }
     }
     UnUse();
 }
