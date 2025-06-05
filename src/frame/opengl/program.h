@@ -108,6 +108,19 @@ class Program : public ProgramInterface
      */
     void AddUniform(std::unique_ptr<UniformInterface>&& uniform) override;
 
+  private:
+    /**
+     * @brief Internal helper to add a uniform with optional skipping of the
+     * presence check. This is used when building the list of uniforms after
+     * linking where all uniforms reported by OpenGL must be inserted
+     * unconditionally.
+     *
+     * @param uniform Interface to add to the program.
+     * @param bypass_check If true the presence check is bypassed.
+     */
+    void AddUniformInternal(
+        std::unique_ptr<UniformInterface>&& uniform, bool bypass_check);
+
   protected:
     /**
      * @brief Get the memoize version of the uniform (stored locally).
