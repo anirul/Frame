@@ -55,9 +55,11 @@ void FrameBuffer::AttachRender(const RenderBuffer& render) const
 void FrameBuffer::AttachTexture(
     unsigned int texture_id,
     FrameColorAttachment frame_color_attachment /*=
-            FrameColorAttachment::COLOR_ATTACHMENT0*/,
+            FrameColorAttachment::COLOR_ATTACHMENT0*/
+    ,
     FrameTextureType frame_texture_type /*=
-            FrameTextureType::TEXTURE_2D*/,
+            FrameTextureType::TEXTURE_2D*/
+    ,
     int mipmap /*= 0*/) const
 {
     Bind();
@@ -67,6 +69,12 @@ void FrameBuffer::AttachTexture(
         GetFrameTextureType(frame_texture_type),
         texture_id,
         mipmap);
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+    {
+        auto error_pair = GetError();
+        throw std::runtime_error(
+            fmt::format("{} - {}", error_pair.first, error_pair.second));
+    }
     UnBind();
 }
 
@@ -95,8 +103,7 @@ FrameColorAttachment FrameBuffer::GetFrameColorAttachment(int i)
     }
 }
 
-int FrameBuffer::GetFrameTextureType(
-    FrameTextureType frame_texture_type) const
+int FrameBuffer::GetFrameTextureType(FrameTextureType frame_texture_type) const
 {
     int value = static_cast<int>(frame_texture_type);
     if (value >= 0)

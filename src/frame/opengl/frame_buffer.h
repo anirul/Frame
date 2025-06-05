@@ -75,13 +75,15 @@ class FrameBuffer : public BindInterface
      * @param frame_texture_type: What kind of texture is it normal or
      * cubemap element.
      * @param mipmap: Mipmap level.
+     *
+     * The framebuffer status is checked after the attachment and an
+     * exception is thrown if it is incomplete.
      */
     void AttachTexture(
         unsigned int texture_id,
         FrameColorAttachment frame_color_attachment =
             FrameColorAttachment::COLOR_ATTACHMENT0,
-        FrameTextureType frame_texture_type =
-            FrameTextureType::TEXTURE_2D,
+        FrameTextureType frame_texture_type = FrameTextureType::TEXTURE_2D,
         int mipmap = 0) const;
     /**
      * @brief Define an array of buffers into which outputs from the
@@ -142,8 +144,7 @@ class FrameBuffer : public BindInterface
     // still used inside.
     std::pair<bool, std::string> GetError() const;
     // Convert from the internal frame texture type to the OpenGL type.
-    int GetFrameTextureType(
-        FrameTextureType frame_texture_type) const;
+    int GetFrameTextureType(FrameTextureType frame_texture_type) const;
 
   protected:
     friend class ScopedBind;
