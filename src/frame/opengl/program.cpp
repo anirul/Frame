@@ -97,8 +97,17 @@ const UniformInterface& Program::GetUniform(const std::string& name) const
 
 void Program::AddUniform(std::unique_ptr<UniformInterface>&& uniform_interface)
 {
-    auto it = uniform_map_.find(uniform_interface->GetName());
     std::string name = uniform_interface->GetName();
+    if (!HasUniform(name))
+    {
+        logger_->warn(
+            std::format(
+                "Uniform [{}] not active in program [{}], skipping.",
+                name,
+                name_));
+        return;
+    }
+    auto it = uniform_map_.find(name);
     if (it == uniform_map_.end())
     {
         uniform_map_.emplace(name, std::move(uniform_interface));
