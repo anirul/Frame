@@ -236,22 +236,23 @@ glm::uvec2 Texture::GetSize()
 
 void Texture::SetDisplaySize(glm::uvec2 display_size)
 {
-    if (display_size.x == 0)
-    {
-        inner_size_.x = data_.size().x();
-    }
-    else if (data_.size().x() < 0)
-    {
-        inner_size_.x = display_size.x / std::abs(data_.size().x());
-    }
-    if (display_size.y == 0)
-    {
-        inner_size_.y = data_.size().y();
-    }
-    else if (data_.size().y() < 0)
-    {
-        inner_size_.y = display_size.y / std::abs(data_.size().y());
-    }
+    auto compute = [&](int stored, unsigned int display) {
+        if (stored < 0)
+        {
+            return display / static_cast<unsigned int>(std::abs(stored));
+        }
+        else if (stored > 0)
+        {
+            return static_cast<unsigned int>(stored);
+        }
+        else
+        {
+            return display;
+        }
+    };
+
+    inner_size_.x = compute(data_.size().x(), display_size.x);
+    inner_size_.y = compute(data_.size().y(), display_size.y);
 }
 
 void Texture::CreateFrameAndRenderBuffer()
