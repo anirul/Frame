@@ -116,6 +116,8 @@ void Texture::CreateTextureFromPointer(
     {
         inner_size_ = size;
     }
+    // Store the actual texture size in the proto for later retrieval.
+    data_.mutable_size()->CopyFrom(json::SerializeSize(inner_size_));
     glGenTextures(1, &texture_id_);
     ScopedBind scoped_bind(*this);
     proto::TextureFilter texture_filter;
