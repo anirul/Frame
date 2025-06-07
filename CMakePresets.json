@@ -27,26 +27,14 @@
             }
         },
         {
-            "name": "windows-release",
-            "displayName": "Windows Release (VS2022 + VCPKG)",
+            "name": "windows",
+            "displayName": "Windows (VS2022 + VCPKG)",
             "generator": "Visual Studio 17 2022",
-            "binaryDir": "${sourceDir}/build/windows-release",
+            "binaryDir": "${sourceDir}/build/windows",
             "cacheVariables": {
                 "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/external/vcpkg/scripts/buildsystems/vcpkg.cmake",
                 "CMAKE_GENERATOR_TOOLSET": "v143",
                 "CMAKE_GENERATOR_PLATFORM": "x64"
-            }
-        },
-        {
-            "name": "windows-debug",
-            "displayName": "Windows Debug (VS2022 + VCPKG)",
-            "generator": "Visual Studio 17 2022",
-            "binaryDir": "${sourceDir}/build/windows-debug",
-            "cacheVariables": {
-                "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/external/vcpkg/scripts/buildsystems/vcpkg.cmake",
-                "CMAKE_GENERATOR_TOOLSET": "v143",
-                "CMAKE_GENERATOR_PLATFORM": "x64",
-                "CMAKE_BUILD_TYPE": "Debug"
             }
         }
     ],
@@ -61,12 +49,12 @@
         },
         {
             "name": "windows-debug",
-            "configurePreset": "windows-debug",
+            "configurePreset": "windows",
             "configuration": "Debug"
         },
         {
             "name": "windows-release",
-            "configurePreset": "windows-release",
+            "configurePreset": "windows",
             "configuration": "Release"
         }
     ]
