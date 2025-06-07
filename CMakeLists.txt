@@ -17,6 +17,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Adding subfolder property.
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
+# Enable testing.
+set(CMAKE_CTEST_ARGUMENTS "--output-on-failure")
+enable_testing()
+
 # External packages.
 find_package(absl CONFIG REQUIRED)
 find_package(GLEW CONFIG REQUIRED)
@@ -35,6 +39,4 @@ add_subdirectory(asset/json)
 add_subdirectory(src/frame)
 add_subdirectory(editor)
 add_subdirectory(examples)
-set(CMAKE_CTEST_ARGUMENTS "--output-on-failure")
-enable_testing()
 add_subdirectory(tests/frame)

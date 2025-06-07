@@ -21,6 +21,14 @@ What you need to build and run Frame:
 
 ### Building Frame with CMake
 
+Update the local VCPKG and other externals dependencies:
+
+```shell
+git submodule update --init --recursive
+```
+
+#### Under windows
+
 Navigate to your Frame directory and use the following commands to build the project:
 
 ```shell
@@ -30,7 +38,39 @@ cmake --preset windows
 After setting up, you can build the project using Visual Studio or via the command line with the following command:
 
 ```shell
+cmake --build --preset windows-release
+```
+
+Or if you want the debug version you can use:
+
+```shell
 cmake --build --preset windows-debug
+```
+
+#### Under linux
+
+Navigate to your Frame directory and use the following commands to build the project:
+
+```shell
+cmake --preset linux-release
+```
+
+Or if you want the debug version:
+
+```shell
+cmake --preset linux-debug
+```
+
+After setting up, you can build the project using Visual Studio or via the command line with the following command:
+
+```shell
+cmake --build --preset linux-release
+```
+
+Or if you want to build the debug version:
+
+```shell
+cmake --preset linux-debug
 ```
 
 ## Dive in with Examples
