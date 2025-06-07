@@ -29,7 +29,7 @@
         {
             "name": "windows-release",
             "displayName": "Windows Release (VS2022 + VCPKG)",
-            "generator": "Ninja Multi-Config",
+            "generator": "Visual Studio 17 2022",
             "binaryDir": "${sourceDir}/build/windows-release",
             "cacheVariables": {
                 "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/external/vcpkg/scripts/buildsystems/vcpkg.cmake",
@@ -40,7 +40,7 @@
         {
             "name": "windows-debug",
             "displayName": "Windows Debug (VS2022 + VCPKG)",
-            "generator": "Ninja Multi-Config",
+            "generator": "Visual Studio 17 2022",
             "binaryDir": "${sourceDir}/build/windows-debug",
             "cacheVariables": {
                 "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/external/vcpkg/scripts/buildsystems/vcpkg.cmake",
