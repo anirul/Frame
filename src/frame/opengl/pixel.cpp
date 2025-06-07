@@ -87,8 +87,12 @@ GLenum ConvertToGLType(
         case frame::proto::PixelStructure::GREY_ALPHA:
             return GL_RG16;
         case frame::proto::PixelStructure::RGB:
+            [[fallthrough]];
+        case frame::proto::PixelStructure::BGR:
             return GL_RGB16;
         case frame::proto::PixelStructure::RGB_ALPHA:
+            [[fallthrough]];
+        case frame::proto::PixelStructure::BGR_ALPHA:
             return GL_RGBA16;
         default:
             throw std::runtime_error(
@@ -105,8 +109,12 @@ GLenum ConvertToGLType(
         case frame::proto::PixelStructure::GREY_ALPHA:
             return GL_RG16F;
         case frame::proto::PixelStructure::RGB:
+            [[fallthrough]];
+        case frame::proto::PixelStructure::BGR:
             return GL_RGB16F;
         case frame::proto::PixelStructure::RGB_ALPHA:
+            [[fallthrough]];
+        case frame::proto::PixelStructure::BGR_ALPHA:
             return GL_RGBA16F;
         default:
             throw std::runtime_error(
@@ -123,8 +131,12 @@ GLenum ConvertToGLType(
         case frame::proto::PixelStructure::GREY_ALPHA:
             return GL_RG32F;
         case frame::proto::PixelStructure::RGB:
+            [[fallthrough]];
+        case frame::proto::PixelStructure::BGR:
             return GL_RGB32F;
         case frame::proto::PixelStructure::RGB_ALPHA:
+            [[fallthrough]];
+        case frame::proto::PixelStructure::BGR_ALPHA:
             return GL_RGBA32F;
         default:
             throw std::runtime_error(

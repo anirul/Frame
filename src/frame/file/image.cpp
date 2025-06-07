@@ -29,7 +29,27 @@ Image::Image(
     const auto& logger = frame::Logger::GetInstance();
     logger->info("Openning image: [{}].", file.string());
     int channels;
-    int desired_channels = {static_cast<int>(pixel_structure.value())};
+    auto GetDesiredChannels = [](const proto::PixelStructure& pixel_structure) {
+        switch (pixel_structure.value())
+        {
+        case proto::PixelStructure::GREY:
+        case proto::PixelStructure::DEPTH:
+            return 1;
+        case proto::PixelStructure::GREY_ALPHA:
+            return 2;
+        case proto::PixelStructure::RGB:
+        case proto::PixelStructure::BGR:
+            return 3;
+        case proto::PixelStructure::RGB_ALPHA:
+        case proto::PixelStructure::BGR_ALPHA:
+            return 4;
+        default:
+            throw std::runtime_error(
+                "unsupported pixel structure : " +
+                std::to_string(static_cast<int>(pixel_structure.value())));
+        }
+    };
+    int desired_channels = GetDesiredChannels(pixel_structure);
     // This is in the case of OpenGL (for now the only case).
     stbi_set_flip_vertically_on_load(true);
     glm::ivec2 size = glm::ivec2(0, 0);
