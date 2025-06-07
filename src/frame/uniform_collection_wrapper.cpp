@@ -20,10 +20,13 @@ UniformCollectionWrapper::UniformCollectionWrapper(
         std::make_unique<Uniform>("model", model);
     std::unique_ptr<Uniform> uniform_time =
         std::make_unique<Uniform>("time", static_cast<float>(time));
+    std::unique_ptr<Uniform> uniform_time_s =
+        std::make_unique<Uniform>("time_s", static_cast<float>(time));
     AddUniform(std::move(uniform_projection));
     AddUniform(std::move(uniform_view));
     AddUniform(std::move(uniform_model));
     AddUniform(std::move(uniform_time));
+    AddUniform(std::move(uniform_time_s));
 }
 
 const UniformInterface& UniformCollectionWrapper::GetUniform(
