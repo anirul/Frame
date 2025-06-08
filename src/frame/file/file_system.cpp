@@ -31,10 +31,13 @@ const std::filesystem::path FindElement(
             for (auto j = 0; j < i; ++j)
                 new_path /= "../";
             new_path /= file;
-            if (test(new_path))
+            // Normalize the path before testing it. Some platforms
+            // don't correctly resolve directories containing "..".
+            auto normalized_path = new_path.lexically_normal();
+            if (test(normalized_path))
             {
                 // Prune the path from relative elements.
-                new_path = new_path.lexically_normal();
+                new_path = normalized_path;
                 // Search for build (it create a bunch of asset and other
                 // element that will confuse the search for the file and path).
                 bool found = false;
