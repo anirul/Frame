@@ -353,7 +353,6 @@ void Cubemap::CreateCubemapFromPointer(
     {
         throw std::runtime_error("Couldn't load cubemap from single ptr.");
     }
-    auto equirectangular_size = equirectangular->GetSize();
     // Seams correct when you are less than 2048 in height you get 512.
     std::uint32_t cube_single_res = PowerFloor(size.y);
     glm::uvec2 cube_pair_res = {cube_single_res, cube_single_res};
