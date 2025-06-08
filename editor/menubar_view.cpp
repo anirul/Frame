@@ -9,6 +9,7 @@
 #include "frame/gui/window_logger.h"
 #include "frame/opengl/texture.h"
 #include "frame/gui/window_texture.h"
+#include "frame/gui/window_cubemap.h"
 
 namespace frame::gui
 {
@@ -114,8 +115,16 @@ void MenubarView::ShowTexturesWindow(DeviceInterface& device)
         {
             if (window_state_[texture_interface.GetName()])
             {
-                draw_gui_.AddWindow(
-                    std::make_unique<WindowTexture>(texture_interface));
+                if (texture_interface.GetData().cubemap())
+                {
+                    draw_gui_.AddWindow(
+                        std::make_unique<WindowCubemap>(texture_interface));
+                }
+                else
+                {
+                    draw_gui_.AddWindow(
+                        std::make_unique<WindowTexture>(texture_interface));
+                }
             }
             else
             {
@@ -131,13 +140,24 @@ void MenubarView::Reset()
 {
     for (std::string window_name : draw_gui_.GetWindowTitles())
     {
-        if (window_name.starts_with("texture - "))
+        if (window_name.starts_with("texture - ") ||
+            window_name.starts_with("cubemap - "))
         {
             try
             {
-                WindowTexture& window_texture = dynamic_cast<WindowTexture&>(
-                    draw_gui_.GetWindow(window_name));
-                draw_gui_.DeleteWindow(window_name);
+                if (window_name.starts_with("cubemap - "))
+                {
+                    WindowCubemap& window_cubemap = dynamic_cast<WindowCubemap&>(
+                        draw_gui_.GetWindow(window_name));
+                    draw_gui_.DeleteWindow(window_name);
+                }
+                else
+                {
+                    WindowTexture& window_texture =
+                        dynamic_cast<WindowTexture&>(
+                            draw_gui_.GetWindow(window_name));
+                    draw_gui_.DeleteWindow(window_name);
+                }
                 auto maybe_name = ExtractStringBracket(window_name);
                 if (maybe_name)
                 {
@@ -153,7 +173,7 @@ void MenubarView::Reset()
             catch (const std::bad_cast& ex)
             {
                 frame::Logger::GetInstance()->warn(std::format(
-                    "Counldn't cast window named {} to a window texture {}.",
+                    "Counldn't cast window named {} to a window display {}.",
                     window_name,
                     ex.what()));
             }
