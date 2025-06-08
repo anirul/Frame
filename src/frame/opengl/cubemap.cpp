@@ -412,6 +412,9 @@ void Cubemap::CreateCubemapFromPointer(
     texture_id_ = cubemap.GetId();
     cubemap.texture_id_ = 0;
     inner_size_ = cube_pair_res;
+    // Record the actual cubemap size in the proto so callers such as tests
+    // query the correct dimensions after the equirectangular conversion.
+    data_.mutable_size()->CopyFrom(json::SerializeSize(inner_size_));
 }
 
 void Cubemap::CreateCubemapFromPointers(
