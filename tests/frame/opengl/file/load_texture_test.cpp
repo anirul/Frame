@@ -3,6 +3,8 @@
 #include <algorithm>
 
 #include "frame/file/file_system.h"
+#include "frame/json/parse_uniform.h"
+#include "frame/opengl/cubemap.h"
 #include "frame/opengl/file/load_texture.h"
 #include "frame/opengl/texture.h"
 
@@ -13,8 +15,9 @@ TEST_F(LoadTextureTest, LoadTextureFromFloatTest)
 {
     auto texture = frame::opengl::file::LoadTextureFromFloat(0.1f);
     EXPECT_TRUE(texture);
-    EXPECT_EQ(1, texture->GetSize().x);
-    EXPECT_EQ(1, texture->GetSize().y);
+    auto texture_size = frame::json::ParseSize(texture->GetData().size());
+    EXPECT_EQ(1, texture_size.x);
+    EXPECT_EQ(1, texture_size.y);
     auto vecf = texture->GetTextureFloat();
     EXPECT_FLOAT_EQ(0.1f, *vecf.data());
 }
@@ -24,8 +27,9 @@ TEST_F(LoadTextureTest, LoadTextureFromVec4Test)
     auto texture = frame::opengl::file::LoadTextureFromVec4(
         glm::vec4(0.1f, 0.2f, 0.3f, 0.4f));
     EXPECT_TRUE(texture);
-    EXPECT_EQ(1, texture->GetSize().x);
-    EXPECT_EQ(1, texture->GetSize().y);
+    auto texture_size = frame::json::ParseSize(texture->GetData().size());
+    EXPECT_EQ(1, texture_size.x);
+    EXPECT_EQ(1, texture_size.y);
     auto vecf = texture->GetTextureFloat();
     EXPECT_EQ(4, vecf.size());
     EXPECT_FLOAT_EQ(0.1f, vecf[0]);
@@ -36,13 +40,14 @@ TEST_F(LoadTextureTest, LoadTextureFromVec4Test)
 
 TEST_F(LoadTextureTest, LoadTextureFromFileTest)
 {
-    auto texture = frame::opengl::file::LoadTextureFromFile(
+    auto texture = std::make_unique<frame::opengl::Texture>(
         frame::file::FindFile("asset/cubemap/positive_x.png"),
         frame::json::PixelElementSize_BYTE(),
         frame::json::PixelStructure_RGB_ALPHA());
     EXPECT_TRUE(texture);
-    EXPECT_EQ(1024, texture->GetSize().x);
-    EXPECT_EQ(1024, texture->GetSize().y);
+    auto texture_size = frame::json::ParseSize(texture->GetData().size());
+    EXPECT_EQ(1024, texture_size.x);
+    EXPECT_EQ(1024, texture_size.y);
     auto vec8 = texture->GetTextureByte();
     auto it_pair = std::minmax_element(vec8.begin(), vec8.end());
     EXPECT_EQ(0x59, *it_pair.first);
@@ -54,18 +59,20 @@ TEST_F(LoadTextureTest, LoadTextureFromFileTest)
 
 TEST_F(LoadTextureTest, LoadCubeMapFromFilesTest)
 {
-    auto texture = frame::opengl::file::LoadCubeMapTextureFromFiles(
-        {frame::file::FindFile("asset/cubemap/positive_x.png"),
-         frame::file::FindFile("asset/cubemap/negative_x.png"),
-         frame::file::FindFile("asset/cubemap/positive_y.png"),
-         frame::file::FindFile("asset/cubemap/negative_y.png"),
-         frame::file::FindFile("asset/cubemap/positive_z.png"),
-         frame::file::FindFile("asset/cubemap/negative_z.png")},
+    auto texture = std::make_unique<frame::opengl::Cubemap>(
+        std::array<std::filesystem::path, 6>{
+            frame::file::FindFile("asset/cubemap/positive_x.png"),
+            frame::file::FindFile("asset/cubemap/negative_x.png"),
+            frame::file::FindFile("asset/cubemap/positive_y.png"),
+            frame::file::FindFile("asset/cubemap/negative_y.png"),
+            frame::file::FindFile("asset/cubemap/positive_z.png"),
+            frame::file::FindFile("asset/cubemap/negative_z.png")},
         frame::json::PixelElementSize_BYTE(),
         frame::json::PixelStructure_RGB_ALPHA());
     EXPECT_TRUE(texture);
-    EXPECT_EQ(1024, texture->GetSize().x);
-    EXPECT_EQ(1024, texture->GetSize().y);
+    auto texture_size = frame::json::ParseSize(texture->GetData().size());
+    EXPECT_EQ(1024, texture_size.x);
+    EXPECT_EQ(1024, texture_size.y);
     auto vec8 = texture->GetTextureByte();
     auto it_pair = std::minmax_element(vec8.begin(), vec8.end());
     EXPECT_EQ(0x49, *it_pair.first);

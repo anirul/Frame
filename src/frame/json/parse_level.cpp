@@ -40,7 +40,7 @@ std::unique_ptr<LevelInterface> LevelProto(
     for (const auto& proto_texture : proto_level.textures())
     {
         std::unique_ptr<TextureInterface> texture =
-            ParseBasicTexture(proto_texture, size);
+            ParseTexture(proto_texture, size);
         EntityId stream_id = NullId;
         EntityId texture_id = NullId;
         std::string texture_name = proto_texture.name();
@@ -87,13 +87,12 @@ std::unique_ptr<LevelInterface> LevelProto(
     // Load material from proto.
     for (const auto& proto_material : proto_level.materials())
     {
-        auto maybe_material = ParseMaterialOpenGL(proto_material, *level.get());
-        if (!maybe_material)
+        auto material = ParseMaterialOpenGL(proto_material, *level.get());
+        if (!material)
         {
             throw std::runtime_error(
                 fmt::format("invalid material : {}", proto_material.name()));
         }
-        auto material = std::move(maybe_material.value());
         if (!level->AddMaterial(std::move(material)))
         {
             throw std::runtime_error(fmt::format(

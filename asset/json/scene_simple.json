@@ -22,7 +22,7 @@
       "output_texture_names": "albedo",
       "input_scene_type": { "value": "CUBE" },
       "shader": "cubemap",
-      "parameters": [
+      "uniforms": [
         {
           "name": "projection",
           "uniform_enum": "PROJECTION_MAT4"
@@ -46,7 +46,7 @@
       "input_scene_type": { "value": "SCENE" },
       "input_scene_root_name": "root",
       "shader": "scene_simple",
-      "parameters": [
+      "uniforms": [
         {
           "name": "projection",
           "uniform_enum": "PROJECTION_MAT4"
@@ -112,7 +112,7 @@
   "scene_tree": {
     "default_camera_name": "camera",
     "default_root_name": "root",
-    "scene_matrices": [
+    "node_matrices": [
       {
         "name": "root",
         "matrix": {
@@ -143,7 +143,7 @@
         }
       }
     ],
-    "scene_static_meshes": [
+    "node_static_meshes": [
       {
         "name": "InitCleanBuffer",
         "clean_buffer": {
@@ -173,7 +173,7 @@
         "render_time_enum": "SCENE_RENDER_TIME"
       }
     ],
-    "scene_cameras": [
+    "node_cameras": [
       {
         "name": "camera",
         "parent": "root",
@@ -197,7 +197,7 @@
         }
       }
     ],
-    "scene_lights": [
+    "node_lights": [
       {
         "name": "sun",
         "parent": "root",

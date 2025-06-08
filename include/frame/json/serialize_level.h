@@ -11,6 +11,6 @@ namespace frame::json
  * @param level: Level to be serialized.
  * @return A level proto.
  */
-proto::Level SerializeLevel(LevelInterface& level);
+proto::Level SerializeLevel(const LevelInterface& level);
 
 } // End namespace frame::json.

@@ -12,6 +12,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "frame/json/parse_uniform.h"
 #include "frame/logger.h"
 #include "frame/uniform.h"
 
@@ -97,8 +98,28 @@ const UniformInterface& Program::GetUniform(const std::string& name) const
 
 void Program::AddUniform(std::unique_ptr<UniformInterface>&& uniform_interface)
 {
-    auto it = uniform_map_.find(uniform_interface->GetName());
+    AddUniformInternal(std::move(uniform_interface), false);
+}
+
+void Program::AddUniformInternal(
+    std::unique_ptr<UniformInterface>&& uniform_interface, bool bypass_check)
+{
+    if (!uniform_interface)
+    {
+        // Unknown types yield a null pointer; skip them silently.
+        return;
+    }
     std::string name = uniform_interface->GetName();
+    if (!bypass_check && !HasUniform(name))
+    {
+        logger_->warn(
+            std::format(
+                "Uniform [{}] not active in program [{}], skipping.",
+                name,
+                name_));
+        return;
+    }
+    auto it = uniform_map_.find(name);
     if (it == uniform_map_.end())
     {
         uniform_map_.emplace(name, std::move(uniform_interface));
@@ -108,40 +129,53 @@ void Program::AddUniform(std::unique_ptr<UniformInterface>&& uniform_interface)
         uniform_map_[name] = std::move(uniform_interface);
     }
     auto* uniform_ptr = uniform_map_[name].get();
-    switch (uniform_ptr->GetType())
+    switch (uniform_ptr->GetData().type())
     {
     case proto::Uniform::INVALID_TYPE:
         break;
     case proto::Uniform::INT:
-        glUniform1i(GetMemoizeUniformLocation(name), uniform_ptr->GetInt());
+        glUniform1i(
+            GetMemoizeUniformLocation(name),
+            uniform_ptr->GetData().uniform_int());
         break;
-    case proto::Uniform::INTS:
+    case proto::Uniform::INTS: {
+        auto& uniform_ints = uniform_ptr->GetData().uniform_ints();
         glUniform1iv(
             GetMemoizeUniformLocation(name),
-            static_cast<GLsizei>(uniform_ptr->GetInts().size()),
-            uniform_ptr->GetInts().data());
+            static_cast<GLsizei>(
+                uniform_ints.size().x() * uniform_ints.size().y()),
+            uniform_ints.values().data());
         break;
+    }
     case proto::Uniform::FLOAT:
-        glUniform1f(GetMemoizeUniformLocation(name), uniform_ptr->GetFloat());
+        glUniform1f(
+            GetMemoizeUniformLocation(name),
+            uniform_ptr->GetData().uniform_float());
         break;
-    case proto::Uniform::FLOATS:
+    case proto::Uniform::FLOATS: {
+        auto& uniform_floats = uniform_ptr->GetData().uniform_floats();
         glUniform1fv(
             GetMemoizeUniformLocation(name),
-            static_cast<GLsizei>(uniform_ptr->GetFloats().size()),
-            uniform_ptr->GetFloats().data());
+            static_cast<GLsizei>(
+                uniform_floats.size().x() * uniform_floats.size().y()),
+            uniform_floats.values().data());
         break;
+    }
     case proto::Uniform::FLOAT_VECTOR2: {
-        glm::vec2 value = uniform_ptr->GetVec2();
+        glm::vec2 value =
+            json::ParseUniform(uniform_ptr->GetData().uniform_vec2());
         glUniform2f(GetMemoizeUniformLocation(name), value.x, value.y);
         break;
     }
     case proto::Uniform::FLOAT_VECTOR3: {
-        glm::vec3 value = uniform_ptr->GetVec3();
+        glm::vec3 value =
+            json::ParseUniform(uniform_ptr->GetData().uniform_vec3());
         glUniform3f(GetMemoizeUniformLocation(name), value.x, value.y, value.z);
         break;
     }
     case proto::Uniform::FLOAT_VECTOR4: {
-        glm::vec4 value = uniform_ptr->GetVec4();
+        glm::vec4 value =
+            json::ParseUniform(uniform_ptr->GetData().uniform_vec4());
         glUniform4f(
             GetMemoizeUniformLocation(name),
             value.x,
@@ -151,7 +185,8 @@ void Program::AddUniform(std::unique_ptr<UniformInterface>&& uniform_interface)
         break;
     }
     case proto::Uniform::FLOAT_MATRIX4: {
-        glm::mat4 value = uniform_ptr->GetMat4();
+        glm::mat4 value =
+            json::ParseUniform(uniform_ptr->GetData().uniform_mat4());
         glUniformMatrix4fv(
             GetMemoizeUniformLocation(name), 1, GL_FALSE, &value[0][0]);
         break;
@@ -160,7 +195,7 @@ void Program::AddUniform(std::unique_ptr<UniformInterface>&& uniform_interface)
         logger_->error(
             fmt::format(
                 "Unknown uniform type [{}] for uniform [{}].",
-                static_cast<int>(uniform_ptr->GetType()),
+                static_cast<int>(uniform_ptr->GetData().type()),
                 name));
         break;
     }
@@ -267,7 +302,9 @@ EntityId Program::GetSceneRoot() const
 {
     // TODO(anirul): Change me with an assert.
     if (!scene_root_)
-        throw std::runtime_error("Should not be null!");
+    {
+        throw std::runtime_error("Scene root should not be null!");
+    }
     return scene_root_;
 }
 
@@ -366,7 +403,10 @@ void Program::CreateUniformList()
             logger_->error(
                 std::format("Unknown uniform name: {} type: {}", name, type));
         }
-        AddUniform(std::move(uniform_interface));
+        if (uniform_interface)
+        {
+            AddUniformInternal(std::move(uniform_interface), true);
+        }
     }
     UnUse();
 }
@@ -405,6 +445,7 @@ void Program::SetTemporarySceneRoot(const std::string& name)
 
 std::unique_ptr<ProgramInterface> CreateProgram(
     const std::string& name,
+    const std::string& shader_name,
     std::istream& vertex_shader_code,
     std::istream& pixel_shader_code)
 {
@@ -430,10 +471,56 @@ std::unique_ptr<ProgramInterface> CreateProgram(
     program->AddShader(vertex);
     program->AddShader(fragment);
     program->LinkShader();
+    program->GetData().set_shader(shader_name);
 #ifdef _DEBUG
     logger->info("with pointer := {}", static_cast<void*>(program.get()));
 #endif // _DEBUG
-    return std::move(program);
+    return program;
+}
+
+std::unique_ptr<ProgramInterface> CreateProgram(
+    const proto::Program& proto_program,
+    std::istream& vertex_shader_code,
+    std::istream& pixel_shader_code)
+{
+    std::string vertex_source(
+        std::istreambuf_iterator<char>(vertex_shader_code), {});
+    std::string pixel_source(
+        std::istreambuf_iterator<char>(pixel_shader_code), {});
+#ifdef _DEBUG
+    auto& logger = Logger::GetInstance();
+    logger->info("Creating program");
+#endif // _DEBUG
+    auto program = std::make_unique<Program>(proto_program.name());
+    Shader vertex(ShaderEnum::VERTEX_SHADER);
+    Shader fragment(ShaderEnum::FRAGMENT_SHADER);
+    if (!vertex.LoadFromSource(vertex_source))
+    {
+        throw std::runtime_error(vertex.GetErrorMessage());
+    }
+    if (!fragment.LoadFromSource(pixel_source))
+    {
+        throw std::runtime_error(fragment.GetErrorMessage());
+    }
+    program->AddShader(vertex);
+    program->AddShader(fragment);
+    // Need to add the uniform enum list for serialization.
+    for (const auto& uniform : proto_program.uniforms())
+    {
+        if (uniform.has_uniform_enum())
+        {
+            std::unique_ptr<UniformInterface> uniform_interface =
+                std::make_unique<Uniform>(
+                    uniform.name(), uniform.uniform_enum());
+            program->AddUniform(std::move(uniform_interface));
+        }
+    }
+    program->LinkShader();
+    program->GetData().set_shader(proto_program.shader());
+#ifdef _DEBUG
+    logger->info("with pointer := {}", static_cast<void*>(program.get()));
+#endif // _DEBUG
+    return program;
 }
 
 } // End namespace frame::opengl.

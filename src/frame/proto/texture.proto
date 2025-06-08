@@ -41,7 +41,7 @@ message TextureFrame {
 
 // CubeMap definition message.
 // Next 7
-message CubeMapFiles {
+message CubemapFiles {
     // Same as top.
     string positive_x = 1;
     // Same as bottom.
@@ -92,6 +92,6 @@ message Texture {
 		// Load from a stream.
 		Plugin plugin = 17;
 		// Load from files, this is suppose to represent the 6 face of a cube map.
-		CubeMapFiles file_names = 15;
+		CubemapFiles file_names = 15;
     }
 }

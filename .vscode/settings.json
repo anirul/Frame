@@ -1,12 +1,17 @@
 {
-    // Tell VSCode to pick up your .clang-format file
-    "C_Cpp.clang_format_style": "file",
-  
-    // Use clang-format as the default formatter for C/C++
-    "[cpp]": {
+  // Tell VSCode to pick up your .clang-format file
+  "C_Cpp.clang_format_style": "file",
+
+  // Use clang-format as the default formatter for C/C++
+  "[cpp]": {
     "editor.defaultFormatter": "ms-vscode.cpptools",
     "editor.formatOnSave": true
-    },
-    "C_Cpp.clang_format_fallbackStyle": "google"  // or your preferred style
+  },
+  "cmake.configureEnvironment": {
+    "VCPKG_ROOT": "/home/anirul/github/vcpkg",
+    "PATH": "/home/anirul/github/vcpkg:${env:PATH}"
+  },
+
+  // if you’re using CMakePresets.json, keep these:
+  "cmake.useCMakePresets": true,
 }
-  

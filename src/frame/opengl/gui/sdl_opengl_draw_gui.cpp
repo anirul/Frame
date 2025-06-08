@@ -1,13 +1,14 @@
 #include "frame/opengl/gui/sdl_opengl_draw_gui.h"
 
 #include <SDL3/SDL.h>
-#include <imgui.h>
-#include <imgui_impl_sdl3.h>
-#include <imgui_impl_opengl3.h>
 #include <format>
+#include <imgui.h>
+#include <imgui_impl_opengl3.h>
+#include <imgui_impl_sdl3.h>
 
 #include "frame/device_interface.h"
 #include "frame/file/file_system.h"
+#include "frame/json/parse_uniform.h"
 #include "frame/opengl/texture.h"
 #include "frame/window_interface.h"
 
@@ -18,9 +19,7 @@ SDLOpenGLDrawGui::SDLOpenGLDrawGui(
     frame::WindowInterface& window,
     const std::filesystem::path& font_path,
     float font_size)
-    : window_(window),
-      device_(window_.GetDevice()),
-      font_path_(font_path),
+    : window_(window), device_(window_.GetDevice()), font_path_(font_path),
       font_size_(font_size)
 {
     // Set the name this is a way to find the plugin.
@@ -130,16 +129,15 @@ bool SDLOpenGLDrawGui::Update(DeviceInterface& device, double dt)
     {
         frame::TextureInterface& texture_interface =
             device.GetLevel().GetTextureFromId(id);
-        if (texture_interface.IsCubeMap())
+        if (texture_interface.GetData().cubemap())
         {
             continue;
         }
         opengl::Texture& texture = dynamic_cast<opengl::Texture&>(
             device.GetLevel().GetTextureFromId(id));
         auto& level = device.GetLevel();
-        bool is_default_output =
-            level.GetIdFromName(texture.GetName()) ==
-            level.GetDefaultOutputTextureId();
+        bool is_default_output = level.GetIdFromName(texture.GetName()) ==
+                                 level.GetDefaultOutputTextureId();
         // This is not the default window so skip.
         if (!is_default_output)
         {
@@ -147,18 +145,28 @@ bool SDLOpenGLDrawGui::Update(DeviceInterface& device, double dt)
         }
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
         original_image_size_ = texture.GetSize();
-       
+
         if (!is_visible_)
         {
             ImGui::Begin(
-                std::format("<fullscreen> - [{}]", texture.GetName()).c_str(),
+                std::format(
+                    "<fullscreen> - [{}] - ({}, {})",
+                    texture.GetName(),
+                    texture.GetSize().x,
+                    texture.GetSize().y)
+                    .c_str(),
                 nullptr,
                 ImGuiWindowFlags_NoDecoration);
         }
         else
         {
             ImGui::Begin(
-                std::format("default - [{}]", texture.GetName()).c_str());
+                std::format(
+                    "default - [{}] - ({}, {})",
+                    texture.GetName(),
+                    texture.GetSize().x,
+                    texture.GetSize().y)
+                    .c_str());
         }
         if (modal_callback_)
         {
@@ -171,7 +179,7 @@ bool SDLOpenGLDrawGui::Update(DeviceInterface& device, double dt)
                     modal_callback_->GetName().c_str(),
                     nullptr,
                     ImGuiWindowFlags_AlwaysAutoResize |
-                    ImGuiWindowFlags_NoMove))
+                        ImGuiWindowFlags_NoMove))
             {
                 modal_callback_->DrawCallback();
                 if (modal_callback_->End())
@@ -195,16 +203,7 @@ bool SDLOpenGLDrawGui::Update(DeviceInterface& device, double dt)
         float aspect_ratio =
             static_cast<float>(size.x) / static_cast<float>(size.y);
         // Cast the opengl windows id.
-        // I disable the warning C4312 from unsigned int to void* casting to
-        // a bigger space.
-#if defined(_WIN32) || defined(_WIN64)
-#pragma warning(push)
-#pragma warning(disable : 4312)
-#endif
         ImTextureID gl_id = static_cast<ImTextureID>(texture.GetId());
-#if defined(_WIN32) || defined(_WIN64)
-#pragma warning(pop)
-#endif
         // Compute the final size.
         ImVec2 window_range{};
         if (content_window.x / aspect_ratio > content_window.y)
@@ -230,21 +229,19 @@ bool SDLOpenGLDrawGui::Update(DeviceInterface& device, double dt)
     {
         for (const auto& pair : overlay_callbacks_)
         {
-            ImGui::SetNextWindowPos(
-                ImVec2(
-                    static_cast<float>(pair.second.position.x),
-                    static_cast<float>(pair.second.position.y)));
-            ImGui::SetNextWindowSize(
-                ImVec2(
-                    static_cast<float>(pair.second.size.x),
-                    static_cast<float>(pair.second.size.y)));
+            ImGui::SetNextWindowPos(ImVec2(
+                static_cast<float>(pair.second.position.x),
+                static_cast<float>(pair.second.position.y)));
+            ImGui::SetNextWindowSize(ImVec2(
+                static_cast<float>(pair.second.size.x),
+                static_cast<float>(pair.second.size.y)));
             // Setup overlay window with appropriate flags
             ImGui::Begin(
                 pair.first.c_str(),
                 nullptr,
                 ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar |
-                ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove |
-                ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoInputs);
+                    ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove |
+                    ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoInputs);
             pair.second.callback->DrawCallback();
             ImGui::End();
         }
@@ -297,8 +294,7 @@ void SDLOpenGLDrawGui::AddOverlayWindow(
     std::string name = callback->GetName();
     if (name.empty())
     {
-        throw std::runtime_error(
-            "Cannot create a sub window without a name!");
+        throw std::runtime_error("Cannot create a sub window without a name!");
     }
     CallbackData callback_data;
     callback_data.callback = std::move(callback);
@@ -364,8 +360,8 @@ bool SDLOpenGLDrawGui::PollEvent(void* event)
         return false;
     auto& io = ImGui::GetIO();
     return (!is_keyboard_passed_locked_)
-            ? io.WantCaptureMouse || io.WantCaptureKeyboard
-            : false;
+               ? io.WantCaptureMouse || io.WantCaptureKeyboard
+               : false;
 }
 
 frame::gui::GuiWindowInterface& SDLOpenGLDrawGui::GetWindow(

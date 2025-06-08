@@ -9,11 +9,12 @@
 
 #include "frame/camera.h"
 #include "frame/file/image.h"
+#include "frame/json/parse_uniform.h"
 #include "frame/level.h"
+#include "frame/opengl/cubemap.h"
 #include "frame/opengl/frame_buffer.h"
 #include "frame/opengl/render_buffer.h"
 #include "frame/opengl/renderer.h"
-#include "frame/opengl/cubemap.h"
 
 namespace frame::opengl
 {
@@ -54,19 +55,17 @@ void Device::Startup(std::unique_ptr<frame::LevelInterface>&& level)
     renderer_ = std::make_unique<Renderer>(
         *level_.get(), glm::uvec4(0, 0, size_.x, size_.y));
     // Add a callback to allow plugins to be called at pre-render step.
-    renderer_->SetMeshRenderCallback(
-        [this](
-            UniformCollectionInterface& uniform,
-            StaticMeshInterface& static_mesh,
-            MaterialInterface& material)
+    renderer_->SetMeshRenderCallback([this](
+                                         UniformCollectionInterface& uniform,
+                                         StaticMeshInterface& static_mesh,
+                                         MaterialInterface& material) {
+        for (auto* plugin : GetPluginPtrs())
         {
-            for (auto* plugin : GetPluginPtrs())
-            {
-                if (!plugin)
-                    continue;
-                plugin->PreRender(uniform, *this, static_mesh, material);
-            }
-        });
+            if (!plugin)
+                continue;
+            plugin->PreRender(uniform, *this, static_mesh, material);
+        }
+    });
 }
 
 void Device::AddPlugin(std::unique_ptr<PluginInterface>&& plugin_interface)
@@ -223,16 +222,15 @@ void Device::Display(double dt /*= 0.0*/)
         left_camera.GetPosition() -
         left_camera.GetRight() * interocular_distance_ * 0.5f);
     glm::vec3 left_camera_direction =
-        default_camera.GetPosition() + focus_point_
-        - left_camera.GetPosition();
+        default_camera.GetPosition() + focus_point_ - left_camera.GetPosition();
     left_camera.SetFront(glm::normalize(left_camera_direction));
     Camera right_camera{default_camera};
     right_camera.SetPosition(
         right_camera.GetPosition() +
         right_camera.GetRight() * interocular_distance_ * 0.5f);
-    glm::vec3 right_camera_direction =
-        default_camera.GetPosition() + focus_point_
-        - right_camera.GetPosition();
+    glm::vec3 right_camera_direction = default_camera.GetPosition() +
+                                       focus_point_ -
+                                       right_camera.GetPosition();
     right_camera.SetFront(glm::normalize(right_camera_direction));
     switch (stereo_enum_)
     {
@@ -273,11 +271,14 @@ void Device::ScreenShot(const std::string& file) const
     auto texture_id = maybe_texture_id;
     auto& texture = level_->GetTextureFromId(texture_id);
     proto::PixelElementSize pixel_element_size{};
-    pixel_element_size.set_value(texture.GetPixelElementSize());
+    pixel_element_size.set_value(
+        texture.GetData().pixel_element_size().value());
     proto::PixelStructure pixel_structure{};
-    pixel_structure.set_value(texture.GetPixelStructure());
+    pixel_structure.set_value(texture.GetData().pixel_structure().value());
     file::Image output_image(
-        texture.GetSize(), pixel_element_size, pixel_structure);
+        json::ParseSize(texture.GetData().size()),
+        pixel_element_size,
+        pixel_structure);
     auto vec = texture.GetTextureByte();
     output_image.SetData(vec.data());
     output_image.SaveImageToFile(file);
@@ -300,22 +301,6 @@ std::unique_ptr<frame::StaticMeshInterface> Device::CreateStaticMesh(
 {
     return std::make_unique<opengl::StaticMesh>(
         GetLevel(), static_mesh_parameter);
-}
-
-std::unique_ptr<frame::TextureInterface> Device::CreateTexture(
-    const TextureParameter& texture_parameter)
-{
-    switch (texture_parameter.map_type)
-    {
-    case TextureTypeEnum::TEXTURE_2D:
-        return std::make_unique<Texture>(texture_parameter);
-    case TextureTypeEnum::CUBMAP:
-        return std::make_unique<Cubemap>(texture_parameter);
-    case TextureTypeEnum::TEXTURE_3D:
-        throw std::runtime_error("No 3D texture implemented yet!");
-    default:
-        throw std::runtime_error("Unknown texture type?");
-    }
 }
 
 void Device::Resize(glm::uvec2 size)

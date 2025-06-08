@@ -1,10 +1,15 @@
 #include "frame/json/parse_uniform.h"
-
+#include "frame/json/serialize_uniform.h"
 #include "frame/logger.h"
 #include "frame/uniform.h"
 
 namespace frame::json
 {
+
+glm::uvec2 ParseSize(const frame::proto::Size& size)
+{
+    return {size.x(), size.y()};
+}
 
 glm::vec2 ParseUniform(const proto::UniformVector2& uniform_vec2)
 {
@@ -127,8 +132,10 @@ void RegisterUniformEnumFromProto(
         std::unique_ptr<frame::UniformInterface> uniform_interface =
             std::make_unique<frame::Uniform>(
                 name,
-                uniform_collection_interface.GetUniform("projection")
-                    .GetMat4());
+                json::ParseUniform(
+                    uniform_collection_interface.GetUniform("projection")
+                        .GetData()
+                        .uniform_mat4()));
         program_interface.AddUniform(std::move(uniform_interface));
         break;
     }
@@ -136,9 +143,10 @@ void RegisterUniformEnumFromProto(
         std::unique_ptr<frame::UniformInterface> uniform_interface =
             std::make_unique<frame::Uniform>(
                 name,
-                glm::inverse(
+                glm::inverse(json::ParseUniform(
                     uniform_collection_interface.GetUniform("projection")
-                        .GetMat4()));
+                        .GetData()
+                        .uniform_mat4())));
         program_interface.AddUniform(std::move(uniform_interface));
         break;
     }
@@ -146,7 +154,10 @@ void RegisterUniformEnumFromProto(
         std::unique_ptr<frame::UniformInterface> uniform_interface =
             std::make_unique<frame::Uniform>(
                 name,
-                uniform_collection_interface.GetUniform("view").GetMat4());
+                json::ParseUniform(
+                    uniform_collection_interface.GetUniform("view")
+                        .GetData()
+                        .uniform_mat4()));
         program_interface.AddUniform(std::move(uniform_interface));
         break;
     }
@@ -154,8 +165,10 @@ void RegisterUniformEnumFromProto(
         std::unique_ptr<frame::UniformInterface> uniform_interface =
             std::make_unique<frame::Uniform>(
                 name,
-                glm::inverse(
-                    uniform_collection_interface.GetUniform("view").GetMat4()));
+                glm::inverse(json::ParseUniform(
+                    uniform_collection_interface.GetUniform("view")
+                        .GetData()
+                        .uniform_mat4())));
         program_interface.AddUniform(std::move(uniform_interface));
         break;
     }
@@ -163,7 +176,10 @@ void RegisterUniformEnumFromProto(
         std::unique_ptr<frame::UniformInterface> uniform_interface =
             std::make_unique<frame::Uniform>(
                 name,
-                uniform_collection_interface.GetUniform("model").GetMat4());
+                json::ParseUniform(
+                    uniform_collection_interface.GetUniform("model")
+                        .GetData()
+                        .uniform_mat4()));
         program_interface.AddUniform(std::move(uniform_interface));
         break;
     }
@@ -171,24 +187,22 @@ void RegisterUniformEnumFromProto(
         std::unique_ptr<frame::UniformInterface> uniform_interface =
             std::make_unique<frame::Uniform>(
                 name,
-                glm::inverse(uniform_collection_interface.GetUniform("model")
-                                 .GetMat4()));
+                glm::inverse(json::ParseUniform(
+                    uniform_collection_interface.GetUniform("model")
+                        .GetData()
+                        .uniform_mat4())));
         program_interface.AddUniform(std::move(uniform_interface));
         break;
     }
     case proto::Uniform::FLOAT_TIME_S: {
         static Logger& logger_ = Logger::GetInstance();
-        logger_->info(
-            "set {} := {}",
-            name,
-            static_cast<float>(
-                uniform_collection_interface.GetUniform("time").GetFloat()));
         std::unique_ptr<frame::UniformInterface> uniform_interface =
             std::make_unique<frame::Uniform>(
                 name,
                 static_cast<float>(
                     uniform_collection_interface.GetUniform("time")
-                        .GetFloat()));
+                        .GetData()
+                        .uniform_float()));
         program_interface.AddUniform(std::move(uniform_interface));
         break;
     }
@@ -197,11 +211,4 @@ void RegisterUniformEnumFromProto(
     }
 }
 
-std::pair<std::uint32_t, std::uint32_t> ParseSizeInt(const proto::Size size)
-{
-    return std::make_pair<std::uint32_t, std::uint32_t>(
-        static_cast<std::uint32_t>(size.x()),
-        static_cast<std::uint32_t>(size.y()));
-}
-
-} // namespace frame::proto
+} // namespace frame::json

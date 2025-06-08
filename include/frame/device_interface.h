@@ -143,13 +143,6 @@ class DeviceInterface
      */
     virtual std::unique_ptr<StaticMeshInterface> CreateStaticMesh(
         const StaticMeshParameter& static_mesh_parameter) = 0;
-    /**
-     * @brief Create a 2d texture from a structure.
-     * @param parameters: Parameters for the creation of the texture.
-     * @return A unique pointer to a 2d texture.
-     */
-    virtual std::unique_ptr<TextureInterface> CreateTexture(
-        const TextureParameter& texture_parameter) = 0;
 };
 
 } // End namespace frame.

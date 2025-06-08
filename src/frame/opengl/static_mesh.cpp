@@ -20,10 +20,10 @@ StaticMesh::StaticMesh(
       normal_buffer_size_(parameter.normal_buffer_size),
       texture_buffer_id_(parameter.texture_buffer_id),
       texture_buffer_size_(parameter.texture_buffer_size),
-      index_buffer_id_(parameter.index_buffer_id),
-      shadow_effect_enum_(parameter.shadow_effect_enum),
-      render_primitive_enum_(parameter.render_primitive_enum)
+      index_buffer_id_(parameter.index_buffer_id)
 {
+    data_.set_shadow_effect_enum(parameter.shadow_effect_enum);
+    data_.set_render_primitive_enum(parameter.render_primitive_enum);
     if (!point_buffer_id_)
     {
         throw std::runtime_error("No point buffer specified.");
@@ -180,7 +180,8 @@ StaticMesh::StaticMesh(
     // Index buffer.
     if (!index_buffer_id_)
     {
-        if (render_primitive_enum_ != proto::SceneStaticMesh::POINT_PRIMITIVE)
+        if (data_.render_primitive_enum() !=
+            proto::NodeStaticMesh::POINT_PRIMITIVE)
         {
             throw std::runtime_error(
                 "No index buffer and render type is not set to point.");
@@ -212,7 +213,6 @@ StaticMesh::StaticMesh(
 
     // Increment static counter.
     count++;
-    SetRenderPrimitive(render_primitive_enum_);
 
     // Enable vertex attrib array.
     for (std::uint32_t i = 0; i <= vertex_array_count; ++i)
@@ -343,7 +343,7 @@ EntityId CreateQuadStaticMesh(LevelInterface& level)
     parameter.texture_buffer_id = maybe_texture_buffer_id;
     parameter.index_buffer_id = maybe_index_buffer_id;
     parameter.render_primitive_enum =
-        proto::SceneStaticMesh::TRIANGLE_PRIMITIVE;
+        proto::NodeStaticMesh::TRIANGLE_PRIMITIVE;
     auto mesh = std::make_unique<StaticMesh>(level, parameter);
     mesh->SetName(fmt::format("QuadMesh.{}", count));
     return level.AddStaticMesh(std::move(mesh));
@@ -526,7 +526,7 @@ EntityId CreateCubeStaticMesh(LevelInterface& level)
     parameter.texture_buffer_id = maybe_texture_buffer_id;
     parameter.index_buffer_id = maybe_index_buffer_id;
     parameter.render_primitive_enum =
-        proto::SceneStaticMesh::TRIANGLE_PRIMITIVE;
+        proto::NodeStaticMesh::TRIANGLE_PRIMITIVE;
     auto mesh = std::make_unique<StaticMesh>(level, parameter);
     mesh->SetName(fmt::format("CubeMesh.{}", count));
     return level.AddStaticMesh(std::move(mesh));

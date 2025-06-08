@@ -8,7 +8,7 @@
       "input_scene_type": {
         "value": "QUAD"
       },
-      "parameters": [
+      "uniforms": [
         {
           "name": "projection",
           "uniform_enum": "PROJECTION_MAT4"
@@ -28,7 +28,7 @@
   "scene_tree": {
     "default_root_name": "root",
     "default_camera_name": "camera",
-    "scene_matrices": [
+    "node_matrices": [
       {
         "name": "root",
         "matrix": {
@@ -43,7 +43,7 @@
         "parent": "root"
       }
     ],
-    "scene_static_meshes": [
+    "node_static_meshes": [
       {
         "name": "Cube",
         "mesh_enum": "CUBE",
@@ -51,7 +51,7 @@
         "parent": "root"
       }
     ],
-    "scene_cameras": [
+    "node_cameras": [
       {
         "name": "camera",
         "parent": "camera_boon",

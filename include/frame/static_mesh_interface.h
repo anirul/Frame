@@ -4,7 +4,7 @@
 
 #include "frame/entity_id.h"
 #include "frame/json/proto.h"
-#include "frame/name_interface.h"
+#include "frame/serialize.h"
 
 namespace frame
 {
@@ -35,11 +35,11 @@ struct StaticMeshParameter
     //! @brief Index of the points 3 per triangle 2 per line and 1 per point.
     EntityId index_buffer_id = NullId;
     //! @brief The kind of draw that the mesh is.
-    proto::SceneStaticMesh::RenderPrimitiveEnum render_primitive_enum =
-        proto::SceneStaticMesh::TRIANGLE_PRIMITIVE;
+    proto::NodeStaticMesh::RenderPrimitiveEnum render_primitive_enum =
+        proto::NodeStaticMesh::TRIANGLE_PRIMITIVE;
     //! @brief The shadow effect type.
-    proto::SceneStaticMesh::ShadowEffectEnum shadow_effect_enum =
-        proto::SceneStaticMesh::OPAQUE_SHADOW_EFFECT;
+    proto::NodeStaticMesh::ShadowEffectEnum shadow_effect_enum =
+        proto::NodeStaticMesh::OPAQUE_SHADOW_EFFECT;
     //! @brief what kind of buffer will be generated (no point of course).
     enum class StaticMeshParameterEnum
     {
@@ -56,7 +56,7 @@ struct StaticMeshParameter
  * @class StaticMeshInterface
  * @brief A static mesh is a mesh that cannot change over time (no skeleton).
  */
-class StaticMeshInterface : public NameInterface
+class StaticMeshInterface : public Serialize<proto::NodeStaticMesh>
 {
   public:
     //! @brief Virtual destructor.
@@ -102,26 +102,6 @@ class StaticMeshInterface : public NameInterface
      * @return Is depth buffer cleared?
      */
     virtual bool IsClearBuffer() const = 0;
-    /**
-     * @brief Set the way a mesh is rendered (point/line/triangle) triangle is
-     * the default.
-     * @param render_enum: The basic shape of the renderer that should be used
-     * on this mesh.
-     */
-    virtual void SetRenderPrimitive(
-        proto::SceneStaticMesh::RenderPrimitiveEnum render_enum) = 0;
-    /**
-     * @brief Get the static mesh render primitive.
-     * @return Get the render primitive.
-     */
-    virtual proto::SceneStaticMesh::RenderPrimitiveEnum
-		GetRenderPrimitive() const = 0;
-    /**
-     * @brief Get the shadow effect.
-     * @return Get the shadow effect.
-     */
-    virtual proto::SceneStaticMesh::ShadowEffectEnum
-		GetShadowEffect() const = 0;
 };
 
 } // End namespace frame.

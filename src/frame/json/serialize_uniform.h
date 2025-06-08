@@ -1,11 +1,18 @@
 #pragma once
 
 #include "frame/json/proto.h"
+#include "frame/level_interface.h"
 #include "frame/uniform_interface.h"
 
 namespace frame::json
 {
 
+/**
+ * @brief serialize a glm::uvec2 into a proto::Size.
+ * @param uvec2 : Vector to be serialized.
+ * @return Proto serialized.
+ */
+proto::Size SerializeSize(glm::uvec2 uvec2);
 /**
  * @brief Serialize a glm::vec2 into a proto::UniformVector2.
  * @param vec : Vector to be serialized.
@@ -33,9 +40,11 @@ proto::UniformMatrix4 SerializeUniformMatrix4(glm::mat4 mat);
 /**
  * @brief Serialize uniform to their constituant proto.
  * @param uniform_interface: The interface to a uniform.
+ * @param uniform_level: The interface to the level.
  * @return Proto that represent a uniform.
  */
 proto::Uniform SerializeUniform(
-    const frame::UniformInterface& uniform_interface);
+    const frame::UniformInterface& uniform_interface,
+    const frame::LevelInterface& level_interface);
 
 } // End namespace frame::json.

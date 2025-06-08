@@ -20,7 +20,8 @@ class Ply
      *        buffers.
      * @param file_name: File to be open.
      */
-    Ply(const std::filesystem::path& file_name);
+    Ply(std::filesystem::path file_name);
+    ~Ply();
 
   public:
     /**

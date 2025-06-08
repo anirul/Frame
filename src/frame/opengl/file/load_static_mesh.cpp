@@ -36,12 +36,12 @@ std::optional<EntityId> CreateBufferInLevel(
     return level.AddBuffer(std::move(buffer));
 }
 
-std::optional<std::unique_ptr<TextureInterface>> LoadTextureFromString(
+std::unique_ptr<TextureInterface> LoadTextureFromString(
     const std::string& str,
     const proto::PixelElementSize pixel_element_size,
     const proto::PixelStructure pixel_structure)
 {
-    return opengl::file::LoadTextureFromFile(
+    return std::make_unique<Texture>(
         frame::file::FindFile("asset/" + str),
         pixel_element_size,
         pixel_structure);
@@ -51,38 +51,37 @@ std::optional<EntityId> LoadMaterialFromObj(
     LevelInterface& level, const frame::file::ObjMaterial& material_obj)
 {
     // Load textures.
-    auto maybe_color = (material_obj.ambient_str.empty())
-                           ? LoadTextureFromVec4(material_obj.ambient_vec4)
-                           : LoadTextureFromString(
-                                 material_obj.ambient_str,
-                                 json::PixelElementSize_BYTE(),
-                                 json::PixelStructure_RGB());
-    if (!maybe_color)
+    auto color = (material_obj.ambient_str.empty())
+                     ? LoadTextureFromVec4(material_obj.ambient_vec4)
+                     : LoadTextureFromString(
+                           material_obj.ambient_str,
+                           json::PixelElementSize_BYTE(),
+                           json::PixelStructure_RGB());
+    if (!color)
         return std::nullopt;
-    auto maybe_normal = (material_obj.normal_str.empty())
-                            ? LoadTextureFromVec4(glm::vec4(0.f, 0.f, 0.f, 1.f))
-                            : LoadTextureFromString(
-                                  material_obj.normal_str,
-                                  json::PixelElementSize_BYTE(),
-                                  json::PixelStructure_RGB());
-    if (!maybe_normal)
+    auto normal = (material_obj.normal_str.empty())
+                      ? LoadTextureFromVec4(glm::vec4(0.f, 0.f, 0.f, 1.f))
+                      : LoadTextureFromString(
+                            material_obj.normal_str,
+                            json::PixelElementSize_BYTE(),
+                            json::PixelStructure_RGB());
+    if (!normal)
         return std::nullopt;
-    auto maybe_roughness =
-        (material_obj.roughness_str.empty())
-            ? LoadTextureFromFloat(material_obj.roughness_val)
-            : LoadTextureFromString(
-                  material_obj.roughness_str,
-                  json::PixelElementSize_BYTE(),
-                  json::PixelStructure_GREY());
-    if (!maybe_roughness)
+    auto roughness = (material_obj.roughness_str.empty())
+                         ? LoadTextureFromFloat(material_obj.roughness_val)
+                         : LoadTextureFromString(
+                               material_obj.roughness_str,
+                               json::PixelElementSize_BYTE(),
+                               json::PixelStructure_GREY());
+    if (!roughness)
         return std::nullopt;
-    auto maybe_metallic = (material_obj.metallic_str.empty())
-                              ? LoadTextureFromFloat(material_obj.metallic_val)
-                              : LoadTextureFromString(
-                                    material_obj.metallic_str,
-                                    json::PixelElementSize_BYTE(),
-                                    json::PixelStructure_GREY());
-    if (!maybe_metallic)
+    auto metallic = (material_obj.metallic_str.empty())
+                        ? LoadTextureFromFloat(material_obj.metallic_val)
+                        : LoadTextureFromString(
+                              material_obj.metallic_str,
+                              json::PixelElementSize_BYTE(),
+                              json::PixelStructure_GREY());
+    if (!metallic)
         return std::nullopt;
     // Create names for textures.
     auto color_name = fmt::format("{}.Color", material_obj.name);
@@ -90,32 +89,30 @@ std::optional<EntityId> LoadMaterialFromObj(
     auto roughness_name = fmt::format("{}.Roughness", material_obj.name);
     auto metallic_name = fmt::format("{}.Metallic", material_obj.name);
     // Add texture to the level.
-    maybe_color.value()->SetName(color_name);
-    auto maybe_color_id = level.AddTexture(std::move(maybe_color.value()));
-    if (!maybe_color_id)
+    color->SetName(color_name);
+    auto color_id = level.AddTexture(std::move(color));
+    if (!color_id)
         return std::nullopt;
-    maybe_normal.value()->SetName(normal_name);
-    auto maybe_normal_id = level.AddTexture(std::move(maybe_normal.value()));
-    if (!maybe_normal_id)
+    normal->SetName(normal_name);
+    auto normal_id = level.AddTexture(std::move(normal));
+    if (!normal_id)
         return std::nullopt;
-    maybe_roughness.value()->SetName(roughness_name);
-    auto maybe_roughness_id =
-        level.AddTexture(std::move(maybe_roughness.value()));
-    if (!maybe_roughness_id)
+    roughness->SetName(roughness_name);
+    auto roughness_id = level.AddTexture(std::move(roughness));
+    if (!roughness_id)
         return std::nullopt;
-    maybe_metallic.value()->SetName(metallic_name);
-    auto maybe_metallic_id =
-        level.AddTexture(std::move(maybe_metallic.value()));
-    if (!maybe_metallic_id)
+    metallic->SetName(metallic_name);
+    auto metallic_id = level.AddTexture(std::move(metallic));
+    if (!metallic_id)
         return std::nullopt;
     // Create the material.
     std::unique_ptr<MaterialInterface> material =
         std::make_unique<opengl::Material>();
     // Add texture to the material.
-    material->AddTextureId(maybe_color_id, color_name);
-    material->AddTextureId(maybe_normal_id, normal_name);
-    material->AddTextureId(maybe_roughness_id, roughness_name);
-    material->AddTextureId(maybe_metallic_id, metallic_name);
+    material->AddTextureId(color_id, color_name);
+    material->AddTextureId(normal_id, normal_name);
+    material->AddTextureId(roughness_id, roughness_name);
+    material->AddTextureId(metallic_id, metallic_name);
     // Finally add the material to the level.
     material->SetName(material_obj.name);
     return level.AddMaterial(std::move(material));
@@ -301,7 +298,7 @@ EntityId LoadStaticMeshFromPly(
 
 std::vector<EntityId> LoadStaticMeshesFromObjFile(
     LevelInterface& level,
-    const std::filesystem::path& file,
+    std::filesystem::path file,
     const std::string& name,
     const std::string& material_name /* = ""*/)
 {
@@ -314,7 +311,9 @@ std::vector<EntityId> LoadStaticMeshesFromObjFile(
     {
         auto maybe_id = level.GetIdFromName(material_name);
         if (maybe_id)
+        {
             material_ids.push_back(maybe_id);
+        }
     }
     logger->info("Found in obj<{}> : {} meshes.", file.string(), meshes.size());
     int mesh_counter = 0;
@@ -337,7 +336,9 @@ std::vector<EntityId> LoadStaticMeshesFromObjFile(
         ptr->SetName(fmt::format("Node.{}.{}", name, mesh_counter));
         auto maybe_id = level.AddSceneNode(std::move(ptr));
         if (!maybe_id)
+        {
             return {};
+        }
         level.AddMeshMaterialId(maybe_id, material_id);
         entity_id_vec.push_back(maybe_id);
         mesh_counter++;
@@ -347,7 +348,7 @@ std::vector<EntityId> LoadStaticMeshesFromObjFile(
 
 EntityId LoadStaticMeshFromPlyFile(
     LevelInterface& level,
-    const std::filesystem::path& file,
+    std::filesystem::path file,
     const std::string& name,
     const std::string& material_name /* = ""*/)
 {
@@ -385,20 +386,25 @@ EntityId LoadStaticMeshFromPlyFile(
 } // End namespace.
 
 std::vector<EntityId> LoadStaticMeshesFromFile(
-    LevelInterface& level,
-    const std::filesystem::path& file,
+    LevelInterface& level_interface,
+    std::filesystem::path file,
     const std::string& name,
     const std::string& material_name /* = ""*/)
 {
     auto extension = file.extension();
     std::filesystem::path final_path = frame::file::FindFile(file);
     if (extension == ".obj")
+    {
         return LoadStaticMeshesFromObjFile(
-            level, final_path, name, material_name);
+            level_interface, final_path, name, material_name);
+    }
     if (extension == ".ply")
-        return {
-            LoadStaticMeshFromPlyFile(level, final_path, name, material_name)};
-    return {};
+    {
+        return {LoadStaticMeshFromPlyFile(
+            level_interface, final_path, name, material_name)};
+    }
+    throw std::runtime_error(
+        std::format("Unknown extention for file : {}", file.string()));
 }
 
 } // End namespace frame::opengl::file.

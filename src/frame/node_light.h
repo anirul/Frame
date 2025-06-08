@@ -1,10 +1,10 @@
 #pragma once
 
 #define GLM_ENABLE_EXPERIMENTAL
-#include <glm/glm.hpp>
-
 #include "frame/light_interface.h"
 #include "frame/node_interface.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 namespace frame
 {
@@ -13,7 +13,7 @@ namespace frame
  * @class NodeLight
  * @brief A light in the node for the scene tree.
  */
-class NodeLight : public NodeInterface
+class NodeLight : public NodeInterface, public Serialize<proto::NodeLight>
 {
   public:
     /**
@@ -25,11 +25,7 @@ class NodeLight : public NodeInterface
      */
     NodeLight(
         std::function<NodeInterface*(const std::string&)> func,
-        const glm::vec3 color)
-        : NodeInterface(func), light_type_(LightTypeEnum::AMBIENT_LIGHT),
-          color_(color)
-    {
-    }
+        const glm::vec3 color);
     /**
      * @brief Create a point or directional light.
      * @param func: This function return the ID from a string (it will need
@@ -101,7 +97,7 @@ class NodeLight : public NodeInterface
         const float dot_inner_limit,
         const float dot_outer_limit);
     //! @brief Virtual destructor.
-    ~NodeLight() override = default;
+    ~NodeLight() override;
 
   public:
     /**
@@ -121,64 +117,6 @@ class NodeLight : public NodeInterface
     {
         return NodeTypeEnum::NODE_LIGHT;
     }
-    /**
-     * @brief Get the light type.
-     * @return The light type (see the NodeLightEnum).
-     */
-    LightTypeEnum GetType() const
-    {
-        return light_type_;
-    }
-    /**
-     * @brief Get the light position.
-     * @return the light position.
-     */
-    glm::vec3 GetPosition() const
-    {
-        return position_;
-    }
-    /**
-     * @brief Get the light direction.
-     * @return the light direction.
-     */
-    glm::vec3 GetDirection() const
-    {
-        return direction_;
-    }
-    /**
-     * @brief Get the light color.
-     * @return the light color.
-     */
-    glm::vec3 GetColor() const
-    {
-        return color_;
-    }
-    /**
-     * @brief Get the inner limit in dot format.
-     * @return the inner limit in dot format.
-     */
-    float GetDotInner() const
-    {
-        return dot_inner_limit_;
-    }
-    /**
-     * @brief Get the outer limit in dot format.
-     * @return the outer limit in dot format.
-     */
-    float GetDotOuter() const
-    {
-        return dot_outer_limit_;
-    }
-
-  private:
-    LightTypeEnum light_type_ = LightTypeEnum::INVALID_LIGHT;
-    ShadowTypeEnum shadow_type_ = ShadowTypeEnum::NO_SHADOW;
-    std::string shadow_texture_ = "";
-    glm::vec3 position_ = glm::vec3(0.0f);
-    glm::vec3 direction_ = glm::vec3(0.0f);
-    glm::vec3 color_ = glm::vec3(1.0f);
-    float dot_inner_limit_ = 0.0f;
-    float dot_outer_limit_ = 0.0f;
 };
 
 } // End namespace frame.

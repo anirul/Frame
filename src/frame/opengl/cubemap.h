@@ -23,25 +23,69 @@ namespace frame::opengl
 {
 
 /**
- * @brief Get texture frame from position.
- * @param i: Position (+X, -X, +Y, -Y, +Z, -Z) [0, 5].
- * @return The texture frame.
- */
-proto::TextureFrame GetTextureFrameFromPosition(int i);
-
-/**
  * @class Cubemap
  * @brief The same as texture but in a cube map perfect for environment
- *        maps.
+ * maps.
  */
 class Cubemap : public TextureInterface, public BindInterface
 {
   public:
     /**
-     * @brief Create a texture from a texture parameter structure.
-     * @param texture_parameter: Texture parameter structure.
+     * @brief Create a texture from a proto.
+     * @param proto_parameter: The proto to guide in the creation of the
+     * texture.
      */
-    Cubemap(const TextureParameter& texture_parameter);
+    Cubemap(
+        const proto::Texture& proto_texture,
+        glm::uvec2 display_size = glm::uvec2{0, 0});
+    /**
+     * @brief Create a texture from a file.
+     * @param file_name: A file to be loaded into the texture.
+     * @param pixel_element_size: The element size of the texture.
+     * @param pixel_structure: The pixel structure of the texture.
+     */
+    Cubemap(
+        std::filesystem::path file_name,
+        proto::PixelElementSize pixel_element_size =
+            json::PixelElementSize_BYTE(),
+        proto::PixelStructure pixel_strucutre = json::PixelStructure_RGB());
+    /**
+     * @brief Create from 6 textures (cubemap).
+     * @param file_names: 6 files to describe this new cubemap.
+     * @param pixel_element_size: The element size of the texture.
+     * @param pixel_structure: The pixel structure of the texture.
+     */
+    Cubemap(
+        std::array<std::filesystem::path, 6> file_names,
+        proto::PixelElementSize pixel_element_size =
+            json::PixelElementSize_BYTE(),
+        proto::PixelStructure pixel_strucutre = json::PixelStructure_RGB());
+    /**
+     * @brief Create a texture from a pointer and a brief description of the
+     * underlying structure.
+     * @param ptr: The pointer to the underlying structure.
+     * @param size: The size of the texture.
+     * @param pixel_element_size: The element size of the texture.
+     * @param pixel_structure: The pixel structure of the texture.
+     */
+    Cubemap(
+        const void* ptr,
+        glm::uvec2 size,
+        proto::PixelElementSize pixel_element_size,
+        proto::PixelStructure pixel_structure);
+    /**
+     * @brief Create a texture from a pointer and a brief description of the
+     * underlying structure.
+     * @param ptrs: The pointers to the underlying structures.
+     * @param size: The size of the texture.
+     * @param pixel_element_size: The element size of the texture.
+     * @param pixel_structure: The pixel structure of the texture.
+     */
+    Cubemap(
+        std::array<const void*, 6> ptrs,
+        glm::uvec2 size,
+        proto::PixelElementSize pixel_element_size,
+        proto::PixelStructure pixel_structure);
     //! @brief Destroy texture also on GPU side.
     ~Cubemap();
 
@@ -76,7 +120,7 @@ class Cubemap : public TextureInterface, public BindInterface
     /**
      * @brief Get a copy of the texture output (32 bit float format).
      * @return A vector containing the pixel of the image in 32 bit float
-     *         format.
+     * format.
      */
     std::vector<float> GetTextureFloat() const override;
     /**
@@ -85,83 +129,16 @@ class Cubemap : public TextureInterface, public BindInterface
      */
     void Clear(glm::vec4 color) override;
     /**
-     * @brief Enable mip map, this allow a recursive level of texture faster
-     *        for rendering.
-     */
-    void EnableMipmap() const override;
-    /**
      * @brief From the bind interface this will bind the texture at slot to
-     *        the current context.
+     * the current context.
      * @param slot: Slot to be binded.
      */
     void Bind(unsigned int slot = 0) const override;
     /**
      * @brief From the bind interface this will unbind the current texture
-     *        from the context.
+     * from the context.
      */
     void UnBind() const override;
-    /**
-     * @brief Set the minification filter.
-     * @param texture_filter: Usually and by default GL_LINEAR.
-     */
-    void SetMinFilter(proto::TextureFilter::Enum texture_filter) override;
-    /**
-     * @brief Get the minification filter.
-     * @return The value of the minification filter.
-     */
-    proto::TextureFilter::Enum GetMinFilter() const override;
-    /**
-     * @brief Set the magnification filter.
-     * @param texture_filter: Usually and by default GL_LINEAR.
-     */
-    void SetMagFilter(proto::TextureFilter::Enum texture_filter) override;
-    /**
-     * @brief Get the magnification filter.
-     * @return The value of the magnification filter.
-     */
-    proto::TextureFilter::Enum GetMagFilter() const override;
-    /**
-     * @brief Set the wrapping on the s size of the texture (horizontal)
-     *        this will decide how the texture is treated in case you
-     *        overflow in this direction.
-     * @param texture_filter: Could be any of (REPEAT, CLAMP_TO_EDGE,
-     *        MIRRORED_REPEAT).
-     */
-    void SetWrapS(proto::TextureFilter::Enum texture_filter) override;
-    /**
-     * @brief Get the wrapping on the s size of the texture (horizontal).
-     * @return The way the texture is wrap could be any of (REPEAT,
-     *         CLAMP_TO_EDGE, MIRRORED_REPEAT).
-     */
-    proto::TextureFilter::Enum GetWrapS() const override;
-    /**
-     * @brief Set the wrapping on the t size of the texture (vertical) this
-     *        will decide how the texture is treated in case you overflow in
-     *        this direction.
-     * @param texture_filter: Could be any of (REPEAT, CLAMP_TO_EDGE,
-     *        MIRRORED_REPEAT).
-     */
-    void SetWrapT(proto::TextureFilter::Enum texture_filter) override;
-    /**
-     * @brief Get the wrapping on the t size of the texture (vertical).
-     * @return The way the texture is wrap could be any of (REPEAT,
-     *         CLAMP_TO_EDGE, MIRRORED_REPEAT).
-     */
-    proto::TextureFilter::Enum GetWrapT() const override;
-    /**
-     * @brief Set the wrapping on the t size of the texture (vertical) this
-     *        will decide how the texture is treated in case you overflow in
-     *        this direction.
-     * @param texture_filter: Could be any of (REPEAT, CLAMP_TO_EDGE,
-     * MIRRORED_REPEAT).
-     */
-    void SetWrapR(proto::TextureFilter::Enum texture_filter);
-    /**
-     * @brief Get the wrapping on the t size of the texture (vertical).
-     * @return The way the texture is wrap could be any of (REPEAT,
-     *         CLAMP_TO_EDGE, MIRRORED_REPEAT).
-     */
-    proto::TextureFilter::Enum GetWrapR() const;
     /**
      * @brief Copy the texture input to the texture.
      * @param vector: Vector of uint32_t containing the RGBA values of the
@@ -172,32 +149,29 @@ class Cubemap : public TextureInterface, public BindInterface
         std::vector<std::uint8_t>&& vector,
         glm::uvec2 size,
         std::uint8_t bytes_per_pixel) override;
+    //! @brief Enable mipmap generation.
+    void EnableMipmap() override;
+    /**
+     * @brief Get the computed size (can be different from the stored one).
+     * @return The computed size.
+     */
+    glm::uvec2 GetSize() override;
+    /**
+     * @brief Set the window size (in case the
+     * texture size is relative).
+     * @param display_size: The window size.
+     */
+    void SetDisplaySize(glm::uvec2 display_size) override;
 
   public:
     /**
-     * @brief Get name from the name interface.
-     * @return The name of the object.
+     * @brief Get texture frame from position.
+     * @param i: Position (+X, -X, +Y, -Y, +Z, -Z) [0, 5].
+     * @return The texture frame.
      */
-    std::string GetName() const override
-    {
-        return name_;
-    }
-    /**
-     * @brief Set name from the name interface.
-     * @param name: New name to be set.
-     */
-    void SetName(const std::string& name) override
-    {
-        name_ = name;
-    }
-    /**
-     * @brief Will respond true as this is a cube map.
-     * @return True this is a cube map.
-     */
-    bool IsCubeMap() const final
-    {
-        return true;
-    }
+    static proto::TextureFrame GetTextureFrameFromPosition(int i);
+
+  public:
     /**
      * @brief Return the texture cube map OpenGL id, from the bind
      * interface.
@@ -207,40 +181,6 @@ class Cubemap : public TextureInterface, public BindInterface
     {
         return texture_id_;
     }
-    /**
-     * @brief Get the texture cube map size.
-     * @return A single side size in pixel.
-     */
-    glm::uvec2 GetSize() const override
-    {
-        return size_;
-    }
-    /**
-     * @brief Get the pixel element size individual element (BYTE, SHORT,
-     * LONG, FLOAT).
-     * @return The pixel element size.
-     */
-    proto::PixelElementSize::Enum GetPixelElementSize() const override
-    {
-        return pixel_element_size_.value();
-    }
-    /**
-     * @brief Get the pixel structure (R, RG, RGB, RGBA).
-     * @return the pixel structure.
-     */
-    proto::PixelStructure::Enum GetPixelStructure() const override
-    {
-        return pixel_structure_.value();
-    }
-    /**
-     * @brief Get the texture parameters used at creation, usefull for
-     * serialization.
-     * @return Texture parameters used at creation.
-     */
-    const TextureParameter& GetTextureParameter() const override
-	{
-        return texture_parameter_;
-	}
 
   protected:
     /**
@@ -256,18 +196,10 @@ class Cubemap : public TextureInterface, public BindInterface
             json::PixelElementSize_BYTE(),
         const proto::PixelStructure pixel_structure =
             json::PixelStructure_RGB())
-        : pixel_element_size_(pixel_element_size),
-          pixel_structure_(pixel_structure)
     {
+        data_.mutable_pixel_element_size()->CopyFrom(pixel_element_size);
+        data_.mutable_pixel_structure()->CopyFrom(pixel_structure);
     }
-    /**
-     * @brief Fill a texture with a data pointer, the size has to be set
-     * first!
-     * @param data: pixel used to fill up (or null for don't care).
-     */
-    void CreateCubemap(
-        const std::array<void*, 6> cube_map = {
-            nullptr, nullptr, nullptr, nullptr, nullptr, nullptr});
     //! @brief Lock the bind for RAII interface to the bind interface.
     void LockedBind() const override
     {
@@ -283,18 +215,62 @@ class Cubemap : public TextureInterface, public BindInterface
     //! Create a render and a frame buffer for internal rendering (used in
     //! Clear).
     void CreateFrameAndRenderBuffer();
+    /**
+     * @brief Create a cubemap from a single file.
+     * @param file_name: File that will create the texture.
+     * @param pixel_element_size: The element size of the texture.
+     * @param pixel_structure: The pixel structure of the texture.
+     */
+    void CreateCubemapFromFile(
+        std::filesystem::path file_name,
+        proto::PixelElementSize pixel_element_size,
+        proto::PixelStructure pixel_strucutre);
+    /**
+     * @brief Create a cubemap from 6 files.
+     * @param file_names: Files that will create the texture.
+     * @param pixel_element_size: The element size of the texture.
+     * @param pixel_structure: The pixel structure of the texture.
+     */
+    void CreateCubemapFromFiles(
+        std::array<std::filesystem::path, 6> file_names,
+        proto::PixelElementSize pixel_element_size,
+        proto::PixelStructure pixel_structure);
+    /**
+     * @brief Create a texture from a pointer and a brief description of the
+     * underlying structure.
+     * @param ptr: The pointer to the underlying structure.
+     * @param size: The size of the texture.
+     * @param pixel_element_size: The element size of the texture.
+     * @param pixel_structure: The pixel structure of the texture.
+     */
+    void CreateCubemapFromPointer(
+        const void* ptr,
+        glm::uvec2 size,
+        proto::PixelElementSize pixel_element_size,
+        proto::PixelStructure pixel_structure);
+    /**
+     * @brief Create a texture from a pointer and a brief description of the
+     * underlying structure.
+     * @param ptrs: The pointers to the underlying structures.
+     * @param size: The size of the texture.
+     * @param pixel_element_size: The element size of the texture.
+     * @param pixel_structure: The pixel structure of the texture.
+     */
+    void CreateCubemapFromPointers(
+        std::array<const void*, 6> ptrs,
+        glm::uvec2 size,
+        proto::PixelElementSize pixel_element_size,
+        proto::PixelStructure pixel_structure);
+
+  protected:
     friend class ScopedBind;
 
   private:
     unsigned int texture_id_ = 0;
-    glm::uvec2 size_ = glm::uvec2(0, 0);
-    const proto::PixelElementSize pixel_element_size_;
-    const proto::PixelStructure pixel_structure_;
     mutable bool locked_bind_ = false;
     std::unique_ptr<RenderBuffer> render_ = nullptr;
     std::unique_ptr<FrameBuffer> frame_ = nullptr;
-    std::string name_;
-    TextureParameter texture_parameter_;
+    glm::uvec2 inner_size_;
 };
 
 } // End namespace frame::opengl.

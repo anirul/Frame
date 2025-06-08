@@ -5,9 +5,13 @@
 namespace frame::json
 {
 
-std::optional<std::unique_ptr<frame::MaterialInterface>> ParseMaterialOpenGL(
+std::unique_ptr<frame::MaterialInterface> ParseMaterialOpenGL(
     const frame::proto::Material& proto_material, LevelInterface& level)
 {
+    if (proto_material.program_name() == "DisplayProgram")
+    {
+        return nullptr;
+    }
     const std::size_t texture_size = proto_material.texture_names_size();
     const std::size_t inner_size = proto_material.inner_names_size();
     if (texture_size != inner_size)
@@ -24,7 +28,7 @@ std::optional<std::unique_ptr<frame::MaterialInterface>> ParseMaterialOpenGL(
         throw std::runtime_error(
             fmt::format("No program name in {}.", proto_material.name()));
     }
-    material->SetProgramName(proto_material.program_name());
+    material->GetData().set_program_name(proto_material.program_name());
     auto maybe_program_id = level.GetIdFromName(proto_material.program_name());
     if (maybe_program_id)
     {
@@ -36,7 +40,7 @@ std::optional<std::unique_ptr<frame::MaterialInterface>> ParseMaterialOpenGL(
         auto maybe_texture_id =
             level.GetIdFromName(proto_material.texture_names(i));
         if (!maybe_texture_id)
-            return std::nullopt;
+            return nullptr;
         EntityId texture_id = maybe_texture_id;
         material->AddTextureId(texture_id, proto_material.inner_names(i));
     }

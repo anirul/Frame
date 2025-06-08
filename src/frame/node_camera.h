@@ -9,7 +9,7 @@
 namespace frame
 {
 
-class NodeCamera : public NodeInterface
+class NodeCamera : public NodeInterface, public Serialize<proto::NodeCamera>
 {
   public:
     /**
@@ -46,7 +46,7 @@ class NodeCamera : public NodeInterface
     {
     }
     //! @brief Virtual destructor.
-    ~NodeCamera() override = default;
+    virtual ~NodeCamera() override;
 
   public:
     /**

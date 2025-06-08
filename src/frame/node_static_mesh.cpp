@@ -7,6 +7,8 @@
 namespace frame
 {
 
+NodeStaticMesh::~NodeStaticMesh() = default;
+
 glm::mat4 NodeStaticMesh::GetLocalModel(const double dt) const
 {
     if (!GetParentName().empty())
@@ -14,8 +16,10 @@ glm::mat4 NodeStaticMesh::GetLocalModel(const double dt) const
         auto parent_node = func_(GetParentName());
         if (!parent_node)
         {
-            throw std::runtime_error(fmt::format(
-                "SceneStaticMesh func({}) returned nullptr", GetParentName()));
+            throw std::runtime_error(
+                fmt::format(
+                    "SceneStaticMesh func({}) returned nullptr",
+                    GetParentName()));
         }
         return parent_node->GetLocalModel(dt);
     }

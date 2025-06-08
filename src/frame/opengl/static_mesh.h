@@ -94,34 +94,6 @@ class StaticMesh : public BindInterface, public StaticMeshInterface
     {
         index_size_ = index_size;
     }
-    /**
-     * @brief Set the way a mesh is rendered (point/line/triangle) triangle
-     *        is the default.
-     * @param render_enum: The basic shape of the renderer that should be
-     *        used on this mesh.
-     */
-    void SetRenderPrimitive(proto::SceneStaticMesh::RenderPrimitiveEnum
-                                render_primitive_enum) override
-    {
-        render_primitive_enum_ = render_primitive_enum;
-    }
-    /**
-     * @brief Get the static mesh render primitive.
-     * @return Get the render primitive.
-     */
-    proto::SceneStaticMesh::RenderPrimitiveEnum GetRenderPrimitive()
-        const override
-    {
-        return render_primitive_enum_;
-    }
-    /**
-     * @brief Get the shadow effect.
-     * @return Get the shadow effect.
-     */
-    proto::SceneStaticMesh::ShadowEffectEnum GetShadowEffect() const override
-    {
-        return shadow_effect_enum_;
-    }
     //! @brief Lock the bind for RAII interface to the bind interface.
     void LockedBind() const override
     {
@@ -148,22 +120,6 @@ class StaticMesh : public BindInterface, public StaticMeshInterface
     bool IsClearBuffer() const override
     {
         return clear_depth_buffer_;
-    }
-    /**
-     * @brief Get name from the name interface.
-     * @return The name of the object.
-     */
-    std::string GetName() const override
-    {
-        return name_;
-    }
-    /**
-     * @brief Set name from the name interface.
-     * @param name: New name to be set.
-     */
-    void SetName(const std::string& name) override
-    {
-        name_ = name;
     }
 
   public:
@@ -195,10 +151,7 @@ class StaticMesh : public BindInterface, public StaticMeshInterface
     EntityId index_buffer_id_ = NullId;
     std::size_t index_size_ = 0;
     unsigned int vertex_array_object_ = 0;
-    proto::SceneStaticMesh::ShadowEffectEnum shadow_effect_enum_ = {};
-    proto::SceneStaticMesh::RenderPrimitiveEnum render_primitive_enum_ = {};
     float point_size_ = 1.0f;
-    std::string name_;
 };
 
 /**

@@ -43,13 +43,12 @@ target_include_directories(FrameOpenGLTest
 
 target_link_libraries(FrameOpenGLTest
   PUBLIC
-    Frame
+    GTest::gmock
+    GTest::gtest
+    FrameJson
     FrameFile
     FrameOpenGL
     FrameOpenGLFile
-    FrameProto
-    GTest::gmock
-    GTest::gtest
 )
 
 # In order to remove the tests from the bin folder.

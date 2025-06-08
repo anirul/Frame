@@ -23,3 +23,19 @@
 #endif
 
 #define GLM_ENABLE_EXPERIMENTAL
+
+namespace frame::json
+{
+
+template <typename T>
+concept FullProto =
+    std::is_base_of_v<google::protobuf::Message, std::remove_cv_t<T>>;
+
+template <typename T>
+concept LiteProto =
+    std::is_base_of_v<google::protobuf::Message, std::remove_cv_t<T>>;
+
+template <typename T>
+concept ProtoMessage = FullProto<T> || LiteProto<T>;
+
+} // End namespace frame::json.

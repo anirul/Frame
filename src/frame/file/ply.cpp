@@ -70,10 +70,11 @@ void GetElementFloat(
     std::vector<std::vector<float>>& result)
 {
     if (result.size() != SIZE)
-        throw std::runtime_error(fmt::format(
-            "Result size is incorrect should be {} is {}",
-            SIZE,
-            result.size()));
+        throw std::runtime_error(
+            fmt::format(
+                "Result size is incorrect should be {} is {}",
+                SIZE,
+                result.size()));
     for (int i = 0; i < SIZE; ++i)
     {
         GetElementInternal<std::uint8_t>(ply, names[i], i, result);
@@ -120,18 +121,19 @@ std::vector<glm::vec4> GetElementVertexPropertyVec4(
     GetElementFloat<4>(ply, names, float_vec);
     for (int i = 0; i < float_vec[0].size(); ++i)
     {
-        result.emplace_back(glm::vec4(
-            float_vec[0][i],
-            float_vec[1][i],
-            float_vec[2][i],
-            float_vec[3][i]));
+        result.emplace_back(
+            glm::vec4(
+                float_vec[0][i],
+                float_vec[1][i],
+                float_vec[2][i],
+                float_vec[3][i]));
     }
     return result;
 }
 
 } // namespace
 
-Ply::Ply(const std::filesystem::path& file_name)
+Ply::Ply(std::filesystem::path file_name)
 {
     logger_->info("Opening file: {}", file_name.string());
     happly::PLYData ply_in(file_name.string());
@@ -172,5 +174,7 @@ Ply::Ply(const std::filesystem::path& file_name)
         std::iota(indices_.begin(), indices_.end(), 0);
     }
 }
+
+Ply::~Ply() = default;
 
 } // End namespace frame::file.

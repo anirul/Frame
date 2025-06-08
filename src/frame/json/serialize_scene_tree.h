@@ -12,6 +12,6 @@ namespace frame::json
  * from.
  * @return The proto scene tree.
  */
-proto::SceneTree SerializeSceneTree(const LevelInterface& level_interface);
+proto::SceneTree SerializeSceneTree(const LevelInterface& level_interfacec);
 
 } // End namespace frame::json.

@@ -31,7 +31,7 @@ bool Material::RemoveTextureId(EntityId id)
     return true;
 }
 
-const std::pair<std::string, int> Material::EnableTextureId(EntityId id) const
+std::pair<std::string, int> Material::EnableTextureId(EntityId id) const
 {
     // Check it exist.
     if (!HasTextureId(id))
@@ -87,7 +87,7 @@ void Material::DisableAll() const
     }
 }
 
-const std::vector<EntityId> Material::GetIds() const
+std::vector<EntityId> Material::GetTextureIds() const
 {
     std::vector<EntityId> vec;
     for (const auto& p : id_name_map_)
@@ -121,11 +121,6 @@ void Material::SetProgramId(EntityId id)
     }
     // TODO(anirul): Check that the program has a valid uniform!
     program_id_ = id;
-}
-
-void Material::SetProgramName(const std::string& name)
-{
-    program_name_ = name;
 }
 
 } // End namespace frame::opengl.

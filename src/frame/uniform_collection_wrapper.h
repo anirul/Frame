@@ -50,7 +50,7 @@ class UniformCollectionWrapper : public UniformCollectionInterface
      * @brief Get the uniform names.
      * @return The uniform names.
      */
-    const std::vector<std::string> GetUniformNames() const override;
+    std::vector<std::string> GetUniformNames() const override;
 
   private:
     std::map<std::string, std::unique_ptr<UniformInterface>> value_map_ = {};

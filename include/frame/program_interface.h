@@ -8,6 +8,7 @@
 #include "frame/entity_id.h"
 #include "frame/json/proto.h"
 #include "frame/name_interface.h"
+#include "frame/serialize.h"
 #include "frame/uniform_collection_interface.h"
 
 namespace frame
@@ -17,7 +18,7 @@ namespace frame
  * @class Program
  * @brief This is containing the program and all associated functions.
  */
-struct ProgramInterface : public NameInterface
+struct ProgramInterface : public Serialize<proto::Program>
 {
     //! @brief Virtual destructor
     virtual ~ProgramInterface() = default;
@@ -53,13 +54,13 @@ struct ProgramInterface : public NameInterface
     virtual std::vector<EntityId> GetOutputTextureIds() const = 0;
     /**
      * @brief Select temporary (before assignment to a entity id) scene
-     *        root.
+     * root.
      * @return Get the temporary scene root.
      */
     virtual std::string GetTemporarySceneRoot() const = 0;
     /**
      * @brief Select temporary (before assignment to a entity id) scene
-     *        root.
+     * root.
      * @param Set the temporary scene root.
      */
     virtual void SetTemporarySceneRoot(const std::string& name) = 0;
@@ -78,8 +79,8 @@ struct ProgramInterface : public NameInterface
     /**
      * @brief Use the program, a little bit like bind.
      * @param uniform_interface: The way to communicate the uniform like
-     *        matrices (model, view, projection) but also time and other
-     *        uniform that could be needed.
+     * matrices (model, view, projection) but also time and other uniform that
+     * could be needed.
      */
     virtual void Use(
         const UniformCollectionInterface& uniform_collection_interface) = 0;
@@ -99,8 +100,7 @@ struct ProgramInterface : public NameInterface
      * @param name: Name of the uniform.
      * @return The uniform.
      */
-    virtual const UniformInterface& GetUniform(
-        const std::string& name) const = 0;
+    virtual const UniformInterface& GetUniform(const std::string& name) const = 0;
     /**
      * @brief Set the uniform.
      * @param uniform: The uniform to set.

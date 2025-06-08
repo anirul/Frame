@@ -16,7 +16,7 @@ TEST_F(CubemapTest, CreateCubemapTest)
 {
     ASSERT_FALSE(texture_);
     EXPECT_NO_THROW(
-        texture_ = frame::opengl::file::LoadCubeMapTextureFromFiles(
+        texture_ = std::make_unique<frame::opengl::Cubemap>(
             std::array<std::filesystem::path, 6>{
                 frame::file::FindFile("asset/cubemap/positive_x.png"),
                 frame::file::FindFile("asset/cubemap/negative_x.png"),
@@ -29,8 +29,8 @@ TEST_F(CubemapTest, CreateCubemapTest)
         dynamic_cast<frame::opengl::Cubemap*>(texture_.get());
     ASSERT_NE(nullptr, opengl_texture);
     ASSERT_NE(0, opengl_texture->GetId());
-    EXPECT_EQ(1024, texture_->GetSize().x);
-    EXPECT_EQ(1024, texture_->GetSize().y);
+    EXPECT_EQ(1024, texture_->GetData().size().x());
+    EXPECT_EQ(1024, texture_->GetData().size().y());
     auto vec8 = texture_->GetTextureByte();
     EXPECT_EQ(1024 * 1024 * 3 * 6, vec8.size());
     auto p = std::minmax_element(vec8.begin(), vec8.end());
@@ -42,7 +42,7 @@ TEST_F(CubemapTest, CreateEquirectangularCubemapTest)
 {
     ASSERT_FALSE(texture_);
     EXPECT_NO_THROW(
-        texture_ = frame::opengl::file::LoadCubeMapTextureFromFile(
+        texture_ = std::make_unique<frame::opengl::Cubemap>(
             frame::file::FindFile("asset/cubemap/hamarikyu.hdr"),
             frame::json::PixelElementSize_FLOAT()));
     ASSERT_TRUE(texture_);
@@ -50,8 +50,8 @@ TEST_F(CubemapTest, CreateEquirectangularCubemapTest)
         dynamic_cast<frame::opengl::Cubemap*>(texture_.get());
     ASSERT_NE(nullptr, opengl_texture);
     ASSERT_NE(0, opengl_texture->GetId());
-    EXPECT_EQ(1024, texture_->GetSize().x);
-    EXPECT_EQ(1024, texture_->GetSize().y);
+    EXPECT_EQ(1024, texture_->GetData().size().x());
+    EXPECT_EQ(1024, texture_->GetData().size().y());
     auto vecf = texture_->GetTextureFloat();
     // Image size time the number of color per pixel time 6 (cubemap).
     EXPECT_EQ(1024 * 1024 * 3 * 6, vecf.size());

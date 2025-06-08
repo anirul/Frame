@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "frame/uniform.h"
+#include "frame/opengl/program.h"
 
 namespace frame::opengl
 {

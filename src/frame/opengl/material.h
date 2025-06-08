@@ -40,11 +40,6 @@ class Material : public MaterialInterface
      */
     void SetProgramId(EntityId id) override;
     /**
-     * @brief Store the program name.
-     * @param name: Program name.
-     */
-    void SetProgramName(const std::string& name) override;
-    /**
      * @brief Store a texture reference associated to a given name.
      * @param id: Texture reference id.
      * @param name: Associated name (shader name).
@@ -63,18 +58,17 @@ class Material : public MaterialInterface
      */
     bool RemoveTextureId(EntityId id) override;
     /**
-     * @brief Get ids of a material.
+     * @brief Get texture ids of a material.
      * @return Return the list of texture ids.
      */
-    const std::vector<EntityId> GetIds() const final;
+    std::vector<EntityId> GetTextureIds() const final;
     /**
      * @brief Enable a texture to be used by the context.
      * @param id: Id of the texture to be enabled.
      * @return Return the name and the binding slot of a texture (to be
      * passed to the program).
      */
-    const std::pair<std::string, int> EnableTextureId(
-        EntityId id) const override;
+    std::pair<std::string, int> EnableTextureId(EntityId id) const override;
     /**
      * @brief Unbind the texture and remove it from the list.
      * @param id: Texture id.
@@ -84,22 +78,6 @@ class Material : public MaterialInterface
      * @brief Disable all the texture and unbind them.
      */
     void DisableAll() const override;
-    /**
-     * @brief Get name from the name interface.
-     * @return The name of the object.
-     */
-    std::string GetName() const override
-    {
-        return name_;
-    }
-    /**
-     * @brief Set name from the name interface.
-     * @param name: New name to be set.
-     */
-    void SetName(const std::string& name) override
-    {
-        name_ = name;
-    }
 
   private:
     std::map<EntityId, std::string> id_name_map_ = {};

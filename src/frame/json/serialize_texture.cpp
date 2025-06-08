@@ -1,5 +1,7 @@
 #include "frame/json/serialize_texture.h"
 
+#include "frame/file/file_system.h"
+#include "frame/json/serialize_uniform.h"
 #include "frame/opengl/cubemap.h"
 
 namespace frame::json
@@ -7,13 +9,7 @@ namespace frame::json
 
 proto::Texture SerializeTexture(TextureInterface& texture_interface)
 {
-    proto::Texture proto_texture;
-    proto_texture.set_name(texture_interface.GetName());
-    proto_texture.set_mipmap(texture_interface.IsCubeMap());
-    TextureParameter texture_parameter =
-        texture_interface.GetTextureParameter();
-    
-    return proto_texture;
+    return texture_interface.GetData();
 }
 
 } // End namespace frame::json.

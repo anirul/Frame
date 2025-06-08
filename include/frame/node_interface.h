@@ -26,7 +26,7 @@ enum class NodeTypeEnum
  * @class NodeInterface
  * @brief Interface to visit the scene node.
  */
-struct NodeInterface : public NameInterface
+struct NodeInterface
 {
   public:
     /**
@@ -88,28 +88,11 @@ struct NodeInterface : public NameInterface
     {
         parent_name_ = parent;
     }
-    /**
-     * @brief Get name from the name interface.
-     * @return The name of the object.
-     */
-    std::string GetName() const override
-    {
-        return name_;
-    }
-    /**
-     * @brief Set name from the name interface.
-     * @param name: New name to be set.
-     */
-    void SetName(const std::string& name) override
-    {
-        name_ = name;
-    }
 
   protected:
     std::function<NodeInterface*(const std::string&)> func_ =
         [](const std::string&) -> NodeInterface* { return nullptr; };
     std::string parent_name_;
-    std::string name_;
 };
 
 } // End namespace frame.

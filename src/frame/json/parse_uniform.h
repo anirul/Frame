@@ -26,6 +26,12 @@ template <typename T> T ParseUniform(const T& uniform_val)
     return uniform_val;
 }
 /**
+ * @brief Convert frame proto size into pair.
+ * @param size: Proto size param.
+ * @return Size result as an glm::uvec2.
+ */
+glm::uvec2 ParseSize(const frame::proto::Size& size);
+/**
  * @brief Specialization into glm types (vec2).
  * @param uniform_vec2: Uniform vector 2 input.
  * @return Glm vec2 output.
@@ -93,12 +99,5 @@ void RegisterUniformEnumFromProto(
     const frame::proto::Uniform::UniformEnum& uniform_enum,
     const UniformCollectionInterface& uniform_interface,
     ProgramInterface& program_interface);
-/**
- * @brief Convert frame proto size into pair.
- * @param size: Proto size param.
- * @return Size result.
- */
-std::pair<std::uint32_t, std::uint32_t> ParseSizeInt(
-    const frame::proto::Size size);
 
 } // namespace frame::json.

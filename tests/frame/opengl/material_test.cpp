@@ -23,12 +23,12 @@ TEST_F(MaterialTest, CheckAddRemoveTextureTest)
     auto material = std::make_unique<frame::opengl::Material>();
     material_ = std::move(material);
     EXPECT_TRUE(material_);
-    auto texture1 = frame::opengl::file::LoadTextureFromFile(
+    auto texture1 = std::make_unique<frame::opengl::Texture>(
         frame::file::FindDirectory("asset") /
         std::filesystem::path("cubemap/positive_x.png"));
     EXPECT_TRUE(texture1);
     texture1->SetName("PositiveX");
-    auto texture2 = frame::opengl::file::LoadTextureFromFile(
+    auto texture2 = std::make_unique<frame::opengl::Texture>(
         frame::file::FindDirectory("asset") /
         std::filesystem::path("cubemap/positive_y.png"));
     EXPECT_TRUE(texture2);
@@ -48,7 +48,7 @@ TEST_F(MaterialTest, CheckAddRemoveTextureTest)
     EXPECT_FALSE(material_->RemoveTextureId(id_false));
     EXPECT_TRUE(material_->RemoveTextureId(id1));
     material_->AddTextureId(id1, "PositiveX");
-    EXPECT_EQ(2, material_->GetIds().size());
+    EXPECT_EQ(2, material_->GetTextureIds().size());
 }
 
 } // End namespace test.

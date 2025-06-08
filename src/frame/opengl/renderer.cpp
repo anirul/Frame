@@ -4,8 +4,10 @@
 #include <fmt/core.h>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <format>
 #include <stdexcept>
 
+#include "frame/json/parse_uniform.h"
 #include "frame/node_matrix.h"
 #include "frame/node_static_mesh.h"
 #include "frame/opengl/cubemap.h"
@@ -60,7 +62,10 @@ Renderer::Renderer(LevelInterface& level, glm::uvec4 viewport)
     render_buffer_->CreateStorage(
         {viewport_.z - viewport_.x, viewport_.w - viewport_.y});
     frame_buffer_->AttachRender(*render_buffer_);
-    auto program = file::LoadProgram("display");
+    proto::Program proto_program;
+    proto_program.set_name("display");
+    proto_program.set_shader("display");
+    auto program = file::LoadProgram(proto_program);
     if (!program)
         throw std::runtime_error("No program!");
     auto material = std::make_unique<Material>();
@@ -109,7 +114,12 @@ std::optional<glm::mat4> Renderer::RenderNode(
     if (!mesh_id)
     {
         GLbitfield bit_field = 0;
-        std::uint32_t clean_buffer = node_static_mesh.GetCleanBuffer();
+        std::uint32_t clean_buffer = 0;
+        for (const auto clean_elem :
+             node_static_mesh.GetData().clean_buffer().values())
+        {
+            clean_buffer |= static_cast<std::uint32_t>(clean_elem);
+        }
         if (clean_buffer | proto::CleanBuffer::CLEAR_COLOR)
         {
             bit_field += GL_COLOR_BUFFER_BIT;
@@ -150,7 +160,7 @@ void Renderer::RenderMesh(
     // In case the camera doesn't exist it will create a basic one.
     UniformCollectionWrapper uniform_collection_wrapper(
         projection, view, model, delta_time_);
-    if (render_time_ == proto::SceneStaticMesh::SCENE_RENDER_TIME)
+    if (render_time_ == proto::NodeStaticMesh::SCENE_RENDER_TIME)
     {
         std::unique_ptr<UniformInterface> env_map_uniform =
             std::make_unique<Uniform>("env_map_model", env_map_model_);
@@ -162,7 +172,7 @@ void Renderer::RenderMesh(
 
     auto texture_out_ids = program.GetOutputTextureIds();
     auto& texture_ref = level_.GetTextureFromId(*texture_out_ids.cbegin());
-    auto size = texture_ref.GetSize();
+    auto size = json::ParseSize(texture_ref.GetData().size());
 
     glViewport(viewport_.x, viewport_.y, viewport_.z, viewport_.w);
 
@@ -170,7 +180,7 @@ void Renderer::RenderMesh(
     int i = 0;
     for (const auto& texture_id : program.GetOutputTextureIds())
     {
-        if (level_.GetTextureFromId(texture_id).IsCubeMap())
+        if (level_.GetTextureFromId(texture_id).GetData().cubemap())
         {
             auto& opengl_texture =
                 dynamic_cast<Cubemap&>(level_.GetTextureFromId(texture_id));
@@ -198,7 +208,7 @@ void Renderer::RenderMesh(
         static_cast<std::uint32_t>(texture_out_ids.size()));
 
     std::map<std::string, std::vector<std::int32_t>> uniform_include;
-    for (const auto& id : material.GetIds())
+    for (const auto& id : material.GetTextureIds())
     {
         EntityId texture_id = NullId;
         if (level_.GetEnumTypeFromId(id) == EntityTypeEnum::TEXTURE)
@@ -214,7 +224,7 @@ void Renderer::RenderMesh(
         // TODO(anirul): Why? id and not texture id?
         const auto p = material.EnableTextureId(id);
         auto& texture = level_.GetTextureFromId(texture_id);
-        if (texture.IsCubeMap())
+        if (texture.GetData().cubemap())
         {
             auto& gl_texture =
                 dynamic_cast<Cubemap&>(level_.GetTextureFromId(texture_id));
@@ -240,9 +250,9 @@ void Renderer::RenderMesh(
     if (static_mesh.GetIndexSize())
     {
         gl_index_buffer.Bind();
-        switch (static_mesh.GetRenderPrimitive())
+        switch (static_mesh.GetData().render_primitive_enum())
         {
-        case proto::SceneStaticMesh::TRIANGLE_PRIMITIVE:
+        case proto::NodeStaticMesh::TRIANGLE_PRIMITIVE:
             glDrawElements(
                 GL_TRIANGLES,
                 static_cast<GLsizei>(static_mesh.GetIndexSize()) /
@@ -250,7 +260,7 @@ void Renderer::RenderMesh(
                 GL_UNSIGNED_INT,
                 nullptr);
             break;
-        case proto::SceneStaticMesh::POINT_PRIMITIVE:
+        case proto::NodeStaticMesh::POINT_PRIMITIVE:
             glDrawElements(
                 GL_POINTS,
                 static_cast<GLsizei>(static_mesh.GetIndexSize()) /
@@ -258,7 +268,7 @@ void Renderer::RenderMesh(
                 GL_UNSIGNED_INT,
                 nullptr);
             break;
-        case proto::SceneStaticMesh::LINE_PRIMITIVE:
+        case proto::NodeStaticMesh::LINE_PRIMITIVE:
             glDrawElements(
                 GL_LINES,
                 static_cast<GLsizei>(static_mesh.GetIndexSize()) /
@@ -267,17 +277,17 @@ void Renderer::RenderMesh(
                 nullptr);
             break;
         default:
-            throw std::runtime_error(fmt::format(
+            throw std::runtime_error(std::format(
                 "Couldn't draw primitive {}",
-                proto::SceneStaticMesh_RenderPrimitiveEnum_Name(
-                    static_mesh.GetRenderPrimitive())));
+                proto::NodeStaticMesh_RenderPrimitiveEnum_Name(
+                    static_mesh.GetData().render_primitive_enum())));
         }
         gl_index_buffer.UnBind();
     }
     program.UnUse();
     glBindVertexArray(0);
 
-    for (const auto id : material.GetIds())
+    for (const auto id : material.GetTextureIds())
     {
         EntityId texture_id = id;
         if (level_.GetEnumTypeFromId(id) != EntityTypeEnum::TEXTURE)
@@ -285,7 +295,7 @@ void Renderer::RenderMesh(
             texture_id = id + 1;
         }
         auto& texture = level_.GetTextureFromId(texture_id);
-        if (texture.IsCubeMap())
+        if (texture.GetData().cubemap())
         {
             auto& gl_texture =
                 dynamic_cast<Cubemap&>(level_.GetTextureFromId(texture_id));
@@ -316,7 +326,7 @@ void Renderer::PresentFinal()
     UniformCollectionWrapper uniform_collection_wrapper{};
     program.Use(uniform_collection_wrapper);
     auto& material = level_.GetMaterialFromId(display_material_id_);
-    for (const auto id : material.GetIds())
+    for (const auto id : material.GetTextureIds())
     {
         auto& opengl_texture =
             dynamic_cast<Texture&>(level_.GetTextureFromId(id));
@@ -342,7 +352,7 @@ void Renderer::PresentFinal()
     program.UnUse();
     glBindVertexArray(0);
 
-    for (const auto id : material.GetIds())
+    for (const auto id : material.GetTextureIds())
     {
         auto& opengl_texture =
             dynamic_cast<Texture&>(level_.GetTextureFromId(id));
@@ -365,11 +375,11 @@ void Renderer::SetDepthTest(bool enable)
 
 void Renderer::PreRender()
 {
-    render_time_ = proto::SceneStaticMesh::PRE_RENDER_TIME;
+    render_time_ = proto::NodeStaticMesh::PRE_RENDER_TIME;
     // This will ensure that it is only true once.
     auto first_render = std::exchange(first_render_, false);
     for (const auto& p : level_.GetStaticMeshMaterialIds(
-             proto::SceneStaticMesh::PRE_RENDER_TIME))
+             proto::NodeStaticMesh::PRE_RENDER_TIME))
     {
         if (first_render)
         {
@@ -377,21 +387,29 @@ void Renderer::PreRender()
             auto temp_viewport = viewport_;
             // Now this get the image size from the environment map.
             auto& material = level_.GetMaterialFromId(material_id);
-            auto ids = material.GetIds();
+            auto ids = material.GetTextureIds();
             assert(!ids.empty());
             auto& texture = level_.GetTextureFromId(ids[0]);
-            auto size = texture.GetSize();
+            auto size = json::ParseSize(texture.GetData().size());
             viewport_ = glm::ivec4(0, 0, size.x / 2, size.y / 2);
             for (std::uint32_t i = 0; i < 6; ++i)
             {
-                SetCubeMapTarget(GetTextureFrameFromPosition(i));
+                proto::TextureFrame texture_frame;
+                texture_frame.set_value(static_cast<proto::TextureFrame::Enum>(
+                    proto::TextureFrame::CUBE_MAP_POSITIVE_X + i));
+                SetCubeMapTarget(texture_frame);
                 RenderNode(
                     p.first, material_id, projection_cubemap, views_cubemap[i]);
             }
-            // Again why?
-            SetCubeMapTarget(GetTextureFrameFromPosition(0));
-            RenderNode(
-                p.first, material_id, projection_cubemap, views_cubemap[0]);
+            {
+                // Again why?
+                proto::TextureFrame texture_frame;
+                texture_frame.set_value(static_cast<proto::TextureFrame::Enum>(
+                    proto::TextureFrame::CUBE_MAP_POSITIVE_X));
+                SetCubeMapTarget(texture_frame);
+                RenderNode(
+                    p.first, material_id, projection_cubemap, views_cubemap[0]);
+            }
             viewport_ = temp_viewport;
         }
     }
@@ -399,7 +417,7 @@ void Renderer::PreRender()
 
 void Renderer::RenderShadows(const CameraInterface& camera)
 {
-    render_time_ = proto::SceneStaticMesh::SHADOW_RENDER_TIME;
+    render_time_ = proto::NodeStaticMesh::SHADOW_RENDER_TIME;
     // For every light in the level.
     for (const auto& light_id : level_.GetLights())
     {
@@ -429,7 +447,7 @@ void Renderer::RenderShadows(const CameraInterface& camera)
         auto temp_viewport = viewport_;
         frame_buffer_ = std::make_unique<FrameBuffer>();
         auto& texture_interface = level_.GetTextureFromId(texture_id);
-        auto size = texture_interface.GetSize();
+        auto size = json::ParseSize(texture_interface.GetData().size());
         viewport_ = glm::ivec4(0, 0, size.x, size.y);
         if (light.GetType() == LightTypeEnum::DIRECTIONAL_LIGHT)
         {
@@ -445,12 +463,12 @@ void Renderer::RenderShadows(const CameraInterface& camera)
             glClear(GL_DEPTH_BUFFER_BIT);
             // For every mesh / material pair in the scene.
             for (const auto& p : level_.GetStaticMeshMaterialIds(
-                     proto::SceneStaticMesh::SHADOW_RENDER_TIME))
+                     proto::NodeStaticMesh::SHADOW_RENDER_TIME))
             {
                 auto& mesh = level_.GetStaticMeshFromId(p.first);
                 // Skip object that doesn't cast shadow.
-                if (mesh.GetShadowEffect() ==
-                    proto::SceneStaticMesh::TRANSPARENT_SHADOW_EFFECT)
+                if (mesh.GetData().shadow_effect_enum() ==
+                    proto::NodeStaticMesh::TRANSPARENT_SHADOW_EFFECT)
                 {
                     continue;
                 }
@@ -483,12 +501,12 @@ void Renderer::RenderShadows(const CameraInterface& camera)
             {
                 // For every mesh / material pair in the scene.
                 for (const auto& p : level_.GetStaticMeshMaterialIds(
-                         proto::SceneStaticMesh::SHADOW_RENDER_TIME))
+                         proto::NodeStaticMesh::SHADOW_RENDER_TIME))
                 {
                     auto& mesh = level_.GetStaticMeshFromId(p.first);
                     // Skip object that doesn't cast shadow.
-                    if (mesh.GetShadowEffect() ==
-                        proto::SceneStaticMesh::TRANSPARENT_SHADOW_EFFECT)
+                    if (mesh.GetData().shadow_effect_enum() ==
+                        proto::NodeStaticMesh::TRANSPARENT_SHADOW_EFFECT)
                     {
                         continue;
                     }
@@ -514,9 +532,9 @@ void Renderer::RenderShadows(const CameraInterface& camera)
 
 void Renderer::RenderSkybox(const CameraInterface& camera)
 {
-    render_time_ = proto::SceneStaticMesh::SKYBOX_RENDER_TIME;
+    render_time_ = proto::NodeStaticMesh::SKYBOX_RENDER_TIME;
     for (const auto& p : level_.GetStaticMeshMaterialIds(
-             proto::SceneStaticMesh::SKYBOX_RENDER_TIME))
+             proto::NodeStaticMesh::SKYBOX_RENDER_TIME))
     {
         auto maybe_model = RenderNode(
             p.first,
@@ -532,9 +550,9 @@ void Renderer::RenderSkybox(const CameraInterface& camera)
 
 void Renderer::RenderScene(const CameraInterface& camera)
 {
-    render_time_ = proto::SceneStaticMesh::SCENE_RENDER_TIME;
+    render_time_ = proto::NodeStaticMesh::SCENE_RENDER_TIME;
     for (const auto& p : level_.GetStaticMeshMaterialIds(
-             proto::SceneStaticMesh::SCENE_RENDER_TIME))
+             proto::NodeStaticMesh::SCENE_RENDER_TIME))
     {
         RenderNode(
             p.first,
@@ -546,9 +564,9 @@ void Renderer::RenderScene(const CameraInterface& camera)
 
 void Renderer::PostProcess()
 {
-    render_time_ = proto::SceneStaticMesh::POST_PROCESS_TIME;
+    render_time_ = proto::NodeStaticMesh::POST_PROCESS_TIME;
     for (const auto& p : level_.GetStaticMeshMaterialIds(
-             proto::SceneStaticMesh::POST_PROCESS_TIME))
+             proto::NodeStaticMesh::POST_PROCESS_TIME))
     {
         // Is it correct for projection and view? This is a post process?
         RenderNode(p.first, p.second, glm::mat4(1.0), glm::mat4(1.0));

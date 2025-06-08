@@ -17,33 +17,60 @@ What you need to build and run Frame:
   - Visual Studio (Community Edition is sufficient)
   - Alternatives like clang or gcc
 - *CMake* - Required for creating the build system. Download it [here](https://cmake.org/).
-- *VCPKG* - Frame uses VCPKG for managing C++ libraries. Set it up using instructions from the official [VCPKG GitHub](https://github.com/Microsoft/vcpkg/).
+- *VCPKG* - Frame uses VCPKG for managing C++ libraries, it will be install automatically [VCPKG GitHub](https://github.com/Microsoft/vcpkg/).
 
-### Setting Up VCPKG
+### Building Frame with CMake
 
-After installing VCPKG following the instructions [here](https://github.com/Microsoft/vcpkg/), use the command line to install the necessary packages:
+Update the local VCPKG and other externals dependencies:
 
+```shell
+git submodule update --init --recursive
 ```
-./vcpkg install abseil glm gtest happly imgui opengl protobuf sdl2 spdlog stb tinyobjloader
-```
 
-Or you can use the cmake to get the list of dependencies from the `vcpkg.json`.
-
-### Building Frame
+#### Under windows
 
 Navigate to your Frame directory and use the following commands to build the project:
 
 ```shell
-cd path-to-frame
-mkdir build
-cd build
-cmake .. -DCMAKE_TOOLCHAIN_FILE="path-to-vcpkg\scripts\buildsystems\vcpkg.cmake"
+cmake --preset windows
 ```
 
 After setting up, you can build the project using Visual Studio or via the command line with the following command:
 
 ```shell
-cmake --build .
+cmake --build --preset windows-release
+```
+
+Or if you want the debug version you can use:
+
+```shell
+cmake --build --preset windows-debug
+```
+
+#### Under linux
+
+Navigate to your Frame directory and use the following commands to build the project:
+
+```shell
+cmake --preset linux-release
+```
+
+Or if you want the debug version:
+
+```shell
+cmake --preset linux-debug
+```
+
+After setting up, you can build the project using Visual Studio or via the command line with the following command:
+
+```shell
+cmake --build --preset linux-release
+```
+
+Or if you want to build the debug version:
+
+```shell
+cmake --preset linux-debug
 ```
 
 ## Dive in with Examples

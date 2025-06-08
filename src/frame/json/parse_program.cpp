@@ -17,37 +17,38 @@ std::unique_ptr<frame::ProgramInterface> ParseProgramOpenGL(
 {
     Logger& logger = Logger::GetInstance();
     // Create the program.
-    auto program = opengl::file::LoadProgram(proto_program.shader());
+    auto program = opengl::file::LoadProgram(proto_program);
     if (!program)
     {
         return nullptr;
     }
     for (const auto& texture_name : proto_program.input_texture_names())
     {
-        auto maybe_texture_id = level.GetIdFromName(texture_name);
-        if (!maybe_texture_id)
+        EntityId texture_id = level.GetIdFromName(texture_name);
+        if (!texture_id)
+        {
             return nullptr;
-        EntityId texture_id = maybe_texture_id;
-        // Check this is a texture.
+        }
         program->AddInputTextureId(texture_id);
     }
     for (const auto& texture_name : proto_program.output_texture_names())
     {
-        auto maybe_texture_id = level.GetIdFromName(texture_name);
-        if (!maybe_texture_id)
+        EntityId texture_id = level.GetIdFromName(texture_name);
+        if (!texture_id)
+        {
             return nullptr;
-        EntityId texture_id = maybe_texture_id;
-        // Check this is a texture.
+        }
         program->AddOutputTextureId(texture_id);
     }
     program->SetSceneRoot(0);
     switch (proto_program.input_scene_type().value())
     {
     case proto::SceneType::QUAD: {
-        auto maybe_quad_id = level.GetDefaultStaticMeshQuadId();
-        if (!maybe_quad_id)
+        EntityId quad_id = level.GetDefaultStaticMeshQuadId();
+        if (!quad_id)
+        {
             return nullptr;
-        EntityId quad_id = maybe_quad_id;
+        }
         program->SetSceneRoot(quad_id);
         break;
     }
@@ -71,12 +72,17 @@ std::unique_ptr<frame::ProgramInterface> ParseProgramOpenGL(
                 static_cast<int>(proto_program.input_scene_type().value())));
     }
     program->Use();
-    for (const auto& parameter : proto_program.parameters())
+    for (const auto& parameter : proto_program.uniforms())
     {
         switch (parameter.value_oneof_case())
         {
-        case proto::Uniform::kUniformEnum:
+        case proto::Uniform::kUniformEnum: {
+            std::unique_ptr<UniformInterface> uniform_interface =
+                std::make_unique<frame::Uniform>(
+                    parameter.name(), parameter.uniform_enum());
+            program->AddUniform(std::move(uniform_interface));
             break;
+        }
         case proto::Uniform::kUniformInt: {
             std::unique_ptr<UniformInterface> uniform_interface =
                 std::make_unique<frame::Uniform>(
@@ -155,6 +161,7 @@ std::unique_ptr<frame::ProgramInterface> ParseProgramOpenGL(
         }
     }
     program->UnUse();
+    program->SetSerializeEnable(true);
     return program;
 }
 
