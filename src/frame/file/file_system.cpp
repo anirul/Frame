@@ -31,12 +31,16 @@ const std::filesystem::path FindElement(
             for (auto j = 0; j < i; ++j)
                 new_path /= "../";
             new_path /= file;
-            // Normalize the path before testing it. Some platforms
-            // don't correctly resolve directories containing "..".
-            auto normalized_path = new_path.lexically_normal();
+            // Resolve the full path before testing it.  Windows in
+            // particular struggles with relative paths that contain
+            // ".." segments, so normalize and make the path absolute
+            // prior to the existence check.
+            auto normalized_path =
+                std::filesystem::absolute(new_path).lexically_normal();
             if (test(normalized_path))
             {
-                // Prune the path from relative elements.
+                // Prune the path from relative elements and keep the
+                // resolved absolute version.
                 new_path = normalized_path;
                 // Search for build (it create a bunch of asset and other
                 // element that will confuse the search for the file and path).
