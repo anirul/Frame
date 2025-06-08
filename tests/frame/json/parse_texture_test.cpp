@@ -42,7 +42,7 @@ TEST_F(ParseTextureTest, CreateTextureFromProtoCheckSizeTest)
     EXPECT_TRUE(texture_);
     glm::uvec2 test_size = {256, 256};
     auto texture_size = frame::json::ParseSize(texture_->GetData().size());
-    EXPECT_NE(test_size, texture_size);
+    EXPECT_EQ(test_size, texture_size);
 }
 
 TEST_F(ParseTextureTest, CreateTextureFromProtoWrongSizeTest)
