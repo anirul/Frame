@@ -226,7 +226,7 @@ bool SDLOpenGLWindow::RunEvent(const SDL_Event& event, const double dt)
                 }
                 return true;
             }
-            return false;
+            break;
         case SDLK_PRINTSCREEN:
             device_->ScreenShot("ScreenShot.png");
             return true;
