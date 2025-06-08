@@ -77,19 +77,6 @@ WindowCubemap::WindowCubemap(TextureInterface& texture_interface)
                 pixel_struct);
         }
     }
-    else if (
-        pixel_size.value() == proto::PixelElementSize::DWORD)
-    {
-        auto data = texture_cubemap.GetTextureDWord();
-        for (int i = 0; i < 6; ++i)
-        {
-            face_textures_[i] = std::make_unique<opengl::Texture>(
-                data.data() + i * slice_pixels,
-                face_size,
-                pixel_size,
-                pixel_struct);
-        }
-    }
     else if (pixel_size.value() == proto::PixelElementSize::FLOAT)
     {
         auto data = texture_cubemap.GetTextureFloat();
@@ -117,8 +104,7 @@ bool WindowCubemap::DrawCallback()
             if (face_textures_[idx])
             {
                 ImGui::Image(
-                    reinterpret_cast<ImTextureID>(
-                        face_textures_[idx]->GetId()),
+                    static_cast<ImTextureID>(face_textures_[idx]->GetId()),
                     ImVec2(cell_w, cell_h),
                     ImVec2(0, 1),
                     ImVec2(1, 0));
