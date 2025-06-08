@@ -154,7 +154,7 @@ Cubemap::Cubemap(const proto::Texture& proto_texture, glm::uvec2 display_size)
         {
             CreateCubemapFromPointers(
                 {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr},
-                display_size,
+                GetSize(),
                 proto_texture.pixel_element_size(),
                 proto_texture.pixel_structure());
         }
@@ -182,7 +182,7 @@ Cubemap::Cubemap(const proto::Texture& proto_texture, glm::uvec2 display_size)
         CreateCubemapFromPointers(
             std::array<const void*, 6>{
                 nullptr, nullptr, nullptr, nullptr, nullptr, nullptr},
-            display_size,
+            GetSize(),
             proto_texture.pixel_element_size(),
             proto_texture.pixel_structure());
         break;
