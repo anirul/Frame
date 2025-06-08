@@ -1,7 +1,12 @@
 #pragma once
 
+#include <array>
+#include <memory>
+#include <glm/glm.hpp>
+
 #include <frame/gui/draw_gui_interface.h>
 #include <frame/level_interface.h>
+#include <frame/opengl/texture.h>
 
 #include <filesystem>
 
@@ -42,6 +47,7 @@ class WindowCubemap : public GuiWindowInterface
     std::string name_;
     glm::uvec2 size_;
     TextureInterface& texture_interface_;
+    std::array<std::unique_ptr<opengl::Texture>, 6> face_textures_;
 };
 
 } // End namespace frame::gui.
