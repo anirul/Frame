@@ -29,9 +29,14 @@ TEST_F(FileSystemTest, IsFileExist)
 {
     std::filesystem::path asset = frame::file::FindDirectory("asset/");
     EXPECT_FALSE(asset.empty());
-    EXPECT_TRUE(std::filesystem::is_directory(asset / "cubemap/"));
-    EXPECT_TRUE(
-        std::filesystem::is_regular_file(asset / "cubemap/positive_x.png"));
+    std::filesystem::path cubemap =
+        frame::file::FindDirectory("asset/cubemap/");
+    EXPECT_FALSE(cubemap.empty());
+    EXPECT_TRUE(std::filesystem::is_directory(cubemap));
+    std::filesystem::path file =
+        frame::file::FindFile("asset/cubemap/positive_x.png");
+    EXPECT_FALSE(file.empty());
+    EXPECT_TRUE(std::filesystem::is_regular_file(file));
 }
 
 } // End namespace test.
