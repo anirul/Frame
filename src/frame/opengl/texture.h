@@ -47,7 +47,7 @@ class Texture : public TextureInterface, public BindInterface
         std::filesystem::path file_name,
         proto::PixelElementSize pixel_element_size =
             json::PixelElementSize_BYTE(),
-        proto::PixelStructure pixel_strucutre = json::PixelStructure_BGR());
+        proto::PixelStructure pixel_strucutre = json::PixelStructure_RGB());
     /**
      * @brief Create a texture from a pointer and a brief description of the
      * underlying structure.

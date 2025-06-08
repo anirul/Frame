@@ -38,10 +38,22 @@ Texture::Texture(const proto::Texture& proto_texture, glm::uvec2 display_size)
             data_.pixel_structure());
         break;
     case proto::Texture::kFileName:
-        CreateTextureFromFile(
-            data_.file_name(),
-            data_.pixel_element_size(),
-            data_.pixel_structure());
+        if (proto_texture.file_name().empty())
+        {
+            // Empty path means no initial data, just allocate storage.
+            CreateTextureFromPointer(
+                nullptr,
+                GetSize(),
+                data_.pixel_element_size(),
+                data_.pixel_structure());
+        }
+        else
+        {
+            CreateTextureFromFile(
+                data_.file_name(),
+                data_.pixel_element_size(),
+                data_.pixel_structure());
+        }
         break;
     case proto::Texture::kPlugin:
         throw std::runtime_error("Don't know what to do there?");
@@ -58,10 +70,11 @@ Texture::Texture(const proto::Texture& proto_texture, glm::uvec2 display_size)
         const auto enum_value = proto_texture.texture_oneof_case();
         const auto* value_desc =
             proto_texture.GetDescriptor()->FindFieldByNumber(enum_value);
-        throw std::runtime_error(std::format(
-            "Unknown texture [{}] type [{}]?",
-            name,
-            value_desc ? value_desc->name() : "<unknown>"));
+        throw std::runtime_error(
+            std::format(
+                "Unknown texture [{}] type [{}]?",
+                name,
+                value_desc ? value_desc->name() : "<unknown>"));
     }
     }
 }
@@ -88,6 +101,13 @@ void Texture::CreateTextureFromFile(
     proto::PixelElementSize pixel_element_size,
     proto::PixelStructure pixel_structure)
 {
+    if (file_name.empty())
+    {
+        // No file provided: allocate empty texture using existing size data.
+        CreateTextureFromPointer(
+            nullptr, GetSize(), pixel_element_size, pixel_structure);
+        return;
+    }
     data_.mutable_pixel_element_size()->CopyFrom(pixel_element_size);
     data_.mutable_pixel_structure()->CopyFrom(pixel_structure);
     data_.set_file_name(frame::file::PurifyFilePath(file_name));
@@ -116,6 +136,8 @@ void Texture::CreateTextureFromPointer(
     {
         inner_size_ = size;
     }
+    // Store the actual texture size in the proto for later retrieval.
+    data_.mutable_size()->CopyFrom(json::SerializeSize(inner_size_));
     glGenTextures(1, &texture_id_);
     ScopedBind scoped_bind(*this);
     proto::TextureFilter texture_filter;
@@ -234,22 +256,23 @@ glm::uvec2 Texture::GetSize()
 
 void Texture::SetDisplaySize(glm::uvec2 display_size)
 {
-    if (display_size.x == 0)
-    {
-        inner_size_.x = data_.size().x();
-    }
-    else if (data_.size().x() < 0)
-    {
-        inner_size_.x = display_size.x / std::abs(data_.size().x());
-    }
-    if (display_size.y == 0)
-    {
-        inner_size_.y = data_.size().y();
-    }
-    else if (data_.size().y() < 0)
-    {
-        inner_size_.y = display_size.y / std::abs(data_.size().y());
-    }
+    auto compute = [&](int stored, unsigned int display) {
+        if (stored < 0)
+        {
+            return display / static_cast<unsigned int>(std::abs(stored));
+        }
+        else if (stored > 0)
+        {
+            return static_cast<unsigned int>(stored);
+        }
+        else
+        {
+            return display;
+        }
+    };
+
+    inner_size_.x = compute(data_.size().x(), display_size.x);
+    inner_size_.y = compute(data_.size().y(), display_size.y);
 }
 
 void Texture::CreateFrameAndRenderBuffer()

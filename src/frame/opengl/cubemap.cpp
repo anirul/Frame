@@ -150,10 +150,21 @@ Cubemap::Cubemap(const proto::Texture& proto_texture, glm::uvec2 display_size)
     case proto::Texture::kPixels:
         throw std::runtime_error("Not supported yet.");
     case proto::Texture::kFileName:
-        CreateCubemapFromFile(
-            proto_texture.file_name(),
-            proto_texture.pixel_element_size(),
-            proto_texture.pixel_structure());
+        if (proto_texture.file_name().empty())
+        {
+            CreateCubemapFromPointers(
+                {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr},
+                GetSize(),
+                proto_texture.pixel_element_size(),
+                proto_texture.pixel_structure());
+        }
+        else
+        {
+            CreateCubemapFromFile(
+                proto_texture.file_name(),
+                proto_texture.pixel_element_size(),
+                proto_texture.pixel_structure());
+        }
         break;
     case proto::Texture::kFileNames:
         CreateCubemapFromFiles(
@@ -171,7 +182,7 @@ Cubemap::Cubemap(const proto::Texture& proto_texture, glm::uvec2 display_size)
         CreateCubemapFromPointers(
             std::array<const void*, 6>{
                 nullptr, nullptr, nullptr, nullptr, nullptr, nullptr},
-            display_size,
+            GetSize(),
             proto_texture.pixel_element_size(),
             proto_texture.pixel_structure());
         break;
@@ -342,7 +353,6 @@ void Cubemap::CreateCubemapFromPointer(
     {
         throw std::runtime_error("Couldn't load cubemap from single ptr.");
     }
-    auto equirectangular_size = equirectangular->GetSize();
     // Seams correct when you are less than 2048 in height you get 512.
     std::uint32_t cube_single_res = PowerFloor(size.y);
     glm::uvec2 cube_pair_res = {cube_single_res, cube_single_res};
@@ -401,6 +411,9 @@ void Cubemap::CreateCubemapFromPointer(
     texture_id_ = cubemap.GetId();
     cubemap.texture_id_ = 0;
     inner_size_ = cube_pair_res;
+    // Record the actual cubemap size in the proto so callers such as tests
+    // query the correct dimensions after the equirectangular conversion.
+    data_.mutable_size()->CopyFrom(json::SerializeSize(inner_size_));
 }
 
 void Cubemap::CreateCubemapFromPointers(
@@ -599,22 +612,23 @@ glm::uvec2 Cubemap::GetSize()
 
 void Cubemap::SetDisplaySize(glm::uvec2 display_size)
 {
-    if (display_size.x == 0)
-    {
-        inner_size_.x = data_.size().x();
-    }
-    else if (data_.size().x() < 0)
-    {
-        inner_size_.x = display_size.x / std::abs(data_.size().x());
-    }
-    if (display_size.y == 0)
-    {
-        inner_size_.y = data_.size().y();
-    }
-    else if (data_.size().y() < 0)
-    {
-        inner_size_.y = display_size.y / std::abs(data_.size().y());
-    }
+    auto compute = [&](int stored, unsigned int display) {
+        if (stored < 0)
+        {
+            return display / static_cast<unsigned int>(std::abs(stored));
+        }
+        else if (stored > 0)
+        {
+            return static_cast<unsigned int>(stored);
+        }
+        else
+        {
+            return display;
+        }
+    };
+
+    inner_size_.x = compute(data_.size().x(), display_size.x);
+    inner_size_.y = compute(data_.size().y(), display_size.y);
 }
 
 proto::TextureFrame Cubemap::GetTextureFrameFromPosition(int i)
