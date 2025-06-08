@@ -150,10 +150,21 @@ Cubemap::Cubemap(const proto::Texture& proto_texture, glm::uvec2 display_size)
     case proto::Texture::kPixels:
         throw std::runtime_error("Not supported yet.");
     case proto::Texture::kFileName:
-        CreateCubemapFromFile(
-            proto_texture.file_name(),
-            proto_texture.pixel_element_size(),
-            proto_texture.pixel_structure());
+        if (proto_texture.file_name().empty())
+        {
+            CreateCubemapFromPointers(
+                {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr},
+                display_size,
+                proto_texture.pixel_element_size(),
+                proto_texture.pixel_structure());
+        }
+        else
+        {
+            CreateCubemapFromFile(
+                proto_texture.file_name(),
+                proto_texture.pixel_element_size(),
+                proto_texture.pixel_structure());
+        }
         break;
     case proto::Texture::kFileNames:
         CreateCubemapFromFiles(

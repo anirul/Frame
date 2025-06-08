@@ -38,10 +38,22 @@ Texture::Texture(const proto::Texture& proto_texture, glm::uvec2 display_size)
             data_.pixel_structure());
         break;
     case proto::Texture::kFileName:
-        CreateTextureFromFile(
-            data_.file_name(),
-            data_.pixel_element_size(),
-            data_.pixel_structure());
+        if (proto_texture.file_name().empty())
+        {
+            // Empty path means no initial data, just allocate storage.
+            CreateTextureFromPointer(
+                nullptr,
+                GetSize(),
+                data_.pixel_element_size(),
+                data_.pixel_structure());
+        }
+        else
+        {
+            CreateTextureFromFile(
+                data_.file_name(),
+                data_.pixel_element_size(),
+                data_.pixel_structure());
+        }
         break;
     case proto::Texture::kPlugin:
         throw std::runtime_error("Don't know what to do there?");
@@ -58,10 +70,11 @@ Texture::Texture(const proto::Texture& proto_texture, glm::uvec2 display_size)
         const auto enum_value = proto_texture.texture_oneof_case();
         const auto* value_desc =
             proto_texture.GetDescriptor()->FindFieldByNumber(enum_value);
-        throw std::runtime_error(std::format(
-            "Unknown texture [{}] type [{}]?",
-            name,
-            value_desc ? value_desc->name() : "<unknown>"));
+        throw std::runtime_error(
+            std::format(
+                "Unknown texture [{}] type [{}]?",
+                name,
+                value_desc ? value_desc->name() : "<unknown>"));
     }
     }
 }
@@ -88,6 +101,13 @@ void Texture::CreateTextureFromFile(
     proto::PixelElementSize pixel_element_size,
     proto::PixelStructure pixel_structure)
 {
+    if (file_name.empty())
+    {
+        // No file provided: allocate empty texture using existing size data.
+        CreateTextureFromPointer(
+            nullptr, GetSize(), pixel_element_size, pixel_structure);
+        return;
+    }
     data_.mutable_pixel_element_size()->CopyFrom(pixel_element_size);
     data_.mutable_pixel_structure()->CopyFrom(pixel_structure);
     data_.set_file_name(frame::file::PurifyFilePath(file_name));
