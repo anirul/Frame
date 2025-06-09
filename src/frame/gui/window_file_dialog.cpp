@@ -167,8 +167,10 @@ bool WindowFileDialog::DrawCallback()
     case FileDialogEnum::NEW:
         if (ImGui::Button("New File"))
         {
-            file_name_ =
+            std::filesystem::path selected_path =
                 (std::strlen(file_buffer)) ? file_buffer : file_name_;
+            if (selected_path.is_relative()) selected_path = current_path / selected_path;
+            file_name_ = selected_path.string();
             get_file_(file_name_);
             end_ = true;
         }
@@ -176,8 +178,10 @@ bool WindowFileDialog::DrawCallback()
     case FileDialogEnum::OPEN:
         if (ImGui::Button("Open File"))
         {
-            file_name_ =
+            std::filesystem::path selected_path =
                 (std::strlen(file_buffer)) ? file_buffer : file_name_;
+            if (selected_path.is_relative()) selected_path = current_path / selected_path;
+            file_name_ = selected_path.string();
             get_file_(file_name_);
             end_ = true;
         }
@@ -185,8 +189,10 @@ bool WindowFileDialog::DrawCallback()
     case FileDialogEnum::SAVE_AS:
         if (ImGui::Button("Save As"))
         {
-            file_name_ =
+            std::filesystem::path selected_path =
                 (std::strlen(file_buffer)) ? file_buffer : file_name_;
+            if (selected_path.is_relative()) selected_path = current_path / selected_path;
+            file_name_ = selected_path.string();
             get_file_(file_name_);
             end_ = true;
         }
