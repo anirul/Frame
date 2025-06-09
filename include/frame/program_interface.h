@@ -117,7 +117,6 @@ struct ProgramInterface : public Serialize<proto::Program>
      * @return True if present false otherwise.
      */
     virtual bool HasUniform(const std::string& name) const = 0;
-
 };
 
 } // End namespace frame.

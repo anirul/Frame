@@ -444,7 +444,6 @@ bool Program::HasUniform(const std::string& name) const
     return true;
 }
 
-
 std::string Program::GetTemporarySceneRoot() const
 {
     return temporary_scene_root_;
@@ -522,7 +521,9 @@ std::unique_ptr<ProgramInterface> CreateProgram(
     // enum identifiers from the proto so serialization keeps the same names.
     for (const auto& uniform : proto_program.uniforms())
     {
-        if (uniform.has_uniform_enum() && program->HasUniform(uniform.name()))
+        ProgramInterface* program_iface = program.get();
+        if (uniform.has_uniform_enum() &&
+            program_iface->HasUniform(uniform.name()))
         {
             std::unique_ptr<UniformInterface> uniform_interface =
                 std::make_unique<Uniform>(
