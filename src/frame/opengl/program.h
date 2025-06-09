@@ -164,8 +164,6 @@ class Program : public ProgramInterface
      * @return True if present false otherwise.
      */
     bool HasUniform(const std::string& name) const override;
-    bool HasUniformEnum(const std::string& name) const override;
-    proto::Uniform::UniformEnum GetUniformEnum(const std::string& name) const override;
 
   private:
     const Logger& logger_ = Logger::GetInstance();
@@ -179,7 +177,6 @@ class Program : public ProgramInterface
     EntityId scene_root_ = 0;
     std::vector<EntityId> input_texture_ids_ = {};
     std::vector<EntityId> output_texture_ids_ = {};
-    std::map<std::string, proto::Uniform::UniformEnum> name_uniform_enums_;
     std::string shader_name_;
     bool serialize_enable_ = false;
     mutable bool is_used_ = false;
