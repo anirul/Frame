@@ -122,14 +122,14 @@ void Program::AddUniformInternal(
     auto it = uniform_map_.find(name);
     if (it != uniform_map_.end())
     {
-        // Preserve the enum from the existing uniform if the new value does not
-        // specify one. This allows runtime updates to keep their original
-        // serialization identifier.
-        auto& old_data = it->second->GetData();
-        auto& new_data = uniform_interface->GetData();
-        if (new_data.uniform_enum() == proto::Uniform::INVALID_UNIFORM)
+        // Copy the existing enum before replacing the uniform to avoid any
+        // reference to destroyed data.
+        const proto::Uniform::UniformEnum old_enum =
+            it->second->GetData().uniform_enum();
+        if (uniform_interface->GetData().uniform_enum() ==
+            proto::Uniform::INVALID_UNIFORM)
         {
-            new_data.set_uniform_enum(old_data.uniform_enum());
+            uniform_interface->GetData().set_uniform_enum(old_enum);
         }
         uniform_map_[name] = std::move(uniform_interface);
     }
