@@ -122,15 +122,6 @@ void Program::AddUniformInternal(
     auto it = uniform_map_.find(name);
     if (it != uniform_map_.end())
     {
-        // Copy the existing enum before replacing the uniform to avoid any
-        // reference to destroyed data.
-        const proto::Uniform::UniformEnum old_enum =
-            it->second->GetData().uniform_enum();
-        if (uniform_interface->GetData().uniform_enum() ==
-            proto::Uniform::INVALID_UNIFORM)
-        {
-            uniform_interface->GetData().set_uniform_enum(old_enum);
-        }
         uniform_map_[name] = std::move(uniform_interface);
     }
     else
