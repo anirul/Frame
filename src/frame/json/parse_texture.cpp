@@ -41,6 +41,11 @@ std::unique_ptr<frame::TextureInterface> ParseTexture(
     }
     std::unique_ptr<TextureInterface> texture_interface =
         std::make_unique<opengl::Texture>(proto_texture, size);
+    // Preserve the original file name in case the texture was loaded from disk
+    if (proto_texture.has_file_name())
+    {
+        texture_interface->GetData().set_file_name(proto_texture.file_name());
+    }
     texture_interface->SetSerializeEnable(true);
     return texture_interface;
 }
@@ -55,6 +60,11 @@ std::unique_ptr<TextureInterface> ParseCubemap(
     }
     std::unique_ptr<TextureInterface> texture_interface =
         std::make_unique<opengl::Cubemap>(proto_texture, size);
+    if (proto_texture.has_file_names())
+    {
+        *texture_interface->GetData().mutable_file_names() =
+            proto_texture.file_names();
+    }
     texture_interface->SetSerializeEnable(true);
     return texture_interface;
 }
