@@ -41,6 +41,7 @@ std::unique_ptr<frame::TextureInterface> ParseTexture(
     }
     std::unique_ptr<TextureInterface> texture_interface =
         std::make_unique<opengl::Texture>(proto_texture, size);
+    texture_interface->SetSerializeEnable(true);
     return texture_interface;
 }
 
@@ -54,6 +55,7 @@ std::unique_ptr<TextureInterface> ParseCubemap(
     }
     std::unique_ptr<TextureInterface> texture_interface =
         std::make_unique<opengl::Cubemap>(proto_texture, size);
+    texture_interface->SetSerializeEnable(true);
     return texture_interface;
 }
 

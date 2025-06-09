@@ -291,7 +291,6 @@ void Cubemap::CreateCubemapFromFile(
         frame::file::FindFile(file_name),
         data_.pixel_element_size(),
         data_.pixel_structure());
-    data_.mutable_size()->CopyFrom(json::SerializeSize(image.GetSize()));
     CreateCubemapFromPointer(
         image.Data(),
         image.GetSize(),
@@ -323,7 +322,6 @@ void Cubemap::CreateCubemapFromFiles(
     cubemap_files.set_positive_z(frame::file::PurifyFilePath(paths[4]));
     cubemap_files.set_negative_z(frame::file::PurifyFilePath(paths[5]));
     data_.mutable_file_names()->CopyFrom(cubemap_files);
-    data_.mutable_size()->CopyFrom(json::SerializeSize(images[0]->GetSize()));
     CreateCubemapFromPointers(
         {images[0]->Data(),
          images[1]->Data(),
@@ -344,7 +342,6 @@ void Cubemap::CreateCubemapFromPointer(
 {
     data_.mutable_pixel_element_size()->CopyFrom(pixel_element_size);
     data_.mutable_pixel_structure()->CopyFrom(pixel_structure);
-    data_.mutable_size()->CopyFrom(json::SerializeSize(size));
     auto& logger = Logger::GetInstance();
     std::unique_ptr<TextureInterface> equirectangular =
         std::make_unique<Texture>(
@@ -411,9 +408,8 @@ void Cubemap::CreateCubemapFromPointer(
     texture_id_ = cubemap.GetId();
     cubemap.texture_id_ = 0;
     inner_size_ = cube_pair_res;
-    // Record the actual cubemap size in the proto so callers such as tests
-    // query the correct dimensions after the equirectangular conversion.
-    data_.mutable_size()->CopyFrom(json::SerializeSize(inner_size_));
+    // Keep the original size from the proto, inner_size_ stores the computed
+    // resolution for the GPU.
 }
 
 void Cubemap::CreateCubemapFromPointers(
@@ -424,7 +420,6 @@ void Cubemap::CreateCubemapFromPointers(
 {
     data_.mutable_pixel_element_size()->CopyFrom(pixel_element_size);
     data_.mutable_pixel_structure()->CopyFrom(pixel_structure);
-    data_.mutable_size()->CopyFrom(json::SerializeSize(size));
     inner_size_ = size;
     glGenTextures(1, &texture_id_);
     ScopedBind scoped_bind(*this);
