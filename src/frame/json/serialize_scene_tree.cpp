@@ -61,12 +61,12 @@ proto::NodeLight SerializeNodeLight(const NodeInterface& node_interface)
     proto_scene_light.set_name(node_light.GetData().name());
     proto_scene_light.set_parent(node_light.GetParentName());
     proto_scene_light.set_light_type(node_light.GetData().light_type());
-    *proto_scene_light.mutable_position() =
-        node_light.GetData().position();
-    *proto_scene_light.mutable_direction() =
-        node_light.GetData().direction();
-    proto_scene_light.set_dot_inner_limit(node_light.GetData().dot_inner_limit());
-    proto_scene_light.set_dot_outer_limit(node_light.GetData().dot_outer_limit());
+    *proto_scene_light.mutable_position() = node_light.GetData().position();
+    *proto_scene_light.mutable_direction() = node_light.GetData().direction();
+    proto_scene_light.set_dot_inner_limit(
+        node_light.GetData().dot_inner_limit());
+    proto_scene_light.set_dot_outer_limit(
+        node_light.GetData().dot_outer_limit());
     *proto_scene_light.mutable_color() = node_light.GetData().color();
     return proto_scene_light;
 }
@@ -78,9 +78,11 @@ proto::NodeMatrix SerializeNodeMatrix(const NodeInterface& node_interface)
         dynamic_cast<const NodeMatrix&>(node_interface);
     proto_scene_matrix.set_name(node_matrix.GetData().name());
     proto_scene_matrix.set_parent(node_matrix.GetParentName());
-    if (node_matrix.GetData().matrix_type_enum() == proto::NodeMatrix::ROTATION_MATRIX)
+    if (node_matrix.GetData().matrix_type_enum() ==
+        proto::NodeMatrix::ROTATION_MATRIX)
     {
-        *proto_scene_matrix.mutable_quaternion() = node_matrix.GetData().quaternion();
+        *proto_scene_matrix.mutable_quaternion() =
+            node_matrix.GetData().quaternion();
     }
     else
     {
@@ -107,9 +109,10 @@ void SerializeNodeStaticMeshEnum(
     }
     if (proto_node_static_mesh.mesh_enum() == proto::NodeStaticMesh::INVALID)
     {
-        throw std::runtime_error(std::format(
-            "Couldn't find any mesh for this node: [{}].",
-            node_static_mesh.GetData().name()));
+        throw std::runtime_error(
+            std::format(
+                "Couldn't find any mesh for this node: [{}].",
+                node_static_mesh.GetData().name()));
     }
     proto_node_static_mesh.set_material_name(
         node_static_mesh.GetData().material_name());
@@ -154,45 +157,39 @@ proto::NodeStaticMesh SerializeNodeStaticMesh(
         dynamic_cast<const NodeStaticMesh&>(node_interface);
     proto_node_static_mesh.set_name(node_static_mesh.GetData().name());
     proto_node_static_mesh.set_parent(node_static_mesh.GetParentName());
-    std::string mesh_name =
-        level_interface.GetStaticMeshFromId(node_static_mesh.GetLocalMesh())
-            .GetData()
-            .file_name();
-    const google::protobuf::EnumDescriptor* enum_descriptor =
-        proto::NodeStaticMesh::RenderTimeEnum_descriptor();
-    for (int i = 0; i < enum_descriptor->value_count(); ++i)
+
+    // Determine which representation of the mesh we should serialize.
+    if (node_static_mesh.GetLocalMesh() == NullId)
     {
-        const google::protobuf::EnumValueDescriptor* enum_value =
-            enum_descriptor->value(i);
-        proto::NodeStaticMesh::RenderTimeEnum render_time_enum =
-            static_cast<proto::NodeStaticMesh::RenderTimeEnum>(
-                enum_descriptor->value(i)->number());
-        // Check if this is a clean buffer.
-        if (node_static_mesh.GetLocalMesh() == NullId)
-        {
-            *proto_node_static_mesh.mutable_clean_buffer() = node_static_mesh.GetData().clean_buffer();
-            proto_node_static_mesh.set_render_time_enum(render_time_enum);
-        }
-        // Now check for a mesh enum version.
-        if (node_static_mesh.GetLocalMesh() ==
-                level_interface.GetDefaultStaticMeshCubeId() ||
-            node_static_mesh.GetLocalMesh() ==
-                level_interface.GetDefaultStaticMeshQuadId())
-        {
-            SerializeNodeStaticMeshEnum(
-                proto_node_static_mesh, node_static_mesh, level_interface);
-        }
-        // This case is the file_name version.
-        if (!mesh_name.empty())
-        {
-            SerializeNodeStaticMeshFileName(
-                proto_node_static_mesh,
-                mesh_name,
-                node_static_mesh,
-                level_interface);
-        }
-        // TODO(anirul): handle the plugin case?
+        *proto_node_static_mesh.mutable_clean_buffer() =
+            node_static_mesh.GetData().clean_buffer();
     }
+    else if (
+        node_static_mesh.GetLocalMesh() ==
+            level_interface.GetDefaultStaticMeshCubeId() ||
+        node_static_mesh.GetLocalMesh() ==
+            level_interface.GetDefaultStaticMeshQuadId())
+    {
+        SerializeNodeStaticMeshEnum(
+            proto_node_static_mesh, node_static_mesh, level_interface);
+    }
+    else
+    {
+        std::string mesh_name =
+            level_interface.GetStaticMeshFromId(node_static_mesh.GetLocalMesh())
+                .GetData()
+                .file_name();
+        SerializeNodeStaticMeshFileName(
+            proto_node_static_mesh,
+            mesh_name,
+            node_static_mesh,
+            level_interface);
+    }
+
+    proto_node_static_mesh.set_material_name(
+        node_static_mesh.GetData().material_name());
+    proto_node_static_mesh.set_render_time_enum(
+        node_static_mesh.GetData().render_time_enum());
     return proto_node_static_mesh;
 }
 
@@ -217,15 +214,16 @@ void SerializeNode(
             SerializeNodeMatrix(node_interface);
         break;
     case NodeTypeEnum::NODE_STATIC_MESH:
-        *proto_scene_tree.add_node_static_meshes() = SerializeNodeStaticMesh(
-            node_interface, level_interface);
+        *proto_scene_tree.add_node_static_meshes() =
+            SerializeNodeStaticMesh(node_interface, level_interface);
         break;
     case NodeTypeEnum::NODE_UKNOWN:
         [[fallthrough]];
     default:
-        throw std::runtime_error(std::format(
-            "Unknown node type [{}]?",
-            static_cast<int>(node_interface.GetNodeType())));
+        throw std::runtime_error(
+            std::format(
+                "Unknown node type [{}]?",
+                static_cast<int>(node_interface.GetNodeType())));
     }
     for (const auto id : level_interface.GetChildList(id))
     {
