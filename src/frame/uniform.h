@@ -49,6 +49,24 @@ class Uniform : public UniformInterface
      * @param uniform_interface: The uniform interface to copy.
      */
     Uniform(const UniformInterface& uniform_interface);
+
+    /**
+     * @brief Get the enum stored in this uniform.
+     * @return The uniform enum value.
+     */
+    proto::Uniform::UniformEnum GetUniformEnum() const
+    {
+        return data_.uniform_enum();
+    }
+
+    /**
+     * @brief Set the enum stored in this uniform.
+     * @param uniform_enum: The uniform enum value.
+     */
+    void SetUniformEnum(proto::Uniform::UniformEnum uniform_enum)
+    {
+        data_.set_uniform_enum(uniform_enum);
+    }
 };
 
 } // End of namespace frame.

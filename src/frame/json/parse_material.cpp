@@ -16,13 +16,15 @@ std::unique_ptr<frame::MaterialInterface> ParseMaterialOpenGL(
     const std::size_t inner_size = proto_material.inner_names_size();
     if (texture_size != inner_size)
     {
-        throw std::runtime_error(fmt::format(
-            "Not the same size for texture and inner names: {} != {}.",
-            texture_size,
-            inner_size));
+        throw std::runtime_error(
+            fmt::format(
+                "Not the same size for texture and inner names: {} != {}.",
+                texture_size,
+                inner_size));
     }
     auto material = std::make_unique<frame::opengl::Material>();
     material->SetName(proto_material.name());
+    material->SetSerializeEnable(true);
     if (proto_material.program_name().empty())
     {
         throw std::runtime_error(

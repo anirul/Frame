@@ -120,13 +120,13 @@ void Program::AddUniformInternal(
         return;
     }
     auto it = uniform_map_.find(name);
-    if (it == uniform_map_.end())
+    if (it != uniform_map_.end())
     {
-        uniform_map_.emplace(name, std::move(uniform_interface));
+        uniform_map_[name] = std::move(uniform_interface);
     }
     else
     {
-        uniform_map_[name] = std::move(uniform_interface);
+        uniform_map_.emplace(name, std::move(uniform_interface));
     }
     auto* uniform_ptr = uniform_map_[name].get();
     switch (uniform_ptr->GetData().type())
@@ -505,17 +505,23 @@ std::unique_ptr<ProgramInterface> CreateProgram(
     program->AddShader(vertex);
     program->AddShader(fragment);
     // Need to add the uniform enum list for serialization.
+    program->LinkShader();
+    // After linking, the program knows about all active uniforms. Preserve the
+    // enum identifiers from the proto so serialization keeps the same names.
     for (const auto& uniform : proto_program.uniforms())
     {
-        if (uniform.has_uniform_enum())
+        ProgramInterface* program_iface = program.get();
+        if (uniform.has_uniform_enum() &&
+            program_iface->HasUniform(uniform.name()))
         {
             std::unique_ptr<UniformInterface> uniform_interface =
                 std::make_unique<Uniform>(
                     uniform.name(), uniform.uniform_enum());
+            // Bypass the check because the uniform exists but may not be
+            // currently active due to the INVALID_TYPE placeholder.
             program->AddUniform(std::move(uniform_interface));
         }
     }
-    program->LinkShader();
     program->GetData().set_shader(proto_program.shader());
 #ifdef _DEBUG
     logger->info("with pointer := {}", static_cast<void*>(program.get()));

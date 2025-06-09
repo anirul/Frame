@@ -177,9 +177,7 @@ class Program : public ProgramInterface
     EntityId scene_root_ = 0;
     std::vector<EntityId> input_texture_ids_ = {};
     std::vector<EntityId> output_texture_ids_ = {};
-    std::map<std::string, proto::Uniform::UniformEnum> name_uniform_enums_;
     std::string shader_name_;
-    bool serialize_enable_ = false;
     mutable bool is_used_ = false;
 };
 

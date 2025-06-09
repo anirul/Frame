@@ -22,8 +22,10 @@ std::string GetMaterialNameFromProgramName(
             return material.name();
         }
     }
-    throw std::runtime_error(std::format(
-        "Couldn't find material name from program name: [{}]?", program_name));
+    throw std::runtime_error(
+        std::format(
+            "Couldn't find material name from program name: [{}]?",
+            program_name));
 }
 
 } // End anonymous namespace.
@@ -41,6 +43,10 @@ proto::Level SerializeLevel(const LevelInterface& level_interface)
     {
         TextureInterface& texture_interface =
             level_interface.GetTextureFromId(texture_id);
+        if (!texture_interface.SerializeEnable())
+        {
+            continue;
+        }
         proto::Texture proto_texture = SerializeTexture(texture_interface);
         *proto_level.add_textures() = proto_texture;
     }
@@ -48,6 +54,10 @@ proto::Level SerializeLevel(const LevelInterface& level_interface)
     {
         MaterialInterface& material_interface =
             level_interface.GetMaterialFromId(material_id);
+        if (!material_interface.SerializeEnable())
+        {
+            continue;
+        }
         proto::Material proto_material =
             SerializeMaterial(material_interface, level_interface);
         *proto_level.add_materials() = proto_material;

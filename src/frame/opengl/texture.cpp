@@ -136,8 +136,6 @@ void Texture::CreateTextureFromPointer(
     {
         inner_size_ = size;
     }
-    // Store the actual texture size in the proto for later retrieval.
-    data_.mutable_size()->CopyFrom(json::SerializeSize(inner_size_));
     glGenTextures(1, &texture_id_);
     ScopedBind scoped_bind(*this);
     proto::TextureFilter texture_filter;
@@ -184,7 +182,6 @@ void Texture::CreateDepthTexture(
         proto::PixelElementSize_FLOAT()*/)
 {
     inner_size_ = size;
-    data_.mutable_size()->CopyFrom(json::SerializeSize(size));
     glGenTextures(1, &texture_id_);
     ScopedBind scoped_bind(*this);
     proto::TextureFilter texture_filter;
@@ -456,7 +453,6 @@ void Texture::Update(
     std::uint8_t bytes_per_pixel)
 {
     ScopedBind scoped_bind(*this);
-    data_.mutable_size()->CopyFrom(json::SerializeSize(size));
     assert(data_.pixel_element_size().value() == 1);
     auto format = opengl::ConvertToGLType(data_.pixel_structure());
     auto type = opengl::ConvertToGLType(data_.pixel_element_size());

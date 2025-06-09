@@ -97,7 +97,6 @@ void RegisterUniformFromProto(
 void RegisterUniformEnumFromProto(
     const std::string& name,
     const frame::proto::Uniform::UniformEnum& uniform_enum,
-    const UniformCollectionInterface& uniform_interface,
     ProgramInterface& program_interface);
 
 } // namespace frame::json.
