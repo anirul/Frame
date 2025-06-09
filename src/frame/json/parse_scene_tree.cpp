@@ -163,6 +163,17 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
             proto_scene_static_mesh.render_primitive_enum());
         auto str = fmt::format("{}.{}", proto_scene_static_mesh.name(), i);
         mesh.SetName(str);
+        // Rename the node to match the reference name (without the 'Node.'
+        // prefix) so serialization will use the same identifier as the input
+        // file.
+        if (vec_node_mesh_id.size() == 1)
+        {
+            node.SetName(proto_scene_static_mesh.name());
+        }
+        else
+        {
+            node.SetName(str);
+        }
         node.SetParentName(proto_scene_static_mesh.parent());
         auto& static_mesh_node = dynamic_cast<NodeStaticMesh&>(node);
         static_mesh_node.GetData().set_material_name(

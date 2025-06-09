@@ -164,6 +164,8 @@ class Program : public ProgramInterface
      * @return True if present false otherwise.
      */
     bool HasUniform(const std::string& name) const override;
+    bool HasUniformEnum(const std::string& name) const override;
+    proto::Uniform::UniformEnum GetUniformEnum(const std::string& name) const override;
 
   private:
     const Logger& logger_ = Logger::GetInstance();

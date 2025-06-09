@@ -117,6 +117,21 @@ struct ProgramInterface : public Serialize<proto::Program>
      * @return True if present false otherwise.
      */
     virtual bool HasUniform(const std::string& name) const = 0;
+
+    /**
+     * @brief Check if the program stores an enum for the given uniform.
+     * @param name Name of the uniform.
+     * @return True if an enum value is recorded.
+     */
+    virtual bool HasUniformEnum(const std::string& name) const = 0;
+
+    /**
+     * @brief Get the enum associated with a uniform.
+     * @param name Name of the uniform.
+     * @return The enum value or INVALID_UNIFORM if not found.
+     */
+    virtual proto::Uniform::UniformEnum GetUniformEnum(
+        const std::string& name) const = 0;
 };
 
 } // End namespace frame.

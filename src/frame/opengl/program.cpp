@@ -129,6 +129,13 @@ void Program::AddUniformInternal(
         uniform_map_[name] = std::move(uniform_interface);
     }
     auto* uniform_ptr = uniform_map_[name].get();
+    if (
+        uniform_ptr->GetData().type() == proto::Uniform::INVALID_TYPE &&
+        uniform_ptr->GetData().uniform_enum() !=
+            proto::Uniform::INVALID_UNIFORM)
+    {
+        name_uniform_enums_[name] = uniform_ptr->GetData().uniform_enum();
+    }
     switch (uniform_ptr->GetData().type())
     {
     case proto::Uniform::INVALID_TYPE:
@@ -208,6 +215,7 @@ void Program::RemoveUniform(const std::string& name)
     {
         uniform_map_.erase(it);
     }
+    name_uniform_enums_.erase(name);
 }
 
 int Program::GetMemoizeUniformLocation(const std::string& name) const
@@ -431,6 +439,22 @@ bool Program::HasUniform(const std::string& name) const
             uniform_list.begin(), uniform_list.end(), name + "[0]");
     }
     return true;
+}
+
+bool Program::HasUniformEnum(const std::string& name) const
+{
+    return name_uniform_enums_.count(name) > 0;
+}
+
+proto::Uniform::UniformEnum Program::GetUniformEnum(
+    const std::string& name) const
+{
+    auto it = name_uniform_enums_.find(name);
+    if (it == name_uniform_enums_.end())
+    {
+        return proto::Uniform::INVALID_UNIFORM;
+    }
+    return it->second;
 }
 
 std::string Program::GetTemporarySceneRoot() const

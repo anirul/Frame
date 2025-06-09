@@ -59,8 +59,18 @@ proto::Program SerializeProgram(
     *proto_program.mutable_input_scene_type() = proto_scene_type;
     for (const auto& uniform_name : program_interface.GetUniformNameList())
     {
-        proto::Uniform proto_uniform = SerializeUniform(
-            program_interface.GetUniform(uniform_name), level_interface);
+        proto::Uniform proto_uniform;
+        if (program_interface.HasUniformEnum(uniform_name))
+        {
+            proto_uniform.set_name(uniform_name);
+            proto_uniform.set_uniform_enum(
+                program_interface.GetUniformEnum(uniform_name));
+        }
+        else
+        {
+            proto_uniform = SerializeUniform(
+                program_interface.GetUniform(uniform_name), level_interface);
+        }
         // Could return an empty name in case it was found in the materials.
         if (!proto_uniform.name().empty())
         {
