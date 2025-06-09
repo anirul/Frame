@@ -70,11 +70,13 @@ Renderer::Renderer(LevelInterface& level, glm::uvec4 viewport)
         throw std::runtime_error("No program!");
     auto material = std::make_unique<Material>();
     program->SetName("DisplayProgram");
+    program->SetSerializeEnable(false);
     auto maybe_display_program_id = level_.AddProgram(std::move(program));
     if (!maybe_display_program_id)
         throw std::runtime_error("No display program id.");
     display_program_id_ = maybe_display_program_id;
     material->SetName("DisplayMaterial");
+    material->SetSerializeEnable(false);
     auto maybe_display_material_id = level_.AddMaterial(std::move(material));
     if (!maybe_display_material_id)
         throw std::runtime_error("No display material id.");

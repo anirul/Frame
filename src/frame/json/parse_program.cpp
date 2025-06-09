@@ -100,6 +100,7 @@ std::unique_ptr<frame::ProgramInterface> ParseProgramOpenGL(
             std::unique_ptr<UniformInterface> uniform_interface =
                 std::make_unique<frame::Uniform>(
                     parameter.name(), glm_size, int_list);
+            program->AddUniform(std::move(uniform_interface));
             break;
         }
         case proto::Uniform::kUniformFloat: {
@@ -119,6 +120,7 @@ std::unique_ptr<frame::ProgramInterface> ParseProgramOpenGL(
             std::unique_ptr<UniformInterface> uniform_interface =
                 std::make_unique<frame::Uniform>(
                     parameter.name(), glm_size, float_list);
+            program->AddUniform(std::move(uniform_interface));
             break;
         }
         case proto::Uniform::kUniformVec2: {
