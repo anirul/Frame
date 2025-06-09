@@ -209,9 +209,33 @@ bool SDLOpenGLWindow::RunEvent(const SDL_Event& event, const double dt)
     }
     if (event.type == SDL_EVENT_KEY_DOWN)
     {
-        if (key_callbacks_.count(event.key.key))
+        switch (event.key.key)
         {
-            return key_callbacks_[event.key.key]();
+        case SDLK_F11:
+            if (has_window_plugin)
+            {
+                for (PluginInterface* plugin : device_->GetPluginPtrs())
+                {
+                    auto* window_plugin =
+                        dynamic_cast<frame::gui::DrawGuiInterface*>(plugin);
+                    if (window_plugin)
+                    {
+                        auto is_visible = window_plugin->IsVisible();
+                        window_plugin->SetVisible(!is_visible);
+                    }
+                }
+                return true;
+            }
+            break;
+        case SDLK_PRINTSCREEN:
+            device_->ScreenShot("ScreenShot.png");
+            return true;
+        default:
+            if (key_callbacks_.count(event.key.key))
+            {
+                return key_callbacks_[event.key.key]();
+            }
+            break;
         }
     }
     if (input_interface_)

@@ -79,6 +79,9 @@ void Menubar::MenuView()
     {
         if (ImGui::MenuItem("Fullscreen", "F11"))
         {
+            auto& draw_gui = menubar_view_.GetDrawGui();
+            auto is_visible = draw_gui.IsVisible();
+            draw_gui.SetVisible(!is_visible);
         }
         ImGui::Separator();
         if (ImGui::MenuItem("Show Resolution", "Ctrl+R", &show_resolution_))

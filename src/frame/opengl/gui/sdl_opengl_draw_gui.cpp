@@ -94,8 +94,8 @@ bool SDLOpenGLDrawGui::Update(DeviceInterface& device, double dt)
     if (!is_visible_)
     {
         ImGuiViewport* viewport = ImGui::GetMainViewport();
-        ImGui::SetNextWindowPos(viewport->WorkPos);
-        ImGui::SetNextWindowSize(viewport->WorkSize);
+        ImGui::SetNextWindowPos(viewport->Pos);
+        ImGui::SetNextWindowSize(viewport->Size);
         ImGui::SetNextWindowViewport(viewport->ID);
     }
     else
@@ -112,7 +112,7 @@ bool SDLOpenGLDrawGui::Update(DeviceInterface& device, double dt)
         }
     }
 
-    if (menubar_callback_)
+    if (menubar_callback_ && is_visible_)
     {
         if (ImGui::BeginMainMenuBar())
         {
