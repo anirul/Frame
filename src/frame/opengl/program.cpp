@@ -120,13 +120,24 @@ void Program::AddUniformInternal(
         return;
     }
     auto it = uniform_map_.find(name);
-    if (it == uniform_map_.end())
+    if (it != uniform_map_.end())
     {
-        uniform_map_.emplace(name, std::move(uniform_interface));
+        // Preserve the enum from the existing uniform if the new value does not
+        // specify one. This allows runtime updates to keep their original
+        // serialization identifier.
+        auto* old_uniform_ptr = it->second.get();
+        auto* new_uniform_ptr = dynamic_cast<Uniform*>(uniform_interface.get());
+        if (new_uniform_ptr &&
+            new_uniform_ptr->GetUniformEnum() ==
+                proto::Uniform::INVALID_UNIFORM)
+        {
+            new_uniform_ptr->SetUniformEnum(old_uniform_ptr->GetData().uniform_enum());
+        }
+        uniform_map_[name] = std::move(uniform_interface);
     }
     else
     {
-        uniform_map_[name] = std::move(uniform_interface);
+        uniform_map_.emplace(name, std::move(uniform_interface));
     }
     auto* uniform_ptr = uniform_map_[name].get();
     switch (uniform_ptr->GetData().type())
