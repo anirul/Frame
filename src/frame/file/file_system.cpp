@@ -22,6 +22,13 @@ const std::filesystem::path FindElement(
     auto normalized_input = std::filesystem::absolute(file).lexically_normal();
     if (test(normalized_input))
     {
+        // If the user passed an absolute path, honor it even if it contains
+        // one of the avoided directory names (like "build").  The avoidance
+        // logic is primarily meant for relative asset paths searched from the
+        // source tree, not for explicitly selected absolute files.
+        if (file.is_absolute())
+            return normalized_input;
+
         bool found = false;
         for (const auto& element : avoid_elements)
         {
