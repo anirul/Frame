@@ -62,16 +62,14 @@ proto::Program SerializeProgram(
         const auto& uniform = program_interface.GetUniform(uniform_name);
         const auto& data = uniform.GetData();
         proto::Uniform proto_uniform;
-        if (data.type() == proto::Uniform::INVALID_TYPE &&
-            data.uniform_enum() != proto::Uniform::INVALID_UNIFORM)
+        if (data.uniform_enum() != proto::Uniform::INVALID_UNIFORM)
         {
             proto_uniform.set_name(uniform_name);
             proto_uniform.set_uniform_enum(data.uniform_enum());
         }
         else
         {
-            proto_uniform =
-                SerializeUniform(uniform, level_interface);
+            proto_uniform = SerializeUniform(uniform, level_interface);
         }
         if (!proto_uniform.name().empty())
         {
