@@ -164,6 +164,17 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
         auto str = fmt::format("{}.{}", proto_scene_static_mesh.name(), i);
         mesh.SetName(str);
         node.SetParentName(proto_scene_static_mesh.parent());
+        auto& static_mesh_node = dynamic_cast<NodeStaticMesh&>(node);
+        static_mesh_node.GetData().set_material_name(
+            proto_scene_static_mesh.material_name());
+        static_mesh_node.GetData().set_render_time_enum(
+            proto_scene_static_mesh.render_time_enum());
+        auto material_id =
+            level.GetIdFromName(proto_scene_static_mesh.material_name());
+        level.AddMeshMaterialId(
+            node_mesh_id,
+            material_id,
+            proto_scene_static_mesh.render_time_enum());
         ++i;
     }
     return true;
