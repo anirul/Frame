@@ -76,10 +76,7 @@ void Program::Use(
     {
         if (HasUniform(name))
         {
-            std::unique_ptr<UniformInterface> uniform_interface =
-                std::make_unique<Uniform>(
-                    uniform_collection_interface.GetUniform(name));
-            AddUniform(std::move(uniform_interface));
+            UploadUniform(uniform_collection_interface.GetUniform(name));
         }
     }
 }
@@ -197,6 +194,75 @@ void Program::AddUniformInternal(
                 "Unknown uniform type [{}] for uniform [{}].",
                 static_cast<int>(uniform_ptr->GetData().type()),
                 name));
+        break;
+    }
+}
+
+void Program::UploadUniform(const UniformInterface& uniform_interface) const
+{
+    const std::string& name = uniform_interface.GetName();
+    const auto& data = uniform_interface.GetData();
+    switch (data.type())
+    {
+    case proto::Uniform::INVALID_TYPE:
+        break;
+    case proto::Uniform::INT:
+        glUniform1i(GetMemoizeUniformLocation(name), data.uniform_int());
+        break;
+    case proto::Uniform::INTS: {
+        auto& uniform_ints = data.uniform_ints();
+        glUniform1iv(
+            GetMemoizeUniformLocation(name),
+            static_cast<GLsizei>(
+                uniform_ints.size().x() * uniform_ints.size().y()),
+            uniform_ints.values().data());
+        break;
+    }
+    case proto::Uniform::FLOAT:
+        glUniform1f(
+            GetMemoizeUniformLocation(name), data.uniform_float());
+        break;
+    case proto::Uniform::FLOATS: {
+        auto& uniform_floats = data.uniform_floats();
+        glUniform1fv(
+            GetMemoizeUniformLocation(name),
+            static_cast<GLsizei>(
+                uniform_floats.size().x() * uniform_floats.size().y()),
+            uniform_floats.values().data());
+        break;
+    }
+    case proto::Uniform::FLOAT_VECTOR2: {
+        glm::vec2 value = json::ParseUniform(data.uniform_vec2());
+        glUniform2f(GetMemoizeUniformLocation(name), value.x, value.y);
+        break;
+    }
+    case proto::Uniform::FLOAT_VECTOR3: {
+        glm::vec3 value = json::ParseUniform(data.uniform_vec3());
+        glUniform3f(
+            GetMemoizeUniformLocation(name), value.x, value.y, value.z);
+        break;
+    }
+    case proto::Uniform::FLOAT_VECTOR4: {
+        glm::vec4 value = json::ParseUniform(data.uniform_vec4());
+        glUniform4f(
+            GetMemoizeUniformLocation(name),
+            value.x,
+            value.y,
+            value.z,
+            value.w);
+        break;
+    }
+    case proto::Uniform::FLOAT_MATRIX4: {
+        glm::mat4 value = json::ParseUniform(data.uniform_mat4());
+        glUniformMatrix4fv(
+            GetMemoizeUniformLocation(name), 1, GL_FALSE, &value[0][0]);
+        break;
+    }
+    default:
+        logger_->error(std::format(
+            "Unknown uniform type [{}] for uniform [{}].",
+            static_cast<int>(data.type()),
+            name));
         break;
     }
 }

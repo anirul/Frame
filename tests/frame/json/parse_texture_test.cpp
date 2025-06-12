@@ -41,8 +41,9 @@ TEST_F(ParseTextureTest, CreateTextureFromProtoCheckSizeTest)
     texture_ = std::move(maybe_texture.value());
     EXPECT_TRUE(texture_);
     glm::uvec2 test_size = {256, 256};
-    auto texture_size = frame::json::ParseSize(texture_->GetData().size());
-    EXPECT_EQ(test_size, texture_size);
+    EXPECT_EQ(test_size, texture_->GetSize());
+    EXPECT_EQ(-2, texture_->GetData().size().x());
+    EXPECT_EQ(-2, texture_->GetData().size().y());
 }
 
 TEST_F(ParseTextureTest, CreateTextureFromProtoWrongSizeTest)

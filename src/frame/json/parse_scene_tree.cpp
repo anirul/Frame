@@ -91,8 +91,13 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
     {
         throw std::runtime_error("No scene Id.");
     }
+    auto scene_id = maybe_scene_id;
+    auto& node =
+        dynamic_cast<NodeStaticMesh&>(level.GetSceneNodeFromId(scene_id));
+    node.GetData().set_render_time_enum(
+        proto_scene_static_mesh.render_time_enum());
     level.AddMeshMaterialId(
-        maybe_scene_id, 0, proto_scene_static_mesh.render_time_enum());
+        scene_id, 0, proto_scene_static_mesh.render_time_enum());
     return true;
 }
 
@@ -133,10 +138,13 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
     node_interface->SetParentName(proto_scene_static_mesh.parent());
     node_interface->GetData().set_material_name(
         proto_scene_static_mesh.material_name());
-    level.AddMeshMaterialId(
-        level.AddSceneNode(std::move(node_interface)),
-        material_id,
+    auto scene_id = level.AddSceneNode(std::move(node_interface));
+    auto& node =
+        dynamic_cast<NodeStaticMesh&>(level.GetSceneNodeFromId(scene_id));
+    node.GetData().set_render_time_enum(
         proto_scene_static_mesh.render_time_enum());
+    level.AddMeshMaterialId(
+        scene_id, material_id, proto_scene_static_mesh.render_time_enum());
     return true;
 }
 
@@ -164,6 +172,8 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
         auto str = fmt::format("{}.{}", proto_scene_static_mesh.name(), i);
         mesh.SetName(str);
         auto& static_mesh_node = dynamic_cast<NodeStaticMesh&>(node);
+        static_mesh_node.GetData().set_file_name(
+            proto_scene_static_mesh.file_name());
         // Rename the node to match the reference name (without the 'Node.'
         // prefix) so serialization will use the same identifier as the input
         // file.
@@ -239,6 +249,10 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
     node_interface->GetData().set_material_name(
         proto_scene_static_mesh.material_name());
     auto scene_id = level.AddSceneNode(std::move(node_interface));
+    auto& node =
+        dynamic_cast<NodeStaticMesh&>(level.GetSceneNodeFromId(scene_id));
+    node.GetData().set_render_time_enum(
+        proto_scene_static_mesh.render_time_enum());
     level.AddMeshMaterialId(
         scene_id, material_id, proto_scene_static_mesh.render_time_enum());
     if (!scene_id)

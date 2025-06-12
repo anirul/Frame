@@ -1,10 +1,12 @@
 #include "frame/json/serialize_scene_tree.h"
+#include "frame/entity_id.h"
 #include "frame/json/serialize_uniform.h"
 #include "frame/node_camera.h"
 #include "frame/node_light.h"
 #include "frame/node_matrix.h"
 #include "frame/node_static_mesh.h"
 #include <absl/strings/str_split.h>
+#include <unordered_set>
 
 namespace frame::json
 {
@@ -78,8 +80,11 @@ proto::NodeMatrix SerializeNodeMatrix(const NodeInterface& node_interface)
         dynamic_cast<const NodeMatrix&>(node_interface);
     proto_scene_matrix.set_name(node_matrix.GetData().name());
     proto_scene_matrix.set_parent(node_matrix.GetParentName());
+    proto_scene_matrix.set_matrix_type_enum(
+        node_matrix.GetData().matrix_type_enum());
     if (node_matrix.GetData().matrix_type_enum() ==
-        proto::NodeMatrix::ROTATION_MATRIX)
+            proto::NodeMatrix::ROTATION_MATRIX &&
+        node_matrix.GetData().has_quaternion())
     {
         *proto_scene_matrix.mutable_quaternion() =
             node_matrix.GetData().quaternion();
@@ -127,8 +132,6 @@ void SerializeNodeStaticMeshFileName(
     const LevelInterface& level_interface)
 {
     proto_node_static_mesh.set_file_name(mesh_name);
-    auto mesh_ids_material_ids = level_interface.GetStaticMeshMaterialIds(
-        node_static_mesh.GetData().render_time_enum());
     proto_node_static_mesh.set_material_name(
         node_static_mesh.GetData().material_name());
     proto_node_static_mesh.set_render_time_enum(
@@ -175,10 +178,19 @@ proto::NodeStaticMesh SerializeNodeStaticMesh(
     }
     else
     {
-        std::string mesh_name =
-            level_interface.GetStaticMeshFromId(node_static_mesh.GetLocalMesh())
-                .GetData()
-                .file_name();
+        std::string mesh_name;
+        if (node_static_mesh.GetData().has_file_name())
+        {
+            mesh_name = node_static_mesh.GetData().file_name();
+        }
+        else
+        {
+            mesh_name =
+                level_interface
+                    .GetStaticMeshFromId(node_static_mesh.GetLocalMesh())
+                    .GetData()
+                    .file_name();
+        }
         SerializeNodeStaticMeshFileName(
             proto_node_static_mesh,
             mesh_name,
@@ -196,8 +208,13 @@ proto::NodeStaticMesh SerializeNodeStaticMesh(
 void SerializeNode(
     proto::SceneTree& proto_scene_tree,
     EntityId id,
-    const LevelInterface& level_interface)
+    const LevelInterface& level_interface,
+    std::unordered_set<EntityId>& visited)
 {
+    if (visited.contains(id))
+        return;
+    visited.insert(id);
+
     NodeInterface& node_interface = level_interface.GetSceneNodeFromId(id);
     switch (node_interface.GetNodeType())
     {
@@ -225,9 +242,9 @@ void SerializeNode(
                 "Unknown node type [{}]?",
                 static_cast<int>(node_interface.GetNodeType())));
     }
-    for (const auto id : level_interface.GetChildList(id))
+    for (const auto child_id : level_interface.GetChildList(id))
     {
-        SerializeNode(proto_scene_tree, id, level_interface);
+        SerializeNode(proto_scene_tree, child_id, level_interface, visited);
     }
 }
 
@@ -240,10 +257,22 @@ proto::SceneTree SerializeSceneTree(const LevelInterface& level_interface)
         level_interface.GetNameFromId(level_interface.GetDefaultCameraId()));
     proto_scene_tree.set_default_root_name(level_interface.GetNameFromId(
         level_interface.GetDefaultRootSceneNodeId()));
+    std::unordered_set<EntityId> visited;
     SerializeNode(
         proto_scene_tree,
         level_interface.GetDefaultRootSceneNodeId(),
-        level_interface);
+        level_interface,
+        visited);
+    // Serialize nodes that do not have a parent (independent roots).
+    for (const auto node_id : level_interface.GetSceneNodes())
+    {
+        if (node_id == level_interface.GetDefaultRootSceneNodeId())
+            continue;
+        if (level_interface.GetParentId(node_id) == NullId)
+        {
+            SerializeNode(proto_scene_tree, node_id, level_interface, visited);
+        }
+    }
     return proto_scene_tree;
 }
 
