@@ -123,6 +123,14 @@ class Program : public ProgramInterface
     void AddUniformInternal(
         std::unique_ptr<UniformInterface>&& uniform, bool bypass_check);
 
+    /**
+     * @brief Upload a uniform to the currently bound program without
+     *        modifying the internal uniform map. Used when feeding values from
+     *        a uniform collection so serialization keeps the original enum
+     *        information.
+     */
+    void UploadUniform(const UniformInterface& uniform) const;
+
   protected:
     /**
      * @brief Get the memoize version of the uniform (stored locally).
