@@ -34,6 +34,7 @@ target_link_libraries(FrameJsonTest
   PUBLIC
   Frame
   FrameFile
+  FrameJson
   FrameProto
   GTest::gmock
   GTest::gtest
