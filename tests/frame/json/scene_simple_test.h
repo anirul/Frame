@@ -4,6 +4,7 @@
 
 #include "frame/file/file_system.h"
 #include "frame/json/parse_json.h"
+#include "frame/json/parse_level.h"
 #include "frame/level_interface.h"
 #include "frame/window_factory.h"
 
