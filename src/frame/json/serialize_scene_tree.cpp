@@ -81,7 +81,8 @@ proto::NodeMatrix SerializeNodeMatrix(const NodeInterface& node_interface)
     proto_scene_matrix.set_name(node_matrix.GetData().name());
     proto_scene_matrix.set_parent(node_matrix.GetParentName());
     if (node_matrix.GetData().matrix_type_enum() ==
-        proto::NodeMatrix::ROTATION_MATRIX)
+            proto::NodeMatrix::ROTATION_MATRIX &&
+        node_matrix.GetData().has_quaternion())
     {
         *proto_scene_matrix.mutable_quaternion() =
             node_matrix.GetData().quaternion();
