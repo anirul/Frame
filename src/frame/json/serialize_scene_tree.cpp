@@ -128,8 +128,6 @@ void SerializeNodeStaticMeshFileName(
     const LevelInterface& level_interface)
 {
     proto_node_static_mesh.set_file_name(mesh_name);
-    auto mesh_ids_material_ids = level_interface.GetStaticMeshMaterialIds(
-        node_static_mesh.GetData().render_time_enum());
     proto_node_static_mesh.set_material_name(
         node_static_mesh.GetData().material_name());
     proto_node_static_mesh.set_render_time_enum(
@@ -176,10 +174,19 @@ proto::NodeStaticMesh SerializeNodeStaticMesh(
     }
     else
     {
-        std::string mesh_name =
-            level_interface.GetStaticMeshFromId(node_static_mesh.GetLocalMesh())
-                .GetData()
-                .file_name();
+        std::string mesh_name;
+        if (node_static_mesh.GetData().has_file_name())
+        {
+            mesh_name = node_static_mesh.GetData().file_name();
+        }
+        else
+        {
+            mesh_name =
+                level_interface
+                    .GetStaticMeshFromId(node_static_mesh.GetLocalMesh())
+                    .GetData()
+                    .file_name();
+        }
         SerializeNodeStaticMeshFileName(
             proto_node_static_mesh,
             mesh_name,

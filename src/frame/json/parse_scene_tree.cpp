@@ -172,6 +172,8 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
         auto str = fmt::format("{}.{}", proto_scene_static_mesh.name(), i);
         mesh.SetName(str);
         auto& static_mesh_node = dynamic_cast<NodeStaticMesh&>(node);
+        static_mesh_node.GetData().set_file_name(
+            proto_scene_static_mesh.file_name());
         // Rename the node to match the reference name (without the 'Node.'
         // prefix) so serialization will use the same identifier as the input
         // file.
