@@ -408,7 +408,10 @@ void Cubemap::CreateCubemapFromPointer(
     texture_id_ = cubemap.GetId();
     cubemap.texture_id_ = 0;
     inner_size_ = cube_pair_res;
-    data_.mutable_size()->CopyFrom(json::SerializeSize(inner_size_));
+    if (!data_.has_size())
+    {
+        data_.mutable_size()->CopyFrom(json::SerializeSize(inner_size_));
+    }
     // Keep the original size from the proto, inner_size_ stores the computed
     // resolution for the GPU.
 }
@@ -422,7 +425,10 @@ void Cubemap::CreateCubemapFromPointers(
     data_.mutable_pixel_element_size()->CopyFrom(pixel_element_size);
     data_.mutable_pixel_structure()->CopyFrom(pixel_structure);
     inner_size_ = size;
-    data_.mutable_size()->CopyFrom(json::SerializeSize(inner_size_));
+    if (!data_.has_size())
+    {
+        data_.mutable_size()->CopyFrom(json::SerializeSize(inner_size_));
+    }
     glGenTextures(1, &texture_id_);
     ScopedBind scoped_bind(*this);
     glTexParameteri(
