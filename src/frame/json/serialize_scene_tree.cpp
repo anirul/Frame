@@ -6,6 +6,7 @@
 #include "frame/node_matrix.h"
 #include "frame/node_static_mesh.h"
 #include <absl/strings/str_split.h>
+#include <unordered_set>
 
 namespace frame::json
 {
@@ -204,8 +205,13 @@ proto::NodeStaticMesh SerializeNodeStaticMesh(
 void SerializeNode(
     proto::SceneTree& proto_scene_tree,
     EntityId id,
-    const LevelInterface& level_interface)
+    const LevelInterface& level_interface,
+    std::unordered_set<EntityId>& visited)
 {
+    if (visited.contains(id))
+        return;
+    visited.insert(id);
+
     NodeInterface& node_interface = level_interface.GetSceneNodeFromId(id);
     switch (node_interface.GetNodeType())
     {
@@ -233,9 +239,9 @@ void SerializeNode(
                 "Unknown node type [{}]?",
                 static_cast<int>(node_interface.GetNodeType())));
     }
-    for (const auto id : level_interface.GetChildList(id))
+    for (const auto child_id : level_interface.GetChildList(id))
     {
-        SerializeNode(proto_scene_tree, id, level_interface);
+        SerializeNode(proto_scene_tree, child_id, level_interface, visited);
     }
 }
 
@@ -248,10 +254,12 @@ proto::SceneTree SerializeSceneTree(const LevelInterface& level_interface)
         level_interface.GetNameFromId(level_interface.GetDefaultCameraId()));
     proto_scene_tree.set_default_root_name(level_interface.GetNameFromId(
         level_interface.GetDefaultRootSceneNodeId()));
+    std::unordered_set<EntityId> visited;
     SerializeNode(
         proto_scene_tree,
         level_interface.GetDefaultRootSceneNodeId(),
-        level_interface);
+        level_interface,
+        visited);
     // Serialize nodes that do not have a parent (independent roots).
     for (const auto node_id : level_interface.GetSceneNodes())
     {
@@ -259,7 +267,7 @@ proto::SceneTree SerializeSceneTree(const LevelInterface& level_interface)
             continue;
         if (level_interface.GetParentId(node_id) == NullId)
         {
-            SerializeNode(proto_scene_tree, node_id, level_interface);
+            SerializeNode(proto_scene_tree, node_id, level_interface, visited);
         }
     }
     return proto_scene_tree;
