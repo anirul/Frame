@@ -317,6 +317,16 @@ std::vector<frame::EntityId> Level::GetMaterials() const
     return list;
 }
 
+std::vector<frame::EntityId> Level::GetSceneNodes() const
+{
+    std::vector<EntityId> list;
+    for (const auto& [node_id, _] : id_scene_node_map_)
+    {
+        list.push_back(node_id);
+    }
+    return list;
+}
+
 std::unique_ptr<frame::TextureInterface> Level::ExtractTexture(EntityId id)
 {
     auto node_texture = id_texture_map_.extract(id);
@@ -360,10 +370,11 @@ void Level::ReplaceMesh(
 {
     if (!id_static_mesh_map_.count(id))
     {
-        throw std::runtime_error(fmt::format(
-            "trying to replace {} by {} but no mesh there yet?",
-            mesh->GetName(),
-            id));
+        throw std::runtime_error(
+            fmt::format(
+                "trying to replace {} by {} but no mesh there yet?",
+                mesh->GetName(),
+                id));
     }
     id_static_mesh_map_.erase(id);
     id_static_mesh_map_.emplace(id, std::move(mesh));
@@ -382,8 +393,10 @@ std::string Level::GetNameFromNodeInterface(const NodeInterface& node) const
     case NodeTypeEnum::NODE_STATIC_MESH:
         return dynamic_cast<const NodeStaticMesh&>(node).GetData().name();
     default:
-        throw std::runtime_error(std::format(
-            "Unknown node type [{}]?", static_cast<int>(node.GetNodeType())));
+        throw std::runtime_error(
+            std::format(
+                "Unknown node type [{}]?",
+                static_cast<int>(node.GetNodeType())));
     }
 }
 

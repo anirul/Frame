@@ -1,4 +1,5 @@
 #include "frame/json/serialize_scene_tree.h"
+#include "frame/entity_id.h"
 #include "frame/json/serialize_uniform.h"
 #include "frame/node_camera.h"
 #include "frame/node_light.h"
@@ -244,6 +245,16 @@ proto::SceneTree SerializeSceneTree(const LevelInterface& level_interface)
         proto_scene_tree,
         level_interface.GetDefaultRootSceneNodeId(),
         level_interface);
+    // Serialize nodes that do not have a parent (independent roots).
+    for (const auto node_id : level_interface.GetSceneNodes())
+    {
+        if (node_id == level_interface.GetDefaultRootSceneNodeId())
+            continue;
+        if (level_interface.GetParentId(node_id) == NullId)
+        {
+            SerializeNode(proto_scene_tree, node_id, level_interface);
+        }
+    }
     return proto_scene_tree;
 }
 

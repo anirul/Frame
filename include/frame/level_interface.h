@@ -251,6 +251,11 @@ class LevelInterface : public NameInterface
      */
     virtual std::vector<EntityId> GetMaterials() const = 0;
     /**
+     * @brief Get all scene node ids from the level.
+     * @return A vector of scene node ids.
+     */
+    virtual std::vector<EntityId> GetSceneNodes() const = 0;
+    /**
      * @brief Extract a texture (move it) from the level to outside (used in
      * special cases).
      * @warning This will invalidate this entry!

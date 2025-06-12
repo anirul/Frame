@@ -324,6 +324,11 @@ class Level : public LevelInterface
      */
     std::vector<EntityId> GetMaterials() const override;
     /**
+     * @brief Get all scene node ids from the level.
+     * @return A vector of scene node ids.
+     */
+    std::vector<EntityId> GetSceneNodes() const override;
+    /**
      * @brief Extract a texture (move it) from the level to outside (used in
      *        special cases).
      * @warning This will invalidate this entry!
