@@ -48,6 +48,6 @@ set_target_properties(FrameJsonTest PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
 
 include(GoogleTest)
-gtest_add_tests(TARGET FrameJsonTest)
+gtest_discover_tests(FrameJsonTest)
 
 set_property(TARGET FrameJsonTest PROPERTY FOLDER "FrameTest")
