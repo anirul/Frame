@@ -447,6 +447,9 @@ void Cubemap::CreateCubemapFromPointers(
         GL_TEXTURE_CUBE_MAP,
         GL_TEXTURE_WRAP_R,
         ConvertToGLType(proto::TextureFilter::CLAMP_TO_EDGE));
+    GLint previous_align = 0;
+    glGetIntegerv(GL_UNPACK_ALIGNMENT, &previous_align);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     for (unsigned int i : {0, 1, 2, 3, 4, 5})
     {
         glTexImage2D(
@@ -461,6 +464,7 @@ void Cubemap::CreateCubemapFromPointers(
             opengl::ConvertToGLType(data_.pixel_element_size()),
             cube_map[i]);
     }
+    glPixelStorei(GL_UNPACK_ALIGNMENT, previous_align);
 }
 
 void Cubemap::Clear(glm::vec4 color)

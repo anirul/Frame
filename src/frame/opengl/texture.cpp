@@ -165,6 +165,9 @@ void Texture::CreateTextureFromPointer(
     data_.mutable_wrap_t()->CopyFrom(texture_filter);
     auto format = opengl::ConvertToGLType(data_.pixel_structure());
     auto type = opengl::ConvertToGLType(data_.pixel_element_size());
+    GLint previous_align = 0;
+    glGetIntegerv(GL_UNPACK_ALIGNMENT, &previous_align);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glTexImage2D(
         GL_TEXTURE_2D,
         0,
@@ -176,6 +179,7 @@ void Texture::CreateTextureFromPointer(
         format,
         type,
         data);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, previous_align);
 }
 
 void Texture::CreateDepthTexture(
