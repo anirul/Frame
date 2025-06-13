@@ -1,4 +1,4 @@
-#include "frame/json/scene_simple_test.h"
+#include "frame/full/scene_simple_test.h"
 
 #include <algorithm>
 
