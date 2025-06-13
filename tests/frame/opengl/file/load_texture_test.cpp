@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include "frame/file/file_system.h"
+#include "frame/file/image.h"
 #include "frame/json/parse_uniform.h"
 #include "frame/opengl/cubemap.h"
 #include "frame/opengl/file/load_texture.h"
