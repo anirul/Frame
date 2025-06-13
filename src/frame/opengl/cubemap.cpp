@@ -494,15 +494,31 @@ std::vector<std::uint8_t> Cubemap::GetTextureByte() const
     std::size_t image_size = static_cast<std::size_t>(inner_size_.x) *
                              static_cast<std::size_t>(inner_size_.y) *
                              static_cast<std::size_t>(pixel_structure) * 6;
-    std::vector<std::uint8_t> result = {};
-    result.resize(image_size);
-    glGetTextureImage(
-        texture_id_,
-        0,
-        format,
-        type,
-        static_cast<GLsizei>(image_size * sizeof(std::uint8_t)),
-        result.data());
+    std::vector<std::uint8_t> result(image_size);
+#if defined(GL_VERSION_4_5) || defined(GL_ARB_direct_state_access)
+    if (glGetTextureImage)
+    {
+        glGetTextureImage(
+            texture_id_,
+            0,
+            format,
+            type,
+            static_cast<GLsizei>(image_size * sizeof(std::uint8_t)),
+            result.data());
+        return result;
+    }
+#endif
+    ScopedBind bind(*this);
+    for (std::size_t i = 0; i < 6; ++i)
+    {
+        glGetTexImage(
+            GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+            0,
+            format,
+            type,
+            result.data() +
+                i * inner_size_.x * inner_size_.y * pixel_structure);
+    }
     return result;
 }
 
@@ -522,15 +538,31 @@ std::vector<std::uint16_t> Cubemap::GetTextureWord() const
     std::size_t image_size = static_cast<std::size_t>(inner_size_.x) *
                              static_cast<std::size_t>(inner_size_.y) *
                              static_cast<std::size_t>(pixel_structure) * 6;
-    std::vector<std::uint16_t> result = {};
-    result.resize(image_size);
-    glGetTextureImage(
-        texture_id_,
-        0,
-        format,
-        type,
-        static_cast<GLsizei>(image_size * sizeof(std::uint16_t)),
-        result.data());
+    std::vector<std::uint16_t> result(image_size);
+#if defined(GL_VERSION_4_5) || defined(GL_ARB_direct_state_access)
+    if (glGetTextureImage)
+    {
+        glGetTextureImage(
+            texture_id_,
+            0,
+            format,
+            type,
+            static_cast<GLsizei>(image_size * sizeof(std::uint16_t)),
+            result.data());
+        return result;
+    }
+#endif
+    ScopedBind bind(*this);
+    for (std::size_t i = 0; i < 6; ++i)
+    {
+        glGetTexImage(
+            GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+            0,
+            format,
+            type,
+            result.data() +
+                i * inner_size_.x * inner_size_.y * pixel_structure);
+    }
     return result;
 }
 
@@ -550,15 +582,31 @@ std::vector<std::uint32_t> Cubemap::GetTextureDWord() const
     std::size_t image_size = static_cast<std::size_t>(inner_size_.x) *
                              static_cast<std::size_t>(inner_size_.y) *
                              static_cast<std::size_t>(pixel_structure) * 6;
-    std::vector<std::uint32_t> result = {};
-    result.resize(image_size);
-    glGetTextureImage(
-        texture_id_,
-        0,
-        format,
-        type,
-        static_cast<GLsizei>(image_size * sizeof(std::uint32_t)),
-        result.data());
+    std::vector<std::uint32_t> result(image_size);
+#if defined(GL_VERSION_4_5) || defined(GL_ARB_direct_state_access)
+    if (glGetTextureImage)
+    {
+        glGetTextureImage(
+            texture_id_,
+            0,
+            format,
+            type,
+            static_cast<GLsizei>(image_size * sizeof(std::uint32_t)),
+            result.data());
+        return result;
+    }
+#endif
+    ScopedBind bind(*this);
+    for (std::size_t i = 0; i < 6; ++i)
+    {
+        glGetTexImage(
+            GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+            0,
+            format,
+            type,
+            result.data() +
+                i * inner_size_.x * inner_size_.y * pixel_structure);
+    }
     return result;
 }
 
@@ -578,15 +626,31 @@ std::vector<float> Cubemap::GetTextureFloat() const
     std::size_t image_size = static_cast<std::size_t>(inner_size_.x) *
                              static_cast<std::size_t>(inner_size_.y) *
                              static_cast<std::size_t>(pixel_structure) * 6;
-    std::vector<float> result = {};
-    result.resize(image_size);
-    glGetTextureImage(
-        texture_id_,
-        0,
-        format,
-        type,
-        static_cast<GLsizei>(image_size * sizeof(float)),
-        result.data());
+    std::vector<float> result(image_size);
+#if defined(GL_VERSION_4_5) || defined(GL_ARB_direct_state_access)
+    if (glGetTextureImage)
+    {
+        glGetTextureImage(
+            texture_id_,
+            0,
+            format,
+            type,
+            static_cast<GLsizei>(image_size * sizeof(float)),
+            result.data());
+        return result;
+    }
+#endif
+    ScopedBind bind(*this);
+    for (std::size_t i = 0; i < 6; ++i)
+    {
+        glGetTexImage(
+            GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+            0,
+            format,
+            type,
+            result.data() +
+                i * inner_size_.x * inner_size_.y * pixel_structure);
+    }
     return result;
 }
 
