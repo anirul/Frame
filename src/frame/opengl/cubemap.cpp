@@ -512,7 +512,7 @@ std::vector<std::uint8_t> Cubemap::GetTextureByte() const
     for (std::size_t i = 0; i < 6; ++i)
     {
         glGetTexImage(
-            GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+            GL_TEXTURE_CUBE_MAP_POSITIVE_X + static_cast<GLenum>(i),
             0,
             format,
             type,
@@ -556,7 +556,7 @@ std::vector<std::uint16_t> Cubemap::GetTextureWord() const
     for (std::size_t i = 0; i < 6; ++i)
     {
         glGetTexImage(
-            GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+            GL_TEXTURE_CUBE_MAP_POSITIVE_X + static_cast<GLenum>(i),
             0,
             format,
             type,
@@ -600,7 +600,7 @@ std::vector<std::uint32_t> Cubemap::GetTextureDWord() const
     for (std::size_t i = 0; i < 6; ++i)
     {
         glGetTexImage(
-            GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+            GL_TEXTURE_CUBE_MAP_POSITIVE_X + static_cast<GLenum>(i),
             0,
             format,
             type,
@@ -644,7 +644,7 @@ std::vector<float> Cubemap::GetTextureFloat() const
     for (std::size_t i = 0; i < 6; ++i)
     {
         glGetTexImage(
-            GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+            GL_TEXTURE_CUBE_MAP_POSITIVE_X + static_cast<GLenum>(i),
             0,
             format,
             type,
