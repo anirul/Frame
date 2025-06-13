@@ -20,7 +20,8 @@ TEST_F(ImageBasedLightingTest, SkyboxCubemapFromSingleFileTest)
     auto vec = cubemap->GetTextureFloat();
     EXPECT_EQ(cubemap->GetSize().x * cubemap->GetSize().y * 3 * 6, vec.size());
     auto range = std::minmax_element(vec.begin(), vec.end());
-    EXPECT_LT(*range.first, *range.second);
+    EXPECT_NEAR(0.0f, *range.first, 0.1f);
+    EXPECT_GT(*range.second, 1.0f);
 }
 
 } // namespace test

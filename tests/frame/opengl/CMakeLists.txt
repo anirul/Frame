@@ -26,11 +26,14 @@ add_executable(FrameOpenGLTest
   shader_test.h
   cubemap_test.cpp
   cubemap_test.h
+  image_based_lighting_test.cpp
+  image_based_lighting_test.h
   texture_test.cpp
   texture_test.h
   window_test.cpp
   window_test.h
   ${CMAKE_CURRENT_SOURCE_DIR}/../../../asset/json/device_test.json
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../../asset/json/image_based_lighting.json
   ${CMAKE_CURRENT_SOURCE_DIR}/../../../asset/json/renderer_test.json
 )
 
