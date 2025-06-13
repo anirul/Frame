@@ -1,4 +1,4 @@
-#include "frame/full/image_based_lighting_test.h"
+#include "frame/opengl/image_based_lighting_test.h"
 
 #include <algorithm>
 

@@ -40,6 +40,5 @@ gtest_add_tests(TARGET FrameTest)
 add_subdirectory(file)
 add_subdirectory(json)
 add_subdirectory(opengl)
-add_subdirectory(full)
 
 set_property(TARGET FrameTest PROPERTY FOLDER "FrameTest")
