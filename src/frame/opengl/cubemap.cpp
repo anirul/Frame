@@ -450,20 +450,33 @@ void Cubemap::CreateCubemapFromPointers(
     GLint previous_align = 0;
     glGetIntegerv(GL_UNPACK_ALIGNMENT, &previous_align);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+    const GLenum internal_format = opengl::ConvertToGLType(
+        data_.pixel_element_size(), data_.pixel_structure());
+    const GLenum format = opengl::ConvertToGLType(data_.pixel_structure());
+    const GLenum type = opengl::ConvertToGLType(data_.pixel_element_size());
+
+    glTexStorage2D(
+        GL_TEXTURE_CUBE_MAP,
+        1,
+        internal_format,
+        static_cast<GLsizei>(inner_size_.x),
+        static_cast<GLsizei>(inner_size_.y));
+
     for (unsigned int i : {0, 1, 2, 3, 4, 5})
     {
-        glTexImage2D(
+        glTexSubImage2D(
             GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
             0,
-            opengl::ConvertToGLType(
-                data_.pixel_element_size(), data_.pixel_structure()),
+            0,
+            0,
             static_cast<GLsizei>(inner_size_.x),
             static_cast<GLsizei>(inner_size_.y),
-            0,
-            opengl::ConvertToGLType(data_.pixel_structure()),
-            opengl::ConvertToGLType(data_.pixel_element_size()),
+            format,
+            type,
             cube_map[i]);
     }
+
     glPixelStorei(GL_UNPACK_ALIGNMENT, previous_align);
 }
 
