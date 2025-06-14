@@ -425,6 +425,70 @@ void Cubemap::CreateCubemapFromPointers(
     inner_size_ = size;
     if (!data_.has_size())
         data_.mutable_size()->CopyFrom(json::SerializeSize(inner_size_));
+    // Prefer modern DSA texture creation when available.
+#if defined(GL_VERSION_4_5) || defined(GL_ARB_direct_state_access)
+    if (glCreateTextures && glTextureStorage2D && glTextureSubImage3D &&
+        glTextureParameteri)
+    {
+        glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &texture_id_);
+        glTextureParameteri(
+            texture_id_,
+            GL_TEXTURE_MIN_FILTER,
+            ConvertToGLType(proto::TextureFilter::LINEAR));
+        glTextureParameteri(
+            texture_id_,
+            GL_TEXTURE_MAG_FILTER,
+            ConvertToGLType(proto::TextureFilter::LINEAR));
+        glTextureParameteri(
+            texture_id_,
+            GL_TEXTURE_WRAP_S,
+            ConvertToGLType(proto::TextureFilter::CLAMP_TO_EDGE));
+        glTextureParameteri(
+            texture_id_,
+            GL_TEXTURE_WRAP_T,
+            ConvertToGLType(proto::TextureFilter::CLAMP_TO_EDGE));
+        glTextureParameteri(
+            texture_id_,
+            GL_TEXTURE_WRAP_R,
+            ConvertToGLType(proto::TextureFilter::CLAMP_TO_EDGE));
+        GLint previous_align = 0;
+        glGetIntegerv(GL_UNPACK_ALIGNMENT, &previous_align);
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+        const GLenum internal_format = opengl::ConvertToGLType(
+            data_.pixel_element_size(), data_.pixel_structure());
+        const GLenum format = opengl::ConvertToGLType(data_.pixel_structure());
+        const GLenum type = opengl::ConvertToGLType(data_.pixel_element_size());
+
+        glTextureStorage2D(
+            texture_id_,
+            1,
+            internal_format,
+            static_cast<GLsizei>(inner_size_.x),
+            static_cast<GLsizei>(inner_size_.y));
+
+        for (unsigned int i : {0, 1, 2, 3, 4, 5})
+        {
+            glTextureSubImage3D(
+                texture_id_,
+                0,
+                0,
+                0,
+                static_cast<GLint>(i),
+                static_cast<GLsizei>(inner_size_.x),
+                static_cast<GLsizei>(inner_size_.y),
+                1,
+                format,
+                type,
+                cube_map[i]);
+        }
+
+        glPixelStorei(GL_UNPACK_ALIGNMENT, previous_align);
+        return;
+    }
+#endif
+
+    // Legacy path using bind to configure texture.
     glGenTextures(1, &texture_id_);
     ScopedBind scoped_bind(*this);
     glTexParameteri(
@@ -463,18 +527,41 @@ void Cubemap::CreateCubemapFromPointers(
         static_cast<GLsizei>(inner_size_.x),
         static_cast<GLsizei>(inner_size_.y));
 
-    for (unsigned int i : {0, 1, 2, 3, 4, 5})
+#if defined(GL_VERSION_4_5) || defined(GL_ARB_direct_state_access)
+    if (glTextureSubImage3D)
     {
-        glTexSubImage2D(
-            GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-            0,
-            0,
-            0,
-            static_cast<GLsizei>(inner_size_.x),
-            static_cast<GLsizei>(inner_size_.y),
-            format,
-            type,
-            cube_map[i]);
+        for (unsigned int i : {0, 1, 2, 3, 4, 5})
+        {
+            glTextureSubImage3D(
+                texture_id_,
+                0,
+                0,
+                0,
+                static_cast<GLint>(i),
+                static_cast<GLsizei>(inner_size_.x),
+                static_cast<GLsizei>(inner_size_.y),
+                1,
+                format,
+                type,
+                cube_map[i]);
+        }
+    }
+    else
+#endif
+    {
+        for (unsigned int i : {0, 1, 2, 3, 4, 5})
+        {
+            glTexSubImage2D(
+                GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+                0,
+                0,
+                0,
+                static_cast<GLsizei>(inner_size_.x),
+                static_cast<GLsizei>(inner_size_.y),
+                format,
+                type,
+                cube_map[i]);
+        }
     }
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, previous_align);
