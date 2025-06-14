@@ -463,17 +463,16 @@ void Cubemap::CreateCubemapFromPointers(
         static_cast<GLsizei>(inner_size_.x),
         static_cast<GLsizei>(inner_size_.y));
 
+    ScopedBind scoped_bind(*this);
     for (unsigned int i : {0, 1, 2, 3, 4, 5})
     {
-        glTextureSubImage3D(
-            texture_id_,
+        glTexSubImage2D(
+            GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
             0,
             0,
             0,
-            static_cast<GLint>(i),
             static_cast<GLsizei>(inner_size_.x),
             static_cast<GLsizei>(inner_size_.y),
-            1,
             format,
             type,
             cube_map[i]);
