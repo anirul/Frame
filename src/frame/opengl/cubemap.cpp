@@ -311,7 +311,9 @@ void Cubemap::CreateCubemapFromFiles(
     {
         paths.push_back(file_name);
         auto image_ptr = std::make_unique<frame::file::Image>(
-            frame::file::FindFile(file_name));
+            frame::file::FindFile(file_name),
+            pixel_element_size,
+            pixel_structure);
         images.push_back(std::move(image_ptr));
     }
     proto::CubemapFiles cubemap_files;
