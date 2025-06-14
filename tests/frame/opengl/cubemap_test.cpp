@@ -61,4 +61,25 @@ TEST_F(CubemapTest, CreateEquirectangularCubemapTest)
     EXPECT_NEAR(20.0f, *p.second, 1.0f);
 }
 
+TEST_F(CubemapTest, CreateEquirectangularCubemapShiodomeTest)
+{
+    ASSERT_FALSE(texture_);
+    EXPECT_NO_THROW(
+        texture_ = std::make_unique<frame::opengl::Cubemap>(
+            frame::file::FindFile("asset/cubemap/shiodome.hdr"),
+            frame::json::PixelElementSize_FLOAT()));
+    ASSERT_TRUE(texture_);
+    auto* opengl_texture =
+        dynamic_cast<frame::opengl::Cubemap*>(texture_.get());
+    ASSERT_NE(nullptr, opengl_texture);
+    ASSERT_NE(0, opengl_texture->GetId());
+    EXPECT_EQ(1024, texture_->GetData().size().x());
+    EXPECT_EQ(1024, texture_->GetData().size().y());
+    auto vecf = texture_->GetTextureFloat();
+    EXPECT_EQ(1024 * 1024 * 3 * 6, vecf.size());
+    auto p = std::minmax_element(vecf.begin(), vecf.end());
+    EXPECT_NEAR(0.0f, *p.first, 0.1f);
+    EXPECT_NEAR(37.0f, *p.second, 1.0f);
+}
+
 } // End namespace test.

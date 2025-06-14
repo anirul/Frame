@@ -138,44 +138,57 @@ void Texture::CreateTextureFromPointer(
         if (!data_.has_size())
             data_.mutable_size()->CopyFrom(json::SerializeSize(inner_size_));
     }
-    glGenTextures(1, &texture_id_);
-    ScopedBind scoped_bind(*this);
+    glCreateTextures(GL_TEXTURE_2D, 1, &texture_id_);
     proto::TextureFilter texture_filter;
     texture_filter.set_value(proto::TextureFilter::LINEAR);
-    glTexParameteri(
-        GL_TEXTURE_2D,
+    glTextureParameteri(
+        texture_id_,
         GL_TEXTURE_MIN_FILTER,
         ConvertToGLType(proto::TextureFilter::LINEAR));
     data_.mutable_min_filter()->CopyFrom(texture_filter);
-    glTexParameteri(
-        GL_TEXTURE_2D,
+    glTextureParameteri(
+        texture_id_,
         GL_TEXTURE_MAG_FILTER,
         ConvertToGLType(proto::TextureFilter::LINEAR));
     data_.mutable_mag_filter()->CopyFrom(texture_filter);
     texture_filter.set_value(proto::TextureFilter::CLAMP_TO_EDGE);
-    glTexParameteri(
-        GL_TEXTURE_2D,
+    glTextureParameteri(
+        texture_id_,
         GL_TEXTURE_WRAP_S,
         ConvertToGLType(proto::TextureFilter::CLAMP_TO_EDGE));
     data_.mutable_wrap_s()->CopyFrom(texture_filter);
-    glTexParameteri(
-        GL_TEXTURE_2D,
+    glTextureParameteri(
+        texture_id_,
         GL_TEXTURE_WRAP_T,
         ConvertToGLType(proto::TextureFilter::CLAMP_TO_EDGE));
     data_.mutable_wrap_t()->CopyFrom(texture_filter);
-    auto format = opengl::ConvertToGLType(data_.pixel_structure());
-    auto type = opengl::ConvertToGLType(data_.pixel_element_size());
-    glTexImage2D(
-        GL_TEXTURE_2D,
-        0,
-        opengl::ConvertToGLType(
-            data_.pixel_element_size(), data_.pixel_structure()),
+    const GLenum internal_format = opengl::ConvertToGLType(
+        data_.pixel_element_size(), data_.pixel_structure());
+    const GLenum format = opengl::ConvertToGLType(data_.pixel_structure());
+    const GLenum type = opengl::ConvertToGLType(data_.pixel_element_size());
+    glTextureStorage2D(
+        texture_id_,
+        1,
+        internal_format,
         static_cast<GLsizei>(inner_size_.x),
-        static_cast<GLsizei>(inner_size_.y),
-        0,
-        format,
-        type,
-        data);
+        static_cast<GLsizei>(inner_size_.y));
+    if (data)
+    {
+        GLint previous_align = 0;
+        glGetIntegerv(GL_UNPACK_ALIGNMENT, &previous_align);
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+        glTextureSubImage2D(
+            texture_id_,
+            0,
+            0,
+            0,
+            static_cast<GLsizei>(inner_size_.x),
+            static_cast<GLsizei>(inner_size_.y),
+            format,
+            type,
+            data);
+        glPixelStorei(GL_UNPACK_ALIGNMENT, previous_align);
+    }
 }
 
 void Texture::CreateDepthTexture(
@@ -186,41 +199,36 @@ void Texture::CreateDepthTexture(
     inner_size_ = size;
     if (!data_.has_size())
         data_.mutable_size()->CopyFrom(json::SerializeSize(inner_size_));
-    glGenTextures(1, &texture_id_);
-    ScopedBind scoped_bind(*this);
+    glCreateTextures(GL_TEXTURE_2D, 1, &texture_id_);
     proto::TextureFilter texture_filter;
     texture_filter.set_value(proto::TextureFilter::NEAREST);
-    glTexParameteri(
-        GL_TEXTURE_2D,
+    glTextureParameteri(
+        texture_id_,
         GL_TEXTURE_MIN_FILTER,
         ConvertToGLType(proto::TextureFilter::NEAREST));
     data_.mutable_min_filter()->CopyFrom(texture_filter);
-    glTexParameteri(
-        GL_TEXTURE_2D,
+    glTextureParameteri(
+        texture_id_,
         GL_TEXTURE_MAG_FILTER,
         ConvertToGLType(proto::TextureFilter::NEAREST));
     data_.mutable_mag_filter()->CopyFrom(texture_filter);
     texture_filter.set_value(proto::TextureFilter::CLAMP_TO_EDGE);
-    glTexParameteri(
-        GL_TEXTURE_2D,
+    glTextureParameteri(
+        texture_id_,
         GL_TEXTURE_WRAP_S,
         ConvertToGLType(proto::TextureFilter::CLAMP_TO_EDGE));
     data_.mutable_wrap_s()->CopyFrom(texture_filter);
-    glTexParameteri(
-        GL_TEXTURE_2D,
+    glTextureParameteri(
+        texture_id_,
         GL_TEXTURE_WRAP_T,
         ConvertToGLType(proto::TextureFilter::CLAMP_TO_EDGE));
     data_.mutable_wrap_t()->CopyFrom(texture_filter);
-    glTexImage2D(
-        GL_TEXTURE_2D,
-        0,
+    glTextureStorage2D(
+        texture_id_,
+        1,
         GL_DEPTH_COMPONENT32F,
         static_cast<GLsizei>(data_.size().x()),
-        static_cast<GLsizei>(data_.size().y()),
-        0,
-        GL_DEPTH_COMPONENT,
-        GL_FLOAT,
-        nullptr);
+        static_cast<GLsizei>(data_.size().y()));
 }
 
 Texture::~Texture()
@@ -361,7 +369,6 @@ frame::proto::TextureFilter::Enum Texture::ConvertFromGLType(
 
 std::vector<std::uint8_t> Texture::GetTextureByte() const
 {
-    Bind();
     auto format = opengl::ConvertToGLType(data_.pixel_structure());
     auto type = opengl::ConvertToGLType(data_.pixel_element_size());
     if (type != GL_UNSIGNED_BYTE)
@@ -375,16 +382,19 @@ std::vector<std::uint8_t> Texture::GetTextureByte() const
     std::size_t image_size = static_cast<std::size_t>(inner_size_.x) *
                              static_cast<std::size_t>(inner_size_.y) *
                              static_cast<std::size_t>(pixel_structure);
-    std::vector<std::uint8_t> result = {};
-    result.resize(image_size);
-    glGetTexImage(GL_TEXTURE_2D, 0, format, type, result.data());
-    UnBind();
+    std::vector<std::uint8_t> result(image_size);
+    glGetTextureImage(
+        texture_id_,
+        0,
+        format,
+        type,
+        static_cast<GLsizei>(image_size * sizeof(std::uint8_t)),
+        result.data());
     return result;
 }
 
 std::vector<std::uint16_t> Texture::GetTextureWord() const
 {
-    Bind();
     auto format = opengl::ConvertToGLType(data_.pixel_structure());
     auto type = opengl::ConvertToGLType(data_.pixel_element_size());
     if (type != GL_UNSIGNED_SHORT)
@@ -398,16 +408,19 @@ std::vector<std::uint16_t> Texture::GetTextureWord() const
     std::size_t image_size = static_cast<std::size_t>(inner_size_.x) *
                              static_cast<std::size_t>(inner_size_.y) *
                              static_cast<std::size_t>(pixel_structure);
-    std::vector<std::uint16_t> result = {};
-    result.resize(image_size);
-    glGetTexImage(GL_TEXTURE_2D, 0, format, type, result.data());
-    UnBind();
+    std::vector<std::uint16_t> result(image_size);
+    glGetTextureImage(
+        texture_id_,
+        0,
+        format,
+        type,
+        static_cast<GLsizei>(image_size * sizeof(std::uint16_t)),
+        result.data());
     return result;
 }
 
 std::vector<std::uint32_t> Texture::GetTextureDWord() const
 {
-    Bind();
     auto format = opengl::ConvertToGLType(data_.pixel_structure());
     auto type = opengl::ConvertToGLType(data_.pixel_element_size());
     if (type != GL_UNSIGNED_INT)
@@ -421,16 +434,19 @@ std::vector<std::uint32_t> Texture::GetTextureDWord() const
     std::size_t image_size = static_cast<std::size_t>(inner_size_.x) *
                              static_cast<std::size_t>(inner_size_.y) *
                              static_cast<std::size_t>(pixel_structure);
-    std::vector<std::uint32_t> result = {};
-    result.resize(image_size);
-    glGetTexImage(GL_TEXTURE_2D, 0, format, type, result.data());
-    UnBind();
+    std::vector<std::uint32_t> result(image_size);
+    glGetTextureImage(
+        texture_id_,
+        0,
+        format,
+        type,
+        static_cast<GLsizei>(image_size * sizeof(std::uint32_t)),
+        result.data());
     return result;
 }
 
 std::vector<float> Texture::GetTextureFloat() const
 {
-    Bind();
     auto format = opengl::ConvertToGLType(data_.pixel_structure());
     auto type = opengl::ConvertToGLType(data_.pixel_element_size());
     if (type != GL_FLOAT)
@@ -444,10 +460,14 @@ std::vector<float> Texture::GetTextureFloat() const
     std::size_t image_size = static_cast<std::size_t>(inner_size_.x) *
                              static_cast<std::size_t>(inner_size_.y) *
                              static_cast<std::size_t>(pixel_structure);
-    std::vector<float> result = {};
-    result.resize(image_size);
-    glGetTexImage(GL_TEXTURE_2D, 0, format, type, result.data());
-    UnBind();
+    std::vector<float> result(image_size);
+    glGetTextureImage(
+        texture_id_,
+        0,
+        format,
+        type,
+        static_cast<GLsizei>(image_size * sizeof(float)),
+        result.data());
     return result;
 }
 
@@ -456,18 +476,16 @@ void Texture::Update(
     glm::uvec2 size,
     std::uint8_t bytes_per_pixel)
 {
-    ScopedBind scoped_bind(*this);
     assert(data_.pixel_element_size().value() == 1);
     auto format = opengl::ConvertToGLType(data_.pixel_structure());
     auto type = opengl::ConvertToGLType(data_.pixel_element_size());
-    glTexImage2D(
-        GL_TEXTURE_2D,
+    glTextureSubImage2D(
+        texture_id_,
         0,
-        opengl::ConvertToGLType(
-            data_.pixel_element_size(), data_.pixel_structure()),
+        0,
+        0,
         static_cast<GLsizei>(inner_size_.x),
         static_cast<GLsizei>(inner_size_.y),
-        0,
         format,
         type,
         vector.data());
