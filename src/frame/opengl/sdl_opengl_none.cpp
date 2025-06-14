@@ -115,6 +115,7 @@ void* SDLOpenGLNone::GetGraphicContext() const
             gl_version.second);
 
         // Initialize GLEW to find the 'glDebugMessageCallback' function.
+        glewExperimental = GL_TRUE;
         auto result = glewInit();
         if (result != GLEW_OK)
         {
