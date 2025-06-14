@@ -108,6 +108,7 @@ void* Win32OpenGLNone::GetGraphicContext() const
 {
     // Initialize GLEW.
     GLenum error = GLEW_OK;
+    glewExperimental = GL_TRUE;
     if (GLEW_OK != (error = glewInit()))
     {
         throw std::runtime_error(

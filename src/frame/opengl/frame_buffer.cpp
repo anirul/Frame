@@ -67,6 +67,12 @@ void FrameBuffer::AttachTexture(
         GetFrameTextureType(frame_texture_type),
         texture_id,
         mipmap);
+    auto error = GetError();
+    if (!error.first)
+    {
+        throw std::runtime_error(
+            fmt::format("{} - {}", error.first, error.second));
+    }
     UnBind();
 }
 
