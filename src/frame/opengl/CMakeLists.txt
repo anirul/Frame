@@ -33,6 +33,7 @@ add_library(FrameOpenGL
     texture.h
     cubemap.cpp
     cubemap.h
+    cubemap_views.h
     sdl_opengl_none.cpp
     sdl_opengl_none.h
     sdl_opengl_window.cpp

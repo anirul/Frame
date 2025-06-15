@@ -10,38 +10,14 @@
 #include "frame/open_gl/render_buffer.h"
 #include "frame/open_gl/renderer.h"
 #include "frame/open_gl/static_mesh.h"
+#include "frame/opengl/cubemap_views.h"
 
 namespace frame::opengl
 {
 
 namespace
 {
-// Get the 6 view for the cube map.
-const std::array<glm::mat4, 6> views_cubemap = {
-    glm::lookAt(
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(1.0f, 0.0f, 0.0f),
-        glm::vec3(0.0f, -1.0f, 0.0f)),
-    glm::lookAt(
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(-1.0f, 0.0f, 0.0f),
-        glm::vec3(0.0f, -1.0f, 0.0f)),
-    glm::lookAt(
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(0.0f, 1.0f, 0.0f),
-        glm::vec3(0.0f, 0.0f, 1.0f)),
-    glm::lookAt(
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(0.0f, -1.0f, 0.0f),
-        glm::vec3(0.0f, 0.0f, -1.0f)),
-    glm::lookAt(
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(0.0f, 0.0f, 1.0f),
-        glm::vec3(0.0f, -1.0f, 0.0f)),
-    glm::lookAt(
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(0.0f, 0.0f, -1.0f),
-        glm::vec3(0.0f, -1.0f, 0.0f))};
+// View matrices for each cubemap face (see cubemap_views.h).
 } // namespace
 
 void FillProgramMultiTexture(
@@ -174,7 +150,7 @@ void FillProgramMultiTextureCubeMapMipmap(
         frame.AttachRender(render);
         glViewport(0, 0, temporary_size.first, temporary_size.second);
         int cubemap_element = 0;
-        for (const auto& view : views_cubemap)
+        for (const auto& view : kCubemapViews)
         {
             int i = 0;
             for (const auto& texture_id : program->GetOutputTextureIds())
