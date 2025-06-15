@@ -14,6 +14,7 @@
 #include "frame/json/parse_uniform.h"
 #include "frame/json/serialize_uniform.h"
 #include "frame/level.h"
+#include "frame/opengl/cubemap_views.h"
 #include "frame/opengl/file/load_program.h"
 #include "frame/opengl/frame_buffer.h"
 #include "frame/opengl/pixel.h"
@@ -27,32 +28,7 @@ namespace frame::opengl
 
 namespace
 {
-// Get the 6 view for the cube map.
-const std::array<glm::mat4, 6> views_cubemap = {
-    glm::lookAt(
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(-1.0f, 0.0f, 0.0f),
-        glm::vec3(0.0f, 1.0f, 0.0f)),
-    glm::lookAt(
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(1.0f, 0.0f, 0.0f),
-        glm::vec3(0.0f, 1.0f, 0.0f)),
-    glm::lookAt(
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(0.0f, -1.0f, 0.0f),
-        glm::vec3(0.0f, 0.0f, 1.0f)),
-    glm::lookAt(
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(0.0f, 1.0f, 0.0f),
-        glm::vec3(0.0f, 0.0f, -1.0f)),
-    glm::lookAt(
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(0.0f, 0.0f, 1.0f),
-        glm::vec3(0.0f, 1.0f, 0.0f)),
-    glm::lookAt(
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(0.0f, 0.0f, -1.0f),
-        glm::vec3(0.0f, 1.0f, 0.0f))};
+// View matrices for each cubemap face (see cubemap_views.h).
 // Projection cube map.
 const glm::mat4 projection_cubemap =
     glm::perspective(glm::radians(90.0f), 1.0f, 0.01f, 10.0f);
@@ -392,12 +368,12 @@ void Cubemap::CreateCubemapFromPointer(
     {
         renderer.SetCubeMapTarget(Cubemap::GetTextureFrameFromPosition(i));
         renderer.RenderMesh(
-            mesh_ref, material_ref, projection_cubemap, views_cubemap[i]);
+            mesh_ref, material_ref, projection_cubemap, kCubemapViews[i]);
     }
     // FIXME(anirul): Why?
     renderer.SetCubeMapTarget(Cubemap::GetTextureFrameFromPosition(0));
     renderer.RenderMesh(
-        mesh_ref, material_ref, projection_cubemap, views_cubemap[0]);
+        mesh_ref, material_ref, projection_cubemap, kCubemapViews[0]);
     // Get the output image (cube map).
     auto maybe_output_id = level->GetIdFromName("OutputTexture");
     if (!maybe_output_id)
