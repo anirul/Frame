@@ -24,36 +24,30 @@ namespace
 {
 // Get the 6 view for the cube map.
 const std::array<glm::mat4, 6> views_cubemap = {
-    // +X
-    glm::lookAt(
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(1.0f, 0.0f, 0.0f),
-        glm::vec3(0.0f, -1.0f, 0.0f)),
-    // -X
     glm::lookAt(
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(-1.0f, 0.0f, 0.0f),
-        glm::vec3(0.0f, -1.0f, 0.0f)),
-    // +Y
+        glm::vec3(0.0f, 1.0f, 0.0f)),
     glm::lookAt(
         glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(0.0f, 1.0f, 0.0f),
-        glm::vec3(0.0f, 0.0f, 1.0f)),
-    // -Y
+        glm::vec3(1.0f, 0.0f, 0.0f),
+        glm::vec3(0.0f, 1.0f, 0.0f)),
     glm::lookAt(
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(0.0f, -1.0f, 0.0f),
+        glm::vec3(0.0f, 0.0f, 1.0f)),
+    glm::lookAt(
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(0.0f, 1.0f, 0.0f),
         glm::vec3(0.0f, 0.0f, -1.0f)),
-    // +Z
     glm::lookAt(
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(0.0f, 0.0f, 1.0f),
-        glm::vec3(0.0f, -1.0f, 0.0f)),
-    // -Z
+        glm::vec3(0.0f, 1.0f, 0.0f)),
     glm::lookAt(
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(0.0f, 0.0f, -1.0f),
-        glm::vec3(0.0f, -1.0f, 0.0f))};
+        glm::vec3(0.0f, 1.0f, 0.0f))};
 // Projection cube map.
 const glm::mat4 projection_cubemap =
     glm::perspective(glm::radians(90.0f), 1.0f, 0.01f, 10.0f);
