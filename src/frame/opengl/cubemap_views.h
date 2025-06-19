@@ -15,32 +15,32 @@ inline const std::array<glm::mat4, 6> kViewsCubemap = {
     glm::lookAt(
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(1.0f, 0.0f, 0.0f),
-        glm::vec3(0.0f, -1.0f, 0.0f)),
+        glm::vec3(0.0f, 1.0f, 0.0f)),
     // -X
     glm::lookAt(
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(-1.0f, 0.0f, 0.0f),
-        glm::vec3(0.0f, -1.0f, 0.0f)),
+        glm::vec3(0.0f, 1.0f, 0.0f)),
     // +Y
     glm::lookAt(
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(0.0f, 1.0f, 0.0f),
-        glm::vec3(0.0f, 0.0f, 1.0f)),
+        glm::vec3(0.0f, 0.0f, -1.0f)),
     // -Y
     glm::lookAt(
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(0.0f, -1.0f, 0.0f),
-        glm::vec3(0.0f, 0.0f, -1.0f)),
+        glm::vec3(0.0f, 0.0f, 1.0f)),
     // +Z
     glm::lookAt(
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(0.0f, 0.0f, 1.0f),
-        glm::vec3(0.0f, -1.0f, 0.0f)),
+        glm::vec3(0.0f, 1.0f, 0.0f)),
     // -Z
     glm::lookAt(
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(0.0f, 0.0f, -1.0f),
-        glm::vec3(0.0f, -1.0f, 0.0f))};
+        glm::vec3(0.0f, 1.0f, 0.0f))};
 
 /**
  * @brief Projection matrix for cubemap rendering.
