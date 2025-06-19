@@ -11,32 +11,32 @@ namespace frame::opengl
  * @brief View matrices for cubemap rendering.
  */
 inline const std::array<glm::mat4, 6> kViewsCubemap = {
-    // +X
-    glm::lookAt(
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(1.0f, 0.0f, 0.0f),
-        glm::vec3(0.0f, 1.0f, 0.0f)),
-    // -X
+    // -X (right face) – kept for legacy texture ordering
     glm::lookAt(
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(-1.0f, 0.0f, 0.0f),
         glm::vec3(0.0f, 1.0f, 0.0f)),
-    // +Y
+    // +X (left face)
     glm::lookAt(
         glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(0.0f, 1.0f, 0.0f),
-        glm::vec3(0.0f, 0.0f, -1.0f)),
-    // -Y
+        glm::vec3(1.0f, 0.0f, 0.0f),
+        glm::vec3(0.0f, 1.0f, 0.0f)),
+    // -Y (top face)
     glm::lookAt(
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(0.0f, -1.0f, 0.0f),
         glm::vec3(0.0f, 0.0f, 1.0f)),
-    // +Z
+    // +Y (bottom face)
+    glm::lookAt(
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(0.0f, 1.0f, 0.0f),
+        glm::vec3(0.0f, 0.0f, -1.0f)),
+    // +Z (front face)
     glm::lookAt(
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(0.0f, 0.0f, 1.0f),
         glm::vec3(0.0f, 1.0f, 0.0f)),
-    // -Z
+    // -Z (back face)
     glm::lookAt(
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(0.0f, 0.0f, -1.0f),
