@@ -19,8 +19,6 @@ vec2 SampleSphericalMap(vec3 v)
 void main()
 {		
     vec2 uv = SampleSphericalMap(normalize(out_local));
-    // Flip both axes so the cubemap faces are oriented correctly.
-    uv = vec2(1.0 - uv.x, 1.0 - uv.y);
     vec3 color = texture(Equirectangular, uv).rgb;
     
     frag_color = vec4(color, 1.0);
