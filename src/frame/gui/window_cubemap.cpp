@@ -19,7 +19,12 @@ WindowCubemap::WindowCubemap(TextureInterface& texture_interface)
     {
         throw std::runtime_error("Cannot create a normal texture!");
     }
-    name_ = std::format("cubemap - [{}]", texture_interface_.GetName());
+    auto display_size = texture_interface_.GetSize();
+    name_ = std::format(
+        "cubemap - [{}] - ({}, {})",
+        texture_interface_.GetName(),
+        display_size.x,
+        display_size.y);
 
     opengl::Cubemap& texture_cubemap =
         dynamic_cast<opengl::Cubemap&>(texture_interface_);
