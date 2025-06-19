@@ -130,7 +130,11 @@ void MenubarView::ShowTexturesWindow(DeviceInterface& device)
             {
                 draw_gui_.DeleteWindow(
                     std::format(
-                        "{} - [{}]", str_type, texture_interface.GetName()));
+                        "{} - [{}] - ({}, {})",
+                        str_type,
+                        texture_interface.GetName(),
+                        texture_interface.GetSize().x,
+                        texture_interface.GetSize().y));
             }
         }
     }
