@@ -11,6 +11,7 @@
 #include "frame/node_matrix.h"
 #include "frame/node_static_mesh.h"
 #include "frame/opengl/cubemap.h"
+#include "frame/opengl/cubemap_views.h"
 #include "frame/opengl/file/load_program.h"
 #include "frame/opengl/material.h"
 #include "frame/opengl/static_mesh.h"
@@ -19,39 +20,6 @@
 
 namespace frame::opengl
 {
-
-namespace
-{
-// Get the 6 view for the cube map.
-const std::array<glm::mat4, 6> views_cubemap = {
-    glm::lookAt(
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(-1.0f, 0.0f, 0.0f),
-        glm::vec3(0.0f, 1.0f, 0.0f)),
-    glm::lookAt(
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(1.0f, 0.0f, 0.0f),
-        glm::vec3(0.0f, 1.0f, 0.0f)),
-    glm::lookAt(
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(0.0f, -1.0f, 0.0f),
-        glm::vec3(0.0f, 0.0f, 1.0f)),
-    glm::lookAt(
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(0.0f, 1.0f, 0.0f),
-        glm::vec3(0.0f, 0.0f, -1.0f)),
-    glm::lookAt(
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(0.0f, 0.0f, 1.0f),
-        glm::vec3(0.0f, 1.0f, 0.0f)),
-    glm::lookAt(
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(0.0f, 0.0f, -1.0f),
-        glm::vec3(0.0f, 1.0f, 0.0f))};
-// Projection cube map.
-const glm::mat4 projection_cubemap =
-    glm::perspective(glm::radians(90.0f), 1.0f, 0.01f, 10.0f);
-} // namespace
 
 Renderer::Renderer(LevelInterface& level, glm::uvec4 viewport)
     : level_(level), viewport_(viewport)
@@ -279,10 +247,11 @@ void Renderer::RenderMesh(
                 nullptr);
             break;
         default:
-            throw std::runtime_error(std::format(
-                "Couldn't draw primitive {}",
-                proto::NodeStaticMesh_RenderPrimitiveEnum_Name(
-                    static_mesh.GetData().render_primitive_enum())));
+            throw std::runtime_error(
+                std::format(
+                    "Couldn't draw primitive {}",
+                    proto::NodeStaticMesh_RenderPrimitiveEnum_Name(
+                        static_mesh.GetData().render_primitive_enum())));
         }
         gl_index_buffer.UnBind();
     }
@@ -397,20 +366,22 @@ void Renderer::PreRender()
             for (std::uint32_t i = 0; i < 6; ++i)
             {
                 proto::TextureFrame texture_frame;
-                texture_frame.set_value(static_cast<proto::TextureFrame::Enum>(
-                    proto::TextureFrame::CUBE_MAP_POSITIVE_X + i));
+                texture_frame.set_value(
+                    static_cast<proto::TextureFrame::Enum>(
+                        proto::TextureFrame::CUBE_MAP_POSITIVE_X + i));
                 SetCubeMapTarget(texture_frame);
                 RenderNode(
-                    p.first, material_id, projection_cubemap, views_cubemap[i]);
+                    p.first, material_id, kProjectionCubemap, kViewsCubemap[i]);
             }
             {
                 // Again why?
                 proto::TextureFrame texture_frame;
-                texture_frame.set_value(static_cast<proto::TextureFrame::Enum>(
-                    proto::TextureFrame::CUBE_MAP_POSITIVE_X));
+                texture_frame.set_value(
+                    static_cast<proto::TextureFrame::Enum>(
+                        proto::TextureFrame::CUBE_MAP_POSITIVE_X));
                 SetCubeMapTarget(texture_frame);
                 RenderNode(
-                    p.first, material_id, projection_cubemap, views_cubemap[0]);
+                    p.first, material_id, kProjectionCubemap, kViewsCubemap[0]);
             }
             viewport_ = temp_viewport;
         }
@@ -438,10 +409,11 @@ void Renderer::RenderShadows(const CameraInterface& camera)
         auto texture_id = level_.GetIdFromName(texture_name);
         if (texture_id == NullId)
         {
-            throw std::runtime_error(fmt::format(
-                "Couldn't find texture {} for light {}",
-                texture_name,
-                light.GetName()));
+            throw std::runtime_error(
+                fmt::format(
+                    "Couldn't find texture {} for light {}",
+                    texture_name,
+                    light.GetName()));
         }
         // Save the current context.
         std::unique_ptr<FrameBuffer> temp_frame_buffer =
@@ -516,7 +488,7 @@ void Renderer::RenderShadows(const CameraInterface& camera)
                     // If you want that single “camera-based” pass:
                     glm::mat4 proj =
                         glm::perspective(glm::radians(90.f), 1.f, 0.1f, 1000.f);
-                    glm::mat4 rotation = views_cubemap[i];
+                    glm::mat4 rotation = kViewsCubemap[i];
                     glm::mat4 translation =
                         glm::translate(glm::mat4(1.0f), -light.GetVector());
                     glm::mat4 view = rotation * translation;
