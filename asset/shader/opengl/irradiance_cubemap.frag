@@ -15,7 +15,8 @@ void main()
     // incoming radiance of the environment. The result of this radiance
     // is the radiance of light coming from -Normal direction, which is what
     // we use in the PBR shader to sample irradiance.
-    vec3 normal = normalize(vec3(vert_local.x, -vert_local.y, vert_local.z));
+    // Invert X and Y so irradiance map matches skybox orientation.
+    vec3 normal = normalize(vec3(-vert_local.x, -vert_local.y, vert_local.z));
     vec3 irradiance = vec3(0.0);
 
     vec3 up = vec3(0.0, 1.0, 0.0);
