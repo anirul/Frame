@@ -1,5 +1,6 @@
 #include "frame/gui/window_raw_file.h"
 
+#include <algorithm>
 #include <cstring>
 #include <fstream>
 #include <imgui.h>
@@ -34,12 +35,6 @@ WindowRawFile::WindowRawFile(const std::string& file_name)
 
 bool WindowRawFile::DrawCallback()
 {
-    ImGui::InputTextMultiline(
-        "##rawtext",
-        buffer_.data(),
-        buffer_.size(),
-        ImVec2(-FLT_MIN, ImGui::GetTextLineHeight() * 30),
-        ImGuiInputTextFlags_AllowTabInput);
     if (ImGui::Button("Save"))
     {
         std::ofstream file(file_name_);
@@ -54,6 +49,14 @@ bool WindowRawFile::DrawCallback()
     {
         end_ = true;
     }
+    ImGui::Separator();
+    ImVec2 avail = ImGui::GetContentRegionAvail();
+    ImGui::InputTextMultiline(
+        "##rawtext",
+        buffer_.data(),
+        buffer_.size(),
+        avail,
+        ImGuiInputTextFlags_AllowTabInput);
     return true;
 }
 
