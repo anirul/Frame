@@ -1,10 +1,11 @@
 #include "menubar.h"
 
-#include <imgui.h>
-#include "frame/gui/window_logger.h"
-#include "frame/gui/window_resolution.h"
 #include "frame/gui/window_file_dialog.h"
+#include "frame/gui/window_logger.h"
+#include "frame/gui/window_raw_file.h"
+#include "frame/gui/window_resolution.h"
 #include "frame/logger.h"
+#include <imgui.h>
 
 namespace frame::gui
 {
@@ -14,9 +15,7 @@ Menubar::Menubar(
     MenubarFile& menubar_file,
     MenubarView& menubar_view,
     DeviceInterface& device)
-    : name_(name),
-      menubar_file_(menubar_file),
-      menubar_view_(menubar_view),
+    : name_(name), menubar_file_(menubar_file), menubar_view_(menubar_view),
       device_(device)
 {
     SetName(name);
@@ -68,6 +67,11 @@ void Menubar::MenuEdit()
         }
         if (ImGui::MenuItem("Delete", "Del"))
         {
+        }
+        if (ImGui::MenuItem("Raw edit this level"))
+        {
+            menubar_view_.GetDrawGui().AddWindow(
+                std::make_unique<WindowRawFile>(menubar_file_.GetFileName()));
         }
         ImGui::EndMenu();
     }
