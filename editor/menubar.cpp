@@ -71,8 +71,8 @@ void Menubar::MenuEdit()
         ImGui::Separator();
         if (ImGui::MenuItem("Raw edit this level"))
         {
-            menubar_view_.GetDrawGui().AddWindow(
-                std::make_unique<WindowRawFile>(menubar_file_.GetFileName()));
+            menubar_view_.GetDrawGui().AddWindow(std::make_unique<WindowRawFile>(
+                menubar_file_.GetFileName(), device_));
         }
         ImGui::EndMenu();
     }

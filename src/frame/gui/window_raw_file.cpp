@@ -6,12 +6,13 @@
 #include <imgui.h>
 
 #include "frame/file/file_system.h"
+#include "frame/json/parse_level.h"
 
 namespace frame::gui
 {
 
-WindowRawFile::WindowRawFile(const std::string& file_name)
-    : name_("Raw Level Edit"), file_name_(file_name)
+WindowRawFile::WindowRawFile(const std::string& file_name, DeviceInterface& device)
+    : name_("Raw Level Edit"), file_name_(file_name), device_(device)
 {
     buffer_.resize(64 * 1024, '\0');
     try
@@ -35,17 +36,19 @@ WindowRawFile::WindowRawFile(const std::string& file_name)
 
 bool WindowRawFile::DrawCallback()
 {
-    if (ImGui::Button("Save"))
+    if (ImGui::Button("Reload"))
     {
         std::ofstream file(file_name_);
         if (file)
         {
             file.write(buffer_.data(), std::strlen(buffer_.data()));
         }
-        end_ = true;
+        auto level = frame::json::ParseLevel(
+            device_.GetSize(), frame::file::FindFile(file_name_));
+        device_.Startup(std::move(level));
     }
     ImGui::SameLine();
-    if (ImGui::Button("Cancel"))
+    if (ImGui::Button("Close"))
     {
         end_ = true;
     }

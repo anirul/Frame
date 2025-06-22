@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "frame/gui/gui_window_interface.h"
+#include "frame/device_interface.h"
 
 namespace frame::gui
 {
@@ -15,7 +16,7 @@ namespace frame::gui
 class WindowRawFile : public GuiWindowInterface
 {
   public:
-    explicit WindowRawFile(const std::string& file_name);
+    WindowRawFile(const std::string& file_name, DeviceInterface& device);
     ~WindowRawFile() override = default;
 
     bool DrawCallback() override;
@@ -26,6 +27,7 @@ class WindowRawFile : public GuiWindowInterface
   private:
     std::string name_;
     std::string file_name_;
+    DeviceInterface& device_;
     std::vector<char> buffer_;
     bool end_ = false;
 };
