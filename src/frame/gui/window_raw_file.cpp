@@ -38,11 +38,6 @@ bool WindowRawFile::DrawCallback()
 {
     if (ImGui::Button("Reload"))
     {
-        std::ofstream file(file_name_);
-        if (file)
-        {
-            file.write(buffer_.data(), std::strlen(buffer_.data()));
-        }
         auto level = frame::json::ParseLevel(
             device_.GetSize(), frame::file::FindFile(file_name_));
         device_.Startup(std::move(level));

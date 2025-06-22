@@ -102,6 +102,7 @@ bool SDLOpenGLDrawGui::Update(DeviceInterface& device, double dt)
     {
         ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
         // Make the other window visible.
+        std::vector<std::string> windows_to_remove;
         for (const auto& pair : window_callbacks_)
         {
             // Call the callback!
@@ -109,6 +110,14 @@ bool SDLOpenGLDrawGui::Update(DeviceInterface& device, double dt)
             if (!pair.second.callback->DrawCallback())
                 returned_value = false;
             ImGui::End();
+            if (pair.second.callback->End())
+            {
+                windows_to_remove.push_back(pair.first);
+            }
+        }
+        for (const auto& name : windows_to_remove)
+        {
+            DeleteWindow(name);
         }
     }
 
