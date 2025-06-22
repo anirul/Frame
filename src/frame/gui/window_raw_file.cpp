@@ -11,7 +11,8 @@
 namespace frame::gui
 {
 
-WindowRawFile::WindowRawFile(const std::string& file_name, DeviceInterface& device)
+WindowRawFile::WindowRawFile(
+    const std::string& file_name, DeviceInterface& device)
     : name_("Raw Level Edit"), file_name_(file_name), device_(device)
 {
     buffer_.resize(64 * 1024, '\0');
@@ -38,8 +39,8 @@ bool WindowRawFile::DrawCallback()
 {
     if (ImGui::Button("Reload"))
     {
-        auto level = frame::json::ParseLevel(
-            device_.GetSize(), frame::file::FindFile(file_name_));
+        std::string content(buffer_.data());
+        auto level = frame::json::ParseLevel(device_.GetSize(), content);
         device_.Startup(std::move(level));
     }
     ImGui::SameLine();
