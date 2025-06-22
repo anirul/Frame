@@ -68,7 +68,15 @@ void Menubar::MenuEdit()
         if (ImGui::MenuItem("Delete", "Del"))
         {
         }
-        if (ImGui::MenuItem("Raw edit this level"))
+        ImGui::EndMenu();
+    }
+}
+
+void Menubar::MenuRaw()
+{
+    if (ImGui::BeginMenu("Raw"))
+    {
+        if (ImGui::MenuItem("Edit this level"))
         {
             menubar_view_.GetDrawGui().AddWindow(
                 std::make_unique<WindowRawFile>(menubar_file_.GetFileName()));
@@ -110,6 +118,7 @@ bool Menubar::DrawCallback()
 {
     MenuFile();
     MenuEdit();
+    MenuRaw();
     MenuView();
     return true;
 }
