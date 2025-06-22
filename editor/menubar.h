@@ -60,7 +60,6 @@ class Menubar : public GuiMenuBarInterface
   protected:
     void MenuFile();
     void MenuEdit();
-    void MenuRaw();
     void MenuView();
 
   private:
