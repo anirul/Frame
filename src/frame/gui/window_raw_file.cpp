@@ -63,19 +63,20 @@ bool WindowRawFile::DrawCallback()
     if (!error_message_.empty())
     {
         ImVec2 avail = ImGui::GetContentRegionAvail();
-        float text_height = ImGui::CalcTextSize(
-                                error_message_.c_str(), nullptr, false, avail.x)
-                              .y +
-                           ImGui::GetStyle().FramePadding.y * 2 +
-                           ImGui::GetStyle().ItemSpacing.y;
-        text_height = std::ceil(text_height);
-        ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.5f, 0.1f, 0.1f, 1.0f));
+        float text_height =
+            ImGui::CalcTextSize(error_message_.c_str(), nullptr, false, avail.x)
+                .y;
+        float padding = ImGui::GetStyle().WindowPadding.y;
+        text_height = std::ceil(text_height + padding * 2);
+        ImGui::PushStyleColor(
+            ImGuiCol_ChildBg, ImVec4(0.5f, 0.1f, 0.1f, 1.0f));
         ImGui::BeginChild(
             "##error_message", ImVec2(0, text_height), true,
             ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
         ImGui::TextWrapped("%s", error_message_.c_str());
         ImGui::EndChild();
         ImGui::PopStyleColor();
+        ImGui::Spacing();
         ImGui::Separator();
     }
     ImVec2 avail = ImGui::GetContentRegionAvail();
