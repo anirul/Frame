@@ -45,6 +45,7 @@ target_link_libraries(FrameGui
     fmt::fmt
     glm::glm
     imgui::imgui
+    spdlog::spdlog
     protobuf::libprotobuf
 )
 
