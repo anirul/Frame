@@ -15,7 +15,7 @@ SDLVulkanNone::SDLVulkanNone(glm::uvec2 size) : size_(size)
     if (SDL_Init(SDL_INIT_VIDEO) != 0)
     {
         throw std::runtime_error(
-            fmt::format("Couldn't initialize SDL: {}", SDL_GetError()));
+            std::format("Couldn't initialize SDL: {}", SDL_GetError()));
     }
 
     // Create an SDL window to use as a surface for Vulkan.
@@ -27,7 +27,7 @@ SDLVulkanNone::SDLVulkanNone(glm::uvec2 size) : size_(size)
     if (!sdl_window_)
     {
         throw std::runtime_error(
-            fmt::format("Couldn't initialize window: {}", SDL_GetError()));
+            std::format("Couldn't initialize window: {}", SDL_GetError()));
     }
 
     // Get the required extensions for creating a Vulkan surface.
@@ -41,7 +41,7 @@ SDLVulkanNone::SDLVulkanNone(glm::uvec2 size) : size_(size)
     }
     if (extension_count == 0)
     {
-        throw std::runtime_error(fmt::format(
+        throw std::runtime_error(std::format(
             "Could not get the extension count: {}", SDL_GetError()));
     }
 
@@ -91,7 +91,7 @@ SDLVulkanNone::SDLVulkanNone(glm::uvec2 size) : size_(size)
     if (!SDL_Vulkan_CreateSurface(
             sdl_window_, *vk_unique_instance_, nullptr, &vk_surface))
     {
-        throw std::runtime_error(fmt::format(
+        throw std::runtime_error(std::format(
             "Error while create vulkan surface: {}", SDL_GetError()));
     }
     vk_surface_ = vk::UniqueSurfaceKHR(vk_surface);

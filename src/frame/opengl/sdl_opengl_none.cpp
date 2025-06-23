@@ -49,7 +49,7 @@ SDLOpenGLNone::SDLOpenGLNone(glm::uvec2 size) : size_(size)
     if (!gl_context_)
     {
         throw std::runtime_error(
-            fmt::format("Failed to create GL context: {}", SDL_GetError()));
+            std::format("Failed to create GL context: {}", SDL_GetError()));
     }
 
     // Set as current
@@ -116,7 +116,7 @@ void* SDLOpenGLNone::GetGraphicContext() const
     auto result = glewInit();
     if (result != GLEW_OK)
     {
-        throw std::runtime_error(fmt::format(
+        throw std::runtime_error(std::format(
             "GLEW problems : {}",
             reinterpret_cast<const char*>(glewGetErrorString(result))));
     }

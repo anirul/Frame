@@ -67,7 +67,7 @@ std::unique_ptr<frame::ProgramInterface> ParseProgramOpenGL(
     case proto::SceneType::NONE:
     default:
         throw std::runtime_error(
-            fmt::format(
+            std::format(
                 "No way {}?",
                 static_cast<int>(proto_program.input_scene_type().value())));
     }

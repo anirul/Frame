@@ -16,13 +16,13 @@ SDLVulkanWindow::SDLVulkanWindow(glm::uvec2 size) : size_(size)
     if (!SDL_Init(SDL_INIT_VIDEO))
     {
         throw std::runtime_error(
-            fmt::format("Couldn't initialize SDL: {}", SDL_GetError()));
+            std::format("Couldn't initialize SDL: {}", SDL_GetError()));
     }
 
     if (!SDL_Vulkan_LoadLibrary(nullptr))
     {
         throw std::runtime_error(
-            fmt::format("Couldn't load Vulkan library: {}", SDL_GetError()));
+            std::format("Couldn't load Vulkan library: {}", SDL_GetError()));
     }
 
     // Create an SDL window to use as a surface for Vulkan.
@@ -34,7 +34,7 @@ SDLVulkanWindow::SDLVulkanWindow(glm::uvec2 size) : size_(size)
     if (!sdl_window_)
     {
         throw std::runtime_error(
-            fmt::format("Couldn't initialize window: {}", SDL_GetError()));
+            std::format("Couldn't initialize window: {}", SDL_GetError()));
     }
 
     // Get the required extensions for creating a Vulkan surface.
@@ -48,7 +48,7 @@ SDLVulkanWindow::SDLVulkanWindow(glm::uvec2 size) : size_(size)
     }
     if (extension_count == 0)
     {
-        throw std::runtime_error(fmt::format(
+        throw std::runtime_error(std::format(
             "Could not get the extension count: {}", SDL_GetError()));
     }
 #ifdef VK_EXT_ENABLE_DEBUG_EXTENSION
@@ -94,7 +94,7 @@ SDLVulkanWindow::SDLVulkanWindow(glm::uvec2 size) : size_(size)
     if (!SDL_Vulkan_CreateSurface(
             sdl_window_, *vk_unique_instance_, nullptr, &vk_surface))
     {
-        throw std::runtime_error(fmt::format(
+        throw std::runtime_error(std::format(
             "Error while create vulkan surface: {}", SDL_GetError()));
     }
     vk_surface_ = vk::UniqueSurfaceKHR(vk_surface);
@@ -210,14 +210,14 @@ void SDLVulkanWindow::Resize(glm::uvec2 size, FullScreenEnum fullscreen_enum)
             SDL_DisplayID display = SDL_GetDisplayForWindow(sdl_window_);
             if (!display)
             {
-                throw std::runtime_error(fmt::format(
+                throw std::runtime_error(std::format(
                     "SDL_GetDisplayForWindow failed: {}", SDL_GetError()));
             }
 
             SDL_Rect bounds;
             if (!SDL_GetDisplayBounds(display, &bounds))
             {
-                throw std::runtime_error(fmt::format(
+                throw std::runtime_error(std::format(
                     "SDL_GetDisplayBounds failed: {}", SDL_GetError()));
             }
 
@@ -236,7 +236,7 @@ void SDLVulkanWindow::Resize(glm::uvec2 size, FullScreenEnum fullscreen_enum)
 
         if (!SDL_SetWindowFullscreenMode(sdl_window_, mode_ptr))
         {
-            throw std::runtime_error(fmt::format(
+            throw std::runtime_error(std::format(
                 "Error switching fullscreen mode: {}", SDL_GetError()));
         }
 

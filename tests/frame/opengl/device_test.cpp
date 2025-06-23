@@ -70,14 +70,14 @@ TEST_F(DeviceTest, AddManyDifferentPluginTest)
     {
         auto plugin = std::make_unique<test::PluginMock>();
         EXPECT_CALL(*plugin, GetName)
-            .WillRepeatedly(Return(fmt::format("test{}", i)));
+            .WillRepeatedly(Return(std::format("test{}", i)));
         device.AddPlugin(std::move(plugin));
     }
     EXPECT_EQ(8, device.GetPluginPtrs().size());
     std::vector<std::string> vec;
     for (int i = 0; i < 8; ++i)
     {
-        vec.push_back(fmt::format("test{}", i));
+        vec.push_back(std::format("test{}", i));
     }
     EXPECT_EQ(vec, device.GetPluginNames());
     for (int i = 0; i < 8; ++i)

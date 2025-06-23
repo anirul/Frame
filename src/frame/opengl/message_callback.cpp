@@ -92,7 +92,7 @@ void GLAPIENTRY MessageCallback(
     const void* userParam)
 {
     Logger& logger = Logger::GetInstance();
-    std::string str_message = fmt::format(
+    std::string str_message = std::format(
         "GL: {} (source [{}], type [{}], severity [{}])",
         message,
         Source2String(source),

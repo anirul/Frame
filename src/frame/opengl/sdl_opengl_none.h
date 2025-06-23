@@ -3,7 +3,7 @@
 #define NOMINMAX
 #include <GL/glew.h>
 #include <SDL3/SDL.h>
-#include <fmt/core.h>
+#include <format>
 
 #include <stdexcept>
 

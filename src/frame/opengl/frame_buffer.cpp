@@ -46,7 +46,7 @@ void FrameBuffer::AttachRender(const RenderBuffer& render) const
     {
         auto error_pair = GetError();
         throw std::runtime_error(
-            fmt::format("{} - {}", error_pair.first, error_pair.second));
+            std::format("{} - {}", error_pair.first, error_pair.second));
     }
     render.UnBind();
     UnBind();

@@ -1,6 +1,6 @@
 #include "frame/gui/window_camera.h"
 
-#include <fmt/core.h>
+#include <format>
 #include <imgui.h>
 
 #include <glm/gtc/type_ptr.hpp>
@@ -30,7 +30,7 @@ bool WindowCamera::DrawCallback()
     }
     ImGui::Text(
         "%s",
-        fmt::format("Aspect ratio: {}", camera_ptr_->GetAspectRatio()).c_str());
+        std::format("Aspect ratio: {}", camera_ptr_->GetAspectRatio()).c_str());
     ImGui::Separator();
     ImGui::DragFloat3("Position", glm::value_ptr(position_));
     ImGui::DragFloat3("Front", glm::value_ptr(front_));

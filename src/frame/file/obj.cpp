@@ -3,7 +3,7 @@
 #include <fstream>
 #include <numeric>
 #define TINYOBJLOADER_IMPLEMENTATION // define this in only *one* .cc
-#include <fmt/core.h>
+#include <format>
 #include <tiny_obj_loader.h>
 
 #include "frame/file/file_system.h"
@@ -26,7 +26,7 @@ Obj::Obj(std::filesystem::path file_name)
             throw std::runtime_error(reader.Error());
         }
         throw std::runtime_error(
-            fmt::format("Unknown error parsing file [{}].", total_path));
+            std::format("Unknown error parsing file [{}].", total_path));
     }
 
     logger_->info("Opening OBJ File [{}].", total_path);
@@ -106,7 +106,7 @@ Obj::Obj(std::filesystem::path file_name)
                 if (fv != 3)
                 {
                     throw std::runtime_error(
-                        fmt::format(
+                        std::format(
                             "The face should be 3 in size now {}.", fv));
                 }
                 // Loop over vertices in the face.

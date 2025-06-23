@@ -17,7 +17,7 @@ std::unique_ptr<frame::MaterialInterface> ParseMaterialOpenGL(
     if (texture_size != inner_size)
     {
         throw std::runtime_error(
-            fmt::format(
+            std::format(
                 "Not the same size for texture and inner names: {} != {}.",
                 texture_size,
                 inner_size));
@@ -28,7 +28,7 @@ std::unique_ptr<frame::MaterialInterface> ParseMaterialOpenGL(
     if (proto_material.program_name().empty())
     {
         throw std::runtime_error(
-            fmt::format("No program name in {}.", proto_material.name()));
+            std::format("No program name in {}.", proto_material.name()));
     }
     material->GetData().set_program_name(proto_material.program_name());
     auto maybe_program_id = level.GetIdFromName(proto_material.program_name());

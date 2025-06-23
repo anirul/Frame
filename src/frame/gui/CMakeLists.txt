@@ -42,7 +42,6 @@ target_include_directories(FrameGui
 
 target_link_libraries(FrameGui
   PRIVATE
-    fmt::fmt
     glm::glm
     imgui::imgui
     spdlog::spdlog

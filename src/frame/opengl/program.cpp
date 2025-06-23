@@ -86,7 +86,7 @@ const UniformInterface& Program::GetUniform(const std::string& name) const
     if (!HasUniform(name))
     {
         throw std::runtime_error(
-            fmt::format(
+            std::format(
                 "Uniform [{}] not found in program [{}].", name, name_));
     }
     auto it = uniform_map_.find(name);
@@ -190,7 +190,7 @@ void Program::AddUniformInternal(
     }
     default:
         logger_->error(
-            fmt::format(
+            std::format(
                 "Unknown uniform type [{}] for uniform [{}].",
                 static_cast<int>(uniform_ptr->GetData().type()),
                 name));
@@ -293,7 +293,7 @@ int Program::GetMemoizeUniformLocation(const std::string& name) const
         {
             GLenum error = glGetError();
             throw std::runtime_error(
-                fmt::format(
+                std::format(
                     "Could not get a location for uniform [{}] error: {}.",
                     name,
                     error));

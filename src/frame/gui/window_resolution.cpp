@@ -1,6 +1,6 @@
 #include "frame/gui/window_resolution.h"
 
-#include <fmt/core.h>
+#include <format>
 #include <imgui.h>
 
 #include <glm/gtc/type_ptr.hpp>
@@ -29,7 +29,7 @@ WindowResolution::WindowResolution(
     }
     for (const auto& value : resolutions_)
     {
-        resolution_items_.push_back(fmt::format(
+        resolution_items_.push_back(std::format(
             "{} - {}x{}", value.name, value.values.x, value.values.y));
     }
     fullscreen_items_.push_back("Windowed");
@@ -105,8 +105,8 @@ bool WindowResolution::DrawCallback()
         ImGui::Checkbox("Invert Left and Right", &invert_left_right_);
     }
     ImGui::Separator();
-    ImGui::Text("%s", fmt::format("Horizontal PPI: {}", hppi_).c_str());
-    ImGui::Text("%s", fmt::format("Vertical PPI: {}", vppi_).c_str());
+    ImGui::Text("%s", std::format("Horizontal PPI: {}", hppi_).c_str());
+    ImGui::Text("%s", std::format("Vertical PPI: {}", vppi_).c_str());
     ImGui::Separator();
     if (ImGui::Button("Change"))
     {

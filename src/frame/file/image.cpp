@@ -92,7 +92,7 @@ Image::Image(
     if (!image_)
     {
         std::string stbi_error = stbi_failure_reason();
-        throw std::runtime_error(fmt::format(
+        throw std::runtime_error(std::format(
             "unsupported file: [{}], reason: {}", file.string(), stbi_error));
     }
     free_ = true;
