@@ -1,218 +1,256 @@
 {
-  "name": "PointCloud",
-  "default_texture_name": "point_cloud_rendering",
-  "textures": [
-    {
-      "name": "skybox",
-      "cubemap": "true",
-      "pixel_element_size": { "value": "BYTE" },
-      "pixel_structure": { "value": "RGB" },
-      "file_names": {
-        "positive_x": "asset/cubemap/negative_x.png",
-        "negative_x": "asset/cubemap/positive_x.png",
-        "positive_y": "asset/cubemap/negative_y.png",
-        "negative_y": "asset/cubemap/positive_y.png",
-        "positive_z": "asset/cubemap/negative_z.png",
-        "negative_z": "asset/cubemap/positive_z.png"
-      }
-    },
-    {
-      "name": "black_texture",
-      "size": {
-        "x": 1,
-        "y": 1
-      },
-      "pixel_element_size": { "value": "BYTE" },
-      "pixel_structure": { "value": "RGB" }
-    },
-    {
-      "name": "point_cloud_rendering",
-      "size": {
-        "x": -1,
-        "y": -1
-      },
-      "pixel_element_size": { "value": "BYTE" },
-      "pixel_structure": { "value": "RGB" }
-    }
-  ],
-  "materials": [
-    {
-      "name": "PaintBlackMaterial",
-      "program_name": "PaintBlackProgram",
-      "texture_names": [ "black_texture" ],
-      "inner_names": [ "Display" ]
-    },
-    {
-      "name": "CubeMapMaterial",
-      "program_name": "CubeMapProgram",
-      "texture_names": [ "skybox" ],
-      "inner_names": [ "Skybox" ]
-    },
-    {
-      "name": "PointCloudMaterial",
-      "program_name": "PointCloudProgram"
-    }
-  ],
-  "programs": [
-    {
-      "name": "PaintBlackProgram",
-      "output_texture_names": [ "point_cloud_rendering" ],
-      "input_scene_type": { "value": "QUAD" },
-      "shader": "display"
-    },
-    {
-      "name": "CubeMapProgram",
-      "input_texture_names": "skybox",
-      "output_texture_names": "point_cloud_rendering",
-      "input_scene_type": { "value": "CUBE" },
-      "shader": "cubemap",
-      "uniforms": [
+    "name": "PointCloud",
+    "default_texture_name": "point_cloud_rendering",
+    "textures": [
         {
-          "name": "projection",
-          "uniform_enum": "PROJECTION_MAT4"
+            "name": "skybox",
+            "cubemap": "true",
+            "pixel_element_size": {
+                "value": "BYTE"
+            },
+            "pixel_structure": {
+                "value": "RGB"
+            },
+            "file_names": {
+                "positive_x": "asset/cubemap/negative_x.png",
+                "negative_x": "asset/cubemap/positive_x.png",
+                "positive_y": "asset/cubemap/negative_y.png",
+                "negative_y": "asset/cubemap/positive_y.png",
+                "positive_z": "asset/cubemap/negative_z.png",
+                "negative_z": "asset/cubemap/positive_z.png"
+            }
         },
         {
-          "name": "view",
-          "uniform_enum": "VIEW_MAT4"
+            "name": "black_texture",
+            "size": {
+                "x": 1,
+                "y": 1
+            },
+            "pixel_element_size": {
+                "value": "BYTE"
+            },
+            "pixel_structure": {
+                "value": "RGB"
+            }
         },
         {
-          "name": "model",
-          "uniform_enum": "MODEL_MAT4"
+            "name": "point_cloud_rendering",
+            "size": {
+                "x": -1,
+                "y": -1
+            },
+            "pixel_element_size": {
+                "value": "BYTE"
+            },
+            "pixel_structure": {
+                "value": "RGB"
+            }
         }
-      ]
-    },
-    {
-      "name": "PointCloudProgram",
-      "output_texture_names": [ "point_cloud_rendering" ],
-      "input_scene_type": { "value": "SCENE" },
-      "input_scene_root_name": "root",
-      "shader": "point_cloud",
-      "uniforms": [
-        {
-          "name": "projection",
-          "uniform_enum": "PROJECTION_MAT4"
-        },
-        {
-          "name": "view",
-          "uniform_enum": "VIEW_MAT4"
-        },
-        {
-          "name": "model",
-          "uniform_enum": "MODEL_MAT4"
-        },
-        {
-          "name": "time_s",
-          "uniform_enum": "FLOAT_TIME_S"
-        }
-      ]
-    }
-  ],
-  "scene_tree": {
-    "default_camera_name": "camera",
-    "default_root_name": "root",
-    "node_matrices": [
-      {
-        "name": "root",
-        "matrix": {
-          "m11": 1,
-          "m22": 1,
-          "m33": 1,
-          "m44": 1
-        }
-      },
-      {
-        "name": "move",
-        "parent": "root",
-        "matrix": {
-          "m11": 1,
-          "m22": 1,
-          "m33": 1,
-          "m34": -2,
-          "m44": 1
-        }
-      },
-      {
-        "name": "skybox_holder",
-        "parent": "root",
-        "matrix": {
-          "m11": 1,
-          "m22": 1,
-          "m33": 1,
-          "m44": 1
-        }
-      },
-      {
-        "name": "move_back",
-        "parent": "rotation",
-        "matrix": {
-          "m11": 1,
-          "m22": 1,
-          "m33": 1,
-          "m34": 2,
-          "m44": 1
-        }
-      },
-      {
-        "name": "rotation",
-        "parent": "root",
-        "quaternion": {
-          "x": 0,
-          "y": 0.0087265,
-          "z": 0,
-          "w": 0.9999619
-        }
-      }
     ],
-    "node_static_meshes": [
-      {
-        "name": "InitCleanBuffer",
-        "clean_buffer": {
-          "values": [ "CLEAR_COLOR", "CLEAR_DEPTH" ]
+    "materials": [
+        {
+            "name": "PaintBlackMaterial",
+            "program_name": "PaintBlackProgram",
+            "texture_names": [
+                "black_texture"
+            ],
+            "inner_names": [
+                "Display"
+            ]
+        },
+        {
+            "name": "CubeMapMaterial",
+            "program_name": "CubeMapProgram",
+            "texture_names": [
+                "skybox"
+            ],
+            "inner_names": [
+                "Skybox"
+            ]
+        },
+        {
+            "name": "PointCloudMaterial",
+            "program_name": "PointCloudProgram"
         }
-      },
-      {
-        "name": "CubeMapMesh",
-        "parent": "skybox_holder",
-        "material_name": "CubeMapMaterial",
-        "mesh_enum": "CUBE"
-      },
-      {
-        "name": "ClearDepthBuffer",
-        "clean_buffer": {
-          "values": [ "CLEAR_DEPTH" ]
-        }
-      },
-      {
-        "name": "PointCloudMesh",
-        "parent": "root",
-        "render_primitive_enum": "POINT_PRIMITIVE",
-        "file_name": "racing_turbo.ply",
-        "material_name": "PointCloudMaterial"
-      }
     ],
-    "node_cameras": [
-      {
-        "name": "camera",
-        "parent": "root",
-        "fov_degrees": 65.0,
-        "near_clip": 0.01,
-        "far_clip": 100000.0,
-        "position": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.5
+    "programs": [
+        {
+            "name": "PaintBlackProgram",
+            "output_texture_names": [
+                "point_cloud_rendering"
+            ],
+            "input_scene_type": {
+                "value": "QUAD"
+            },
+            "shader_vertex": "display.vert",
+            "shader_fragment": "display.frag"
         },
-        "target": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 1.0
+        {
+            "name": "CubeMapProgram",
+            "input_texture_names": "skybox",
+            "output_texture_names": "point_cloud_rendering",
+            "input_scene_type": {
+                "value": "CUBE"
+            },
+            "shader_vertex": "cubemap.vert",
+            "shader_fragment": "cubemap.frag",
+            "uniforms": [
+                {
+                    "name": "projection",
+                    "uniform_enum": "PROJECTION_MAT4"
+                },
+                {
+                    "name": "view",
+                    "uniform_enum": "VIEW_MAT4"
+                },
+                {
+                    "name": "model",
+                    "uniform_enum": "MODEL_MAT4"
+                }
+            ]
         },
-        "up": {
-          "x": 0.0,
-          "y": -1.0,
-          "z": 0.0
+        {
+            "name": "PointCloudProgram",
+            "output_texture_names": [
+                "point_cloud_rendering"
+            ],
+            "input_scene_type": {
+                "value": "SCENE"
+            },
+            "input_scene_root_name": "root",
+            "shader_vertex": "point_cloud.vert",
+            "shader_fragment": "point_cloud.frag",
+            "uniforms": [
+                {
+                    "name": "projection",
+                    "uniform_enum": "PROJECTION_MAT4"
+                },
+                {
+                    "name": "view",
+                    "uniform_enum": "VIEW_MAT4"
+                },
+                {
+                    "name": "model",
+                    "uniform_enum": "MODEL_MAT4"
+                },
+                {
+                    "name": "time_s",
+                    "uniform_enum": "FLOAT_TIME_S"
+                }
+            ]
         }
-      }
-    ]
-  }
+    ],
+    "scene_tree": {
+        "default_camera_name": "camera",
+        "default_root_name": "root",
+        "node_matrices": [
+            {
+                "name": "root",
+                "matrix": {
+                    "m11": 1,
+                    "m22": 1,
+                    "m33": 1,
+                    "m44": 1
+                }
+            },
+            {
+                "name": "move",
+                "parent": "root",
+                "matrix": {
+                    "m11": 1,
+                    "m22": 1,
+                    "m33": 1,
+                    "m34": -2,
+                    "m44": 1
+                }
+            },
+            {
+                "name": "skybox_holder",
+                "parent": "root",
+                "matrix": {
+                    "m11": 1,
+                    "m22": 1,
+                    "m33": 1,
+                    "m44": 1
+                }
+            },
+            {
+                "name": "move_back",
+                "parent": "rotation",
+                "matrix": {
+                    "m11": 1,
+                    "m22": 1,
+                    "m33": 1,
+                    "m34": 2,
+                    "m44": 1
+                }
+            },
+            {
+                "name": "rotation",
+                "parent": "root",
+                "quaternion": {
+                    "x": 0,
+                    "y": 0.0087265,
+                    "z": 0,
+                    "w": 0.9999619
+                }
+            }
+        ],
+        "node_static_meshes": [
+            {
+                "name": "InitCleanBuffer",
+                "clean_buffer": {
+                    "values": [
+                        "CLEAR_COLOR",
+                        "CLEAR_DEPTH"
+                    ]
+                }
+            },
+            {
+                "name": "CubeMapMesh",
+                "parent": "skybox_holder",
+                "material_name": "CubeMapMaterial",
+                "mesh_enum": "CUBE"
+            },
+            {
+                "name": "ClearDepthBuffer",
+                "clean_buffer": {
+                    "values": [
+                        "CLEAR_DEPTH"
+                    ]
+                }
+            },
+            {
+                "name": "PointCloudMesh",
+                "parent": "root",
+                "render_primitive_enum": "POINT_PRIMITIVE",
+                "file_name": "racing_turbo.ply",
+                "material_name": "PointCloudMaterial"
+            }
+        ],
+        "node_cameras": [
+            {
+                "name": "camera",
+                "parent": "root",
+                "fov_degrees": 65.0,
+                "near_clip": 0.01,
+                "far_clip": 100000.0,
+                "position": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.5
+                },
+                "target": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 1.0
+                },
+                "up": {
+                    "x": 0.0,
+                    "y": -1.0,
+                    "z": 0.0
+                }
+            }
+        ]
+    }
 }

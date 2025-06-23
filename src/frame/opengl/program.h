@@ -185,7 +185,6 @@ class Program : public ProgramInterface
     EntityId scene_root_ = 0;
     std::vector<EntityId> input_texture_ids_ = {};
     std::vector<EntityId> output_texture_ids_ = {};
-    std::string shader_name_;
     mutable bool is_used_ = false;
 };
 
@@ -196,7 +195,8 @@ class Program : public ProgramInterface
  */
 std::unique_ptr<frame::ProgramInterface> CreateProgram(
     const std::string& name,
-    const std::string& shader_name,
+    const std::string& vertex_shader_name,
+    const std::string& fragment_shader_name,
     std::istream& vertex_shader_code,
     std::istream& pixel_shader_code);
 /**

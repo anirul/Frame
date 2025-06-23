@@ -51,8 +51,8 @@ TEST_F(ProgramTest, CreateSimpleProgramProgramTest)
     EXPECT_FALSE(program_);
     std::istringstream iss_vertex(GetVertexSource());
     std::istringstream iss_fragment(GetFragmentSource());
-    auto program =
-        frame::opengl::CreateProgram("test", "test", iss_vertex, iss_fragment);
+    auto program = frame::opengl::CreateProgram(
+        "test", "test_vert", "test_frag", iss_vertex, iss_fragment);
     ASSERT_TRUE(program);
 }
 
@@ -61,8 +61,8 @@ TEST_F(ProgramTest, UniformTest)
     EXPECT_FALSE(program_);
     std::istringstream iss_vertex(GetVertexSource());
     std::istringstream iss_fragment(GetFragmentSource());
-    auto program =
-        frame::opengl::CreateProgram("test", "test", iss_vertex, iss_fragment);
+    auto program = frame::opengl::CreateProgram(
+        "test", "test_vert", "test_frag", iss_vertex, iss_fragment);
     ASSERT_TRUE(program);
     program_ = std::move(program);
     auto uniform_list = program_->GetUniformNameList();

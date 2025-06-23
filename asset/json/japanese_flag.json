@@ -1,80 +1,87 @@
 {
-  "name": "JapaneseFlag",
-  "default_texture_name": "billboard",
-  "textures": [
-    {
-      "name": "billboard",
-      "size": {
-        "x": "-1",
-        "y": "-1"
-      },
-      "cubemap": "false",
-      "pixel_element_size": { "value": "HALF" },
-      "pixel_structure": { "value": "RGB" }
-    }
-  ],
-  "programs": [
-    {
-      "name": "JapaneseFlagProgram",
-      "output_texture_names": "billboard",
-      "input_scene_type": { "value": "QUAD" },
-      "shader": "japanese_flag"
-    }
-  ],
-  "materials": [
-    {
-      "name": "JapaneseFlagMaterial",
-      "program_name": "JapaneseFlagProgram",
-      "texture_names": [],
-      "inner_names": []
-    }
-  ],
-  "scene_tree": {
-    "default_root_name": "root",
-    "default_camera_name": "camera",
-    "node_matrices": [
-      {
-        "name": "root",
-        "matrix": {
-          "m11": "1.0",
-          "m22": "1.0",
-          "m33": "1.0",
-          "m44": "1.0"
+    "name": "JapaneseFlag",
+    "default_texture_name": "billboard",
+    "textures": [
+        {
+            "name": "billboard",
+            "size": {
+                "x": "-1",
+                "y": "-1"
+            },
+            "cubemap": "false",
+            "pixel_element_size": {
+                "value": "HALF"
+            },
+            "pixel_structure": {
+                "value": "RGB"
+            }
         }
-      }
     ],
-    "node_cameras": [
-      {
-        "name": "camera",
-        "parent": "root",
-        "aspect_ratio": 1.3333,
-        "fov_degrees": 65.0,
-        "near_clip": 0.01,
-        "far_clip": 1000.0,
-        "position": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": -2.0
-        },
-        "target": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 1.0
-        },
-        "up": {
-          "x": 0.0,
-          "y": 1.0,
-          "z": 0.0
+    "programs": [
+        {
+            "name": "JapaneseFlagProgram",
+            "output_texture_names": "billboard",
+            "input_scene_type": {
+                "value": "QUAD"
+            },
+            "shader_vertex": "japanese_flag.vert",
+            "shader_fragment": "japanese_flag.frag"
         }
-      }
     ],
-    "node_static_meshes": [
-      {
-        "name": "JapaneseFlagRendering",
-        "parent": "root",
-        "mesh_enum": "QUAD",
-        "material_name": "JapaneseFlagMaterial"
-      }
-    ]
-  }
+    "materials": [
+        {
+            "name": "JapaneseFlagMaterial",
+            "program_name": "JapaneseFlagProgram",
+            "texture_names": [],
+            "inner_names": []
+        }
+    ],
+    "scene_tree": {
+        "default_root_name": "root",
+        "default_camera_name": "camera",
+        "node_matrices": [
+            {
+                "name": "root",
+                "matrix": {
+                    "m11": "1.0",
+                    "m22": "1.0",
+                    "m33": "1.0",
+                    "m44": "1.0"
+                }
+            }
+        ],
+        "node_cameras": [
+            {
+                "name": "camera",
+                "parent": "root",
+                "aspect_ratio": 1.3333,
+                "fov_degrees": 65.0,
+                "near_clip": 0.01,
+                "far_clip": 1000.0,
+                "position": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": -2.0
+                },
+                "target": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 1.0
+                },
+                "up": {
+                    "x": 0.0,
+                    "y": 1.0,
+                    "z": 0.0
+                }
+            }
+        ],
+        "node_static_meshes": [
+            {
+                "name": "JapaneseFlagRendering",
+                "parent": "root",
+                "mesh_enum": "QUAD",
+                "material_name": "JapaneseFlagMaterial"
+            }
+        ]
+    }
 }

@@ -14,7 +14,10 @@ proto::Program SerializeProgram(
 {
     proto::Program proto_program;
     proto_program.set_name(program_interface.GetName());
-    proto_program.set_shader(program_interface.GetData().shader());
+    proto_program.set_shader_vertex(
+        program_interface.GetData().shader_vertex());
+    proto_program.set_shader_fragment(
+        program_interface.GetData().shader_fragment());
     for (const auto& input_texture_id : program_interface.GetInputTextureIds())
     {
         *proto_program.add_input_texture_names() =

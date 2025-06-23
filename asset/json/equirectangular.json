@@ -1,104 +1,109 @@
 {
-  "name": "Equirectangular",
-  "default_texture_name": "OutputTexture",
-  "programs": [
-    {
-      "name": "EquirectangularProgram",
-      "shader": "equirectangular_cubemap",
-      "input_scene_type": {
-        "value": "QUAD"
-      },
-      "uniforms": [
+    "name": "Equirectangular",
+    "default_texture_name": "OutputTexture",
+    "programs": [
         {
-          "name": "projection",
-          "uniform_enum": "PROJECTION_MAT4"
-        },
-        {
-          "name": "view",
-          "uniform_enum": "VIEW_MAT4"
-        },
-        {
-          "name": "model",
-          "uniform_enum": "MODEL_MAT4"
+            "name": "EquirectangularProgram",
+            "shader_vertex": "equirectangular_cubemap.vert",
+            "shader_fragment": "equirectangular_cubemap.frag",
+            "input_scene_type": {
+                "value": "QUAD"
+            },
+            "uniforms": [
+                {
+                    "name": "projection",
+                    "uniform_enum": "PROJECTION_MAT4"
+                },
+                {
+                    "name": "view",
+                    "uniform_enum": "VIEW_MAT4"
+                },
+                {
+                    "name": "model",
+                    "uniform_enum": "MODEL_MAT4"
+                }
+            ],
+            "output_texture_names": [
+                "OutputTexture"
+            ]
         }
-      ],
-      "output_texture_names": [ "OutputTexture" ]
-    }
-  ],
-  "scene_tree": {
-    "default_root_name": "root",
-    "default_camera_name": "camera",
-    "node_matrices": [
-      {
-        "name": "root",
-        "matrix": {
-          "m11": 1,
-          "m22": 1,
-          "m33": 1,
-          "m44": 1
-        }
-      },
-      {
-        "name": "camera_boon",
-        "parent": "root"
-      }
     ],
-    "node_static_meshes": [
-      {
-        "name": "Cube",
-        "mesh_enum": "CUBE",
-        "material_name": "EquirectangularMaterial",
-        "parent": "root"
-      }
-    ],
-    "node_cameras": [
-      {
-        "name": "camera",
-        "parent": "camera_boon",
-        "fov_degrees": "90.0",
-        "near_clip": "0.1",
-        "far_clip": "1000.0",
-        "aspect_ratio": "1.0"
-      }
-    ]
-  },
-  "textures": [
-    {
-      "name": "InputTexture",
-      "file_name": "<filename>",
-      "cubemap": "false",
-      "size": {
-        "x": "<x>",
-        "y": "<y>"
-      },
-      "pixel_element_size": {
-        "value": "<pixel_element_size>"
-      },
-      "pixel_structure": {
-        "value": "<pixel_structure>"
-      }
+    "scene_tree": {
+        "default_root_name": "root",
+        "default_camera_name": "camera",
+        "node_matrices": [
+            {
+                "name": "root",
+                "matrix": {
+                    "m11": 1,
+                    "m22": 1,
+                    "m33": 1,
+                    "m44": 1
+                }
+            },
+            {
+                "name": "camera_boon",
+                "parent": "root"
+            }
+        ],
+        "node_static_meshes": [
+            {
+                "name": "Cube",
+                "mesh_enum": "CUBE",
+                "material_name": "EquirectangularMaterial",
+                "parent": "root"
+            }
+        ],
+        "node_cameras": [
+            {
+                "name": "camera",
+                "parent": "camera_boon",
+                "fov_degrees": "90.0",
+                "near_clip": "0.1",
+                "far_clip": "1000.0",
+                "aspect_ratio": "1.0"
+            }
+        ]
     },
-    {
-      "name": "OutputTexture",
-      "cubemap": "true",
-      "size": {
-        "x": "<x>",
-        "y": "<y>"
-      },
-      "pixel_element_size": {
-        "value": "<pixel_element_size>"
-      },
-      "pixel_structure": {
-        "value": "<pixel_structure>"
-      }
-    }
-  ],
-  "materials": [
-    {
-      "name": "EquirectangularMaterial",
-      "program_name": "EquirectangularProgram",
-      "texture_names": [ "InputTexture" ],
-      "inner_names": "Equirectangular"
-    }
-  ]
+    "textures": [
+        {
+            "name": "InputTexture",
+            "file_name": "<filename>",
+            "cubemap": "false",
+            "size": {
+                "x": "<x>",
+                "y": "<y>"
+            },
+            "pixel_element_size": {
+                "value": "<pixel_element_size>"
+            },
+            "pixel_structure": {
+                "value": "<pixel_structure>"
+            }
+        },
+        {
+            "name": "OutputTexture",
+            "cubemap": "true",
+            "size": {
+                "x": "<x>",
+                "y": "<y>"
+            },
+            "pixel_element_size": {
+                "value": "<pixel_element_size>"
+            },
+            "pixel_structure": {
+                "value": "<pixel_structure>"
+            }
+        }
+    ],
+    "materials": [
+        {
+            "name": "EquirectangularMaterial",
+            "program_name": "EquirectangularProgram",
+            "texture_names": [
+                "InputTexture"
+            ],
+            "inner_names": "Equirectangular"
+        }
+    ]
 }
