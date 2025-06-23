@@ -61,7 +61,11 @@ bool WindowRawFile::DrawCallback()
     ImGui::Separator();
     if (!error_message_.empty())
     {
+        ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.5f, 0.1f, 0.1f, 1.0f));
+        ImGui::BeginChild("##error_message", ImVec2(0, 0), true);
         ImGui::TextWrapped("%s", error_message_.c_str());
+        ImGui::EndChild();
+        ImGui::PopStyleColor();
         ImGui::Separator();
     }
     ImVec2 avail = ImGui::GetContentRegionAvail();
