@@ -226,4 +226,6 @@ cython_debug/
 ### Situational Files ###
 imgui.ini
 !asset/model/*.obj
+include/frame/proto/*.pb.h
+src/frame/proto/include/frame/proto
 

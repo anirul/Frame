@@ -185,7 +185,6 @@ class Program : public ProgramInterface
     EntityId scene_root_ = 0;
     std::vector<EntityId> input_texture_ids_ = {};
     std::vector<EntityId> output_texture_ids_ = {};
-    std::string shader_name_;
     mutable bool is_used_ = false;
 };
 
