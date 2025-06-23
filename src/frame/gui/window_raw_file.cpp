@@ -61,8 +61,15 @@ bool WindowRawFile::DrawCallback()
     ImGui::Separator();
     if (!error_message_.empty())
     {
+        ImVec2 avail = ImGui::GetContentRegionAvail();
+        float text_height = ImGui::CalcTextSize(
+            error_message_.c_str(), nullptr, true, avail.x)
+                              .y +
+                           ImGui::GetStyle().FramePadding.y * 2;
         ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.5f, 0.1f, 0.1f, 1.0f));
-        ImGui::BeginChild("##error_message", ImVec2(0, 0), true);
+        ImGui::BeginChild(
+            "##error_message", ImVec2(0, text_height), true,
+            ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
         ImGui::TextWrapped("%s", error_message_.c_str());
         ImGui::EndChild();
         ImGui::PopStyleColor();
