@@ -32,7 +32,8 @@ Renderer::Renderer(LevelInterface& level, glm::uvec4 viewport)
     frame_buffer_->AttachRender(*render_buffer_);
     proto::Program proto_program;
     proto_program.set_name("display");
-    proto_program.set_shader("display");
+    proto_program.set_shader_vertex("display.vert");
+    proto_program.set_shader_fragment("display.frag");
     auto program = file::LoadProgram(proto_program);
     if (!program)
         throw std::runtime_error("No program!");

@@ -196,7 +196,8 @@ class Program : public ProgramInterface
  */
 std::unique_ptr<frame::ProgramInterface> CreateProgram(
     const std::string& name,
-    const std::string& shader_name,
+    const std::string& vertex_shader_name,
+    const std::string& fragment_shader_name,
     std::istream& vertex_shader_code,
     std::istream& pixel_shader_code);
 /**

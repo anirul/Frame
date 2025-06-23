@@ -1,87 +1,102 @@
 {
-  "name": "RayMarching",
-  "default_texture_name": "billboard",
-  "materials": [
-    {
-      "name": "RayMarchingMaterial",
-      "program_name": "RayMarchingProgram",
-      "texture_names": [],
-      "inner_names": []
-    }
-  ],
-  "programs": [
-    {
-      "name": "RayMarchingProgram",
-      "output_texture_names": "billboard",
-      "input_scene_type": { "value": "QUAD" },
-      "shader": "ray_marching",
-      "uniforms": [
+    "name": "RayMarching",
+    "default_texture_name": "billboard",
+    "materials": [
         {
-          "name": "time_s",
-          "uniform_enum": "FLOAT_TIME_S"
+            "name": "RayMarchingMaterial",
+            "program_name": "RayMarchingProgram",
+            "texture_names": [],
+            "inner_names": []
         }
-      ]
-    }
-  ],
-  "textures": [
-    {
-      "name": "billboard",
-      "size": {
-        "x": "-1",
-        "y": "-1"
-      },
-      "cubemap": "false",
-      "pixel_element_size": { "value": "HALF" },
-      "pixel_structure": { "value": "RGB" },
-      "min_filter": { "value": "LINEAR" },
-      "mag_filter": { "value": "LINEAR" },
-      "wrap_s": { "value": "CLAMP_TO_EDGE" },
-      "wrap_t": { "value": "CLAMP_TO_EDGE" }
-    }
-  ],
-  "scene_tree": {
-    "default_camera_name": "camera",
-    "default_root_name": "root",
-    "node_matrices": [
-      {
-        "name": "root",
-        "matrix": {
-          "m11": "1.0",
-          "m22": "1.0",
-          "m33": "1.0",
-          "m44": "1.0"
-        }
-      }
     ],
-    "node_cameras": [
-      {
-        "name": "camera",
-        "parent": "root",
-        "fov_degrees": "65.0",
-        "position": {
-          "x": "0",
-          "y": "0",
-          "z": "-1"
-        },
-        "target": {
-          "x": "0",
-          "y": "0",
-          "z": "1"
-        },
-        "up": {
-          "x": "0",
-          "y": "1",
-          "z": "0"
+    "programs": [
+        {
+            "name": "RayMarchingProgram",
+            "output_texture_names": "billboard",
+            "input_scene_type": {
+                "value": "QUAD"
+            },
+            "shader_vertex": "ray_marching.vert",
+            "shader_fragment": "ray_marching.frag",
+            "uniforms": [
+                {
+                    "name": "time_s",
+                    "uniform_enum": "FLOAT_TIME_S"
+                }
+            ]
         }
-      }
     ],
-    "node_static_meshes": [
-      {
-        "name": "RayMarchingRendering",
-        "parent": "root",
-        "mesh_enum": "QUAD",
-        "material_name": "RayMarchingMaterial"
-      }
-    ]
-  }
+    "textures": [
+        {
+            "name": "billboard",
+            "size": {
+                "x": "-1",
+                "y": "-1"
+            },
+            "cubemap": "false",
+            "pixel_element_size": {
+                "value": "HALF"
+            },
+            "pixel_structure": {
+                "value": "RGB"
+            },
+            "min_filter": {
+                "value": "LINEAR"
+            },
+            "mag_filter": {
+                "value": "LINEAR"
+            },
+            "wrap_s": {
+                "value": "CLAMP_TO_EDGE"
+            },
+            "wrap_t": {
+                "value": "CLAMP_TO_EDGE"
+            }
+        }
+    ],
+    "scene_tree": {
+        "default_camera_name": "camera",
+        "default_root_name": "root",
+        "node_matrices": [
+            {
+                "name": "root",
+                "matrix": {
+                    "m11": "1.0",
+                    "m22": "1.0",
+                    "m33": "1.0",
+                    "m44": "1.0"
+                }
+            }
+        ],
+        "node_cameras": [
+            {
+                "name": "camera",
+                "parent": "root",
+                "fov_degrees": "65.0",
+                "position": {
+                    "x": "0",
+                    "y": "0",
+                    "z": "-1"
+                },
+                "target": {
+                    "x": "0",
+                    "y": "0",
+                    "z": "1"
+                },
+                "up": {
+                    "x": "0",
+                    "y": "1",
+                    "z": "0"
+                }
+            }
+        ],
+        "node_static_meshes": [
+            {
+                "name": "RayMarchingRendering",
+                "parent": "root",
+                "mesh_enum": "QUAD",
+                "material_name": "RayMarchingMaterial"
+            }
+        ]
+    }
 }

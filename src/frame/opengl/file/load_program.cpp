@@ -14,9 +14,9 @@ std::unique_ptr<frame::ProgramInterface> LoadProgram(
     const proto::Program& proto_program)
 {
     std::string vertex_file =
-        std::string("asset/shader/opengl/" + proto_program.shader() + ".vert");
+        std::string("asset/shader/opengl/" + proto_program.shader_vertex());
     std::string fragment_file =
-        std::string("asset/shader/opengl/" + proto_program.shader() + ".frag");
+        std::string("asset/shader/opengl/" + proto_program.shader_fragment());
     return LoadProgram(proto_program, vertex_file, fragment_file);
 }
 

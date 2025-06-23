@@ -219,8 +219,7 @@ void Program::UploadUniform(const UniformInterface& uniform_interface) const
         break;
     }
     case proto::Uniform::FLOAT:
-        glUniform1f(
-            GetMemoizeUniformLocation(name), data.uniform_float());
+        glUniform1f(GetMemoizeUniformLocation(name), data.uniform_float());
         break;
     case proto::Uniform::FLOATS: {
         auto& uniform_floats = data.uniform_floats();
@@ -238,8 +237,7 @@ void Program::UploadUniform(const UniformInterface& uniform_interface) const
     }
     case proto::Uniform::FLOAT_VECTOR3: {
         glm::vec3 value = json::ParseUniform(data.uniform_vec3());
-        glUniform3f(
-            GetMemoizeUniformLocation(name), value.x, value.y, value.z);
+        glUniform3f(GetMemoizeUniformLocation(name), value.x, value.y, value.z);
         break;
     }
     case proto::Uniform::FLOAT_VECTOR4: {
@@ -259,10 +257,11 @@ void Program::UploadUniform(const UniformInterface& uniform_interface) const
         break;
     }
     default:
-        logger_->error(std::format(
-            "Unknown uniform type [{}] for uniform [{}].",
-            static_cast<int>(data.type()),
-            name));
+        logger_->error(
+            std::format(
+                "Unknown uniform type [{}] for uniform [{}].",
+                static_cast<int>(data.type()),
+                name));
         break;
     }
 }
@@ -511,7 +510,8 @@ void Program::SetTemporarySceneRoot(const std::string& name)
 
 std::unique_ptr<ProgramInterface> CreateProgram(
     const std::string& name,
-    const std::string& shader_name,
+    const std::string& vertex_shader_name,
+    const std::string& fragment_shader_name,
     std::istream& vertex_shader_code,
     std::istream& pixel_shader_code)
 {
@@ -537,7 +537,8 @@ std::unique_ptr<ProgramInterface> CreateProgram(
     program->AddShader(vertex);
     program->AddShader(fragment);
     program->LinkShader();
-    program->GetData().set_shader(shader_name);
+    program->GetData().set_shader_vertex(vertex_shader_name);
+    program->GetData().set_shader_fragment(fragment_shader_name);
 #ifdef _DEBUG
     logger->info("with pointer := {}", static_cast<void*>(program.get()));
 #endif // _DEBUG
@@ -588,7 +589,8 @@ std::unique_ptr<ProgramInterface> CreateProgram(
             program->AddUniform(std::move(uniform_interface));
         }
     }
-    program->GetData().set_shader(proto_program.shader());
+    program->GetData().set_shader_vertex(proto_program.shader_vertex());
+    program->GetData().set_shader_fragment(proto_program.shader_fragment());
 #ifdef _DEBUG
     logger->info("with pointer := {}", static_cast<void*>(program.get()));
 #endif // _DEBUG
