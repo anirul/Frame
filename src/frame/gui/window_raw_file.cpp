@@ -1,10 +1,10 @@
 #include "frame/gui/window_raw_file.h"
 
+#include "frame/logger.h"
 #include <algorithm>
 #include <cstring>
 #include <fstream>
 #include <imgui.h>
-#include "frame/logger.h"
 
 #include "frame/file/file_system.h"
 #include "frame/json/parse_level.h"
@@ -59,6 +59,11 @@ bool WindowRawFile::DrawCallback()
         end_ = true;
     }
     ImGui::Separator();
+    if (!error_message_.empty())
+    {
+        ImGui::TextWrapped("%s", error_message_.c_str());
+        ImGui::Separator();
+    }
     ImVec2 avail = ImGui::GetContentRegionAvail();
     ImGui::InputTextMultiline(
         "##rawtext",
@@ -66,10 +71,6 @@ bool WindowRawFile::DrawCallback()
         buffer_.size(),
         avail,
         ImGuiInputTextFlags_AllowTabInput);
-    if (!error_message_.empty())
-    {
-        ImGui::Text("%s", error_message_.c_str());
-    }
     return true;
 }
 
