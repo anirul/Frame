@@ -30,6 +30,7 @@ class WindowRawFile : public GuiWindowInterface
     DeviceInterface& device_;
     std::vector<char> buffer_;
     bool end_ = false;
+    std::string error_message_;
 };
 
 } // End namespace frame::gui.
