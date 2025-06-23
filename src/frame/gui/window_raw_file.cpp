@@ -4,6 +4,7 @@
 #include <cstring>
 #include <fstream>
 #include <imgui.h>
+#include "frame/logger.h"
 
 #include "frame/file/file_system.h"
 #include "frame/json/parse_level.h"
@@ -39,9 +40,18 @@ bool WindowRawFile::DrawCallback()
 {
     if (ImGui::Button("Reload"))
     {
-        std::string content(buffer_.data());
-        auto level = frame::json::ParseLevel(device_.GetSize(), content);
-        device_.Startup(std::move(level));
+        try
+        {
+            std::string content(buffer_.data());
+            auto level = frame::json::ParseLevel(device_.GetSize(), content);
+            device_.Startup(std::move(level));
+            error_message_.clear();
+        }
+        catch (const std::exception& e)
+        {
+            error_message_ = e.what();
+            frame::Logger::GetInstance()->error(e.what());
+        }
     }
     ImGui::SameLine();
     if (ImGui::Button("Close"))
@@ -56,6 +66,10 @@ bool WindowRawFile::DrawCallback()
         buffer_.size(),
         avail,
         ImGuiInputTextFlags_AllowTabInput);
+    if (!error_message_.empty())
+    {
+        ImGui::Text("%s", error_message_.c_str());
+    }
     return true;
 }
 
