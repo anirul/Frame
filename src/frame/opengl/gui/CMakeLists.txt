@@ -16,7 +16,6 @@ target_include_directories(FrameOpenGLGui
 
 target_link_libraries(FrameOpenGLGui
   PRIVATE
-    fmt::fmt
     Frame
     FrameGui
     FrameOpenGL

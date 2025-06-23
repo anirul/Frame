@@ -46,18 +46,18 @@ std::unique_ptr<LevelInterface> LevelProto(
         std::string texture_name = proto_texture.name();
         if (!texture)
         {
-            throw std::runtime_error(fmt::format(
+            throw std::runtime_error(std::format(
                 "Could not load texture: {}", proto_texture.file_name()));
         }
         texture->SetName(texture_name);
         texture_id = level->AddTexture(std::move(texture));
-        logger->info(fmt::format(
+        logger->info(std::format(
             "Add a new texture {}, with id [{}].",
             proto_texture.name(),
             texture_id));
         if (!texture_id)
         {
-            throw std::runtime_error(fmt::format(
+            throw std::runtime_error(std::format(
                 "Coudn't save texture {} to level.", proto_texture.name()));
         }
     }
@@ -74,12 +74,12 @@ std::unique_ptr<LevelInterface> LevelProto(
         if (!program)
         {
             throw std::runtime_error(
-                fmt::format("invalid program: {}", proto_program.name()));
+                std::format("invalid program: {}", proto_program.name()));
         }
         program->SetName(proto_program.name());
         if (!level->AddProgram(std::move(program)))
         {
-            throw std::runtime_error(fmt::format(
+            throw std::runtime_error(std::format(
                 "Couldn't save program {} to level.", proto_program.name()));
         }
     }
@@ -91,11 +91,11 @@ std::unique_ptr<LevelInterface> LevelProto(
         if (!material)
         {
             throw std::runtime_error(
-                fmt::format("invalid material : {}", proto_material.name()));
+                std::format("invalid material : {}", proto_material.name()));
         }
         if (!level->AddMaterial(std::move(material)))
         {
-            throw std::runtime_error(fmt::format(
+            throw std::runtime_error(std::format(
                 "Couldn't save material {} to level.", proto_material.name()));
         }
     }

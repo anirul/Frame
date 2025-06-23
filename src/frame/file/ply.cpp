@@ -71,7 +71,7 @@ void GetElementFloat(
 {
     if (result.size() != SIZE)
         throw std::runtime_error(
-            fmt::format(
+            std::format(
                 "Result size is incorrect should be {} is {}",
                 SIZE,
                 result.size()));

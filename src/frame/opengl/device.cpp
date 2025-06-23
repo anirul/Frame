@@ -254,7 +254,7 @@ void Device::Display(double dt /*= 0.0*/)
             dt);
         break;
     default:
-        throw std::runtime_error(fmt::format(
+        throw std::runtime_error(std::format(
             "Unknown StereoEnum type {}.", static_cast<int>(stereo_enum_)));
     }
     // Reset viewport.

@@ -211,7 +211,7 @@ void Level::RemoveBuffer(EntityId buffer_id)
     if (!id_buffer_map_.count(buffer_id))
     {
         throw std::runtime_error(
-            fmt::format("No buffer with id #{}.", buffer_id));
+            std::format("No buffer with id #{}.", buffer_id));
     }
     std::string name = id_name_map_.at(buffer_id);
     id_buffer_map_.erase(buffer_id);
@@ -360,7 +360,7 @@ void Level::ReplaceTexture(
     if (!texture)
     {
         throw std::runtime_error(
-            fmt::format("Invalid texture tried to be updated {}.", id));
+            std::format("Invalid texture tried to be updated {}.", id));
     }
     texture->Update(std::move(vector), size, bytes_per_pixel);
 }
@@ -371,7 +371,7 @@ void Level::ReplaceMesh(
     if (!id_static_mesh_map_.count(id))
     {
         throw std::runtime_error(
-            fmt::format(
+            std::format(
                 "trying to replace {} by {} but no mesh there yet?",
                 mesh->GetName(),
                 id));

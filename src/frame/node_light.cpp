@@ -2,7 +2,7 @@
 
 #include "frame/json/serialize_uniform.h"
 
-#include <fmt/core.h>
+#include <format>
 #include <stdexcept>
 
 namespace frame
@@ -141,7 +141,7 @@ glm::mat4 NodeLight::GetLocalModel(const double dt) const
         if (!parent_node)
         {
             throw std::runtime_error(
-                fmt::format(
+                std::format(
                     "SceneLight func({}) returned nullptr", GetParentName()));
         }
         return parent_node->GetLocalModel(dt);

@@ -1,7 +1,7 @@
 #include "renderer.h"
 
 #include <GL/glew.h>
-#include <fmt/core.h>
+#include <format>
 #include <glm/gtc/type_ptr.hpp>
 
 #include <format>
@@ -411,7 +411,7 @@ void Renderer::RenderShadows(const CameraInterface& camera)
         if (texture_id == NullId)
         {
             throw std::runtime_error(
-                fmt::format(
+                std::format(
                     "Couldn't find texture {} for light {}",
                     texture_name,
                     light.GetName()));

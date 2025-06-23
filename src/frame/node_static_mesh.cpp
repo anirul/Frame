@@ -1,6 +1,6 @@
 #include "frame/node_static_mesh.h"
 
-#include <fmt/core.h>
+#include <format>
 
 #include <stdexcept>
 
@@ -17,7 +17,7 @@ glm::mat4 NodeStaticMesh::GetLocalModel(const double dt) const
         if (!parent_node)
         {
             throw std::runtime_error(
-                fmt::format(
+                std::format(
                     "SceneStaticMesh func({}) returned nullptr",
                     GetParentName()));
         }

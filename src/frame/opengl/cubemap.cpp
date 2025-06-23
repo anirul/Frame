@@ -628,7 +628,7 @@ proto::TextureFrame Cubemap::GetTextureFrameFromPosition(int i)
         texture_frame.set_value(proto::TextureFrame::CUBE_MAP_NEGATIVE_Z);
         break;
     default:
-        throw std::runtime_error(fmt::format("Invalid entry {}.", i));
+        throw std::runtime_error(std::format("Invalid entry {}.", i));
     }
     return texture_frame;
 }

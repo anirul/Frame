@@ -62,7 +62,7 @@ SDLOpenGLWindow::SDLOpenGLWindow(glm::uvec2 size) : size_(size)
     if (!gl_context_)
     {
         throw std::runtime_error(
-            fmt::format("Failed to create GL context: {}", SDL_GetError()));
+            std::format("Failed to create GL context: {}", SDL_GetError()));
     }
 
     // Set as current
@@ -353,14 +353,14 @@ void SDLOpenGLWindow::Resize(glm::uvec2 size, FullScreenEnum fullscreen_enum)
             SDL_DisplayID display = SDL_GetDisplayForWindow(sdl_window_);
             if (!display)
             {
-                throw std::runtime_error(fmt::format(
+                throw std::runtime_error(std::format(
                     "SDL_GetDisplayForWindow failed: {}", SDL_GetError()));
             }
 
             SDL_Rect bounds;
             if (!SDL_GetDisplayBounds(display, &bounds))
             {
-                throw std::runtime_error(fmt::format(
+                throw std::runtime_error(std::format(
                     "SDL_GetDisplayBounds failed: {}", SDL_GetError()));
             }
 

@@ -120,11 +120,11 @@ void* Win32OpenGLNone::GetGraphicContext() const
 
     // Check OpenGL versions.
     const char* version = (const char*)glGetString(GL_VERSION);
-    logger_->info(fmt::format("Version  : {}", version));
+    logger_->info(std::format("Version  : {}", version));
     const char* vendor = (const char*)glGetString(GL_VENDOR);
-    logger_->info(fmt::format("Vendor   : {}", vendor));
+    logger_->info(std::format("Vendor   : {}", vendor));
     const char* renderer = (const char*)glGetString(GL_RENDERER);
-    logger_->info(fmt::format("Renderer : {}", renderer));
+    logger_->info(std::format("Renderer : {}", renderer));
 
 #if defined(_WIN32) || defined(_WIN64)
     if (wglewIsSupported("WGL_ARB_create_context"))

@@ -1,6 +1,6 @@
 #include "frame/node_matrix.h"
 
-#include <fmt/core.h>
+#include <format>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
@@ -94,7 +94,7 @@ glm::mat4 NodeMatrix::GetLocalModel(const double dt) const
         auto parent_node = func_(GetParentName());
         if (!parent_node)
         {
-            throw std::runtime_error(fmt::format(
+            throw std::runtime_error(std::format(
                 "SceneMatrix func({}) returned nullptr", GetParentName()));
         }
         return parent_node->GetLocalModel(dt) * ComputeLocalRotation(dt);

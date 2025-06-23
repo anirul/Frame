@@ -71,7 +71,7 @@ StaticMesh::StaticMesh(
         std::fill(color.begin(), color.end(), 1.0f);
         std::unique_ptr<BufferInterface> gl_color_buffer =
             std::make_unique<Buffer>();
-        gl_color_buffer->SetName(fmt::format("Mesh.Buffer.Color.{}", count));
+        gl_color_buffer->SetName(std::format("Mesh.Buffer.Color.{}", count));
         gl_color_buffer->Copy(color);
         color_buffer_id_ = level_.AddBuffer(std::move(gl_color_buffer));
         auto& color_buffer_ref =
@@ -116,7 +116,7 @@ StaticMesh::StaticMesh(
         }
         std::unique_ptr<BufferInterface> gl_normal_buffer =
             std::make_unique<Buffer>();
-        gl_normal_buffer->SetName(fmt::format("Mesh.Buffer.Normal.{}", count));
+        gl_normal_buffer->SetName(std::format("Mesh.Buffer.Normal.{}", count));
         gl_normal_buffer->Copy(normal);
         normal_buffer_id_ = level_.AddBuffer(std::move(gl_normal_buffer));
         auto& normal_buffer_ref =
@@ -161,7 +161,7 @@ StaticMesh::StaticMesh(
         std::unique_ptr<BufferInterface> gl_texture_coordinate =
             std::make_unique<Buffer>();
         gl_texture_coordinate->SetName(
-            fmt::format("Mesh.Buffer.TexCoord.{}", count));
+            std::format("Mesh.Buffer.TexCoord.{}", count));
         gl_texture_coordinate->Copy(texture_coordinate);
         texture_buffer_id_ = level_.AddBuffer(std::move(gl_texture_coordinate));
         auto& texture_buffer_ref =
@@ -202,7 +202,7 @@ StaticMesh::StaticMesh(
             std::make_unique<Buffer>(
                 BufferTypeEnum::ELEMENT_ARRAY_BUFFER,
                 BufferUsageEnum::STREAM_DRAW);
-        gl_index_buffer->SetName(fmt::format("Mesh.Buffer.Index.{}", count));
+        gl_index_buffer->SetName(std::format("Mesh.Buffer.Index.{}", count));
         gl_index_buffer->Copy(index);
         index_buffer_id_ = level_.AddBuffer(std::move(gl_index_buffer));
     }
@@ -321,10 +321,10 @@ EntityId CreateQuadStaticMesh(LevelInterface& level)
     index_buffer->Copy(indices);
     static std::int64_t count = 0;
     count++;
-    point_buffer->SetName(fmt::format("QuadPoint.{}", count));
-    normal_buffer->SetName(fmt::format("QuadNormal.{}", count));
-    texture_buffer->SetName(fmt::format("QuadTexture.{}", count));
-    index_buffer->SetName(fmt::format("QuadIndex.{}", count));
+    point_buffer->SetName(std::format("QuadPoint.{}", count));
+    normal_buffer->SetName(std::format("QuadNormal.{}", count));
+    texture_buffer->SetName(std::format("QuadTexture.{}", count));
+    index_buffer->SetName(std::format("QuadIndex.{}", count));
     auto maybe_point_buffer_id = level.AddBuffer(std::move(point_buffer));
     if (!maybe_point_buffer_id)
         return NullId;
@@ -345,7 +345,7 @@ EntityId CreateQuadStaticMesh(LevelInterface& level)
     parameter.render_primitive_enum =
         proto::NodeStaticMesh::TRIANGLE_PRIMITIVE;
     auto mesh = std::make_unique<StaticMesh>(level, parameter);
-    mesh->SetName(fmt::format("QuadMesh.{}", count));
+    mesh->SetName(std::format("QuadMesh.{}", count));
     return level.AddStaticMesh(std::move(mesh));
 }
 
@@ -504,10 +504,10 @@ EntityId CreateCubeStaticMesh(LevelInterface& level)
     index_buffer->Copy(indices);
     static std::int64_t count = 0;
     count++;
-    point_buffer->SetName(fmt::format("CubePoint.{}", count));
-    normal_buffer->SetName(fmt::format("CubeNormal.{}", count));
-    texture_buffer->SetName(fmt::format("CubeTexture.{}", count));
-    index_buffer->SetName(fmt::format("CubeIndex.{}", count));
+    point_buffer->SetName(std::format("CubePoint.{}", count));
+    normal_buffer->SetName(std::format("CubeNormal.{}", count));
+    texture_buffer->SetName(std::format("CubeTexture.{}", count));
+    index_buffer->SetName(std::format("CubeIndex.{}", count));
     auto maybe_point_buffer_id = level.AddBuffer(std::move(point_buffer));
     if (!maybe_point_buffer_id)
         return NullId;
@@ -528,7 +528,7 @@ EntityId CreateCubeStaticMesh(LevelInterface& level)
     parameter.render_primitive_enum =
         proto::NodeStaticMesh::TRIANGLE_PRIMITIVE;
     auto mesh = std::make_unique<StaticMesh>(level, parameter);
-    mesh->SetName(fmt::format("CubeMesh.{}", count));
+    mesh->SetName(std::format("CubeMesh.{}", count));
     return level.AddStaticMesh(std::move(mesh));
 }
 

@@ -1,6 +1,6 @@
 #include "frame/json/parse_scene_tree.h"
 
-#include <fmt/core.h>
+#include <format>
 
 #include "frame/file/file_system.h"
 #include "frame/file/obj.h"
@@ -26,7 +26,7 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
         auto maybe_id = level.GetIdFromName(name);
         if (!maybe_id)
         {
-            throw std::runtime_error(fmt::format("No id from name: {}", name));
+            throw std::runtime_error(std::format("No id from name: {}", name));
         }
         EntityId id = maybe_id;
         return &level.GetSceneNodeFromId(id);
@@ -122,7 +122,7 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
     }
     default: {
         throw std::runtime_error(
-            fmt::format(
+            std::format(
                 "unknown mesh enum value: {}",
                 static_cast<int>(proto_scene_static_mesh.mesh_enum())));
     }
@@ -169,7 +169,7 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
         mesh.GetData().set_file_name(proto_scene_static_mesh.file_name());
         mesh.GetData().set_render_primitive_enum(
             proto_scene_static_mesh.render_primitive_enum());
-        auto str = fmt::format("{}.{}", proto_scene_static_mesh.name(), i);
+        auto str = std::format("{}.{}", proto_scene_static_mesh.name(), i);
         mesh.SetName(str);
         auto& static_mesh_node = dynamic_cast<NodeStaticMesh&>(node);
         static_mesh_node.GetData().set_file_name(
@@ -377,7 +377,7 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
         [[fallthrough]];
     default:
         throw std::runtime_error(
-            fmt::format(
+            std::format(
                 "Unknown scene light type {}",
                 static_cast<int>(proto_scene_light.light_type())));
     }

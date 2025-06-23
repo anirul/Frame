@@ -28,7 +28,6 @@ target_link_libraries(FrameFile
     Frame
     FrameJson
     FrameOpenGL
-    fmt::fmt
     glm::glm
     protobuf::libprotobuf
     spdlog::spdlog
