@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include "frame/file/file_system.h"
+#include "frame/file/image.h"
 #include "frame/json/parse_uniform.h"
 #include "frame/opengl/cubemap.h"
 #include "frame/opengl/file/load_texture.h"
@@ -52,6 +53,20 @@ TEST_F(LoadTextureTest, LoadTextureFromFileTest)
     auto it_pair = std::minmax_element(vec8.begin(), vec8.end());
     EXPECT_EQ(0x59, *it_pair.first);
     EXPECT_EQ(0xff, *it_pair.second);
+}
+
+TEST_F(LoadTextureTest, LoadHdrImageTest)
+{
+    frame::file::Image image(
+        frame::file::FindFile("asset/cubemap/shiodome.hdr"),
+        frame::json::PixelElementSize_FLOAT(),
+        frame::json::PixelStructure_RGB());
+    EXPECT_EQ(glm::uvec2(3200, 1600), image.GetSize());
+    const float* ptr = static_cast<const float*>(image.Data());
+    std::size_t len = image.GetSize().x * image.GetSize().y * 3;
+    auto range = std::minmax_element(ptr, ptr + len);
+    EXPECT_NEAR(0.0f, *range.first, 0.1f);
+    EXPECT_GT(*range.second, 1.0f);
 }
 
 // TODO(anirul): Add a test for the load Cubemap from single file when

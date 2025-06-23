@@ -90,10 +90,7 @@ void* SDLOpenGLNone::GetGraphicContext() const
     std::pair<int, int> gl_version;
     frame::Logger& logger = frame::Logger::GetInstance();
 
-    // GL context.
-    void* gl_context =
-        SDL_GL_CreateContext(static_cast<SDL_Window*>(GetWindowContext()));
-    if (!gl_context)
+    if (!gl_context_)
     {
         std::string error = SDL_GetError();
         logger->error(error);
@@ -102,30 +99,38 @@ void* SDLOpenGLNone::GetGraphicContext() const
 
     SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &gl_version.first);
     SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &gl_version.second);
-    logger->info(reinterpret_cast<const char*>(glGetString(GL_RENDERER)));
 
-    // Vsync off.
-    SDL_GL_SetSwapInterval(0);
-
-    logger->info(
-        "Started SDL OpenGL version {}.{}.",
-        gl_version.first,
-        gl_version.second);
-
-    // Initialize GLEW to find the 'glDebugMessageCallback' function.
-    auto result = glewInit();
-    if (result != GLEW_OK)
+    static bool s_once = false;
+    if (!s_once)
     {
-        throw std::runtime_error(fmt::format(
-            "GLEW problems : {}",
-            reinterpret_cast<const char*>(glewGetErrorString(result))));
+        s_once = true;
+        logger->info(reinterpret_cast<const char*>(glGetString(GL_RENDERER)));
+
+        // Vsync off.
+        SDL_GL_SetSwapInterval(0);
+
+        logger->info(
+            "Started SDL OpenGL version {}.{}.",
+            gl_version.first,
+            gl_version.second);
+
+        // Initialize GLEW to find the 'glDebugMessageCallback' function.
+        glewExperimental = GL_TRUE;
+        auto result = glewInit();
+        if (result != GLEW_OK)
+        {
+            throw std::runtime_error(
+                fmt::format(
+                    "GLEW problems : {}",
+                    reinterpret_cast<const char*>(glewGetErrorString(result))));
+        }
+
+        // During init, enable debug output
+        glEnable(GL_DEBUG_OUTPUT);
+        glDebugMessageCallback(MessageCallback, nullptr);
     }
 
-    // During init, enable debug output
-    glEnable(GL_DEBUG_OUTPUT);
-    glDebugMessageCallback(MessageCallback, nullptr);
-
-    return gl_context;
+    return gl_context_;
 }
 
 } // End namespace frame::opengl.

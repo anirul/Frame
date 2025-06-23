@@ -399,42 +399,60 @@ void Cubemap::CreateCubemapFromPointers(
     inner_size_ = size;
     if (!data_.has_size())
         data_.mutable_size()->CopyFrom(json::SerializeSize(inner_size_));
-    glGenTextures(1, &texture_id_);
-    ScopedBind scoped_bind(*this);
-    glTexParameteri(
-        GL_TEXTURE_CUBE_MAP,
+    // Create cubemap texture with modern DSA functions.
+    glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &texture_id_);
+    glTextureParameteri(
+        texture_id_,
         GL_TEXTURE_MIN_FILTER,
         ConvertToGLType(proto::TextureFilter::LINEAR));
-    glTexParameteri(
-        GL_TEXTURE_CUBE_MAP,
+    glTextureParameteri(
+        texture_id_,
         GL_TEXTURE_MAG_FILTER,
         ConvertToGLType(proto::TextureFilter::LINEAR));
-    glTexParameteri(
-        GL_TEXTURE_CUBE_MAP,
+    glTextureParameteri(
+        texture_id_,
         GL_TEXTURE_WRAP_S,
         ConvertToGLType(proto::TextureFilter::CLAMP_TO_EDGE));
-    glTexParameteri(
-        GL_TEXTURE_CUBE_MAP,
+    glTextureParameteri(
+        texture_id_,
         GL_TEXTURE_WRAP_T,
         ConvertToGLType(proto::TextureFilter::CLAMP_TO_EDGE));
-    glTexParameteri(
-        GL_TEXTURE_CUBE_MAP,
+    glTextureParameteri(
+        texture_id_,
         GL_TEXTURE_WRAP_R,
         ConvertToGLType(proto::TextureFilter::CLAMP_TO_EDGE));
+        GLint previous_align = 0;
+        glGetIntegerv(GL_UNPACK_ALIGNMENT, &previous_align);
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+        const GLenum internal_format = opengl::ConvertToGLType(
+            data_.pixel_element_size(), data_.pixel_structure());
+        const GLenum format = opengl::ConvertToGLType(data_.pixel_structure());
+        const GLenum type = opengl::ConvertToGLType(data_.pixel_element_size());
+
+    glTextureStorage2D(
+        texture_id_,
+        1,
+        internal_format,
+        static_cast<GLsizei>(inner_size_.x),
+        static_cast<GLsizei>(inner_size_.y));
+
+    ScopedBind scoped_bind(*this);
     for (unsigned int i : {0, 1, 2, 3, 4, 5})
     {
-        glTexImage2D(
+        glTexSubImage2D(
             GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
             0,
-            opengl::ConvertToGLType(
-                data_.pixel_element_size(), data_.pixel_structure()),
+            0,
+            0,
             static_cast<GLsizei>(inner_size_.x),
             static_cast<GLsizei>(inner_size_.y),
-            0,
-            opengl::ConvertToGLType(data_.pixel_structure()),
-            opengl::ConvertToGLType(data_.pixel_element_size()),
+            format,
+            type,
             cube_map[i]);
     }
+
+    glPixelStorei(GL_UNPACK_ALIGNMENT, previous_align);
 }
 
 void Cubemap::Clear(glm::vec4 color)
@@ -468,8 +486,7 @@ std::vector<std::uint8_t> Cubemap::GetTextureByte() const
     std::size_t image_size = static_cast<std::size_t>(inner_size_.x) *
                              static_cast<std::size_t>(inner_size_.y) *
                              static_cast<std::size_t>(pixel_structure) * 6;
-    std::vector<std::uint8_t> result = {};
-    result.resize(image_size);
+    std::vector<std::uint8_t> result(image_size);
     glGetTextureImage(
         texture_id_,
         0,
@@ -496,8 +513,7 @@ std::vector<std::uint16_t> Cubemap::GetTextureWord() const
     std::size_t image_size = static_cast<std::size_t>(inner_size_.x) *
                              static_cast<std::size_t>(inner_size_.y) *
                              static_cast<std::size_t>(pixel_structure) * 6;
-    std::vector<std::uint16_t> result = {};
-    result.resize(image_size);
+    std::vector<std::uint16_t> result(image_size);
     glGetTextureImage(
         texture_id_,
         0,
@@ -524,8 +540,7 @@ std::vector<std::uint32_t> Cubemap::GetTextureDWord() const
     std::size_t image_size = static_cast<std::size_t>(inner_size_.x) *
                              static_cast<std::size_t>(inner_size_.y) *
                              static_cast<std::size_t>(pixel_structure) * 6;
-    std::vector<std::uint32_t> result = {};
-    result.resize(image_size);
+    std::vector<std::uint32_t> result(image_size);
     glGetTextureImage(
         texture_id_,
         0,
@@ -552,8 +567,7 @@ std::vector<float> Cubemap::GetTextureFloat() const
     std::size_t image_size = static_cast<std::size_t>(inner_size_.x) *
                              static_cast<std::size_t>(inner_size_.y) *
                              static_cast<std::size_t>(pixel_structure) * 6;
-    std::vector<float> result = {};
-    result.resize(image_size);
+    std::vector<float> result(image_size);
     glGetTextureImage(
         texture_id_,
         0,
