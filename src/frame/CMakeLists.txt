@@ -68,6 +68,8 @@ target_link_libraries(Frame
     FrameProto
 )
 
+add_dependencies(Frame FrameProto)
+
 set_property(TARGET Frame PROPERTY FOLDER "Frame")
 
 add_subdirectory(opengl)
