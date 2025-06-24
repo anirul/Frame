@@ -1,5 +1,9 @@
 # Frame part.
 
+# Generate protobuf sources first so that headers are available to
+# the rest of the project.
+add_subdirectory(proto)
+
 add_library(Frame
   STATIC
     # Included from include/frame.
@@ -53,6 +57,7 @@ target_include_directories(Frame
     ${CMAKE_CURRENT_SOURCE_DIR}/../../include
     ${CMAKE_CURRENT_SOURCE_DIR}/../../src
     ${CMAKE_CURRENT_BINARY_DIR}
+    ${CMAKE_BINARY_DIR}/src/frame/proto
 )
 
 target_link_libraries(Frame
@@ -64,7 +69,10 @@ target_link_libraries(Frame
     SDL3::SDL3
     spdlog::spdlog
     glm::glm
+    FrameProto
 )
+
+add_dependencies(Frame FrameProto)
 
 set_property(TARGET Frame PROPERTY FOLDER "Frame")
 
@@ -75,4 +83,3 @@ add_subdirectory(common)
 add_subdirectory(file)
 add_subdirectory(gui)
 add_subdirectory(json)
-add_subdirectory(proto)
