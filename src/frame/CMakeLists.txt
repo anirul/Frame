@@ -1,5 +1,9 @@
 # Frame part.
 
+# Generate protobuf sources first so that headers are available to
+# the rest of the project.
+add_subdirectory(proto)
+
 add_library(Frame
   STATIC
     # Included from include/frame.
@@ -79,4 +83,3 @@ add_subdirectory(common)
 add_subdirectory(file)
 add_subdirectory(gui)
 add_subdirectory(json)
-add_subdirectory(proto)
