@@ -53,6 +53,7 @@ target_include_directories(Frame
     ${CMAKE_CURRENT_SOURCE_DIR}/../../include
     ${CMAKE_CURRENT_SOURCE_DIR}/../../src
     ${CMAKE_CURRENT_BINARY_DIR}
+    ${CMAKE_BINARY_DIR}/src/frame/proto
 )
 
 target_link_libraries(Frame
@@ -64,6 +65,7 @@ target_link_libraries(Frame
     SDL3::SDL3
     spdlog::spdlog
     glm::glm
+    FrameProto
 )
 
 set_property(TARGET Frame PROPERTY FOLDER "Frame")
