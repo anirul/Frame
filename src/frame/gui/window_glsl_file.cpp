@@ -1,22 +1,21 @@
-#include "frame/gui/window_json_file.h"
+#include "frame/gui/window_glsl_file.h"
 
 #include "frame/logger.h"
-#include <algorithm>
 #include <cmath>
+#include <format>
 #include <fstream>
 #include <imgui.h>
-
-#include "frame/file/file_system.h"
-#include "frame/json/parse_level.h"
+#include <string_view>
 
 namespace frame::gui
 {
 
-WindowJsonFile::WindowJsonFile(
+WindowGlslFile::WindowGlslFile(
     const std::string& file_name, DeviceInterface& device)
-    : name_("JSON Level Edit"), file_name_(file_name), device_(device)
+    : name_(std::format("GLSL File [{}]", file_name)), file_name_(file_name),
+      device_(device)
 {
-    editor_.SetLanguageDefinition(TextEditor::LanguageDefinitionId::Json);
+    editor_.SetLanguageDefinition(TextEditor::LanguageDefinitionId::Glsl);
     try
     {
         std::ifstream file(frame::file::FindFile(file_name_));
@@ -30,19 +29,31 @@ WindowJsonFile::WindowJsonFile(
     }
     catch (...)
     {
-        // If file not found just keep empty buffer
+        // ignore missing file
     }
 }
 
-bool WindowJsonFile::DrawCallback()
+bool WindowGlslFile::DrawCallback()
 {
-    if (ImGui::Button("Build"))
+    if (ImGui::Button("Compile"))
     {
         try
         {
-            std::string content = editor_.GetText();
-            auto level = frame::json::ParseLevel(device_.GetSize(), content);
-            device_.Startup(std::move(level));
+            std::string source = editor_.GetText();
+            std::ofstream out(frame::file::FindFile(file_name_));
+            out << source;
+
+            using frame::opengl::Shader;
+            using frame::opengl::ShaderEnum;
+            ShaderEnum shader_type = ShaderEnum::FRAGMENT_SHADER;
+            if (std::string_view(file_name_).ends_with(".vert"))
+                shader_type = ShaderEnum::VERTEX_SHADER;
+            Shader shader(shader_type);
+            if (!shader.LoadFromSource(source))
+            {
+                throw std::runtime_error(shader.GetErrorMessage());
+            }
+            device_.Resize(device_.GetSize());
             error_message_.clear();
         }
         catch (const std::exception& e)
@@ -112,21 +123,21 @@ bool WindowJsonFile::DrawCallback()
         ImGui::Separator();
     }
     ImVec2 avail = ImGui::GetContentRegionAvail();
-    editor_.Render("##jsontext", true, avail, false);
+    editor_.Render("##shadertext", true, avail, false);
     return true;
 }
 
-bool WindowJsonFile::End() const
+bool WindowGlslFile::End() const
 {
     return end_;
 }
 
-std::string WindowJsonFile::GetName() const
+std::string WindowGlslFile::GetName() const
 {
     return name_;
 }
 
-void WindowJsonFile::SetName(const std::string& name)
+void WindowGlslFile::SetName(const std::string& name)
 {
     name_ = name;
 }

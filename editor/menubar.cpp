@@ -1,11 +1,13 @@
 #include "menubar.h"
 
 #include "frame/gui/window_file_dialog.h"
-#include "frame/gui/window_logger.h"
+#include "frame/gui/window_glsl_file.h"
 #include "frame/gui/window_json_file.h"
+#include "frame/gui/window_logger.h"
 #include "frame/gui/window_resolution.h"
 #include "frame/logger.h"
 #include <imgui.h>
+#include <set>
 
 namespace frame::gui
 {
@@ -71,8 +73,31 @@ void Menubar::MenuEdit()
         ImGui::Separator();
         if (ImGui::MenuItem("Edit this level"))
         {
-            menubar_view_.GetDrawGui().AddWindow(std::make_unique<WindowJsonFile>(
-                menubar_file_.GetFileName(), device_));
+            menubar_view_.GetDrawGui().AddWindow(
+                std::make_unique<WindowJsonFile>(
+                    menubar_file_.GetFileName(), device_));
+        }
+        if (ImGui::BeginMenu("Shader"))
+        {
+            std::set<std::string> shader_names;
+            auto& level = device_.GetLevel();
+            for (auto program_id : level.GetPrograms())
+            {
+                auto& program = level.GetProgramFromId(program_id);
+                shader_names.insert(program.GetData().shader_vertex());
+                shader_names.insert(program.GetData().shader_fragment());
+            }
+            for (const auto& shader : shader_names)
+            {
+                if (ImGui::MenuItem(shader.c_str()))
+                {
+                    menubar_view_.GetDrawGui().AddWindow(
+                        std::make_unique<WindowGlslFile>(
+                            std::string("asset/shader/opengl/") + shader,
+                            device_));
+                }
+            }
+            ImGui::EndMenu();
         }
         ImGui::EndMenu();
     }
