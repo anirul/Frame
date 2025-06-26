@@ -16,15 +16,7 @@ WindowRawFile::WindowRawFile(
     const std::string& file_name, DeviceInterface& device)
     : name_("Raw Level Edit"), file_name_(file_name), device_(device)
 {
-    auto lang = TextEditor::LanguageDefinition::C();
-    lang.mKeywords.insert("true");
-    lang.mKeywords.insert("false");
-    lang.mKeywords.insert("null");
-    lang.mCommentStart.clear();
-    lang.mCommentEnd.clear();
-    lang.mSingleLineComment.clear();
-    lang.mName = "JSON";
-    editor_.SetLanguageDefinition(lang);
+    editor_.SetLanguageDefinition(TextEditor::LanguageDefinitionId::Json);
     try
     {
         std::ifstream file(frame::file::FindFile(file_name_));
@@ -86,7 +78,7 @@ bool WindowRawFile::DrawCallback()
         ImGui::Separator();
     }
     ImVec2 avail = ImGui::GetContentRegionAvail();
-    editor_.Render("##rawtext", avail, false);
+    editor_.Render("##rawtext", true, avail, false);
     return true;
 }
 

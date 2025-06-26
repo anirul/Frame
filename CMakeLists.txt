@@ -34,6 +34,7 @@ find_package(imgui CONFIG REQUIRED)
 find_package(Vulkan REQUIRED)
 
 # Sources.
+add_subdirectory(external/ImGuiColorTextEdit)
 add_subdirectory(asset/shader/opengl)
 add_subdirectory(asset/json)
 add_subdirectory(src/frame)

@@ -5,6 +5,7 @@
   "description": "Frame graphic library.",
   "dependencies": [
     "abseil",
+    "boost-regex",
     "glm",
     "glew",
     "gtest",

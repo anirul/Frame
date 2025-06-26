@@ -15,7 +15,6 @@ add_library(FrameGui
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/gui/window_texture.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/gui/window_raw_file.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/gui/input_factory.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../../external/ImGuiColorTextEdit/TextEditor.cpp
     draw_gui_factory.cpp
     input_arcball.cpp
     input_arcball.h
@@ -47,6 +46,7 @@ target_link_libraries(FrameGui
     imgui::imgui
     spdlog::spdlog
     protobuf::libprotobuf
+    ImGuiColorTextEdit
 )
 
 set_property(TARGET FrameGui PROPERTY FOLDER "Frame")

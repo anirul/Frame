@@ -3,4 +3,4 @@
 	url = https://github.com/microsoft/vcpkg.git
 [submodule "external/ImGuiColorTextEdit"]
 	path = external/ImGuiColorTextEdit
-	url = https://github.com/anirul/ImGuiColorTextEdit.git
+	url = git@github.com:anirul/ImGuiColorTextEdit.git
