@@ -27,7 +27,7 @@ WindowGlslFile::WindowGlslFile(const std::string& file_name, DeviceInterface& de
 }
 
 bool WindowGlslFile::DrawCallback() {
-    if (ImGui::Button("Reload")) {
+    if (ImGui::Button("Compile")) {
         try {
             std::string source = editor_.GetText();
             std::ofstream out(frame::file::FindFile(file_name_));
@@ -47,6 +47,20 @@ bool WindowGlslFile::DrawCallback() {
         } catch (const std::exception& e) {
             error_message_ = e.what();
             frame::Logger::GetInstance()->error(e.what());
+        }
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Reload")) {
+        try {
+            std::ifstream file(frame::file::FindFile(file_name_));
+            if (file) {
+                std::string content((std::istreambuf_iterator<char>(file)),
+                                    std::istreambuf_iterator<char>());
+                editor_.SetText(content);
+            }
+            error_message_.clear();
+        } catch (const std::exception& e) {
+            error_message_ = e.what();
         }
     }
     ImGui::SameLine();

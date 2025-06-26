@@ -36,7 +36,7 @@ WindowJsonFile::WindowJsonFile(
 
 bool WindowJsonFile::DrawCallback()
 {
-    if (ImGui::Button("Reload"))
+    if (ImGui::Button("Build"))
     {
         try
         {
@@ -49,6 +49,39 @@ bool WindowJsonFile::DrawCallback()
         {
             error_message_ = e.what();
             frame::Logger::GetInstance()->error(e.what());
+        }
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Reload"))
+    {
+        try
+        {
+            std::ifstream file(frame::file::FindFile(file_name_));
+            if (file)
+            {
+                std::string content((std::istreambuf_iterator<char>(file)),
+                                    std::istreambuf_iterator<char>());
+                editor_.SetText(content);
+            }
+            error_message_.clear();
+        }
+        catch (const std::exception& e)
+        {
+            error_message_ = e.what();
+        }
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Save"))
+    {
+        try
+        {
+            std::ofstream out(frame::file::FindFile(file_name_));
+            out << editor_.GetText();
+            error_message_.clear();
+        }
+        catch (const std::exception& e)
+        {
+            error_message_ = e.what();
         }
     }
     ImGui::SameLine();
