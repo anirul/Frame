@@ -358,15 +358,15 @@ void SDLOpenGLDrawGui::RemoveMenuBar()
 
 bool SDLOpenGLDrawGui::PollEvent(void* event)
 {
-    // Allow to click on close window.
-    if (static_cast<SDL_Event*>(event)->type == SDL_EVENT_QUIT)
-        return false;
+    SDL_Event* sdl_event = static_cast<SDL_Event*>(event);
     // Process the event in ImGui (has to be done or you won't be able to
     // handle the main window).
-    ImGui_ImplSDL3_ProcessEvent(static_cast<SDL_Event*>(event));
-    // This is the main window (receiving the input for) so skip.
-    if (is_keyboard_passed_)
+    ImGui_ImplSDL3_ProcessEvent(sdl_event);
+    // Allow to click on close window.
+    if (sdl_event->type == SDL_EVENT_QUIT)
+    {
         return false;
+    }
     auto& io = ImGui::GetIO();
     return (!is_keyboard_passed_locked_)
                ? io.WantCaptureMouse || io.WantCaptureKeyboard

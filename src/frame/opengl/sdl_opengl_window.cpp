@@ -87,9 +87,10 @@ SDLOpenGLWindow::SDLOpenGLWindow(glm::uvec2 size) : size_(size)
     auto result = glewInit();
     if (result != GLEW_OK)
     {
-        throw std::runtime_error(std::format(
-            "GLEW problems : {}",
-            reinterpret_cast<const char*>(glewGetErrorString(result))));
+        throw std::runtime_error(
+            std::format(
+                "GLEW problems : {}",
+                reinterpret_cast<const char*>(glewGetErrorString(result))));
     }
 
     // During init, enable debug output
@@ -111,6 +112,7 @@ SDLOpenGLWindow::~SDLOpenGLWindow()
 
 WindowReturnEnum SDLOpenGLWindow::Run(std::function<bool()> lambda)
 {
+    SDL_StartTextInput(sdl_window_);
     // Called only once at the beginning.
     for (const auto& plugin_interface : device_->GetPluginPtrs())
     {
@@ -136,24 +138,16 @@ WindowReturnEnum SDLOpenGLWindow::Run(std::function<bool()> lambda)
         SDL_Event event;
         while (SDL_PollEvent(&event))
         {
-            bool skip = false;
+            if (!RunEvent(event, dt))
+            {
+                window_return_enum = WindowReturnEnum::QUIT;
+            }
             for (const auto& plugin_interface : device_->GetPluginPtrs())
             {
                 if (plugin_interface)
                 {
-                    if (plugin_interface->PollEvent(&event))
-                    {
-                        skip = true;
-                    }
+                    plugin_interface->PollEvent(&event);
                 }
-            }
-            if (skip)
-            {
-                continue;
-            }
-            if (!RunEvent(event, dt))
-            {
-                window_return_enum = WindowReturnEnum::QUIT;
             }
         }
         if (input_interface_)
@@ -353,15 +347,17 @@ void SDLOpenGLWindow::Resize(glm::uvec2 size, FullScreenEnum fullscreen_enum)
             SDL_DisplayID display = SDL_GetDisplayForWindow(sdl_window_);
             if (!display)
             {
-                throw std::runtime_error(std::format(
-                    "SDL_GetDisplayForWindow failed: {}", SDL_GetError()));
+                throw std::runtime_error(
+                    std::format(
+                        "SDL_GetDisplayForWindow failed: {}", SDL_GetError()));
             }
 
             SDL_Rect bounds;
             if (!SDL_GetDisplayBounds(display, &bounds))
             {
-                throw std::runtime_error(std::format(
-                    "SDL_GetDisplayBounds failed: {}", SDL_GetError()));
+                throw std::runtime_error(
+                    std::format(
+                        "SDL_GetDisplayBounds failed: {}", SDL_GetError()));
             }
 
             // Use desired resolution if needed
@@ -379,8 +375,9 @@ void SDLOpenGLWindow::Resize(glm::uvec2 size, FullScreenEnum fullscreen_enum)
 
         if (!SDL_SetWindowFullscreenMode(sdl_window_, mode_ptr))
         {
-            throw std::runtime_error(std::format(
-                "Error switching fullscreen mode: {}", SDL_GetError()));
+            throw std::runtime_error(
+                std::format(
+                    "Error switching fullscreen mode: {}", SDL_GetError()));
         }
 
         // Only resize in windowed mode — fullscreen modes will auto-resize the
@@ -443,9 +440,10 @@ BOOL MonitorEnumProc(HMONITOR hmonitor, HDC hdc, LPRECT p_rect, LPARAM param)
     float multiplication_scale = horz_scale;
 
     // Push back the value to the vector.
-    s_ppi_vec.push_back(glm::vec2(
-        static_cast<float>(hppi) * multiplication_scale,
-        static_cast<float>(vppi) * multiplication_scale));
+    s_ppi_vec.push_back(
+        glm::vec2(
+            static_cast<float>(hppi) * multiplication_scale,
+            static_cast<float>(vppi) * multiplication_scale));
     return TRUE;
 }
 
