@@ -5,13 +5,15 @@
 
 #include "frame/gui/gui_window_interface.h"
 #include "frame/file/file_system.h"
+#include "frame/device_interface.h"
+#include "frame/opengl/shader.h"
 
 namespace frame::gui {
 
-class WindowShaderFile : public GuiWindowInterface {
+class WindowGlslFile : public GuiWindowInterface {
   public:
-    explicit WindowShaderFile(const std::string& file_name);
-    ~WindowShaderFile() override = default;
+    WindowGlslFile(const std::string& file_name, DeviceInterface& device);
+    ~WindowGlslFile() override = default;
 
     bool DrawCallback() override;
     bool End() const override;
@@ -21,6 +23,7 @@ class WindowShaderFile : public GuiWindowInterface {
   private:
     std::string name_;
     std::string file_name_;
+    DeviceInterface& device_;
     TextEditor editor_;
     bool end_ = false;
     std::string error_message_;

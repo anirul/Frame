@@ -1,14 +1,18 @@
-#include "frame/gui/window_shader_file.h"
+#include "frame/gui/window_glsl_file.h"
 
 #include <fstream>
 #include <cmath>
 #include <imgui.h>
 #include <format>
+#include <string_view>
+#include "frame/logger.h"
 
 namespace frame::gui {
 
-WindowShaderFile::WindowShaderFile(const std::string& file_name)
-    : name_(std::format("Shader File [{}]", file_name)), file_name_(file_name) {
+WindowGlslFile::WindowGlslFile(const std::string& file_name, DeviceInterface& device)
+    : name_(std::format("GLSL File [{}]", file_name)),
+      file_name_(file_name),
+      device_(device) {
     editor_.SetLanguageDefinition(TextEditor::LanguageDefinitionId::Glsl);
     try {
         std::ifstream file(frame::file::FindFile(file_name_));
@@ -22,7 +26,30 @@ WindowShaderFile::WindowShaderFile(const std::string& file_name)
     }
 }
 
-bool WindowShaderFile::DrawCallback() {
+bool WindowGlslFile::DrawCallback() {
+    if (ImGui::Button("Reload")) {
+        try {
+            std::string source = editor_.GetText();
+            std::ofstream out(frame::file::FindFile(file_name_));
+            out << source;
+
+            using frame::opengl::Shader;
+            using frame::opengl::ShaderEnum;
+            ShaderEnum shader_type = ShaderEnum::FRAGMENT_SHADER;
+            if (std::string_view(file_name_).ends_with(".vert"))
+                shader_type = ShaderEnum::VERTEX_SHADER;
+            Shader shader(shader_type);
+            if (!shader.LoadFromSource(source)) {
+                throw std::runtime_error(shader.GetErrorMessage());
+            }
+            device_.Resize(device_.GetSize());
+            error_message_.clear();
+        } catch (const std::exception& e) {
+            error_message_ = e.what();
+            frame::Logger::GetInstance()->error(e.what());
+        }
+    }
+    ImGui::SameLine();
     if (ImGui::Button("Save")) {
         try {
             std::ofstream out(frame::file::FindFile(file_name_));
@@ -59,15 +86,15 @@ bool WindowShaderFile::DrawCallback() {
     return true;
 }
 
-bool WindowShaderFile::End() const {
+bool WindowGlslFile::End() const {
     return end_;
 }
 
-std::string WindowShaderFile::GetName() const {
+std::string WindowGlslFile::GetName() const {
     return name_;
 }
 
-void WindowShaderFile::SetName(const std::string& name) {
+void WindowGlslFile::SetName(const std::string& name) {
     name_ = name;
 }
 

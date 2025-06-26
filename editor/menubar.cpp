@@ -3,7 +3,7 @@
 #include "frame/gui/window_file_dialog.h"
 #include "frame/gui/window_logger.h"
 #include "frame/gui/window_json_file.h"
-#include "frame/gui/window_shader_file.h"
+#include "frame/gui/window_glsl_file.h"
 #include "frame/gui/window_resolution.h"
 #include "frame/logger.h"
 #include <imgui.h>
@@ -91,8 +91,9 @@ void Menubar::MenuEdit()
                 if (ImGui::MenuItem(shader.c_str()))
                 {
                     menubar_view_.GetDrawGui().AddWindow(
-                        std::make_unique<WindowShaderFile>(
-                            std::string("asset/shader/opengl/") + shader));
+                        std::make_unique<WindowGlslFile>(
+                            std::string("asset/shader/opengl/") + shader,
+                            device_));
                 }
             }
             ImGui::EndMenu();
