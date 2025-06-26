@@ -2,9 +2,8 @@
 
 #include "frame/logger.h"
 #include <algorithm>
-#include <cstring>
-#include <fstream>
 #include <cmath>
+#include <fstream>
 #include <imgui.h>
 
 #include "frame/file/file_system.h"
@@ -17,7 +16,15 @@ WindowRawFile::WindowRawFile(
     const std::string& file_name, DeviceInterface& device)
     : name_("Raw Level Edit"), file_name_(file_name), device_(device)
 {
-    buffer_.resize(64 * 1024, '\0');
+    auto lang = TextEditor::LanguageDefinition::C();
+    lang.mKeywords.insert("true");
+    lang.mKeywords.insert("false");
+    lang.mKeywords.insert("null");
+    lang.mCommentStart.clear();
+    lang.mCommentEnd.clear();
+    lang.mSingleLineComment.clear();
+    lang.mName = "JSON";
+    editor_.SetLanguageDefinition(lang);
     try
     {
         std::ifstream file(frame::file::FindFile(file_name_));
@@ -26,9 +33,7 @@ WindowRawFile::WindowRawFile(
             std::string content(
                 (std::istreambuf_iterator<char>(file)),
                 std::istreambuf_iterator<char>());
-            std::size_t len = std::min(content.size(), buffer_.size() - 1);
-            std::memcpy(buffer_.data(), content.data(), len);
-            buffer_[len] = '\0';
+            editor_.SetText(content);
         }
     }
     catch (...)
@@ -43,7 +48,7 @@ bool WindowRawFile::DrawCallback()
     {
         try
         {
-            std::string content(buffer_.data());
+            std::string content = editor_.GetText();
             auto level = frame::json::ParseLevel(device_.GetSize(), content);
             device_.Startup(std::move(level));
             error_message_.clear();
@@ -68,10 +73,11 @@ bool WindowRawFile::DrawCallback()
                 .y;
         float padding = ImGui::GetStyle().WindowPadding.y;
         text_height = std::ceil(text_height + padding * 2);
-        ImGui::PushStyleColor(
-            ImGuiCol_ChildBg, ImVec4(0.5f, 0.1f, 0.1f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.5f, 0.1f, 0.1f, 1.0f));
         ImGui::BeginChild(
-            "##error_message", ImVec2(0, text_height), true,
+            "##error_message",
+            ImVec2(0, text_height),
+            true,
             ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
         ImGui::TextWrapped("%s", error_message_.c_str());
         ImGui::EndChild();
@@ -80,12 +86,7 @@ bool WindowRawFile::DrawCallback()
         ImGui::Separator();
     }
     ImVec2 avail = ImGui::GetContentRegionAvail();
-    ImGui::InputTextMultiline(
-        "##rawtext",
-        buffer_.data(),
-        buffer_.size(),
-        avail,
-        ImGuiInputTextFlags_AllowTabInput);
+    editor_.Render("##rawtext", avail, false);
     return true;
 }
 

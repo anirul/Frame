@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include "TextEditor.h"
 
 #include "frame/gui/gui_window_interface.h"
 #include "frame/device_interface.h"
@@ -28,7 +29,7 @@ class WindowRawFile : public GuiWindowInterface
     std::string name_;
     std::string file_name_;
     DeviceInterface& device_;
-    std::vector<char> buffer_;
+    TextEditor editor_;
     bool end_ = false;
     std::string error_message_;
 };

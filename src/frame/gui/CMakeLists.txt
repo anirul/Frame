@@ -15,6 +15,7 @@ add_library(FrameGui
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/gui/window_texture.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/gui/window_raw_file.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/gui/input_factory.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../../external/ImGuiColorTextEdit/TextEditor.cpp
     draw_gui_factory.cpp
     input_arcball.cpp
     input_arcball.h
@@ -34,10 +35,10 @@ add_library(FrameGui
 
 target_include_directories(FrameGui
   PUBLIC
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../..
   ${CMAKE_CURRENT_SOURCE_DIR}/../../../include
   ${CMAKE_CURRENT_SOURCE_DIR}/../../../src
   ${CMAME_CURRENT_BINARY_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../../external/ImGuiColorTextEdit
 )
 
 target_link_libraries(FrameGui
