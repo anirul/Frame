@@ -47,6 +47,7 @@ target_link_libraries(FrameGui
     glm::glm
     imgui::imgui
     spdlog::spdlog
+    boost_regex
     protobuf::libprotobuf
     ImGuiColorTextEdit
 )
