@@ -11,14 +11,14 @@ namespace frame::gui
 {
 
 /**
- * @class WindowRawFile
- * @brief Simple window to edit a file as raw text.
+ * @class WindowJsonFile
+ * @brief Simple window to edit a file as JSON text.
  */
-class WindowRawFile : public GuiWindowInterface
+class WindowJsonFile : public GuiWindowInterface
 {
   public:
-    WindowRawFile(const std::string& file_name, DeviceInterface& device);
-    ~WindowRawFile() override = default;
+    WindowJsonFile(const std::string& file_name, DeviceInterface& device);
+    ~WindowJsonFile() override = default;
 
     bool DrawCallback() override;
     bool End() const override;

@@ -1,4 +1,4 @@
-#include "frame/gui/window_raw_file.h"
+#include "frame/gui/window_json_file.h"
 
 #include "frame/logger.h"
 #include <algorithm>
@@ -12,9 +12,9 @@
 namespace frame::gui
 {
 
-WindowRawFile::WindowRawFile(
+WindowJsonFile::WindowJsonFile(
     const std::string& file_name, DeviceInterface& device)
-    : name_("Raw Level Edit"), file_name_(file_name), device_(device)
+    : name_("JSON Level Edit"), file_name_(file_name), device_(device)
 {
     editor_.SetLanguageDefinition(TextEditor::LanguageDefinitionId::Json);
     try
@@ -34,7 +34,7 @@ WindowRawFile::WindowRawFile(
     }
 }
 
-bool WindowRawFile::DrawCallback()
+bool WindowJsonFile::DrawCallback()
 {
     if (ImGui::Button("Reload"))
     {
@@ -78,21 +78,21 @@ bool WindowRawFile::DrawCallback()
         ImGui::Separator();
     }
     ImVec2 avail = ImGui::GetContentRegionAvail();
-    editor_.Render("##rawtext", true, avail, false);
+    editor_.Render("##jsontext", true, avail, false);
     return true;
 }
 
-bool WindowRawFile::End() const
+bool WindowJsonFile::End() const
 {
     return end_;
 }
 
-std::string WindowRawFile::GetName() const
+std::string WindowJsonFile::GetName() const
 {
     return name_;
 }
 
-void WindowRawFile::SetName(const std::string& name)
+void WindowJsonFile::SetName(const std::string& name)
 {
     name_ = name;
 }
