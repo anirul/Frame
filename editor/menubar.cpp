@@ -69,7 +69,7 @@ void Menubar::MenuEdit()
         {
         }
         ImGui::Separator();
-        if (ImGui::MenuItem("JSON edit this level"))
+        if (ImGui::MenuItem("Edit this level"))
         {
             menubar_view_.GetDrawGui().AddWindow(std::make_unique<WindowJsonFile>(
                 menubar_file_.GetFileName(), device_));
