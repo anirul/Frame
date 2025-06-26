@@ -59,8 +59,9 @@ bool WindowJsonFile::DrawCallback()
             std::ifstream file(frame::file::FindFile(file_name_));
             if (file)
             {
-                std::string content((std::istreambuf_iterator<char>(file)),
-                                    std::istreambuf_iterator<char>());
+                std::string content(
+                    (std::istreambuf_iterator<char>(file)),
+                    std::istreambuf_iterator<char>());
                 editor_.SetText(content);
             }
             error_message_.clear();

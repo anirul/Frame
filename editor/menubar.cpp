@@ -1,9 +1,9 @@
 #include "menubar.h"
 
 #include "frame/gui/window_file_dialog.h"
-#include "frame/gui/window_logger.h"
-#include "frame/gui/window_json_file.h"
 #include "frame/gui/window_glsl_file.h"
+#include "frame/gui/window_json_file.h"
+#include "frame/gui/window_logger.h"
 #include "frame/gui/window_resolution.h"
 #include "frame/logger.h"
 #include <imgui.h>
@@ -73,8 +73,9 @@ void Menubar::MenuEdit()
         ImGui::Separator();
         if (ImGui::MenuItem("Edit this level"))
         {
-            menubar_view_.GetDrawGui().AddWindow(std::make_unique<WindowJsonFile>(
-                menubar_file_.GetFileName(), device_));
+            menubar_view_.GetDrawGui().AddWindow(
+                std::make_unique<WindowJsonFile>(
+                    menubar_file_.GetFileName(), device_));
         }
         if (ImGui::BeginMenu("Shader"))
         {

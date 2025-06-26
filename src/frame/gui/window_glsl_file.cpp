@@ -1,34 +1,44 @@
 #include "frame/gui/window_glsl_file.h"
 
-#include <fstream>
-#include <cmath>
-#include <imgui.h>
-#include <format>
-#include <string_view>
 #include "frame/logger.h"
+#include <cmath>
+#include <format>
+#include <fstream>
+#include <imgui.h>
+#include <string_view>
 
-namespace frame::gui {
+namespace frame::gui
+{
 
-WindowGlslFile::WindowGlslFile(const std::string& file_name, DeviceInterface& device)
-    : name_(std::format("GLSL File [{}]", file_name)),
-      file_name_(file_name),
-      device_(device) {
+WindowGlslFile::WindowGlslFile(
+    const std::string& file_name, DeviceInterface& device)
+    : name_(std::format("GLSL File [{}]", file_name)), file_name_(file_name),
+      device_(device)
+{
     editor_.SetLanguageDefinition(TextEditor::LanguageDefinitionId::Glsl);
-    try {
+    try
+    {
         std::ifstream file(frame::file::FindFile(file_name_));
-        if (file) {
-            std::string content((std::istreambuf_iterator<char>(file)),
-                                std::istreambuf_iterator<char>());
+        if (file)
+        {
+            std::string content(
+                (std::istreambuf_iterator<char>(file)),
+                std::istreambuf_iterator<char>());
             editor_.SetText(content);
         }
-    } catch (...) {
+    }
+    catch (...)
+    {
         // ignore missing file
     }
 }
 
-bool WindowGlslFile::DrawCallback() {
-    if (ImGui::Button("Compile")) {
-        try {
+bool WindowGlslFile::DrawCallback()
+{
+    if (ImGui::Button("Compile"))
+    {
+        try
+        {
             std::string source = editor_.GetText();
             std::ofstream out(frame::file::FindFile(file_name_));
             out << source;
@@ -39,56 +49,73 @@ bool WindowGlslFile::DrawCallback() {
             if (std::string_view(file_name_).ends_with(".vert"))
                 shader_type = ShaderEnum::VERTEX_SHADER;
             Shader shader(shader_type);
-            if (!shader.LoadFromSource(source)) {
+            if (!shader.LoadFromSource(source))
+            {
                 throw std::runtime_error(shader.GetErrorMessage());
             }
             device_.Resize(device_.GetSize());
             error_message_.clear();
-        } catch (const std::exception& e) {
+        }
+        catch (const std::exception& e)
+        {
             error_message_ = e.what();
             frame::Logger::GetInstance()->error(e.what());
         }
     }
     ImGui::SameLine();
-    if (ImGui::Button("Reload")) {
-        try {
+    if (ImGui::Button("Reload"))
+    {
+        try
+        {
             std::ifstream file(frame::file::FindFile(file_name_));
-            if (file) {
-                std::string content((std::istreambuf_iterator<char>(file)),
-                                    std::istreambuf_iterator<char>());
+            if (file)
+            {
+                std::string content(
+                    (std::istreambuf_iterator<char>(file)),
+                    std::istreambuf_iterator<char>());
                 editor_.SetText(content);
             }
             error_message_.clear();
-        } catch (const std::exception& e) {
+        }
+        catch (const std::exception& e)
+        {
             error_message_ = e.what();
         }
     }
     ImGui::SameLine();
-    if (ImGui::Button("Save")) {
-        try {
+    if (ImGui::Button("Save"))
+    {
+        try
+        {
             std::ofstream out(frame::file::FindFile(file_name_));
             out << editor_.GetText();
             error_message_.clear();
-        } catch (const std::exception& e) {
+        }
+        catch (const std::exception& e)
+        {
             error_message_ = e.what();
         }
     }
     ImGui::SameLine();
-    if (ImGui::Button("Close")) {
+    if (ImGui::Button("Close"))
+    {
         end_ = true;
     }
     ImGui::Separator();
-    if (!error_message_.empty()) {
+    if (!error_message_.empty())
+    {
         ImVec2 avail = ImGui::GetContentRegionAvail();
         float text_height =
-            ImGui::CalcTextSize(error_message_.c_str(), nullptr, false, avail.x).y;
+            ImGui::CalcTextSize(error_message_.c_str(), nullptr, false, avail.x)
+                .y;
         float padding = ImGui::GetStyle().WindowPadding.y;
         text_height = std::ceil(text_height + padding * 2);
         ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.5f, 0.1f, 0.1f, 1.0f));
-        ImGui::BeginChild("##error_message",
-                         ImVec2(0, text_height),
-                         true,
-                         ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+        ImGui::BeginChild(
+            "##error_message",
+            ImVec2(0, text_height),
+            true,
+            ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
         ImGui::TextWrapped("%s", error_message_.c_str());
         ImGui::EndChild();
         ImGui::PopStyleColor();
@@ -100,15 +127,18 @@ bool WindowGlslFile::DrawCallback() {
     return true;
 }
 
-bool WindowGlslFile::End() const {
+bool WindowGlslFile::End() const
+{
     return end_;
 }
 
-std::string WindowGlslFile::GetName() const {
+std::string WindowGlslFile::GetName() const
+{
     return name_;
 }
 
-void WindowGlslFile::SetName(const std::string& name) {
+void WindowGlslFile::SetName(const std::string& name)
+{
     name_ = name;
 }
 

@@ -1,16 +1,18 @@
 #pragma once
 
-#include <string>
 #include "TextEditor.h"
+#include <string>
 
-#include "frame/gui/gui_window_interface.h"
-#include "frame/file/file_system.h"
 #include "frame/device_interface.h"
+#include "frame/file/file_system.h"
+#include "frame/gui/gui_window_interface.h"
 #include "frame/opengl/shader.h"
 
-namespace frame::gui {
+namespace frame::gui
+{
 
-class WindowGlslFile : public GuiWindowInterface {
+class WindowGlslFile : public GuiWindowInterface
+{
   public:
     WindowGlslFile(const std::string& file_name, DeviceInterface& device);
     ~WindowGlslFile() override = default;
