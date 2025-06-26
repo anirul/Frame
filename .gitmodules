@@ -4,7 +4,3 @@
 [submodule "external/ImGuiColorTextEdit"]
 	path = external/ImGuiColorTextEdit
 	url = https://github.com/anirul/ImGuiColorTextEdit.git
-[submodule "extern/ImGuiColorTextEdit"]
-	url = https://github.com/anirul/ImGuiColorTextEdit.git
-[submodule "extenal/ImGuiColorTextEdit"]
-	url = https://github.com/anirul/ImGuiColorTextEdit.git
