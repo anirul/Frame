@@ -18,6 +18,7 @@ What you need to build and run Frame:
   - Alternatives like clang or gcc
 - *CMake* - Required for creating the build system. Download it [here](https://cmake.org/).
 - *VCPKG* - Frame uses VCPKG for managing C++ libraries, it will be install automatically [VCPKG GitHub](https://github.com/Microsoft/vcpkg/).
+- *Ninja* - Linux build presets rely on the Ninja generator. Install it from your package manager or set the generator to `Unix Makefiles`.
 
 ### Building Frame with CMake
 
