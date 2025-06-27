@@ -43,11 +43,10 @@ target_include_directories(FrameGui
 )
 
 target_link_libraries(FrameGui
-  PUBLIC
+  PRIVATE
     glm::glm
     imgui::imgui
     spdlog::spdlog
-    boost_regex
     protobuf::libprotobuf
     ImGuiColorTextEdit
 )
