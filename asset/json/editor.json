@@ -83,7 +83,7 @@
     "textures": [
         {
             "name": "skybox",
-            "cubemap": "true",
+            "cubemap": true,
             "pixel_element_size": {
                 "value": "BYTE"
             },
@@ -114,8 +114,8 @@
             "name": "albedo",
             "cubemap": "false",
             "size": {
-                "x": "-1",
-                "y": "-1"
+                "x": -1,
+                "y": -1
             },
             "pixel_element_size": {
                 "value": "BYTE"
@@ -128,8 +128,8 @@
             "name": "zbuffer",
             "cubemap": "false",
             "size": {
-                "x": "-1",
-                "y": "-1"
+                "x": -1,
+                "y": -1
             },
             "pixel_element_size": {
                 "value": "BYTE"

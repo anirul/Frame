@@ -30,12 +30,12 @@ find_package(protobuf CONFIG REQUIRED)
 find_package(SDL3 CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(tinyobjloader CONFIG REQUIRED)
-find_package(boost_regex CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
 find_package(Vulkan REQUIRED)
 
 # Sources.
 add_subdirectory(external/ImGuiColorTextEdit)
+set_property(TARGET ImGuiColorTextEdit PROPERTY FOLDER "external/ImGuiColorTextEditor")
 add_subdirectory(asset/shader/opengl)
 add_subdirectory(asset/json)
 add_subdirectory(src/frame)
