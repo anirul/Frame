@@ -36,6 +36,7 @@ find_package(Vulkan REQUIRED)
 
 # Sources.
 add_subdirectory(external/ImGuiColorTextEdit)
+target_compile_definitions(ImGuiColorTextEdit PUBLIC BOOST_REGEX_NO_LIB)
 add_subdirectory(asset/shader/opengl)
 add_subdirectory(asset/json)
 add_subdirectory(src/frame)
