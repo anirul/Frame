@@ -8,7 +8,7 @@ add_executable(04_PointCloud
 
 target_include_directories(04_PointCloud
   PUBLIC
-    examples/04-japanese_flag
+    examples/04_japanese_flag
     ${CMAKE_CURRENT_SOURCE_DIR}/../..
     ${CMAKE_CURRENT_BINARY_DIR}
 )
