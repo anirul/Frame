@@ -43,12 +43,13 @@ target_include_directories(FrameGui
 )
 
 target_link_libraries(FrameGui
+  PUBLIC
+    ImGuiColorTextEdit
   PRIVATE
     glm::glm
     imgui::imgui
     spdlog::spdlog
     protobuf::libprotobuf
-    ImGuiColorTextEdit
 )
 
 set_property(TARGET FrameGui PROPERTY FOLDER "Frame")
