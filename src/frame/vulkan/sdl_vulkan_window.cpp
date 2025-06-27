@@ -266,7 +266,7 @@ bool SDLVulkanWindow::RunEvent(const SDL_Event& event, const double dt)
     }
     if (event.type == SDL_EVENT_WINDOW_FOCUS_LOST)
     {
-        SDL_StopTextInput();
+        SDL_StopTextInput(sdl_window_);
     }
     bool has_window_plugin = false;
     for (PluginInterface* plugin : device_->GetPluginPtrs())
