@@ -38,17 +38,18 @@ target_include_directories(FrameGui
   PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/../../../include
   ${CMAKE_CURRENT_SOURCE_DIR}/../../../src
-  ${CMAME_CURRENT_BINARY_DIR}
+  ${CMAKE_CURRENT_BINARY_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/../../../external/ImGuiColorTextEdit
 )
 
 target_link_libraries(FrameGui
+  PUBLIC
+    ImGuiColorTextEdit
   PRIVATE
     glm::glm
     imgui::imgui
     spdlog::spdlog
     protobuf::libprotobuf
-    ImGuiColorTextEdit
 )
 
 set_property(TARGET FrameGui PROPERTY FOLDER "Frame")
