@@ -29,6 +29,7 @@ target_link_libraries(FrameEditor
     FrameOpenGLFile
     FrameProto
     imgui::imgui
+    ImGuiColorTextEdit
 )
 
 set_property(TARGET FrameEditor PROPERTY FOLDER "FrameEditor")
