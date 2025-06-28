@@ -3,6 +3,7 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_vulkan.h>
 #include <vulkan/vulkan.hpp>
+#include <string>
 
 #include "frame/gui/draw_gui_interface.h"
 #include "frame/vulkan/debug_callback.h"
@@ -174,8 +175,13 @@ WindowReturnEnum SDLVulkanWindow::Run(
             }
         }
 
-        SetWindowTitle(
-            "SDL Vulkan - " + std::to_string(static_cast<float>(GetFPS(dt))));
+        std::string title = "SDL Vulkan";
+        if (!open_file_name_.empty())
+        {
+            title += " - " + open_file_name_;
+        }
+        title += " - " + std::to_string(static_cast<float>(GetFPS(dt)));
+        SetWindowTitle(title);
         if (!lambda())
         {
             window_return_enum = WindowReturnEnum::RESTART;

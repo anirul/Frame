@@ -5,6 +5,7 @@
 #define WINDOWS_LEAN_AND_MEAN
 #include <windows.h>
 #endif
+#include <string>
 
 #include "frame/device_interface.h"
 #include "frame/input_interface.h"
@@ -57,6 +58,14 @@ class Win32OpenGLNone : public WindowInterface
     void SetWindowTitle(const std::string& title) const override
     {
     }
+    void SetOpenFileName(const std::string& file_name) override
+    {
+        open_file_name_ = file_name;
+    }
+    const std::string& GetOpenFileName() const override
+    {
+        return open_file_name_;
+    }
     void Resize(glm::uvec2 size, FullScreenEnum fullscreen_enum)
     {
         size_ = size;
@@ -75,6 +84,7 @@ class Win32OpenGLNone : public WindowInterface
     glm::uvec2 size_;
     std::unique_ptr<DeviceInterface> device_ = nullptr;
     std::unique_ptr<InputInterface> input_interface_ = nullptr;
+    std::string open_file_name_ = "";
     frame::Logger& logger_ = frame::Logger::GetInstance();
 #if defined(_WIN32) || defined(_WIN64)
     HWND hwnd_dummy_; //< The dummy window.

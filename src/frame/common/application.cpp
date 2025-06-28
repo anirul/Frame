@@ -21,6 +21,7 @@ void Application::Startup(std::filesystem::path path)
 {
     assert(window_);
     auto& device = window_->GetDevice();
+    window_->SetOpenFileName(path.filename().string());
     if (!plugin_name_.empty())
     {
         device.RemovePluginByName(plugin_name_);
@@ -35,6 +36,7 @@ void Application::Startup(std::unique_ptr<frame::LevelInterface> level)
 {
     assert(window_);
     auto& device = window_->GetDevice();
+    window_->SetOpenFileName("");
     if (!plugin_name_.empty())
     {
         device.RemovePluginByName(plugin_name_);
