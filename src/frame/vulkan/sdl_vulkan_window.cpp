@@ -27,10 +27,7 @@ SDLVulkanWindow::SDLVulkanWindow(glm::uvec2 size) : size_(size)
 
     // Create an SDL window to use as a surface for Vulkan.
     sdl_window_ = SDL_CreateWindow(
-        "Vulkan Headless",
-        size_.x,
-        size_.y,
-        SDL_WINDOW_VULKAN);
+        "Vulkan Headless", size_.x, size_.y, SDL_WINDOW_VULKAN);
     if (!sdl_window_)
     {
         throw std::runtime_error(
@@ -48,8 +45,9 @@ SDLVulkanWindow::SDLVulkanWindow(glm::uvec2 size) : size_(size)
     }
     if (extension_count == 0)
     {
-        throw std::runtime_error(std::format(
-            "Could not get the extension count: {}", SDL_GetError()));
+        throw std::runtime_error(
+            std::format(
+                "Could not get the extension count: {}", SDL_GetError()));
     }
 #ifdef VK_EXT_ENABLE_DEBUG_EXTENSION
     extensions.push_back("VK_EXT_debug_utils");
@@ -80,11 +78,11 @@ SDLVulkanWindow::SDLVulkanWindow(glm::uvec2 size) : size_(size)
         vk::DebugUtilsMessengerCreateInfoEXT(
             {},
             vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose |
-            vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning |
-            vk::DebugUtilsMessageSeverityFlagBitsEXT::eError,
+                vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning |
+                vk::DebugUtilsMessageSeverityFlagBitsEXT::eError,
             vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral |
-            vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation |
-            vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance,
+                vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation |
+                vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance,
             vk::PFN_DebugUtilsMessengerCallbackEXT(DebugCallback)));
 #endif
 
@@ -94,8 +92,9 @@ SDLVulkanWindow::SDLVulkanWindow(glm::uvec2 size) : size_(size)
     if (!SDL_Vulkan_CreateSurface(
             sdl_window_, *vk_unique_instance_, nullptr, &vk_surface))
     {
-        throw std::runtime_error(std::format(
-            "Error while create vulkan surface: {}", SDL_GetError()));
+        throw std::runtime_error(
+            std::format(
+                "Error while create vulkan surface: {}", SDL_GetError()));
     }
     vk_surface_ = vk::UniqueSurfaceKHR(vk_surface);
 
@@ -212,15 +211,17 @@ void SDLVulkanWindow::Resize(glm::uvec2 size, FullScreenEnum fullscreen_enum)
             SDL_DisplayID display = SDL_GetDisplayForWindow(sdl_window_);
             if (!display)
             {
-                throw std::runtime_error(std::format(
-                    "SDL_GetDisplayForWindow failed: {}", SDL_GetError()));
+                throw std::runtime_error(
+                    std::format(
+                        "SDL_GetDisplayForWindow failed: {}", SDL_GetError()));
             }
 
             SDL_Rect bounds;
             if (!SDL_GetDisplayBounds(display, &bounds))
             {
-                throw std::runtime_error(std::format(
-                    "SDL_GetDisplayBounds failed: {}", SDL_GetError()));
+                throw std::runtime_error(
+                    std::format(
+                        "SDL_GetDisplayBounds failed: {}", SDL_GetError()));
             }
 
             // Use desired resolution if needed
@@ -238,8 +239,9 @@ void SDLVulkanWindow::Resize(glm::uvec2 size, FullScreenEnum fullscreen_enum)
 
         if (!SDL_SetWindowFullscreenMode(sdl_window_, mode_ptr))
         {
-            throw std::runtime_error(std::format(
-                "Error switching fullscreen mode: {}", SDL_GetError()));
+            throw std::runtime_error(
+                std::format(
+                    "Error switching fullscreen mode: {}", SDL_GetError()));
         }
 
         // Only resize in windowed mode — fullscreen modes will auto-resize the
@@ -260,16 +262,46 @@ frame::FullScreenEnum SDLVulkanWindow::GetFullScreenEnum() const
 
 bool SDLVulkanWindow::RunEvent(const SDL_Event& event, const double dt)
 {
-    // Ensure text input is active on the focused window.
-    SDL_Window* focused = SDL_GetKeyboardFocus();
-    if (focused == sdl_window_)
+    const Uint32 window_id = SDL_GetWindowID(sdl_window_);
+
+    switch (event.type)
     {
+    case SDL_EVENT_WINDOW_FOCUS_GAINED:
+        if (event.window.windowID != window_id)
+            return true;
         SDL_StartTextInput(sdl_window_);
-    }
-    else
-    {
+        break;
+    case SDL_EVENT_WINDOW_FOCUS_LOST:
+        if (event.window.windowID != window_id)
+            return true;
         SDL_StopTextInput(sdl_window_);
+        break;
+    case SDL_EVENT_KEY_DOWN:
+    case SDL_EVENT_KEY_UP:
+        if (event.key.windowID != window_id)
+            return true;
+        break;
+    case SDL_EVENT_TEXT_INPUT:
+        if (event.text.windowID != window_id)
+            return true;
+        break;
+    case SDL_EVENT_MOUSE_MOTION:
+        if (event.motion.windowID != window_id)
+            return true;
+        break;
+    case SDL_EVENT_MOUSE_BUTTON_DOWN:
+    case SDL_EVENT_MOUSE_BUTTON_UP:
+        if (event.button.windowID != window_id)
+            return true;
+        break;
+    case SDL_EVENT_MOUSE_WHEEL:
+        if (event.wheel.windowID != window_id)
+            return true;
+        break;
+    default:
+        break;
     }
+
     if (event.type == SDL_EVENT_QUIT)
         return false;
     bool has_window_plugin = false;

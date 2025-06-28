@@ -191,16 +191,46 @@ WindowReturnEnum SDLOpenGLWindow::Run(std::function<bool()> lambda)
 
 bool SDLOpenGLWindow::RunEvent(const SDL_Event& event, const double dt)
 {
-    // Ensure text input is active on the focused window.
-    SDL_Window* focused = SDL_GetKeyboardFocus();
-    if (focused == sdl_window_)
+    const Uint32 window_id = SDL_GetWindowID(sdl_window_);
+
+    switch (event.type)
     {
+    case SDL_EVENT_WINDOW_FOCUS_GAINED:
+        if (event.window.windowID != window_id)
+            return true;
         SDL_StartTextInput(sdl_window_);
-    }
-    else
-    {
+        break;
+    case SDL_EVENT_WINDOW_FOCUS_LOST:
+        if (event.window.windowID != window_id)
+            return true;
         SDL_StopTextInput(sdl_window_);
+        break;
+    case SDL_EVENT_KEY_DOWN:
+    case SDL_EVENT_KEY_UP:
+        if (event.key.windowID != window_id)
+            return true;
+        break;
+    case SDL_EVENT_TEXT_INPUT:
+        if (event.text.windowID != window_id)
+            return true;
+        break;
+    case SDL_EVENT_MOUSE_MOTION:
+        if (event.motion.windowID != window_id)
+            return true;
+        break;
+    case SDL_EVENT_MOUSE_BUTTON_DOWN:
+    case SDL_EVENT_MOUSE_BUTTON_UP:
+        if (event.button.windowID != window_id)
+            return true;
+        break;
+    case SDL_EVENT_MOUSE_WHEEL:
+        if (event.wheel.windowID != window_id)
+            return true;
+        break;
+    default:
+        break;
     }
+
     if (event.type == SDL_EVENT_QUIT)
     {
         return false;
