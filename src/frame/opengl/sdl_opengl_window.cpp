@@ -7,6 +7,7 @@
 #include <shtypes.h>
 #pragma comment(lib, "Shcore.lib")
 #endif
+#include <SDL3/SDL.h>
 #include <SDL3/SDL_video.h>
 #include <format>
 
@@ -112,6 +113,8 @@ SDLOpenGLWindow::~SDLOpenGLWindow()
 
 WindowReturnEnum SDLOpenGLWindow::Run(std::function<bool()> lambda)
 {
+    // Start accepting text input on this window.
+    SDL_StartTextInput(sdl_window_);
     // Called only once at the beginning.
     for (const auto& plugin_interface : device_->GetPluginPtrs())
     {
@@ -188,20 +191,19 @@ WindowReturnEnum SDLOpenGLWindow::Run(std::function<bool()> lambda)
 
 bool SDLOpenGLWindow::RunEvent(const SDL_Event& event, const double dt)
 {
-    if (event.type == SDL_EVENT_QUIT)
-    {
-        return false;
-    }
-    const Uint32 this_window_id = SDL_GetWindowID(sdl_window_);
-    if (event.type == SDL_EVENT_WINDOW_FOCUS_GAINED &&
-        event.window.windowID == this_window_id)
+    // Ensure text input is active on the focused window.
+    SDL_Window* focused = SDL_GetKeyboardFocus();
+    if (focused == sdl_window_)
     {
         SDL_StartTextInput(sdl_window_);
     }
-    if (event.type == SDL_EVENT_WINDOW_FOCUS_LOST &&
-        event.window.windowID == this_window_id)
+    else
     {
         SDL_StopTextInput(sdl_window_);
+    }
+    if (event.type == SDL_EVENT_QUIT)
+    {
+        return false;
     }
     bool has_window_plugin = false;
     for (PluginInterface* plugin : device_->GetPluginPtrs())
@@ -211,8 +213,7 @@ bool SDLOpenGLWindow::RunEvent(const SDL_Event& event, const double dt)
             has_window_plugin = true;
         }
     }
-    if (event.type == SDL_EVENT_KEY_DOWN &&
-        event.key.windowID == this_window_id)
+    if (event.type == SDL_EVENT_KEY_DOWN)
     {
         switch (event.key.key)
         {
@@ -245,38 +246,32 @@ bool SDLOpenGLWindow::RunEvent(const SDL_Event& event, const double dt)
     }
     if (input_interface_)
     {
-        if (event.type == SDL_EVENT_KEY_DOWN &&
-            event.key.windowID == this_window_id)
+        if (event.type == SDL_EVENT_KEY_DOWN)
         {
             return input_interface_->KeyPressed(event.key.key, dt);
         }
-        if (event.type == SDL_EVENT_KEY_UP &&
-            event.key.windowID == this_window_id)
+        if (event.type == SDL_EVENT_KEY_UP)
         {
             return input_interface_->KeyReleased(event.key.key, dt);
         }
-        if (event.type == SDL_EVENT_MOUSE_MOTION &&
-            event.motion.windowID == this_window_id)
+        if (event.type == SDL_EVENT_MOUSE_MOTION)
         {
             return input_interface_->MouseMoved(
                 glm::vec2(event.motion.x, event.motion.y),
                 glm::vec2(event.motion.xrel, event.motion.yrel),
                 dt);
         }
-        if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN &&
-            event.button.windowID == this_window_id)
+        if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN)
         {
             return input_interface_->MousePressed(
                 SDLButtonToChar(event.button.button), dt);
         }
-        if (event.type == SDL_EVENT_MOUSE_BUTTON_UP &&
-            event.button.windowID == this_window_id)
+        if (event.type == SDL_EVENT_MOUSE_BUTTON_UP)
         {
             return input_interface_->MouseReleased(
                 SDLButtonToChar(event.button.button), dt);
         }
-        if (event.type == SDL_EVENT_MOUSE_WHEEL &&
-            event.wheel.windowID == this_window_id && event.wheel.y != 0)
+        if (event.type == SDL_EVENT_MOUSE_WHEEL && event.wheel.y != 0)
         {
             return input_interface_->WheelMoved(
                 static_cast<float>(event.wheel.y), dt);
