@@ -84,6 +84,8 @@ void Menubar::MenuEdit()
             for (auto program_id : level.GetPrograms())
             {
                 auto& program = level.GetProgramFromId(program_id);
+                if (!program.SerializeEnable())
+                    continue; // Skip internal programs such as DisplayProgram
                 shader_names.insert(program.GetData().shader_vertex());
                 shader_names.insert(program.GetData().shader_fragment());
             }
