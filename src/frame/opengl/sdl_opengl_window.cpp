@@ -123,6 +123,8 @@ WindowReturnEnum SDLOpenGLWindow::Run(std::function<bool()> lambda)
         }
     }
     WindowReturnEnum window_return_enum = WindowReturnEnum::CONTINUE;
+    if (SDL_GetKeyboardFocus() == sdl_window_)
+        SDL_StartTextInput(sdl_window_);
     double previous_count = 0.0;
     // Timing counter.
     auto start = std::chrono::system_clock::now();
@@ -188,17 +190,49 @@ WindowReturnEnum SDLOpenGLWindow::Run(std::function<bool()> lambda)
 
 bool SDLOpenGLWindow::RunEvent(const SDL_Event& event, const double dt)
 {
+    const Uint32 window_id = SDL_GetWindowID(sdl_window_);
+
+    switch (event.type)
+    {
+    case SDL_EVENT_WINDOW_FOCUS_GAINED:
+        if (event.window.windowID != window_id)
+            return true;
+        SDL_StartTextInput(sdl_window_);
+        break;
+    case SDL_EVENT_WINDOW_FOCUS_LOST:
+        if (event.window.windowID != window_id)
+            return true;
+        SDL_StopTextInput(sdl_window_);
+        break;
+    case SDL_EVENT_KEY_DOWN:
+    case SDL_EVENT_KEY_UP:
+        if (event.key.windowID != window_id)
+            return true;
+        break;
+    case SDL_EVENT_TEXT_INPUT:
+        if (event.text.windowID != window_id)
+            return true;
+        break;
+    case SDL_EVENT_MOUSE_MOTION:
+        if (event.motion.windowID != window_id)
+            return true;
+        break;
+    case SDL_EVENT_MOUSE_BUTTON_DOWN:
+    case SDL_EVENT_MOUSE_BUTTON_UP:
+        if (event.button.windowID != window_id)
+            return true;
+        break;
+    case SDL_EVENT_MOUSE_WHEEL:
+        if (event.wheel.windowID != window_id)
+            return true;
+        break;
+    default:
+        break;
+    }
+
     if (event.type == SDL_EVENT_QUIT)
     {
         return false;
-    }
-    if (event.type == SDL_EVENT_WINDOW_FOCUS_GAINED)
-    {
-        SDL_StartTextInput(sdl_window_);
-    }
-    if (event.type == SDL_EVENT_WINDOW_FOCUS_LOST)
-    {
-        SDL_StopTextInput(sdl_window_);
     }
     bool has_window_plugin = false;
     for (PluginInterface* plugin : device_->GetPluginPtrs())
