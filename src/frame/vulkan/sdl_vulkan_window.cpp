@@ -1,6 +1,5 @@
 #include "frame/vulkan/sdl_vulkan_window.h"
 
-#include <SDL3/SDL.h>
 #include <SDL3/SDL_vulkan.h>
 #include <vulkan/vulkan.hpp>
 
@@ -37,11 +36,11 @@ SDLVulkanWindow::SDLVulkanWindow(glm::uvec2 size) : size_(size)
     // Get the required extensions for creating a Vulkan surface.
     uint32_t extension_count = 0;
     std::vector<const char*> extensions(extension_count);
-    const char* const* extentions_c =
+    const char* const* extensions_c =
         SDL_Vulkan_GetInstanceExtensions(&extension_count);
     for (uint32_t i = 0; i < extension_count; i++)
     {
-        extensions.push_back(extentions_c[i]);
+        extensions.push_back(extensions_c[i]);
     }
     if (extension_count == 0)
     {
