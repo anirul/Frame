@@ -113,8 +113,6 @@ SDLOpenGLWindow::~SDLOpenGLWindow()
 
 WindowReturnEnum SDLOpenGLWindow::Run(std::function<bool()> lambda)
 {
-    // Start accepting text input on this window.
-    SDL_StartTextInput(sdl_window_);
     // Called only once at the beginning.
     for (const auto& plugin_interface : device_->GetPluginPtrs())
     {
