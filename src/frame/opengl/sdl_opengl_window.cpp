@@ -112,7 +112,6 @@ SDLOpenGLWindow::~SDLOpenGLWindow()
 
 WindowReturnEnum SDLOpenGLWindow::Run(std::function<bool()> lambda)
 {
-    SDL_StartTextInput(sdl_window_);
     // Called only once at the beginning.
     for (const auto& plugin_interface : device_->GetPluginPtrs())
     {
@@ -192,6 +191,14 @@ bool SDLOpenGLWindow::RunEvent(const SDL_Event& event, const double dt)
     if (event.type == SDL_EVENT_QUIT)
     {
         return false;
+    }
+    if (event.type == SDL_EVENT_WINDOW_FOCUS_GAINED)
+    {
+        SDL_StartTextInput(sdl_window_);
+    }
+    if (event.type == SDL_EVENT_WINDOW_FOCUS_LOST)
+    {
+        SDL_StopTextInput(sdl_window_);
     }
     bool has_window_plugin = false;
     for (PluginInterface* plugin : device_->GetPluginPtrs())
