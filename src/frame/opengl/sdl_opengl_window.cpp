@@ -124,6 +124,8 @@ WindowReturnEnum SDLOpenGLWindow::Run(std::function<bool()> lambda)
         }
     }
     WindowReturnEnum window_return_enum = WindowReturnEnum::CONTINUE;
+    if (SDL_GetKeyboardFocus() == sdl_window_)
+        SDL_StartTextInput(sdl_window_);
     double previous_count = 0.0;
     // Timing counter.
     auto start = std::chrono::system_clock::now();
