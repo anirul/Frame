@@ -112,7 +112,18 @@ bool WindowJsonFile::DrawCallback()
         ImGui::Separator();
     }
     ImVec2 avail = ImGui::GetContentRegionAvail();
-    editor_.Render("##jsontext", true, avail, false);
+    bool focused =
+        ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
+    if (focused)
+    {
+        editor_.Render("##jsontext", focused, avail, false);
+    }
+    else
+    {
+        ImGui::BeginDisabled();
+        editor_.Render("##jsontext", focused, avail, false);
+        ImGui::EndDisabled();
+    }
     return true;
 }
 
