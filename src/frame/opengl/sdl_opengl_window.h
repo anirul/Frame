@@ -3,6 +3,7 @@
 #include <GL/glew.h>
 #include <SDL3/SDL.h>
 #include <stdexcept>
+#include <string>
 #if defined(_WIN32) || defined(_WIN64)
 #define NOMINMAX
 #include <windows.h>
@@ -62,6 +63,14 @@ class SDLOpenGLWindow : public WindowInterface
     {
         SDL_SetWindowTitle(sdl_window_, title.c_str());
     }
+    void SetOpenFileName(const std::string& file_name) override
+    {
+        open_file_name_ = file_name;
+    }
+    const std::string& GetOpenFileName() const override
+    {
+        return open_file_name_;
+    }
 
   public:
     WindowReturnEnum Run(std::function<bool()> lambda) override;
@@ -94,6 +103,7 @@ class SDLOpenGLWindow : public WindowInterface
 #if defined(_WIN32) || defined(_WIN64)
     HWND hwnd_ = nullptr;
 #endif
+    std::string open_file_name_ = "";
     frame::Logger& logger_ = frame::Logger::GetInstance();
 };
 

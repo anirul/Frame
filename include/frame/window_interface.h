@@ -99,6 +99,16 @@ struct WindowInterface
      */
     virtual void SetWindowTitle(const std::string& title) const = 0;
     /**
+     * @brief Set the file name used in the window title.
+     * @param file_name: The opened file name.
+     */
+    virtual void SetOpenFileName(const std::string& file_name) = 0;
+    /**
+     * @brief Get the current file name used in the window title.
+     * @return The opened file name.
+     */
+    virtual const std::string& GetOpenFileName() const = 0;
+    /**
      * @brief Resize the window.
      * @param fullscreen_enum: Is it full screen or not?
      * @param size: The new window size.

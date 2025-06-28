@@ -9,6 +9,7 @@
 #endif
 #include <SDL3/SDL_video.h>
 #include <format>
+#include <string>
 
 #include "frame/gui/draw_gui_interface.h"
 #include "frame/opengl/gui/sdl_opengl_draw_gui.h"
@@ -169,8 +170,13 @@ WindowReturnEnum SDLOpenGLWindow::Run(std::function<bool()> lambda)
 
         SDL_GL_MakeCurrent(sdl_window_, gl_context_);
 
-        SetWindowTitle(
-            "SDL OpenGL - " + std::to_string(static_cast<float>(GetFPS(dt))));
+        std::string title = "SDL OpenGL";
+        if (!open_file_name_.empty())
+        {
+            title += " - " + open_file_name_;
+        }
+        title += " - " + std::to_string(static_cast<float>(GetFPS(dt)));
+        SetWindowTitle(title);
         previous_count = time.count();
         if (!lambda())
         {

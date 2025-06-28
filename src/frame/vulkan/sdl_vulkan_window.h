@@ -2,6 +2,7 @@
 
 #include <SDL3/SDL.h>
 #include <vulkan/vulkan.hpp>
+#include <string>
 #if defined(_WIN32) || defined(_WIN64)
 #define NOMINMAX
 #include <Windows.h>
@@ -62,6 +63,14 @@ class SDLVulkanWindow : public WindowInterface
     {
         SDL_SetWindowTitle(sdl_window_, title.c_str());
     }
+    void SetOpenFileName(const std::string& file_name) override
+    {
+        open_file_name_ = file_name;
+    }
+    const std::string& GetOpenFileName() const override
+    {
+        return open_file_name_;
+    }
     DrawingTargetEnum GetDrawingTargetEnum() const override
     {
         return DrawingTargetEnum::WINDOW;
@@ -102,6 +111,7 @@ class SDLVulkanWindow : public WindowInterface
 #if defined(_WIN32) || defined(_WIN64)
     HWND hwnd_ = nullptr;
 #endif
+    std::string open_file_name_ = "";
     frame::Logger& logger_ = frame::Logger::GetInstance();
     vk::UniqueInstance vk_unique_instance_;
     vk::UniqueSurfaceKHR vk_surface_;

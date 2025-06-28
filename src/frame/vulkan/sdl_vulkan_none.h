@@ -2,6 +2,7 @@
 
 #include <SDL3/SDL.h>
 #include <vulkan/vulkan.hpp>
+#include <string>
 #if defined(_WIN32) || defined(_WIN64)
 #define NOMINMAX
 #include <Windows.h>
@@ -65,6 +66,14 @@ class SDLVulkanNone : public WindowInterface
     void SetWindowTitle(const std::string& title) const override
     {
     }
+    void SetOpenFileName(const std::string& file_name) override
+    {
+        open_file_name_ = file_name;
+    }
+    const std::string& GetOpenFileName() const override
+    {
+        return open_file_name_;
+    }
     void Resize(glm::uvec2 size, FullScreenEnum fullscreen_enum) override
     {
         size_ = size;
@@ -90,6 +99,7 @@ class SDLVulkanNone : public WindowInterface
     std::unique_ptr<DeviceInterface> device_ = nullptr;
     std::unique_ptr<InputInterface> input_interface_ = nullptr;
     SDL_Window* sdl_window_ = nullptr;
+    std::string open_file_name_ = "";
     frame::Logger& logger_ = frame::Logger::GetInstance();
     vk::UniqueInstance vk_unique_instance_;
     vk::UniqueSurfaceKHR vk_surface_;

@@ -4,6 +4,7 @@
 #include <GL/glew.h>
 #include <SDL3/SDL.h>
 #include <format>
+#include <string>
 
 #include <stdexcept>
 
@@ -64,6 +65,14 @@ class SDLOpenGLNone : public WindowInterface
     void SetWindowTitle(const std::string& title) const override
     {
     }
+    void SetOpenFileName(const std::string& file_name) override
+    {
+        open_file_name_ = file_name;
+    }
+    const std::string& GetOpenFileName() const override
+    {
+        return open_file_name_;
+    }
     void Resize(glm::uvec2 size, FullScreenEnum fullscreen_enum) override
     {
         size_ = size;
@@ -84,6 +93,7 @@ class SDLOpenGLNone : public WindowInterface
     std::unique_ptr<InputInterface> input_interface_ = nullptr;
     SDL_Window* sdl_window_ = nullptr;
     SDL_GLContext gl_context_;
+    std::string open_file_name_ = "";
     frame::Logger& logger_ = frame::Logger::GetInstance();
 };
 
