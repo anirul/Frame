@@ -15,12 +15,49 @@
 #include "frame/gui/draw_gui_factory.h"
 #include "frame/gui/window_logger.h"
 #include "frame/gui/window_resolution.h"
+#include "frame/json/parse_level.h"
 #include "frame/window_factory.h"
 #include "menubar.h"
 #include "menubar_file.h"
 #include "menubar_view.h"
 #include "window_start.h"
 #include <filesystem>
+
+// Minimal default level loaded when the editor starts without a project.
+static constexpr const char kDefaultEditorLevel[] = R"({
+  "name": "EmptyProject",
+  "default_texture_name": "DefaultTexture",
+  "textures": [
+    {
+      "name": "DefaultTexture",
+      "size": { "x": -1, "y": -1 },
+      "pixel_element_size": { "value": "BYTE" },
+      "pixel_structure": { "value": "RGB" }
+    }
+  ],
+  "programs": [],
+  "scene_tree": {
+    "default_root_name": "root",
+    "default_camera_name": "camera",
+    "node_matrices": [
+      { "name": "root", "quaternion": { "w": 1, "x": 0, "y": 0, "z": 0 } }
+    ],
+    "node_cameras": [
+      {
+        "name": "camera",
+        "parent": "root",
+        "position": { "x": 0, "y": 0, "z": 0 },
+        "target": { "x": 0, "y": 0, "z": 1 },
+        "up": { "x": 0, "y": 1, "z": 0 },
+        "fov_degrees": 65.0,
+        "aspect_ratio": 1.6,
+        "near_clip": 0.1,
+        "far_clip": 10000.0
+      }
+    ]
+  },
+  "materials": []
+})";
 
 // From: https://sourceforge.net/p/predef/wiki/OperatingSystems/
 #if defined(_WIN32) || defined(_WIN64)
@@ -48,8 +85,7 @@ try
         size,
         win->GetDesktopSize(),
         win->GetPixelPerInch());
-    frame::gui::MenubarFile menubar_file(
-        device, *gui_window.get(), "asset/json/new_project_template.json");
+    frame::gui::MenubarFile menubar_file(device, *gui_window.get(), "");
     gui_window->SetMenuBar(
         std::make_unique<frame::gui::Menubar>(
             "Menu", menubar_file, menubar_view, gui_window->GetDevice()));
@@ -61,7 +97,14 @@ try
     bool loop = true;
     while (loop)
     {
-        app.Startup(frame::file::FindFile(menubar_file.GetFileName()));
+        if (menubar_file.GetFileName().empty())
+        {
+            app.Startup(frame::json::ParseLevel(size, kDefaultEditorLevel));
+        }
+        else
+        {
+            app.Startup(frame::file::FindFile(menubar_file.GetFileName()));
+        }
         switch (app.Run([&menubar_file] { return !menubar_file.HasChanged(); }))
         {
         case frame::WindowReturnEnum::QUIT:
