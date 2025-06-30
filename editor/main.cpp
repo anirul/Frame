@@ -99,7 +99,7 @@ try
     bool loop = true;
     while (loop)
     {
-        if (menubar_file.HasChanged() && !menubar_file.GetFileName().empty())
+        if (!menubar_file.GetFileName().empty())
         {
             app.Startup(frame::file::FindFile(menubar_file.GetFileName()));
         }
