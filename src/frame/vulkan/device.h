@@ -5,6 +5,7 @@
 #include "frame/camera.h"
 #include "frame/device_interface.h"
 #include "frame/logger.h"
+#include <glm/glm.hpp>
 
 namespace frame::vulkan
 {
@@ -23,10 +24,7 @@ class Device : public DeviceInterface
      * @param surface: Surface for the drawing.
      * @param dispatch: Dispatch from vulkan.
      */
-    Device(
-        void* vk_instance,
-        glm::uvec2 size,
-        vk::SurfaceKHR& surface);
+    Device(void* vk_instance, glm::uvec2 size, vk::SurfaceKHR& surface);
     //! @brief Destructor this is where the memory is freed.
     virtual ~Device();
 
@@ -93,6 +91,22 @@ class Device : public DeviceInterface
      * @param dt: Delta time from the beginning of the software in seconds.
      */
     void Display(double dt = 0.0) final;
+    /**
+     * @brief Set the color used when clearing the screen.
+     * @param color: The new clear color.
+     */
+    void SetClearColor(const glm::vec4& color) final
+    {
+        clear_color_ = color;
+    }
+    /**
+     * @brief Get the current clear color.
+     * @return The color used when clearing the screen.
+     */
+    glm::vec4 GetClearColor() const final
+    {
+        return clear_color_;
+    }
     /**
      * @brief Make a screen shot to a file.
      * @param file: File name of the screenshot (usually with the *.png)
@@ -198,6 +212,8 @@ class Device : public DeviceInterface
     bool invert_left_right_ = false;
     // Logger for the device.
     const Logger& logger_ = Logger::GetInstance();
+    // Clear color used by the Display call.
+    glm::vec4 clear_color_ = glm::vec4(0.2f, 0.0f, 0.2f, 1.0f);
 };
 
 } // End namespace frame::vulkan.
