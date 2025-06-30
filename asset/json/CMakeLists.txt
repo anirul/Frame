@@ -5,6 +5,7 @@ add_custom_target(AssetJson
     depth_normal.json
     device_test.json
     editor.json
+    new_project_template.json
     equirectangular.json
     image_based_lighting.json
     japanese_flag.json

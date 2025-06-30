@@ -9,7 +9,9 @@ add_executable(FrameEditor
     menubar_view.h
     menubar_file.cpp
     menubar_file.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/../asset/json/editor.json
+    window_start.cpp
+    window_start.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../asset/json/new_project_template.json
 )
 
 target_include_directories(FrameEditor
