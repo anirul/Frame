@@ -316,6 +316,7 @@ void SDLOpenGLDrawGui::AddModalWindow(
     std::unique_ptr<frame::gui::GuiWindowInterface> callback)
 {
     modal_callback_ = std::move(callback);
+    start_modal_ = false;
 }
 
 std::vector<std::string> SDLOpenGLDrawGui::GetWindowTitles() const

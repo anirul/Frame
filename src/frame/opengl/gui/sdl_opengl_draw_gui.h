@@ -140,8 +140,9 @@ class SDLOpenGLDrawGui : public frame::gui::DrawGuiInterface
      * removed. This will trigger an internal boolean that will decide if the
      * modal is active or not.
      */
+    /** Set the modal window. Replaces any current modal and opens it next frame. */
     void AddModalWindow(
-		std::unique_ptr<frame::gui::GuiWindowInterface> callback) override;
+                std::unique_ptr<frame::gui::GuiWindowInterface> callback) override;
     /**
      * @brief Get a specific window (associated with a name).
      * @param name: The name of the window.

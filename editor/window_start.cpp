@@ -15,11 +15,13 @@ bool WindowStart::DrawCallback()
     ImGui::Text("Welcome to Frame Editor");
     if (ImGui::Button("Create New Project"))
     {
+        ImGui::CloseCurrentPopup();
         menubar_file_.ShowNewProject();
         end_ = true;
     }
     if (ImGui::Button("Open Existing Project"))
     {
+        ImGui::CloseCurrentPopup();
         menubar_file_.ShowOpenProject();
         end_ = true;
     }
