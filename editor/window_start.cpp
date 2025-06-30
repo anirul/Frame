@@ -12,6 +12,10 @@ WindowStart::WindowStart(MenubarFile& menubar_file)
 
 bool WindowStart::DrawCallback()
 {
+    constexpr float side_space = 20.0f;
+    ImGui::Dummy(ImVec2(side_space, 0.0f));
+    ImGui::SameLine();
+    ImGui::BeginGroup();
     ImGui::Dummy(ImVec2(0.0f, 10.0f));
     ImGui::Text("Welcome to Frame Editor");
     ImGui::Dummy(ImVec2(0.0f, 10.0f));
@@ -29,6 +33,9 @@ bool WindowStart::DrawCallback()
         end_ = true;
     }
     ImGui::Dummy(ImVec2(0.0f, 10.0f));
+    ImGui::EndGroup();
+    ImGui::SameLine();
+    ImGui::Dummy(ImVec2(side_space, 0.0f));
     return true;
 }
 
