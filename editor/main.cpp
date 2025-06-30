@@ -17,6 +17,7 @@
 #include "frame/gui/window_resolution.h"
 #include "frame/json/parse_level.h"
 #include "frame/window_factory.h"
+#include <SDL3/SDL.h>
 #include "menubar.h"
 #include "menubar_file.h"
 #include "menubar_view.h"
@@ -101,6 +102,9 @@ try
     {
         if (!menubar_file.GetFileName().empty())
         {
+            device.Clear(glm::vec4(0.3f, 0.3f, 0.3f, 1.0f));
+            SDL_GL_SwapWindow(static_cast<SDL_Window*>(
+                app.GetWindow().GetWindowContext()));
             app.Startup(frame::file::FindFile(menubar_file.GetFileName()));
         }
         switch (app.Run([&menubar_file] { return !menubar_file.HasChanged(); }))
