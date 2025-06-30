@@ -19,6 +19,8 @@
 #include "menubar.h"
 #include "menubar_file.h"
 #include "menubar_view.h"
+#include "window_start.h"
+#include <filesystem>
 
 // From: https://sourceforge.net/p/predef/wiki/OperatingSystems/
 #if defined(_WIN32) || defined(_WIN64)
@@ -47,10 +49,12 @@ try
         win->GetDesktopSize(),
         win->GetPixelPerInch());
     frame::gui::MenubarFile menubar_file(
-        device, *gui_window.get(), "asset/json/editor.json");
+        device, *gui_window.get(), "asset/json/new_project_template.json");
     gui_window->SetMenuBar(
         std::make_unique<frame::gui::Menubar>(
             "Menu", menubar_file, menubar_view, gui_window->GetDevice()));
+    gui_window->AddModalWindow(
+        std::make_unique<frame::gui::WindowStart>(menubar_file));
     // Set the main window in full.
     device.AddPlugin(std::move(gui_window));
     frame::common::Application app(std::move(win));
@@ -73,6 +77,15 @@ try
             else
             {
                 menubar_view.Reset();
+                if (menubar_file.GetFileDialogEnum() ==
+                    frame::gui::FileDialogEnum::NEW)
+                {
+                    std::filesystem::copy_file(
+                        frame::file::FindFile(
+                            "asset/json/new_project_template.json"),
+                        menubar_file.GetFileName(),
+                        std::filesystem::copy_options::overwrite_existing);
+                }
                 menubar_file.TrySaveFile();
             }
             break;
