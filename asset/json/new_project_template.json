@@ -5,8 +5,8 @@
     {
       "name": "DefaultTexture",
       "size": {
-        "x": "640",
-        "y": "480"
+        "x": -1,
+        "y": -1
       },
       "pixel_element_size": { "value": "BYTE" },
       "pixel_structure": { "value": "RGB" }
