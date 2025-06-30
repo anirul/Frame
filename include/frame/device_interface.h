@@ -8,6 +8,7 @@
 #include "frame/level_interface.h"
 #include "frame/plugin_interface.h"
 #include "frame/texture_interface.h"
+#include <glm/glm.hpp>
 
 namespace frame
 {
@@ -70,6 +71,16 @@ class DeviceInterface
      * @return The size of the window.
      */
     virtual glm::uvec2 GetSize() const = 0;
+    /**
+     * @brief Set the color used when clearing the screen.
+     * @param color: The new clear color.
+     */
+    virtual void SetClearColor(const glm::vec4& color) = 0;
+    /**
+     * @brief Get the color currently used when clearing the screen.
+     * @return The clear color.
+     */
+    virtual glm::vec4 GetClearColor() const = 0;
     /**
      * @brief  Get the current level.
      * @return A pointer to the level.

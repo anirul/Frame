@@ -94,10 +94,11 @@ try
     // Set the main window in full.
     device.AddPlugin(std::move(gui_window));
     frame::common::Application app(std::move(win));
+    device.SetClearColor(glm::vec4(0.3f, 0.3f, 0.3f, 1.0f));
     // Load a blank level so GUI elements can display before any project is
     // opened.
     app.Startup(frame::json::ParseLevel(size, std::string(kBlankLevelJson)));
-    device.Clear(glm::vec4(0.3f, 0.3f, 0.3f, 1.0f));
+    device.Clear(device.GetClearColor());
     SDL_GL_SwapWindow(
         static_cast<SDL_Window*>(app.GetWindow().GetWindowContext()));
     bool loop = true;
@@ -105,7 +106,7 @@ try
     {
         if (!menubar_file.GetFileName().empty())
         {
-            device.Clear(glm::vec4(0.3f, 0.3f, 0.3f, 1.0f));
+            device.Clear(device.GetClearColor());
             SDL_GL_SwapWindow(
                 static_cast<SDL_Window*>(app.GetWindow().GetWindowContext()));
             app.Startup(frame::file::FindFile(menubar_file.GetFileName()));

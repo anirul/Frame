@@ -19,6 +19,7 @@
 #include "frame/opengl/static_mesh.h"
 #include "frame/opengl/texture.h"
 #include "frame/uniform_interface.h"
+#include <glm/glm.hpp>
 
 namespace frame::opengl
 {
@@ -94,6 +95,22 @@ class Device : public DeviceInterface
      * @return The size of the window.
      */
     glm::uvec2 GetSize() const final;
+    /**
+     * @brief Set the color used when clearing the screen.
+     * @param color: The new clear color.
+     */
+    void SetClearColor(const glm::vec4& color) final
+    {
+        clear_color_ = color;
+    }
+    /**
+     * @brief Get the current clear color.
+     * @return The color used when clearing the screen.
+     */
+    glm::vec4 GetClearColor() const final
+    {
+        return clear_color_;
+    }
     /**
      * @brief Display to the screen.
      * @param dt: Delta time from the beginning of the software in seconds.
@@ -181,7 +198,7 @@ class Device : public DeviceInterface
 
   protected:
     void DisplayCamera(
-		const CameraInterface& camera, glm::uvec4 viewport, double time);
+        const CameraInterface& camera, glm::uvec4 viewport, double time);
     void DisplayLeftRightCamera(
         const CameraInterface& camera_left,
         const CameraInterface& camera_right,
@@ -208,6 +225,8 @@ class Device : public DeviceInterface
     bool invert_left_right_ = false;
     // Logger for the device.
     const Logger& logger_ = Logger::GetInstance();
+    // Clear color used by the Display call.
+    glm::vec4 clear_color_ = glm::vec4(0.2f, 0.0f, 0.2f, 1.0f);
 };
 
 } // End namespace frame::opengl.
