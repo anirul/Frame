@@ -12,19 +12,23 @@ WindowStart::WindowStart(MenubarFile& menubar_file)
 
 bool WindowStart::DrawCallback()
 {
+    ImGui::Dummy(ImVec2(0.0f, 10.0f));
     ImGui::Text("Welcome to Frame Editor");
+    ImGui::Dummy(ImVec2(0.0f, 10.0f));
     if (ImGui::Button("Create New Project"))
     {
         ImGui::CloseCurrentPopup();
         menubar_file_.ShowNewProject();
         end_ = true;
     }
+    ImGui::Dummy(ImVec2(0.0f, 10.0f));
     if (ImGui::Button("Open Existing Project"))
     {
         ImGui::CloseCurrentPopup();
         menubar_file_.ShowOpenProject();
         end_ = true;
     }
+    ImGui::Dummy(ImVec2(0.0f, 10.0f));
     return true;
 }
 
