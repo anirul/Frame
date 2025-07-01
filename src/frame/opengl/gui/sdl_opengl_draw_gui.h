@@ -199,9 +199,10 @@ class SDLOpenGLDrawGui : public frame::gui::DrawGuiInterface
 
   protected:
     struct CallbackData {
-		std::unique_ptr<frame::gui::GuiWindowInterface> callback = nullptr;
-        glm::vec2 position = { 0.0f, 0.0f };
-        glm::vec2 size = { 0.0f, 0.0f };
+        std::unique_ptr<frame::gui::GuiWindowInterface> callback = nullptr;
+        glm::vec2 position = {0.0f, 0.0f};
+        glm::vec2 size = {0.0f, 0.0f};
+        bool open = true;
     };
     std::map<std::string, CallbackData> window_callbacks_ = {};
     std::map<std::string, CallbackData> overlay_callbacks_ = {};
