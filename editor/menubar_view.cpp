@@ -6,10 +6,10 @@
 #include <imgui_impl_opengl3.h>
 #include <imgui_impl_sdl3.h>
 
-#include "frame/gui/window_logger.h"
-#include "frame/opengl/texture.h"
-#include "frame/gui/window_texture.h"
 #include "frame/gui/window_cubemap.h"
+#include "frame/gui/window_logger.h"
+#include "frame/gui/window_texture.h"
+#include "frame/opengl/texture.h"
 
 namespace frame::gui
 {
@@ -20,11 +20,8 @@ MenubarView::MenubarView(
     glm::uvec2 size,
     glm::uvec2 desktop_size,
     glm::uvec2 pixel_per_inch)
-    : device_(device),
-      draw_gui_(draw_gui),
-      size_(size),
-      desktop_size_(desktop_size),
-      pixel_per_inch_(pixel_per_inch)
+    : device_(device), draw_gui_(draw_gui), size_(size),
+      desktop_size_(desktop_size), pixel_per_inch_(pixel_per_inch)
 {
 }
 
@@ -42,10 +39,7 @@ void MenubarView::CreateResolution(const std::string& name)
 {
     std::unique_ptr<WindowResolution> unique_window_resolution =
         std::make_unique<WindowResolution>(
-            name,
-            size_,
-            desktop_size_,
-            pixel_per_inch_);
+            name, size_, desktop_size_, pixel_per_inch_);
     ptr_window_resolution_ = unique_window_resolution.get();
     draw_gui_.AddWindow(std::move(unique_window_resolution));
 }
@@ -68,7 +62,7 @@ void MenubarView::ShowLoggerWindow()
     }
     else
     {
-        CreateLogger("Logger");   
+        CreateLogger("Logger");
     }
     window_state_["Logger"] = !window_state_["Logger"];
 }
@@ -93,27 +87,32 @@ void MenubarView::ShowResolutionWindow()
 void MenubarView::ShowTexturesWindow(DeviceInterface& device)
 {
     auto& level = device.GetLevel();
+    auto open_windows = draw_gui_.GetWindowTitles();
     for (auto id : level.GetTextures())
     {
         frame::TextureInterface& texture_interface =
             device.GetLevel().GetTextureFromId(id);
         std::string str_type =
             texture_interface.GetData().cubemap() ? "cubemap" : "texture";
-        if (!window_state_.contains(texture_interface.GetName()))
-        {
-            window_state_[texture_interface.GetName()] = false;
-        }
+        std::string window_name = std::format(
+            "{} - [{}] - ({}, {})",
+            str_type,
+            texture_interface.GetName(),
+            texture_interface.GetSize().x,
+            texture_interface.GetSize().y);
+
+        bool is_open =
+            std::find(open_windows.begin(), open_windows.end(), window_name) !=
+            open_windows.end();
+        window_state_[texture_interface.GetName()] = is_open;
+
+        bool previous_state = window_state_[texture_interface.GetName()];
         if (ImGui::MenuItem(
-                std::format(
-                    "{} - [{}] - ({}, {})",
-                    str_type,
-                    texture_interface.GetName(),
-                    std::to_string(texture_interface.GetSize().x),
-                    std::to_string(texture_interface.GetSize().y)).c_str(),
+                window_name.c_str(),
                 "",
                 &window_state_[texture_interface.GetName()]))
         {
-            if (window_state_[texture_interface.GetName()])
+            if (window_state_[texture_interface.GetName()] && !previous_state)
             {
                 if (texture_interface.GetData().cubemap())
                 {
@@ -126,15 +125,10 @@ void MenubarView::ShowTexturesWindow(DeviceInterface& device)
                         std::make_unique<WindowTexture>(texture_interface));
                 }
             }
-            else
+            else if (
+                !window_state_[texture_interface.GetName()] && previous_state)
             {
-                draw_gui_.DeleteWindow(
-                    std::format(
-                        "{} - [{}] - ({}, {})",
-                        str_type,
-                        texture_interface.GetName(),
-                        texture_interface.GetSize().x,
-                        texture_interface.GetSize().y));
+                draw_gui_.DeleteWindow(window_name);
             }
         }
     }
@@ -151,8 +145,9 @@ void MenubarView::Reset()
             {
                 if (window_name.starts_with("cubemap - "))
                 {
-                    WindowCubemap& window_cubemap = dynamic_cast<WindowCubemap&>(
-                        draw_gui_.GetWindow(window_name));
+                    WindowCubemap& window_cubemap =
+                        dynamic_cast<WindowCubemap&>(
+                            draw_gui_.GetWindow(window_name));
                     draw_gui_.DeleteWindow(window_name);
                 }
                 else
@@ -176,10 +171,12 @@ void MenubarView::Reset()
             }
             catch (const std::bad_cast& ex)
             {
-                frame::Logger::GetInstance()->warn(std::format(
-                    "Counldn't cast window named {} to a window display {}.",
-                    window_name,
-                    ex.what()));
+                frame::Logger::GetInstance()->warn(
+                    std::format(
+                        "Counldn't cast window named {} to a window display "
+                        "{}.",
+                        window_name,
+                        ex.what()));
             }
         }
     }
