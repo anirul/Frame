@@ -103,16 +103,16 @@ bool SDLOpenGLDrawGui::Update(DeviceInterface& device, double dt)
         ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
         // Make the other window visible.
         std::vector<std::string> windows_to_remove;
-        for (const auto& pair : window_callbacks_)
+        for (auto& [name, data] : window_callbacks_)
         {
             // Call the callback!
-            ImGui::Begin(pair.second.callback->GetName().c_str());
-            if (!pair.second.callback->DrawCallback())
+            ImGui::Begin(data.callback->GetName().c_str(), &data.open);
+            if (!data.callback->DrawCallback())
                 returned_value = false;
             ImGui::End();
-            if (pair.second.callback->End())
+            if (data.callback->End() || !data.open)
             {
-                windows_to_remove.push_back(pair.first);
+                windows_to_remove.push_back(name);
             }
         }
         for (const auto& name : windows_to_remove)
@@ -292,6 +292,7 @@ void SDLOpenGLDrawGui::AddWindow(
     callback_data.callback = std::move(callback);
     callback_data.position = glm::vec2(0.0f, 0.0f);
     callback_data.size = glm::vec2(0.0f, 0.0f);
+    callback_data.open = true;
     window_callbacks_.emplace(name, std::move(callback_data));
 }
 
@@ -309,6 +310,7 @@ void SDLOpenGLDrawGui::AddOverlayWindow(
     callback_data.callback = std::move(callback);
     callback_data.position = position;
     callback_data.size = size;
+    callback_data.open = true;
     overlay_callbacks_.emplace(name, std::move(callback_data));
 }
 
