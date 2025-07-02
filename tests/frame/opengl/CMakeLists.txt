@@ -48,6 +48,7 @@ target_link_libraries(FrameOpenGLTest
     GTest::gmock
     GTest::gtest
     FrameFile
+    FrameGui
     FrameOpenGL
     FrameOpenGLFile
     FrameJson
