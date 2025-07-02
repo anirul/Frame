@@ -71,7 +71,7 @@ cmake --build --preset linux-release
 Or if you want to build the debug version:
 
 ```shell
-cmake --preset linux-debug
+cmake --build --preset linux-debug
 ```
 
 ## Dive in with Examples
