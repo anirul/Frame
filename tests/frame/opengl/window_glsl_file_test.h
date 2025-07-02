@@ -4,6 +4,8 @@
 #include <fstream>
 #include <gtest/gtest.h>
 #include <imgui.h>
+#include "frame/file/file_system.h"
+#include "frame/json/parse_level.h"
 
 #include "frame/gui/window_glsl_file.h"
 #include "frame/window_factory.h"
@@ -27,6 +29,10 @@ class WindowGlslFileTest : public testing::Test
             std::filesystem::temp_directory_path() / "glsl_window_test.frag";
         std::ofstream out(temp_file_);
         out << "void main() {}";
+        auto level = frame::json::ParseLevel(
+            window_->GetDevice().GetSize(),
+            frame::file::FindFile("asset/json/device_test.json"));
+        window_->GetDevice().Startup(std::move(level));
     }
 
     void TearDown() override
