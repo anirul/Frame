@@ -85,11 +85,6 @@ bool WindowJsonFile::DrawCallback()
             error_message_ = e.what();
         }
     }
-    ImGui::SameLine();
-    if (ImGui::Button("Close"))
-    {
-        end_ = true;
-    }
     ImGui::Separator();
     if (!error_message_.empty())
     {
