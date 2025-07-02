@@ -40,8 +40,31 @@ bool WindowGlslFile::DrawCallback()
         try
         {
             std::string source = editor_.GetText();
-            std::ofstream out(frame::file::FindFile(file_name_));
-            out << source;
+
+            using frame::opengl::Shader;
+            using frame::opengl::ShaderEnum;
+            ShaderEnum shader_type = ShaderEnum::FRAGMENT_SHADER;
+            if (std::string_view(file_name_).ends_with(".vert"))
+                shader_type = ShaderEnum::VERTEX_SHADER;
+            Shader shader(shader_type);
+            if (!shader.LoadFromSource(source))
+            {
+                throw std::runtime_error(shader.GetErrorMessage());
+            }
+            error_message_.clear();
+        }
+        catch (const std::exception& e)
+        {
+            error_message_ = e.what();
+            frame::Logger::GetInstance()->error(e.what());
+        }
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Apply"))
+    {
+        try
+        {
+            std::string source = editor_.GetText();
 
             using frame::opengl::Shader;
             using frame::opengl::ShaderEnum;
