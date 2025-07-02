@@ -1,5 +1,7 @@
 #include "frame/gui/window_glsl_file.h"
 
+#include "frame/json/parse_level.h"
+#include "frame/json/serialize_level.h"
 #include "frame/logger.h"
 #include <cmath>
 #include <format>
@@ -164,7 +166,18 @@ bool WindowGlslFile::Apply()
         frame::Logger::GetInstance()->error(e.what());
         return false;
     }
-    device_.Resize(device_.GetSize());
+    try
+    {
+        auto proto_level = frame::json::SerializeLevel(device_.GetLevel());
+        auto level = frame::json::ParseLevel(device_.GetSize(), proto_level);
+        device_.Startup(std::move(level));
+    }
+    catch (const std::exception& e)
+    {
+        error_message_ = e.what();
+        frame::Logger::GetInstance()->error(e.what());
+        return false;
+    }
     return true;
 }
 
