@@ -24,6 +24,8 @@ add_executable(FrameOpenGLTest
   renderer_test.h
   shader_test.cpp
   shader_test.h
+  window_glsl_file_test.cpp
+  window_glsl_file_test.h
   cubemap_test.cpp
   cubemap_test.h
   texture_test.cpp

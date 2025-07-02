@@ -22,6 +22,24 @@ class WindowGlslFile : public GuiWindowInterface
     std::string GetName() const override;
     void SetName(const std::string& name) override;
 
+    /**
+     * @brief Compile the current editor text without writing it to disk.
+     * @return True on successful compilation, false otherwise.
+     */
+    bool Compile();
+    /**
+     * @brief Apply the current editor text by compiling it and, on success,
+     * saving the file and reloading the device.
+     * @return True on success, false if compilation failed or writing the file
+     * failed.
+     */
+    bool Apply();
+
+    /** @brief Set the text in the internal editor. */
+    void SetEditorText(const std::string& text);
+    /** @brief Get the text from the internal editor. */
+    std::string GetEditorText() const;
+
   private:
     std::string name_;
     std::string file_name_;

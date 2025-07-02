@@ -37,53 +37,12 @@ bool WindowGlslFile::DrawCallback()
 {
     if (ImGui::Button("Compile"))
     {
-        try
-        {
-            std::string source = editor_.GetText();
-
-            using frame::opengl::Shader;
-            using frame::opengl::ShaderEnum;
-            ShaderEnum shader_type = ShaderEnum::FRAGMENT_SHADER;
-            if (std::string_view(file_name_).ends_with(".vert"))
-                shader_type = ShaderEnum::VERTEX_SHADER;
-            Shader shader(shader_type);
-            if (!shader.LoadFromSource(source))
-            {
-                throw std::runtime_error(shader.GetErrorMessage());
-            }
-            error_message_.clear();
-        }
-        catch (const std::exception& e)
-        {
-            error_message_ = e.what();
-            frame::Logger::GetInstance()->error(e.what());
-        }
+        Compile();
     }
     ImGui::SameLine();
     if (ImGui::Button("Apply"))
     {
-        try
-        {
-            std::string source = editor_.GetText();
-
-            using frame::opengl::Shader;
-            using frame::opengl::ShaderEnum;
-            ShaderEnum shader_type = ShaderEnum::FRAGMENT_SHADER;
-            if (std::string_view(file_name_).ends_with(".vert"))
-                shader_type = ShaderEnum::VERTEX_SHADER;
-            Shader shader(shader_type);
-            if (!shader.LoadFromSource(source))
-            {
-                throw std::runtime_error(shader.GetErrorMessage());
-            }
-            device_.Resize(device_.GetSize());
-            error_message_.clear();
-        }
-        catch (const std::exception& e)
-        {
-            error_message_ = e.what();
-            frame::Logger::GetInstance()->error(e.what());
-        }
+        Apply();
     }
     ImGui::SameLine();
     if (ImGui::Button("Reload"))
@@ -169,6 +128,54 @@ std::string WindowGlslFile::GetName() const
 void WindowGlslFile::SetName(const std::string& name)
 {
     name_ = name;
+}
+
+bool WindowGlslFile::Compile()
+{
+    using frame::opengl::Shader;
+    using frame::opengl::ShaderEnum;
+    std::string source = editor_.GetText();
+    ShaderEnum shader_type = ShaderEnum::FRAGMENT_SHADER;
+    if (std::string_view(file_name_).ends_with(".vert"))
+        shader_type = ShaderEnum::VERTEX_SHADER;
+    Shader shader(shader_type);
+    if (!shader.LoadFromSource(source))
+    {
+        error_message_ = shader.GetErrorMessage();
+        frame::Logger::GetInstance()->error(error_message_);
+        return false;
+    }
+    error_message_.clear();
+    return true;
+}
+
+bool WindowGlslFile::Apply()
+{
+    if (!Compile())
+        return false;
+    try
+    {
+        std::ofstream out(frame::file::FindFile(file_name_));
+        out << editor_.GetText();
+    }
+    catch (const std::exception& e)
+    {
+        error_message_ = e.what();
+        frame::Logger::GetInstance()->error(e.what());
+        return false;
+    }
+    device_.Resize(device_.GetSize());
+    return true;
+}
+
+void WindowGlslFile::SetEditorText(const std::string& text)
+{
+    editor_.SetText(text);
+}
+
+std::string WindowGlslFile::GetEditorText() const
+{
+    return editor_.GetText();
 }
 
 } // End namespace frame::gui.
