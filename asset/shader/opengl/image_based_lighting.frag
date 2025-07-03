@@ -15,7 +15,8 @@ void main()
     // Sample the diffuse texture.
     vec3 diffuseColor = texture(Color, fragTexCoord).rgb;
     // Sample the irradiance map using the transformed normal.
-    vec3 irradiance = texture(IrradianceMap, normalize(vec3(fragNormal.x, -fragNormal.y, fragNormal.z))).rgb;
+    vec3 normalizeDirection =  normalize(vec3(fragNormal.x, -fragNormal.y, fragNormal.z));
+    vec3 irradiance = texture(IrradianceMap, normalizeDirection).rgb;
     // Mix the irradiance with the diffuse color.
     vec3 mixedColor = mix(irradiance, diffuseColor.rgb, ibl_exposure);
     // Output the mixed color.
