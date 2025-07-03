@@ -96,7 +96,8 @@ void Menubar::MenuEdit()
                     menubar_view_.GetDrawGui().AddWindow(
                         std::make_unique<WindowGlslFile>(
                             std::string("asset/shader/opengl/") + shader,
-                            device_));
+                            device_,
+                            menubar_file_.GetFileName()));
                 }
             }
             ImGui::EndMenu();

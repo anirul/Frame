@@ -8,7 +8,9 @@ namespace test
 TEST_F(WindowGlslFileTest, FailedCompileDoesNotTouchFile)
 {
     frame::gui::WindowGlslFile window(
-        temp_file_.string(), window_->GetDevice());
+        temp_file_.string(),
+        window_->GetDevice(),
+        "asset/json/device_test.json");
     window.SetEditorText("false");
     EXPECT_FALSE(window.Compile());
 
@@ -21,7 +23,9 @@ TEST_F(WindowGlslFileTest, FailedCompileDoesNotTouchFile)
 TEST_F(WindowGlslFileTest, FailedApplyDoesNotTouchFile)
 {
     frame::gui::WindowGlslFile window(
-        temp_file_.string(), window_->GetDevice());
+        temp_file_.string(),
+        window_->GetDevice(),
+        "asset/json/device_test.json");
     window.SetEditorText("false");
     EXPECT_FALSE(window.Apply());
 
@@ -34,7 +38,9 @@ TEST_F(WindowGlslFileTest, FailedApplyDoesNotTouchFile)
 TEST_F(WindowGlslFileTest, ApplyWritesFileOnSuccess)
 {
     frame::gui::WindowGlslFile window(
-        temp_file_.string(), window_->GetDevice());
+        temp_file_.string(),
+        window_->GetDevice(),
+        "asset/json/device_test.json");
     const std::string shader =
         "#version 330 core\nlayout(location=0) out vec4 frag_color;\nvoid "
         "main(){frag_color=vec4(1.0);}";

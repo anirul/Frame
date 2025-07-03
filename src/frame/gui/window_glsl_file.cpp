@@ -13,9 +13,11 @@ namespace frame::gui
 {
 
 WindowGlslFile::WindowGlslFile(
-    const std::string& file_name, DeviceInterface& device)
+    const std::string& file_name,
+    DeviceInterface& device,
+    const std::string& level_file)
     : name_(std::format("GLSL File [{}]", file_name)), file_name_(file_name),
-      device_(device)
+      device_(device), level_file_(level_file)
 {
     editor_.SetLanguageDefinition(TextEditor::LanguageDefinitionId::Glsl);
     try
@@ -168,9 +170,19 @@ bool WindowGlslFile::Apply()
     }
     try
     {
-        auto proto_level = frame::json::SerializeLevel(device_.GetLevel());
-        auto level = frame::json::ParseLevel(device_.GetSize(), proto_level);
-        device_.Startup(std::move(level));
+        if (!level_file_.empty())
+        {
+            auto level = frame::json::ParseLevel(
+                device_.GetSize(), frame::file::FindFile(level_file_));
+            device_.Startup(std::move(level));
+        }
+        else
+        {
+            auto proto_level = frame::json::SerializeLevel(device_.GetLevel());
+            auto level =
+                frame::json::ParseLevel(device_.GetSize(), proto_level);
+            device_.Startup(std::move(level));
+        }
     }
     catch (const std::exception& e)
     {

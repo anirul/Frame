@@ -14,7 +14,10 @@ namespace frame::gui
 class WindowGlslFile : public GuiWindowInterface
 {
   public:
-    WindowGlslFile(const std::string& file_name, DeviceInterface& device);
+    WindowGlslFile(
+        const std::string& file_name,
+        DeviceInterface& device,
+        const std::string& level_file = "");
     ~WindowGlslFile() override = default;
 
     bool DrawCallback() override;
@@ -47,6 +50,7 @@ class WindowGlslFile : public GuiWindowInterface
     TextEditor editor_;
     bool end_ = false;
     std::string error_message_;
+    std::string level_file_;
 };
 
 } // End namespace frame::gui.
