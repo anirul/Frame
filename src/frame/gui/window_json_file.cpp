@@ -36,7 +36,7 @@ WindowJsonFile::WindowJsonFile(
 
 bool WindowJsonFile::DrawCallback()
 {
-    if (ImGui::Button("Build"))
+    if (ImGui::Button("Apply"))
     {
         try
         {
@@ -52,7 +52,7 @@ bool WindowJsonFile::DrawCallback()
         }
     }
     ImGui::SameLine();
-    if (ImGui::Button("Reload"))
+    if (ImGui::Button("Load"))
     {
         try
         {
