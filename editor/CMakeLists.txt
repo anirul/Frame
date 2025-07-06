@@ -11,6 +11,8 @@ add_executable(FrameEditor
     menubar_file.h
     window_start.cpp
     window_start.h
+    window_level.cpp
+    window_level.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../asset/json/new_project_template.json
 )
 
@@ -30,6 +32,7 @@ target_link_libraries(FrameEditor
     FrameOpenGLGui
     FrameOpenGLFile
     FrameProto
+    unofficial::imgui-node-editor::imgui-node-editor
     imgui::imgui
     ImGuiColorTextEdit
 )
