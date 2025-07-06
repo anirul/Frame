@@ -8,6 +8,7 @@
 
 #include "frame/file/file_system.h"
 #include "frame/json/parse_level.h"
+#include "frame/entity_id.h"
 
 namespace ed = ax::NodeEditor;
 
@@ -41,23 +42,68 @@ WindowLevel::~WindowLevel()
         ed::DestroyEditor(context_);
 }
 
-void WindowLevel::DisplayNode(LevelInterface& level, EntityId id)
+void WindowLevel::DisplayNode(LevelInterface& level, EntityId id, EntityId parent)
 {
-    std::string name = level.GetNameFromId(id);
+    auto name = level.GetNameFromId(id);
     ed::BeginNode(id);
+
+    auto input_id = id * 2 + 1;
+    auto output_id = id * 2 + 2;
+
+    ed::BeginPin(input_id, ed::PinKind::Input);
+    ImGui::Dummy(ImVec2(10, 10));
+    ed::EndPin();
+
+    ImGui::SameLine();
     ImGui::Text("%s", name.c_str());
+    ImGui::SameLine();
+
+    ed::BeginPin(output_id, ed::PinKind::Output);
+    ImGui::Dummy(ImVec2(10, 10));
+    ed::EndPin();
+
     ed::EndNode();
+
+    if (parent != frame::NullId)
+    {
+        auto parent_output = parent * 2 + 2;
+        ed::Link(next_link_id_++, parent_output, input_id);
+    }
+
     for (auto child : level.GetChildList(id))
     {
-        DisplayNode(level, child);
+        DisplayNode(level, child, id);
     }
 }
 
 bool WindowLevel::DrawCallback()
 {
     auto& level = device_.GetLevel();
+    auto draw_toggle = [&]() {
+        if (show_json_)
+        {
+            ImGui::BeginDisabled();
+            ImGui::Button("JSON Editor");
+            ImGui::EndDisabled();
+            ImGui::SameLine();
+            if (ImGui::Button("Node Editor"))
+                show_json_ = false;
+        }
+        else
+        {
+            if (ImGui::Button("JSON Editor"))
+                show_json_ = true;
+            ImGui::SameLine();
+            ImGui::BeginDisabled();
+            ImGui::Button("Node Editor");
+            ImGui::EndDisabled();
+        }
+    };
+
     if (show_json_)
     {
+        draw_toggle();
+        ImGui::SameLine();
         if (ImGui::Button("Apply"))
         {
             try
@@ -107,9 +153,6 @@ bool WindowLevel::DrawCallback()
                 error_message_ = e.what();
             }
         }
-        ImGui::SameLine();
-        if (ImGui::Button("Node Editor"))
-            show_json_ = false;
         ImGui::Separator();
         if (!error_message_.empty())
         {
@@ -152,13 +195,12 @@ bool WindowLevel::DrawCallback()
     {
         if (!context_)
             context_ = ed::CreateEditor();
+        draw_toggle();
+        ImGui::SameLine();
         if (ImGui::Button("Save"))
         {
             // TODO: implement saving level
         }
-        ImGui::SameLine();
-        if (ImGui::Button("JSON Editor"))
-            show_json_ = true;
         ImGui::Separator();
         if (ImGui::BeginTabBar("##level_tabs"))
         {
@@ -196,7 +238,7 @@ bool WindowLevel::DrawCallback()
                 auto root = level.GetDefaultRootSceneNodeId();
                 if (root)
                 {
-                    DisplayNode(level, root);
+                    DisplayNode(level, root, frame::NullId);
                 }
                 ed::End();
                 ed::SetCurrentEditor(nullptr);

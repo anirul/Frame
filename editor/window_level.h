@@ -20,10 +20,11 @@ class WindowLevel : public GuiWindowInterface
     void SetName(const std::string& name) override;
 
   private:
-    void DisplayNode(LevelInterface& level, EntityId id);
+    void DisplayNode(LevelInterface& level, EntityId id, EntityId parent);
 
     DeviceInterface& device_;
     ax::NodeEditor::EditorContext* context_ = nullptr;
+    std::int64_t next_link_id_ = 1;
     std::string name_ = "Level Editor";
     bool end_ = false;
     bool show_json_ = false;
