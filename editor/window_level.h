@@ -2,7 +2,7 @@
 
 #include "frame/device_interface.h"
 #include "frame/gui/gui_window_interface.h"
-#include <imgui_node_editor.h>
+#include <imgui-node-editor/imgui_node_editor.h>
 
 namespace frame::gui
 {

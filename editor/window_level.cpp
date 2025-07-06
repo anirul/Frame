@@ -1,7 +1,7 @@
 #include "window_level.h"
 
 #include <imgui.h>
-#include <imgui_node_editor.h>
+#include <imgui-node-editor/imgui_node_editor.h>
 
 namespace ed = ax::NodeEditor;
 
