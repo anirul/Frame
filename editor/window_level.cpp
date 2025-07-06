@@ -17,24 +17,8 @@ namespace frame::gui
 {
 
 WindowLevel::WindowLevel(DeviceInterface& device, const std::string& file_name)
-    : device_(device), file_name_(file_name)
+    : WindowJsonFile(file_name, device), device_(device)
 {
-    editor_.SetLanguageDefinition(TextEditor::LanguageDefinitionId::Json);
-    try
-    {
-        std::ifstream file(frame::file::FindFile(file_name_));
-        if (file)
-        {
-            std::string content(
-                (std::istreambuf_iterator<char>(file)),
-                std::istreambuf_iterator<char>());
-            editor_.SetText(content);
-        }
-    }
-    catch (...)
-    {
-        // ignore
-    }
 }
 
 WindowLevel::~WindowLevel()
@@ -107,92 +91,7 @@ bool WindowLevel::DrawCallback()
     {
         draw_toggle();
         ImGui::SameLine();
-        if (ImGui::Button("Apply"))
-        {
-            try
-            {
-                std::string content = editor_.GetText();
-                auto new_level =
-                    frame::json::ParseLevel(device_.GetSize(), content);
-                device_.Startup(std::move(new_level));
-                error_message_.clear();
-            }
-            catch (const std::exception& e)
-            {
-                error_message_ = e.what();
-            }
-        }
-        ImGui::SameLine();
-        if (ImGui::Button("Load"))
-        {
-            try
-            {
-                std::ifstream file(frame::file::FindFile(file_name_));
-                if (file)
-                {
-                    std::string content(
-                        (std::istreambuf_iterator<char>(file)),
-                        std::istreambuf_iterator<char>());
-                    editor_.SetText(content);
-                }
-                error_message_.clear();
-            }
-            catch (const std::exception& e)
-            {
-                error_message_ = e.what();
-            }
-        }
-        ImGui::SameLine();
-        if (ImGui::Button("Save"))
-        {
-            try
-            {
-                std::ofstream out(frame::file::FindFile(file_name_));
-                out << editor_.GetText();
-                error_message_.clear();
-            }
-            catch (const std::exception& e)
-            {
-                error_message_ = e.what();
-            }
-        }
-        ImGui::Separator();
-        if (!error_message_.empty())
-        {
-            ImVec2 avail = ImGui::GetContentRegionAvail();
-            float text_height =
-                ImGui::CalcTextSize(
-                    error_message_.c_str(), nullptr, false, avail.x)
-                    .y;
-            float padding = ImGui::GetStyle().WindowPadding.y;
-            text_height = std::ceil(text_height + padding * 2);
-            ImGui::PushStyleColor(
-                ImGuiCol_ChildBg, ImVec4(0.5f, 0.1f, 0.1f, 1.0f));
-            ImGui::BeginChild(
-                "##error_message",
-                ImVec2(0, text_height),
-                true,
-                ImGuiWindowFlags_NoScrollbar |
-                    ImGuiWindowFlags_NoScrollWithMouse);
-            ImGui::TextWrapped("%s", error_message_.c_str());
-            ImGui::EndChild();
-            ImGui::PopStyleColor();
-            ImGui::Spacing();
-            ImGui::Separator();
-        }
-        ImVec2 avail = ImGui::GetContentRegionAvail();
-        bool focused =
-            ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
-        if (focused)
-        {
-            editor_.Render("##jsontext", focused, avail, false);
-        }
-        else
-        {
-            ImGui::BeginDisabled();
-            editor_.Render("##jsontext", focused, avail, false);
-            ImGui::EndDisabled();
-        }
+        WindowJsonFile::DrawCallback();
     }
     else
     {
@@ -251,21 +150,6 @@ bool WindowLevel::DrawCallback()
         }
     }
     return true;
-}
-
-bool WindowLevel::End() const
-{
-    return end_;
-}
-
-std::string WindowLevel::GetName() const
-{
-    return name_;
-}
-
-void WindowLevel::SetName(const std::string& name)
-{
-    name_ = name;
 }
 
 } // namespace frame::gui
