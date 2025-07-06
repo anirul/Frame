@@ -32,10 +32,6 @@ add_library(FrameGui
     window_texture.cpp
     window_json_file.cpp
     window_glsl_file.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../../external/imgui-node-editor/imgui_node_editor.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../../external/imgui-node-editor/imgui_node_editor_api.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../../external/imgui-node-editor/imgui_canvas.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../../external/imgui-node-editor/crude_json.cpp
 )
 
 target_include_directories(FrameGui
@@ -44,7 +40,6 @@ target_include_directories(FrameGui
   ${CMAKE_CURRENT_SOURCE_DIR}/../../../src
   ${CMAKE_CURRENT_BINARY_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/../../../external/ImGuiColorTextEdit
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../../external/imgui-node-editor
 )
 
 target_link_libraries(FrameGui
