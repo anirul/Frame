@@ -6,6 +6,7 @@
 #include "frame/gui/window_logger.h"
 #include "frame/gui/window_resolution.h"
 #include "frame/logger.h"
+#include "window_level.h"
 #include <imgui.h>
 #include <set>
 
@@ -76,6 +77,11 @@ void Menubar::MenuEdit()
             menubar_view_.GetDrawGui().AddWindow(
                 std::make_unique<WindowJsonFile>(
                     menubar_file_.GetFileName(), device_));
+        }
+        if (ImGui::MenuItem("Level Editor"))
+        {
+            menubar_view_.GetDrawGui().AddWindow(
+                std::make_unique<WindowLevel>(device_));
         }
         if (ImGui::BeginMenu("Shader"))
         {
