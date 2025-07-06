@@ -1,15 +1,38 @@
 #include "window_level.h"
 
-#include <imgui.h>
+#include <algorithm>
+#include <cmath>
+#include <fstream>
 #include <imgui-node-editor/imgui_node_editor.h>
+#include <imgui.h>
+
+#include "frame/file/file_system.h"
+#include "frame/json/parse_level.h"
 
 namespace ed = ax::NodeEditor;
 
 namespace frame::gui
 {
 
-WindowLevel::WindowLevel(DeviceInterface& device) : device_(device)
+WindowLevel::WindowLevel(DeviceInterface& device, const std::string& file_name)
+    : device_(device), file_name_(file_name)
 {
+    editor_.SetLanguageDefinition(TextEditor::LanguageDefinitionId::Json);
+    try
+    {
+        std::ifstream file(frame::file::FindFile(file_name_));
+        if (file)
+        {
+            std::string content(
+                (std::istreambuf_iterator<char>(file)),
+                std::istreambuf_iterator<char>());
+            editor_.SetText(content);
+        }
+    }
+    catch (...)
+    {
+        // ignore
+    }
 }
 
 WindowLevel::~WindowLevel()
@@ -32,52 +55,147 @@ void WindowLevel::DisplayNode(LevelInterface& level, EntityId id)
 
 bool WindowLevel::DrawCallback()
 {
+    if (ImGui::Button(show_json_ ? "Node Editor" : "JSON Editor"))
+        show_json_ = !show_json_;
+    ImGui::Separator();
     auto& level = device_.GetLevel();
-    if (!context_)
-        context_ = ed::CreateEditor();
-    if (ImGui::BeginTabBar("##level_tabs"))
+    if (show_json_)
     {
-        if (ImGui::BeginTabItem("Textures"))
+        if (ImGui::Button("Apply"))
         {
-            for (auto id : level.GetTextures())
+            try
             {
-                auto& tex = level.GetTextureFromId(id);
-                ImGui::BulletText("%s", tex.GetName().c_str());
+                std::string content = editor_.GetText();
+                auto new_level =
+                    frame::json::ParseLevel(device_.GetSize(), content);
+                device_.Startup(std::move(new_level));
+                error_message_.clear();
             }
-            ImGui::EndTabItem();
+            catch (const std::exception& e)
+            {
+                error_message_ = e.what();
+            }
         }
-        if (ImGui::BeginTabItem("Programs"))
+        ImGui::SameLine();
+        if (ImGui::Button("Load"))
         {
-            for (auto id : level.GetPrograms())
+            try
             {
-                auto& prog = level.GetProgramFromId(id);
-                ImGui::BulletText("%s", prog.GetName().c_str());
+                std::ifstream file(frame::file::FindFile(file_name_));
+                if (file)
+                {
+                    std::string content(
+                        (std::istreambuf_iterator<char>(file)),
+                        std::istreambuf_iterator<char>());
+                    editor_.SetText(content);
+                }
+                error_message_.clear();
             }
-            ImGui::EndTabItem();
+            catch (const std::exception& e)
+            {
+                error_message_ = e.what();
+            }
         }
-        if (ImGui::BeginTabItem("Materials"))
+        ImGui::SameLine();
+        if (ImGui::Button("Save"))
         {
-            for (auto id : level.GetMaterials())
+            try
             {
-                auto& mat = level.GetMaterialFromId(id);
-                ImGui::BulletText("%s", mat.GetName().c_str());
+                std::ofstream out(frame::file::FindFile(file_name_));
+                out << editor_.GetText();
+                error_message_.clear();
             }
-            ImGui::EndTabItem();
+            catch (const std::exception& e)
+            {
+                error_message_ = e.what();
+            }
         }
-        if (ImGui::BeginTabItem("Scene"))
+        ImGui::Separator();
+        if (!error_message_.empty())
         {
-            ed::SetCurrentEditor(context_);
-            ed::Begin("SceneEditor");
-            auto root = level.GetDefaultRootSceneNodeId();
-            if (root)
-            {
-                DisplayNode(level, root);
-            }
-            ed::End();
-            ed::SetCurrentEditor(nullptr);
-            ImGui::EndTabItem();
+            ImVec2 avail = ImGui::GetContentRegionAvail();
+            float text_height =
+                ImGui::CalcTextSize(
+                    error_message_.c_str(), nullptr, false, avail.x)
+                    .y;
+            float padding = ImGui::GetStyle().WindowPadding.y;
+            text_height = std::ceil(text_height + padding * 2);
+            ImGui::PushStyleColor(
+                ImGuiCol_ChildBg, ImVec4(0.5f, 0.1f, 0.1f, 1.0f));
+            ImGui::BeginChild(
+                "##error_message",
+                ImVec2(0, text_height),
+                true,
+                ImGuiWindowFlags_NoScrollbar |
+                    ImGuiWindowFlags_NoScrollWithMouse);
+            ImGui::TextWrapped("%s", error_message_.c_str());
+            ImGui::EndChild();
+            ImGui::PopStyleColor();
+            ImGui::Spacing();
+            ImGui::Separator();
         }
-        ImGui::EndTabBar();
+        ImVec2 avail = ImGui::GetContentRegionAvail();
+        bool focused =
+            ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
+        if (focused)
+        {
+            editor_.Render("##jsontext", focused, avail, false);
+        }
+        else
+        {
+            ImGui::BeginDisabled();
+            editor_.Render("##jsontext", focused, avail, false);
+            ImGui::EndDisabled();
+        }
+    }
+    else
+    {
+        if (!context_)
+            context_ = ed::CreateEditor();
+        if (ImGui::BeginTabBar("##level_tabs"))
+        {
+            if (ImGui::BeginTabItem("Textures"))
+            {
+                for (auto id : level.GetTextures())
+                {
+                    auto& tex = level.GetTextureFromId(id);
+                    ImGui::BulletText("%s", tex.GetName().c_str());
+                }
+                ImGui::EndTabItem();
+            }
+            if (ImGui::BeginTabItem("Programs"))
+            {
+                for (auto id : level.GetPrograms())
+                {
+                    auto& prog = level.GetProgramFromId(id);
+                    ImGui::BulletText("%s", prog.GetName().c_str());
+                }
+                ImGui::EndTabItem();
+            }
+            if (ImGui::BeginTabItem("Materials"))
+            {
+                for (auto id : level.GetMaterials())
+                {
+                    auto& mat = level.GetMaterialFromId(id);
+                    ImGui::BulletText("%s", mat.GetName().c_str());
+                }
+                ImGui::EndTabItem();
+            }
+            if (ImGui::BeginTabItem("Scene"))
+            {
+                ed::SetCurrentEditor(context_);
+                ed::Begin("SceneEditor");
+                auto root = level.GetDefaultRootSceneNodeId();
+                if (root)
+                {
+                    DisplayNode(level, root);
+                }
+                ed::End();
+                ed::SetCurrentEditor(nullptr);
+                ImGui::EndTabItem();
+            }
+            ImGui::EndTabBar();
+        }
     }
     return true;
 }
