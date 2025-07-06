@@ -17,6 +17,10 @@ class WindowLevel : public WindowJsonFile
 
   private:
     void DisplayNode(LevelInterface& level, EntityId id, EntityId parent);
+    void DrawTexturesTab(LevelInterface& level);
+    void DrawProgramsTab(LevelInterface& level);
+    void DrawMaterialsTab(LevelInterface& level);
+    void DrawSceneTab(LevelInterface& level);
 
     DeviceInterface& device_;
     ax::NodeEditor::EditorContext* context_ = nullptr;

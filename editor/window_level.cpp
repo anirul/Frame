@@ -2,14 +2,14 @@
 
 #include <algorithm>
 #include <cmath>
-#include <fstream>
 #include <cstdint>
+#include <fstream>
 #include <imgui-node-editor/imgui_node_editor.h>
 #include <imgui.h>
 
+#include "frame/entity_id.h"
 #include "frame/file/file_system.h"
 #include "frame/json/parse_level.h"
-#include "frame/entity_id.h"
 
 namespace ed = ax::NodeEditor;
 
@@ -27,7 +27,8 @@ WindowLevel::~WindowLevel()
         ed::DestroyEditor(context_);
 }
 
-void WindowLevel::DisplayNode(LevelInterface& level, EntityId id, EntityId parent)
+void WindowLevel::DisplayNode(
+    LevelInterface& level, EntityId id, EntityId parent)
 {
     auto name = level.GetNameFromId(id);
     ed::BeginNode(id);
@@ -53,7 +54,7 @@ void WindowLevel::DisplayNode(LevelInterface& level, EntityId id, EntityId paren
     {
         auto parent_output = parent * 2 + 2;
         std::uint64_t link_id = (static_cast<std::uint64_t>(parent) << 32) |
-            static_cast<std::uint64_t>(id);
+                                static_cast<std::uint64_t>(id);
         ed::Link(static_cast<ed::LinkId>(link_id), parent_output, input_id);
     }
 
@@ -61,6 +62,46 @@ void WindowLevel::DisplayNode(LevelInterface& level, EntityId id, EntityId paren
     {
         DisplayNode(level, child, id);
     }
+}
+
+void WindowLevel::DrawTexturesTab(LevelInterface& level)
+{
+    for (auto id : level.GetTextures())
+    {
+        auto& tex = level.GetTextureFromId(id);
+        ImGui::BulletText("%s", tex.GetName().c_str());
+    }
+}
+
+void WindowLevel::DrawProgramsTab(LevelInterface& level)
+{
+    for (auto id : level.GetPrograms())
+    {
+        auto& prog = level.GetProgramFromId(id);
+        ImGui::BulletText("%s", prog.GetName().c_str());
+    }
+}
+
+void WindowLevel::DrawMaterialsTab(LevelInterface& level)
+{
+    for (auto id : level.GetMaterials())
+    {
+        auto& mat = level.GetMaterialFromId(id);
+        ImGui::BulletText("%s", mat.GetName().c_str());
+    }
+}
+
+void WindowLevel::DrawSceneTab(LevelInterface& level)
+{
+    ed::SetCurrentEditor(context_);
+    ed::Begin("SceneEditor");
+    auto root = level.GetDefaultRootSceneNodeId();
+    if (root)
+    {
+        DisplayNode(level, root, frame::NullId);
+    }
+    ed::End();
+    ed::SetCurrentEditor(nullptr);
 }
 
 bool WindowLevel::DrawCallback()
@@ -108,42 +149,22 @@ bool WindowLevel::DrawCallback()
         {
             if (ImGui::BeginTabItem("Textures"))
             {
-                for (auto id : level.GetTextures())
-                {
-                    auto& tex = level.GetTextureFromId(id);
-                    ImGui::BulletText("%s", tex.GetName().c_str());
-                }
+                DrawTexturesTab(level);
                 ImGui::EndTabItem();
             }
             if (ImGui::BeginTabItem("Programs"))
             {
-                for (auto id : level.GetPrograms())
-                {
-                    auto& prog = level.GetProgramFromId(id);
-                    ImGui::BulletText("%s", prog.GetName().c_str());
-                }
+                DrawProgramsTab(level);
                 ImGui::EndTabItem();
             }
             if (ImGui::BeginTabItem("Materials"))
             {
-                for (auto id : level.GetMaterials())
-                {
-                    auto& mat = level.GetMaterialFromId(id);
-                    ImGui::BulletText("%s", mat.GetName().c_str());
-                }
+                DrawMaterialsTab(level);
                 ImGui::EndTabItem();
             }
             if (ImGui::BeginTabItem("Scene"))
             {
-                ed::SetCurrentEditor(context_);
-                ed::Begin("SceneEditor");
-                auto root = level.GetDefaultRootSceneNodeId();
-                if (root)
-                {
-                    DisplayNode(level, root, frame::NullId);
-                }
-                ed::End();
-                ed::SetCurrentEditor(nullptr);
+                DrawSceneTab(level);
                 ImGui::EndTabItem();
             }
             ImGui::EndTabBar();
