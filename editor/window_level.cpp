@@ -55,9 +55,6 @@ void WindowLevel::DisplayNode(LevelInterface& level, EntityId id)
 
 bool WindowLevel::DrawCallback()
 {
-    if (ImGui::Button(show_json_ ? "Node Editor" : "JSON Editor"))
-        show_json_ = !show_json_;
-    ImGui::Separator();
     auto& level = device_.GetLevel();
     if (show_json_)
     {
@@ -110,6 +107,9 @@ bool WindowLevel::DrawCallback()
                 error_message_ = e.what();
             }
         }
+        ImGui::SameLine();
+        if (ImGui::Button("Node Editor"))
+            show_json_ = false;
         ImGui::Separator();
         if (!error_message_.empty())
         {
@@ -152,6 +152,14 @@ bool WindowLevel::DrawCallback()
     {
         if (!context_)
             context_ = ed::CreateEditor();
+        if (ImGui::Button("Save"))
+        {
+            // TODO: implement saving level
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("JSON Editor"))
+            show_json_ = true;
+        ImGui::Separator();
         if (ImGui::BeginTabBar("##level_tabs"))
         {
             if (ImGui::BeginTabItem("Textures"))
