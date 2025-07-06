@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cmath>
 #include <fstream>
+#include <cstdint>
 #include <imgui-node-editor/imgui_node_editor.h>
 #include <imgui.h>
 
@@ -67,7 +68,9 @@ void WindowLevel::DisplayNode(LevelInterface& level, EntityId id, EntityId paren
     if (parent != frame::NullId)
     {
         auto parent_output = parent * 2 + 2;
-        ed::Link(next_link_id_++, parent_output, input_id);
+        std::uint64_t link_id = (static_cast<std::uint64_t>(parent) << 32) |
+            static_cast<std::uint64_t>(id);
+        ed::Link(static_cast<ed::LinkId>(link_id), parent_output, input_id);
     }
 
     for (auto child : level.GetChildList(id))

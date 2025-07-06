@@ -24,7 +24,6 @@ class WindowLevel : public GuiWindowInterface
 
     DeviceInterface& device_;
     ax::NodeEditor::EditorContext* context_ = nullptr;
-    std::int64_t next_link_id_ = 1;
     std::string name_ = "Level Editor";
     bool end_ = false;
     bool show_json_ = false;
