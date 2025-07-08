@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
@@ -16,6 +16,11 @@ jobs:
     - name: Git-lfs pull
       run: |
         git lfs pull
+
+    - name: Install build dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ninja-build build-essential libxi-dev libxmu-dev libgl1-mesa-dev libglu1-mesa-dev autoconf automake autoconf-archive libtool python3-jinja2
         
     #- name: Install Vulkan SDK
     #  run: |
@@ -23,22 +28,20 @@ jobs:
     #    Start-Process ./VulkanSDKInstaller.exe -ArgumentList "/S" -NoNewWindow -Wait
       
     - name: Bootstrap vcpkg
-      shell: cmd
       run: |
-        cd external\vcpkg
-        bootstrap-vcpkg.bat
-        vcpkg integrate install
+        cd external/vcpkg
+        ./bootstrap-vcpkg.sh
+        ./vcpkg integrate install
 
     # No need for a manual vcpkg install step, the manifest mode will handle it
 
     - name: Configure with CMake Preset
-      run: cmake --preset windows
+      run: cmake --preset linux-release
 
     - name: Build with CMake Preset
-      run: cmake --build --preset windows-release
+      run: cmake --build --preset linux-release
         
     - name: Run tests using CTest
-      shell: cmd
       run: |
-        cd build\windows
-        ctest -C Release --output-on-failure
+        cd build/linux-release
+        xvfb-run ctest --output-on-failure
