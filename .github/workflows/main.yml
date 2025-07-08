@@ -41,6 +41,8 @@ jobs:
         
     - name: Run tests using CTest
       shell: cmd
+      env:
+        SDL_VIDEODRIVER: dummy
       run: |
         cd build\windows
         ctest -C Release --output-on-failure
