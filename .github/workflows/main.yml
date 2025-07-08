@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
@@ -22,25 +22,26 @@ jobs:
     #    Invoke-WebRequest -Uri "https://sdk.lunarg.com/sdk/download/1.3.261.1/windows/VulkanSDK-1.3.261.1-Installer.exe" -OutFile "VulkanSDKInstaller.exe"
     #    Start-Process ./VulkanSDKInstaller.exe -ArgumentList "/S" -NoNewWindow -Wait
       
-    - name: Bootstrap vcpkg
-      shell: cmd
+    - name: Install dependencies
       run: |
-        cd external\vcpkg
-        bootstrap-vcpkg.bat
-        vcpkg integrate install
+        sudo apt-get update
+        sudo apt-get install -y ninja-build libxmu-dev libxi-dev libgl-dev libglx-dev libgles-dev build-essential libx11-xcb-dev libegl1-mesa-dev libopengl-dev libxkbcommon-dev libwayland-dev libxrandr-dev mesa-vulkan-drivers libglu1-mesa-dev libdrm-dev libegl-dev libglm-dev
+
+    - name: Bootstrap vcpkg
+      run: |
+        cd external/vcpkg
+        ./bootstrap-vcpkg.sh
+        ./vcpkg integrate install
 
     # No need for a manual vcpkg install step, the manifest mode will handle it
 
     - name: Configure with CMake Preset
-      shell: cmd
-      run: cmake --preset windows
+      run: cmake --preset linux-release
 
     - name: Build with CMake Preset
-      shell: cmd
-      run: cmake --build --preset windows-release
+      run: cmake --build --preset linux-release
         
     - name: Run tests using CTest
-      shell: cmd
       run: |
-        cd build\windows
-        ctest -C Release --output-on-failure
+        cd build/linux-release
+        xvfb-run ctest --output-on-failure
