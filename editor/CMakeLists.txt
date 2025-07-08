@@ -13,6 +13,15 @@ add_executable(FrameEditor
     window_start.h
     window_level.cpp
     window_level.h
+    tab_interface.h
+    tab_textures.cpp
+    tab_textures.h
+    tab_programs.cpp
+    tab_programs.h
+    tab_materials.cpp
+    tab_materials.h
+    tab_scene.cpp
+    tab_scene.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../asset/json/new_project_template.json
 )
 
