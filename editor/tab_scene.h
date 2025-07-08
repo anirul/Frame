@@ -8,10 +8,9 @@ namespace frame::gui {
 
 class TabScene : public TabInterface {
   public:
-    TabScene() = default;
+    TabScene() : TabInterface("Scene") {}
     ~TabScene() override;
 
-    std::string GetName() const override { return "Scene"; }
     void Draw(LevelInterface& level) override;
 
   private:

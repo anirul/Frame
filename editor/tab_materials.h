@@ -6,7 +6,7 @@ namespace frame::gui {
 
 class TabMaterials : public TabInterface {
   public:
-    std::string GetName() const override { return "Materials"; }
+    TabMaterials() : TabInterface("Materials") {}
     void Draw(LevelInterface& level) override;
 };
 
