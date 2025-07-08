@@ -21,6 +21,9 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y ninja-build build-essential libxi-dev libxmu-dev libgl1-mesa-dev libglu1-mesa-dev autoconf automake autoconf-archive libtool python3-jinja2
+
+    - name: Ensure Python Jinja2 available
+      run: pip install jinja2
         
     #- name: Install Vulkan SDK
     #  run: |
