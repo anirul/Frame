@@ -25,6 +25,16 @@ jobs:
           build-essential \
           libxi-dev \
           libxmu-dev \
+          libx11-dev \
+          libxrandr-dev \
+          libxinerama-dev \
+          libx11-xcb-dev \
+          libxcb1-dev \
+          libxcb-randr0-dev \
+          libxcb-xfixes0-dev \
+          libxkbcommon-dev \
+          libwayland-dev \
+          wayland-protocols \
           libgl1-mesa-dev \
           libglu1-mesa-dev \
           autoconf \
