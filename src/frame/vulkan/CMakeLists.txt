@@ -18,7 +18,8 @@ target_include_directories(FrameVulkan
 PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
-    ${CMAKE_CURRENT_BINARY_DIR}/src/frame/proto
+    ${CMAKE_BINARY_DIR}/src
+    ${CMAKE_BINARY_DIR}/src/frame/proto
 )
 
 target_link_libraries(FrameVulkan

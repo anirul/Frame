@@ -16,7 +16,8 @@ target_include_directories(FrameOpenGLFile
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../../include
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../../src
     ${CMAKE_CURRENT_BINARY_DIR}
-    ${CMAKE_CURRENT_BINARY_DIR}/src/frame/proto
+    ${CMAKE_BINARY_DIR}/src
+    ${CMAKE_BINARY_DIR}/src/frame/proto
   PRIVATE
     ${STB_INCLUDE_DIRS}
 )
