@@ -42,6 +42,8 @@ jobs:
           autoconf-archive \
           libtool \
           libltdl-dev \
+          gettext \
+          pkg-config \
           python3-jinja2
 
     - name: Ensure Python Jinja2 available
