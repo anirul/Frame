@@ -39,6 +39,7 @@ target_include_directories(FrameJson
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../include
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../src
     ${Protobuf_INCLUDE_DIRS}
+    ${CMAKE_BINARY_DIR}/src
     ${CMAKE_BINARY_DIR}/src/frame/proto
 )
 

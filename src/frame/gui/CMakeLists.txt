@@ -40,6 +40,8 @@ target_include_directories(FrameGui
   ${CMAKE_CURRENT_SOURCE_DIR}/../../../src
   ${CMAKE_CURRENT_BINARY_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/../../../external/ImGuiColorTextEdit
+  ${CMAKE_BINARY_DIR}/src
+  ${CMAKE_BINARY_DIR}/src/frame/proto
 )
 
 target_link_libraries(FrameGui
@@ -50,6 +52,7 @@ target_link_libraries(FrameGui
     imgui::imgui
     spdlog::spdlog
     protobuf::libprotobuf
+    FrameProto
 )
 
 set_property(TARGET FrameGui PROPERTY FOLDER "Frame")

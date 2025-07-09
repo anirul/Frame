@@ -57,6 +57,7 @@ target_include_directories(Frame
     ${CMAKE_CURRENT_SOURCE_DIR}/../../include
     ${CMAKE_CURRENT_SOURCE_DIR}/../../src
     ${CMAKE_CURRENT_BINARY_DIR}
+    ${CMAKE_BINARY_DIR}/src
     ${CMAKE_BINARY_DIR}/src/frame/proto
 )
 
