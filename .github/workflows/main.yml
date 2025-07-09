@@ -43,6 +43,7 @@ jobs:
           automake \
           autoconf-archive \
           libtool \
+          libtool-bin \
           libltdl-dev \
           gettext \
           pkg-config \
