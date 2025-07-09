@@ -41,10 +41,39 @@ jobs:
     - name: apt install
       if: ${{ matrix.os == 'ubuntu-latest' }}
       run: |
-        sudo apt update 
-        sudo apt install -y libxmu-dev libxi-dev libgl-dev libglx-dev libgles-dev \
-         build-essential libx11-xcb-dev libegl1-mesa-dev libopengl-dev \
-        libxkbcommon-dev libwayland-dev libxrandr-dev mesa-vulkan-drivers libglu1-mesa-dev libdrm-dev libegl-dev libglm-dev 
+        sudo apt update
+        sudo apt install -y \
+          ninja-build \
+          build-essential \
+          libxi-dev \
+          libxmu-dev \
+          libx11-dev \
+          libxrandr-dev \
+          libxinerama-dev \
+          libx11-xcb-dev \
+          libxcb1-dev \
+          libxcb-randr0-dev \
+          libxcb-xfixes0-dev \
+          libxkbcommon-dev \
+          libwayland-dev \
+          wayland-protocols \
+          libgl1-mesa-dev \
+          libglu1-mesa-dev \
+          libglx-dev \
+          xorg-dev \
+          autoconf \
+          automake \
+          autoconf-archive \
+          libtool \
+          libtool-bin \
+          libltdl-dev \
+          gettext \
+          pkg-config \
+          gperf \
+          python3-jinja2
+    - name: Ensure Python Jinja2 available
+      if: ${{ matrix.os == 'ubuntu-latest' }}
+      run: pip install jinja2
       # the dependency list is too big but at least it works
       # https://packages.ubuntu.com/search
     - name: vcpkg build
