@@ -37,6 +37,8 @@ jobs:
           wayland-protocols \
           libgl1-mesa-dev \
           libglu1-mesa-dev \
+          libglx-dev \
+          xorg-dev \
           autoconf \
           automake \
           autoconf-archive \
@@ -44,6 +46,7 @@ jobs:
           libltdl-dev \
           gettext \
           pkg-config \
+          gperf \
           python3-jinja2
 
     - name: Ensure Python Jinja2 available
