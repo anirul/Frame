@@ -37,9 +37,6 @@ bool WindowLevel::DrawCallback() {
     if (ImGui::Button("Save")) {
         // TODO: implement saving level
     }
-    ImGui::SameLine();
-    ImGui::Checkbox("Scene Tree", &show_tree_);
-
     ImGui::Separator();
 
     if (show_json_) {
@@ -52,12 +49,6 @@ bool WindowLevel::DrawCallback() {
         ImGui::End();
 
         tab_scene_.Draw(level);
-
-        if (show_tree_) {
-            ImGui::Begin("Scene Tree");
-            tab_tree_.Draw(level);
-            ImGui::End();
-        }
     }
     return true;
 }

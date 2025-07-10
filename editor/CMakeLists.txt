@@ -22,8 +22,6 @@ add_executable(FrameEditor
     tab_materials.h
     tab_scene.cpp
     tab_scene.h
-    tab_tree.cpp
-    tab_tree.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../asset/json/new_project_template.json
 )
 

@@ -6,7 +6,6 @@
 #include "tab_materials.h"
 #include "tab_programs.h"
 #include "tab_scene.h"
-#include "tab_tree.h"
 #include "tab_textures.h"
 
 namespace frame::gui
@@ -26,9 +25,7 @@ class WindowLevel : public WindowJsonFile
     TabPrograms tab_programs_;
     TabMaterials tab_materials_;
     TabScene tab_scene_;
-    TabTree tab_tree_;
     bool show_json_ = false;
-    bool show_tree_ = false;
 };
 
 } // namespace frame::gui
