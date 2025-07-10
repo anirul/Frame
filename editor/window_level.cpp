@@ -32,28 +32,23 @@ bool WindowLevel::DrawCallback() {
         }
     };
 
+    draw_toggle();
+    ImGui::SameLine();
+    if (ImGui::Button("Save")) {
+        // TODO: implement saving level
+    }
+    ImGui::Separator();
+
     if (show_json_) {
-        draw_toggle();
-        ImGui::SameLine();
         WindowJsonFile::DrawCallback();
     } else {
-        draw_toggle();
-        ImGui::SameLine();
-        if (ImGui::Button("Save")) {
-            // TODO: implement saving level
-        }
-        ImGui::Separator();
-        if (ImGui::BeginTabBar("##level_tabs")) {
-            TabInterface* tabs[] = {&tab_textures_, &tab_programs_,
-                                    &tab_materials_, &tab_scene_};
-            for (TabInterface* tab : tabs) {
-                if (ImGui::BeginTabItem(tab->GetName().c_str())) {
-                    tab->Draw(level);
-                    ImGui::EndTabItem();
-                }
-            }
-            ImGui::EndTabBar();
-        }
+        ImGui::Begin("Assets", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+        tab_textures_.Draw(level);
+        tab_programs_.Draw(level);
+        tab_materials_.Draw(level);
+        ImGui::End();
+
+        tab_scene_.Draw(level);
     }
     return true;
 }

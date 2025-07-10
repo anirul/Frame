@@ -206,6 +206,20 @@ EntityId Level::AddLight(std::unique_ptr<LightInterface>&& light)
     return id;
 }
 
+void Level::RemoveSceneNode(EntityId node_id)
+{
+    if (!id_scene_node_map_.count(node_id))
+    {
+        throw std::runtime_error(
+            std::format("No scene node with id #{}.", node_id));
+    }
+    std::string name = id_name_map_.at(node_id);
+    id_scene_node_map_.erase(node_id);
+    id_name_map_.erase(node_id);
+    name_id_map_.erase(name);
+    id_enum_map_.erase(node_id);
+}
+
 void Level::RemoveBuffer(EntityId buffer_id)
 {
     if (!id_buffer_map_.count(buffer_id))
