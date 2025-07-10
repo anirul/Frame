@@ -62,13 +62,20 @@ void TabScene::Draw(LevelInterface& level) {
 
 void TabScene::ProcessEvents(LevelInterface& level) {
     if (ed::BeginCreate()) {
-        ed::PinId input_id, output_id;
-        if (ed::QueryNewLink(&input_id, &output_id)) {
+        ed::PinId start_pin, end_pin;
+        if (ed::QueryNewLink(&start_pin, &end_pin)) {
+            auto start_kind = ed::GetPinKind(start_pin);
+            ed::PinId input_id = start_kind == ed::PinKind::Input ? start_pin : end_pin;
+            ed::PinId output_id = start_kind == ed::PinKind::Input ? end_pin : start_pin;
             if (ed::AcceptNewItem()) {
                 EntityId child = (static_cast<int>(input_id.Get()) - 1) / 2;
                 EntityId parent = (static_cast<int>(output_id.Get()) - 2) / 2;
                 auto parent_name = level.GetNameFromId(parent);
                 level.GetSceneNodeFromId(child).SetParentName(parent_name);
+                std::uint64_t link_id =
+                    (static_cast<std::uint64_t>(parent) << 32) |
+                    static_cast<std::uint64_t>(child);
+                ed::CreateLink(static_cast<ed::LinkId>(link_id), output_id, input_id);
             }
         }
         ed::EndCreate();
@@ -78,6 +85,7 @@ void TabScene::ProcessEvents(LevelInterface& level) {
         ed::LinkId link_id;
         while (ed::QueryDeletedLink(&link_id)) {
             if (ed::AcceptDeletedItem()) {
+                ed::DeleteLink(link_id);
                 std::uint64_t lid = link_id.Get();
                 EntityId child = static_cast<EntityId>(lid & 0xffffffffu);
                 level.GetSceneNodeFromId(child).SetParentName("");
@@ -86,6 +94,7 @@ void TabScene::ProcessEvents(LevelInterface& level) {
         ed::NodeId node_id;
         while (ed::QueryDeletedNode(&node_id)) {
             if (ed::AcceptDeletedItem()) {
+                ed::DeleteNode(node_id);
                 EntityId id = static_cast<EntityId>(node_id.Get());
                 level.RemoveSceneNode(id);
             }
