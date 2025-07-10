@@ -61,50 +61,47 @@ void TabScene::Draw(LevelInterface& level) {
 }
 
 void TabScene::ProcessEvents(LevelInterface& level) {
-    if (ed::BeginCreate()) {
-        ed::PinId start_pin, end_pin;
-        if (ed::QueryNewLink(&start_pin, &end_pin)) {
-            bool start_is_input = (static_cast<int>(start_pin.Get()) % 2) == 1;
-            bool end_is_input = (static_cast<int>(end_pin.Get()) % 2) == 1;
-            ed::PinId input_id = start_is_input ? start_pin : end_pin;
-            ed::PinId output_id = start_is_input ? end_pin : start_pin;
-            if (start_is_input == end_is_input)
-                ed::RejectNewItem();
-            else
-            if (ed::AcceptNewItem()) {
-                EntityId child = (static_cast<int>(input_id.Get()) - 1) / 2;
-                EntityId parent = (static_cast<int>(output_id.Get()) - 2) / 2;
-                auto parent_name = level.GetNameFromId(parent);
-                level.GetSceneNodeFromId(child).SetParentName(parent_name);
-                std::uint64_t link_id =
-                    (static_cast<std::uint64_t>(parent) << 32) |
-                    static_cast<std::uint64_t>(child);
-                ed::Link(static_cast<ed::LinkId>(link_id), output_id, input_id);
-            }
+    ed::BeginCreate();
+    ed::PinId start_pin, end_pin;
+    if (ed::QueryNewLink(&start_pin, &end_pin)) {
+        bool start_is_input = (static_cast<int>(start_pin.Get()) % 2) == 1;
+        bool end_is_input = (static_cast<int>(end_pin.Get()) % 2) == 1;
+        ed::PinId input_id = start_is_input ? start_pin : end_pin;
+        ed::PinId output_id = start_is_input ? end_pin : start_pin;
+        if (start_is_input == end_is_input)
+            ed::RejectNewItem();
+        else if (ed::AcceptNewItem()) {
+            EntityId child = (static_cast<int>(input_id.Get()) - 1) / 2;
+            EntityId parent = (static_cast<int>(output_id.Get()) - 2) / 2;
+            auto parent_name = level.GetNameFromId(parent);
+            level.GetSceneNodeFromId(child).SetParentName(parent_name);
+            std::uint64_t link_id =
+                (static_cast<std::uint64_t>(parent) << 32) |
+                static_cast<std::uint64_t>(child);
+            ed::Link(static_cast<ed::LinkId>(link_id), output_id, input_id);
         }
-        ed::EndCreate();
     }
+    ed::EndCreate();
 
-    if (ed::BeginDelete()) {
-        ed::LinkId link_id;
-        while (ed::QueryDeletedLink(&link_id)) {
-            if (ed::AcceptDeletedItem()) {
-                ed::DeleteLink(link_id);
-                std::uint64_t lid = link_id.Get();
-                EntityId child = static_cast<EntityId>(lid & 0xffffffffu);
-                level.GetSceneNodeFromId(child).SetParentName("");
-            }
+    ed::BeginDelete();
+    ed::LinkId link_id;
+    while (ed::QueryDeletedLink(&link_id)) {
+        if (ed::AcceptDeletedItem()) {
+            ed::DeleteLink(link_id);
+            std::uint64_t lid = link_id.Get();
+            EntityId child = static_cast<EntityId>(lid & 0xffffffffu);
+            level.GetSceneNodeFromId(child).SetParentName("");
         }
-        ed::NodeId node_id;
-        while (ed::QueryDeletedNode(&node_id)) {
-            if (ed::AcceptDeletedItem()) {
-                ed::DeleteNode(node_id);
-                EntityId id = static_cast<EntityId>(node_id.Get());
-                level.RemoveSceneNode(id);
-            }
-        }
-        ed::EndDelete();
     }
+    ed::NodeId node_id;
+    while (ed::QueryDeletedNode(&node_id)) {
+        if (ed::AcceptDeletedItem()) {
+            ed::DeleteNode(node_id);
+            EntityId id = static_cast<EntityId>(node_id.Get());
+            level.RemoveSceneNode(id);
+        }
+    }
+    ed::EndDelete();
 
     if (ImGui::BeginDragDropTarget()) {
         if (auto* payload = ImGui::AcceptDragDropPayload("FRAME_ASSET_ID")) {
