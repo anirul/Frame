@@ -15,6 +15,9 @@ class TabScene : public TabInterface {
 
   private:
     void DisplayNode(LevelInterface& level, EntityId id, EntityId parent);
+    void ProcessEvents(LevelInterface& level);
+
+    int next_node_index_ = 0;
 
     ax::NodeEditor::EditorContext* context_ = nullptr;
 };

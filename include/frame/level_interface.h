@@ -175,6 +175,11 @@ class LevelInterface : public NameInterface
     virtual EntityId AddSceneNode(
         std::unique_ptr<NodeInterface>&& scene_node) = 0;
     /**
+     * @brief Remove a scene node from the scene tree.
+     * @param node_id: Id of the scene node to remove.
+     */
+    virtual void RemoveSceneNode(EntityId node_id) = 0;
+    /**
      * @brief Add a texture to the level.
      * @param texture: Move a texture in the level.
      * @return Assigned entity id or error.
