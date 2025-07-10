@@ -64,9 +64,13 @@ void TabScene::ProcessEvents(LevelInterface& level) {
     if (ed::BeginCreate()) {
         ed::PinId start_pin, end_pin;
         if (ed::QueryNewLink(&start_pin, &end_pin)) {
-            auto start_kind = ed::GetPinKind(start_pin);
-            ed::PinId input_id = start_kind == ed::PinKind::Input ? start_pin : end_pin;
-            ed::PinId output_id = start_kind == ed::PinKind::Input ? end_pin : start_pin;
+            bool start_is_input = (static_cast<int>(start_pin.Get()) % 2) == 1;
+            bool end_is_input = (static_cast<int>(end_pin.Get()) % 2) == 1;
+            ed::PinId input_id = start_is_input ? start_pin : end_pin;
+            ed::PinId output_id = start_is_input ? end_pin : start_pin;
+            if (start_is_input == end_is_input)
+                ed::RejectNewItem();
+            else
             if (ed::AcceptNewItem()) {
                 EntityId child = (static_cast<int>(input_id.Get()) - 1) / 2;
                 EntityId parent = (static_cast<int>(output_id.Get()) - 2) / 2;
@@ -75,7 +79,7 @@ void TabScene::ProcessEvents(LevelInterface& level) {
                 std::uint64_t link_id =
                     (static_cast<std::uint64_t>(parent) << 32) |
                     static_cast<std::uint64_t>(child);
-                ed::CreateLink(static_cast<ed::LinkId>(link_id), output_id, input_id);
+                ed::Link(static_cast<ed::LinkId>(link_id), output_id, input_id);
             }
         }
         ed::EndCreate();
