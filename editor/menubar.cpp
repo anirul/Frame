@@ -75,7 +75,9 @@ void Menubar::MenuEdit()
         {
             menubar_view_.GetDrawGui().AddWindow(
                 std::make_unique<WindowLevel>(
-                    device_, menubar_file_.GetFileName()));
+                    device_,
+                    menubar_view_.GetDrawGui(),
+                    menubar_file_.GetFileName()));
         }
         if (ImGui::BeginMenu("Shader"))
         {
