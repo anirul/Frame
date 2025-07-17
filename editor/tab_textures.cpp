@@ -15,6 +15,7 @@ void TabTextures::Draw(LevelInterface& level)
         ImGui::CollapsingHeader("Textures", ImGuiTreeNodeFlags_DefaultOpen);
     ImVec2 header_min = ImGui::GetItemRectMin();
     ImVec2 header_max = ImGui::GetItemRectMax();
+    ImGui::SetItemAllowOverlap();
     ImGui::SetCursorScreenPos({header_max.x - button_size - 4.f, header_min.y});
     if (ImGui::Button("+", ImVec2(button_size, button_size)))
     {
