@@ -137,4 +137,14 @@ void WindowJsonFile::SetName(const std::string& name)
     name_ = name;
 }
 
+void WindowJsonFile::SetEditorText(const std::string& text)
+{
+    editor_.SetText(text);
+}
+
+std::string WindowJsonFile::GetEditorText() const
+{
+    return editor_.GetText();
+}
+
 } // End namespace frame::gui.

@@ -21,6 +21,9 @@ class WindowLevel : public WindowJsonFile
         const std::string& file_name);
     ~WindowLevel() override = default;
 
+    /** @brief Update the JSON editor with the current level state. */
+    void UpdateJsonEditor();
+
     bool DrawCallback() override;
 
   private:

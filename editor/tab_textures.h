@@ -2,6 +2,7 @@
 
 #include "frame/gui/draw_gui_interface.h"
 #include "frame/gui/window_file_dialog.h"
+#include <functional>
 #include "tab_interface.h"
 
 namespace frame::gui
@@ -10,8 +11,12 @@ namespace frame::gui
 class TabTextures : public TabInterface
 {
   public:
-    explicit TabTextures(DrawGuiInterface& draw_gui)
-        : TabInterface("Textures"), draw_gui_(draw_gui)
+    TabTextures(
+        DrawGuiInterface& draw_gui,
+        std::function<void()> update_json_callback)
+        : TabInterface("Textures"),
+          draw_gui_(draw_gui),
+          update_json_callback_(std::move(update_json_callback))
     {
     }
 
@@ -22,6 +27,7 @@ class TabTextures : public TabInterface
 
   private:
     DrawGuiInterface& draw_gui_;
+    std::function<void()> update_json_callback_;
 };
 
 } // namespace frame::gui

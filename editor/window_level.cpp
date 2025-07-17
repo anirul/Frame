@@ -6,6 +6,8 @@
 
 #include "frame/file/file_system.h"
 #include "frame/json/parse_level.h"
+#include "frame/json/serialize_json.h"
+#include "frame/json/serialize_level.h"
 
 namespace frame::gui
 {
@@ -14,9 +16,18 @@ WindowLevel::WindowLevel(
     DeviceInterface& device,
     DrawGuiInterface& draw_gui,
     const std::string& file_name)
-    : WindowJsonFile(file_name, device), device_(device), draw_gui_(draw_gui),
-      tab_textures_(draw_gui)
+    : WindowJsonFile(file_name, device),
+      device_(device),
+      draw_gui_(draw_gui),
+      tab_textures_(draw_gui, [this]() { UpdateJsonEditor(); })
 {
+}
+
+void WindowLevel::UpdateJsonEditor()
+{
+    auto proto_level = frame::json::SerializeLevel(device_.GetLevel());
+    std::string json = frame::json::SaveProtoToJson(proto_level);
+    SetEditorText(json);
 }
 
 bool WindowLevel::DrawCallback()

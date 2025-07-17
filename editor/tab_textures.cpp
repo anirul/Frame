@@ -11,8 +11,9 @@ namespace frame::gui
 void TabTextures::Draw(LevelInterface& level)
 {
     const float button_size = ImGui::GetFrameHeight();
-    bool open =
-        ImGui::CollapsingHeader("Textures", ImGuiTreeNodeFlags_DefaultOpen);
+    bool open = ImGui::CollapsingHeader(
+        "Textures",
+        ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap);
     ImVec2 header_min = ImGui::GetItemRectMin();
     ImVec2 header_max = ImGui::GetItemRectMax();
     ImGui::SetItemAllowOverlap();
@@ -62,6 +63,8 @@ void TabTextures::AddTextureFromFile(
         texture->SetName(name);
         texture->SetSerializeEnable(true);
         level.AddTexture(std::move(texture));
+        if (update_json_callback_)
+            update_json_callback_();
     }
     catch (const std::exception&)
     {
