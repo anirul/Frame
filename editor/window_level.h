@@ -1,6 +1,7 @@
 #pragma once
 
 #include "frame/device_interface.h"
+#include "frame/gui/draw_gui_interface.h"
 #include "frame/gui/window_json_file.h"
 
 #include "tab_materials.h"
@@ -14,13 +15,20 @@ namespace frame::gui
 class WindowLevel : public WindowJsonFile
 {
   public:
-    WindowLevel(DeviceInterface& device, const std::string& file_name);
+    WindowLevel(
+        DeviceInterface& device,
+        DrawGuiInterface& draw_gui,
+        const std::string& file_name);
     ~WindowLevel() override = default;
+
+    /** @brief Update the JSON editor with the current level state. */
+    void UpdateJsonEditor();
 
     bool DrawCallback() override;
 
   private:
     DeviceInterface& device_;
+    DrawGuiInterface& draw_gui_;
     TabTextures tab_textures_;
     TabPrograms tab_programs_;
     TabMaterials tab_materials_;

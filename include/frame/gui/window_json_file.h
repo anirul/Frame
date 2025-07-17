@@ -25,6 +25,11 @@ class WindowJsonFile : public GuiWindowInterface
     std::string GetName() const override;
     void SetName(const std::string& name) override;
 
+    /** @brief Set the text in the internal editor. */
+    void SetEditorText(const std::string& text);
+    /** @brief Get the text from the internal editor. */
+    std::string GetEditorText() const;
+
   private:
     std::string name_;
     std::string file_name_;
