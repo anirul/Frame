@@ -30,6 +30,9 @@ class WindowJsonFile : public GuiWindowInterface
     /** @brief Get the text from the internal editor. */
     std::string GetEditorText() const;
 
+    /** @brief Get the file name associated with this window. */
+    const std::string& GetFileName() const;
+
   private:
     std::string name_;
     std::string file_name_;
