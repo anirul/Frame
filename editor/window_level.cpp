@@ -56,9 +56,10 @@ bool WindowLevel::DrawCallback()
 
     draw_toggle();
     ImGui::SameLine();
-    if (ImGui::Button("Save"))
+    if (ImGui::Button("Save##level"))
     {
-        // TODO: implement saving level
+        auto proto_level = frame::json::SerializeLevel(level);
+        frame::json::SaveProtoToJsonFile(proto_level, GetFileName());
     }
     ImGui::Separator();
 

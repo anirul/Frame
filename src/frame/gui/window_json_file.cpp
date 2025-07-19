@@ -72,7 +72,7 @@ bool WindowJsonFile::DrawCallback()
         }
     }
     ImGui::SameLine();
-    if (ImGui::Button("Save"))
+    if (ImGui::Button("Save##json"))
     {
         try
         {
@@ -145,6 +145,11 @@ void WindowJsonFile::SetEditorText(const std::string& text)
 std::string WindowJsonFile::GetEditorText() const
 {
     return editor_.GetText();
+}
+
+const std::string& WindowJsonFile::GetFileName() const
+{
+    return file_name_;
 }
 
 } // End namespace frame::gui.
