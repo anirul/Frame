@@ -5,6 +5,7 @@
 #include "frame/gui/window_file_dialog.h"
 #include "tab_interface.h"
 #include <functional>
+#include <string>
 
 namespace frame::gui
 {
@@ -24,6 +25,8 @@ class TabTextures : public TabInterface
   private:
     void AddTextureFromFile(LevelInterface& level, const std::string& file);
     void RemoveSelectedTexture(LevelInterface& level);
+    bool IsTextureUsed(const LevelInterface& level, EntityId id) const;
+    void CloseTextureWindows(const std::string& name);
 
   private:
     DrawGuiInterface& draw_gui_;
