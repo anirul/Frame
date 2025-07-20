@@ -19,7 +19,7 @@ class WindowMessageBox : public GuiWindowInterface
     void SetName(const std::string& name) override;
     glm::vec2 GetInitialSize() const override
     {
-        return glm::vec2(400.f, 0.f);
+        return glm::vec2(266.f, 0.f);
     }
 
   private:
