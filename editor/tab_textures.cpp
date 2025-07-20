@@ -7,10 +7,7 @@
 #include "frame/material_interface.h"
 #include "frame/program_interface.h"
 #include "frame/logger.h"
-#if defined(_WIN32) || defined(_WIN64)
-#define WINDOWS_LEAN_AND_MEAN
-#include <windows.h>
-#endif
+#include "frame/gui/window_message_box.h"
 
 #include <imgui.h>
 
@@ -132,15 +129,10 @@ void TabTextures::RemoveSelectedTexture(LevelInterface& level)
     std::string name = level.GetTextureFromId(selected_texture_id_).GetName();
     if (IsTextureUsed(level, selected_texture_id_))
     {
-#if defined(_WIN32) || defined(_WIN64)
-        MessageBox(nullptr,
-                   "Cannot delete a texture that is still used.",
-                   "Warning",
-                   MB_ICONEXCLAMATION);
-#else
         frame::Logger::GetInstance()->warn(
             "Cannot delete a texture that is still used.");
-#endif
+        draw_gui_.AddModalWindow(std::make_unique<WindowMessageBox>(
+            "Warning", "Cannot delete a texture that is still used."));
         return;
     }
     CloseTextureWindows(name);
