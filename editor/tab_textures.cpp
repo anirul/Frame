@@ -1,7 +1,13 @@
 #include "tab_textures.h"
 #include "frame/entity_id.h"
 #include "frame/file/file_system.h"
+#include "frame/gui/window_message_box.h"
+#include "frame/logger.h"
+#include "frame/material_interface.h"
 #include "frame/opengl/texture.h"
+#include "frame/program_interface.h"
+#include <algorithm>
+#include <string>
 
 #include <imgui.h>
 
@@ -17,8 +23,14 @@ void TabTextures::Draw(LevelInterface& level)
     ImVec2 header_min = ImGui::GetItemRectMin();
     ImVec2 header_max = ImGui::GetItemRectMax();
     ImGui::SetItemAllowOverlap();
+    ImGui::SetCursorScreenPos(
+        {header_max.x - 2.f * button_size - 8.f, header_min.y});
+    if (ImGui::Button("-##texture", ImVec2(button_size, button_size)))
+    {
+        RemoveSelectedTexture(level);
+    }
     ImGui::SetCursorScreenPos({header_max.x - button_size - 4.f, header_min.y});
-    if (ImGui::Button("+", ImVec2(button_size, button_size)))
+    if (ImGui::Button("+##texture", ImVec2(button_size, button_size)))
     {
         draw_gui_.AddModalWindow(
             std::make_unique<WindowFileDialog>(
@@ -33,7 +45,11 @@ void TabTextures::Draw(LevelInterface& level)
         for (auto id : level.GetTextures())
         {
             auto& tex = level.GetTextureFromId(id);
-            ImGui::Selectable(tex.GetName().c_str());
+            bool selected = (id == selected_texture_id_);
+            if (ImGui::Selectable(tex.GetName().c_str(), selected))
+            {
+                selected_texture_id_ = id;
+            }
             if (ImGui::BeginDragDropSource())
             {
                 EntityId payload = id;
@@ -70,6 +86,69 @@ void TabTextures::AddTextureFromFile(
     {
         // Ignore errors when loading texture
     }
+}
+
+bool TabTextures::IsTextureUsed(const LevelInterface& level, EntityId id) const
+{
+    for (auto material_id : level.GetMaterials())
+    {
+        const frame::MaterialInterface& mat =
+            level.GetMaterialFromId(material_id);
+        if (mat.HasTextureId(id))
+            return true;
+    }
+    for (auto program_id : level.GetPrograms())
+    {
+        const frame::ProgramInterface& prog =
+            level.GetProgramFromId(program_id);
+        auto inputs = prog.GetInputTextureIds();
+        if (std::count(inputs.begin(), inputs.end(), id))
+            return true;
+        auto outputs = prog.GetOutputTextureIds();
+        if (std::count(outputs.begin(), outputs.end(), id))
+            return true;
+    }
+    return false;
+}
+
+void TabTextures::CloseTextureWindows(const std::string& name)
+{
+    for (const std::string& window_name : draw_gui_.GetWindowTitles())
+    {
+        if ((window_name.starts_with("texture - ") ||
+             window_name.starts_with("cubemap - ")) &&
+            window_name.find(std::string("[") + name + "]") !=
+                std::string::npos)
+        {
+            draw_gui_.DeleteWindow(window_name);
+        }
+    }
+}
+
+void TabTextures::RemoveSelectedTexture(LevelInterface& level)
+{
+    if (selected_texture_id_ == frame::NullId)
+    {
+        draw_gui_.AddModalWindow(
+            std::make_unique<WindowMessageBox>(
+                "Warning", "No texture selected."));
+        return;
+    }
+    std::string name = level.GetTextureFromId(selected_texture_id_).GetName();
+    if (IsTextureUsed(level, selected_texture_id_))
+    {
+        frame::Logger::GetInstance()->warn(
+            "Cannot delete a texture that is still used.");
+        draw_gui_.AddModalWindow(
+            std::make_unique<WindowMessageBox>(
+                "Warning", "Cannot delete a texture that is still used."));
+        return;
+    }
+    CloseTextureWindows(name);
+    level.ExtractTexture(selected_texture_id_);
+    selected_texture_id_ = frame::NullId;
+    if (update_json_callback_)
+        update_json_callback_();
 }
 
 } // namespace frame::gui

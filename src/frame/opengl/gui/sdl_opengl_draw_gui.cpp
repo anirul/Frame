@@ -181,14 +181,17 @@ bool SDLOpenGLDrawGui::Update(DeviceInterface& device, double dt)
         {
             if (!start_modal_)
             {
+                glm::vec2 size = modal_callback_->GetInitialSize();
+                if (size.x > 0.f || size.y > 0.f)
+                    ImGui::SetNextWindowSize(
+                        ImVec2(size.x, size.y), ImGuiCond_Appearing);
                 ImGui::OpenPopup(modal_callback_->GetName().c_str());
                 start_modal_ = true;
             }
             if (ImGui::BeginPopupModal(
                     modal_callback_->GetName().c_str(),
                     nullptr,
-                    ImGuiWindowFlags_AlwaysAutoResize |
-                        ImGuiWindowFlags_NoMove))
+                    ImGuiWindowFlags_NoMove))
             {
                 modal_callback_->DrawCallback();
                 if (modal_callback_->End())
