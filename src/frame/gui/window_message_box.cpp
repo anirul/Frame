@@ -14,6 +14,11 @@ WindowMessageBox::WindowMessageBox(
 bool WindowMessageBox::DrawCallback()
 {
     ImGui::TextWrapped("%s", message_.c_str());
+    ImGuiStyle& style = ImGui::GetStyle();
+    float button_width =
+        ImGui::CalcTextSize("Ok").x + style.FramePadding.x * 2.f;
+    float avail_width = ImGui::GetContentRegionAvail().x;
+    ImGui::SetCursorPosX((avail_width - button_width) * 0.5f);
     if (ImGui::Button("Ok"))
     {
         end_ = true;
