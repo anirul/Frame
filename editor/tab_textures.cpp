@@ -17,6 +17,12 @@ void TabTextures::Draw(LevelInterface& level)
     ImVec2 header_min = ImGui::GetItemRectMin();
     ImVec2 header_max = ImGui::GetItemRectMax();
     ImGui::SetItemAllowOverlap();
+    ImGui::SetCursorScreenPos(
+        {header_max.x - 2.f * button_size - 8.f, header_min.y});
+    if (ImGui::Button("-", ImVec2(button_size, button_size)))
+    {
+        RemoveSelectedTexture(level);
+    }
     ImGui::SetCursorScreenPos({header_max.x - button_size - 4.f, header_min.y});
     if (ImGui::Button("+", ImVec2(button_size, button_size)))
     {
@@ -33,7 +39,11 @@ void TabTextures::Draw(LevelInterface& level)
         for (auto id : level.GetTextures())
         {
             auto& tex = level.GetTextureFromId(id);
-            ImGui::Selectable(tex.GetName().c_str());
+            bool selected = (id == selected_texture_id_);
+            if (ImGui::Selectable(tex.GetName().c_str(), selected))
+            {
+                selected_texture_id_ = id;
+            }
             if (ImGui::BeginDragDropSource())
             {
                 EntityId payload = id;
@@ -70,6 +80,16 @@ void TabTextures::AddTextureFromFile(
     {
         // Ignore errors when loading texture
     }
+}
+
+void TabTextures::RemoveSelectedTexture(LevelInterface& level)
+{
+    if (selected_texture_id_ == frame::NullId)
+        return;
+    level.ExtractTexture(selected_texture_id_);
+    selected_texture_id_ = frame::NullId;
+    if (update_json_callback_)
+        update_json_callback_();
 }
 
 } // namespace frame::gui
