@@ -54,6 +54,7 @@ target_link_libraries(FrameGui
   PRIVATE
     glm::glm
     imgui::imgui
+    unofficial-imgui-node-editor::imgui-node-editor
     spdlog::spdlog
     protobuf::libprotobuf
     FrameProto
