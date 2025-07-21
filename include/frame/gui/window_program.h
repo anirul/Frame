@@ -1,15 +1,17 @@
 #pragma once
 
-#include <string>
 #include <imgui-node-editor/imgui_node_editor.h>
+#include <string>
 
 #include "frame/gui/gui_window_interface.h"
 #include "frame/level_interface.h"
 #include "frame/program_interface.h"
 
-namespace frame::gui {
+namespace frame::gui
+{
 
-class WindowProgram : public GuiWindowInterface {
+class WindowProgram : public GuiWindowInterface
+{
   public:
     WindowProgram(LevelInterface& level, ProgramInterface& program);
     ~WindowProgram() override;
@@ -27,4 +29,3 @@ class WindowProgram : public GuiWindowInterface {
 };
 
 } // namespace frame::gui
-
