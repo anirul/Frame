@@ -101,20 +101,16 @@ bool WindowProgram::DrawCallback()
         ++pin_index;
     }
 
-    ed::End();
-
     if (!initialized_)
     {
-        ed::SetCurrentEditor(context_);
-        ed::Suspend();
         ed::SetNodePosition(entry_node, ImVec2(-250, 0));
         ed::SetNodePosition(program_node, ImVec2(0, 0));
         ed::SetNodePosition(exit_node, ImVec2(250, 0));
         ed::NavigateToContent();
-        ed::Resume();
         initialized_ = true;
     }
 
+    ed::End();
     ed::SetCurrentEditor(nullptr);
     return true;
 }
