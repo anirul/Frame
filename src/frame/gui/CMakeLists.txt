@@ -51,10 +51,10 @@ target_include_directories(FrameGui
 target_link_libraries(FrameGui
   PUBLIC
     ImGuiColorTextEdit
+    unofficial::imgui-node-editor::imgui-node-editor
   PRIVATE
     glm::glm
     imgui::imgui
-    unofficial::imgui-node-editor::imgui-node-editor
     spdlog::spdlog
     protobuf::libprotobuf
     FrameProto

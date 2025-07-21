@@ -17,7 +17,10 @@ WindowProgram::WindowProgram(LevelInterface& level, ProgramInterface& program)
 WindowProgram::~WindowProgram()
 {
     if (context_)
+    {
         ed::DestroyEditor(context_);
+        context_ = nullptr;
+    }
 }
 
 bool WindowProgram::DrawCallback()
@@ -26,7 +29,7 @@ bool WindowProgram::DrawCallback()
         context_ = ed::CreateEditor();
 
     ed::SetCurrentEditor(context_);
-    ed::Begin("ProgramEditor");
+    ed::Begin(name_.c_str());
 
     int entry_node = 1;
     int program_node = 2;
