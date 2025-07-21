@@ -25,6 +25,7 @@ class WindowProgram : public GuiWindowInterface
     LevelInterface& level_;
     ProgramInterface& program_;
     ax::NodeEditor::EditorContext* context_ = nullptr;
+    bool initialized_ = false;
     std::string name_;
 };
 

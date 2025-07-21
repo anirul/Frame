@@ -101,6 +101,15 @@ bool WindowProgram::DrawCallback()
         ++pin_index;
     }
 
+    if (!initialized_)
+    {
+        ed::SetNodePosition(entry_node, ImVec2(-250, 0));
+        ed::SetNodePosition(program_node, ImVec2(0, 0));
+        ed::SetNodePosition(exit_node, ImVec2(250, 0));
+        ed::NavigateToContent();
+        initialized_ = true;
+    }
+
     ed::End();
     ed::SetCurrentEditor(nullptr);
     return true;
