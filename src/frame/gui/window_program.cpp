@@ -12,6 +12,7 @@ WindowProgram::WindowProgram(LevelInterface& level, ProgramInterface& program)
     : level_(level), program_(program)
 {
     name_ = std::format("program - [{}]", program_.GetName());
+    config_.SettingsFile = nullptr;
 }
 
 WindowProgram::~WindowProgram()
@@ -26,7 +27,7 @@ WindowProgram::~WindowProgram()
 bool WindowProgram::DrawCallback()
 {
     if (!context_)
-        context_ = ed::CreateEditor();
+        context_ = ed::CreateEditor(&config_);
 
     ed::SetCurrentEditor(context_);
     ed::Begin(name_.c_str());
