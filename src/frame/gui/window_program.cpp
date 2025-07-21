@@ -118,12 +118,14 @@ bool WindowProgram::DrawCallback()
 
     ed::End();
     ed::SetCurrentEditor(nullptr);
+    if (ImGui::Button("Close"))
+        end_ = true;
     return true;
 }
 
 bool WindowProgram::End() const
 {
-    return false;
+    return end_;
 }
 
 std::string WindowProgram::GetName() const
