@@ -12,6 +12,7 @@ WindowProgram::WindowProgram(LevelInterface& level, ProgramInterface& program)
     : level_(level), program_(program)
 {
     name_ = std::format("program - [{}]", program_.GetName());
+    editor_name_ = std::format("##editor-{}", program_.GetName());
     config_.SettingsFile = nullptr;
 }
 
@@ -30,7 +31,7 @@ bool WindowProgram::DrawCallback()
         context_ = ed::CreateEditor(&config_);
 
     ed::SetCurrentEditor(context_);
-    ed::Begin(name_.c_str());
+    ed::Begin(editor_name_.c_str());
 
     int entry_node = 1;
     int program_node = 2;
@@ -105,21 +106,22 @@ bool WindowProgram::DrawCallback()
         ++pin_index;
     }
 
+    ed::End();
+    ed::SetCurrentEditor(nullptr);
+
     if (!initialized_)
     {
+        ed::SetCurrentEditor(context_);
         ed::Suspend();
         ed::SetNodePosition(entry_node, ImVec2(-250, 0));
         ed::SetNodePosition(program_node, ImVec2(0, 0));
         ed::SetNodePosition(exit_node, ImVec2(250, 0));
-        ed::NavigateToContent();
         ed::Resume();
+        ed::NavigateToContent();
+        ed::SetCurrentEditor(nullptr);
         initialized_ = true;
     }
 
-    ed::End();
-    ed::SetCurrentEditor(nullptr);
-    if (ImGui::Button("Close"))
-        end_ = true;
     return true;
 }
 
