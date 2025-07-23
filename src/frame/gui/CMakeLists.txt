@@ -15,6 +15,7 @@ add_library(FrameGui
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/gui/window_texture.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/gui/window_json_file.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/gui/window_glsl_file.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/gui/window_program.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/gui/window_message_box.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/gui/input_factory.h
     draw_gui_factory.cpp
@@ -33,6 +34,7 @@ add_library(FrameGui
     window_texture.cpp
     window_json_file.cpp
     window_glsl_file.cpp
+    window_program.cpp
     window_message_box.cpp
 )
 
@@ -49,6 +51,7 @@ target_include_directories(FrameGui
 target_link_libraries(FrameGui
   PUBLIC
     ImGuiColorTextEdit
+    unofficial::imgui-node-editor::imgui-node-editor
   PRIVATE
     glm::glm
     imgui::imgui

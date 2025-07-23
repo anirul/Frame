@@ -19,7 +19,8 @@ WindowLevel::WindowLevel(
     : WindowJsonFile(file_name, device),
       device_(device),
       draw_gui_(draw_gui),
-      tab_textures_(draw_gui, [this]() { UpdateJsonEditor(); })
+      tab_textures_(draw_gui, [this]() { UpdateJsonEditor(); }),
+      tab_programs_(draw_gui)
 {
 }
 
