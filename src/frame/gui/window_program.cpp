@@ -113,7 +113,7 @@ bool WindowProgram::DrawCallback()
         ed::SetNodePosition(program_node, ImVec2(0, 0));
         ed::SetNodePosition(exit_node, ImVec2(250, 0));
         ed::Resume();
-        ed::NavigateToContent();
+        ed::NavigateToContent(0.0f);
         initialized_ = true;
     }
 
