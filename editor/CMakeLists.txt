@@ -41,7 +41,7 @@ target_link_libraries(FrameEditor
     FrameOpenGLGui
     FrameOpenGLFile
     FrameProto
-    unofficial::imgui-node-editor::imgui-node-editor
+    ImNodeFlow
     imgui::imgui
     ImGuiColorTextEdit
 )

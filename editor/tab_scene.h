@@ -1,25 +1,28 @@
 #pragma once
 
-#include "tab_interface.h"
 #include "frame/entity_id.h"
-#include <imgui-node-editor/imgui_node_editor.h>
+#include "tab_interface.h"
 
-namespace frame::gui {
+#define IMGUI_DEFINE_MATH_OPERATORS
+#include <ImNodeFlow.h>
+#include <imgui.h>
 
-class TabScene : public TabInterface {
+namespace frame::gui
+{
+
+class TabScene : public TabInterface
+{
   public:
-    TabScene() : TabInterface("Scene") {}
-    ~TabScene() override;
+    TabScene() : TabInterface("Scene")
+    {
+    }
+    ~TabScene() override = default;
 
     void Draw(LevelInterface& level) override;
 
   private:
-    void DisplayNode(LevelInterface& level, EntityId id, EntityId parent);
-    void ProcessEvents(LevelInterface& level);
-
-    int next_node_index_ = 0;
-
-    ax::NodeEditor::EditorContext* context_ = nullptr;
+    bool initialized_ = false;
+    ImFlow::ImNodeFlow node_flow_;
 };
 
 } // namespace frame::gui

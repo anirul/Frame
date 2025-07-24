@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <fstream>
+#define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
 
 #include "frame/file/file_system.h"
@@ -16,9 +17,7 @@ WindowLevel::WindowLevel(
     DeviceInterface& device,
     DrawGuiInterface& draw_gui,
     const std::string& file_name)
-    : WindowJsonFile(file_name, device),
-      device_(device),
-      draw_gui_(draw_gui),
+    : WindowJsonFile(file_name, device), device_(device), draw_gui_(draw_gui),
       tab_textures_(draw_gui, [this]() { UpdateJsonEditor(); })
 {
 }
