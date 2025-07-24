@@ -6,6 +6,7 @@
 #include "frame/gui/window_resolution.h"
 #include "frame/logger.h"
 #include "window_level.h"
+#define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
 #include <set>
 

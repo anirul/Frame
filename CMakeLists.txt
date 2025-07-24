@@ -31,12 +31,14 @@ find_package(SDL3 CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(tinyobjloader CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
-find_package(unofficial-imgui-node-editor CONFIG REQUIRED)
 find_package(Vulkan REQUIRED)
+
+include(cmake/AddImNodeFlow.cmake)
 
 # Sources.
 add_subdirectory(external/ImGuiColorTextEdit)
 set_property(TARGET ImGuiColorTextEdit PROPERTY FOLDER "external/ImGuiColorTextEditor")
+set_property(TARGET ImNodeFlow PROPERTY FOLDER "external/ImNodeFlow")
 add_subdirectory(asset/shader/opengl)
 add_subdirectory(asset/json)
 add_subdirectory(src/frame)

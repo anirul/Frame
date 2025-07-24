@@ -2,10 +2,12 @@
 
 #include <functional>
 
-#include "frame/gui/gui_window_interface.h"
-#include "frame/gui/gui_menu_bar_interface.h"
-#include "frame/name_interface.h"
+#define IMGUI_DEFINE_MATH_OPERATORS
+
 #include "frame/device_interface.h"
+#include "frame/gui/gui_menu_bar_interface.h"
+#include "frame/gui/gui_window_interface.h"
+#include "frame/name_interface.h"
 #include "frame/plugin_interface.h"
 
 namespace frame::gui
@@ -37,7 +39,7 @@ class DrawGuiInterface : public PluginInterface
     virtual void AddOverlayWindow(
         glm::vec2 position,
         glm::vec2 size,
-		std::unique_ptr<GuiWindowInterface> callback) = 0;
+        std::unique_ptr<GuiWindowInterface> callback) = 0;
     /**
      * @brief Add a modal window.
      * @param callback: A window callback that can add buttons, etc.
@@ -65,22 +67,22 @@ class DrawGuiInterface : public PluginInterface
      */
     virtual void DeleteWindow(const std::string& name) = 0;
     /**
-	 * @brief Set a menu bar to the main window.
-	 * @param callback: A menu bar for the main window.
-	 * 
+     * @brief Set a menu bar to the main window.
+     * @param callback: A menu bar for the main window.
+     *
      * If the callback return is 0 the callback stay and if it is other it is
      * removed. This will trigger an internal boolean that will decide if the
      * modal is active or not.
      */
     virtual void SetMenuBar(std::unique_ptr<GuiMenuBarInterface> callback) = 0;
     /**
-	 * @brief Get the menu bar.
-	 * @return The menu bar.
-	 */
+     * @brief Get the menu bar.
+     * @return The menu bar.
+     */
     virtual GuiMenuBarInterface& GetMenuBar() = 0;
     /**
-	 * @Remove the menu bar.
-	 */
+     * @Remove the menu bar.
+     */
     virtual void RemoveMenuBar() = 0;
     /**
      * @brief Is the draw gui active?
