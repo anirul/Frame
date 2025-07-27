@@ -158,6 +158,20 @@ EntityId Level::AddProgram(std::unique_ptr<ProgramInterface>&& program)
     return id;
 }
 
+void Level::RemoveProgram(EntityId program_id)
+{
+    if (!id_program_map_.count(program_id))
+    {
+        throw std::runtime_error(
+            std::format("No program with id #{}.", program_id));
+    }
+    std::string name = id_name_map_.at(program_id);
+    id_program_map_.erase(program_id);
+    id_name_map_.erase(program_id);
+    name_id_map_.erase(name);
+    id_enum_map_.erase(program_id);
+}
+
 EntityId Level::AddMaterial(std::unique_ptr<MaterialInterface>&& material)
 {
     EntityId id = GetMaterialNewId();
