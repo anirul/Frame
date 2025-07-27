@@ -2,6 +2,8 @@
 #include "frame/entity_id.h"
 #include "frame/gui/window_message_box.h"
 #include "frame/gui/window_new_program.h"
+#include "frame/material_interface.h"
+#include "frame/logger.h"
 
 #include <imgui.h>
 
@@ -47,10 +49,29 @@ void TabPrograms::RemoveSelectedProgram(LevelInterface& level) {
             std::make_unique<WindowMessageBox>("Warning", "No program selected."));
         return;
     }
+    if (IsProgramUsed(level, selected_program_id_)) {
+        frame::Logger::GetInstance()->warn(
+            "Cannot delete a program that is still used.");
+        draw_gui_.AddModalWindow(std::make_unique<WindowMessageBox>(
+            "Warning", "Cannot delete a program that is still used."));
+        return;
+    }
     level.RemoveProgram(selected_program_id_);
     selected_program_id_ = frame::NullId;
     if (update_json_callback_)
         update_json_callback_();
+}
+
+bool TabPrograms::IsProgramUsed(const LevelInterface& level, EntityId id) const {
+    for (auto material_id : level.GetMaterials()) {
+        const MaterialInterface& material = level.GetMaterialFromId(material_id);
+        try {
+            if (material.GetProgramId(&level) == id)
+                return true;
+        } catch (...) {
+        }
+    }
+    return false;
 }
 
 } // namespace frame::gui

@@ -27,8 +27,7 @@ class WindowNewProgram : public GuiWindowInterface {
     LevelInterface& level_;
     std::function<void()> update_json_callback_;
     char name_buffer_[64] = "";
-    char vertex_buffer_[64] = "";
-    char fragment_buffer_[64] = "";
+    char shader_buffer_[64] = "";
     bool end_ = false;
     std::string name_ = "New Program";
 };

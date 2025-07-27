@@ -165,6 +165,22 @@ void Level::RemoveProgram(EntityId program_id)
         throw std::runtime_error(
             std::format("No program with id #{}.", program_id));
     }
+    for (const auto& [material_id, material_ptr] : id_material_map_)
+    {
+        try
+        {
+            if (material_ptr->GetProgramId(this) == program_id)
+            {
+                throw std::runtime_error(std::format(
+                    "Program '{}' is still used by material '{}'",
+                    id_name_map_.at(program_id),
+                    id_name_map_.at(material_id)));
+            }
+        }
+        catch (...)
+        {
+        }
+    }
     std::string name = id_name_map_.at(program_id);
     id_program_map_.erase(program_id);
     id_name_map_.erase(program_id);

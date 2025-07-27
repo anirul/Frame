@@ -21,8 +21,7 @@ WindowNewProgram::WindowNewProgram(
 
 bool WindowNewProgram::DrawCallback() {
     ImGui::InputText("Name", name_buffer_, sizeof(name_buffer_));
-    ImGui::InputText("Vertex Shader", vertex_buffer_, sizeof(vertex_buffer_));
-    ImGui::InputText("Fragment Shader", fragment_buffer_, sizeof(fragment_buffer_));
+    ImGui::InputText("Shader", shader_buffer_, sizeof(shader_buffer_));
 
     if (ImGui::Button("Create")) {
         std::string name{name_buffer_};
@@ -37,14 +36,17 @@ bool WindowNewProgram::DrawCallback() {
             return true;
         }
         try {
+            std::string shader{shader_buffer_};
+            std::string vert_name = shader + ".vert";
+            std::string frag_name = shader + ".frag";
             std::ifstream vert_file(frame::file::FindFile(
-                std::string("asset/shader/opengl/") + vertex_buffer_));
+                std::string("asset/shader/opengl/") + vert_name));
             std::ifstream frag_file(frame::file::FindFile(
-                std::string("asset/shader/opengl/") + fragment_buffer_));
+                std::string("asset/shader/opengl/") + frag_name));
             auto program = frame::opengl::CreateProgram(
                 name,
-                vertex_buffer_,
-                fragment_buffer_,
+                vert_name,
+                frag_name,
                 vert_file,
                 frag_file);
             program->SetSerializeEnable(true);

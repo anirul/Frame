@@ -15,6 +15,7 @@ class TabPrograms : public TabInterface {
 
   private:
     void RemoveSelectedProgram(LevelInterface& level);
+    bool IsProgramUsed(const LevelInterface& level, EntityId id) const;
 
   private:
     DrawGuiInterface& draw_gui_;
