@@ -266,6 +266,11 @@ class Level : public LevelInterface
      */
     EntityId AddProgram(std::unique_ptr<ProgramInterface>&& program) override;
     /**
+     * @brief Remove a program from the level.
+     * @param program_id: Id of the program to remove.
+     */
+    void RemoveProgram(EntityId program_id) override;
+    /**
      * @brief Add a material to the level.
      * @param material: Move a material in the level.
      * @return Assigned entity id or error.

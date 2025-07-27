@@ -34,6 +34,7 @@ add_library(FrameGui
     window_json_file.cpp
     window_glsl_file.cpp
     window_message_box.cpp
+    window_new_program.cpp
 )
 
 target_include_directories(FrameGui
