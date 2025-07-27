@@ -1,5 +1,7 @@
 #pragma once
 
+#define IMGUI_DEFINE_MATH_OPERATORS
+
 #include "frame/device_interface.h"
 #include "frame/gui/draw_gui_interface.h"
 #include "frame/gui/window_json_file.h"
