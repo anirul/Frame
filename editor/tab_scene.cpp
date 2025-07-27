@@ -8,9 +8,11 @@ namespace frame::gui
 
 void TabScene::Draw(LevelInterface& level)
 {
+    ImVec2 avail = ImGui::GetContentRegionAvail();
+    node_flow_.setSize(avail);
+
     if (!initialized_)
     {
-        node_flow_.setSize(ImVec2(600.0f, 600.0f));
         auto root = level.GetDefaultRootSceneNodeId();
         std::function<void(EntityId, int)> add = [&](EntityId id, int depth) {
             auto name = level.GetNameFromId(id);
