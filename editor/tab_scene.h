@@ -6,6 +6,8 @@
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <ImNodeFlow.h>
 #include <imgui.h>
+#include <memory>
+#include <unordered_map>
 
 namespace frame::gui
 {
@@ -21,8 +23,12 @@ class TabScene : public TabInterface
     void Draw(LevelInterface& level) override;
 
   private:
-    bool initialized_ = false;
+    void BuildScene(LevelInterface& level);
+
+  private:
     ImFlow::ImNodeFlow node_flow_;
+    std::unordered_map<frame::EntityId, std::shared_ptr<ImFlow::BaseNode>>
+        nodes_;
 };
 
 } // namespace frame::gui
