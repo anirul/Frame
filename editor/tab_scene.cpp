@@ -18,8 +18,7 @@ void TabScene::BuildScene(LevelInterface& level)
     std::function<void(EntityId, int)> add = [&](EntityId id, int depth) {
         auto name = level.GetNameFromId(id);
         auto node = node_flow_.addLambdaNode(
-            [](ImFlow::BaseNode*) {},
-            ImVec2(depth * 100.0f, depth * 60.0f));
+            [](ImFlow::BaseNode*) {}, ImVec2(depth * 100.0f, depth * 60.0f));
         node->setTitle(name);
         node->addIN<int>("in", 0, ImFlow::ConnectionFilter::None());
         static_cast<void>(node->addOUT<int>("out"));
@@ -45,7 +44,7 @@ void TabScene::Draw(LevelInterface& level)
     ImVec2 avail = ImGui::GetContentRegionAvail();
     node_flow_.setSize(avail);
 
-    if (ImGui::Button("Add Node"))
+    if (ImGui::Button("New Node"))
     {
         auto functor = [&level](const std::string& n) -> frame::NodeInterface* {
             auto maybe = level.GetIdFromName(n);
@@ -65,14 +64,9 @@ void TabScene::Draw(LevelInterface& level)
         if (root_id != frame::NullId)
             node->SetParentName(level.GetNameFromId(root_id));
         level.AddSceneNode(std::move(node));
-        initialized_ = false;
     }
 
-    if (!initialized_)
-    {
-        BuildScene(level);
-        initialized_ = true;
-    }
+    BuildScene(level);
 
     node_flow_.update();
 }

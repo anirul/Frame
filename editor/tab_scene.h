@@ -26,7 +26,6 @@ class TabScene : public TabInterface
     void BuildScene(LevelInterface& level);
 
   private:
-    bool initialized_ = false;
     ImFlow::ImNodeFlow node_flow_;
     std::unordered_map<frame::EntityId, std::shared_ptr<ImFlow::BaseNode>>
         nodes_;
