@@ -18,10 +18,11 @@ void TabScene::BuildScene(LevelInterface& level)
     std::function<void(EntityId, int)> add = [&](EntityId id, int depth) {
         auto name = level.GetNameFromId(id);
         auto node = node_flow_.addLambdaNode(
-            [name](ImFlow::BaseNode*) { ImGui::Text("%s", name.c_str()); },
+            [](ImFlow::BaseNode*) {},
             ImVec2(depth * 100.0f, depth * 60.0f));
+        node->setTitle(name);
         node->addIN<int>("in", 0, ImFlow::ConnectionFilter::None());
-        node->addOUT<int>("out");
+        static_cast<void>(node->addOUT<int>("out"));
         nodes_[id] = node;
         for (auto child : level.GetChildList(id))
             add(child, depth + 1);
