@@ -1,7 +1,7 @@
 #include "tab_programs.h"
 #include "frame/entity_id.h"
 #include "frame/gui/window_message_box.h"
-#include "frame/gui/window_new_program.h"
+#include "window_new_program.h"
 #include "frame/material_interface.h"
 #include "frame/logger.h"
 

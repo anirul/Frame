@@ -13,6 +13,8 @@ add_executable(FrameEditor
     window_start.h
     window_level.cpp
     window_level.h
+    window_new_program.cpp
+    window_new_program.h
     tab_interface.h
     tab_textures.cpp
     tab_textures.h
