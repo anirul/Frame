@@ -1,4 +1,4 @@
-#include "frame/gui/window_new_program.h"
+#include "window_new_program.h"
 
 #include <fstream>
 #include <imgui.h>
