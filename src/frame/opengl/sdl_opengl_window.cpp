@@ -20,6 +20,12 @@ namespace frame::opengl
 
 SDLOpenGLWindow::SDLOpenGLWindow(glm::uvec2 size) : size_(size)
 {
+#ifdef __linux__
+    SDL_SetHint(SDL_HINT_MOUSE_FOCUS_CLICKTHROUGH, "1");
+    SDL_SetHint(SDL_HINT_VIDEO_WAYLAND_ALLOW_LIBDECOR, "1"); // optional
+    SDL_SetHint(SDL_HINT_VIDEO_X11_NET_WM_BYPASS_COMPOSITOR, "0");
+#endif // __linux__
+
     if (!SDL_Init(SDL_INIT_VIDEO))
     {
         throw std::runtime_error(
