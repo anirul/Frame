@@ -80,6 +80,7 @@ bool WindowNewProgram::DrawCallback()
             std::ifstream frag_file(frag_path);
             auto program = frame::opengl::CreateProgram(
                 name, vert_name, frag_name, vert_file, frag_file);
+            program->SetSceneRoot(level_.GetDefaultRootSceneNodeId());
             program->SetSerializeEnable(true);
             level_.AddProgram(std::move(program));
             if (update_json_callback_)
