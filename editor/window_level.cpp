@@ -9,6 +9,7 @@
 #include "frame/json/parse_level.h"
 #include "frame/json/serialize_json.h"
 #include "frame/json/serialize_level.h"
+#include "frame/logger.h"
 
 namespace frame::gui
 {
@@ -28,6 +29,18 @@ void WindowLevel::UpdateJsonEditor()
     auto proto_level = frame::json::SerializeLevel(device_.GetLevel());
     std::string json = frame::json::SaveProtoToJson(proto_level);
     SetEditorText(json);
+
+    if (!GetFileName().empty())
+    {
+        try
+        {
+            frame::json::SaveProtoToJsonFile(proto_level, GetFileName());
+        }
+        catch (const std::exception& e)
+        {
+            frame::Logger::GetInstance()->error(e.what());
+        }
+    }
 }
 
 bool WindowLevel::DrawCallback()
