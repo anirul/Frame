@@ -27,19 +27,6 @@
             "file_name": "asset/cubemap/shiodome.hdr"
         },
         {
-            "name": "shadow_map",
-            "size": {
-                "x": 1024,
-                "y": 1024
-            },
-            "pixel_element_size": {
-                "value": "FLOAT"
-            },
-            "pixel_structure": {
-                "value": "DEPTH"
-            }
-        },
-        {
             "name": "apple_texture",
             "cubemap": false,
             "pixel_element_size": {
@@ -81,13 +68,17 @@
             "program_name": "AppleProgram",
             "texture_names": [
                 "apple_texture",
-                "zbuffer",
-                "shadow"
+                "zbuffer"
             ],
             "inner_names": [
                 "AppleTexture",
-                "Zbuffer",
-                "Shadow "
+                "Zbuffer"
+            ],
+            "buffer_names": [
+                "AppleMesh.0.triangle"
+            ],
+            "inner_buffer_names": [
+                "TriangleBuffer"
             ]
         }
     ],
@@ -121,24 +112,10 @@
             ]
         },
         {
-            "name": "ShadowProgram",
-            "input_texture_names": [],
-            "output_texture_names": [
-                "shadow_map"
-            ],
-            "input_scene_type": {
-                "value": "SCENE"
-            },
-            "input_scene_root_name": "root",
-            "shader_vertex": "shadow.vert",
-            "shader_fragment": "shadow.frag"
-        },
-        {
             "name": "AppleProgram",
             "input_texture_names": [
                 "apple_texture",
-                "skybox",
-                "shadow_map"
+                "skybox"
             ],
             "output_texture_names": [
                 "albedo"
@@ -161,37 +138,6 @@
                 {
                     "name": "model",
                     "uniform_enum": "MODEL_MAT4"
-                },
-                {
-                    "name": "light_projection_view",
-                    "uniform_vec4s": {
-                        "values": [
-                            {
-                                "x": 1.0,
-                                "y": 0.0,
-                                "z": 0.0,
-                                "w": 0.0
-                            },
-                            {
-                                "x": 0.0,
-                                "y": 1.0,
-                                "z": 0.0,
-                                "w": 0.0
-                            },
-                            {
-                                "x": 0.0,
-                                "y": 0.0,
-                                "z": 1.0,
-                                "w": 0.0
-                            },
-                            {
-                                "x": 0.0,
-                                "y": 0.0,
-                                "z": 0.0,
-                                "w": 1.0
-                            }
-                        ]
-                    }
                 }
             ]
         }
@@ -274,7 +220,6 @@
                 "parent": "root",
                 "light_type": "DIRECTIONAL_LIGHT",
                 "shadow_type": "SOFT_SHADOW",
-                "shadow_texture": "shadow_map",
                 "position": {
                     "x": -1.0,
                     "y": 1.0,

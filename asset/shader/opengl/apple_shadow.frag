@@ -3,16 +3,57 @@
 in vec3 out_normal;
 in vec3 out_world_position;
 in vec2 out_uv;
-in vec4 out_light_space_pos;
 
-uniform sampler2D shadow_map;
 uniform sampler2D apple_texture;
 uniform vec3 light_pos;
 uniform vec3 light_color;
 uniform vec3 camera_pos;
-uniform float bias;
 
 out vec4 frag_color;
+
+struct Triangle {
+    vec3 v0;
+    vec3 v1;
+    vec3 v2;
+};
+
+layout(std430, binding = 0) buffer TriangleBuffer {
+    Triangle triangles[];
+};
+
+// Moller-Trumbore intersection algorithm
+bool rayTriangleIntersect(
+    const vec3 ray_origin,
+    const vec3 ray_direction,
+    const Triangle triangle,
+    out float out_t)
+{
+    const float EPSILON = 0.0000001;
+    vec3 edge1 = triangle.v1 - triangle.v0;
+    vec3 edge2 = triangle.v2 - triangle.v0;
+    vec3 h = cross(ray_direction, edge2);
+    float a = dot(edge1, h);
+    if (a > -EPSILON && a < EPSILON)
+        return false;    // This ray is parallel to this triangle.
+    float f = 1.0/a;
+    vec3 s = ray_origin - triangle.v0;
+    float u = f * dot(s, h);
+    if (u < 0.0 || u > 1.0)
+        return false;
+    vec3 q = cross(s, edge1);
+    float v = f * dot(ray_direction, q);
+    if (v < 0.0 || u + v > 1.0)
+        return false;
+    // At this stage we can compute t to find out where the intersection point is on the line.
+    float t = f * dot(edge2, q);
+    if (t > EPSILON) // ray intersection
+    {
+        out_t = t;
+        return true;
+    }
+    else // This means that there is a line intersection but not a ray intersection.
+        return false;
+}
 
 void main() {
     // 1. Basic lighting (Lambert / Blinn-Phong, etc.)
@@ -21,25 +62,17 @@ void main() {
     float diff = max(dot(normal, light_direction), 0.0);
 
     // 2. Compute shadow
-    // Transform from clip-space [-1..1] to [0..1] coordinates
-    vec3 proj_coords = out_light_space_pos.xyz / out_light_space_pos.w;
-    proj_coords = proj_coords * 0.5 + 0.5;
-
-    // If outside the [0,1] range, skip shadow or clamp
-    // (for directional light you might clamp, or check with an if)
-    if (proj_coords.x < 0.0 || proj_coords.x > 1.0 ||
-        proj_coords.y < 0.0 || proj_coords.y > 1.0 ||
-        proj_coords.z < 0.0 || proj_coords.z > 1.0)
+    float shadow = 0.0;
+    vec3 ray_origin = out_world_position + normal * 0.001;
+    float t;
+    for (int i = 0; i < triangles.length(); ++i)
     {
-        // Fragment is outside the shadow map area
-        // so for directional lights, typically no shadow 
-        // (or 1 if you want to treat it as shadow)
+        if (rayTriangleIntersect(ray_origin, light_direction, triangles[i], t))
+        {
+            shadow = 1.0;
+            break;
+        }
     }
-
-    float current_depth = proj_coords.z;
-    float closest_depth = texture(shadow_map, proj_coords.xy).r;
-    // Subtract a small bias to reduce shadow acne
-    float shadow = current_depth - bias > closest_depth ? 1.0 : 0.0;
 
     // 3. Combine
     vec3 color = vec3(diff) * (1.0 - shadow) * light_color;
