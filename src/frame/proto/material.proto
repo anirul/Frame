@@ -13,4 +13,8 @@ message Material {
 	repeated string texture_names = 3;
 	// Reference to the name inside the material in the shader file.
 	repeated string inner_names = 4;
+	// Reference name of the buffer names in the buffer file.
+	repeated string buffer_names = 6;
+	// Reference to the name inside the material in the shader file.
+	repeated string inner_buffer_names = 7;
 }

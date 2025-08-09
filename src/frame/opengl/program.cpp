@@ -67,8 +67,12 @@ void Program::Use() const
     is_used_ = true;
 }
 
+#include "frame/level_interface.h"
+#include "frame/opengl/buffer.h"
+
 void Program::Use(
-    const UniformCollectionInterface& uniform_collection_interface)
+    const UniformCollectionInterface& uniform_collection_interface,
+    const LevelInterface* level)
 {
     glUseProgram(program_id_);
     is_used_ = true;
@@ -77,6 +81,15 @@ void Program::Use(
         if (HasUniform(name))
         {
             UploadUniform(uniform_collection_interface.GetUniform(name));
+        }
+    }
+    if (level)
+    {
+        for (const auto& [id, name_binding] : buffer_map_)
+        {
+            const auto& buffer =
+                dynamic_cast<const Buffer&>(level->GetBufferFromId(id));
+            buffer.BindBase(name_binding.second);
         }
     }
 }
@@ -595,6 +608,11 @@ std::unique_ptr<ProgramInterface> CreateProgram(
     logger->info("with pointer := {}", static_cast<void*>(program.get()));
 #endif // _DEBUG
     return program;
+}
+
+void Program::AddBuffer(EntityId id, const std::string& name, int binding)
+{
+    buffer_map_[id] = {name, binding};
 }
 
 } // End namespace frame::opengl.

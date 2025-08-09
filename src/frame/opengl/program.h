@@ -94,8 +94,9 @@ class Program : public ProgramInterface
      * matrices (model, view, projection) but also time and other uniform
      * that could be needed.
      */
-    void Use(const UniformCollectionInterface& uniform_collection_interface)
-        override;
+    void Use(
+        const UniformCollectionInterface& uniform_collection_interface,
+        const LevelInterface* level = nullptr) override;
     /**
      * @brief Use the program, a little bit like bind.
      */
@@ -107,6 +108,13 @@ class Program : public ProgramInterface
      * @param uniform: The uniform to set.
      */
     void AddUniform(std::unique_ptr<UniformInterface>&& uniform) override;
+    /**
+     * @brief Add a buffer to the program.
+     * @param id: Id of the buffer.
+     * @param name: Name of the buffer in the shader.
+     * @param binding: Binding point of the buffer.
+     */
+    void AddBuffer(EntityId id, const std::string& name, int binding);
 
   private:
     /**
@@ -186,6 +194,8 @@ class Program : public ProgramInterface
     std::vector<EntityId> input_texture_ids_ = {};
     std::vector<EntityId> output_texture_ids_ = {};
     mutable bool is_used_ = false;
+    // Map of id and name, binding point.
+    std::map<EntityId, std::pair<std::string, int>> buffer_map_ = {};
 };
 
 /**

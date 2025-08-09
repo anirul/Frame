@@ -18,6 +18,13 @@ proto::Material SerializeMaterial(
             level_interface.GetNameFromId(texture_id);
         *proto_material.add_inner_names() = inner_name;
     }
+    for (const auto buffer_id : material_interface.GetBufferIds())
+    {
+        std::string inner_name = material_interface.GetInnerBufferName(buffer_id);
+        *proto_material.add_buffer_names() =
+            level_interface.GetNameFromId(buffer_id);
+        *proto_material.add_inner_buffer_names() = inner_name;
+    }
     return proto_material;
 }
 

@@ -139,7 +139,7 @@ void Renderer::RenderMesh(
     }
     // Go through the callback.
     callback_(uniform_collection_wrapper, static_mesh, material);
-    program.Use(uniform_collection_wrapper);
+    program.Use(uniform_collection_wrapper, &level_);
 
     auto texture_out_ids = program.GetOutputTextureIds();
     auto& texture_ref = level_.GetTextureFromId(*texture_out_ids.cbegin());
@@ -210,6 +210,14 @@ void Renderer::RenderMesh(
         std::unique_ptr<UniformInterface> uniform_interface =
             std::make_unique<Uniform>(p.first, p.second);
         program.AddUniform(std::move(uniform_interface));
+    }
+    int i = 0;
+    for (const auto& id : material.GetBufferIds())
+    {
+        auto& buffer =
+            dynamic_cast<opengl::Buffer&>(level_.GetBufferFromId(id));
+        auto inner_name = material.GetInnerBufferName(id);
+        dynamic_cast<opengl::Program&>(program).AddBuffer(id, inner_name, i++);
     }
 
     auto& gl_static_mesh = dynamic_cast<StaticMesh&>(static_mesh);
@@ -296,7 +304,7 @@ void Renderer::PresentFinal()
     auto& quad = level_.GetStaticMeshFromId(maybe_quad_id);
     auto& program = level_.GetProgramFromId(display_program_id_);
     UniformCollectionWrapper uniform_collection_wrapper{};
-    program.Use(uniform_collection_wrapper);
+    program.Use(uniform_collection_wrapper, &level_);
     auto& material = level_.GetMaterialFromId(display_material_id_);
     for (const auto id : material.GetTextureIds())
     {

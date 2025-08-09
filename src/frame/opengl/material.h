@@ -78,9 +78,16 @@ class Material : public MaterialInterface
      * @brief Disable all the texture and unbind them.
      */
     void DisableAll() const override;
+    // Buffer part.
+    std::string GetInnerBufferName(EntityId id) const override;
+    bool AddBufferId(EntityId id, const std::string& name) override;
+    bool HasBufferId(EntityId id) const override;
+    bool RemoveBufferId(EntityId id) override;
+    std::vector<EntityId> GetBufferIds() const override;
 
   private:
     std::map<EntityId, std::string> id_name_map_ = {};
+    std::map<EntityId, std::string> id_buffer_name_map_ = {};
     mutable std::array<EntityId, 32> id_array_ = {};
     mutable EntityId program_id_ = 0;
     std::string name_;
