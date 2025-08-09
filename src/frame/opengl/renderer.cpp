@@ -211,13 +211,13 @@ void Renderer::RenderMesh(
             std::make_unique<Uniform>(p.first, p.second);
         program.AddUniform(std::move(uniform_interface));
     }
-    int i = 0;
+    int j = 0;
     for (const auto& id : material.GetBufferIds())
     {
         auto& buffer =
             dynamic_cast<opengl::Buffer&>(level_.GetBufferFromId(id));
         auto inner_name = material.GetInnerBufferName(id);
-        dynamic_cast<opengl::Program&>(program).AddBuffer(id, inner_name, i++);
+        dynamic_cast<opengl::Program&>(program).AddBuffer(id, inner_name, j++);
     }
 
     auto& gl_static_mesh = dynamic_cast<StaticMesh&>(static_mesh);

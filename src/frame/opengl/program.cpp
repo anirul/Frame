@@ -13,7 +13,14 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "frame/json/parse_uniform.h"
+#include <algorithm>
+#include <stdexcept>
+#include <string>
+#include <vector>
+
+#include "frame/json/parse_uniform.h"
 #include "frame/logger.h"
+#include "frame/opengl/buffer.h"
 #include "frame/uniform.h"
 
 namespace frame::opengl
