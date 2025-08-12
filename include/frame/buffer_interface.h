@@ -44,6 +44,11 @@ struct BufferInterface : public NameInterface
      * @return The size in bytes of the buffer.
      */
     virtual std::size_t GetSize() const = 0;
+    /**
+     * @brief Bind the base of a buffer to an attachment point.
+     * @param binding: The attachment point.
+     */
+    virtual void BindBase(int binding) const = 0;
 };
 
 } // End namespace frame.

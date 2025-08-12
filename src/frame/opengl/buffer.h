@@ -105,6 +105,11 @@ class Buffer : public BindInterface, public BufferInterface
      * from the current context.
      */
     void UnBind() const override;
+    /**
+     * @brief Bind the base of a buffer to an attachment point.
+     * @param binding: The attachment point.
+     */
+    void BindBase(int binding) const override;
 
   public:
     /**
