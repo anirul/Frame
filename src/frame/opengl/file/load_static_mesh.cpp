@@ -353,7 +353,7 @@ std::vector<EntityId> LoadStaticMeshesFromObjFile(
             auto maybe_id = LoadMaterialFromObj(level, material);
             if (maybe_id)
             {
-                material_ids.push_back(maybe_id);
+                material_ids.push_back(*maybe_id);
             }
         }
     }
