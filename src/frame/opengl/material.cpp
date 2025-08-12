@@ -123,35 +123,21 @@ void Material::SetProgramId(EntityId id)
     program_id_ = id;
 }
 
-std::string Material::GetInnerBufferName(EntityId id) const
+std::string Material::GetInnerBufferName(const std::string& name) const
 {
-    return id_buffer_name_map_.at(id);
+    return name_buffer_name_map_.at(name);
 }
 
-bool Material::AddBufferId(EntityId id, const std::string& name)
+bool Material::AddBufferName(
+    const std::string& name, const std::string& inner_name)
 {
-    RemoveBufferId(id);
-    return id_buffer_name_map_.insert({id, name}).second;
+    return name_buffer_name_map_.insert({name, inner_name}).second;
 }
 
-bool Material::HasBufferId(EntityId id) const
+std::vector<std::string> Material::GetBufferNames() const
 {
-    return static_cast<bool>(id_buffer_name_map_.count(id));
-}
-
-bool Material::RemoveBufferId(EntityId id)
-{
-    if (!HasBufferId(id))
-        return false;
-    auto it = id_buffer_name_map_.find(id);
-    id_buffer_name_map_.erase(it);
-    return true;
-}
-
-std::vector<EntityId> Material::GetBufferIds() const
-{
-    std::vector<EntityId> vec;
-    for (const auto& p : id_buffer_name_map_)
+    std::vector<std::string> vec;
+    for (const auto& p : name_buffer_name_map_)
     {
         vec.push_back(p.first);
     }

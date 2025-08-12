@@ -58,12 +58,9 @@ std::unique_ptr<frame::MaterialInterface> ParseMaterialOpenGL(
     }
     for (int i = 0; i < buffer_size; ++i)
     {
-        auto maybe_buffer_id =
-            level.GetIdFromName(proto_material.buffer_names(i));
-        if (!maybe_buffer_id)
-            return nullptr;
-        EntityId buffer_id = maybe_buffer_id;
-        material->AddBufferId(buffer_id, proto_material.inner_buffer_names(i));
+        material->AddBufferName(
+            proto_material.buffer_names(i),
+            proto_material.inner_buffer_names(i));
     }
     return material;
 }

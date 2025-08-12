@@ -211,11 +211,15 @@ void Renderer::RenderMesh(
         program.AddUniform(std::move(uniform_interface));
     }
     int j = 0;
-    for (const auto& id : material.GetBufferIds())
+    for (const auto& name : material.GetBufferNames())
     {
-        auto& buffer =
-            dynamic_cast<opengl::Buffer&>(level_.GetBufferFromId(id));
-        auto inner_name = material.GetInnerBufferName(id);
+        auto id = level_.GetIdFromName(name);
+        if (id == NullId)
+        {
+            throw std::runtime_error("Could not find buffer: " + name);
+        }
+        auto& buffer = dynamic_cast<opengl::Buffer&>(level_.GetBufferFromId(id));
+        auto inner_name = material.GetInnerBufferName(name);
         dynamic_cast<opengl::Program&>(program).AddBuffer(id, inner_name, j++);
     }
 
