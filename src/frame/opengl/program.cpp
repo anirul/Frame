@@ -141,6 +141,12 @@ void Program::AddUniformInternal(
         uniform_map_.emplace(name, std::move(uniform_interface));
     }
     auto* uniform_ptr = uniform_map_[name].get();
+    if (uniform_ptr->GetData().has_uniform_enum())
+    {
+        // This will be processed by the renderer so no need to do anything
+        // here.
+        return;
+    }
     switch (uniform_ptr->GetData().type())
     {
     case proto::Uniform::INVALID_TYPE:

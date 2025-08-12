@@ -29,6 +29,9 @@ message Uniform {
 		MODEL_MAT4 = 5;
 		MODEL_INV_MAT4 = 6;
 		FLOAT_TIME_S = 7;
+		LIGHT_POSITION_VEC3 = 8;
+		LIGHT_COLOR_VEC3 = 9;
+		CAMERA_POSITION_VEC3 = 10;
 	}
 	// Name of the uniform (should be the same as declared in the shader!).
 	string name = 1;

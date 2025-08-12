@@ -130,6 +130,17 @@ void Renderer::RenderMesh(
     // In case the camera doesn't exist it will create a basic one.
     UniformCollectionWrapper uniform_collection_wrapper(
         projection, view, model, delta_time_);
+    if (level_.GetLights().size() > 0)
+    {
+        auto& light = level_.GetLightFromId(level_.GetLights()[0]);
+        uniform_collection_wrapper.AddUniform(
+            std::make_unique<Uniform>("light_pos", light.GetVector()));
+        uniform_collection_wrapper.AddUniform(
+            std::make_unique<Uniform>("light_color", light.GetColorIntensity()));
+    }
+    auto& camera = level_.GetCameraFromId(level_.GetDefaultCameraId());
+    uniform_collection_wrapper.AddUniform(
+        std::make_unique<Uniform>("camera_pos", camera.GetPosition()));
     if (render_time_ == proto::NodeStaticMesh::SCENE_RENDER_TIME)
     {
         std::unique_ptr<UniformInterface> env_map_uniform =

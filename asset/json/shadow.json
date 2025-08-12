@@ -138,6 +138,18 @@
                 {
                     "name": "model",
                     "uniform_enum": "MODEL_MAT4"
+                },
+                {
+                    "name": "light_pos",
+                    "uniform_enum": "LIGHT_POSITION_VEC3"
+                },
+                {
+                    "name": "light_color",
+                    "uniform_enum": "LIGHT_COLOR_VEC3"
+                },
+                {
+                    "name": "camera_pos",
+                    "uniform_enum": "CAMERA_POSITION_VEC3"
                 }
             ]
         }
@@ -149,16 +161,15 @@
             {
                 "name": "root",
                 "matrix": {
-                    "m11": 1.0,
-                    "m22": 1.0,
-                    "m33": 1.0,
-                    "m44": 1.0
+                    "m11": 1,
+                    "m22": 1,
+                    "m33": 1,
+                    "m44": 1
                 }
             },
             {
                 "name": "mesh_holder",
                 "parent": "root",
-                "matrix_type_enum": "STATIC_MATRIX",
                 "quaternion": {
                     "x": 0.0,
                     "y": 0.1979232,
@@ -167,7 +178,7 @@
                 }
             },
             {
-                "name": "camera_holder",
+                "name": "env_holder",
                 "parent": "root",
                 "quaternion": {
                     "x": 0,
@@ -180,7 +191,7 @@
         "node_static_meshes": [
             {
                 "name": "CubeMapMesh",
-                "parent": "root",
+                "parent": "env_holder",
                 "material_name": "CubeMapMaterial",
                 "mesh_enum": "CUBE"
             },
@@ -194,7 +205,7 @@
         "node_cameras": [
             {
                 "name": "camera",
-                "parent": "camera_holder",
+                "parent": "root",
                 "fov_degrees": 65.0,
                 "near_clip": 0.01,
                 "far_clip": 1000.0,
