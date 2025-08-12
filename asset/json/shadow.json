@@ -96,7 +96,7 @@
             },
             "shader_vertex": "cubemap.vert",
             "shader_fragment": "cubemap.frag",
-            "parameters": [
+            "uniforms": [
                 {
                     "name": "projection",
                     "uniform_enum": "PROJECTION_MAT4"
@@ -126,7 +126,7 @@
             "input_scene_root_name": "root",
             "shader_vertex": "apple_shadow.vert",
             "shader_fragment": "apple_shadow.frag",
-            "parameters": [
+            "uniforms": [
                 {
                     "name": "projection",
                     "uniform_enum": "PROJECTION_MAT4"
@@ -145,7 +145,7 @@
     "scene_tree": {
         "default_camera_name": "camera",
         "default_root_name": "root",
-        "scene_matrices": [
+        "node_matrices": [
             {
                 "name": "root",
                 "matrix": {
@@ -176,7 +176,7 @@
                 }
             }
         ],
-        "scene_static_meshes": [
+        "node_static_meshes": [
             {
                 "name": "CubeMapMesh",
                 "parent": "root",
@@ -190,7 +190,7 @@
                 "material_name": "AppleMaterial"
             }
         ],
-        "scene_cameras": [
+        "node_cameras": [
             {
                 "name": "camera",
                 "parent": "camera_holder",
@@ -214,7 +214,7 @@
                 }
             }
         ],
-        "scene_lights": [
+        "node_lights": [
             {
                 "name": "sun",
                 "parent": "root",
