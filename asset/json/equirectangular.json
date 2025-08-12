@@ -103,7 +103,9 @@
             "texture_names": [
                 "InputTexture"
             ],
-            "inner_names": "Equirectangular"
+            "inner_names": [
+                "Equirectangular"
+            ]
         }
     ]
 }
