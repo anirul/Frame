@@ -84,6 +84,12 @@ std::unique_ptr<LevelInterface> LevelProto(
         }
     }
 
+    // Load scenes from proto.
+    if (!ParseSceneTreeFile(proto_level.scene_tree(), *level.get()))
+    {
+        throw std::runtime_error("Could not parse proto scene file.");
+    }
+
     // Load material from proto.
     for (const auto& proto_material : proto_level.materials())
     {
@@ -98,12 +104,6 @@ std::unique_ptr<LevelInterface> LevelProto(
             throw std::runtime_error(std::format(
                 "Couldn't save material {} to level.", proto_material.name()));
         }
-    }
-
-    // Load scenes from proto.
-    if (!ParseSceneTreeFile(proto_level.scene_tree(), *level.get()))
-    {
-        throw std::runtime_error("Could not parse proto scene file.");
     }
     level->SetDefaultCameraName(proto_level.scene_tree().default_camera_name());
     return level;
