@@ -1,6 +1,8 @@
 #pragma once
 
+#include <cstdint>
 #include <memory>
+#include <set>
 
 #include "frame/entity_id.h"
 #include "frame/json/proto.h"

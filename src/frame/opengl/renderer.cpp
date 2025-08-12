@@ -1,10 +1,9 @@
 #include "renderer.h"
 
 #include <GL/glew.h>
+#include <cassert>
 #include <format>
 #include <glm/gtc/type_ptr.hpp>
-
-#include <format>
 #include <stdexcept>
 
 #include "frame/json/parse_uniform.h"
