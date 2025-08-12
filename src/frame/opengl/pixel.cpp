@@ -138,6 +138,8 @@ GLenum ConvertToGLType(
             [[fallthrough]];
         case frame::proto::PixelStructure::BGR_ALPHA:
             return GL_RGBA32F;
+        case frame::proto::PixelStructure::DEPTH:
+            return GL_DEPTH_COMPONENT32F;
         default:
             throw std::runtime_error(
                 "unknown structure : " +
