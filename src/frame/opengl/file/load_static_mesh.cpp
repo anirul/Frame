@@ -346,12 +346,31 @@ std::vector<EntityId> LoadStaticMeshesFromObjFile(
             material_ids.push_back(maybe_id);
         }
     }
+    else
+    {
+        for (const auto& material : obj.GetMaterials())
+        {
+            auto maybe_id = LoadMaterialFromObj(level, material);
+            if (maybe_id)
+            {
+                material_ids.push_back(maybe_id);
+            }
+        }
+    }
     logger->info("Found in obj<{}> : {} meshes.", file.string(), meshes.size());
     int mesh_counter = 0;
     for (const auto& mesh : meshes)
     {
-        auto [static_mesh_id, material_id] = LoadStaticMeshFromObj(
-            level, mesh, name, material_ids, mesh_counter);
+        EntityId material_id{};
+        if (!material_ids.empty())
+        {
+            if (mesh.GetMaterialId() < material_ids.size())
+            {
+                material_id = material_ids[mesh.GetMaterialId()];
+            }
+        }
+        auto [static_mesh_id, returned_material_id] = LoadStaticMeshFromObj(
+            level, mesh, name, {material_id}, mesh_counter);
         if (!static_mesh_id)
             return {};
         auto func = [&level](const std::string& name) -> NodeInterface* {
@@ -370,7 +389,7 @@ std::vector<EntityId> LoadStaticMeshesFromObjFile(
         {
             return {};
         }
-        level.AddMeshMaterialId(maybe_id, material_id);
+        level.AddMeshMaterialId(maybe_id, returned_material_id);
         entity_id_vec.push_back(maybe_id);
         mesh_counter++;
     }
