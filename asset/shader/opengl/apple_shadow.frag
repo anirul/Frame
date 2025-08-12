@@ -63,19 +63,10 @@ void main() {
 
     // 2. Compute shadow
     float shadow = 0.0;
-    vec3 ray_origin = out_world_position + normal * 0.001;
-    float t;
-    for (int i = 0; i < triangles.length(); ++i)
-    {
-        if (rayTriangleIntersect(ray_origin, light_direction, triangles[i], t))
-        {
-            shadow = 1.0;
-            break;
-        }
-    }
 
     // 3. Combine
-    vec3 color = vec3(diff) * (1.0 - shadow) * light_color;
+    vec3 texture_color = texture(apple_texture, out_uv).rgb;
+    vec3 color = vec3(diff) * (1.0 - shadow) * light_color * texture_color;
 
     // For demonstration, let's just output that as final.
     frag_color = vec4(color, 1.0);
