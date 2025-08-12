@@ -444,4 +444,11 @@ std::string Level::GetNameFromNodeInterface(const NodeInterface& node) const
     }
 }
 
+CameraInterface& Level::GetCameraFromId(EntityId id) const
+{
+    auto& node = GetSceneNodeFromId(id);
+    auto& camera_node = dynamic_cast<NodeCamera&>(node);
+    return camera_node.GetCamera();
+}
+
 } // End namespace frame.

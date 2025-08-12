@@ -73,6 +73,12 @@ class LevelInterface : public NameInterface
      */
     virtual LightInterface& GetLightFromId(EntityId id) const = 0;
     /**
+     * @brief Get a camera from an id.
+     * @param id: The id to get the camera from.
+     * @return A reference to a camera.
+     */
+    virtual CameraInterface& GetCameraFromId(EntityId id) const = 0;
+    /**
      * @brief Get a vector of static mesh id and corresponding material id.
      * @return Vector of static mesh id and corresponding material id.
      */

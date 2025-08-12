@@ -107,6 +107,12 @@ class Level : public LevelInterface
         return *id_light_map_.at(id).get();
     }
     /**
+     * @brief Get a camera from an id.
+     * @param id: The id to get the camera from.
+     * @return A reference to a camera.
+     */
+    CameraInterface& GetCameraFromId(EntityId id) const override;
+    /**
      * @brief Get a vector of static mesh id and corresponding material id.
      * @return Vector of static mesh id and corresponding material id and
      * RenderTimeEnum.
