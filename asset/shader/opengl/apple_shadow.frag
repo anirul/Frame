@@ -58,11 +58,21 @@ bool rayTriangleIntersect(
 void main() {
     // 1. Basic lighting (Lambert / Blinn-Phong, etc.)
     vec3 normal = normalize(out_normal);
-    vec3 light_direction = normalize(light_pos - out_world_position);
+    vec3 light_direction = normalize(-light_pos);
     float diff = max(dot(normal, light_direction), 0.0);
 
     // 2. Compute shadow
     float shadow = 0.0;
+    vec3 ray_origin = out_world_position + normal * 0.001;
+    float t;
+    for (int i = 0; i < triangles.length(); ++i)
+    {
+        if (rayTriangleIntersect(ray_origin, light_direction, triangles[i], t))
+        {
+            shadow = 1.0;
+            break;
+        }
+    }
 
     // 3. Combine
     vec3 texture_color = texture(apple_texture, out_uv).rgb;

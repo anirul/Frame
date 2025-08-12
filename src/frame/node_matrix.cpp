@@ -121,7 +121,7 @@ glm::mat4 NodeMatrix::ComputeLocalRotation(const double dt) const
         rotation.x / normal, rotation.y / normal, rotation.z / normal);
     // Reconvert from angle / axis to quaternion.
     glm::quat present_rotation = glm::angleAxis(
-        angle_rad, glm::normalize(axis));
+        angle_rad * static_cast<float>(dt), glm::normalize(axis));
     glm::mat4 result_matrix = glm::toMat4(present_rotation);
     return result_matrix;
 }

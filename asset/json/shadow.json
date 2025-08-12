@@ -158,6 +158,7 @@
             {
                 "name": "mesh_holder",
                 "parent": "root",
+                "matrix_type_enum": "STATIC_MATRIX",
                 "quaternion": {
                     "x": 0.0,
                     "y": 0.1979232,
