@@ -58,7 +58,7 @@ bool rayTriangleIntersect(
 void main() {
     // 1. Basic lighting (Lambert / Blinn-Phong, etc.)
     vec3 normal = normalize(out_normal);
-    vec3 light_direction = normalize(-light_pos);
+    vec3 light_direction = normalize(light_pos);
     float diff = max(dot(normal, light_direction), 0.0);
 
     // 2. Compute shadow
