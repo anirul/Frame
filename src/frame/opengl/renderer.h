@@ -72,15 +72,9 @@ class Renderer : public RendererInterface
      */
     void SetDepthTest(bool enable) override;
     /**
-     * @brief Render the shadows.
-     * @param camera: The camera to be used for rendering.
+     * @brief Execute pre-render tasks.
      */
     void PreRender() override;
-    /**
-     * @brief Render the shadows.
-     * @param camera: The camera to be used for rendering.
-     */
-    void RenderShadows(const CameraInterface& camera) override;
     /**
      * @brief Render the skybox.
      * @param camera: The camera to be used for rendering.
