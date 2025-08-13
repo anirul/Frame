@@ -8,6 +8,7 @@ uniform sampler2D apple_texture;
 // Direction from the light toward the scene.
 uniform vec3 light_dir;
 uniform vec3 light_color;
+uniform mat4 model;
 
 out vec4 frag_color;
 
@@ -58,13 +59,16 @@ bool rayTriangleIntersect(
 void main() {
     // 1. Basic lighting (Lambert / Blinn-Phong, etc.)
     vec3 normal = normalize(out_normal);
-    // Light direction points from the fragment toward the light source.
-    vec3 light_direction = normalize(-light_dir);
-    float diff = max(dot(normal, light_direction), 0.0);
+    // Light direction points from the fragment toward the light source (world space).
+    vec3 light_direction_world = normalize(-light_dir);
+    float diff = max(dot(normal, light_direction_world), 0.0);
 
     // 2. Compute shadow
     float shadow = 0.0;
-    vec3 ray_origin = out_world_position + normal * 0.001;
+    vec3 ray_origin_world = out_world_position + normal * 0.001;
+    mat4 inv_model = inverse(model);
+    vec3 ray_origin = vec3(inv_model * vec4(ray_origin_world, 1.0));
+    vec3 light_direction = normalize(mat3(inv_model) * light_direction_world);
     float t;
     for (int i = 0; i < triangles.length(); ++i)
     {
