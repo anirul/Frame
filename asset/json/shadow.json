@@ -146,10 +146,6 @@
                 {
                     "name": "light_color",
                     "uniform_enum": "LIGHT_COLOR_VEC3"
-                },
-                {
-                    "name": "camera_pos",
-                    "uniform_enum": "CAMERA_POSITION_VEC3"
                 }
             ]
         }

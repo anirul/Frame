@@ -7,7 +7,6 @@ in vec2 out_uv;
 uniform sampler2D apple_texture;
 uniform vec3 light_pos;
 uniform vec3 light_color;
-uniform vec3 camera_pos;
 
 out vec4 frag_color;
 
@@ -58,7 +57,7 @@ bool rayTriangleIntersect(
 void main() {
     // 1. Basic lighting (Lambert / Blinn-Phong, etc.)
     vec3 normal = normalize(out_normal);
-    vec3 light_direction = normalize(light_pos);
+    vec3 light_direction = normalize(light_pos - out_world_position);
     float diff = max(dot(normal, light_direction), 0.0);
 
     // 2. Compute shadow
