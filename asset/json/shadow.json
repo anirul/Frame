@@ -71,8 +71,8 @@
                 "zbuffer"
             ],
             "inner_names": [
-                "AppleTexture",
-                "Zbuffer"
+                "apple_texture",
+                "zbuffer"
             ],
             "buffer_names": [
                 "AppleMesh.0.triangle"
@@ -115,7 +115,7 @@
             "name": "AppleProgram",
             "input_texture_names": [
                 "apple_texture",
-                "skybox"
+                "zbuffer"
             ],
             "output_texture_names": [
                 "albedo"

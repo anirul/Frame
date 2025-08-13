@@ -121,7 +121,11 @@ EntityId Level::AddSceneNode(std::unique_ptr<NodeInterface>&& scene_node)
     {
         throw std::runtime_error("Name: " + name + " is already in!");
     }
-    string_set_.insert(name);
+    bool is_light_node = dynamic_cast<NodeLight*>(scene_node.get()) != nullptr;
+    if (!is_light_node)
+    {
+        string_set_.insert(name);
+    }
     id_scene_node_map_.insert({id, std::move(scene_node)});
     id_name_map_.insert({id, name});
     name_id_map_.insert({name, id});
@@ -259,6 +263,7 @@ EntityId Level::AddLight(std::unique_ptr<LightInterface>&& light)
     {
         throw std::runtime_error("Name: " + name + " is already in!");
     }
+    string_set_.insert(name);
     id_light_map_.insert({id, std::move(light)});
     id_name_map_.insert({id, name});
     name_id_map_.insert({name, id});
