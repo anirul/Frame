@@ -319,25 +319,25 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
         EntityId node_id = NullId;
         if (proto_scene_light.shadow_type() == proto::NodeLight::NO_SHADOW)
         {
-            std::unique_ptr<NodeInterface> node_light =
-                std::make_unique<frame::NodeLight>(
-                    GetFunctor(level),
-                    LightTypeEnum::POINT_LIGHT,
-                    ParseUniform(proto_scene_light.position()),
-                    ParseUniform(proto_scene_light.color()));
+            auto node_light = std::make_unique<frame::NodeLight>(
+                GetFunctor(level),
+                LightTypeEnum::POINT_LIGHT,
+                ParseUniform(proto_scene_light.position()),
+                ParseUniform(proto_scene_light.color()));
+            node_light->GetData().set_name(proto_scene_light.name());
             node_id = level.AddSceneNode(std::move(node_light));
         }
         else
         {
-            std::unique_ptr<NodeInterface> node_light =
-                std::make_unique<frame::NodeLight>(
-                    GetFunctor(level),
-                    LightTypeEnum::POINT_LIGHT,
-                    static_cast<ShadowTypeEnum>(
-                        proto_scene_light.shadow_type()),
-                    proto_scene_light.shadow_texture(),
-                    ParseUniform(proto_scene_light.position()),
-                    ParseUniform(proto_scene_light.color()));
+            auto node_light = std::make_unique<frame::NodeLight>(
+                GetFunctor(level),
+                LightTypeEnum::POINT_LIGHT,
+                static_cast<ShadowTypeEnum>(
+                    proto_scene_light.shadow_type()),
+                proto_scene_light.shadow_texture(),
+                ParseUniform(proto_scene_light.position()),
+                ParseUniform(proto_scene_light.color()));
+            node_light->GetData().set_name(proto_scene_light.name());
             node_id = level.AddSceneNode(std::move(node_light));
         }
         return static_cast<bool>(node_id);
@@ -346,25 +346,25 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
         EntityId node_id = NullId;
         if (proto_scene_light.shadow_type() == proto::NodeLight::NO_SHADOW)
         {
-            std::unique_ptr<NodeInterface> node_light =
-                std::make_unique<frame::NodeLight>(
-                    GetFunctor(level),
-                    LightTypeEnum::DIRECTIONAL_LIGHT,
-                    ParseUniform(proto_scene_light.position()),
-                    ParseUniform(proto_scene_light.color()));
+            auto node_light = std::make_unique<frame::NodeLight>(
+                GetFunctor(level),
+                LightTypeEnum::DIRECTIONAL_LIGHT,
+                ParseUniform(proto_scene_light.position()),
+                ParseUniform(proto_scene_light.color()));
+            node_light->GetData().set_name(proto_scene_light.name());
             node_id = level.AddSceneNode(std::move(node_light));
         }
         else
         {
-            std::unique_ptr<NodeInterface> node_light =
-                std::make_unique<frame::NodeLight>(
-                    GetFunctor(level),
-                    LightTypeEnum::DIRECTIONAL_LIGHT,
-                    static_cast<ShadowTypeEnum>(
-                        proto_scene_light.shadow_type()),
-                    proto_scene_light.shadow_texture(),
-                    ParseUniform(proto_scene_light.position()),
-                    ParseUniform(proto_scene_light.color()));
+            auto node_light = std::make_unique<frame::NodeLight>(
+                GetFunctor(level),
+                LightTypeEnum::DIRECTIONAL_LIGHT,
+                static_cast<ShadowTypeEnum>(
+                    proto_scene_light.shadow_type()),
+                proto_scene_light.shadow_texture(),
+                ParseUniform(proto_scene_light.position()),
+                ParseUniform(proto_scene_light.color()));
+            node_light->GetData().set_name(proto_scene_light.name());
             node_id = level.AddSceneNode(std::move(node_light));
         }
         return static_cast<bool>(node_id);
