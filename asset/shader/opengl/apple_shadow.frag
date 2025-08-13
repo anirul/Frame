@@ -5,7 +5,8 @@ in vec3 out_world_position;
 in vec2 out_uv;
 
 uniform sampler2D apple_texture;
-uniform vec3 light_pos;
+// Direction from the light toward the scene.
+uniform vec3 light_dir;
 uniform vec3 light_color;
 
 out vec4 frag_color;
@@ -57,7 +58,8 @@ bool rayTriangleIntersect(
 void main() {
     // 1. Basic lighting (Lambert / Blinn-Phong, etc.)
     vec3 normal = normalize(out_normal);
-    vec3 light_direction = normalize(light_pos - out_world_position);
+    // Light direction points from the fragment toward the light source.
+    vec3 light_direction = normalize(-light_dir);
     float diff = max(dot(normal, light_direction), 0.0);
 
     // 2. Compute shadow

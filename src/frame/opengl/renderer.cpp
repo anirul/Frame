@@ -134,13 +134,10 @@ void Renderer::RenderMesh(
     {
         auto& light = level_.GetLightFromId(level_.GetLights()[0]);
         uniform_collection_wrapper.AddUniform(
-            std::make_unique<Uniform>("light_pos", light.GetVector()));
+            std::make_unique<Uniform>("light_dir", light.GetVector()));
         uniform_collection_wrapper.AddUniform(
             std::make_unique<Uniform>("light_color", light.GetColorIntensity()));
     }
-    auto& camera = level_.GetCameraFromId(level_.GetDefaultCameraId());
-    uniform_collection_wrapper.AddUniform(
-        std::make_unique<Uniform>("camera_pos", camera.GetPosition()));
     if (render_time_ == proto::NodeStaticMesh::SCENE_RENDER_TIME)
     {
         std::unique_ptr<UniformInterface> env_map_uniform =

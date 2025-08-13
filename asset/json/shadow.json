@@ -140,7 +140,7 @@
                     "uniform_enum": "MODEL_MAT4"
                 },
                 {
-                    "name": "light_pos",
+                    "name": "light_dir",
                     "uniform_enum": "LIGHT_POSITION_VEC3"
                 },
                 {
