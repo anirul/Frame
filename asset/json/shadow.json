@@ -27,19 +27,6 @@
             "file_name": "asset/cubemap/shiodome.hdr"
         },
         {
-            "name": "shadow_map",
-            "size": {
-                "x": 1024,
-                "y": 1024
-            },
-            "pixel_element_size": {
-                "value": "FLOAT"
-            },
-            "pixel_structure": {
-                "value": "DEPTH"
-            }
-        },
-        {
             "name": "apple_texture",
             "cubemap": false,
             "pixel_element_size": {
@@ -81,13 +68,17 @@
             "program_name": "AppleProgram",
             "texture_names": [
                 "apple_texture",
-                "zbuffer",
-                "shadow"
+                "zbuffer"
             ],
             "inner_names": [
-                "AppleTexture",
-                "Zbuffer",
-                "Shadow "
+                "apple_texture",
+                "zbuffer"
+            ],
+            "buffer_names": [
+                "AppleMesh.0.triangle"
+            ],
+            "inner_buffer_names": [
+                "TriangleBuffer"
             ]
         }
     ],
@@ -105,7 +96,7 @@
             },
             "shader_vertex": "cubemap.vert",
             "shader_fragment": "cubemap.frag",
-            "parameters": [
+            "uniforms": [
                 {
                     "name": "projection",
                     "uniform_enum": "PROJECTION_MAT4"
@@ -121,24 +112,10 @@
             ]
         },
         {
-            "name": "ShadowProgram",
-            "input_texture_names": [],
-            "output_texture_names": [
-                "shadow_map"
-            ],
-            "input_scene_type": {
-                "value": "SCENE"
-            },
-            "input_scene_root_name": "root",
-            "shader_vertex": "shadow.vert",
-            "shader_fragment": "shadow.frag"
-        },
-        {
             "name": "AppleProgram",
             "input_texture_names": [
                 "apple_texture",
-                "skybox",
-                "shadow_map"
+                "zbuffer"
             ],
             "output_texture_names": [
                 "albedo"
@@ -149,7 +126,7 @@
             "input_scene_root_name": "root",
             "shader_vertex": "apple_shadow.vert",
             "shader_fragment": "apple_shadow.frag",
-            "parameters": [
+            "uniforms": [
                 {
                     "name": "projection",
                     "uniform_enum": "PROJECTION_MAT4"
@@ -163,35 +140,12 @@
                     "uniform_enum": "MODEL_MAT4"
                 },
                 {
-                    "name": "light_projection_view",
-                    "uniform_vec4s": {
-                        "values": [
-                            {
-                                "x": 1.0,
-                                "y": 0.0,
-                                "z": 0.0,
-                                "w": 0.0
-                            },
-                            {
-                                "x": 0.0,
-                                "y": 1.0,
-                                "z": 0.0,
-                                "w": 0.0
-                            },
-                            {
-                                "x": 0.0,
-                                "y": 0.0,
-                                "z": 1.0,
-                                "w": 0.0
-                            },
-                            {
-                                "x": 0.0,
-                                "y": 0.0,
-                                "z": 0.0,
-                                "w": 1.0
-                            }
-                        ]
-                    }
+                    "name": "light_dir",
+                    "uniform_enum": "LIGHT_POSITION_VEC3"
+                },
+                {
+                    "name": "light_color",
+                    "uniform_enum": "LIGHT_COLOR_VEC3"
                 }
             ]
         }
@@ -199,14 +153,14 @@
     "scene_tree": {
         "default_camera_name": "camera",
         "default_root_name": "root",
-        "scene_matrices": [
+        "node_matrices": [
             {
                 "name": "root",
                 "matrix": {
-                    "m11": 1.0,
-                    "m22": 1.0,
-                    "m33": 1.0,
-                    "m44": 1.0
+                    "m11": 1,
+                    "m22": 1,
+                    "m33": 1,
+                    "m44": 1
                 }
             },
             {
@@ -220,7 +174,7 @@
                 }
             },
             {
-                "name": "camera_holder",
+                "name": "env_holder",
                 "parent": "root",
                 "quaternion": {
                     "x": 0,
@@ -230,10 +184,10 @@
                 }
             }
         ],
-        "scene_static_meshes": [
+        "node_static_meshes": [
             {
                 "name": "CubeMapMesh",
-                "parent": "root",
+                "parent": "env_holder",
                 "material_name": "CubeMapMaterial",
                 "mesh_enum": "CUBE"
             },
@@ -244,10 +198,10 @@
                 "material_name": "AppleMaterial"
             }
         ],
-        "scene_cameras": [
+        "node_cameras": [
             {
                 "name": "camera",
-                "parent": "camera_holder",
+                "parent": "root",
                 "fov_degrees": 65.0,
                 "near_clip": 0.01,
                 "far_clip": 1000.0,
@@ -268,13 +222,12 @@
                 }
             }
         ],
-        "scene_lights": [
+        "node_lights": [
             {
                 "name": "sun",
                 "parent": "root",
                 "light_type": "DIRECTIONAL_LIGHT",
                 "shadow_type": "SOFT_SHADOW",
-                "shadow_texture": "shadow_map",
                 "position": {
                     "x": -1.0,
                     "y": 1.0,

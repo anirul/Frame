@@ -123,4 +123,25 @@ void Material::SetProgramId(EntityId id)
     program_id_ = id;
 }
 
+std::string Material::GetInnerBufferName(const std::string& name) const
+{
+    return name_buffer_name_map_.at(name);
+}
+
+bool Material::AddBufferName(
+    const std::string& name, const std::string& inner_name)
+{
+    return name_buffer_name_map_.insert({name, inner_name}).second;
+}
+
+std::vector<std::string> Material::GetBufferNames() const
+{
+    std::vector<std::string> vec;
+    for (const auto& p : name_buffer_name_map_)
+    {
+        vec.push_back(p.first);
+    }
+    return vec;
+}
+
 } // End namespace frame::opengl.

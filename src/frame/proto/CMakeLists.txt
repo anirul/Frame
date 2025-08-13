@@ -46,4 +46,26 @@ foreach(HEADERN ${HEADERS_TO_BE_COPIED})
   )
 endforeach(HEADERN)
 
+set(PROTO_FILES
+    level
+    material
+    math
+    pixel
+    plugin
+    program
+    scene
+    size
+    texture
+    uniform
+)
+
+add_custom_target(
+    clean_proto
+    COMMAND ${CMAKE_COMMAND} -E remove
+    foreach(PROTO_FILE ${PROTO_FILES})
+        ${CMAKE_CURRENT_BINARY_DIR}/${PROTO_FILE}.pb.h
+        ${CMAKE_CURRENT_BINARY_DIR}/${PROTO_FILE}.pb.cc
+    endforeach()
+)
+
 set_property(TARGET FrameProto PROPERTY FOLDER "Frame")

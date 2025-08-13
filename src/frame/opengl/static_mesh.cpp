@@ -20,7 +20,8 @@ StaticMesh::StaticMesh(
       normal_buffer_size_(parameter.normal_buffer_size),
       texture_buffer_id_(parameter.texture_buffer_id),
       texture_buffer_size_(parameter.texture_buffer_size),
-      index_buffer_id_(parameter.index_buffer_id)
+      index_buffer_id_(parameter.index_buffer_id),
+      triangle_buffer_id_(parameter.triangle_buffer_id)
 {
     data_.set_shadow_effect_enum(parameter.shadow_effect_enum);
     data_.set_render_primitive_enum(parameter.render_primitive_enum);
@@ -245,6 +246,10 @@ StaticMesh::~StaticMesh()
     if (index_buffer_id_)
     {
         level_.RemoveBuffer(index_buffer_id_);
+    }
+    if (triangle_buffer_id_)
+    {
+        level_.RemoveBuffer(triangle_buffer_id_);
     }
 }
 

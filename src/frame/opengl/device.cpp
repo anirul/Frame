@@ -160,7 +160,6 @@ void Device::DisplayCamera(
     renderer_->SetDeltaTime(time);
     renderer_->PreRender();
     renderer_->SetViewport(viewport);
-    renderer_->RenderShadows(camera);
     renderer_->RenderSkybox(camera);
     renderer_->RenderScene(camera);
     renderer_->PostProcess();
@@ -180,7 +179,6 @@ void Device::DisplayLeftRightCamera(
     renderer_->SetDeltaTime(time);
     renderer_->PreRender();
     renderer_->SetViewport(viewport_left);
-    renderer_->RenderShadows(camera_left);
     renderer_->RenderSkybox(camera_left);
     if (invert_left_right_)
     {

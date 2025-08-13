@@ -173,11 +173,42 @@ std::pair<EntityId, EntityId> LoadStaticMeshFromObj(
     if (!maybe_index_buffer_id)
         return {NullId, NullId};
     EntityId index_buffer_id = maybe_index_buffer_id.value();
+
+    // Triangle buffer generation (SSBO).
+    std::vector<float> triangles;
+    for (int i = 0; i < indices.size(); i += 3)
+    {
+        int i0 = indices[i];
+        int i1 = indices[i + 1];
+        int i2 = indices[i + 2];
+        triangles.push_back(points[i0 * 3]);
+        triangles.push_back(points[i0 * 3 + 1]);
+        triangles.push_back(points[i0 * 3 + 2]);
+        triangles.push_back(0.0f); // Padding
+        triangles.push_back(points[i1 * 3]);
+        triangles.push_back(points[i1 * 3 + 1]);
+        triangles.push_back(points[i1 * 3 + 2]);
+        triangles.push_back(0.0f); // Padding
+        triangles.push_back(points[i2 * 3]);
+        triangles.push_back(points[i2 * 3 + 1]);
+        triangles.push_back(points[i2 * 3 + 2]);
+        triangles.push_back(0.0f); // Padding
+    }
+    auto maybe_triangle_buffer_id = CreateBufferInLevel(
+        level,
+        triangles,
+        std::format("{}.{}.triangle", name, counter),
+        opengl::BufferTypeEnum::SHADER_STORAGE_BUFFER);
+    if (!maybe_triangle_buffer_id)
+        return {NullId, NullId};
+    EntityId triangle_buffer_id = maybe_triangle_buffer_id.value();
+
     StaticMeshParameter parameter = {};
     parameter.point_buffer_id = point_buffer_id;
     parameter.normal_buffer_id = normal_buffer_id;
     parameter.texture_buffer_id = tex_coord_buffer_id;
     parameter.index_buffer_id = index_buffer_id;
+    parameter.triangle_buffer_id = triangle_buffer_id;
     auto static_mesh = std::make_unique<opengl::StaticMesh>(level, parameter);
     auto material_id = NullId;
     if (!material_ids.empty())
@@ -315,12 +346,31 @@ std::vector<EntityId> LoadStaticMeshesFromObjFile(
             material_ids.push_back(maybe_id);
         }
     }
+    else
+    {
+        for (const auto& material : obj.GetMaterials())
+        {
+            auto maybe_id = LoadMaterialFromObj(level, material);
+            if (maybe_id)
+            {
+                material_ids.push_back(*maybe_id);
+            }
+        }
+    }
     logger->info("Found in obj<{}> : {} meshes.", file.string(), meshes.size());
     int mesh_counter = 0;
     for (const auto& mesh : meshes)
     {
-        auto [static_mesh_id, material_id] = LoadStaticMeshFromObj(
-            level, mesh, name, material_ids, mesh_counter);
+        EntityId material_id{};
+        if (!material_ids.empty())
+        {
+            if (mesh.GetMaterialId() < material_ids.size())
+            {
+                material_id = material_ids[mesh.GetMaterialId()];
+            }
+        }
+        auto [static_mesh_id, returned_material_id] = LoadStaticMeshFromObj(
+            level, mesh, name, {material_id}, mesh_counter);
         if (!static_mesh_id)
             return {};
         auto func = [&level](const std::string& name) -> NodeInterface* {
@@ -339,7 +389,7 @@ std::vector<EntityId> LoadStaticMeshesFromObjFile(
         {
             return {};
         }
-        level.AddMeshMaterialId(maybe_id, material_id);
+        level.AddMeshMaterialId(maybe_id, returned_material_id);
         entity_id_vec.push_back(maybe_id);
         mesh_counter++;
     }

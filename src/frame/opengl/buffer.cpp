@@ -33,6 +33,12 @@ void Buffer::UnBind() const
     glBindBuffer(static_cast<GLenum>(buffer_type_), 0);
 }
 
+void Buffer::BindBase(int binding) const
+{
+    glBindBufferBase(
+        static_cast<GLenum>(buffer_type_), binding, buffer_object_);
+}
+
 void Buffer::Copy(const std::size_t size, const void* data /*= nullptr*/) const
 {
     Bind();

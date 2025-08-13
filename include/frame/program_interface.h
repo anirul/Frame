@@ -14,6 +14,8 @@
 namespace frame
 {
 
+class LevelInterface;
+
 /**
  * @class Program
  * @brief This is containing the program and all associated functions.
@@ -83,7 +85,8 @@ struct ProgramInterface : public Serialize<proto::Program>
      * could be needed.
      */
     virtual void Use(
-        const UniformCollectionInterface& uniform_collection_interface) = 0;
+        const UniformCollectionInterface& uniform_collection_interface,
+        const LevelInterface* level = nullptr) = 0;
     /**
      * @brief Use the program, a little bit like bind.
      */

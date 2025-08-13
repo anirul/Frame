@@ -41,14 +41,9 @@ struct RendererInterface
 	 */
     virtual void PreRender() = 0;
     /**
-     * @brief Render the shadows.
-     * @param camera: The camera to be used for rendering.
-	 */
-    virtual void RenderShadows(const CameraInterface& camera) = 0;
-    /**
      * @brief Render the skybox.
      * @param camera: The camera to be used for rendering.
-	 */
+         */
     virtual void RenderSkybox(const CameraInterface& camera) = 0;
     /**
      * @brief Render all meshes at a dt time.

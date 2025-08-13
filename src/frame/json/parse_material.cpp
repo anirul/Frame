@@ -46,6 +46,22 @@ std::unique_ptr<frame::MaterialInterface> ParseMaterialOpenGL(
         EntityId texture_id = maybe_texture_id;
         material->AddTextureId(texture_id, proto_material.inner_names(i));
     }
+    const std::size_t buffer_size = proto_material.buffer_names_size();
+    const std::size_t inner_buffer_size =
+        proto_material.inner_buffer_names_size();
+    if (buffer_size != inner_buffer_size)
+    {
+        throw std::runtime_error(std::format(
+            "Not the same size for buffer and inner names: {} != {}.",
+            buffer_size,
+            inner_buffer_size));
+    }
+    for (int i = 0; i < buffer_size; ++i)
+    {
+        material->AddBufferName(
+            proto_material.buffer_names(i),
+            proto_material.inner_buffer_names(i));
+    }
     return material;
 }
 

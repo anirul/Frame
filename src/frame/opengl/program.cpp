@@ -1,19 +1,24 @@
 #include "program.h"
 
+#include <GL/glew.h>
+#include <absl/strings/match.h>
+#include <absl/strings/string_view.h>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/glm.hpp>
+#include <algorithm>
+#include <cinttypes>
 #include <format>
 #include <memory>
 #include <regex>
 #include <stdexcept>
+#include <string>
 #include <string_view>
-
-#include <GL/glew.h>
-#include <absl/strings/match.h>
-#include <absl/strings/string_view.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include <vector>
 
 #include "frame/json/parse_uniform.h"
+#include "frame/level_interface.h"
 #include "frame/logger.h"
+#include "frame/opengl/buffer.h"
 #include "frame/uniform.h"
 
 namespace frame::opengl
@@ -68,7 +73,8 @@ void Program::Use() const
 }
 
 void Program::Use(
-    const UniformCollectionInterface& uniform_collection_interface)
+    const UniformCollectionInterface& uniform_collection_interface,
+    const LevelInterface* level)
 {
     glUseProgram(program_id_);
     is_used_ = true;
@@ -77,6 +83,15 @@ void Program::Use(
         if (HasUniform(name))
         {
             UploadUniform(uniform_collection_interface.GetUniform(name));
+        }
+    }
+    if (level)
+    {
+        for (const auto& [id, name_binding] : buffer_map_)
+        {
+            const auto& buffer =
+                dynamic_cast<const Buffer&>(level->GetBufferFromId(id));
+            buffer.BindBase(name_binding.second);
         }
     }
 }
@@ -126,6 +141,12 @@ void Program::AddUniformInternal(
         uniform_map_.emplace(name, std::move(uniform_interface));
     }
     auto* uniform_ptr = uniform_map_[name].get();
+    if (uniform_ptr->GetData().has_uniform_enum())
+    {
+        // This will be processed by the renderer so no need to do anything
+        // here.
+        return;
+    }
     switch (uniform_ptr->GetData().type())
     {
     case proto::Uniform::INVALID_TYPE:
@@ -595,6 +616,11 @@ std::unique_ptr<ProgramInterface> CreateProgram(
     logger->info("with pointer := {}", static_cast<void*>(program.get()));
 #endif // _DEBUG
     return program;
+}
+
+void Program::AddBuffer(EntityId id, const std::string& name, int binding)
+{
+    buffer_map_[id] = {name, binding};
 }
 
 } // End namespace frame::opengl.

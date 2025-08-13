@@ -1,10 +1,9 @@
 #include "renderer.h"
 
 #include <GL/glew.h>
+#include <cassert>
 #include <format>
 #include <glm/gtc/type_ptr.hpp>
-
-#include <format>
 #include <stdexcept>
 
 #include "frame/json/parse_uniform.h"
@@ -131,6 +130,14 @@ void Renderer::RenderMesh(
     // In case the camera doesn't exist it will create a basic one.
     UniformCollectionWrapper uniform_collection_wrapper(
         projection, view, model, delta_time_);
+    if (level_.GetLights().size() > 0)
+    {
+        auto& light = level_.GetLightFromId(level_.GetLights()[0]);
+        uniform_collection_wrapper.AddUniform(
+            std::make_unique<Uniform>("light_dir", light.GetVector()));
+        uniform_collection_wrapper.AddUniform(
+            std::make_unique<Uniform>("light_color", light.GetColorIntensity()));
+    }
     if (render_time_ == proto::NodeStaticMesh::SCENE_RENDER_TIME)
     {
         std::unique_ptr<UniformInterface> env_map_uniform =
@@ -139,7 +146,7 @@ void Renderer::RenderMesh(
     }
     // Go through the callback.
     callback_(uniform_collection_wrapper, static_mesh, material);
-    program.Use(uniform_collection_wrapper);
+    program.Use(uniform_collection_wrapper, &level_);
 
     auto texture_out_ids = program.GetOutputTextureIds();
     auto& texture_ref = level_.GetTextureFromId(*texture_out_ids.cbegin());
@@ -210,6 +217,18 @@ void Renderer::RenderMesh(
         std::unique_ptr<UniformInterface> uniform_interface =
             std::make_unique<Uniform>(p.first, p.second);
         program.AddUniform(std::move(uniform_interface));
+    }
+    int j = 0;
+    for (const auto& name : material.GetBufferNames())
+    {
+        auto id = level_.GetIdFromName(name);
+        if (id == NullId)
+        {
+            throw std::runtime_error("Could not find buffer: " + name);
+        }
+        auto& buffer = dynamic_cast<opengl::Buffer&>(level_.GetBufferFromId(id));
+        auto inner_name = material.GetInnerBufferName(name);
+        dynamic_cast<opengl::Program&>(program).AddBuffer(id, inner_name, j++);
     }
 
     auto& gl_static_mesh = dynamic_cast<StaticMesh&>(static_mesh);
@@ -296,7 +315,7 @@ void Renderer::PresentFinal()
     auto& quad = level_.GetStaticMeshFromId(maybe_quad_id);
     auto& program = level_.GetProgramFromId(display_program_id_);
     UniformCollectionWrapper uniform_collection_wrapper{};
-    program.Use(uniform_collection_wrapper);
+    program.Use(uniform_collection_wrapper, &level_);
     auto& material = level_.GetMaterialFromId(display_material_id_);
     for (const auto id : material.GetTextureIds())
     {
@@ -386,122 +405,6 @@ void Renderer::PreRender()
             }
             viewport_ = temp_viewport;
         }
-    }
-}
-
-void Renderer::RenderShadows(const CameraInterface& camera)
-{
-    render_time_ = proto::NodeStaticMesh::SHADOW_RENDER_TIME;
-    // For every light in the level.
-    for (const auto& light_id : level_.GetLights())
-    {
-        EntityId shadow_material_id = level_.GetDefaultShadowMaterialId();
-        if (shadow_material_id == NullId)
-        {
-            throw std::runtime_error("No shadow material id.");
-        }
-        auto& light = level_.GetLightFromId(light_id);
-        // Check if light has shadow.
-        if (light.GetShadowType() == ShadowTypeEnum::NO_SHADOW)
-        {
-            continue;
-        }
-        auto texture_name = light.GetShadowMapTextureName();
-        auto texture_id = level_.GetIdFromName(texture_name);
-        if (texture_id == NullId)
-        {
-            throw std::runtime_error(
-                std::format(
-                    "Couldn't find texture {} for light {}",
-                    texture_name,
-                    light.GetName()));
-        }
-        // Save the current context.
-        std::unique_ptr<FrameBuffer> temp_frame_buffer =
-            std::move(frame_buffer_);
-        auto temp_viewport = viewport_;
-        frame_buffer_ = std::make_unique<FrameBuffer>();
-        auto& texture_interface = level_.GetTextureFromId(texture_id);
-        auto size = json::ParseSize(texture_interface.GetData().size());
-        viewport_ = glm::ivec4(0, 0, size.x, size.y);
-        if (light.GetType() == LightTypeEnum::DIRECTIONAL_LIGHT)
-        {
-            Texture& depth_texture =
-                dynamic_cast<Texture&>(level_.GetTextureFromId(texture_id));
-            frame_buffer_->AttachTexture(
-                depth_texture.GetId(),
-                static_cast<FrameColorAttachment>(GL_DEPTH_ATTACHMENT),
-                FrameTextureType::TEXTURE_2D);
-            frame_buffer_->Bind();
-            glDrawBuffer(GL_NONE);
-            glReadBuffer(GL_NONE);
-            glClear(GL_DEPTH_BUFFER_BIT);
-            // For every mesh / material pair in the scene.
-            for (const auto& p : level_.GetStaticMeshMaterialIds(
-                     proto::NodeStaticMesh::SHADOW_RENDER_TIME))
-            {
-                auto& mesh = level_.GetStaticMeshFromId(p.first);
-                // Skip object that doesn't cast shadow.
-                if (mesh.GetData().shadow_effect_enum() ==
-                    proto::NodeStaticMesh::TRANSPARENT_SHADOW_EFFECT)
-                {
-                    continue;
-                }
-                // Render it acording to the light position.
-                glm::mat4 proj =
-                    glm::ortho(-50.f, 50.f, -50.f, 50.f, 0.1f, 1000.f);
-                glm::vec3 dir = glm::normalize(light.GetVector());
-                glm::vec3 up = glm::normalize(camera.GetUp());
-                glm::vec3 center = camera.GetPosition();
-                float distance = 100.0f;
-                glm::vec3 eye = center - dir * distance;
-                glm::mat4 view = glm::lookAt(eye, center, up);
-                RenderNode(p.first, shadow_material_id, proj, view);
-            }
-            frame_buffer_->UnBind();
-        }
-        if (light.GetType() == LightTypeEnum::POINT_LIGHT)
-        {
-            Cubemap& depth_texture =
-                dynamic_cast<Cubemap&>(level_.GetTextureFromId(texture_id));
-            frame_buffer_->AttachTexture(
-                depth_texture.GetId(),
-                static_cast<FrameColorAttachment>(GL_DEPTH_ATTACHMENT),
-                FrameTextureType::TEXTURE_2D);
-            frame_buffer_->Bind();
-            glDrawBuffer(GL_NONE);
-            glReadBuffer(GL_NONE);
-            glClear(GL_DEPTH_BUFFER_BIT);
-            for (int i = 0; i < 6; ++i)
-            {
-                // For every mesh / material pair in the scene.
-                for (const auto& p : level_.GetStaticMeshMaterialIds(
-                         proto::NodeStaticMesh::SHADOW_RENDER_TIME))
-                {
-                    auto& mesh = level_.GetStaticMeshFromId(p.first);
-                    // Skip object that doesn't cast shadow.
-                    if (mesh.GetData().shadow_effect_enum() ==
-                        proto::NodeStaticMesh::TRANSPARENT_SHADOW_EFFECT)
-                    {
-                        continue;
-                    }
-                    // Render it acording to the light position.
-                    // If you want that single “camera-based” pass:
-                    glm::mat4 proj =
-                        glm::perspective(glm::radians(90.f), 1.f, 0.1f, 1000.f);
-                    glm::mat4 rotation = kViewsCubemap[i];
-                    glm::mat4 translation =
-                        glm::translate(glm::mat4(1.0f), -light.GetVector());
-                    glm::mat4 view = rotation * translation;
-                    RenderNode(p.first, shadow_material_id, proj, view);
-                }
-            }
-            frame_buffer_->UnBind();
-        }
-        // Restore the context.
-        viewport_ = temp_viewport;
-        frame_buffer_.reset();
-        frame_buffer_ = std::move(temp_frame_buffer);
     }
 }
 

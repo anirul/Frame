@@ -9,6 +9,8 @@
 #include "frame/node_light.h"
 #include "frame/node_matrix.h"
 #include "frame/node_static_mesh.h"
+#include "frame/opengl/light.h"
+#include "frame/json/parse_uniform.h"
 
 namespace frame
 {
@@ -119,11 +121,43 @@ EntityId Level::AddSceneNode(std::unique_ptr<NodeInterface>&& scene_node)
     {
         throw std::runtime_error("Name: " + name + " is already in!");
     }
-    string_set_.insert(name);
+    bool is_light_node = dynamic_cast<NodeLight*>(scene_node.get()) != nullptr;
+    if (!is_light_node)
+    {
+        string_set_.insert(name);
+    }
     id_scene_node_map_.insert({id, std::move(scene_node)});
     id_name_map_.insert({id, name});
     name_id_map_.insert({name, id});
     id_enum_map_.insert({id, EntityTypeEnum::NODE});
+    // Now check if this is a light and add it to the light map.
+    NodeInterface* node = id_scene_node_map_.at(id).get();
+    if (auto* node_light = dynamic_cast<NodeLight*>(node))
+    {
+        const auto& data = node_light->GetData();
+        std::unique_ptr<LightInterface> light = nullptr;
+        switch (data.light_type())
+        {
+            case proto::NodeLight::POINT_LIGHT:
+                light = std::make_unique<opengl::LightPoint>(
+                    json::ParseUniform(data.position()),
+                    json::ParseUniform(data.color()));
+                break;
+            case proto::NodeLight::DIRECTIONAL_LIGHT:
+                light = std::make_unique<opengl::LightDirectional>(
+                    json::ParseUniform(data.direction()),
+                    json::ParseUniform(data.color()));
+                break;
+            default:
+                // Other light types not handled yet.
+                break;
+        }
+        if (light)
+        {
+            light->SetName(data.name());
+            this->AddLight(std::move(light));
+        }
+    }
     return id;
 }
 
@@ -229,6 +263,7 @@ EntityId Level::AddLight(std::unique_ptr<LightInterface>&& light)
     {
         throw std::runtime_error("Name: " + name + " is already in!");
     }
+    string_set_.insert(name);
     id_light_map_.insert({id, std::move(light)});
     id_name_map_.insert({id, name});
     name_id_map_.insert({name, id});
@@ -442,6 +477,13 @@ std::string Level::GetNameFromNodeInterface(const NodeInterface& node) const
                 "Unknown node type [{}]?",
                 static_cast<int>(node.GetNodeType())));
     }
+}
+
+CameraInterface& Level::GetCameraFromId(EntityId id) const
+{
+    auto& node = GetSceneNodeFromId(id);
+    auto& camera_node = dynamic_cast<NodeCamera&>(node);
+    return camera_node.GetCamera();
 }
 
 } // End namespace frame.

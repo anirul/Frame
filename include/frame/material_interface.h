@@ -70,6 +70,24 @@ class MaterialInterface : public Serialize<proto::Material>
      */
     virtual std::vector<EntityId> GetTextureIds() const = 0;
     /**
+     * @brief Get the inner name that correspond to a buffer name.
+     * @param name: The name to check for corresponding string.
+     * @return The string.
+     */
+    virtual std::string GetInnerBufferName(const std::string& name) const = 0;
+    /**
+     * @brief Store a buffer reference associated to a given name.
+     * @param name: Buffer reference name.
+     * @param inner_name: Associated name (shader name).
+     */
+    virtual bool AddBufferName(
+        const std::string& name, const std::string& inner_name) = 0;
+    /**
+     * @brief Get buffer names of a material.
+     * @return Return the list of buffer names.
+     */
+    virtual std::vector<std::string> GetBufferNames() const = 0;
+    /**
      * @brief Enable a texture to be used by the context.
      * @param id: Id of the texture to be enabled.
      * @return Return the name and the binding slot of a texture (to be
