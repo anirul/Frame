@@ -9,6 +9,8 @@
 #include "frame/node_light.h"
 #include "frame/node_matrix.h"
 #include "frame/node_static_mesh.h"
+#include "frame/opengl/light.h"
+#include "frame/json/parse_uniform.h"
 
 namespace frame
 {
@@ -124,6 +126,34 @@ EntityId Level::AddSceneNode(std::unique_ptr<NodeInterface>&& scene_node)
     id_name_map_.insert({id, name});
     name_id_map_.insert({name, id});
     id_enum_map_.insert({id, EntityTypeEnum::NODE});
+    // Now check if this is a light and add it to the light map.
+    NodeInterface* node = id_scene_node_map_.at(id).get();
+    if (auto* node_light = dynamic_cast<NodeLight*>(node))
+    {
+        const auto& data = node_light->GetData();
+        std::unique_ptr<LightInterface> light = nullptr;
+        switch (data.light_type())
+        {
+            case proto::NodeLight::POINT_LIGHT:
+                light = std::make_unique<opengl::LightPoint>(
+                    json::ParseUniform(data.position()),
+                    json::ParseUniform(data.color()));
+                break;
+            case proto::NodeLight::DIRECTIONAL_LIGHT:
+                light = std::make_unique<opengl::LightDirectional>(
+                    json::ParseUniform(data.direction()),
+                    json::ParseUniform(data.color()));
+                break;
+            default:
+                // Other light types not handled yet.
+                break;
+        }
+        if (light)
+        {
+            light->SetName(data.name());
+            this->AddLight(std::move(light));
+        }
+    }
     return id;
 }
 
