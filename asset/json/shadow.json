@@ -71,8 +71,8 @@
                 "zbuffer"
             ],
             "inner_names": [
-                "AppleTexture",
-                "Zbuffer"
+                "apple_texture",
+                "zbuffer"
             ],
             "buffer_names": [
                 "AppleMesh.0.triangle"
@@ -115,7 +115,7 @@
             "name": "AppleProgram",
             "input_texture_names": [
                 "apple_texture",
-                "skybox"
+                "zbuffer"
             ],
             "output_texture_names": [
                 "albedo"
@@ -140,16 +140,12 @@
                     "uniform_enum": "MODEL_MAT4"
                 },
                 {
-                    "name": "light_pos",
+                    "name": "light_dir",
                     "uniform_enum": "LIGHT_POSITION_VEC3"
                 },
                 {
                     "name": "light_color",
                     "uniform_enum": "LIGHT_COLOR_VEC3"
-                },
-                {
-                    "name": "camera_pos",
-                    "uniform_enum": "CAMERA_POSITION_VEC3"
                 }
             ]
         }
