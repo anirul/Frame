@@ -84,29 +84,12 @@ class LightPoint : public LightInterface
     {
         return color_intensity_;
     }
-    /**
-     * @brief Set the shadow map texture name.
-     * @param name: Name of the shadow map texture.
-     */
-    void SetShadowMapTextureName(const std::string& name)
-    {
-        shadow_map_texture_name_ = name;
-	}
-    /**
-     * @brief Get the shadow map texture name.
-     * @return Name of the shadow map texture.
-     */
-    std::string GetShadowMapTextureName() const
-    {
-        return shadow_map_texture_name_;
-    }
 
   protected:
     glm::vec3 position_;
     glm::vec3 color_intensity_;
     ShadowTypeEnum shadow_type_enum_ = ShadowTypeEnum::NO_SHADOW;
     std::string name_;
-    std::string shadow_map_texture_name_;
 };
 
 /**
@@ -183,29 +166,12 @@ class LightDirectional : public LightInterface
     {
         return color_intensity_;
     }
-    /**
-     * @brief Set the shadow map texture name.
-     * @param name: Name of the shadow map texture.
-     */
-    void SetShadowMapTextureName(const std::string& name)
-    {
-        shadow_map_texture_name_ = name;
-    }
-    /**
-     * @brief Get the shadow map texture name.
-     * @return Name of the shadow map texture.
-     */
-    std::string GetShadowMapTextureName() const
-    {
-        return shadow_map_texture_name_;
-    }
 
   protected:
     glm::vec3 direction_;
     glm::vec3 color_intensity_;
     ShadowTypeEnum shadow_type_enum_ = ShadowTypeEnum::NO_SHADOW;
 	std::string name_;
-    std::string shadow_map_texture_name_;
 };
 
 /**

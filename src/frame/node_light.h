@@ -41,24 +41,6 @@ class NodeLight : public NodeInterface, public Serialize<proto::NodeLight>
         const glm::vec3 position_or_direction,
         const glm::vec3 color);
     /**
-     * @brief Create a point or directional light with shadow.
-     * @param func: This function return the ID from a string (it will need
-     *        a level passed in the capture list).
-     * @param light_type: Light type of the light.
-     * @param shadow_type: Type of shadow used.
-     * @param shadow_texture: Name of the texture to render for the shadows.
-     * @param position_or_direction: Position (if point light) or direction
-     *        (if directional light).
-     * @param color: Color of the light in vec3 format.
-     */
-    NodeLight(
-        std::function<NodeInterface*(const std::string&)> func,
-        const frame::LightTypeEnum light_type,
-        const frame::ShadowTypeEnum shadow_type,
-        const std::string& shadow_texture,
-        const glm::vec3 position_or_direction,
-        const glm::vec3 color);
-    /**
      * @brief Create a spot light.
      * @param func: This function return the ID from a string (it will need
      *        a level passed in the capture list).
@@ -70,27 +52,6 @@ class NodeLight : public NodeInterface, public Serialize<proto::NodeLight>
      */
     NodeLight(
         std::function<NodeInterface*(const std::string&)> func,
-        const glm::vec3 position,
-        const glm::vec3 direction,
-        const glm::vec3 color,
-        const float dot_inner_limit,
-        const float dot_outer_limit);
-    /**
-     * @brief Create a spot light.
-     * @param func: This function return the ID from a string (it will need
-     * a level passed in the capture list).
-     * @param shadow_type: Type of shadow used.
-     * @param shadow_texture: Name of the texture to render for the shadows.
-     * @param position: Position of the spot light.
-     * @param direction: Direction of the spot light.
-     * @param color: Color in a vec3 format.
-     * @param dot_inner_limit: Inner limit of the total light in dot format.
-     * @param dot_outer_limit: Outer limit of the total light in dot format.
-     */
-    NodeLight(
-        std::function<NodeInterface*(const std::string&)> func,
-        ShadowTypeEnum shadow_type,
-        const std::string& shadow_texture,
         const glm::vec3 position,
         const glm::vec3 direction,
         const glm::vec3 color,
