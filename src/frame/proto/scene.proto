@@ -167,8 +167,6 @@ message NodeLight {
 
 	// Shadow type for the light.
 	ShadowTypeEnum shadow_type = 9;
-	// Name of an existing texture to render the shadow depth into.
-	string shadow_texture = 10;
 }
 
 // Scene definition.

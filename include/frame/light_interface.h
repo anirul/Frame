@@ -61,16 +61,6 @@ struct LightInterface : public NameInterface
      * @return Return the color of the light.
      */
     virtual glm::vec3 GetColorIntensity() const = 0;
-    /**
-     * @brief Set the shadow map texture name.
-     * @param name: Name of the shadow map texture.
-     */
-    virtual void SetShadowMapTextureName(const std::string& name) = 0;
-    /**
-     * @brief Get the shadow map texture name.
-     * @return Name of the shadow map texture.
-     */
-    virtual std::string GetShadowMapTextureName() const = 0;
 };
 
 } // End namespace frame.
