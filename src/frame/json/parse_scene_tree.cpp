@@ -323,6 +323,8 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
             ParseUniform(proto_scene_light.position()),
             ParseUniform(proto_scene_light.color()));
         node_light->GetData().set_name(proto_scene_light.name());
+        node_light->SetParentName(proto_scene_light.parent());
+        node_light->GetData().set_shadow_type(proto_scene_light.shadow_type());
         node_id = level.AddSceneNode(std::move(node_light));
         return static_cast<bool>(node_id);
     }
@@ -331,9 +333,11 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
         auto node_light = std::make_unique<frame::NodeLight>(
             GetFunctor(level),
             LightTypeEnum::DIRECTIONAL_LIGHT,
-            ParseUniform(proto_scene_light.position()),
+            ParseUniform(proto_scene_light.direction()),
             ParseUniform(proto_scene_light.color()));
         node_light->GetData().set_name(proto_scene_light.name());
+        node_light->SetParentName(proto_scene_light.parent());
+        node_light->GetData().set_shadow_type(proto_scene_light.shadow_type());
         node_id = level.AddSceneNode(std::move(node_light));
         return static_cast<bool>(node_id);
     }

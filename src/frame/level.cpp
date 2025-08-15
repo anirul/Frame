@@ -136,21 +136,30 @@ EntityId Level::AddSceneNode(std::unique_ptr<NodeInterface>&& scene_node)
     {
         const auto& data = node_light->GetData();
         std::unique_ptr<LightInterface> light = nullptr;
+        glm::mat4 model = node_light->GetLocalModel(0.0);
         switch (data.light_type())
         {
-            case proto::NodeLight::POINT_LIGHT:
-                light = std::make_unique<opengl::LightPoint>(
-                    json::ParseUniform(data.position()),
-                    json::ParseUniform(data.color()));
-                break;
-            case proto::NodeLight::DIRECTIONAL_LIGHT:
-                light = std::make_unique<opengl::LightDirectional>(
-                    json::ParseUniform(data.direction()),
-                    json::ParseUniform(data.color()));
-                break;
-            default:
-                // Other light types not handled yet.
-                break;
+        case proto::NodeLight::POINT_LIGHT: {
+            glm::vec3 pos = json::ParseUniform(data.position());
+            glm::vec3 world_pos = glm::vec3(model * glm::vec4(pos, 1.0f));
+            light = std::make_unique<opengl::LightPoint>(
+                world_pos,
+                json::ParseUniform(data.color()),
+                static_cast<opengl::ShadowTypeEnum>(data.shadow_type()));
+            break;
+        }
+        case proto::NodeLight::DIRECTIONAL_LIGHT: {
+            glm::vec3 dir = json::ParseUniform(data.direction());
+            glm::vec3 world_dir = glm::mat3(model) * dir;
+            light = std::make_unique<opengl::LightDirectional>(
+                world_dir,
+                json::ParseUniform(data.color()),
+                static_cast<opengl::ShadowTypeEnum>(data.shadow_type()));
+            break;
+        }
+        default:
+            // Other light types not handled yet.
+            break;
         }
         if (light)
         {

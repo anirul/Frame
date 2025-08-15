@@ -225,10 +225,10 @@
         "node_lights": [
             {
                 "name": "sun",
-                "parent": "root",
+                "parent": "env_holder",
                 "light_type": "DIRECTIONAL_LIGHT",
                 "shadow_type": "SOFT_SHADOW",
-                "position": {
+                "direction": {
                     "x": 1.0,
                     "y": -1.0,
                     "z": -1.0
