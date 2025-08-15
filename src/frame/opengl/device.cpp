@@ -203,6 +203,7 @@ void Device::Display(double dt /*= 0.0*/)
     if (!renderer_)
         throw std::runtime_error("No Renderer.");
     Clear();
+    level_->UpdateLights(dt);
     // Get the holder of the camera.
     auto camera_holder_id = level_->GetDefaultCameraId();
     auto enum_type = level_->GetEnumTypeFromId(camera_holder_id);
@@ -212,8 +213,9 @@ void Device::Display(double dt /*= 0.0*/)
     CameraInterface& default_camera = level_->GetDefaultCamera();
     default_camera.SetFront(
         default_camera.GetFront() * glm::mat3(inverse_model));
-    default_camera.SetPosition(glm::vec3(
-        glm::vec4(default_camera.GetPosition(), 1.0) * inverse_model));
+    default_camera.SetPosition(
+        glm::vec3(
+            glm::vec4(default_camera.GetPosition(), 1.0) * inverse_model));
     // Compute left and right cameras.
     Camera left_camera{default_camera};
     left_camera.SetPosition(
@@ -252,8 +254,9 @@ void Device::Display(double dt /*= 0.0*/)
             dt);
         break;
     default:
-        throw std::runtime_error(std::format(
-            "Unknown StereoEnum type {}.", static_cast<int>(stereo_enum_)));
+        throw std::runtime_error(
+            std::format(
+                "Unknown StereoEnum type {}.", static_cast<int>(stereo_enum_)));
     }
     // Reset viewport.
     renderer_->SetViewport(glm::uvec4(0, 0, size_.x, size_.y));

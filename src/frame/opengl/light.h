@@ -25,11 +25,10 @@ class LightPoint : public LightInterface
      * intensity.
      */
     LightPoint(
-		const glm::vec3 position,
-		const glm::vec3 color_intensity,
-		ShadowTypeEnum shadow_type_enum = ShadowTypeEnum::NO_SHADOW)
-        : position_(position),
-		  color_intensity_(color_intensity),
+        const glm::vec3 position,
+        const glm::vec3 color_intensity,
+        ShadowTypeEnum shadow_type_enum = ShadowTypeEnum::NO_SHADOW)
+        : position_(position), color_intensity_(color_intensity),
           shadow_type_enum_(shadow_type_enum)
     {
     }
@@ -41,8 +40,8 @@ class LightPoint : public LightInterface
      */
     std::string GetName() const override
     {
-		return name_;
-	}
+        return name_;
+    }
     /**
      * @brief Set name.
      * @param name: Name.
@@ -50,7 +49,7 @@ class LightPoint : public LightInterface
     void SetName(const std::string& name) override
     {
         name_ = name;
-	}
+    }
     /**
      * @brief Get the type of the light, coming from the light interface.
      * @return Return the type of the light.
@@ -65,8 +64,8 @@ class LightPoint : public LightInterface
      */
     ShadowTypeEnum GetShadowType() const override
     {
-		return shadow_type_enum_;
-	}
+        return shadow_type_enum_;
+    }
     /**
      * @brief Get the position of the light, coming from the light
      * interface.
@@ -77,8 +76,18 @@ class LightPoint : public LightInterface
         return position_;
     }
     /**
+     * @brief Set the position of the light, coming from the light
+     * interface.
+     * @param position: New position of the light.
+     */
+    void SetVector(const glm::vec3& position) override
+    {
+        position_ = position;
+    }
+    /**
      * @brief Get the color intensity, coming from the light interface.
-     * @return Return the color of the light.
+
+     * * @return Return the color of the light.
      */
     glm::vec3 GetColorIntensity() const override
     {
@@ -107,11 +116,10 @@ class LightDirectional : public LightInterface
      * containing any intensity).
      */
     LightDirectional(
-		const glm::vec3 direction,
-		const glm::vec3 color_intensity,
-		ShadowTypeEnum shadow_type_enum = ShadowTypeEnum::NO_SHADOW)
-        : direction_(direction),
-		  color_intensity_(color_intensity),
+        const glm::vec3 direction,
+        const glm::vec3 color_intensity,
+        ShadowTypeEnum shadow_type_enum = ShadowTypeEnum::NO_SHADOW)
+        : direction_(direction), color_intensity_(color_intensity),
           shadow_type_enum_(shadow_type_enum)
     {
     }
@@ -141,11 +149,11 @@ class LightDirectional : public LightInterface
     {
         return LightTypeEnum::DIRECTIONAL_LIGHT;
     }
-	/**
+    /**
      * @brief Get the type of the shadow, coming from the light interface.
      * @return Return the type of the shadow.
      */
-	ShadowTypeEnum GetShadowType() const override
+    ShadowTypeEnum GetShadowType() const override
     {
         return shadow_type_enum_;
     }
@@ -159,8 +167,18 @@ class LightDirectional : public LightInterface
         return direction_;
     }
     /**
+     * @brief Set the direction of the light, coming from the light
+     * interface.
+     * @param direction: New direction of the light.
+     */
+    void SetVector(const glm::vec3& direction) override
+    {
+        direction_ = direction;
+    }
+    /**
      * @brief Get the color intensity, coming from the light interface.
-     * @return Return the color of the light.
+
+     * * @return Return the color of the light.
      */
     glm::vec3 GetColorIntensity() const override
     {
@@ -171,7 +189,7 @@ class LightDirectional : public LightInterface
     glm::vec3 direction_;
     glm::vec3 color_intensity_;
     ShadowTypeEnum shadow_type_enum_ = ShadowTypeEnum::NO_SHADOW;
-	std::string name_;
+    std::string name_;
 };
 
 /**
