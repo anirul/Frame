@@ -145,7 +145,7 @@ EntityId Level::AddSceneNode(std::unique_ptr<NodeInterface>&& scene_node)
             light = std::make_unique<opengl::LightPoint>(
                 world_pos,
                 json::ParseUniform(data.color()),
-                static_cast<opengl::ShadowTypeEnum>(data.shadow_type()));
+                static_cast<ShadowTypeEnum>(data.shadow_type()));
             break;
         }
         case proto::NodeLight::DIRECTIONAL_LIGHT: {
@@ -154,7 +154,7 @@ EntityId Level::AddSceneNode(std::unique_ptr<NodeInterface>&& scene_node)
             light = std::make_unique<opengl::LightDirectional>(
                 world_dir,
                 json::ParseUniform(data.color()),
-                static_cast<opengl::ShadowTypeEnum>(data.shadow_type()));
+                static_cast<ShadowTypeEnum>(data.shadow_type()));
             break;
         }
         default:
