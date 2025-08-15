@@ -12,6 +12,8 @@ add_executable(FrameJsonTest
   parse_program_test.h
   parse_scene_tree_test.cpp
   parse_scene_tree_test.h
+  light_parent_test.cpp
+  light_parent_test.h
   parse_texture_test.cpp
   parse_texture_test.h
   parse_uniform_test.cpp
