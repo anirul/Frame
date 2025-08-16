@@ -257,6 +257,12 @@ class LevelInterface : public NameInterface
      */
     virtual std::vector<EntityId> GetLights() const = 0;
     /**
+     * @brief Update the light positions or directions according to their
+     * parent scene nodes.
+     * @param dt: Delta time from the beginning of the software in seconds.
+     */
+    virtual void UpdateLights(double dt) = 0;
+    /**
      * @brief Get all the program from the level.
      * @return A vector of program ids.
      */

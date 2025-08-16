@@ -5,12 +5,12 @@
 #include <numeric>
 
 #include "frame/device_interface.h"
+#include "frame/json/parse_uniform.h"
 #include "frame/node_camera.h"
 #include "frame/node_light.h"
 #include "frame/node_matrix.h"
 #include "frame/node_static_mesh.h"
 #include "frame/opengl/light.h"
-#include "frame/json/parse_uniform.h"
 
 namespace frame
 {
@@ -138,24 +138,31 @@ EntityId Level::AddSceneNode(std::unique_ptr<NodeInterface>&& scene_node)
         std::unique_ptr<LightInterface> light = nullptr;
         switch (data.light_type())
         {
-            case proto::NodeLight::POINT_LIGHT:
-                light = std::make_unique<opengl::LightPoint>(
-                    json::ParseUniform(data.position()),
-                    json::ParseUniform(data.color()));
-                break;
-            case proto::NodeLight::DIRECTIONAL_LIGHT:
-                light = std::make_unique<opengl::LightDirectional>(
-                    json::ParseUniform(data.direction()),
-                    json::ParseUniform(data.color()));
-                break;
-            default:
-                // Other light types not handled yet.
-                break;
+        case proto::NodeLight::POINT_LIGHT: {
+            glm::vec3 pos = json::ParseUniform(data.position());
+            light = std::make_unique<opengl::LightPoint>(
+                pos,
+                json::ParseUniform(data.color()),
+                static_cast<ShadowTypeEnum>(data.shadow_type()));
+            break;
+        }
+        case proto::NodeLight::DIRECTIONAL_LIGHT: {
+            glm::vec3 dir = json::ParseUniform(data.direction());
+            light = std::make_unique<opengl::LightDirectional>(
+                dir,
+                json::ParseUniform(data.color()),
+                static_cast<ShadowTypeEnum>(data.shadow_type()));
+            break;
+        }
+        default:
+            // Other light types not handled yet.
+            break;
         }
         if (light)
         {
             light->SetName(data.name());
-            this->AddLight(std::move(light));
+            EntityId light_id = this->AddLight(std::move(light));
+            node_light_to_light_map_.insert({id, light_id});
         }
     }
     return id;
@@ -205,10 +212,11 @@ void Level::RemoveProgram(EntityId program_id)
         {
             if (material_ptr->GetProgramId(this) == program_id)
             {
-                throw std::runtime_error(std::format(
-                    "Program '{}' is still used by material '{}'",
-                    id_name_map_.at(program_id),
-                    id_name_map_.at(material_id)));
+                throw std::runtime_error(
+                    std::format(
+                        "Program '{}' is still used by material '{}'",
+                        id_name_map_.at(program_id),
+                        id_name_map_.at(material_id)));
             }
         }
         catch (...)
@@ -374,6 +382,39 @@ std::vector<frame::EntityId> Level::GetLights() const
         list.push_back(light_id);
     }
     return list;
+}
+
+void Level::UpdateLights(double dt)
+{
+    for (const auto& [node_id, light_id] : node_light_to_light_map_)
+    {
+        auto* node_interface = id_scene_node_map_.at(node_id).get();
+        auto* node_light = dynamic_cast<NodeLight*>(node_interface);
+        if (!node_light)
+        {
+            continue;
+        }
+        const auto& data = node_light->GetData();
+        glm::mat4 model = node_light->GetLocalModel(dt);
+        auto& light = *id_light_map_.at(light_id);
+        switch (data.light_type())
+        {
+        case proto::NodeLight::POINT_LIGHT: {
+            glm::vec3 pos = json::ParseUniform(data.position());
+            glm::vec3 world_pos = glm::vec3(model * glm::vec4(pos, 1.0f));
+            light.SetVector(world_pos);
+            break;
+        }
+        case proto::NodeLight::DIRECTIONAL_LIGHT: {
+            glm::vec3 dir = json::ParseUniform(data.direction());
+            glm::vec3 world_dir = glm::mat3(model) * dir;
+            light.SetVector(world_dir);
+            break;
+        }
+        default:
+            break;
+        }
+    }
 }
 
 std::vector<frame::EntityId> Level::GetPrograms() const

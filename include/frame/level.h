@@ -330,6 +330,12 @@ class Level : public LevelInterface
      */
     std::vector<EntityId> GetLights() const override;
     /**
+     * @brief Update the light vectors based on their parent scene node
+     * transformations.
+     * @param dt: Delta time from the beginning of the software in seconds.
+     */
+    void UpdateLights(double dt) override;
+    /**
      * @brief Get all the program from level.
      * @return A vector of program ids.
      */
@@ -463,6 +469,7 @@ class Level : public LevelInterface
     std::map<EntityId, std::unique_ptr<StaticMeshInterface>>
         id_static_mesh_map_;
     std::map<EntityId, std::unique_ptr<LightInterface>> id_light_map_;
+    std::map<EntityId, EntityId> node_light_to_light_map_;
     // These are storage specifiers.
     std::set<std::string> string_set_;
     std::map<std::string, EntityId> name_id_map_;

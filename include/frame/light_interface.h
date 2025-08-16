@@ -15,11 +15,11 @@ namespace frame
  */
 enum class LightTypeEnum : std::uint8_t
 {
-    INVALID_LIGHT		= 0,
-    AMBIENT_LIGHT		= 1,
-    POINT_LIGHT			= 2,
-    DIRECTIONAL_LIGHT	= 3,
-    SPOT_LIGHT			= 4,
+    INVALID_LIGHT = 0,
+    AMBIENT_LIGHT = 1,
+    POINT_LIGHT = 2,
+    DIRECTIONAL_LIGHT = 3,
+    SPOT_LIGHT = 4,
 };
 
 /**
@@ -27,9 +27,9 @@ enum class LightTypeEnum : std::uint8_t
  */
 enum class ShadowTypeEnum : std::uint8_t
 {
-	NO_SHADOW			= 0,
-	HARD_SHADOW			= 1,
-	SOFT_SHADOW			= 2
+    NO_SHADOW = 0,
+    HARD_SHADOW = 1,
+    SOFT_SHADOW = 2
 };
 
 /**
@@ -56,6 +56,12 @@ struct LightInterface : public NameInterface
      * @return Return the position of a light.
      */
     virtual glm::vec3 GetVector() const = 0;
+    /**
+     * @brief Set the position of the light or the direction in case this is
+     * a directional light.
+     * @param vector: The new position or direction of the light.
+     */
+    virtual void SetVector(const glm::vec3& vector) = 0;
     /**
      * @brief Get the color intensity.
      * @return Return the color of the light.
