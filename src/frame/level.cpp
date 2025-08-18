@@ -148,8 +148,11 @@ EntityId Level::AddSceneNode(std::unique_ptr<NodeInterface>&& scene_node)
         }
         case proto::NodeLight::DIRECTIONAL_LIGHT: {
             glm::vec3 dir = json::ParseUniform(data.direction());
+            glm::mat4 model = node_light->GetLocalModel(0.0);
+            glm::vec3 world_dir = glm::mat3(model) * dir;
+            world_dir = glm::normalize(world_dir);
             light = std::make_unique<opengl::LightDirectional>(
-                dir,
+                world_dir,
                 json::ParseUniform(data.color()),
                 static_cast<ShadowTypeEnum>(data.shadow_type()));
             break;
@@ -408,6 +411,7 @@ void Level::UpdateLights(double dt)
         case proto::NodeLight::DIRECTIONAL_LIGHT: {
             glm::vec3 dir = json::ParseUniform(data.direction());
             glm::vec3 world_dir = glm::mat3(model) * dir;
+            world_dir = glm::normalize(world_dir);
             light.SetVector(world_dir);
             break;
         }
