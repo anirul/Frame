@@ -1,6 +1,9 @@
 #include "frame/opengl/file/load_static_mesh.h"
 
 #include <stdexcept>
+#include <cmath>
+#include <cstdint>
+#include <unordered_map>
 
 #include "frame/file/file_system.h"
 #include "frame/file/image.h"
@@ -34,6 +37,67 @@ std::optional<EntityId> CreateBufferInLevel(
     buffer->UnBind();
     buffer->SetName(desc);
     return level.AddBuffer(std::move(buffer));
+}
+
+struct VertexKey
+{
+    int x;
+    int y;
+    int z;
+    bool operator==(const VertexKey& other) const noexcept = default;
+};
+
+struct VertexKeyHash
+{
+    std::size_t operator()(const VertexKey& v) const noexcept
+    {
+        std::size_t h1 = std::hash<int>{}(v.x);
+        std::size_t h2 = std::hash<int>{}(v.y);
+        std::size_t h3 = std::hash<int>{}(v.z);
+        return ((h1 ^ (h2 << 1)) >> 1) ^ (h3 << 1);
+    }
+};
+
+std::pair<std::vector<float>, std::vector<int>> WeldVertices(
+    const std::vector<float>& points,
+    const std::vector<int>& indices,
+    float epsilon = 1e-6f)
+{
+    std::unordered_map<VertexKey, int, VertexKeyHash> vertex_map;
+    std::vector<float> welded_points;
+    welded_points.reserve(points.size());
+    std::vector<int> remap(points.size() / 3);
+    for (std::size_t i = 0; i < points.size(); i += 3)
+    {
+        VertexKey key{
+            static_cast<int>(std::round(points[i] / epsilon)),
+            static_cast<int>(std::round(points[i + 1] / epsilon)),
+            static_cast<int>(std::round(points[i + 2] / epsilon))};
+        auto ite = vertex_map.find(key);
+        if (ite == vertex_map.end())
+        {
+            int new_index = static_cast<int>(welded_points.size() / 3);
+            vertex_map.emplace(key, new_index);
+            remap[i / 3] = new_index;
+            welded_points.push_back(
+                std::round(points[i] / epsilon) * epsilon);
+            welded_points.push_back(
+                std::round(points[i + 1] / epsilon) * epsilon);
+            welded_points.push_back(
+                std::round(points[i + 2] / epsilon) * epsilon);
+        }
+        else
+        {
+            remap[i / 3] = ite->second;
+        }
+    }
+    std::vector<int> welded_indices;
+    welded_indices.reserve(indices.size());
+    for (auto idx : indices)
+    {
+        welded_indices.push_back(remap[idx]);
+    }
+    return {welded_points, welded_indices};
 }
 
 std::unique_ptr<TextureInterface> LoadTextureFromString(
@@ -143,6 +207,10 @@ std::pair<EntityId, EntityId> LoadStaticMeshFromObj(
     }
     const auto& indices = mesh_obj.GetIndices();
 
+    // Remove duplicate vertices and quantize positions for acceleration
+    // structure construction.
+    auto [welded_points, welded_indices] = WeldVertices(points, indices);
+
     // Point buffer initialization.
     auto maybe_point_buffer_id = CreateBufferInLevel(
         level, points, std::format("{}.{}.point", name, counter));
@@ -176,22 +244,22 @@ std::pair<EntityId, EntityId> LoadStaticMeshFromObj(
 
     // Triangle buffer generation (SSBO).
     std::vector<float> triangles;
-    for (int i = 0; i < indices.size(); i += 3)
+    for (int i = 0; i < welded_indices.size(); i += 3)
     {
-        int i0 = indices[i];
-        int i1 = indices[i + 1];
-        int i2 = indices[i + 2];
-        triangles.push_back(points[i0 * 3]);
-        triangles.push_back(points[i0 * 3 + 1]);
-        triangles.push_back(points[i0 * 3 + 2]);
+        int i0 = welded_indices[i];
+        int i1 = welded_indices[i + 1];
+        int i2 = welded_indices[i + 2];
+        triangles.push_back(welded_points[i0 * 3]);
+        triangles.push_back(welded_points[i0 * 3 + 1]);
+        triangles.push_back(welded_points[i0 * 3 + 2]);
         triangles.push_back(0.0f); // Padding
-        triangles.push_back(points[i1 * 3]);
-        triangles.push_back(points[i1 * 3 + 1]);
-        triangles.push_back(points[i1 * 3 + 2]);
+        triangles.push_back(welded_points[i1 * 3]);
+        triangles.push_back(welded_points[i1 * 3 + 1]);
+        triangles.push_back(welded_points[i1 * 3 + 2]);
         triangles.push_back(0.0f); // Padding
-        triangles.push_back(points[i2 * 3]);
-        triangles.push_back(points[i2 * 3 + 1]);
-        triangles.push_back(points[i2 * 3 + 2]);
+        triangles.push_back(welded_points[i2 * 3]);
+        triangles.push_back(welded_points[i2 * 3 + 1]);
+        triangles.push_back(welded_points[i2 * 3 + 2]);
         triangles.push_back(0.0f); // Padding
     }
     auto maybe_triangle_buffer_id = CreateBufferInLevel(
