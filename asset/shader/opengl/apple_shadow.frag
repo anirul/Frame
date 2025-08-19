@@ -39,11 +39,11 @@ bool rayTriangleIntersect(
     float f = 1.0/a;
     vec3 s = ray_origin - triangle.v0;
     float u = f * dot(s, h);
-    if (u < 0.0 || u > 1.0)
+    if (u < -EPSILON || u > 1.0 + EPSILON)
         return false;
     vec3 q = cross(s, edge1);
     float v = f * dot(ray_direction, q);
-    if (v < 0.0 || u + v > 1.0)
+    if (v < -EPSILON || u + v > 1.0 + EPSILON)
         return false;
     // At this stage we can compute t to find out where the intersection point is on the line.
     float t = f * dot(edge2, q);
