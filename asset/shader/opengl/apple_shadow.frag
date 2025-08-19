@@ -9,16 +9,19 @@ uniform sampler2D apple_texture;
 uniform vec3 light_dir;
 uniform vec3 light_color;
 uniform mat4 model;
+uniform mat4 view;
 
 out vec4 frag_color;
 
-struct Triangle {
+struct Triangle
+{
     vec3 v0;
     vec3 v1;
     vec3 v2;
 };
 
-layout(std430, binding = 0) buffer TriangleBuffer {
+layout(std430, binding = 0) buffer TriangleBuffer
+{
     Triangle triangles[];
 };
 
@@ -35,8 +38,8 @@ bool rayTriangleIntersect(
     vec3 h = cross(ray_direction, edge2);
     float a = dot(edge1, h);
     if (a > -EPSILON && a < EPSILON)
-        return false;    // This ray is parallel to this triangle.
-    float f = 1.0/a;
+        return false; // This ray is parallel to this triangle.
+    float f = 1.0 / a;
     vec3 s = ray_origin - triangle.v0;
     float u = f * dot(s, h);
     if (u < 0.0 || u > 1.0)
@@ -45,34 +48,52 @@ bool rayTriangleIntersect(
     float v = f * dot(ray_direction, q);
     if (v < 0.0 || u + v > 1.0)
         return false;
-    // At this stage we can compute t to find out where the intersection point is on the line.
+    // At this stage we can compute t to find out where the intersection point
+    // is on the line.
     float t = f * dot(edge2, q);
     if (t > EPSILON) // ray intersection
     {
         out_t = t;
         return true;
     }
-    else // This means that there is a line intersection but not a ray intersection.
+    else // This means that there is a line intersection but not a ray
+         // intersection.
         return false;
 }
 
-void main() {
+void main()
+{
     // 1. Basic lighting (Lambert / Blinn-Phong, etc.)
     vec3 normal = normalize(out_normal);
-    // Light direction points from the fragment toward the light source (world space).
+    // Light direction points from the fragment toward the light source (world
+    // space).
     vec3 light_direction_world = normalize(-light_dir);
     float diff = max(dot(normal, light_direction_world), 0.0);
 
+    // Build geometric normal from the triangle's vertices and compute hit
+    // position
+    vec3 dp1 = dFdx(out_world_position);
+    vec3 dp2 = dFdy(out_world_position);
+    vec3 geometric_normal = normalize(cross(dp1, dp2));
+    vec3 hitPos = out_world_position;
+
+    // Camera position to scale the bias with distance
+    mat4 inv_view = inverse(view);
+    vec3 camera_pos = inv_view[3].xyz;
+    float t = length(hitPos - camera_pos);
+    float bias = max(1e-4 * t, 1e-4);
+
     // 2. Compute shadow
     float shadow = 0.0;
-    vec3 ray_origin_world = out_world_position + normal * 0.001;
+    vec3 ray_origin_world = hitPos + geometric_normal * bias;
     mat4 inv_model = inverse(model);
     vec3 ray_origin = vec3(inv_model * vec4(ray_origin_world, 1.0));
     vec3 light_direction = normalize(mat3(inv_model) * light_direction_world);
-    float t;
+    float tShadow;
     for (int i = 0; i < triangles.length(); ++i)
     {
-        if (rayTriangleIntersect(ray_origin, light_direction, triangles[i], t))
+        if (rayTriangleIntersect(
+                ray_origin, light_direction, triangles[i], tShadow))
         {
             shadow = 1.0;
             break;
