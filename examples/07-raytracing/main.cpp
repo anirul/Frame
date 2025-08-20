@@ -6,6 +6,7 @@
 #endif
 #include <frame/common/application.h>
 #include <frame/file/file_system.h>
+#include <frame/file/image_stb.h>
 #include <frame/window_factory.h>
 
 #include <exception>
