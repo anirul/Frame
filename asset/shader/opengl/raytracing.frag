@@ -53,6 +53,39 @@ bool rayTriangleIntersect(
 
 void main()
 {
-    // Output UV coordinates as color to verify the shader is running.
-    frag_color = vec4(out_uv, 0.0, 1.0);
+    // Reconstruct the view ray for this fragment.
+    vec2 uv = out_uv * 2.0 - 1.0;
+    vec4 clip_pos = vec4(uv, -1.0, 1.0);
+    vec4 view_pos = inverse(projection) * clip_pos;
+    view_pos = vec4(view_pos.xy, -1.0, 0.0);
+    vec3 ray_dir = normalize((inverse(view) * view_pos).xyz);
+
+    // Trace the ray against all triangles and keep the closest hit.
+    float closest_t = 1e20;
+    vec3 hit_normal = vec3(0.0);
+    bool hit = false;
+    for (int i = 0; i < triangles.length(); ++i)
+    {
+        float t;
+        if (rayTriangleIntersect(camera_position, ray_dir, triangles[i], t) &&
+            t < closest_t)
+        {
+            closest_t = t;
+            vec3 edge1 = triangles[i].v1 - triangles[i].v0;
+            vec3 edge2 = triangles[i].v2 - triangles[i].v0;
+            hit_normal = normalize(cross(edge1, edge2));
+            hit = true;
+        }
+    }
+
+    if (hit)
+    {
+        float diff = max(dot(hit_normal, normalize(-light_dir)), 0.0);
+        vec3 color = diff * light_color;
+        frag_color = vec4(color, 1.0);
+    }
+    else
+    {
+        frag_color = vec4(0.0, 0.0, 0.0, 1.0);
+    }
 }
