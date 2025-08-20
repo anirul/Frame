@@ -38,6 +38,8 @@ add_custom_target(AssetShaderOpenGL
     physically_based_rendering.vert
     point_cloud.frag
     point_cloud.vert
+    raytracing.frag
+    raytracing.vert
     ray_marching.frag
     ray_marching.vert
     screen_space_ambient_occlusion.frag

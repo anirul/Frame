@@ -1,0 +1,139 @@
+{
+    "name": "RayTracing",
+    "default_texture_name": "albedo",
+    "textures": [
+        {
+            "name": "albedo",
+            "size": {
+                "x": -1,
+                "y": -1
+            },
+            "pixel_element_size": {
+                "value": "BYTE"
+            },
+            "pixel_structure": {
+                "value": "RGB"
+            }
+        }
+    ],
+    "materials": [
+        {
+            "name": "RayTraceMaterial",
+            "program_name": "RayTraceProgram",
+            "texture_names": [],
+            "inner_names": [],
+            "buffer_names": [
+                "AppleMesh.0.triangle"
+            ],
+            "inner_buffer_names": [
+                "TriangleBuffer"
+            ]
+        }
+    ],
+    "programs": [
+        {
+            "name": "RayTraceProgram",
+            "output_texture_names": [
+                "albedo"
+            ],
+            "input_scene_type": {
+                "value": "QUAD"
+            },
+            "shader_vertex": "raytracing.vert",
+            "shader_fragment": "raytracing.frag",
+            "uniforms": [
+                {
+                    "name": "projection",
+                    "uniform_enum": "PROJECTION_MAT4"
+                },
+                {
+                    "name": "view",
+                    "uniform_enum": "VIEW_MAT4"
+                },
+                {
+                    "name": "camera_position",
+                    "uniform_enum": "CAMERA_POSITION_VEC3"
+                },
+                {
+                    "name": "light_dir",
+                    "uniform_enum": "LIGHT_POSITION_VEC3"
+                },
+                {
+                    "name": "light_color",
+                    "uniform_enum": "LIGHT_COLOR_VEC3"
+                }
+            ]
+        }
+    ],
+    "scene_tree": {
+        "default_camera_name": "camera",
+        "default_root_name": "root",
+        "node_matrices": [
+            {
+                "name": "root",
+                "matrix": {
+                    "m11": 1,
+                    "m22": 1,
+                    "m33": 1,
+                    "m44": 1
+                }
+            }
+        ],
+        "node_cameras": [
+            {
+                "name": "camera",
+                "parent": "root",
+                "fov_degrees": 65.0,
+                "near_clip": 0.01,
+                "far_clip": 1000.0,
+                "position": {
+                    "x": 0,
+                    "y": 0,
+                    "z": -2
+                },
+                "target": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                },
+                "up": {
+                    "x": 0,
+                    "y": 1,
+                    "z": 0
+                }
+            }
+        ],
+        "node_static_meshes": [
+            {
+                "name": "RayTracingRendering",
+                "parent": "root",
+                "mesh_enum": "QUAD",
+                "material_name": "RayTraceMaterial"
+            },
+            {
+                "name": "AppleMesh",
+                "parent": "root",
+                "file_name": "apple.obj",
+                "material_name": "RayTraceMaterial"
+            }
+        ],
+        "node_lights": [
+            {
+                "name": "sun",
+                "parent": "root",
+                "light_type": "DIRECTIONAL_LIGHT",
+                "shadow_type": "SOFT_SHADOW",
+                "direction": {
+                    "x": 1.0,
+                    "y": -1.0,
+                    "z": -1.0
+                },
+                "color": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                }
+            }
+        ]
+    }
+}

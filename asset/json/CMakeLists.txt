@@ -18,6 +18,7 @@ add_custom_target(AssetJson
     scene_simple.json
     scene_tree_test.json
     shadow.json
+    raytracing.json
 )
 
 set_property(TARGET AssetJson PROPERTY FOLDER "FrameAsset/Json")
