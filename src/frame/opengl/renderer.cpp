@@ -146,6 +146,21 @@ void Renderer::RenderMesh(
     }
     // Go through the callback.
     callback_(uniform_collection_wrapper, static_mesh, material);
+
+    // Register shader storage buffers before using the program so they are
+    // bound when Program::Use uploads them.
+    int j = 0;
+    for (const auto& name : material.GetBufferNames())
+    {
+        auto id = level_.GetIdFromName(name);
+        if (id == NullId)
+        {
+            throw std::runtime_error("Could not find buffer: " + name);
+        }
+        auto inner_name = material.GetInnerBufferName(name);
+        dynamic_cast<opengl::Program&>(program).AddBuffer(id, inner_name, j++);
+    }
+
     program.Use(uniform_collection_wrapper, &level_);
 
     auto texture_out_ids = program.GetOutputTextureIds();
@@ -217,18 +232,6 @@ void Renderer::RenderMesh(
         std::unique_ptr<UniformInterface> uniform_interface =
             std::make_unique<Uniform>(p.first, p.second);
         program.AddUniform(std::move(uniform_interface));
-    }
-    int j = 0;
-    for (const auto& name : material.GetBufferNames())
-    {
-        auto id = level_.GetIdFromName(name);
-        if (id == NullId)
-        {
-            throw std::runtime_error("Could not find buffer: " + name);
-        }
-        auto& buffer = dynamic_cast<opengl::Buffer&>(level_.GetBufferFromId(id));
-        auto inner_name = material.GetInnerBufferName(name);
-        dynamic_cast<opengl::Program&>(program).AddBuffer(id, inner_name, j++);
     }
 
     auto& gl_static_mesh = dynamic_cast<StaticMesh&>(static_mesh);
