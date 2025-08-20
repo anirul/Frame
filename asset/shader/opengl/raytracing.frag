@@ -78,10 +78,9 @@ void main()
     }
 
     if (hit) {
-        vec3 light_direction_world = normalize(-light_dir);
-        float diff = max(dot(hit_normal, light_direction_world), 0.0);
-        vec3 color = diff * light_color;
-        frag_color = vec4(color, 1.0);
+        // For debugging, shade intersections as solid red to verify
+        // that the ray/triangle tests work before adding lighting.
+        frag_color = vec4(1.0, 0.0, 0.0, 1.0);
     } else {
         frag_color = vec4(0.0, 0.0, 0.0, 1.0);
     }
