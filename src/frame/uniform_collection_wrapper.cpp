@@ -2,6 +2,7 @@
 #include "frame/uniform.h"
 
 #include "frame/node_matrix.h"
+#include <glm/gtc/matrix_inverse.hpp>
 
 namespace frame
 {
@@ -22,11 +23,15 @@ UniformCollectionWrapper::UniformCollectionWrapper(
         std::make_unique<Uniform>("time", static_cast<float>(time));
     std::unique_ptr<Uniform> uniform_time_s =
         std::make_unique<Uniform>("time_s", static_cast<float>(time));
+    glm::vec3 camera_position = glm::vec3(glm::inverse(view)[3]);
+    std::unique_ptr<Uniform> uniform_camera_position =
+        std::make_unique<Uniform>("camera_position", camera_position);
     AddUniform(std::move(uniform_projection));
     AddUniform(std::move(uniform_view));
     AddUniform(std::move(uniform_model));
     AddUniform(std::move(uniform_time));
     AddUniform(std::move(uniform_time_s));
+    AddUniform(std::move(uniform_camera_position));
 }
 
 const UniformInterface& UniformCollectionWrapper::GetUniform(
