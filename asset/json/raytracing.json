@@ -115,7 +115,7 @@
                 "parent": "root",
                 "file_name": "apple.obj",
                 "material_name": "RayTraceMaterial",
-                "render_time_enum": "SHADOW_RENDER_TIME"
+                "render_time_enum": "PRE_RENDER_TIME"
             }
         ],
         "node_lights": [

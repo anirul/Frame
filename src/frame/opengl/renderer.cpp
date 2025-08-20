@@ -379,7 +379,11 @@ void Renderer::PreRender()
             // Now this get the image size from the environment map.
             auto& material = level_.GetMaterialFromId(material_id);
             auto ids = material.GetTextureIds();
-            assert(!ids.empty());
+            if (ids.empty())
+            {
+                // Nothing to pre-render for materials without textures.
+                continue;
+            }
             auto& texture = level_.GetTextureFromId(ids[0]);
             auto size = json::ParseSize(texture.GetData().size());
             viewport_ = glm::ivec4(0, 0, size.x / 2, size.y / 2);
