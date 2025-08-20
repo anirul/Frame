@@ -115,7 +115,7 @@
                 "parent": "root",
                 "file_name": "apple.obj",
                 "material_name": "RayTraceMaterial",
-                "render_time_enum": "PRE_RENDER_TIME"
+                "render_time_enum": "SHADOW_RENDER_TIME"
             }
         ],
         "node_lights": [
@@ -123,7 +123,7 @@
                 "name": "sun",
                 "parent": "root",
                 "light_type": "DIRECTIONAL_LIGHT",
-                "shadow_type": "SOFT_SHADOW",
+                "shadow_type": "NO_SHADOW",
                 "direction": {
                     "x": 1.0,
                     "y": -1.0,
