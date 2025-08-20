@@ -53,35 +53,6 @@ bool rayTriangleIntersect(
 
 void main()
 {
-    vec2 ndc = out_uv * 2.0 - 1.0;
-    // Reconstruct the view-space ray and transform it to world space.
-    vec4 ray_clip = vec4(ndc, -1.0, 1.0);
-    vec4 ray_eye = inverse(projection) * ray_clip;
-    ray_eye = vec4(ray_eye.xy, -1.0, 0.0);
-    vec3 ray_dir_world = normalize((inverse(view) * ray_eye).xyz);
-
-    float t_min = 1e30;
-    vec3 hit_normal = vec3(0.0);
-    bool hit = false;
-    for (int i = 0; i < triangles.length(); ++i) {
-        float t;
-        if (rayTriangleIntersect(camera_position, ray_dir_world, triangles[i], t)) {
-            if (t < t_min) {
-                t_min = t;
-                vec3 v0 = triangles[i].v0;
-                vec3 v1 = triangles[i].v1;
-                vec3 v2 = triangles[i].v2;
-                hit_normal = normalize(cross(v1 - v0, v2 - v0));
-                hit = true;
-            }
-        }
-    }
-
-    if (hit) {
-        // For debugging, shade intersections as solid red to verify
-        // that the ray/triangle tests work before adding lighting.
-        frag_color = vec4(1.0, 0.0, 0.0, 1.0);
-    } else {
-        frag_color = vec4(0.0, 0.0, 0.0, 1.0);
-    }
+    // Output UV coordinates as color to verify the shader is running.
+    frag_color = vec4(out_uv, 0.0, 1.0);
 }
