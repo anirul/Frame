@@ -54,11 +54,11 @@ bool rayTriangleIntersect(
 void main()
 {
     vec2 ndc = out_uv * 2.0 - 1.0;
-    vec4 clip = vec4(ndc, 1.0, 1.0);
-    mat4 inv_vp = inverse(projection * view);
-    vec4 world = inv_vp * clip;
-    world /= world.w;
-    vec3 ray_dir_world = normalize(world.xyz - camera_position);
+    // Reconstruct the view-space ray and transform it to world space.
+    vec4 ray_clip = vec4(ndc, -1.0, 1.0);
+    vec4 ray_eye = inverse(projection) * ray_clip;
+    ray_eye = vec4(ray_eye.xy, -1.0, 0.0);
+    vec3 ray_dir_world = normalize((inverse(view) * ray_eye).xyz);
 
     float t_min = 1e30;
     vec3 hit_normal = vec3(0.0);
