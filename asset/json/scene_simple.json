@@ -57,7 +57,6 @@
             "input_scene_type": {
                 "value": "SCENE"
             },
-            "input_scene_root_name": "root",
             "shader_vertex": "scene_simple.vert",
             "shader_fragment": "scene_simple.frag",
             "uniforms": [

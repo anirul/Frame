@@ -169,7 +169,6 @@
             "input_scene_type": {
                 "value": "SCENE"
             },
-            "input_scene_root_name": "root",
             "shader_vertex": "image_based_lighting.vert",
             "shader_fragment": "image_based_lighting.frag",
             "uniforms": [

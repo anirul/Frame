@@ -123,7 +123,6 @@
             "input_scene_type": {
                 "value": "SCENE"
             },
-            "input_scene_root_name": "root",
             "shader_vertex": "apple_shadow.vert",
             "shader_fragment": "apple_shadow.frag",
             "uniforms": [
