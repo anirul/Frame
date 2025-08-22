@@ -80,9 +80,11 @@ void main()
 
     if (hit)
     {
-        float diff = max(dot(hit_normal, normalize(-light_dir)), 0.0);
-        vec3 color = diff * light_color;
-        frag_color = vec4(color, 1.0);
+        // Fall back to a default light when no light uniforms are provided.
+        vec3 dir = length(light_dir) > 0.0 ? light_dir : vec3(1.0, -1.0, -1.0);
+        vec3 col = length(light_color) > 0.0 ? light_color : vec3(1.0);
+        float diff = max(dot(hit_normal, normalize(-dir)), 0.0);
+        frag_color = vec4(diff * col, 1.0);
     }
     else
     {
