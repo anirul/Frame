@@ -164,8 +164,19 @@
                 }
             },
             {
-                "name": "mesh_holder",
+                "name": "apple_root",
                 "parent": "root",
+                "matrix_type_enum": "ROTATION_MATRIX",
+                "quaternion": {
+                    "x": 0.0,
+                    "y": 0.4794255,
+                    "z": 0.0,
+                    "w": 0.8775826
+                }
+            },
+            {
+                "name": "mesh_holder",
+                "parent": "apple_root",
                 "quaternion": {
                     "x": 0.0,
                     "y": 0.1979232,
