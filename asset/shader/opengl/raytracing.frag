@@ -18,6 +18,9 @@ struct Triangle {
     vec3 v0;
     vec3 v1;
     vec3 v2;
+    vec3 n0;
+    vec3 n1;
+    vec3 n2;
 };
 
 layout(std430, binding = 0) buffer TriangleBuffer {
@@ -28,7 +31,8 @@ bool rayTriangleIntersect(
     const vec3 ray_origin,
     const vec3 ray_direction,
     const Triangle triangle,
-    out float out_t)
+    out float out_t,
+    out vec2 out_bary)
 {
     const float EPSILON = 0.0000001;
     vec3 edge1 = triangle.v1 - triangle.v0;
@@ -49,6 +53,7 @@ bool rayTriangleIntersect(
     float t = f * dot(edge2, q);
     if (t > EPSILON) {
         out_t = t;
+        out_bary = vec2(u, v);
         return true;
     }
     return false;
@@ -75,13 +80,16 @@ void main()
     for (int i = 0; i < triangles.length(); ++i)
     {
         float t;
-        if (rayTriangleIntersect(ray_origin, ray_dir, triangles[i], t) &&
+        vec2 bary;
+        if (rayTriangleIntersect(ray_origin, ray_dir, triangles[i], t, bary) &&
             t < closest_t)
         {
             closest_t = t;
-            vec3 edge1 = triangles[i].v1 - triangles[i].v0;
-            vec3 edge2 = triangles[i].v2 - triangles[i].v0;
-            hit_normal_model = normalize(cross(edge1, edge2));
+            float w = 1.0 - bary.x - bary.y;
+            hit_normal_model = normalize(
+                triangles[i].n0 * w +
+                triangles[i].n1 * bary.x +
+                triangles[i].n2 * bary.y);
             hit = true;
         }
     }
