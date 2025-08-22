@@ -15,18 +15,21 @@ uniform vec3 light_dir;
 uniform vec3 light_color;
 uniform sampler2D apple_texture;
 
+struct Vertex
+{
+    vec3 position;
+    float pad0;
+    vec3 normal;
+    float pad1;
+    vec2 uv;
+    vec2 pad2;
+};
+
 struct Triangle
 {
-    vec3 v0;
-    vec3 v1;
-    vec3 v2;
-    vec3 n0;
-    vec3 n1;
-    vec3 n2;
-    vec2 uv0;
-    vec2 uv1;
-    vec2 uv2;
-    vec2 pad; // Padding to 16-byte alignment
+    Vertex v0;
+    Vertex v1;
+    Vertex v2;
 };
 
 layout(std430, binding = 0) buffer TriangleBuffer
@@ -42,14 +45,14 @@ bool rayTriangleIntersect(
     out vec2 out_bary)
 {
     const float EPSILON = 0.0000001;
-    vec3 edge1 = triangle.v1 - triangle.v0;
-    vec3 edge2 = triangle.v2 - triangle.v0;
+    vec3 edge1 = triangle.v1.position - triangle.v0.position;
+    vec3 edge2 = triangle.v2.position - triangle.v0.position;
     vec3 h = cross(ray_direction, edge2);
     float a = dot(edge1, h);
     if (a > -EPSILON && a < EPSILON)
         return false; // Ray is parallel to triangle.
     float f = 1.0 / a;
-    vec3 s = ray_origin - triangle.v0;
+    vec3 s = ray_origin - triangle.v0.position;
     float u = f * dot(s, h);
     if (u < 0.0 || u > 1.0)
         return false;
@@ -96,10 +99,11 @@ void main()
             closest_t = t;
             float w = 1.0 - bary.x - bary.y;
             hit_normal_model = normalize(
-                triangles[i].n0 * w + triangles[i].n1 * bary.x +
-                triangles[i].n2 * bary.y);
-            hit_uv = triangles[i].uv0 * w + triangles[i].uv1 * bary.x +
-                     triangles[i].uv2 * bary.y;
+                triangles[i].v0.normal * w +
+                triangles[i].v1.normal * bary.x +
+                triangles[i].v2.normal * bary.y);
+            hit_uv = triangles[i].v0.uv * w + triangles[i].v1.uv * bary.x +
+                     triangles[i].v2.uv * bary.y;
             hit = true;
         }
     }
