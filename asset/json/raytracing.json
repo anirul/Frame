@@ -76,7 +76,7 @@
             "input_scene_type": {
                 "value": "QUAD"
             },
-            "input_scene_root_name": "apple_root",
+            "input_scene_root_name": "mesh_holder",
             "shader_vertex": "raytracing.vert",
             "shader_fragment": "raytracing.frag",
             "uniforms": [
@@ -174,12 +174,12 @@
                 }
             },
             {
-                "name": "apple_root",
+                "name": "mesh_holder",
                 "parent": "root",
                 "quaternion": {
                     "x": 0.0,
-                    "y": 0.2474039,
-                    "z": 0.0,
+                    "y": 0.1979232,
+                    "z": 0.1484424,
                     "w": 0.9689124
                 }
             }
@@ -217,7 +217,7 @@
             },
             {
                 "name": "AppleMesh",
-                "parent": "apple_root",
+                "parent": "mesh_holder",
                 "file_name": "apple.obj",
                 "material_name": "RayTracePreprocessMaterial",
                 "render_time_enum": "PRE_RENDER_TIME"
@@ -232,7 +232,7 @@
                 "direction": {
                     "x": 1.0,
                     "y": -1.0,
-                    "z": -1.0
+                    "z": 1.0
                 },
                 "color": {
                     "x": 1.0,

@@ -115,7 +115,7 @@ void main()
             normalize(transpose(mat3(inv_model)) * hit_normal_model);
 
         // Fall back to a default light when no light uniforms are provided.
-        vec3 dir = length(light_dir) > 0.0 ? light_dir : vec3(1.0, -1.0, -1.0);
+        vec3 dir = length(light_dir) > 0.0 ? light_dir : vec3(1.0, -1.0, 1.0);
         vec3 col = length(light_color) > 0.0 ? light_color : vec3(1.0);
         float diff = max(dot(hit_normal, normalize(-dir)), 0.0);
         vec3 tex_color = texture(apple_texture, hit_uv).rgb;
