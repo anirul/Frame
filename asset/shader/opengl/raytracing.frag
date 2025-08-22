@@ -88,6 +88,8 @@ void main()
     }
     else
     {
-        frag_color = vec4(0.0, 0.0, 0.0, 1.0);
+        // Visualize the UV coordinates when no geometry is hit so we can
+        // verify that the full-screen quad renders correctly.
+        frag_color = vec4(out_uv, 0.0, 1.0);
     }
 }
