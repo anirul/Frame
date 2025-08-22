@@ -26,6 +26,7 @@ struct Triangle
     vec2 uv0;
     vec2 uv1;
     vec2 uv2;
+    vec2 pad; // Padding to 16-byte alignment
 };
 
 layout(std430, binding = 0) buffer TriangleBuffer

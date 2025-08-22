@@ -219,6 +219,12 @@ std::pair<EntityId, EntityId> LoadStaticMeshFromObj(
         push_uv(i0);
         push_uv(i1);
         push_uv(i2);
+
+        // std430 requires each struct to be aligned to 16 bytes. The
+        // Triangle struct in the shader is 120 bytes of real data, so add
+        // two floats of padding so each triangle occupies 128 bytes.
+        triangles.push_back(0.0f);
+        triangles.push_back(0.0f);
     }
     auto maybe_triangle_buffer_id = CreateBufferInLevel(
         level,
