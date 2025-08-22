@@ -6,6 +6,7 @@ out vec4 frag_color;
 
 uniform mat4 projection;
 uniform mat4 view;
+uniform mat4 model;
 uniform vec3 camera_position;
 // Direction from the light toward the scene.
 uniform vec3 light_dir;
@@ -58,28 +59,36 @@ void main()
     vec4 clip_pos = vec4(uv, -1.0, 1.0);
     vec4 view_pos = inverse(projection) * clip_pos;
     view_pos = vec4(view_pos.xy, -1.0, 0.0);
-    vec3 ray_dir = normalize((inverse(view) * view_pos).xyz);
+    vec3 ray_dir_world = normalize((inverse(view) * view_pos).xyz);
+
+    // Transform the ray to model space to match the triangle buffer
+    mat4 inv_model = inverse(model);
+    vec3 ray_origin = vec3(inv_model * vec4(camera_position, 1.0));
+    vec3 ray_dir = normalize(mat3(inv_model) * ray_dir_world);
 
     // Trace the ray against all triangles and keep the closest hit.
     float closest_t = 1e20;
-    vec3 hit_normal = vec3(0.0);
+    vec3 hit_normal_model = vec3(0.0);
     bool hit = false;
     for (int i = 0; i < triangles.length(); ++i)
     {
         float t;
-        if (rayTriangleIntersect(camera_position, ray_dir, triangles[i], t) &&
+        if (rayTriangleIntersect(ray_origin, ray_dir, triangles[i], t) &&
             t < closest_t)
         {
             closest_t = t;
             vec3 edge1 = triangles[i].v1 - triangles[i].v0;
             vec3 edge2 = triangles[i].v2 - triangles[i].v0;
-            hit_normal = normalize(cross(edge1, edge2));
+            hit_normal_model = normalize(cross(edge1, edge2));
             hit = true;
         }
     }
 
     if (hit)
     {
+        // Transform normal back to world space for lighting
+        vec3 hit_normal = normalize(transpose(mat3(inv_model)) * hit_normal_model);
+
         // Fall back to a default light when no light uniforms are provided.
         vec3 dir = length(light_dir) > 0.0 ? light_dir : vec3(1.0, -1.0, -1.0);
         vec3 col = length(light_color) > 0.0 ? light_color : vec3(1.0);
