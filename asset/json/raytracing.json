@@ -29,6 +29,17 @@
             }
         },
         {
+            "name": "skybox",
+            "cubemap": true,
+            "pixel_element_size": {
+                "value": "FLOAT"
+            },
+            "pixel_structure": {
+                "value": "RGB"
+            },
+            "file_name": "asset/cubemap/shiodome.hdr"
+        },
+        {
             "name": "apple_texture",
             "cubemap": false,
             "pixel_element_size": {
@@ -45,10 +56,12 @@
             "name": "RayTraceMaterial",
             "program_name": "RayTraceProgram",
             "texture_names": [
-                "apple_texture"
+                "apple_texture",
+                "skybox"
             ],
             "inner_names": [
-                "apple_texture"
+                "apple_texture",
+                "skybox"
             ],
             "buffer_names": [
                 "AppleMesh.0.triangle"
@@ -71,7 +84,8 @@
                 "albedo"
             ],
             "input_texture_names": [
-                "apple_texture"
+                "apple_texture",
+                "skybox"
             ],
             "input_scene_type": {
                 "value": "QUAD"

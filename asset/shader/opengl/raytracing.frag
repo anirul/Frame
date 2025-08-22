@@ -14,6 +14,7 @@ uniform vec3 camera_position;
 uniform vec3 light_dir;
 uniform vec3 light_color;
 uniform sampler2D apple_texture;
+uniform samplerCube skybox;
 
 struct Vertex
 {
@@ -145,8 +146,7 @@ void main()
     }
     else
     {
-        // Visualize the UV coordinates when no geometry is hit so we can
-        // verify that the full-screen quad renders correctly.
-        frag_color = vec4(out_uv, 0.0, 1.0);
+        vec3 env_color = texture(skybox, ray_dir_world).rgb;
+        frag_color = vec4(env_color, 1.0);
     }
 }
