@@ -1,4 +1,5 @@
 // Ray tracing example.
+// Preprocess apple mesh off-screen so only ray-traced image is displayed.
 // From: https://sourceforge.net/p/predef/wiki/OperatingSystems/
 #if defined(_WIN32) || defined(_WIN64)
 #define WINDOWS_LEAN_AND_MEAN

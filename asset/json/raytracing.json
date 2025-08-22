@@ -14,6 +14,19 @@
             "pixel_structure": {
                 "value": "RGB"
             }
+        },
+        {
+            "name": "dummy",
+            "size": {
+                "x": 1,
+                "y": 1
+            },
+            "pixel_element_size": {
+                "value": "BYTE"
+            },
+            "pixel_structure": {
+                "value": "RGB"
+            }
         }
     ],
     "materials": [
@@ -28,6 +41,12 @@
             "inner_buffer_names": [
                 "TriangleBuffer"
             ]
+        },
+        {
+            "name": "RayTracePreprocessMaterial",
+            "program_name": "RayTracePreprocessProgram",
+            "texture_names": [],
+            "inner_names": []
         }
     ],
     "programs": [
@@ -38,6 +57,39 @@
             ],
             "input_scene_type": {
                 "value": "QUAD"
+            },
+            "shader_vertex": "raytracing.vert",
+            "shader_fragment": "raytracing.frag",
+            "uniforms": [
+                {
+                    "name": "projection",
+                    "uniform_enum": "PROJECTION_MAT4"
+                },
+                {
+                    "name": "view",
+                    "uniform_enum": "VIEW_MAT4"
+                },
+                {
+                    "name": "camera_position",
+                    "uniform_enum": "CAMERA_POSITION_VEC3"
+                },
+                {
+                    "name": "light_dir",
+                    "uniform_enum": "LIGHT_POSITION_VEC3"
+                },
+                {
+                    "name": "light_color",
+                    "uniform_enum": "LIGHT_COLOR_VEC3"
+                }
+            ]
+        },
+        {
+            "name": "RayTracePreprocessProgram",
+            "output_texture_names": [
+                "dummy"
+            ],
+            "input_scene_type": {
+                "value": "SCENE"
             },
             "shader_vertex": "raytracing.vert",
             "shader_fragment": "raytracing.frag",
@@ -114,7 +166,7 @@
                 "name": "AppleMesh",
                 "parent": "root",
                 "file_name": "apple.obj",
-                "material_name": "RayTraceMaterial",
+                "material_name": "RayTracePreprocessMaterial",
                 "render_time_enum": "PRE_RENDER_TIME"
             }
         ],
