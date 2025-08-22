@@ -146,7 +146,9 @@ void main()
     }
     else
     {
-        vec3 env_color = texture(skybox, ray_dir_world).rgb;
+        // Flip Y to match the shadow scene's cubemap orientation.
+        vec3 env_dir = vec3(ray_dir_world.x, -ray_dir_world.y, ray_dir_world.z);
+        vec3 env_color = texture(skybox, env_dir).rgb;
         frag_color = vec4(env_color, 1.0);
     }
 }
