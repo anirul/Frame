@@ -70,6 +70,14 @@
                     "uniform_enum": "VIEW_MAT4"
                 },
                 {
+                    "name": "projection_inv",
+                    "uniform_enum": "PROJECTION_INV_MAT4"
+                },
+                {
+                    "name": "view_inv",
+                    "uniform_enum": "VIEW_INV_MAT4"
+                },
+                {
                     "name": "model",
                     "uniform_enum": "MODEL_MAT4"
                 },
@@ -105,6 +113,14 @@
                 {
                     "name": "view",
                     "uniform_enum": "VIEW_MAT4"
+                },
+                {
+                    "name": "projection_inv",
+                    "uniform_enum": "PROJECTION_INV_MAT4"
+                },
+                {
+                    "name": "view_inv",
+                    "uniform_enum": "VIEW_INV_MAT4"
                 },
                 {
                     "name": "model",

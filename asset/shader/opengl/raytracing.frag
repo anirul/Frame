@@ -6,6 +6,8 @@ out vec4 frag_color;
 
 uniform mat4 projection;
 uniform mat4 view;
+uniform mat4 projection_inv;
+uniform mat4 view_inv;
 uniform mat4 model;
 uniform vec3 camera_position;
 // Direction from the light toward the scene.
@@ -57,9 +59,9 @@ void main()
     // Reconstruct the view ray for this fragment.
     vec2 uv = out_uv * 2.0 - 1.0;
     vec4 clip_pos = vec4(uv, -1.0, 1.0);
-    vec4 view_pos = inverse(projection) * clip_pos;
+    vec4 view_pos = projection_inv * clip_pos;
     view_pos = vec4(view_pos.xy, -1.0, 0.0);
-    vec3 ray_dir_world = normalize((inverse(view) * view_pos).xyz);
+    vec3 ray_dir_world = normalize((view_inv * view_pos).xyz);
 
     // Transform the ray to model space to match the triangle buffer
     mat4 inv_model = inverse(model);
