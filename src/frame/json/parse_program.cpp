@@ -71,6 +71,10 @@ std::unique_ptr<frame::ProgramInterface> ParseProgramOpenGL(
                 "No way {}?",
                 static_cast<int>(proto_program.input_scene_type().value())));
     }
+    if (proto_program.has_input_scene_root_name())
+    {
+        program->SetTemporarySceneRoot(proto_program.input_scene_root_name());
+    }
     program->Use();
     for (const auto& parameter : proto_program.uniforms())
     {

@@ -126,10 +126,20 @@ void Renderer::RenderMesh(
     auto program_id = material.GetProgramId();
     auto& program = level_.GetProgramFromId(program_id);
     assert(program.GetOutputTextureIds().size());
+    glm::mat4 model_matrix = model;
+    if (!program.GetTemporarySceneRoot().empty())
+    {
+        auto temp_id = level_.GetIdFromName(program.GetTemporarySceneRoot());
+        if (temp_id != NullId)
+        {
+            auto& temp_node = level_.GetSceneNodeFromId(temp_id);
+            model_matrix = temp_node.GetLocalModel(delta_time_);
+        }
+    }
 
     // In case the camera doesn't exist it will create a basic one.
     UniformCollectionWrapper uniform_collection_wrapper(
-        projection, view, model, delta_time_);
+        projection, view, model_matrix, delta_time_);
     if (level_.GetLights().size() > 0)
     {
         auto& light = level_.GetLightFromId(level_.GetLights()[0]);

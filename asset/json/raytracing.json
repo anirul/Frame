@@ -76,6 +76,7 @@
             "input_scene_type": {
                 "value": "QUAD"
             },
+            "input_scene_root_name": "apple_root",
             "shader_vertex": "raytracing.vert",
             "shader_fragment": "raytracing.frag",
             "uniforms": [
@@ -171,6 +172,16 @@
                     "m33": 1,
                     "m44": 1
                 }
+            },
+            {
+                "name": "apple_root",
+                "parent": "root",
+                "quaternion": {
+                    "x": 0.0,
+                    "y": 0.2474039,
+                    "z": 0.0,
+                    "w": 0.9689124
+                }
             }
         ],
         "node_cameras": [
@@ -206,7 +217,7 @@
             },
             {
                 "name": "AppleMesh",
-                "parent": "root",
+                "parent": "apple_root",
                 "file_name": "apple.obj",
                 "material_name": "RayTracePreprocessMaterial",
                 "render_time_enum": "PRE_RENDER_TIME"
