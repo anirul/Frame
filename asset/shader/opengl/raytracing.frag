@@ -113,11 +113,33 @@ void main()
         // Transform normal back to world space for lighting
         vec3 hit_normal =
             normalize(transpose(mat3(inv_model)) * hit_normal_model);
+        // Position of the hit point in model space for casting shadow rays.
+        vec3 hit_pos_model = ray_origin + closest_t * ray_dir;
 
         // Fall back to a default light when no light uniforms are provided.
         vec3 dir = length(light_dir) > 0.0 ? light_dir : vec3(1.0, -1.0, 1.0);
         vec3 col = length(light_color) > 0.0 ? light_color : vec3(1.0);
-        float diff = max(dot(hit_normal, normalize(-dir)), 0.0);
+
+        // Cast a shadow ray toward the light in model space.
+        vec3 shadow_dir = normalize(mat3(inv_model) * -dir);
+        vec3 shadow_origin = hit_pos_model + hit_normal_model * 0.0001;
+        bool in_shadow = false;
+        for (int i = 0; i < triangles.length(); ++i)
+        {
+            float t_shadow;
+            vec2 bary_shadow;
+            if (rayTriangleIntersect(shadow_origin, shadow_dir, triangles[i],
+                                     t_shadow, bary_shadow))
+            {
+                in_shadow = true;
+                break;
+            }
+        }
+
+        float diff = 0.0;
+        if (!in_shadow)
+            diff = max(dot(hit_normal, normalize(-dir)), 0.0);
+
         vec3 tex_color = texture(apple_texture, hit_uv).rgb;
         frag_color = vec4(diff * col * tex_color, 1.0);
     }
