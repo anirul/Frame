@@ -27,14 +27,29 @@
             "pixel_structure": {
                 "value": "RGB"
             }
+        },
+        {
+            "name": "apple_texture",
+            "cubemap": false,
+            "pixel_element_size": {
+                "value": "BYTE"
+            },
+            "pixel_structure": {
+                "value": "RGB"
+            },
+            "file_name": "asset/apple/color.jpg"
         }
     ],
     "materials": [
         {
             "name": "RayTraceMaterial",
             "program_name": "RayTraceProgram",
-            "texture_names": [],
-            "inner_names": [],
+            "texture_names": [
+                "apple_texture"
+            ],
+            "inner_names": [
+                "apple_texture"
+            ],
             "buffer_names": [
                 "AppleMesh.0.triangle"
             ],
@@ -54,6 +69,9 @@
             "name": "RayTraceProgram",
             "output_texture_names": [
                 "albedo"
+            ],
+            "input_texture_names": [
+                "apple_texture"
             ],
             "input_scene_type": {
                 "value": "QUAD"

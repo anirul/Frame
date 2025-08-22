@@ -13,17 +13,23 @@ uniform vec3 camera_position;
 // Direction from the light toward the scene.
 uniform vec3 light_dir;
 uniform vec3 light_color;
+uniform sampler2D apple_texture;
 
-struct Triangle {
+struct Triangle
+{
     vec3 v0;
     vec3 v1;
     vec3 v2;
     vec3 n0;
     vec3 n1;
     vec3 n2;
+    vec2 uv0;
+    vec2 uv1;
+    vec2 uv2;
 };
 
-layout(std430, binding = 0) buffer TriangleBuffer {
+layout(std430, binding = 0) buffer TriangleBuffer
+{
     Triangle triangles[];
 };
 
@@ -40,7 +46,7 @@ bool rayTriangleIntersect(
     vec3 h = cross(ray_direction, edge2);
     float a = dot(edge1, h);
     if (a > -EPSILON && a < EPSILON)
-        return false;    // Ray is parallel to triangle.
+        return false; // Ray is parallel to triangle.
     float f = 1.0 / a;
     vec3 s = ray_origin - triangle.v0;
     float u = f * dot(s, h);
@@ -51,7 +57,8 @@ bool rayTriangleIntersect(
     if (v < 0.0 || u + v > 1.0)
         return false;
     float t = f * dot(edge2, q);
-    if (t > EPSILON) {
+    if (t > EPSILON)
+    {
         out_t = t;
         out_bary = vec2(u, v);
         return true;
@@ -76,6 +83,7 @@ void main()
     // Trace the ray against all triangles and keep the closest hit.
     float closest_t = 1e20;
     vec3 hit_normal_model = vec3(0.0);
+    vec2 hit_uv = vec2(0.0);
     bool hit = false;
     for (int i = 0; i < triangles.length(); ++i)
     {
@@ -87,9 +95,10 @@ void main()
             closest_t = t;
             float w = 1.0 - bary.x - bary.y;
             hit_normal_model = normalize(
-                triangles[i].n0 * w +
-                triangles[i].n1 * bary.x +
+                triangles[i].n0 * w + triangles[i].n1 * bary.x +
                 triangles[i].n2 * bary.y);
+            hit_uv = triangles[i].uv0 * w + triangles[i].uv1 * bary.x +
+                     triangles[i].uv2 * bary.y;
             hit = true;
         }
     }
@@ -97,13 +106,15 @@ void main()
     if (hit)
     {
         // Transform normal back to world space for lighting
-        vec3 hit_normal = normalize(transpose(mat3(inv_model)) * hit_normal_model);
+        vec3 hit_normal =
+            normalize(transpose(mat3(inv_model)) * hit_normal_model);
 
         // Fall back to a default light when no light uniforms are provided.
         vec3 dir = length(light_dir) > 0.0 ? light_dir : vec3(1.0, -1.0, -1.0);
         vec3 col = length(light_color) > 0.0 ? light_color : vec3(1.0);
         float diff = max(dot(hit_normal, normalize(-dir)), 0.0);
-        frag_color = vec4(diff * col, 1.0);
+        vec3 tex_color = texture(apple_texture, hit_uv).rgb;
+        frag_color = vec4(diff * col * tex_color, 1.0);
     }
     else
     {

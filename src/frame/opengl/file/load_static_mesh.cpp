@@ -175,39 +175,50 @@ std::pair<EntityId, EntityId> LoadStaticMeshFromObj(
     EntityId index_buffer_id = maybe_index_buffer_id.value();
 
     // Triangle buffer generation (SSBO).
-    // Each triangle stores the three positions followed by the three normals.
+    // Each triangle stores the three positions, normals, and texture coords.
     std::vector<float> triangles;
     for (int i = 0; i < indices.size(); i += 3)
     {
         int i0 = indices[i];
         int i1 = indices[i + 1];
         int i2 = indices[i + 2];
+        auto push_position = [&](int idx) {
+            triangles.push_back(points[idx * 3]);
+            triangles.push_back(points[idx * 3 + 1]);
+            triangles.push_back(points[idx * 3 + 2]);
+            triangles.push_back(0.0f); // Padding
+        };
+        auto push_normal = [&](int idx) {
+            triangles.push_back(normals[idx * 3]);
+            triangles.push_back(normals[idx * 3 + 1]);
+            triangles.push_back(normals[idx * 3 + 2]);
+            triangles.push_back(0.0f); // Padding
+        };
+        auto push_uv = [&](int idx) {
+            if (!textures.empty())
+            {
+                triangles.push_back(textures[idx * 2]);
+                triangles.push_back(textures[idx * 2 + 1]);
+            }
+            else
+            {
+                triangles.push_back(0.0f);
+                triangles.push_back(0.0f);
+            }
+        };
+
         // Positions
-        triangles.push_back(points[i0 * 3]);
-        triangles.push_back(points[i0 * 3 + 1]);
-        triangles.push_back(points[i0 * 3 + 2]);
-        triangles.push_back(0.0f); // Padding
-        triangles.push_back(points[i1 * 3]);
-        triangles.push_back(points[i1 * 3 + 1]);
-        triangles.push_back(points[i1 * 3 + 2]);
-        triangles.push_back(0.0f); // Padding
-        triangles.push_back(points[i2 * 3]);
-        triangles.push_back(points[i2 * 3 + 1]);
-        triangles.push_back(points[i2 * 3 + 2]);
-        triangles.push_back(0.0f); // Padding
+        push_position(i0);
+        push_position(i1);
+        push_position(i2);
         // Normals
-        triangles.push_back(normals[i0 * 3]);
-        triangles.push_back(normals[i0 * 3 + 1]);
-        triangles.push_back(normals[i0 * 3 + 2]);
-        triangles.push_back(0.0f); // Padding
-        triangles.push_back(normals[i1 * 3]);
-        triangles.push_back(normals[i1 * 3 + 1]);
-        triangles.push_back(normals[i1 * 3 + 2]);
-        triangles.push_back(0.0f); // Padding
-        triangles.push_back(normals[i2 * 3]);
-        triangles.push_back(normals[i2 * 3 + 1]);
-        triangles.push_back(normals[i2 * 3 + 2]);
-        triangles.push_back(0.0f); // Padding
+        push_normal(i0);
+        push_normal(i1);
+        push_normal(i2);
+        // UV coordinates
+        push_uv(i0);
+        push_uv(i1);
+        push_uv(i2);
     }
     auto maybe_triangle_buffer_id = CreateBufferInLevel(
         level,

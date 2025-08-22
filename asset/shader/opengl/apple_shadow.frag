@@ -12,16 +12,21 @@ uniform mat4 model;
 
 out vec4 frag_color;
 
-struct Triangle {
+struct Triangle
+{
     vec3 v0;
     vec3 v1;
     vec3 v2;
     vec3 n0;
     vec3 n1;
     vec3 n2;
+    vec2 uv0;
+    vec2 uv1;
+    vec2 uv2;
 };
 
-layout(std430, binding = 0) buffer TriangleBuffer {
+layout(std430, binding = 0) buffer TriangleBuffer
+{
     Triangle triangles[];
 };
 
@@ -38,8 +43,8 @@ bool rayTriangleIntersect(
     vec3 h = cross(ray_direction, edge2);
     float a = dot(edge1, h);
     if (a > -EPSILON && a < EPSILON)
-        return false;    // This ray is parallel to this triangle.
-    float f = 1.0/a;
+        return false; // This ray is parallel to this triangle.
+    float f = 1.0 / a;
     vec3 s = ray_origin - triangle.v0;
     float u = f * dot(s, h);
     if (u < 0.0 || u > 1.0)
@@ -48,21 +53,25 @@ bool rayTriangleIntersect(
     float v = f * dot(ray_direction, q);
     if (v < 0.0 || u + v > 1.0)
         return false;
-    // At this stage we can compute t to find out where the intersection point is on the line.
+    // At this stage we can compute t to find out where the intersection point
+    // is on the line.
     float t = f * dot(edge2, q);
     if (t > EPSILON) // ray intersection
     {
         out_t = t;
         return true;
     }
-    else // This means that there is a line intersection but not a ray intersection.
+    else // This means that there is a line intersection but not a ray
+         // intersection.
         return false;
 }
 
-void main() {
+void main()
+{
     // 1. Basic lighting (Lambert / Blinn-Phong, etc.)
     vec3 normal = normalize(out_normal);
-    // Light direction points from the fragment toward the light source (world space).
+    // Light direction points from the fragment toward the light source (world
+    // space).
     vec3 light_direction_world = normalize(-light_dir);
     float diff = max(dot(normal, light_direction_world), 0.0);
 
