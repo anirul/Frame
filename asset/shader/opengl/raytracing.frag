@@ -146,8 +146,10 @@ void main()
     }
     else
     {
-        // Flip Y to match the shadow scene's cubemap orientation.
+        // Flip Y to match the shadow scene's cubemap orientation and rotate
+        // the sample direction so the environment follows the apple's motion.
         vec3 env_dir = vec3(ray_dir_world.x, -ray_dir_world.y, ray_dir_world.z);
+        env_dir = mat3(model) * env_dir;
         vec3 env_color = texture(skybox, env_dir).rgb;
         frag_color = vec4(env_color, 1.0);
     }
