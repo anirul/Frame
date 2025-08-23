@@ -90,7 +90,7 @@
             "input_scene_type": {
                 "value": "QUAD"
             },
-            "input_scene_root_name": "mesh_holder",
+            "input_scene_root_name": "apple_root",
             "shader_vertex": "raytracing.vert",
             "shader_fragment": "raytracing.frag",
             "uniforms": [
@@ -188,8 +188,19 @@
                 }
             },
             {
-                "name": "mesh_holder",
+                "name": "apple_root",
                 "parent": "root",
+                "matrix_type_enum": "ROTATION_MATRIX",
+                "quaternion": {
+                    "x": 0.0,
+                    "y": 0.4794255,
+                    "z": 0.0,
+                    "w": 0.8775826
+                }
+            },
+            {
+                "name": "mesh_holder",
+                "parent": "apple_root",
                 "quaternion": {
                     "x": 0.0,
                     "y": 0.1979232,
@@ -208,7 +219,7 @@
                 "position": {
                     "x": 0,
                     "y": 0,
-                    "z": -3
+                    "z": -2
                 },
                 "target": {
                     "x": 0,
