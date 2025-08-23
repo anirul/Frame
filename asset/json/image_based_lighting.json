@@ -215,8 +215,8 @@
                 "matrix_type_enum": "ROTATION_MATRIX",
                 "quaternion": {
                     "x": 0.0,
-                    "y": 0.4794255,
-                    "z": 0.0,
+                    "y": 0.3835404,
+                    "z": 0.2876553,
                     "w": 0.8775826
                 }
             },
