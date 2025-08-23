@@ -169,6 +169,7 @@
             "input_scene_type": {
                 "value": "SCENE"
             },
+            "input_scene_root_name": "root",
             "shader_vertex": "image_based_lighting.vert",
             "shader_fragment": "image_based_lighting.frag",
             "uniforms": [
@@ -210,19 +211,8 @@
                 }
             },
             {
-                "name": "apple_root",
-                "parent": "root",
-                "matrix_type_enum": "ROTATION_MATRIX",
-                "quaternion": {
-                    "x": 0.0,
-                    "y": 0.3835404,
-                    "z": 0.2876553,
-                    "w": 0.8775826
-                }
-            },
-            {
                 "name": "mesh_holder",
-                "parent": "apple_root",
+                "parent": "root",
                 "quaternion": {
                     "x": 0.0,
                     "y": 0.1979232,

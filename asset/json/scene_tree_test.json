@@ -41,6 +41,7 @@
             "input_scene_type": {
                 "value": "SCENE"
             },
+            "input_scene_root_name": "root",
             "shader_vertex": "blur.vert",
             "shader_fragment": "blur.frag"
         }

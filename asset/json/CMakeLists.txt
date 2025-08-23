@@ -14,11 +14,11 @@ add_custom_target(AssetJson
     point_cloud.json
     program_test.json
     ray_marching.json
+    raytracing.json
     renderer_test.json
     scene_simple.json
     scene_tree_test.json
     shadow.json
-    raytracing.json
 )
 
 set_property(TARGET AssetJson PROPERTY FOLDER "FrameAsset/Json")
