@@ -125,6 +125,10 @@
                 {
                     "name": "light_color",
                     "uniform_enum": "LIGHT_COLOR_VEC3"
+                },
+                {
+                    "name": "time",
+                    "uniform_enum": "FLOAT_TIME_S"
                 }
             ]
         },
@@ -170,6 +174,10 @@
                 {
                     "name": "light_color",
                     "uniform_enum": "LIGHT_COLOR_VEC3"
+                },
+                {
+                    "name": "time",
+                    "uniform_enum": "FLOAT_TIME_S"
                 }
             ]
         }
@@ -193,9 +201,9 @@
                 "matrix_type_enum": "ROTATION_MATRIX",
                 "quaternion": {
                     "x": 0.0,
-                    "y": 0.4794255,
+                    "y": 0.12467473338522769,
                     "z": 0.0,
-                    "w": 0.8775826
+                    "w": 0.992197667229329
                 }
             },
             {
