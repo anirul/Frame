@@ -12,10 +12,19 @@ uniform mat4 model;
 
 out vec4 frag_color;
 
+struct Vertex {
+    vec3 position;
+    float pad0;
+    vec3 normal;
+    float pad1;
+    vec2 uv;
+    vec2 pad2;
+};
+
 struct Triangle {
-    vec3 v0;
-    vec3 v1;
-    vec3 v2;
+    Vertex v0;
+    Vertex v1;
+    Vertex v2;
 };
 
 layout(std430, binding = 0) buffer TriangleBuffer {
@@ -30,14 +39,14 @@ bool rayTriangleIntersect(
     out float out_t)
 {
     const float EPSILON = 0.0000001;
-    vec3 edge1 = triangle.v1 - triangle.v0;
-    vec3 edge2 = triangle.v2 - triangle.v0;
+    vec3 edge1 = triangle.v1.position - triangle.v0.position;
+    vec3 edge2 = triangle.v2.position - triangle.v0.position;
     vec3 h = cross(ray_direction, edge2);
     float a = dot(edge1, h);
     if (a > -EPSILON && a < EPSILON)
         return false;    // This ray is parallel to this triangle.
     float f = 1.0/a;
-    vec3 s = ray_origin - triangle.v0;
+    vec3 s = ray_origin - triangle.v0.position;
     float u = f * dot(s, h);
     if (u < 0.0 || u > 1.0)
         return false;
