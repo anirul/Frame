@@ -389,34 +389,40 @@ void Renderer::PreRender()
         {
             auto material_id = p.second;
             auto temp_viewport = viewport_;
-            // Now this get the image size from the environment map.
+            // Query textures from the material.
             auto& material = level_.GetMaterialFromId(material_id);
             auto ids = material.GetTextureIds();
             if (ids.empty())
             {
-                // Nothing to pre-render for materials without textures.
+                // Mesh has no target texture: just render once to populate
+                // buffers without touching the framebuffer.
+                RenderNode(
+                    p.first, material_id, kProjectionCubemap, kViewsCubemap[0]);
                 continue;
             }
             auto& texture = level_.GetTextureFromId(ids[0]);
             auto size = json::ParseSize(texture.GetData().size());
-            viewport_ = glm::ivec4(0, 0, size.x / 2, size.y / 2);
-            for (std::uint32_t i = 0; i < 6; ++i)
+            viewport_ = glm::ivec4(0, 0, size.x, size.y);
+            if (texture.GetData().cubemap())
             {
-                proto::TextureFrame texture_frame;
-                texture_frame.set_value(
-                    static_cast<proto::TextureFrame::Enum>(
-                        proto::TextureFrame::CUBE_MAP_POSITIVE_X + i));
-                SetCubeMapTarget(texture_frame);
-                RenderNode(
-                    p.first, material_id, kProjectionCubemap, kViewsCubemap[i]);
+                for (std::uint32_t i = 0; i < 6; ++i)
+                {
+                    proto::TextureFrame texture_frame;
+                    texture_frame.set_value(
+                        static_cast<proto::TextureFrame::Enum>(
+                            proto::TextureFrame::CUBE_MAP_POSITIVE_X + i));
+                    SetCubeMapTarget(texture_frame);
+                    RenderNode(
+                        p.first,
+                        material_id,
+                        kProjectionCubemap,
+                        kViewsCubemap[i]);
+                }
             }
+            else
             {
-                // Again why?
-                proto::TextureFrame texture_frame;
-                texture_frame.set_value(
-                    static_cast<proto::TextureFrame::Enum>(
-                        proto::TextureFrame::CUBE_MAP_POSITIVE_X));
-                SetCubeMapTarget(texture_frame);
+                // Regular 2D texture target.
+                texture_frame_ = FrameTextureType::TEXTURE_2D;
                 RenderNode(
                     p.first, material_id, kProjectionCubemap, kViewsCubemap[0]);
             }
