@@ -175,24 +175,45 @@ std::pair<EntityId, EntityId> LoadStaticMeshFromObj(
     EntityId index_buffer_id = maybe_index_buffer_id.value();
 
     // Triangle buffer generation (SSBO).
+    // Each triangle is composed of three vertices, each storing position,
+    // normal, and texture coordinates. The vertex layout mirrors the GLSL
+    // `Vertex` struct and occupies 48 bytes, yielding 144 bytes per triangle
+    // (already aligned to 16 bytes).
     std::vector<float> triangles;
+    auto push_vertex = [&](int idx) {
+        // Position
+        triangles.push_back(points[idx * 3]);
+        triangles.push_back(points[idx * 3 + 1]);
+        triangles.push_back(points[idx * 3 + 2]);
+        triangles.push_back(0.0f); // Padding
+        // Normal
+        triangles.push_back(normals[idx * 3]);
+        triangles.push_back(normals[idx * 3 + 1]);
+        triangles.push_back(normals[idx * 3 + 2]);
+        triangles.push_back(0.0f); // Padding
+        // UV
+        if (!textures.empty())
+        {
+            triangles.push_back(textures[idx * 2]);
+            triangles.push_back(textures[idx * 2 + 1]);
+        }
+        else
+        {
+            triangles.push_back(0.0f);
+            triangles.push_back(0.0f);
+        }
+        triangles.push_back(0.0f); // Padding
+        triangles.push_back(0.0f); // Padding
+    };
+
     for (int i = 0; i < indices.size(); i += 3)
     {
         int i0 = indices[i];
         int i1 = indices[i + 1];
         int i2 = indices[i + 2];
-        triangles.push_back(points[i0 * 3]);
-        triangles.push_back(points[i0 * 3 + 1]);
-        triangles.push_back(points[i0 * 3 + 2]);
-        triangles.push_back(0.0f); // Padding
-        triangles.push_back(points[i1 * 3]);
-        triangles.push_back(points[i1 * 3 + 1]);
-        triangles.push_back(points[i1 * 3 + 2]);
-        triangles.push_back(0.0f); // Padding
-        triangles.push_back(points[i2 * 3]);
-        triangles.push_back(points[i2 * 3 + 1]);
-        triangles.push_back(points[i2 * 3 + 2]);
-        triangles.push_back(0.0f); // Padding
+        push_vertex(i0);
+        push_vertex(i1);
+        push_vertex(i2);
     }
     auto maybe_triangle_buffer_id = CreateBufferInLevel(
         level,

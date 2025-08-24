@@ -61,7 +61,6 @@ std::unique_ptr<frame::ProgramInterface> ParseProgramOpenGL(
         break;
     }
     case proto::SceneType::SCENE: {
-        program->SetTemporarySceneRoot(proto_program.input_scene_root_name());
         break;
     }
     case proto::SceneType::NONE:
@@ -70,6 +69,11 @@ std::unique_ptr<frame::ProgramInterface> ParseProgramOpenGL(
             std::format(
                 "No way {}?",
                 static_cast<int>(proto_program.input_scene_type().value())));
+    }
+    if (!proto_program.input_scene_root_name().empty() &&
+        proto_program.input_scene_root_name() != "root")
+    {
+        program->SetTemporarySceneRoot(proto_program.input_scene_root_name());
     }
     program->Use();
     for (const auto& parameter : proto_program.uniforms())

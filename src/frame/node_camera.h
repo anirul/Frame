@@ -17,7 +17,7 @@ class NodeCamera : public NodeInterface, public Serialize<proto::NodeCamera>
      * @param func: This function return the ID from a string (it will need
      *        a level passed in the capture list).
      * @param position: Position of the camera.
-     * @param front: Direction the camera is facing to (normalized).
+     * @param target: Position the camera is looking at.
      * @param up: Direction of the up for the camera (normalized).
      * @param fov_degrees: Field of view (angle in degrees of the vertical
      *        field of view).
@@ -37,7 +37,7 @@ class NodeCamera : public NodeInterface, public Serialize<proto::NodeCamera>
         : NodeInterface(func), camera_(
                                    std::make_unique<Camera>(
                                        position,
-                                       target,
+                                       glm::normalize(target - position),
                                        up,
                                        fov_degrees,
                                        aspect_ratio,

@@ -126,10 +126,20 @@ void Renderer::RenderMesh(
     auto program_id = material.GetProgramId();
     auto& program = level_.GetProgramFromId(program_id);
     assert(program.GetOutputTextureIds().size());
+    glm::mat4 model_matrix = model;
+    if (!program.GetTemporarySceneRoot().empty())
+    {
+        auto temp_id = level_.GetIdFromName(program.GetTemporarySceneRoot());
+        if (temp_id != NullId)
+        {
+            auto& temp_node = level_.GetSceneNodeFromId(temp_id);
+            model_matrix = temp_node.GetLocalModel(delta_time_);
+        }
+    }
 
     // In case the camera doesn't exist it will create a basic one.
     UniformCollectionWrapper uniform_collection_wrapper(
-        projection, view, model, delta_time_);
+        projection, view, model_matrix, delta_time_);
     if (level_.GetLights().size() > 0)
     {
         auto& light = level_.GetLightFromId(level_.GetLights()[0]);
@@ -146,6 +156,21 @@ void Renderer::RenderMesh(
     }
     // Go through the callback.
     callback_(uniform_collection_wrapper, static_mesh, material);
+
+    // Register shader storage buffers before using the program so they are
+    // bound when Program::Use uploads them.
+    int j = 0;
+    for (const auto& name : material.GetBufferNames())
+    {
+        auto id = level_.GetIdFromName(name);
+        if (id == NullId)
+        {
+            throw std::runtime_error("Could not find buffer: " + name);
+        }
+        auto inner_name = material.GetInnerBufferName(name);
+        dynamic_cast<opengl::Program&>(program).AddBuffer(id, inner_name, j++);
+    }
+
     program.Use(uniform_collection_wrapper, &level_);
 
     auto texture_out_ids = program.GetOutputTextureIds();
@@ -217,18 +242,6 @@ void Renderer::RenderMesh(
         std::unique_ptr<UniformInterface> uniform_interface =
             std::make_unique<Uniform>(p.first, p.second);
         program.AddUniform(std::move(uniform_interface));
-    }
-    int j = 0;
-    for (const auto& name : material.GetBufferNames())
-    {
-        auto id = level_.GetIdFromName(name);
-        if (id == NullId)
-        {
-            throw std::runtime_error("Could not find buffer: " + name);
-        }
-        auto& buffer = dynamic_cast<opengl::Buffer&>(level_.GetBufferFromId(id));
-        auto inner_name = material.GetInnerBufferName(name);
-        dynamic_cast<opengl::Program&>(program).AddBuffer(id, inner_name, j++);
     }
 
     auto& gl_static_mesh = dynamic_cast<StaticMesh&>(static_mesh);
@@ -376,30 +389,41 @@ void Renderer::PreRender()
         {
             auto material_id = p.second;
             auto temp_viewport = viewport_;
-            // Now this get the image size from the environment map.
+            // Query textures from the material.
             auto& material = level_.GetMaterialFromId(material_id);
             auto ids = material.GetTextureIds();
-            assert(!ids.empty());
+            if (ids.empty())
+            {
+                // Mesh has no target texture: just render once to populate
+                // buffers without touching the framebuffer.
+                RenderNode(
+                    p.first, material_id, kProjectionCubemap, kViewsCubemap[0]);
+                continue;
+            }
             auto& texture = level_.GetTextureFromId(ids[0]);
             auto size = json::ParseSize(texture.GetData().size());
-            viewport_ = glm::ivec4(0, 0, size.x / 2, size.y / 2);
-            for (std::uint32_t i = 0; i < 6; ++i)
+            viewport_ = glm::ivec4(0, 0, size.x, size.y);
+            if (texture.GetData().cubemap())
             {
-                proto::TextureFrame texture_frame;
-                texture_frame.set_value(
-                    static_cast<proto::TextureFrame::Enum>(
-                        proto::TextureFrame::CUBE_MAP_POSITIVE_X + i));
-                SetCubeMapTarget(texture_frame);
-                RenderNode(
-                    p.first, material_id, kProjectionCubemap, kViewsCubemap[i]);
+                for (std::uint32_t i = 0; i < 6; ++i)
+                {
+                    proto::TextureFrame texture_frame;
+                    texture_frame.set_value(
+                        static_cast<proto::TextureFrame::Enum>(
+                            proto::TextureFrame::CUBE_MAP_POSITIVE_X + i));
+                    SetCubeMapTarget(texture_frame);
+                    RenderNode(
+                        p.first,
+                        material_id,
+                        kProjectionCubemap,
+                        kViewsCubemap[i]);
+                }
             }
+            else
             {
-                // Again why?
-                proto::TextureFrame texture_frame;
-                texture_frame.set_value(
-                    static_cast<proto::TextureFrame::Enum>(
-                        proto::TextureFrame::CUBE_MAP_POSITIVE_X));
-                SetCubeMapTarget(texture_frame);
+                // Regular 2D texture target.
+                texture_frame_.set_value(
+                    proto::TextureFrame::TEXTURE_2D);
                 RenderNode(
                     p.first, material_id, kProjectionCubemap, kViewsCubemap[0]);
             }

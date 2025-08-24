@@ -135,6 +135,9 @@ void RegisterUniformEnumFromProto(
     case proto::Uniform::VIEW_INV_MAT4:
     case proto::Uniform::MODEL_MAT4:
     case proto::Uniform::MODEL_INV_MAT4:
+    case proto::Uniform::LIGHT_POSITION_VEC3:
+    case proto::Uniform::LIGHT_COLOR_VEC3:
+    case proto::Uniform::CAMERA_POSITION_VEC3:
     case proto::Uniform::FLOAT_TIME_S: {
         std::unique_ptr<frame::UniformInterface> uniform_interface =
             std::make_unique<frame::Uniform>(name, uniform_enum);
