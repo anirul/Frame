@@ -422,7 +422,8 @@ void Renderer::PreRender()
             else
             {
                 // Regular 2D texture target.
-                texture_frame_ = FrameTextureType::TEXTURE_2D;
+                texture_frame_.set_value(
+                    proto::TextureFrame::TEXTURE_2D);
                 RenderNode(
                     p.first, material_id, kProjectionCubemap, kViewsCubemap[0]);
             }
