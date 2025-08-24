@@ -14,7 +14,7 @@ uniform vec3 camera_position;
 uniform vec3 light_dir;
 uniform vec3 light_color;
 uniform sampler2D apple_texture;
-uniform samplerCube skybox;
+uniform samplerCube skybox_env;
 
 struct Vertex
 {
@@ -144,8 +144,8 @@ void main()
         vec3 tex_color = texture(apple_texture, hit_uv).rgb;
         vec3 env_reflect_dir = reflect(ray_dir_world, hit_normal);
         env_reflect_dir = vec3(env_reflect_dir.x, -env_reflect_dir.y, env_reflect_dir.z);
-        vec3 env_color = texture(skybox, env_reflect_dir).rgb;
-        frag_color = vec4(diff * col * tex_color + 0.2 * env_color, 1.0);
+        vec3 env_color = texture(skybox_env, env_reflect_dir).rgb;
+        frag_color = vec4(diff * col * tex_color + 0.1 * env_color, 1.0);
     }
     else
     {
