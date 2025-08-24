@@ -53,6 +53,16 @@
     ],
     "materials": [
         {
+            "name": "CubeMapMaterial",
+            "program_name": "CubeMapProgram",
+            "texture_names": [
+                "skybox"
+            ],
+            "inner_names": [
+                "Skybox"
+            ]
+        },
+        {
             "name": "RayTraceMaterial",
             "program_name": "RayTraceProgram",
             "texture_names": [
@@ -79,6 +89,34 @@
     ],
     "programs": [
         {
+            "name": "CubeMapProgram",
+            "input_texture_names": [
+                "skybox"
+            ],
+            "output_texture_names": [
+                "albedo"
+            ],
+            "input_scene_type": {
+                "value": "CUBE"
+            },
+            "shader_vertex": "cubemap.vert",
+            "shader_fragment": "cubemap.frag",
+            "uniforms": [
+                {
+                    "name": "projection",
+                    "uniform_enum": "PROJECTION_MAT4"
+                },
+                {
+                    "name": "view",
+                    "uniform_enum": "VIEW_MAT4"
+                },
+                {
+                    "name": "model",
+                    "uniform_enum": "MODEL_MAT4"
+                }
+            ]
+        },
+        {
             "name": "RayTraceProgram",
             "output_texture_names": [
                 "albedo"
@@ -90,7 +128,7 @@
             "input_scene_type": {
                 "value": "QUAD"
             },
-            "input_scene_root_name": "apple_root",
+            "input_scene_root_name": "mesh_holder",
             "shader_vertex": "raytracing.vert",
             "shader_fragment": "raytracing.frag",
             "uniforms": [
@@ -125,10 +163,6 @@
                 {
                     "name": "light_color",
                     "uniform_enum": "LIGHT_COLOR_VEC3"
-                },
-                {
-                    "name": "time",
-                    "uniform_enum": "FLOAT_TIME_S"
                 }
             ]
         },
@@ -174,10 +208,6 @@
                 {
                     "name": "light_color",
                     "uniform_enum": "LIGHT_COLOR_VEC3"
-                },
-                {
-                    "name": "time",
-                    "uniform_enum": "FLOAT_TIME_S"
                 }
             ]
         }
@@ -196,24 +226,23 @@
                 }
             },
             {
-                "name": "apple_root",
+                "name": "mesh_holder",
                 "parent": "root",
-                "matrix_type_enum": "ROTATION_MATRIX",
                 "quaternion": {
                     "x": 0.0,
-                    "y": 0.09973979,
-                    "z": 0.07480484,
-                    "w": 0.9921977
+                    "y": 0.2930181,
+                    "z": 0.2197635,
+                    "w": 0.9305076
                 }
             },
             {
-                "name": "mesh_holder",
-                "parent": "apple_root",
+                "name": "env_holder",
+                "parent": "root",
                 "quaternion": {
                     "x": 0.0,
-                    "y": 0.1979232,
-                    "z": 0.1484424,
-                    "w": 0.9689124
+                    "y": 0.0499792,
+                    "z": 0.0,
+                    "w": 0.9987503
                 }
             }
         ],
@@ -243,6 +272,12 @@
         ],
         "node_static_meshes": [
             {
+                "name": "CubeMapMesh",
+                "parent": "env_holder",
+                "material_name": "CubeMapMaterial",
+                "mesh_enum": "CUBE"
+            },
+            {
                 "name": "RayTracingRendering",
                 "parent": "root",
                 "mesh_enum": "QUAD",
@@ -259,13 +294,13 @@
         "node_lights": [
             {
                 "name": "sun",
-                "parent": "root",
+                "parent": "env_holder",
                 "light_type": "DIRECTIONAL_LIGHT",
                 "shadow_type": "NO_SHADOW",
                 "direction": {
                     "x": 1.0,
                     "y": -1.0,
-                    "z": 1.0
+                    "z": -1.0
                 },
                 "color": {
                     "x": 1.0,
@@ -276,3 +311,4 @@
         ]
     }
 }
+

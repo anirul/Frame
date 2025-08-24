@@ -10,7 +10,6 @@ uniform mat4 projection_inv;
 uniform mat4 view_inv;
 uniform mat4 model;
 uniform vec3 camera_position;
-uniform float time;
 // Direction from the light toward the scene.
 uniform vec3 light_dir;
 uniform vec3 light_color;
@@ -143,20 +142,13 @@ void main()
             diff = max(dot(hit_normal, normalize(-dir)), 0.0);
 
         vec3 tex_color = texture(apple_texture, hit_uv).rgb;
-        frag_color = vec4(diff * col * tex_color, 1.0);
+        vec3 env_reflect_dir = reflect(ray_dir_world, hit_normal);
+        env_reflect_dir = vec3(env_reflect_dir.x, -env_reflect_dir.y, env_reflect_dir.z);
+        vec3 env_color = texture(skybox, env_reflect_dir).rgb;
+        frag_color = vec4(diff * col * tex_color + 0.2 * env_color, 1.0);
     }
     else
     {
-        // Flip Y to match the shadow scene's cubemap orientation and rotate
-        // the sample direction using time so the environment spins slowly.
-        vec3 env_dir = vec3(ray_dir_world.x, -ray_dir_world.y, ray_dir_world.z);
-        float angle = time * 0.25;
-        mat3 rot = mat3(
-            cos(angle), 0.0, sin(angle),
-            0.0,        1.0, 0.0,
-            -sin(angle),0.0, cos(angle));
-        env_dir = rot * env_dir;
-        vec3 env_color = texture(skybox, env_dir).rgb;
-        frag_color = vec4(env_color, 1.0);
+        discard;
     }
 }
