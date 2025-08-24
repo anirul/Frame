@@ -137,15 +137,15 @@ void main()
             }
         }
 
-        float diff = 0.0;
-        if (!in_shadow)
-            diff = max(dot(hit_normal, normalize(-dir)), 0.0);
-
+        float diff = max(dot(hit_normal, normalize(-dir)), 0.0);
+        float shadow_factor = in_shadow ? 0.3 : 1.0;
         vec3 tex_color = texture(apple_texture, hit_uv).rgb;
         vec3 env_reflect_dir = reflect(ray_dir_world, hit_normal);
         env_reflect_dir = vec3(env_reflect_dir.x, -env_reflect_dir.y, env_reflect_dir.z);
         vec3 env_color = texture(skybox_env, env_reflect_dir).rgb;
-        frag_color = vec4(diff * col * tex_color + 0.1 * env_color, 1.0);
+        float reflection_strength = 0.03;
+        vec3 lit_color = shadow_factor * diff * col * tex_color;
+        frag_color = vec4(mix(lit_color, env_color, reflection_strength), 1.0);
     }
     else
     {
