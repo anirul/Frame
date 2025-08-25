@@ -165,6 +165,7 @@ void main()
         vec3 T = normalize(inv_model3 * hit_tangent_model);
         vec3 B = normalize(inv_model3 * hit_bitangent_model);
         vec3 normal_map = texture(apple_normal_texture, hit_uv).xyz * 2.0 - 1.0;
+        normal_map.y = -normal_map.y; // Invert green channel to match texture orientation
         vec3 hit_normal = normalize(mat3(T, B, N) * normal_map);
         // Position of the hit point in model space for casting shadow rays.
         vec3 hit_pos_model = ray_origin + closest_t * ray_dir;
@@ -192,8 +193,9 @@ void main()
         float shadow_factor = in_shadow ? 0.3 : 1.0;
         vec3 albedo = texture(apple_texture, hit_uv).rgb;
         float roughness = texture(apple_roughness_texture, hit_uv).r;
-        float metallic = texture(apple_metalness_texture, hit_uv).r;
-        float ao = texture(apple_ao_texture, hit_uv).r;
+        float metal_map = texture(apple_metalness_texture, hit_uv).r; // sample to keep uniform used
+        float metallic = 0.0; // apple is non-metallic
+        float ao = 1.0 - texture(apple_ao_texture, hit_uv).r; // invert occlusion map
         vec3 V = normalize(camera_position - (model * vec4(hit_pos_model, 1.0)).xyz);
         vec3 L = normalize(-dir);
         vec3 H = normalize(V + L);
@@ -211,7 +213,7 @@ void main()
         vec3 env_reflect_dir = reflect(-V, hit_normal);
         env_reflect_dir = vec3(env_reflect_dir.x, -env_reflect_dir.y, env_reflect_dir.z);
         vec3 env_color = texture(skybox_env, env_reflect_dir).rgb;
-        vec3 ambient = kD * albedo * 0.05 * ao + kD * albedo / 3.14159265 * env_color * ao;
+        vec3 ambient = kD * albedo * 0.1 * ao + kD * albedo / 3.14159265 * env_color * ao;
         vec3 env_specular = specular * env_color * ao * (in_shadow ? 0.0 : 1.0);
         vec3 Lo = diffuse * col * NdotL * shadow_factor +
                   specular * col * NdotL * (in_shadow ? 0.0 : 1.0) +
