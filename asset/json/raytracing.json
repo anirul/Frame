@@ -143,6 +143,12 @@
             "inner_buffer_names": [
                 "TriangleBuffer",
                 "BvhBuffer"
+            ],
+            "node_names": [
+                "AppleMesh"
+            ],
+            "inner_node_names": [
+                "model"
             ]
         },
         {

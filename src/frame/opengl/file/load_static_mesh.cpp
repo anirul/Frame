@@ -1,5 +1,6 @@
 #include "frame/opengl/file/load_static_mesh.h"
 
+#include <format>
 #include <stdexcept>
 
 #include "frame/file/file_system.h"
@@ -417,7 +418,10 @@ std::vector<EntityId> LoadStaticMeshesFromObjFile(
             return &level.GetSceneNodeFromId(maybe_id);
         };
         auto ptr = std::make_unique<NodeStaticMesh>(func, static_mesh_id);
-        ptr->SetName(std::format("Node.{}.{}", name, mesh_counter));
+        std::string node_name = meshes.size() == 1
+                                    ? name
+                                    : std::format("{}.{}", name, mesh_counter);
+        ptr->SetName(node_name);
         auto maybe_id = level.AddSceneNode(std::move(ptr));
         if (!maybe_id)
         {
@@ -458,7 +462,7 @@ EntityId LoadStaticMeshFromPlyFile(
         return &level.GetSceneNodeFromId(maybe_id);
     };
     auto ptr = std::make_unique<NodeStaticMesh>(func, static_mesh_id);
-    ptr->SetName(std::format("Node.{}", name));
+    ptr->SetName(name);
     auto maybe_id = level.AddSceneNode(std::move(ptr));
     if (!maybe_id)
         return NullId;
