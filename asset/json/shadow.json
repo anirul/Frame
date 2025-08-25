@@ -75,10 +75,12 @@
                 "zbuffer"
             ],
             "buffer_names": [
-                "AppleMesh.0.triangle"
+                "AppleMesh.0.triangle",
+                "AppleMesh.0.bvh"
             ],
             "inner_buffer_names": [
-                "TriangleBuffer"
+                "TriangleBuffer",
+                "BvhBuffer"
             ]
         }
     ],
