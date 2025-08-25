@@ -8,6 +8,7 @@
 #include "frame/file/ply.h"
 #include "frame/logger.h"
 #include "frame/opengl/buffer.h"
+#include "frame/bvh.h"
 #include "frame/opengl/file/load_texture.h"
 #include "frame/opengl/static_mesh.h"
 
@@ -180,6 +181,7 @@ std::pair<EntityId, EntityId> LoadStaticMeshFromObj(
     // `Vertex` struct and occupies 48 bytes, yielding 144 bytes per triangle
     // (already aligned to 16 bytes).
     std::vector<float> triangles;
+    auto bvh_nodes = frame::BuildBVH(points, indices);
     auto push_vertex = [&](int idx) {
         // Position
         triangles.push_back(points[idx * 3]);
@@ -206,6 +208,15 @@ std::pair<EntityId, EntityId> LoadStaticMeshFromObj(
         triangles.push_back(0.0f); // Padding
     };
 
+    auto maybe_bvh_buffer_id = CreateBufferInLevel(
+        level,
+        bvh_nodes,
+        std::format("{}.{}.bvh", name, counter),
+        opengl::BufferTypeEnum::SHADER_STORAGE_BUFFER);
+    if (!maybe_bvh_buffer_id)
+        return {NullId, NullId};
+    EntityId bvh_buffer_id = maybe_bvh_buffer_id.value();
+
     for (int i = 0; i < indices.size(); i += 3)
     {
         int i0 = indices[i];
@@ -230,6 +241,7 @@ std::pair<EntityId, EntityId> LoadStaticMeshFromObj(
     parameter.texture_buffer_id = tex_coord_buffer_id;
     parameter.index_buffer_id = index_buffer_id;
     parameter.triangle_buffer_id = triangle_buffer_id;
+    parameter.bvh_buffer_id = bvh_buffer_id;
     auto static_mesh = std::make_unique<opengl::StaticMesh>(level, parameter);
     auto material_id = NullId;
     if (!material_ids.empty())
