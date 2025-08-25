@@ -193,9 +193,8 @@ void main()
         float shadow_factor = in_shadow ? 0.3 : 1.0;
         vec3 albedo = texture(apple_texture, hit_uv).rgb;
         float roughness = texture(apple_roughness_texture, hit_uv).r;
-        float metal_map = texture(apple_metalness_texture, hit_uv).r; // sample to keep uniform used
-        float metallic = 0.0; // apple is non-metallic
-        float ao = 1.0 - texture(apple_ao_texture, hit_uv).r; // invert occlusion map
+        float metallic = texture(apple_metalness_texture, hit_uv).r;
+        float ao = texture(apple_ao_texture, hit_uv).r;
         vec3 V = normalize(camera_position - (model * vec4(hit_pos_model, 1.0)).xyz);
         vec3 L = normalize(-dir);
         vec3 H = normalize(V + L);
