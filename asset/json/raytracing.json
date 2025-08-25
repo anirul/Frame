@@ -79,7 +79,7 @@
                 "value": "BYTE"
             },
             "pixel_structure": {
-                "value": "R"
+                "value": "GREY"
             },
             "file_name": "asset/apple/roughness.jpg"
         },
@@ -90,7 +90,7 @@
                 "value": "BYTE"
             },
             "pixel_structure": {
-                "value": "R"
+                "value": "GREY"
             },
             "file_name": "asset/apple/metalness.jpg"
         },
@@ -101,7 +101,7 @@
                 "value": "BYTE"
             },
             "pixel_structure": {
-                "value": "R"
+                "value": "GREY"
             },
             "file_name": "asset/apple/ambient_occlusion.jpg"
         }
