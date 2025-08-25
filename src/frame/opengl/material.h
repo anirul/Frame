@@ -90,7 +90,8 @@ class Material : public MaterialInterface
 
   private:
     std::map<EntityId, std::string> id_name_map_ = {};
-    std::map<std::string, std::string> name_buffer_name_map_ = {};
+    // Preserve insertion order for buffer bindings to match shader layout
+    std::vector<std::pair<std::string, std::string>> buffer_name_vec_ = {};
     std::map<std::string, std::string> name_node_name_map_ = {};
     mutable std::array<EntityId, 32> id_array_ = {};
     mutable EntityId program_id_ = 0;
