@@ -14,6 +14,10 @@ uniform vec3 camera_position;
 uniform vec3 light_dir;
 uniform vec3 light_color;
 uniform sampler2D apple_texture;
+uniform sampler2D apple_normal_texture;
+uniform sampler2D apple_roughness_texture;
+uniform sampler2D apple_metalness_texture;
+uniform sampler2D apple_ao_texture;
 uniform samplerCube skybox_env;
 
 struct Vertex
@@ -37,6 +41,38 @@ layout(std430, binding = 0) buffer TriangleBuffer
 {
     Triangle triangles[];
 };
+
+// ----------------------------------------------------------------------------
+float DistributionGGX(vec3 N, vec3 H, float roughness)
+{
+    float a = roughness * roughness;
+    float a2 = a * a;
+    float NdotH = max(dot(N, H), 0.0);
+    float NdotH2 = NdotH * NdotH;
+    float denom = (NdotH2 * (a2 - 1.0) + 1.0);
+    return a2 / (3.14159265 * denom * denom);
+}
+
+float GeometrySchlickGGX(float NdotV, float roughness)
+{
+    float r = roughness + 1.0;
+    float k = (r * r) / 8.0;
+    return NdotV / (NdotV * (1.0 - k) + k);
+}
+
+float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
+{
+    float NdotV = max(dot(N, V), 0.0);
+    float NdotL = max(dot(N, L), 0.0);
+    float ggx1 = GeometrySchlickGGX(NdotV, roughness);
+    float ggx2 = GeometrySchlickGGX(NdotL, roughness);
+    return ggx1 * ggx2;
+}
+
+vec3 fresnelSchlick(float cosTheta, vec3 F0)
+{
+    return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+}
 
 bool rayTriangleIntersect(
     const vec3 ray_origin,
@@ -89,6 +125,8 @@ void main()
     float closest_t = 1e20;
     vec3 hit_normal_model = vec3(0.0);
     vec2 hit_uv = vec2(0.0);
+    vec3 hit_tangent_model = vec3(0.0);
+    vec3 hit_bitangent_model = vec3(0.0);
     bool hit = false;
     for (int i = 0; i < triangles.length(); ++i)
     {
@@ -105,15 +143,29 @@ void main()
                 triangles[i].v2.normal * bary.y);
             hit_uv = triangles[i].v0.uv * w + triangles[i].v1.uv * bary.x +
                      triangles[i].v2.uv * bary.y;
+            vec3 edge1 = triangles[i].v1.position - triangles[i].v0.position;
+            vec3 edge2 = triangles[i].v2.position - triangles[i].v0.position;
+            vec2 deltaUV1 = triangles[i].v1.uv - triangles[i].v0.uv;
+            vec2 deltaUV2 = triangles[i].v2.uv - triangles[i].v0.uv;
+            float f = 1.0 / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+            if (!isinf(f))
+            {
+                hit_tangent_model = normalize(f * (deltaUV2.y * edge1 - deltaUV1.y * edge2));
+                hit_bitangent_model = normalize(f * (-deltaUV2.x * edge1 + deltaUV1.x * edge2));
+            }
             hit = true;
         }
     }
 
     if (hit)
     {
-        // Transform normal back to world space for lighting
-        vec3 hit_normal =
-            normalize(transpose(mat3(inv_model)) * hit_normal_model);
+        // Transform to world space
+        mat3 inv_model3 = transpose(mat3(inv_model));
+        vec3 N = normalize(inv_model3 * hit_normal_model);
+        vec3 T = normalize(inv_model3 * hit_tangent_model);
+        vec3 B = normalize(inv_model3 * hit_bitangent_model);
+        vec3 normal_map = texture(apple_normal_texture, hit_uv).xyz * 2.0 - 1.0;
+        vec3 hit_normal = normalize(mat3(T, B, N) * normal_map);
         // Position of the hit point in model space for casting shadow rays.
         vec3 hit_pos_model = ray_origin + closest_t * ray_dir;
 
@@ -137,15 +189,31 @@ void main()
             }
         }
 
-        float diff = max(dot(hit_normal, normalize(-dir)), 0.0);
         float shadow_factor = in_shadow ? 0.3 : 1.0;
-        vec3 tex_color = texture(apple_texture, hit_uv).rgb;
-        vec3 env_reflect_dir = reflect(ray_dir_world, hit_normal);
+        vec3 albedo = texture(apple_texture, hit_uv).rgb;
+        float roughness = texture(apple_roughness_texture, hit_uv).r;
+        float metallic = texture(apple_metalness_texture, hit_uv).r;
+        float ao = texture(apple_ao_texture, hit_uv).r;
+        vec3 V = normalize(camera_position - (model * vec4(hit_pos_model, 1.0)).xyz);
+        vec3 L = normalize(-dir);
+        vec3 H = normalize(V + L);
+        vec3 F0 = mix(vec3(0.04), albedo, metallic);
+        vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
+        float D = DistributionGGX(hit_normal, H, roughness);
+        float G = GeometrySmith(hit_normal, V, L, roughness);
+        vec3 numerator = D * G * F;
+        float denominator = 4.0 * max(dot(hit_normal, V), 0.0) * max(dot(hit_normal, L), 0.0) + 0.001;
+        vec3 specular = numerator / denominator;
+        vec3 kS = F;
+        vec3 kD = (1.0 - kS) * (1.0 - metallic);
+        vec3 diffuse = kD * albedo / 3.14159265;
+        float NdotL = max(dot(hit_normal, L), 0.0);
+        vec3 env_reflect_dir = reflect(-V, hit_normal);
         env_reflect_dir = vec3(env_reflect_dir.x, -env_reflect_dir.y, env_reflect_dir.z);
         vec3 env_color = texture(skybox_env, env_reflect_dir).rgb;
-        float reflection_strength = 0.03;
-        vec3 lit_color = shadow_factor * diff * col * tex_color;
-        frag_color = vec4(mix(lit_color, env_color, reflection_strength), 1.0);
+        vec3 ambient = (kD * albedo / 3.14159265 + specular) * env_color * ao;
+        vec3 Lo = (diffuse + specular) * col * NdotL * shadow_factor;
+        frag_color = vec4(ambient + Lo, 1.0);
     }
     else
     {
