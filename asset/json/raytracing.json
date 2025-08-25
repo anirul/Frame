@@ -366,7 +366,8 @@
                 "name": "CubeMapMesh",
                 "parent": "env_holder",
                 "material_name": "CubeMapMaterial",
-                "mesh_enum": "CUBE"
+                "mesh_enum": "CUBE",
+                "render_time_enum": "SKYBOX_RENDER_TIME"
             },
             {
                 "name": "RayTracingRendering",
