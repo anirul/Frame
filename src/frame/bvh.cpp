@@ -20,8 +20,8 @@ std::vector<BVHNode> BuildBVH(
     const std::vector<float>& points,
     const std::vector<std::uint32_t>& indices)
 {
-    const int tri_count = indices.size() / 3;
-    std::vector<BuildTriangle> tris(tri_count);
+    const int tri_count = static_cast<int>(indices.size() / 3);
+    std::vector<BuildTriangle> tris(static_cast<std::size_t>(tri_count));
     for (int i = 0; i < tri_count; ++i)
     {
         glm::vec3 v0{
@@ -42,11 +42,11 @@ std::vector<BVHNode> BuildBVH(
         tris[i].centroid = (v0 + v1 + v2) / 3.0f;
     }
 
-    std::vector<int> tri_indices(tri_count);
+    std::vector<int> tri_indices(static_cast<std::size_t>(tri_count));
     std::iota(tri_indices.begin(), tri_indices.end(), 0);
 
     std::vector<BVHNode> nodes;
-    nodes.reserve(tri_count * 2);
+    nodes.reserve(static_cast<std::size_t>(tri_count) * 2);
 
     std::function<int(int, int)> build = [&](int start, int end) -> int {
         AABB bounds;
@@ -57,7 +57,7 @@ std::vector<BVHNode> BuildBVH(
         BVHNode node;
         node.min = bounds.min;
         node.max = bounds.max;
-        int node_index = nodes.size();
+        int node_index = static_cast<int>(nodes.size());
         nodes.push_back(node);
         int count = end - start;
         if (count == 1)
