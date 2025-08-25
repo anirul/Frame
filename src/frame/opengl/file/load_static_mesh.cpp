@@ -181,7 +181,8 @@ std::pair<EntityId, EntityId> LoadStaticMeshFromObj(
     // `Vertex` struct and occupies 48 bytes, yielding 144 bytes per triangle
     // (already aligned to 16 bytes).
     std::vector<float> triangles;
-    auto bvh_nodes = frame::BuildBVH(points, indices);
+    auto bvh_nodes =
+        frame::BuildBVH(points, std::vector<std::uint32_t>(indices.begin(), indices.end()));
     auto push_vertex = [&](int idx) {
         // Position
         triangles.push_back(points[idx * 3]);
