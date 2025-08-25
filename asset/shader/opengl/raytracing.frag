@@ -213,7 +213,8 @@ void main()
         vec3 env_reflect_dir = reflect(-V, hit_normal);
         env_reflect_dir = vec3(env_reflect_dir.x, -env_reflect_dir.y, env_reflect_dir.z);
         vec3 env_color = texture(skybox_env, env_reflect_dir).rgb;
-        vec3 ambient = kD * albedo * 0.1 * ao + kD * albedo / 3.14159265 * env_color * ao;
+        vec3 ambient = kD * albedo * 0.25 * ao +
+                       kD * albedo / 3.14159265 * env_color * ao;
         vec3 env_specular = specular * env_color * ao * (in_shadow ? 0.0 : 1.0);
         vec3 Lo = diffuse * col * NdotL * shadow_factor +
                   specular * col * NdotL * (in_shadow ? 0.0 : 1.0) +
