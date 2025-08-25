@@ -269,7 +269,11 @@ std::pair<EntityId, EntityId> LoadStaticMeshFromObj(
         }
         material_id = material_ids[0];
     }
-    std::string mesh_name = std::format("{}.{}", name, counter);
+    // Mesh names must differ from node names, which are also based on the
+    // original "name" parameter.  Otherwise, adding both the mesh and its
+    // node to the level triggers a duplicate-name error.  Give the mesh a
+    // distinct suffix so it can coexist with a node of the same base name.
+    std::string mesh_name = std::format("{}.{}.mesh", name, counter);
     static_mesh->SetName(mesh_name);
     auto maybe_mesh_id = level.AddStaticMesh(std::move(static_mesh));
     if (!maybe_mesh_id)
@@ -378,7 +382,9 @@ EntityId LoadStaticMeshFromPly(
     }
 
     static_mesh = std::make_unique<opengl::StaticMesh>(level, parameter);
-    std::string mesh_name = std::format("{}", name);
+    // As with OBJ meshes, ensure the static mesh name is distinct from the
+    // scene node name to avoid duplicate identifiers within the level.
+    std::string mesh_name = std::format("{}.mesh", name);
     static_mesh->SetName(mesh_name);
     auto maybe_mesh_id = level.AddStaticMesh(std::move(static_mesh));
     if (!maybe_mesh_id)
