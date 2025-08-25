@@ -153,18 +153,24 @@ std::pair<EntityId, EntityId> LoadStaticMeshFromObj(
     EntityId point_buffer_id = maybe_point_buffer_id.value();
 
     // Normal buffer initialization.
-    auto maybe_normal_buffer_id = CreateBufferInLevel(
-        level, normals, std::format("{}.{}.normal", name, counter));
-    if (!maybe_normal_buffer_id)
-        return {NullId, NullId};
-    EntityId normal_buffer_id = maybe_normal_buffer_id.value();
+    EntityId normal_buffer_id = NullId;
+    if (!normals.empty())
+    {
+        auto maybe_normal_buffer_id = CreateBufferInLevel(
+            level, normals, std::format("{}.{}.normal", name, counter));
+        if (maybe_normal_buffer_id)
+            normal_buffer_id = maybe_normal_buffer_id.value();
+    }
 
     // Texture coordinates buffer initialization.
-    auto maybe_tex_coord_buffer_id = CreateBufferInLevel(
-        level, textures, std::format("{}.{}.texture", name, counter));
-    if (!maybe_tex_coord_buffer_id)
-        return {NullId, NullId};
-    EntityId tex_coord_buffer_id = maybe_tex_coord_buffer_id.value();
+    EntityId tex_coord_buffer_id = NullId;
+    if (!textures.empty())
+    {
+        auto maybe_tex_coord_buffer_id = CreateBufferInLevel(
+            level, textures, std::format("{}.{}.texture", name, counter));
+        if (maybe_tex_coord_buffer_id)
+            tex_coord_buffer_id = maybe_tex_coord_buffer_id.value();
+    }
 
     // Index buffer array.
     auto maybe_index_buffer_id = CreateBufferInLevel(
@@ -191,9 +197,18 @@ std::pair<EntityId, EntityId> LoadStaticMeshFromObj(
         triangles.push_back(points[idx * 3 + 2]);
         triangles.push_back(0.0f); // Padding
         // Normal
-        triangles.push_back(normals[idx * 3]);
-        triangles.push_back(normals[idx * 3 + 1]);
-        triangles.push_back(normals[idx * 3 + 2]);
+        if (!normals.empty())
+        {
+            triangles.push_back(normals[idx * 3]);
+            triangles.push_back(normals[idx * 3 + 1]);
+            triangles.push_back(normals[idx * 3 + 2]);
+        }
+        else
+        {
+            triangles.push_back(0.0f);
+            triangles.push_back(0.0f);
+            triangles.push_back(0.0f);
+        }
         triangles.push_back(0.0f); // Padding
         // UV
         if (!textures.empty())
@@ -303,25 +318,34 @@ EntityId LoadStaticMeshFromPly(
     EntityId point_buffer_id = maybe_point_buffer_id.value();
 
     // Color buffer initialization.
-    auto maybe_color_buffer_id =
-        CreateBufferInLevel(level, colors, std::format("{}.color", name));
-    if (!maybe_color_buffer_id)
-        return NullId;
-    EntityId color_buffer_id = maybe_color_buffer_id.value();
+    EntityId color_buffer_id = NullId;
+    if (!colors.empty())
+    {
+        auto maybe_color_buffer_id =
+            CreateBufferInLevel(level, colors, std::format("{}.color", name));
+        if (maybe_color_buffer_id)
+            color_buffer_id = maybe_color_buffer_id.value();
+    }
 
     // Normal buffer initialization.
-    auto maybe_normal_buffer_id =
-        CreateBufferInLevel(level, normals, std::format("{}.normal", name));
-    if (!maybe_normal_buffer_id)
-        return NullId;
-    EntityId normal_buffer_id = maybe_normal_buffer_id.value();
+    EntityId normal_buffer_id = NullId;
+    if (!normals.empty())
+    {
+        auto maybe_normal_buffer_id =
+            CreateBufferInLevel(level, normals, std::format("{}.normal", name));
+        if (maybe_normal_buffer_id)
+            normal_buffer_id = maybe_normal_buffer_id.value();
+    }
 
     // Texture coordinates buffer initialization.
-    auto maybe_tex_coord_buffer_id =
-        CreateBufferInLevel(level, textures, std::format("{}.texture", name));
-    if (!maybe_tex_coord_buffer_id)
-        return NullId;
-    EntityId tex_coord_buffer_id = maybe_tex_coord_buffer_id.value();
+    EntityId tex_coord_buffer_id = NullId;
+    if (!textures.empty())
+    {
+        auto maybe_tex_coord_buffer_id =
+            CreateBufferInLevel(level, textures, std::format("{}.texture", name));
+        if (maybe_tex_coord_buffer_id)
+            tex_coord_buffer_id = maybe_tex_coord_buffer_id.value();
+    }
 
     // Index buffer array.
     auto maybe_index_buffer_id = CreateBufferInLevel(
