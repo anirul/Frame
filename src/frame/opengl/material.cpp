@@ -1,5 +1,6 @@
 #include "material.h"
 
+#include <algorithm>
 #include <cassert>
 #include <sstream>
 
@@ -125,19 +126,59 @@ void Material::SetProgramId(EntityId id)
 
 std::string Material::GetInnerBufferName(const std::string& name) const
 {
-    return name_buffer_name_map_.at(name);
+    auto it = std::find_if(
+        buffer_name_vec_.begin(),
+        buffer_name_vec_.end(),
+        [&name](const auto& p) { return p.first == name; });
+    if (it == buffer_name_vec_.end())
+    {
+        throw std::runtime_error("Could not find buffer name: " + name);
+    }
+    return it->second;
 }
 
 bool Material::AddBufferName(
     const std::string& name, const std::string& inner_name)
 {
-    return name_buffer_name_map_.insert({name, inner_name}).second;
+    // Keep insertion order to preserve binding indices
+    auto it = std::find_if(
+        buffer_name_vec_.begin(),
+        buffer_name_vec_.end(),
+        [&name](const auto& p) { return p.first == name; });
+    if (it != buffer_name_vec_.end())
+    {
+        return false;
+    }
+    buffer_name_vec_.emplace_back(name, inner_name);
+    return true;
 }
 
 std::vector<std::string> Material::GetBufferNames() const
 {
     std::vector<std::string> vec;
-    for (const auto& p : name_buffer_name_map_)
+    vec.reserve(buffer_name_vec_.size());
+    for (const auto& p : buffer_name_vec_)
+    {
+        vec.push_back(p.first);
+    }
+    return vec;
+}
+
+std::string Material::GetInnerNodeName(const std::string& name) const
+{
+    return name_node_name_map_.at(name);
+}
+
+bool Material::AddNodeName(
+    const std::string& name, const std::string& inner_name)
+{
+    return name_node_name_map_.insert({name, inner_name}).second;
+}
+
+std::vector<std::string> Material::GetNodeNames() const
+{
+    std::vector<std::string> vec;
+    for (const auto& p : name_node_name_map_)
     {
         vec.push_back(p.first);
     }

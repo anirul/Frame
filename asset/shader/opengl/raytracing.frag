@@ -37,9 +37,26 @@ struct Triangle
     Vertex v2;
 };
 
+struct BvhNode
+{
+    vec3 min;
+    float pad0;
+    vec3 max;
+    float pad1;
+    int left;
+    int right;
+    int first_triangle;
+    int triangle_count;
+};
+
 layout(std430, binding = 0) buffer TriangleBuffer
 {
     Triangle triangles[];
+};
+
+layout(std430, binding = 1) buffer BvhBuffer
+{
+    BvhNode nodes[];
 };
 
 // ----------------------------------------------------------------------------
@@ -107,6 +124,109 @@ bool rayTriangleIntersect(
     return false;
 }
 
+bool rayAabbIntersect(
+    const vec3 ray_origin, const vec3 ray_dir, const BvhNode node)
+{
+    vec3 inv_dir = 1.0 / ray_dir;
+    vec3 t0 = (node.min - ray_origin) * inv_dir;
+    vec3 t1 = (node.max - ray_origin) * inv_dir;
+    vec3 tmin = min(t0, t1);
+    vec3 tmax = max(t0, t1);
+    float t_enter = max(max(tmin.x, tmin.y), tmin.z);
+    float t_exit = min(min(tmax.x, tmax.y), tmax.z);
+    return t_exit >= max(t_enter, 0.0);
+}
+
+bool traverseBVH(
+    const vec3 ray_origin,
+    const vec3 ray_dir,
+    out float out_t,
+    out vec2 out_bary,
+    out int out_tri)
+{
+    int stack[64];
+    int stack_ptr = 0;
+    stack[stack_ptr++] = 0;
+    out_t = 1e20;
+    out_tri = -1;
+    bool hit = false;
+    while (stack_ptr > 0)
+    {
+        int node_index = stack[--stack_ptr];
+        BvhNode node = nodes[node_index];
+        if (!rayAabbIntersect(ray_origin, ray_dir, node))
+            continue;
+        if (node.triangle_count > 0)
+        {
+            for (int i = 0; i < node.triangle_count; ++i)
+            {
+                int tri_index = node.first_triangle + i;
+                float t;
+                vec2 bary;
+                if (rayTriangleIntersect(
+                        ray_origin,
+                        ray_dir,
+                        triangles[tri_index],
+                        t,
+                        bary) &&
+                    t < out_t)
+                {
+                    out_t = t;
+                    out_bary = bary;
+                    out_tri = tri_index;
+                    hit = true;
+                }
+            }
+        }
+        else
+        {
+            if (node.left >= 0)
+                stack[stack_ptr++] = node.left;
+            if (node.right >= 0)
+                stack[stack_ptr++] = node.right;
+        }
+    }
+    return hit;
+}
+
+bool anyHitBVH(const vec3 ray_origin, const vec3 ray_dir)
+{
+    int stack[64];
+    int stack_ptr = 0;
+    stack[stack_ptr++] = 0;
+    while (stack_ptr > 0)
+    {
+        int node_index = stack[--stack_ptr];
+        BvhNode node = nodes[node_index];
+        if (!rayAabbIntersect(ray_origin, ray_dir, node))
+            continue;
+        if (node.triangle_count > 0)
+        {
+            for (int i = 0; i < node.triangle_count; ++i)
+            {
+                int tri_index = node.first_triangle + i;
+                float t;
+                vec2 bary;
+                if (rayTriangleIntersect(
+                        ray_origin,
+                        ray_dir,
+                        triangles[tri_index],
+                        t,
+                        bary))
+                    return true;
+            }
+        }
+        else
+        {
+            if (node.left >= 0)
+                stack[stack_ptr++] = node.left;
+            if (node.right >= 0)
+                stack[stack_ptr++] = node.right;
+        }
+    }
+    return false;
+}
+
 void main()
 {
     // Reconstruct the view ray for this fragment.
@@ -121,39 +241,36 @@ void main()
     vec3 ray_origin = vec3(inv_model * vec4(camera_position, 1.0));
     vec3 ray_dir = normalize(mat3(inv_model) * ray_dir_world);
 
-    // Trace the ray against all triangles and keep the closest hit.
-    float closest_t = 1e20;
+    // Trace the ray against the BVH.
+    float closest_t;
+    vec2 hit_bary;
+    int tri_index;
+    bool hit = traverseBVH(ray_origin, ray_dir, closest_t, hit_bary, tri_index);
     vec3 hit_normal_model = vec3(0.0);
     vec2 hit_uv = vec2(0.0);
     vec3 hit_tangent_model = vec3(0.0);
     vec3 hit_bitangent_model = vec3(0.0);
-    bool hit = false;
-    for (int i = 0; i < triangles.length(); ++i)
+    if (hit)
     {
-        float t;
-        vec2 bary;
-        if (rayTriangleIntersect(ray_origin, ray_dir, triangles[i], t, bary) &&
-            t < closest_t)
+        Triangle tri = triangles[tri_index];
+        float w = 1.0 - hit_bary.x - hit_bary.y;
+        hit_normal_model = normalize(
+            tri.v0.normal * w +
+            tri.v1.normal * hit_bary.x +
+            tri.v2.normal * hit_bary.y);
+        hit_uv = tri.v0.uv * w + tri.v1.uv * hit_bary.x +
+                 tri.v2.uv * hit_bary.y;
+        vec3 edge1 = tri.v1.position - tri.v0.position;
+        vec3 edge2 = tri.v2.position - tri.v0.position;
+        vec2 deltaUV1 = tri.v1.uv - tri.v0.uv;
+        vec2 deltaUV2 = tri.v2.uv - tri.v0.uv;
+        float f = 1.0 / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+        if (!isinf(f))
         {
-            closest_t = t;
-            float w = 1.0 - bary.x - bary.y;
-            hit_normal_model = normalize(
-                triangles[i].v0.normal * w +
-                triangles[i].v1.normal * bary.x +
-                triangles[i].v2.normal * bary.y);
-            hit_uv = triangles[i].v0.uv * w + triangles[i].v1.uv * bary.x +
-                     triangles[i].v2.uv * bary.y;
-            vec3 edge1 = triangles[i].v1.position - triangles[i].v0.position;
-            vec3 edge2 = triangles[i].v2.position - triangles[i].v0.position;
-            vec2 deltaUV1 = triangles[i].v1.uv - triangles[i].v0.uv;
-            vec2 deltaUV2 = triangles[i].v2.uv - triangles[i].v0.uv;
-            float f = 1.0 / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
-            if (!isinf(f))
-            {
-                hit_tangent_model = normalize(f * (deltaUV2.y * edge1 - deltaUV1.y * edge2));
-                hit_bitangent_model = normalize(f * (-deltaUV2.x * edge1 + deltaUV1.x * edge2));
-            }
-            hit = true;
+            hit_tangent_model =
+                normalize(f * (deltaUV2.y * edge1 - deltaUV1.y * edge2));
+            hit_bitangent_model =
+                normalize(f * (-deltaUV2.x * edge1 + deltaUV1.x * edge2));
         }
     }
 
@@ -177,18 +294,7 @@ void main()
         // Cast a shadow ray toward the light in model space.
         vec3 shadow_dir = normalize(mat3(inv_model) * -dir);
         vec3 shadow_origin = hit_pos_model + hit_normal_model * 0.0001;
-        bool in_shadow = false;
-        for (int i = 0; i < triangles.length(); ++i)
-        {
-            float t_shadow;
-            vec2 bary_shadow;
-            if (rayTriangleIntersect(shadow_origin, shadow_dir, triangles[i],
-                                     t_shadow, bary_shadow))
-            {
-                in_shadow = true;
-                break;
-            }
-        }
+        bool in_shadow = anyHitBVH(shadow_origin, shadow_dir);
 
         float shadow_factor = in_shadow ? 0.3 : 1.0;
         vec3 albedo = texture(apple_texture, hit_uv).rgb;

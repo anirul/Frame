@@ -86,6 +86,14 @@ class StaticMesh : public BindInterface, public StaticMeshInterface
         return triangle_buffer_id_;
     }
     /**
+     * @brief Get BVH buffer id (SSBO).
+     * @return Current BVH buffer id.
+     */
+    EntityId GetBvhBufferId() const override
+    {
+        return bvh_buffer_id_;
+    }
+    /**
      * @brief This is the size in bytes! so if you need the element size
      *        just divide this number by the sizeof(std::int32_t).
      * @return Size of the index buffer in bytes!
@@ -158,6 +166,7 @@ class StaticMesh : public BindInterface, public StaticMeshInterface
     std::uint32_t texture_buffer_size_ = 2;
     EntityId index_buffer_id_ = NullId;
     EntityId triangle_buffer_id_ = NullId;
+    EntityId bvh_buffer_id_ = NullId;
     std::size_t index_size_ = 0;
     unsigned int vertex_array_object_ = 0;
     float point_size_ = 1.0f;

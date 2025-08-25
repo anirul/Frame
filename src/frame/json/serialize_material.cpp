@@ -24,6 +24,12 @@ proto::Material SerializeMaterial(
         *proto_material.add_buffer_names() = name;
         *proto_material.add_inner_buffer_names() = inner_name;
     }
+    for (const auto& name : material_interface.GetNodeNames())
+    {
+        std::string inner_name = material_interface.GetInnerNodeName(name);
+        *proto_material.add_node_names() = name;
+        *proto_material.add_inner_node_names() = inner_name;
+    }
     return proto_material;
 }
 

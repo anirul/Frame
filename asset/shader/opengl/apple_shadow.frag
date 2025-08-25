@@ -31,6 +31,21 @@ layout(std430, binding = 0) buffer TriangleBuffer {
     Triangle triangles[];
 };
 
+struct BvhNode {
+    vec3 min;
+    float pad0;
+    vec3 max;
+    float pad1;
+    int left;
+    int right;
+    int first_triangle;
+    int triangle_count;
+};
+
+layout(std430, binding = 1) buffer BvhBuffer {
+    BvhNode nodes[];
+};
+
 // Moller-Trumbore intersection algorithm
 bool rayTriangleIntersect(
     const vec3 ray_origin,
@@ -65,6 +80,50 @@ bool rayTriangleIntersect(
         return false;
 }
 
+bool rayAabbIntersect(const vec3 ray_origin, const vec3 ray_dir, const BvhNode node)
+{
+    vec3 inv_dir = 1.0 / ray_dir;
+    vec3 t0 = (node.min - ray_origin) * inv_dir;
+    vec3 t1 = (node.max - ray_origin) * inv_dir;
+    vec3 tmin = min(t0, t1);
+    vec3 tmax = max(t0, t1);
+    float t_enter = max(max(tmin.x, tmin.y), tmin.z);
+    float t_exit = min(min(tmax.x, tmax.y), tmax.z);
+    return t_exit >= max(t_enter, 0.0);
+}
+
+bool anyHitBVH(const vec3 ray_origin, const vec3 ray_dir)
+{
+    int stack[64];
+    int stack_ptr = 0;
+    stack[stack_ptr++] = 0;
+    while (stack_ptr > 0)
+    {
+        int node_index = stack[--stack_ptr];
+        BvhNode node = nodes[node_index];
+        if (!rayAabbIntersect(ray_origin, ray_dir, node))
+            continue;
+        if (node.triangle_count > 0)
+        {
+            for (int i = 0; i < node.triangle_count; ++i)
+            {
+                int tri_index = node.first_triangle + i;
+                float t;
+                if (rayTriangleIntersect(ray_origin, ray_dir, triangles[tri_index], t))
+                    return true;
+            }
+        }
+        else
+        {
+            if (node.left >= 0)
+                stack[stack_ptr++] = node.left;
+            if (node.right >= 0)
+                stack[stack_ptr++] = node.right;
+        }
+    }
+    return false;
+}
+
 void main() {
     // 1. Basic lighting (Lambert / Blinn-Phong, etc.)
     vec3 normal = normalize(out_normal);
@@ -78,15 +137,8 @@ void main() {
     mat4 inv_model = inverse(model);
     vec3 ray_origin = vec3(inv_model * vec4(ray_origin_world, 1.0));
     vec3 light_direction = normalize(mat3(inv_model) * light_direction_world);
-    float t;
-    for (int i = 0; i < triangles.length(); ++i)
-    {
-        if (rayTriangleIntersect(ray_origin, light_direction, triangles[i], t))
-        {
-            shadow = 1.0;
-            break;
-        }
-    }
+    if (anyHitBVH(ray_origin, light_direction))
+        shadow = 1.0;
 
     // 3. Combine
     vec3 texture_color = texture(apple_texture, out_uv).rgb;

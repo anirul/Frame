@@ -1,6 +1,7 @@
 # Frame Test.
 
 add_executable(FrameTest
+  bvh_test.cpp
   camera_test.cpp
   camera_test.h
   device_mock.h
