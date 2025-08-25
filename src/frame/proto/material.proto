@@ -3,7 +3,7 @@ syntax = "proto3";
 package frame.proto;
 
 // Material
-// Next 4
+// Next 10
 message Material {
 	// Name of the material.
 	string name = 1;
@@ -13,8 +13,12 @@ message Material {
 	repeated string texture_names = 3;
 	// Reference to the name inside the material in the shader file.
 	repeated string inner_names = 4;
-	// Reference name of the buffer names in the buffer file.
-	repeated string buffer_names = 6;
-	// Reference to the name inside the material in the shader file.
-	repeated string inner_buffer_names = 7;
+        // Reference name of the buffer names in the buffer file.
+        repeated string buffer_names = 6;
+        // Reference to the name inside the material in the shader file.
+        repeated string inner_buffer_names = 7;
+        // Reference name of the node transforms in the scene tree.
+        repeated string node_names = 8;
+        // Reference to the uniform name inside the material in the shader file.
+        repeated string inner_node_names = 9;
 }

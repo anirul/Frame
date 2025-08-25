@@ -88,6 +88,24 @@ class MaterialInterface : public Serialize<proto::Material>
      */
     virtual std::vector<std::string> GetBufferNames() const = 0;
     /**
+     * @brief Get the inner name that correspond to a node name.
+     * @param name: The node name to check for corresponding string.
+     * @return The string.
+     */
+    virtual std::string GetInnerNodeName(const std::string& name) const = 0;
+    /**
+     * @brief Store a node reference associated to a given name.
+     * @param name: Node reference name.
+     * @param inner_name: Associated uniform name in the shader.
+     */
+    virtual bool AddNodeName(
+        const std::string& name, const std::string& inner_name) = 0;
+    /**
+     * @brief Get node names of a material.
+     * @return Return the list of node names.
+     */
+    virtual std::vector<std::string> GetNodeNames() const = 0;
+    /**
      * @brief Enable a texture to be used by the context.
      * @param id: Id of the texture to be enabled.
      * @return Return the name and the binding slot of a texture (to be

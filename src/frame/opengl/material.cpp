@@ -144,4 +144,25 @@ std::vector<std::string> Material::GetBufferNames() const
     return vec;
 }
 
+std::string Material::GetInnerNodeName(const std::string& name) const
+{
+    return name_node_name_map_.at(name);
+}
+
+bool Material::AddNodeName(
+    const std::string& name, const std::string& inner_name)
+{
+    return name_node_name_map_.insert({name, inner_name}).second;
+}
+
+std::vector<std::string> Material::GetNodeNames() const
+{
+    std::vector<std::string> vec;
+    for (const auto& p : name_node_name_map_)
+    {
+        vec.push_back(p.first);
+    }
+    return vec;
+}
+
 } // End namespace frame::opengl.

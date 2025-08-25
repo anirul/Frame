@@ -157,6 +157,22 @@ void Renderer::RenderMesh(
     // Go through the callback.
     callback_(uniform_collection_wrapper, static_mesh, material);
 
+    // Add node-based model matrices.
+    for (const auto& name : material.GetNodeNames())
+    {
+        auto node_id = level_.GetIdFromName(name);
+        if (node_id == NullId)
+        {
+            throw std::runtime_error("Could not find node: " + name);
+        }
+        auto& node = level_.GetSceneNodeFromId(node_id);
+        glm::mat4 node_model = node.GetLocalModel(delta_time_);
+        auto inner_name = material.GetInnerNodeName(name);
+        std::unique_ptr<UniformInterface> node_uniform =
+            std::make_unique<Uniform>(inner_name, node_model);
+        uniform_collection_wrapper.AddUniform(std::move(node_uniform));
+    }
+
     // Register shader storage buffers before using the program so they are
     // bound when Program::Use uploads them.
     int j = 0;
