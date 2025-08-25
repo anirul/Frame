@@ -62,6 +62,22 @@ std::unique_ptr<frame::MaterialInterface> ParseMaterialOpenGL(
             proto_material.buffer_names(i),
             proto_material.inner_buffer_names(i));
     }
+    const std::size_t node_size = proto_material.node_names_size();
+    const std::size_t inner_node_size =
+        proto_material.inner_node_names_size();
+    if (node_size != inner_node_size)
+    {
+        throw std::runtime_error(std::format(
+            "Not the same size for node and inner names: {} != {}.",
+            node_size,
+            inner_node_size));
+    }
+    for (int i = 0; i < node_size; ++i)
+    {
+        material->AddNodeName(
+            proto_material.node_names(i),
+            proto_material.inner_node_names(i));
+    }
     return material;
 }
 
