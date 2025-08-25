@@ -38,6 +38,8 @@ struct StaticMeshParameter
     EntityId index_buffer_id = NullId;
     //! @brief Buffer of triangles (SSBO).
     EntityId triangle_buffer_id = NullId;
+    //! @brief Buffer of BVH nodes (SSBO).
+    EntityId bvh_buffer_id = NullId;
     //! @brief The kind of draw that the mesh is.
     proto::NodeStaticMesh::RenderPrimitiveEnum render_primitive_enum =
         proto::NodeStaticMesh::TRIANGLE_PRIMITIVE;
@@ -95,6 +97,11 @@ class StaticMeshInterface : public Serialize<proto::NodeStaticMesh>
      * @return Current triangle buffer id.
      */
     virtual EntityId GetTriangleBufferId() const = 0;
+    /**
+     * @brief Get BVH buffer id (SSBO).
+     * @return Current BVH buffer id.
+     */
+    virtual EntityId GetBvhBufferId() const = 0;
     /**
      * @brief This is the size in bytes! so if you need the element size just
      * divide this number by the sizeof(std::int32_t).

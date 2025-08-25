@@ -137,10 +137,18 @@
                 "skybox_env"
             ],
             "buffer_names": [
-                "AppleMesh.0.triangle"
+                "AppleMesh.0.triangle",
+                "AppleMesh.0.bvh"
             ],
             "inner_buffer_names": [
-                "TriangleBuffer"
+                "TriangleBuffer",
+                "BvhBuffer"
+            ],
+            "node_names": [
+                "AppleMesh"
+            ],
+            "inner_node_names": [
+                "model"
             ]
         },
         {
@@ -161,6 +169,14 @@
                 "apple_metalness_texture",
                 "apple_ao_texture",
                 "skybox_env"
+            ],
+            "buffer_names": [
+                "AppleMesh.0.triangle",
+                "AppleMesh.0.bvh"
+            ],
+            "inner_buffer_names": [
+                "TriangleBuffer",
+                "BvhBuffer"
             ]
         }
     ],
@@ -356,7 +372,8 @@
                 "name": "CubeMapMesh",
                 "parent": "env_holder",
                 "material_name": "CubeMapMaterial",
-                "mesh_enum": "CUBE"
+                "mesh_enum": "CUBE",
+                "render_time_enum": "SKYBOX_RENDER_TIME"
             },
             {
                 "name": "RayTracingRendering",

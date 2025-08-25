@@ -1,5 +1,6 @@
 #include "frame/opengl/file/load_static_mesh.h"
 
+#include <format>
 #include <stdexcept>
 
 #include "frame/file/file_system.h"
@@ -8,6 +9,7 @@
 #include "frame/file/ply.h"
 #include "frame/logger.h"
 #include "frame/opengl/buffer.h"
+#include "frame/bvh.h"
 #include "frame/opengl/file/load_texture.h"
 #include "frame/opengl/static_mesh.h"
 
@@ -151,18 +153,24 @@ std::pair<EntityId, EntityId> LoadStaticMeshFromObj(
     EntityId point_buffer_id = maybe_point_buffer_id.value();
 
     // Normal buffer initialization.
-    auto maybe_normal_buffer_id = CreateBufferInLevel(
-        level, normals, std::format("{}.{}.normal", name, counter));
-    if (!maybe_normal_buffer_id)
-        return {NullId, NullId};
-    EntityId normal_buffer_id = maybe_normal_buffer_id.value();
+    EntityId normal_buffer_id = NullId;
+    if (!normals.empty())
+    {
+        auto maybe_normal_buffer_id = CreateBufferInLevel(
+            level, normals, std::format("{}.{}.normal", name, counter));
+        if (maybe_normal_buffer_id)
+            normal_buffer_id = maybe_normal_buffer_id.value();
+    }
 
     // Texture coordinates buffer initialization.
-    auto maybe_tex_coord_buffer_id = CreateBufferInLevel(
-        level, textures, std::format("{}.{}.texture", name, counter));
-    if (!maybe_tex_coord_buffer_id)
-        return {NullId, NullId};
-    EntityId tex_coord_buffer_id = maybe_tex_coord_buffer_id.value();
+    EntityId tex_coord_buffer_id = NullId;
+    if (!textures.empty())
+    {
+        auto maybe_tex_coord_buffer_id = CreateBufferInLevel(
+            level, textures, std::format("{}.{}.texture", name, counter));
+        if (maybe_tex_coord_buffer_id)
+            tex_coord_buffer_id = maybe_tex_coord_buffer_id.value();
+    }
 
     // Index buffer array.
     auto maybe_index_buffer_id = CreateBufferInLevel(
@@ -180,6 +188,8 @@ std::pair<EntityId, EntityId> LoadStaticMeshFromObj(
     // `Vertex` struct and occupies 48 bytes, yielding 144 bytes per triangle
     // (already aligned to 16 bytes).
     std::vector<float> triangles;
+    auto bvh_nodes =
+        frame::BuildBVH(points, std::vector<std::uint32_t>(indices.begin(), indices.end()));
     auto push_vertex = [&](int idx) {
         // Position
         triangles.push_back(points[idx * 3]);
@@ -187,9 +197,18 @@ std::pair<EntityId, EntityId> LoadStaticMeshFromObj(
         triangles.push_back(points[idx * 3 + 2]);
         triangles.push_back(0.0f); // Padding
         // Normal
-        triangles.push_back(normals[idx * 3]);
-        triangles.push_back(normals[idx * 3 + 1]);
-        triangles.push_back(normals[idx * 3 + 2]);
+        if (!normals.empty())
+        {
+            triangles.push_back(normals[idx * 3]);
+            triangles.push_back(normals[idx * 3 + 1]);
+            triangles.push_back(normals[idx * 3 + 2]);
+        }
+        else
+        {
+            triangles.push_back(0.0f);
+            triangles.push_back(0.0f);
+            triangles.push_back(0.0f);
+        }
         triangles.push_back(0.0f); // Padding
         // UV
         if (!textures.empty())
@@ -205,6 +224,15 @@ std::pair<EntityId, EntityId> LoadStaticMeshFromObj(
         triangles.push_back(0.0f); // Padding
         triangles.push_back(0.0f); // Padding
     };
+
+    auto maybe_bvh_buffer_id = CreateBufferInLevel(
+        level,
+        bvh_nodes,
+        std::format("{}.{}.bvh", name, counter),
+        opengl::BufferTypeEnum::SHADER_STORAGE_BUFFER);
+    if (!maybe_bvh_buffer_id)
+        return {NullId, NullId};
+    EntityId bvh_buffer_id = maybe_bvh_buffer_id.value();
 
     for (int i = 0; i < indices.size(); i += 3)
     {
@@ -230,6 +258,7 @@ std::pair<EntityId, EntityId> LoadStaticMeshFromObj(
     parameter.texture_buffer_id = tex_coord_buffer_id;
     parameter.index_buffer_id = index_buffer_id;
     parameter.triangle_buffer_id = triangle_buffer_id;
+    parameter.bvh_buffer_id = bvh_buffer_id;
     auto static_mesh = std::make_unique<opengl::StaticMesh>(level, parameter);
     auto material_id = NullId;
     if (!material_ids.empty())
@@ -240,7 +269,11 @@ std::pair<EntityId, EntityId> LoadStaticMeshFromObj(
         }
         material_id = material_ids[0];
     }
-    std::string mesh_name = std::format("{}.{}", name, counter);
+    // Mesh names must differ from node names, which are also based on the
+    // original "name" parameter.  Otherwise, adding both the mesh and its
+    // node to the level triggers a duplicate-name error.  Give the mesh a
+    // distinct suffix so it can coexist with a node of the same base name.
+    std::string mesh_name = std::format("{}.{}.mesh", name, counter);
     static_mesh->SetName(mesh_name);
     auto maybe_mesh_id = level.AddStaticMesh(std::move(static_mesh));
     if (!maybe_mesh_id)
@@ -289,25 +322,34 @@ EntityId LoadStaticMeshFromPly(
     EntityId point_buffer_id = maybe_point_buffer_id.value();
 
     // Color buffer initialization.
-    auto maybe_color_buffer_id =
-        CreateBufferInLevel(level, colors, std::format("{}.color", name));
-    if (!maybe_color_buffer_id)
-        return NullId;
-    EntityId color_buffer_id = maybe_color_buffer_id.value();
+    EntityId color_buffer_id = NullId;
+    if (!colors.empty())
+    {
+        auto maybe_color_buffer_id =
+            CreateBufferInLevel(level, colors, std::format("{}.color", name));
+        if (maybe_color_buffer_id)
+            color_buffer_id = maybe_color_buffer_id.value();
+    }
 
     // Normal buffer initialization.
-    auto maybe_normal_buffer_id =
-        CreateBufferInLevel(level, normals, std::format("{}.normal", name));
-    if (!maybe_normal_buffer_id)
-        return NullId;
-    EntityId normal_buffer_id = maybe_normal_buffer_id.value();
+    EntityId normal_buffer_id = NullId;
+    if (!normals.empty())
+    {
+        auto maybe_normal_buffer_id =
+            CreateBufferInLevel(level, normals, std::format("{}.normal", name));
+        if (maybe_normal_buffer_id)
+            normal_buffer_id = maybe_normal_buffer_id.value();
+    }
 
     // Texture coordinates buffer initialization.
-    auto maybe_tex_coord_buffer_id =
-        CreateBufferInLevel(level, textures, std::format("{}.texture", name));
-    if (!maybe_tex_coord_buffer_id)
-        return NullId;
-    EntityId tex_coord_buffer_id = maybe_tex_coord_buffer_id.value();
+    EntityId tex_coord_buffer_id = NullId;
+    if (!textures.empty())
+    {
+        auto maybe_tex_coord_buffer_id =
+            CreateBufferInLevel(level, textures, std::format("{}.texture", name));
+        if (maybe_tex_coord_buffer_id)
+            tex_coord_buffer_id = maybe_tex_coord_buffer_id.value();
+    }
 
     // Index buffer array.
     auto maybe_index_buffer_id = CreateBufferInLevel(
@@ -340,7 +382,9 @@ EntityId LoadStaticMeshFromPly(
     }
 
     static_mesh = std::make_unique<opengl::StaticMesh>(level, parameter);
-    std::string mesh_name = std::format("{}", name);
+    // As with OBJ meshes, ensure the static mesh name is distinct from the
+    // scene node name to avoid duplicate identifiers within the level.
+    std::string mesh_name = std::format("{}.mesh", name);
     static_mesh->SetName(mesh_name);
     auto maybe_mesh_id = level.AddStaticMesh(std::move(static_mesh));
     if (!maybe_mesh_id)
@@ -404,7 +448,10 @@ std::vector<EntityId> LoadStaticMeshesFromObjFile(
             return &level.GetSceneNodeFromId(maybe_id);
         };
         auto ptr = std::make_unique<NodeStaticMesh>(func, static_mesh_id);
-        ptr->SetName(std::format("Node.{}.{}", name, mesh_counter));
+        std::string node_name = meshes.size() == 1
+                                    ? name
+                                    : std::format("{}.{}", name, mesh_counter);
+        ptr->SetName(node_name);
         auto maybe_id = level.AddSceneNode(std::move(ptr));
         if (!maybe_id)
         {
@@ -445,7 +492,7 @@ EntityId LoadStaticMeshFromPlyFile(
         return &level.GetSceneNodeFromId(maybe_id);
     };
     auto ptr = std::make_unique<NodeStaticMesh>(func, static_mesh_id);
-    ptr->SetName(std::format("Node.{}", name));
+    ptr->SetName(name);
     auto maybe_id = level.AddSceneNode(std::move(ptr));
     if (!maybe_id)
         return NullId;
