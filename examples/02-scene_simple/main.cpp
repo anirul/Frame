@@ -53,15 +53,16 @@ try
     //    std::make_unique<ModalInfo>("Info", "This is a test modal window."));
     win->GetDevice().AddPlugin(std::move(gui_window));
     frame::common::Application app(std::move(win));
-    do
+    while (true)
     {
         app.Startup(frame::file::FindFile("asset/json/scene_simple.json"));
         app.Run();
+        if (ptr_window_resolution->End())
+            break;
         app.Resize(
             ptr_window_resolution->GetSize(),
             ptr_window_resolution->GetFullScreen());
     }
-    while (!ptr_window_resolution->End());
     return 0;
 }
 catch (std::exception ex)
