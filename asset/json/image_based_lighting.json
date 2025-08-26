@@ -161,7 +161,7 @@
             "name": "ImageBasedLightingProgram",
             "input_texture_names": [
                 "apple_texture",
-                "skybox"
+                "irradiance"
             ],
             "output_texture_names": [
                 "albedo"
