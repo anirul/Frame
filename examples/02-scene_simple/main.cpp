@@ -56,9 +56,15 @@ try
     while (true)
     {
         app.Startup(frame::file::FindFile("asset/json/scene_simple.json"));
-        app.Run();
-        if (ptr_window_resolution->End())
+        auto window_return = app.Run();
+        if (window_return == frame::WindowReturnEnum::QUIT)
+        {
             break;
+        }
+        if (ptr_window_resolution->End())
+        {
+            break;
+        }
         app.Resize(
             ptr_window_resolution->GetSize(),
             ptr_window_resolution->GetFullScreen());

@@ -91,7 +91,11 @@ try
         }
         ptr_window_camera->SetCameraPtr(&level->GetDefaultCamera());
         app.Startup(std::move(level));
-        app.Run();
+        auto window_return = app.Run();
+        if (window_return == frame::WindowReturnEnum::QUIT)
+        {
+            break;
+        }
         ptr_window_camera->SaveCamera();
         // Update screen resolution parameters.
         size = ptr_window_resolution->GetSize();
