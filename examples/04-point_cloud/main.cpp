@@ -73,7 +73,7 @@ try
     bool do_once = true;
     bool create_proto = true;
     frame::proto::Level proto_level;
-    do
+    while (true)
     {
         if (std::exchange(create_proto, false))
         {
@@ -91,18 +91,26 @@ try
         }
         ptr_window_camera->SetCameraPtr(&level->GetDefaultCamera());
         app.Startup(std::move(level));
-        app.Run();
-        app.Resize(
-            ptr_window_resolution->GetSize(),
-            ptr_window_resolution->GetFullScreen());
+        auto window_return = app.Run();
+        if (window_return == frame::WindowReturnEnum::QUIT)
+        {
+            break;
+        }
         ptr_window_camera->SaveCamera();
         // Update screen resolution parameters.
         size = ptr_window_resolution->GetSize();
         check_end = {
             ptr_window_resolution->End(),
             ptr_window_camera->End()};
-    } while (!std::all_of(
-        check_end.begin(), check_end.end(), [](bool b) { return b; }));
+        if (std::all_of(
+                check_end.begin(), check_end.end(), [](bool b) { return b; }))
+        {
+            break;
+        }
+        app.Resize(
+            ptr_window_resolution->GetSize(),
+            ptr_window_resolution->GetFullScreen());
+    }
     return 0;
 }
 catch (std::exception ex)

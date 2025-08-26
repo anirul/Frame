@@ -35,10 +35,7 @@
             "pixel_structure": {
                 "value": "RGB"
             },
-            "size": {
-                "x": 512,
-                "y": 512
-            }
+            "file_name": "asset/cubemap/shiodome_env.hdr"
         },
         {
             "name": "apple_texture",
@@ -88,47 +85,9 @@
             "inner_names": [
                 "Skybox"
             ]
-        },
-        {
-            "name": "IrradianceMaterial",
-            "program_name": "IrradianceProgram",
-            "texture_names": [
-                "skybox"
-            ],
-            "inner_names": [
-                "Environment"
-            ]
         }
     ],
     "programs": [
-        {
-            "name": "IrradianceProgram",
-            "input_texture_names": [
-                "skybox"
-            ],
-            "output_texture_names": [
-                "irradiance"
-            ],
-            "input_scene_type": {
-                "value": "CUBE"
-            },
-            "shader_vertex": "irradiance_cubemap.vert",
-            "shader_fragment": "irradiance_cubemap.frag",
-            "uniforms": [
-                {
-                    "name": "projection",
-                    "uniform_enum": "PROJECTION_MAT4"
-                },
-                {
-                    "name": "view",
-                    "uniform_enum": "VIEW_MAT4"
-                },
-                {
-                    "name": "model",
-                    "uniform_enum": "MODEL_MAT4"
-                }
-            ]
-        },
         {
             "name": "CubeMapProgram",
             "input_texture_names": [
@@ -161,7 +120,7 @@
             "name": "ImageBasedLightingProgram",
             "input_texture_names": [
                 "apple_texture",
-                "skybox"
+                "irradiance"
             ],
             "output_texture_names": [
                 "albedo"
@@ -232,13 +191,6 @@
             }
         ],
         "node_static_meshes": [
-            {
-                "name": "ComputeIrradianceMap",
-                "parent": "root",
-                "mesh_enum": "CUBE",
-                "material_name": "IrradianceMaterial",
-                "render_time_enum": "PRE_RENDER_TIME"
-            },
             {
                 "name": "InitCleanBuffer",
                 "clean_buffer": {
