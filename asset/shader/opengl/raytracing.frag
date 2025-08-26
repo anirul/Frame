@@ -282,7 +282,6 @@ void main()
         vec3 T = normalize(inv_model3 * hit_tangent_model);
         vec3 B = normalize(inv_model3 * hit_bitangent_model);
         vec3 normal_map = texture(apple_normal_texture, hit_uv).xyz * 2.0 - 1.0;
-        normal_map.y = -normal_map.y; // Invert green channel to match texture orientation
         vec3 hit_normal = normalize(mat3(T, B, N) * normal_map);
         // Position of the hit point in model space for casting shadow rays.
         vec3 hit_pos_model = ray_origin + closest_t * ray_dir;
