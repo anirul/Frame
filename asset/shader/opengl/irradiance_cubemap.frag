@@ -19,8 +19,13 @@ void main()
     vec3 normal = normalize(vec3(-vert_local.x, -vert_local.y, vert_local.z));
     vec3 irradiance = vec3(0.0);
 
-    vec3 up = vec3(0.0, 1.0, 0.0);
-    vec3 right = cross(up, normal);
+    // Build an orthonormal basis around the normal. Using a fixed up vector
+    // causes issues when the normal is parallel to it, which resulted in
+    // several faces of the irradiance cube map being black. Choose a new up
+    // vector when necessary and normalize the basis vectors so sampling works
+    // for all directions.
+    vec3 up = abs(normal.y) < 0.999 ? vec3(0.0, 1.0, 0.0) : vec3(0.0, 0.0, 1.0);
+    vec3 right = normalize(cross(up, normal));
     up = cross(normal, right);
 
     // Increase the number of samples
