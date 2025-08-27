@@ -112,13 +112,10 @@ void* SDLOpenGLNone::GetGraphicContext() const
         gl_version.first,
         gl_version.second);
 
-    // Initialize GLEW to find the 'glDebugMessageCallback' function.
-    auto result = glewInit();
-    if (result != GLEW_OK)
+    // Load OpenGL via GLAD using SDL's loader (works on GLX or EGL)
+    if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress))
     {
-        throw std::runtime_error(std::format(
-            "GLEW problems : {}",
-            reinterpret_cast<const char*>(glewGetErrorString(result))));
+        throw std::runtime_error("glad load failed problems!");
     }
 
     // During init, enable debug output

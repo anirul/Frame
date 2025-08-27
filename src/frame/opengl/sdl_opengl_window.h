@@ -1,7 +1,7 @@
 #pragma once
 
-#include <GL/glew.h>
 #include <SDL3/SDL.h>
+#include <glad/glad.h>
 #include <stdexcept>
 #include <string>
 #if defined(_WIN32) || defined(_WIN64)
@@ -32,10 +32,10 @@ class SDLOpenGLWindow : public WindowInterface
     {
         key_callbacks_.insert({key, func});
     }
-	void RemoveKeyCallback(std::int32_t key) override
-	{
-		key_callbacks_.erase(key);
-	}
+    void RemoveKeyCallback(std::int32_t key) override
+    {
+        key_callbacks_.erase(key);
+    }
     void SetUniqueDevice(std::unique_ptr<DeviceInterface> device) override
     {
         device_ = std::move(device);

@@ -62,7 +62,7 @@ target_link_libraries(FrameOpenGL
     FrameFile
     FrameJson
     FrameOpenGLFile
-    GLEW::GLEW
+    glad::glad
     glm::glm
     protobuf::libprotobuf
     SDL3::SDL3

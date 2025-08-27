@@ -1,8 +1,7 @@
 #include "frame/opengl/static_mesh.h"
 
-#include <GL/glew.h>
-
 #include <fstream>
+#include <glad/glad.h>
 #include <iterator>
 #include <numeric>
 #include <sstream>
@@ -352,8 +351,7 @@ EntityId CreateQuadStaticMesh(LevelInterface& level)
     parameter.normal_buffer_id = maybe_normal_buffer_id;
     parameter.texture_buffer_id = maybe_texture_buffer_id;
     parameter.index_buffer_id = maybe_index_buffer_id;
-    parameter.render_primitive_enum =
-        proto::NodeStaticMesh::TRIANGLE_PRIMITIVE;
+    parameter.render_primitive_enum = proto::NodeStaticMesh::TRIANGLE_PRIMITIVE;
     auto mesh = std::make_unique<StaticMesh>(level, parameter);
     mesh->SetName(std::format("QuadMesh.{}", count));
     return level.AddStaticMesh(std::move(mesh));
@@ -535,8 +533,7 @@ EntityId CreateCubeStaticMesh(LevelInterface& level)
     parameter.normal_buffer_id = maybe_normal_buffer_id;
     parameter.texture_buffer_id = maybe_texture_buffer_id;
     parameter.index_buffer_id = maybe_index_buffer_id;
-    parameter.render_primitive_enum =
-        proto::NodeStaticMesh::TRIANGLE_PRIMITIVE;
+    parameter.render_primitive_enum = proto::NodeStaticMesh::TRIANGLE_PRIMITIVE;
     auto mesh = std::make_unique<StaticMesh>(level, parameter);
     mesh->SetName(std::format("CubeMesh.{}", count));
     return level.AddStaticMesh(std::move(mesh));

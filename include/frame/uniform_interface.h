@@ -1,12 +1,11 @@
 #pragma once
 
-#include <GL/glew.h>
 #define GLM_ENABLE_EXPERIMENTAL
+#include "frame/json/proto.h"
+#include "frame/serialize.h"
 #include <glm/glm.hpp>
 #include <memory>
 #include <vector>
-#include "frame/json/proto.h"
-#include "frame/serialize.h"
 
 namespace frame
 {

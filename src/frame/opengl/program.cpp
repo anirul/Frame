@@ -1,13 +1,13 @@
 #include "program.h"
 
-#include <GL/glew.h>
 #include <absl/strings/match.h>
 #include <absl/strings/string_view.h>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/glm.hpp>
 #include <algorithm>
 #include <cinttypes>
 #include <format>
+#include <glad/glad.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <memory>
 #include <regex>
 #include <stdexcept>

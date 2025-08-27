@@ -23,7 +23,7 @@ enable_testing()
 
 # External packages.
 find_package(absl CONFIG REQUIRED)
-find_package(GLEW CONFIG REQUIRED)
+find_package(glad CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
 find_package(GTest CONFIG REQUIRED)
 find_package(protobuf CONFIG REQUIRED)

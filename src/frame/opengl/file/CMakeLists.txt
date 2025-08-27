@@ -29,7 +29,7 @@ target_link_libraries(FrameOpenGLFile
     FrameOpenGL
     FrameProto
     FrameJson
-    GLEW::GLEW
+    glad::glad
     glm::glm
     protobuf::libprotobuf
     spdlog::spdlog

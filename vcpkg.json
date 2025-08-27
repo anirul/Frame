@@ -6,7 +6,7 @@
   "dependencies": [
     "abseil",
     "glm",
-    "glew",
+    "glad",
     "gtest",
     "happly",
     {

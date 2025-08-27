@@ -1,6 +1,6 @@
 #include "frame/opengl/pixel_test.h"
 
-#include <GL/glew.h>
+#include <glad/glad.h>
 
 #include "frame/json/parse_pixel.h"
 

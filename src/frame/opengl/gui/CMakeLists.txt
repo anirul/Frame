@@ -19,7 +19,7 @@ target_link_libraries(FrameOpenGLGui
     Frame
     FrameGui
     FrameOpenGL
-    GLEW::GLEW
+    glad::glad
     glm::glm
     imgui::imgui
     protobuf::libprotobuf

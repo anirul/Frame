@@ -89,15 +89,10 @@ SDLOpenGLWindow::SDLOpenGLWindow(glm::uvec2 size) : size_(size)
     // Vsync off.
     SDL_GL_SetSwapInterval(0);
 
-    // Initialize GLEW to find the 'glDebugMessageCallback' function.
-    glewExperimental = GL_TRUE;
-    auto result = glewInit();
-    if (result != GLEW_OK)
+    // Load OpenGL via GLAD using SDL's loader (works on GLX or EGL)
+    if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress))
     {
-        throw std::runtime_error(
-            std::format(
-                "GLEW problems : {}",
-                reinterpret_cast<const char*>(glewGetErrorString(result))));
+        throw std::runtime_error("glad load failed problems!");
     }
 
     // During init, enable debug output

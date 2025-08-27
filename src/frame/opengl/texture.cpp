@@ -1,9 +1,9 @@
 #include "frame/opengl/texture.h"
 
-#include <GL/glew.h>
 #include <algorithm>
 #include <cassert>
 #include <functional>
+#include <glad/glad.h>
 #include <google/protobuf/descriptor.h>
 #include <stdexcept>
 

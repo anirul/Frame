@@ -1,11 +1,10 @@
 #include "frame/opengl/cubemap.h"
 
-#include <GL/glew.h>
-
 #include <algorithm>
 #include <cassert>
 #include <fstream>
 #include <functional>
+#include <glad/glad.h>
 #include <stdexcept>
 
 #include "frame/file/file_system.h"

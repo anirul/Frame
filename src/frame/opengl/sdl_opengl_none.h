@@ -1,9 +1,9 @@
 #pragma once
 
 #define NOMINMAX
-#include <GL/glew.h>
 #include <SDL3/SDL.h>
 #include <format>
+#include <glad/glad.h>
 #include <string>
 
 #include <stdexcept>
@@ -34,10 +34,10 @@ class SDLOpenGLNone : public WindowInterface
     {
         throw std::runtime_error("Not implemented.");
     }
-	void RemoveKeyCallback(std::int32_t key) override
-	{
-		throw std::runtime_error("Not implemented.");
-	}
+    void RemoveKeyCallback(std::int32_t key) override
+    {
+        throw std::runtime_error("Not implemented.");
+    }
     void SetUniqueDevice(std::unique_ptr<DeviceInterface> device) override
     {
         device_ = std::move(device);
