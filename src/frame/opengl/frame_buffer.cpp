@@ -1,6 +1,6 @@
 #include "frame/opengl/frame_buffer.h"
 
-#include <GL/glew.h>
+#include <glad/glad.h>
 
 #include <cassert>
 #include <sstream>
@@ -55,9 +55,11 @@ void FrameBuffer::AttachRender(const RenderBuffer& render) const
 void FrameBuffer::AttachTexture(
     unsigned int texture_id,
     FrameColorAttachment frame_color_attachment /*=
-            FrameColorAttachment::COLOR_ATTACHMENT0*/,
+            FrameColorAttachment::COLOR_ATTACHMENT0*/
+    ,
     FrameTextureType frame_texture_type /*=
-            FrameTextureType::TEXTURE_2D*/,
+            FrameTextureType::TEXTURE_2D*/
+    ,
     int mipmap /*= 0*/) const
 {
     Bind();
@@ -95,8 +97,7 @@ FrameColorAttachment FrameBuffer::GetFrameColorAttachment(int i)
     }
 }
 
-int FrameBuffer::GetFrameTextureType(
-    FrameTextureType frame_texture_type) const
+int FrameBuffer::GetFrameTextureType(FrameTextureType frame_texture_type) const
 {
     int value = static_cast<int>(frame_texture_type);
     if (value >= 0)

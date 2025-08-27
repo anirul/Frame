@@ -1,7 +1,6 @@
 #include "frame/opengl/render_buffer.h"
 
-#include <GL/glew.h>
-
+#include <glad/glad.h>
 #include <stdexcept>
 
 #include "pixel.h"

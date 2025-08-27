@@ -1,9 +1,9 @@
 #include "frame/opengl/window_factory.h"
 
-#include <GL/glew.h>
 #include <SDL3/SDL.h>
 #include <chrono>
 #include <exception>
+#include <glad/glad.h>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>

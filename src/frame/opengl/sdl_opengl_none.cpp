@@ -1,7 +1,7 @@
 #include "frame/opengl/sdl_opengl_none.h"
 
 #include "frame/opengl/message_callback.h"
-#include <SDL3/SDL_video.h>
+#include <SDL3/SDL.h>
 #include <format>
 
 namespace frame::opengl
@@ -54,17 +54,27 @@ SDLOpenGLNone::SDLOpenGLNone(glm::uvec2 size) : size_(size)
 
     // Set as current
     SDL_GL_MakeCurrent(sdl_window_, gl_context_);
+    if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress))
+    {
+        throw std::runtime_error("glad load failed");
+    }
+    SDL_GL_SetSwapInterval(0);
+    glEnable(GL_DEBUG_OUTPUT);
+    glDebugMessageCallback(MessageCallback, nullptr);
 }
 
 SDLOpenGLNone::~SDLOpenGLNone()
 {
-    // TODO(anirul): Fix me to check which device this is.
-    if (device_)
+    if (gl_context_)
     {
-        SDL_GL_DestroyContext(
-            static_cast<SDL_GLContext>(device_->GetDeviceContext()));
+        SDL_GL_DestroyContext(gl_context_);
+        gl_context_ = nullptr;
     }
-    SDL_DestroyWindow(sdl_window_);
+    if (sdl_window_)
+    {
+        SDL_DestroyWindow(sdl_window_);
+        sdl_window_ = nullptr;
+    }
     SDL_Quit();
 }
 
@@ -91,41 +101,29 @@ void* SDLOpenGLNone::GetGraphicContext() const
     frame::Logger& logger = frame::Logger::GetInstance();
 
     // GL context.
-    void* gl_context =
-        SDL_GL_CreateContext(static_cast<SDL_Window*>(GetWindowContext()));
-    if (!gl_context)
+    // Re-bind the context to the calling thread
+    if (!SDL_GL_MakeCurrent(sdl_window_, gl_context_))
     {
-        std::string error = SDL_GetError();
-        logger->error(error);
-        throw std::runtime_error(error);
+        throw std::runtime_error(
+            std::format("MakeCurrent failed: {}", SDL_GetError()));
+    }
+
+    const char* ver = reinterpret_cast<const char*>(glGetString(GL_VERSION));
+    if (!ver)
+    {
+        throw std::runtime_error("No current GL context");
     }
 
     SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &gl_version.first);
     SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &gl_version.second);
     logger->info(reinterpret_cast<const char*>(glGetString(GL_RENDERER)));
 
-    // Vsync off.
-    SDL_GL_SetSwapInterval(0);
-
     logger->info(
         "Started SDL OpenGL version {}.{}.",
         gl_version.first,
         gl_version.second);
 
-    // Initialize GLEW to find the 'glDebugMessageCallback' function.
-    auto result = glewInit();
-    if (result != GLEW_OK)
-    {
-        throw std::runtime_error(std::format(
-            "GLEW problems : {}",
-            reinterpret_cast<const char*>(glewGetErrorString(result))));
-    }
-
-    // During init, enable debug output
-    glEnable(GL_DEBUG_OUTPUT);
-    glDebugMessageCallback(MessageCallback, nullptr);
-
-    return gl_context;
+    return gl_context_;
 }
 
 } // End namespace frame::opengl.

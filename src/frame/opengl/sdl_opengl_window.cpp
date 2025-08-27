@@ -73,7 +73,11 @@ SDLOpenGLWindow::SDLOpenGLWindow(glm::uvec2 size) : size_(size)
     }
 
     // Set as current
-    SDL_GL_MakeCurrent(sdl_window_, gl_context_);
+    if (!SDL_GL_MakeCurrent(sdl_window_, gl_context_))
+    {
+        throw std::runtime_error(
+            std::format("MakeCurrent failed: {}", SDL_GetError()));
+    }
 
 #if defined(_WIN32) || defined(_WIN64)
     // Get the window handler.
@@ -89,15 +93,10 @@ SDLOpenGLWindow::SDLOpenGLWindow(glm::uvec2 size) : size_(size)
     // Vsync off.
     SDL_GL_SetSwapInterval(0);
 
-    // Initialize GLEW to find the 'glDebugMessageCallback' function.
-    glewExperimental = GL_TRUE;
-    auto result = glewInit();
-    if (result != GLEW_OK)
+    // Load OpenGL via GLAD using SDL's loader (works on GLX or EGL)
+    if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress))
     {
-        throw std::runtime_error(
-            std::format(
-                "GLEW problems : {}",
-                reinterpret_cast<const char*>(glewGetErrorString(result))));
+        throw std::runtime_error("glad load failed problems!");
     }
 
     // During init, enable debug output
@@ -107,11 +106,11 @@ SDLOpenGLWindow::SDLOpenGLWindow(glm::uvec2 size) : size_(size)
 
 SDLOpenGLWindow::~SDLOpenGLWindow()
 {
-    // TODO(anirul): Fix me to check which device this is.
-    if (device_)
+    // Destroy the context we own; don't touch device_ here.
+    if (gl_context_)
     {
-        SDL_GL_DestroyContext(
-            static_cast<SDL_GLContext>(device_->GetDeviceContext()));
+        SDL_GL_DestroyContext(gl_context_);
+        gl_context_ = nullptr;
     }
     SDL_DestroyWindow(sdl_window_);
     SDL_Quit();
@@ -174,7 +173,11 @@ WindowReturnEnum SDLOpenGLWindow::Run(std::function<bool()> lambda)
             }
         }
 
-        SDL_GL_MakeCurrent(sdl_window_, gl_context_);
+        if (!SDL_GL_MakeCurrent(sdl_window_, gl_context_))
+        {
+            throw std::runtime_error(
+                std::format("MakeCurrent failed: {}", SDL_GetError()));
+        }
 
         std::string title = "SDL OpenGL";
         if (!open_file_name_.empty())
@@ -334,6 +337,12 @@ void* SDLOpenGLWindow::GetGraphicContext() const
         std::string error = SDL_GetError();
         logger->error(error);
         throw std::runtime_error(error);
+    }
+    // Ensure current before anyone uses it
+    if (!SDL_GL_MakeCurrent(sdl_window_, gl_context_))
+    {
+        throw std::runtime_error(
+            std::format("MakeCurrent failed: {}", SDL_GetError()));
     }
 
     SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &gl_version.first);

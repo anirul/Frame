@@ -1,13 +1,12 @@
 #include "frame/opengl/cubemap_test.h"
 
-#include <GL/glew.h>
-
 #include <algorithm>
+#include <glad/glad.h>
 
 #include "frame/file/file_system.h"
 #include "frame/json/parse_texture.h"
-#include "frame/opengl/file/load_texture.h"
 #include "frame/opengl/cubemap.h"
+#include "frame/opengl/file/load_texture.h"
 
 namespace test
 {

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <GL/glew.h>
 #include <SDL3/SDL.h>
+#include <glad/glad.h>
 #include <stdexcept>
 #include <string>
 #if defined(_WIN32) || defined(_WIN64)
@@ -32,10 +32,10 @@ class SDLOpenGLWindow : public WindowInterface
     {
         key_callbacks_.insert({key, func});
     }
-	void RemoveKeyCallback(std::int32_t key) override
-	{
-		key_callbacks_.erase(key);
-	}
+    void RemoveKeyCallback(std::int32_t key) override
+    {
+        key_callbacks_.erase(key);
+    }
     void SetUniqueDevice(std::unique_ptr<DeviceInterface> device) override
     {
         device_ = std::move(device);
@@ -98,8 +98,8 @@ class SDLOpenGLWindow : public WindowInterface
     FullScreenEnum fullscreen_enum_ = FullScreenEnum::WINDOW;
     std::unique_ptr<DeviceInterface> device_ = nullptr;
     std::unique_ptr<InputInterface> input_interface_ = nullptr;
-    SDL_Window* sdl_window_;
-    SDL_GLContext gl_context_;
+    SDL_Window* sdl_window_ = nullptr;
+    SDL_GLContext gl_context_ = nullptr;
     std::map<std::int32_t, std::function<bool()>> key_callbacks_ = {};
 #if defined(_WIN32) || defined(_WIN64)
     HWND hwnd_ = nullptr;

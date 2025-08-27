@@ -1,6 +1,6 @@
 #pragma once
 
-#include <GL/glew.h>
+#include <glad/glad.h>
 
 #include <vector>
 
@@ -167,8 +167,7 @@ class Buffer : public BindInterface, public BufferInterface
  * @param device: A pointer to a device.
  * @param vector: A vector that is moved into the device and level.
  */
-std::unique_ptr<BufferInterface> CreatePointBuffer(
-	std::vector<float>&& vector);
+std::unique_ptr<BufferInterface> CreatePointBuffer(std::vector<float>&& vector);
 /**
  * @brief Create an index buffer from a vector of unsigned integer.
  * @param device: A pointer to a device.

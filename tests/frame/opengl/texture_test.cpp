@@ -1,6 +1,6 @@
 #include "frame/opengl/texture_test.h"
 
-#include <GL/glew.h>
+#include <glad/glad.h>
 #include <memory>
 
 #include "frame/file/file_system.h"

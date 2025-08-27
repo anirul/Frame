@@ -1,8 +1,8 @@
 #include "renderer.h"
 
-#include <GL/glew.h>
 #include <cassert>
 #include <format>
+#include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
 #include <stdexcept>
 
@@ -146,7 +146,8 @@ void Renderer::RenderMesh(
         uniform_collection_wrapper.AddUniform(
             std::make_unique<Uniform>("light_dir", light.GetVector()));
         uniform_collection_wrapper.AddUniform(
-            std::make_unique<Uniform>("light_color", light.GetColorIntensity()));
+            std::make_unique<Uniform>(
+                "light_color", light.GetColorIntensity()));
     }
     if (render_time_ == proto::NodeStaticMesh::SCENE_RENDER_TIME)
     {
@@ -438,8 +439,7 @@ void Renderer::PreRender()
             else
             {
                 // Regular 2D texture target.
-                texture_frame_.set_value(
-                    proto::TextureFrame::TEXTURE_2D);
+                texture_frame_.set_value(proto::TextureFrame::TEXTURE_2D);
                 RenderNode(
                     p.first, material_id, kProjectionCubemap, kViewsCubemap[0]);
             }

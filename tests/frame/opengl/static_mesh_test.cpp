@@ -1,6 +1,6 @@
 #include "frame/opengl/static_mesh_test.h"
 
-#include <GL/glew.h>
+#include <glad/glad.h>
 
 #include "frame/buffer_interface.h"
 #include "frame/file/file_system.h"
