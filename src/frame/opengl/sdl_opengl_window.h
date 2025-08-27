@@ -98,8 +98,8 @@ class SDLOpenGLWindow : public WindowInterface
     FullScreenEnum fullscreen_enum_ = FullScreenEnum::WINDOW;
     std::unique_ptr<DeviceInterface> device_ = nullptr;
     std::unique_ptr<InputInterface> input_interface_ = nullptr;
-    SDL_Window* sdl_window_;
-    SDL_GLContext gl_context_;
+    SDL_Window* sdl_window_ = nullptr;
+    SDL_GLContext gl_context_ = nullptr;
     std::map<std::int32_t, std::function<bool()>> key_callbacks_ = {};
 #if defined(_WIN32) || defined(_WIN64)
     HWND hwnd_ = nullptr;
