@@ -59,7 +59,7 @@
             "pixel_structure": {
                 "value": "RGB"
             },
-            "file_name": "asset/apple/color.jpg"
+            "file_name": "asset/metal/color.jpg"
         },
         {
             "name": "normal_texture",
@@ -70,7 +70,7 @@
             "pixel_structure": {
                 "value": "RGB"
             },
-            "file_name": "asset/apple/normal.jpg"
+            "file_name": "asset/metal/normal.jpg"
         },
         {
             "name": "roughness_texture",
@@ -81,7 +81,7 @@
             "pixel_structure": {
                 "value": "GREY"
             },
-            "file_name": "asset/apple/roughness.jpg"
+            "file_name": "asset/metal/roughness.jpg"
         },
         {
             "name": "metallic_texture",
@@ -92,7 +92,7 @@
             "pixel_structure": {
                 "value": "GREY"
             },
-            "file_name": "asset/apple/metalness.jpg"
+            "file_name": "asset/metal/metalness.jpg"
         },
         {
             "name": "ao_texture",
@@ -103,7 +103,7 @@
             "pixel_structure": {
                 "value": "GREY"
             },
-            "file_name": "asset/apple/ambient_occlusion.jpg"
+            "file_name": "asset/metal/ambient_occlusion.jpg"
         }
     ],
     "materials": [
@@ -137,15 +137,15 @@
                 "skybox_env"
             ],
             "buffer_names": [
-                "AppleMesh.0.triangle",
-                "AppleMesh.0.bvh"
+                "DragonMesh.0.triangle",
+                "DragonMesh.0.bvh"
             ],
             "inner_buffer_names": [
                 "TriangleBuffer",
                 "BvhBuffer"
             ],
             "node_names": [
-                "AppleMesh"
+                "DragonMesh"
             ],
             "inner_node_names": [
                 "model"
@@ -171,8 +171,8 @@
                 "skybox_env"
             ],
             "buffer_names": [
-                "AppleMesh.0.triangle",
-                "AppleMesh.0.bvh"
+                "DragonMesh.0.triangle",
+                "DragonMesh.0.bvh"
             ],
             "inner_buffer_names": [
                 "TriangleBuffer",
@@ -382,9 +382,9 @@
                 "material_name": "RayTraceMaterial"
             },
             {
-                "name": "AppleMesh",
+                "name": "DragonMesh",
                 "parent": "mesh_holder",
-                "file_name": "apple.obj",
+                "file_name": "dragon.obj",
                 "material_name": "RayTracePreprocessMaterial",
                 "render_time_enum": "PRE_RENDER_TIME"
             }
