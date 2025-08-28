@@ -391,7 +391,8 @@
                 "name": "DragonMesh",
                 "parent": "mesh_holder",
                 "file_name": "dragon.obj",
-                "material_name": "RayTraceMaterial"
+                "material_name": "RayTracePreprocessMaterial",
+                "render_time_enum": "PRE_RENDER_TIME"
             }
         ],
         "node_lights": [
