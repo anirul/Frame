@@ -13,11 +13,12 @@ uniform vec3 camera_position;
 // Direction from the light toward the scene.
 uniform vec3 light_dir;
 uniform vec3 light_color;
-uniform sampler2D apple_texture;
-uniform sampler2D apple_normal_texture;
-uniform sampler2D apple_roughness_texture;
-uniform sampler2D apple_metalness_texture;
-uniform sampler2D apple_ao_texture;
+// Generic PBR textures for the traced mesh.
+uniform sampler2D albedo_texture;
+uniform sampler2D normal_texture;
+uniform sampler2D roughness_texture;
+uniform sampler2D metallic_texture;
+uniform sampler2D ao_texture;
 uniform samplerCube skybox_env;
 
 struct Vertex
@@ -281,7 +282,7 @@ void main()
         vec3 N = normalize(inv_model3 * hit_normal_model);
         vec3 T = normalize(inv_model3 * hit_tangent_model);
         vec3 B = normalize(inv_model3 * hit_bitangent_model);
-        vec3 normal_map = texture(apple_normal_texture, hit_uv).xyz * 2.0 - 1.0;
+        vec3 normal_map = texture(normal_texture, hit_uv).xyz * 2.0 - 1.0;
         vec3 hit_normal = normalize(mat3(T, B, N) * normal_map);
         // Position of the hit point in model space for casting shadow rays.
         vec3 hit_pos_model = ray_origin + closest_t * ray_dir;
@@ -296,10 +297,10 @@ void main()
         bool in_shadow = anyHitBVH(shadow_origin, shadow_dir);
 
         float shadow_factor = in_shadow ? 0.3 : 1.0;
-        vec3 albedo = texture(apple_texture, hit_uv).rgb;
-        float roughness = texture(apple_roughness_texture, hit_uv).r;
-        float metallic = texture(apple_metalness_texture, hit_uv).r;
-        float ao = texture(apple_ao_texture, hit_uv).r;
+        vec3 albedo = texture(albedo_texture, hit_uv).rgb;
+        float roughness = texture(roughness_texture, hit_uv).r;
+        float metallic = texture(metallic_texture, hit_uv).r;
+        float ao = texture(ao_texture, hit_uv).r;
         vec3 V = normalize(camera_position - (model * vec4(hit_pos_model, 1.0)).xyz);
         vec3 L = normalize(-dir);
         vec3 H = normalize(V + L);

@@ -51,7 +51,7 @@
             "file_name": "asset/cubemap/shiodome_env.hdr"
         },
         {
-            "name": "apple_texture",
+            "name": "albedo_texture",
             "cubemap": false,
             "pixel_element_size": {
                 "value": "BYTE"
@@ -62,7 +62,7 @@
             "file_name": "asset/apple/color.jpg"
         },
         {
-            "name": "apple_normal_texture",
+            "name": "normal_texture",
             "cubemap": false,
             "pixel_element_size": {
                 "value": "BYTE"
@@ -73,7 +73,7 @@
             "file_name": "asset/apple/normal.jpg"
         },
         {
-            "name": "apple_roughness_texture",
+            "name": "roughness_texture",
             "cubemap": false,
             "pixel_element_size": {
                 "value": "BYTE"
@@ -84,7 +84,7 @@
             "file_name": "asset/apple/roughness.jpg"
         },
         {
-            "name": "apple_metalness_texture",
+            "name": "metallic_texture",
             "cubemap": false,
             "pixel_element_size": {
                 "value": "BYTE"
@@ -95,7 +95,7 @@
             "file_name": "asset/apple/metalness.jpg"
         },
         {
-            "name": "apple_ao_texture",
+            "name": "ao_texture",
             "cubemap": false,
             "pixel_element_size": {
                 "value": "BYTE"
@@ -121,19 +121,19 @@
             "name": "RayTraceMaterial",
             "program_name": "RayTraceProgram",
             "texture_names": [
-                "apple_texture",
-                "apple_normal_texture",
-                "apple_roughness_texture",
-                "apple_metalness_texture",
-                "apple_ao_texture",
+                "albedo_texture",
+                "normal_texture",
+                "roughness_texture",
+                "metallic_texture",
+                "ao_texture",
                 "skybox_env"
             ],
             "inner_names": [
-                "apple_texture",
-                "apple_normal_texture",
-                "apple_roughness_texture",
-                "apple_metalness_texture",
-                "apple_ao_texture",
+                "albedo_texture",
+                "normal_texture",
+                "roughness_texture",
+                "metallic_texture",
+                "ao_texture",
                 "skybox_env"
             ],
             "buffer_names": [
@@ -155,19 +155,19 @@
             "name": "RayTracePreprocessMaterial",
             "program_name": "RayTracePreprocessProgram",
             "texture_names": [
-                "apple_texture",
-                "apple_normal_texture",
-                "apple_roughness_texture",
-                "apple_metalness_texture",
-                "apple_ao_texture",
+                "albedo_texture",
+                "normal_texture",
+                "roughness_texture",
+                "metallic_texture",
+                "ao_texture",
                 "skybox_env"
             ],
             "inner_names": [
-                "apple_texture",
-                "apple_normal_texture",
-                "apple_roughness_texture",
-                "apple_metalness_texture",
-                "apple_ao_texture",
+                "albedo_texture",
+                "normal_texture",
+                "roughness_texture",
+                "metallic_texture",
+                "ao_texture",
                 "skybox_env"
             ],
             "buffer_names": [
@@ -215,11 +215,11 @@
                 "albedo"
             ],
             "input_texture_names": [
-                "apple_texture",
-                "apple_normal_texture",
-                "apple_roughness_texture",
-                "apple_metalness_texture",
-                "apple_ao_texture",
+                "albedo_texture",
+                "normal_texture",
+                "roughness_texture",
+                "metallic_texture",
+                "ao_texture",
                 "skybox_env"
             ],
             "input_scene_type": {
