@@ -177,6 +177,12 @@
             "inner_buffer_names": [
                 "TriangleBuffer",
                 "BvhBuffer"
+            ],
+            "node_names": [
+                "DragonMesh"
+            ],
+            "inner_node_names": [
+                "model"
             ]
         }
     ],
