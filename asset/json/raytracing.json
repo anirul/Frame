@@ -143,12 +143,6 @@
             "inner_buffer_names": [
                 "TriangleBuffer",
                 "BvhBuffer"
-            ],
-            "node_names": [
-                "DragonMesh"
-            ],
-            "inner_node_names": [
-                "model"
             ]
         },
         {
@@ -177,12 +171,6 @@
             "inner_buffer_names": [
                 "TriangleBuffer",
                 "BvhBuffer"
-            ],
-            "node_names": [
-                "DragonMesh"
-            ],
-            "inner_node_names": [
-                "model"
             ]
         }
     ],
@@ -392,7 +380,7 @@
                 "parent": "mesh_holder",
                 "file_name": "dragon.obj",
                 "material_name": "RayTracePreprocessMaterial",
-                "render_time_enum": "SCENE_RENDER_TIME"
+                "render_time_enum": "PRE_RENDER_TIME"
             }
         ],
         "node_lights": [
