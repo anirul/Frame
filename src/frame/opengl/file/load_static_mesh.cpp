@@ -406,10 +406,12 @@ std::vector<EntityId> LoadStaticMeshesFromObjFile(
     if (!material_name.empty())
     {
         auto maybe_id = level.GetIdFromName(material_name);
-        if (maybe_id)
+        if (!maybe_id)
         {
-            material_ids.push_back(maybe_id);
+            throw std::runtime_error(
+                std::format("Unknown material: {}", material_name));
         }
+        material_ids.push_back(maybe_id);
     }
     else
     {
@@ -426,8 +428,9 @@ std::vector<EntityId> LoadStaticMeshesFromObjFile(
     int mesh_counter = 0;
     for (const auto& mesh : meshes)
     {
-        // Default to the first provided material so every mesh gets a valid
-        // material ID even if the OBJ lacks per-mesh material references.
+        // Choose the material referenced by the mesh; if none is provided,
+        // fall back to the first supplied material so every mesh has a valid
+        // material id.
         EntityId material_id = NullId;
         if (!material_ids.empty())
         {
@@ -445,6 +448,10 @@ std::vector<EntityId> LoadStaticMeshesFromObjFile(
             level, mesh, name, {material_id}, mesh_counter);
         if (!static_mesh_id)
             return {};
+        if (returned_material_id == NullId)
+        {
+            throw std::runtime_error("No material for mesh");
+        }
         auto func = [&level](const std::string& name) -> NodeInterface* {
             auto maybe_id = level.GetIdFromName(name);
             if (!maybe_id)
