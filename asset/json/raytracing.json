@@ -148,22 +148,6 @@
         {
             "name": "RayTracePreprocessMaterial",
             "program_name": "RayTracePreprocessProgram",
-            "texture_names": [
-                "albedo_texture",
-                "normal_texture",
-                "roughness_texture",
-                "metallic_texture",
-                "ao_texture",
-                "skybox_env"
-            ],
-            "inner_names": [
-                "albedo_texture",
-                "normal_texture",
-                "roughness_texture",
-                "metallic_texture",
-                "ao_texture",
-                "skybox_env"
-            ],
             "buffer_names": [
                 "DragonMesh.0.triangle",
                 "DragonMesh.0.bvh"
@@ -347,7 +331,7 @@
                 "position": {
                     "x": 0,
                     "y": 0,
-                    "z": -2
+                    "z": -1
                 },
                 "target": {
                     "x": 0,
