@@ -426,12 +426,19 @@ std::vector<EntityId> LoadStaticMeshesFromObjFile(
     int mesh_counter = 0;
     for (const auto& mesh : meshes)
     {
-        EntityId material_id{};
+        // Default to the first provided material so every mesh gets a valid
+        // material ID even if the OBJ lacks per-mesh material references.
+        EntityId material_id = NullId;
         if (!material_ids.empty())
         {
-            if (mesh.GetMaterialId() < material_ids.size())
+            material_id = material_ids.front();
+            int mesh_material_index = mesh.GetMaterialId();
+            if (
+                mesh_material_index >= 0 &&
+                static_cast<std::size_t>(mesh_material_index) <
+                    material_ids.size())
             {
-                material_id = material_ids[mesh.GetMaterialId()];
+                material_id = material_ids[mesh_material_index];
             }
         }
         auto [static_mesh_id, returned_material_id] = LoadStaticMeshFromObj(
