@@ -140,10 +140,27 @@ std::pair<EntityId, EntityId> LoadStaticMeshFromObj(
         normals.push_back(vertice.normal.x);
         normals.push_back(vertice.normal.y);
         normals.push_back(vertice.normal.z);
-        textures.push_back(vertice.tex_coord.x);
-        textures.push_back(vertice.tex_coord.y);
     }
     const auto& indices = mesh_obj.GetIndices();
+    // Check if texture coordinates are present.
+    if (mesh_obj.HasTextureCoordinates())
+    {
+        for (const auto& vertice : vertices)
+        {
+            textures.push_back(vertice.tex_coord.x);
+            textures.push_back(vertice.tex_coord.y);
+        }
+    }
+    else
+    {
+        Logger::GetInstance()->warn(
+            "No texture coordinates found for mesh {}, using normals.", name);
+        for (const auto& vertice : vertices)
+        {
+            textures.push_back(vertice.normal.x);
+            textures.push_back(vertice.normal.y);
+        }
+    }
 
     // Point buffer initialization.
     auto maybe_point_buffer_id = CreateBufferInLevel(

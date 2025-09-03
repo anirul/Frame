@@ -66,6 +66,7 @@ Obj::Obj(std::filesystem::path file_name)
         throw std::runtime_error(err);
     }
 #endif // TINY_OBJ_LOADER_V2
+    has_texture_coordinates_ = !attrib.texcoords.empty();
 
     if (shapes.size() == 0)
     {
@@ -84,7 +85,7 @@ Obj::Obj(std::filesystem::path file_name)
         std::vector<int> indices;
         indices.resize(attrib.vertices.size());
         std::iota(indices.begin(), indices.end(), 1);
-        ObjMesh mesh(points, indices, material_id);
+        ObjMesh mesh(points, indices, material_id, has_texture_coordinates_);
         meshes_.push_back(mesh);
     }
     else
@@ -147,7 +148,8 @@ Obj::Obj(std::filesystem::path file_name)
                 }
                 material_id = shapes[s].mesh.material_ids[f];
             }
-            ObjMesh mesh(points, indices, material_id);
+            ObjMesh mesh(
+                points, indices, material_id, has_texture_coordinates_);
             meshes_.push_back(mesh);
         }
     }
