@@ -17,7 +17,7 @@ TEST_F(StaticMeshTest, CreateCubeMeshObjTest)
     auto mesh_vec = frame::opengl::file::LoadStaticMeshesFromFile(
         *level.get(), frame::file::FindFile("asset/model/cube.obj"), "cube");
     ASSERT_TRUE(!mesh_vec.empty());
-    auto node_id = mesh_vec.at(0);
+    auto& [node_id, material_id] = mesh_vec.at(0);
     auto& node = level->GetSceneNodeFromId(node_id);
     auto static_mesh_id = node.GetLocalMesh();
     EXPECT_NE(0, static_mesh_id);
@@ -41,7 +41,7 @@ TEST_F(StaticMeshTest, CreateTorusMeshObjTest)
         *level.get(), frame::file::FindFile("asset/model/torus.obj"), "torus");
     ASSERT_TRUE(!mesh_vec.empty());
     EXPECT_EQ(1, mesh_vec.size());
-    auto node_id = mesh_vec.at(0);
+    auto& [node_id, material_id] = mesh_vec.at(0);
     auto& node = level->GetSceneNodeFromId(node_id);
     auto static_mesh_id = node.GetLocalMesh();
     EXPECT_NE(0, static_mesh_id);
@@ -64,7 +64,7 @@ TEST_F(StaticMeshTest, CreateAppleMeshPlyTest)
         *level.get(), frame::file::FindFile("asset/model/apple.ply"), "apple");
     ASSERT_TRUE(!mesh_vec.empty());
     EXPECT_EQ(1, mesh_vec.size());
-    auto node_id = mesh_vec.at(0);
+    auto& [node_id, material_id] = mesh_vec.at(0);
     auto& node = level->GetSceneNodeFromId(node_id);
     auto static_mesh_id = node.GetLocalMesh();
     EXPECT_NE(0, static_mesh_id);

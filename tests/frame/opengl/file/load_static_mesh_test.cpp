@@ -17,7 +17,7 @@ TEST_F(LoadStaticMeshTest, CreateLoadStaticMeshFromObjFileTest)
         "Monkey");
     ASSERT_TRUE(!node_vec.empty());
     EXPECT_EQ(1, node_vec.size());
-    auto node_id = node_vec.at(0);
+    auto& [node_id, material_id] = node_vec.at(0);
     auto& node = level->GetSceneNodeFromId(node_id);
     auto mesh_id = node.GetLocalMesh();
     EXPECT_NE(0, mesh_id);
@@ -33,7 +33,7 @@ TEST_F(LoadStaticMeshTest, CreateLoadStaticMeshFromPlyFileTest)
         *level.get(), frame::file::FindFile("asset/model/apple.ply"), "Apple");
     ASSERT_TRUE(!node_vec.empty());
     EXPECT_EQ(1, node_vec.size());
-    auto node_id = node_vec.at(0);
+    auto& [node_id, material_id] = node_vec.at(0);
     auto& node = level->GetSceneNodeFromId(node_id);
     auto mesh_id = node.GetLocalMesh();
     EXPECT_NE(0, mesh_id);
@@ -49,7 +49,7 @@ TEST_F(LoadStaticMeshTest, CreateSceneFromFileTest)
         *level.get(), frame::file::FindFile("asset/model/scene.obj"), "Scene");
     EXPECT_TRUE(!node_vec.empty());
     EXPECT_EQ(5, node_vec.size());
-    for (auto node_id : node_vec)
+    for (const auto& [node_id, material_id] : node_vec)
     {
         auto& node = level->GetSceneNodeFromId(node_id);
         auto mesh_id = node.GetLocalMesh();
