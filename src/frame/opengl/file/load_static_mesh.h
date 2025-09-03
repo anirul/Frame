@@ -17,10 +17,10 @@ namespace frame::opengl::file
  * @param file: The file name of the mesh.
  * @param name: The name of the mesh.
  * @param material_name: The material that is used.
- * @return The entity id of the meshes in the level (could be more than one
- *         in case OBJ file).
+ * @return A vector of pairs containing the entity id of the node and the
+ *         entity id of the material.
  */
-std::vector<EntityId> LoadStaticMeshesFromFile(
+std::vector<std::pair<EntityId, EntityId>> LoadStaticMeshesFromFile(
     LevelInterface& level,
     std::filesystem::path file,
     const std::string& name,

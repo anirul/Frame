@@ -162,9 +162,9 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
         return false;
     }
     int i = 0;
-    for (const auto node_mesh_id : vec_node_mesh_id)
+    for (const auto& [node_id, material_id] : vec_node_mesh_id)
     {
-        auto& node = level.GetSceneNodeFromId(node_mesh_id);
+        auto& node = level.GetSceneNodeFromId(node_id);
         auto& mesh = level.GetStaticMeshFromId(node.GetLocalMesh());
         mesh.GetData().set_file_name(proto_scene_static_mesh.file_name());
         mesh.GetData().set_render_primitive_enum(
@@ -190,10 +190,15 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
             proto_scene_static_mesh.material_name());
         static_mesh_node.GetData().set_render_time_enum(
             proto_scene_static_mesh.render_time_enum());
-        auto material_id =
-            level.GetIdFromName(proto_scene_static_mesh.material_name());
+        if (!material_id)
+        {
+            throw std::runtime_error(std::format(
+                "No material found for mesh {} in file {}",
+                proto_scene_static_mesh.name(),
+                proto_scene_static_mesh.file_name()));
+        }
         level.AddMeshMaterialId(
-            node_mesh_id,
+            node_id,
             material_id,
             proto_scene_static_mesh.render_time_enum());
         ++i;
