@@ -140,10 +140,27 @@ std::pair<EntityId, EntityId> LoadStaticMeshFromObj(
         normals.push_back(vertice.normal.x);
         normals.push_back(vertice.normal.y);
         normals.push_back(vertice.normal.z);
-        textures.push_back(vertice.tex_coord.x);
-        textures.push_back(vertice.tex_coord.y);
     }
     const auto& indices = mesh_obj.GetIndices();
+    // Check if texture coordinates are present.
+    if (mesh_obj.HasTextureCoordinates())
+    {
+        for (const auto& vertice : vertices)
+        {
+            textures.push_back(vertice.tex_coord.x);
+            textures.push_back(vertice.tex_coord.y);
+        }
+    }
+    else
+    {
+        Logger::GetInstance()->warn(
+            "No texture coordinates found for mesh {}, using normals.", name);
+        for (const auto& vertice : vertices)
+        {
+            textures.push_back(vertice.normal.x);
+            textures.push_back(vertice.normal.y);
+        }
+    }
 
     // Point buffer initialization.
     auto maybe_point_buffer_id = CreateBufferInLevel(
@@ -392,13 +409,13 @@ EntityId LoadStaticMeshFromPly(
     return maybe_mesh_id;
 }
 
-std::vector<EntityId> LoadStaticMeshesFromObjFile(
+std::vector<std::pair<EntityId, EntityId>> LoadStaticMeshesFromObjFile(
     LevelInterface& level,
     std::filesystem::path file,
     const std::string& name,
     const std::string& material_name /* = ""*/)
 {
-    std::vector<EntityId> entity_id_vec;
+    std::vector<std::pair<EntityId, EntityId>> entity_id_vec;
     frame::file::Obj obj(file);
     const auto& meshes = obj.GetMeshes();
     Logger& logger = Logger::GetInstance();
@@ -429,9 +446,16 @@ std::vector<EntityId> LoadStaticMeshesFromObjFile(
         EntityId material_id{};
         if (!material_ids.empty())
         {
-            if (mesh.GetMaterialId() < material_ids.size())
+            if (material_ids.size() == 1)
             {
-                material_id = material_ids[mesh.GetMaterialId()];
+                material_id = material_ids[0];
+            }
+            else
+            {
+                if (mesh.GetMaterialId() < material_ids.size())
+                {
+                    material_id = material_ids[mesh.GetMaterialId()];
+                }
             }
         }
         auto [static_mesh_id, returned_material_id] = LoadStaticMeshFromObj(
@@ -457,14 +481,13 @@ std::vector<EntityId> LoadStaticMeshesFromObjFile(
         {
             return {};
         }
-        level.AddMeshMaterialId(maybe_id, returned_material_id);
-        entity_id_vec.push_back(maybe_id);
+        entity_id_vec.push_back({maybe_id, returned_material_id});
         mesh_counter++;
     }
     return entity_id_vec;
 }
 
-EntityId LoadStaticMeshFromPlyFile(
+std::pair<EntityId, EntityId> LoadStaticMeshFromPlyFile(
     LevelInterface& level,
     std::filesystem::path file,
     const std::string& name,
@@ -482,7 +505,7 @@ EntityId LoadStaticMeshFromPlyFile(
     }
     auto static_mesh_id = LoadStaticMeshFromPly(level, ply, name);
     if (!static_mesh_id)
-        return NullId;
+        return {NullId, NullId};
     auto func = [&level](const std::string& name) -> NodeInterface* {
         auto maybe_id = level.GetIdFromName(name);
         if (!maybe_id)
@@ -495,15 +518,13 @@ EntityId LoadStaticMeshFromPlyFile(
     ptr->SetName(name);
     auto maybe_id = level.AddSceneNode(std::move(ptr));
     if (!maybe_id)
-        return NullId;
-    level.AddMeshMaterialId(maybe_id, material_id);
-    entity_id = maybe_id;
-    return entity_id;
+        return {NullId, NullId};
+    return {maybe_id, material_id};
 }
 
 } // End namespace.
 
-std::vector<EntityId> LoadStaticMeshesFromFile(
+std::vector<std::pair<EntityId, EntityId>> LoadStaticMeshesFromFile(
     LevelInterface& level_interface,
     std::filesystem::path file,
     const std::string& name,

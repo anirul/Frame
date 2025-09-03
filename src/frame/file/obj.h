@@ -36,10 +36,17 @@ class ObjMesh
      * @param indices: Vector of indices as int.
      * @param material: Material id (watch out this is an  internal material
      *        not a entity id type of material!).
+     * @param has_texture_coordinates: Does the mesh has texture coordinates?
      */
     ObjMesh(
-        std::vector<ObjVertex> points, std::vector<int> indices, int material)
-        : points_(points), indices_(indices), material_(material)
+        std::vector<ObjVertex> points,
+        std::vector<int> indices,
+        int material,
+        bool has_texture_coordinates)
+        : points_(points),
+          indices_(indices),
+          material_(material),
+          has_texture_coordinates_(has_texture_coordinates)
     {
     }
     /**
@@ -66,11 +73,20 @@ class ObjMesh
     {
         return material_;
     }
+    /**
+     * @brief Return true if the mesh has texture coordinates.
+     * @return True if the mesh has texture coordinates.
+     */
+    bool HasTextureCoordinates() const
+    {
+        return has_texture_coordinates_;
+    }
 
   protected:
     std::vector<ObjVertex> points_ = {};
     std::vector<int> indices_ = {};
     int material_ = -1;
+    bool has_texture_coordinates_ = false;
 };
 
 /**
@@ -128,10 +144,19 @@ class Obj
     {
         return materials_;
     }
+    /**
+     * @brief Return true if the OBJ has texture coordinates.
+     * @return True if the OBJ has texture coordinates.
+     */
+    bool HasTextureCoordinates() const
+    {
+        return has_texture_coordinates_;
+    }
 
   protected:
     std::vector<ObjMesh> meshes_ = {};
     std::vector<ObjMaterial> materials_ = {};
+    bool has_texture_coordinates_ = false;
     Logger& logger_ = Logger::GetInstance();
 };
 

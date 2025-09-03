@@ -223,6 +223,9 @@ cython_debug/
 
 # End of https://www.toptal.com/developers/gitignore/api/python,c++,visualstudiocode
 
+# Vcpkg
+vcpkg_installed/
+
 ### Situational Files ###
 imgui.ini
 !asset/model/*.obj
