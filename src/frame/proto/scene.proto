@@ -64,6 +64,8 @@ message NodeStaticMesh {
 		MeshEnum mesh_enum = 6;
 		// Where the file is loaded from.
 		string file_name = 3;
+		// Where the obj file is loaded from (will also load the mtl file).
+		string obj_file = 13;
 		// Plugin input.
 		MultiPlugin multi_plugin = 10;
 	}

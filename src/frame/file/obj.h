@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+#include "frame/file/mtl.h"
 #include "frame/logger.h"
 
 namespace frame::file
@@ -90,28 +91,6 @@ class ObjMesh
 };
 
 /**
- * @class ObjMaterial
- * @brief Material file that old information for material in an obj style.
- */
-struct ObjMaterial
-{
-    std::string name;
-    glm::vec4 ambient_vec4 = glm::vec4(0.5f, 0.5f, 0.5f, 1.0f);
-    std::string ambient_str;
-    glm::vec4 diffuse_vec4 = glm::vec4(0.5f, 0.5f, 0.5f, 1.0f);
-    std::string diffuse_str;
-    std::string displacement_str;
-    float roughness_val = 0.0f;
-    std::string roughness_str;
-    float metallic_val = 0.0f;
-    std::string metallic_str;
-    float sheen_val = 0.0f;
-    std::string sheen_str;
-    std::string emmissive_str;
-    std::string normal_str;
-};
-
-/**
  * @class Obj
  * @brief The class that will open an obj file and store data from it on the
  *        disk.
@@ -122,8 +101,10 @@ class Obj
     /**
      * @brief Constructor parse from an OBJ file.
      * @param file_name: File to be open.
+     * @param search_paths: Paths to search for MTL files in.
      */
-    Obj(std::filesystem::path file_name);
+    Obj(const std::filesystem::path& file_name,
+        const std::vector<std::filesystem::path>& search_paths = {});
     ~Obj();
 
   public:
@@ -140,7 +121,7 @@ class Obj
      *        (*.mtl).
      * @return The materials that are in the file.
      */
-    const std::vector<ObjMaterial>& GetMaterials() const
+    const std::vector<MtlMaterial>& GetMaterials() const
     {
         return materials_;
     }
@@ -155,7 +136,7 @@ class Obj
 
   protected:
     std::vector<ObjMesh> meshes_ = {};
-    std::vector<ObjMaterial> materials_ = {};
+    std::vector<MtlMaterial> materials_ = {};
     bool has_texture_coordinates_ = false;
     Logger& logger_ = Logger::GetInstance();
 };
