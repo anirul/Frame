@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include <glm/glm.hpp>
+
 #include "frame/logger.h"
 
 namespace frame::file
@@ -13,7 +15,7 @@ namespace frame::file
 // Structure to hold the material properties from the MTL file.
 struct MtlMaterial
 {
-    std.string name;
+    std::string name;
     std::string ambient_str;
     glm::vec4 ambient_vec4;
     std::string diffuse_str;

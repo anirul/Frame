@@ -267,63 +267,6 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
     return true;
 }
 
-[[nodiscard]] bool ParseNodeStaticMeshObjFile(
-    LevelInterface& level, const proto::NodeStaticMesh& proto_scene_static_mesh)
-{
-    auto obj_path = frame::file::FindFile(proto_scene_static_mesh.obj_file());
-    if (obj_path.empty())
-    {
-        throw std::runtime_error(std::format(
-            "Could not find obj file: {}",
-            proto_scene_static_mesh.obj_file()));
-    }
-    frame::file::Obj obj(
-        obj_path,
-        {obj_path.parent_path(), "asset/model", "asset"});
-    const auto& materials = obj.GetMaterials();
-    for (const auto& material : materials)
-    {
-        auto opengl_material = std::make_unique<opengl::Material>();
-        opengl_material->SetName(material.name);
-        opengl_material->SetProgramName("SceneSimpleProgram");
-        if (!material.diffuse_str.empty())
-        {
-            auto texture = std::make_unique<opengl::Texture>(
-                level.GetDefaultTextureId(),
-                material.diffuse_str);
-            texture->SetName(material.name + "_diffuse");
-            auto texture_id = level.AddTexture(std::move(texture));
-            opengl_material->AddTextureId(texture_id, "Color");
-        }
-        level.AddMaterial(std::move(opengl_material));
-    }
-
-    const auto& meshes = obj.GetMeshes();
-    for (const auto& mesh : meshes)
-    {
-        auto static_mesh =
-            std::make_unique<opengl::StaticMesh>(level, mesh.GetVertices(), mesh.GetIndices());
-        static_mesh->SetName(proto_scene_static_mesh.name());
-        auto mesh_id = level.AddStaticMesh(std::move(static_mesh));
-        auto node_interface =
-            std::make_unique<NodeStaticMesh>(GetFunctor(level), mesh_id);
-        node_interface->GetData().set_name(proto_scene_static_mesh.name());
-        node_interface->SetParentName(proto_scene_static_mesh.parent());
-        const auto& material = materials.at(mesh.GetMaterialId());
-        node_interface->GetData().set_material_name(material.name);
-        auto scene_id = level.AddSceneNode(std::move(node_interface));
-        auto& node =
-            dynamic_cast<NodeStaticMesh&>(level.GetSceneNodeFromId(scene_id));
-        node.GetData().set_render_time_enum(
-            proto_scene_static_mesh.render_time_enum());
-        level.AddMeshMaterialId(
-            scene_id,
-            level.GetIdFromName(material.name),
-            proto_scene_static_mesh.render_time_enum());
-    }
-    return true;
-}
-
 [[nodiscard]] bool ParseNodeStaticMesh(
     LevelInterface& level, const proto::NodeStaticMesh& proto_scene_static_mesh)
 {
@@ -345,7 +288,52 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
     // 4th case this is a mesh obj file.
     if (proto_scene_static_mesh.has_obj_file())
     {
-        return ParseNodeStaticMeshObjFile(level, proto_scene_static_mesh);
+        auto vec_node_mesh_id = opengl::file::LoadStaticMeshesFromFile(
+            level,
+            frame::file::FindFile(proto_scene_static_mesh.obj_file()),
+            proto_scene_static_mesh.name());
+        if (vec_node_mesh_id.empty())
+        {
+            return false;
+        }
+        int i = 0;
+        for (const auto& [node_id, material_id] : vec_node_mesh_id)
+        {
+            auto& node = level.GetSceneNodeFromId(node_id);
+            auto& mesh = level.GetStaticMeshFromId(node.GetLocalMesh());
+            mesh.GetData().set_file_name(proto_scene_static_mesh.obj_file());
+            mesh.GetData().set_render_primitive_enum(
+                proto_scene_static_mesh.render_primitive_enum());
+            auto str = std::format("{}.{}", proto_scene_static_mesh.name(), i);
+            mesh.SetName(str);
+            auto& static_mesh_node = dynamic_cast<NodeStaticMesh&>(node);
+            static_mesh_node.GetData().set_file_name(
+                proto_scene_static_mesh.obj_file());
+            if (vec_node_mesh_id.size() == 1)
+            {
+                static_mesh_node.SetName(proto_scene_static_mesh.name());
+            }
+            else
+            {
+                static_mesh_node.SetName(str);
+            }
+            node.SetParentName(proto_scene_static_mesh.parent());
+            static_mesh_node.GetData().set_render_time_enum(
+                proto_scene_static_mesh.render_time_enum());
+            if (!material_id)
+            {
+                throw std::runtime_error(std::format(
+                    "No material found for mesh {} in file {}",
+                    proto_scene_static_mesh.name(),
+                    proto_scene_static_mesh.obj_file()));
+            }
+            level.AddMeshMaterialId(
+                node_id,
+                material_id,
+                proto_scene_static_mesh.render_time_enum());
+            ++i;
+        }
+        return true;
     }
     // 5th case stream input.
     if (proto_scene_static_mesh.has_multi_plugin())
