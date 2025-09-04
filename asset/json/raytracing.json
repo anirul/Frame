@@ -353,7 +353,7 @@
                 "position": {
                     "x": 0,
                     "y": 0,
-                    "z": -2
+                    "z": -1
                 },
                 "target": {
                     "x": 0,
@@ -384,7 +384,7 @@
             {
                 "name": "AppleMesh",
                 "parent": "mesh_holder",
-                "file_name": "apple.obj",
+                "file_name": "dragon.obj",
                 "material_name": "RayTracePreprocessMaterial",
                 "render_time_enum": "PRE_RENDER_TIME"
             }
