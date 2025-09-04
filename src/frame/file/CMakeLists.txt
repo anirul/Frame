@@ -4,9 +4,11 @@ add_library(FrameFile
   STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/file/file_system.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/file/image_stb.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/file/mtl.h
     file_system.cpp
     image.cpp
     image.h
+    mtl.cpp
     obj.cpp
     obj.h
     ply.cpp

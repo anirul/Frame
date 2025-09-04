@@ -39,18 +39,18 @@ std::optional<EntityId> CreateBufferInLevel(
 }
 
 std::unique_ptr<TextureInterface> LoadTextureFromString(
-    const std::string& str,
+    const std::filesystem::path& path,
     const proto::PixelElementSize pixel_element_size,
     const proto::PixelStructure pixel_structure)
 {
     return std::make_unique<Texture>(
-        frame::file::FindFile("asset/" + str),
+        path,
         pixel_element_size,
         pixel_structure);
 }
 
 std::optional<EntityId> LoadMaterialFromObj(
-    LevelInterface& level, const frame::file::ObjMaterial& material_obj)
+    LevelInterface& level, const frame::file::MtlMaterial& material_obj)
 {
     // Load textures.
     auto color = (material_obj.ambient_str.empty())
@@ -117,6 +117,11 @@ std::optional<EntityId> LoadMaterialFromObj(
     material->AddTextureId(metallic_id, metallic_name);
     // Finally add the material to the level.
     material->SetName(material_obj.name);
+    auto maybe_program_id = level.GetIdFromName("SceneSimpleProgram");
+    if (maybe_program_id)
+    {
+        material->SetProgramId(*maybe_program_id);
+    }
     return level.AddMaterial(std::move(material));
 }
 
@@ -416,7 +421,7 @@ std::vector<std::pair<EntityId, EntityId>> LoadStaticMeshesFromObjFile(
     const std::string& material_name /* = ""*/)
 {
     std::vector<std::pair<EntityId, EntityId>> entity_id_vec;
-    frame::file::Obj obj(file);
+    frame::file::Obj obj(file, {file.parent_path(), "asset/model", "asset"});
     const auto& meshes = obj.GetMeshes();
     Logger& logger = Logger::GetInstance();
     std::vector<EntityId> material_ids;

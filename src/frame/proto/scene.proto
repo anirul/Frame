@@ -64,6 +64,8 @@ message NodeStaticMesh {
 		MeshEnum mesh_enum = 6;
 		// Where the file is loaded from.
 		string file_name = 3;
+		// Where the obj file is loaded from (will also load the mtl file).
+		string obj_file = 13;
 		// Plugin input.
 		MultiPlugin multi_plugin = 10;
 	}
@@ -131,7 +133,7 @@ message NodeLight {
 	string name = 1;
 	// Give the name of the parent (if present).
 	string parent = 2;
-	
+
 	// Light type this is what the light can be.
 	enum LightTypeEnum {
 		INVALID_LIGHT = 0;
@@ -142,11 +144,11 @@ message NodeLight {
 	}
 	// The light type of this light.
 	LightTypeEnum light_type = 3;
-	
+
 	// Position of the light.
 	// not considered in case this is AMBIENT, DIRECTIONAL.
 	UniformVector3 position = 4;
-	// Direction of the light 
+	// Direction of the light
 	// not considered in case this is AMBIENT, POINT.
 	UniformVector3 direction = 5;
 	// Dot inner limit for spot light.

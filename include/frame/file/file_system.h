@@ -1,10 +1,19 @@
 #pragma once
 
 #include <filesystem>
+#include <vector>
 
 namespace frame::file
 {
 
+/**
+ * @brief Find the path to a file, this will avoid build directory.
+ * @param file: Basic search pattern for your file "asset/json/test.json".
+ * @return Full path to the file.
+ */
+std::filesystem::path FindFile(
+    std::filesystem::path file,
+    const std::vector<std::filesystem::path>& paths);
 /**
  * @brief Find the path to a file, this will avoid build directory.
  * @param file: Basic search pattern for your file "asset/json/test.json".

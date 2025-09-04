@@ -93,6 +93,21 @@ std::filesystem::path FindDirectory(std::filesystem::path file)
     });
 }
 
+std::filesystem::path FindFile(
+    std::filesystem::path file,
+    const std::vector<std::filesystem::path>& paths)
+{
+    for (const auto& path : paths)
+    {
+        auto full_path = path / file;
+        if (std::filesystem::is_regular_file(full_path))
+        {
+            return full_path;
+        }
+    }
+    return FindFile(file);
+}
+
 std::filesystem::path FindFile(std::filesystem::path file)
 {
     return FindElement(file, [](const std::filesystem::path& p) {

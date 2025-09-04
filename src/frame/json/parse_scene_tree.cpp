@@ -285,7 +285,57 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
     {
         return ParseNodeStaticMeshFileName(level, proto_scene_static_mesh);
     }
-    // 4th case stream input.
+    // 4th case this is a mesh obj file.
+    if (proto_scene_static_mesh.has_obj_file())
+    {
+        auto vec_node_mesh_id = opengl::file::LoadStaticMeshesFromFile(
+            level,
+            frame::file::FindFile(proto_scene_static_mesh.obj_file()),
+            proto_scene_static_mesh.name());
+        if (vec_node_mesh_id.empty())
+        {
+            return false;
+        }
+        int i = 0;
+        for (const auto& [node_id, material_id] : vec_node_mesh_id)
+        {
+            auto& node = level.GetSceneNodeFromId(node_id);
+            auto& mesh = level.GetStaticMeshFromId(node.GetLocalMesh());
+            mesh.GetData().set_file_name(proto_scene_static_mesh.obj_file());
+            mesh.GetData().set_render_primitive_enum(
+                proto_scene_static_mesh.render_primitive_enum());
+            auto str = std::format("{}.{}", proto_scene_static_mesh.name(), i);
+            mesh.SetName(str);
+            auto& static_mesh_node = dynamic_cast<NodeStaticMesh&>(node);
+            static_mesh_node.GetData().set_file_name(
+                proto_scene_static_mesh.obj_file());
+            if (vec_node_mesh_id.size() == 1)
+            {
+                static_mesh_node.SetName(proto_scene_static_mesh.name());
+            }
+            else
+            {
+                static_mesh_node.SetName(str);
+            }
+            node.SetParentName(proto_scene_static_mesh.parent());
+            static_mesh_node.GetData().set_render_time_enum(
+                proto_scene_static_mesh.render_time_enum());
+            if (!material_id)
+            {
+                throw std::runtime_error(std::format(
+                    "No material found for mesh {} in file {}",
+                    proto_scene_static_mesh.name(),
+                    proto_scene_static_mesh.obj_file()));
+            }
+            level.AddMeshMaterialId(
+                node_id,
+                material_id,
+                proto_scene_static_mesh.render_time_enum());
+            ++i;
+        }
+        return true;
+    }
+    // 5th case stream input.
     if (proto_scene_static_mesh.has_multi_plugin())
     {
         return ParseNodeStaticMeshStreamInput(level, proto_scene_static_mesh);

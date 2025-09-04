@@ -3,16 +3,6 @@
     "default_texture_name": "albedo",
     "materials": [
         {
-            "name": "SceneSimpleMaterial",
-            "program_name": "SceneSimpleProgram",
-            "texture_names": [
-                "apple_texture"
-            ],
-            "inner_names": [
-                "Color"
-            ]
-        },
-        {
             "name": "CubeMapMaterial",
             "program_name": "CubeMapProgram",
             "texture_names": [
@@ -98,17 +88,6 @@
                 "positive_z": "asset/cubemap/negative_z.png",
                 "negative_z": "asset/cubemap/positive_z.png"
             }
-        },
-        {
-            "name": "apple_texture",
-            "cubemap": "false",
-            "pixel_element_size": {
-                "value": "BYTE"
-            },
-            "pixel_structure": {
-                "value": "RGB"
-            },
-            "file_name": "asset/apple/color.jpg"
         },
         {
             "name": "albedo",
@@ -203,8 +182,7 @@
             {
                 "name": "AppleMesh",
                 "parent": "mesh_holder",
-                "file_name": "apple.obj",
-                "material_name": "SceneSimpleMaterial",
+                "obj_file": "asset/model/apple.obj",
                 "render_time_enum": "SCENE_RENDER_TIME"
             }
         ],
