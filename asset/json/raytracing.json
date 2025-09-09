@@ -59,7 +59,7 @@
             "pixel_structure": {
                 "value": "RGB"
             },
-            "file_name": "asset/apple/color.jpg"
+            "file_name": "asset/planks/color.jpg"
         },
         {
             "name": "normal_texture",
@@ -70,7 +70,7 @@
             "pixel_structure": {
                 "value": "RGB"
             },
-            "file_name": "asset/apple/normal.jpg"
+            "file_name": "asset/planks/normal.jpg"
         },
         {
             "name": "roughness_texture",
@@ -81,7 +81,7 @@
             "pixel_structure": {
                 "value": "GREY"
             },
-            "file_name": "asset/apple/roughness.jpg"
+            "file_name": "asset/planks/roughness.jpg"
         },
         {
             "name": "metallic_texture",
@@ -92,7 +92,7 @@
             "pixel_structure": {
                 "value": "GREY"
             },
-            "file_name": "asset/apple/metalness.jpg"
+            "file_name": "asset/planks/metalness.jpg"
         },
         {
             "name": "ao_texture",
@@ -103,7 +103,7 @@
             "pixel_structure": {
                 "value": "GREY"
             },
-            "file_name": "asset/apple/ambient_occlusion.jpg"
+            "file_name": "asset/planks/ambient_occlusion.jpg"
         }
     ],
     "materials": [
