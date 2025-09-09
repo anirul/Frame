@@ -228,6 +228,7 @@ vcpkg_installed/
 
 ### Situational Files ###
 imgui.ini
+log.txt
 !asset/model/*.obj
 include/frame/proto/*.pb.h
 src/frame/proto/include/frame/proto
