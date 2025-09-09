@@ -59,7 +59,7 @@
             "pixel_structure": {
                 "value": "RGB"
             },
-            "file_name": "asset/apple/color.jpg"
+            "file_name": "asset/plastic/plastic_albedo.png"
         },
         {
             "name": "normal_texture",
@@ -70,7 +70,7 @@
             "pixel_structure": {
                 "value": "RGB"
             },
-            "file_name": "asset/apple/normal.jpg"
+            "file_name": "asset/plastic/plastic_normal.png"
         },
         {
             "name": "roughness_texture",
@@ -81,7 +81,7 @@
             "pixel_structure": {
                 "value": "GREY"
             },
-            "file_name": "asset/apple/roughness.jpg"
+            "file_name": "asset/plastic/plastic_roughness.png"
         },
         {
             "name": "metallic_texture",
@@ -92,7 +92,7 @@
             "pixel_structure": {
                 "value": "GREY"
             },
-            "file_name": "asset/apple/metalness.jpg"
+            "file_name": "asset/plastic/plastic_metallic.png"
         },
         {
             "name": "ao_texture",
@@ -103,7 +103,7 @@
             "pixel_structure": {
                 "value": "GREY"
             },
-            "file_name": "asset/apple/ambient_occlusion.jpg"
+            "file_name": "asset/plastic/plastic_ao.png"
         }
     ],
     "materials": [
