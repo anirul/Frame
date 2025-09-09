@@ -120,6 +120,7 @@
         {
             "name": "RayTraceMaterial",
             "program_name": "RayTraceProgram",
+            "preprocess_program_name": "RayTracePreprocessProgram",
             "texture_names": [
                 "albedo_texture",
                 "normal_texture",
@@ -149,34 +150,6 @@
             ],
             "inner_node_names": [
                 "model"
-            ]
-        },
-        {
-            "name": "RayTracePreprocessMaterial",
-            "program_name": "RayTracePreprocessProgram",
-            "texture_names": [
-                "albedo_texture",
-                "normal_texture",
-                "roughness_texture",
-                "metallic_texture",
-                "ao_texture",
-                "skybox_env"
-            ],
-            "inner_names": [
-                "albedo_texture",
-                "normal_texture",
-                "roughness_texture",
-                "metallic_texture",
-                "ao_texture",
-                "skybox_env"
-            ],
-            "buffer_names": [
-                "AppleMesh.0.triangle",
-                "AppleMesh.0.bvh"
-            ],
-            "inner_buffer_names": [
-                "TriangleBuffer",
-                "BvhBuffer"
             ]
         }
     ],
@@ -385,7 +358,7 @@
                 "name": "AppleMesh",
                 "parent": "mesh_holder",
                 "file_name": "dragon.obj",
-                "material_name": "RayTracePreprocessMaterial",
+                "material_name": "RayTraceMaterial",
                 "render_time_enum": "PRE_RENDER_TIME"
             }
         ],

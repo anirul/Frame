@@ -37,6 +37,19 @@ std::unique_ptr<frame::MaterialInterface> ParseMaterialOpenGL(
         EntityId program_id = maybe_program_id;
         material->SetProgramId(program_id);
     }
+    if (!proto_material.preprocess_program_name().empty())
+    {
+        material->GetData().set_preprocess_program_name(
+            proto_material.preprocess_program_name());
+        material->SetPreprocessProgramName(
+            proto_material.preprocess_program_name());
+        auto maybe_preprocess_id =
+            level.GetIdFromName(proto_material.preprocess_program_name());
+        if (maybe_preprocess_id)
+        {
+            material->SetPreprocessProgramId(maybe_preprocess_id);
+        }
+    }
     for (int i = 0; i < inner_size; ++i)
     {
         auto maybe_texture_id =

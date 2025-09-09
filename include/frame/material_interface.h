@@ -36,6 +36,13 @@ class MaterialInterface : public Serialize<proto::Material>
     virtual EntityId GetProgramId(
         const LevelInterface* level = nullptr) const = 0;
     /**
+     * @brief Get the preprocess program id from a level or from the local stored one.
+     * @param level: Pointer to the local level.
+     * @return Id of the preprocess program (can be the linked program).
+     */
+    virtual EntityId GetPreprocessProgramId(
+        const LevelInterface* level = nullptr) const = 0;
+    /**
      * @brief Get the inner name that correspond to a texture id.
      * @param id: The id to check for corresponding string.
      * @return The string.
@@ -46,6 +53,11 @@ class MaterialInterface : public Serialize<proto::Material>
      * @param id: the stored program id.
      */
     virtual void SetProgramId(EntityId id) = 0;
+    /**
+     * @brief Store local preprocess program id.
+     * @param id: the stored preprocess program id.
+     */
+    virtual void SetPreprocessProgramId(EntityId id) = 0;
     /**
      * @brief Store a texture reference associated to a given name.
      * @param id: Texture reference id.
