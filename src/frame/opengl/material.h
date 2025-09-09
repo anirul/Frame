@@ -29,6 +29,14 @@ class Material : public MaterialInterface
      */
     EntityId GetProgramId(const LevelInterface* level = nullptr) const override;
     /**
+     * @brief This is getting the preprocess program id from a level or from the
+     * local stored one.
+     * @param level: Pointer to the local level.
+     * @return Id of the preprocess program (can be the linked program).
+     */
+    EntityId GetPreprocessProgramId(
+        const LevelInterface* level = nullptr) const override;
+    /**
      * @brief Get the inner name that correspond to a texture id.
      * @param id: The id to check for corresponding string.
      * @return The string.
@@ -39,6 +47,11 @@ class Material : public MaterialInterface
      * @param id: the stored program id.
      */
     void SetProgramId(EntityId id) override;
+    /**
+     * @brief Store local preprocess program id.
+     * @param id: the stored preprocess program id.
+     */
+    void SetPreprocessProgramId(EntityId id) override;
     /**
      * @brief Store a texture reference associated to a given name.
      * @param id: Texture reference id.
@@ -88,6 +101,11 @@ class Material : public MaterialInterface
         const std::string& name, const std::string& inner_name) override;
     std::vector<std::string> GetNodeNames() const override;
 
+    void SetPreprocessProgramName(const std::string& name)
+    {
+        preprocess_program_name_ = name;
+    }
+
   private:
     std::map<EntityId, std::string> id_name_map_ = {};
     // Preserve insertion order for buffer bindings to match shader layout
@@ -95,8 +113,10 @@ class Material : public MaterialInterface
     std::map<std::string, std::string> name_node_name_map_ = {};
     mutable std::array<EntityId, 32> id_array_ = {};
     mutable EntityId program_id_ = 0;
+    mutable EntityId preprocess_program_id_ = 0;
     std::string name_;
     std::string program_name_;
+    std::string preprocess_program_name_;
 };
 
 } // End namespace frame::opengl.

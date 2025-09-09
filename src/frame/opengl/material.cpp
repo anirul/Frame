@@ -114,6 +114,25 @@ frame::EntityId Material::GetProgramId(
     throw std::runtime_error("No valid program!");
 }
 
+frame::EntityId Material::GetPreprocessProgramId(
+    const LevelInterface* level /*= nullptr*/) const
+{
+    if (preprocess_program_id_)
+    {
+        return preprocess_program_id_;
+    }
+    if (!preprocess_program_name_.empty() && level)
+    {
+        auto maybe_id = level->GetIdFromName(preprocess_program_name_);
+        if (maybe_id)
+        {
+            preprocess_program_id_ = maybe_id;
+            return preprocess_program_id_;
+        }
+    }
+    return NullId;
+}
+
 void Material::SetProgramId(EntityId id)
 {
     if (!id)
@@ -122,6 +141,15 @@ void Material::SetProgramId(EntityId id)
     }
     // TODO(anirul): Check that the program has a valid uniform!
     program_id_ = id;
+}
+
+void Material::SetPreprocessProgramId(EntityId id)
+{
+    if (!id)
+    {
+        throw std::runtime_error("Not a valid program id.");
+    }
+    preprocess_program_id_ = id;
 }
 
 std::string Material::GetInnerBufferName(const std::string& name) const

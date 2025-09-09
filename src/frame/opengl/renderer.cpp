@@ -408,6 +408,32 @@ void Renderer::PreRender()
             auto temp_viewport = viewport_;
             // Query textures from the material.
             auto& material = level_.GetMaterialFromId(material_id);
+            if (!material.GetData().preprocess_program_name().empty())
+            {
+                auto saved_program = material.GetProgramId();
+                auto preprocess_id = material.GetPreprocessProgramId();
+                if (preprocess_id)
+                {
+                    auto& preprocess_program =
+                        level_.GetProgramFromId(preprocess_id);
+                    auto out_ids = preprocess_program.GetOutputTextureIds();
+                    if (!out_ids.empty())
+                    {
+                        auto& tex = level_.GetTextureFromId(*out_ids.begin());
+                        auto size = json::ParseSize(tex.GetData().size());
+                        viewport_ = glm::ivec4(0, 0, size.x, size.y);
+                    }
+                    material.SetProgramId(preprocess_id);
+                    RenderNode(
+                        p.first,
+                        material_id,
+                        kProjectionCubemap,
+                        kViewsCubemap[0]);
+                    material.SetProgramId(saved_program);
+                    viewport_ = temp_viewport;
+                }
+                continue;
+            }
             auto ids = material.GetTextureIds();
             if (ids.empty())
             {

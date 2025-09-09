@@ -5,12 +5,14 @@ package frame.proto;
 // Material
 // Next 10
 message Material {
-	// Name of the material.
-	string name = 1;
-	// Program reference.
-	string program_name = 5;
-	// Reference name of the texture names in the texture file.
-	repeated string texture_names = 3;
+        // Name of the material.
+        string name = 1;
+        // Program reference.
+        string program_name = 5;
+        // Optional preprocess program reference.
+        optional string preprocess_program_name = 10;
+        // Reference name of the texture names in the texture file.
+        repeated string texture_names = 3;
 	// Reference to the name inside the material in the shader file.
 	repeated string inner_names = 4;
         // Reference name of the buffer names in the buffer file.
