@@ -1,6 +1,7 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
+
 Frame's runtime sources live in `src/frame`, grouped by subsystems such as `opengl`, `json`, `proto`, and node components. Public headers mirror this layout under `include/frame`. Engine assets and demo content sit in `asset/` and `examples/`. Tests mirror engine modules inside `tests/frame`, with extra fixtures under `tests/frame/{file,json,opengl}`. Third-party libraries are managed through `external/vcpkg`, so do not vendor additional copies under `src/`.
 
 ## Build, Test, and Development Commands

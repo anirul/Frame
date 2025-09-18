@@ -1,19 +1,19 @@
 # Ray Tracing
 
-add_executable(07_RayTracing
+add_executable(02_RayTracing
   WIN32
     main.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../../asset/json/raytracing.json
 )
 
-target_include_directories(07_RayTracing
+target_include_directories(02_RayTracing
   PUBLIC
-    examples/07-raytracing
+    examples/02-raytracing
     ${CMAKE_CURRENT_SOURCE_DIR}/../..
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-target_link_libraries(07_RayTracing
+target_link_libraries(02_RayTracing
   PUBLIC
     Frame
     FrameCommon
@@ -23,4 +23,4 @@ target_link_libraries(07_RayTracing
     FrameProto
 )
 
-set_property(TARGET 07_RayTracing PROPERTY FOLDER "FrameExamples")
+set_property(TARGET 02_RayTracing PROPERTY FOLDER "FrameExamples")

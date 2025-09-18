@@ -12,8 +12,6 @@ add_custom_target(AssetShaderOpenGL
     cubemap.vert
     cubemap_deferred.frag
     cubemap_deferred.vert
-    depth_normal.frag
-    depth_normal.vert
     display.frag
     display.vert
     equirectangular_cubemap.frag
@@ -22,8 +20,6 @@ add_custom_target(AssetShaderOpenGL
     gaussian_blur.vert
     high_dynamic_range.frag
     high_dynamic_range.vert
-    image_based_lighting.frag
-    image_based_lighting.vert
     integrate_brdf.frag
     integrate_brdf.vert
     irradiance_cubemap.frag
@@ -36,8 +32,6 @@ add_custom_target(AssetShaderOpenGL
     monte_carlo_prefilter.vert
     physically_based_rendering.frag
     physically_based_rendering.vert
-    point_cloud.frag
-    point_cloud.vert
     raytracing.frag
     raytracing.vert
     ray_marching.frag
@@ -46,8 +40,6 @@ add_custom_target(AssetShaderOpenGL
     screen_space_ambient_occlusion.vert
     scene_simple.frag
     scene_simple.vert
-    shadow.frag
-    shadow.vert
     vector_addition.frag
     vector_addition.vert
     vector_multiply.frag

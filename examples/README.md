@@ -2,36 +2,22 @@
 
 ## 00 Japanese Flag
 
-![Screenshot of the japanese flag app.](https://github.com/anirul/Frame/raw/master/examples/japanese_flag.png)
+![Screenshot of the Japanese flag app.](https://github.com/anirul/Frame/raw/master/examples/japaneseflag.png)
 
-This is a simple example that show how to create a simple effect, this doesn't use any custom uniform.
+A minimal shader demo that renders a simple analytic flag pattern. Useful for
+sanity-checking your toolchain and shader hot-reload workflow.
 
 ## 01 Ray Marching
 
-![Screenshot of the ray marching app.](https://github.com/anirul/Frame/raw/master/examples/ray_marching.png)
+![Screenshot of the ray marching app.](https://github.com/anirul/Frame/raw/master/examples/raymarching.png)
 
-This example is a ray marching example still use a pure shader and some uniform time.
+A GLSL ray-marcher showing procedural distance fields and animated uniforms.
+Great for experimenting with screen-space shading without scene assets.
 
-## 02 Scene Simple
+## 02 Raytracing
 
-![Screenshot of the ray marching app.](https://github.com/anirul/Frame/raw/master/examples/scene_simple.png)
+![Screenshot of the ray tracing app.](https://github.com/anirul/Frame/raw/master/examples/raytracing.png)
 
-This will draw a cube map made of 6 texture and an apple (simple just albedo).
-
-## 03 Depth Normal
-
-![Screenshot of the depth normal app.](https://github.com/anirul/Frame/raw/master/examples/depth_normal.png)
-
-This example show how you can get an normal map from a simple depth texture.
-
-## 04 Point Cloud
-
-![Screenshot of the depth point cloud app.](https://github.com/anirul/Frame/raw/master/examples/point_cloud.png)
-
-This is a test of the point cloud rendering ability of the software, it use an arcball to move around.
-
-## 05 Image Based Rendering
-
-![Screenshot of the image based rendering app.](https://github.com/anirul/Frame/raw/master/examples/image_based_lighting.png)
-
-This is using image based rendering this use an env map from the enviroment map to decide where the light come from.
+The primary sample for Frame. It loads `asset/json/raytracing.json`, builds the
+scene acceleration data, and shades the results with physically-based textures.
+Use this as the reference when extending the renderer or adding compute stages.

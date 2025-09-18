@@ -16,19 +16,6 @@
             }
         },
         {
-            "name": "dummy",
-            "size": {
-                "x": 1,
-                "y": 1
-            },
-            "pixel_element_size": {
-                "value": "BYTE"
-            },
-            "pixel_structure": {
-                "value": "RGB"
-            }
-        },
-        {
             "name": "skybox",
             "cubemap": true,
             "pixel_element_size": {
@@ -238,9 +225,6 @@
         },
         {
             "name": "RayTracePreprocessProgram",
-            "output_texture_names": [
-                "dummy"
-            ],
             "input_scene_type": {
                 "value": "SCENE"
             },
