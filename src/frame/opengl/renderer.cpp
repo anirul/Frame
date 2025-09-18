@@ -125,7 +125,6 @@ void Renderer::RenderMesh(
 {
     auto program_id = material.GetProgramId();
     auto& program = level_.GetProgramFromId(program_id);
-    assert(program.GetOutputTextureIds().size());
     glm::mat4 model_matrix = model;
     if (!program.GetTemporarySceneRoot().empty())
     {
@@ -191,41 +190,47 @@ void Renderer::RenderMesh(
     program.Use(uniform_collection_wrapper, &level_);
 
     auto texture_out_ids = program.GetOutputTextureIds();
-    auto& texture_ref = level_.GetTextureFromId(*texture_out_ids.cbegin());
-    auto size = json::ParseSize(texture_ref.GetData().size());
-
     glViewport(viewport_.x, viewport_.y, viewport_.z, viewport_.w);
-
-    ScopedBind scoped_frame(*frame_buffer_);
-    int i = 0;
-    for (const auto& texture_id : program.GetOutputTextureIds())
+    std::unique_ptr<ScopedBind> scoped_frame;
+    if (!texture_out_ids.empty())
     {
-        if (level_.GetTextureFromId(texture_id).GetData().cubemap())
+        scoped_frame = std::make_unique<ScopedBind>(*frame_buffer_);
+        int i = 0;
+        for (const auto& texture_id : texture_out_ids)
         {
-            auto& opengl_texture =
-                dynamic_cast<Cubemap&>(level_.GetTextureFromId(texture_id));
-            // TODO(anirul): Check the mipmap level (last parameter)!
-            frame_buffer_->AttachTexture(
-                opengl_texture.GetId(),
-                FrameBuffer::GetFrameColorAttachment(i),
-                FrameBuffer::GetFrameTextureType(texture_frame_),
-                0);
+            if (level_.GetTextureFromId(texture_id).GetData().cubemap())
+            {
+                auto& opengl_texture =
+                    dynamic_cast<Cubemap&>(level_.GetTextureFromId(texture_id));
+                // TODO(anirul): Check the mipmap level (last parameter)!
+                frame_buffer_->AttachTexture(
+                    opengl_texture.GetId(),
+                    FrameBuffer::GetFrameColorAttachment(i),
+                    FrameBuffer::GetFrameTextureType(texture_frame_),
+                    0);
+            }
+            else
+            {
+                auto& opengl_texture =
+                    dynamic_cast<Texture&>(level_.GetTextureFromId(texture_id));
+                // TODO(anirul): Check the mipmap level (last parameter)!
+                frame_buffer_->AttachTexture(
+                    opengl_texture.GetId(),
+                    FrameBuffer::GetFrameColorAttachment(i),
+                    FrameTextureType::TEXTURE_2D,
+                    0);
+            }
+            i++;
         }
-        else
-        {
-            auto& opengl_texture =
-                dynamic_cast<Texture&>(level_.GetTextureFromId(texture_id));
-            // TODO(anirul): Check the mipmap level (last parameter)!
-            frame_buffer_->AttachTexture(
-                opengl_texture.GetId(),
-                FrameBuffer::GetFrameColorAttachment(i),
-                FrameTextureType::TEXTURE_2D,
-                0);
-        }
-        i++;
+        frame_buffer_->DrawBuffers(
+            static_cast<std::uint32_t>(texture_out_ids.size()));
     }
-    frame_buffer_->DrawBuffers(
-        static_cast<std::uint32_t>(texture_out_ids.size()));
+    else
+    {
+        scoped_frame = std::make_unique<ScopedBind>(*frame_buffer_);
+        glDrawBuffer(GL_NONE);
+        glReadBuffer(GL_NONE);
+    }
 
     std::map<std::string, std::vector<std::int32_t>> uniform_include;
     for (const auto& id : material.GetTextureIds())
@@ -417,12 +422,22 @@ void Renderer::PreRender()
                     auto& preprocess_program =
                         level_.GetProgramFromId(preprocess_id);
                     auto out_ids = preprocess_program.GetOutputTextureIds();
-                    if (!out_ids.empty())
+                    if (out_ids.empty())
                     {
-                        auto& tex = level_.GetTextureFromId(*out_ids.begin());
-                        auto size = json::ParseSize(tex.GetData().size());
-                        viewport_ = glm::ivec4(0, 0, size.x, size.y);
+                        texture_frame_.set_value(proto::TextureFrame::TEXTURE_2D);
+                        material.SetProgramId(preprocess_id);
+                        RenderNode(
+                            p.first,
+                            material_id,
+                            kProjectionCubemap,
+                            kViewsCubemap[0]);
+                        material.SetProgramId(saved_program);
+                        viewport_ = temp_viewport;
+                        continue;
                     }
+                    auto& tex = level_.GetTextureFromId(*out_ids.begin());
+                    auto size = json::ParseSize(tex.GetData().size());
+                    viewport_ = glm::ivec4(0, 0, size.x, size.y);
                     material.SetProgramId(preprocess_id);
                     RenderNode(
                         p.first,
