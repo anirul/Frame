@@ -1,17 +1,19 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-
-Frame's runtime sources live in `src/frame`, grouped by subsystems such as `opengl`, `json`, `proto`, and node components. Public headers mirror this layout under `include/frame`. Engine assets and demo content sit in `asset/` and `examples/`. Tests mirror engine modules inside `tests/frame`, with extra fixtures under `tests/frame/{file,json,opengl}`. Third-party libraries are managed through `external/vcpkg`, so do not vendor additional copies under `src/`.
+Frame's engine sources live in `src/frame`, with public headers mirrored under `include/frame`. Runtime assets such as models, textures, and shaders belong in `asset/`, while generated artifacts should never be committed. Runnable integration samples reside in `examples/`, and unit tests live in `tests/frame` with feature-specific subfolders (for example `tests/frame/json/`). CMake support scripts are under `cmake/`, and the VCPKG submodule is pulled into `external/` during configuration. Build products stay within `build/<preset>`; keep that tree clean in Git.
 
 ## Build, Test, and Development Commands
-Run `git submodule update --init --recursive` after cloning to populate dependencies. Configure a build with `cmake --preset linux-debug` (or `linux-release`, `windows`) and let the preset pull the VCPKG toolchain. Compile everything via `cmake --build --preset linux-debug`. Execute the full suite with `ctest --output-on-failure --test-dir build/linux-debug` or launch an individual binary such as `build/linux-debug/tests/FrameTest`.
+Initialize dependencies with `git submodule update --init --recursive`. Configure a build via `cmake --preset linux-debug` (use `linux-release` or `windows` as needed). Compile with `cmake --build --preset linux-debug`, and rebuild specific targets such as `FrameTest` using `cmake --build --preset linux-debug --target FrameTest`. Launch the sample viewer at `./build/linux-debug/examples/frame_viewer` after a successful build.
 
 ## Coding Style & Naming Conventions
-Use C++17, four-space indentation, and brace-on-new-line for types and functions. Prefer descriptive PascalCase for classes (`Camera`, `WindowFactory`), camelCase for methods (`UpdateCameraVectors`) and free functions, and snake_case with trailing underscores for private data members. Keep includes ordered: local headers after standard/third-party. All new headers must live under `include/frame/...` and ship with an accompanying implementation. Run `clang-format` if available; mirror existing style found in `src/frame`.
+C++ code follows the repository `.clang-format` (Microsoft base, 4-space indent, 80-column limit, left-aligned pointers). Public classes use PascalCase, while functions, variables, and private members stay camelCase; constants take the `kPrefix`. Filenames use snake_case and mirror namespace layout. Run `clang-format -i path/to/file.cpp` before committing and respect `.editorconfig` CRLF endings and trimmed whitespace.
 
 ## Testing Guidelines
-Frame uses GoogleTest (see `tests/frame/CMakeLists.txt`). Add focused `*_test.cpp` files alongside the module under test and register them through the existing CMake targets. Write tests in the Arrange-Act-Assert style and keep fixture helpers in the `tests/frame` tree. Tests should run cleanly through `ctest` in both Debug and Release builds; add coverage for new branches that touch rendering or resource loading paths.
+GoogleTest drives unit coverage in `tests/frame`. Name suites after the component (for example `CameraTest`) and individual tests in `Method_State_Expectation` form. After building, execute `ctest --test-dir build/linux-debug --output-on-failure` to run the full suite; target the matching preset directory for other builds. Add targeted tests or update examples whenever you add features.
 
 ## Commit & Pull Request Guidelines
-Follow the concise style visible in `git log`: imperative mood summaries (`Add preprocess program support...`), optionally prefixed with scopes such as `feat:` when meaningful. Reference tickets in the body and describe behavioral changes plus validation steps. Pull requests should include a short overview, rebuild/test evidence, and screenshots or clips when the change affects rendering output. Link related issues and call out any follow-up work so reviewers can triage quickly.
+Write commit messages in imperative mood under 72 characters (e.g., `Update material parser defaults`). Group related changes and avoid WIP commits. Pull requests should describe intent, state which build or test presets were run, and link any relevant issues. Include before/after renders when modifying assets or graphics-facing code, and flag reviewers responsible for the subsystem touched.
+
+## Assets & Dependencies
+Coordinate before adding binaries over ~10 MB and keep large artifacts in `asset/` or approved storage. When adjusting VCPKG ports or submodules, note the change in your PR and confirm `cmake --preset <target>` succeeds from a clean clone.
