@@ -2,7 +2,7 @@
 
 Welcome to Frame, a versatile 3D engine harnessing the power of OpenGL, with forthcoming support for Vulkan or DirectX 12. Designed to facilitate an immersive dive into computer graphics, Frame accepts models in OBJ format and images readable by stb (jpg, png, hdr, and more).
 
-![A Scene rendering made with ShaderGL.](https://github.com/anirul/Frame/raw/master/examples/scene_rendering.png)
+![A Scene rendering made with ShaderGL.](examples/raytracing.png)
 
 ## Getting Started
 

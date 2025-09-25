@@ -24,7 +24,7 @@
             "pixel_structure": {
                 "value": "RGB"
             },
-            "file_name": "asset/cubemap/shiodome.hdr"
+            "file_name": "asset/cubemap/hamarikyu.hdr"
         },
         {
             "name": "skybox_env",
@@ -35,7 +35,7 @@
             "pixel_structure": {
                 "value": "RGB"
             },
-            "file_name": "asset/cubemap/shiodome_env.hdr"
+            "file_name": "asset/cubemap/hamarikyu_env.hdr"
         },
         {
             "name": "albedo_texture",
@@ -309,13 +309,13 @@
                 "far_clip": 1000.0,
                 "position": {
                     "x": 0,
-                    "y": 0,
-                    "z": -1
+                    "y": 0.5,
+                    "z": -0.7
                 },
                 "target": {
                     "x": 0,
-                    "y": 0,
-                    "z": 1
+                    "y": -0.5,
+                    "z": 0.7
                 },
                 "up": {
                     "x": 0,
