@@ -61,7 +61,10 @@ std::size_t BytesPerElement(proto::PixelElementSize::Enum element_size)
     case proto::PixelElementSize::SHORT:
         return 2;
     case proto::PixelElementSize::HALF:
-        return 2;
+        // stb_image returns 32-bit floats even when requesting half floats.
+        // Preserve the original behaviour (feeding floats to OpenGL while
+        // advertising half precision) so we cache the same 4-byte stride.
+        return 4;
     case proto::PixelElementSize::FLOAT:
         return 4;
     default:
