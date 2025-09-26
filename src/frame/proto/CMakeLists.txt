@@ -2,6 +2,9 @@
 
 add_library(FrameProto
   STATIC
+    bvh_cache.proto
+    obj_cache.proto
+    image_cache.proto
     level.proto
     material.proto
     math.proto
@@ -23,6 +26,9 @@ target_link_libraries(FrameProto
 )
 
 set(HEADERS_TO_BE_COPIED
+  bvh_cache.pb.h
+  obj_cache.pb.h
+  image_cache.pb.h
   level.pb.h
   material.pb.h
   math.pb.h
@@ -47,6 +53,9 @@ foreach(HEADERN ${HEADERS_TO_BE_COPIED})
 endforeach(HEADERN)
 
 set(PROTO_FILES
+    bvh_cache
+    obj_cache
+    image_cache
     level
     material
     math

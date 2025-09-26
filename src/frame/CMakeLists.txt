@@ -9,6 +9,7 @@ add_library(Frame
     # Included from include/frame.
     ${CMAKE_CURRENT_SOURCE_DIR}/../../include/frame/api.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../include/frame/bvh.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/bvh_cache.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../include/frame/buffer_interface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../include/frame/camera.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../include/frame/camera_interface.h
@@ -38,6 +39,7 @@ add_library(Frame
     camera.cpp
     level.cpp
     bvh.cpp
+    bvh_cache.cpp
     logger.cpp
     node_camera.cpp
     node_camera.h
