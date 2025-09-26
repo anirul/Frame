@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package frame.proto;
+
+// Serialized cache for parsed OBJ data.
+message ObjCache {
+    uint32 cache_version = 1;
+    string source_relative = 2;
+    uint64 source_size = 3;
+    uint64 source_mtime_ns = 4;
+    string cache_relative = 5;
+    bool has_texture_coordinates = 6;
+    repeated ObjMesh meshes = 7;
+    repeated ObjMaterial materials = 8;
+
+    message ObjVertex {
+        float position_x = 1;
+        float position_y = 2;
+        float position_z = 3;
+        float normal_x = 4;
+        float normal_y = 5;
+        float normal_z = 6;
+        float tex_coord_u = 7;
+        float tex_coord_v = 8;
+    }
+
+    message ObjMesh {
+        repeated ObjVertex vertices = 1;
+        repeated int32 indices = 2;
+        int32 material_id = 3;
+        bool has_texture_coordinates = 4;
+    }
+
+    message ObjMaterial {
+        string name = 1;
+        float ambient_x = 2;
+        float ambient_y = 3;
+        float ambient_z = 4;
+        float ambient_w = 5;
+        string ambient_texture = 6;
+        float diffuse_x = 7;
+        float diffuse_y = 8;
+        float diffuse_z = 9;
+        float diffuse_w = 10;
+        string diffuse_texture = 11;
+        string displacement_texture = 12;
+        float roughness_value = 13;
+        string roughness_texture = 14;
+        float metallic_value = 15;
+        string metallic_texture = 16;
+        float sheen_value = 17;
+        string sheen_texture = 18;
+        string emissive_texture = 19;
+        string normal_texture = 20;
+    }
+}

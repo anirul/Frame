@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package frame.proto;
+
+// Serialized bounding volume hierarchy cache for meshes.
+message BvhCache {
+	uint32 cache_version = 1;
+	string source_relative = 2;
+	uint64 source_size = 3;
+	uint64 source_mtime_ns = 4;
+	string cache_relative = 5;
+	repeated BvhNode nodes = 6;
+
+	message BvhNode {
+		float min_x = 1;
+		float min_y = 2;
+		float min_z = 3;
+		float max_x = 4;
+		float max_y = 5;
+		float max_z = 6;
+		int32 left = 7;
+		int32 right = 8;
+		int32 first_triangle = 9;
+		int32 triangle_count = 10;
+	}
+}

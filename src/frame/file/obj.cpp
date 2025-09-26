@@ -1,5 +1,6 @@
 #include "frame/file/obj.h"
 
+#include <chrono>
 #include <fstream>
 #include <numeric>
 #define TINYOBJLOADER_IMPLEMENTATION // define this in only *one* .cc
@@ -7,18 +8,86 @@
 #include <tiny_obj_loader.h>
 
 #include "frame/file/file_system.h"
+#include "frame/file/obj_cache.h"
 
 namespace frame::file
 {
 
 Obj::Obj(std::filesystem::path file_name)
 {
+    const auto absolute_path =
+        std::filesystem::absolute(file_name).lexically_normal();
+
+    std::optional<ObjCacheMetadata> cache_metadata;
+    std::error_code metadata_error;
+    const auto source_size =
+        std::filesystem::file_size(absolute_path, metadata_error);
+    if (!metadata_error)
+    {
+        auto write_time =
+            std::filesystem::last_write_time(absolute_path, metadata_error);
+        if (!metadata_error)
+        {
+            const auto mtime_ns =
+                std::chrono::duration_cast<std::chrono::nanoseconds>(
+                    write_time.time_since_epoch())
+                    .count();
+            ObjCacheMetadata metadata;
+            metadata.source_relative =
+                frame::file::PurifyFilePath(absolute_path);
+            metadata.source_size = static_cast<std::uint64_t>(source_size);
+            metadata.source_mtime_ns = static_cast<std::uint64_t>(mtime_ns);
+            try
+            {
+                const auto asset_root = frame::file::FindDirectory("asset");
+                const auto cache_root =
+                    (asset_root / "cache").lexically_normal();
+                std::error_code relative_error;
+                auto relative = std::filesystem::relative(
+                    absolute_path, asset_root, relative_error);
+                if (relative_error)
+                {
+                    relative = absolute_path.filename();
+                }
+                auto cache_path = (cache_root / relative).lexically_normal();
+                cache_path.replace_extension(".objpb");
+                metadata.cache_path = cache_path;
+                metadata.cache_relative =
+                    frame::file::PurifyFilePath(cache_path);
+                cache_metadata = std::move(metadata);
+            }
+            catch (const std::exception& exception)
+            {
+                logger_->warn("OBJ cache disabled: {}", exception.what());
+            }
+        }
+    }
+    else
+    {
+        logger_->info(
+            "OBJ cache disabled for {}: unable to inspect source file.",
+            absolute_path.string());
+    }
+
+    if (cache_metadata)
+    {
+        if (auto cached = LoadObjCache(*cache_metadata))
+        {
+            has_texture_coordinates_ = cached->hasTextureCoordinates;
+            meshes_ = std::move(cached->meshes);
+            materials_ = std::move(cached->materials);
+            logger_->info(
+                "Loaded OBJ cache {}.", cache_metadata->cache_relative);
+            return;
+        }
+    }
+
 #ifdef TINY_OBJ_LOADER_V2
     tinyobj::ObjReaderConfig reader_config;
-    const auto pair = SplitFileDirectory(file_name);
+    const auto pair = SplitFileDirectory(absolute_path);
     reader_config.mtl_search_path = pair.first;
     tinyobj::ObjReader reader;
-    std::string total_path = file::FindFile(file_name);
+    std::string total_path = file::FindFile(absolute_path);
     if (!reader.ParseFromFile(total_path))
     {
         if (!reader.Error().empty())
@@ -43,8 +112,8 @@ Obj::Obj(std::filesystem::path file_name)
     tinyobj::attrib_t attrib;
     std::vector<tinyobj::shape_t> shapes;
     std::vector<tinyobj::material_t> materials;
-    const auto directory = file_name.parent_path();
-    const auto file = file_name.filename();
+    const auto directory = absolute_path.parent_path();
+    const auto file = absolute_path.filename();
 
     std::string err;
     std::string warn;
@@ -54,7 +123,7 @@ Obj::Obj(std::filesystem::path file_name)
         &materials,
         &warn,
         &err,
-        file_name.string().c_str(),
+        absolute_path.string().c_str(),
         directory.string().c_str());
     if (!warn.empty())
     {
@@ -180,6 +249,16 @@ Obj::Obj(std::filesystem::path file_name)
         obj_material.sheen_str = material.sheen_texname;
         obj_material.sheen_val = material.sheen;
         materials_.emplace_back(obj_material);
+    }
+
+    if (cache_metadata)
+    {
+        ObjCachePayload payload;
+        payload.hasTextureCoordinates = has_texture_coordinates_;
+        payload.meshes = meshes_;
+        payload.materials = materials_;
+        SaveObjCache(*cache_metadata, payload);
+        logger_->info("Saved OBJ cache {}.", cache_metadata->cache_relative);
     }
 }
 

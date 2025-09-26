@@ -5,6 +5,8 @@ add_executable(FrameFileTest
   file_system_test.h
   image_test.cpp
   image_test.h
+  obj_cache_test.cpp
+  image_cache_test.cpp
   main.cpp
   obj_test.cpp
   obj_test.h
