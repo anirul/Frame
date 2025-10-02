@@ -9,6 +9,7 @@ uniform mat4 view;
 uniform mat4 projection_inv;
 uniform mat4 view_inv;
 uniform mat4 model;
+uniform mat4 model_inv;
 uniform vec3 camera_position;
 // Direction from the light toward the scene.
 uniform vec3 light_dir;
@@ -126,11 +127,10 @@ bool rayTriangleIntersect(
 }
 
 bool rayAabbIntersect(
-    const vec3 ray_origin, const vec3 ray_dir, const BvhNode node)
+    const vec3 ray_origin, const vec3 inv_ray_dir, const BvhNode node)
 {
-    vec3 inv_dir = 1.0 / ray_dir;
-    vec3 t0 = (node.min - ray_origin) * inv_dir;
-    vec3 t1 = (node.max - ray_origin) * inv_dir;
+    vec3 t0 = (node.min - ray_origin) * inv_ray_dir;
+    vec3 t1 = (node.max - ray_origin) * inv_ray_dir;
     vec3 tmin = min(t0, t1);
     vec3 tmax = max(t0, t1);
     float t_enter = max(max(tmin.x, tmin.y), tmin.z);
@@ -145,6 +145,7 @@ bool traverseBVH(
     out vec2 out_bary,
     out int out_tri)
 {
+    vec3 inv_ray_dir = 1.0 / ray_dir;
     int stack[64];
     int stack_ptr = 0;
     stack[stack_ptr++] = 0;
@@ -155,7 +156,7 @@ bool traverseBVH(
     {
         int node_index = stack[--stack_ptr];
         BvhNode node = nodes[node_index];
-        if (!rayAabbIntersect(ray_origin, ray_dir, node))
+        if (!rayAabbIntersect(ray_origin, inv_ray_dir, node))
             continue;
         if (node.triangle_count > 0)
         {
@@ -192,6 +193,7 @@ bool traverseBVH(
 
 bool anyHitBVH(const vec3 ray_origin, const vec3 ray_dir)
 {
+    vec3 inv_ray_dir = 1.0 / ray_dir;
     int stack[64];
     int stack_ptr = 0;
     stack[stack_ptr++] = 0;
@@ -199,7 +201,7 @@ bool anyHitBVH(const vec3 ray_origin, const vec3 ray_dir)
     {
         int node_index = stack[--stack_ptr];
         BvhNode node = nodes[node_index];
-        if (!rayAabbIntersect(ray_origin, ray_dir, node))
+        if (!rayAabbIntersect(ray_origin, inv_ray_dir, node))
             continue;
         if (node.triangle_count > 0)
         {
@@ -238,9 +240,17 @@ void main()
     vec3 ray_dir_world = normalize((view_inv * view_pos).xyz);
 
     // Transform the ray to model space to match the triangle buffer
-    mat4 inv_model = inverse(model);
-    vec3 ray_origin = vec3(inv_model * vec4(camera_position, 1.0));
-    vec3 ray_dir = normalize(mat3(inv_model) * ray_dir_world);
+    mat4 inv_model4 = model_inv;
+    mat3 model_inv3 = mat3(inv_model4);
+    float inv_det = abs(determinant(model_inv3));
+    if (inv_det < 1e-8)
+    {
+        inv_model4 = inverse(model);
+        model_inv3 = mat3(inv_model4);
+    }
+    mat3 normal_matrix = transpose(model_inv3);
+    vec3 ray_origin = (inv_model4 * vec4(camera_position, 1.0)).xyz;
+    vec3 ray_dir = normalize(model_inv3 * ray_dir_world);
 
     // Trace the ray against the BVH.
     float closest_t;
@@ -278,10 +288,9 @@ void main()
     if (hit)
     {
         // Transform to world space
-        mat3 inv_model3 = transpose(mat3(inv_model));
-        vec3 N = normalize(inv_model3 * hit_normal_model);
-        vec3 T = normalize(inv_model3 * hit_tangent_model);
-        vec3 B = normalize(inv_model3 * hit_bitangent_model);
+        vec3 N = normalize(normal_matrix * hit_normal_model);
+        vec3 T = normalize(normal_matrix * hit_tangent_model);
+        vec3 B = normalize(normal_matrix * hit_bitangent_model);
         if (length(T) < 0.001 || length(B) < 0.001)
         {
             // Fallback basis when UVs are degenerate; avoids zero tangent frames.
@@ -303,7 +312,7 @@ void main()
         vec3 col = length(light_color) > 0.0 ? light_color : vec3(1.0);
 
         // Cast a shadow ray toward the light in model space.
-        vec3 shadow_dir = normalize(mat3(inv_model) * -dir);
+        vec3 shadow_dir = normalize(model_inv3 * -dir);
         vec3 shadow_origin = hit_pos_model + hit_normal_model * 0.0015;
         bool in_shadow = anyHitBVH(shadow_origin, shadow_dir);
 
@@ -340,7 +349,7 @@ void main()
         if (should_trace_reflection)
         {
             vec3 reflection_origin_model = hit_pos_model + hit_normal_model * 0.0015;
-            vec3 reflection_dir_model = normalize(mat3(inv_model) * reflection_dir_world);
+            vec3 reflection_dir_model = normalize(model_inv3 * reflection_dir_world);
             float reflection_t;
             vec2 reflection_bary;
             int reflection_tri;
