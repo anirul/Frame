@@ -13,6 +13,10 @@ UniformCollectionWrapper::UniformCollectionWrapper(
     const glm::mat4& model,
     double time)
 {
+    glm::mat4 projection_inv = glm::inverse(projection);
+    glm::mat4 view_inv = glm::inverse(view);
+    glm::mat4 model_inv = glm::inverse(model);
+
     std::unique_ptr<Uniform> uniform_projection =
         std::make_unique<Uniform>("projection", projection);
     std::unique_ptr<Uniform> uniform_view =
@@ -23,15 +27,17 @@ UniformCollectionWrapper::UniformCollectionWrapper(
         std::make_unique<Uniform>("time", static_cast<float>(time));
     std::unique_ptr<Uniform> uniform_time_s =
         std::make_unique<Uniform>("time_s", static_cast<float>(time));
-    glm::vec3 camera_position = glm::vec3(glm::inverse(view)[3]);
+    glm::vec3 camera_position = glm::vec3(view_inv[3]);
     std::unique_ptr<Uniform> uniform_camera_position =
         std::make_unique<Uniform>("camera_position", camera_position);
     // Provide inverse matrices so shaders can reconstruct rays without
     // computing matrix inverses per-fragment.
     std::unique_ptr<Uniform> uniform_projection_inv =
-        std::make_unique<Uniform>("projection_inv", glm::inverse(projection));
+        std::make_unique<Uniform>("projection_inv", projection_inv);
     std::unique_ptr<Uniform> uniform_view_inv =
-        std::make_unique<Uniform>("view_inv", glm::inverse(view));
+        std::make_unique<Uniform>("view_inv", view_inv);
+    std::unique_ptr<Uniform> uniform_model_inv =
+        std::make_unique<Uniform>("model_inv", model_inv);
 
     AddUniform(std::move(uniform_projection));
     AddUniform(std::move(uniform_view));
@@ -41,6 +47,7 @@ UniformCollectionWrapper::UniformCollectionWrapper(
     AddUniform(std::move(uniform_camera_position));
     AddUniform(std::move(uniform_projection_inv));
     AddUniform(std::move(uniform_view_inv));
+    AddUniform(std::move(uniform_model_inv));
 }
 
 const UniformInterface& UniformCollectionWrapper::GetUniform(

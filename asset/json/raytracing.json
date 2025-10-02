@@ -210,6 +210,10 @@
                     "uniform_enum": "MODEL_MAT4"
                 },
                 {
+                    "name": "model_inv",
+                    "uniform_enum": "MODEL_INV_MAT4"
+                },
+                {
                     "name": "camera_position",
                     "uniform_enum": "CAMERA_POSITION_VEC3"
                 },
@@ -250,6 +254,10 @@
                 {
                     "name": "model",
                     "uniform_enum": "MODEL_MAT4"
+                },
+                {
+                    "name": "model_inv",
+                    "uniform_enum": "MODEL_INV_MAT4"
                 },
                 {
                     "name": "camera_position",
@@ -366,4 +374,3 @@
         ]
     }
 }
-

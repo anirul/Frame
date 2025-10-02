@@ -310,9 +310,17 @@ int Program::GetMemoizeUniformLocation(const std::string& name) const
             // Clear the error.
         }
         int location = glGetUniformLocation(program_id_, name.c_str());
+        GLenum error = glGetError();
+        if (location == -1 && error == GL_NO_ERROR &&
+            name.find('[') == std::string::npos)
+        {
+            std::string array_candidate = name + "[0]";
+            location =
+                glGetUniformLocation(program_id_, array_candidate.c_str());
+            error = glGetError();
+        }
         if (location == -1)
         {
-            GLenum error = glGetError();
             throw std::runtime_error(
                 std::format(
                     "Could not get a location for uniform [{}] error: {}.",
