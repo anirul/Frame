@@ -2,6 +2,7 @@
 #include <cctype>
 #include <iostream>
 #include <string>
+#include <cstdlib>
 #include <utility>
 #include <vector>
 
@@ -10,12 +11,12 @@
 #if defined(_WIN32) || defined(_WIN64)
 #define WINDOWS_LEAN_AND_MEAN
 #include <windows.h>
-#include <shellapi.h>
 #endif
 
 #include "frame/common/application.h"
 #include "frame/file/file_system.h"
 #include "frame/file/image_stb.h"
+#include "frame/logger.h"
 #include "frame/window_factory.h"
 
 namespace
@@ -77,72 +78,26 @@ frame::WindowReturnEnum RunWithPreference(const std::vector<std::string>& args)
         }
         catch (const std::exception& ex)
         {
-#if defined(_WIN32) || defined(_WIN64)
-            OutputDebugStringA("Vulkan startup failed, falling back to OpenGL.\n");
-            OutputDebugStringA(ex.what());
-            OutputDebugStringA("\n");
-#else
-            std::cerr << "Vulkan startup failed (" << ex.what()
-                      << "), falling back to OpenGL." << std::endl;
-#endif
+            auto& logger = frame::Logger::GetInstance();
+            logger->warn("Vulkan startup failed, falling back to OpenGL: {}", ex.what());
         }
     }
     return RunApplication(frame::RenderingAPIEnum::OPENGL);
 }
 
-#if defined(_WIN32) || defined(_WIN64)
-std::vector<std::string> CollectCommandLineArgs()
-{
-    int argc = 0;
-    LPWSTR* argv_w = CommandLineToArgvW(GetCommandLineW(), &argc);
-    std::vector<std::string> args;
-    if (!argv_w)
-    {
-        return args;
-    }
-    args.reserve(static_cast<std::size_t>(argc));
-    for (int i = 0; i < argc; ++i)
-    {
-        const int required = WideCharToMultiByte(
-            CP_UTF8,
-            0,
-            argv_w[i],
-            -1,
-            nullptr,
-            0,
-            nullptr,
-            nullptr);
-        if (required <= 0)
-        {
-            continue;
-        }
-        std::string utf8(static_cast<std::size_t>(required - 1), '\0');
-        WideCharToMultiByte(
-            CP_UTF8,
-            0,
-            argv_w[i],
-            -1,
-            utf8.data(),
-            required,
-            nullptr,
-            nullptr);
-        args.push_back(std::move(utf8));
-    }
-    LocalFree(argv_w);
-    return args;
-}
-#else
 std::vector<std::string> CollectCommandLineArgs(int argc, char** argv)
 {
     std::vector<std::string> args;
     args.reserve(static_cast<std::size_t>(argc));
     for (int i = 0; i < argc; ++i)
     {
-        args.emplace_back(argv[i]);
+        if (argv[i])
+        {
+            args.emplace_back(argv[i]);
+        }
     }
     return args;
 }
-#endif
 
 } // namespace
 
@@ -154,7 +109,7 @@ int WINAPI WinMain(
     _In_ int /*nShowCmd*/)
 try
 {
-    const auto args = CollectCommandLineArgs();
+    const auto args = CollectCommandLineArgs(__argc, __argv);
     RunWithPreference(args);
     return 0;
 }
