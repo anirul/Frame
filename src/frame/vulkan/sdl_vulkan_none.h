@@ -1,5 +1,9 @@
 #pragma once
 
+#ifndef VULKAN_HPP_DISPATCH_LOADER_DYNAMIC
+#define VULKAN_HPP_DISPATCH_LOADER_DYNAMIC 1
+#endif
+
 #include <SDL3/SDL.h>
 #include <vulkan/vulkan.hpp>
 #include <string>
@@ -19,8 +23,8 @@ namespace frame::vulkan
 class SDLVulkanNone : public WindowInterface
 {
   public:
-    SDLVulkanNone(glm::uvec2 size);
-    virtual ~SDLVulkanNone();
+    explicit SDLVulkanNone(glm::uvec2 size);
+    ~SDLVulkanNone() override;
 
   public:
     WindowReturnEnum Run(std::function<bool()> lambda) override;
@@ -36,10 +40,10 @@ class SDLVulkanNone : public WindowInterface
     {
         throw std::runtime_error("Not implemented yet!");
     }
-	void RemoveKeyCallback(std::int32_t key) override
-	{
-		throw std::runtime_error("Not implemented yet!");
-	}
+    void RemoveKeyCallback(std::int32_t key) override
+    {
+        throw std::runtime_error("Not implemented yet!");
+    }
     void SetUniqueDevice(std::unique_ptr<DeviceInterface> device) override
     {
         device_ = std::move(device);
@@ -52,7 +56,7 @@ class SDLVulkanNone : public WindowInterface
     {
         return size_;
     }
-    glm::vec2 GetPixelPerInch(std::uint32_t screen = 0) const
+    glm::vec2 GetPixelPerInch(std::uint32_t screen = 0) const override
     {
         throw std::runtime_error("Not implemented yet!");
     }
@@ -64,7 +68,7 @@ class SDLVulkanNone : public WindowInterface
     {
         return sdl_window_;
     }
-    void SetWindowTitle(const std::string& title) const override
+    void SetWindowTitle(const std::string& /*title*/) const override
     {
     }
     void SetOpenFileName(const std::string& file_name) override
@@ -75,10 +79,13 @@ class SDLVulkanNone : public WindowInterface
     {
         return open_file_name_;
     }
-    void Resize(glm::uvec2 size, FullScreenEnum fullscreen_enum) override
+    void Resize(glm::uvec2 size, FullScreenEnum /*fullscreen_enum*/) override
     {
         size_ = size;
-        device_->Resize(size);
+        if (device_)
+        {
+            device_->Resize(size);
+        }
     }
     FullScreenEnum GetFullScreenEnum() const override
     {
@@ -90,9 +97,10 @@ class SDLVulkanNone : public WindowInterface
     }
 
   public:
-    vk::SurfaceKHR& GetVulkanSurfaceKHR()
+    vk::SurfaceKHR& GetVulkanSurfaceKHR();
+    const vk::SurfaceKHR& GetVulkanSurfaceKHR() const
     {
-        return vk_surface_.get();
+        return vk_surface_;
     }
 
   private:
@@ -103,7 +111,7 @@ class SDLVulkanNone : public WindowInterface
     std::string open_file_name_ = "";
     frame::Logger& logger_ = frame::Logger::GetInstance();
     vk::UniqueInstance vk_unique_instance_;
-    vk::UniqueSurfaceKHR vk_surface_;
+    vk::SurfaceKHR vk_surface_ = VK_NULL_HANDLE;
 };
 
-} // namespace frame::vulkan.
+} // namespace frame::vulkan

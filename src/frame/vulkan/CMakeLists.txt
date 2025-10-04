@@ -10,6 +10,7 @@ add_library(FrameVulkan
     sdl_vulkan_none.cpp
     sdl_vulkan_window.h
     sdl_vulkan_window.cpp
+    dispatcher.cpp
     window_factory.h
     window_factory.cpp
 )

@@ -233,3 +233,7 @@ log.txt
 include/frame/proto/*.pb.h
 src/frame/proto/include/frame/proto
 
+
+# Asset caches
+asset/cache/
+

@@ -1,19 +1,33 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-Frame engine sources live in `src/frame`, with their public headers mirrored under `include/frame`. Runtime assets such as models, textures, and shaders belong in `asset/`; keep generated or temporary artifacts out of version control. Integration samples run from `examples/`, while unit tests live in `tests/frame/<feature>/`. Build products stay in `build/<preset>`; clean this tree before committing changes.
+- Core engine sources sit in src/frame, with public headers mirrored in include/frame for external consumption.
+- Runtime assets (models, textures, shaders) belong in sset/; keep generated or temporary files out of git.
+- Integration samples live in xamples/, while unit tests reside under 	ests/frame/<feature>/ to match the component under test.
+- Build products are written to uild/<preset>; clean this tree before commits to avoid shipping artifacts.
 
 ## Build, Test, and Development Commands
-Run `git submodule update --init --recursive` after cloning to pull `external/` dependencies. Configure a local build with `cmake --preset linux-debug` (switch to `linux-release` or `windows` when needed). Compile iteratively via `cmake --build --preset linux-debug`, or rebuild a target such as `FrameTest` by adding `--target FrameTest`. Launch the sample viewer with `./build/linux-debug/examples/frame_viewer` once binaries are in place.
+- git submodule update --init --recursive: syncs all xternal/ dependencies after cloning or pulling.
+- cmake --preset linux-debug (or linux-release, windows): configures the build directory with the chosen toolchain and options.
+- cmake --build --preset linux-debug: incrementally compiles the project; append --target FrameTest to focus on a test binary.
+- ./build/linux-debug/examples/frame_viewer: launches the sample viewer once binaries have been produced.
 
 ## Coding Style & Naming Conventions
-C++ sources follow the repo `.clang-format` (Microsoft base, 4-space indent, 80-column limit, left-aligned pointers). Public classes use PascalCase; functions, variables, and private fields stay camelCase; constants take the `kName` form. Align filenames with namespaces using snake_case. Run `clang-format -i path/to/file.cpp` and honor `.editorconfig` rules (CRLF endings, trimmed whitespace).
+- Follow the repo .clang-format (Microsoft base, 4 spaces, 80-column limit, left-aligned pointers); run clang-format -i on touched files.
+- Respect .editorconfig: CRLF endings and trimmed trailing whitespace.
+- Use PascalCase for public classes, camelCase for functions and variables, and kName for constants; align filenames with namespaces using snake_case.
 
 ## Testing Guidelines
-All tests use GoogleTest in `tests/frame`. Name suites after the component (for example `CameraTest`) and cases as `Method_State_Expectation`. After building, execute `ctest --test-dir build/linux-debug --output-on-failure` to validate the full suite; adjust the preset path when switching configurations.
+- GoogleTest powers the suite; place tests beside their feature in 	ests/frame/<feature>/ with ComponentTest fixture names.
+- Name cases with the Method_State_Expectation convention for clarity.
+- Execute ctest --test-dir build/linux-debug --output-on-failure after building to run the suite; adjust the preset directory as needed.
 
 ## Commit & Pull Request Guidelines
-Write commit messages in imperative mood under 72 characters (e.g., `Update material parser defaults`). Group related changes and avoid WIP commits. Pull requests must explain intent, list the build or test presets exercised, and link related issues. Include before/after renders for graphics-facing changes and flag subsystem reviewers when relevant.
+- Write imperative commit messages under 72 characters (e.g., Update material parser defaults) and group related changes.
+- PRs should explain intent, list exercised build/test presets, and link relevant issues.
+- Provide before/after renders for graphics-facing updates and flag subsystem reviewers when applicable.
 
 ## Configuration & Assets
-Coordinate before adding binaries larger than ~10 MB. When touching VCPKG submodules or ports in `external/`, note it in your PR and confirm a clean `cmake --preset <target>` succeeds. Keep `asset/` organized and avoid committing generated shaders or other build outputs.
+- Avoid adding binaries larger than ~10 MB without coordinating with maintainers.
+- Call out any changes to VCPKG submodules or ports in xternal/, and confirm a clean cmake --preset <target> build.
+- Keep sset/ organized; do not commit generated shaders or other build outputs.

@@ -14,7 +14,7 @@ TEST_F(WindowFactoryTest, CreateWindowOpenGLTest)
     EXPECT_TRUE(window_);
 }
 
-TEST_F(WindowFactoryTest, DISABLED_CreateWindowVulkanTest)
+TEST_F(WindowFactoryTest, CreateWindowVulkanTest)
 {
     EXPECT_FALSE(window_);
     EXPECT_NO_THROW(

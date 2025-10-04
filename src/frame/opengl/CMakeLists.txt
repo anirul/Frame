@@ -62,6 +62,7 @@ target_link_libraries(FrameOpenGL
     FrameFile
     FrameJson
     FrameOpenGLFile
+    FrameVulkan
     glad::glad
     glm::glm
     protobuf::libprotobuf

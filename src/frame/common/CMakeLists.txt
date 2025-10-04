@@ -22,6 +22,7 @@ target_link_libraries(FrameCommon
     Frame
     FrameProto
     FrameOpenGL
+    FrameVulkan
     glm::glm
     protobuf::libprotobuf
 )

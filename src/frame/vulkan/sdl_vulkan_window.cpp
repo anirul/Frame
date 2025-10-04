@@ -3,17 +3,24 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_vulkan.h>
 #include <vulkan/vulkan.hpp>
+
+#include <chrono>
+#include <format>
 #include <string>
+#include <vector>
 
 #include "frame/gui/draw_gui_interface.h"
 #include "frame/vulkan/debug_callback.h"
 
 namespace frame::vulkan
 {
+namespace
+{
+constexpr const char* kDefaultTitle = "Frame Vulkan";
+}
 
 SDLVulkanWindow::SDLVulkanWindow(glm::uvec2 size) : size_(size)
 {
-    // Initialize SDL with the video subsystem.
     if (!SDL_Init(SDL_INIT_VIDEO))
     {
         throw std::runtime_error(
@@ -26,34 +33,49 @@ SDLVulkanWindow::SDLVulkanWindow(glm::uvec2 size) : size_(size)
             std::format("Couldn't load Vulkan library: {}", SDL_GetError()));
     }
 
-    // Create an SDL window to use as a surface for Vulkan.
-    sdl_window_ = SDL_CreateWindow(
-        "Vulkan Headless",
-        size_.x,
-        size_.y,
-        SDL_WINDOW_VULKAN);
+    const auto vk_get_instance_proc_addr = reinterpret_cast<PFN_vkGetInstanceProcAddr>(        SDL_Vulkan_GetVkGetInstanceProcAddr());
+    if (!vk_get_instance_proc_addr)
+    {
+        throw std::runtime_error(std::format("Couldn't resolve vkGetInstanceProcAddr: {}", SDL_GetError()));
+    }
+    VULKAN_HPP_DEFAULT_DISPATCHER.init(vk_get_instance_proc_addr);
+
+    const Uint32 window_flags = SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE;
+    sdl_window_ =
+        SDL_CreateWindow(kDefaultTitle, size_.x, size_.y, window_flags);
     if (!sdl_window_)
     {
         throw std::runtime_error(
             std::format("Couldn't initialize window: {}", SDL_GetError()));
     }
 
-    // Get the required extensions for creating a Vulkan surface.
-    uint32_t extension_count = 0;
-    std::vector<const char*> extensions(extension_count);
-    const char* const* extentions_c =
-        SDL_Vulkan_GetInstanceExtensions(&extension_count);
-    for (uint32_t i = 0; i < extension_count; i++)
+    SDL_DisplayID display_id = SDL_GetDisplayForWindow(sdl_window_);
+    SDL_Rect bounds{};
+    if (display_id && SDL_GetDisplayBounds(display_id, &bounds))
     {
-        extensions.push_back(extentions_c[i]);
+        desktop_size_ = glm::uvec2(bounds.w, bounds.h);
     }
-    if (extension_count == 0)
+    else
+    {
+        desktop_size_ = size_;
+    }
+
+    Uint32 extension_count = 0;
+    const char* const* extension_names =
+        SDL_Vulkan_GetInstanceExtensions(&extension_count);
+    if (!extension_names || extension_count == 0)
     {
         throw std::runtime_error(std::format(
-            "Could not get the extension count: {}", SDL_GetError()));
+            "Could not query Vulkan instance extensions: {}",
+            SDL_GetError()));
     }
+
+    std::vector<const char*> extensions;
+    extensions.reserve(static_cast<std::size_t>(extension_count) + 1);
+    extensions.insert(
+        extensions.end(), extension_names, extension_names + extension_count);
 #ifdef VK_EXT_ENABLE_DEBUG_EXTENSION
-    extensions.push_back("VK_EXT_debug_utils");
+    extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 #endif
     for (const auto& extension : extensions)
     {
@@ -65,7 +87,7 @@ SDLVulkanWindow::SDLVulkanWindow(glm::uvec2 size) : size_(size)
         VK_MAKE_VERSION(0, 5, 1),
         "SDL - Vulkan - Window",
         VK_MAKE_VERSION(0, 5, 1),
-        VK_API_VERSION_1_3);
+        VK_API_VERSION_1_4);
 
     vk::InstanceCreateInfo instance_create_info(
         {},
@@ -76,31 +98,20 @@ SDLVulkanWindow::SDLVulkanWindow(glm::uvec2 size) : size_(size)
         extensions.data());
 
     vk_unique_instance_ = vk::createInstanceUnique(instance_create_info);
-#ifdef VK_EXT_ENABLE_DEBUG_EXTENSION
-    auto result = vk_unique_instance_->createDebugUtilsMessengerEXT(
-        vk::DebugUtilsMessengerCreateInfoEXT(
-            {},
-            vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose |
-            vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning |
-            vk::DebugUtilsMessageSeverityFlagBitsEXT::eError,
-            vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral |
-            vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation |
-            vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance,
-            vk::PFN_DebugUtilsMessengerCallbackEXT(DebugCallback)));
-#endif
+    VULKAN_HPP_DEFAULT_DISPATCHER.init(*vk_unique_instance_, vk_get_instance_proc_addr);
 
-    // Create the surface.
-    // CHECKME(anirul): What happen in case of a resize?
-    VkSurfaceKHR vk_surface;
+    VkSurfaceKHR surface = VK_NULL_HANDLE;
     if (!SDL_Vulkan_CreateSurface(
-            sdl_window_, *vk_unique_instance_, nullptr, &vk_surface))
+            sdl_window_,
+            static_cast<VkInstance>(*vk_unique_instance_),
+            nullptr,
+            &surface))
     {
         throw std::runtime_error(std::format(
-            "Error while create vulkan surface: {}", SDL_GetError()));
+            "Error while creating Vulkan surface: {}", SDL_GetError()));
     }
-    vk_surface_ = vk::UniqueSurfaceKHR(vk_surface);
+    vk_surface_ = surface;
 
-    // Get the hwnd.
 #if defined(_WIN32) || defined(_WIN64)
     hwnd_ = FindWindowA(nullptr, SDL_GetWindowTitle(sdl_window_));
 #endif
@@ -108,88 +119,110 @@ SDLVulkanWindow::SDLVulkanWindow(glm::uvec2 size) : size_(size)
 
 SDLVulkanWindow::~SDLVulkanWindow()
 {
-    // Destroy the surface and instance when finished
-    SDL_DestroyWindow(sdl_window_);
+    if (vk_unique_instance_ && vk_surface_)
+    {
+        SDL_Vulkan_DestroySurface(
+            static_cast<VkInstance>(*vk_unique_instance_),
+            static_cast<VkSurfaceKHR>(vk_surface_),
+            nullptr);
+        vk_surface_ = VK_NULL_HANDLE;
+    }
+
+    vk_unique_instance_.reset();
+    SDL_Vulkan_UnloadLibrary();
+
+    if (sdl_window_)
+    {
+        SDL_DestroyWindow(sdl_window_);
+        sdl_window_ = nullptr;
+    }
     SDL_Quit();
 }
 
-WindowReturnEnum SDLVulkanWindow::Run(
-    std::function<bool()> lambda /* = []{ return true; }*/)
+WindowReturnEnum SDLVulkanWindow::Run(std::function<bool()> lambda)
 {
-    // Called only once at the beginning.
-    for (const auto& plugin_interface : device_->GetPluginPtrs())
+    if (device_)
     {
-        // In case this is a removed one it will be nulled.
-        if (plugin_interface)
-        {
-            // This will call the device startup.
-            plugin_interface->Startup(size_);
-        }
-    }
-    WindowReturnEnum window_return_enum = WindowReturnEnum::CONTINUE;
-    // Timing counter.
-    auto start = std::chrono::system_clock::now();
-    do
-    {
-        // Compute the time difference from previous frame.
-        auto end = std::chrono::system_clock::now();
-        std::chrono::duration<double> time = end - start;
-        const double dt = GetFrameDt(time.count());
-
-        // Process events.
-        SDL_Event event;
-        while (SDL_PollEvent(&event))
-        {
-            bool skip = false;
-            for (const auto& plugin_interface : device_->GetPluginPtrs())
-            {
-                if (plugin_interface)
-                {
-                    if (plugin_interface->PollEvent(&event))
-                    {
-                        skip = true;
-                    }
-                }
-            }
-            if (skip)
-                continue;
-            if (!RunEvent(event, dt))
-            {
-                window_return_enum = WindowReturnEnum::QUIT;
-            }
-        }
-        if (input_interface_)
-            input_interface_->NextFrame();
-
-        device_->Display(time.count());
-
-        // Draw the Scene not used?
         for (const auto& plugin_interface : device_->GetPluginPtrs())
         {
             if (plugin_interface)
             {
-                if (!plugin_interface->Update(*device_.get(), time.count()))
+                plugin_interface->Startup(size_);
+            }
+        }
+    }
+
+    WindowReturnEnum window_return_enum = WindowReturnEnum::CONTINUE;
+    auto start = std::chrono::steady_clock::now();
+
+    while (window_return_enum == WindowReturnEnum::CONTINUE)
+    {
+        auto now = std::chrono::steady_clock::now();
+        std::chrono::duration<double> elapsed = now - start;
+        const double dt = GetFrameDt(elapsed.count());
+
+        SDL_Event event;
+        while (SDL_PollEvent(&event))
+        {
+            bool consumed = false;
+            if (device_)
+            {
+                for (const auto& plugin_interface : device_->GetPluginPtrs())
+                {
+                    if (plugin_interface && plugin_interface->PollEvent(&event))
+                    {
+                        consumed = true;
+                    }
+                }
+            }
+
+            if (!consumed && !RunEvent(event, dt))
+            {
+                window_return_enum = WindowReturnEnum::QUIT;
+            }
+        }
+
+        if (window_return_enum != WindowReturnEnum::CONTINUE)
+        {
+            break;
+        }
+
+        if (input_interface_)
+        {
+            input_interface_->NextFrame();
+        }
+
+        if (device_)
+        {
+            device_->Display(elapsed.count());
+
+            for (const auto& plugin_interface : device_->GetPluginPtrs())
+            {
+                if (plugin_interface &&
+                    !plugin_interface->Update(*device_, elapsed.count()))
                 {
                     window_return_enum = WindowReturnEnum::RESTART;
                 }
             }
         }
 
-        std::string title = "SDL Vulkan";
+        std::string title = kDefaultTitle;
         if (!open_file_name_.empty())
         {
             title += " - " + open_file_name_;
         }
         title += " - " + std::to_string(static_cast<float>(GetFPS(dt)));
         SetWindowTitle(title);
+
         if (!lambda())
         {
             window_return_enum = WindowReturnEnum::RESTART;
         }
 
-        // Swap the window.
-        throw std::runtime_error("Implement swap window.");
-    } while (window_return_enum == WindowReturnEnum::CONTINUE);
+        SDL_Delay(1);
+    }
+
+    return window_return_enum;
 }
 
 void* SDLVulkanWindow::GetGraphicContext() const
@@ -200,6 +233,7 @@ void* SDLVulkanWindow::GetGraphicContext() const
 void SDLVulkanWindow::Resize(glm::uvec2 size, FullScreenEnum fullscreen_enum)
 {
     size_ = size;
+
     if (fullscreen_enum_ != fullscreen_enum)
     {
         fullscreen_enum_ = fullscreen_enum;
@@ -227,7 +261,6 @@ void SDLVulkanWindow::Resize(glm::uvec2 size, FullScreenEnum fullscreen_enum)
                     "SDL_GetDisplayBounds failed: {}", SDL_GetError()));
             }
 
-            // Use desired resolution if needed
             fullscreen_mode.w = bounds.w;
             fullscreen_mode.h = bounds.h;
             mode_ptr = &fullscreen_mode;
@@ -246,15 +279,16 @@ void SDLVulkanWindow::Resize(glm::uvec2 size, FullScreenEnum fullscreen_enum)
                 "Error switching fullscreen mode: {}", SDL_GetError()));
         }
 
-        // Only resize in windowed mode — fullscreen modes will auto-resize the
-        // window
         if (fullscreen_enum_ == FullScreenEnum::WINDOW)
         {
             SDL_SetWindowSize(sdl_window_, size_.x, size_.y);
         }
     }
 
-    device_->Resize(size_);
+    if (device_)
+    {
+        device_->Resize(size_);
+    }
 }
 
 frame::FullScreenEnum SDLVulkanWindow::GetFullScreenEnum() const
@@ -265,7 +299,10 @@ frame::FullScreenEnum SDLVulkanWindow::GetFullScreenEnum() const
 bool SDLVulkanWindow::RunEvent(const SDL_Event& event, const double dt)
 {
     if (event.type == SDL_EVENT_QUIT)
+    {
         return false;
+    }
+
     if (event.type == SDL_EVENT_WINDOW_FOCUS_GAINED)
     {
         SDL_StartTextInput(sdl_window_);
@@ -274,17 +311,24 @@ bool SDLVulkanWindow::RunEvent(const SDL_Event& event, const double dt)
     {
         SDL_StopTextInput(sdl_window_);
     }
+
     bool has_window_plugin = false;
-    for (PluginInterface* plugin : device_->GetPluginPtrs())
+    if (device_)
     {
-        if (dynamic_cast<frame::gui::DrawGuiInterface*>(plugin))
-            has_window_plugin = true;
+        for (PluginInterface* plugin : device_->GetPluginPtrs())
+        {
+            if (dynamic_cast<frame::gui::DrawGuiInterface*>(plugin))
+            {
+                has_window_plugin = true;
+            }
+        }
     }
+
     if (event.type == SDL_EVENT_KEY_DOWN)
     {
         switch (event.key.key)
         {
-        case SDLK_ESCAPE: {
+        case SDLK_ESCAPE:
             if (has_window_plugin)
             {
                 for (PluginInterface* plugin : device_->GetPluginPtrs())
@@ -293,19 +337,22 @@ bool SDLVulkanWindow::RunEvent(const SDL_Event& event, const double dt)
                         dynamic_cast<frame::gui::DrawGuiInterface*>(plugin);
                     if (window_plugin)
                     {
-                        auto is_visible = window_plugin->IsVisible();
+                        const bool is_visible = window_plugin->IsVisible();
                         window_plugin->SetVisible(!is_visible);
                     }
                 }
                 return true;
             }
             return false;
-        }
         case SDLK_PRINTSCREEN:
-            device_->ScreenShot("ScreenShot.png");
+            if (device_)
+            {
+                device_->ScreenShot("ScreenShot.png");
+            }
             return true;
         }
     }
+
     if (input_interface_)
     {
         if (event.type == SDL_EVENT_KEY_DOWN)
@@ -340,6 +387,7 @@ bool SDLVulkanWindow::RunEvent(const SDL_Event& event, const double dt)
                 static_cast<float>(event.wheel.y), dt);
         }
     }
+
     return true;
 }
 
@@ -359,12 +407,17 @@ const char SDLVulkanWindow::SDLButtonToChar(const Uint8 button) const
     return ret;
 }
 
-const double SDLVulkanWindow::GetFrameDt(const double t) const
+double SDLVulkanWindow::GetFrameDt(double t) const
 {
     static double previous_t = 0.0;
-    double ret = t - previous_t;
+    const double ret = t - previous_t;
     previous_t = t;
     return ret;
 }
 
-} // End namespace frame::vulkan.
+vk::SurfaceKHR& SDLVulkanWindow::GetVulkanSurfaceKHR()
+{
+    return vk_surface_;
+}
+
+} // namespace frame::vulkan

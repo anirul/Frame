@@ -24,6 +24,7 @@ target_link_libraries(FrameOpenGLFileTest
   FrameFile
   FrameOpenGL
   FrameOpenGLFile
+  FrameVulkan
   GTest::gmock
   GTest::gtest
 )

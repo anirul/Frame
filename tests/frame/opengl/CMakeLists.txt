@@ -52,6 +52,7 @@ target_link_libraries(FrameOpenGLTest
     FrameOpenGL
     FrameOpenGLFile
     FrameJson
+    FrameVulkan
 )
 
 # In order to remove the tests from the bin folder.

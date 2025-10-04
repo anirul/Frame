@@ -1,5 +1,9 @@
 #pragma once
 
+#ifndef VULKAN_HPP_DISPATCH_LOADER_DYNAMIC
+#define VULKAN_HPP_DISPATCH_LOADER_DYNAMIC 1
+#endif
+
 #include <SDL3/SDL.h>
 #include <vulkan/vulkan.hpp>
 #include <string>
@@ -19,8 +23,8 @@ namespace frame::vulkan
 class SDLVulkanWindow : public WindowInterface
 {
   public:
-    SDLVulkanWindow(glm::uvec2 size);
-    virtual ~SDLVulkanWindow();
+    explicit SDLVulkanWindow(glm::uvec2 size);
+    ~SDLVulkanWindow() override;
 
   public:
     void SetInputInterface(
@@ -32,10 +36,10 @@ class SDLVulkanWindow : public WindowInterface
     {
         throw std::runtime_error("Not implemented yet!");
     }
-	void RemoveKeyCallback(std::int32_t key) override
-	{
-		throw std::runtime_error("Not implemented yet!");
-	}
+    void RemoveKeyCallback(std::int32_t key) override
+    {
+        throw std::runtime_error("Not implemented yet!");
+    }
     void SetUniqueDevice(std::unique_ptr<DeviceInterface> device) override
     {
         device_ = std::move(device);
@@ -48,7 +52,7 @@ class SDLVulkanWindow : public WindowInterface
     {
         return size_;
     }
-    glm::vec2 GetPixelPerInch(std::uint32_t screen = 0) const
+    glm::vec2 GetPixelPerInch(std::uint32_t screen = 0) const override
     {
         throw std::runtime_error("Not implemented yet!");
     }
@@ -79,25 +83,23 @@ class SDLVulkanWindow : public WindowInterface
 
   public:
     WindowReturnEnum Run(
-		std::function<bool()> lambda = [] { return true; }) override;
+        std::function<bool()> lambda = [] { return true; }) override;
     void* GetGraphicContext() const override;
     void Resize(glm::uvec2 size, FullScreenEnum fullscreen_enum) override;
     FullScreenEnum GetFullScreenEnum() const override;
 
   public:
-    vk::SurfaceKHR& GetVulkanSurfaceKHR()
+    vk::SurfaceKHR& GetVulkanSurfaceKHR();
+    const vk::SurfaceKHR& GetVulkanSurfaceKHR() const
     {
-        return vk_surface_.get();
+        return vk_surface_;
     }
 
   protected:
-    bool RunEvent(const SDL_Event& event, const double dt);
-    const char SDLButtonToChar(const Uint8 button) const;
-    // Can only be called ONCE per frame!
-    const double GetFrameDt(const double t) const;
-
-  protected:
-    const double GetFPS(const double dt) const
+    bool RunEvent(const SDL_Event& event, double dt);
+    const char SDLButtonToChar(Uint8 button) const;
+    double GetFrameDt(double t) const;
+    double GetFPS(double dt) const
     {
         return 1.0 / dt;
     }
@@ -115,7 +117,7 @@ class SDLVulkanWindow : public WindowInterface
     std::string open_file_name_ = "";
     frame::Logger& logger_ = frame::Logger::GetInstance();
     vk::UniqueInstance vk_unique_instance_;
-    vk::UniqueSurfaceKHR vk_surface_;
+    vk::SurfaceKHR vk_surface_ = VK_NULL_HANDLE;
 };
 
-} // namespace frame::vulkan.
+} // namespace frame::vulkan

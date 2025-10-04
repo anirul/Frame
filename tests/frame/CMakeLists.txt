@@ -30,6 +30,7 @@ target_link_libraries(FrameTest
     FrameOpenGL
     FrameOpenGLFile
     FrameJson
+    FrameVulkan
 )
 
 # In order to remove the tests from the bin folder.
@@ -42,5 +43,6 @@ gtest_add_tests(TARGET FrameTest)
 add_subdirectory(file)
 add_subdirectory(json)
 add_subdirectory(opengl)
+add_subdirectory(vulkan)
 
 set_property(TARGET FrameTest PROPERTY FOLDER "FrameTest")

@@ -1,5 +1,9 @@
 #pragma once
 
+#ifndef VULKAN_HPP_DISPATCH_LOADER_DYNAMIC
+#define VULKAN_HPP_DISPATCH_LOADER_DYNAMIC 1
+#endif
+
 #include <vulkan/vulkan.hpp>
 
 namespace frame::vulkan
@@ -22,4 +26,4 @@ VKAPI_ATTR vk::Bool32 VKAPI_CALL DebugReportCallback(
     const char* pMessage,
     void* pUserData);
 
-} // End namespace frame::vulkan.
+} // namespace frame::vulkan
