@@ -1,33 +1,32 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-- Core engine sources sit in src/frame, with public headers mirrored in include/frame for external consumption.
-- Runtime assets (models, textures, shaders) belong in sset/; keep generated or temporary files out of git.
-- Integration samples live in xamples/, while unit tests reside under 	ests/frame/<feature>/ to match the component under test.
-- Build products are written to uild/<preset>; clean this tree before commits to avoid shipping artifacts.
+- Engine sources live in src/frame, with mirrored public headers in include/frame.
+- Rendering backends sit under src/frame/<api> (for example src/frame/vulkan), while supporting tests mirror that layout beneath 	ests/frame/<feature>/.
+- Runtime assets (sset/) include JSON scenes, shaders, and textures; keep generated artefacts and build outputs out of version control.
+- Examples build from xamples/, with intermediate files landing in uild/<preset>; clean that tree before commits.
 
 ## Build, Test, and Development Commands
-- git submodule update --init --recursive: syncs all xternal/ dependencies after cloning or pulling.
-- cmake --preset linux-debug (or linux-release, windows): configures the build directory with the chosen toolchain and options.
-- cmake --build --preset linux-debug: incrementally compiles the project; append --target FrameTest to focus on a test binary.
-- ./build/linux-debug/examples/frame_viewer: launches the sample viewer once binaries have been produced.
+- git submodule update --init --recursive: fetches xternal/ dependencies after cloning or rebasing.
+- Configure with cmake --preset windows (MSVC), cmake --preset linux-debug, or the release variants; customise with --fresh when toolchains change.
+- Incremental builds use cmake --build --preset <preset>; add --target FrameVulkan or any other library/executable to focus compilation.
+- Run examples from uild/<preset>/bin/<Example>.exe (Windows) or the matching ELF under uild/<preset>/examples/ on Linux.
 
 ## Coding Style & Naming Conventions
-- Follow the repo .clang-format (Microsoft base, 4 spaces, 80-column limit, left-aligned pointers); run clang-format -i on touched files.
-- Respect .editorconfig: CRLF endings and trimmed trailing whitespace.
-- Use PascalCase for public classes, camelCase for functions and variables, and kName for constants; align filenames with namespaces using snake_case.
+- Apply the repository .clang-format (Microsoft style, 4-space indent, 80-column soft limit) to all C++ changes; stick with CRLF endings per .editorconfig.
+- Public types use PascalCase, functions and locals camelCase, constants kName, and filenames align with namespaces in snake_case.
 
 ## Testing Guidelines
-- GoogleTest powers the suite; place tests beside their feature in 	ests/frame/<feature>/ with ComponentTest fixture names.
-- Name cases with the Method_State_Expectation convention for clarity.
-- Execute ctest --test-dir build/linux-debug --output-on-failure after building to run the suite; adjust the preset directory as needed.
+- Primary targets: FrameTest, FrameOpenGLTest, FrameVulkanTest, plus JSON/file suites; build them with cmake --build --preset <preset> --target <TestTarget>.
+- Execute ctest --test-dir build/<preset> --output-on-failure -C Debug (or Release) before sending patches; this runs the full GoogleTest suite, including Vulkan fixtures under 	ests/frame/vulkan.
+- New tests should follow the fixture-per-component style used in OpenGL/Vulkan suites and live beside the feature they exercise.
 
 ## Commit & Pull Request Guidelines
-- Write imperative commit messages under 72 characters (e.g., Update material parser defaults) and group related changes.
-- PRs should explain intent, list exercised build/test presets, and link relevant issues.
-- Provide before/after renders for graphics-facing updates and flag subsystem reviewers when applicable.
+- Use imperative, <72 character commit messages (e.g. Enable Vulkan window test).
+- PR descriptions must state intent, list exercised presets/tests, and link issues; attach before/after renders for graphics changes when possible.
+- Call out modifications to xternal/ or build scripts, and confirm clean configure/build on the affected presets.
 
 ## Configuration & Assets
-- Avoid adding binaries larger than ~10 MB without coordinating with maintainers.
-- Call out any changes to VCPKG submodules or ports in xternal/, and confirm a clean cmake --preset <target> build.
-- Keep sset/ organized; do not commit generated shaders or other build outputs.
+- Coordinate before adding assets >10?MB.
+- Do not commit generated shaders, compiled binaries, or build directories; update .gitignore if new tools emit artefacts.
+- Maintain logical subfolders in sset/ (textures, materials, scenes) to keep example content manageable.
