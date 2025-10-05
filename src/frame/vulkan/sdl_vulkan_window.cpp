@@ -1,13 +1,23 @@
 #include "frame/vulkan/sdl_vulkan_window.h"
 
+// Needed under Windows to compute DPI.
+#if defined(_WIN32) || defined(_WIN64)
+#include <shellscalingapi.h>
+#include <shtypes.h>
+#pragma comment(lib, "Shcore.lib")
+#endif
+
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_vulkan.h>
 #include <vulkan/vulkan.hpp>
 
 #include <chrono>
 #include <format>
+#include <stdexcept>
 #include <string>
+#include <utility>
 #include <vector>
+#include <glm/glm.hpp>
 
 #include "frame/gui/draw_gui_interface.h"
 #include "frame/vulkan/debug_callback.h"
@@ -17,6 +27,66 @@ namespace frame::vulkan
 namespace
 {
 constexpr const char* kDefaultTitle = "Frame Vulkan";
+
+#if defined(_WIN32) || defined(_WIN64)
+std::vector<glm::vec2> g_monitor_ppi;
+
+BOOL MonitorEnumProc(HMONITOR hmonitor, HDC, LPRECT, LPARAM)
+{
+    std::uint32_t hppi = 0;
+    std::uint32_t vppi = 0;
+    if (GetDpiForMonitor(hmonitor, MDT_RAW_DPI, &hppi, &vppi) != S_OK)
+    {
+        throw std::runtime_error("Couldn't get the PPI.");
+    }
+
+    MONITORINFOEX monitor_info{};
+    monitor_info.cbSize = sizeof(monitor_info);
+    if (!GetMonitorInfo(hmonitor, &monitor_info))
+    {
+        throw std::runtime_error("Couldn't get monitor info.");
+    }
+    const int cx_logical =
+        monitor_info.rcMonitor.right - monitor_info.rcMonitor.left;
+    const int cy_logical =
+        monitor_info.rcMonitor.bottom - monitor_info.rcMonitor.top;
+
+    DEVMODE display_mode{};
+    display_mode.dmSize = sizeof(display_mode);
+    display_mode.dmDriverExtra = 0;
+    if (!EnumDisplaySettings(
+            monitor_info.szDevice, ENUM_CURRENT_SETTINGS, &display_mode))
+    {
+        throw std::runtime_error("Couldn't enumerate display settings.");
+    }
+    const int cx_physical = display_mode.dmPelsWidth;
+    const int cy_physical = display_mode.dmPelsHeight;
+
+    const float horz_scale =
+        static_cast<float>(cx_physical) / static_cast<float>(cx_logical);
+    const float vert_scale =
+        static_cast<float>(cy_physical) / static_cast<float>(cy_logical);
+    const float uniform_scale = (horz_scale + vert_scale) * 0.5f;
+
+    g_monitor_ppi.emplace_back(
+        static_cast<float>(hppi) * uniform_scale,
+        static_cast<float>(vppi) * uniform_scale);
+
+    return TRUE;
+}
+#endif
+}
+
+void SDLVulkanWindow::AddKeyCallback(
+    std::int32_t key,
+    std::function<bool()> func)
+{
+    key_callbacks_[key] = std::move(func);
+}
+
+void SDLVulkanWindow::RemoveKeyCallback(std::int32_t key)
+{
+    key_callbacks_.erase(key);
 }
 
 SDLVulkanWindow::SDLVulkanWindow(glm::uvec2 size) : size_(size)
@@ -119,6 +189,12 @@ SDLVulkanWindow::SDLVulkanWindow(glm::uvec2 size) : size_(size)
 
 SDLVulkanWindow::~SDLVulkanWindow()
 {
+    if (device_)
+    {
+        device_->Cleanup();
+        device_.reset();
+    }
+
     if (vk_unique_instance_ && vk_surface_)
     {
         SDL_Vulkan_DestroySurface(
@@ -206,12 +282,12 @@ WindowReturnEnum SDLVulkanWindow::Run(std::function<bool()> lambda)
             }
         }
 
-        std::string title = kDefaultTitle;
+        std::string title = "Frame - Vulkan";
         if (!open_file_name_.empty())
         {
             title += " - " + open_file_name_;
         }
-        title += " - " + std::to_string(static_cast<float>(GetFPS(dt)));
+        title += std::format(" - {:.2f}", GetFPS(dt));
         SetWindowTitle(title);
 
         if (!lambda())
@@ -296,6 +372,41 @@ frame::FullScreenEnum SDLVulkanWindow::GetFullScreenEnum() const
     return fullscreen_enum_;
 }
 
+glm::vec2 SDLVulkanWindow::GetPixelPerInch(std::uint32_t screen) const
+{
+#if defined(_WIN32) || defined(_WIN64)
+    g_monitor_ppi.clear();
+    if (!EnumDisplayMonitors(nullptr, nullptr, MonitorEnumProc, 0))
+    {
+        throw std::runtime_error("Couldn't enumerate monitors.");
+    }
+    if (screen >= g_monitor_ppi.size())
+    {
+        throw std::runtime_error("Outside screen.");
+    }
+    return g_monitor_ppi[screen];
+#else
+    int display_count = 0;
+    SDL_DisplayID* displays = SDL_GetDisplays(&display_count);
+    SDL_DisplayID target_display = SDL_GetPrimaryDisplay();
+    if (displays)
+    {
+        if (screen < static_cast<std::uint32_t>(display_count))
+        {
+            target_display = displays[screen];
+        }
+        SDL_free(displays);
+    }
+    const float scale = SDL_GetDisplayContentScale(target_display);
+    if (scale <= 0.0f)
+    {
+        throw std::runtime_error("Error couldn't get the DPI");
+    }
+    const float dpi = scale * 96.0f;
+    return glm::vec2(dpi, dpi);
+#endif
+}
+
 bool SDLVulkanWindow::RunEvent(const SDL_Event& event, const double dt)
 {
     if (event.type == SDL_EVENT_QUIT)
@@ -350,6 +461,12 @@ bool SDLVulkanWindow::RunEvent(const SDL_Event& event, const double dt)
                 device_->ScreenShot("ScreenShot.png");
             }
             return true;
+        default:
+            if (key_callbacks_.count(event.key.key))
+            {
+                return key_callbacks_.at(event.key.key)();
+            }
+            break;
         }
     }
 

@@ -6,6 +6,8 @@
 
 #include <SDL3/SDL.h>
 #include <vulkan/vulkan.hpp>
+#include <map>
+#include <functional>
 #include <string>
 #if defined(_WIN32) || defined(_WIN64)
 #define NOMINMAX
@@ -38,11 +40,11 @@ class SDLVulkanNone : public WindowInterface
     }
     void AddKeyCallback(std::int32_t key, std::function<bool()> func) override
     {
-        throw std::runtime_error("Not implemented yet!");
+        key_callbacks_[key] = func;
     }
     void RemoveKeyCallback(std::int32_t key) override
     {
-        throw std::runtime_error("Not implemented yet!");
+        key_callbacks_.erase(key);
     }
     void SetUniqueDevice(std::unique_ptr<DeviceInterface> device) override
     {
@@ -58,7 +60,7 @@ class SDLVulkanNone : public WindowInterface
     }
     glm::vec2 GetPixelPerInch(std::uint32_t screen = 0) const override
     {
-        throw std::runtime_error("Not implemented yet!");
+        return glm::vec2(96.0f, 96.0f);
     }
     glm::uvec2 GetDesktopSize() const override
     {
@@ -108,6 +110,7 @@ class SDLVulkanNone : public WindowInterface
     std::unique_ptr<DeviceInterface> device_ = nullptr;
     std::unique_ptr<InputInterface> input_interface_ = nullptr;
     SDL_Window* sdl_window_ = nullptr;
+    std::map<std::int32_t, std::function<bool()>> key_callbacks_;
     std::string open_file_name_ = "";
     frame::Logger& logger_ = frame::Logger::GetInstance();
     vk::UniqueInstance vk_unique_instance_;

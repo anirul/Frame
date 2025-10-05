@@ -23,6 +23,9 @@ target_link_libraries(FrameCommon
     FrameProto
     FrameOpenGL
     FrameVulkan
+    absl::flags
+    absl::flags_parse
+    absl::strings
     glm::glm
     protobuf::libprotobuf
 )

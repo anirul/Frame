@@ -4,10 +4,17 @@
 #define VULKAN_HPP_DISPATCH_LOADER_DYNAMIC 1
 #endif
 
+#include <array>
 #include <cstdint>
+#include <filesystem>
+#include <optional>
 #include <string>
 #include <vector>
 #include <vulkan/vulkan.hpp>
+#include <shaderc/shaderc.h>
+
+#include "frame/json/level_data.h"
+#include "frame/proto/level.pb.h"
 
 #include "frame/camera.h"
 #include "frame/device_interface.h"
@@ -38,11 +45,13 @@ class Device : public DeviceInterface
     void Clear(
         const glm::vec4& color = glm::vec4(.2f, 0.f, .2f, 1.0f)) const final;
     void Startup(std::unique_ptr<LevelInterface>&& level) final;
+    void StartupFromLevelData(const frame::json::LevelData& level_data);
     void AddPlugin(std::unique_ptr<PluginInterface>&& plugin_interface) final;
     std::vector<PluginInterface*> GetPluginPtrs() final;
     std::vector<std::string> GetPluginNames() const final;
     void RemovePluginByName(const std::string& name) final;
     void Cleanup() final;
+    void Shutdown();
     void Resize(glm::uvec2 size) final;
     glm::uvec2 GetSize() const final;
     void Display(double dt = 0.0) final;
@@ -81,6 +90,29 @@ class Device : public DeviceInterface
     }
 
   private:
+    void CreateCommandPool();
+    void CreateSyncObjects();
+    void CreateSwapchainResources();
+    void DestroySwapchainResources();
+    void RecreateSwapchain();
+    void CreateGraphicsPipeline();
+    void DestroyGraphicsPipeline();
+    std::vector<std::uint32_t> CompileShader(
+        const std::filesystem::path& path,
+        shaderc_shader_kind kind) const;
+    vk::UniqueShaderModule CreateShaderModule(
+        const std::vector<std::uint32_t>& code) const;
+    vk::SurfaceFormatKHR SelectSurfaceFormat(
+        const std::vector<vk::SurfaceFormatKHR>& formats) const;
+    vk::PresentModeKHR SelectPresentMode(
+        const std::vector<vk::PresentModeKHR>& modes) const;
+    vk::Extent2D SelectSwapExtent(
+        const vk::SurfaceCapabilitiesKHR& capabilities) const;
+    void RecordCommandBuffer(
+        vk::CommandBuffer command_buffer,
+        std::uint32_t image_index);
+
+  private:
     std::unique_ptr<LevelInterface> level_ = nullptr;
     std::vector<std::unique_ptr<PluginInterface>> plugin_interfaces_ = {};
     vk::Instance vk_instance_ = {};
@@ -88,7 +120,9 @@ class Device : public DeviceInterface
     float queue_family_priority_ = 1.0f;
     vk::UniqueDevice vk_unique_device_;
     std::uint32_t graphics_queue_family_index_ = 0;
+    std::uint32_t present_queue_family_index_ = 0;
     vk::Queue graphics_queue_;
+    vk::Queue present_queue_;
     vk::SurfaceKHR& vk_surface_;
     glm::uvec2 size_ = {0, 0};
     const proto::PixelElementSize pixel_element_size_ =
@@ -98,6 +132,26 @@ class Device : public DeviceInterface
     glm::vec3 focus_point_ = glm::vec3(0.0f);
     bool invert_left_right_ = false;
     const Logger& logger_ = Logger::GetInstance();
+
+    vk::Format swapchain_image_format_ = vk::Format::eUndefined;
+    vk::Extent2D swapchain_extent_{};
+    vk::UniqueSwapchainKHR swapchain_;
+    std::vector<vk::Image> swapchain_images_;
+    std::vector<vk::UniqueImageView> swapchain_image_views_;
+    vk::UniqueRenderPass render_pass_;
+    std::vector<vk::UniqueFramebuffer> framebuffers_;
+    vk::UniqueCommandPool command_pool_;
+    std::vector<vk::CommandBuffer> command_buffers_;
+    vk::UniquePipelineLayout pipeline_layout_;
+    vk::UniquePipeline graphics_pipeline_;
+    static constexpr std::size_t kMaxFramesInFlight = 2;
+    std::array<vk::UniqueSemaphore, kMaxFramesInFlight> image_available_semaphores_;
+    std::array<vk::UniqueSemaphore, kMaxFramesInFlight> render_finished_semaphores_;
+    std::array<vk::UniqueFence, kMaxFramesInFlight> in_flight_fences_;
+    std::size_t current_frame_ = 0;
+    bool framebuffer_resized_ = false;
+    bool sync_objects_created_ = false;
+    std::optional<frame::json::LevelData> current_level_data_;
 };
 
 } // namespace frame::vulkan

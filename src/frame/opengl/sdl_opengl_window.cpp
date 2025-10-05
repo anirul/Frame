@@ -179,12 +179,12 @@ WindowReturnEnum SDLOpenGLWindow::Run(std::function<bool()> lambda)
                 std::format("MakeCurrent failed: {}", SDL_GetError()));
         }
 
-        std::string title = "SDL OpenGL";
+        std::string title = "Frame - OpenGL";
         if (!open_file_name_.empty())
         {
             title += " - " + open_file_name_;
         }
-        title += " - " + std::to_string(static_cast<float>(GetFPS(dt)));
+        title += std::format(" - {:.2f}", GetFPS(dt));
         SetWindowTitle(title);
         previous_count = time.count();
         if (!lambda())

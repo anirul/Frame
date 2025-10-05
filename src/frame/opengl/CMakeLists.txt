@@ -11,6 +11,7 @@ add_library(FrameOpenGL
     frame_buffer.h
     light.cpp
     light.h
+    build_level.cpp
     material.cpp
     material.h
     static_mesh.cpp

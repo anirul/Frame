@@ -6,6 +6,8 @@
 
 #include <SDL3/SDL.h>
 #include <vulkan/vulkan.hpp>
+#include <map>
+#include <functional>
 #include <string>
 #if defined(_WIN32) || defined(_WIN64)
 #define NOMINMAX
@@ -32,14 +34,8 @@ class SDLVulkanWindow : public WindowInterface
     {
         input_interface_ = std::move(input_interface);
     }
-    void AddKeyCallback(std::int32_t key, std::function<bool()> func) override
-    {
-        throw std::runtime_error("Not implemented yet!");
-    }
-    void RemoveKeyCallback(std::int32_t key) override
-    {
-        throw std::runtime_error("Not implemented yet!");
-    }
+    void AddKeyCallback(std::int32_t key, std::function<bool()> func) override;
+    void RemoveKeyCallback(std::int32_t key) override;
     void SetUniqueDevice(std::unique_ptr<DeviceInterface> device) override
     {
         device_ = std::move(device);
@@ -52,10 +48,7 @@ class SDLVulkanWindow : public WindowInterface
     {
         return size_;
     }
-    glm::vec2 GetPixelPerInch(std::uint32_t screen = 0) const override
-    {
-        throw std::runtime_error("Not implemented yet!");
-    }
+    glm::vec2 GetPixelPerInch(std::uint32_t screen = 0) const override;
     glm::uvec2 GetDesktopSize() const override
     {
         return desktop_size_;
@@ -111,6 +104,7 @@ class SDLVulkanWindow : public WindowInterface
     std::unique_ptr<DeviceInterface> device_ = nullptr;
     std::unique_ptr<InputInterface> input_interface_ = nullptr;
     SDL_Window* sdl_window_ = nullptr;
+    std::map<std::int32_t, std::function<bool()>> key_callbacks_;
 #if defined(_WIN32) || defined(_WIN64)
     HWND hwnd_ = nullptr;
 #endif

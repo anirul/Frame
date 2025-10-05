@@ -1,6 +1,16 @@
 #include "frame/common/application.h"
 
+#include <stdexcept>
+
+#include "absl/flags/flag.h"
+#include "absl/flags/parse.h"
+#include "absl/strings/ascii.h"
+
 #include "frame/common/draw.h"
+#include "frame/logger.h"
+#include "frame/window_factory.h"
+
+ABSL_FLAG(std::string, device, "vulkan", "Rendering backend (vulkan|opengl).");
 
 namespace frame::common
 {
@@ -8,25 +18,40 @@ namespace frame::common
 Application::Application(std::unique_ptr<frame::WindowInterface> window)
     : window_(std::move(window))
 {
-    assert(window_);
+    if (!window_)
+    {
+        throw std::invalid_argument("Application requires a valid window.");
+    }
+}
+
+Application::Application(
+    int argc,
+    char** argv,
+    glm::uvec2 size,
+    DrawingTargetEnum drawing_target)
+{
+    absl::ParseCommandLine(argc, argv);
+    InitializeFromArgs(argc, argv, size, drawing_target);
 }
 
 frame::WindowInterface& Application::GetWindow()
 {
-    assert(window_);
+    if (!window_)
+    {
+        throw std::runtime_error("Application window not initialized.");
+    }
     return *window_;
 }
 
 void Application::Startup(std::filesystem::path path)
 {
-    assert(window_);
-    auto& device = window_->GetDevice();
-    window_->SetOpenFileName(path.filename().string());
+    auto& device = GetWindow().GetDevice();
+    GetWindow().SetOpenFileName(path.filename().string());
     if (!plugin_name_.empty())
     {
         device.RemovePluginByName(plugin_name_);
     }
-    auto plugin = std::make_unique<Draw>(window_->GetSize(), path, device);
+    auto plugin = std::make_unique<Draw>(GetWindow().GetSize(), path, device);
     plugin_name_ = "ApplicationDraw";
     plugin->SetName(plugin_name_);
     device.AddPlugin(std::move(plugin));
@@ -34,15 +59,14 @@ void Application::Startup(std::filesystem::path path)
 
 void Application::Startup(std::unique_ptr<frame::LevelInterface> level)
 {
-    assert(window_);
-    auto& device = window_->GetDevice();
-    window_->SetOpenFileName("");
+    auto& device = GetWindow().GetDevice();
+    GetWindow().SetOpenFileName("");
     if (!plugin_name_.empty())
     {
         device.RemovePluginByName(plugin_name_);
     }
     auto plugin =
-        std::make_unique<Draw>(window_->GetSize(), std::move(level), device);
+        std::make_unique<Draw>(GetWindow().GetSize(), std::move(level), device);
     plugin_name_ = "ApplicationDraw";
     plugin->SetName(plugin_name_);
     device.AddPlugin(std::move(plugin));
@@ -50,14 +74,75 @@ void Application::Startup(std::unique_ptr<frame::LevelInterface> level)
 
 void Application::Resize(glm::uvec2 size, FullScreenEnum fullscreen_enum)
 {
-    assert(window_);
-    window_->Resize(size, fullscreen_enum);
+    GetWindow().Resize(size, fullscreen_enum);
 }
 
 WindowReturnEnum Application::Run(std::function<bool()> lambda)
 {
-    assert(window_);
-    return window_->Run(lambda);
+    return GetWindow().Run(std::move(lambda));
 }
 
-} // End namespace frame::common.
+RenderingAPIEnum Application::ParseDeviceFlag(const std::string& value) const
+{
+    const std::string lowered = absl::AsciiStrToLower(value);
+    if (lowered == "opengl")
+    {
+        return RenderingAPIEnum::OPENGL;
+    }
+    if (lowered == "vulkan")
+    {
+        return RenderingAPIEnum::VULKAN;
+    }
+    frame::Logger::GetInstance()->warn(
+        "Unknown rendering device '{}', defaulting to Vulkan.",
+        value);
+    return RenderingAPIEnum::VULKAN;
+}
+
+std::unique_ptr<frame::WindowInterface> Application::CreateWindowOrThrow(
+    DrawingTargetEnum drawing_target,
+    RenderingAPIEnum api,
+    glm::uvec2 size) const
+{
+    auto window = frame::CreateNewWindow(drawing_target, api, size);
+    if (!window)
+    {
+        throw std::runtime_error("Failed to create rendering window.");
+    }
+    return window;
+}
+
+void Application::InitializeFromArgs(
+    int /*argc*/,
+    char** /*argv*/,
+    glm::uvec2 size,
+    DrawingTargetEnum drawing_target)
+{
+    const auto requested = ParseDeviceFlag(absl::GetFlag(FLAGS_device));
+
+    auto attempt = [&](RenderingAPIEnum api) {
+        return CreateWindowOrThrow(drawing_target, api, size);
+    };
+
+    if (requested == RenderingAPIEnum::VULKAN)
+    {
+        try
+        {
+            window_ = attempt(RenderingAPIEnum::VULKAN);
+            return;
+        }
+        catch (const std::exception& ex)
+        {
+            frame::Logger::GetInstance()->warn(
+                "Vulkan startup failed, falling back to OpenGL: {}",
+                ex.what());
+        }
+    }
+
+    window_ = attempt(
+        requested == RenderingAPIEnum::VULKAN
+            ? RenderingAPIEnum::OPENGL
+            : requested);
+}
+
+} // namespace frame::common

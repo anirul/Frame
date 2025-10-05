@@ -24,6 +24,7 @@
     "tinyobjloader",
     {
       "name": "vulkan"
-    }
+    },
+    "shaderc"
   ]
 }

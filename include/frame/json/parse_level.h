@@ -33,4 +33,7 @@ std::unique_ptr<LevelInterface> ParseLevel(
 std::unique_ptr<LevelInterface> ParseLevel(
     glm::uvec2 size, const proto::Level& proto);
 
+proto::Level LoadLevelProto(const std::string& content);
+proto::Level LoadLevelProto(const std::filesystem::path& path);
+
 } // End namespace frame::json.

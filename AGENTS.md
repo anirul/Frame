@@ -1,32 +1,40 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-- Engine sources live in src/frame, with mirrored public headers in include/frame.
-- Rendering backends sit under src/frame/<api> (for example src/frame/vulkan), while supporting tests mirror that layout beneath 	ests/frame/<feature>/.
-- Runtime assets (sset/) include JSON scenes, shaders, and textures; keep generated artefacts and build outputs out of version control.
-- Examples build from xamples/, with intermediate files landing in uild/<preset>; clean that tree before commits.
+- Core engine sources live under `src/frame/`, with public headers mirrored in `include/frame/`. Keep module pairs synchronized to avoid API drift.
+- Rendering backends are isolated per API (`src/frame/vulkan/`, `src/frame/opengl/`, etc.); add matching tests under `tests/frame/<feature>/` when extending a backend.
+- Shared runtime assets belong in `asset/`; never commit generated artifacts or build outputs.
+- Example apps compile from `examples/`; binaries should land in `build/<preset>/bin/`. Clean the `build/` tree before committing new work.
 
 ## Build, Test, and Development Commands
-- git submodule update --init --recursive: fetches xternal/ dependencies after cloning or rebasing.
-- Configure with cmake --preset windows (MSVC), cmake --preset linux-debug, or the release variants; customise with --fresh when toolchains change.
-- Incremental builds use cmake --build --preset <preset>; add --target FrameVulkan or any other library/executable to focus compilation.
-- Run examples from uild/<preset>/bin/<Example>.exe (Windows) or the matching ELF under uild/<preset>/examples/ on Linux.
+- `git submodule update --init --recursive` syncs dependencies in `external/`; run after clone, rebase, or submodule bumps.
+- `cmake --preset windows` (MSVC) or `cmake --preset linux-debug` configures the project; add `--fresh` when toolchains change.
+- `cmake --build --preset <preset> --target FrameVulkanTest` performs focused builds (omit `--target` for a full build).
+- Run examples via `build/<preset>/bin/<Example>.exe -device <vulkan|opengl>`; Vulkan is the default renderer.
 
 ## Coding Style & Naming Conventions
-- Apply the repository .clang-format (Microsoft style, 4-space indent, 80-column soft limit) to all C++ changes; stick with CRLF endings per .editorconfig.
-- Public types use PascalCase, functions and locals camelCase, constants kName, and filenames align with namespaces in snake_case.
+- Follow `.clang-format` (Microsoft style, 4-space indent, 80-column soft limit) and `.editorconfig` (CRLF, no trailing whitespace).
+- Classes use PascalCase, functions and locals camelCase, constants `kName`, filenames snake_case matching namespaces.
+- Prefer ASCII source; introduce comments sparingly and only when the code is non-obvious.
+- Keep headers in `include/frame/` aligned with their `src/` counterparts to preserve the public API.
 
 ## Testing Guidelines
-- Primary targets: FrameTest, FrameOpenGLTest, FrameVulkanTest, plus JSON/file suites; build them with cmake --build --preset <preset> --target <TestTarget>.
-- Execute ctest --test-dir build/<preset> --output-on-failure -C Debug (or Release) before sending patches; this runs the full GoogleTest suite, including Vulkan fixtures under 	ests/frame/vulkan.
-- New tests should follow the fixture-per-component style used in OpenGL/Vulkan suites and live beside the feature they exercise.
+- Primary GoogleTest suites: `FrameTest`, `FrameOpenGLTest`, `FrameVulkanTest`, plus JSON/file fixtures; co-locate new tests beside the feature under `tests/frame/`.
+- Build tests with `cmake --build --preset <preset> --target <TestTarget>`; use `ctest --test-dir build/<preset> --output-on-failure -C Debug` before submission.
+- Mirror Vulkan fixtures with OpenGL equivalents to maintain parity; seed data sits under `tests/frame/vulkan/`.
+- Name tests after the scenario under test and the expected result for quick triage.
 
 ## Commit & Pull Request Guidelines
-- Use imperative, <72 character commit messages (e.g. Enable Vulkan window test).
-- PR descriptions must state intent, list exercised presets/tests, and link issues; attach before/after renders for graphics changes when possible.
-- Call out modifications to xternal/ or build scripts, and confirm clean configure/build on the affected presets.
+- Write imperative commit subjects under 72 characters.
+- PR descriptions should state intent, list exercised presets/tests, link relevant issues, and include before/after imagery for graphics changes.
+- Call out updates to `external/` or build scripts explicitly and confirm a clean configure/build cycle in the PR body.
+- Exclude build outputs, compiled shaders, and other generated artifacts; update `.gitignore` when introducing new generators.
 
-## Configuration & Assets
-- Coordinate before adding assets >10?MB.
-- Do not commit generated shaders, compiled binaries, or build directories; update .gitignore if new tools emit artefacts.
-- Maintain logical subfolders in sset/ (textures, materials, scenes) to keep example content manageable.
+## Vulkan Port Progress
+
+- JSON parsing is renderer-neutral: `frame::json::BuildLevelData` captures proto + asset root plus texture/program/material descriptors and a generated quad mesh stub.
+- OpenGL builds its level via `frame::opengl::BuildLevel`, while Vulkan device stores the neutral data and calls `frame::vulkan::BuildLevel` (currently stubbed).
+- Swapchain/resize plumbing works; Vulkan tests pass.
+- Vulkan shaders (GLSL) live under `asset/shader/vulkan/`; `CMakeLists.txt` adds them for IDE visibility.
+- Vulkan device compiles GLSL at runtime (shaderc). cmake now requires `shaderc` (via vcpkg).
+- Next steps: implement GPU resource creation (vertex/index buffers, textures, descriptors, pipeline) in `Device::StartupFromLevelData` / `frame::vulkan::BuildLevel`, then draw the quad.

@@ -7,6 +7,7 @@ add_library(FrameFile
     file_system.cpp
     image.cpp
     image.h
+    image_stb.cpp
     image_cache.cpp
     image_cache.h
     obj_cache.cpp

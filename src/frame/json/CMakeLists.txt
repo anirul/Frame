@@ -1,9 +1,9 @@
 # Frame Proto.
-
 add_library(FrameJson
   STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/json/parse_json.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/json/parse_level.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/json/level_data.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/json/parse_pixel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/json/proto.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/json/serialize_json.h
@@ -19,6 +19,7 @@ add_library(FrameJson
     parse_texture.h
     parse_uniform.cpp
     parse_uniform.h
+    level_data.cpp
     parse_level.cpp
     serialize_material.cpp
     serialize_material.h
@@ -32,7 +33,6 @@ add_library(FrameJson
     serialize_uniform.cpp
     serialize_uniform.h
 )
-
 target_include_directories(FrameJson 
   PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/../../..
@@ -42,7 +42,6 @@ target_include_directories(FrameJson
     ${CMAKE_BINARY_DIR}/src
     ${CMAKE_BINARY_DIR}/src/frame/proto
 )
-
 target_link_libraries(FrameJson
   PRIVATE
     Frame
@@ -54,5 +53,4 @@ target_link_libraries(FrameJson
     protobuf::libprotobuf
     spdlog::spdlog
 )
-
 set_property(TARGET FrameJson PROPERTY FOLDER "Frame")

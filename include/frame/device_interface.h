@@ -21,6 +21,7 @@ namespace frame
 class DeviceInterface
 {
   public:
+    virtual ~DeviceInterface() = default;
     /**
      * @brief Clear the Screen.
      * @param color: A vec4 containing the color you want to clear to.

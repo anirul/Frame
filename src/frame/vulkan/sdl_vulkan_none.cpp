@@ -96,6 +96,12 @@ SDLVulkanNone::SDLVulkanNone(glm::uvec2 size) : size_(size)
 
 SDLVulkanNone::~SDLVulkanNone()
 {
+    if (device_)
+    {
+        device_->Cleanup();
+        device_.reset();
+    }
+
     if (vk_unique_instance_ && vk_surface_)
     {
         SDL_Vulkan_DestroySurface(
