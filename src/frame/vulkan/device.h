@@ -152,6 +152,7 @@ class Device : public DeviceInterface
     bool framebuffer_resized_ = false;
     bool sync_objects_created_ = false;
     std::optional<frame::json::LevelData> current_level_data_;
+    float elapsed_time_seconds_ = 0.0f;
 };
 
 } // namespace frame::vulkan

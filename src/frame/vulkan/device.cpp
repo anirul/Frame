@@ -191,6 +191,7 @@ void Device::Startup(std::unique_ptr<LevelInterface>&& level)
 void Device::StartupFromLevelData(const frame::json::LevelData& level_data)
 {
     current_level_data_ = level_data;
+    elapsed_time_seconds_ = 0.0f;
 
     auto built = BuildLevel(*this, level_data);
     level_ = std::move(built.level);
@@ -284,6 +285,7 @@ void Device::Cleanup()
     }
     plugin_interfaces_.clear();
     level_.reset();
+    elapsed_time_seconds_ = 0.0f;
 }
 
 void Device::Resize(glm::uvec2 size)
@@ -304,8 +306,10 @@ glm::uvec2 Device::GetSize() const
     return size_;
 }
 
-void Device::Display(double /*dt*/)
+void Device::Display(double dt)
 {
+    elapsed_time_seconds_ = static_cast<float>(dt);
+
     if (!vk_unique_device_ || !swapchain_)
     {
         return;
@@ -723,6 +727,12 @@ void Device::RecordCommandBuffer(
         vk::Rect2D scissor({0, 0}, swapchain_extent_);
         command_buffer.setScissor(0, 1, &scissor);
 
+        command_buffer.pushConstants<float>(
+            *pipeline_layout_,
+            vk::ShaderStageFlagBits::eFragment,
+            0,
+            elapsed_time_seconds_);
+
         command_buffer.draw(6, 1, 0, 0);
     }
 
@@ -827,12 +837,17 @@ void Device::CreateGraphicsPipeline()
         static_cast<std::uint32_t>(dynamic_states.size()),
         dynamic_states.data());
 
+    vk::PushConstantRange push_constant_range(
+        vk::ShaderStageFlagBits::eFragment,
+        0,
+        static_cast<std::uint32_t>(sizeof(float)));
+
     vk::PipelineLayoutCreateInfo pipeline_layout_info(
         vk::PipelineLayoutCreateFlags{},
         0,
         nullptr,
-        0,
-        nullptr);
+        1,
+        &push_constant_range);
     pipeline_layout_ = vk_unique_device_->createPipelineLayoutUnique(pipeline_layout_info);
 
     vk::GraphicsPipelineCreateInfo pipeline_info(
