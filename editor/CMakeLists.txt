@@ -36,13 +36,11 @@ target_include_directories(FrameEditor
 
 target_link_libraries(FrameEditor
   PUBLIC
-    Frame
+    ${FRAME_LINK_GROUP_BEGIN}
+    ${FRAME_CORE_LIBS}
+    ${FRAME_VULKAN_LIBS}
+    ${FRAME_LINK_GROUP_END}
     FrameCommon
-    FrameGui
-    FrameOpenGL
-    FrameOpenGLGui
-    FrameOpenGLFile
-    FrameProto
     ImNodeFlow
     imgui::imgui
     ImGuiColorTextEdit

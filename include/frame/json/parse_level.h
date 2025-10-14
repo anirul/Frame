@@ -3,6 +3,7 @@
 #include <filesystem>
 
 #include "frame/device_interface.h"
+#include "frame/json/level_data.h"
 #include "frame/json/proto.h"
 #include "frame/level_interface.h"
 
@@ -35,5 +36,18 @@ std::unique_ptr<LevelInterface> ParseLevel(
 
 proto::Level LoadLevelProto(const std::string& content);
 proto::Level LoadLevelProto(const std::filesystem::path& path);
+
+LevelData ParseLevelData(
+    glm::uvec2 size,
+    const proto::Level& proto,
+    const std::filesystem::path& asset_root);
+LevelData ParseLevelData(
+    glm::uvec2 size,
+    const std::string& content,
+    const std::filesystem::path& asset_root);
+LevelData ParseLevelData(
+    glm::uvec2 size,
+    const std::filesystem::path& path,
+    const std::filesystem::path& asset_root);
 
 } // End namespace frame::json.

@@ -26,11 +26,9 @@ target_link_libraries(FrameTest
   PUBLIC
     GTest::gmock
     GTest::gtest
-    Frame
-    FrameOpenGL
-    FrameOpenGLFile
-    FrameJson
-    FrameVulkan
+    ${FRAME_LINK_GROUP_BEGIN}
+    ${FRAME_CORE_LIBS}
+    ${FRAME_LINK_GROUP_END}
 )
 
 # In order to remove the tests from the bin folder.

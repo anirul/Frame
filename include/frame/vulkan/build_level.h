@@ -5,7 +5,7 @@
 #include <glm/glm.hpp>
 
 #include "frame/json/level_data.h"
-#include "frame/vulkan/device.h"
+#include "frame/level_interface.h"
 
 namespace frame::vulkan
 {
@@ -17,7 +17,7 @@ struct BuiltLevel
 };
 
 BuiltLevel BuildLevel(
-    Device& device,
+    glm::uvec2 size,
     const frame::json::LevelData& level_data);
 
 }

@@ -24,10 +24,9 @@ void Draw::Startup(glm::uvec2 size)
         }
         else if (backend == frame::RenderingAPIEnum::VULKAN)
         {
-            const auto level_proto = frame::json::LoadLevelProto(path_);
             const auto asset_root = frame::file::FindDirectory("asset");
-            const auto level_data =
-                frame::json::BuildLevelData(size_, level_proto, asset_root);
+            const auto level_data = frame::json::ParseLevelData(
+                size_, path_, asset_root);
             auto* vulkan_device = dynamic_cast<frame::vulkan::Device*>(&device_);
             if (!vulkan_device)
             {

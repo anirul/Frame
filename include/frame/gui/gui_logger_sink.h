@@ -1,5 +1,7 @@
 #pragma once
 
+#include <ctime>
+#include <format>
 #include <mutex>
 #include <spdlog/sinks/base_sink.h>
 #include <string>
@@ -34,15 +36,35 @@ class GuiLoggerSink : public spdlog::sinks::base_sink<std::mutex>
         spdlog::memory_buf_t formatted;
         spdlog::sinks::base_sink<std::mutex>::formatter_->format(
             msg, formatted);
-        const auto time = std::chrono::current_zone()->to_local(
-            std::chrono::system_clock::now());
-        const auto current_milli{
-            duration_cast<std::chrono::milliseconds>(time.time_since_epoch())
-                .count() %
-            1000};
-        const auto time_p = std::format("{:%X}.{:03} ", time, current_milli);
-        std::string formatted_message(msg.payload.begin(), msg.payload.end());
-        logs.push_back({msg.level, std::move(time_p + formatted_message)});
+        const auto now = std::chrono::system_clock::now();
+        const auto millis = duration_cast<std::chrono::milliseconds>(
+                                now.time_since_epoch()) % 1000;
+        std::time_t timer = std::chrono::system_clock::to_time_t(now);
+#ifdef _WIN32
+        std::tm local_tm{};
+        localtime_s(&local_tm, &timer);
+#else
+        std::tm local_tm{};
+        localtime_r(&timer, &local_tm);
+#endif
+        char time_buffer[32] = {0};
+        if (std::strftime(time_buffer, sizeof(time_buffer), "%T", &local_tm) !=
+            0)
+        {
+            std::string formatted_message(
+                msg.payload.begin(), msg.payload.end());
+            logs.push_back({
+                msg.level,
+                std::format(
+                    "{}.{:03} {}", time_buffer, millis.count(),
+                    formatted_message)});
+        }
+        else
+        {
+            std::string formatted_message(
+                msg.payload.begin(), msg.payload.end());
+            logs.push_back({msg.level, std::move(formatted_message)});
+        }
     }
     void flush_() override
     {

@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cstring>
 #include <format>
 #include <limits>
 #include <optional>
@@ -193,12 +194,27 @@ void Device::StartupFromLevelData(const frame::json::LevelData& level_data)
     current_level_data_ = level_data;
     elapsed_time_seconds_ = 0.0f;
 
-    auto built = BuildLevel(*this, level_data);
+    auto built = BuildLevel(GetSize(), level_data);
     level_ = std::move(built.level);
 
     if (!command_pool_)
     {
         CreateCommandPool();
+    }
+
+    DestroyDescriptorResources();
+    DestroyTextureResources();
+
+    try
+    {
+        CreateTextureResources(level_data);
+        CreateDescriptorResources();
+    }
+    catch (const std::exception& ex)
+    {
+        logger_->error("Failed to prepare Vulkan GPU resources: {}", ex.what());
+        DestroyDescriptorResources();
+        DestroyTextureResources();
     }
 
     DestroySwapchainResources();
@@ -727,11 +743,15 @@ void Device::RecordCommandBuffer(
         vk::Rect2D scissor({0, 0}, swapchain_extent_);
         command_buffer.setScissor(0, 1, &scissor);
 
-        command_buffer.pushConstants<float>(
-            *pipeline_layout_,
-            vk::ShaderStageFlagBits::eFragment,
-            0,
-            elapsed_time_seconds_);
+        if (descriptor_set_layout_ && descriptor_set_)
+        {
+            command_buffer.bindDescriptorSets(
+                vk::PipelineBindPoint::eGraphics,
+                *pipeline_layout_,
+                0,
+                descriptor_set_,
+                {});
+        }
 
         command_buffer.draw(6, 1, 0, 0);
     }
@@ -742,38 +762,55 @@ void Device::RecordCommandBuffer(
 
 void Device::CreateGraphicsPipeline()
 {
-    if (!vk_unique_device_ || !render_pass_ || !current_level_data_)
+    if (!vk_unique_device_ || !render_pass_)
     {
         return;
     }
 
     DestroyGraphicsPipeline();
 
-    const auto asset_root = current_level_data_->asset_root;
-    if (current_level_data_->programs.empty())
+    if (textures_.empty())
     {
-        throw std::runtime_error("Level data does not contain any program descriptions.");
+        return;
     }
-    const auto& program = current_level_data_->programs.front();
 
-    auto resolve_shader_path = [&](const std::string& shader_name) {
-        std::filesystem::path path(shader_name);
-        if (path.is_absolute())
-        {
-            return path;
+    static constexpr const char* kDefaultVertexShader = R"glsl(
+        #version 450
+        layout(location = 0) out vec2 v_uv;
+        vec2 positions[3] = vec2[](
+            vec2(-1.0, -1.0),
+            vec2(3.0, -1.0),
+            vec2(-1.0, 3.0)
+        );
+        vec2 uvs[3] = vec2[](
+            vec2(0.0, 0.0),
+            vec2(2.0, 0.0),
+            vec2(0.0, 2.0)
+        );
+        void main() {
+            gl_Position = vec4(positions[gl_VertexIndex], 0.0, 1.0);
+            v_uv = uvs[gl_VertexIndex];
         }
-        if (path.has_parent_path())
-        {
-            return (asset_root / path).lexically_normal();
+    )glsl";
+
+    static constexpr const char* kDefaultFragmentShader = R"glsl(
+        #version 450
+        layout(location = 0) in vec2 v_uv;
+        layout(location = 0) out vec4 out_color;
+        layout(binding = 0) uniform sampler2D u_texture;
+        void main() {
+            out_color = texture(u_texture, v_uv);
         }
-        return (asset_root / "shader/vulkan" / path).lexically_normal();
-    };
+    )glsl";
 
-    const auto vert_path = resolve_shader_path(program.vertex_shader);
-    const auto frag_path = resolve_shader_path(program.fragment_shader);
-
-    auto vert_code = CompileShader(vert_path, shaderc_vertex_shader);
-    auto frag_code = CompileShader(frag_path, shaderc_fragment_shader);
+    auto vert_code = CompileShaderSource(
+        kDefaultVertexShader,
+        shaderc_vertex_shader,
+        "frame_vulkan_default_vertex");
+    auto frag_code = CompileShaderSource(
+        kDefaultFragmentShader,
+        shaderc_fragment_shader,
+        "frame_vulkan_default_fragment");
 
     auto vert_module = CreateShaderModule(vert_code);
     auto frag_module = CreateShaderModule(frag_code);
@@ -837,17 +874,16 @@ void Device::CreateGraphicsPipeline()
         static_cast<std::uint32_t>(dynamic_states.size()),
         dynamic_states.data());
 
-    vk::PushConstantRange push_constant_range(
-        vk::ShaderStageFlagBits::eFragment,
-        0,
-        static_cast<std::uint32_t>(sizeof(float)));
+    std::vector<vk::DescriptorSetLayout> set_layouts;
+    if (descriptor_set_layout_)
+    {
+        set_layouts.push_back(*descriptor_set_layout_);
+    }
 
     vk::PipelineLayoutCreateInfo pipeline_layout_info(
         vk::PipelineLayoutCreateFlags{},
-        0,
-        nullptr,
-        1,
-        &push_constant_range);
+        static_cast<std::uint32_t>(set_layouts.size()),
+        set_layouts.data());
     pipeline_layout_ = vk_unique_device_->createPipelineLayoutUnique(pipeline_layout_info);
 
     vk::GraphicsPipelineCreateInfo pipeline_info(
@@ -914,6 +950,27 @@ std::vector<std::uint32_t> Device::CompileShader(
     return {result.cbegin(), result.cend()};
 }
 
+std::vector<std::uint32_t> Device::CompileShaderSource(
+    const std::string& source,
+    shaderc_shader_kind kind,
+    const std::string& identifier) const
+{
+    shaderc::Compiler compiler;
+    shaderc::CompileOptions options;
+    options.SetOptimizationLevel(shaderc_optimization_level_performance);
+    auto result = compiler.CompileGlslToSpv(
+        source,
+        kind,
+        identifier.c_str(),
+        "main",
+        options);
+    if (result.GetCompilationStatus() != shaderc_compilation_status_success)
+    {
+        throw std::runtime_error(result.GetErrorMessage());
+    }
+    return {result.cbegin(), result.cend()};
+}
+
 vk::UniqueShaderModule Device::CreateShaderModule(
     const std::vector<std::uint32_t>& code) const
 {
@@ -922,6 +979,446 @@ vk::UniqueShaderModule Device::CreateShaderModule(
         code.size() * sizeof(std::uint32_t),
         code.data());
     return vk_unique_device_->createShaderModuleUnique(create_info);
+}
+
+std::uint32_t Device::FindMemoryType(
+    std::uint32_t type_filter,
+    vk::MemoryPropertyFlags properties) const
+{
+    auto mem_properties = vk_physical_device_.getMemoryProperties();
+    for (std::uint32_t i = 0; i < mem_properties.memoryTypeCount; ++i)
+    {
+        if ((type_filter & (1u << i)) &&
+            (mem_properties.memoryTypes[i].propertyFlags & properties) == properties)
+        {
+            return i;
+        }
+    }
+    throw std::runtime_error("Unable to find suitable Vulkan memory type.");
+}
+
+vk::UniqueBuffer Device::CreateBuffer(
+    vk::DeviceSize size,
+    vk::BufferUsageFlags usage,
+    vk::MemoryPropertyFlags properties,
+    vk::UniqueDeviceMemory& out_memory) const
+{
+    vk::BufferCreateInfo buffer_info(
+        vk::BufferCreateFlags{},
+        size,
+        usage,
+        vk::SharingMode::eExclusive);
+    auto buffer = vk_unique_device_->createBufferUnique(buffer_info);
+    auto requirements = vk_unique_device_->getBufferMemoryRequirements(*buffer);
+    vk::MemoryAllocateInfo allocate_info(
+        requirements.size,
+        FindMemoryType(requirements.memoryTypeBits, properties));
+    out_memory = vk_unique_device_->allocateMemoryUnique(allocate_info);
+    vk_unique_device_->bindBufferMemory(*buffer, *out_memory, 0);
+    return buffer;
+}
+
+void Device::CopyBuffer(vk::Buffer src, vk::Buffer dst, vk::DeviceSize size)
+{
+    vk::CommandBufferAllocateInfo alloc_info(
+        *command_pool_,
+        vk::CommandBufferLevel::ePrimary,
+        1);
+    auto command_buffers = vk_unique_device_->allocateCommandBuffers(alloc_info);
+    auto command_buffer = command_buffers.front();
+    vk::CommandBufferBeginInfo begin_info(
+        vk::CommandBufferUsageFlagBits::eOneTimeSubmit);
+    command_buffer.begin(begin_info);
+    vk::BufferCopy copy_region(0, 0, size);
+    command_buffer.copyBuffer(src, dst, copy_region);
+    command_buffer.end();
+    vk::SubmitInfo submit_info(
+        0, nullptr, nullptr,
+        1, &command_buffer,
+        0, nullptr);
+    graphics_queue_.submit(submit_info);
+    graphics_queue_.waitIdle();
+    vk_unique_device_->freeCommandBuffers(*command_pool_, command_buffer);
+}
+
+void Device::TransitionImageLayout(
+    vk::Image image,
+    vk::Format,
+    vk::ImageLayout old_layout,
+    vk::ImageLayout new_layout)
+{
+    vk::CommandBufferAllocateInfo alloc_info(
+        *command_pool_,
+        vk::CommandBufferLevel::ePrimary,
+        1);
+    auto command_buffers = vk_unique_device_->allocateCommandBuffers(alloc_info);
+    auto command_buffer = command_buffers.front();
+    vk::CommandBufferBeginInfo begin_info(
+        vk::CommandBufferUsageFlagBits::eOneTimeSubmit);
+    command_buffer.begin(begin_info);
+
+    vk::ImageMemoryBarrier barrier(
+        {},
+        {},
+        old_layout,
+        new_layout,
+        VK_QUEUE_FAMILY_IGNORED,
+        VK_QUEUE_FAMILY_IGNORED,
+        image,
+        {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1});
+
+    vk::PipelineStageFlags src_stage;
+    vk::PipelineStageFlags dst_stage;
+
+    if (old_layout == vk::ImageLayout::eUndefined &&
+        new_layout == vk::ImageLayout::eTransferDstOptimal)
+    {
+        barrier.srcAccessMask = {};
+        barrier.dstAccessMask = vk::AccessFlagBits::eTransferWrite;
+        src_stage = vk::PipelineStageFlagBits::eTopOfPipe;
+        dst_stage = vk::PipelineStageFlagBits::eTransfer;
+    }
+    else if (old_layout == vk::ImageLayout::eTransferDstOptimal &&
+             new_layout == vk::ImageLayout::eShaderReadOnlyOptimal)
+    {
+        barrier.srcAccessMask = vk::AccessFlagBits::eTransferWrite;
+        barrier.dstAccessMask = vk::AccessFlagBits::eShaderRead;
+        src_stage = vk::PipelineStageFlagBits::eTransfer;
+        dst_stage = vk::PipelineStageFlagBits::eFragmentShader;
+    }
+    else
+    {
+        throw std::runtime_error("Unsupported Vulkan image layout transition.");
+    }
+
+    command_buffer.pipelineBarrier(
+        src_stage,
+        dst_stage,
+        {},
+        nullptr,
+        nullptr,
+        barrier);
+    command_buffer.end();
+
+    vk::SubmitInfo submit_info(
+        0, nullptr, nullptr,
+        1, &command_buffer,
+        0, nullptr);
+    graphics_queue_.submit(submit_info);
+    graphics_queue_.waitIdle();
+    vk_unique_device_->freeCommandBuffers(*command_pool_, command_buffer);
+}
+
+void Device::CopyBufferToImage(
+    vk::Buffer buffer,
+    vk::Image image,
+    std::uint32_t width,
+    std::uint32_t height)
+{
+    vk::CommandBufferAllocateInfo alloc_info(
+        *command_pool_,
+        vk::CommandBufferLevel::ePrimary,
+        1);
+    auto command_buffers = vk_unique_device_->allocateCommandBuffers(alloc_info);
+    auto command_buffer = command_buffers.front();
+    vk::CommandBufferBeginInfo begin_info(
+        vk::CommandBufferUsageFlagBits::eOneTimeSubmit);
+    command_buffer.begin(begin_info);
+
+    vk::BufferImageCopy copy_region(
+        0,
+        0,
+        0,
+        {vk::ImageAspectFlagBits::eColor, 0, 0, 1},
+        {0, 0, 0},
+        {width, height, 1});
+
+    command_buffer.copyBufferToImage(
+        buffer,
+        image,
+        vk::ImageLayout::eTransferDstOptimal,
+        copy_region);
+
+    command_buffer.end();
+
+    vk::SubmitInfo submit_info(
+        0, nullptr, nullptr,
+        1, &command_buffer,
+        0, nullptr);
+    graphics_queue_.submit(submit_info);
+    graphics_queue_.waitIdle();
+    vk_unique_device_->freeCommandBuffers(*command_pool_, command_buffer);
+}
+
+void Device::DestroyTextureResources()
+{
+    textures_.clear();
+}
+
+void Device::DestroyDescriptorResources()
+{
+    descriptor_set_ = VK_NULL_HANDLE;
+    descriptor_pool_.reset();
+    descriptor_set_layout_.reset();
+}
+
+Device::TextureResource Device::CreateTextureFromCpu(
+    const frame::TextureInterface& texture_interface)
+{
+    auto& mutable_texture =
+        const_cast<frame::TextureInterface&>(texture_interface);
+    const auto size = mutable_texture.GetSize();
+    if (size.x == 0 || size.y == 0)
+    {
+        throw std::runtime_error("Texture has invalid size.");
+    }
+
+    const auto& proto = texture_interface.GetData();
+    if (proto.pixel_element_size().value() != frame::proto::PixelElementSize::BYTE)
+    {
+        throw std::runtime_error("Only 8-bit textures are currently supported.");
+    }
+
+    std::vector<std::uint8_t> src_data = mutable_texture.GetTextureByte();
+    if (src_data.empty())
+    {
+        throw std::runtime_error("Texture contains no pixel data.");
+    }
+
+    std::vector<std::uint8_t> rgba_data;
+    const auto structure = proto.pixel_structure().value();
+    std::uint32_t component_count = 0;
+    switch (structure)
+    {
+    case frame::proto::PixelStructure::GREY:
+        component_count = 1;
+        break;
+    case frame::proto::PixelStructure::GREY_ALPHA:
+        component_count = 2;
+        break;
+    case frame::proto::PixelStructure::RGB:
+        component_count = 3;
+        break;
+    case frame::proto::PixelStructure::RGB_ALPHA:
+        component_count = 4;
+        break;
+    case frame::proto::PixelStructure::BGR:
+        component_count = 3;
+        break;
+    case frame::proto::PixelStructure::BGR_ALPHA:
+        component_count = 4;
+        break;
+    default:
+        throw std::runtime_error("Unsupported pixel structure for Vulkan texture.");
+    }
+
+    const std::size_t pixel_count = src_data.size() / component_count;
+    rgba_data.reserve(pixel_count * 4);
+    for (std::size_t i = 0; i < pixel_count; ++i)
+    {
+        std::uint8_t r = 0;
+        std::uint8_t g = 0;
+        std::uint8_t b = 0;
+        std::uint8_t a = 255;
+        switch (component_count)
+        {
+        case 1: {
+            const std::uint8_t v = src_data[i];
+            r = g = b = v;
+            break;
+        }
+        case 2: {
+            const std::uint8_t v = src_data[i * 2 + 0];
+            r = g = b = v;
+            a = src_data[i * 2 + 1];
+            break;
+        }
+        case 3: {
+            r = src_data[i * 3 + 0];
+            g = src_data[i * 3 + 1];
+            b = src_data[i * 3 + 2];
+            break;
+        }
+        case 4: {
+            r = src_data[i * 4 + 0];
+            g = src_data[i * 4 + 1];
+            b = src_data[i * 4 + 2];
+            a = src_data[i * 4 + 3];
+            break;
+        }
+        }
+        if (structure == frame::proto::PixelStructure::BGR ||
+            structure == frame::proto::PixelStructure::BGR_ALPHA)
+        {
+            std::swap(r, b);
+        }
+        rgba_data.push_back(r);
+        rgba_data.push_back(g);
+        rgba_data.push_back(b);
+        rgba_data.push_back(a);
+    }
+
+    vk::UniqueDeviceMemory staging_memory;
+    auto staging_buffer = CreateBuffer(
+        rgba_data.size(),
+        vk::BufferUsageFlagBits::eTransferSrc,
+        vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent,
+        staging_memory);
+    void* mapped_data =
+        vk_unique_device_->mapMemory(*staging_memory, 0, rgba_data.size());
+    std::memcpy(mapped_data, rgba_data.data(), rgba_data.size());
+    vk_unique_device_->unmapMemory(*staging_memory);
+
+    vk::ImageCreateInfo image_info(
+        vk::ImageCreateFlags{},
+        vk::ImageType::e2D,
+        vk::Format::eR8G8B8A8Srgb,
+        vk::Extent3D(size.x, size.y, 1),
+        1,
+        1,
+        vk::SampleCountFlagBits::e1,
+        vk::ImageTiling::eOptimal,
+        vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eSampled);
+
+    auto image = vk_unique_device_->createImageUnique(image_info);
+    auto requirements = vk_unique_device_->getImageMemoryRequirements(*image);
+    vk::MemoryAllocateInfo allocate_info(
+        requirements.size,
+        FindMemoryType(requirements.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal));
+    auto image_memory = vk_unique_device_->allocateMemoryUnique(allocate_info);
+    vk_unique_device_->bindImageMemory(*image, *image_memory, 0);
+
+    TransitionImageLayout(
+        *image,
+        vk::Format::eR8G8B8A8Srgb,
+        vk::ImageLayout::eUndefined,
+        vk::ImageLayout::eTransferDstOptimal);
+    CopyBufferToImage(
+        *staging_buffer,
+        *image,
+        size.x,
+        size.y);
+    TransitionImageLayout(
+        *image,
+        vk::Format::eR8G8B8A8Srgb,
+        vk::ImageLayout::eTransferDstOptimal,
+        vk::ImageLayout::eShaderReadOnlyOptimal);
+
+    vk::ImageViewCreateInfo view_info(
+        vk::ImageViewCreateFlags{},
+        *image,
+        vk::ImageViewType::e2D,
+        vk::Format::eR8G8B8A8Srgb,
+        {},
+        {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1});
+    auto view = vk_unique_device_->createImageViewUnique(view_info);
+
+    vk::SamplerCreateInfo sampler_info(
+        vk::SamplerCreateFlags{},
+        vk::Filter::eLinear,
+        vk::Filter::eLinear,
+        vk::SamplerMipmapMode::eLinear,
+        vk::SamplerAddressMode::eRepeat,
+        vk::SamplerAddressMode::eRepeat,
+        vk::SamplerAddressMode::eRepeat,
+        0.0f,
+        VK_FALSE,
+        1.0f,
+        VK_FALSE,
+        vk::CompareOp::eAlways,
+        0.0f,
+        0.0f,
+        vk::BorderColor::eIntOpaqueBlack,
+        VK_FALSE);
+    auto sampler = vk_unique_device_->createSamplerUnique(sampler_info);
+
+    TextureResource resource;
+    resource.image = std::move(image);
+    resource.memory = std::move(image_memory);
+    resource.view = std::move(view);
+    resource.sampler = std::move(sampler);
+    resource.size = size;
+    return resource;
+}
+
+void Device::CreateTextureResources(
+    const frame::json::LevelData& level_data)
+{
+    if (!level_)
+    {
+        return;
+    }
+
+    for (const auto& proto_texture : level_data.proto.textures())
+    {
+        auto texture_id = level_->GetIdFromName(proto_texture.name());
+        if (!texture_id)
+        {
+            continue;
+        }
+        auto& texture_interface = level_->GetTextureFromId(texture_id);
+        try
+        {
+            textures_.push_back(CreateTextureFromCpu(texture_interface));
+        }
+        catch (const std::exception& ex)
+        {
+            logger_->warn(
+                "Skipping texture {}: {}",
+                proto_texture.name(),
+                ex.what());
+        }
+    }
+}
+
+void Device::CreateDescriptorResources()
+{
+    if (textures_.empty())
+    {
+        return;
+    }
+
+    vk::DescriptorSetLayoutBinding binding(
+        0,
+        vk::DescriptorType::eCombinedImageSampler,
+        1,
+        vk::ShaderStageFlagBits::eFragment);
+    vk::DescriptorSetLayoutCreateInfo layout_info(
+        vk::DescriptorSetLayoutCreateFlags{},
+        1,
+        &binding);
+    descriptor_set_layout_ =
+        vk_unique_device_->createDescriptorSetLayoutUnique(layout_info);
+
+    vk::DescriptorPoolSize pool_size(
+        vk::DescriptorType::eCombinedImageSampler,
+        1);
+    vk::DescriptorPoolCreateInfo pool_info(
+        vk::DescriptorPoolCreateFlags{},
+        1,
+        1,
+        &pool_size);
+    descriptor_pool_ = vk_unique_device_->createDescriptorPoolUnique(pool_info);
+
+    vk::DescriptorSetAllocateInfo alloc_info(
+        *descriptor_pool_,
+        1,
+        &descriptor_set_layout_.get());
+    descriptor_set_ =
+        vk_unique_device_->allocateDescriptorSets(alloc_info).front();
+
+    vk::DescriptorImageInfo image_info(
+        *textures_.front().sampler,
+        *textures_.front().view,
+        vk::ImageLayout::eShaderReadOnlyOptimal);
+    vk::WriteDescriptorSet descriptor_write(
+        descriptor_set_,
+        0,
+        0,
+        1,
+        vk::DescriptorType::eCombinedImageSampler,
+        &image_info);
+    vk_unique_device_->updateDescriptorSets(descriptor_write, nullptr);
 }
 
 } // namespace frame::vulkan

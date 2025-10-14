@@ -22,4 +22,14 @@ std::unique_ptr<WindowInterface> CreateNewWindow(
     RenderingAPIEnum rendering_api_enum = RenderingAPIEnum::OPENGL,
     glm::uvec2 size = {1280, 720});
 
+struct VulkanWindowFactory
+{
+    using FactoryFn = std::unique_ptr<WindowInterface> (*)(glm::uvec2);
+    FactoryFn create_window = nullptr;
+    FactoryFn create_none = nullptr;
+};
+
+void RegisterVulkanWindowFactory(VulkanWindowFactory factory);
+bool HasVulkanWindowFactory();
+
 } // End namespace frame.

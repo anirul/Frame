@@ -16,7 +16,10 @@ target_link_libraries(FrameVulkanTest
   PUBLIC
     GTest::gmock
     GTest::gtest
-    FrameVulkan
+    ${FRAME_LINK_GROUP_BEGIN}
+    ${FRAME_CORE_LIBS}
+    FrameVulkanData
+    ${FRAME_LINK_GROUP_END}
 )
 
 set_target_properties(FrameVulkanTest PROPERTIES

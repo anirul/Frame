@@ -24,12 +24,11 @@ target_include_directories(FrameFileTest
 
 target_link_libraries(FrameFileTest
   PUBLIC
-    Frame
-    FrameFile
-    FrameJson
-    FrameVulkan
     GTest::gmock
     GTest::gtest
+  ${FRAME_LINK_GROUP_BEGIN}
+  ${FRAME_CORE_LIBS}
+  ${FRAME_LINK_GROUP_END}
 )
 
 # In order to remove the tests from the bin folder.

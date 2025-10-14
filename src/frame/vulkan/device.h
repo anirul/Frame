@@ -18,6 +18,7 @@
 
 #include "frame/camera.h"
 #include "frame/device_interface.h"
+#include "frame/texture_interface.h"
 #include "frame/logger.h"
 
 namespace frame::vulkan
@@ -90,6 +91,15 @@ class Device : public DeviceInterface
     }
 
   private:
+    struct TextureResource
+    {
+        vk::UniqueImage image;
+        vk::UniqueDeviceMemory memory;
+        vk::UniqueImageView view;
+        vk::UniqueSampler sampler;
+        glm::uvec2 size = {0, 0};
+    };
+
     void CreateCommandPool();
     void CreateSyncObjects();
     void CreateSwapchainResources();
@@ -100,6 +110,10 @@ class Device : public DeviceInterface
     std::vector<std::uint32_t> CompileShader(
         const std::filesystem::path& path,
         shaderc_shader_kind kind) const;
+    std::vector<std::uint32_t> CompileShaderSource(
+        const std::string& source,
+        shaderc_shader_kind kind,
+        const std::string& identifier) const;
     vk::UniqueShaderModule CreateShaderModule(
         const std::vector<std::uint32_t>& code) const;
     vk::SurfaceFormatKHR SelectSurfaceFormat(
@@ -111,6 +125,31 @@ class Device : public DeviceInterface
     void RecordCommandBuffer(
         vk::CommandBuffer command_buffer,
         std::uint32_t image_index);
+    void CreateTextureResources(const frame::json::LevelData& level_data);
+    void DestroyTextureResources();
+    void CreateDescriptorResources();
+    void DestroyDescriptorResources();
+    TextureResource CreateTextureFromCpu(
+        const frame::TextureInterface& texture_interface);
+    vk::UniqueBuffer CreateBuffer(
+        vk::DeviceSize size,
+        vk::BufferUsageFlags usage,
+        vk::MemoryPropertyFlags properties,
+        vk::UniqueDeviceMemory& out_memory) const;
+    void CopyBuffer(vk::Buffer src, vk::Buffer dst, vk::DeviceSize size);
+    void TransitionImageLayout(
+        vk::Image image,
+        vk::Format format,
+        vk::ImageLayout old_layout,
+        vk::ImageLayout new_layout);
+    void CopyBufferToImage(
+        vk::Buffer buffer,
+        vk::Image image,
+        std::uint32_t width,
+        std::uint32_t height);
+    std::uint32_t FindMemoryType(
+        std::uint32_t type_filter,
+        vk::MemoryPropertyFlags properties) const;
 
   private:
     std::unique_ptr<LevelInterface> level_ = nullptr;
@@ -144,6 +183,10 @@ class Device : public DeviceInterface
     std::vector<vk::CommandBuffer> command_buffers_;
     vk::UniquePipelineLayout pipeline_layout_;
     vk::UniquePipeline graphics_pipeline_;
+    vk::UniqueDescriptorSetLayout descriptor_set_layout_;
+    vk::UniqueDescriptorPool descriptor_pool_;
+    vk::DescriptorSet descriptor_set_ = VK_NULL_HANDLE;
+    std::vector<TextureResource> textures_;
     static constexpr std::size_t kMaxFramesInFlight = 2;
     std::array<vk::UniqueSemaphore, kMaxFramesInFlight> image_available_semaphores_;
     std::array<vk::UniqueSemaphore, kMaxFramesInFlight> render_finished_semaphores_;

@@ -8,19 +8,11 @@ add_library(FrameJson
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/json/proto.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/json/serialize_json.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../include/frame/json/serialize_level.h
-    parse_material.cpp
-    parse_material.h
     parse_pixel.cpp
-    parse_program.cpp
-    parse_program.h
-    parse_scene_tree.cpp
-    parse_scene_tree.h
-    parse_texture.cpp
-    parse_texture.h
     parse_uniform.cpp
     parse_uniform.h
     level_data.cpp
-    parse_level.cpp
+    parse_level_data.cpp
     serialize_material.cpp
     serialize_material.h
     serialize_program.cpp
@@ -46,9 +38,6 @@ target_link_libraries(FrameJson
   PRIVATE
     Frame
     FrameProto
-    FrameOpenGL
-    glm::glm
-    glad::glad
     glm::glm
     protobuf::libprotobuf
     spdlog::spdlog

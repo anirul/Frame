@@ -7,10 +7,10 @@
 #include "frame/opengl/material.h"
 #include "frame/opengl/static_mesh.h"
 #include "frame/opengl/texture.h"
-#include "frame/json/parse_material.h"
-#include "frame/json/parse_program.h"
-#include "frame/json/parse_scene_tree.h"
-#include "frame/json/parse_texture.h"
+#include "frame/opengl/json/parse_material.h"
+#include "frame/opengl/json/parse_program.h"
+#include "frame/opengl/json/parse_scene_tree.h"
+#include "frame/opengl/json/parse_texture.h"
 
 namespace frame::opengl
 {

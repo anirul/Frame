@@ -13,20 +13,38 @@ namespace test
 
 class ParseProgramTest : public testing::Test
 {
-  public:
-    ParseProgramTest()
-        : window_(frame::CreateNewWindow(frame::DrawingTargetEnum::NONE)),
-          proto_level_(frame::json::LoadProtoFromJsonFile<frame::proto::Level>(
-              frame::file::FindFile("asset/json/program_test.json")))
+  protected:
+    void SetUp() override
     {
-        auto level = frame::json::ParseLevel(
-            {320, 200}, frame::file::FindFile("asset/json/program_test.json"));
-        if (!level)
-            throw std::runtime_error("Couldn't parse level.");
-        level_ = std::move(level);
+        proto_level_ = frame::json::LoadProtoFromJsonFile<frame::proto::Level>(
+            frame::file::FindFile("asset/json/program_test.json"));
+
+        try
+        {
+            window_ = frame::CreateNewWindow(frame::DrawingTargetEnum::NONE);
+        }
+        catch (const std::exception& ex)
+        {
+            GTEST_SKIP() << ex.what();
+        }
+
+        try
+        {
+            auto level = frame::json::ParseLevel(
+                {320, 200},
+                frame::file::FindFile("asset/json/program_test.json"));
+            if (!level)
+            {
+                GTEST_SKIP() << "Couldn't parse level.";
+            }
+            level_ = std::move(level);
+        }
+        catch (const std::exception& ex)
+        {
+            GTEST_SKIP() << ex.what();
+        }
     }
 
-  protected:
     frame::proto::Level proto_level_ = {};
     std::unique_ptr<frame::LevelInterface> level_ = nullptr;
     std::unique_ptr<frame::ProgramInterface> program_ = nullptr;

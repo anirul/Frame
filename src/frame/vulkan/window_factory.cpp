@@ -8,6 +8,7 @@
 #include <stdexcept>
 #include <utility>
 
+#include "frame/window_factory.h"
 #include "frame/vulkan/device.h"
 #include "frame/vulkan/sdl_vulkan_none.h"
 #include "frame/vulkan/sdl_vulkan_window.h"
@@ -42,3 +43,21 @@ std::unique_ptr<WindowInterface> CreateSDLVulkanNone(glm::uvec2 size)
 }
 
 } // End namespace frame::vulkan.
+
+namespace
+{
+
+struct VulkanWindowFactoryRegistrar
+{
+    VulkanWindowFactoryRegistrar()
+    {
+        frame::RegisterVulkanWindowFactory(
+            frame::VulkanWindowFactory{
+                frame::vulkan::CreateSDLVulkanWindow,
+                frame::vulkan::CreateSDLVulkanNone});
+    }
+};
+
+const VulkanWindowFactoryRegistrar kRegisterVulkanWindowFactory{};
+
+} // namespace

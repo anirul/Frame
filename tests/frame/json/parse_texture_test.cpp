@@ -3,7 +3,7 @@
 #include <glm/common.hpp>
 
 #include "frame/json/parse_pixel.h"
-#include "frame/json/parse_texture.h"
+#include "frame/opengl/json/parse_texture.h"
 #include "frame/json/parse_uniform.h"
 #include "frame/json/proto.h"
 

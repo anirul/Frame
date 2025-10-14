@@ -49,6 +49,37 @@ if(NOT shaderc_FOUND)
   endif()
 endif()
 find_package(Vulkan REQUIRED)
+if(UNIX AND NOT APPLE AND TARGET Vulkan::Vulkan)
+  get_target_property(_frame_vulkan_lib Vulkan::Vulkan IMPORTED_LOCATION)
+  if(_frame_vulkan_lib AND NOT EXISTS "${_frame_vulkan_lib}")
+    find_library(_frame_vulkan_fallback NAMES vulkan)
+    if(_frame_vulkan_fallback)
+      set_property(TARGET Vulkan::Vulkan PROPERTY IMPORTED_LOCATION "${_frame_vulkan_fallback}")
+    endif()
+  endif()
+  unset(_frame_vulkan_lib)
+  unset(_frame_vulkan_fallback)
+endif()
+
+if(UNIX AND NOT APPLE)
+  set(FRAME_LINK_GROUP_BEGIN "-Wl,--start-group")
+  set(FRAME_LINK_GROUP_END "-Wl,--end-group")
+endif()
+
+set(FRAME_CORE_LIBS
+  Frame
+  FrameFile
+  FrameJson
+  FrameOpenGL
+  FrameOpenGLFile
+  FrameOpenGLGui
+  FrameGui
+  FrameProto
+)
+
+set(FRAME_VULKAN_LIBS
+  FrameVulkan
+)
 
 include(cmake/AddImNodeFlow.cmake)
 

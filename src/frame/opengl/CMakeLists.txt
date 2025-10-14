@@ -12,6 +12,15 @@ add_library(FrameOpenGL
     light.cpp
     light.h
     build_level.cpp
+    json/parse_level.cpp
+    json/parse_material.cpp
+    json/parse_material.h
+    json/parse_program.cpp
+    json/parse_program.h
+    json/parse_scene_tree.cpp
+    json/parse_scene_tree.h
+    json/parse_texture.cpp
+    json/parse_texture.h
     material.cpp
     material.h
     static_mesh.cpp
@@ -63,7 +72,6 @@ target_link_libraries(FrameOpenGL
     FrameFile
     FrameJson
     FrameOpenGLFile
-    FrameVulkan
     glad::glad
     glm::glm
     protobuf::libprotobuf

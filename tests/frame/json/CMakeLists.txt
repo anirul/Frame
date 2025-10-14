@@ -33,13 +33,19 @@ target_include_directories(FrameJsonTest
 
 target_link_libraries(FrameJsonTest
   PUBLIC
-  Frame
-  FrameFile
-  FrameJson
-  FrameProto
-  FrameVulkan
   GTest::gmock
   GTest::gtest
+  ${FRAME_LINK_GROUP_BEGIN}
+    Frame
+    FrameFile
+    FrameJson
+    FrameOpenGL
+    FrameOpenGLFile
+    FrameOpenGLGui
+    FrameGui
+    FrameProto
+    FrameVulkanData
+  ${FRAME_LINK_GROUP_END}
 )
 
 # In order to remove the tests from the bin folder.

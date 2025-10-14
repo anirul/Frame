@@ -15,12 +15,11 @@ target_include_directories(02_RayTracing
 
 target_link_libraries(02_RayTracing
   PUBLIC
-    Frame
+    ${FRAME_LINK_GROUP_BEGIN}
+    ${FRAME_CORE_LIBS}
+    ${FRAME_VULKAN_LIBS}
+    ${FRAME_LINK_GROUP_END}
     FrameCommon
-    FrameGui
-    FrameOpenGL
-    FrameOpenGLGui
-    FrameProto
 )
 
 set_property(TARGET 02_RayTracing PROPERTY FOLDER "FrameExamples")
