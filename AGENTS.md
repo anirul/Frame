@@ -1,28 +1,16 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-- Core engine implementation lives in `src/frame/`; expose matching headers under `include/frame/`. Update both together to avoid API drift.
-- Renderer backends are isolated under `src/frame/vulkan/`, `src/frame/opengl/`, etc. Add focused tests under `tests/frame/<feature>/` whenever a backend changes.
-- Runtime assets belong in `asset/`; example apps assemble from `examples/` and output binaries into `build/<preset>/bin/`. Clean `build/` before committing.
+Engine sources and public headers now live side by side in `frame/`. Core interfaces (e.g., `frame/api.h`) sit at the root, while feature code stays grouped under `frame/opengl/`, `frame/vulkan/`, `frame/json/`, and similar modules. Update headers and implementations together inside these folders to keep exports consistent. Tests continue to mirror features under `tests/frame/<feature>/`, assets stay in `asset/`, example apps in `examples/`, and builds drop into `build/<preset>/bin/`. Clean `build/` before committing to avoid stray binaries.
 
 ## Build, Test, and Development Commands
-- `git submodule update --init --recursive` ensures `external/` dependencies stay in sync after clone, rebase, or branch switches.
-- Configure via `cmake --preset windows` (MSVC) or `cmake --preset linux-debug`; add `--fresh` after toolchain updates.
-- `cmake --build --preset <preset>` builds the tree; append `--target FrameVulkanTest` (or similar) for focused targets.
-- Run examples with `build/<preset>/bin/Sample.exe -device vulkan` (use `opengl` to switch).
+Run `git submodule update --init --recursive` after branch switches to sync `external/` dependencies. Configure with `cmake --preset linux-debug` (add `--fresh` after toolchain updates) or `cmake --preset windows` on Windows hosts. Build via `cmake --build --preset <preset>`; append `--target FrameVulkanTest` or `FrameOpenGLTest` for focused suites. Launch samples from `build/<preset>/bin/Sample.exe -device vulkan` (swap `opengl` as needed) to validate runtime paths.
 
 ## Coding Style & Naming Conventions
-- Adopt `.clang-format` (Microsoft style, 4 spaces, 80-column soft limit) and `.editorconfig` (CRLF, trim trailing whitespace).
-- Use PascalCase for classes, camelCase for functions/locals, `kName` for constants, and snake_case filenames that mirror namespaces.
-- Prefer ASCII and add comments only when intent is non-obvious.
+Code follows `.clang-format` (Microsoft style, 4-space indent, 80-character soft limit) and `.editorconfig` (CRLF line endings, trimmed trailing whitespace). Adopt PascalCase for classes, camelCase for functions and locals, `kConstantName` for immutable values, and snake_case for filenames that mirror namespaces. Keep new sources ASCII unless feature requirements dictate otherwise, and add concise intent-driven comments only where behavior is non-obvious.
 
 ## Testing Guidelines
-- GoogleTest suites live in `FrameTest`, `FrameOpenGLTest`, and `FrameVulkanTest`; place new suites beside their feature under `tests/frame/`.
-- Build tests with `cmake --build --preset <preset> --target <TestTarget>` and run via `ctest --test-dir build/<preset> --output-on-failure -C Debug`.
-- Mirror Vulkan fixtures with OpenGL equivalents; store seed data under `tests/frame/vulkan/`.
+Tests use GoogleTest across `FrameTest`, `FrameOpenGLTest`, and `FrameVulkanTest`. Place fixtures beside related features under `tests/frame/`, mirroring Vulkan and OpenGL cases when applicable. Build and execute suites with `cmake --build --preset <preset> --target FrameVulkanTest` followed by `ctest --test-dir build/<preset> --output-on-failure -C Debug`. Store shared seeds under `tests/frame/vulkan/` to keep regression coverage aligned across backends.
 
 ## Commit & Pull Request Guidelines
-- Write imperative commit subjects under 72 characters and describe the change in the first line.
-- PRs should explain intent, list exercised presets/tests, link issues, and include before/after imagery for graphics deltas.
-- Call out edits to `external/` or build tooling explicitly and confirm a clean configure/build run.
-- Exclude generated outputs (build artifacts, compiled shaders); extend `.gitignore` for any new generators.
+Write imperative commit subjects under 72 characters and summarize intent on the first line. PR descriptions should capture motivation, enumerate exercised presets/tests, link tracked issues, and attach before/after imagery for any graphics-impacting change. Call out edits to `external/` or build tooling explicitly, confirm a clean configure/build run, and ensure generated binaries or intermediate artifacts stay out of version control (extend `.gitignore` when needed).

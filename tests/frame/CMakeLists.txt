@@ -15,11 +15,10 @@ add_executable(FrameTest
 
 target_include_directories(FrameTest
   PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../include
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../tests
-    ${CMAKE_CURRENT_BINARY_DIR}/../../
-    ${CMAKE_BINARY_DIR}/src
-    ${CMAKE_BINARY_DIR}/src/frame/proto
+    ${CMAKE_CURRENT_SOURCE_DIR}/../..
+    ${CMAKE_CURRENT_SOURCE_DIR}/..
+    ${CMAKE_CURRENT_BINARY_DIR}/..
+    ${CMAKE_BINARY_DIR}/frame/proto
 )
 
 target_link_libraries(FrameTest

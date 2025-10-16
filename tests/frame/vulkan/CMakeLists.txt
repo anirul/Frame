@@ -7,8 +7,8 @@ add_executable(FrameVulkanTest
 
 target_include_directories(FrameVulkanTest
   PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../../tests
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../../include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../..
+    ${CMAKE_CURRENT_SOURCE_DIR}/../..
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 

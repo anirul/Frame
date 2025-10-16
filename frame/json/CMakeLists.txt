@@ -1,0 +1,44 @@
+# Frame Proto.
+add_library(FrameJson
+  STATIC
+    level_data.cpp
+    level_data.h
+    parse_json.h
+    parse_level.h
+    parse_pixel.cpp
+    parse_pixel.h
+    parse_uniform.cpp
+    parse_uniform.h
+    parse_level_data.cpp
+    serialize_material.cpp
+    serialize_material.h
+    serialize_program.cpp
+    serialize_program.h
+    serialize_scene_tree.cpp
+    serialize_scene_tree.h
+    serialize_texture.cpp
+    serialize_texture.h
+    serialize_level.cpp
+    serialize_uniform.cpp
+    serialize_uniform.h
+    serialize_json.h
+    serialize_level.h
+    proto.cpp
+    proto.h
+)
+target_include_directories(FrameJson 
+  PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/../..
+    ${Protobuf_INCLUDE_DIRS}
+    ${CMAKE_CURRENT_BINARY_DIR}
+    ${CMAKE_BINARY_DIR}/frame/proto
+)
+target_link_libraries(FrameJson
+  PRIVATE
+    Frame
+    FrameProto
+    glm::glm
+    protobuf::libprotobuf
+    spdlog::spdlog
+)
+set_property(TARGET FrameJson PROPERTY FOLDER "Frame")

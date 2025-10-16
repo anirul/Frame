@@ -3,6 +3,7 @@
 #include "frame/file/file_system.h"
 #include "frame/json/parse_level.h"
 #include "frame/vulkan/build_level.h"
+#include "frame/vulkan/mesh_utils.h"
 
 namespace test
 {
@@ -68,6 +69,29 @@ TEST_F(VulkanBuildLevelTest, BuildLevelRegistersProgramsMaterialsAndTextures)
     {
         EXPECT_NE(
             built.level->GetIdFromName(proto_material.name()), frame::NullId);
+    }
+}
+
+TEST_F(VulkanBuildLevelTest, BuildMeshVerticesFromStaticMeshInfo)
+{
+    const auto mesh_level_path =
+        frame::file::FindFile("asset/json/japanese_flag.json");
+    const auto mesh_level_proto =
+        frame::json::LoadLevelProto(mesh_level_path);
+    const auto mesh_level_data = frame::json::ParseLevelData(
+        glm::uvec2(320, 200), mesh_level_proto, asset_root_);
+    ASSERT_FALSE(mesh_level_data.meshes.empty());
+
+    const auto& mesh_info = mesh_level_data.meshes.front();
+    const auto vertices = frame::vulkan::BuildMeshVertices(mesh_info);
+    ASSERT_EQ(vertices.size(), mesh_info.positions.size() / 3);
+    EXPECT_FLOAT_EQ(vertices.front().position.x, mesh_info.positions[0]);
+    EXPECT_FLOAT_EQ(vertices.front().position.y, mesh_info.positions[1]);
+    EXPECT_FLOAT_EQ(vertices.front().position.z, mesh_info.positions[2]);
+    if (!mesh_info.uvs.empty())
+    {
+        EXPECT_FLOAT_EQ(vertices.front().uv.x, mesh_info.uvs[0]);
+        EXPECT_FLOAT_EQ(vertices.front().uv.y, mesh_info.uvs[1]);
     }
 }
 

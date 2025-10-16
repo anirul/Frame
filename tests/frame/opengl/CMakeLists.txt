@@ -38,8 +38,8 @@ add_executable(FrameOpenGLTest
 
 target_include_directories(FrameOpenGLTest
   PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../../tests
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../../include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../..
+    ${CMAKE_CURRENT_SOURCE_DIR}/../..
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
