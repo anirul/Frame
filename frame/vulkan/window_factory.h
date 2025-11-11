@@ -21,4 +21,10 @@ std::unique_ptr<WindowInterface> CreateSDLVulkanWindow(glm::uvec2 size);
  */
 std::unique_ptr<WindowInterface> CreateSDLVulkanNone(glm::uvec2 size);
 
+/**
+ * @brief Ensure the Vulkan window factory is registered with the shared
+ * window factory registry. Safe to call multiple times.
+ */
+void EnsureWindowFactoryRegistered();
+
 } // End namespace frame::vulkan.

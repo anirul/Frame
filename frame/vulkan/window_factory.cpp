@@ -4,6 +4,7 @@
 #include <exception>
 #include <iostream>
 #include <memory>
+#include <mutex>
 #include <sstream>
 #include <stdexcept>
 #include <utility>
@@ -47,17 +48,21 @@ std::unique_ptr<WindowInterface> CreateSDLVulkanNone(glm::uvec2 size)
 namespace
 {
 
-struct VulkanWindowFactoryRegistrar
+std::once_flag g_register_vulkan_factory_once;
+
+} // namespace
+
+namespace frame::vulkan
 {
-    VulkanWindowFactoryRegistrar()
-    {
+
+void EnsureWindowFactoryRegistered()
+{
+    std::call_once(g_register_vulkan_factory_once, [] {
         frame::RegisterVulkanWindowFactory(
             frame::VulkanWindowFactory{
                 frame::vulkan::CreateSDLVulkanWindow,
                 frame::vulkan::CreateSDLVulkanNone});
-    }
-};
+    });
+}
 
-const VulkanWindowFactoryRegistrar kRegisterVulkanWindowFactory{};
-
-} // namespace
+} // namespace frame::vulkan

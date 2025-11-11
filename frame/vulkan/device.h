@@ -7,6 +7,7 @@
 #include <array>
 #include <cstdint>
 #include <filesystem>
+#include <memory>
 #include <optional>
 #include <string>
 #include <vector>
@@ -23,6 +24,9 @@
 
 namespace frame::vulkan
 {
+
+class Texture;
+class TextureResources;
 
 /**
  * @class Device
@@ -91,15 +95,7 @@ class Device : public DeviceInterface
     }
 
   private:
-    struct TextureResource
-    {
-        vk::UniqueImage image;
-        vk::UniqueDeviceMemory memory;
-        vk::UniqueImageView view;
-        vk::UniqueSampler sampler;
-        glm::uvec2 size = {0, 0};
-    };
-
+    friend class TextureResources;
     void CreateCommandPool();
     void CreateSyncObjects();
     void CreateSwapchainResources();
@@ -129,8 +125,6 @@ class Device : public DeviceInterface
     void DestroyTextureResources();
     void CreateDescriptorResources();
     void DestroyDescriptorResources();
-    TextureResource CreateTextureFromCpu(
-        const frame::TextureInterface& texture_interface);
     struct MeshResource
     {
         vk::UniqueBuffer vertex_buffer;
@@ -198,7 +192,8 @@ class Device : public DeviceInterface
     vk::UniqueDescriptorSetLayout descriptor_set_layout_;
     vk::UniqueDescriptorPool descriptor_pool_;
     vk::DescriptorSet descriptor_set_ = VK_NULL_HANDLE;
-    std::vector<TextureResource> textures_;
+    std::unique_ptr<TextureResources> texture_resources_;
+    std::vector<EntityId> descriptor_texture_ids_;
     std::vector<MeshResource> meshes_;
     static constexpr std::size_t kMaxFramesInFlight = 2;
     std::array<vk::UniqueSemaphore, kMaxFramesInFlight> image_available_semaphores_;
@@ -207,8 +202,23 @@ class Device : public DeviceInterface
     std::size_t current_frame_ = 0;
     bool framebuffer_resized_ = false;
     bool sync_objects_created_ = false;
+    struct ProgramPipelineInfo
+    {
+        std::string program_name;
+        EntityId program_id = NullId;
+        std::filesystem::path vertex_shader;
+        std::filesystem::path fragment_shader;
+        frame::proto::SceneType::Enum scene_type = frame::proto::SceneType::NONE;
+        bool uses_time_uniform = false;
+        std::vector<EntityId> input_texture_ids;
+    };
+
     std::optional<frame::json::LevelData> current_level_data_;
+    std::optional<ProgramPipelineInfo> active_program_info_;
+    bool use_procedural_quad_pipeline_ = false;
     float elapsed_time_seconds_ = 0.0f;
+    vk::ShaderStageFlags push_constant_stages_ = {};
+    std::uint32_t push_constant_size_ = 0;
 };
 
 } // namespace frame::vulkan

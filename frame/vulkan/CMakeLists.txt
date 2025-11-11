@@ -35,6 +35,7 @@ target_link_libraries(FrameVulkanData
   PUBLIC
     Frame
     FrameJson
+    Vulkan::Vulkan
 )
 
 set_property(TARGET FrameVulkanData PROPERTY FOLDER "Frame/Vulkan")

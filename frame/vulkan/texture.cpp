@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cstring>
+#include <stdexcept>
 
 namespace frame::vulkan
 {
@@ -33,9 +34,18 @@ Texture::Texture(
     display_size_ = display_size;
     if (proto.has_size())
     {
-        size_ = glm::uvec2(
-            static_cast<std::uint32_t>(proto.size().x()),
-            static_cast<std::uint32_t>(proto.size().y()));
+        const auto width = proto.size().x();
+        const auto height = proto.size().y();
+        if (width > 0 && height > 0)
+        {
+            size_ = glm::uvec2(
+                static_cast<std::uint32_t>(width),
+                static_cast<std::uint32_t>(height));
+        }
+        else
+        {
+            size_ = display_size;
+        }
     }
     else
     {
@@ -190,6 +200,49 @@ std::uint8_t Texture::ComponentCount(proto::PixelStructure::Enum value)
     default:
         return 4;
     }
+}
+
+bool Texture::HasGpuResources() const
+{
+    return static_cast<bool>(view_) && static_cast<bool>(sampler_);
+}
+
+void Texture::SetGpuResources(
+    vk::Format format,
+    vk::ImageViewType view_type,
+    vk::UniqueImage image,
+    vk::UniqueDeviceMemory memory,
+    vk::UniqueImageView view,
+    vk::UniqueSampler sampler)
+{
+    gpu_format_ = format;
+    view_type_ = view_type;
+    image_ = std::move(image);
+    memory_ = std::move(memory);
+    view_ = std::move(view);
+    sampler_ = std::move(sampler);
+}
+
+void Texture::ResetGpuResources()
+{
+    sampler_.reset();
+    view_.reset();
+    image_.reset();
+    memory_.reset();
+    gpu_format_ = vk::Format::eUndefined;
+    view_type_ = vk::ImageViewType::e2D;
+}
+
+vk::DescriptorImageInfo Texture::GetDescriptorInfo() const
+{
+    if (!HasGpuResources())
+    {
+        throw std::runtime_error("Vulkan texture has no GPU resources.");
+    }
+    return vk::DescriptorImageInfo(
+        *sampler_,
+        *view_,
+        vk::ImageLayout::eShaderReadOnlyOptimal);
 }
 
 void Texture::SyncProtoSize()

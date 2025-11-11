@@ -1,8 +1,13 @@
 #pragma once
 
+#ifndef VULKAN_HPP_DISPATCH_LOADER_DYNAMIC
+#define VULKAN_HPP_DISPATCH_LOADER_DYNAMIC 1
+#endif
+
 #include <vector>
 
 #include <glm/glm.hpp>
+#include <vulkan/vulkan.hpp>
 
 #include "frame/texture_interface.h"
 
@@ -36,6 +41,17 @@ class Texture : public frame::TextureInterface
         display_size_ = display_size;
     }
 
+    bool HasGpuResources() const;
+    void SetGpuResources(
+        vk::Format format,
+        vk::ImageViewType view_type,
+        vk::UniqueImage image,
+        vk::UniqueDeviceMemory memory,
+        vk::UniqueImageView view,
+        vk::UniqueSampler sampler);
+    void ResetGpuResources();
+    vk::DescriptorImageInfo GetDescriptorInfo() const;
+
     static std::uint8_t BytesPerComponent(proto::PixelElementSize::Enum value);
     static std::uint8_t ComponentCount(proto::PixelStructure::Enum value);
   private:
@@ -48,6 +64,12 @@ class Texture : public frame::TextureInterface
     std::vector<std::uint8_t> data_{};
     std::uint8_t bytes_per_pixel_ = 4;
     bool mipmap_enabled_ = false;
+    vk::Format gpu_format_ = vk::Format::eUndefined;
+    vk::ImageViewType view_type_ = vk::ImageViewType::e2D;
+    vk::UniqueImage image_;
+    vk::UniqueDeviceMemory memory_;
+    vk::UniqueImageView view_;
+    vk::UniqueSampler sampler_;
 };
 
 } // namespace frame::vulkan

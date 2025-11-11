@@ -65,11 +65,12 @@ float LightAndShadow(vec3 position, vec3 normal)
     vec3 light_position = LightPosition();
     vec4 light_normal_value = LightNormalValue(position, normal);
     float dist_light = RayMarching(position + normal * min_dist * 2.0, light_normal_value.xyz).w;
+    float light = max(light_normal_value.w, 0.0);
     if (dist_light < length(light_position - position))
     {
-        light_normal_value.w *= 0.1;
+        light *= 0.1;
     }
-    return light_normal_value.w;
+    return light;
 }
 
 void main()
