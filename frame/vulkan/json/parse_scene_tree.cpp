@@ -8,6 +8,10 @@
 #include "frame/node_light.h"
 #include "frame/node_matrix.h"
 #include "frame/node_static_mesh.h"
+#include "frame/file/file_system.h"
+#include "frame/file/obj.h"
+#include "frame/bvh.h"
+#include "frame/vulkan/buffer.h"
 #include "frame/vulkan/static_mesh.h"
 
 namespace frame::vulkan::json
@@ -139,6 +143,15 @@ bool ParseNodeStaticMesh(
     LevelInterface& level,
     const frame::proto::NodeStaticMesh& proto_mesh)
 {
+    auto material_id = level.GetIdFromName(proto_mesh.material_name());
+    if (!material_id && !proto_mesh.material_name().empty())
+    {
+        throw std::runtime_error(std::format(
+            "Material {} not found for static mesh {}.",
+            proto_mesh.material_name(),
+            proto_mesh.name()));
+    }
+
     if (proto_mesh.has_clean_buffer())
     {
         return ParseNodeStaticMeshCleanBuffer(level, proto_mesh);
@@ -149,8 +162,178 @@ bool ParseNodeStaticMesh(
     }
     if (proto_mesh.has_file_name())
     {
-        throw std::runtime_error(
-            "Loading static meshes from file is not implemented for Vulkan yet.");
+        const auto path = frame::file::FindFile(
+            "asset/model/" + proto_mesh.file_name());
+        frame::file::Obj obj(path);
+
+        int counter = 0;
+        for (const auto& mesh : obj.GetMeshes())
+        {
+            std::vector<float> points;
+            std::vector<float> normals;
+            std::vector<float> textures;
+            const auto& vertices = mesh.GetVertices();
+            points.reserve(vertices.size() * 3);
+            normals.reserve(vertices.size() * 3);
+            textures.reserve(vertices.size() * 2);
+            for (const auto& vertex : vertices)
+            {
+                points.push_back(vertex.point.x);
+                points.push_back(vertex.point.y);
+                points.push_back(vertex.point.z);
+                normals.push_back(vertex.normal.x);
+                normals.push_back(vertex.normal.y);
+                normals.push_back(vertex.normal.z);
+                if (obj.HasTextureCoordinates())
+                {
+                    textures.push_back(vertex.tex_coord.x);
+                    textures.push_back(vertex.tex_coord.y);
+                }
+            }
+
+            std::vector<std::uint32_t> indices;
+            indices.reserve(mesh.GetIndices().size());
+            for (int idx : mesh.GetIndices())
+            {
+                indices.push_back(static_cast<std::uint32_t>(idx));
+            }
+
+            auto make_buffer = [](const auto& data,
+                                  const std::string& name,
+                                  LevelInterface& lvl) -> EntityId {
+                if (data.empty())
+                {
+                    return NullId;
+                }
+                auto buffer = std::make_unique<frame::vulkan::Buffer>();
+                buffer->Copy(data.size() * sizeof(data[0]), data.data());
+                buffer->SetName(name);
+                return lvl.AddBuffer(std::move(buffer));
+            };
+
+            auto point_buffer_id = make_buffer(
+                points,
+                std::format("{}.{}.point", proto_mesh.name(), counter),
+                level);
+            if (!point_buffer_id)
+            {
+                throw std::runtime_error("Failed to create point buffer.");
+            }
+            auto normal_buffer_id = make_buffer(
+                normals,
+                std::format("{}.{}.normal", proto_mesh.name(), counter),
+                level);
+            auto texture_buffer_id = make_buffer(
+                textures,
+                std::format("{}.{}.texture", proto_mesh.name(), counter),
+                level);
+            auto index_buffer_id = make_buffer(
+                indices,
+                std::format("{}.{}.index", proto_mesh.name(), counter),
+                level);
+            if (!index_buffer_id)
+            {
+                throw std::runtime_error("Failed to create index buffer.");
+            }
+
+            std::vector<float> triangles;
+            triangles.reserve(indices.size() / 3 * 36); // 3 verts * 12 floats
+            auto push_vertex = [&](std::uint32_t idx) {
+                const auto base = idx * 3;
+                const auto uv_base = idx * 2;
+                triangles.push_back(points[base + 0]);
+                triangles.push_back(points[base + 1]);
+                triangles.push_back(points[base + 2]);
+                triangles.push_back(0.0f);
+                if (!normals.empty())
+                {
+                    triangles.push_back(normals[base + 0]);
+                    triangles.push_back(normals[base + 1]);
+                    triangles.push_back(normals[base + 2]);
+                }
+                else
+                {
+                    triangles.push_back(0.0f);
+                    triangles.push_back(0.0f);
+                    triangles.push_back(0.0f);
+                }
+                triangles.push_back(0.0f);
+                if (!textures.empty())
+                {
+                    triangles.push_back(textures[uv_base + 0]);
+                    triangles.push_back(textures[uv_base + 1]);
+                }
+                else
+                {
+                    triangles.push_back(0.0f);
+                    triangles.push_back(0.0f);
+                }
+                triangles.push_back(0.0f);
+                triangles.push_back(0.0f);
+            };
+            for (std::size_t i = 0; i + 2 < indices.size(); i += 3)
+            {
+                push_vertex(indices[i]);
+                push_vertex(indices[i + 1]);
+                push_vertex(indices[i + 2]);
+            }
+
+            auto bvh_nodes = frame::BuildBVH(points, indices);
+
+            auto triangle_buffer_id = make_buffer(
+                triangles,
+                std::format("{}.{}.triangle", proto_mesh.name(), counter),
+                level);
+            auto bvh_buffer_id = make_buffer(
+                bvh_nodes,
+                std::format("{}.{}.bvh", proto_mesh.name(), counter),
+                level);
+
+            frame::StaticMeshParameter parameter{};
+            parameter.point_buffer_id = point_buffer_id;
+            parameter.normal_buffer_id = normal_buffer_id;
+            parameter.texture_buffer_id = texture_buffer_id;
+            parameter.index_buffer_id = index_buffer_id;
+            parameter.triangle_buffer_id = triangle_buffer_id;
+            parameter.bvh_buffer_id = bvh_buffer_id;
+            parameter.render_primitive_enum =
+                proto_mesh.render_primitive_enum();
+
+            auto static_mesh =
+                std::make_unique<frame::vulkan::StaticMesh>(parameter, true);
+            static_mesh->SetIndexSize(indices.size() * sizeof(std::uint32_t));
+            const std::string mesh_name =
+                std::format("{}.{}.mesh", proto_mesh.name(), counter);
+            static_mesh->SetName(mesh_name);
+            static_mesh->GetData().set_file_name(proto_mesh.file_name());
+            static_mesh->GetData().set_render_primitive_enum(
+                proto_mesh.render_primitive_enum());
+            auto mesh_id = level.AddStaticMesh(std::move(static_mesh));
+            if (!mesh_id)
+            {
+                throw std::runtime_error("Failed to add static mesh to level.");
+            }
+
+            auto node = std::make_unique<frame::NodeStaticMesh>(
+                MakeResolver(level), mesh_id);
+            std::string node_name = (obj.GetMeshes().size() == 1)
+                                        ? proto_mesh.name()
+                                        : std::format(
+                                              "{}.{}",
+                                              proto_mesh.name(),
+                                              counter);
+            node->SetName(node_name);
+            node->SetParentName(proto_mesh.parent());
+            node->GetData().set_material_name(proto_mesh.material_name());
+            node->GetData().set_render_time_enum(proto_mesh.render_time_enum());
+            node->GetData().set_file_name(proto_mesh.file_name());
+
+            auto scene_id = level.AddSceneNode(std::move(node));
+            level.AddMeshMaterialId(
+                scene_id, material_id, proto_mesh.render_time_enum());
+            ++counter;
+        }
+        return true;
     }
     if (proto_mesh.has_multi_plugin())
     {

@@ -17,6 +17,7 @@
 #include <sstream>
 #include <shaderc/shaderc.hpp>
 
+#include "frame/camera.h"
 #include "frame/level.h"
 #include "frame/vulkan/build_level.h"
 #include "frame/vulkan/mesh_utils.h"
@@ -1291,6 +1292,7 @@ void Device::RecordCommandBuffer(
         {
             try
             {
+                Camera camera_for_frame(level_->GetDefaultCamera());
                 auto camera_holder_id = level_->GetDefaultCameraId();
                 if (camera_holder_id != NullId)
                 {
@@ -1299,25 +1301,25 @@ void Device::RecordCommandBuffer(
                     auto matrix_node = node.GetLocalModel(
                         static_cast<double>(elapsed_time_seconds_));
                     auto inverse_model = glm::inverse(matrix_node);
-                    auto& default_camera = level_->GetDefaultCamera();
-                    default_camera.SetFront(
-                        default_camera.GetFront() * glm::mat3(inverse_model));
-                    default_camera.SetPosition(
+                    camera_for_frame.SetFront(
+                        level_->GetDefaultCamera().GetFront() *
+                        glm::mat3(inverse_model));
+                    camera_for_frame.SetPosition(
                         glm::vec3(
-                            glm::vec4(default_camera.GetPosition(), 1.0f) *
+                            glm::vec4(
+                                level_->GetDefaultCamera().GetPosition(), 1.0f) *
                             inverse_model));
                 }
 
-                auto& camera = level_->GetDefaultCamera();
                 if (swapchain_extent_.height != 0)
                 {
-                    camera.SetAspectRatio(
+                    camera_for_frame.SetAspectRatio(
                         static_cast<float>(swapchain_extent_.width) /
                         static_cast<float>(swapchain_extent_.height));
                 }
-                projection = camera.ComputeProjection();
+                projection = camera_for_frame.ComputeProjection();
                 projection[1][1] *= -1.0f;
-                view = camera.ComputeView();
+                view = camera_for_frame.ComputeView();
                 glm::mat4 rotation = glm::mat4(1.0f);
                 view = rotation * view;
 
@@ -1340,20 +1342,34 @@ void Device::RecordCommandBuffer(
 
         if (push_constant_size_ > 0)
         {
-            struct alignas(16) PushConstants
+            if (use_procedural_quad_pipeline_ && active_program_info_ &&
+                active_program_info_->uses_time_uniform)
             {
-                glm::mat4 projection;
-                glm::mat4 view;
-                glm::mat4 model;
-                float time_s;
-            } push_constants{projection, view, model, elapsed_time_seconds_};
-            command_buffer.pushConstants(
-                *pipeline_layout_,
-                push_constant_stages_,
-                0,
-                push_constant_size_,
-                &push_constants);
+                float time = elapsed_time_seconds_;
+                command_buffer.pushConstants(
+                    *pipeline_layout_,
+                    push_constant_stages_,
+                    0,
+                    push_constant_size_,
+                    &time);
             }
+            else
+            {
+                struct alignas(16) PushConstants
+                {
+                    glm::mat4 projection;
+                    glm::mat4 view;
+                    glm::mat4 model;
+                    float time_s;
+                } push_constants{projection, view, model, elapsed_time_seconds_};
+                command_buffer.pushConstants(
+                    *pipeline_layout_,
+                    push_constant_stages_,
+                    0,
+                    push_constant_size_,
+                    &push_constants);
+            }
+        }
 
         if (use_procedural_quad_pipeline_)
         {

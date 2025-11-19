@@ -206,38 +206,42 @@ void Device::Display(double dt /*= 0.0*/)
     const double time_s = elapsed_time_seconds_;
     Clear();
     level_->UpdateLights(time_s);
-    // Get the holder of the camera.
+    Camera camera_for_frame{level_->GetDefaultCamera()};
     auto camera_holder_id = level_->GetDefaultCameraId();
-    auto enum_type = level_->GetEnumTypeFromId(camera_holder_id);
-    auto& node = level_->GetSceneNodeFromId(camera_holder_id);
-    auto matrix_node = node.GetLocalModel(time_s);
-    auto inverse_model = glm::inverse(matrix_node);
-    CameraInterface& default_camera = level_->GetDefaultCamera();
-    default_camera.SetFront(
-        default_camera.GetFront() * glm::mat3(inverse_model));
-    default_camera.SetPosition(
-        glm::vec3(
-            glm::vec4(default_camera.GetPosition(), 1.0) * inverse_model));
+    if (camera_holder_id != NullId)
+    {
+        auto& node = level_->GetSceneNodeFromId(camera_holder_id);
+        auto matrix_node = node.GetLocalModel(time_s);
+        auto inverse_model = glm::inverse(matrix_node);
+        camera_for_frame.SetFront(
+            level_->GetDefaultCamera().GetFront() * glm::mat3(inverse_model));
+        camera_for_frame.SetPosition(
+            glm::vec3(
+                glm::vec4(
+                    level_->GetDefaultCamera().GetPosition(), 1.0) *
+                inverse_model));
+    }
     // Compute left and right cameras.
-    Camera left_camera{default_camera};
+    Camera left_camera{camera_for_frame};
     left_camera.SetPosition(
         left_camera.GetPosition() -
         left_camera.GetRight() * interocular_distance_ * 0.5f);
     glm::vec3 left_camera_direction =
-        default_camera.GetPosition() + focus_point_ - left_camera.GetPosition();
+        camera_for_frame.GetPosition() + focus_point_ -
+        left_camera.GetPosition();
     left_camera.SetFront(glm::normalize(left_camera_direction));
-    Camera right_camera{default_camera};
+    Camera right_camera{camera_for_frame};
     right_camera.SetPosition(
         right_camera.GetPosition() +
         right_camera.GetRight() * interocular_distance_ * 0.5f);
-    glm::vec3 right_camera_direction = default_camera.GetPosition() +
-                                       focus_point_ -
-                                       right_camera.GetPosition();
+    glm::vec3 right_camera_direction = camera_for_frame.GetPosition() +
+                                       focus_point_ - right_camera.GetPosition();
     right_camera.SetFront(glm::normalize(right_camera_direction));
     switch (stereo_enum_)
     {
     case StereoEnum::NONE:
-        DisplayCamera(default_camera, glm::uvec4(0, 0, size_.x, size_.y), time_s);
+        DisplayCamera(
+            camera_for_frame, glm::uvec4(0, 0, size_.x, size_.y), time_s);
         break;
     case StereoEnum::HORIZONTAL_SPLIT:
         DisplayLeftRightCamera(
