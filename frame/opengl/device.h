@@ -201,6 +201,7 @@ class Device : public DeviceInterface
         json::PixelElementSize_HALF();
     // Rendering pipeline.
     std::unique_ptr<Renderer> renderer_ = nullptr;
+    double elapsed_time_seconds_ = 0.0;
     // Stereo mode.
     StereoEnum stereo_enum_ = StereoEnum::NONE;
     float interocular_distance_ = 0.0f;

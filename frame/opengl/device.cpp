@@ -202,13 +202,15 @@ void Device::Display(double dt /*= 0.0*/)
 {
     if (!renderer_)
         throw std::runtime_error("No Renderer.");
+    elapsed_time_seconds_ += dt;
+    const double time_s = elapsed_time_seconds_;
     Clear();
-    level_->UpdateLights(dt);
+    level_->UpdateLights(time_s);
     // Get the holder of the camera.
     auto camera_holder_id = level_->GetDefaultCameraId();
     auto enum_type = level_->GetEnumTypeFromId(camera_holder_id);
     auto& node = level_->GetSceneNodeFromId(camera_holder_id);
-    auto matrix_node = node.GetLocalModel(dt);
+    auto matrix_node = node.GetLocalModel(time_s);
     auto inverse_model = glm::inverse(matrix_node);
     CameraInterface& default_camera = level_->GetDefaultCamera();
     default_camera.SetFront(
@@ -235,7 +237,7 @@ void Device::Display(double dt /*= 0.0*/)
     switch (stereo_enum_)
     {
     case StereoEnum::NONE:
-        DisplayCamera(default_camera, glm::uvec4(0, 0, size_.x, size_.y), dt);
+        DisplayCamera(default_camera, glm::uvec4(0, 0, size_.x, size_.y), time_s);
         break;
     case StereoEnum::HORIZONTAL_SPLIT:
         DisplayLeftRightCamera(
@@ -243,7 +245,7 @@ void Device::Display(double dt /*= 0.0*/)
             right_camera,
             glm::uvec4(0, 0, size_.x / 2, size_.y),
             glm::uvec4(size_.x / 2, 0, size_.x / 2, size_.y),
-            dt);
+            time_s);
         break;
     case StereoEnum::HORIZONTAL_SIDE_BY_SIDE:
         DisplayLeftRightCamera(
@@ -251,7 +253,7 @@ void Device::Display(double dt /*= 0.0*/)
             right_camera,
             glm::uvec4(0, 0, size_.x / 2, size_.y / 2),
             glm::uvec4(size_.x / 2, 0, size_.x / 2, size_.y / 2),
-            dt);
+            time_s);
         break;
     default:
         throw std::runtime_error(

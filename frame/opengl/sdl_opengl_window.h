@@ -83,13 +83,11 @@ class SDLOpenGLWindow : public WindowInterface
   protected:
     bool RunEvent(const SDL_Event& event, const double dt);
     const char SDLButtonToChar(const Uint8 button) const;
-    // Can only be called ONCE per frame!
-    const double GetFrameDt(const double t) const;
 
   protected:
     const double GetFPS(const double dt) const
     {
-        return 1.0 / dt;
+        return dt > 0.0 ? 1.0 / dt : 0.0;
     }
 
   private:

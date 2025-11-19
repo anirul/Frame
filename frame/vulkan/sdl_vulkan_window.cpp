@@ -270,7 +270,7 @@ WindowReturnEnum SDLVulkanWindow::Run(std::function<bool()> lambda)
 
         if (device_)
         {
-            device_->Display(elapsed.count());
+            device_->Display(dt);
 
             for (const auto& plugin_interface : device_->GetPluginPtrs())
             {

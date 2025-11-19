@@ -6,6 +6,8 @@ add_custom_target(AssetShaderVulkan
     japanese_flag.vert
     ray_marching.frag
     ray_marching.vert
+    cubemap.frag
+    cubemap.vert
 )
 
 set_property(TARGET AssetShaderVulkan PROPERTY FOLDER "FrameAsset/Shader")

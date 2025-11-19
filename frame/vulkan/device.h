@@ -147,12 +147,15 @@ class Device : public DeviceInterface
         vk::Image image,
         vk::Format format,
         vk::ImageLayout old_layout,
-        vk::ImageLayout new_layout);
+        vk::ImageLayout new_layout,
+        std::uint32_t layer_count = 1);
     void CopyBufferToImage(
         vk::Buffer buffer,
         vk::Image image,
         std::uint32_t width,
-        std::uint32_t height);
+        std::uint32_t height,
+        std::uint32_t layer_count = 1,
+        std::size_t layer_stride = 0);
     std::uint32_t FindMemoryType(
         std::uint32_t type_filter,
         vk::MemoryPropertyFlags properties) const;

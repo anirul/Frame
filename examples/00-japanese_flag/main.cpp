@@ -3,6 +3,8 @@
 
 #include <glm/glm.hpp>
 
+#include "absl/flags/usage.h"
+
 #if defined(_WIN32) || defined(_WIN64)
 #define WINDOWS_LEAN_AND_MEAN
 #include <windows.h>
@@ -15,6 +17,15 @@ namespace
 {
 constexpr glm::uvec2 kDefaultSize{1280u, 720u};
 constexpr const char* kLevelPath = "asset/json/japanese_flag.json";
+
+int Run(int argc, char** argv)
+{
+    absl::SetProgramUsageMessage("00_JapaneseFlag --device={vulkan|opengl}");
+    frame::common::Application app(argc, argv, kDefaultSize);
+    app.Startup(frame::file::FindFile(kLevelPath));
+    app.Run();
+    return 0;
+}
 }
 
 #if defined(_WIN32) || defined(_WIN64)
@@ -25,19 +36,13 @@ int WINAPI WinMain(
     _In_ int /*nShowCmd*/)
 try
 {
-    frame::common::Application app(__argc, __argv, kDefaultSize);
-    app.Startup(frame::file::FindFile(kLevelPath));
-    app.Run();
-    return 0;
+    return Run(__argc, __argv);
 }
 #else
 int main(int argc, char** argv)
 try
 {
-    frame::common::Application app(argc, argv, kDefaultSize);
-    app.Startup(frame::file::FindFile(kLevelPath));
-    app.Run();
-    return 0;
+    return Run(argc, argv);
 }
 #endif
 catch (const std::exception& ex)

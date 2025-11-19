@@ -1,9 +1,6 @@
 #include <iostream>
-#include <string>
 
 #include <glm/glm.hpp>
-
-#include "absl/flags/usage.h"
 
 #if defined(_WIN32) || defined(_WIN64)
 #define WINDOWS_LEAN_AND_MEAN
@@ -13,14 +10,16 @@
 #include "frame/common/application.h"
 #include "frame/file/file_system.h"
 
+#include "absl/flags/usage.h"
+
 namespace
 {
 constexpr glm::uvec2 kDefaultSize{1280u, 720u};
-constexpr const char* kLevelPath = "asset/json/ray_marching.json";
+constexpr const char* kLevelPath = "asset/json/cubemap.json";
 
 int Run(int argc, char** argv)
 {
-    absl::SetProgramUsageMessage("01_RayMarching --device={vulkan|opengl}");
+    absl::SetProgramUsageMessage("02_Cubemap --device={vulkan|opengl}");
     frame::common::Application app(argc, argv, kDefaultSize);
     app.Startup(frame::file::FindFile(kLevelPath));
     app.Run();

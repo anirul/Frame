@@ -8,6 +8,7 @@
 #pragma comment(lib, "Shcore.lib")
 #endif
 #include <SDL3/SDL_video.h>
+#include <chrono>
 #include <format>
 #include <string>
 
@@ -129,15 +130,13 @@ WindowReturnEnum SDLOpenGLWindow::Run(std::function<bool()> lambda)
         }
     }
     WindowReturnEnum window_return_enum = WindowReturnEnum::CONTINUE;
-    double previous_count = 0.0;
-    // Timing counter.
-    auto start = std::chrono::system_clock::now();
+    auto previous_frame = std::chrono::steady_clock::now();
     while (window_return_enum == WindowReturnEnum::CONTINUE)
     {
-        // Compute the time difference from previous frame.
-        auto end = std::chrono::system_clock::now();
-        std::chrono::duration<double> time = end - start;
-        const double dt = GetFrameDt(time.count());
+        auto now = std::chrono::steady_clock::now();
+        const double dt =
+            std::chrono::duration<double>(now - previous_frame).count();
+        previous_frame = now;
 
         // Process events.
         SDL_Event event;
@@ -159,14 +158,14 @@ WindowReturnEnum SDLOpenGLWindow::Run(std::function<bool()> lambda)
         {
             input_interface_->NextFrame();
         }
-        device_->Display(time.count());
+        device_->Display(dt);
 
         // Draw the Scene not used?
         for (const auto& plugin_interface : device_->GetPluginPtrs())
         {
             if (plugin_interface)
             {
-                if (!plugin_interface->Update(*device_.get(), time.count()))
+                if (!plugin_interface->Update(*device_.get(), dt))
                 {
                     window_return_enum = WindowReturnEnum::QUIT;
                 }
@@ -186,7 +185,6 @@ WindowReturnEnum SDLOpenGLWindow::Run(std::function<bool()> lambda)
         }
         title += std::format(" - {:.2f}", GetFPS(dt));
         SetWindowTitle(title);
-        previous_count = time.count();
         if (!lambda())
         {
             window_return_enum = WindowReturnEnum::RESTART;
@@ -315,14 +313,6 @@ const char SDLOpenGLWindow::SDLButtonToChar(const Uint8 button) const
     {
         ret += 16;
     }
-    return ret;
-}
-
-const double SDLOpenGLWindow::GetFrameDt(const double t) const
-{
-    static double previous_t = 0.0;
-    double ret = t - previous_t;
-    previous_t = t;
     return ret;
 }
 

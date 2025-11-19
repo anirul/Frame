@@ -23,6 +23,8 @@
 #include "frame/vulkan/texture.h"
 #include "frame/proto/uniform.pb.h"
 #include <glm/gtc/packing.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/matrix_inverse.hpp>
 
 namespace frame::vulkan
 {
@@ -152,11 +154,9 @@ void TextureResources::UploadTexture(
         throw std::runtime_error("Texture has invalid size.");
     }
 
+    const bool is_cubemap =
+        texture_interface.GetViewType() == vk::ImageViewType::eCube;
     const auto& proto = texture_interface.GetData();
-    if (proto.cubemap())
-    {
-        throw std::runtime_error("Cubemap textures are not supported in Vulkan yet.");
-    }
     const auto structure = proto.pixel_structure().value();
     const auto element_size = proto.pixel_element_size().value();
 
@@ -254,9 +254,11 @@ void TextureResources::UploadTexture(
         throw std::runtime_error("Texture contains no pixel data.");
     }
 
+    const std::size_t face_count = is_cubemap ? 6 : 1;
     const std::size_t pixel_count =
         static_cast<std::size_t>(size.x) * size.y;
-    const std::size_t expected_bytes = pixel_count * src_stride;
+    const std::size_t pixel_count_total = pixel_count * face_count;
+    const std::size_t expected_bytes = pixel_count_total * src_stride;
 
     if (!is_depth && src_data.size() < expected_bytes)
     {
@@ -304,13 +306,13 @@ void TextureResources::UploadTexture(
 
     if (is_depth)
     {
-        linear_bytes.resize(pixel_count * bytes_per_component);
+        linear_bytes.resize(pixel_count_total * bytes_per_component);
         std::memcpy(linear_bytes.data(), src_data.data(), linear_bytes.size());
     }
     else
     {
-        rgba_data.reserve(pixel_count * 4 * bytes_per_component);
-        for (std::size_t i = 0; i < pixel_count; ++i)
+        rgba_data.reserve(pixel_count_total * 4 * bytes_per_component);
+        for (std::size_t i = 0; i < pixel_count_total; ++i)
         {
             const auto* pixel = &src_data[i * src_stride];
             auto push_channel = [&](std::size_t channel) {
@@ -379,13 +381,15 @@ void TextureResources::UploadTexture(
     std::memcpy(mapped_data, upload_data.data(), upload_data.size());
     owner_.vk_unique_device_->unmapMemory(*staging_memory);
 
+    const std::uint32_t layer_count = face_count;
+
     vk::ImageCreateInfo image_info(
-        vk::ImageCreateFlags{},
+        is_cubemap ? vk::ImageCreateFlagBits::eCubeCompatible : vk::ImageCreateFlags{},
         vk::ImageType::e2D,
         image_format,
         vk::Extent3D(size.x, size.y, 1),
         1,
-        1,
+        layer_count,
         vk::SampleCountFlagBits::e1,
         vk::ImageTiling::eOptimal,
         vk::ImageUsageFlagBits::eTransferDst |
@@ -404,25 +408,29 @@ void TextureResources::UploadTexture(
         *image,
         image_format,
         vk::ImageLayout::eUndefined,
-        vk::ImageLayout::eTransferDstOptimal);
+        vk::ImageLayout::eTransferDstOptimal,
+        layer_count);
     owner_.CopyBufferToImage(
         *staging_buffer,
         *image,
         size.x,
-        size.y);
+        size.y,
+        layer_count,
+        upload_data.size() / layer_count);
     owner_.TransitionImageLayout(
         *image,
         image_format,
         vk::ImageLayout::eTransferDstOptimal,
-        vk::ImageLayout::eShaderReadOnlyOptimal);
+        vk::ImageLayout::eShaderReadOnlyOptimal,
+        layer_count);
 
     vk::ImageViewCreateInfo view_info(
         vk::ImageViewCreateFlags{},
         *image,
-        vk::ImageViewType::e2D,
+        texture_interface.GetViewType(),
         image_format,
         {},
-        {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1});
+        {vk::ImageAspectFlagBits::eColor, 0, 1, 0, layer_count});
     auto view = owner_.vk_unique_device_->createImageViewUnique(view_info);
 
     vk::SamplerCreateInfo sampler_info(
@@ -430,9 +438,9 @@ void TextureResources::UploadTexture(
         vk::Filter::eLinear,
         vk::Filter::eLinear,
         vk::SamplerMipmapMode::eLinear,
-        vk::SamplerAddressMode::eRepeat,
-        vk::SamplerAddressMode::eRepeat,
-        vk::SamplerAddressMode::eRepeat,
+        is_cubemap ? vk::SamplerAddressMode::eClampToEdge : vk::SamplerAddressMode::eRepeat,
+        is_cubemap ? vk::SamplerAddressMode::eClampToEdge : vk::SamplerAddressMode::eRepeat,
+        is_cubemap ? vk::SamplerAddressMode::eClampToEdge : vk::SamplerAddressMode::eRepeat,
         0.0f,
         VK_FALSE,
         1.0f,
@@ -446,7 +454,7 @@ void TextureResources::UploadTexture(
 
     texture_interface.SetGpuResources(
         image_format,
-        vk::ImageViewType::e2D,
+        texture_interface.GetViewType(),
         std::move(image),
         std::move(image_memory),
         std::move(view),
@@ -827,7 +835,12 @@ glm::uvec2 Device::GetSize() const
 
 void Device::Display(double dt)
 {
-    elapsed_time_seconds_ = static_cast<float>(dt);
+    elapsed_time_seconds_ += static_cast<float>(dt);
+
+    if (level_)
+    {
+        level_->UpdateLights(static_cast<double>(elapsed_time_seconds_));
+    }
 
     if (!vk_unique_device_ || !swapchain_)
     {
@@ -1278,6 +1291,23 @@ void Device::RecordCommandBuffer(
         {
             try
             {
+                auto camera_holder_id = level_->GetDefaultCameraId();
+                if (camera_holder_id != NullId)
+                {
+                    auto& node =
+                        level_->GetSceneNodeFromId(camera_holder_id);
+                    auto matrix_node = node.GetLocalModel(
+                        static_cast<double>(elapsed_time_seconds_));
+                    auto inverse_model = glm::inverse(matrix_node);
+                    auto& default_camera = level_->GetDefaultCamera();
+                    default_camera.SetFront(
+                        default_camera.GetFront() * glm::mat3(inverse_model));
+                    default_camera.SetPosition(
+                        glm::vec3(
+                            glm::vec4(default_camera.GetPosition(), 1.0f) *
+                            inverse_model));
+                }
+
                 auto& camera = level_->GetDefaultCamera();
                 if (swapchain_extent_.height != 0)
                 {
@@ -1286,7 +1316,10 @@ void Device::RecordCommandBuffer(
                         static_cast<float>(swapchain_extent_.height));
                 }
                 projection = camera.ComputeProjection();
+                projection[1][1] *= -1.0f;
                 view = camera.ComputeView();
+                glm::mat4 rotation = glm::mat4(1.0f);
+                view = rotation * view;
 
                 const auto mesh_pairs =
                     level_->GetStaticMeshMaterialIds();
@@ -1307,35 +1340,20 @@ void Device::RecordCommandBuffer(
 
         if (push_constant_size_ > 0)
         {
-            if (use_procedural_quad_pipeline_ &&
-                active_program_info_ &&
-                active_program_info_->uses_time_uniform)
+            struct alignas(16) PushConstants
             {
-                const float time_value = elapsed_time_seconds_;
-                command_buffer.pushConstants(
-                    *pipeline_layout_,
-                    push_constant_stages_,
-                    0,
-                    sizeof(time_value),
-                    &time_value);
+                glm::mat4 projection;
+                glm::mat4 view;
+                glm::mat4 model;
+                float time_s;
+            } push_constants{projection, view, model, elapsed_time_seconds_};
+            command_buffer.pushConstants(
+                *pipeline_layout_,
+                push_constant_stages_,
+                0,
+                push_constant_size_,
+                &push_constants);
             }
-            else
-            {
-                struct alignas(16) PushConstants
-                {
-                    glm::mat4 projection;
-                    glm::mat4 view;
-                    glm::mat4 model;
-                } push_constants{projection, view, model};
-
-                command_buffer.pushConstants(
-                    *pipeline_layout_,
-                    push_constant_stages_,
-                    0,
-                    sizeof(PushConstants),
-                    &push_constants);
-            }
-        }
 
         if (use_procedural_quad_pipeline_)
         {
@@ -1448,6 +1466,14 @@ void Device::CreateGraphicsPipeline()
         active_program_info_ &&
         active_program_info_->scene_type == frame::proto::SceneType::QUAD;
 
+    struct alignas(16) PushConstants
+    {
+        glm::mat4 projection;
+        glm::mat4 view;
+        glm::mat4 model;
+        float time_s;
+    };
+
     if (use_procedural_quad_pipeline_)
     {
         if (active_program_info_ && active_program_info_->uses_time_uniform)
@@ -1463,7 +1489,7 @@ void Device::CreateGraphicsPipeline()
     }
     else
     {
-        push_constant_size_ = sizeof(glm::mat4) * 3;
+        push_constant_size_ = static_cast<std::uint32_t>(sizeof(PushConstants));
         push_constant_stages_ = vk::ShaderStageFlagBits::eVertex;
     }
 
@@ -1729,7 +1755,8 @@ void Device::TransitionImageLayout(
     vk::Image image,
     vk::Format,
     vk::ImageLayout old_layout,
-    vk::ImageLayout new_layout)
+    vk::ImageLayout new_layout,
+    std::uint32_t layer_count)
 {
     vk::CommandBufferAllocateInfo alloc_info(
         *command_pool_,
@@ -1749,7 +1776,7 @@ void Device::TransitionImageLayout(
         VK_QUEUE_FAMILY_IGNORED,
         VK_QUEUE_FAMILY_IGNORED,
         image,
-        {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1});
+        {vk::ImageAspectFlagBits::eColor, 0, 1, 0, layer_count});
 
     vk::PipelineStageFlags src_stage;
     vk::PipelineStageFlags dst_stage;
@@ -1797,7 +1824,9 @@ void Device::CopyBufferToImage(
     vk::Buffer buffer,
     vk::Image image,
     std::uint32_t width,
-    std::uint32_t height)
+    std::uint32_t height,
+    std::uint32_t layer_count,
+    std::size_t layer_stride)
 {
     vk::CommandBufferAllocateInfo alloc_info(
         *command_pool_,
@@ -1809,19 +1838,29 @@ void Device::CopyBufferToImage(
         vk::CommandBufferUsageFlagBits::eOneTimeSubmit);
     command_buffer.begin(begin_info);
 
-    vk::BufferImageCopy copy_region(
-        0,
-        0,
-        0,
-        {vk::ImageAspectFlagBits::eColor, 0, 0, 1},
-        {0, 0, 0},
-        {width, height, 1});
+    std::vector<vk::BufferImageCopy> copies;
+    copies.reserve(layer_count);
+    const std::size_t stride =
+        (layer_stride == 0)
+            ? static_cast<std::size_t>(width) * height
+            : layer_stride;
+    for (std::uint32_t layer = 0; layer < layer_count; ++layer)
+    {
+        copies.emplace_back(
+            stride * layer,
+            0,
+            0,
+            vk::ImageSubresourceLayers{
+                vk::ImageAspectFlagBits::eColor, 0, layer, 1},
+            vk::Offset3D{0, 0, 0},
+            vk::Extent3D{width, height, 1});
+    }
 
     command_buffer.copyBufferToImage(
         buffer,
         image,
         vk::ImageLayout::eTransferDstOptimal,
-        copy_region);
+        copies);
 
     command_buffer.end();
 

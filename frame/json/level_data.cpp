@@ -66,6 +66,31 @@ LevelData BuildLevelData(
             mesh_info.indices = {0, 1, 2, 2, 3, 0};
             data.meshes.push_back(std::move(mesh_info));
         }
+        else if (node.mesh_enum() == frame::proto::NodeStaticMesh::CUBE)
+        {
+            StaticMeshInfo mesh_info;
+            mesh_info.name = node.name();
+            mesh_info.positions = {
+                -0.5f, -0.5f, -0.5f, 0.5f,  -0.5f, -0.5f, 0.5f,  0.5f, -0.5f,
+                0.5f,  0.5f,  -0.5f, -0.5f, 0.5f,  -0.5f, -0.5f, -0.5f, -0.5f,
+                -0.5f, -0.5f, 0.5f,  0.5f,  -0.5f, 0.5f,  0.5f,  0.5f, 0.5f,
+                0.5f,  0.5f,  0.5f,  -0.5f, 0.5f,  0.5f,  -0.5f, -0.5f, 0.5f,
+                -0.5f, 0.5f,  0.5f,  -0.5f, 0.5f,  -0.5f, -0.5f, -0.5f, -0.5f,
+                -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, 0.5f,  -0.5f, 0.5f,  0.5f,
+                0.5f,  0.5f,  0.5f,  0.5f,  0.5f,  0.5f,  0.5f,  0.5f,  0.5f,
+                0.5f,  0.5f,  0.5f,  0.5f,  0.5f,  -0.5f, 0.5f,  -0.5f, -0.5f,
+                0.5f,  -0.5f, -0.5f, 0.5f,  -0.5f, -0.5f, 0.5f,  -0.5f, 0.5f,
+                0.5f,  -0.5f, 0.5f,  0.5f,  0.5f,  0.5f,  0.5f,  0.5f,  0.5f,
+                0.5f,  0.5f,  -0.5f, -0.5f, -0.5f, -0.5f, 0.5f,  -0.5f, -0.5f,
+                0.5f,  -0.5f, 0.5f,  0.5f,  -0.5f, 0.5f,  -0.5f, -0.5f, 0.5f,
+                -0.5f, -0.5f, -0.5f, -0.5f, 0.5f,  -0.5f, 0.5f,  0.5f,  -0.5f,
+                0.5f,  0.5f,  0.5f,  0.5f,  0.5f,  0.5f,  -0.5f, 0.5f,  0.5f,
+                -0.5f, 0.5f,  -0.5f};
+            mesh_info.uvs.resize((mesh_info.positions.size() / 3) * 2, 0.0f);
+            mesh_info.indices.resize(36);
+            std::iota(mesh_info.indices.begin(), mesh_info.indices.end(), 0);
+            data.meshes.push_back(std::move(mesh_info));
+        }
     }
 
     return data;

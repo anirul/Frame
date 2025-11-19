@@ -40,6 +40,14 @@ class Texture : public frame::TextureInterface
     {
         display_size_ = display_size;
     }
+    void SetViewType(vk::ImageViewType view_type)
+    {
+        view_type_ = view_type;
+    }
+    vk::ImageViewType GetViewType() const
+    {
+        return view_type_;
+    }
 
     bool HasGpuResources() const;
     void SetGpuResources(
