@@ -15,10 +15,17 @@ set(FRAME_VULKAN_DATA_SOURCES
   material.h
   program.cpp
   program.h
+  command_queue.cpp
+  command_queue.h
+  gpu_memory_manager.cpp
+  gpu_memory_manager.h
+  scene_state.cpp
+  scene_state.h
   static_mesh.cpp
   static_mesh.h
   texture.cpp
   texture.h
+  dispatcher.cpp
 )
 
 add_library(FrameVulkanData STATIC ${FRAME_VULKAN_DATA_SOURCES})
@@ -46,7 +53,6 @@ add_library(FrameVulkan
     debug_callback.h
     device.h
     device.cpp
-    dispatcher.cpp
     sdl_vulkan_none.h
     sdl_vulkan_none.cpp
     sdl_vulkan_window.h

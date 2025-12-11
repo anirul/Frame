@@ -13,7 +13,7 @@
 #include <vector>
 #include <vulkan/vulkan.hpp>
 #include <shaderc/shaderc.h>
-
+ 
 #include "frame/json/level_data.h"
 #include "frame/proto/level.pb.h"
 
@@ -21,7 +21,7 @@
 #include "frame/device_interface.h"
 #include "frame/texture_interface.h"
 #include "frame/logger.h"
-
+ 
 namespace frame::vulkan
 {
 
@@ -103,6 +103,10 @@ class Device : public DeviceInterface
     void RecreateSwapchain();
     void CreateGraphicsPipeline();
     void DestroyGraphicsPipeline();
+    void CreateComputePipeline();
+    void DestroyComputePipeline();
+    void CreateComputeOutputImage();
+    void DestroyComputeOutputImage();
     std::vector<std::uint32_t> CompileShader(
         const std::filesystem::path& path,
         shaderc_shader_kind kind) const;
@@ -133,15 +137,23 @@ class Device : public DeviceInterface
         vk::UniqueDeviceMemory index_memory;
         std::uint32_t index_count = 0;
     };
+    struct BufferResource
+    {
+        std::string name;
+        vk::UniqueBuffer buffer;
+        vk::UniqueDeviceMemory memory;
+        vk::DeviceSize size = 0;
+    };
+    void LogDescriptorDebugInfo(
+        const std::vector<EntityId>& texture_ids,
+        const std::vector<std::uint32_t>& texture_bindings,
+        const std::vector<BufferResource>& buffers,
+        const std::vector<std::uint32_t>& storage_bindings) const;
+    void LogGpuBufferSamples() const;
     void CreateMeshResources(const frame::json::LevelData& level_data);
     void DestroyMeshResources();
     MeshResource CreateMeshResource(
         const frame::json::StaticMeshInfo& mesh_info);
-    vk::UniqueBuffer CreateBuffer(
-        vk::DeviceSize size,
-        vk::BufferUsageFlags usage,
-        vk::MemoryPropertyFlags properties,
-        vk::UniqueDeviceMemory& out_memory) const;
     void CopyBuffer(vk::Buffer src, vk::Buffer dst, vk::DeviceSize size);
     void TransitionImageLayout(
         vk::Image image,
@@ -156,9 +168,6 @@ class Device : public DeviceInterface
         std::uint32_t height,
         std::uint32_t layer_count = 1,
         std::size_t layer_stride = 0);
-    std::uint32_t FindMemoryType(
-        std::uint32_t type_filter,
-        vk::MemoryPropertyFlags properties) const;
 
   private:
     std::unique_ptr<LevelInterface> level_ = nullptr;
@@ -192,11 +201,17 @@ class Device : public DeviceInterface
     std::vector<vk::CommandBuffer> command_buffers_;
     vk::UniquePipelineLayout pipeline_layout_;
     vk::UniquePipeline graphics_pipeline_;
+    vk::UniquePipeline compute_pipeline_;
+    vk::UniquePipelineLayout compute_pipeline_layout_;
+    std::unique_ptr<class GpuMemoryManager> gpu_memory_manager_;
+    std::unique_ptr<class CommandQueue> command_queue_;
     vk::UniqueDescriptorSetLayout descriptor_set_layout_;
     vk::UniqueDescriptorPool descriptor_pool_;
     vk::DescriptorSet descriptor_set_ = VK_NULL_HANDLE;
     std::unique_ptr<TextureResources> texture_resources_;
     std::vector<EntityId> descriptor_texture_ids_;
+    std::vector<BufferResource> storage_buffers_;
+    BufferResource uniform_buffer_;
     std::vector<MeshResource> meshes_;
     static constexpr std::size_t kMaxFramesInFlight = 2;
     std::array<vk::UniqueSemaphore, kMaxFramesInFlight> image_available_semaphores_;
@@ -205,15 +220,31 @@ class Device : public DeviceInterface
     std::size_t current_frame_ = 0;
     bool framebuffer_resized_ = false;
     bool sync_objects_created_ = false;
+    bool use_compute_raytracing_ = false;
+    vk::UniqueImage compute_output_image_;
+    vk::UniqueDeviceMemory compute_output_memory_;
+    vk::UniqueImageView compute_output_view_;
+    vk::UniqueSampler compute_output_sampler_;
+    bool compute_output_in_shader_read_ = false;
+    vk::Format compute_output_format_ = vk::Format::eR16G16B16A16Sfloat;
+    bool debug_dump_compute_output_ = false;
+    bool debug_dump_done_ = false;
+    BufferResource debug_readback_;
+    bool debug_log_scene_state_ = false;
     struct ProgramPipelineInfo
     {
         std::string program_name;
         EntityId program_id = NullId;
+        EntityId material_id = NullId;
         std::filesystem::path vertex_shader;
         std::filesystem::path fragment_shader;
+        std::filesystem::path compute_shader;
         frame::proto::SceneType::Enum scene_type = frame::proto::SceneType::NONE;
         bool uses_time_uniform = false;
+        bool use_compute = false;
         std::vector<EntityId> input_texture_ids;
+        std::vector<EntityId> input_buffer_ids;
+        std::vector<std::string> input_buffer_inner_names;
     };
 
     std::optional<frame::json::LevelData> current_level_data_;

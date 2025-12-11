@@ -26,6 +26,10 @@ class Buffer : public frame::BufferInterface
     {
         // No-op for the CPU backed implementation.
     }
+    const std::vector<std::uint8_t>& GetRawData() const
+    {
+        return data_;
+    }
 
     std::string GetName() const override
     {

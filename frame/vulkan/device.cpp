@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <cstdlib>
 #include <cstring>
 #include <format>
 #include <limits>
@@ -19,8 +20,13 @@
 
 #include "frame/camera.h"
 #include "frame/level.h"
+#include "frame/vulkan/buffer.h"
 #include "frame/vulkan/build_level.h"
+#include "frame/vulkan/command_queue.h"
+#include "frame/vulkan/gpu_memory_manager.h"
 #include "frame/vulkan/mesh_utils.h"
+#include "frame/vulkan/scene_state.h"
+#include "frame/vulkan/raytracing_bindings.h"
 #include "frame/vulkan/texture.h"
 #include "frame/proto/uniform.pb.h"
 #include <glm/gtc/packing.hpp>
@@ -372,10 +378,11 @@ void TextureResources::UploadTexture(
     }
 
     vk::UniqueDeviceMemory staging_memory;
-    auto staging_buffer = owner_.CreateBuffer(
+    auto staging_buffer = owner_.gpu_memory_manager_->CreateBuffer(
         upload_data.size(),
         vk::BufferUsageFlagBits::eTransferSrc,
-        vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent,
+        vk::MemoryPropertyFlagBits::eHostVisible |
+            vk::MemoryPropertyFlagBits::eHostCoherent,
         staging_memory);
     void* mapped_data =
         owner_.vk_unique_device_->mapMemory(*staging_memory, 0, upload_data.size());
@@ -401,24 +408,26 @@ void TextureResources::UploadTexture(
     auto requirements = owner_.vk_unique_device_->getImageMemoryRequirements(*image);
     vk::MemoryAllocateInfo allocate_info(
         requirements.size,
-        owner_.FindMemoryType(requirements.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal));
+        owner_.gpu_memory_manager_->FindMemoryType(
+            requirements.memoryTypeBits,
+            vk::MemoryPropertyFlagBits::eDeviceLocal));
     auto image_memory = owner_.vk_unique_device_->allocateMemoryUnique(allocate_info);
     owner_.vk_unique_device_->bindImageMemory(*image, *image_memory, 0);
 
-    owner_.TransitionImageLayout(
+    owner_.command_queue_->TransitionImageLayout(
         *image,
         image_format,
         vk::ImageLayout::eUndefined,
         vk::ImageLayout::eTransferDstOptimal,
         layer_count);
-    owner_.CopyBufferToImage(
+    owner_.command_queue_->CopyBufferToImage(
         *staging_buffer,
         *image,
         size.x,
         size.y,
         layer_count,
         upload_data.size() / layer_count);
-    owner_.TransitionImageLayout(
+    owner_.command_queue_->TransitionImageLayout(
         *image,
         image_format,
         vk::ImageLayout::eTransferDstOptimal,
@@ -472,6 +481,11 @@ Device::Device(
       vk_surface_(surface),
       texture_resources_(std::make_unique<TextureResources>(*this))
 {
+    const char* dump_env = std::getenv("FRAME_VK_DUMP_COMPUTE");
+    debug_dump_compute_output_ = dump_env && std::strlen(dump_env) > 0;
+    const char* log_state_env = std::getenv("FRAME_VK_LOG_SCENE");
+    debug_log_scene_state_ = log_state_env && std::strlen(log_state_env) > 0;
+
     logger_->info("Initializing Vulkan device ({}x{})", size_.x, size_.y);
 
     std::vector<vk::PhysicalDevice> physical_devices =
@@ -637,18 +651,44 @@ void Device::StartupFromLevelData(const frame::json::LevelData& level_data)
     current_level_data_ = level_data;
     active_program_info_.reset();
     use_procedural_quad_pipeline_ = false;
+    use_compute_raytracing_ = false;
+    compute_output_in_shader_read_ = false;
     elapsed_time_seconds_ = 0.0f;
 
-    if (!level_data.programs.empty())
+    // Prefer the raytracing program (QUAD) if present; otherwise fall back to
+    // the first available program.
+    auto pick_program = [&]() -> std::optional<frame::json::ProgramInfo> {
+        for (const auto& program : level_data.programs)
+        {
+            if (program.vertex_shader == "raytracing.vert" ||
+                program.name == "RayTraceProgram")
+            {
+                return program;
+            }
+        }
+        if (!level_data.programs.empty())
+        {
+            return level_data.programs.front();
+        }
+        return std::nullopt;
+    };
+
+    if (auto chosen_program = pick_program())
     {
         ProgramPipelineInfo pipeline_info;
-        const auto& program_info = level_data.programs.front();
+        const auto& program_info = *chosen_program;
         pipeline_info.program_name = program_info.name;
         const auto shader_root =
             level_data.asset_root / "shader" / "vulkan";
         pipeline_info.vertex_shader = shader_root / program_info.vertex_shader;
         pipeline_info.fragment_shader =
             shader_root / program_info.fragment_shader;
+        pipeline_info.use_compute =
+            (program_info.name == "RayTraceProgram");
+        if (pipeline_info.use_compute)
+        {
+            pipeline_info.compute_shader = shader_root / "raytracing.comp";
+        }
         pipeline_info.scene_type = frame::proto::SceneType::NONE;
         for (const auto& proto_program : level_data.proto.programs())
         {
@@ -679,7 +719,10 @@ void Device::StartupFromLevelData(const frame::json::LevelData& level_data)
     {
         active_program_info_->program_id =
             level_->GetIdFromName(active_program_info_->program_name);
+        use_compute_raytracing_ = active_program_info_->use_compute;
         active_program_info_->input_texture_ids.clear();
+        active_program_info_->input_buffer_ids.clear();
+        active_program_info_->input_buffer_inner_names.clear();
         if (active_program_info_->program_id != NullId)
         {
             try
@@ -688,6 +731,101 @@ void Device::StartupFromLevelData(const frame::json::LevelData& level_data)
                     active_program_info_->program_id);
                 active_program_info_->input_texture_ids =
                     program.GetInputTextureIds();
+                // Select a material bound to this program as the active one and
+                // capture buffers in the same order as the proto definition.
+                const frame::proto::Material* proto_material_ptr = nullptr;
+                for (const auto& proto_mat : current_level_data_->proto.materials())
+                {
+                    if (proto_mat.program_name() ==
+                        active_program_info_->program_name)
+                    {
+                        proto_material_ptr = &proto_mat;
+                        break;
+                    }
+                }
+                for (auto material_id : level_->GetMaterials())
+                {
+                    auto& material = level_->GetMaterialFromId(material_id);
+                    if (material.GetProgramId(level_.get()) ==
+                        active_program_info_->program_id)
+                    {
+                        active_program_info_->material_id = material_id;
+                        if (proto_material_ptr)
+                        {
+                            for (int i = 0;
+                                 i < proto_material_ptr->buffer_names_size();
+                                 ++i)
+                            {
+                                const auto& buffer_name =
+                                    proto_material_ptr->buffer_names(i);
+                                auto buffer_id =
+                                    level_->GetIdFromName(buffer_name);
+                                if (buffer_id != NullId)
+                                {
+                                    active_program_info_->input_buffer_ids.push_back(
+                                        buffer_id);
+                                    active_program_info_
+                                        ->input_buffer_inner_names.push_back(
+                                            proto_material_ptr
+                                                ->inner_buffer_names(i));
+                                }
+                            }
+                        }
+                        // Ensure triangle/BVH SSBOs are captured even if the
+                        // proto material list is missing or incomplete.
+                        auto append_buffer_if_present =
+                            [&](EntityId buffer_id,
+                                const std::string& inner_name) {
+                                if (buffer_id == NullId)
+                                {
+                                    return;
+                                }
+                                if (std::find(
+                                        active_program_info_
+                                            ->input_buffer_ids.begin(),
+                                        active_program_info_
+                                            ->input_buffer_ids.end(),
+                                        buffer_id) ==
+                                    active_program_info_
+                                        ->input_buffer_ids.end())
+                                {
+                                    active_program_info_->input_buffer_ids.push_back(
+                                        buffer_id);
+                                    // Keep binding order stable by mirroring
+                                    // the shader names.
+                                    active_program_info_
+                                        ->input_buffer_inner_names.push_back(
+                                            inner_name);
+                                }
+                            };
+                        // Collect buffers from all meshes using this material.
+                        const std::array<
+                            frame::proto::NodeStaticMesh::RenderTimeEnum, 2>
+                            render_times = {
+                                frame::proto::NodeStaticMesh::PRE_RENDER_TIME,
+                                frame::proto::NodeStaticMesh::SCENE_RENDER_TIME};
+                        for (auto render_time : render_times)
+                        {
+                            const auto mesh_pairs =
+                                level_->GetStaticMeshMaterialIds(render_time);
+                            for (const auto& pair : mesh_pairs)
+                            {
+                                if (pair.second != material_id)
+                                {
+                                    continue;
+                                }
+                                auto& mesh =
+                                    level_->GetStaticMeshFromId(pair.first);
+                                append_buffer_if_present(
+                                    mesh.GetTriangleBufferId(),
+                                    "TriangleBuffer");
+                                append_buffer_if_present(
+                                    mesh.GetBvhBufferId(), "BvhBuffer");
+                            }
+                        }
+                        break;
+                    }
+                }
             }
             catch (const std::exception& ex)
             {
@@ -704,6 +842,7 @@ void Device::StartupFromLevelData(const frame::json::LevelData& level_data)
         CreateCommandPool();
     }
 
+    DestroyComputePipeline();
     DestroyDescriptorResources();
     DestroyTextureResources();
     DestroyMeshResources();
@@ -711,8 +850,15 @@ void Device::StartupFromLevelData(const frame::json::LevelData& level_data)
     try
     {
         CreateTextureResources(level_data);
+        DestroySwapchainResources();
+        CreateSwapchainResources();
         CreateDescriptorResources();
         CreateMeshResources(level_data);
+        CreateGraphicsPipeline();
+        if (use_compute_raytracing_)
+        {
+            CreateComputePipeline();
+        }
     }
     catch (const std::exception& ex)
     {
@@ -720,10 +866,9 @@ void Device::StartupFromLevelData(const frame::json::LevelData& level_data)
         DestroyDescriptorResources();
         DestroyTextureResources();
         DestroyMeshResources();
+        DestroyGraphicsPipeline();
+        DestroyComputePipeline();
     }
-
-    DestroySwapchainResources();
-    CreateSwapchainResources();
 
     if (!sync_objects_created_)
     {
@@ -909,6 +1054,63 @@ void Device::Display(double dt)
 
     graphics_queue_.submit(submit_info, *fence);
 
+    if (debug_dump_compute_output_ && debug_readback_.buffer && !debug_dump_done_)
+    {
+        graphics_queue_.waitIdle();
+        void* mapped = vk_unique_device_->mapMemory(
+            *debug_readback_.memory, 0, debug_readback_.size);
+        const auto* raw16 =
+            static_cast<const std::uint16_t*>(mapped);
+        const std::size_t pixel_count =
+            swapchain_extent_.width * swapchain_extent_.height;
+        double sum_r = 0.0;
+        double sum_g = 0.0;
+        double sum_b = 0.0;
+        auto sample_half2 = [](const std::uint16_t* p) -> glm::vec2 {
+            return glm::unpackHalf2x16(
+                (static_cast<std::uint32_t>(p[1]) << 16) | p[0]);
+        };
+        for (std::size_t i = 0; i < pixel_count; ++i)
+        {
+            const std::uint16_t* px = raw16 + i * 4;
+            const glm::vec2 rg = sample_half2(px);
+            const glm::vec2 ba = sample_half2(px + 2);
+            sum_r += rg.x;
+            sum_g += rg.y;
+            sum_b += ba.x;
+        }
+        vk_unique_device_->unmapMemory(*debug_readback_.memory);
+        if (pixel_count > 0)
+        {
+            const float avg_r = static_cast<float>(sum_r / pixel_count);
+            const float avg_g = static_cast<float>(sum_g / pixel_count);
+            const float avg_b = static_cast<float>(sum_b / pixel_count);
+            if (!std::isfinite(avg_r) || !std::isfinite(avg_g) ||
+                !std::isfinite(avg_b))
+            {
+                logger_->warn("Debug compute capture avg color is NaN/Inf.");
+            }
+            else
+            {
+                logger_->info(
+                    "Debug compute capture avg color: ({:.3f}, {:.3f}, {:.3f})",
+                    avg_r,
+                    avg_g,
+                    avg_b);
+            }
+            const std::size_t cx = swapchain_extent_.width / 2;
+            const std::size_t cy = swapchain_extent_.height / 2;
+            const std::size_t center_index = (cy * swapchain_extent_.width + cx) * 4;
+            const auto* center_px = raw16 + center_index;
+            const glm::vec2 center_rg = sample_half2(center_px);
+            const glm::vec2 center_ba = sample_half2(center_px + 2);
+            logger_->info(
+                "Center pixel color (compute output): ({:.3f}, {:.3f}, {:.3f}, {:.3f})",
+                center_rg.x, center_rg.y, center_ba.x, center_ba.y);
+        }
+        debug_dump_done_ = true;
+    }
+
     vk::PresentInfoKHR present_info(
         1,
         signal_semaphores,
@@ -966,6 +1168,10 @@ void Device::CreateCommandPool()
         vk::CommandPoolCreateFlagBits::eResetCommandBuffer,
         graphics_queue_family_index_);
     command_pool_ = vk_unique_device_->createCommandPoolUnique(pool_info);
+    gpu_memory_manager_ = std::make_unique<GpuMemoryManager>(
+        vk_physical_device_, *vk_unique_device_);
+    command_queue_ = std::make_unique<CommandQueue>(
+        *vk_unique_device_, graphics_queue_, *command_pool_);
 }
 
 void Device::CreateSyncObjects()
@@ -1188,12 +1394,11 @@ void Device::CreateSwapchainResources()
         static_cast<std::uint32_t>(kMaxFramesInFlight));
     command_buffers_ =
         vk_unique_device_->allocateCommandBuffers(allocate_info);
-
-    CreateGraphicsPipeline();
 }
 
 void Device::DestroySwapchainResources()
 {
+    DestroyComputePipeline();
     DestroyGraphicsPipeline();
 
     if (vk_unique_device_ && command_pool_ && !command_buffers_.empty())
@@ -1221,8 +1426,16 @@ void Device::RecreateSwapchain()
         vk_unique_device_->waitIdle();
     }
 
+    DestroyComputePipeline();
+    DestroyDescriptorResources();
     DestroySwapchainResources();
     CreateSwapchainResources();
+    CreateDescriptorResources();
+    CreateGraphicsPipeline();
+    if (use_compute_raytracing_)
+    {
+        CreateComputePipeline();
+    }
 }
 
 void Device::RecordCommandBuffer(
@@ -1231,6 +1444,202 @@ void Device::RecordCommandBuffer(
 {
     vk::CommandBufferBeginInfo begin_info;
     command_buffer.begin(begin_info);
+
+    const SceneState scene_state =
+        (level_)
+            ? BuildSceneState(
+                  *level_,
+                  frame::Logger::GetInstance(),
+                  {swapchain_extent_.width, swapchain_extent_.height},
+                  elapsed_time_seconds_,
+                  active_program_info_
+                      ? active_program_info_->material_id
+                      : NullId)
+            : SceneState{};
+
+    if (debug_log_scene_state_ && !debug_dump_done_)
+    {
+        logger_->info(
+            "SceneState: proj[1][1]={:.3f}, view[3]={:.3f},{:.3f},{:.3f},{:.3f}, "
+            "model[3]={:.3f},{:.3f},{:.3f},{:.3f}, camera=({:.3f},{:.3f},{:.3f})",
+            scene_state.projection[1][1],
+            scene_state.view[3][0],
+            scene_state.view[3][1],
+            scene_state.view[3][2],
+            scene_state.view[3][3],
+            scene_state.model[3][0],
+            scene_state.model[3][1],
+            scene_state.model[3][2],
+            scene_state.model[3][3],
+            scene_state.camera_position.x,
+            scene_state.camera_position.y,
+            scene_state.camera_position.z);
+        logger_->info(
+            "SceneState model matrix first row: {:.3f} {:.3f} {:.3f} {:.3f}",
+            scene_state.model[0][0],
+            scene_state.model[0][1],
+            scene_state.model[0][2],
+            scene_state.model[0][3]);
+    }
+
+    auto update_uniform_buffer = [&](const SceneState& state) {
+        if (!uniform_buffer_.buffer ||
+            !uniform_buffer_.memory ||
+            uniform_buffer_.size == 0)
+        {
+            return;
+        }
+        auto block = MakeUniformBlock(
+            state, elapsed_time_seconds_);
+        void* mapped = vk_unique_device_->mapMemory(
+            *uniform_buffer_.memory, 0, uniform_buffer_.size);
+        std::memcpy(mapped, &block, sizeof(UniformBlock));
+        vk_unique_device_->unmapMemory(*uniform_buffer_.memory);
+    };
+    update_uniform_buffer(scene_state);
+
+    auto transition_output = [&](vk::ImageLayout old_layout,
+                                 vk::ImageLayout new_layout,
+                                 vk::PipelineStageFlags src_stage,
+                                 vk::PipelineStageFlags dst_stage,
+                                 vk::AccessFlags src_access,
+                                 vk::AccessFlags dst_access) {
+        if (!compute_output_image_)
+        {
+            return;
+        }
+        vk::ImageMemoryBarrier barrier(
+            src_access,
+            dst_access,
+            old_layout,
+            new_layout,
+            VK_QUEUE_FAMILY_IGNORED,
+            VK_QUEUE_FAMILY_IGNORED,
+            *compute_output_image_,
+            {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1});
+        command_buffer.pipelineBarrier(
+            src_stage,
+            dst_stage,
+            {},
+            nullptr,
+            nullptr,
+            barrier);
+    };
+
+    if (use_compute_raytracing_ &&
+        compute_pipeline_ &&
+        compute_pipeline_layout_ &&
+        descriptor_set_ &&
+        compute_output_image_ &&
+        swapchain_extent_.width > 0 &&
+        swapchain_extent_.height > 0)
+    {
+        if (compute_output_in_shader_read_)
+        {
+            transition_output(
+                vk::ImageLayout::eShaderReadOnlyOptimal,
+                vk::ImageLayout::eGeneral,
+                vk::PipelineStageFlagBits::eFragmentShader,
+                vk::PipelineStageFlagBits::eComputeShader,
+                vk::AccessFlagBits::eShaderRead,
+                vk::AccessFlagBits::eShaderWrite);
+            compute_output_in_shader_read_ = false;
+        }
+
+        command_buffer.bindPipeline(
+            vk::PipelineBindPoint::eCompute,
+            *compute_pipeline_);
+        command_buffer.bindDescriptorSets(
+            vk::PipelineBindPoint::eCompute,
+            *compute_pipeline_layout_,
+            0,
+            descriptor_set_,
+            {});
+        const std::uint32_t group_x =
+            (swapchain_extent_.width + 7) / 8;
+        const std::uint32_t group_y =
+            (swapchain_extent_.height + 7) / 8;
+        command_buffer.dispatch(group_x, group_y, 1);
+
+        transition_output(
+            vk::ImageLayout::eGeneral,
+            vk::ImageLayout::eShaderReadOnlyOptimal,
+            vk::PipelineStageFlagBits::eComputeShader,
+            vk::PipelineStageFlagBits::eFragmentShader,
+            vk::AccessFlagBits::eShaderWrite,
+            vk::AccessFlagBits::eShaderRead);
+        compute_output_in_shader_read_ = true;
+
+        if (debug_dump_compute_output_)
+        {
+            const vk::DeviceSize expected_size =
+                static_cast<vk::DeviceSize>(
+                    swapchain_extent_.width *
+                    swapchain_extent_.height *
+                    sizeof(std::uint16_t) * 4);
+            if (!debug_readback_.buffer ||
+                debug_readback_.size != expected_size)
+            {
+                vk::UniqueDeviceMemory rb_memory;
+                auto rb_buffer = gpu_memory_manager_->CreateBuffer(
+                    expected_size,
+                    vk::BufferUsageFlagBits::eTransferDst,
+                    vk::MemoryPropertyFlagBits::eHostVisible |
+                        vk::MemoryPropertyFlagBits::eHostCoherent,
+                    rb_memory);
+                debug_readback_.buffer = std::move(rb_buffer);
+                debug_readback_.memory = std::move(rb_memory);
+                debug_readback_.size = expected_size;
+            }
+
+            vk::ImageMemoryBarrier to_transfer(
+                vk::AccessFlagBits::eShaderWrite,
+                vk::AccessFlagBits::eTransferRead,
+                vk::ImageLayout::eShaderReadOnlyOptimal,
+                vk::ImageLayout::eTransferSrcOptimal,
+                VK_QUEUE_FAMILY_IGNORED,
+                VK_QUEUE_FAMILY_IGNORED,
+                *compute_output_image_,
+                {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1});
+            command_buffer.pipelineBarrier(
+                vk::PipelineStageFlagBits::eFragmentShader,
+                vk::PipelineStageFlagBits::eTransfer,
+                {},
+                nullptr,
+                nullptr,
+                to_transfer);
+
+            vk::BufferImageCopy copy_region(
+                0,
+                0,
+                0,
+                {vk::ImageAspectFlagBits::eColor, 0, 0, 1},
+                {0, 0, 0},
+                {swapchain_extent_.width, swapchain_extent_.height, 1});
+            command_buffer.copyImageToBuffer(
+                *compute_output_image_,
+                vk::ImageLayout::eTransferSrcOptimal,
+                *debug_readback_.buffer,
+                copy_region);
+
+            vk::ImageMemoryBarrier back_to_shader(
+                vk::AccessFlagBits::eTransferRead,
+                vk::AccessFlagBits::eShaderRead,
+                vk::ImageLayout::eTransferSrcOptimal,
+                vk::ImageLayout::eShaderReadOnlyOptimal,
+                VK_QUEUE_FAMILY_IGNORED,
+                VK_QUEUE_FAMILY_IGNORED,
+                *compute_output_image_,
+                {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1});
+            command_buffer.pipelineBarrier(
+                vk::PipelineStageFlagBits::eTransfer,
+                vk::PipelineStageFlagBits::eFragmentShader,
+                {},
+                nullptr,
+                nullptr,
+                back_to_shader);
+        }
+    }
 
     std::array<vk::ClearValue, 1> clear_values{};
     clear_values[0].color = vk::ClearColorValue(std::array<float, 4>{
@@ -1278,9 +1687,9 @@ void Device::RecordCommandBuffer(
                 {});
         }
 
-        glm::mat4 projection(1.0f);
-        glm::mat4 view(1.0f);
-        glm::mat4 model(1.0f);
+        glm::mat4 projection = scene_state.projection;
+        glm::mat4 view = scene_state.view;
+        glm::mat4 model = scene_state.model;
 
         const bool needs_scene_matrices =
             push_constant_size_ > 0 &&
@@ -1643,6 +2052,78 @@ void Device::DestroyGraphicsPipeline()
     pipeline_layout_.reset();
 }
 
+void Device::CreateComputePipeline()
+{
+    if (!use_compute_raytracing_ || !vk_unique_device_)
+    {
+        return;
+    }
+
+    DestroyComputePipeline();
+
+    if (!descriptor_set_layout_)
+    {
+        return;
+    }
+
+    if (!active_program_info_ ||
+        active_program_info_->compute_shader.empty())
+    {
+        return;
+    }
+
+    std::vector<std::uint32_t> compute_code;
+    try
+    {
+        compute_code = CompileShader(
+            active_program_info_->compute_shader, shaderc_compute_shader);
+    }
+    catch (const std::exception& ex)
+    {
+        logger_->warn(
+            "Failed to compile compute shader {}: {}",
+            active_program_info_->compute_shader.string(),
+            ex.what());
+        return;
+    }
+
+    auto compute_module = CreateShaderModule(compute_code);
+
+    vk::PipelineShaderStageCreateInfo stage_info(
+        vk::PipelineShaderStageCreateFlags{},
+        vk::ShaderStageFlagBits::eCompute,
+        *compute_module,
+        "main");
+
+    const vk::DescriptorSetLayout layouts[] = {*descriptor_set_layout_};
+    vk::PipelineLayoutCreateInfo layout_info(
+        vk::PipelineLayoutCreateFlags{},
+        1,
+        layouts);
+    compute_pipeline_layout_ =
+        vk_unique_device_->createPipelineLayoutUnique(layout_info);
+
+    vk::ComputePipelineCreateInfo pipeline_info(
+        vk::PipelineCreateFlags{},
+        stage_info,
+        *compute_pipeline_layout_);
+
+    auto pipeline_result =
+        vk_unique_device_->createComputePipelineUnique(nullptr, pipeline_info);
+    if (pipeline_result.result != vk::Result::eSuccess)
+    {
+        throw std::runtime_error("Failed to create Vulkan compute pipeline.");
+    }
+    compute_pipeline_ = std::move(pipeline_result.value);
+}
+
+void Device::DestroyComputePipeline()
+{
+    compute_pipeline_.reset();
+    compute_pipeline_layout_.reset();
+    compute_output_in_shader_read_ = false;
+}
+
 std::vector<std::uint32_t> Device::CompileShader(
     const std::filesystem::path& path,
     shaderc_shader_kind kind) const
@@ -1707,64 +2188,12 @@ vk::UniqueShaderModule Device::CreateShaderModule(
     return vk_unique_device_->createShaderModuleUnique(create_info);
 }
 
-std::uint32_t Device::FindMemoryType(
-    std::uint32_t type_filter,
-    vk::MemoryPropertyFlags properties) const
-{
-    auto mem_properties = vk_physical_device_.getMemoryProperties();
-    for (std::uint32_t i = 0; i < mem_properties.memoryTypeCount; ++i)
-    {
-        if ((type_filter & (1u << i)) &&
-            (mem_properties.memoryTypes[i].propertyFlags & properties) == properties)
-        {
-            return i;
-        }
-    }
-    throw std::runtime_error("Unable to find suitable Vulkan memory type.");
-}
-
-vk::UniqueBuffer Device::CreateBuffer(
-    vk::DeviceSize size,
-    vk::BufferUsageFlags usage,
-    vk::MemoryPropertyFlags properties,
-    vk::UniqueDeviceMemory& out_memory) const
-{
-    vk::BufferCreateInfo buffer_info(
-        vk::BufferCreateFlags{},
-        size,
-        usage,
-        vk::SharingMode::eExclusive);
-    auto buffer = vk_unique_device_->createBufferUnique(buffer_info);
-    auto requirements = vk_unique_device_->getBufferMemoryRequirements(*buffer);
-    vk::MemoryAllocateInfo allocate_info(
-        requirements.size,
-        FindMemoryType(requirements.memoryTypeBits, properties));
-    out_memory = vk_unique_device_->allocateMemoryUnique(allocate_info);
-    vk_unique_device_->bindBufferMemory(*buffer, *out_memory, 0);
-    return buffer;
-}
-
 void Device::CopyBuffer(vk::Buffer src, vk::Buffer dst, vk::DeviceSize size)
 {
-    vk::CommandBufferAllocateInfo alloc_info(
-        *command_pool_,
-        vk::CommandBufferLevel::ePrimary,
-        1);
-    auto command_buffers = vk_unique_device_->allocateCommandBuffers(alloc_info);
-    auto command_buffer = command_buffers.front();
-    vk::CommandBufferBeginInfo begin_info(
-        vk::CommandBufferUsageFlagBits::eOneTimeSubmit);
-    command_buffer.begin(begin_info);
-    vk::BufferCopy copy_region(0, 0, size);
-    command_buffer.copyBuffer(src, dst, copy_region);
-    command_buffer.end();
-    vk::SubmitInfo submit_info(
-        0, nullptr, nullptr,
-        1, &command_buffer,
-        0, nullptr);
-    graphics_queue_.submit(submit_info);
-    graphics_queue_.waitIdle();
-    vk_unique_device_->freeCommandBuffers(*command_pool_, command_buffer);
+    if (command_queue_)
+    {
+        command_queue_->CopyBuffer(src, dst, size);
+    }
 }
 
 void Device::TransitionImageLayout(
@@ -1774,66 +2203,11 @@ void Device::TransitionImageLayout(
     vk::ImageLayout new_layout,
     std::uint32_t layer_count)
 {
-    vk::CommandBufferAllocateInfo alloc_info(
-        *command_pool_,
-        vk::CommandBufferLevel::ePrimary,
-        1);
-    auto command_buffers = vk_unique_device_->allocateCommandBuffers(alloc_info);
-    auto command_buffer = command_buffers.front();
-    vk::CommandBufferBeginInfo begin_info(
-        vk::CommandBufferUsageFlagBits::eOneTimeSubmit);
-    command_buffer.begin(begin_info);
-
-    vk::ImageMemoryBarrier barrier(
-        {},
-        {},
-        old_layout,
-        new_layout,
-        VK_QUEUE_FAMILY_IGNORED,
-        VK_QUEUE_FAMILY_IGNORED,
-        image,
-        {vk::ImageAspectFlagBits::eColor, 0, 1, 0, layer_count});
-
-    vk::PipelineStageFlags src_stage;
-    vk::PipelineStageFlags dst_stage;
-
-    if (old_layout == vk::ImageLayout::eUndefined &&
-        new_layout == vk::ImageLayout::eTransferDstOptimal)
+    if (command_queue_)
     {
-        barrier.srcAccessMask = {};
-        barrier.dstAccessMask = vk::AccessFlagBits::eTransferWrite;
-        src_stage = vk::PipelineStageFlagBits::eTopOfPipe;
-        dst_stage = vk::PipelineStageFlagBits::eTransfer;
+        command_queue_->TransitionImageLayout(
+            image, {}, old_layout, new_layout, layer_count);
     }
-    else if (old_layout == vk::ImageLayout::eTransferDstOptimal &&
-             new_layout == vk::ImageLayout::eShaderReadOnlyOptimal)
-    {
-        barrier.srcAccessMask = vk::AccessFlagBits::eTransferWrite;
-        barrier.dstAccessMask = vk::AccessFlagBits::eShaderRead;
-        src_stage = vk::PipelineStageFlagBits::eTransfer;
-        dst_stage = vk::PipelineStageFlagBits::eFragmentShader;
-    }
-    else
-    {
-        throw std::runtime_error("Unsupported Vulkan image layout transition.");
-    }
-
-    command_buffer.pipelineBarrier(
-        src_stage,
-        dst_stage,
-        {},
-        nullptr,
-        nullptr,
-        barrier);
-    command_buffer.end();
-
-    vk::SubmitInfo submit_info(
-        0, nullptr, nullptr,
-        1, &command_buffer,
-        0, nullptr);
-    graphics_queue_.submit(submit_info);
-    graphics_queue_.waitIdle();
-    vk_unique_device_->freeCommandBuffers(*command_pool_, command_buffer);
 }
 
 void Device::CopyBufferToImage(
@@ -1844,49 +2218,11 @@ void Device::CopyBufferToImage(
     std::uint32_t layer_count,
     std::size_t layer_stride)
 {
-    vk::CommandBufferAllocateInfo alloc_info(
-        *command_pool_,
-        vk::CommandBufferLevel::ePrimary,
-        1);
-    auto command_buffers = vk_unique_device_->allocateCommandBuffers(alloc_info);
-    auto command_buffer = command_buffers.front();
-    vk::CommandBufferBeginInfo begin_info(
-        vk::CommandBufferUsageFlagBits::eOneTimeSubmit);
-    command_buffer.begin(begin_info);
-
-    std::vector<vk::BufferImageCopy> copies;
-    copies.reserve(layer_count);
-    const std::size_t stride =
-        (layer_stride == 0)
-            ? static_cast<std::size_t>(width) * height
-            : layer_stride;
-    for (std::uint32_t layer = 0; layer < layer_count; ++layer)
+    if (command_queue_)
     {
-        copies.emplace_back(
-            stride * layer,
-            0,
-            0,
-            vk::ImageSubresourceLayers{
-                vk::ImageAspectFlagBits::eColor, 0, layer, 1},
-            vk::Offset3D{0, 0, 0},
-            vk::Extent3D{width, height, 1});
+        command_queue_->CopyBufferToImage(
+            buffer, image, width, height, layer_count, layer_stride);
     }
-
-    command_buffer.copyBufferToImage(
-        buffer,
-        image,
-        vk::ImageLayout::eTransferDstOptimal,
-        copies);
-
-    command_buffer.end();
-
-    vk::SubmitInfo submit_info(
-        0, nullptr, nullptr,
-        1, &command_buffer,
-        0, nullptr);
-    graphics_queue_.submit(submit_info);
-    graphics_queue_.waitIdle();
-    vk_unique_device_->freeCommandBuffers(*command_pool_, command_buffer);
 }
 
 void Device::DestroyTextureResources()
@@ -1903,6 +2239,102 @@ void Device::DestroyDescriptorResources()
     descriptor_pool_.reset();
     descriptor_set_layout_.reset();
     descriptor_texture_ids_.clear();
+    storage_buffers_.clear();
+    uniform_buffer_ = {};
+    DestroyComputeOutputImage();
+    debug_readback_ = {};
+}
+
+void Device::CreateComputeOutputImage()
+{
+    if (!use_compute_raytracing_ || !vk_unique_device_ || !swapchain_)
+    {
+        return;
+    }
+    if (swapchain_extent_.width == 0 || swapchain_extent_.height == 0)
+    {
+        return;
+    }
+
+    vk::Extent3D extent{
+        swapchain_extent_.width,
+        swapchain_extent_.height,
+        1};
+
+    vk::ImageCreateInfo image_info(
+        vk::ImageCreateFlags{},
+        vk::ImageType::e2D,
+        compute_output_format_,
+        extent,
+        1,
+        1,
+        vk::SampleCountFlagBits::e1,
+        vk::ImageTiling::eOptimal,
+        vk::ImageUsageFlagBits::eStorage |
+            vk::ImageUsageFlagBits::eSampled |
+            vk::ImageUsageFlagBits::eTransferSrc);
+
+    compute_output_image_ = vk_unique_device_->createImageUnique(image_info);
+    auto requirements =
+        vk_unique_device_->getImageMemoryRequirements(*compute_output_image_);
+    vk::MemoryAllocateInfo allocate_info(
+        requirements.size,
+        gpu_memory_manager_->FindMemoryType(
+            requirements.memoryTypeBits,
+            vk::MemoryPropertyFlagBits::eDeviceLocal));
+    compute_output_memory_ =
+        vk_unique_device_->allocateMemoryUnique(allocate_info);
+    vk_unique_device_->bindImageMemory(
+        *compute_output_image_, *compute_output_memory_, 0);
+
+    TransitionImageLayout(
+        *compute_output_image_,
+        compute_output_format_,
+        vk::ImageLayout::eUndefined,
+        vk::ImageLayout::eGeneral);
+
+    vk::ImageViewCreateInfo view_info(
+        vk::ImageViewCreateFlags{},
+        *compute_output_image_,
+        vk::ImageViewType::e2D,
+        compute_output_format_,
+        {},
+        {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1});
+    compute_output_view_ =
+        vk_unique_device_->createImageViewUnique(view_info);
+
+    if (!compute_output_sampler_)
+    {
+        vk::SamplerCreateInfo sampler_info(
+            vk::SamplerCreateFlags{},
+            vk::Filter::eLinear,
+            vk::Filter::eLinear,
+            vk::SamplerMipmapMode::eLinear,
+            vk::SamplerAddressMode::eClampToEdge,
+            vk::SamplerAddressMode::eClampToEdge,
+            vk::SamplerAddressMode::eClampToEdge,
+            0.0f,
+            VK_FALSE,
+            1.0f,
+            VK_FALSE,
+            vk::CompareOp::eAlways,
+            0.0f,
+            0.0f,
+            vk::BorderColor::eIntOpaqueBlack,
+            VK_FALSE);
+        compute_output_sampler_ =
+            vk_unique_device_->createSamplerUnique(sampler_info);
+    }
+    compute_output_in_shader_read_ = false;
+}
+
+void Device::DestroyComputeOutputImage()
+{
+    compute_output_sampler_.reset();
+    compute_output_view_.reset();
+    compute_output_image_.reset();
+    compute_output_memory_.reset();
+    compute_output_in_shader_read_ = false;
 }
 
 
@@ -1922,7 +2354,6 @@ void Device::CreateDescriptorResources()
     descriptor_texture_ids_.clear();
 
     if (!active_program_info_ ||
-        active_program_info_->input_texture_ids.empty() ||
         !texture_resources_ ||
         texture_resources_->Empty())
     {
@@ -1938,16 +2369,220 @@ void Device::CreateDescriptorResources()
         return;
     }
 
-    std::vector<vk::DescriptorSetLayoutBinding> bindings;
-    bindings.reserve(image_infos.size());
-    for (std::uint32_t binding = 0; binding < image_infos.size(); ++binding)
+    // Build storage buffers for triangle/BVH if present.
+    struct PendingBuffer
     {
+        std::string name;
+        const frame::vulkan::Buffer* source = nullptr;
+    };
+    std::vector<PendingBuffer> pending_buffers;
+    if (level_ && active_program_info_->material_id != NullId)
+    {
+        for (auto buffer_id : active_program_info_->input_buffer_ids)
+        {
+            try
+            {
+                auto& buffer =
+                    dynamic_cast<const frame::vulkan::Buffer&>(
+                        level_->GetBufferFromId(buffer_id));
+                PendingBuffer pb{level_->GetNameFromId(buffer_id), &buffer};
+                pending_buffers.push_back(pb);
+            }
+            catch (const std::exception& ex)
+            {
+                logger_->warn(
+                    "Skipping buffer {}: {}", buffer_id, ex.what());
+            }
+        }
+    }
+
+    storage_buffers_.clear();
+    auto make_gpu_buffer =
+        [&](const std::vector<std::uint8_t>& bytes,
+            vk::BufferUsageFlags extra_flags)
+        -> std::pair<vk::UniqueBuffer, vk::UniqueDeviceMemory> {
+        vk::UniqueDeviceMemory staging_memory;
+        auto staging = gpu_memory_manager_->CreateBuffer(
+            bytes.size(),
+            vk::BufferUsageFlagBits::eTransferSrc,
+            vk::MemoryPropertyFlagBits::eHostVisible |
+                vk::MemoryPropertyFlagBits::eHostCoherent,
+            staging_memory);
+        if (!bytes.empty())
+        {
+            void* mapped = vk_unique_device_->mapMemory(
+                *staging_memory, 0, bytes.size());
+            std::memcpy(mapped, bytes.data(), bytes.size());
+            vk_unique_device_->unmapMemory(*staging_memory);
+        }
+        vk::UniqueDeviceMemory gpu_memory;
+        auto gpu_buffer = gpu_memory_manager_->CreateBuffer(
+            bytes.size(),
+            vk::BufferUsageFlagBits::eTransferDst | extra_flags,
+            vk::MemoryPropertyFlagBits::eDeviceLocal,
+            gpu_memory);
+        command_queue_->CopyBuffer(*staging, *gpu_buffer, bytes.size());
+        return {std::move(gpu_buffer), std::move(gpu_memory)};
+    };
+
+    for (const auto& pending : pending_buffers)
+    {
+        auto [gpu_buffer, gpu_memory] = make_gpu_buffer(
+            pending.source->GetRawData(),
+            vk::BufferUsageFlagBits::eStorageBuffer);
+        BufferResource res{};
+        res.name = pending.name;
+        res.size = pending.source->GetSize();
+        res.buffer = std::move(gpu_buffer);
+        res.memory = std::move(gpu_memory);
+        storage_buffers_.push_back(std::move(res));
+    }
+
+    // Debug: log the first triangle/BVH values to confirm layout on GPU side.
+    auto log_buffer_sample = [&](const BufferResource& res) {
+        if (debug_dump_done_ || res.size < sizeof(float) * 16)
+        {
+            return;
+        }
+        const auto& src_bytes =
+            reinterpret_cast<const frame::vulkan::Buffer*>(
+                &level_->GetBufferFromId(level_->GetIdFromName(res.name)))
+                ->GetRawData();
+        if (src_bytes.size() < sizeof(float) * 16)
+        {
+            return;
+        }
+        const float* f = reinterpret_cast<const float*>(src_bytes.data());
+        logger_->info(
+            "Buffer {} sample floats: {:.3f} {:.3f} {:.3f} {:.3f} | {:.3f} {:.3f} {:.3f} {:.3f}",
+            res.name,
+            f[0], f[1], f[2], f[3],
+            f[4], f[5], f[6], f[7]);
+    };
+    if (!storage_buffers_.empty() && level_)
+    {
+        for (const auto& res : storage_buffers_)
+        {
+            log_buffer_sample(res);
+        }
+    }
+
+    // Uniform buffer for matrices/camera/light.
+    uniform_buffer_ = {};
+    const vk::DeviceSize uniform_size =
+        static_cast<vk::DeviceSize>(sizeof(UniformBlock));
+    {
+        vk::UniqueDeviceMemory uniform_memory;
+        auto uniform_buf = gpu_memory_manager_->CreateBuffer(
+            uniform_size,
+            vk::BufferUsageFlagBits::eUniformBuffer,
+            vk::MemoryPropertyFlagBits::eHostVisible |
+                vk::MemoryPropertyFlagBits::eHostCoherent,
+            uniform_memory);
+        uniform_buffer_.name = "uniforms";
+        uniform_buffer_.size = uniform_size;
+        uniform_buffer_.buffer = std::move(uniform_buf);
+        uniform_buffer_.memory = std::move(uniform_memory);
+    }
+
+    if (use_compute_raytracing_)
+    {
+        DestroyComputeOutputImage();
+        if (swapchain_extent_.width == 0 || swapchain_extent_.height == 0)
+        {
+            return;
+        }
+        CreateComputeOutputImage();
+    }
+
+    std::vector<vk::DescriptorSetLayoutBinding> bindings;
+    bindings.reserve(image_infos.size() + storage_buffers_.size() + 4);
+    const bool has_compute_output =
+        use_compute_raytracing_ && compute_output_view_;
+
+    // Binding indices for the raytracing pipeline must match the GLSL layout.
+    const std::uint32_t kBindingOutputImage = 0;
+    const std::uint32_t kBindingOutputSample = 1;
+    const std::uint32_t kBindingTextureBase = use_compute_raytracing_ ? 2 : 0;
+    const std::uint32_t kBindingTriangle = 8;
+    const std::uint32_t kBindingBvh = 9;
+    const std::uint32_t kBindingUniform = use_compute_raytracing_
+        ? 10
+        : static_cast<std::uint32_t>(kBindingTextureBase + image_infos.size() + storage_buffers_.size());
+
+    std::vector<std::uint32_t> texture_bindings;
+    std::vector<std::uint32_t> storage_bindings;
+
+    if (has_compute_output)
+    {
+        bindings.emplace_back(
+            kBindingOutputImage,
+            vk::DescriptorType::eStorageImage,
+            1,
+            vk::ShaderStageFlagBits::eCompute);
+        bindings.emplace_back(
+            kBindingOutputSample,
+            vk::DescriptorType::eCombinedImageSampler,
+            1,
+            vk::ShaderStageFlagBits::eFragment |
+                vk::ShaderStageFlagBits::eCompute);
+    }
+
+    vk::ShaderStageFlags texture_stages = vk::ShaderStageFlagBits::eFragment;
+    if (use_compute_raytracing_)
+    {
+        texture_stages |= vk::ShaderStageFlagBits::eCompute;
+    }
+    for (std::uint32_t i = 0; i < image_infos.size(); ++i)
+    {
+        const std::uint32_t binding = kBindingTextureBase + i;
+        texture_bindings.push_back(binding);
         bindings.emplace_back(
             binding,
             vk::DescriptorType::eCombinedImageSampler,
             1,
-            vk::ShaderStageFlagBits::eFragment);
+            texture_stages);
     }
+
+    vk::ShaderStageFlags buffer_stage = use_compute_raytracing_
+        ? vk::ShaderStageFlagBits::eCompute
+        : vk::ShaderStageFlagBits::eFragment;
+    for (std::uint32_t i = 0; i < storage_buffers_.size(); ++i)
+    {
+        std::uint32_t binding = kBindingTextureBase +
+            static_cast<std::uint32_t>(image_infos.size()) + i;
+        // Force fixed bindings for raytracing SSBOs: first is triangles, second BVH.
+        if (use_compute_raytracing_)
+        {
+            if (i == 0)
+            {
+                binding = kBindingTriangle;
+            }
+            else if (i == 1)
+            {
+                binding = kBindingBvh;
+            }
+        }
+        storage_bindings.push_back(binding);
+        bindings.emplace_back(
+            binding,
+            vk::DescriptorType::eStorageBuffer,
+            1,
+            buffer_stage);
+    }
+
+    vk::ShaderStageFlags uniform_stages =
+        vk::ShaderStageFlagBits::eFragment |
+        vk::ShaderStageFlagBits::eVertex;
+    if (use_compute_raytracing_)
+    {
+        uniform_stages |= vk::ShaderStageFlagBits::eCompute;
+    }
+    bindings.emplace_back(
+        kBindingUniform,
+        vk::DescriptorType::eUniformBuffer,
+        1,
+        uniform_stages);
 
     vk::DescriptorSetLayoutCreateInfo layout_info(
         vk::DescriptorSetLayoutCreateFlags{},
@@ -1956,14 +2591,34 @@ void Device::CreateDescriptorResources()
     descriptor_set_layout_ =
         vk_unique_device_->createDescriptorSetLayoutUnique(layout_info);
 
-    vk::DescriptorPoolSize pool_size(
-        vk::DescriptorType::eCombinedImageSampler,
-        static_cast<std::uint32_t>(image_infos.size()));
+    std::vector<vk::DescriptorPoolSize> pool_sizes;
+    if (has_compute_output)
+    {
+        pool_sizes.emplace_back(
+            vk::DescriptorType::eStorageImage, 1);
+        pool_sizes.emplace_back(
+            vk::DescriptorType::eCombinedImageSampler, 1);
+    }
+    if (!image_infos.empty())
+    {
+        pool_sizes.emplace_back(
+            vk::DescriptorType::eCombinedImageSampler,
+            static_cast<std::uint32_t>(image_infos.size()));
+    }
+    if (!storage_buffers_.empty())
+    {
+        pool_sizes.emplace_back(
+            vk::DescriptorType::eStorageBuffer,
+            static_cast<std::uint32_t>(storage_buffers_.size()));
+    }
+    pool_sizes.emplace_back(
+        vk::DescriptorType::eUniformBuffer, 1);
+
     vk::DescriptorPoolCreateInfo pool_info(
         vk::DescriptorPoolCreateFlags{},
         1,
-        1,
-        &pool_size);
+        static_cast<std::uint32_t>(pool_sizes.size()),
+        pool_sizes.data());
     descriptor_pool_ = vk_unique_device_->createDescriptorPoolUnique(pool_info);
 
     const vk::DescriptorSetLayout layouts[] = {*descriptor_set_layout_};
@@ -1975,22 +2630,173 @@ void Device::CreateDescriptorResources()
         vk_unique_device_->allocateDescriptorSets(alloc_info).front();
 
     std::vector<vk::WriteDescriptorSet> descriptor_writes;
-    descriptor_writes.reserve(image_infos.size());
-    for (std::uint32_t binding = 0; binding < image_infos.size(); ++binding)
+    descriptor_writes.reserve(bindings.size());
+    if (use_compute_raytracing_ && storage_buffers_.size() < 2)
     {
+        logger_->warn(
+            "Raytracing requires triangle/BVH buffers, but only {} storage buffers were bound.",
+            storage_buffers_.size());
+    }
+    if (use_compute_raytracing_ && !compute_output_view_)
+    {
+        logger_->warn("Raytracing compute output view missing; falling back to raster.");
+    }
+    if (has_compute_output)
+    {
+        vk::DescriptorImageInfo storage_image_info(
+            nullptr,
+            *compute_output_view_,
+            vk::ImageLayout::eGeneral);
         descriptor_writes.emplace_back(
             descriptor_set_,
-            binding,
+            kBindingOutputImage,
+            0,
+            1,
+            vk::DescriptorType::eStorageImage,
+            &storage_image_info);
+        vk::DescriptorImageInfo output_sample_info(
+            *compute_output_sampler_,
+            *compute_output_view_,
+            vk::ImageLayout::eShaderReadOnlyOptimal);
+        descriptor_writes.emplace_back(
+            descriptor_set_,
+            kBindingOutputSample,
             0,
             1,
             vk::DescriptorType::eCombinedImageSampler,
-            &image_infos[binding]);
+            &output_sample_info);
     }
+    for (std::uint32_t i = 0; i < image_infos.size(); ++i)
+    {
+        descriptor_writes.emplace_back(
+            descriptor_set_,
+            texture_bindings[i],
+            0,
+            1,
+            vk::DescriptorType::eCombinedImageSampler,
+            &image_infos[i]);
+    }
+    for (std::uint32_t i = 0; i < storage_buffers_.size(); ++i)
+    {
+        vk::DescriptorBufferInfo info(
+            *storage_buffers_[i].buffer, 0, storage_buffers_[i].size);
+        descriptor_writes.emplace_back(
+            descriptor_set_,
+            storage_bindings[i],
+            0,
+            1,
+            vk::DescriptorType::eStorageBuffer,
+            nullptr,
+            &info);
+    }
+    vk::DescriptorBufferInfo uniform_info(
+        *uniform_buffer_.buffer, 0, uniform_buffer_.size);
+    descriptor_writes.emplace_back(
+        descriptor_set_,
+        kBindingUniform,
+        0,
+        1,
+        vk::DescriptorType::eUniformBuffer,
+        nullptr,
+        &uniform_info);
     vk_unique_device_->updateDescriptorSets(
         static_cast<std::uint32_t>(descriptor_writes.size()),
         descriptor_writes.data(),
         0,
         nullptr);
+
+    if (use_compute_raytracing_)
+    {
+        LogDescriptorDebugInfo(
+            descriptor_texture_ids_,
+            texture_bindings,
+            storage_buffers_,
+            storage_bindings);
+        LogGpuBufferSamples();
+        if (!compute_pipeline_ || !compute_pipeline_layout_)
+        {
+            logger_->warn("Raytracing compute pipeline missing after descriptor build.");
+        }
+    }
+}
+
+void Device::LogDescriptorDebugInfo(
+    const std::vector<EntityId>& texture_ids,
+    const std::vector<std::uint32_t>& texture_bindings,
+    const std::vector<BufferResource>& buffers,
+    const std::vector<std::uint32_t>& storage_bindings) const
+{
+    logger_->info(
+        "Raytracing descriptor setup: {} textures, {} storage buffers, uniform size {} bytes",
+        texture_ids.size(),
+        buffers.size(),
+        uniform_buffer_.size);
+    for (std::size_t i = 0; i < texture_ids.size() && i < texture_bindings.size(); ++i)
+    {
+        logger_->info(
+            "  Texture binding {} -> id {}",
+            static_cast<int>(texture_bindings[i]),
+            texture_ids[i]);
+    }
+    for (std::size_t i = 0; i < buffers.size() && i < storage_bindings.size(); ++i)
+    {
+        logger_->info(
+            "  Storage buffer binding {} -> {} ({} bytes)",
+            static_cast<int>(storage_bindings[i]),
+            buffers[i].name,
+            buffers[i].size);
+    }
+}
+
+void Device::LogGpuBufferSamples() const
+{
+    if (!vk_unique_device_ || storage_buffers_.empty() || !command_pool_)
+    {
+        return;
+    }
+    // Copy first chunk of each GPU storage buffer into a host-visible staging buffer for inspection.
+    const vk::DeviceSize sample_bytes = 16 * sizeof(float); // grab first 16 floats
+    for (const auto& res : storage_buffers_)
+    {
+        if (!res.buffer || res.size < sizeof(float) * 8)
+        {
+            continue;
+        }
+        const vk::DeviceSize bytes_to_copy =
+            std::min(res.size, sample_bytes);
+
+        vk::UniqueDeviceMemory staging_memory;
+        auto staging_buffer = gpu_memory_manager_->CreateBuffer(
+            bytes_to_copy,
+            vk::BufferUsageFlagBits::eTransferDst,
+            vk::MemoryPropertyFlagBits::eHostVisible |
+                vk::MemoryPropertyFlagBits::eHostCoherent,
+            staging_memory);
+
+        try
+        {
+            // Need a non-const this to call CopyBuffer; use const_cast safely here.
+            const_cast<Device*>(this)->CopyBuffer(
+                *res.buffer, *staging_buffer, bytes_to_copy);
+            void* mapped = vk_unique_device_->mapMemory(
+                *staging_memory, 0, bytes_to_copy);
+            if (mapped)
+            {
+                const float* f = static_cast<const float*>(mapped);
+                logger_->info(
+                    "GPU buffer {} sample floats: {:.3f} {:.3f} {:.3f} {:.3f} | {:.3f} {:.3f} {:.3f} {:.3f}",
+                    res.name,
+                    f[0], f[1], f[2], f[3],
+                    f[4], f[5], f[6], f[7]);
+                vk_unique_device_->unmapMemory(*staging_memory);
+            }
+        }
+        catch (const std::exception& ex)
+        {
+            logger_->warn(
+                "Failed to read back GPU buffer {}: {}", res.name, ex.what());
+        }
+    }
 }
 
 void Device::CreateMeshResources(
@@ -2053,7 +2859,7 @@ Device::MeshResource Device::CreateMeshResource(
     const vk::DeviceSize vertex_size =
         static_cast<vk::DeviceSize>(vertices.size() * sizeof(MeshVertex));
     vk::UniqueDeviceMemory staging_vertex_memory;
-    auto staging_vertex_buffer = CreateBuffer(
+    auto staging_vertex_buffer = gpu_memory_manager_->CreateBuffer(
         vertex_size,
         vk::BufferUsageFlagBits::eTransferSrc,
         vk::MemoryPropertyFlagBits::eHostVisible |
@@ -2064,7 +2870,7 @@ Device::MeshResource Device::CreateMeshResource(
     std::memcpy(mapped_vertices, vertices.data(), vertex_size);
     vk_unique_device_->unmapMemory(*staging_vertex_memory);
 
-    auto vertex_buffer = CreateBuffer(
+    auto vertex_buffer = gpu_memory_manager_->CreateBuffer(
         vertex_size,
         vk::BufferUsageFlagBits::eTransferDst |
             vk::BufferUsageFlagBits::eVertexBuffer,
@@ -2079,7 +2885,7 @@ Device::MeshResource Device::CreateMeshResource(
         const vk::DeviceSize index_size =
             static_cast<vk::DeviceSize>(indices.size() * sizeof(std::uint32_t));
         vk::UniqueDeviceMemory staging_index_memory;
-        auto staging_index_buffer = CreateBuffer(
+        auto staging_index_buffer = gpu_memory_manager_->CreateBuffer(
             index_size,
             vk::BufferUsageFlagBits::eTransferSrc,
             vk::MemoryPropertyFlagBits::eHostVisible |
@@ -2090,7 +2896,7 @@ Device::MeshResource Device::CreateMeshResource(
         std::memcpy(mapped_indices, indices.data(), index_size);
         vk_unique_device_->unmapMemory(*staging_index_memory);
 
-        auto index_buffer = CreateBuffer(
+        auto index_buffer = gpu_memory_manager_->CreateBuffer(
             index_size,
             vk::BufferUsageFlagBits::eTransferDst |
                 vk::BufferUsageFlagBits::eIndexBuffer,

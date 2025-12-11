@@ -241,6 +241,7 @@ bool ParseNodeStaticMesh(
             auto push_vertex = [&](std::uint32_t idx) {
                 const auto base = idx * 3;
                 const auto uv_base = idx * 2;
+                // position (vec3) + pad
                 triangles.push_back(points[base + 0]);
                 triangles.push_back(points[base + 1]);
                 triangles.push_back(points[base + 2]);
@@ -257,6 +258,7 @@ bool ParseNodeStaticMesh(
                     triangles.push_back(0.0f);
                     triangles.push_back(0.0f);
                 }
+                // normal (vec3) + pad
                 triangles.push_back(0.0f);
                 if (!textures.empty())
                 {
@@ -268,6 +270,7 @@ bool ParseNodeStaticMesh(
                     triangles.push_back(0.0f);
                     triangles.push_back(0.0f);
                 }
+                // uv_pad (vec4) to match shader vec4 uv_pad
                 triangles.push_back(0.0f);
                 triangles.push_back(0.0f);
             };

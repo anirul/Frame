@@ -2,6 +2,9 @@
 
 add_executable(FrameVulkanTest
   main.cpp
+  command_queue_test.cpp
+  raytracing_test.cpp
+  scene_state_test.cpp
   window_test.cpp
 )
 

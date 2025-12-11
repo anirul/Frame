@@ -8,6 +8,9 @@ add_custom_target(AssetShaderVulkan
     ray_marching.vert
     cubemap.frag
     cubemap.vert
+    raytracing.vert
+    raytracing.frag
+    raytracing.comp
 )
 
 set_property(TARGET AssetShaderVulkan PROPERTY FOLDER "FrameAsset/Shader")
