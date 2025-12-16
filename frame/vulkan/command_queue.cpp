@@ -148,6 +148,14 @@ void CommandQueue::TransitionImageLayout(
             vk::PipelineStageFlagBits::eComputeShader;
         dst_stage = vk::PipelineStageFlagBits::eTransfer;
     }
+    else if (old_layout == vk::ImageLayout::eGeneral &&
+             new_layout == vk::ImageLayout::eTransferSrcOptimal)
+    {
+        barrier.srcAccessMask = vk::AccessFlagBits::eShaderWrite;
+        barrier.dstAccessMask = vk::AccessFlagBits::eTransferRead;
+        src_stage = vk::PipelineStageFlagBits::eComputeShader;
+        dst_stage = vk::PipelineStageFlagBits::eTransfer;
+    }
     else if (old_layout == vk::ImageLayout::eTransferSrcOptimal &&
              new_layout == vk::ImageLayout::eShaderReadOnlyOptimal)
     {

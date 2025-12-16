@@ -4,6 +4,7 @@ add_executable(FrameVulkanTest
   main.cpp
   command_queue_test.cpp
   raytracing_test.cpp
+  raytracing_compute_test.cpp
   scene_state_test.cpp
   window_test.cpp
 )
@@ -19,6 +20,7 @@ target_link_libraries(FrameVulkanTest
   PUBLIC
     GTest::gmock
     GTest::gtest
+    shaderc::shaderc_combined
     ${FRAME_LINK_GROUP_BEGIN}
     ${FRAME_CORE_LIBS}
     FrameVulkanData

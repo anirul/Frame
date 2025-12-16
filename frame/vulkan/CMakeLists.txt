@@ -25,7 +25,11 @@ set(FRAME_VULKAN_DATA_SOURCES
   static_mesh.h
   texture.cpp
   texture.h
+  texture_resources.cpp
+  texture_resources.h
   dispatcher.cpp
+  raytracing_bindings.cpp
+  raytracing_bindings.h
 )
 
 add_library(FrameVulkanData STATIC ${FRAME_VULKAN_DATA_SOURCES})
