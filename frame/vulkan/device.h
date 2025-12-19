@@ -21,6 +21,8 @@
 #include "frame/device_interface.h"
 #include "frame/texture_interface.h"
 #include "frame/logger.h"
+#include "frame/vulkan/buffer_resources.h"
+#include "frame/vulkan/mesh_resources.h"
  
 namespace frame::vulkan
 {
@@ -129,31 +131,11 @@ class Device : public DeviceInterface
     void DestroyTextureResources();
     void CreateDescriptorResources();
     void DestroyDescriptorResources();
-    struct MeshResource
-    {
-        vk::UniqueBuffer vertex_buffer;
-        vk::UniqueDeviceMemory vertex_memory;
-        vk::UniqueBuffer index_buffer;
-        vk::UniqueDeviceMemory index_memory;
-        std::uint32_t index_count = 0;
-    };
-    struct BufferResource
-    {
-        std::string name;
-        vk::UniqueBuffer buffer;
-        vk::UniqueDeviceMemory memory;
-        vk::DeviceSize size = 0;
-    };
     void LogDescriptorDebugInfo(
         const std::vector<EntityId>& texture_ids,
         const std::vector<std::uint32_t>& texture_bindings,
         const std::vector<BufferResource>& buffers,
         const std::vector<std::uint32_t>& storage_bindings) const;
-    void LogGpuBufferSamples() const;
-    void CreateMeshResources(const frame::json::LevelData& level_data);
-    void DestroyMeshResources();
-    MeshResource CreateMeshResource(
-        const frame::json::StaticMeshInfo& mesh_info);
     void CopyBuffer(vk::Buffer src, vk::Buffer dst, vk::DeviceSize size);
     void TransitionImageLayout(
         vk::Image image,
@@ -205,14 +187,13 @@ class Device : public DeviceInterface
     vk::UniquePipelineLayout compute_pipeline_layout_;
     std::unique_ptr<class GpuMemoryManager> gpu_memory_manager_;
     std::unique_ptr<class CommandQueue> command_queue_;
+    std::unique_ptr<class BufferResourceManager> buffer_resources_;
+    std::unique_ptr<class MeshResources> mesh_resources_;
     vk::UniqueDescriptorSetLayout descriptor_set_layout_;
     vk::UniqueDescriptorPool descriptor_pool_;
     vk::DescriptorSet descriptor_set_ = VK_NULL_HANDLE;
     std::unique_ptr<TextureResources> texture_resources_;
     std::vector<EntityId> descriptor_texture_ids_;
-    std::vector<BufferResource> storage_buffers_;
-    BufferResource uniform_buffer_;
-    std::vector<MeshResource> meshes_;
     static constexpr std::size_t kMaxFramesInFlight = 2;
     std::array<vk::UniqueSemaphore, kMaxFramesInFlight> image_available_semaphores_;
     std::array<vk::UniqueSemaphore, kMaxFramesInFlight> render_finished_semaphores_;
@@ -231,6 +212,7 @@ class Device : public DeviceInterface
     bool debug_dump_done_ = false;
     BufferResource debug_readback_;
     bool debug_log_scene_state_ = false;
+    bool debug_hit_mask_ = false;
     struct ProgramPipelineInfo
     {
         std::string program_name;

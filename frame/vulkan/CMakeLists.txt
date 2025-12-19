@@ -3,10 +3,14 @@
 set(FRAME_VULKAN_DATA_SOURCES
   buffer.cpp
   buffer.h
+  buffer_resources.cpp
+  buffer_resources.h
   build_level.cpp
   build_level.h
   mesh_utils.cpp
   mesh_utils.h
+  mesh_resources.cpp
+  mesh_resources.h
   json/parse_material.cpp
   json/parse_program.cpp
   json/parse_scene_tree.cpp

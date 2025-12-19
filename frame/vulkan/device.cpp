@@ -20,9 +20,11 @@
 #include "frame/camera.h"
 #include "frame/level.h"
 #include "frame/vulkan/buffer.h"
+#include "frame/vulkan/buffer_resources.h"
 #include "frame/vulkan/build_level.h"
 #include "frame/vulkan/command_queue.h"
 #include "frame/vulkan/gpu_memory_manager.h"
+#include "frame/vulkan/mesh_resources.h"
 #include "frame/vulkan/mesh_utils.h"
 #include "frame/vulkan/scene_state.h"
 #include "frame/vulkan/raytracing_bindings.h"
@@ -35,6 +37,152 @@
 
 namespace frame::vulkan
 {
+
+namespace
+{
+
+struct DebugVertex
+{
+    glm::vec4 position;
+    glm::vec4 normal;
+    glm::vec4 uv_pad;
+};
+
+struct DebugTriangle
+{
+    DebugVertex v0;
+    DebugVertex v1;
+    DebugVertex v2;
+};
+
+struct DebugBvhNode
+{
+    glm::vec4 min;
+    glm::vec4 max;
+    int left;
+    int right;
+    int first_triangle;
+    int triangle_count;
+};
+
+bool RayTriangleIntersectDebug(
+    const glm::vec3& ray_origin,
+    const glm::vec3& ray_direction,
+    const DebugTriangle& triangle,
+    float& out_t)
+{
+    constexpr float kEpsilon = 0.0000001f;
+    const glm::vec3 edge1 =
+        glm::vec3(triangle.v1.position) - glm::vec3(triangle.v0.position);
+    const glm::vec3 edge2 =
+        glm::vec3(triangle.v2.position) - glm::vec3(triangle.v0.position);
+    const glm::vec3 h = glm::cross(ray_direction, edge2);
+    const float a = glm::dot(edge1, h);
+    if (a > -kEpsilon && a < kEpsilon)
+    {
+        return false;
+    }
+    const float f = 1.0f / a;
+    const glm::vec3 s = ray_origin - glm::vec3(triangle.v0.position);
+    const float u = f * glm::dot(s, h);
+    if (u < 0.0f || u > 1.0f)
+    {
+        return false;
+    }
+    const glm::vec3 q = glm::cross(s, edge1);
+    const float v = f * glm::dot(ray_direction, q);
+    if (v < 0.0f || u + v > 1.0f)
+    {
+        return false;
+    }
+    const float t = f * glm::dot(edge2, q);
+    if (t > kEpsilon)
+    {
+        out_t = t;
+        return true;
+    }
+    return false;
+}
+
+bool RayAabbIntersectDebug(
+    const glm::vec3& ray_origin,
+    const glm::vec3& inv_ray_dir,
+    const DebugBvhNode& node)
+{
+    const glm::vec3 t0 = (glm::vec3(node.min) - ray_origin) * inv_ray_dir;
+    const glm::vec3 t1 = (glm::vec3(node.max) - ray_origin) * inv_ray_dir;
+    const glm::vec3 tmin = glm::min(t0, t1);
+    const glm::vec3 tmax = glm::max(t0, t1);
+    const float t_enter = std::max(std::max(tmin.x, tmin.y), tmin.z);
+    const float t_exit = std::min(std::min(tmax.x, tmax.y), tmax.z);
+    return t_exit >= std::max(t_enter, 0.0f);
+}
+
+bool TraverseBvhDebug(
+    const std::vector<DebugBvhNode>& nodes,
+    const std::vector<DebugTriangle>& tris,
+    const glm::vec3& ray_origin,
+    const glm::vec3& ray_dir,
+    float& out_t,
+    int& out_tri)
+{
+    if (nodes.empty())
+    {
+        return false;
+    }
+
+    const glm::vec3 inv_ray_dir = 1.0f / ray_dir;
+    int stack[64];
+    int sp = 0;
+    stack[sp++] = 0;
+    out_t = std::numeric_limits<float>::max();
+    out_tri = -1;
+    bool hit = false;
+    while (sp > 0)
+    {
+        const int node_index = stack[--sp];
+        const auto& node = nodes[static_cast<std::size_t>(node_index)];
+        if (!RayAabbIntersectDebug(ray_origin, inv_ray_dir, node))
+        {
+            continue;
+        }
+        if (node.triangle_count > 0)
+        {
+            for (int i = 0; i < node.triangle_count; ++i)
+            {
+                const int tri_index = node.first_triangle + i;
+                if (tri_index < 0 ||
+                    static_cast<std::size_t>(tri_index) >= tris.size())
+                {
+                    continue;
+                }
+                float t = 0.0f;
+                if (RayTriangleIntersectDebug(
+                        ray_origin, ray_dir, tris[static_cast<std::size_t>(tri_index)], t) &&
+                    t < out_t)
+                {
+                    out_t = t;
+                    out_tri = tri_index;
+                    hit = true;
+                }
+            }
+        }
+        else
+        {
+            if (node.left >= 0)
+            {
+                stack[sp++] = node.left;
+            }
+            if (node.right >= 0)
+            {
+                stack[sp++] = node.right;
+            }
+        }
+    }
+    return hit;
+}
+
+} // namespace
 
 Device::Device(
     void* vk_instance,
@@ -49,6 +197,8 @@ Device::Device(
     debug_dump_compute_output_ = dump_env && std::strlen(dump_env) > 0;
     const char* log_state_env = std::getenv("FRAME_VK_LOG_SCENE");
     debug_log_scene_state_ = log_state_env && std::strlen(log_state_env) > 0;
+    const char* hitmask_env = std::getenv("FRAME_VK_DEBUG_HITMASK");
+    debug_hit_mask_ = hitmask_env && std::strlen(hitmask_env) > 0;
 
     logger_->info("Initializing Vulkan device ({}x{})", size_.x, size_.y);
 
@@ -393,8 +543,15 @@ void Device::StartupFromLevelData(const frame::json::LevelData& level_data)
                                 {
                                     continue;
                                 }
+                                auto& node =
+                                    level_->GetSceneNodeFromId(pair.first);
+                                const auto mesh_id = node.GetLocalMesh();
+                                if (mesh_id == NullId)
+                                {
+                                    continue;
+                                }
                                 auto& mesh =
-                                    level_->GetStaticMeshFromId(pair.first);
+                                    level_->GetStaticMeshFromId(mesh_id);
                                 append_buffer_if_present(
                                     mesh.GetTriangleBufferId(),
                                     "TriangleBuffer");
@@ -424,7 +581,10 @@ void Device::StartupFromLevelData(const frame::json::LevelData& level_data)
     DestroyComputePipeline();
     DestroyDescriptorResources();
     DestroyTextureResources();
-    DestroyMeshResources();
+    if (mesh_resources_)
+    {
+        mesh_resources_->Clear();
+    }
 
     try
     {
@@ -432,7 +592,10 @@ void Device::StartupFromLevelData(const frame::json::LevelData& level_data)
         DestroySwapchainResources();
         CreateSwapchainResources();
         CreateDescriptorResources();
-        CreateMeshResources(level_data);
+        if (mesh_resources_)
+        {
+            mesh_resources_->Build(level_data);
+        }
         CreateGraphicsPipeline();
         if (use_compute_raytracing_)
         {
@@ -444,7 +607,10 @@ void Device::StartupFromLevelData(const frame::json::LevelData& level_data)
         logger_->error("Failed to prepare Vulkan GPU resources: {}", ex.what());
         DestroyDescriptorResources();
         DestroyTextureResources();
-        DestroyMeshResources();
+        if (mesh_resources_)
+        {
+            mesh_resources_->Clear();
+        }
         DestroyGraphicsPipeline();
         DestroyComputePipeline();
     }
@@ -505,7 +671,10 @@ void Device::Cleanup()
     DestroySwapchainResources();
     DestroyDescriptorResources();
     DestroyTextureResources();
-    DestroyMeshResources();
+    if (mesh_resources_)
+    {
+        mesh_resources_->Clear();
+    }
     command_pool_.reset();
 
     for (auto& semaphore : image_available_semaphores_)
@@ -633,59 +802,86 @@ void Device::Display(double dt)
 
     graphics_queue_.submit(submit_info, *fence);
 
-    if (debug_dump_compute_output_ && debug_readback_.buffer && !debug_dump_done_)
+    if ((debug_dump_compute_output_ || !debug_dump_done_) &&
+        debug_readback_.buffer &&
+        !debug_dump_done_)
     {
         graphics_queue_.waitIdle();
         void* mapped = vk_unique_device_->mapMemory(
             *debug_readback_.memory, 0, debug_readback_.size);
-        const auto* raw16 =
-            static_cast<const std::uint16_t*>(mapped);
-        const std::size_t pixel_count =
-            swapchain_extent_.width * swapchain_extent_.height;
-        double sum_r = 0.0;
-        double sum_g = 0.0;
-        double sum_b = 0.0;
-        auto sample_half2 = [](const std::uint16_t* p) -> glm::vec2 {
-            return glm::unpackHalf2x16(
-                (static_cast<std::uint32_t>(p[1]) << 16) | p[0]);
-        };
-        for (std::size_t i = 0; i < pixel_count; ++i)
+        if (mapped)
         {
-            const std::uint16_t* px = raw16 + i * 4;
-            const glm::vec2 rg = sample_half2(px);
-            const glm::vec2 ba = sample_half2(px + 2);
-            sum_r += rg.x;
-            sum_g += rg.y;
-            sum_b += ba.x;
-        }
-        vk_unique_device_->unmapMemory(*debug_readback_.memory);
-        if (pixel_count > 0)
-        {
-            const float avg_r = static_cast<float>(sum_r / pixel_count);
-            const float avg_g = static_cast<float>(sum_g / pixel_count);
-            const float avg_b = static_cast<float>(sum_b / pixel_count);
-            if (!std::isfinite(avg_r) || !std::isfinite(avg_g) ||
-                !std::isfinite(avg_b))
+            const auto* raw16 =
+                static_cast<const std::uint16_t*>(mapped);
+            auto sample_half2 = [](const std::uint16_t* p) -> glm::vec2 {
+                return glm::unpackHalf2x16(
+                    (static_cast<std::uint32_t>(p[1]) << 16) | p[0]);
+            };
+            if (debug_readback_.size == sizeof(std::uint16_t) * 4)
             {
-                logger_->warn("Debug compute capture avg color is NaN/Inf.");
+                const glm::vec2 rg = sample_half2(raw16);
+                const glm::vec2 ba = sample_half2(raw16 + 2);
+                logger_->info(
+                    "Compute output first pixel: ({:.3f}, {:.3f}, {:.3f}, {:.3f})",
+                    rg.x,
+                    rg.y,
+                    ba.x,
+                    ba.y);
             }
             else
             {
-                logger_->info(
-                    "Debug compute capture avg color: ({:.3f}, {:.3f}, {:.3f})",
-                    avg_r,
-                    avg_g,
-                    avg_b);
+                const std::size_t pixel_count =
+                    swapchain_extent_.width * swapchain_extent_.height;
+                double sum_r = 0.0;
+                double sum_g = 0.0;
+                double sum_b = 0.0;
+                for (std::size_t i = 0; i < pixel_count; ++i)
+                {
+                    const std::uint16_t* px = raw16 + i * 4;
+                    const glm::vec2 rg = sample_half2(px);
+                    const glm::vec2 ba = sample_half2(px + 2);
+                    sum_r += rg.x;
+                    sum_g += rg.y;
+                    sum_b += ba.x;
+                }
+                if (pixel_count > 0)
+                {
+                    const float avg_r =
+                        static_cast<float>(sum_r / pixel_count);
+                    const float avg_g =
+                        static_cast<float>(sum_g / pixel_count);
+                    const float avg_b =
+                        static_cast<float>(sum_b / pixel_count);
+                    if (!std::isfinite(avg_r) || !std::isfinite(avg_g) ||
+                        !std::isfinite(avg_b))
+                    {
+                        logger_->warn("Debug compute capture avg color is NaN/Inf.");
+                    }
+                    else
+                    {
+                        logger_->info(
+                            "Debug compute capture avg color: ({:.3f}, {:.3f}, {:.3f})",
+                            avg_r,
+                            avg_g,
+                            avg_b);
+                    }
+                    const std::size_t cx = swapchain_extent_.width / 2;
+                    const std::size_t cy = swapchain_extent_.height / 2;
+                    const std::size_t center_index =
+                        (cy * swapchain_extent_.width + cx) * 4;
+                    const auto* center_px = raw16 + center_index;
+                    const glm::vec2 center_rg = sample_half2(center_px);
+                    const glm::vec2 center_ba = sample_half2(center_px + 2);
+                    logger_->info(
+                        "Center pixel color (compute output): "
+                        "({:.3f}, {:.3f}, {:.3f}, {:.3f})",
+                        center_rg.x,
+                        center_rg.y,
+                        center_ba.x,
+                        center_ba.y);
+                }
             }
-            const std::size_t cx = swapchain_extent_.width / 2;
-            const std::size_t cy = swapchain_extent_.height / 2;
-            const std::size_t center_index = (cy * swapchain_extent_.width + cx) * 4;
-            const auto* center_px = raw16 + center_index;
-            const glm::vec2 center_rg = sample_half2(center_px);
-            const glm::vec2 center_ba = sample_half2(center_px + 2);
-            logger_->info(
-                "Center pixel color (compute output): ({:.3f}, {:.3f}, {:.3f}, {:.3f})",
-                center_rg.x, center_rg.y, center_ba.x, center_ba.y);
+            vk_unique_device_->unmapMemory(*debug_readback_.memory);
         }
         debug_dump_done_ = true;
     }
@@ -751,6 +947,16 @@ void Device::CreateCommandPool()
         vk_physical_device_, *vk_unique_device_);
     command_queue_ = std::make_unique<CommandQueue>(
         *vk_unique_device_, graphics_queue_, *command_pool_);
+    buffer_resources_ = std::make_unique<BufferResourceManager>(
+        *vk_unique_device_,
+        *gpu_memory_manager_,
+        *command_queue_,
+        logger_);
+    mesh_resources_ = std::make_unique<MeshResources>(
+        *vk_unique_device_,
+        *gpu_memory_manager_,
+        *command_queue_,
+        logger_);
 }
 
 void Device::CreateSyncObjects()
@@ -1059,21 +1265,139 @@ void Device::RecordCommandBuffer(
             scene_state.model[0][1],
             scene_state.model[0][2],
             scene_state.model[0][3]);
+
+        // CPU-side sanity check: cast a center ray through the BVH using the
+        // same data the compute shader consumes.
+        if (level_)
+        {
+            EntityId tri_id = NullId;
+            EntityId bvh_id = NullId;
+            if (active_program_info_)
+            {
+                for (std::size_t i = 0;
+                     i < active_program_info_->input_buffer_ids.size() &&
+                     i < active_program_info_->input_buffer_inner_names.size();
+                     ++i)
+                {
+                    const auto& inner =
+                        active_program_info_->input_buffer_inner_names[i];
+                    if (inner == "TriangleBuffer")
+                    {
+                        tri_id = active_program_info_->input_buffer_ids[i];
+                    }
+                    else if (inner == "BvhBuffer")
+                    {
+                        bvh_id = active_program_info_->input_buffer_ids[i];
+                    }
+                }
+            }
+            logger_->info(
+                "CPU debug raytrace buffers tri_id={} bvh_id={}",
+                static_cast<std::int64_t>(tri_id),
+                static_cast<std::int64_t>(bvh_id));
+
+            if (tri_id != NullId && bvh_id != NullId &&
+                swapchain_extent_.width > 0 &&
+                swapchain_extent_.height > 0)
+            {
+                try
+                {
+                    const auto& tri_buf =
+                        dynamic_cast<const frame::vulkan::Buffer&>(
+                            level_->GetBufferFromId(tri_id));
+                    const auto& bvh_buf =
+                        dynamic_cast<const frame::vulkan::Buffer&>(
+                            level_->GetBufferFromId(bvh_id));
+                    const auto& tri_bytes = tri_buf.GetRawData();
+                    const auto& bvh_bytes = bvh_buf.GetRawData();
+                    const std::size_t tri_count =
+                        tri_bytes.size() / sizeof(DebugTriangle);
+                    const std::size_t node_count =
+                        bvh_bytes.size() / sizeof(DebugBvhNode);
+                    logger_->info(
+                        "CPU debug raytrace counts: tris={} nodes={}",
+                        tri_count,
+                        node_count);
+                    if (tri_count > 0 && node_count > 0)
+                    {
+                        std::vector<DebugTriangle> tris(tri_count);
+                        std::memcpy(
+                            tris.data(), tri_bytes.data(), tri_bytes.size());
+                        std::vector<DebugBvhNode> nodes(node_count);
+                        std::memcpy(
+                            nodes.data(), bvh_bytes.data(), bvh_bytes.size());
+
+                        const float px =
+                            static_cast<float>(swapchain_extent_.width) * 0.5f;
+                        const float py =
+                            static_cast<float>(swapchain_extent_.height) * 0.5f;
+                        glm::vec2 uv = (glm::vec2(px, py) + glm::vec2(0.5f)) /
+                                       glm::vec2(
+                                           swapchain_extent_.width,
+                                           swapchain_extent_.height);
+                        glm::vec2 ndc = uv * 2.0f - 1.0f;
+                        glm::vec4 clip_pos(ndc, -1.0f, 1.0f);
+                        glm::vec4 view_pos =
+                            glm::inverse(scene_state.projection) * clip_pos;
+                        view_pos = glm::vec4(
+                            view_pos.x, view_pos.y, -1.0f, 0.0f);
+                        glm::vec3 ray_dir_world = glm::normalize(glm::vec3(
+                            glm::inverse(scene_state.view) * view_pos));
+                        glm::mat4 model_inv = glm::inverse(scene_state.model);
+                        glm::vec3 ray_origin = glm::vec3(
+                            model_inv *
+                            glm::vec4(scene_state.camera_position, 1.0f));
+                        glm::vec3 ray_dir = glm::normalize(
+                            glm::mat3(model_inv) * ray_dir_world);
+                        logger_->info(
+                            "CPU debug ray origin=({:.3f},{:.3f},{:.3f}) dir=({:.3f},{:.3f},{:.3f})",
+                            ray_origin.x,
+                            ray_origin.y,
+                            ray_origin.z,
+                            ray_dir.x,
+                            ray_dir.y,
+                            ray_dir.z);
+
+                        float t_hit = 0.0f;
+                        int tri_index = -1;
+                        const bool cpu_hit = TraverseBvhDebug(
+                            nodes, tris, ray_origin, ray_dir, t_hit, tri_index);
+                        if (cpu_hit)
+                        {
+                            logger_->info(
+                                "CPU debug ray hit tri {} at t {:.4f}",
+                                tri_index,
+                                t_hit);
+                        }
+                        else
+                        {
+                            logger_->warn(
+                                "CPU debug ray missed BVH (center pixel)");
+                        }
+                    }
+                }
+                catch (const std::exception& ex)
+                {
+                    logger_->warn(
+                        "CPU debug raytrace failed: {}", ex.what());
+                }
+            }
+        }
     }
 
     auto update_uniform_buffer = [&](const SceneState& state) {
-        if (!uniform_buffer_.buffer ||
-            !uniform_buffer_.memory ||
-            uniform_buffer_.size == 0)
+        if (!buffer_resources_)
         {
             return;
         }
         auto block = MakeUniformBlock(
             state, elapsed_time_seconds_);
-        void* mapped = vk_unique_device_->mapMemory(
-            *uniform_buffer_.memory, 0, uniform_buffer_.size);
-        std::memcpy(mapped, &block, sizeof(UniformBlock));
-        vk_unique_device_->unmapMemory(*uniform_buffer_.memory);
+        if (debug_hit_mask_)
+        {
+            block.time_s.w = 6.0f; // >5.5 targeted tri debug
+        }
+        buffer_resources_->UpdateUniform(
+            &block, sizeof(UniformBlock));
     };
     update_uniform_buffer(scene_state);
 
@@ -1113,6 +1437,18 @@ void Device::RecordCommandBuffer(
         swapchain_extent_.width > 0 &&
         swapchain_extent_.height > 0)
     {
+        if (debug_log_scene_state_ && !debug_dump_done_)
+        {
+            logger_->info(
+                "Dispatching raytracing compute: groups=({},{}), "
+                "image {}x{}, output_in_read={}",
+                (swapchain_extent_.width + 7) / 8,
+                (swapchain_extent_.height + 7) / 8,
+                swapchain_extent_.width,
+                swapchain_extent_.height,
+                compute_output_in_shader_read_);
+        }
+
         if (compute_output_in_shader_read_)
         {
             transition_output(
@@ -1149,13 +1485,17 @@ void Device::RecordCommandBuffer(
             vk::AccessFlagBits::eShaderRead);
         compute_output_in_shader_read_ = true;
 
-        if (debug_dump_compute_output_)
+        // Always grab at least one pixel for debugging on the first frame.
+        const bool want_full_dump = debug_dump_compute_output_;
+        const bool want_single_pixel = !debug_dump_done_;
+        if (want_full_dump || want_single_pixel)
         {
-            const vk::DeviceSize expected_size =
-                static_cast<vk::DeviceSize>(
-                    swapchain_extent_.width *
-                    swapchain_extent_.height *
-                    sizeof(std::uint16_t) * 4);
+            const vk::DeviceSize expected_size = want_full_dump
+                ? static_cast<vk::DeviceSize>(
+                      swapchain_extent_.width *
+                      swapchain_extent_.height *
+                      sizeof(std::uint16_t) * 4)
+                : static_cast<vk::DeviceSize>(sizeof(std::uint16_t) * 4);
             if (!debug_readback_.buffer ||
                 debug_readback_.size != expected_size)
             {
@@ -1194,7 +1534,75 @@ void Device::RecordCommandBuffer(
                 0,
                 {vk::ImageAspectFlagBits::eColor, 0, 0, 1},
                 {0, 0, 0},
-                {swapchain_extent_.width, swapchain_extent_.height, 1});
+                {want_full_dump ? swapchain_extent_.width : 1,
+                 want_full_dump ? swapchain_extent_.height : 1,
+                 1});
+            command_buffer.copyImageToBuffer(
+                *compute_output_image_,
+                vk::ImageLayout::eTransferSrcOptimal,
+                *debug_readback_.buffer,
+                copy_region);
+
+            vk::ImageMemoryBarrier back_to_shader(
+                vk::AccessFlagBits::eTransferRead,
+                vk::AccessFlagBits::eShaderRead,
+                vk::ImageLayout::eTransferSrcOptimal,
+                vk::ImageLayout::eShaderReadOnlyOptimal,
+                VK_QUEUE_FAMILY_IGNORED,
+                VK_QUEUE_FAMILY_IGNORED,
+                *compute_output_image_,
+                {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1});
+            command_buffer.pipelineBarrier(
+                vk::PipelineStageFlagBits::eTransfer,
+                vk::PipelineStageFlagBits::eFragmentShader,
+                {},
+                nullptr,
+                nullptr,
+                back_to_shader);
+        }
+        else if (debug_log_scene_state_ && !debug_dump_done_)
+        {
+            // Read back a single pixel to sanity-check shader output without
+            // dumping the whole image.
+            const vk::DeviceSize expected_size = sizeof(std::uint16_t) * 4;
+            if (!debug_readback_.buffer || debug_readback_.size != expected_size)
+            {
+                vk::UniqueDeviceMemory rb_memory;
+                auto rb_buffer = gpu_memory_manager_->CreateBuffer(
+                    expected_size,
+                    vk::BufferUsageFlagBits::eTransferDst,
+                    vk::MemoryPropertyFlagBits::eHostVisible |
+                        vk::MemoryPropertyFlagBits::eHostCoherent,
+                    rb_memory);
+                debug_readback_.buffer = std::move(rb_buffer);
+                debug_readback_.memory = std::move(rb_memory);
+                debug_readback_.size = expected_size;
+            }
+
+            vk::ImageMemoryBarrier to_transfer(
+                vk::AccessFlagBits::eShaderWrite,
+                vk::AccessFlagBits::eTransferRead,
+                vk::ImageLayout::eShaderReadOnlyOptimal,
+                vk::ImageLayout::eTransferSrcOptimal,
+                VK_QUEUE_FAMILY_IGNORED,
+                VK_QUEUE_FAMILY_IGNORED,
+                *compute_output_image_,
+                {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1});
+            command_buffer.pipelineBarrier(
+                vk::PipelineStageFlagBits::eFragmentShader,
+                vk::PipelineStageFlagBits::eTransfer,
+                {},
+                nullptr,
+                nullptr,
+                to_transfer);
+
+            vk::BufferImageCopy copy_region(
+                0,
+                0,
+                0,
+                {vk::ImageAspectFlagBits::eColor, 0, 0, 1},
+                {0, 0, 0},
+                {1, 1, 1});
             command_buffer.copyImageToBuffer(
                 *compute_output_image_,
                 vk::ImageLayout::eTransferSrcOptimal,
@@ -1363,9 +1771,9 @@ void Device::RecordCommandBuffer(
         {
             command_buffer.draw(6, 1, 0, 0);
         }
-        else if (!meshes_.empty())
+        else if (mesh_resources_ && !mesh_resources_->Empty())
         {
-            const auto& mesh = meshes_.front();
+            const auto& mesh = mesh_resources_->GetMeshes().front();
             const vk::DeviceSize offsets[] = {0};
             command_buffer.bindVertexBuffers(0, *mesh.vertex_buffer, offsets);
             if (mesh.index_buffer)
@@ -1642,12 +2050,16 @@ void Device::CreateComputePipeline()
 
     if (!descriptor_set_layout_)
     {
+        logger_->warn(
+            "CreateComputePipeline skipped: descriptor set layout missing.");
         return;
     }
 
     if (!active_program_info_ ||
         active_program_info_->compute_shader.empty())
     {
+        logger_->warn(
+            "CreateComputePipeline skipped: no active compute shader.");
         return;
     }
 
@@ -1694,6 +2106,7 @@ void Device::CreateComputePipeline()
         throw std::runtime_error("Failed to create Vulkan compute pipeline.");
     }
     compute_pipeline_ = std::move(pipeline_result.value);
+    logger_->info("Created raytracing compute pipeline.");
 }
 
 void Device::DestroyComputePipeline()
@@ -1818,8 +2231,10 @@ void Device::DestroyDescriptorResources()
     descriptor_pool_.reset();
     descriptor_set_layout_.reset();
     descriptor_texture_ids_.clear();
-    storage_buffers_.clear();
-    uniform_buffer_ = {};
+    if (buffer_resources_)
+    {
+        buffer_resources_->Clear();
+    }
     DestroyComputeOutputImage();
     debug_readback_ = {};
 }
@@ -1949,7 +2364,8 @@ void Device::CreateDescriptorResources()
 
     if (!active_program_info_ ||
         !texture_resources_ ||
-        texture_resources_->Empty())
+        texture_resources_->Empty() ||
+        !buffer_resources_)
     {
         return;
     }
@@ -1963,120 +2379,24 @@ void Device::CreateDescriptorResources()
         return;
     }
 
-    // Build storage buffers for triangle/BVH if present.
-    struct PendingBuffer
-    {
-        std::string name;
-        const frame::vulkan::Buffer* source = nullptr;
-    };
-    std::vector<PendingBuffer> pending_buffers;
+    buffer_resources_->Clear();
     if (level_ && active_program_info_->material_id != NullId)
     {
-        for (auto buffer_id : active_program_info_->input_buffer_ids)
-        {
-            try
-            {
-                auto& buffer =
-                    dynamic_cast<const frame::vulkan::Buffer&>(
-                        level_->GetBufferFromId(buffer_id));
-                PendingBuffer pb{level_->GetNameFromId(buffer_id), &buffer};
-                pending_buffers.push_back(pb);
-            }
-            catch (const std::exception& ex)
-            {
-                logger_->warn(
-                    "Skipping buffer {}: {}", buffer_id, ex.what());
-            }
-        }
+        buffer_resources_->BuildStorageBuffers(
+            *level_, active_program_info_->input_buffer_ids);
+        buffer_resources_->LogCpuBufferSamples(*level_, debug_dump_done_);
     }
 
-    storage_buffers_.clear();
-    auto make_gpu_buffer =
-        [&](const std::vector<std::uint8_t>& bytes,
-            vk::BufferUsageFlags extra_flags)
-        -> std::pair<vk::UniqueBuffer, vk::UniqueDeviceMemory> {
-        vk::UniqueDeviceMemory staging_memory;
-        auto staging = gpu_memory_manager_->CreateBuffer(
-            bytes.size(),
-            vk::BufferUsageFlagBits::eTransferSrc,
-            vk::MemoryPropertyFlagBits::eHostVisible |
-                vk::MemoryPropertyFlagBits::eHostCoherent,
-            staging_memory);
-        if (!bytes.empty())
-        {
-            void* mapped = vk_unique_device_->mapMemory(
-                *staging_memory, 0, bytes.size());
-            std::memcpy(mapped, bytes.data(), bytes.size());
-            vk_unique_device_->unmapMemory(*staging_memory);
-        }
-        vk::UniqueDeviceMemory gpu_memory;
-        auto gpu_buffer = gpu_memory_manager_->CreateBuffer(
-            bytes.size(),
-            vk::BufferUsageFlagBits::eTransferDst | extra_flags,
-            vk::MemoryPropertyFlagBits::eDeviceLocal,
-            gpu_memory);
-        command_queue_->CopyBuffer(*staging, *gpu_buffer, bytes.size());
-        return {std::move(gpu_buffer), std::move(gpu_memory)};
-    };
+    const auto& storage_buffers = buffer_resources_->GetStorageBuffers();
 
-    for (const auto& pending : pending_buffers)
-    {
-        auto [gpu_buffer, gpu_memory] = make_gpu_buffer(
-            pending.source->GetRawData(),
-            vk::BufferUsageFlagBits::eStorageBuffer);
-        BufferResource res{};
-        res.name = pending.name;
-        res.size = pending.source->GetSize();
-        res.buffer = std::move(gpu_buffer);
-        res.memory = std::move(gpu_memory);
-        storage_buffers_.push_back(std::move(res));
-    }
-
-    // Debug: log the first triangle/BVH values to confirm layout on GPU side.
-    auto log_buffer_sample = [&](const BufferResource& res) {
-        if (debug_dump_done_ || res.size < sizeof(float) * 16)
-        {
-            return;
-        }
-        const auto& src_bytes =
-            reinterpret_cast<const frame::vulkan::Buffer*>(
-                &level_->GetBufferFromId(level_->GetIdFromName(res.name)))
-                ->GetRawData();
-        if (src_bytes.size() < sizeof(float) * 16)
-        {
-            return;
-        }
-        const float* f = reinterpret_cast<const float*>(src_bytes.data());
-        logger_->info(
-            "Buffer {} sample floats: {:.3f} {:.3f} {:.3f} {:.3f} | {:.3f} {:.3f} {:.3f} {:.3f}",
-            res.name,
-            f[0], f[1], f[2], f[3],
-            f[4], f[5], f[6], f[7]);
-    };
-    if (!storage_buffers_.empty() && level_)
-    {
-        for (const auto& res : storage_buffers_)
-        {
-            log_buffer_sample(res);
-        }
-    }
-
-    // Uniform buffer for matrices/camera/light.
-    uniform_buffer_ = {};
     const vk::DeviceSize uniform_size =
         static_cast<vk::DeviceSize>(sizeof(UniformBlock));
+    buffer_resources_->BuildUniformBuffer(uniform_size);
+    const BufferResource* uniform = buffer_resources_->GetUniformBuffer();
+    if (!uniform)
     {
-        vk::UniqueDeviceMemory uniform_memory;
-        auto uniform_buf = gpu_memory_manager_->CreateBuffer(
-            uniform_size,
-            vk::BufferUsageFlagBits::eUniformBuffer,
-            vk::MemoryPropertyFlagBits::eHostVisible |
-                vk::MemoryPropertyFlagBits::eHostCoherent,
-            uniform_memory);
-        uniform_buffer_.name = "uniforms";
-        uniform_buffer_.size = uniform_size;
-        uniform_buffer_.buffer = std::move(uniform_buf);
-        uniform_buffer_.memory = std::move(uniform_memory);
+        logger_->warn("Failed to allocate Vulkan uniform buffer.");
+        return;
     }
 
     if (use_compute_raytracing_)
@@ -2090,7 +2410,7 @@ void Device::CreateDescriptorResources()
     }
 
     std::vector<vk::DescriptorSetLayoutBinding> bindings;
-    bindings.reserve(image_infos.size() + storage_buffers_.size() + 4);
+    bindings.reserve(image_infos.size() + storage_buffers.size() + 4);
     const bool has_compute_output =
         use_compute_raytracing_ && compute_output_view_;
 
@@ -2102,7 +2422,10 @@ void Device::CreateDescriptorResources()
     const std::uint32_t kBindingBvh = 9;
     const std::uint32_t kBindingUniform = use_compute_raytracing_
         ? 10
-        : static_cast<std::uint32_t>(kBindingTextureBase + image_infos.size() + storage_buffers_.size());
+        : static_cast<std::uint32_t>(
+              kBindingTextureBase +
+              image_infos.size() +
+              storage_buffers.size());
 
     std::vector<std::uint32_t> texture_bindings;
     std::vector<std::uint32_t> storage_bindings;
@@ -2141,20 +2464,38 @@ void Device::CreateDescriptorResources()
     vk::ShaderStageFlags buffer_stage = use_compute_raytracing_
         ? vk::ShaderStageFlagBits::eCompute
         : vk::ShaderStageFlagBits::eFragment;
-    for (std::uint32_t i = 0; i < storage_buffers_.size(); ++i)
+    for (std::uint32_t i = 0; i < storage_buffers.size(); ++i)
     {
         std::uint32_t binding = kBindingTextureBase +
             static_cast<std::uint32_t>(image_infos.size()) + i;
-        // Force fixed bindings for raytracing SSBOs: first is triangles, second BVH.
+        // Force fixed bindings for raytracing SSBOs: map by inner name or suffix.
         if (use_compute_raytracing_)
         {
-            if (i == 0)
+            const std::string* inner_name = nullptr;
+            if (active_program_info_ &&
+                i < active_program_info_->input_buffer_inner_names.size())
+            {
+                inner_name = &active_program_info_->input_buffer_inner_names[i];
+            }
+            if (inner_name && *inner_name == "TriangleBuffer")
             {
                 binding = kBindingTriangle;
             }
-            else if (i == 1)
+            else if (inner_name && *inner_name == "BvhBuffer")
             {
                 binding = kBindingBvh;
+            }
+            else
+            {
+                const auto& name = storage_buffers[i].name;
+                if (name.find(".triangle") != std::string::npos)
+                {
+                    binding = kBindingTriangle;
+                }
+                else if (name.find(".bvh") != std::string::npos)
+                {
+                    binding = kBindingBvh;
+                }
             }
         }
         storage_bindings.push_back(binding);
@@ -2199,11 +2540,11 @@ void Device::CreateDescriptorResources()
             vk::DescriptorType::eCombinedImageSampler,
             static_cast<std::uint32_t>(image_infos.size()));
     }
-    if (!storage_buffers_.empty())
+    if (!storage_buffers.empty())
     {
         pool_sizes.emplace_back(
             vk::DescriptorType::eStorageBuffer,
-            static_cast<std::uint32_t>(storage_buffers_.size()));
+            static_cast<std::uint32_t>(storage_buffers.size()));
     }
     pool_sizes.emplace_back(
         vk::DescriptorType::eUniformBuffer, 1);
@@ -2225,11 +2566,11 @@ void Device::CreateDescriptorResources()
 
     std::vector<vk::WriteDescriptorSet> descriptor_writes;
     descriptor_writes.reserve(bindings.size());
-    if (use_compute_raytracing_ && storage_buffers_.size() < 2)
+    if (use_compute_raytracing_ && storage_buffers.size() < 2)
     {
         logger_->warn(
             "Raytracing requires triangle/BVH buffers, but only {} storage buffers were bound.",
-            storage_buffers_.size());
+            storage_buffers.size());
     }
     if (use_compute_raytracing_ && !compute_output_view_)
     {
@@ -2270,10 +2611,10 @@ void Device::CreateDescriptorResources()
             vk::DescriptorType::eCombinedImageSampler,
             &image_infos[i]);
     }
-    for (std::uint32_t i = 0; i < storage_buffers_.size(); ++i)
+    for (std::uint32_t i = 0; i < storage_buffers.size(); ++i)
     {
         vk::DescriptorBufferInfo info(
-            *storage_buffers_[i].buffer, 0, storage_buffers_[i].size);
+            *storage_buffers[i].buffer, 0, storage_buffers[i].size);
         descriptor_writes.emplace_back(
             descriptor_set_,
             storage_bindings[i],
@@ -2284,7 +2625,7 @@ void Device::CreateDescriptorResources()
             &info);
     }
     vk::DescriptorBufferInfo uniform_info(
-        *uniform_buffer_.buffer, 0, uniform_buffer_.size);
+        *uniform->buffer, 0, uniform->size);
     descriptor_writes.emplace_back(
         descriptor_set_,
         kBindingUniform,
@@ -2304,13 +2645,29 @@ void Device::CreateDescriptorResources()
         LogDescriptorDebugInfo(
             descriptor_texture_ids_,
             texture_bindings,
-            storage_buffers_,
+            storage_buffers,
             storage_bindings);
-        LogGpuBufferSamples();
+        buffer_resources_->LogGpuBufferSamples();
         if (!compute_pipeline_ || !compute_pipeline_layout_)
         {
             logger_->warn("Raytracing compute pipeline missing after descriptor build.");
         }
+    }
+    else if (use_compute_raytracing_ && !compute_pipeline_)
+    {
+        logger_->warn("Compute dispatch skipped: compute pipeline not ready.");
+    }
+    else if (
+        use_compute_raytracing_ &&
+        (!compute_output_image_ || !descriptor_set_ ||
+         swapchain_extent_.width == 0 || swapchain_extent_.height == 0))
+    {
+        logger_->warn(
+            "Compute dispatch skipped: output_image={} descriptor_set={} size={}x{}",
+            static_cast<bool>(compute_output_image_),
+            static_cast<bool>(descriptor_set_),
+            swapchain_extent_.width,
+            swapchain_extent_.height);
     }
 }
 
@@ -2320,11 +2677,15 @@ void Device::LogDescriptorDebugInfo(
     const std::vector<BufferResource>& buffers,
     const std::vector<std::uint32_t>& storage_bindings) const
 {
+    const auto* uniform = buffer_resources_
+        ? buffer_resources_->GetUniformBuffer()
+        : nullptr;
+    const auto uniform_size = uniform ? uniform->size : 0;
     logger_->info(
         "Raytracing descriptor setup: {} textures, {} storage buffers, uniform size {} bytes",
         texture_ids.size(),
         buffers.size(),
-        uniform_buffer_.size);
+        uniform_size);
     for (std::size_t i = 0; i < texture_ids.size() && i < texture_bindings.size(); ++i)
     {
         logger_->info(
@@ -2340,173 +2701,6 @@ void Device::LogDescriptorDebugInfo(
             buffers[i].name,
             buffers[i].size);
     }
-}
-
-void Device::LogGpuBufferSamples() const
-{
-    if (!vk_unique_device_ || storage_buffers_.empty() || !command_pool_)
-    {
-        return;
-    }
-    // Copy first chunk of each GPU storage buffer into a host-visible staging buffer for inspection.
-    const vk::DeviceSize sample_bytes = 16 * sizeof(float); // grab first 16 floats
-    for (const auto& res : storage_buffers_)
-    {
-        if (!res.buffer || res.size < sizeof(float) * 8)
-        {
-            continue;
-        }
-        const vk::DeviceSize bytes_to_copy =
-            std::min(res.size, sample_bytes);
-
-        vk::UniqueDeviceMemory staging_memory;
-        auto staging_buffer = gpu_memory_manager_->CreateBuffer(
-            bytes_to_copy,
-            vk::BufferUsageFlagBits::eTransferDst,
-            vk::MemoryPropertyFlagBits::eHostVisible |
-                vk::MemoryPropertyFlagBits::eHostCoherent,
-            staging_memory);
-
-        try
-        {
-            // Need a non-const this to call CopyBuffer; use const_cast safely here.
-            const_cast<Device*>(this)->CopyBuffer(
-                *res.buffer, *staging_buffer, bytes_to_copy);
-            void* mapped = vk_unique_device_->mapMemory(
-                *staging_memory, 0, bytes_to_copy);
-            if (mapped)
-            {
-                const float* f = static_cast<const float*>(mapped);
-                logger_->info(
-                    "GPU buffer {} sample floats: {:.3f} {:.3f} {:.3f} {:.3f} | {:.3f} {:.3f} {:.3f} {:.3f}",
-                    res.name,
-                    f[0], f[1], f[2], f[3],
-                    f[4], f[5], f[6], f[7]);
-                vk_unique_device_->unmapMemory(*staging_memory);
-            }
-        }
-        catch (const std::exception& ex)
-        {
-            logger_->warn(
-                "Failed to read back GPU buffer {}: {}", res.name, ex.what());
-        }
-    }
-}
-
-void Device::CreateMeshResources(
-    const frame::json::LevelData& level_data)
-{
-    meshes_.clear();
-
-    std::vector<frame::json::StaticMeshInfo> mesh_infos =
-        level_data.meshes;
-
-    if (mesh_infos.empty())
-    {
-        frame::json::StaticMeshInfo quad{};
-        quad.positions = {
-            -1.0f, -1.0f, 0.0f,
-            1.0f, -1.0f, 0.0f,
-            1.0f,  1.0f, 0.0f,
-            -1.0f, 1.0f, 0.0f};
-        quad.uvs = {
-            0.0f, 0.0f,
-            1.0f, 0.0f,
-            1.0f, 1.0f,
-            0.0f, 1.0f};
-        quad.indices = {0, 1, 2, 2, 3, 0};
-        mesh_infos.push_back(std::move(quad));
-    }
-
-    for (const auto& mesh_info : mesh_infos)
-    {
-        try
-        {
-            meshes_.push_back(CreateMeshResource(mesh_info));
-        }
-        catch (const std::exception& ex)
-        {
-            logger_->warn(
-                "Skipping mesh {}: {}",
-                mesh_info.name,
-                ex.what());
-        }
-    }
-}
-
-void Device::DestroyMeshResources()
-{
-    meshes_.clear();
-}
-
-Device::MeshResource Device::CreateMeshResource(
-    const frame::json::StaticMeshInfo& mesh_info)
-{
-    auto vertices = BuildMeshVertices(mesh_info);
-    if (vertices.empty())
-    {
-        throw std::runtime_error("Static mesh has no vertices.");
-    }
-
-    MeshResource resource;
-
-    const vk::DeviceSize vertex_size =
-        static_cast<vk::DeviceSize>(vertices.size() * sizeof(MeshVertex));
-    vk::UniqueDeviceMemory staging_vertex_memory;
-    auto staging_vertex_buffer = gpu_memory_manager_->CreateBuffer(
-        vertex_size,
-        vk::BufferUsageFlagBits::eTransferSrc,
-        vk::MemoryPropertyFlagBits::eHostVisible |
-            vk::MemoryPropertyFlagBits::eHostCoherent,
-        staging_vertex_memory);
-    void* mapped_vertices =
-        vk_unique_device_->mapMemory(*staging_vertex_memory, 0, vertex_size);
-    std::memcpy(mapped_vertices, vertices.data(), vertex_size);
-    vk_unique_device_->unmapMemory(*staging_vertex_memory);
-
-    auto vertex_buffer = gpu_memory_manager_->CreateBuffer(
-        vertex_size,
-        vk::BufferUsageFlagBits::eTransferDst |
-            vk::BufferUsageFlagBits::eVertexBuffer,
-        vk::MemoryPropertyFlagBits::eDeviceLocal,
-        resource.vertex_memory);
-    CopyBuffer(*staging_vertex_buffer, *vertex_buffer, vertex_size);
-    resource.vertex_buffer = std::move(vertex_buffer);
-
-    const auto& indices = mesh_info.indices;
-    if (!indices.empty())
-    {
-        const vk::DeviceSize index_size =
-            static_cast<vk::DeviceSize>(indices.size() * sizeof(std::uint32_t));
-        vk::UniqueDeviceMemory staging_index_memory;
-        auto staging_index_buffer = gpu_memory_manager_->CreateBuffer(
-            index_size,
-            vk::BufferUsageFlagBits::eTransferSrc,
-            vk::MemoryPropertyFlagBits::eHostVisible |
-                vk::MemoryPropertyFlagBits::eHostCoherent,
-            staging_index_memory);
-        void* mapped_indices =
-            vk_unique_device_->mapMemory(*staging_index_memory, 0, index_size);
-        std::memcpy(mapped_indices, indices.data(), index_size);
-        vk_unique_device_->unmapMemory(*staging_index_memory);
-
-        auto index_buffer = gpu_memory_manager_->CreateBuffer(
-            index_size,
-            vk::BufferUsageFlagBits::eTransferDst |
-                vk::BufferUsageFlagBits::eIndexBuffer,
-            vk::MemoryPropertyFlagBits::eDeviceLocal,
-            resource.index_memory);
-        CopyBuffer(*staging_index_buffer, *index_buffer, index_size);
-        resource.index_buffer = std::move(index_buffer);
-        resource.index_count = static_cast<std::uint32_t>(indices.size());
-    }
-    else
-    {
-        resource.index_count =
-            static_cast<std::uint32_t>(vertices.size());
-    }
-
-    return resource;
 }
 
 } // namespace frame::vulkan
