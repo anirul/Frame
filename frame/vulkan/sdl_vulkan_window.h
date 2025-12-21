@@ -111,6 +111,7 @@ class SDLVulkanWindow : public WindowInterface
     std::string open_file_name_ = "";
     frame::Logger& logger_ = frame::Logger::GetInstance();
     vk::UniqueInstance vk_unique_instance_;
+    vk::UniqueDebugUtilsMessengerEXT debug_messenger_;
     vk::SurfaceKHR vk_surface_ = VK_NULL_HANDLE;
 };
 

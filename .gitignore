@@ -237,3 +237,5 @@ src/frame/proto/include/frame/proto
 # Asset caches
 asset/cache/
 
+# Vulkan shader outputs
+*.spv

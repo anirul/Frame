@@ -12,6 +12,47 @@
 #include "frame/vulkan/window_factory.h"
 
 ABSL_FLAG(std::string, device, "vulkan", "Rendering backend (vulkan|opengl).");
+#if defined(_DEBUG)
+ABSL_FLAG(bool, vk_validation, true, "Enable Vulkan validation layers.");
+#else
+ABSL_FLAG(bool, vk_validation, false, "Enable Vulkan validation layers.");
+#endif
+ABSL_FLAG(bool, vk_raytrace_compute, true, "Use Vulkan compute raytracing path.");
+ABSL_FLAG(
+    bool,
+    vk_raytrace_bruteforce,
+    false,
+    "Force Vulkan raytracing to brute-force triangles (skip BVH).");
+ABSL_FLAG(
+    bool,
+    vk_raytrace_bruteforce_full,
+    false,
+    "Force Vulkan raytracing to brute-force every pixel (debug only).");
+ABSL_FLAG(
+    bool,
+    vk_raytrace_debug_uv,
+    false,
+    "Force Vulkan raytracing compute output to show a UV gradient.");
+ABSL_FLAG(
+    bool,
+    vk_log_scene,
+    false,
+    "Log Vulkan raytracing scene state for debugging.");
+ABSL_FLAG(
+    bool,
+    vk_dump_compute,
+    false,
+    "Dump Vulkan raytracing compute output for debugging.");
+ABSL_FLAG(
+    bool,
+    vk_debug_hitmask,
+    false,
+    "Enable Vulkan raytracing hit-mask debug output.");
+ABSL_FLAG(
+    bool,
+    vk_debug_tri_id,
+    false,
+    "Enable Vulkan raytracing triangle-id debug output.");
 
 namespace frame::common
 {

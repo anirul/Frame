@@ -1,9 +1,17 @@
 #include "frame/vulkan/json/parse_scene_tree.h"
 
+#include <algorithm>
+#include <array>
+#include <cmath>
 #include <format>
+#include <numeric>
 #include <stdexcept>
 
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+
 #include "frame/json/parse_uniform.h"
+#include "frame/logger.h"
 #include "frame/node_camera.h"
 #include "frame/node_light.h"
 #include "frame/node_matrix.h"
@@ -19,6 +27,23 @@ namespace frame::vulkan::json
 
 namespace
 {
+
+struct GpuVertex
+{
+    glm::vec4 position;
+    glm::vec4 normal;
+    glm::vec4 uv_pad;
+};
+
+struct GpuTriangle
+{
+    GpuVertex v0;
+    GpuVertex v1;
+    GpuVertex v2;
+};
+
+static_assert(sizeof(GpuVertex) == 48);
+static_assert(sizeof(GpuTriangle) == 144);
 
 std::function<NodeInterface*(const std::string&)> MakeResolver(
     LevelInterface& level)
@@ -176,6 +201,7 @@ bool ParseNodeStaticMesh(
             points.reserve(vertices.size() * 3);
             normals.reserve(vertices.size() * 3);
             textures.reserve(vertices.size() * 2);
+            std::size_t invalid_uvs = 0;
             for (const auto& vertex : vertices)
             {
                 points.push_back(vertex.point.x);
@@ -184,11 +210,31 @@ bool ParseNodeStaticMesh(
                 normals.push_back(vertex.normal.x);
                 normals.push_back(vertex.normal.y);
                 normals.push_back(vertex.normal.z);
-                if (obj.HasTextureCoordinates())
+                if (mesh.HasTextureCoordinates())
                 {
-                    textures.push_back(vertex.tex_coord.x);
-                    textures.push_back(vertex.tex_coord.y);
+                    float u = vertex.tex_coord.x;
+                    float v = vertex.tex_coord.y;
+                    if (!std::isfinite(u) || !std::isfinite(v))
+                    {
+                        u = 0.0f;
+                        v = 0.0f;
+                        ++invalid_uvs;
+                    }
+                    textures.push_back(u);
+                    textures.push_back(v);
                 }
+                else
+                {
+                    textures.push_back(vertex.normal.x);
+                    textures.push_back(vertex.normal.y);
+                }
+            }
+            if (invalid_uvs > 0)
+            {
+                frame::Logger::GetInstance()->warn(
+                    "Vulkan mesh {} had {} invalid UVs; clamped to 0.",
+                    proto_mesh.name(),
+                    invalid_uvs);
             }
 
             std::vector<std::uint32_t> indices;
@@ -196,6 +242,69 @@ bool ParseNodeStaticMesh(
             for (int idx : mesh.GetIndices())
             {
                 indices.push_back(static_cast<std::uint32_t>(idx));
+            }
+            const std::size_t vertex_count = points.size() / 3;
+            if (!indices.empty() && vertex_count > 0)
+            {
+                const auto [min_it, max_it] =
+                    std::minmax_element(indices.begin(), indices.end());
+                const bool has_zero =
+                    std::find(indices.begin(), indices.end(), 0) !=
+                    indices.end();
+                const bool looks_one_based =
+                    !has_zero &&
+                    *min_it >= 1 &&
+                    *max_it == vertex_count;
+                if (looks_one_based)
+                {
+                    for (auto& idx : indices)
+                    {
+                        idx -= 1;
+                    }
+                }
+                const auto [min_it_after, max_it_after] =
+                    std::minmax_element(indices.begin(), indices.end());
+                frame::Logger::GetInstance()->info(
+                    "Vulkan mesh {}: vertices={}, indices={}, min_idx={}, max_idx={}, has_zero={}, one_based={}",
+                    proto_mesh.name(),
+                    vertex_count,
+                    indices.size(),
+                    static_cast<std::uint32_t>(*min_it_after),
+                    static_cast<std::uint32_t>(*max_it_after),
+                    has_zero ? "true" : "false",
+                    looks_one_based ? "true" : "false");
+                if (indices.size() >= 9)
+                {
+                    frame::Logger::GetInstance()->info(
+                        "Vulkan mesh {} first indices: {} {} {} | {} {} {} | {} {} {}",
+                        proto_mesh.name(),
+                        indices[0], indices[1], indices[2],
+                        indices[3], indices[4], indices[5],
+                        indices[6], indices[7], indices[8]);
+                }
+            }
+            const auto indices_valid =
+                !indices.empty() &&
+                std::all_of(
+                    indices.begin(),
+                    indices.end(),
+                    [vertex_count](std::uint32_t idx) {
+                        return idx < vertex_count;
+                    }) &&
+                (indices.size() % 3 == 0);
+            std::vector<std::uint32_t> fallback_indices;
+            const std::vector<std::uint32_t>* triangle_indices = &indices;
+            if (!indices_valid && vertex_count > 0)
+            {
+                fallback_indices.resize(vertex_count);
+                std::iota(fallback_indices.begin(), fallback_indices.end(), 0);
+                const auto remainder = fallback_indices.size() % 3;
+                if (remainder != 0)
+                {
+                    fallback_indices.resize(
+                        fallback_indices.size() - remainder);
+                }
+                triangle_indices = &fallback_indices;
             }
 
             auto make_buffer = [](const auto& data,
@@ -236,52 +345,55 @@ bool ParseNodeStaticMesh(
                 throw std::runtime_error("Failed to create index buffer.");
             }
 
-            std::vector<float> triangles;
-            triangles.reserve(indices.size() / 3 * 36); // 3 verts * 12 floats
-            auto push_vertex = [&](std::uint32_t idx) {
+            std::vector<GpuTriangle> triangles;
+            triangles.reserve(triangle_indices->size() / 3);
+            auto make_vertex = [&](std::uint32_t idx) -> GpuVertex {
                 const auto base = idx * 3;
                 const auto uv_base = idx * 2;
-                // position (vec3) + pad
-                triangles.push_back(points[base + 0]);
-                triangles.push_back(points[base + 1]);
-                triangles.push_back(points[base + 2]);
-                triangles.push_back(0.0f);
+                GpuVertex vertex{};
+                vertex.position = glm::vec4(
+                    points[base + 0],
+                    points[base + 1],
+                    points[base + 2],
+                    0.0f);
                 if (!normals.empty())
                 {
-                    triangles.push_back(normals[base + 0]);
-                    triangles.push_back(normals[base + 1]);
-                    triangles.push_back(normals[base + 2]);
+                    vertex.normal = glm::vec4(
+                        normals[base + 0],
+                        normals[base + 1],
+                        normals[base + 2],
+                        0.0f);
                 }
                 else
                 {
-                    triangles.push_back(0.0f);
-                    triangles.push_back(0.0f);
-                    triangles.push_back(0.0f);
+                    vertex.normal = glm::vec4(0.0f);
                 }
-                // normal (vec3) + pad
-                triangles.push_back(0.0f);
                 if (!textures.empty())
                 {
-                    triangles.push_back(textures[uv_base + 0]);
-                    triangles.push_back(textures[uv_base + 1]);
+                    vertex.uv_pad = glm::vec4(
+                        textures[uv_base + 0],
+                        textures[uv_base + 1],
+                        0.0f,
+                        0.0f);
                 }
                 else
                 {
-                    triangles.push_back(0.0f);
-                    triangles.push_back(0.0f);
+                    vertex.uv_pad = glm::vec4(0.0f);
                 }
-                // uv_pad (vec4) to match shader vec4 uv_pad
-                triangles.push_back(0.0f);
-                triangles.push_back(0.0f);
+                return vertex;
             };
-            for (std::size_t i = 0; i + 2 < indices.size(); i += 3)
+            for (std::size_t i = 0;
+                 i + 2 < triangle_indices->size();
+                 i += 3)
             {
-                push_vertex(indices[i]);
-                push_vertex(indices[i + 1]);
-                push_vertex(indices[i + 2]);
+                GpuTriangle tri{};
+                tri.v0 = make_vertex((*triangle_indices)[i]);
+                tri.v1 = make_vertex((*triangle_indices)[i + 1]);
+                tri.v2 = make_vertex((*triangle_indices)[i + 2]);
+                triangles.push_back(tri);
             }
 
-            auto bvh_nodes = frame::BuildBVH(points, indices);
+            auto bvh_nodes = frame::BuildBVH(points, *triangle_indices);
 
             auto triangle_buffer_id = make_buffer(
                 triangles,

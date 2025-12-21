@@ -88,3 +88,11 @@ target_link_libraries(FrameVulkan
 )
 
 set_property(TARGET FrameVulkan PROPERTY FOLDER "Frame/Vulkan")
+
+if(MSVC)
+  target_compile_options(FrameVulkan PRIVATE /FS)
+endif()
+
+if(TARGET AssetShaderVulkanSpv)
+  add_dependencies(FrameVulkan AssetShaderVulkanSpv)
+endif()

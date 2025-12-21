@@ -349,7 +349,7 @@
             {
                 "name": "AppleMesh",
                 "parent": "mesh_holder",
-                "file_name": "dragon.obj",
+                "file_name": "apple.obj",
                 "material_name": "RayTraceMaterial",
                 "render_time_enum": "PRE_RENDER_TIME"
             }

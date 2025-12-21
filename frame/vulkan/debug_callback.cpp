@@ -15,8 +15,16 @@ VKAPI_ATTR VkBool32 VKAPI_CALL DebugReportCallback(
     const char* pMessage,
     void* pUserData)
 {
-    // TODO(anirul): Improve this.
-    throw std::runtime_error(pMessage);
+    (void)flags;
+    (void)objectType;
+    (void)object;
+    (void)location;
+    (void)messageCode;
+    (void)pLayerPrefix;
+    (void)pUserData;
+    auto& logger = Logger::GetInstance();
+    logger->warn(pMessage ? pMessage : "Vulkan debug report message.");
+    return VK_FALSE;
 }
 
 VKAPI_ATTR vk::Bool32 VKAPI_CALL DebugCallback(
@@ -25,11 +33,12 @@ VKAPI_ATTR vk::Bool32 VKAPI_CALL DebugCallback(
     const VkDebugUtilsMessengerCallbackDataEXT* p_callback_data,
     void* p_user_data)
 {
+    auto& logger = Logger::GetInstance();
     if (message_severity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
     {
-        throw std::runtime_error(p_callback_data->pMessage);
+        logger->error(p_callback_data->pMessage);
+        return VK_FALSE;
     }
-    auto& logger = Logger::GetInstance();
     if (message_severity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT)
     {
         logger->info(p_callback_data->pMessage);
@@ -43,7 +52,7 @@ VKAPI_ATTR vk::Bool32 VKAPI_CALL DebugCallback(
         logger->info(p_callback_data->pMessage);
         return VK_FALSE;
     }
-    return VK_TRUE;
+    return VK_FALSE;
 }
 
 } // namespace frame::vulkan

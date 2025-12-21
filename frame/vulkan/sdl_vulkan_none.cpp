@@ -4,14 +4,61 @@
 #include <SDL3/SDL_vulkan.h>
 #include <vulkan/vulkan.hpp>
 
+#include <cstring>
 #include <format>
 #include <string>
 #include <vector>
 
+#include "absl/flags/flag.h"
+
+#include "frame/common/application.h"
 #include "frame/vulkan/debug_callback.h"
 
 namespace frame::vulkan
 {
+namespace
+{
+constexpr const char* kValidationLayerName = "VK_LAYER_KHRONOS_validation";
+
+bool HasExtension(
+    const std::vector<vk::ExtensionProperties>& extensions,
+    const char* name)
+{
+    for (const auto& ext : extensions)
+    {
+        if (std::strcmp(ext.extensionName, name) == 0)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool HasLayer(
+    const std::vector<vk::LayerProperties>& layers,
+    const char* name)
+{
+    for (const auto& layer : layers)
+    {
+        if (std::strcmp(layer.layerName, name) == 0)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool IsValidationEnabled()
+{
+#if defined(_DEBUG)
+    bool enabled = true;
+#else
+    bool enabled = false;
+#endif
+    enabled = absl::GetFlag(FLAGS_vk_validation);
+    return enabled;
+}
+} // namespace
 
 SDLVulkanNone::SDLVulkanNone(glm::uvec2 size) : size_(size)
 {
@@ -56,12 +103,32 @@ SDLVulkanNone::SDLVulkanNone(glm::uvec2 size) : size_(size)
     extensions.reserve(static_cast<std::size_t>(extension_count) + 1);
     extensions.insert(
         extensions.end(), extension_names, extension_names + extension_count);
-#ifdef VK_EXT_ENABLE_DEBUG_EXTENSION
-    extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-#endif
+    const auto available_extensions =
+        vk::enumerateInstanceExtensionProperties();
+    const bool want_validation = IsValidationEnabled();
+    const bool has_debug_utils =
+        HasExtension(available_extensions, VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+    if (want_validation && has_debug_utils)
+    {
+        extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+    }
     for (const auto& extension : extensions)
     {
         logger_->info("Extension: {}", extension);
+    }
+
+    std::vector<const char*> layers;
+    if (want_validation)
+    {
+        const auto available_layers = vk::enumerateInstanceLayerProperties();
+        if (HasLayer(available_layers, kValidationLayerName))
+        {
+            layers.push_back(kValidationLayerName);
+        }
+        else
+        {
+            logger_->warn("Vulkan validation layer not found.");
+        }
     }
 
     vk::ApplicationInfo application_info(
@@ -73,13 +140,35 @@ SDLVulkanNone::SDLVulkanNone(glm::uvec2 size) : size_(size)
     vk::InstanceCreateInfo instance_create_info(
         {},
         &application_info,
-        0,
-        nullptr,
+        static_cast<std::uint32_t>(layers.size()),
+        layers.data(),
         static_cast<std::uint32_t>(extensions.size()),
         extensions.data());
 
+    vk::DebugUtilsMessengerCreateInfoEXT debug_info{};
+    if (want_validation && has_debug_utils)
+    {
+        debug_info.messageSeverity =
+            vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning |
+            vk::DebugUtilsMessageSeverityFlagBitsEXT::eError |
+            vk::DebugUtilsMessageSeverityFlagBitsEXT::eInfo;
+        debug_info.messageType =
+            vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral |
+            vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation |
+            vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance;
+        debug_info.pfnUserCallback =
+            reinterpret_cast<vk::PFN_DebugUtilsMessengerCallbackEXT>(
+                DebugCallback);
+        instance_create_info.setPNext(&debug_info);
+    }
+
     vk_unique_instance_ = vk::createInstanceUnique(instance_create_info);
     VULKAN_HPP_DEFAULT_DISPATCHER.init(*vk_unique_instance_, vk_get_instance_proc_addr);
+    if (want_validation && has_debug_utils)
+    {
+        debug_messenger_ =
+            vk_unique_instance_->createDebugUtilsMessengerEXTUnique(debug_info);
+    }
 
     VkSurfaceKHR surface = VK_NULL_HANDLE;
     if (!SDL_Vulkan_CreateSurface(
@@ -96,11 +185,7 @@ SDLVulkanNone::SDLVulkanNone(glm::uvec2 size) : size_(size)
 
 SDLVulkanNone::~SDLVulkanNone()
 {
-    if (device_)
-    {
-        device_->Cleanup();
-        device_.reset();
-    }
+    device_.reset();
 
     if (vk_unique_instance_ && vk_surface_)
     {
@@ -142,7 +227,15 @@ WindowReturnEnum SDLVulkanNone::Run(std::function<bool()> lambda)
 
     if (device_)
     {
-        device_->Display(0.0);
+        try
+        {
+            device_->Display(0.0);
+        }
+        catch (const std::exception& ex)
+        {
+            logger_->error("Vulkan Display failed: {}", ex.what());
+            return WindowReturnEnum::QUIT;
+        }
         for (const auto& plugin_interface : device_->GetPluginPtrs())
         {
             if (plugin_interface)

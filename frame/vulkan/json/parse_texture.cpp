@@ -1,6 +1,8 @@
 #include "frame/vulkan/json/parse_texture.h"
 
+#include <algorithm>
 #include <cstring>
+#include <numbers>
 #include <stdexcept>
 
 #include "frame/file/image.h"

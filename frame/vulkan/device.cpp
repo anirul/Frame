@@ -16,9 +16,11 @@
 #include <stdexcept>
 #include <sstream>
 #include <shaderc/shaderc.hpp>
+#include "absl/flags/flag.h"
 
 #include "frame/camera.h"
 #include "frame/level.h"
+#include "frame/common/application.h"
 #include "frame/vulkan/buffer.h"
 #include "frame/vulkan/buffer_resources.h"
 #include "frame/vulkan/build_level.h"
@@ -193,12 +195,31 @@ Device::Device(
       vk_surface_(surface),
       texture_resources_(std::make_unique<TextureResources>(*this))
 {
-    const char* dump_env = std::getenv("FRAME_VK_DUMP_COMPUTE");
-    debug_dump_compute_output_ = dump_env && std::strlen(dump_env) > 0;
-    const char* log_state_env = std::getenv("FRAME_VK_LOG_SCENE");
-    debug_log_scene_state_ = log_state_env && std::strlen(log_state_env) > 0;
-    const char* hitmask_env = std::getenv("FRAME_VK_DEBUG_HITMASK");
-    debug_hit_mask_ = hitmask_env && std::strlen(hitmask_env) > 0;
+    auto env_enabled = [](const char* name) {
+#if defined(_WIN32) || defined(_WIN64)
+        char* value = nullptr;
+        size_t len = 0;
+        const errno_t err = _dupenv_s(&value, &len, name);
+        const bool enabled = (err == 0) && value && len > 1;
+        if (value)
+        {
+            std::free(value);
+        }
+        return enabled;
+#else
+        const char* value = std::getenv(name);
+        return value && std::strlen(value) > 0;
+#endif
+    };
+    debug_dump_compute_output_ =
+        absl::GetFlag(FLAGS_vk_dump_compute) ||
+        env_enabled("FRAME_VK_DUMP_COMPUTE");
+    debug_log_scene_state_ =
+        absl::GetFlag(FLAGS_vk_log_scene) ||
+        env_enabled("FRAME_VK_LOG_SCENE");
+    debug_hit_mask_ =
+        absl::GetFlag(FLAGS_vk_debug_hitmask) ||
+        env_enabled("FRAME_VK_DEBUG_HITMASK");
 
     logger_->info("Initializing Vulkan device ({}x{})", size_.x, size_.y);
 
@@ -448,7 +469,9 @@ void Device::StartupFromLevelData(const frame::json::LevelData& level_data)
     {
         active_program_info_->program_id =
             level_->GetIdFromName(active_program_info_->program_name);
-        use_compute_raytracing_ = active_program_info_->use_compute;
+        const bool allow_compute = absl::GetFlag(FLAGS_vk_raytrace_compute);
+        use_compute_raytracing_ =
+            active_program_info_->use_compute && allow_compute;
         active_program_info_->input_texture_ids.clear();
         active_program_info_->input_buffer_ids.clear();
         active_program_info_->input_buffer_inner_names.clear();
@@ -664,7 +687,14 @@ void Device::Cleanup()
 {
     if (vk_unique_device_)
     {
-        vk_unique_device_->waitIdle();
+        const VkResult result =
+            vkDeviceWaitIdle(static_cast<VkDevice>(*vk_unique_device_));
+        if (result != VK_SUCCESS)
+        {
+            logger_->warn(
+                "vkDeviceWaitIdle failed during cleanup: {}",
+                vk::to_string(static_cast<vk::Result>(result)));
+        }
     }
 
     DestroyGraphicsPipeline();
@@ -729,6 +759,11 @@ glm::uvec2 Device::GetSize() const
 
 void Device::Display(double dt)
 {
+    if (device_lost_)
+    {
+        return;
+    }
+
     elapsed_time_seconds_ += static_cast<float>(dt);
 
     if (level_)
@@ -753,11 +788,23 @@ void Device::Display(double dt)
     }
 
     const auto& fence = in_flight_fences_[current_frame_];
-    const vk::Result wait_result = vk_unique_device_->waitForFences(
-        *fence, VK_TRUE, std::numeric_limits<std::uint64_t>::max());
-    if (wait_result != vk::Result::eSuccess)
+    const VkFence fence_handle = static_cast<VkFence>(*fence);
+    const VkResult wait_result = vkWaitForFences(
+        static_cast<VkDevice>(*vk_unique_device_),
+        1,
+        &fence_handle,
+        VK_TRUE,
+        std::numeric_limits<std::uint64_t>::max());
+    if (wait_result != VK_SUCCESS)
     {
-        throw std::runtime_error("Failed to wait for in-flight fence.");
+        logger_->error(
+            "vkWaitForFences failed: {}",
+            vk::to_string(static_cast<vk::Result>(wait_result)));
+        if (wait_result == VK_ERROR_DEVICE_LOST)
+        {
+            device_lost_ = true;
+        }
+        return;
     }
 
     auto acquire = vk_unique_device_->acquireNextImageKHR(
@@ -774,11 +821,32 @@ void Device::Display(double dt)
     if (acquire.result != vk::Result::eSuccess &&
         acquire.result != vk::Result::eSuboptimalKHR)
     {
-        throw std::runtime_error("Failed to acquire swapchain image.");
+        logger_->error(
+            "Failed to acquire swapchain image: {}",
+            vk::to_string(acquire.result));
+        if (acquire.result == vk::Result::eErrorDeviceLost)
+        {
+            device_lost_ = true;
+        }
+        return;
     }
 
     const std::uint32_t image_index = acquire.value;
-    vk_unique_device_->resetFences(*fence);
+    const VkResult reset_result = vkResetFences(
+        static_cast<VkDevice>(*vk_unique_device_),
+        1,
+        &fence_handle);
+    if (reset_result != VK_SUCCESS)
+    {
+        logger_->error(
+            "vkResetFences failed: {}",
+            vk::to_string(static_cast<vk::Result>(reset_result)));
+        if (reset_result == VK_ERROR_DEVICE_LOST)
+        {
+            device_lost_ = true;
+        }
+        return;
+    }
 
     vk::CommandBuffer command_buffer = command_buffers_[current_frame_];
     command_buffer.reset();
@@ -800,86 +868,113 @@ void Device::Display(double dt)
         1,
         signal_semaphores);
 
-    graphics_queue_.submit(submit_info, *fence);
+    const VkSubmitInfo submit_info_c = submit_info;
+    const VkResult submit_result = vkQueueSubmit(
+        static_cast<VkQueue>(graphics_queue_),
+        1,
+        &submit_info_c,
+        *fence);
+    if (submit_result != VK_SUCCESS)
+    {
+        logger_->error(
+            "vkQueueSubmit failed: {}",
+            vk::to_string(static_cast<vk::Result>(submit_result)));
+        if (submit_result == VK_ERROR_DEVICE_LOST)
+        {
+            device_lost_ = true;
+        }
+        return;
+    }
 
     if ((debug_dump_compute_output_ || !debug_dump_done_) &&
         debug_readback_.buffer &&
         !debug_dump_done_)
     {
-        graphics_queue_.waitIdle();
-        void* mapped = vk_unique_device_->mapMemory(
-            *debug_readback_.memory, 0, debug_readback_.size);
-        if (mapped)
+        const VkResult wait_result =
+            vkQueueWaitIdle(static_cast<VkQueue>(graphics_queue_));
+        if (wait_result != VK_SUCCESS)
         {
-            const auto* raw16 =
-                static_cast<const std::uint16_t*>(mapped);
-            auto sample_half2 = [](const std::uint16_t* p) -> glm::vec2 {
-                return glm::unpackHalf2x16(
-                    (static_cast<std::uint32_t>(p[1]) << 16) | p[0]);
-            };
-            if (debug_readback_.size == sizeof(std::uint16_t) * 4)
+            logger_->warn(
+                "vkQueueWaitIdle failed for debug readback: {}",
+                vk::to_string(static_cast<vk::Result>(wait_result)));
+            debug_dump_done_ = true;
+        }
+        else
+        {
+            void* mapped = vk_unique_device_->mapMemory(
+                *debug_readback_.memory, 0, debug_readback_.size);
+            if (mapped)
             {
-                const glm::vec2 rg = sample_half2(raw16);
-                const glm::vec2 ba = sample_half2(raw16 + 2);
-                logger_->info(
-                    "Compute output first pixel: ({:.3f}, {:.3f}, {:.3f}, {:.3f})",
-                    rg.x,
-                    rg.y,
-                    ba.x,
-                    ba.y);
-            }
-            else
-            {
-                const std::size_t pixel_count =
-                    swapchain_extent_.width * swapchain_extent_.height;
-                double sum_r = 0.0;
-                double sum_g = 0.0;
-                double sum_b = 0.0;
-                for (std::size_t i = 0; i < pixel_count; ++i)
+                const auto* raw16 =
+                    static_cast<const std::uint16_t*>(mapped);
+                auto sample_half2 = [](const std::uint16_t* p) -> glm::vec2 {
+                    return glm::unpackHalf2x16(
+                        (static_cast<std::uint32_t>(p[1]) << 16) | p[0]);
+                };
+                if (debug_readback_.size == sizeof(std::uint16_t) * 4)
                 {
-                    const std::uint16_t* px = raw16 + i * 4;
-                    const glm::vec2 rg = sample_half2(px);
-                    const glm::vec2 ba = sample_half2(px + 2);
-                    sum_r += rg.x;
-                    sum_g += rg.y;
-                    sum_b += ba.x;
-                }
-                if (pixel_count > 0)
-                {
-                    const float avg_r =
-                        static_cast<float>(sum_r / pixel_count);
-                    const float avg_g =
-                        static_cast<float>(sum_g / pixel_count);
-                    const float avg_b =
-                        static_cast<float>(sum_b / pixel_count);
-                    if (!std::isfinite(avg_r) || !std::isfinite(avg_g) ||
-                        !std::isfinite(avg_b))
-                    {
-                        logger_->warn("Debug compute capture avg color is NaN/Inf.");
-                    }
-                    else
-                    {
-                        logger_->info(
-                            "Debug compute capture avg color: ({:.3f}, {:.3f}, {:.3f})",
-                            avg_r,
-                            avg_g,
-                            avg_b);
-                    }
-                    const std::size_t cx = swapchain_extent_.width / 2;
-                    const std::size_t cy = swapchain_extent_.height / 2;
-                    const std::size_t center_index =
-                        (cy * swapchain_extent_.width + cx) * 4;
-                    const auto* center_px = raw16 + center_index;
-                    const glm::vec2 center_rg = sample_half2(center_px);
-                    const glm::vec2 center_ba = sample_half2(center_px + 2);
+                    const glm::vec2 rg = sample_half2(raw16);
+                    const glm::vec2 ba = sample_half2(raw16 + 2);
                     logger_->info(
-                        "Center pixel color (compute output): "
-                        "({:.3f}, {:.3f}, {:.3f}, {:.3f})",
-                        center_rg.x,
-                        center_rg.y,
-                        center_ba.x,
-                        center_ba.y);
+                        "Compute output first pixel: ({:.3f}, {:.3f}, {:.3f}, {:.3f})",
+                        rg.x,
+                        rg.y,
+                        ba.x,
+                        ba.y);
                 }
+                else
+                {
+                    const std::size_t pixel_count =
+                        swapchain_extent_.width * swapchain_extent_.height;
+                    double sum_r = 0.0;
+                    double sum_g = 0.0;
+                    double sum_b = 0.0;
+                    for (std::size_t i = 0; i < pixel_count; ++i)
+                    {
+                        const std::uint16_t* px = raw16 + i * 4;
+                        const glm::vec2 rg = sample_half2(px);
+                        const glm::vec2 ba = sample_half2(px + 2);
+                        sum_r += rg.x;
+                        sum_g += rg.y;
+                        sum_b += ba.x;
+                    }
+                    if (pixel_count > 0)
+                    {
+                        const float avg_r =
+                            static_cast<float>(sum_r / pixel_count);
+                        const float avg_g =
+                            static_cast<float>(sum_g / pixel_count);
+                        const float avg_b =
+                            static_cast<float>(sum_b / pixel_count);
+                        if (!std::isfinite(avg_r) || !std::isfinite(avg_g) ||
+                            !std::isfinite(avg_b))
+                        {
+                            logger_->warn("Debug compute capture avg color is NaN/Inf.");
+                        }
+                        else
+                        {
+                            logger_->info(
+                                "Debug compute capture avg color: ({:.3f}, {:.3f}, {:.3f})",
+                                avg_r,
+                                avg_g,
+                                avg_b);
+                        }
+                    }
+                }
+                const std::size_t cx = swapchain_extent_.width / 2;
+                const std::size_t cy = swapchain_extent_.height / 2;
+                const std::size_t center_index =
+                    (cy * swapchain_extent_.width + cx) * 4;
+                const auto* center_px = raw16 + center_index;
+                const glm::vec2 center_rg = sample_half2(center_px);
+                const glm::vec2 center_ba = sample_half2(center_px + 2);
+                logger_->info(
+                    "Center pixel color (compute output): "
+                    "({:.3f}, {:.3f}, {:.3f}, {:.3f})",
+                    center_rg.x,
+                    center_rg.y,
+                    center_ba.x,
+                    center_ba.y);
             }
             vk_unique_device_->unmapMemory(*debug_readback_.memory);
         }
@@ -901,7 +996,31 @@ void Device::Display(double dt)
     }
     else if (present_result != vk::Result::eSuccess)
     {
-        throw std::runtime_error("Failed to present swapchain image.");
+        logger_->error(
+            "Failed to present swapchain image: {}",
+            vk::to_string(present_result));
+        if (present_result == vk::Result::eErrorDeviceLost)
+        {
+            device_lost_ = true;
+        }
+        return;
+    }
+
+    if (absl::GetFlag(FLAGS_vk_validation))
+    {
+        const VkResult present_wait = vkQueueWaitIdle(
+            static_cast<VkQueue>(present_queue_));
+        if (present_wait != VK_SUCCESS)
+        {
+            logger_->error(
+                "vkQueueWaitIdle after present failed: {}",
+                vk::to_string(static_cast<vk::Result>(present_wait)));
+            if (present_wait == VK_ERROR_DEVICE_LOST)
+            {
+                device_lost_ = true;
+            }
+            return;
+        }
     }
 
     current_frame_ = (current_frame_ + 1) % kMaxFramesInFlight;
@@ -1326,6 +1445,36 @@ void Device::RecordCommandBuffer(
                         std::vector<DebugBvhNode> nodes(node_count);
                         std::memcpy(
                             nodes.data(), bvh_bytes.data(), bvh_bytes.size());
+                        std::size_t bad_uv = 0;
+                        std::size_t bad_pos = 0;
+                        for (const auto& tri : tris)
+                        {
+                            const auto check_vec4 = [](const glm::vec4& v) {
+                                return std::isfinite(v.x) &&
+                                    std::isfinite(v.y) &&
+                                    std::isfinite(v.z) &&
+                                    std::isfinite(v.w);
+                            };
+                            if (!check_vec4(tri.v0.position) ||
+                                !check_vec4(tri.v1.position) ||
+                                !check_vec4(tri.v2.position))
+                            {
+                                ++bad_pos;
+                            }
+                            if (!check_vec4(tri.v0.uv_pad) ||
+                                !check_vec4(tri.v1.uv_pad) ||
+                                !check_vec4(tri.v2.uv_pad))
+                            {
+                                ++bad_uv;
+                            }
+                        }
+                        if (bad_pos > 0 || bad_uv > 0)
+                        {
+                            logger_->warn(
+                                "CPU debug triangle buffer has invalid data: bad_pos={} bad_uv={}",
+                                bad_pos,
+                                bad_uv);
+                        }
 
                         const float px =
                             static_cast<float>(swapchain_extent_.width) * 0.5f;
@@ -1368,6 +1517,32 @@ void Device::RecordCommandBuffer(
                                 "CPU debug ray hit tri {} at t {:.4f}",
                                 tri_index,
                                 t_hit);
+                            if (tri_index >= 0 &&
+                                static_cast<std::size_t>(tri_index) <
+                                    tris.size())
+                            {
+                                const auto& tri = tris[tri_index];
+                                logger_->info(
+                                    "CPU debug tri {} v0=({:.3f},{:.3f},{:.3f}) uv=({:.3f},{:.3f}) "
+                                    "v1=({:.3f},{:.3f},{:.3f}) uv=({:.3f},{:.3f}) "
+                                    "v2=({:.3f},{:.3f},{:.3f}) uv=({:.3f},{:.3f})",
+                                    tri_index,
+                                    tri.v0.position.x,
+                                    tri.v0.position.y,
+                                    tri.v0.position.z,
+                                    tri.v0.uv_pad.x,
+                                    tri.v0.uv_pad.y,
+                                    tri.v1.position.x,
+                                    tri.v1.position.y,
+                                    tri.v1.position.z,
+                                    tri.v1.uv_pad.x,
+                                    tri.v1.uv_pad.y,
+                                    tri.v2.position.x,
+                                    tri.v2.position.y,
+                                    tri.v2.position.z,
+                                    tri.v2.uv_pad.x,
+                                    tri.v2.uv_pad.y);
+                            }
                         }
                         else
                         {
@@ -1395,6 +1570,18 @@ void Device::RecordCommandBuffer(
         if (debug_hit_mask_)
         {
             block.time_s.w = 6.0f; // >5.5 targeted tri debug
+        }
+        else if (absl::GetFlag(FLAGS_vk_raytrace_bruteforce_full))
+        {
+            block.time_s.w = 7.0f; // >6.5 brute-force every pixel
+        }
+        else if (absl::GetFlag(FLAGS_vk_raytrace_bruteforce))
+        {
+            block.time_s.w = 2.0f; // >1.5 enables brute-force traversal
+        }
+        else if (absl::GetFlag(FLAGS_vk_raytrace_debug_uv))
+        {
+            block.time_s.w = 4.0f; // >3.5 forces UV debug output
         }
         buffer_resources_->UpdateUniform(
             &block, sizeof(UniformBlock));
@@ -1834,9 +2021,22 @@ void Device::CreateGraphicsPipeline()
         }
     )glsl";
 
+    static constexpr const char* kFallbackRaytraceFragment = R"glsl(
+        #version 450
+        layout(location = 0) in vec2 v_uv;
+        layout(location = 0) out vec4 out_color;
+        void main() {
+            out_color = vec4(v_uv, 0.0, 1.0);
+        }
+    )glsl";
+
     std::vector<std::uint32_t> vert_code;
     std::vector<std::uint32_t> frag_code;
     bool using_custom_program = false;
+    const bool wants_raytrace_fallback =
+        !use_compute_raytracing_ &&
+        active_program_info_ &&
+        active_program_info_->program_name == "RayTraceProgram";
 
     if (active_program_info_)
     {
@@ -1847,6 +2047,15 @@ void Device::CreateGraphicsPipeline()
             frag_code = CompileShader(
                 active_program_info_->fragment_shader, shaderc_fragment_shader);
             using_custom_program = true;
+            if (wants_raytrace_fallback)
+            {
+                frag_code = CompileShaderSource(
+                    kFallbackRaytraceFragment,
+                    shaderc_fragment_shader,
+                    "fallback_raytrace.frag");
+                logger_->info(
+                    "Compute raytracing disabled; using fallback fragment shader.");
+            }
         }
         catch (const std::exception& ex)
         {
@@ -1923,9 +2132,15 @@ void Device::CreateGraphicsPipeline()
             static_cast<std::uint32_t>(sizeof(MeshVertex)),
             vk::VertexInputRate::eVertex);
         attribute_descriptions.emplace_back(
-            0, 0, vk::Format::eR32G32B32Sfloat, offsetof(MeshVertex, position));
+            0,
+            0,
+            vk::Format::eR32G32B32Sfloat,
+            static_cast<std::uint32_t>(offsetof(MeshVertex, position)));
         attribute_descriptions.emplace_back(
-            1, 0, vk::Format::eR32G32Sfloat, offsetof(MeshVertex, uv));
+            1,
+            0,
+            vk::Format::eR32G32Sfloat,
+            static_cast<std::uint32_t>(offsetof(MeshVertex, uv)));
     }
 
     vk::PipelineVertexInputStateCreateInfo vertex_input_info(
@@ -2120,6 +2335,39 @@ std::vector<std::uint32_t> Device::CompileShader(
     const std::filesystem::path& path,
     shaderc_shader_kind kind) const
 {
+    const std::filesystem::path cache_path = path.string() + ".spv";
+    std::error_code cache_error;
+    const bool cache_ok =
+        std::filesystem::exists(cache_path, cache_error) && !cache_error;
+    if (cache_ok)
+    {
+        const auto source_time =
+            std::filesystem::last_write_time(path, cache_error);
+        const auto cache_time =
+            std::filesystem::last_write_time(cache_path, cache_error);
+        if (!cache_error && cache_time >= source_time)
+        {
+            std::ifstream cache_file(cache_path, std::ios::binary);
+            if (cache_file)
+            {
+                cache_file.seekg(0, std::ios::end);
+                const std::streamsize cache_size = cache_file.tellg();
+                cache_file.seekg(0, std::ios::beg);
+                if (cache_size > 0 && (cache_size % 4) == 0)
+                {
+                    std::vector<std::uint32_t> cached(
+                        static_cast<std::size_t>(cache_size / 4));
+                    if (cache_file.read(
+                            reinterpret_cast<char*>(cached.data()),
+                            cache_size))
+                    {
+                        return cached;
+                    }
+                }
+            }
+        }
+    }
+
     std::ifstream file(path);
     if (!file)
     {
@@ -2146,7 +2394,19 @@ std::vector<std::uint32_t> Device::CompileShader(
         throw std::runtime_error(result.GetErrorMessage());
     }
 
-    return {result.cbegin(), result.cend()};
+    std::vector<std::uint32_t> compiled{result.cbegin(), result.cend()};
+    std::error_code write_error;
+    std::filesystem::create_directories(
+        cache_path.parent_path(), write_error);
+    std::ofstream cache_out(cache_path, std::ios::binary | std::ios::trunc);
+    if (cache_out)
+    {
+        cache_out.write(
+            reinterpret_cast<const char*>(compiled.data()),
+            static_cast<std::streamsize>(
+                compiled.size() * sizeof(std::uint32_t)));
+    }
+    return compiled;
 }
 
 std::vector<std::uint32_t> Device::CompileShaderSource(

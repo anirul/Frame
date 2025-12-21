@@ -49,7 +49,9 @@ BufferResource BufferResourceManager::MakeGpuBuffer(
     vk::UniqueDeviceMemory gpu_memory;
     auto gpu_buffer = memory_manager_->CreateBuffer(
         bytes.size(),
-        vk::BufferUsageFlagBits::eTransferDst | extra_flags,
+        vk::BufferUsageFlagBits::eTransferDst |
+            vk::BufferUsageFlagBits::eTransferSrc |
+            extra_flags,
         vk::MemoryPropertyFlagBits::eDeviceLocal,
         gpu_memory);
 

@@ -213,6 +213,7 @@ class Device : public DeviceInterface
     BufferResource debug_readback_;
     bool debug_log_scene_state_ = false;
     bool debug_hit_mask_ = false;
+    bool device_lost_ = false;
     struct ProgramPipelineInfo
     {
         std::string program_name;

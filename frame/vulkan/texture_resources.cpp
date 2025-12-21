@@ -345,7 +345,7 @@ void TextureResources::UploadTexture(
     std::memcpy(mapped_data, upload_data.data(), upload_data.size());
     owner_.vk_unique_device_->unmapMemory(*staging_memory);
 
-    const std::uint32_t layer_count = face_count;
+    const std::uint32_t layer_count = static_cast<std::uint32_t>(face_count);
 
     vk::ImageCreateInfo image_info(
         is_cubemap ? vk::ImageCreateFlagBits::eCubeCompatible : vk::ImageCreateFlags{},
