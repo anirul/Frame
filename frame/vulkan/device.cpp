@@ -45,9 +45,12 @@ namespace
 
 struct DebugVertex
 {
-    glm::vec4 position;
-    glm::vec4 normal;
-    glm::vec4 uv_pad;
+    glm::vec3 position;
+    float pad0;
+    glm::vec3 normal;
+    float pad1;
+    glm::vec2 uv;
+    glm::vec2 pad2;
 };
 
 struct DebugTriangle
@@ -1358,7 +1361,8 @@ void Device::RecordCommandBuffer(
                   elapsed_time_seconds_,
                   active_program_info_
                       ? active_program_info_->material_id
-                      : NullId)
+                      : NullId,
+                  !use_compute_raytracing_)
             : SceneState{};
 
     if (debug_log_scene_state_ && !debug_dump_done_)
@@ -1449,21 +1453,24 @@ void Device::RecordCommandBuffer(
                         std::size_t bad_pos = 0;
                         for (const auto& tri : tris)
                         {
-                            const auto check_vec4 = [](const glm::vec4& v) {
+                            const auto check_vec3 = [](const glm::vec3& v) {
                                 return std::isfinite(v.x) &&
                                     std::isfinite(v.y) &&
-                                    std::isfinite(v.z) &&
-                                    std::isfinite(v.w);
+                                    std::isfinite(v.z);
                             };
-                            if (!check_vec4(tri.v0.position) ||
-                                !check_vec4(tri.v1.position) ||
-                                !check_vec4(tri.v2.position))
+                            const auto check_vec2 = [](const glm::vec2& v) {
+                                return std::isfinite(v.x) &&
+                                    std::isfinite(v.y);
+                            };
+                            if (!check_vec3(tri.v0.position) ||
+                                !check_vec3(tri.v1.position) ||
+                                !check_vec3(tri.v2.position))
                             {
                                 ++bad_pos;
                             }
-                            if (!check_vec4(tri.v0.uv_pad) ||
-                                !check_vec4(tri.v1.uv_pad) ||
-                                !check_vec4(tri.v2.uv_pad))
+                            if (!check_vec2(tri.v0.uv) ||
+                                !check_vec2(tri.v1.uv) ||
+                                !check_vec2(tri.v2.uv))
                             {
                                 ++bad_uv;
                             }
@@ -1530,18 +1537,18 @@ void Device::RecordCommandBuffer(
                                     tri.v0.position.x,
                                     tri.v0.position.y,
                                     tri.v0.position.z,
-                                    tri.v0.uv_pad.x,
-                                    tri.v0.uv_pad.y,
+                                    tri.v0.uv.x,
+                                    tri.v0.uv.y,
                                     tri.v1.position.x,
                                     tri.v1.position.y,
                                     tri.v1.position.z,
-                                    tri.v1.uv_pad.x,
-                                    tri.v1.uv_pad.y,
+                                    tri.v1.uv.x,
+                                    tri.v1.uv.y,
                                     tri.v2.position.x,
                                     tri.v2.position.y,
                                     tri.v2.position.z,
-                                    tri.v2.uv_pad.x,
-                                    tri.v2.uv_pad.y);
+                                    tri.v2.uv.x,
+                                    tri.v2.uv.y);
                             }
                         }
                         else

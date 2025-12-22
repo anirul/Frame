@@ -44,19 +44,7 @@ struct alignas(16) UniformBlock
     glm::vec4 time_s;
 };
 
-struct alignas(16) Vertex
-{
-    glm::vec4 position;
-    glm::vec4 normal;
-    glm::vec4 uv_pad;
-};
-
-struct alignas(16) Triangle
-{
-    Vertex v0;
-    Vertex v1;
-    Vertex v2;
-};
+constexpr std::size_t kTriangleVec4Count = 9;
 
 struct alignas(16) BvhNode
 {
@@ -486,14 +474,16 @@ TEST_F(VulkanRayTracingComputeTest, DispatchProducesLitPixel)
         vk::ImageLayout::eGeneral);
 
     // Geometry buffers.
-    Triangle tri{};
-    tri.v0.position = glm::vec4(-0.5f, -0.5f, 0.0f, 1.0f);
-    tri.v1.position = glm::vec4(0.5f, -0.5f, 0.0f, 1.0f);
-    tri.v2.position = glm::vec4(0.0f, 0.5f, 0.0f, 1.0f);
-    tri.v0.normal = tri.v1.normal = tri.v2.normal = glm::vec4(0, 0, 1, 0);
-    tri.v0.uv_pad = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
-    tri.v1.uv_pad = glm::vec4(1.0f, 0.0f, 0.0f, 0.0f);
-    tri.v2.uv_pad = glm::vec4(0.5f, 1.0f, 0.0f, 0.0f);
+    std::array<glm::vec4, kTriangleVec4Count> tri{};
+    tri[0] = glm::vec4(-0.5f, -0.5f, 0.0f, 0.0f);
+    tri[1] = glm::vec4(0.0f, 0.0f, 1.0f, 0.0f);
+    tri[2] = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+    tri[3] = glm::vec4(0.5f, -0.5f, 0.0f, 0.0f);
+    tri[4] = glm::vec4(0.0f, 0.0f, 1.0f, 0.0f);
+    tri[5] = glm::vec4(1.0f, 0.0f, 0.0f, 0.0f);
+    tri[6] = glm::vec4(0.0f, 0.5f, 0.0f, 0.0f);
+    tri[7] = glm::vec4(0.0f, 0.0f, 1.0f, 0.0f);
+    tri[8] = glm::vec4(0.5f, 1.0f, 0.0f, 0.0f);
 
     BvhNode node{};
     node.min = glm::vec4(-1.0f, -1.0f, -0.1f, 0.0f);
@@ -505,8 +495,8 @@ TEST_F(VulkanRayTracingComputeTest, DispatchProducesLitPixel)
 
     vk::UniqueBuffer tri_buffer;
     auto tri_memory = MakeBufferWithData(
-        &tri,
-        sizeof(Triangle),
+        tri.data(),
+        sizeof(glm::vec4) * tri.size(),
         tri_buffer,
         vk::BufferUsageFlagBits::eStorageBuffer);
     vk::UniqueBuffer bvh_buffer;
@@ -629,7 +619,8 @@ TEST_F(VulkanRayTracingComputeTest, DispatchProducesLitPixel)
             &texture_infos.back());
     }
 
-    vk::DescriptorBufferInfo tri_info(*tri_buffer, 0, sizeof(Triangle));
+    vk::DescriptorBufferInfo tri_info(
+        *tri_buffer, 0, sizeof(glm::vec4) * tri.size());
     writes.emplace_back(
         descriptor_set,
         binding_state.storage_bindings[0],

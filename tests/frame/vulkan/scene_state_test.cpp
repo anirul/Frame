@@ -40,7 +40,8 @@ TEST_F(VulkanSceneStateTest, BuildsProjectionViewAndModelMatrices)
         frame::Logger::GetInstance(),
         {640u, 360u},
         /*elapsed_time_seconds=*/0.0f,
-        built.level->GetIdFromName("RayTraceMaterial"));
+        built.level->GetIdFromName("RayTraceMaterial"),
+        true);
 
     // Projection Y is flipped for Vulkan.
     EXPECT_LT(state.projection[1][1], 0.0f);
@@ -59,7 +60,8 @@ TEST_F(VulkanSceneStateTest, CarriesLightInformation)
         frame::Logger::GetInstance(),
         {320u, 200u},
         0.0f,
-        frame::NullId);
+        frame::NullId,
+        true);
 
     // Direction is normalized in scene parsing.
     EXPECT_NEAR(state.light_dir.x, 0.7071f, 1e-3f);

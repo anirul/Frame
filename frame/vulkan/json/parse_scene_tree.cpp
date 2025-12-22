@@ -28,22 +28,17 @@ namespace frame::vulkan::json
 namespace
 {
 
-struct GpuVertex
+struct GpuBvhNode
 {
-    glm::vec4 position;
-    glm::vec4 normal;
-    glm::vec4 uv_pad;
+    glm::vec4 min;
+    glm::vec4 max;
+    int left;
+    int right;
+    int first_triangle;
+    int triangle_count;
 };
 
-struct GpuTriangle
-{
-    GpuVertex v0;
-    GpuVertex v1;
-    GpuVertex v2;
-};
-
-static_assert(sizeof(GpuVertex) == 48);
-static_assert(sizeof(GpuTriangle) == 144);
+static_assert(sizeof(GpuBvhNode) == 48);
 
 std::function<NodeInterface*(const std::string&)> MakeResolver(
     LevelInterface& level)
@@ -345,62 +340,74 @@ bool ParseNodeStaticMesh(
                 throw std::runtime_error("Failed to create index buffer.");
             }
 
-            std::vector<GpuTriangle> triangles;
-            triangles.reserve(triangle_indices->size() / 3);
-            auto make_vertex = [&](std::uint32_t idx) -> GpuVertex {
+            std::vector<float> triangles;
+            triangles.reserve(triangle_indices->size() * 12);
+            auto push_vertex = [&](std::uint32_t idx) {
                 const auto base = idx * 3;
                 const auto uv_base = idx * 2;
-                GpuVertex vertex{};
-                vertex.position = glm::vec4(
-                    points[base + 0],
-                    points[base + 1],
-                    points[base + 2],
-                    0.0f);
+                // Position
+                triangles.push_back(points[base + 0]);
+                triangles.push_back(points[base + 1]);
+                triangles.push_back(points[base + 2]);
+                triangles.push_back(0.0f); // Padding
+                // Normal
                 if (!normals.empty())
                 {
-                    vertex.normal = glm::vec4(
-                        normals[base + 0],
-                        normals[base + 1],
-                        normals[base + 2],
-                        0.0f);
+                    triangles.push_back(normals[base + 0]);
+                    triangles.push_back(normals[base + 1]);
+                    triangles.push_back(normals[base + 2]);
                 }
                 else
                 {
-                    vertex.normal = glm::vec4(0.0f);
+                    triangles.push_back(0.0f);
+                    triangles.push_back(0.0f);
+                    triangles.push_back(0.0f);
                 }
+                triangles.push_back(0.0f); // Padding
+                // UV
                 if (!textures.empty())
                 {
-                    vertex.uv_pad = glm::vec4(
-                        textures[uv_base + 0],
-                        textures[uv_base + 1],
-                        0.0f,
-                        0.0f);
+                    triangles.push_back(textures[uv_base + 0]);
+                    triangles.push_back(textures[uv_base + 1]);
                 }
                 else
                 {
-                    vertex.uv_pad = glm::vec4(0.0f);
+                    triangles.push_back(0.0f);
+                    triangles.push_back(0.0f);
                 }
-                return vertex;
+                triangles.push_back(0.0f); // Padding
+                triangles.push_back(0.0f); // Padding
             };
             for (std::size_t i = 0;
                  i + 2 < triangle_indices->size();
                  i += 3)
             {
-                GpuTriangle tri{};
-                tri.v0 = make_vertex((*triangle_indices)[i]);
-                tri.v1 = make_vertex((*triangle_indices)[i + 1]);
-                tri.v2 = make_vertex((*triangle_indices)[i + 2]);
-                triangles.push_back(tri);
+                push_vertex((*triangle_indices)[i]);
+                push_vertex((*triangle_indices)[i + 1]);
+                push_vertex((*triangle_indices)[i + 2]);
             }
 
             auto bvh_nodes = frame::BuildBVH(points, *triangle_indices);
+            std::vector<GpuBvhNode> gpu_bvh_nodes;
+            gpu_bvh_nodes.reserve(bvh_nodes.size());
+            for (const auto& node : bvh_nodes)
+            {
+                GpuBvhNode gpu_node{};
+                gpu_node.min = glm::vec4(node.min, 0.0f);
+                gpu_node.max = glm::vec4(node.max, 0.0f);
+                gpu_node.left = node.left;
+                gpu_node.right = node.right;
+                gpu_node.first_triangle = node.first_triangle;
+                gpu_node.triangle_count = node.triangle_count;
+                gpu_bvh_nodes.push_back(gpu_node);
+            }
 
             auto triangle_buffer_id = make_buffer(
                 triangles,
                 std::format("{}.{}.triangle", proto_mesh.name(), counter),
                 level);
             auto bvh_buffer_id = make_buffer(
-                bvh_nodes,
+                gpu_bvh_nodes,
                 std::format("{}.{}.bvh", proto_mesh.name(), counter),
                 level);
 

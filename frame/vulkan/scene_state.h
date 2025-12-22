@@ -37,7 +37,8 @@ SceneState BuildSceneState(
     frame::Logger& logger,
     glm::uvec2 swapchain_extent,
     float elapsed_time_seconds,
-    frame::EntityId preferred_material = frame::NullId);
+    frame::EntityId preferred_material = frame::NullId,
+    bool flip_projection_y = true);
 
 UniformBlock MakeUniformBlock(
     const SceneState& state, float elapsed_time_seconds);

@@ -12,7 +12,8 @@ SceneState BuildSceneState(
     frame::Logger& logger,
     glm::uvec2 swapchain_extent,
     float elapsed_time_seconds,
-    frame::EntityId preferred_material)
+    frame::EntityId preferred_material,
+    bool flip_projection_y)
 {
     SceneState state;
 
@@ -40,7 +41,10 @@ SceneState BuildSceneState(
                 static_cast<float>(swapchain_extent.y));
         }
         state.projection = camera_for_frame.ComputeProjection();
-        state.projection[1][1] *= -1.0f;
+        if (flip_projection_y)
+        {
+            state.projection[1][1] *= -1.0f;
+        }
         state.view = camera_for_frame.ComputeView();
         glm::mat4 rotation = glm::mat4(1.0f);
         state.view = rotation * state.view;

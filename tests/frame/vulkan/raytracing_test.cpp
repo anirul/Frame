@@ -19,10 +19,9 @@ namespace test
 
 struct Vertex
 {
-    glm::vec4 position; // vec3 + pad
-    glm::vec4 normal;   // vec3 + pad
+    glm::vec3 position;
+    glm::vec3 normal;
     glm::vec2 uv;
-    glm::vec2 pad2;
 };
 
 struct Triangle
@@ -34,15 +33,41 @@ struct Triangle
 
 struct BvhNode
 {
-    glm::vec3 min;
-    float pad0;
-    glm::vec3 max;
-    float pad1;
+    glm::vec4 min;
+    glm::vec4 max;
     int left;
     int right;
     int first_triangle;
     int triangle_count;
 };
+
+constexpr std::size_t kFloatsPerVertex = 12;
+constexpr std::size_t kFloatsPerTriangle = kFloatsPerVertex * 3;
+
+Triangle ReadTriangle(const float* data, std::size_t tri_index)
+{
+    auto read_vertex = [&](std::size_t base) {
+        Vertex vertex{};
+        vertex.position = glm::vec3(
+            data[base + 0],
+            data[base + 1],
+            data[base + 2]);
+        vertex.normal = glm::vec3(
+            data[base + 4],
+            data[base + 5],
+            data[base + 6]);
+        vertex.uv = glm::vec2(
+            data[base + 8],
+            data[base + 9]);
+        return vertex;
+    };
+    const std::size_t base = tri_index * kFloatsPerTriangle;
+    Triangle tri{};
+    tri.v0 = read_vertex(base);
+    tri.v1 = read_vertex(base + kFloatsPerVertex);
+    tri.v2 = read_vertex(base + kFloatsPerVertex * 2);
+    return tri;
+}
 
 class VulkanRayTracingParseTest : public ::testing::Test
 {
@@ -110,16 +135,20 @@ TEST_F(VulkanRayTracingParseTest, TriangleAndBvhDataLooksValid)
 
     const auto& tri_bytes = tri_buffer->GetRawData();
     const auto& bvh_bytes = bvh_buffer->GetRawData();
-    ASSERT_GE(tri_bytes.size(), sizeof(Triangle));
+    ASSERT_GE(
+        tri_bytes.size(), sizeof(float) * kFloatsPerTriangle);
     ASSERT_GE(bvh_bytes.size(), sizeof(BvhNode));
 
-    const std::size_t tri_count = tri_bytes.size() / sizeof(Triangle);
+    ASSERT_EQ(tri_bytes.size() % sizeof(float), 0u);
+    const std::size_t tri_count =
+        tri_bytes.size() / (sizeof(float) * kFloatsPerTriangle);
     const std::size_t node_count = bvh_bytes.size() / sizeof(BvhNode);
     EXPECT_GT(tri_count, 0u);
     EXPECT_GT(node_count, 0u);
 
-    Triangle first_tri{};
-    std::memcpy(&first_tri, tri_bytes.data(), sizeof(Triangle));
+    const float* tri_floats =
+        reinterpret_cast<const float*>(tri_bytes.data());
+    Triangle first_tri = ReadTriangle(tri_floats, 0);
     EXPECT_TRUE(std::isfinite(first_tri.v0.position.x));
     EXPECT_NEAR(glm::length(first_tri.v0.normal), 1.0f, 1.0f);
     EXPECT_GE(first_tri.v0.uv.x, -10.0f);
@@ -139,8 +168,8 @@ bool RayAabbIntersect(
     const glm::vec3& inv_ray_dir,
     const BvhNode& node)
 {
-    glm::vec3 t0 = (node.min - ray_origin) * inv_ray_dir;
-    glm::vec3 t1 = (node.max - ray_origin) * inv_ray_dir;
+    glm::vec3 t0 = (glm::vec3(node.min) - ray_origin) * inv_ray_dir;
+    glm::vec3 t1 = (glm::vec3(node.max) - ray_origin) * inv_ray_dir;
     glm::vec3 tmin = glm::min(t0, t1);
     glm::vec3 tmax = glm::max(t0, t1);
     float t_enter = std::max(std::max(tmin.x, tmin.y), tmin.z);
@@ -257,11 +286,19 @@ TEST_F(VulkanRayTracingParseTest, CpuTraversesBvhFromCameraCenterRay)
 
     const auto& tri_bytes = tri_buffer->GetRawData();
     const auto& bvh_bytes = bvh_buffer->GetRawData();
-    const std::size_t tri_count = tri_bytes.size() / sizeof(Triangle);
+    ASSERT_EQ(tri_bytes.size() % sizeof(float), 0u);
+    const std::size_t tri_count =
+        tri_bytes.size() / (sizeof(float) * kFloatsPerTriangle);
     const std::size_t node_count = bvh_bytes.size() / sizeof(BvhNode);
-    std::vector<Triangle> tris(tri_count);
+    const float* tri_floats =
+        reinterpret_cast<const float*>(tri_bytes.data());
+    std::vector<Triangle> tris;
+    tris.reserve(tri_count);
+    for (std::size_t i = 0; i < tri_count; ++i)
+    {
+        tris.push_back(ReadTriangle(tri_floats, i));
+    }
     std::vector<BvhNode> nodes(node_count);
-    std::memcpy(tris.data(), tri_bytes.data(), tri_bytes.size());
     std::memcpy(nodes.data(), bvh_bytes.data(), bvh_bytes.size());
 
     // Build a central ray from the default camera toward the origin in model space.
@@ -291,11 +328,19 @@ TEST_F(VulkanRayTracingParseTest, ShaderLikeRayFromCenterHitsGeometry)
 
     const auto& tri_bytes = tri_buffer->GetRawData();
     const auto& bvh_bytes = bvh_buffer->GetRawData();
-    const std::size_t tri_count = tri_bytes.size() / sizeof(Triangle);
+    ASSERT_EQ(tri_bytes.size() % sizeof(float), 0u);
+    const std::size_t tri_count =
+        tri_bytes.size() / (sizeof(float) * kFloatsPerTriangle);
     const std::size_t node_count = bvh_bytes.size() / sizeof(BvhNode);
-    std::vector<Triangle> tris(tri_count);
+    const float* tri_floats =
+        reinterpret_cast<const float*>(tri_bytes.data());
+    std::vector<Triangle> tris;
+    tris.reserve(tri_count);
+    for (std::size_t i = 0; i < tri_count; ++i)
+    {
+        tris.push_back(ReadTriangle(tri_floats, i));
+    }
     std::vector<BvhNode> nodes(node_count);
-    std::memcpy(tris.data(), tri_bytes.data(), tri_bytes.size());
     std::memcpy(nodes.data(), bvh_bytes.data(), bvh_bytes.size());
 
     // Build the same matrices the compute shader uses.
@@ -304,7 +349,8 @@ TEST_F(VulkanRayTracingParseTest, ShaderLikeRayFromCenterHitsGeometry)
         frame::Logger::GetInstance(),
         {1280u, 720u},
         0.0f,
-        level.GetIdFromName("RayTraceMaterial"));
+        level.GetIdFromName("RayTraceMaterial"),
+        false);
 
     glm::mat4 proj_inv = glm::inverse(scene_state.projection);
     glm::mat4 view_inv = glm::inverse(scene_state.view);
