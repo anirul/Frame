@@ -34,3 +34,4 @@ if(Vulkan_GLSLC_EXECUTABLE)
 endif()
 
 set_property(TARGET AssetShaderVulkan PROPERTY FOLDER "FrameAsset/Shader")
+set_property(TARGET AssetShaderVulkanSpv PROPERTY FOLDER "FrameAsset/Shader")

@@ -1,80 +1,51 @@
-# Frame Proto.
+# Frame Proto
 
-add_library(FrameProto
-  STATIC
-    bvh_cache.proto
-    obj_cache.proto
-    image_cache.proto
-    level.proto
-    material.proto
-    math.proto
-    pixel.proto
-    plugin.proto
-    program.proto
-    scene.proto
-    size.proto
-    texture.proto
-    uniform.proto
+add_library(FrameProto STATIC
+  bvh_cache.proto
+  obj_cache.proto
+  image_cache.proto
+  level.proto
+  material.proto
+  math.proto
+  pixel.proto
+  plugin.proto
+  program.proto
+  scene.proto
+  size.proto
+  texture.proto
+  uniform.proto
 )
 
-protobuf_generate(TARGET FrameProto LANGUAGE cpp)
+# Put generated files in the build tree (NOT in the repo)
+set(FRAME_PROTO_GEN_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated/frame/proto")
+file(MAKE_DIRECTORY "${FRAME_PROTO_GEN_DIR}")
+
+# Generate .pb.h/.pb.cc into FRAME_PROTO_GEN_DIR
+protobuf_generate(
+  TARGET FrameProto
+  LANGUAGE cpp
+  PROTOC_OUT_DIR "${FRAME_PROTO_GEN_DIR}"
+)
 
 target_link_libraries(FrameProto
   PRIVATE
-    protobuf::libprotoc
     protobuf::libprotobuf
 )
 
-set(HEADERS_TO_BE_COPIED
-  bvh_cache.pb.h
-  obj_cache.pb.h
-  image_cache.pb.h
-  level.pb.h
-  material.pb.h
-  math.pb.h
-  pixel.pb.h
-  plugin.pb.h
-  program.pb.h
-  scene.pb.h
-  size.pb.h
-  texture.pb.h
-  uniform.pb.h
+# Consumers of FrameProto need the generated headers
+target_include_directories(FrameProto
+  PUBLIC
+    "${FRAME_PROTO_GEN_DIR}"
 )
 
-foreach(HEADERN ${HEADERS_TO_BE_COPIED})
-  add_custom_command(
-    TARGET FrameProto
-    POST_BUILD
-    COMMAND
-      ${CMAKE_COMMAND} -E copy_if_different
-      ${CMAKE_CURRENT_BINARY_DIR}/${HEADERN}
-      ${CMAKE_CURRENT_SOURCE_DIR}
-  )
-endforeach(HEADERN)
+# Optional: if your code includes like "frame/proto/foo.pb.h",
+# keep the include path one level above:
+# target_include_directories(FrameProto PUBLIC "${CMAKE_CURRENT_BINARY_DIR}/generated")
 
-set(PROTO_FILES
-    bvh_cache
-    obj_cache
-    image_cache
-    level
-    material
-    math
-    pixel
-    plugin
-    program
-    scene
-    size
-    texture
-    uniform
-)
-
-add_custom_target(
-    clean_proto
-    COMMAND ${CMAKE_COMMAND} -E remove
-    foreach(PROTO_FILE ${PROTO_FILES})
-        ${CMAKE_CURRENT_BINARY_DIR}/${PROTO_FILE}.pb.h
-        ${CMAKE_CURRENT_BINARY_DIR}/${PROTO_FILE}.pb.cc
-    endforeach()
+# Clean target (simple + correct)
+add_custom_target(FrameCleanProto
+  COMMAND ${CMAKE_COMMAND} -E rm -rf "${FRAME_PROTO_GEN_DIR}"
 )
 
 set_property(TARGET FrameProto PROPERTY FOLDER "Frame")
+set_property(TARGET FrameCleanProto PROPERTY FOLDER "Frame")
