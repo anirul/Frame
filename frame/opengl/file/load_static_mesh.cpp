@@ -208,10 +208,48 @@ std::pair<EntityId, EntityId> LoadStaticMeshFromObj(
     // `Vertex` struct and occupies 48 bytes, yielding 144 bytes per triangle
     // (already aligned to 16 bytes).
     std::vector<float> triangles;
-    std::vector<std::uint32_t> index_u32(indices.begin(), indices.end());
+    std::vector<std::uint32_t> trace_indices(indices.begin(), indices.end());
+    bool downsampled = false;
+    {
+        GLint max_ssbo_bytes = 0;
+        glGetIntegerv(GL_MAX_SHADER_STORAGE_BLOCK_SIZE, &max_ssbo_bytes);
+        if (max_ssbo_bytes > 0)
+        {
+            constexpr std::size_t kFloatsPerVertex = 12;
+            constexpr std::size_t kBytesPerTriangle =
+                kFloatsPerVertex * 3 * sizeof(float);
+            const std::size_t triangle_count = trace_indices.size() / 3;
+            const std::size_t max_triangles =
+                static_cast<std::size_t>(max_ssbo_bytes) / kBytesPerTriangle;
+            if (max_triangles > 0 && triangle_count > max_triangles)
+            {
+                const std::size_t step =
+                    (triangle_count + max_triangles - 1) / max_triangles;
+                std::vector<std::uint32_t> reduced;
+                reduced.reserve(((triangle_count + step - 1) / step) * 3);
+                for (std::size_t tri = 0; tri < triangle_count; tri += step)
+                {
+                    const std::size_t base = tri * 3;
+                    reduced.push_back(trace_indices[base]);
+                    reduced.push_back(trace_indices[base + 1]);
+                    reduced.push_back(trace_indices[base + 2]);
+                }
+                Logger::GetInstance()->warn(
+                    "Raytracing mesh {} has {} triangles; SSBO limit {} bytes. "
+                    "Downsampling to {} triangles for GPU compatibility.",
+                    name,
+                    triangle_count,
+                    static_cast<std::size_t>(max_ssbo_bytes),
+                    reduced.size() / 3);
+                trace_indices.swap(reduced);
+                downsampled = true;
+            }
+        }
+    }
     std::vector<frame::BVHNode> bvh_nodes;
     bool bvh_from_cache = false;
-    if (cache_metadata)
+    const bool allow_cache = cache_metadata.has_value() && !downsampled;
+    if (allow_cache)
     {
         auto cached = frame::LoadBvhCache(*cache_metadata);
         if (cached)
@@ -222,8 +260,8 @@ std::pair<EntityId, EntityId> LoadStaticMeshFromObj(
     }
     if (!bvh_from_cache)
     {
-        bvh_nodes = frame::BuildBVH(points, index_u32);
-        if (cache_metadata)
+        bvh_nodes = frame::BuildBVH(points, trace_indices);
+        if (allow_cache)
         {
             frame::SaveBvhCache(*cache_metadata, bvh_nodes);
         }
@@ -272,11 +310,11 @@ std::pair<EntityId, EntityId> LoadStaticMeshFromObj(
         return {NullId, NullId};
     EntityId bvh_buffer_id = maybe_bvh_buffer_id.value();
 
-    for (int i = 0; i < indices.size(); i += 3)
+    for (std::size_t i = 0; i + 2 < trace_indices.size(); i += 3)
     {
-        int i0 = indices[i];
-        int i1 = indices[i + 1];
-        int i2 = indices[i + 2];
+        int i0 = static_cast<int>(trace_indices[i]);
+        int i1 = static_cast<int>(trace_indices[i + 1]);
+        int i2 = static_cast<int>(trace_indices[i + 2]);
         push_vertex(i0);
         push_vertex(i1);
         push_vertex(i2);
