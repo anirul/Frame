@@ -448,7 +448,31 @@ void Device::StartupFromLevelData(const frame::json::LevelData& level_data)
                 (program_info.name == "RayTraceProgram");
             if (pipeline_info.use_compute)
             {
-                pipeline_info.compute_shader = shader_root / "raytracing.comp";
+                bool wants_dual_buffers = false;
+                for (const auto& proto_mat : level_data.proto.materials())
+                {
+                    if (proto_mat.program_name() != program_info.name)
+                    {
+                        continue;
+                    }
+                    for (const auto& inner_name :
+                         proto_mat.inner_buffer_names())
+                    {
+                        if (inner_name == "TriangleBufferGround")
+                        {
+                            wants_dual_buffers = true;
+                            break;
+                        }
+                    }
+                    if (wants_dual_buffers)
+                    {
+                        break;
+                    }
+                }
+                const char* compute_name = wants_dual_buffers
+                    ? "raytracing_dual.comp"
+                    : "raytracing.comp";
+                pipeline_info.compute_shader = shader_root / compute_name;
             }
             pipeline_info.scene_type = frame::proto::SceneType::NONE;
             for (const auto& proto_program : level_data.proto.programs())
@@ -1465,7 +1489,13 @@ void Device::RecordCommandBuffer(
                 {
                     const auto& inner =
                         active_program_info_->input_buffer_inner_names[i];
-                    if (inner == "TriangleBuffer")
+                    if (inner == "TriangleBuffer" ||
+                        inner == "TriangleBufferGlass")
+                    {
+                        tri_id = active_program_info_->input_buffer_ids[i];
+                    }
+                    else if (inner == "TriangleBufferGround" &&
+                             tri_id == NullId)
                     {
                         tri_id = active_program_info_->input_buffer_ids[i];
                     }
@@ -2858,6 +2888,14 @@ void Device::CreateDescriptorResources()
             if (inner_name && *inner_name == "TriangleBuffer")
             {
                 binding = kBindingTriangle;
+            }
+            else if (inner_name && *inner_name == "TriangleBufferGlass")
+            {
+                binding = kBindingTriangle;
+            }
+            else if (inner_name && *inner_name == "TriangleBufferGround")
+            {
+                binding = kBindingBvh;
             }
             else if (inner_name && *inner_name == "BvhBuffer")
             {

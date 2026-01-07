@@ -125,13 +125,15 @@
                 "skybox_env"
             ],
             "buffer_names": [
-                "IcoPlate.0.triangle"
+                "Ico.0.triangle",
+                "Plate.0.triangle"
             ],
             "inner_buffer_names": [
-                "TriangleBuffer"
+                "TriangleBufferGlass",
+                "TriangleBufferGround"
             ],
             "node_names": [
-                "IcoPlate"
+                "mesh_holder"
             ],
             "inner_node_names": [
                 "model"
@@ -345,9 +347,16 @@
                 "material_name": "RayTraceMaterial"
             },
             {
-                "name": "IcoPlate",
+                "name": "Ico",
                 "parent": "mesh_holder",
-                "file_name": "ico_plate.obj",
+                "file_name": "ico.obj",
+                "material_name": "RayTraceMaterial",
+                "render_time_enum": "PRE_RENDER_TIME"
+            },
+            {
+                "name": "Plate",
+                "parent": "mesh_holder",
+                "file_name": "plate.obj",
                 "material_name": "RayTraceMaterial",
                 "render_time_enum": "PRE_RENDER_TIME"
             }
