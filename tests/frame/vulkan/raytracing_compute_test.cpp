@@ -38,6 +38,7 @@ struct alignas(16) UniformBlock
     glm::mat4 view_inv;
     glm::mat4 model;
     glm::mat4 model_inv;
+    glm::mat4 env_map_model;
     glm::vec4 camera_position;
     glm::vec4 light_dir;
     glm::vec4 light_color;
@@ -515,6 +516,7 @@ TEST_F(VulkanRayTracingComputeTest, DispatchProducesLitPixel)
     ubo.view_inv = glm::mat4(1.0f);
     ubo.model = glm::mat4(1.0f);
     ubo.model_inv = glm::mat4(1.0f);
+    ubo.env_map_model = glm::mat4(1.0f);
     ubo.camera_position = glm::vec4(eye, 1.0f);
     ubo.light_dir = glm::vec4(0.0f, 0.0f, -1.0f, 0.0f);
     ubo.light_color = glm::vec4(8.0f);

@@ -1,6 +1,7 @@
 #include "frame/vulkan/texture_resources.h"
 
 #include <algorithm>
+#include <chrono>
 #include <cmath>
 #include <cstring>
 #include <stdexcept>
@@ -27,6 +28,10 @@ void TextureResources::Build(
 {
     Destroy();
 
+    using Clock = std::chrono::steady_clock;
+    const auto total_start = Clock::now();
+    std::size_t uploaded_count = 0;
+
     for (const auto& proto_texture : level_data.proto.textures())
     {
         auto texture_id = level.GetIdFromName(proto_texture.name());
@@ -45,20 +50,41 @@ void TextureResources::Build(
             continue;
         }
 
+        const auto texture_start = Clock::now();
         try
         {
             UploadTexture(texture_id, *texture_ptr);
             textures_[texture_id] = texture_ptr;
+            ++uploaded_count;
+            const auto elapsed =
+                std::chrono::duration_cast<std::chrono::milliseconds>(
+                    Clock::now() - texture_start);
+            owner_.logger_->info(
+                "Uploaded texture {} in {} ms.",
+                proto_texture.name(),
+                elapsed.count());
         }
         catch (const std::exception& ex)
         {
+            const auto elapsed =
+                std::chrono::duration_cast<std::chrono::milliseconds>(
+                    Clock::now() - texture_start);
             owner_.logger_->warn(
-                "Skipping texture {}: {}",
+                "Skipping texture {} after {} ms: {}",
                 proto_texture.name(),
+                elapsed.count(),
                 ex.what());
             texture_ptr->ResetGpuResources();
         }
     }
+
+    const auto total_elapsed =
+        std::chrono::duration_cast<std::chrono::milliseconds>(
+            Clock::now() - total_start);
+    owner_.logger_->info(
+        "Uploaded {} textures in {} ms.",
+        uploaded_count,
+        total_elapsed.count());
 }
 
 void TextureResources::Destroy()
@@ -211,7 +237,7 @@ void TextureResources::UploadTexture(
         src_stride = bytes_per_component;
     }
 
-    std::vector<std::uint8_t> src_data = mutable_texture.GetTextureByte();
+    const auto& src_data = texture_interface.GetTextureData();
     if (src_data.empty())
     {
         throw std::runtime_error("Texture contains no pixel data.");
@@ -230,36 +256,32 @@ void TextureResources::UploadTexture(
 
     std::vector<std::uint8_t> rgba_data;
     std::vector<std::uint8_t> linear_bytes;
+    const std::vector<std::uint8_t>* upload_data = nullptr;
 
-    auto append_constant = [&](float value) {
+    auto write_constant = [&](std::uint8_t* dst, float value) {
         const float clamped = std::clamp(value, 0.0f, 1.0f);
         switch (element_size)
         {
         case frame::proto::PixelElementSize::BYTE: {
             const std::uint8_t converted =
                 static_cast<std::uint8_t>(std::round(clamped * 255.0f));
-            rgba_data.push_back(converted);
+            std::memcpy(dst, &converted, sizeof(converted));
             break;
         }
         case frame::proto::PixelElementSize::SHORT: {
             const std::uint16_t converted =
                 static_cast<std::uint16_t>(std::round(clamped * 65535.0f));
-            const auto* ptr =
-                reinterpret_cast<const std::uint8_t*>(&converted);
-            rgba_data.insert(rgba_data.end(), ptr, ptr + sizeof(converted));
+            std::memcpy(dst, &converted, sizeof(converted));
             break;
         }
         case frame::proto::PixelElementSize::HALF: {
             const std::uint16_t converted = glm::packHalf1x16(clamped);
-            const auto* ptr =
-                reinterpret_cast<const std::uint8_t*>(&converted);
-            rgba_data.insert(rgba_data.end(), ptr, ptr + sizeof(converted));
+            std::memcpy(dst, &converted, sizeof(converted));
             break;
         }
         case frame::proto::PixelElementSize::FLOAT: {
             const float converted = clamped;
-            const auto* ptr = reinterpret_cast<const std::uint8_t*>(&converted);
-            rgba_data.insert(rgba_data.end(), ptr, ptr + sizeof(converted));
+            std::memcpy(dst, &converted, sizeof(converted));
             break;
         }
         default:
@@ -271,78 +293,96 @@ void TextureResources::UploadTexture(
     {
         linear_bytes.resize(pixel_count_total * bytes_per_component);
         std::memcpy(linear_bytes.data(), src_data.data(), linear_bytes.size());
+        upload_data = &linear_bytes;
+    }
+    else if (structure == frame::proto::PixelStructure::RGB_ALPHA &&
+             component_count == 4 &&
+             src_stride == 4 * bytes_per_component)
+    {
+        upload_data = &src_data;
     }
     else
     {
-        rgba_data.reserve(pixel_count_total * 4 * bytes_per_component);
+        const std::size_t dst_stride = 4 * bytes_per_component;
+        rgba_data.resize(pixel_count_total * dst_stride);
         for (std::size_t i = 0; i < pixel_count_total; ++i)
         {
-            const auto* pixel = &src_data[i * src_stride];
-            auto push_channel = [&](std::size_t channel) {
-                const auto* src =
-                    &pixel[channel * bytes_per_component];
-                rgba_data.insert(
-                    rgba_data.end(),
-                    src,
-                    src + bytes_per_component);
+            const auto* src = src_data.data() + i * src_stride;
+            auto* dst = rgba_data.data() + i * dst_stride;
+            auto copy_channel = [&](std::size_t dst_channel, std::size_t src_channel) {
+                std::memcpy(
+                    dst + dst_channel * bytes_per_component,
+                    src + src_channel * bytes_per_component,
+                    bytes_per_component);
             };
 
             switch (structure)
             {
-            case frame::proto::PixelStructure::GREY:
+            case frame::proto::PixelStructure::GREY: {
+                copy_channel(0, 0);
+                copy_channel(1, 0);
+                copy_channel(2, 0);
+                write_constant(dst + 3 * bytes_per_component, 1.0f);
+                break;
+            }
             case frame::proto::PixelStructure::GREY_ALPHA: {
-                push_channel(0);
-                push_channel(0);
-                push_channel(0);
-                if (component_count > 1)
-                {
-                    push_channel(1);
-                }
-                else
-                {
-                    append_constant(1.0f);
-                }
+                copy_channel(0, 0);
+                copy_channel(1, 0);
+                copy_channel(2, 0);
+                copy_channel(3, 1);
                 break;
             }
-            case frame::proto::PixelStructure::RGB:
+            case frame::proto::PixelStructure::RGB: {
+                copy_channel(0, 0);
+                copy_channel(1, 1);
+                copy_channel(2, 2);
+                write_constant(dst + 3 * bytes_per_component, 1.0f);
+                break;
+            }
             case frame::proto::PixelStructure::BGR: {
-                push_channel(structure == frame::proto::PixelStructure::BGR ? 2 : 0);
-                push_channel(1);
-                push_channel(structure == frame::proto::PixelStructure::BGR ? 0 : 2);
-                append_constant(1.0f);
+                copy_channel(0, 2);
+                copy_channel(1, 1);
+                copy_channel(2, 0);
+                write_constant(dst + 3 * bytes_per_component, 1.0f);
                 break;
             }
-            case frame::proto::PixelStructure::RGB_ALPHA:
+            case frame::proto::PixelStructure::RGB_ALPHA: {
+                copy_channel(0, 0);
+                copy_channel(1, 1);
+                copy_channel(2, 2);
+                copy_channel(3, 3);
+                break;
+            }
             case frame::proto::PixelStructure::BGR_ALPHA: {
-                push_channel(structure == frame::proto::PixelStructure::BGR_ALPHA ? 2 : 0);
-                push_channel(1);
-                push_channel(structure == frame::proto::PixelStructure::BGR_ALPHA ? 0 : 2);
-                push_channel(3);
+                copy_channel(0, 2);
+                copy_channel(1, 1);
+                copy_channel(2, 0);
+                copy_channel(3, 3);
                 break;
             }
             default:
                 throw std::runtime_error("Unsupported pixel structure for Vulkan texture.");
             }
         }
+        upload_data = &rgba_data;
     }
 
-    const std::vector<std::uint8_t>& upload_data =
-        is_depth ? linear_bytes : rgba_data;
-    if (upload_data.empty())
+    if (!upload_data || upload_data->empty())
     {
         throw std::runtime_error("Texture upload buffer is empty.");
     }
 
     vk::UniqueDeviceMemory staging_memory;
     auto staging_buffer = owner_.gpu_memory_manager_->CreateBuffer(
-        upload_data.size(),
+        upload_data->size(),
         vk::BufferUsageFlagBits::eTransferSrc,
         vk::MemoryPropertyFlagBits::eHostVisible |
             vk::MemoryPropertyFlagBits::eHostCoherent,
         staging_memory);
     void* mapped_data =
-        owner_.vk_unique_device_->mapMemory(*staging_memory, 0, upload_data.size());
-    std::memcpy(mapped_data, upload_data.data(), upload_data.size());
+        owner_.vk_unique_device_->mapMemory(
+            *staging_memory, 0, upload_data->size());
+    std::memcpy(mapped_data, upload_data->data(), upload_data->size());
     owner_.vk_unique_device_->unmapMemory(*staging_memory);
 
     const std::uint32_t layer_count = static_cast<std::uint32_t>(face_count);
@@ -370,25 +410,82 @@ void TextureResources::UploadTexture(
     auto image_memory = owner_.vk_unique_device_->allocateMemoryUnique(allocate_info);
     owner_.vk_unique_device_->bindImageMemory(*image, *image_memory, 0);
 
-    owner_.command_queue_->TransitionImageLayout(
-        *image,
-        image_format,
-        vk::ImageLayout::eUndefined,
-        vk::ImageLayout::eTransferDstOptimal,
-        layer_count);
-    owner_.command_queue_->CopyBufferToImage(
-        *staging_buffer,
-        *image,
-        size.x,
-        size.y,
-        layer_count,
-        upload_data.size() / layer_count);
-    owner_.command_queue_->TransitionImageLayout(
-        *image,
-        image_format,
-        vk::ImageLayout::eTransferDstOptimal,
-        vk::ImageLayout::eShaderReadOnlyOptimal,
-        layer_count);
+    owner_.command_queue_->SubmitOneTime([&](vk::CommandBuffer command_buffer) {
+        auto record_transition = [&](vk::ImageLayout old_layout,
+                                     vk::ImageLayout new_layout) {
+            vk::ImageMemoryBarrier barrier(
+                {},
+                {},
+                old_layout,
+                new_layout,
+                VK_QUEUE_FAMILY_IGNORED,
+                VK_QUEUE_FAMILY_IGNORED,
+                *image,
+                {vk::ImageAspectFlagBits::eColor, 0, 1, 0, layer_count});
+
+            vk::PipelineStageFlags src_stage;
+            vk::PipelineStageFlags dst_stage;
+
+            if (old_layout == vk::ImageLayout::eUndefined &&
+                new_layout == vk::ImageLayout::eTransferDstOptimal)
+            {
+                barrier.srcAccessMask = {};
+                barrier.dstAccessMask = vk::AccessFlagBits::eTransferWrite;
+                src_stage = vk::PipelineStageFlagBits::eTopOfPipe;
+                dst_stage = vk::PipelineStageFlagBits::eTransfer;
+            }
+            else if (old_layout == vk::ImageLayout::eTransferDstOptimal &&
+                     new_layout == vk::ImageLayout::eShaderReadOnlyOptimal)
+            {
+                barrier.srcAccessMask = vk::AccessFlagBits::eTransferWrite;
+                barrier.dstAccessMask = vk::AccessFlagBits::eShaderRead;
+                src_stage = vk::PipelineStageFlagBits::eTransfer;
+                dst_stage = vk::PipelineStageFlagBits::eFragmentShader;
+            }
+            else
+            {
+                throw std::runtime_error(
+                    "Unsupported Vulkan image layout transition for texture upload.");
+            }
+
+            command_buffer.pipelineBarrier(
+                src_stage,
+                dst_stage,
+                {},
+                nullptr,
+                nullptr,
+                barrier);
+        };
+
+        record_transition(
+            vk::ImageLayout::eUndefined,
+            vk::ImageLayout::eTransferDstOptimal);
+
+        std::vector<vk::BufferImageCopy> copies;
+        copies.reserve(layer_count);
+        const std::size_t stride = upload_data->size() / layer_count;
+        for (std::uint32_t layer = 0; layer < layer_count; ++layer)
+        {
+            copies.emplace_back(
+                stride * layer,
+                0,
+                0,
+                vk::ImageSubresourceLayers{
+                    vk::ImageAspectFlagBits::eColor, 0, layer, 1},
+                vk::Offset3D{0, 0, 0},
+                vk::Extent3D{size.x, size.y, 1});
+        }
+
+        command_buffer.copyBufferToImage(
+            *staging_buffer,
+            *image,
+            vk::ImageLayout::eTransferDstOptimal,
+            copies);
+
+        record_transition(
+            vk::ImageLayout::eTransferDstOptimal,
+            vk::ImageLayout::eShaderReadOnlyOptimal);
+    });
 
     vk::ImageViewCreateInfo view_info(
         vk::ImageViewCreateFlags{},

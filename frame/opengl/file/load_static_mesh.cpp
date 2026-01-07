@@ -2,6 +2,7 @@
 
 #include <format>
 #include <chrono>
+#include <string_view>
 #include <stdexcept>
 
 #include "frame/file/file_system.h"
@@ -20,6 +21,22 @@ namespace frame::opengl::file
 
 namespace
 {
+
+std::filesystem::path ResolveAssetPath(std::filesystem::path file)
+{
+    if (file.is_absolute())
+    {
+        return file;
+    }
+    const std::string generic = file.generic_string();
+    constexpr std::string_view kPrefix = "asset/";
+    if (generic.rfind(kPrefix, 0) == 0)
+    {
+        file = std::filesystem::path(generic.substr(kPrefix.size()));
+    }
+    const auto asset_root = frame::file::FindDirectory("asset");
+    return (asset_root / file).lexically_normal();
+}
 
 template <typename T>
 std::optional<EntityId> CreateBufferInLevel(
@@ -46,7 +63,7 @@ std::unique_ptr<TextureInterface> LoadTextureFromString(
     const proto::PixelStructure pixel_structure)
 {
     return std::make_unique<Texture>(
-        frame::file::FindFile("asset/" + str),
+        ResolveAssetPath(str),
         pixel_element_size,
         pixel_structure);
 }
@@ -128,7 +145,8 @@ std::pair<EntityId, EntityId> LoadStaticMeshFromObj(
     const std::string& name,
     const std::vector<EntityId> material_ids,
     int counter,
-    const std::optional<frame::BvhCacheMetadata>& cache_metadata)
+    const std::optional<frame::BvhCacheMetadata>& cache_metadata,
+    proto::NodeStaticMesh::AccelerationStructureEnum acceleration_structure_enum)
 {
     std::vector<float> points;
     std::vector<float> normals;
@@ -246,26 +264,8 @@ std::pair<EntityId, EntityId> LoadStaticMeshFromObj(
             }
         }
     }
-    std::vector<frame::BVHNode> bvh_nodes;
-    bool bvh_from_cache = false;
-    const bool allow_cache = cache_metadata.has_value() && !downsampled;
-    if (allow_cache)
-    {
-        auto cached = frame::LoadBvhCache(*cache_metadata);
-        if (cached)
-        {
-            bvh_nodes = std::move(*cached);
-            bvh_from_cache = true;
-        }
-    }
-    if (!bvh_from_cache)
-    {
-        bvh_nodes = frame::BuildBVH(points, trace_indices);
-        if (allow_cache)
-        {
-            frame::SaveBvhCache(*cache_metadata, bvh_nodes);
-        }
-    }
+    const bool build_bvh =
+        acceleration_structure_enum == proto::NodeStaticMesh::BVH_ACCELERATION;
     auto push_vertex = [&](int idx) {
         // Position
         triangles.push_back(points[idx * 3]);
@@ -301,14 +301,38 @@ std::pair<EntityId, EntityId> LoadStaticMeshFromObj(
         triangles.push_back(0.0f); // Padding
     };
 
-    auto maybe_bvh_buffer_id = CreateBufferInLevel(
-        level,
-        bvh_nodes,
-        std::format("{}.{}.bvh", name, counter),
-        opengl::BufferTypeEnum::SHADER_STORAGE_BUFFER);
-    if (!maybe_bvh_buffer_id)
-        return {NullId, NullId};
-    EntityId bvh_buffer_id = maybe_bvh_buffer_id.value();
+    EntityId bvh_buffer_id = NullId;
+    if (build_bvh)
+    {
+        std::vector<frame::BVHNode> bvh_nodes;
+        bool bvh_from_cache = false;
+        const bool allow_cache = cache_metadata.has_value() && !downsampled;
+        if (allow_cache)
+        {
+            auto cached = frame::LoadBvhCache(*cache_metadata);
+            if (cached)
+            {
+                bvh_nodes = std::move(*cached);
+                bvh_from_cache = true;
+            }
+        }
+        if (!bvh_from_cache)
+        {
+            bvh_nodes = frame::BuildBVH(points, trace_indices);
+            if (allow_cache)
+            {
+                frame::SaveBvhCache(*cache_metadata, bvh_nodes);
+            }
+        }
+        auto maybe_bvh_buffer_id = CreateBufferInLevel(
+            level,
+            bvh_nodes,
+            std::format("{}.{}.bvh", name, counter),
+            opengl::BufferTypeEnum::SHADER_STORAGE_BUFFER);
+        if (!maybe_bvh_buffer_id)
+            return {NullId, NullId};
+        bvh_buffer_id = maybe_bvh_buffer_id.value();
+    }
 
     for (std::size_t i = 0; i + 2 < trace_indices.size(); i += 3)
     {
@@ -472,10 +496,11 @@ std::vector<std::pair<EntityId, EntityId>> LoadStaticMeshesFromObjFile(
     LevelInterface& level,
     std::filesystem::path file,
     const std::string& name,
-    const std::string& material_name /* = ""*/)
+    const std::string& material_name /* = ""*/,
+    proto::NodeStaticMesh::AccelerationStructureEnum acceleration_structure_enum)
 {
     std::vector<std::pair<EntityId, EntityId>> entity_id_vec;
-    std::filesystem::path final_path = frame::file::FindFile(file);
+    std::filesystem::path final_path = ResolveAssetPath(file);
     frame::file::Obj obj(final_path);
     const auto& meshes = obj.GetMeshes();
     Logger& logger = Logger::GetInstance();
@@ -501,41 +526,49 @@ std::vector<std::pair<EntityId, EntityId>> LoadStaticMeshesFromObjFile(
     }
     logger->info("Found in obj<{}> : {} meshes.", file.string(), meshes.size());
 
+    const bool build_bvh =
+        acceleration_structure_enum == proto::NodeStaticMesh::BVH_ACCELERATION;
     std::optional<frame::BvhCacheMetadata> base_cache_metadata;
     std::optional<std::filesystem::path> cache_root;
     std::filesystem::path asset_root;
-    std::error_code metadata_error;
-    auto source_size = std::filesystem::file_size(final_path, metadata_error);
-    if (!metadata_error)
+    if (build_bvh)
     {
-        auto write_time = std::filesystem::last_write_time(final_path, metadata_error);
+        std::error_code metadata_error;
+        auto source_size = std::filesystem::file_size(final_path, metadata_error);
         if (!metadata_error)
         {
-            const auto mtime_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
-                write_time.time_since_epoch())
-                                      .count();
-            frame::BvhCacheMetadata metadata;
-            metadata.source_relative = frame::file::PurifyFilePath(final_path);
-            metadata.source_size = static_cast<std::uint64_t>(source_size);
-            metadata.source_mtime_ns = static_cast<std::uint64_t>(mtime_ns);
-            try
+            auto write_time = std::filesystem::last_write_time(
+                final_path, metadata_error);
+            if (!metadata_error)
             {
-                asset_root = frame::file::FindDirectory("asset");
-                cache_root = (asset_root / "cache").lexically_normal();
-                base_cache_metadata = metadata;
-            }
-            catch (const std::exception& exception)
-            {
-                logger->warn(
-                    "BVH cache disabled: {}", exception.what());
+                const auto mtime_ns =
+                    std::chrono::duration_cast<std::chrono::nanoseconds>(
+                        write_time.time_since_epoch())
+                        .count();
+                frame::BvhCacheMetadata metadata;
+                metadata.source_relative = frame::file::PurifyFilePath(final_path);
+                metadata.source_size = static_cast<std::uint64_t>(source_size);
+                metadata.source_mtime_ns =
+                    static_cast<std::uint64_t>(mtime_ns);
+                try
+                {
+                    asset_root = frame::file::FindDirectory("asset");
+                    cache_root = (asset_root / "cache").lexically_normal();
+                    base_cache_metadata = metadata;
+                }
+                catch (const std::exception& exception)
+                {
+                    logger->warn(
+                        "BVH cache disabled: {}", exception.what());
+                }
             }
         }
-    }
-    else
-    {
-        logger->info(
-            "BVH cache disabled for {}: unable to inspect source file.",
-            file.string());
+        else
+        {
+            logger->info(
+                "BVH cache disabled for {}: unable to inspect source file.",
+                file.string());
+        }
     }
 
     int mesh_counter = 0;
@@ -557,7 +590,7 @@ std::vector<std::pair<EntityId, EntityId>> LoadStaticMeshesFromObjFile(
             }
         }
         std::optional<frame::BvhCacheMetadata> cache_metadata;
-        if (base_cache_metadata && cache_root)
+        if (build_bvh && base_cache_metadata && cache_root)
         {
             frame::BvhCacheMetadata metadata = *base_cache_metadata;
             std::error_code relative_error;
@@ -589,7 +622,13 @@ std::vector<std::pair<EntityId, EntityId>> LoadStaticMeshesFromObjFile(
             cache_metadata = std::move(metadata);
         }
         auto [static_mesh_id, returned_material_id] = LoadStaticMeshFromObj(
-            level, mesh, name, {material_id}, mesh_counter, cache_metadata);
+            level,
+            mesh,
+            name,
+            {material_id},
+            mesh_counter,
+            cache_metadata,
+            acceleration_structure_enum);
         if (!static_mesh_id)
             return {};
         auto func = [&level](const std::string& name) -> NodeInterface* {
@@ -658,14 +697,19 @@ std::vector<std::pair<EntityId, EntityId>> LoadStaticMeshesFromFile(
     LevelInterface& level_interface,
     std::filesystem::path file,
     const std::string& name,
-    const std::string& material_name /* = ""*/)
+    const std::string& material_name /* = ""*/,
+    proto::NodeStaticMesh::AccelerationStructureEnum acceleration_structure_enum)
 {
     auto extension = file.extension();
-    std::filesystem::path final_path = frame::file::FindFile(file);
+    std::filesystem::path final_path = ResolveAssetPath(file);
     if (extension == ".obj")
     {
         return LoadStaticMeshesFromObjFile(
-            level_interface, final_path, name, material_name);
+            level_interface,
+            final_path,
+            name,
+            material_name,
+            acceleration_structure_enum);
     }
     if (extension == ".ply")
     {

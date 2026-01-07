@@ -112,7 +112,7 @@ void Texture::CreateTextureFromFile(
     data_.mutable_pixel_structure()->CopyFrom(pixel_structure);
     data_.set_file_name(frame::file::PurifyFilePath(file_name));
     frame::file::Image image(
-        frame::file::FindFile(file_name),
+        file_name,
         data_.pixel_element_size(),
         data_.pixel_structure());
     SetDisplaySize(image.GetSize());

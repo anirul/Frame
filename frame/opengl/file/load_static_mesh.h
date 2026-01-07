@@ -24,6 +24,8 @@ std::vector<std::pair<EntityId, EntityId>> LoadStaticMeshesFromFile(
     LevelInterface& level,
     std::filesystem::path file,
     const std::string& name,
-    const std::string& material_name = "");
+    const std::string& material_name = "",
+    proto::NodeStaticMesh::AccelerationStructureEnum acceleration_structure_enum =
+        proto::NodeStaticMesh::NO_ACCELERATION);
 
 } // namespace frame::opengl::file

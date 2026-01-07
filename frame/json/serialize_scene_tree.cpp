@@ -202,6 +202,8 @@ proto::NodeStaticMesh SerializeNodeStaticMesh(
         node_static_mesh.GetData().material_name());
     proto_node_static_mesh.set_render_time_enum(
         node_static_mesh.GetData().render_time_enum());
+    proto_node_static_mesh.set_acceleration_structure_enum(
+        node_static_mesh.GetData().acceleration_structure_enum());
     return proto_node_static_mesh;
 }
 

@@ -7,8 +7,10 @@ set(_frame_vulkan_shader_sources
   ray_marching.vert
   cubemap.frag
   cubemap.vert
-  raytracing.vert
-  raytracing.frag
+  raytracing_bvh.vert
+  raytracing_bvh.frag
+  raytracing_simple.vert
+  raytracing_simple.frag
   raytracing.comp
 )
 
@@ -17,12 +19,14 @@ add_custom_target(AssetShaderVulkan
 )
 
 if(Vulkan_GLSLC_EXECUTABLE)
+  set(_frame_vulkan_spv_dir "${CMAKE_CURRENT_LIST_DIR}/../../cache/shader/vulkan")
   set(_frame_vulkan_spv_outputs "")
   foreach(_frame_shader IN LISTS _frame_vulkan_shader_sources)
     set(_frame_shader_src "${CMAKE_CURRENT_LIST_DIR}/${_frame_shader}")
-    set(_frame_shader_spv "${_frame_shader_src}.spv")
+    set(_frame_shader_spv "${_frame_vulkan_spv_dir}/${_frame_shader}.spv")
     add_custom_command(
       OUTPUT "${_frame_shader_spv}"
+      COMMAND "${CMAKE_COMMAND}" -E make_directory "${_frame_vulkan_spv_dir}"
       COMMAND "${Vulkan_GLSLC_EXECUTABLE}" -o "${_frame_shader_spv}" "${_frame_shader_src}"
       DEPENDS "${_frame_shader_src}"
       COMMENT "Compiling Vulkan shader ${_frame_shader}"

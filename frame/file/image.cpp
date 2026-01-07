@@ -13,6 +13,7 @@
 #include <fstream>
 #include <optional>
 #include <set>
+#include <string_view>
 #include <vector>
 // This will be included if needed in the "image_stb.h".
 // #define STB_IMAGE_IMPLEMENTATION
@@ -86,6 +87,21 @@ std::string SanitizeLabel(std::string label)
     return label;
 }
 
+std::filesystem::path StripAssetPrefix(std::filesystem::path input)
+{
+    if (input.is_absolute())
+    {
+        return input;
+    }
+    const std::string generic = input.generic_string();
+    constexpr std::string_view kPrefix = "asset/";
+    if (generic.rfind(kPrefix, 0) == 0)
+    {
+        return std::filesystem::path(generic.substr(kPrefix.size()));
+    }
+    return input;
+}
+
 } // namespace
 
 Image::Image(
@@ -95,79 +111,104 @@ Image::Image(
     : pixel_element_size_(pixel_element_size), pixel_structure_(pixel_structure)
 {
     const auto& logger = frame::Logger::GetInstance();
-    const auto resolved_path = frame::file::FindFile(file);
-    const auto absolute_path =
-        std::filesystem::absolute(resolved_path).lexically_normal();
+    bool source_available = true;
+    std::filesystem::path absolute_path;
+    try
+    {
+        const auto resolved_path = frame::file::FindFile(file);
+        absolute_path =
+            std::filesystem::absolute(resolved_path).lexically_normal();
+    }
+    catch (const std::exception&)
+    {
+        source_available = false;
+        const auto asset_root = frame::file::FindDirectory("asset");
+        auto relative = StripAssetPrefix(file);
+        absolute_path = (asset_root / relative).lexically_normal();
+    }
     const int desired_channels = DesiredChannels(pixel_structure);
 
     std::optional<ImageCacheMetadata> cache_metadata;
-    std::error_code metadata_error;
-    const auto source_size =
-        std::filesystem::file_size(absolute_path, metadata_error);
-    if (!metadata_error)
+    std::optional<std::filesystem::file_time_type> source_write_time;
+    std::filesystem::path cache_path;
+    std::string cache_relative;
+    bool cache_path_ready = false;
+    try
     {
-        auto write_time =
-            std::filesystem::last_write_time(absolute_path, metadata_error);
+        const auto asset_root = frame::file::FindDirectory("asset");
+        auto cache_root = (asset_root / "cache").lexically_normal();
+        std::error_code relative_error;
+        auto relative = std::filesystem::relative(
+            absolute_path, asset_root, relative_error);
+        if (relative_error)
+        {
+            relative = absolute_path.filename();
+        }
+        auto cache_dir = cache_root;
+        if (relative.has_parent_path() && relative.parent_path() != ".")
+        {
+            cache_dir /= relative.parent_path();
+        }
+        std::string stem = relative.stem().string();
+        if (stem.empty())
+        {
+            stem = absolute_path.stem().string();
+        }
+        std::string structure_label = SanitizeLabel(
+            proto::PixelStructure_Enum_Name(pixel_structure.value()));
+        std::string element_label = SanitizeLabel(
+            proto::PixelElementSize_Enum_Name(
+                pixel_element_size.value()));
+        std::string cache_filename = std::format(
+            "{}-{}-{}-{}ch.imgpb",
+            stem,
+            structure_label,
+            element_label,
+            desired_channels);
+        cache_path = (cache_dir / cache_filename).lexically_normal();
+        cache_relative = frame::file::PurifyFilePath(cache_path);
+        cache_path_ready = true;
+    }
+    catch (const std::exception& exception)
+    {
+        logger->warn("Image cache disabled: {}", exception.what());
+    }
+
+    if (source_available)
+    {
+        std::error_code metadata_error;
+        const auto source_size =
+            std::filesystem::file_size(absolute_path, metadata_error);
         if (!metadata_error)
         {
-            const auto mtime_ns =
-                std::chrono::duration_cast<std::chrono::nanoseconds>(
-                    write_time.time_since_epoch())
-                    .count();
-            ImageCacheMetadata metadata;
-            metadata.source_relative =
-                frame::file::PurifyFilePath(absolute_path);
-            metadata.source_size = static_cast<std::uint64_t>(source_size);
-            metadata.source_mtime_ns = static_cast<std::uint64_t>(mtime_ns);
-            try
+            auto write_time =
+                std::filesystem::last_write_time(absolute_path, metadata_error);
+            if (!metadata_error)
             {
-                const auto asset_root = frame::file::FindDirectory("asset");
-                auto cache_root = (asset_root / "cache").lexically_normal();
-                std::error_code relative_error;
-                auto relative = std::filesystem::relative(
-                    absolute_path, asset_root, relative_error);
-                if (relative_error)
-                {
-                    relative = absolute_path.filename();
-                }
-                auto cache_dir = cache_root;
-                if (relative.has_parent_path() && relative.parent_path() != ".")
-                {
-                    cache_dir /= relative.parent_path();
-                }
-                std::string stem = relative.stem().string();
-                if (stem.empty())
-                {
-                    stem = absolute_path.stem().string();
-                }
-                std::string structure_label = SanitizeLabel(
-                    proto::PixelStructure_Enum_Name(pixel_structure.value()));
-                std::string element_label = SanitizeLabel(
-                    proto::PixelElementSize_Enum_Name(
-                        pixel_element_size.value()));
-                std::string cache_filename = std::format(
-                    "{}-{}-{}-{}ch.imgpb",
-                    stem,
-                    structure_label,
-                    element_label,
-                    desired_channels);
-                metadata.cache_path =
-                    (cache_dir / cache_filename).lexically_normal();
-                metadata.cache_relative =
-                    frame::file::PurifyFilePath(metadata.cache_path);
+                source_write_time = write_time;
+            }
+            if (!metadata_error && cache_path_ready)
+            {
+                const auto mtime_ns =
+                    std::chrono::duration_cast<std::chrono::nanoseconds>(
+                        write_time.time_since_epoch())
+                        .count();
+                ImageCacheMetadata metadata;
+                metadata.source_relative =
+                    frame::file::PurifyFilePath(absolute_path);
+                metadata.source_size = static_cast<std::uint64_t>(source_size);
+                metadata.source_mtime_ns = static_cast<std::uint64_t>(mtime_ns);
+                metadata.cache_path = cache_path;
+                metadata.cache_relative = cache_relative;
                 cache_metadata = std::move(metadata);
             }
-            catch (const std::exception& exception)
-            {
-                logger->warn("Image cache disabled: {}", exception.what());
-            }
         }
-    }
-    else
-    {
-        logger->info(
-            "Image cache disabled for {}: unable to inspect source file.",
-            absolute_path.string());
+        else
+        {
+            logger->info(
+                "Image cache disabled for {}: unable to inspect source file.",
+                absolute_path.string());
+        }
     }
 
     if (cache_metadata)
@@ -199,6 +240,83 @@ Image::Image(
                     cache_metadata->cache_relative);
             }
         }
+    }
+    if (source_available && cache_path_ready && source_write_time)
+    {
+        std::error_code cache_time_error;
+        const auto cache_write_time =
+            std::filesystem::last_write_time(cache_path, cache_time_error);
+        if (!cache_time_error && cache_write_time >= *source_write_time)
+        {
+            auto cached = LoadImageCacheRelaxed(
+                cache_path,
+                static_cast<proto::PixelElementSize::Enum>(
+                    pixel_element_size.value()),
+                static_cast<proto::PixelStructure::Enum>(
+                    pixel_structure.value()),
+                static_cast<std::uint32_t>(desired_channels));
+            if (cached)
+            {
+                if (!cached->data.empty())
+                {
+                    void* data = std::malloc(cached->data.size());
+                    if (data)
+                    {
+                        std::memcpy(
+                            data,
+                            cached->data.data(),
+                            cached->data.size());
+                        image_ = data;
+                        free_ = true;
+                        size_ = cached->size;
+                        logger->info(
+                            "Loaded image cache {} (source present).",
+                            cache_relative);
+                        return;
+                    }
+                    logger->warn(
+                        "Failed to allocate memory for cached image {}.",
+                        cache_relative);
+                }
+            }
+        }
+    }
+    else if (!source_available && cache_path_ready)
+    {
+        auto cached = LoadImageCacheRelaxed(
+            cache_path,
+            static_cast<proto::PixelElementSize::Enum>(
+                pixel_element_size.value()),
+            static_cast<proto::PixelStructure::Enum>(pixel_structure.value()),
+            static_cast<std::uint32_t>(desired_channels));
+        if (cached)
+        {
+            if (!cached->data.empty())
+            {
+                void* data = std::malloc(cached->data.size());
+                if (data)
+                {
+                    std::memcpy(data, cached->data.data(), cached->data.size());
+                    image_ = data;
+                    free_ = true;
+                    size_ = cached->size;
+                    logger->info(
+                        "Loaded image cache {} (source missing).",
+                        cache_relative);
+                    return;
+                }
+                logger->warn(
+                    "Failed to allocate memory for cached image {}.",
+                    cache_relative);
+            }
+        }
+    }
+
+    if (!source_available)
+    {
+        throw std::runtime_error(std::format(
+            "Image source [{}] not found and cache missing.",
+            absolute_path.string()));
     }
 
     logger->info("Openning image: [{}].", absolute_path.string());

@@ -3,6 +3,7 @@
 #include <chrono>
 #include <fstream>
 #include <numeric>
+#include <string_view>
 #define TINYOBJLOADER_IMPLEMENTATION // define this in only *one* .cc
 #include <format>
 #include <tiny_obj_loader.h>
@@ -13,60 +14,103 @@
 namespace frame::file
 {
 
+namespace
+{
+
+std::filesystem::path StripAssetPrefix(std::filesystem::path input)
+{
+    if (input.is_absolute())
+    {
+        return input;
+    }
+    const std::string generic = input.generic_string();
+    constexpr std::string_view kPrefix = "asset/";
+    if (generic.rfind(kPrefix, 0) == 0)
+    {
+        return std::filesystem::path(generic.substr(kPrefix.size()));
+    }
+    return input;
+}
+
+} // namespace
+
 Obj::Obj(std::filesystem::path file_name)
 {
-    const auto absolute_path =
-        std::filesystem::absolute(file_name).lexically_normal();
+    bool source_available = true;
+    std::filesystem::path absolute_path;
+    try
+    {
+        const auto resolved_path = frame::file::FindFile(file_name);
+        absolute_path =
+            std::filesystem::absolute(resolved_path).lexically_normal();
+    }
+    catch (const std::exception&)
+    {
+        source_available = false;
+        const auto asset_root = frame::file::FindDirectory("asset");
+        auto relative = StripAssetPrefix(file_name);
+        absolute_path = (asset_root / relative).lexically_normal();
+    }
 
     std::optional<ObjCacheMetadata> cache_metadata;
-    std::error_code metadata_error;
-    const auto source_size =
-        std::filesystem::file_size(absolute_path, metadata_error);
-    if (!metadata_error)
+    std::optional<std::filesystem::file_time_type> source_write_time;
+    std::filesystem::path cache_path;
+    std::string cache_relative;
+    bool cache_path_ready = false;
+    try
     {
-        auto write_time =
-            std::filesystem::last_write_time(absolute_path, metadata_error);
-        if (!metadata_error)
+        const auto asset_root = frame::file::FindDirectory("asset");
+        const auto cache_root =
+            (asset_root / "cache").lexically_normal();
+        std::error_code relative_error;
+        auto relative = std::filesystem::relative(
+            absolute_path, asset_root, relative_error);
+        if (relative_error)
         {
-            const auto mtime_ns =
-                std::chrono::duration_cast<std::chrono::nanoseconds>(
-                    write_time.time_since_epoch())
-                    .count();
-            ObjCacheMetadata metadata;
-            metadata.source_relative =
-                frame::file::PurifyFilePath(absolute_path);
-            metadata.source_size = static_cast<std::uint64_t>(source_size);
-            metadata.source_mtime_ns = static_cast<std::uint64_t>(mtime_ns);
-            try
+            relative = absolute_path.filename();
+        }
+        cache_path = (cache_root / relative).lexically_normal();
+        cache_path.replace_extension(".objpb");
+        cache_relative = frame::file::PurifyFilePath(cache_path);
+        cache_path_ready = true;
+    }
+    catch (const std::exception& exception)
+    {
+        logger_->warn("OBJ cache disabled: {}", exception.what());
+    }
+
+    if (source_available)
+    {
+        std::error_code metadata_error;
+        const auto source_size =
+            std::filesystem::file_size(absolute_path, metadata_error);
+        if (!metadata_error && cache_path_ready)
+        {
+            auto write_time =
+                std::filesystem::last_write_time(absolute_path, metadata_error);
+            if (!metadata_error)
             {
-                const auto asset_root = frame::file::FindDirectory("asset");
-                const auto cache_root =
-                    (asset_root / "cache").lexically_normal();
-                std::error_code relative_error;
-                auto relative = std::filesystem::relative(
-                    absolute_path, asset_root, relative_error);
-                if (relative_error)
-                {
-                    relative = absolute_path.filename();
-                }
-                auto cache_path = (cache_root / relative).lexically_normal();
-                cache_path.replace_extension(".objpb");
+                source_write_time = write_time;
+                const auto mtime_ns =
+                    std::chrono::duration_cast<std::chrono::nanoseconds>(
+                        write_time.time_since_epoch())
+                        .count();
+                ObjCacheMetadata metadata;
+                metadata.source_relative =
+                    frame::file::PurifyFilePath(absolute_path);
+                metadata.source_size = static_cast<std::uint64_t>(source_size);
+                metadata.source_mtime_ns = static_cast<std::uint64_t>(mtime_ns);
                 metadata.cache_path = cache_path;
-                metadata.cache_relative =
-                    frame::file::PurifyFilePath(cache_path);
+                metadata.cache_relative = cache_relative;
                 cache_metadata = std::move(metadata);
             }
-            catch (const std::exception& exception)
-            {
-                logger_->warn("OBJ cache disabled: {}", exception.what());
-            }
         }
-    }
-    else
-    {
-        logger_->info(
-            "OBJ cache disabled for {}: unable to inspect source file.",
-            absolute_path.string());
+        else
+        {
+            logger_->info(
+                "OBJ cache disabled for {}: unable to inspect source file.",
+                absolute_path.string());
+        }
     }
 
     if (cache_metadata)
@@ -81,13 +125,52 @@ Obj::Obj(std::filesystem::path file_name)
             return;
         }
     }
+    if (source_available && cache_path_ready && source_write_time)
+    {
+        std::error_code cache_time_error;
+        const auto cache_write_time =
+            std::filesystem::last_write_time(cache_path, cache_time_error);
+        if (!cache_time_error && cache_write_time >= *source_write_time)
+        {
+            if (auto cached = LoadObjCacheRelaxed(cache_path))
+            {
+                has_texture_coordinates_ = cached->hasTextureCoordinates;
+                meshes_ = std::move(cached->meshes);
+                materials_ = std::move(cached->materials);
+                logger_->info(
+                    "Loaded OBJ cache {} (source present).",
+                    cache_relative);
+                return;
+            }
+        }
+    }
+    else if (!source_available && cache_path_ready)
+    {
+        if (auto cached = LoadObjCacheRelaxed(cache_path))
+        {
+            has_texture_coordinates_ = cached->hasTextureCoordinates;
+            meshes_ = std::move(cached->meshes);
+            materials_ = std::move(cached->materials);
+            logger_->info(
+                "Loaded OBJ cache {} (source missing).",
+                cache_relative);
+            return;
+        }
+    }
+
+    if (!source_available)
+    {
+        throw std::runtime_error(std::format(
+            "OBJ source [{}] not found and cache missing.",
+            absolute_path.string()));
+    }
 
 #ifdef TINY_OBJ_LOADER_V2
     tinyobj::ObjReaderConfig reader_config;
     const auto pair = SplitFileDirectory(absolute_path);
     reader_config.mtl_search_path = pair.first;
     tinyobj::ObjReader reader;
-    std::string total_path = file::FindFile(absolute_path);
+    std::string total_path = absolute_path.string();
     if (!reader.ParseFromFile(total_path))
     {
         if (!reader.Error().empty())

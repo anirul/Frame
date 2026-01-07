@@ -1,15 +1,27 @@
-#version 450
+#version 450 core
 
-layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+in vec2 out_uv;
 
-layout(set = 0, binding = 0, rgba16f) uniform writeonly image2D output_image;
-layout(set = 0, binding = 1) uniform sampler2D raytrace_output;
-layout(set = 0, binding = 2) uniform sampler2D albedo_texture;
-layout(set = 0, binding = 3) uniform sampler2D normal_texture;
-layout(set = 0, binding = 4) uniform sampler2D roughness_texture;
-layout(set = 0, binding = 5) uniform sampler2D metallic_texture;
-layout(set = 0, binding = 6) uniform sampler2D ao_texture;
-layout(set = 0, binding = 7) uniform samplerCube skybox_env;
+out vec4 frag_color;
+
+uniform mat4 projection;
+uniform mat4 view;
+uniform mat4 projection_inv;
+uniform mat4 view_inv;
+uniform mat4 model;
+uniform mat4 model_inv;
+uniform vec3 camera_position;
+uniform mat4 env_map_model;
+// Direction from the light toward the scene.
+uniform vec3 light_dir;
+uniform vec3 light_color;
+// Generic PBR textures for the traced mesh.
+uniform sampler2D albedo_texture;
+uniform sampler2D normal_texture;
+uniform sampler2D roughness_texture;
+uniform sampler2D metallic_texture;
+uniform sampler2D ao_texture;
+uniform samplerCube skybox_env;
 
 struct Vertex
 {
@@ -28,25 +40,15 @@ struct Triangle
     Vertex v2;
 };
 
-layout(std430, set = 0, binding = 8) buffer TriangleBuffer
+layout(std430, binding = 0) buffer TriangleBuffer
 {
-    vec4 tri_data[];
+    Triangle triangles[];
 };
 
-layout(set = 0, binding = 10) uniform UniformBlock
+int TriangleCount()
 {
-    mat4 projection;
-    mat4 view;
-    mat4 projection_inv;
-    mat4 view_inv;
-    mat4 model;
-    mat4 model_inv;
-    mat4 env_map_model;
-    vec4 camera_position;
-    vec4 light_dir;
-    vec4 light_color;
-    vec4 time_s;
-} ubo;
+    return int(triangles.length());
+}
 
 struct HitInfo
 {
@@ -60,50 +62,6 @@ struct HitInfo
     vec3 bitangent_model;
     vec2 uv;
 };
-
-int TriangleCount()
-{
-    return int(tri_data.length() / 9);
-}
-
-Triangle LoadTriangle(int tri_index)
-{
-    Triangle tri;
-    tri.v0.position = vec3(0.0);
-    tri.v0.normal = vec3(0.0);
-    tri.v0.uv = vec2(0.0);
-    tri.v1.position = vec3(0.0);
-    tri.v1.normal = vec3(0.0);
-    tri.v1.uv = vec2(0.0);
-    tri.v2.position = vec3(0.0);
-    tri.v2.normal = vec3(0.0);
-    tri.v2.uv = vec2(0.0);
-    if (tri_index < 0 || tri_index >= TriangleCount())
-    {
-        return tri;
-    }
-    const int base = tri_index * 9;
-    vec4 p0 = tri_data[base + 0];
-    vec4 n0 = tri_data[base + 1];
-    vec4 uv0 = tri_data[base + 2];
-    vec4 p1 = tri_data[base + 3];
-    vec4 n1 = tri_data[base + 4];
-    vec4 uv1 = tri_data[base + 5];
-    vec4 p2 = tri_data[base + 6];
-    vec4 n2 = tri_data[base + 7];
-    vec4 uv2 = tri_data[base + 8];
-
-    tri.v0.position = p0.xyz;
-    tri.v0.normal = n0.xyz;
-    tri.v0.uv = uv0.xy;
-    tri.v1.position = p1.xyz;
-    tri.v1.normal = n1.xyz;
-    tri.v1.uv = uv1.xy;
-    tri.v2.position = p2.xyz;
-    tri.v2.normal = n2.xyz;
-    tri.v2.uv = uv2.xy;
-    return tri;
-}
 
 // ----------------------------------------------------------------------------
 float DistributionGGX(vec3 N, vec3 H, float roughness)
@@ -157,7 +115,7 @@ bool rayTriangleIntersect(
     vec3 h = cross(ray_direction, edge2);
     float a = dot(edge1, h);
     if (a > -EPSILON && a < EPSILON)
-        return false;
+        return false; // Ray is parallel to triangle.
     float f = 1.0 / a;
     vec3 s = ray_origin - triangle.v0.position;
     float u = f * dot(s, h);
@@ -179,15 +137,18 @@ bool rayTriangleIntersect(
 
 bool anyHitTriangles(const vec3 ray_origin, const vec3 ray_dir)
 {
-    const int tri_count = TriangleCount();
+    int tri_count = TriangleCount();
     for (int i = 0; i < tri_count; ++i)
     {
         float t;
         vec2 bary;
-        if (rayTriangleIntersect(ray_origin, ray_dir, LoadTriangle(i), t, bary))
-        {
+        if (rayTriangleIntersect(
+                ray_origin,
+                ray_dir,
+                triangles[i],
+                t,
+                bary))
             return true;
-        }
     }
     return false;
 }
@@ -208,12 +169,12 @@ HitInfo TraceScene(const vec3 ray_origin, const vec3 ray_dir)
     float best_t = 1e20;
     vec2 best_bary = vec2(0.0);
     int best_tri = -1;
-    const int tri_count = TriangleCount();
+    int tri_count = TriangleCount();
     for (int i = 0; i < tri_count; ++i)
     {
         float t;
         vec2 bary;
-        if (rayTriangleIntersect(ray_origin, ray_dir, LoadTriangle(i), t, bary) &&
+        if (rayTriangleIntersect(ray_origin, ray_dir, triangles[i], t, bary) &&
             t < best_t)
         {
             best_t = t;
@@ -232,7 +193,7 @@ HitInfo TraceScene(const vec3 ray_origin, const vec3 ray_dir)
     info.tri_index = best_tri;
     info.pos_model = ray_origin + best_t * ray_dir;
 
-    Triangle tri = LoadTriangle(best_tri);
+    Triangle tri = triangles[best_tri];
     float w = 1.0 - best_bary.x - best_bary.y;
     info.normal_model = normalize(
         tri.v0.normal * w +
@@ -243,16 +204,15 @@ HitInfo TraceScene(const vec3 ray_origin, const vec3 ray_dir)
 
     vec3 edge1 = tri.v1.position - tri.v0.position;
     vec3 edge2 = tri.v2.position - tri.v0.position;
-    vec2 delta_uv1 = tri.v1.uv - tri.v0.uv;
-    vec2 delta_uv2 = tri.v2.uv - tri.v0.uv;
-    float det = delta_uv1.x * delta_uv2.y - delta_uv2.x * delta_uv1.y;
-    if (abs(det) > 1e-8 && !isnan(det) && !isinf(det))
+    vec2 deltaUV1 = tri.v1.uv - tri.v0.uv;
+    vec2 deltaUV2 = tri.v2.uv - tri.v0.uv;
+    float f = 1.0 / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+    if (!isinf(f))
     {
-        float f = 1.0 / det;
         info.tangent_model =
-            normalize(f * (delta_uv2.y * edge1 - delta_uv1.y * edge2));
+            normalize(f * (deltaUV2.y * edge1 - deltaUV1.y * edge2));
         info.bitangent_model =
-            normalize(f * (-delta_uv2.x * edge1 + delta_uv1.x * edge2));
+            normalize(f * (-deltaUV2.x * edge1 + deltaUV1.x * edge2));
     }
     return info;
 }
@@ -274,10 +234,7 @@ vec3 SampleEnvSpecular(
     return textureLod(skybox_env, lookup_dir, specular_lod).rgb;
 }
 
-vec3 SampleEnvDiffuse(
-    vec3 normal_world,
-    mat3 env_rot_inv,
-    float max_env_lod)
+vec3 SampleEnvDiffuse(vec3 normal_world, mat3 env_rot_inv, float max_env_lod)
 {
     vec3 env_dir = env_rot_inv * normal_world;
     vec3 lookup_dir = vec3(env_dir.x, -env_dir.y, env_dir.z);
@@ -399,8 +356,9 @@ vec3 ShadeOpaque(
 
     vec3 reflection_dir_world = normalize(reflect(-ray_dir_world, hit_normal));
     vec3 reflection_dir_model = normalize(model_inv3 * reflection_dir_world);
-    vec3 env_color = SampleEnvSpecular(
-        reflection_dir_world, env_rot_inv, roughness, max_env_lod);
+    vec3 env_color =
+        SampleEnvSpecular(
+            reflection_dir_world, env_rot_inv, roughness, max_env_lod);
     vec3 env_diffuse = SampleEnvDiffuse(N, env_rot_inv, max_env_lod);
 
     vec3 reflection_sample = env_color;
@@ -554,97 +512,71 @@ vec3 ShadeGlass(
 
 void main()
 {
-    ivec2 pixel = ivec2(gl_GlobalInvocationID.xy);
-    ivec2 size = imageSize(output_image);
-    if (pixel.x >= size.x || pixel.y >= size.y)
-        return;
-
-    if (TriangleCount() == 0)
-    {
-        imageStore(output_image, pixel, vec4(0.0, 0.0, 0.0, 1.0));
-        return;
-    }
-
-    vec2 uv = (vec2(pixel) + vec2(0.5)) / vec2(size);
-    uv.y = 1.0 - uv.y;
-    vec2 ndc = uv * 2.0 - 1.0;
-    vec4 clip_pos = vec4(ndc, -1.0, 1.0);
-    vec4 view_pos = ubo.projection_inv * clip_pos;
+    // Reconstruct the view ray for this fragment.
+    vec2 uv = out_uv * 2.0 - 1.0;
+    vec4 clip_pos = vec4(uv, -1.0, 1.0);
+    vec4 view_pos = projection_inv * clip_pos;
     view_pos = vec4(view_pos.xy, -1.0, 0.0);
-    vec3 ray_dir_world = normalize((ubo.view_inv * view_pos).xyz);
+    vec3 ray_dir_world = normalize((view_inv * view_pos).xyz);
 
-    mat4 inv_model4 = ubo.model_inv;
+    // Transform the ray to model space to match the triangle buffer.
+    mat4 inv_model4 = model_inv;
     mat3 model_inv3 = mat3(inv_model4);
     float inv_det = abs(determinant(model_inv3));
     if (inv_det < 1e-8)
     {
-        inv_model4 = inverse(ubo.model);
+        inv_model4 = inverse(model);
         model_inv3 = mat3(inv_model4);
     }
     mat3 normal_matrix = transpose(model_inv3);
-    vec3 ray_origin = (inv_model4 * vec4(ubo.camera_position.xyz, 1.0)).xyz;
+    vec3 ray_origin = (inv_model4 * vec4(camera_position, 1.0)).xyz;
     vec3 ray_dir = normalize(model_inv3 * ray_dir_world);
 
     HitInfo hit = TraceScene(ray_origin, ray_dir);
     int env_levels = textureQueryLevels(skybox_env);
     float max_env_lod = env_levels > 0 ? float(env_levels - 1) : 0.0;
-    mat3 env_rot = mat3(ubo.env_map_model);
+    mat3 env_rot = mat3(env_map_model);
     float env_det = abs(determinant(env_rot));
     if (env_det < 1e-6)
     {
         env_rot = mat3(1.0);
     }
     mat3 env_rot_inv = transpose(env_rot);
-
-    vec4 final_color;
     if (!hit.hit)
     {
         vec3 env_dir = env_rot_inv * ray_dir_world;
         env_dir = vec3(env_dir.x, -env_dir.y, env_dir.z);
         vec3 env_color = textureLod(skybox_env, env_dir, 0.0).rgb;
-        final_color = vec4(env_color, 1.0);
+        frag_color = vec4(env_color, 1.0);
+        return;
+    }
+
+    vec3 color;
+    if (IsGround(hit))
+    {
+        color = ShadeOpaque(
+            hit,
+            ray_dir_world,
+            model_inv3,
+            normal_matrix,
+            light_dir,
+            light_color,
+            env_rot_inv,
+            max_env_lod,
+            true);
     }
     else
     {
-        vec3 light_dir_world = length(ubo.light_dir.xyz) > 0.0
-            ? ubo.light_dir.xyz
-            : vec3(1.0, -1.0, 1.0);
-        vec3 light_col = length(ubo.light_color.xyz) > 0.0
-            ? ubo.light_color.xyz
-            : vec3(1.0);
-
-        vec3 color;
-        if (IsGround(hit))
-        {
-            color = ShadeOpaque(
-                hit,
-                ray_dir_world,
-                model_inv3,
-                normal_matrix,
-                light_dir_world,
-                light_col,
-                env_rot_inv,
-                max_env_lod,
-                true);
-        }
-        else
-        {
-            color = ShadeGlass(
-                hit,
-                ray_dir_world,
-                model_inv3,
-                normal_matrix,
-                light_dir_world,
-                light_col,
-                env_rot_inv,
-                max_env_lod);
-        }
-        final_color = vec4(color, 1.0);
+        color = ShadeGlass(
+            hit,
+            ray_dir_world,
+            model_inv3,
+            normal_matrix,
+            light_dir,
+            light_color,
+            env_rot_inv,
+            max_env_lod);
     }
 
-    if (any(isnan(final_color)) || any(isinf(final_color)))
-    {
-        final_color = vec4(1.0, 0.0, 1.0, 1.0);
-    }
-    imageStore(output_image, pixel, final_color);
+    frag_color = vec4(color, 1.0);
 }

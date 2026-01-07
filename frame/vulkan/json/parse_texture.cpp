@@ -1,11 +1,21 @@
 #include "frame/vulkan/json/parse_texture.h"
 
 #include <algorithm>
+#include <chrono>
+#include <cctype>
 #include <cstring>
+#include <filesystem>
+#include <format>
 #include <numbers>
+#include <optional>
+#include <string_view>
 #include <stdexcept>
+#include <unordered_map>
 
+#include "frame/file/file_system.h"
 #include "frame/file/image.h"
+#include "frame/file/image_cache.h"
+#include "frame/logger.h"
 #include "frame/vulkan/texture.h"
 
 namespace frame::vulkan::json
@@ -111,41 +121,43 @@ std::vector<std::uint8_t> ConvertEquirectangularToCubemap(
             out[base_offset + 3] = 255;
             break;
         }
-        case frame::proto::PixelElementSize::SHORT:
-        case frame::proto::PixelElementSize::HALF:
-        case frame::proto::PixelElementSize::FLOAT: {
+        case frame::proto::PixelElementSize::SHORT: {
             auto store = [&](std::size_t channel, float value) {
                 const float clamped = std::clamp(value, 0.0f, 1.0f);
-                switch (element_size.value())
-                {
-                case frame::proto::PixelElementSize::SHORT: {
-                    std::uint16_t v = static_cast<std::uint16_t>(clamped * 65535.0f);
-                    std::memcpy(
-                        out.data() + base_offset + channel * sizeof(std::uint16_t),
-                        &v,
-                        sizeof(v));
-                    break;
-                }
-                case frame::proto::PixelElementSize::HALF: {
-                    const glm::uint packed = glm::packHalf2x16(
-                        glm::vec2(clamped, 0.0f));
-                    std::uint16_t v = static_cast<std::uint16_t>(packed & 0xFFFFu);
-                    std::memcpy(
-                        out.data() + base_offset + channel * sizeof(std::uint16_t),
-                        &v,
-                        sizeof(v));
-                    break;
-                }
-                case frame::proto::PixelElementSize::FLOAT: {
-                    std::memcpy(
-                        out.data() + base_offset + channel * sizeof(float),
-                        &clamped,
-                        sizeof(float));
-                    break;
-                }
-                default:
-                    break;
-                }
+                std::uint16_t v = static_cast<std::uint16_t>(clamped * 65535.0f);
+                std::memcpy(
+                    out.data() + base_offset + channel * sizeof(std::uint16_t),
+                    &v,
+                    sizeof(v));
+            };
+            store(0, rgb.r);
+            store(1, rgb.g);
+            store(2, rgb.b);
+            store(3, 1.0f);
+            break;
+        }
+        case frame::proto::PixelElementSize::HALF: {
+            auto store = [&](std::size_t channel, float value) {
+                const glm::uint packed = glm::packHalf2x16(
+                    glm::vec2(value, 0.0f));
+                std::uint16_t v = static_cast<std::uint16_t>(packed & 0xFFFFu);
+                std::memcpy(
+                    out.data() + base_offset + channel * sizeof(std::uint16_t),
+                    &v,
+                    sizeof(v));
+            };
+            store(0, rgb.r);
+            store(1, rgb.g);
+            store(2, rgb.b);
+            store(3, 1.0f);
+            break;
+        }
+        case frame::proto::PixelElementSize::FLOAT: {
+            auto store = [&](std::size_t channel, float value) {
+                std::memcpy(
+                    out.data() + base_offset + channel * sizeof(float),
+                    &value,
+                    sizeof(float));
             };
             store(0, rgb.r);
             store(1, rgb.g);
@@ -201,6 +213,218 @@ void ValidateTexture(const frame::proto::Texture& proto_texture)
     }
 }
 
+std::string SanitizeLabel(std::string label)
+{
+    for (auto& ch : label)
+    {
+        if (!std::isalnum(static_cast<unsigned char>(ch)) && ch != '_')
+        {
+            ch = '_';
+        }
+    }
+    return label;
+}
+
+std::filesystem::path StripAssetPrefix(std::filesystem::path input)
+{
+    if (input.is_absolute())
+    {
+        return input;
+    }
+    const std::string generic = input.generic_string();
+    constexpr std::string_view kPrefix = "asset/";
+    if (generic.rfind(kPrefix, 0) == 0)
+    {
+        return std::filesystem::path(generic.substr(kPrefix.size()));
+    }
+    return input;
+}
+
+bool CachedCubemapLooksClamped(
+    const frame::file::ImageCachePayload& payload,
+    frame::proto::PixelElementSize::Enum expected_element)
+{
+    if (payload.data.empty())
+    {
+        return false;
+    }
+    if (payload.element_size != expected_element)
+    {
+        return false;
+    }
+    if (expected_element != frame::proto::PixelElementSize::HALF &&
+        expected_element != frame::proto::PixelElementSize::FLOAT)
+    {
+        return false;
+    }
+    constexpr float kEpsilon = 1e-3f;
+    const auto& bytes = payload.data;
+    if (expected_element == frame::proto::PixelElementSize::FLOAT)
+    {
+        const std::size_t count = bytes.size() / sizeof(float);
+        for (std::size_t i = 0; i < count; ++i)
+        {
+            float value = 0.0f;
+            std::memcpy(
+                &value,
+                bytes.data() + i * sizeof(float),
+                sizeof(float));
+            if (value > 1.0f + kEpsilon)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+    const std::size_t count = bytes.size() / sizeof(std::uint16_t);
+    for (std::size_t i = 0; i < count; ++i)
+    {
+        std::uint16_t packed = 0;
+        std::memcpy(
+            &packed,
+            bytes.data() + i * sizeof(std::uint16_t),
+            sizeof(std::uint16_t));
+        const float value = glm::unpackHalf2x16(packed).x;
+        if (value > 1.0f + kEpsilon)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+std::string BuildCubemapCacheKey(
+    const std::filesystem::path& source_path,
+    frame::proto::PixelElementSize::Enum element_size,
+    frame::proto::PixelStructure::Enum structure,
+    std::uint32_t desired_channels)
+{
+    std::string structure_label = SanitizeLabel(
+        frame::proto::PixelStructure_Enum_Name(structure));
+    std::string element_label = SanitizeLabel(
+        frame::proto::PixelElementSize_Enum_Name(element_size));
+    return std::format(
+        "{}|{}|{}|{}|{}ch",
+        frame::file::PurifyFilePath(source_path),
+        "cubemap",
+        structure_label,
+        element_label,
+        desired_channels);
+}
+
+std::optional<frame::file::ImageCacheMetadata> BuildCubemapCacheMetadata(
+    const std::filesystem::path& source_path,
+    frame::proto::PixelElementSize::Enum element_size,
+    frame::proto::PixelStructure::Enum structure,
+    std::uint32_t desired_channels)
+{
+    std::error_code metadata_error;
+    const auto source_size =
+        std::filesystem::file_size(source_path, metadata_error);
+    if (metadata_error)
+    {
+        return std::nullopt;
+    }
+    auto write_time =
+        std::filesystem::last_write_time(source_path, metadata_error);
+    if (metadata_error)
+    {
+        return std::nullopt;
+    }
+    const auto mtime_ns =
+        std::chrono::duration_cast<std::chrono::nanoseconds>(
+            write_time.time_since_epoch())
+            .count();
+
+    frame::file::ImageCacheMetadata metadata;
+    metadata.source_relative = frame::file::PurifyFilePath(source_path);
+    metadata.source_size = static_cast<std::uint64_t>(source_size);
+    metadata.source_mtime_ns = static_cast<std::uint64_t>(mtime_ns);
+
+    try
+    {
+        const auto asset_root = frame::file::FindDirectory("asset");
+        auto cache_root = (asset_root / "cache").lexically_normal();
+        std::error_code relative_error;
+        auto relative =
+            std::filesystem::relative(source_path, asset_root, relative_error);
+        if (relative_error)
+        {
+            relative = source_path.filename();
+        }
+        auto cache_dir = cache_root;
+        if (relative.has_parent_path() && relative.parent_path() != ".")
+        {
+            cache_dir /= relative.parent_path();
+        }
+        std::string stem = relative.stem().string();
+        if (stem.empty())
+        {
+            stem = source_path.stem().string();
+        }
+        std::string structure_label = SanitizeLabel(
+            frame::proto::PixelStructure_Enum_Name(structure));
+        std::string element_label = SanitizeLabel(
+            frame::proto::PixelElementSize_Enum_Name(element_size));
+        std::string cache_filename = std::format(
+            "{}-{}-{}-{}-{}ch.imgpb",
+            stem,
+            "cubemap",
+            structure_label,
+            element_label,
+            desired_channels);
+        metadata.cache_path = (cache_dir / cache_filename).lexically_normal();
+        metadata.cache_relative =
+            frame::file::PurifyFilePath(metadata.cache_path);
+        return metadata;
+    }
+    catch (const std::exception&)
+    {
+        return std::nullopt;
+    }
+}
+
+std::filesystem::path BuildCubemapCachePath(
+    const std::filesystem::path& source_path,
+    frame::proto::PixelElementSize::Enum element_size,
+    frame::proto::PixelStructure::Enum structure,
+    std::uint32_t desired_channels)
+{
+    const auto asset_root = frame::file::FindDirectory("asset");
+    auto cache_root = (asset_root / "cache").lexically_normal();
+    std::error_code relative_error;
+    auto relative =
+        std::filesystem::relative(source_path, asset_root, relative_error);
+    if (relative_error)
+    {
+        relative = source_path.filename();
+    }
+    auto cache_dir = cache_root;
+    if (relative.has_parent_path() && relative.parent_path() != ".")
+    {
+        cache_dir /= relative.parent_path();
+    }
+    std::string stem = relative.stem().string();
+    if (stem.empty())
+    {
+        stem = source_path.stem().string();
+    }
+    std::string structure_label = SanitizeLabel(
+        frame::proto::PixelStructure_Enum_Name(structure));
+    std::string element_label = SanitizeLabel(
+        frame::proto::PixelElementSize_Enum_Name(element_size));
+    std::string cache_filename = std::format(
+        "{}-{}-{}-{}-{}ch.imgpb",
+        stem,
+        "cubemap",
+        structure_label,
+        element_label,
+        desired_channels);
+    return (cache_dir / cache_filename).lexically_normal();
+}
+
+std::unordered_map<std::string, frame::file::ImageCachePayload> g_cubemap_cache;
+
 } // namespace
 
 std::unique_ptr<frame::TextureInterface> ParseTexture(
@@ -217,22 +441,153 @@ std::unique_ptr<frame::TextureInterface> ParseTexture(
 
     if (proto_texture.has_file_name())
     {
+        frame::Logger& logger = frame::Logger::GetInstance();
+        const auto bytes_per_component =
+            frame::vulkan::Texture::BytesPerComponent(
+                proto_texture.pixel_element_size().value());
+        auto component_count = frame::vulkan::Texture::ComponentCount(
+            proto_texture.pixel_structure().value());
+        std::optional<frame::file::ImageCacheMetadata> cubemap_cache_metadata;
+        std::optional<frame::file::ImageCachePayload> cached_cubemap;
+        std::string cubemap_cache_key;
+        const std::uint32_t cubemap_channels = 4;
+        const auto cubemap_structure =
+            frame::proto::PixelStructure::RGB_ALPHA;
+        std::optional<std::filesystem::path> cubemap_cache_path;
+        bool cubemap_cache_relaxed = false;
+
+        if (proto_texture.cubemap())
+        {
+            bool source_available = true;
+            std::filesystem::path absolute_path;
+            try
+            {
+                const auto resolved_path =
+                    frame::file::FindFile(proto_texture.file_name());
+                absolute_path =
+                    std::filesystem::absolute(resolved_path).lexically_normal();
+            }
+            catch (const std::exception&)
+            {
+                source_available = false;
+                const auto asset_root = frame::file::FindDirectory("asset");
+                auto relative = StripAssetPrefix(proto_texture.file_name());
+                absolute_path = (asset_root / relative).lexically_normal();
+            }
+            cubemap_cache_key = BuildCubemapCacheKey(
+                absolute_path,
+                proto_texture.pixel_element_size().value(),
+                cubemap_structure,
+                cubemap_channels);
+            auto in_memory = g_cubemap_cache.find(cubemap_cache_key);
+            if (in_memory != g_cubemap_cache.end())
+            {
+                cached_cubemap = in_memory->second;
+            }
+            else
+            {
+                cubemap_cache_metadata = BuildCubemapCacheMetadata(
+                    absolute_path,
+                    proto_texture.pixel_element_size().value(),
+                    cubemap_structure,
+                    cubemap_channels);
+                if (cubemap_cache_metadata)
+                {
+                    cached_cubemap = frame::file::LoadImageCache(
+                        *cubemap_cache_metadata,
+                        proto_texture.pixel_element_size().value(),
+                        cubemap_structure,
+                        cubemap_channels);
+                    if (cached_cubemap)
+                    {
+                        cubemap_cache_path = cubemap_cache_metadata->cache_path;
+                    }
+                }
+                else if (!source_available)
+                {
+                    const auto cache_path = BuildCubemapCachePath(
+                        absolute_path,
+                        proto_texture.pixel_element_size().value(),
+                        cubemap_structure,
+                        cubemap_channels);
+                    cached_cubemap = frame::file::LoadImageCacheRelaxed(
+                        cache_path,
+                        proto_texture.pixel_element_size().value(),
+                        cubemap_structure,
+                        cubemap_channels);
+                    if (cached_cubemap)
+                    {
+                        cubemap_cache_path = cache_path;
+                        cubemap_cache_relaxed = true;
+                    }
+                }
+            }
+
+            const auto element_size = proto_texture.pixel_element_size().value();
+            const bool has_source = source_available;
+            if (cached_cubemap && has_source &&
+                CachedCubemapLooksClamped(*cached_cubemap, element_size))
+            {
+                const std::string cache_label = cubemap_cache_path
+                    ? frame::file::PurifyFilePath(*cubemap_cache_path)
+                    : cubemap_cache_key;
+                logger->warn(
+                    "Cubemap cache {} appears clamped; regenerating from source.",
+                    cache_label);
+                cached_cubemap.reset();
+                g_cubemap_cache.erase(cubemap_cache_key);
+            }
+            else if (cached_cubemap && !cached_cubemap->data.empty())
+            {
+                if (cubemap_cache_path)
+                {
+                    if (cubemap_cache_relaxed)
+                    {
+                        logger->info(
+                            "Loaded cubemap cache {} (source missing).",
+                            frame::file::PurifyFilePath(*cubemap_cache_path));
+                    }
+                    else
+                    {
+                        logger->info(
+                            "Loaded cubemap cache {}.",
+                            frame::file::PurifyFilePath(*cubemap_cache_path));
+                    }
+                }
+                g_cubemap_cache.emplace(
+                    cubemap_cache_key, *cached_cubemap);
+            }
+        }
+
+        if (proto_texture.cubemap() && cached_cubemap &&
+            !cached_cubemap->data.empty())
+        {
+            component_count = cubemap_channels;
+            texture->GetData().mutable_pixel_structure()->set_value(
+                cubemap_structure);
+            auto bytes_per_pixel =
+                static_cast<std::uint8_t>(bytes_per_component * component_count);
+            glm::uvec2 face_size = {
+                static_cast<std::uint32_t>(cached_cubemap->size.x),
+                static_cast<std::uint32_t>(cached_cubemap->size.y)};
+            texture->Update(
+                std::vector<std::uint8_t>(cached_cubemap->data),
+                face_size,
+                bytes_per_pixel);
+            texture->SetSerializeEnable(true);
+            return texture;
+        }
+
         frame::file::Image image(
             proto_texture.file_name(),
             proto_texture.pixel_element_size(),
             proto_texture.pixel_structure());
         const auto image_size = image.GetSize();
-        const auto bytes_per_component =
-            frame::vulkan::Texture::BytesPerComponent(
-                proto_texture.pixel_element_size().value());
-        auto component_count =
-            frame::vulkan::Texture::ComponentCount(
-                proto_texture.pixel_structure().value());
         if (proto_texture.cubemap())
         {
-            component_count = 4; // force RGBA faces
+            component_count = cubemap_channels; // force RGBA faces
             texture->GetData().mutable_pixel_structure()->set_value(
-                frame::proto::PixelStructure::RGB_ALPHA);
+                cubemap_structure);
         }
         auto bytes_per_pixel =
             static_cast<std::uint8_t>(bytes_per_component * component_count);
@@ -245,6 +600,34 @@ std::unique_ptr<frame::TextureInterface> ParseTexture(
                 face_size,
                 proto_texture.pixel_element_size(),
                 bytes_per_pixel);
+            if (cubemap_cache_metadata)
+            {
+                frame::file::SaveImageCache(
+                    *cubemap_cache_metadata,
+                    proto_texture.pixel_element_size().value(),
+                    cubemap_structure,
+                    cubemap_channels,
+                    glm::ivec2(
+                        static_cast<int>(face_size.x),
+                        static_cast<int>(face_size.y)),
+                    pixels);
+                logger->info(
+                    "Saved cubemap cache {}.",
+                    cubemap_cache_metadata->cache_relative);
+            }
+            if (!cubemap_cache_key.empty())
+            {
+                frame::file::ImageCachePayload payload;
+                payload.size = glm::ivec2(
+                    static_cast<int>(face_size.x),
+                    static_cast<int>(face_size.y));
+                payload.element_size = proto_texture.pixel_element_size().value();
+                payload.structure = cubemap_structure;
+                payload.desired_channels = cubemap_channels;
+                payload.data = pixels;
+                g_cubemap_cache.emplace(
+                    cubemap_cache_key, std::move(payload));
+            }
             texture->Update(std::move(pixels), face_size, bytes_per_pixel);
         }
         else

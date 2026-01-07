@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <chrono>
 #include <cstdlib>
 #include <cstring>
 #include <format>
@@ -43,6 +44,30 @@ namespace frame::vulkan
 namespace
 {
 
+class ScopedTimer
+{
+  public:
+    ScopedTimer(const Logger& logger, std::string label)
+        : logger_(logger),
+          label_(std::move(label)),
+          start_(Clock::now())
+    {
+    }
+
+    ~ScopedTimer()
+    {
+        const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
+            Clock::now() - start_);
+        logger_->info("{} took {} ms.", label_, elapsed.count());
+    }
+
+  private:
+    using Clock = std::chrono::steady_clock;
+    const Logger& logger_;
+    std::string label_;
+    Clock::time_point start_;
+};
+
 struct DebugVertex
 {
     glm::vec3 position;
@@ -59,6 +84,7 @@ struct DebugTriangle
     DebugVertex v1;
     DebugVertex v2;
 };
+
 
 struct DebugBvhNode
 {
@@ -198,31 +224,9 @@ Device::Device(
       vk_surface_(surface),
       texture_resources_(std::make_unique<TextureResources>(*this))
 {
-    auto env_enabled = [](const char* name) {
-#if defined(_WIN32) || defined(_WIN64)
-        char* value = nullptr;
-        size_t len = 0;
-        const errno_t err = _dupenv_s(&value, &len, name);
-        const bool enabled = (err == 0) && value && len > 1;
-        if (value)
-        {
-            std::free(value);
-        }
-        return enabled;
-#else
-        const char* value = std::getenv(name);
-        return value && std::strlen(value) > 0;
-#endif
-    };
-    debug_dump_compute_output_ =
-        absl::GetFlag(FLAGS_vk_dump_compute) ||
-        env_enabled("FRAME_VK_DUMP_COMPUTE");
-    debug_log_scene_state_ =
-        absl::GetFlag(FLAGS_vk_log_scene) ||
-        env_enabled("FRAME_VK_LOG_SCENE");
-    debug_hit_mask_ =
-        absl::GetFlag(FLAGS_vk_debug_hitmask) ||
-        env_enabled("FRAME_VK_DEBUG_HITMASK");
+    debug_dump_compute_output_ = absl::GetFlag(FLAGS_vk_dump_compute);
+    debug_log_scene_state_ = absl::GetFlag(FLAGS_vk_log_scene);
+    debug_hit_mask_ = absl::GetFlag(FLAGS_vk_debug_hitmask);
 
     logger_->info("Initializing Vulkan device ({}x{})", size_.x, size_.y);
 
@@ -401,6 +405,8 @@ void Device::Startup(std::unique_ptr<LevelInterface>&& level)
 
 void Device::StartupFromLevelData(const frame::json::LevelData& level_data)
 {
+    ScopedTimer total_timer(logger_, "Vulkan StartupFromLevelData");
+
     current_level_data_ = level_data;
     active_program_info_.reset();
     use_procedural_quad_pipeline_ = false;
@@ -410,63 +416,69 @@ void Device::StartupFromLevelData(const frame::json::LevelData& level_data)
 
     // Prefer the raytracing program (QUAD) if present; otherwise fall back to
     // the first available program.
-    auto pick_program = [&]() -> std::optional<frame::json::ProgramInfo> {
-        for (const auto& program : level_data.programs)
-        {
-            if (program.vertex_shader == "raytracing.vert" ||
-                program.name == "RayTraceProgram")
-            {
-                return program;
-            }
-        }
-        if (!level_data.programs.empty())
-        {
-            return level_data.programs.front();
-        }
-        return std::nullopt;
-    };
-
-    if (auto chosen_program = pick_program())
     {
-        ProgramPipelineInfo pipeline_info;
-        const auto& program_info = *chosen_program;
-        pipeline_info.program_name = program_info.name;
-        const auto shader_root =
-            level_data.asset_root / "shader" / "vulkan";
-        pipeline_info.vertex_shader = shader_root / program_info.vertex_shader;
-        pipeline_info.fragment_shader =
-            shader_root / program_info.fragment_shader;
-        pipeline_info.use_compute =
-            (program_info.name == "RayTraceProgram");
-        if (pipeline_info.use_compute)
-        {
-            pipeline_info.compute_shader = shader_root / "raytracing.comp";
-        }
-        pipeline_info.scene_type = frame::proto::SceneType::NONE;
-        for (const auto& proto_program : level_data.proto.programs())
-        {
-            if (proto_program.name() == program_info.name)
+        ScopedTimer timer(logger_, "Select program");
+        auto pick_program = [&]() -> std::optional<frame::json::ProgramInfo> {
+            for (const auto& program : level_data.programs)
             {
-                pipeline_info.scene_type =
-                    proto_program.input_scene_type().value();
-                for (const auto& uniform : proto_program.uniforms())
+                if (program.vertex_shader == "raytracing.vert" ||
+                    program.name == "RayTraceProgram")
                 {
-                    if (uniform.value_oneof_case() ==
-                            frame::proto::Uniform::kUniformEnum &&
-                        uniform.uniform_enum() ==
-                            frame::proto::Uniform::FLOAT_TIME_S)
-                    {
-                        pipeline_info.uses_time_uniform = true;
-                    }
+                    return program;
                 }
-                break;
             }
+            if (!level_data.programs.empty())
+            {
+                return level_data.programs.front();
+            }
+            return std::nullopt;
+        };
+
+        if (auto chosen_program = pick_program())
+        {
+            ProgramPipelineInfo pipeline_info;
+            const auto& program_info = *chosen_program;
+            pipeline_info.program_name = program_info.name;
+            const auto shader_root =
+                level_data.asset_root / "shader" / "vulkan";
+            pipeline_info.vertex_shader = shader_root / program_info.vertex_shader;
+            pipeline_info.fragment_shader =
+                shader_root / program_info.fragment_shader;
+            pipeline_info.use_compute =
+                (program_info.name == "RayTraceProgram");
+            if (pipeline_info.use_compute)
+            {
+                pipeline_info.compute_shader = shader_root / "raytracing.comp";
+            }
+            pipeline_info.scene_type = frame::proto::SceneType::NONE;
+            for (const auto& proto_program : level_data.proto.programs())
+            {
+                if (proto_program.name() == program_info.name)
+                {
+                    pipeline_info.scene_type =
+                        proto_program.input_scene_type().value();
+                    for (const auto& uniform : proto_program.uniforms())
+                    {
+                        if (uniform.value_oneof_case() ==
+                                frame::proto::Uniform::kUniformEnum &&
+                            uniform.uniform_enum() ==
+                                frame::proto::Uniform::FLOAT_TIME_S)
+                        {
+                            pipeline_info.uses_time_uniform = true;
+                        }
+                    }
+                    break;
+                }
+            }
+            active_program_info_ = std::move(pipeline_info);
         }
-        active_program_info_ = std::move(pipeline_info);
     }
 
-    auto built = BuildLevel(GetSize(), level_data);
-    level_ = std::move(built.level);
+    {
+        ScopedTimer timer(logger_, "BuildLevel");
+        auto built = BuildLevel(GetSize(), level_data);
+        level_ = std::move(built.level);
+    }
 
     if (active_program_info_ && level_)
     {
@@ -505,6 +517,41 @@ void Device::StartupFromLevelData(const frame::json::LevelData& level_data)
                         active_program_info_->program_id)
                     {
                         active_program_info_->material_id = material_id;
+                        auto material_texture_ids = material.GetTextureIds();
+                        if (!material_texture_ids.empty())
+                        {
+                            auto program_texture_ids =
+                                active_program_info_->input_texture_ids;
+                            if (material_texture_ids.size() ==
+                                program_texture_ids.size())
+                            {
+                                auto sort_ids =
+                                    [](std::vector<EntityId>& ids) {
+                                        std::sort(ids.begin(), ids.end());
+                                    };
+                                sort_ids(material_texture_ids);
+                                sort_ids(program_texture_ids);
+                                if (material_texture_ids == program_texture_ids)
+                                {
+                                    active_program_info_->input_texture_ids =
+                                        material.GetTextureIds();
+                                }
+                                else
+                                {
+                                    logger_->warn(
+                                        "Program/material texture mismatch for {} (keeping program order).",
+                                        active_program_info_->program_name);
+                                }
+                            }
+                            else
+                            {
+                                logger_->warn(
+                                    "Program/material texture count mismatch for {} ({} vs {}); keeping program order.",
+                                    active_program_info_->program_name,
+                                    program_texture_ids.size(),
+                                    material_texture_ids.size());
+                            }
+                        }
                         if (proto_material_ptr)
                         {
                             for (int i = 0;
@@ -614,17 +661,31 @@ void Device::StartupFromLevelData(const frame::json::LevelData& level_data)
 
     try
     {
-        CreateTextureResources(level_data);
+        {
+            ScopedTimer timer(logger_, "CreateTextureResources");
+            CreateTextureResources(level_data);
+        }
         DestroySwapchainResources();
-        CreateSwapchainResources();
-        CreateDescriptorResources();
+        {
+            ScopedTimer timer(logger_, "CreateSwapchainResources");
+            CreateSwapchainResources();
+        }
+        {
+            ScopedTimer timer(logger_, "CreateDescriptorResources");
+            CreateDescriptorResources();
+        }
         if (mesh_resources_)
         {
+            ScopedTimer timer(logger_, "MeshResources Build");
             mesh_resources_->Build(level_data);
         }
-        CreateGraphicsPipeline();
+        {
+            ScopedTimer timer(logger_, "CreateGraphicsPipeline");
+            CreateGraphicsPipeline();
+        }
         if (use_compute_raytracing_)
         {
+            ScopedTimer timer(logger_, "CreateComputePipeline");
             CreateComputePipeline();
         }
     }
@@ -2342,37 +2403,87 @@ std::vector<std::uint32_t> Device::CompileShader(
     const std::filesystem::path& path,
     shaderc_shader_kind kind) const
 {
-    const std::filesystem::path cache_path = path.string() + ".spv";
-    std::error_code cache_error;
-    const bool cache_ok =
-        std::filesystem::exists(cache_path, cache_error) && !cache_error;
-    if (cache_ok)
-    {
-        const auto source_time =
-            std::filesystem::last_write_time(path, cache_error);
-        const auto cache_time =
-            std::filesystem::last_write_time(cache_path, cache_error);
-        if (!cache_error && cache_time >= source_time)
+    auto resolve_spv_path = [](const std::filesystem::path& source_path) {
+        const auto parent = source_path.parent_path();
+        if (!parent.empty() && parent.filename() == "vulkan")
         {
-            std::ifstream cache_file(cache_path, std::ios::binary);
-            if (cache_file)
+            const auto asset_root = parent.parent_path().parent_path();
+            return asset_root / "cache" / "shader" / "vulkan" /
+                (source_path.filename().string() + ".spv");
+        }
+        return std::filesystem::path(source_path.string() + ".spv");
+    };
+
+    const std::filesystem::path spv_path = resolve_spv_path(path);
+    const std::filesystem::path legacy_spv_path = path.string() + ".spv";
+    std::error_code source_error;
+    const bool source_exists =
+        std::filesystem::exists(path, source_error) && !source_error;
+    std::optional<std::filesystem::file_time_type> source_time;
+    if (source_exists)
+    {
+        auto time = std::filesystem::last_write_time(path, source_error);
+        if (!source_error)
+        {
+            source_time = time;
+        }
+    }
+
+    auto try_load_spv = [&](const std::filesystem::path& candidate)
+        -> std::optional<std::vector<std::uint32_t>> {
+        std::error_code cache_error;
+        if (!std::filesystem::exists(candidate, cache_error) || cache_error)
+        {
+            return std::nullopt;
+        }
+        if (source_time)
+        {
+            const auto cache_time =
+                std::filesystem::last_write_time(candidate, cache_error);
+            if (!cache_error && cache_time < *source_time)
             {
-                cache_file.seekg(0, std::ios::end);
-                const std::streamsize cache_size = cache_file.tellg();
-                cache_file.seekg(0, std::ios::beg);
-                if (cache_size > 0 && (cache_size % 4) == 0)
-                {
-                    std::vector<std::uint32_t> cached(
-                        static_cast<std::size_t>(cache_size / 4));
-                    if (cache_file.read(
-                            reinterpret_cast<char*>(cached.data()),
-                            cache_size))
-                    {
-                        return cached;
-                    }
-                }
+                return std::nullopt;
             }
         }
+        std::ifstream cache_file(candidate, std::ios::binary);
+        if (!cache_file)
+        {
+            return std::nullopt;
+        }
+        cache_file.seekg(0, std::ios::end);
+        const std::streamsize cache_size = cache_file.tellg();
+        cache_file.seekg(0, std::ios::beg);
+        if (cache_size > 0 && (cache_size % 4) == 0)
+        {
+            std::vector<std::uint32_t> cached(
+                static_cast<std::size_t>(cache_size / 4));
+            if (cache_file.read(
+                    reinterpret_cast<char*>(cached.data()),
+                    cache_size))
+            {
+                return cached;
+            }
+        }
+        return std::nullopt;
+    };
+
+    if (auto cached = try_load_spv(spv_path))
+    {
+        return *cached;
+    }
+    if (spv_path != legacy_spv_path)
+    {
+        if (auto cached = try_load_spv(legacy_spv_path))
+        {
+            return *cached;
+        }
+    }
+
+    if (!source_exists)
+    {
+        throw std::runtime_error(std::format(
+            "Unable to open shader file {} (no SPV cache found)",
+            path.string()));
     }
 
     std::ifstream file(path);
@@ -2404,8 +2515,8 @@ std::vector<std::uint32_t> Device::CompileShader(
     std::vector<std::uint32_t> compiled{result.cbegin(), result.cend()};
     std::error_code write_error;
     std::filesystem::create_directories(
-        cache_path.parent_path(), write_error);
-    std::ofstream cache_out(cache_path, std::ios::binary | std::ios::trunc);
+        spv_path.parent_path(), write_error);
+    std::ofstream cache_out(spv_path, std::ios::binary | std::ios::trunc);
     if (cache_out)
     {
         cache_out.write(

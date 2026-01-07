@@ -35,7 +35,7 @@
             "pixel_structure": {
                 "value": "RGB"
             },
-            "file_name": "asset/cubemap/hamarikyu.hdr"
+            "file_name": "asset/cubemap/hamarikyu_env.hdr"
         },
         {
             "name": "albedo_texture",
@@ -125,13 +125,15 @@
                 "skybox_env"
             ],
             "buffer_names": [
-                "IcoPlate.0.triangle"
+                "AppleMesh.0.triangle",
+                "AppleMesh.0.bvh"
             ],
             "inner_buffer_names": [
-                "TriangleBuffer"
+                "TriangleBuffer",
+                "BvhBuffer"
             ],
             "node_names": [
-                "IcoPlate"
+                "AppleMesh"
             ],
             "inner_node_names": [
                 "model"
@@ -184,8 +186,8 @@
                 "value": "QUAD"
             },
             "input_scene_root_name": "mesh_holder",
-            "shader_vertex": "raytracing_simple.vert",
-            "shader_fragment": "raytracing_simple.frag",
+            "shader_vertex": "raytracing_bvh.vert",
+            "shader_fragment": "raytracing_bvh.frag",
             "uniforms": [
                 {
                     "name": "projection",
@@ -230,8 +232,8 @@
             "input_scene_type": {
                 "value": "SCENE"
             },
-            "shader_vertex": "raytracing_simple.vert",
-            "shader_fragment": "raytracing_simple.frag",
+            "shader_vertex": "raytracing_bvh.vert",
+            "shader_fragment": "raytracing_bvh.frag",
             "uniforms": [
                 {
                     "name": "projection",
@@ -286,6 +288,16 @@
                 }
             },
             {
+                "name": "mesh_holder",
+                "parent": "root",
+                "quaternion": {
+                    "x": 0.0,
+                    "y": 0.2930181,
+                    "z": 0.2197635,
+                    "w": 0.9305076
+                }
+            },
+            {
                 "name": "env_holder",
                 "parent": "root",
                 "quaternion": {
@@ -293,16 +305,6 @@
                     "y": 0.0499792,
                     "z": 0.0,
                     "w": 0.9987503
-                }
-            },
-            {
-                "name": "mesh_holder",
-                "parent": "env_holder",
-                "quaternion": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0,
-                    "w": 1.0
                 }
             }
         ],
@@ -315,13 +317,13 @@
                 "far_clip": 1000.0,
                 "position": {
                     "x": 0,
-                    "y": 0.8,
-                    "z": -2.2
+                    "y": 0.5,
+                    "z": -0.7
                 },
                 "target": {
                     "x": 0,
-                    "y": -0.3,
-                    "z": 0.2
+                    "y": -0.5,
+                    "z": 0.7
                 },
                 "up": {
                     "x": 0,
@@ -345,9 +347,10 @@
                 "material_name": "RayTraceMaterial"
             },
             {
-                "name": "IcoPlate",
+                "name": "AppleMesh",
                 "parent": "mesh_holder",
-                "file_name": "ico_plate.obj",
+                "file_name": "dragon.obj",
+                "acceleration_structure_enum": "BVH_ACCELERATION",
                 "material_name": "RayTraceMaterial",
                 "render_time_enum": "PRE_RENDER_TIME"
             }

@@ -138,6 +138,8 @@ bool ParseNodeStaticMeshFromEnum(
     node->SetParentName(proto_mesh.parent());
     node->GetData().set_material_name(proto_mesh.material_name());
     node->GetData().set_render_time_enum(proto_mesh.render_time_enum());
+    node->GetData().set_acceleration_structure_enum(
+        proto_mesh.acceleration_structure_enum());
 
     auto scene_id = level.AddSceneNode(std::move(node));
     level.AddMeshMaterialId(scene_id, material_id, proto_mesh.render_time_enum());
@@ -153,6 +155,8 @@ bool ParseNodeStaticMeshCleanBuffer(
     node->GetData().set_name(proto_mesh.name());
     node->SetParentName(proto_mesh.parent());
     node->GetData().set_render_time_enum(proto_mesh.render_time_enum());
+    node->GetData().set_acceleration_structure_enum(
+        proto_mesh.acceleration_structure_enum());
     auto scene_id = level.AddSceneNode(std::move(node));
     level.AddMeshMaterialId(
         scene_id, frame::NullId, proto_mesh.render_time_enum());
@@ -182,10 +186,14 @@ bool ParseNodeStaticMesh(
     }
     if (proto_mesh.has_file_name())
     {
-        const auto path = frame::file::FindFile(
-            "asset/model/" + proto_mesh.file_name());
+        const auto asset_root = frame::file::FindDirectory("asset");
+        const auto path = (asset_root / "model" / proto_mesh.file_name())
+                              .lexically_normal();
         frame::file::Obj obj(path);
 
+        const bool build_bvh =
+            proto_mesh.acceleration_structure_enum() ==
+            frame::proto::NodeStaticMesh::BVH_ACCELERATION;
         int counter = 0;
         for (const auto& mesh : obj.GetMeshes())
         {
@@ -387,29 +395,32 @@ bool ParseNodeStaticMesh(
                 push_vertex((*triangle_indices)[i + 2]);
             }
 
-            auto bvh_nodes = frame::BuildBVH(points, *triangle_indices);
-            std::vector<GpuBvhNode> gpu_bvh_nodes;
-            gpu_bvh_nodes.reserve(bvh_nodes.size());
-            for (const auto& node : bvh_nodes)
-            {
-                GpuBvhNode gpu_node{};
-                gpu_node.min = glm::vec4(node.min, 0.0f);
-                gpu_node.max = glm::vec4(node.max, 0.0f);
-                gpu_node.left = node.left;
-                gpu_node.right = node.right;
-                gpu_node.first_triangle = node.first_triangle;
-                gpu_node.triangle_count = node.triangle_count;
-                gpu_bvh_nodes.push_back(gpu_node);
-            }
-
             auto triangle_buffer_id = make_buffer(
                 triangles,
                 std::format("{}.{}.triangle", proto_mesh.name(), counter),
                 level);
-            auto bvh_buffer_id = make_buffer(
-                gpu_bvh_nodes,
-                std::format("{}.{}.bvh", proto_mesh.name(), counter),
-                level);
+            EntityId bvh_buffer_id = NullId;
+            if (build_bvh)
+            {
+                auto bvh_nodes = frame::BuildBVH(points, *triangle_indices);
+                std::vector<GpuBvhNode> gpu_bvh_nodes;
+                gpu_bvh_nodes.reserve(bvh_nodes.size());
+                for (const auto& node : bvh_nodes)
+                {
+                    GpuBvhNode gpu_node{};
+                    gpu_node.min = glm::vec4(node.min, 0.0f);
+                    gpu_node.max = glm::vec4(node.max, 0.0f);
+                    gpu_node.left = node.left;
+                    gpu_node.right = node.right;
+                    gpu_node.first_triangle = node.first_triangle;
+                    gpu_node.triangle_count = node.triangle_count;
+                    gpu_bvh_nodes.push_back(gpu_node);
+                }
+                bvh_buffer_id = make_buffer(
+                    gpu_bvh_nodes,
+                    std::format("{}.{}.bvh", proto_mesh.name(), counter),
+                    level);
+            }
 
             frame::StaticMeshParameter parameter{};
             parameter.point_buffer_id = point_buffer_id;
@@ -430,6 +441,8 @@ bool ParseNodeStaticMesh(
             static_mesh->GetData().set_file_name(proto_mesh.file_name());
             static_mesh->GetData().set_render_primitive_enum(
                 proto_mesh.render_primitive_enum());
+            static_mesh->GetData().set_acceleration_structure_enum(
+                proto_mesh.acceleration_structure_enum());
             auto mesh_id = level.AddStaticMesh(std::move(static_mesh));
             if (!mesh_id)
             {
@@ -448,6 +461,8 @@ bool ParseNodeStaticMesh(
             node->SetParentName(proto_mesh.parent());
             node->GetData().set_material_name(proto_mesh.material_name());
             node->GetData().set_render_time_enum(proto_mesh.render_time_enum());
+            node->GetData().set_acceleration_structure_enum(
+                proto_mesh.acceleration_structure_enum());
             node->GetData().set_file_name(proto_mesh.file_name());
 
             auto scene_id = level.AddSceneNode(std::move(node));

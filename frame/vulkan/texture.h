@@ -24,6 +24,10 @@ class Texture : public frame::TextureInterface
     std::vector<std::uint16_t> GetTextureWord() const override;
     std::vector<std::uint32_t> GetTextureDWord() const override;
     std::vector<float> GetTextureFloat() const override;
+    const std::vector<std::uint8_t>& GetTextureData() const
+    {
+        return data_;
+    }
     void Update(
         std::vector<std::uint8_t>&& vector,
         glm::uvec2 size,

@@ -259,7 +259,7 @@ void Cubemap::CreateCubemapFromFile(
     data_.mutable_pixel_structure()->CopyFrom(pixel_structure);
     data_.set_file_name(frame::file::PurifyFilePath(file_name));
     frame::file::Image image(
-        frame::file::FindFile(file_name),
+        file_name,
         data_.pixel_element_size(),
         data_.pixel_structure());
     CreateCubemapFromPointer(
@@ -282,7 +282,7 @@ void Cubemap::CreateCubemapFromFiles(
     {
         paths.push_back(file_name);
         auto image_ptr = std::make_unique<frame::file::Image>(
-            frame::file::FindFile(file_name),
+            file_name,
             pixel_element_size,
             pixel_structure);
         images.push_back(std::move(image_ptr));

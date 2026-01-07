@@ -251,6 +251,39 @@ inline bool NodeStaticMesh_ShadowEffectEnum_Parse(absl::string_view name, NodeSt
   return ::google::protobuf::internal::ParseNamedEnum<NodeStaticMesh_ShadowEffectEnum>(
       NodeStaticMesh_ShadowEffectEnum_descriptor(), name, value);
 }
+enum NodeStaticMesh_AccelerationStructureEnum : int {
+  NodeStaticMesh_AccelerationStructureEnum_NO_ACCELERATION = 0,
+  NodeStaticMesh_AccelerationStructureEnum_BVH_ACCELERATION = 1,
+  NodeStaticMesh_AccelerationStructureEnum_NodeStaticMesh_AccelerationStructureEnum_INT_MIN_SENTINEL_DO_NOT_USE_ =
+      std::numeric_limits<::int32_t>::min(),
+  NodeStaticMesh_AccelerationStructureEnum_NodeStaticMesh_AccelerationStructureEnum_INT_MAX_SENTINEL_DO_NOT_USE_ =
+      std::numeric_limits<::int32_t>::max(),
+};
+
+bool NodeStaticMesh_AccelerationStructureEnum_IsValid(int value);
+extern const uint32_t NodeStaticMesh_AccelerationStructureEnum_internal_data_[];
+constexpr NodeStaticMesh_AccelerationStructureEnum NodeStaticMesh_AccelerationStructureEnum_AccelerationStructureEnum_MIN = static_cast<NodeStaticMesh_AccelerationStructureEnum>(0);
+constexpr NodeStaticMesh_AccelerationStructureEnum NodeStaticMesh_AccelerationStructureEnum_AccelerationStructureEnum_MAX = static_cast<NodeStaticMesh_AccelerationStructureEnum>(1);
+constexpr int NodeStaticMesh_AccelerationStructureEnum_AccelerationStructureEnum_ARRAYSIZE = 1 + 1;
+const ::google::protobuf::EnumDescriptor*
+NodeStaticMesh_AccelerationStructureEnum_descriptor();
+template <typename T>
+const std::string& NodeStaticMesh_AccelerationStructureEnum_Name(T value) {
+  static_assert(std::is_same<T, NodeStaticMesh_AccelerationStructureEnum>::value ||
+                    std::is_integral<T>::value,
+                "Incorrect type passed to AccelerationStructureEnum_Name().");
+  return NodeStaticMesh_AccelerationStructureEnum_Name(static_cast<NodeStaticMesh_AccelerationStructureEnum>(value));
+}
+template <>
+inline const std::string& NodeStaticMesh_AccelerationStructureEnum_Name(NodeStaticMesh_AccelerationStructureEnum value) {
+  return ::google::protobuf::internal::NameOfDenseEnum<NodeStaticMesh_AccelerationStructureEnum_descriptor,
+                                                 0, 1>(
+      static_cast<int>(value));
+}
+inline bool NodeStaticMesh_AccelerationStructureEnum_Parse(absl::string_view name, NodeStaticMesh_AccelerationStructureEnum* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<NodeStaticMesh_AccelerationStructureEnum>(
+      NodeStaticMesh_AccelerationStructureEnum_descriptor(), name, value);
+}
 enum NodeLight_LightTypeEnum : int {
   NodeLight_LightTypeEnum_INVALID_LIGHT = 0,
   NodeLight_LightTypeEnum_AMBIENT_LIGHT = 1,
@@ -1531,6 +1564,25 @@ class NodeStaticMesh final : public ::google::protobuf::Message
   static inline bool ShadowEffectEnum_Parse(absl::string_view name, ShadowEffectEnum* value) {
     return NodeStaticMesh_ShadowEffectEnum_Parse(name, value);
   }
+  using AccelerationStructureEnum = NodeStaticMesh_AccelerationStructureEnum;
+  static constexpr AccelerationStructureEnum NO_ACCELERATION = NodeStaticMesh_AccelerationStructureEnum_NO_ACCELERATION;
+  static constexpr AccelerationStructureEnum BVH_ACCELERATION = NodeStaticMesh_AccelerationStructureEnum_BVH_ACCELERATION;
+  static inline bool AccelerationStructureEnum_IsValid(int value) {
+    return NodeStaticMesh_AccelerationStructureEnum_IsValid(value);
+  }
+  static constexpr AccelerationStructureEnum AccelerationStructureEnum_MIN = NodeStaticMesh_AccelerationStructureEnum_AccelerationStructureEnum_MIN;
+  static constexpr AccelerationStructureEnum AccelerationStructureEnum_MAX = NodeStaticMesh_AccelerationStructureEnum_AccelerationStructureEnum_MAX;
+  static constexpr int AccelerationStructureEnum_ARRAYSIZE = NodeStaticMesh_AccelerationStructureEnum_AccelerationStructureEnum_ARRAYSIZE;
+  static inline const ::google::protobuf::EnumDescriptor* AccelerationStructureEnum_descriptor() {
+    return NodeStaticMesh_AccelerationStructureEnum_descriptor();
+  }
+  template <typename T>
+  static inline const std::string& AccelerationStructureEnum_Name(T value) {
+    return NodeStaticMesh_AccelerationStructureEnum_Name(value);
+  }
+  static inline bool AccelerationStructureEnum_Parse(absl::string_view name, AccelerationStructureEnum* value) {
+    return NodeStaticMesh_AccelerationStructureEnum_Parse(name, value);
+  }
 
   // accessors -------------------------------------------------------
   enum : int {
@@ -1540,6 +1592,7 @@ class NodeStaticMesh final : public ::google::protobuf::Message
     kRenderPrimitiveEnumFieldNumber = 8,
     kRenderTimeEnumFieldNumber = 11,
     kShadowEffectEnumFieldNumber = 12,
+    kAccelerationStructureEnumFieldNumber = 13,
     kCleanBufferFieldNumber = 7,
     kMeshEnumFieldNumber = 6,
     kFileNameFieldNumber = 3,
@@ -1623,6 +1676,16 @@ class NodeStaticMesh final : public ::google::protobuf::Message
   void _internal_set_shadow_effect_enum(::frame::proto::NodeStaticMesh_ShadowEffectEnum value);
 
   public:
+  // .frame.proto.NodeStaticMesh.AccelerationStructureEnum acceleration_structure_enum = 13;
+  void clear_acceleration_structure_enum() ;
+  ::frame::proto::NodeStaticMesh_AccelerationStructureEnum acceleration_structure_enum() const;
+  void set_acceleration_structure_enum(::frame::proto::NodeStaticMesh_AccelerationStructureEnum value);
+
+  private:
+  ::frame::proto::NodeStaticMesh_AccelerationStructureEnum _internal_acceleration_structure_enum() const;
+  void _internal_set_acceleration_structure_enum(::frame::proto::NodeStaticMesh_AccelerationStructureEnum value);
+
+  public:
   // .frame.proto.CleanBuffer clean_buffer = 7;
   bool has_clean_buffer() const;
   private:
@@ -1702,7 +1765,7 @@ class NodeStaticMesh final : public ::google::protobuf::Message
   inline void clear_has_mesh_oneof();
   friend class ::google::protobuf::internal::TcParser;
   static const ::google::protobuf::internal::TcParseTable<
-      3, 10, 2,
+      4, 11, 2,
       75, 2>
       _table_;
 
@@ -1726,6 +1789,7 @@ class NodeStaticMesh final : public ::google::protobuf::Message
     int render_primitive_enum_;
     int render_time_enum_;
     int shadow_effect_enum_;
+    int acceleration_structure_enum_;
     union MeshOneofUnion {
       constexpr MeshOneofUnion() : _constinit_{} {}
       ::google::protobuf::internal::ConstantInitialized _constinit_;
@@ -2777,6 +2841,28 @@ inline ::frame::proto::NodeStaticMesh_ShadowEffectEnum NodeStaticMesh::_internal
 inline void NodeStaticMesh::_internal_set_shadow_effect_enum(::frame::proto::NodeStaticMesh_ShadowEffectEnum value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.shadow_effect_enum_ = value;
+}
+
+// .frame.proto.NodeStaticMesh.AccelerationStructureEnum acceleration_structure_enum = 13;
+inline void NodeStaticMesh::clear_acceleration_structure_enum() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.acceleration_structure_enum_ = 0;
+}
+inline ::frame::proto::NodeStaticMesh_AccelerationStructureEnum NodeStaticMesh::acceleration_structure_enum() const {
+  // @@protoc_insertion_point(field_get:frame.proto.NodeStaticMesh.acceleration_structure_enum)
+  return _internal_acceleration_structure_enum();
+}
+inline void NodeStaticMesh::set_acceleration_structure_enum(::frame::proto::NodeStaticMesh_AccelerationStructureEnum value) {
+  _internal_set_acceleration_structure_enum(value);
+  // @@protoc_insertion_point(field_set:frame.proto.NodeStaticMesh.acceleration_structure_enum)
+}
+inline ::frame::proto::NodeStaticMesh_AccelerationStructureEnum NodeStaticMesh::_internal_acceleration_structure_enum() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return static_cast<::frame::proto::NodeStaticMesh_AccelerationStructureEnum>(_impl_.acceleration_structure_enum_);
+}
+inline void NodeStaticMesh::_internal_set_acceleration_structure_enum(::frame::proto::NodeStaticMesh_AccelerationStructureEnum value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.acceleration_structure_enum_ = value;
 }
 
 inline bool NodeStaticMesh::has_mesh_oneof() const {
@@ -4047,6 +4133,12 @@ struct is_proto_enum<::frame::proto::NodeStaticMesh_ShadowEffectEnum> : std::tru
 template <>
 inline const EnumDescriptor* GetEnumDescriptor<::frame::proto::NodeStaticMesh_ShadowEffectEnum>() {
   return ::frame::proto::NodeStaticMesh_ShadowEffectEnum_descriptor();
+}
+template <>
+struct is_proto_enum<::frame::proto::NodeStaticMesh_AccelerationStructureEnum> : std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor<::frame::proto::NodeStaticMesh_AccelerationStructureEnum>() {
+  return ::frame::proto::NodeStaticMesh_AccelerationStructureEnum_descriptor();
 }
 template <>
 struct is_proto_enum<::frame::proto::NodeLight_LightTypeEnum> : std::true_type {};

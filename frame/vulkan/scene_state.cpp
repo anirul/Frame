@@ -147,6 +147,22 @@ SceneState BuildSceneState(
 
     try
     {
+        const auto skybox_pairs = level.GetStaticMeshMaterialIds(
+            frame::proto::NodeStaticMesh::SKYBOX_RENDER_TIME);
+        if (!skybox_pairs.empty())
+        {
+            auto& node = level.GetSceneNodeFromId(skybox_pairs.front().first);
+            state.env_map_model = node.GetLocalModel(
+                static_cast<double>(elapsed_time_seconds));
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        logger->warn("Failed to compute env map model: {}", ex.what());
+    }
+
+    try
+    {
         const auto lights = level.GetLights();
         if (!lights.empty())
         {
@@ -173,6 +189,7 @@ UniformBlock MakeUniformBlock(
     block.view_inv = glm::inverse(state.view);
     block.model = state.model;
     block.model_inv = glm::inverse(state.model);
+    block.env_map_model = state.env_map_model;
     block.camera_position = glm::vec4(state.camera_position, 1.0f);
     block.light_dir = glm::vec4(state.light_dir, 0.0f);
     block.light_color = glm::vec4(state.light_color, 1.0f);

@@ -96,6 +96,8 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
         dynamic_cast<NodeStaticMesh&>(level.GetSceneNodeFromId(scene_id));
     node.GetData().set_render_time_enum(
         proto_scene_static_mesh.render_time_enum());
+    node.GetData().set_acceleration_structure_enum(
+        proto_scene_static_mesh.acceleration_structure_enum());
     level.AddMeshMaterialId(
         scene_id, 0, proto_scene_static_mesh.render_time_enum());
     return true;
@@ -138,6 +140,8 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
     node_interface->SetParentName(proto_scene_static_mesh.parent());
     node_interface->GetData().set_material_name(
         proto_scene_static_mesh.material_name());
+    node_interface->GetData().set_acceleration_structure_enum(
+        proto_scene_static_mesh.acceleration_structure_enum());
     auto scene_id = level.AddSceneNode(std::move(node_interface));
     auto& node =
         dynamic_cast<NodeStaticMesh&>(level.GetSceneNodeFromId(scene_id));
@@ -151,12 +155,13 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
 [[nodiscard]] bool ParseNodeStaticMeshFileName(
     LevelInterface& level, const proto::NodeStaticMesh& proto_scene_static_mesh)
 {
+    const auto asset_root = frame::file::FindDirectory("asset");
     auto vec_node_mesh_id = opengl::file::LoadStaticMeshesFromFile(
         level,
-        frame::file::FindFile(
-            "asset/model/" + proto_scene_static_mesh.file_name()),
+        (asset_root / "model" / proto_scene_static_mesh.file_name()).lexically_normal(),
         proto_scene_static_mesh.name(),
-        proto_scene_static_mesh.material_name());
+        proto_scene_static_mesh.material_name(),
+        proto_scene_static_mesh.acceleration_structure_enum());
     if (vec_node_mesh_id.empty())
     {
         return false;
@@ -174,6 +179,8 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
         auto& static_mesh_node = dynamic_cast<NodeStaticMesh&>(node);
         static_mesh_node.GetData().set_file_name(
             proto_scene_static_mesh.file_name());
+        static_mesh_node.GetData().set_acceleration_structure_enum(
+            proto_scene_static_mesh.acceleration_structure_enum());
         // Rename the node to match the reference name (without the 'Node.'
         // prefix) so serialization will use the same identifier as the input
         // file.
@@ -253,6 +260,8 @@ std::function<NodeInterface*(const std::string& name)> GetFunctor(
     node_interface->SetParentName(proto_scene_static_mesh.parent());
     node_interface->GetData().set_material_name(
         proto_scene_static_mesh.material_name());
+    node_interface->GetData().set_acceleration_structure_enum(
+        proto_scene_static_mesh.acceleration_structure_enum());
     auto scene_id = level.AddSceneNode(std::move(node_interface));
     auto& node =
         dynamic_cast<NodeStaticMesh&>(level.GetSceneNodeFromId(scene_id));

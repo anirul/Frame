@@ -4,6 +4,7 @@
 #define VULKAN_HPP_DISPATCH_LOADER_DYNAMIC 1
 #endif
 
+#include <functional>
 #include <vulkan/vulkan.hpp>
 
 namespace frame::vulkan
@@ -31,6 +32,8 @@ class CommandQueue
         vk::ImageLayout old_layout,
         vk::ImageLayout new_layout,
         std::uint32_t layer_count = 1) const;
+    void SubmitOneTime(
+        const std::function<void(vk::CommandBuffer)>& recorder) const;
 
   private:
     vk::CommandBuffer BeginOneTime() const;

@@ -38,6 +38,11 @@ std::optional<ImageCachePayload> LoadImageCache(
     frame::proto::PixelElementSize::Enum expected_element_size,
     frame::proto::PixelStructure::Enum expected_structure,
     std::uint32_t expected_channels);
+std::optional<ImageCachePayload> LoadImageCacheRelaxed(
+    const std::filesystem::path& cache_path,
+    frame::proto::PixelElementSize::Enum expected_element_size,
+    frame::proto::PixelStructure::Enum expected_structure,
+    std::uint32_t expected_channels);
 
 void SaveImageCache(
     const ImageCacheMetadata& metadata,

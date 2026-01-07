@@ -1,4 +1,4 @@
-// Ray tracing example using a simple icosahedron scene.
+// Ray tracing example using PBR textures.
 // From: https://sourceforge.net/p/predef/wiki/OperatingSystems/
 #if defined(_WIN32) || defined(_WIN64)
 #define WINDOWS_LEAN_AND_MEAN
@@ -31,8 +31,8 @@ try
 {
 #endif
     constexpr glm::uvec2 kDefaultSize{1280u, 720u};
-    constexpr const char* kLevelPath = "asset/json/raytracing.json";
-    absl::SetProgramUsageMessage("03_RayTracing --device={vulkan|opengl}");
+    constexpr const char* kLevelPath = "asset/json/raytracing_bvh.json";
+    absl::SetProgramUsageMessage("04_RayTracingBvh --device={vulkan|opengl}");
     frame::common::Application app(ac, av, kDefaultSize);
     app.Startup(frame::file::FindFile(kLevelPath));
     app.Run();

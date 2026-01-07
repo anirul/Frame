@@ -1,5 +1,6 @@
 #include "frame/vulkan/command_queue.h"
 
+#include <functional>
 #include <stdexcept>
 
 namespace frame::vulkan
@@ -177,6 +178,14 @@ void CommandQueue::TransitionImageLayout(
         nullptr,
         nullptr,
         barrier);
+    EndOneTime(command_buffer);
+}
+
+void CommandQueue::SubmitOneTime(
+    const std::function<void(vk::CommandBuffer)>& recorder) const
+{
+    auto command_buffer = BeginOneTime();
+    recorder(command_buffer);
     EndOneTime(command_buffer);
 }
 

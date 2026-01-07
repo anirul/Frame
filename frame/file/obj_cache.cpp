@@ -129,6 +129,106 @@ std::optional<ObjCachePayload> LoadObjCache(const ObjCacheMetadata& metadata)
     return payload;
 }
 
+std::optional<ObjCachePayload> LoadObjCacheRelaxed(
+    const std::filesystem::path& cache_path)
+{
+    if (cache_path.empty())
+    {
+        return std::nullopt;
+    }
+    if (!std::filesystem::exists(cache_path))
+    {
+        return std::nullopt;
+    }
+    std::ifstream input(cache_path, std::ios::binary);
+    if (!input)
+    {
+        GetLogger()->warn(
+            "Failed to open OBJ cache file {} for reading.",
+            cache_path.string());
+        return std::nullopt;
+    }
+    proto::ObjCache cache_proto;
+    if (!cache_proto.ParseFromIstream(&input))
+    {
+        GetLogger()->warn(
+            "Could not parse OBJ cache {}.", cache_path.string());
+        return std::nullopt;
+    }
+    if (cache_proto.cache_version() != kCacheVersion)
+    {
+        GetLogger()->info(
+            "Ignoring OBJ cache {} due to version mismatch ({} != {}).",
+            cache_path.string(),
+            cache_proto.cache_version(),
+            kCacheVersion);
+        return std::nullopt;
+    }
+
+    ObjCachePayload payload;
+    payload.hasTextureCoordinates = cache_proto.has_texture_coordinates();
+    payload.meshes.reserve(cache_proto.meshes_size());
+    for (const auto& mesh_proto : cache_proto.meshes())
+    {
+        std::vector<ObjVertex> vertices;
+        vertices.reserve(mesh_proto.vertices_size());
+        for (const auto& vertex_proto : mesh_proto.vertices())
+        {
+            ObjVertex vertex;
+            vertex.point = glm::vec3(
+                vertex_proto.position_x(),
+                vertex_proto.position_y(),
+                vertex_proto.position_z());
+            vertex.normal = glm::vec3(
+                vertex_proto.normal_x(),
+                vertex_proto.normal_y(),
+                vertex_proto.normal_z());
+            vertex.tex_coord = glm::vec2(
+                vertex_proto.tex_coord_u(), vertex_proto.tex_coord_v());
+            vertices.push_back(vertex);
+        }
+        std::vector<int> indices(
+            mesh_proto.indices().begin(), mesh_proto.indices().end());
+        ObjMesh mesh(
+            std::move(vertices),
+            std::move(indices),
+            mesh_proto.material_id(),
+            mesh_proto.has_texture_coordinates());
+        payload.meshes.push_back(std::move(mesh));
+    }
+
+    payload.materials.reserve(cache_proto.materials_size());
+    for (const auto& material_proto : cache_proto.materials())
+    {
+        ObjMaterial material;
+        material.name = material_proto.name();
+        material.ambient_vec4 = glm::vec4(
+            material_proto.ambient_x(),
+            material_proto.ambient_y(),
+            material_proto.ambient_z(),
+            material_proto.ambient_w());
+        material.ambient_str = material_proto.ambient_texture();
+        material.diffuse_vec4 = glm::vec4(
+            material_proto.diffuse_x(),
+            material_proto.diffuse_y(),
+            material_proto.diffuse_z(),
+            material_proto.diffuse_w());
+        material.diffuse_str = material_proto.diffuse_texture();
+        material.displacement_str = material_proto.displacement_texture();
+        material.roughness_val = material_proto.roughness_value();
+        material.roughness_str = material_proto.roughness_texture();
+        material.metallic_val = material_proto.metallic_value();
+        material.metallic_str = material_proto.metallic_texture();
+        material.sheen_val = material_proto.sheen_value();
+        material.sheen_str = material_proto.sheen_texture();
+        material.emmissive_str = material_proto.emissive_texture();
+        material.normal_str = material_proto.normal_texture();
+        payload.materials.emplace_back(std::move(material));
+    }
+
+    return payload;
+}
+
 void SaveObjCache(
     const ObjCacheMetadata& metadata, const ObjCachePayload& payload)
 {

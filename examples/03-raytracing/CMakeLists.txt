@@ -1,4 +1,4 @@
-# Ray Tracing
+# Ray Tracing (simple)
 
 add_executable(03_RayTracing
   WIN32

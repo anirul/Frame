@@ -13,6 +13,7 @@ add_custom_target(AssetJson
     cubemap.json
     ray_marching.json
     raytracing.json
+    raytracing_bvh.json
     renderer_test.json
     scene_tree_test.json
 )

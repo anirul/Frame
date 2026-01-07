@@ -34,7 +34,7 @@ message NodeMatrix {
 }
 
 // Static Mesh.
-// Next 13
+// Next 14
 message NodeStaticMesh {
 	// This is the name of the mesh.
 	string name = 1;
@@ -99,6 +99,15 @@ message NodeStaticMesh {
 
 	// Shadow effect (default = OPAQUE_EFFECT_SHADOW).
 	ShadowEffectEnum shadow_effect_enum = 12;
+
+	// Acceleration structure for ray traversal.
+	enum AccelerationStructureEnum {
+		NO_ACCELERATION = 0;
+		BVH_ACCELERATION = 1;
+	}
+
+	// Which acceleration structure to use (default = NO_ACCELERATION).
+	AccelerationStructureEnum acceleration_structure_enum = 13;
 }
 
 // Camera

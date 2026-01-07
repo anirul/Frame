@@ -110,6 +110,69 @@ std::optional<ImageCachePayload> LoadImageCache(
     return payload;
 }
 
+std::optional<ImageCachePayload> LoadImageCacheRelaxed(
+    const std::filesystem::path& cache_path,
+    frame::proto::PixelElementSize::Enum expected_element_size,
+    frame::proto::PixelStructure::Enum expected_structure,
+    std::uint32_t expected_channels)
+{
+    if (cache_path.empty())
+    {
+        return std::nullopt;
+    }
+    if (!std::filesystem::exists(cache_path))
+    {
+        return std::nullopt;
+    }
+    std::ifstream input(cache_path, std::ios::binary);
+    if (!input)
+    {
+        GetLogger()->warn(
+            "Failed to open image cache file {} for reading.",
+            cache_path.string());
+        return std::nullopt;
+    }
+    proto::ImageCache cache_proto;
+    if (!cache_proto.ParseFromIstream(&input))
+    {
+        GetLogger()->warn(
+            "Could not parse image cache {}.", cache_path.string());
+        return std::nullopt;
+    }
+    if (cache_proto.cache_version() != kCacheVersion)
+    {
+        GetLogger()->info(
+            "Ignoring image cache {} due to version mismatch ({} != {}).",
+            cache_path.string(),
+            cache_proto.cache_version(),
+            kCacheVersion);
+        return std::nullopt;
+    }
+    if (cache_proto.pixel_element_size().value() != expected_element_size ||
+        cache_proto.pixel_structure().value() != expected_structure ||
+        cache_proto.desired_channels() != expected_channels)
+    {
+        GetLogger()->info(
+            "Ignoring image cache {} due to mismatched pixel format.",
+            cache_path.string());
+        return std::nullopt;
+    }
+
+    ImageCachePayload payload;
+    payload.size = glm::ivec2(
+        static_cast<int>(cache_proto.width()),
+        static_cast<int>(cache_proto.height()));
+    payload.element_size = cache_proto.pixel_element_size().value();
+    payload.structure = cache_proto.pixel_structure().value();
+    payload.desired_channels = cache_proto.desired_channels();
+    payload.data.resize(cache_proto.data().size());
+    std::memcpy(
+        payload.data.data(),
+        cache_proto.data().data(),
+        cache_proto.data().size());
+    return payload;
+}
+
 void SaveImageCache(
     const ImageCacheMetadata& metadata,
     frame::proto::PixelElementSize::Enum element_size,

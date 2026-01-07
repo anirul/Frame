@@ -28,6 +28,8 @@ struct ObjCachePayload
 };
 
 std::optional<ObjCachePayload> LoadObjCache(const ObjCacheMetadata& metadata);
+std::optional<ObjCachePayload> LoadObjCacheRelaxed(
+    const std::filesystem::path& cache_path);
 
 void SaveObjCache(
     const ObjCacheMetadata& metadata, const ObjCachePayload& payload);
