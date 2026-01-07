@@ -4,6 +4,7 @@
 #define VULKAN_HPP_DISPATCH_LOADER_DYNAMIC 1
 #endif
 
+#include <cstdint>
 #include <functional>
 #include <vulkan/vulkan.hpp>
 
