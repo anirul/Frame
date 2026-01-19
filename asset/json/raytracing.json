@@ -114,6 +114,7 @@
                 "roughness_texture",
                 "metallic_texture",
                 "ao_texture",
+                "skybox",
                 "skybox_env"
             ],
             "inner_names": [
@@ -122,6 +123,7 @@
                 "roughness_texture",
                 "metallic_texture",
                 "ao_texture",
+                "skybox",
                 "skybox_env"
             ],
             "buffer_names": [
@@ -191,6 +193,7 @@
                 "roughness_texture",
                 "metallic_texture",
                 "ao_texture",
+                "skybox",
                 "skybox_env"
             ],
             "input_scene_type": {
@@ -260,6 +263,14 @@
                 {
                     "name": "skybox_env",
                     "binding": 7,
+                    "binding_type": "COMBINED_IMAGE_SAMPLER",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                },
+                {
+                    "name": "skybox",
+                    "binding": 11,
                     "binding_type": "COMBINED_IMAGE_SAMPLER",
                     "stages": [
                         "COMPUTE"

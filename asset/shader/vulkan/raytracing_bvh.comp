@@ -10,6 +10,7 @@ layout(set = 0, binding = 4) uniform sampler2D roughness_texture;
 layout(set = 0, binding = 5) uniform sampler2D metallic_texture;
 layout(set = 0, binding = 6) uniform sampler2D ao_texture;
 layout(set = 0, binding = 7) uniform samplerCube skybox_env;
+layout(set = 0, binding = 11) uniform samplerCube skybox;
 
 struct Vertex
 {
@@ -512,7 +513,7 @@ void main()
     {
         vec3 env_dir = env_rot_inv * ray_dir_world;
         env_dir = vec3(env_dir.x, -env_dir.y, env_dir.z);
-        vec3 env_color = textureLod(skybox_env, env_dir, 0.0).rgb;
+        vec3 env_color = textureLod(skybox, env_dir, 0.0).rgb;
         final_color = vec4(env_color, 1.0);
     }
     else

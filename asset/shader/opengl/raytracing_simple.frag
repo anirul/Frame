@@ -21,6 +21,7 @@ uniform sampler2D normal_texture;
 uniform sampler2D roughness_texture;
 uniform sampler2D metallic_texture;
 uniform sampler2D ao_texture;
+uniform samplerCube skybox;
 uniform samplerCube skybox_env;
 
 struct Vertex
@@ -593,7 +594,7 @@ void main()
     {
         vec3 env_dir = env_rot_inv * ray_dir_world;
         env_dir = vec3(env_dir.x, -env_dir.y, env_dir.z);
-        vec3 env_color = textureLod(skybox_env, env_dir, 0.0).rgb;
+        vec3 env_color = textureLod(skybox, env_dir, 0.0).rgb;
         frag_color = vec4(env_color, 1.0);
         return;
     }

@@ -11,6 +11,7 @@ uniform mat4 view_inv;
 uniform mat4 model;
 uniform mat4 model_inv;
 uniform vec3 camera_position;
+uniform mat4 env_map_model;
 // Direction from the light toward the scene.
 uniform vec3 light_dir;
 uniform vec3 light_color;
@@ -20,6 +21,7 @@ uniform sampler2D normal_texture;
 uniform sampler2D roughness_texture;
 uniform sampler2D metallic_texture;
 uniform sampler2D ao_texture;
+uniform samplerCube skybox;
 uniform samplerCube skybox_env;
 
 struct Vertex
@@ -238,6 +240,13 @@ void main()
     vec4 view_pos = projection_inv * clip_pos;
     view_pos = vec4(view_pos.xy, -1.0, 0.0);
     vec3 ray_dir_world = normalize((view_inv * view_pos).xyz);
+    mat3 env_rot = mat3(env_map_model);
+    float env_det = abs(determinant(env_rot));
+    if (env_det < 1e-6)
+    {
+        env_rot = mat3(1.0);
+    }
+    mat3 env_rot_inv = transpose(env_rot);
 
     // Transform the ray to model space to match the triangle buffer
     mat4 inv_model4 = model_inv;
@@ -337,8 +346,10 @@ void main()
         float NdotL = max(dot(hit_normal, L), 0.0);
         float NdotV = max(dot(hit_normal, V), 0.0);
         vec3 reflection_dir_world = normalize(reflect(-ray_dir_world, hit_normal));
-        vec3 env_lookup_dir = vec3(reflection_dir_world.x, -reflection_dir_world.y, reflection_dir_world.z);
-        vec3 env_diffuse_dir = vec3(N.x, -N.y, N.z);
+        vec3 env_lookup_dir = env_rot_inv * reflection_dir_world;
+        env_lookup_dir = vec3(env_lookup_dir.x, -env_lookup_dir.y, env_lookup_dir.z);
+        vec3 env_diffuse_dir = env_rot_inv * N;
+        env_diffuse_dir = vec3(env_diffuse_dir.x, -env_diffuse_dir.y, env_diffuse_dir.z);
         int env_levels = textureQueryLevels(skybox_env);
         float max_env_lod = env_levels > 0 ? float(env_levels - 1) : 0.0;
         float specular_lod = clamp(roughness * max_env_lod, 0.0, max_env_lod);
@@ -387,6 +398,9 @@ void main()
     }
     else
     {
-        discard;
+        vec3 env_dir = env_rot_inv * ray_dir_world;
+        env_dir = vec3(env_dir.x, -env_dir.y, env_dir.z);
+        vec3 env_color = textureLod(skybox, env_dir, 0.0).rgb;
+        frag_color = vec4(env_color, 1.0);
     }
 }

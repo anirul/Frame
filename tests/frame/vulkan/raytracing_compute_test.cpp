@@ -48,6 +48,7 @@ constexpr std::uint32_t kBindingBvhBuffer = 9;
 constexpr std::uint32_t kBindingTriangleBufferGlass = 8;
 constexpr std::uint32_t kBindingTriangleBufferGround = 9;
 constexpr std::uint32_t kBindingUniform = 10;
+constexpr std::uint32_t kBindingSkyboxBackground = 11;
 
 vk::ShaderModule CompileShader(const std::filesystem::path& path, vk::Device device)
 {
@@ -722,6 +723,26 @@ TEST_F(VulkanRayTracingComputeTest, DispatchProducesLitPixel)
          vk::DescriptorType::eCombinedImageSampler,
          1,
          vk::ShaderStageFlagBits::eCompute},
+        {kBindingSkyboxBackground,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingSkyboxBackground,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingSkyboxBackground,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingSkyboxBackground,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingSkyboxBackground,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
         {kBindingTriangleBuffer,
          vk::DescriptorType::eStorageBuffer,
          1,
@@ -740,7 +761,7 @@ TEST_F(VulkanRayTracingComputeTest, DispatchProducesLitPixel)
 
     std::vector<vk::DescriptorPoolSize> pool_sizes = {
         {vk::DescriptorType::eStorageImage, 1},
-        {vk::DescriptorType::eCombinedImageSampler, 7},
+        {vk::DescriptorType::eCombinedImageSampler, 8},
         {vk::DescriptorType::eStorageBuffer, 1},
         {vk::DescriptorType::eUniformBuffer, 1},
     };
@@ -780,13 +801,14 @@ TEST_F(VulkanRayTracingComputeTest, DispatchProducesLitPixel)
         vk::DescriptorType::eCombinedImageSampler,
         &output_sample);
 
-    const std::array<std::pair<std::uint32_t, ImageResource*>, 6> textures = {
+    const std::array<std::pair<std::uint32_t, ImageResource*>, 7> textures = {
         std::pair{kBindingAlbedo, &albedo_tex},
         std::pair{kBindingNormal, &normal_tex},
         std::pair{kBindingRoughness, &roughness_tex},
         std::pair{kBindingMetallic, &metallic_tex},
         std::pair{kBindingAo, &ao_tex},
         std::pair{kBindingSkybox, &skybox_tex},
+        std::pair{kBindingSkyboxBackground, &skybox_tex},
     };
     std::vector<vk::DescriptorImageInfo> texture_infos;
     texture_infos.reserve(textures.size());
@@ -1101,7 +1123,7 @@ TEST_F(VulkanRayTracingComputeTest, BvhDispatchMaskShowsHit)
 
     std::vector<vk::DescriptorPoolSize> pool_sizes = {
         {vk::DescriptorType::eStorageImage, 1},
-        {vk::DescriptorType::eCombinedImageSampler, 7},
+        {vk::DescriptorType::eCombinedImageSampler, 8},
         {vk::DescriptorType::eStorageBuffer, 2},
         {vk::DescriptorType::eUniformBuffer, 1},
     };
@@ -1139,13 +1161,14 @@ TEST_F(VulkanRayTracingComputeTest, BvhDispatchMaskShowsHit)
         vk::DescriptorType::eCombinedImageSampler,
         &output_sample);
 
-    const std::array<std::pair<std::uint32_t, ImageResource*>, 6> textures = {
+    const std::array<std::pair<std::uint32_t, ImageResource*>, 7> textures = {
         std::pair{kBindingAlbedo, &albedo_tex},
         std::pair{kBindingNormal, &normal_tex},
         std::pair{kBindingRoughness, &roughness_tex},
         std::pair{kBindingMetallic, &metallic_tex},
         std::pair{kBindingAo, &ao_tex},
         std::pair{kBindingSkybox, &skybox_tex},
+        std::pair{kBindingSkyboxBackground, &skybox_tex},
     };
     std::vector<vk::DescriptorImageInfo> texture_infos;
     texture_infos.reserve(textures.size());
@@ -1463,7 +1486,7 @@ TEST_F(VulkanRayTracingComputeTest, DualDispatchMaskShowsGlassHit)
 
     std::vector<vk::DescriptorPoolSize> pool_sizes = {
         {vk::DescriptorType::eStorageImage, 1},
-        {vk::DescriptorType::eCombinedImageSampler, 7},
+        {vk::DescriptorType::eCombinedImageSampler, 8},
         {vk::DescriptorType::eStorageBuffer, 2},
         {vk::DescriptorType::eUniformBuffer, 1},
     };
@@ -1501,13 +1524,14 @@ TEST_F(VulkanRayTracingComputeTest, DualDispatchMaskShowsGlassHit)
         vk::DescriptorType::eCombinedImageSampler,
         &output_sample);
 
-    const std::array<std::pair<std::uint32_t, ImageResource*>, 6> textures = {
+    const std::array<std::pair<std::uint32_t, ImageResource*>, 7> textures = {
         std::pair{kBindingAlbedo, &albedo_tex},
         std::pair{kBindingNormal, &normal_tex},
         std::pair{kBindingRoughness, &roughness_tex},
         std::pair{kBindingMetallic, &metallic_tex},
         std::pair{kBindingAo, &ao_tex},
         std::pair{kBindingSkybox, &skybox_tex},
+        std::pair{kBindingSkyboxBackground, &skybox_tex},
     };
     std::vector<vk::DescriptorImageInfo> texture_infos;
     texture_infos.reserve(textures.size());
@@ -1825,7 +1849,7 @@ TEST_F(VulkanRayTracingComputeTest, DualDispatchMaskShowsGroundHit)
 
     std::vector<vk::DescriptorPoolSize> pool_sizes = {
         {vk::DescriptorType::eStorageImage, 1},
-        {vk::DescriptorType::eCombinedImageSampler, 7},
+        {vk::DescriptorType::eCombinedImageSampler, 8},
         {vk::DescriptorType::eStorageBuffer, 2},
         {vk::DescriptorType::eUniformBuffer, 1},
     };
@@ -1863,13 +1887,14 @@ TEST_F(VulkanRayTracingComputeTest, DualDispatchMaskShowsGroundHit)
         vk::DescriptorType::eCombinedImageSampler,
         &output_sample);
 
-    const std::array<std::pair<std::uint32_t, ImageResource*>, 6> textures = {
+    const std::array<std::pair<std::uint32_t, ImageResource*>, 7> textures = {
         std::pair{kBindingAlbedo, &albedo_tex},
         std::pair{kBindingNormal, &normal_tex},
         std::pair{kBindingRoughness, &roughness_tex},
         std::pair{kBindingMetallic, &metallic_tex},
         std::pair{kBindingAo, &ao_tex},
         std::pair{kBindingSkybox, &skybox_tex},
+        std::pair{kBindingSkyboxBackground, &skybox_tex},
     };
     std::vector<vk::DescriptorImageInfo> texture_infos;
     texture_infos.reserve(textures.size());
@@ -2214,7 +2239,7 @@ TEST_F(VulkanRayTracingComputeTest, SceneHitMaskMatchesCpuIntersections)
 
     std::vector<vk::DescriptorPoolSize> pool_sizes = {
         {vk::DescriptorType::eStorageImage, 1},
-        {vk::DescriptorType::eCombinedImageSampler, 7},
+        {vk::DescriptorType::eCombinedImageSampler, 8},
         {vk::DescriptorType::eStorageBuffer, 2},
         {vk::DescriptorType::eUniformBuffer, 1},
     };
@@ -2252,13 +2277,14 @@ TEST_F(VulkanRayTracingComputeTest, SceneHitMaskMatchesCpuIntersections)
         vk::DescriptorType::eCombinedImageSampler,
         &output_sample);
 
-    const std::array<std::pair<std::uint32_t, ImageResource*>, 6> textures = {
+    const std::array<std::pair<std::uint32_t, ImageResource*>, 7> textures = {
         std::pair{kBindingAlbedo, &albedo_tex},
         std::pair{kBindingNormal, &normal_tex},
         std::pair{kBindingRoughness, &roughness_tex},
         std::pair{kBindingMetallic, &metallic_tex},
         std::pair{kBindingAo, &ao_tex},
         std::pair{kBindingSkybox, &skybox_tex},
+        std::pair{kBindingSkyboxBackground, &skybox_tex},
     };
     std::vector<vk::DescriptorImageInfo> texture_infos;
     texture_infos.reserve(textures.size());
