@@ -697,6 +697,20 @@ std::vector<std::pair<EntityId, EntityId>> LoadStaticMeshesFromFile(
     LevelInterface& level_interface,
     std::filesystem::path file,
     const std::string& name,
+    const std::string& material_name)
+{
+    return LoadStaticMeshesFromFile(
+        level_interface,
+        std::move(file),
+        name,
+        material_name,
+        proto::NodeStaticMesh::NO_ACCELERATION);
+}
+
+std::vector<std::pair<EntityId, EntityId>> LoadStaticMeshesFromFile(
+    LevelInterface& level_interface,
+    std::filesystem::path file,
+    const std::string& name,
     const std::string& material_name /* = ""*/,
     proto::NodeStaticMesh::AccelerationStructureEnum acceleration_structure_enum)
 {
