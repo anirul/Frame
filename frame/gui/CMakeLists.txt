@@ -38,10 +38,10 @@ add_library(FrameGui
 
 target_include_directories(FrameGui
   PUBLIC
+    ${CMAKE_BINARY_DIR}/frame/proto/generated
     ${CMAKE_CURRENT_SOURCE_DIR}/../..
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/../../external/ImGuiColorTextEdit
-    ${CMAKE_BINARY_DIR}/frame/proto
 )
 
 target_link_libraries(FrameGui

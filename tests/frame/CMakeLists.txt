@@ -18,7 +18,7 @@ target_include_directories(FrameTest
     ${CMAKE_CURRENT_SOURCE_DIR}/../..
     ${CMAKE_CURRENT_SOURCE_DIR}/..
     ${CMAKE_CURRENT_BINARY_DIR}/..
-    ${CMAKE_BINARY_DIR}/frame/proto
+    ${CMAKE_BINARY_DIR}/frame/proto/generated
 )
 
 target_link_libraries(FrameTest

@@ -1,11 +1,8 @@
 #pragma once
 
-#ifndef VULKAN_HPP_DISPATCH_LOADER_DYNAMIC
-#define VULKAN_HPP_DISPATCH_LOADER_DYNAMIC 1
-#endif
-
 #include <vector>
-#include <vulkan/vulkan.hpp>
+
+#include "frame/vulkan/vulkan_dispatch.h"
 
 #include "frame/json/level_data.h"
 #include "frame/logger.h"

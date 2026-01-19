@@ -1,14 +1,9 @@
-#ifndef VULKAN_HPP_DISPATCH_LOADER_DYNAMIC
-#define VULKAN_HPP_DISPATCH_LOADER_DYNAMIC 1
-#endif
-#ifndef VULKAN_HPP_ENABLE_DYNAMIC_LOADER_TOOL
 #define VULKAN_HPP_ENABLE_DYNAMIC_LOADER_TOOL 1
-#endif
 
 #include <gtest/gtest.h>
-#include <vulkan/vulkan.hpp>
 
 #include <array>
+#include <cstring>
 #include <optional>
 #include <vector>
 
@@ -18,6 +13,7 @@
 #include "frame/vulkan/gpu_memory_manager.h"
 #include "frame/vulkan/mesh_resources.h"
 #include "frame/vulkan/scene_state.h"
+#include "frame/vulkan/vulkan_dispatch.h"
 
 namespace test
 {
@@ -169,6 +165,55 @@ TEST_F(VulkanResourceFixture, BufferResourcesMirrorCpuBuffer)
         gpu_buffers.front().size,
         values.size() * sizeof(float));
     EXPECT_TRUE(static_cast<bool>(gpu_buffers.front().buffer));
+}
+
+TEST_F(VulkanResourceFixture, BufferResourcesUploadDataVisible)
+{
+    frame::Level level;
+    auto buffer = std::make_unique<frame::vulkan::Buffer>();
+    std::vector<float> values = {0.25f, 1.5f, -2.0f, 4.25f};
+    buffer->Copy(values);
+    buffer->SetName("VisibilityBuffer");
+    auto buffer_id = level.AddBuffer(std::move(buffer));
+
+    frame::vulkan::BufferResourceManager manager(
+        *device_,
+        *memory_manager_,
+        *command_queue_,
+        frame::Logger::GetInstance());
+    manager.BuildStorageBuffers(level, {buffer_id});
+
+    const auto& gpu_buffers = manager.GetStorageBuffers();
+    ASSERT_EQ(gpu_buffers.size(), 1u);
+    ASSERT_TRUE(static_cast<bool>(gpu_buffers.front().buffer));
+    ASSERT_EQ(
+        gpu_buffers.front().size,
+        values.size() * sizeof(float));
+
+    vk::UniqueDeviceMemory readback_memory;
+    auto readback = memory_manager_->CreateBuffer(
+        gpu_buffers.front().size,
+        vk::BufferUsageFlagBits::eTransferDst,
+        vk::MemoryPropertyFlagBits::eHostVisible |
+            vk::MemoryPropertyFlagBits::eHostCoherent,
+        readback_memory);
+
+    command_queue_->CopyBuffer(
+        *gpu_buffers.front().buffer,
+        *readback,
+        gpu_buffers.front().size);
+
+    std::vector<float> out(values.size(), 0.0f);
+    void* mapped = device_->mapMemory(
+        *readback_memory, 0, gpu_buffers.front().size);
+    ASSERT_NE(mapped, nullptr);
+    std::memcpy(out.data(), mapped, gpu_buffers.front().size);
+    device_->unmapMemory(*readback_memory);
+
+    for (std::size_t i = 0; i < values.size(); ++i)
+    {
+        EXPECT_FLOAT_EQ(out[i], values[i]);
+    }
 }
 
 TEST_F(VulkanResourceFixture, BufferResourcesUpdateUniformData)

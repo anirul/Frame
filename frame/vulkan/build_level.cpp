@@ -1,10 +1,10 @@
 #include "frame/vulkan/build_level.h"
 
-#include <chrono>
 #include <format>
 
 #include "frame/level.h"
 #include "frame/logger.h"
+#include "frame/vulkan/scoped_timer.h"
 #include "frame/vulkan/json/parse_material.h"
 #include "frame/vulkan/json/parse_program.h"
 #include "frame/vulkan/json/parse_scene_tree.h"
@@ -13,35 +13,6 @@
 
 namespace frame::vulkan
 {
-
-namespace
-{
-
-class ScopedTimer
-{
-  public:
-    ScopedTimer(const Logger& logger, std::string label)
-        : logger_(logger),
-          label_(std::move(label)),
-          start_(Clock::now())
-    {
-    }
-
-    ~ScopedTimer()
-    {
-        const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
-            Clock::now() - start_);
-        logger_->info("{} took {} ms.", label_, elapsed.count());
-    }
-
-  private:
-    using Clock = std::chrono::steady_clock;
-    const Logger& logger_;
-    std::string label_;
-    Clock::time_point start_;
-};
-
-} // namespace
 
 BuiltLevel BuildLevel(
     glm::uvec2 size,

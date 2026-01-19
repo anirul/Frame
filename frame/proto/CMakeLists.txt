@@ -32,15 +32,12 @@ target_link_libraries(FrameProto
     protobuf::libprotobuf
 )
 
-# Consumers of FrameProto need the generated headers
+# Consumers of FrameProto need the generated headers. Keep the include path one
+# level above so "frame/proto/*.pb.h" resolves to the generated tree.
 target_include_directories(FrameProto
   PUBLIC
-    "${FRAME_PROTO_GEN_DIR}"
+    "${CMAKE_CURRENT_BINARY_DIR}/generated"
 )
-
-# Optional: if your code includes like "frame/proto/foo.pb.h",
-# keep the include path one level above:
-# target_include_directories(FrameProto PUBLIC "${CMAKE_CURRENT_BINARY_DIR}/generated")
 
 # Clean target (simple + correct)
 add_custom_target(FrameCleanProto

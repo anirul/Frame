@@ -1,19 +1,12 @@
 #pragma once
 
-#ifndef VULKAN_HPP_DISPATCH_LOADER_DYNAMIC
-#define VULKAN_HPP_DISPATCH_LOADER_DYNAMIC 1
-#endif
-
-#include <array>
 #include <cstdint>
 #include <filesystem>
 #include <memory>
 #include <optional>
 #include <string>
+#include <unordered_map>
 #include <vector>
-#include <vulkan/vulkan.hpp>
-#include <shaderc/shaderc.h>
- 
 #include "frame/json/level_data.h"
 #include "frame/proto/level.pb.h"
 
@@ -23,10 +16,15 @@
 #include "frame/logger.h"
 #include "frame/vulkan/buffer_resources.h"
 #include "frame/vulkan/mesh_resources.h"
+#include "frame/vulkan/vulkan_dispatch.h"
  
 namespace frame::vulkan
 {
 
+class CommandResources;
+class ShaderCompiler;
+class SwapchainResources;
+class SyncResources;
 class Texture;
 class TextureResources;
 
@@ -98,32 +96,15 @@ class Device : public DeviceInterface
 
   private:
     friend class TextureResources;
-    void CreateCommandPool();
-    void CreateSyncObjects();
-    void CreateSwapchainResources();
-    void DestroySwapchainResources();
-    void RecreateSwapchain();
     void CreateGraphicsPipeline();
     void DestroyGraphicsPipeline();
     void CreateComputePipeline();
     void DestroyComputePipeline();
     void CreateComputeOutputImage();
     void DestroyComputeOutputImage();
-    std::vector<std::uint32_t> CompileShader(
-        const std::filesystem::path& path,
-        shaderc_shader_kind kind) const;
-    std::vector<std::uint32_t> CompileShaderSource(
-        const std::string& source,
-        shaderc_shader_kind kind,
-        const std::string& identifier) const;
+    void RecreateSwapchain();
     vk::UniqueShaderModule CreateShaderModule(
         const std::vector<std::uint32_t>& code) const;
-    vk::SurfaceFormatKHR SelectSurfaceFormat(
-        const std::vector<vk::SurfaceFormatKHR>& formats) const;
-    vk::PresentModeKHR SelectPresentMode(
-        const std::vector<vk::PresentModeKHR>& modes) const;
-    vk::Extent2D SelectSwapExtent(
-        const vk::SurfaceCapabilitiesKHR& capabilities) const;
     void RecordCommandBuffer(
         vk::CommandBuffer command_buffer,
         std::uint32_t image_index);
@@ -131,11 +112,6 @@ class Device : public DeviceInterface
     void DestroyTextureResources();
     void CreateDescriptorResources();
     void DestroyDescriptorResources();
-    void LogDescriptorDebugInfo(
-        const std::vector<EntityId>& texture_ids,
-        const std::vector<std::uint32_t>& texture_bindings,
-        const std::vector<BufferResource>& buffers,
-        const std::vector<std::uint32_t>& storage_bindings) const;
     void CopyBuffer(vk::Buffer src, vk::Buffer dst, vk::DeviceSize size);
     void TransitionImageLayout(
         vk::Image image,
@@ -172,15 +148,10 @@ class Device : public DeviceInterface
     bool invert_left_right_ = false;
     const Logger& logger_ = Logger::GetInstance();
 
-    vk::Format swapchain_image_format_ = vk::Format::eUndefined;
-    vk::Extent2D swapchain_extent_{};
-    vk::UniqueSwapchainKHR swapchain_;
-    std::vector<vk::Image> swapchain_images_;
-    std::vector<vk::UniqueImageView> swapchain_image_views_;
-    vk::UniqueRenderPass render_pass_;
-    std::vector<vk::UniqueFramebuffer> framebuffers_;
-    vk::UniqueCommandPool command_pool_;
-    std::vector<vk::CommandBuffer> command_buffers_;
+    std::unique_ptr<SwapchainResources> swapchain_resources_;
+    std::unique_ptr<CommandResources> command_resources_;
+    std::unique_ptr<SyncResources> sync_resources_;
+    std::unique_ptr<ShaderCompiler> shader_compiler_;
     vk::UniquePipelineLayout pipeline_layout_;
     vk::UniquePipeline graphics_pipeline_;
     vk::UniquePipeline compute_pipeline_;
@@ -193,29 +164,29 @@ class Device : public DeviceInterface
     vk::UniqueDescriptorPool descriptor_pool_;
     vk::DescriptorSet descriptor_set_ = VK_NULL_HANDLE;
     std::unique_ptr<TextureResources> texture_resources_;
-    std::vector<EntityId> descriptor_texture_ids_;
     static constexpr std::size_t kMaxFramesInFlight = 2;
-    std::array<vk::UniqueSemaphore, kMaxFramesInFlight> image_available_semaphores_;
-    std::array<vk::UniqueSemaphore, kMaxFramesInFlight> render_finished_semaphores_;
-    std::array<vk::UniqueFence, kMaxFramesInFlight> in_flight_fences_;
     std::size_t current_frame_ = 0;
     bool framebuffer_resized_ = false;
-    bool sync_objects_created_ = false;
     bool use_compute_raytracing_ = false;
     vk::UniqueImage compute_output_image_;
     vk::UniqueDeviceMemory compute_output_memory_;
     vk::UniqueImageView compute_output_view_;
     vk::UniqueSampler compute_output_sampler_;
     bool compute_output_in_shader_read_ = false;
+    bool storage_buffers_ready_ = false;
     vk::Format compute_output_format_ = vk::Format::eR16G16B16A16Sfloat;
-    bool debug_dump_compute_output_ = false;
-    bool debug_dump_done_ = false;
-    BufferResource debug_readback_;
-    bool debug_log_scene_state_ = false;
-    bool debug_hit_mask_ = false;
     bool device_lost_ = false;
     struct ProgramPipelineInfo
     {
+        struct BindingInfo
+        {
+            std::string name;
+            std::uint32_t binding = 0;
+            frame::proto::ProgramBinding::BindingType binding_type =
+                frame::proto::ProgramBinding::BINDING_INVALID;
+            vk::ShaderStageFlags stages = {};
+        };
+
         std::string program_name;
         EntityId program_id = NullId;
         EntityId material_id = NullId;
@@ -225,9 +196,9 @@ class Device : public DeviceInterface
         frame::proto::SceneType::Enum scene_type = frame::proto::SceneType::NONE;
         bool uses_time_uniform = false;
         bool use_compute = false;
-        std::vector<EntityId> input_texture_ids;
-        std::vector<EntityId> input_buffer_ids;
-        std::vector<std::string> input_buffer_inner_names;
+        std::vector<BindingInfo> bindings;
+        std::unordered_map<std::string, EntityId> texture_ids_by_inner;
+        std::unordered_map<std::string, EntityId> buffer_ids_by_inner;
     };
 
     std::optional<frame::json::LevelData> current_level_data_;

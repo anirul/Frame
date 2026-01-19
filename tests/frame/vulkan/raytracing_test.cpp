@@ -2,6 +2,8 @@
 #include <cmath>
 #include <cstring>
 #include <filesystem>
+#include <limits>
+#include <string>
 #include <gtest/gtest.h>
 #include <vector>
 
@@ -44,6 +46,15 @@ struct BvhNode
 constexpr std::size_t kFloatsPerVertex = 12;
 constexpr std::size_t kFloatsPerTriangle = kFloatsPerVertex * 3;
 
+bool EndsWith(const std::string& value, const std::string& suffix)
+{
+    if (suffix.size() > value.size())
+    {
+        return false;
+    }
+    return value.compare(value.size() - suffix.size(), suffix.size(), suffix) == 0;
+}
+
 Triangle ReadTriangle(const float* data, std::size_t tri_index)
 {
     auto read_vertex = [&](std::size_t base) {
@@ -69,6 +80,46 @@ Triangle ReadTriangle(const float* data, std::size_t tri_index)
     return tri;
 }
 
+void ExpectTriangleBufferValid(const frame::vulkan::Buffer& buffer)
+{
+    const auto& tri_bytes = buffer.GetRawData();
+    ASSERT_FALSE(tri_bytes.empty());
+    ASSERT_EQ(tri_bytes.size() % sizeof(float), 0u);
+    ASSERT_EQ(tri_bytes.size() % (sizeof(float) * kFloatsPerTriangle), 0u);
+
+    const std::size_t tri_count =
+        tri_bytes.size() / (sizeof(float) * kFloatsPerTriangle);
+    ASSERT_GT(tri_count, 0u);
+
+    const float* tri_floats =
+        reinterpret_cast<const float*>(tri_bytes.data());
+    Triangle first_tri = ReadTriangle(tri_floats, 0);
+    EXPECT_TRUE(std::isfinite(first_tri.v0.position.x));
+    EXPECT_TRUE(std::isfinite(first_tri.v0.position.y));
+    EXPECT_TRUE(std::isfinite(first_tri.v0.position.z));
+    EXPECT_TRUE(std::isfinite(first_tri.v0.normal.x));
+    EXPECT_TRUE(std::isfinite(first_tri.v0.normal.y));
+    EXPECT_TRUE(std::isfinite(first_tri.v0.normal.z));
+
+    glm::vec3 min_pos(std::numeric_limits<float>::max());
+    glm::vec3 max_pos(std::numeric_limits<float>::lowest());
+    for (std::size_t i = 0; i < tri_count; ++i)
+    {
+        Triangle tri = ReadTriangle(tri_floats, i);
+        min_pos = glm::min(min_pos, tri.v0.position);
+        min_pos = glm::min(min_pos, tri.v1.position);
+        min_pos = glm::min(min_pos, tri.v2.position);
+        max_pos = glm::max(max_pos, tri.v0.position);
+        max_pos = glm::max(max_pos, tri.v1.position);
+        max_pos = glm::max(max_pos, tri.v2.position);
+    }
+    glm::vec3 extent = max_pos - min_pos;
+    EXPECT_TRUE(std::isfinite(extent.x));
+    EXPECT_TRUE(std::isfinite(extent.y));
+    EXPECT_TRUE(std::isfinite(extent.z));
+    EXPECT_TRUE(extent.x > 0.0f || extent.y > 0.0f || extent.z > 0.0f);
+}
+
 class VulkanRayTracingParseTest : public ::testing::Test
 {
   protected:
@@ -86,6 +137,77 @@ class VulkanRayTracingParseTest : public ::testing::Test
     frame::proto::Level level_proto_;
     frame::json::LevelData level_data_;
 };
+
+class VulkanRayTracingDualParseTest : public ::testing::Test
+{
+  protected:
+    VulkanRayTracingDualParseTest()
+    {
+        asset_root_ = frame::file::FindDirectory("asset");
+        level_path_ = frame::file::FindFile("asset/json/raytracing.json");
+        level_proto_ = frame::json::LoadLevelProto(level_path_);
+        level_data_ = frame::json::ParseLevelData(
+            glm::uvec2(512, 288), level_proto_, asset_root_);
+    }
+
+    std::filesystem::path asset_root_;
+    std::filesystem::path level_path_;
+    frame::proto::Level level_proto_;
+    frame::json::LevelData level_data_;
+};
+
+TEST_F(VulkanRayTracingDualParseTest, BuildsTriangleBuffersFromScene)
+{
+    auto built = frame::vulkan::BuildLevel(glm::uvec2(512, 288), level_data_);
+    ASSERT_NE(built.level, nullptr);
+    auto& level = *built.level;
+
+    const auto material_id = level.GetIdFromName("RayTraceMaterial");
+    ASSERT_NE(material_id, frame::NullId);
+    auto& material = level.GetMaterialFromId(material_id);
+
+    bool found_triangle_buffer = false;
+    for (const auto& name : material.GetBufferNames())
+    {
+        if (!EndsWith(name, ".triangle"))
+        {
+            continue;
+        }
+        found_triangle_buffer = true;
+        auto id = level.GetIdFromName(name);
+        ASSERT_NE(id, frame::NullId) << "Missing buffer " << name;
+        auto* buffer =
+            dynamic_cast<frame::vulkan::Buffer*>(&level.GetBufferFromId(id));
+        ASSERT_NE(buffer, nullptr) << "Unexpected buffer type for " << name;
+        EXPECT_GT(buffer->GetSize(), 0u) << "Empty buffer " << name;
+    }
+    EXPECT_TRUE(found_triangle_buffer);
+}
+
+TEST_F(VulkanRayTracingDualParseTest, TriangleDataLooksValid)
+{
+    auto built = frame::vulkan::BuildLevel(glm::uvec2(512, 288), level_data_);
+    ASSERT_NE(built.level, nullptr);
+    auto& level = *built.level;
+
+    const auto material_id = level.GetIdFromName("RayTraceMaterial");
+    ASSERT_NE(material_id, frame::NullId);
+    auto& material = level.GetMaterialFromId(material_id);
+
+    for (const auto& name : material.GetBufferNames())
+    {
+        if (!EndsWith(name, ".triangle"))
+        {
+            continue;
+        }
+        auto id = level.GetIdFromName(name);
+        ASSERT_NE(id, frame::NullId) << "Missing buffer " << name;
+        auto* buffer =
+            dynamic_cast<frame::vulkan::Buffer*>(&level.GetBufferFromId(id));
+        ASSERT_NE(buffer, nullptr) << "Unexpected buffer type for " << name;
+        ExpectTriangleBufferValid(*buffer);
+    }
+}
 
 TEST_F(VulkanRayTracingParseTest, BuildsTriangleAndBvhBuffersFromScene)
 {

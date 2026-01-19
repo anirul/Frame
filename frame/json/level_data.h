@@ -25,6 +25,7 @@ struct ProgramInfo
     std::string name;
     std::string vertex_shader;
     std::string fragment_shader;
+    std::string compute_shader;
 };
 
 struct MaterialInfo

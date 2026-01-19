@@ -11,9 +11,9 @@ add_library(FrameCommon
 
 target_include_directories(FrameCommon
   PUBLIC
+    ${CMAKE_BINARY_DIR}/frame/proto/generated
     ${CMAKE_CURRENT_SOURCE_DIR}/../..
     ${CMAKE_CURRENT_BINARY_DIR}
-    ${CMAKE_BINARY_DIR}/frame/proto
 )
 
 target_link_libraries(FrameCommon

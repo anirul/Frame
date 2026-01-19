@@ -44,6 +44,7 @@
             "input_scene_root_name": "root",
             "shader_vertex": "blur.vert",
             "shader_fragment": "blur.frag",
+            "shader_compute": "",
             "uniforms": [
                 {
                     "name": "exponent",

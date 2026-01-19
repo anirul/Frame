@@ -154,6 +154,17 @@
             },
             "shader_vertex": "cubemap.vert",
             "shader_fragment": "cubemap.frag",
+            "shader_compute": "",
+            "bindings": [
+                {
+                    "name": "Skybox",
+                    "binding": 0,
+                    "binding_type": "COMBINED_IMAGE_SAMPLER",
+                    "stages": [
+                        "FRAGMENT"
+                    ]
+                }
+            ],
             "uniforms": [
                 {
                     "name": "projection",
@@ -188,6 +199,97 @@
             "input_scene_root_name": "mesh_holder",
             "shader_vertex": "raytracing_simple.vert",
             "shader_fragment": "raytracing_simple.frag",
+            "shader_compute": "raytracing_dual.comp",
+            "bindings": [
+                {
+                    "name": "output_image",
+                    "binding": 0,
+                    "binding_type": "STORAGE_IMAGE",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                },
+                {
+                    "name": "raytrace_output",
+                    "binding": 1,
+                    "binding_type": "OUTPUT_SAMPLER",
+                    "stages": [
+                        "FRAGMENT"
+                    ]
+                },
+                {
+                    "name": "albedo_texture",
+                    "binding": 2,
+                    "binding_type": "COMBINED_IMAGE_SAMPLER",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                },
+                {
+                    "name": "normal_texture",
+                    "binding": 3,
+                    "binding_type": "COMBINED_IMAGE_SAMPLER",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                },
+                {
+                    "name": "roughness_texture",
+                    "binding": 4,
+                    "binding_type": "COMBINED_IMAGE_SAMPLER",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                },
+                {
+                    "name": "metallic_texture",
+                    "binding": 5,
+                    "binding_type": "COMBINED_IMAGE_SAMPLER",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                },
+                {
+                    "name": "ao_texture",
+                    "binding": 6,
+                    "binding_type": "COMBINED_IMAGE_SAMPLER",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                },
+                {
+                    "name": "skybox_env",
+                    "binding": 7,
+                    "binding_type": "COMBINED_IMAGE_SAMPLER",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                },
+                {
+                    "name": "TriangleBufferGlass",
+                    "binding": 8,
+                    "binding_type": "STORAGE_BUFFER",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                },
+                {
+                    "name": "TriangleBufferGround",
+                    "binding": 9,
+                    "binding_type": "STORAGE_BUFFER",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                },
+                {
+                    "name": "UniformBlock",
+                    "binding": 10,
+                    "binding_type": "UNIFORM_BUFFER",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                }
+            ],
             "uniforms": [
                 {
                     "name": "projection",
@@ -234,6 +336,7 @@
             },
             "shader_vertex": "raytracing_simple.vert",
             "shader_fragment": "raytracing_simple.frag",
+            "shader_compute": "",
             "uniforms": [
                 {
                     "name": "projection",

@@ -9,9 +9,11 @@ set(_frame_vulkan_shader_sources
   cubemap.vert
   raytracing_bvh.vert
   raytracing_bvh.frag
+  raytracing_bvh.comp
   raytracing_simple.vert
   raytracing_simple.frag
   raytracing.comp
+  raytracing_dual.comp
 )
 
 add_custom_target(AssetShaderVulkan

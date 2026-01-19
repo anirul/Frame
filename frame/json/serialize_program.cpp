@@ -18,6 +18,12 @@ proto::Program SerializeProgram(
         program_interface.GetData().shader_vertex());
     proto_program.set_shader_fragment(
         program_interface.GetData().shader_fragment());
+    proto_program.set_shader_compute(
+        program_interface.GetData().shader_compute());
+    for (const auto& binding : program_interface.GetData().bindings())
+    {
+        *proto_program.add_bindings() = binding;
+    }
     for (const auto& input_texture_id : program_interface.GetInputTextureIds())
     {
         *proto_program.add_input_texture_names() =

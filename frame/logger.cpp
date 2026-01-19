@@ -29,6 +29,7 @@ Logger::Logger(LoggerType logger_type)
         std::make_shared<spdlog::logger>("frame", begin(sinks), end(sinks));
     spdlog::register_logger(logger_ptr_);
     spdlog::set_default_logger(logger_ptr_);
+    logger_ptr_->flush_on(spdlog::level::info);
     logger_ptr_->info("start logging!");
 }
 

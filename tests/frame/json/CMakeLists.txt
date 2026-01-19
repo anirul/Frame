@@ -44,7 +44,7 @@ target_link_libraries(FrameJsonTest
     FrameOpenGLGui
     FrameGui
     FrameProto
-    FrameVulkanData
+    FrameVulkan
   ${FRAME_LINK_GROUP_END}
 )
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <string>
 
 #include "frame/logger.h"
 #include "frame/level_interface.h"
@@ -40,7 +41,8 @@ SceneState BuildSceneState(
     glm::uvec2 swapchain_extent,
     float elapsed_time_seconds,
     frame::EntityId preferred_material = frame::NullId,
-    bool flip_projection_y = true);
+    bool flip_projection_y = true,
+    const std::string& preferred_scene_root = {});
 
 UniformBlock MakeUniformBlock(
     const SceneState& state, float elapsed_time_seconds);

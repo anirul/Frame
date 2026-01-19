@@ -1,14 +1,10 @@
 #pragma once
 
-#ifndef VULKAN_HPP_DISPATCH_LOADER_DYNAMIC
-#define VULKAN_HPP_DISPATCH_LOADER_DYNAMIC 1
-#endif
-
 #include <SDL3/SDL.h>
-#include <vulkan/vulkan.hpp>
 #include <map>
 #include <functional>
 #include <string>
+#include "frame/vulkan/vulkan_dispatch.h"
 #if defined(_WIN32) || defined(_WIN64)
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN

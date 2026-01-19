@@ -1,13 +1,10 @@
 #pragma once
 
-#ifndef VULKAN_HPP_DISPATCH_LOADER_DYNAMIC
-#define VULKAN_HPP_DISPATCH_LOADER_DYNAMIC 1
-#endif
-
 #include <vector>
 
 #include <glm/glm.hpp>
-#include <vulkan/vulkan.hpp>
+
+#include "frame/vulkan/vulkan_dispatch.h"
 
 #include "frame/texture_interface.h"
 

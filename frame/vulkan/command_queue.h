@@ -1,12 +1,9 @@
 #pragma once
 
-#ifndef VULKAN_HPP_DISPATCH_LOADER_DYNAMIC
-#define VULKAN_HPP_DISPATCH_LOADER_DYNAMIC 1
-#endif
-
 #include <cstdint>
 #include <functional>
-#include <vulkan/vulkan.hpp>
+
+#include "frame/vulkan/vulkan_dispatch.h"
 
 namespace frame::vulkan
 {

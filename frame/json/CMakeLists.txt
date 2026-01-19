@@ -28,10 +28,10 @@ add_library(FrameJson
 )
 target_include_directories(FrameJson 
   PUBLIC
+    ${CMAKE_BINARY_DIR}/frame/proto/generated
     ${CMAKE_CURRENT_SOURCE_DIR}/../..
     ${Protobuf_INCLUDE_DIRS}
     ${CMAKE_CURRENT_BINARY_DIR}
-    ${CMAKE_BINARY_DIR}/frame/proto
 )
 target_link_libraries(FrameJson
   PRIVATE

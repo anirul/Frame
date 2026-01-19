@@ -11,13 +11,6 @@
 #include "frame/window_interface.h"
 
 ABSL_DECLARE_FLAG(bool, vk_validation);
-ABSL_DECLARE_FLAG(bool, vk_raytrace_compute);
-ABSL_DECLARE_FLAG(bool, vk_raytrace_bruteforce);
-ABSL_DECLARE_FLAG(bool, vk_raytrace_bruteforce_full);
-ABSL_DECLARE_FLAG(bool, vk_raytrace_debug_uv);
-ABSL_DECLARE_FLAG(bool, vk_log_scene);
-ABSL_DECLARE_FLAG(bool, vk_dump_compute);
-ABSL_DECLARE_FLAG(bool, vk_debug_hitmask);
 
 namespace frame::common
 {

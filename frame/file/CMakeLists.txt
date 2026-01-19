@@ -20,9 +20,9 @@ add_library(FrameFile
 
 target_include_directories(FrameFile
   PUBLIC
+    ${CMAKE_BINARY_DIR}/frame/proto/generated
     ${CMAKE_CURRENT_SOURCE_DIR}/../..
     ${CMAKE_CURRENT_BINARY_DIR}
-    ${CMAKE_BINARY_DIR}/frame/proto
   PRIVATE
     ${HAPPLY_INCLUDE_DIRS}
     ${STB_INCLUDE_DIRS}

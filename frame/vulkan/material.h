@@ -1,6 +1,7 @@
 #pragma once
 
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include "frame/material_interface.h"
@@ -44,8 +45,8 @@ class Material : public frame::MaterialInterface
     EntityId preprocess_program_id_ = NullId;
     std::vector<EntityId> texture_order_ = {};
     std::unordered_map<EntityId, std::pair<std::string, int>> texture_map_ = {};
-    std::unordered_map<std::string, std::string> buffer_map_ = {};
-    std::unordered_map<std::string, std::string> node_map_ = {};
+    std::vector<std::pair<std::string, std::string>> buffer_names_ = {};
+    std::vector<std::pair<std::string, std::string>> node_names_ = {};
 };
 
 } // namespace frame::vulkan

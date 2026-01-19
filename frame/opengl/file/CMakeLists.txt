@@ -12,9 +12,9 @@ add_library(FrameOpenGLFile
 
 target_include_directories(FrameOpenGLFile
   PUBLIC
+    ${CMAKE_BINARY_DIR}/frame/proto/generated
     ${CMAKE_CURRENT_SOURCE_DIR}/../../..
     ${CMAKE_CURRENT_BINARY_DIR}
-    ${CMAKE_BINARY_DIR}/frame/proto
   PRIVATE
     ${STB_INCLUDE_DIRS}
 )

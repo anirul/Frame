@@ -19,9 +19,38 @@ message SceneType
     Enum value = 1;
 }
 
+// Program binding stage.
+// Next 4
+enum ShaderStage
+{
+    INVALID_STAGE = 0;
+    VERTEX = 1;
+    FRAGMENT = 2;
+    COMPUTE = 3;
+}
+
+// Program binding description.
+// Next 4
+message ProgramBinding
+{
+    string name = 1;
+    uint32 binding = 2;
+    enum BindingType
+    {
+        BINDING_INVALID = 0;
+        COMBINED_IMAGE_SAMPLER = 1;
+        STORAGE_IMAGE = 2;
+        STORAGE_BUFFER = 3;
+        UNIFORM_BUFFER = 4;
+        OUTPUT_SAMPLER = 5;
+    }
+    BindingType binding_type = 3;
+    repeated ShaderStage stages = 4;
+}
+
 // Description of an effect that can be used as a 2D effect on a rendering or
 // as a shader for material.
-// Next 10
+// Next 12
 message Program
 {
     // Name of the effect.
@@ -39,6 +68,10 @@ message Program
     string shader_vertex = 6;
     // Fragment shader file name (including the extension).
     string shader_fragment = 8;
+    // Compute shader file name (including the extension).
+    string shader_compute = 10;
+    // Explicit descriptor bindings for this program.
+    repeated ProgramBinding bindings = 11;
     // Additionnal uniforms for the shader.
     repeated Uniform uniforms = 7;
 }

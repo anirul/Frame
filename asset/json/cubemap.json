@@ -72,6 +72,17 @@
             "input_scene_type": {"value": "CUBE"},
             "shader_vertex": "cubemap.vert",
             "shader_fragment": "cubemap.frag",
+            "shader_compute": "",
+            "bindings": [
+                {
+                    "name": "Skybox",
+                    "binding": 0,
+                    "binding_type": "COMBINED_IMAGE_SAMPLER",
+                    "stages": [
+                        "FRAGMENT"
+                    ]
+                }
+            ],
             "uniforms": [
                 {"name": "projection", "uniform_enum": "PROJECTION_MAT4"},
                 {"name": "view", "uniform_enum": "VIEW_MAT4"},

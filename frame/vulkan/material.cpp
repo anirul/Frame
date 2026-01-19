@@ -93,52 +93,78 @@ std::vector<EntityId> Material::GetTextureIds() const
 
 std::string Material::GetInnerBufferName(const std::string& name) const
 {
-    if (!buffer_map_.count(name))
+    auto it = std::find_if(
+        buffer_names_.begin(),
+        buffer_names_.end(),
+        [&name](const auto& entry) { return entry.first == name; });
+    if (it == buffer_names_.end())
     {
         throw std::runtime_error("Unknown buffer name.");
     }
-    return buffer_map_.at(name);
+    return it->second;
 }
 
 bool Material::AddBufferName(
     const std::string& name, const std::string& inner_name)
 {
-    return buffer_map_.insert({name, inner_name}).second;
+    auto it = std::find_if(
+        buffer_names_.begin(),
+        buffer_names_.end(),
+        [&name](const auto& entry) { return entry.first == name; });
+    if (it != buffer_names_.end())
+    {
+        return false;
+    }
+    buffer_names_.emplace_back(name, inner_name);
+    return true;
 }
 
 std::vector<std::string> Material::GetBufferNames() const
 {
     std::vector<std::string> names;
-    names.reserve(buffer_map_.size());
-    for (const auto& [name, _] : buffer_map_)
+    names.reserve(buffer_names_.size());
+    for (const auto& entry : buffer_names_)
     {
-        names.push_back(name);
+        names.push_back(entry.first);
     }
     return names;
 }
 
 std::string Material::GetInnerNodeName(const std::string& name) const
 {
-    if (!node_map_.count(name))
+    auto it = std::find_if(
+        node_names_.begin(),
+        node_names_.end(),
+        [&name](const auto& entry) { return entry.first == name; });
+    if (it == node_names_.end())
     {
         throw std::runtime_error("Unknown node name.");
     }
-    return node_map_.at(name);
+    return it->second;
 }
 
 bool Material::AddNodeName(
     const std::string& name, const std::string& inner_name)
 {
-    return node_map_.insert({name, inner_name}).second;
+    auto it = std::find_if(
+        node_names_.begin(),
+        node_names_.end(),
+        [&name](const auto& entry) { return entry.first == name; });
+    if (it != node_names_.end())
+    {
+        return false;
+    }
+    node_names_.emplace_back(name, inner_name);
+    return true;
 }
 
 std::vector<std::string> Material::GetNodeNames() const
 {
     std::vector<std::string> names;
-    names.reserve(node_map_.size());
-    for (const auto& [name, _] : node_map_)
+    names.reserve(node_names_.size());
+    for (const auto& entry : node_names_)
     {
-        names.push_back(name);
+        names.push_back(entry.first);
     }
     return names;
 }

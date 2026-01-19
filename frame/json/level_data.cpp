@@ -33,6 +33,7 @@ LevelData BuildLevelData(
         program_info.name = proto_program.name();
         program_info.vertex_shader = proto_program.shader_vertex();
         program_info.fragment_shader = proto_program.shader_fragment();
+        program_info.compute_shader = proto_program.shader_compute();
         data.programs.push_back(std::move(program_info));
     }
 

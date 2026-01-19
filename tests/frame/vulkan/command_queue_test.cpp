@@ -1,18 +1,13 @@
-#ifndef VULKAN_HPP_DISPATCH_LOADER_DYNAMIC
-#define VULKAN_HPP_DISPATCH_LOADER_DYNAMIC 1
-#endif
-#ifndef VULKAN_HPP_ENABLE_DYNAMIC_LOADER_TOOL
 #define VULKAN_HPP_ENABLE_DYNAMIC_LOADER_TOOL 1
-#endif
 
 #include <gtest/gtest.h>
-#include <vulkan/vulkan.hpp>
 #include <cstring>
 #include <vector>
 #include <optional>
 
 #include "frame/vulkan/command_queue.h"
 #include "frame/vulkan/gpu_memory_manager.h"
+#include "frame/vulkan/vulkan_dispatch.h"
 
 namespace test
 {

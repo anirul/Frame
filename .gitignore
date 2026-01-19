@@ -232,6 +232,7 @@ log.txt
 !asset/model/*.obj
 include/frame/proto/*.pb.h
 src/frame/proto/include/frame/proto
+frame/proto/*.pb.h
 
 
 # Asset caches

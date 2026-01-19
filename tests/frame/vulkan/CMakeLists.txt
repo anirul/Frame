@@ -24,7 +24,7 @@ target_link_libraries(FrameVulkanTest
     shaderc::shaderc_combined
     ${FRAME_LINK_GROUP_BEGIN}
     ${FRAME_CORE_LIBS}
-    FrameVulkanData
+    FrameVulkan
     ${FRAME_LINK_GROUP_END}
 )
 

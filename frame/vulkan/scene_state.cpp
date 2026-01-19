@@ -13,7 +13,8 @@ SceneState BuildSceneState(
     glm::uvec2 swapchain_extent,
     float elapsed_time_seconds,
     frame::EntityId preferred_material,
-    bool flip_projection_y)
+    bool flip_projection_y,
+    const std::string& preferred_scene_root)
 {
     SceneState state;
 
@@ -58,6 +59,18 @@ SceneState BuildSceneState(
     try
     {
         bool model_set = false;
+        if (!preferred_scene_root.empty() &&
+            preferred_scene_root != "root")
+        {
+            auto root_id = level.GetIdFromName(preferred_scene_root);
+            if (root_id != frame::NullId)
+            {
+                auto& node = level.GetSceneNodeFromId(root_id);
+                state.model = node.GetLocalModel(
+                    static_cast<double>(elapsed_time_seconds));
+                model_set = true;
+            }
+        }
         if (preferred_material != frame::NullId)
         {
             auto& material = level.GetMaterialFromId(preferred_material);

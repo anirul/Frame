@@ -30,12 +30,12 @@ struct Triangle
 
 layout(std430, set = 0, binding = 8) buffer TriangleBufferGlass
 {
-    vec4 glass_tri_data[];
+    Triangle glass_triangles[];
 };
 
 layout(std430, set = 0, binding = 9) buffer TriangleBufferGround
 {
-    vec4 ground_tri_data[];
+    Triangle ground_triangles[];
 };
 
 const int kMaterialGlass = 0;
@@ -72,65 +72,22 @@ struct HitInfo
 
 int TriangleCountGlass()
 {
-    return int(glass_tri_data.length() / 9);
+    int uniform_count = max(0, int(ubo.time_s.y + 0.5));
+    if (uniform_count > 0)
+    {
+        return uniform_count;
+    }
+    return int(glass_triangles.length());
 }
 
 int TriangleCountGround()
 {
-    return int(ground_tri_data.length() / 9);
-}
-
-vec4 ReadTriData(int material_id, int index)
-{
-    return (material_id == kMaterialGround)
-        ? ground_tri_data[index]
-        : glass_tri_data[index];
-}
-
-int TriangleCount(int material_id)
-{
-    return (material_id == kMaterialGround)
-        ? TriangleCountGround()
-        : TriangleCountGlass();
-}
-
-Triangle LoadTriangle(int material_id, int tri_index)
-{
-    Triangle tri;
-    tri.v0.position = vec3(0.0);
-    tri.v0.normal = vec3(0.0);
-    tri.v0.uv = vec2(0.0);
-    tri.v1.position = vec3(0.0);
-    tri.v1.normal = vec3(0.0);
-    tri.v1.uv = vec2(0.0);
-    tri.v2.position = vec3(0.0);
-    tri.v2.normal = vec3(0.0);
-    tri.v2.uv = vec2(0.0);
-    if (tri_index < 0 || tri_index >= TriangleCount(material_id))
+    int uniform_count = max(0, int(ubo.time_s.z + 0.5));
+    if (uniform_count > 0)
     {
-        return tri;
+        return uniform_count;
     }
-    const int base = tri_index * 9;
-    vec4 p0 = ReadTriData(material_id, base + 0);
-    vec4 n0 = ReadTriData(material_id, base + 1);
-    vec4 uv0 = ReadTriData(material_id, base + 2);
-    vec4 p1 = ReadTriData(material_id, base + 3);
-    vec4 n1 = ReadTriData(material_id, base + 4);
-    vec4 uv1 = ReadTriData(material_id, base + 5);
-    vec4 p2 = ReadTriData(material_id, base + 6);
-    vec4 n2 = ReadTriData(material_id, base + 7);
-    vec4 uv2 = ReadTriData(material_id, base + 8);
-
-    tri.v0.position = p0.xyz;
-    tri.v0.normal = n0.xyz;
-    tri.v0.uv = uv0.xy;
-    tri.v1.position = p1.xyz;
-    tri.v1.normal = n1.xyz;
-    tri.v1.uv = uv1.xy;
-    tri.v2.position = p2.xyz;
-    tri.v2.normal = n2.xyz;
-    tri.v2.uv = uv2.xy;
-    return tri;
+    return int(ground_triangles.length());
 }
 
 // ----------------------------------------------------------------------------
@@ -215,7 +172,7 @@ bool anyHitTriangles(const vec3 ray_origin, const vec3 ray_dir)
         if (rayTriangleIntersect(
                 ray_origin,
                 ray_dir,
-                LoadTriangle(kMaterialGlass, i),
+                glass_triangles[i],
                 t,
                 bary))
         {
@@ -230,7 +187,7 @@ bool anyHitTriangles(const vec3 ray_origin, const vec3 ray_dir)
         if (rayTriangleIntersect(
                 ray_origin,
                 ray_dir,
-                LoadTriangle(kMaterialGround, i),
+                ground_triangles[i],
                 t,
                 bary))
         {
@@ -266,7 +223,7 @@ HitInfo TraceScene(const vec3 ray_origin, const vec3 ray_dir)
         if (rayTriangleIntersect(
                 ray_origin,
                 ray_dir,
-                LoadTriangle(kMaterialGlass, i),
+                glass_triangles[i],
                 t,
                 bary) &&
             t < best_t)
@@ -285,7 +242,7 @@ HitInfo TraceScene(const vec3 ray_origin, const vec3 ray_dir)
         if (rayTriangleIntersect(
                 ray_origin,
                 ray_dir,
-                LoadTriangle(kMaterialGround, i),
+                ground_triangles[i],
                 t,
                 bary) &&
             t < best_t)
@@ -308,7 +265,9 @@ HitInfo TraceScene(const vec3 ray_origin, const vec3 ray_dir)
     info.material_id = best_material;
     info.pos_model = ray_origin + best_t * ray_dir;
 
-    Triangle tri = LoadTriangle(best_material, best_tri);
+    Triangle tri = (best_material == kMaterialGround)
+        ? ground_triangles[best_tri]
+        : glass_triangles[best_tri];
     float w = 1.0 - best_bary.x - best_bary.y;
     info.normal_model = normalize(
         tri.v0.normal * w +
@@ -662,6 +621,33 @@ void main()
     vec3 ray_dir = normalize(model_inv3 * ray_dir_world);
 
     HitInfo hit = TraceScene(ray_origin, ray_dir);
+    if (ubo.time_s.w > 8.5)
+    {
+        float glass_count = float(TriangleCountGlass());
+        float ground_count = float(TriangleCountGround());
+        vec3 count_color = vec3(
+            clamp(glass_count / 32.0, 0.0, 1.0),
+            clamp(ground_count / 32.0, 0.0, 1.0),
+            0.0);
+        imageStore(output_image, pixel, vec4(count_color, 1.0));
+        return;
+    }
+    if (ubo.time_s.w > 5.5)
+    {
+        vec3 mask = vec3(0.0);
+        if (hit.hit)
+        {
+            mask = IsGround(hit) ? vec3(0.0, 1.0, 0.0) : vec3(1.0, 0.0, 0.0);
+        }
+        imageStore(output_image, pixel, vec4(mask, 1.0));
+        return;
+    }
+    if (ubo.time_s.w > 3.5)
+    {
+        vec3 uv_color = hit.hit ? vec3(fract(hit.uv), 0.0) : vec3(0.0);
+        imageStore(output_image, pixel, vec4(uv_color, 1.0));
+        return;
+    }
     int env_levels = textureQueryLevels(skybox_env);
     float max_env_lod = env_levels > 0 ? float(env_levels - 1) : 0.0;
     mat3 env_rot = mat3(ubo.env_map_model);
