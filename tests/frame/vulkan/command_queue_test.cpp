@@ -25,11 +25,32 @@ class VulkanCommandQueueTest : public ::testing::Test
         vk::ApplicationInfo app_info(
             "CommandQueueTest", 1, "Frame", 1, VK_API_VERSION_1_1);
         vk::InstanceCreateInfo instance_info({}, &app_info);
-        instance_ = vk::createInstanceUnique(instance_info);
+        try
+        {
+            instance_ = vk::createInstanceUnique(instance_info);
+        }
+        catch (const vk::SystemError& err)
+        {
+            GTEST_SKIP()
+                << "Skipping Vulkan tests: unable to create instance ("
+                << err.what() << ").";
+            return;
+        }
         VULKAN_HPP_DEFAULT_DISPATCHER.init(*instance_);
         auto physical_devices = instance_->enumeratePhysicalDevices();
-        ASSERT_FALSE(physical_devices.empty());
+        if (physical_devices.empty())
+        {
+            GTEST_SKIP()
+                << "Skipping Vulkan tests: no physical devices found.";
+            return;
+        }
         physical_device_ = physical_devices.front();
+        if (physical_device_.getProperties().deviceType ==
+            vk::PhysicalDeviceType::eCpu)
+        {
+            GTEST_SKIP() << "Skipping on CPU Vulkan device.";
+            return;
+        }
 
         const auto queue_props = physical_device_.getQueueFamilyProperties();
         std::optional<std::uint32_t> graphics_index;
@@ -64,7 +85,10 @@ class VulkanCommandQueueTest : public ::testing::Test
 
     void TearDown() override
     {
-        device_->waitIdle();
+        if (device_)
+        {
+            device_->waitIdle();
+        }
     }
 
     std::unique_ptr<frame::vulkan::GpuMemoryManager> memory_manager_;

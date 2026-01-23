@@ -283,16 +283,32 @@ class VulkanRayTracingComputeTest : public ::testing::Test
             1,
             VK_API_VERSION_1_1);
         vk::InstanceCreateInfo instance_info({}, &app_info);
-        instance_ = vk::createInstanceUnique(instance_info);
+        try
+        {
+            instance_ = vk::createInstanceUnique(instance_info);
+        }
+        catch (const vk::SystemError& err)
+        {
+            GTEST_SKIP()
+                << "Skipping Vulkan tests: unable to create instance ("
+                << err.what() << ").";
+            return;
+        }
         VULKAN_HPP_DEFAULT_DISPATCHER.init(*instance_);
 
         auto physical_devices = instance_->enumeratePhysicalDevices();
-        ASSERT_FALSE(physical_devices.empty());
+        if (physical_devices.empty())
+        {
+            GTEST_SKIP()
+                << "Skipping Vulkan tests: no physical devices found.";
+            return;
+        }
         physical_device_ = physical_devices.front();
         if (physical_device_.getProperties().deviceType ==
             vk::PhysicalDeviceType::eCpu)
         {
             GTEST_SKIP() << "Skipping on CPU Vulkan device.";
+            return;
         }
 
         auto format_props = physical_device_.getFormatProperties(
@@ -301,6 +317,7 @@ class VulkanRayTracingComputeTest : public ::testing::Test
               vk::FormatFeatureFlagBits::eStorageImage))
         {
             GTEST_SKIP() << "Device does not support rgba16f storage images.";
+            return;
         }
 
         const auto queue_props = physical_device_.getQueueFamilyProperties();
@@ -328,6 +345,7 @@ class VulkanRayTracingComputeTest : public ::testing::Test
         {
             GTEST_SKIP()
                 << "shaderStorageImageExtendedFormats not supported on device.";
+            return;
         }
         vk::DeviceCreateInfo device_info({}, 1, &queue_info);
         device_info.setPEnabledFeatures(&features);
