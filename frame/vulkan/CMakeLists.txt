@@ -56,6 +56,7 @@ set(FRAME_VULKAN_SOURCES
 add_library(FrameVulkan
   STATIC
     ${FRAME_VULKAN_SOURCES}
+    $<TARGET_OBJECTS:FrameVulkanJson>
 )
 
 target_include_directories(FrameVulkan
@@ -68,7 +69,6 @@ target_include_directories(FrameVulkan
 
 target_link_libraries(FrameVulkan
   PUBLIC
-    FrameVulkanJson
     Frame
     FrameFile
     FrameJson
