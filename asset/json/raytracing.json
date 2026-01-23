@@ -35,7 +35,7 @@
             "pixel_structure": {
                 "value": "RGB"
             },
-            "file_name": "asset/cubemap/hamarikyu_env.hdr"
+            "file_name": "asset/cubemap/hamarikyu.hdr"
         },
         {
             "name": "albedo_texture",
@@ -114,6 +114,7 @@
                 "roughness_texture",
                 "metallic_texture",
                 "ao_texture",
+                "skybox",
                 "skybox_env"
             ],
             "inner_names": [
@@ -122,18 +123,19 @@
                 "roughness_texture",
                 "metallic_texture",
                 "ao_texture",
+                "skybox",
                 "skybox_env"
             ],
             "buffer_names": [
-                "AppleMesh.0.triangle",
-                "AppleMesh.0.bvh"
+                "Ico.0.triangle",
+                "Plate.0.triangle"
             ],
             "inner_buffer_names": [
-                "TriangleBuffer",
-                "BvhBuffer"
+                "TriangleBufferGlass",
+                "TriangleBufferGround"
             ],
             "node_names": [
-                "AppleMesh"
+                "mesh_holder"
             ],
             "inner_node_names": [
                 "model"
@@ -154,6 +156,17 @@
             },
             "shader_vertex": "cubemap.vert",
             "shader_fragment": "cubemap.frag",
+            "shader_compute": "",
+            "bindings": [
+                {
+                    "name": "Skybox",
+                    "binding": 0,
+                    "binding_type": "COMBINED_IMAGE_SAMPLER",
+                    "stages": [
+                        "FRAGMENT"
+                    ]
+                }
+            ],
             "uniforms": [
                 {
                     "name": "projection",
@@ -180,14 +193,114 @@
                 "roughness_texture",
                 "metallic_texture",
                 "ao_texture",
+                "skybox",
                 "skybox_env"
             ],
             "input_scene_type": {
                 "value": "QUAD"
             },
             "input_scene_root_name": "mesh_holder",
-            "shader_vertex": "raytracing.vert",
-            "shader_fragment": "raytracing.frag",
+            "shader_vertex": "raytracing_simple.vert",
+            "shader_fragment": "raytracing_simple.frag",
+            "shader_compute": "raytracing_dual.comp",
+            "bindings": [
+                {
+                    "name": "output_image",
+                    "binding": 0,
+                    "binding_type": "STORAGE_IMAGE",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                },
+                {
+                    "name": "raytrace_output",
+                    "binding": 1,
+                    "binding_type": "OUTPUT_SAMPLER",
+                    "stages": [
+                        "FRAGMENT"
+                    ]
+                },
+                {
+                    "name": "albedo_texture",
+                    "binding": 2,
+                    "binding_type": "COMBINED_IMAGE_SAMPLER",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                },
+                {
+                    "name": "normal_texture",
+                    "binding": 3,
+                    "binding_type": "COMBINED_IMAGE_SAMPLER",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                },
+                {
+                    "name": "roughness_texture",
+                    "binding": 4,
+                    "binding_type": "COMBINED_IMAGE_SAMPLER",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                },
+                {
+                    "name": "metallic_texture",
+                    "binding": 5,
+                    "binding_type": "COMBINED_IMAGE_SAMPLER",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                },
+                {
+                    "name": "ao_texture",
+                    "binding": 6,
+                    "binding_type": "COMBINED_IMAGE_SAMPLER",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                },
+                {
+                    "name": "skybox_env",
+                    "binding": 7,
+                    "binding_type": "COMBINED_IMAGE_SAMPLER",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                },
+                {
+                    "name": "skybox",
+                    "binding": 11,
+                    "binding_type": "COMBINED_IMAGE_SAMPLER",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                },
+                {
+                    "name": "TriangleBufferGlass",
+                    "binding": 8,
+                    "binding_type": "STORAGE_BUFFER",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                },
+                {
+                    "name": "TriangleBufferGround",
+                    "binding": 9,
+                    "binding_type": "STORAGE_BUFFER",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                },
+                {
+                    "name": "UniformBlock",
+                    "binding": 10,
+                    "binding_type": "UNIFORM_BUFFER",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                }
+            ],
             "uniforms": [
                 {
                     "name": "projection",
@@ -232,8 +345,9 @@
             "input_scene_type": {
                 "value": "SCENE"
             },
-            "shader_vertex": "raytracing.vert",
-            "shader_fragment": "raytracing.frag",
+            "shader_vertex": "raytracing_simple.vert",
+            "shader_fragment": "raytracing_simple.frag",
+            "shader_compute": "",
             "uniforms": [
                 {
                     "name": "projection",
@@ -288,16 +402,6 @@
                 }
             },
             {
-                "name": "mesh_holder",
-                "parent": "root",
-                "quaternion": {
-                    "x": 0.0,
-                    "y": 0.2930181,
-                    "z": 0.2197635,
-                    "w": 0.9305076
-                }
-            },
-            {
                 "name": "env_holder",
                 "parent": "root",
                 "quaternion": {
@@ -305,6 +409,16 @@
                     "y": 0.0499792,
                     "z": 0.0,
                     "w": 0.9987503
+                }
+            },
+            {
+                "name": "mesh_holder",
+                "parent": "env_holder",
+                "quaternion": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "w": 1.0
                 }
             }
         ],
@@ -317,13 +431,13 @@
                 "far_clip": 1000.0,
                 "position": {
                     "x": 0,
-                    "y": 0.5,
-                    "z": -0.7
+                    "y": 0.8,
+                    "z": -2.2
                 },
                 "target": {
                     "x": 0,
-                    "y": -0.5,
-                    "z": 0.7
+                    "y": -0.3,
+                    "z": 0.2
                 },
                 "up": {
                     "x": 0,
@@ -347,9 +461,16 @@
                 "material_name": "RayTraceMaterial"
             },
             {
-                "name": "AppleMesh",
+                "name": "Ico",
                 "parent": "mesh_holder",
-                "file_name": "dragon.obj",
+                "file_name": "ico.obj",
+                "material_name": "RayTraceMaterial",
+                "render_time_enum": "PRE_RENDER_TIME"
+            },
+            {
+                "name": "Plate",
+                "parent": "mesh_holder",
+                "file_name": "plate.obj",
                 "material_name": "RayTraceMaterial",
                 "render_time_enum": "PRE_RENDER_TIME"
             }

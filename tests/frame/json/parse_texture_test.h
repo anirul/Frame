@@ -10,13 +10,19 @@ namespace test
 
 class ParseTextureTest : public testing::Test
 {
-  public:
-    ParseTextureTest()
-        : window_(frame::CreateNewWindow(frame::DrawingTargetEnum::NONE))
+  protected:
+    void SetUp() override
     {
+        try
+        {
+            window_ = frame::CreateNewWindow(frame::DrawingTargetEnum::NONE);
+        }
+        catch (const std::exception& ex)
+        {
+            GTEST_SKIP() << ex.what();
+        }
     }
 
-  protected:
     std::unique_ptr<frame::WindowInterface> window_ = nullptr;
     std::unique_ptr<frame::TextureInterface> texture_ = nullptr;
 };

@@ -7,6 +7,7 @@ out vec3 vert_local_pos;
 uniform mat4 projection;
 uniform mat4 view;
 uniform mat4 model;
+uniform float time_s;
 
 void main()
 {

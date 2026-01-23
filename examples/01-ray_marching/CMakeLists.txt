@@ -17,11 +17,11 @@ target_link_libraries(01_RayMarching
   PUBLIC
     absl::base
     absl::flags
-    Frame
+    ${FRAME_LINK_GROUP_BEGIN}
+    ${FRAME_CORE_LIBS}
+    ${FRAME_VULKAN_LIBS}
+    ${FRAME_LINK_GROUP_END}
     FrameCommon
-    FrameFile
-    FrameOpenGL
-    FrameProto
 )
 
 set_property(TARGET 01_RayMarching PROPERTY FOLDER "FrameExamples")

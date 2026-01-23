@@ -1,6 +1,6 @@
 #include "frame/json/parse_program_test.h"
 
-#include "frame/json/parse_program.h"
+#include "frame/opengl/json/parse_program.h"
 
 namespace test
 {

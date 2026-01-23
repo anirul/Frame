@@ -18,6 +18,7 @@
             },
             "shader_vertex": "ray_marching.vert",
             "shader_fragment": "ray_marching.frag",
+            "shader_compute": "",
             "uniforms": [
                 {
                     "name": "time_s",

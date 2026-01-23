@@ -16,20 +16,19 @@ add_executable(FrameFileTest
 
 target_include_directories(FrameFileTest
   PUBLIC
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../../include
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../../tests
-  ${CMAKE_CURRENT_BINARY_DIR}
-  ${STB_INCLUDE_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../..
+    ${CMAKE_CURRENT_SOURCE_DIR}/../..
+    ${CMAKE_CURRENT_BINARY_DIR}
+    ${STB_INCLUDE_DIRS}
 )
 
 target_link_libraries(FrameFileTest
   PUBLIC
-    Frame
-    FrameFile
-    FrameJson
-    FrameVulkan
     GTest::gmock
     GTest::gtest
+  ${FRAME_LINK_GROUP_BEGIN}
+  ${FRAME_CORE_LIBS}
+  ${FRAME_LINK_GROUP_END}
 )
 
 # In order to remove the tests from the bin folder.

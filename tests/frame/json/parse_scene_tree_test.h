@@ -6,25 +6,21 @@
 #include "frame/json/parse_json.h"
 #include "frame/level_interface.h"
 #include "frame/node_interface.h"
-#include "frame/window_factory.h"
 
 namespace test
 {
 
 class ParseSceneTreeTest : public testing::Test
 {
-  public:
-    ParseSceneTreeTest()
+  protected:
+    void SetUp() override
     {
-        window_ = frame::CreateNewWindow(frame::DrawingTargetEnum::NONE);
         proto_level_ = frame::json::LoadProtoFromJsonFile<frame::proto::Level>(
             frame::file::FindFile("asset/json/scene_tree_test.json"));
     }
 
-  protected:
     frame::proto::Level proto_level_ = {};
     std::unique_ptr<frame::LevelInterface> level_ = nullptr;
-    std::unique_ptr<frame::WindowInterface> window_ = nullptr;
 };
 
 } // End namespace test.

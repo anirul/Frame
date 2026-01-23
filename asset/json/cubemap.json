@@ -1,0 +1,94 @@
+{
+    "name": "CubemapDemo",
+    "default_texture_name": "output",
+    "textures": [
+        {
+            "name": "skybox",
+            "cubemap": true,
+            "file_name": "asset/cubemap/hamarikyu.hdr",
+            "pixel_element_size": {"value": "FLOAT"},
+            "pixel_structure": {"value": "RGB"}
+        },
+        {
+            "name": "output",
+            "cubemap": false,
+            "size": {"x": -1, "y": -1},
+            "pixel_element_size": {"value": "BYTE"},
+            "pixel_structure": {"value": "RGB"}
+        }
+    ],
+    "materials": [
+        {
+            "name": "CubemapMaterial",
+            "program_name": "CubemapProgram",
+            "texture_names": ["skybox"],
+            "inner_names": ["Skybox"]
+        }
+    ],
+    "scene_tree": {
+        "default_camera_name": "camera",
+        "default_root_name": "root",
+        "node_matrices": [
+            {"name": "root", "matrix": {"m11": 1, "m22": 1, "m33": 1, "m44": 1}},
+            {
+                "name": "camera_rot",
+                "parent": "root",
+                "matrix_type_enum": "ROTATION_MATRIX",
+                "quaternion": {
+                    "x": 0.0,
+                    "y": 0.0499792,
+                    "z": 0.0,
+                    "w": 0.9987503
+                }
+            }
+        ],
+        "node_cameras": [
+            {
+                "name": "camera",
+                "parent": "camera_rot",
+                "fov_degrees": 65.0,
+                "near_clip": 0.01,
+                "far_clip": 1000.0,
+                "position": {"x": 0.0, "y": 0.0, "z": 0.0},
+                "target": {"x": 0.0, "y": 0.0, "z": 1.0},
+                "up": {"x": 0.0, "y": 1.0, "z": 0.0}
+            }
+        ],
+        "node_static_meshes": [
+            {
+                "name": "Skybox",
+                "parent": "root",
+                "mesh_enum": "CUBE",
+                "material_name": "CubemapMaterial",
+                "render_time_enum": "SKYBOX_RENDER_TIME"
+            }
+        ]
+    },
+    "programs": [
+        {
+            "name": "CubemapProgram",
+            "input_texture_names": ["skybox"],
+            "output_texture_names": ["output"],
+            "input_scene_type": {"value": "CUBE"},
+            "shader_vertex": "cubemap.vert",
+            "shader_fragment": "cubemap.frag",
+            "shader_compute": "",
+            "bindings": [
+                {
+                    "name": "Skybox",
+                    "binding": 0,
+                    "binding_type": "COMBINED_IMAGE_SAMPLER",
+                    "stages": [
+                        "FRAGMENT"
+                    ]
+                }
+            ],
+            "uniforms": [
+                {"name": "projection", "uniform_enum": "PROJECTION_MAT4"},
+                {"name": "view", "uniform_enum": "VIEW_MAT4"},
+                {"name": "model", "uniform_enum": "MODEL_MAT4"},
+                {"name": "time_s", "uniform_enum": "FLOAT_TIME_S"}
+            ]
+        }
+    ]
+}

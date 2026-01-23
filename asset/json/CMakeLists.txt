@@ -10,8 +10,10 @@ add_custom_target(AssetJson
     level_test.json
     material_test.json
     program_test.json
+    cubemap.json
     ray_marching.json
     raytracing.json
+    raytracing_bvh.json
     renderer_test.json
     scene_tree_test.json
 )

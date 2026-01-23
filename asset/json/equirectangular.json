@@ -6,6 +6,7 @@
             "name": "EquirectangularProgram",
             "shader_vertex": "equirectangular_cubemap.vert",
             "shader_fragment": "equirectangular_cubemap.frag",
+            "shader_compute": "",
             "input_scene_type": {
                 "value": "QUAD"
             },

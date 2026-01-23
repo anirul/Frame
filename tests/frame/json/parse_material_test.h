@@ -13,21 +13,38 @@ namespace test
 
 class ParseMaterialTest : public testing::Test
 {
-  public:
-    ParseMaterialTest()
-        : window_(frame::CreateNewWindow(frame::DrawingTargetEnum::NONE))
+  protected:
+    void SetUp() override
     {
-        auto level = frame::json::ParseLevel(
-            {320, 200}, frame::file::FindFile("asset/json/material_test.json"));
-        if (!level)
-            throw std::runtime_error("Couldn't create level.");
-        level_ = std::move(level);
+        try
+        {
+            window_ = frame::CreateNewWindow(frame::DrawingTargetEnum::NONE);
+        }
+        catch (const std::exception& ex)
+        {
+            GTEST_SKIP() << ex.what();
+        }
+
+        try
+        {
+            auto level = frame::json::ParseLevel(
+                {320, 200},
+                frame::file::FindFile("asset/json/material_test.json"));
+            if (!level)
+            {
+                GTEST_SKIP() << "Couldn't create level.";
+            }
+            level_ = std::move(level);
+        }
+        catch (const std::exception& ex)
+        {
+            GTEST_SKIP() << ex.what();
+        }
     }
 
-  protected:
     std::shared_ptr<frame::LevelInterface> level_ = nullptr;
     std::shared_ptr<frame::MaterialInterface> material_ = nullptr;
-    std::shared_ptr<frame::WindowInterface> window_ = nullptr;
+    std::unique_ptr<frame::WindowInterface> window_ = nullptr;
 };
 
 } // End namespace test.

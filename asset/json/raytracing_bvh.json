@@ -1,0 +1,491 @@
+{
+    "name": "RayTracing",
+    "default_texture_name": "albedo",
+    "textures": [
+        {
+            "name": "albedo",
+            "size": {
+                "x": -1,
+                "y": -1
+            },
+            "pixel_element_size": {
+                "value": "BYTE"
+            },
+            "pixel_structure": {
+                "value": "RGB"
+            }
+        },
+        {
+            "name": "skybox",
+            "cubemap": true,
+            "pixel_element_size": {
+                "value": "FLOAT"
+            },
+            "pixel_structure": {
+                "value": "RGB"
+            },
+            "file_name": "asset/cubemap/hamarikyu.hdr"
+        },
+        {
+            "name": "skybox_env",
+            "cubemap": true,
+            "pixel_element_size": {
+                "value": "FLOAT"
+            },
+            "pixel_structure": {
+                "value": "RGB"
+            },
+            "file_name": "asset/cubemap/hamarikyu_env.hdr"
+        },
+        {
+            "name": "albedo_texture",
+            "cubemap": false,
+            "pixel_element_size": {
+                "value": "BYTE"
+            },
+            "pixel_structure": {
+                "value": "RGB"
+            },
+            "file_name": "asset/plastic/plastic_albedo.png"
+        },
+        {
+            "name": "normal_texture",
+            "cubemap": false,
+            "pixel_element_size": {
+                "value": "BYTE"
+            },
+            "pixel_structure": {
+                "value": "RGB"
+            },
+            "file_name": "asset/plastic/plastic_normal.png"
+        },
+        {
+            "name": "roughness_texture",
+            "cubemap": false,
+            "pixel_element_size": {
+                "value": "BYTE"
+            },
+            "pixel_structure": {
+                "value": "GREY"
+            },
+            "file_name": "asset/plastic/plastic_roughness.png"
+        },
+        {
+            "name": "metallic_texture",
+            "cubemap": false,
+            "pixel_element_size": {
+                "value": "BYTE"
+            },
+            "pixel_structure": {
+                "value": "GREY"
+            },
+            "file_name": "asset/plastic/plastic_metallic.png"
+        },
+        {
+            "name": "ao_texture",
+            "cubemap": false,
+            "pixel_element_size": {
+                "value": "BYTE"
+            },
+            "pixel_structure": {
+                "value": "GREY"
+            },
+            "file_name": "asset/plastic/plastic_ao.png"
+        }
+    ],
+    "materials": [
+        {
+            "name": "CubeMapMaterial",
+            "program_name": "CubeMapProgram",
+            "texture_names": [
+                "skybox"
+            ],
+            "inner_names": [
+                "Skybox"
+            ]
+        },
+        {
+            "name": "RayTraceMaterial",
+            "program_name": "RayTraceProgram",
+            "preprocess_program_name": "RayTracePreprocessProgram",
+            "texture_names": [
+                "albedo_texture",
+                "normal_texture",
+                "roughness_texture",
+                "metallic_texture",
+                "ao_texture",
+                "skybox",
+                "skybox_env"
+            ],
+            "inner_names": [
+                "albedo_texture",
+                "normal_texture",
+                "roughness_texture",
+                "metallic_texture",
+                "ao_texture",
+                "skybox",
+                "skybox_env"
+            ],
+            "buffer_names": [
+                "AppleMesh.0.triangle",
+                "AppleMesh.0.bvh"
+            ],
+            "inner_buffer_names": [
+                "TriangleBuffer",
+                "BvhBuffer"
+            ],
+            "node_names": [
+                "AppleMesh"
+            ],
+            "inner_node_names": [
+                "model"
+            ]
+        }
+    ],
+    "programs": [
+        {
+            "name": "CubeMapProgram",
+            "input_texture_names": [
+                "skybox"
+            ],
+            "output_texture_names": [
+                "albedo"
+            ],
+            "input_scene_type": {
+                "value": "CUBE"
+            },
+            "shader_vertex": "cubemap.vert",
+            "shader_fragment": "cubemap.frag",
+            "shader_compute": "",
+            "bindings": [
+                {
+                    "name": "Skybox",
+                    "binding": 0,
+                    "binding_type": "COMBINED_IMAGE_SAMPLER",
+                    "stages": [
+                        "FRAGMENT"
+                    ]
+                }
+            ],
+            "uniforms": [
+                {
+                    "name": "projection",
+                    "uniform_enum": "PROJECTION_MAT4"
+                },
+                {
+                    "name": "view",
+                    "uniform_enum": "VIEW_MAT4"
+                },
+                {
+                    "name": "model",
+                    "uniform_enum": "MODEL_MAT4"
+                }
+            ]
+        },
+        {
+            "name": "RayTraceProgram",
+            "output_texture_names": [
+                "albedo"
+            ],
+            "input_texture_names": [
+                "albedo_texture",
+                "normal_texture",
+                "roughness_texture",
+                "metallic_texture",
+                "ao_texture",
+                "skybox",
+                "skybox_env"
+            ],
+            "input_scene_type": {
+                "value": "QUAD"
+            },
+            "input_scene_root_name": "mesh_holder",
+            "shader_vertex": "raytracing_bvh.vert",
+            "shader_fragment": "raytracing_bvh.frag",
+            "shader_compute": "raytracing_bvh.comp",
+            "bindings": [
+                {
+                    "name": "output_image",
+                    "binding": 0,
+                    "binding_type": "STORAGE_IMAGE",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                },
+                {
+                    "name": "raytrace_output",
+                    "binding": 1,
+                    "binding_type": "OUTPUT_SAMPLER",
+                    "stages": [
+                        "FRAGMENT"
+                    ]
+                },
+                {
+                    "name": "albedo_texture",
+                    "binding": 2,
+                    "binding_type": "COMBINED_IMAGE_SAMPLER",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                },
+                {
+                    "name": "normal_texture",
+                    "binding": 3,
+                    "binding_type": "COMBINED_IMAGE_SAMPLER",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                },
+                {
+                    "name": "roughness_texture",
+                    "binding": 4,
+                    "binding_type": "COMBINED_IMAGE_SAMPLER",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                },
+                {
+                    "name": "metallic_texture",
+                    "binding": 5,
+                    "binding_type": "COMBINED_IMAGE_SAMPLER",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                },
+                {
+                    "name": "ao_texture",
+                    "binding": 6,
+                    "binding_type": "COMBINED_IMAGE_SAMPLER",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                },
+                {
+                    "name": "skybox_env",
+                    "binding": 7,
+                    "binding_type": "COMBINED_IMAGE_SAMPLER",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                },
+                {
+                    "name": "skybox",
+                    "binding": 11,
+                    "binding_type": "COMBINED_IMAGE_SAMPLER",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                },
+                {
+                    "name": "TriangleBuffer",
+                    "binding": 8,
+                    "binding_type": "STORAGE_BUFFER",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                },
+                {
+                    "name": "BvhBuffer",
+                    "binding": 9,
+                    "binding_type": "STORAGE_BUFFER",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                },
+                {
+                    "name": "UniformBlock",
+                    "binding": 10,
+                    "binding_type": "UNIFORM_BUFFER",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                }
+            ],
+            "uniforms": [
+                {
+                    "name": "projection",
+                    "uniform_enum": "PROJECTION_MAT4"
+                },
+                {
+                    "name": "view",
+                    "uniform_enum": "VIEW_MAT4"
+                },
+                {
+                    "name": "projection_inv",
+                    "uniform_enum": "PROJECTION_INV_MAT4"
+                },
+                {
+                    "name": "view_inv",
+                    "uniform_enum": "VIEW_INV_MAT4"
+                },
+                {
+                    "name": "model",
+                    "uniform_enum": "MODEL_MAT4"
+                },
+                {
+                    "name": "model_inv",
+                    "uniform_enum": "MODEL_INV_MAT4"
+                },
+                {
+                    "name": "camera_position",
+                    "uniform_enum": "CAMERA_POSITION_VEC3"
+                },
+                {
+                    "name": "light_dir",
+                    "uniform_enum": "LIGHT_POSITION_VEC3"
+                },
+                {
+                    "name": "light_color",
+                    "uniform_enum": "LIGHT_COLOR_VEC3"
+                }
+            ]
+        },
+        {
+            "name": "RayTracePreprocessProgram",
+            "input_scene_type": {
+                "value": "SCENE"
+            },
+            "shader_vertex": "raytracing_bvh.vert",
+            "shader_fragment": "raytracing_bvh.frag",
+            "shader_compute": "",
+            "uniforms": [
+                {
+                    "name": "projection",
+                    "uniform_enum": "PROJECTION_MAT4"
+                },
+                {
+                    "name": "view",
+                    "uniform_enum": "VIEW_MAT4"
+                },
+                {
+                    "name": "projection_inv",
+                    "uniform_enum": "PROJECTION_INV_MAT4"
+                },
+                {
+                    "name": "view_inv",
+                    "uniform_enum": "VIEW_INV_MAT4"
+                },
+                {
+                    "name": "model",
+                    "uniform_enum": "MODEL_MAT4"
+                },
+                {
+                    "name": "model_inv",
+                    "uniform_enum": "MODEL_INV_MAT4"
+                },
+                {
+                    "name": "camera_position",
+                    "uniform_enum": "CAMERA_POSITION_VEC3"
+                },
+                {
+                    "name": "light_dir",
+                    "uniform_enum": "LIGHT_POSITION_VEC3"
+                },
+                {
+                    "name": "light_color",
+                    "uniform_enum": "LIGHT_COLOR_VEC3"
+                }
+            ]
+        }
+    ],
+    "scene_tree": {
+        "default_camera_name": "camera",
+        "default_root_name": "root",
+        "node_matrices": [
+            {
+                "name": "root",
+                "matrix": {
+                    "m11": 1,
+                    "m22": 1,
+                    "m33": 1,
+                    "m44": 1
+                }
+            },
+            {
+                "name": "mesh_holder",
+                "parent": "root",
+                "quaternion": {
+                    "x": 0.0,
+                    "y": 0.2930181,
+                    "z": 0.2197635,
+                    "w": 0.9305076
+                }
+            },
+            {
+                "name": "env_holder",
+                "parent": "root",
+                "quaternion": {
+                    "x": 0.0,
+                    "y": 0.0499792,
+                    "z": 0.0,
+                    "w": 0.9987503
+                }
+            }
+        ],
+        "node_cameras": [
+            {
+                "name": "camera",
+                "parent": "root",
+                "fov_degrees": 65.0,
+                "near_clip": 0.01,
+                "far_clip": 1000.0,
+                "position": {
+                    "x": 0,
+                    "y": 0.5,
+                    "z": -0.7
+                },
+                "target": {
+                    "x": 0,
+                    "y": -0.5,
+                    "z": 0.7
+                },
+                "up": {
+                    "x": 0,
+                    "y": 1,
+                    "z": 0
+                }
+            }
+        ],
+        "node_static_meshes": [
+            {
+                "name": "CubeMapMesh",
+                "parent": "env_holder",
+                "material_name": "CubeMapMaterial",
+                "mesh_enum": "CUBE",
+                "render_time_enum": "SKYBOX_RENDER_TIME"
+            },
+            {
+                "name": "RayTracingRendering",
+                "parent": "root",
+                "mesh_enum": "QUAD",
+                "material_name": "RayTraceMaterial"
+            },
+            {
+                "name": "AppleMesh",
+                "parent": "mesh_holder",
+                "file_name": "dragon.obj",
+                "acceleration_structure_enum": "BVH_ACCELERATION",
+                "material_name": "RayTraceMaterial",
+                "render_time_enum": "PRE_RENDER_TIME"
+            }
+        ],
+        "node_lights": [
+            {
+                "name": "sun",
+                "parent": "env_holder",
+                "light_type": "DIRECTIONAL_LIGHT",
+                "shadow_type": "HARD_SHADOW",
+                "direction": {
+                    "x": 1.0,
+                    "y": -1.0,
+                    "z": 0.0
+                },
+                "color": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                }
+            }
+        ]
+    }
+}

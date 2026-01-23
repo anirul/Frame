@@ -1,0 +1,196 @@
+syntax = "proto3";
+
+import "pixel.proto";
+import "math.proto";
+import "plugin.proto";
+
+package frame.proto;
+
+// Scene is a way to load meshes.
+// For now it only load them from obj, mtl files but ths will be able to load
+// from fbx files as soon as we switch to this assimp library. This will add
+// skeleton animation so a new type of mesh.
+
+// Matrix
+// Next 6
+message NodeMatrix {
+	// This is the name of the scene matrix.
+	string name = 1;
+	// Give the name of the parent (if present).
+	string parent = 2;
+
+	// Is it a rotation or a static move?
+	enum MatrixTypeEnum {
+		STATIC_MATRIX = 0;
+		ROTATION_MATRIX = 1;
+	}
+	MatrixTypeEnum matrix_type_enum = 5;
+
+	// Could be a matrix or a quaternion.
+	oneof matrix_oneof {
+		UniformMatrix4 matrix = 3;
+		UniformVector4 quaternion = 4;
+	}
+}
+
+// Static Mesh.
+// Next 14
+message NodeStaticMesh {
+	// This is the name of the mesh.
+	string name = 1;
+	// Give the name of the parent (if present).
+	string parent = 2;
+
+	// Different kind of rendering possible.
+	enum RenderPrimitiveEnum {
+		TRIANGLE_PRIMITIVE	= 0; //< default!
+		POINT_PRIMITIVE		= 1;
+		LINE_PRIMITIVE		= 2;
+	}
+	// What kind of rendering is required (default = triangle).
+	RenderPrimitiveEnum render_primitive_enum = 8;
+
+	// Some mesh are included?
+	enum MeshEnum {
+		INVALID				= 0;
+		CUBE				= 1;
+		QUAD				= 2;
+	}
+	// Can only have one of the 3 cases mesh_enum, file_name or stream_input.
+	oneof mesh_oneof {
+		// If any of the clean buffer is activated, then only this is used!
+		CleanBuffer clean_buffer = 7;
+		// This can be a static mesh enum.
+		MeshEnum mesh_enum = 6;
+		// Where the file is loaded from.
+		string file_name = 3;
+		// Plugin input.
+		MultiPlugin multi_plugin = 10;
+	}
+
+	// Material name.
+	string material_name = 5;
+
+    // Render time enum.
+	enum RenderTimeEnum {
+        // This will be rendered at all frames (this is default).
+        SCENE_RENDER_TIME = 0;
+        // This will be pre-rendered only once at the beginning.
+        PRE_RENDER_TIME = 1;
+		// This will be post-rendered at the end of every frame.
+		POST_PROCESS_TIME = 2;
+		// This is the time we render the skybox.
+		SKYBOX_RENDER_TIME = 3;
+		// Shadow render time (this is used internally and should not be used
+		// as a descriptor in the scene).
+		SHADOW_RENDER_TIME = 4;
+	}
+
+    // When should it be rendered (default = PER_FRAME).
+    RenderTimeEnum render_time_enum = 11;
+
+	// Shadow effect enum.
+	enum ShadowEffectEnum {
+		// Opaque effect normal object behaviour (default).
+		OPAQUE_SHADOW_EFFECT = 0;
+		// No effect light go through.
+		TRANSPARENT_SHADOW_EFFECT = 1;
+	}
+
+	// Shadow effect (default = OPAQUE_EFFECT_SHADOW).
+	ShadowEffectEnum shadow_effect_enum = 12;
+
+	// Acceleration structure for ray traversal.
+	enum AccelerationStructureEnum {
+		NO_ACCELERATION = 0;
+		BVH_ACCELERATION = 1;
+	}
+
+	// Which acceleration structure to use (default = NO_ACCELERATION).
+	AccelerationStructureEnum acceleration_structure_enum = 13;
+}
+
+// Camera
+// Next 10
+message NodeCamera {
+	// This is the name of the camera.
+	string name = 1;
+	// Give the name of the parent (if present).
+	string parent = 2;
+	// Position of the camera in space.
+	UniformVector3 position = 3;
+	// Target where the camera is looking.
+	UniformVector3 target = 4;
+	// Up vector of the camera.
+	UniformVector3 up = 5;
+	// Fov in degrees.
+	float fov_degrees = 6;
+	// Width / Height proportions.
+	float aspect_ratio = 7;
+	// Near clipping plane.
+	float near_clip = 8;
+	// Far clipping plane.
+	float far_clip = 9;
+}
+
+// Light
+// Next 11
+message NodeLight {
+	// This is the name of the light.
+	string name = 1;
+	// Give the name of the parent (if present).
+	string parent = 2;
+	
+	// Light type this is what the light can be.
+	enum LightTypeEnum {
+		INVALID_LIGHT = 0;
+		AMBIENT_LIGHT = 1;
+		POINT_LIGHT = 2;
+		DIRECTIONAL_LIGHT = 3;
+		SPOT_LIGHT = 4;
+	}
+	// The light type of this light.
+	LightTypeEnum light_type = 3;
+	
+	// Position of the light.
+	// not considered in case this is AMBIENT, DIRECTIONAL.
+	UniformVector3 position = 4;
+	// Direction of the light 
+	// not considered in case this is AMBIENT, POINT.
+	UniformVector3 direction = 5;
+	// Dot inner limit for spot light.
+	// not considered in cast this is AMBIENT, POINT, DIRECTIONAL.
+	float dot_inner_limit = 6;
+	// Dot outer limit for spot light.
+	// not considered in cast this is AMBIENT, POINT, DIRECTIONAL.
+	float dot_outer_limit = 7;
+
+	// Color of the light.
+	UniformVector3 color = 8;
+
+	enum ShadowTypeEnum {
+		NO_SHADOW = 0;
+		HARD_SHADOW = 1;
+		SOFT_SHADOW = 2;
+	}
+
+	// Shadow type for the light.
+	ShadowTypeEnum shadow_type = 9;
+}
+
+// Scene definition.
+// Next 9
+message SceneTree {
+	// This defined witch is the root of the scene tree (not really needed).
+	string default_root_name = 1;
+	// This is the default camera node name.
+	string default_camera_name = 2;
+	// This is a list of scene matrices.
+	repeated NodeMatrix node_matrices = 3;
+	// This is a list of scene meshes.
+	repeated NodeStaticMesh node_static_meshes = 4;
+	// This is the camera scene node.
+	repeated NodeCamera node_cameras = 5;
+	// This is the node for the lights.
+	repeated NodeLight node_lights = 6;
+}

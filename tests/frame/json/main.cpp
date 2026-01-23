@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include <gtest/gtest.h>
 
 #include "frame/file/image_stb.h"

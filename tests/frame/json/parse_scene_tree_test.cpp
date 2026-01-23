@@ -1,6 +1,6 @@
 #include "frame/json/parse_scene_tree_test.h"
 
-#include "frame/json/parse_scene_tree.h"
+#include "frame/opengl/json/parse_scene_tree.h"
 #include "frame/level.h"
 
 namespace test

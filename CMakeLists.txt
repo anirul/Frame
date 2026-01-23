@@ -14,6 +14,12 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+if(MSVC)
+  add_compile_options(/FS)
+  set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT
+      "$<$<CONFIG:Debug>:Embedded>$<$<CONFIG:RelWithDebInfo>:ProgramDatabase>")
+endif()
+
 # Adding subfolder property.
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
@@ -49,6 +55,81 @@ if(NOT shaderc_FOUND)
   endif()
 endif()
 find_package(Vulkan REQUIRED)
+if(UNIX AND NOT APPLE AND TARGET Vulkan::Vulkan)
+  set(_frame_vulkan_system_loader "")
+  set(_frame_vulkan_system_candidates
+    /usr/lib64/libvulkan.so.1
+    /usr/lib64/libvulkan.so
+    /usr/lib/libvulkan.so.1
+    /usr/lib/libvulkan.so
+    /lib64/libvulkan.so.1
+    /lib64/libvulkan.so
+    /lib/libvulkan.so.1
+    /lib/libvulkan.so)
+  foreach(_frame_vulkan_system ${_frame_vulkan_system_candidates})
+    if(EXISTS "${_frame_vulkan_system}")
+      set(_frame_vulkan_system_loader "${_frame_vulkan_system}")
+      break()
+    endif()
+  endforeach()
+
+  foreach(_frame_vulkan_prop IN ITEMS "" "_DEBUG" "_RELEASE" "_RELWITHDEBINFO" "_MINSIZEREL")
+    if(_frame_vulkan_prop STREQUAL "")
+      get_target_property(_frame_vulkan_loc Vulkan::Vulkan IMPORTED_LOCATION)
+    else()
+      get_target_property(_frame_vulkan_loc Vulkan::Vulkan "IMPORTED_LOCATION${_frame_vulkan_prop}")
+    endif()
+
+    if(NOT _frame_vulkan_loc)
+      continue()
+    endif()
+
+    set(_frame_vulkan_should_override OFF)
+    if(NOT EXISTS "${_frame_vulkan_loc}")
+      set(_frame_vulkan_should_override ON)
+    elseif(_frame_vulkan_loc MATCHES "/vcpkg_installed/.*/(debug/)?lib/")
+      set(_frame_vulkan_should_override ON)
+    endif()
+
+    if(_frame_vulkan_should_override AND _frame_vulkan_system_loader)
+      if(_frame_vulkan_prop STREQUAL "")
+        set_property(TARGET Vulkan::Vulkan PROPERTY IMPORTED_LOCATION "${_frame_vulkan_system_loader}")
+        set_property(TARGET Vulkan::Vulkan PROPERTY IMPORTED_SONAME "")
+      else()
+        set_property(TARGET Vulkan::Vulkan PROPERTY "IMPORTED_LOCATION${_frame_vulkan_prop}" "${_frame_vulkan_system_loader}")
+        set_property(TARGET Vulkan::Vulkan PROPERTY "IMPORTED_SONAME${_frame_vulkan_prop}" "")
+      endif()
+    endif()
+  endforeach()
+
+  if(_frame_vulkan_system_loader)
+    message(STATUS "System Vulkan loader configured at ${_frame_vulkan_system_loader}")
+  endif()
+
+  unset(_frame_vulkan_loc)
+  unset(_frame_vulkan_prop)
+  unset(_frame_vulkan_system_loader)
+endif()
+
+if(UNIX AND NOT APPLE)
+  set(FRAME_LINK_GROUP_BEGIN "-Wl,--start-group")
+  set(FRAME_LINK_GROUP_END "-Wl,--end-group")
+endif()
+
+set(FRAME_CORE_LIBS
+  Frame
+  FrameFile
+  FrameJson
+  FrameOpenGL
+  FrameOpenGLFile
+  FrameOpenGLGui
+  FrameGui
+  FrameProto
+)
+
+set(FRAME_VULKAN_LIBS
+  FrameVulkan
+)
 
 include(cmake/AddImNodeFlow.cmake)
 
@@ -59,7 +140,7 @@ set_property(TARGET ImNodeFlow PROPERTY FOLDER "external/ImNodeFlow")
 add_subdirectory(asset/shader/opengl)
 add_subdirectory(asset/shader/vulkan)
 add_subdirectory(asset/json)
-add_subdirectory(src/frame)
+add_subdirectory(frame)
 add_subdirectory(editor)
 add_subdirectory(examples)
 add_subdirectory(tests/frame)

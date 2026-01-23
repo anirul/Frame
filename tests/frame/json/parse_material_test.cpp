@@ -1,6 +1,6 @@
 #include "frame/json/parse_material_test.h"
 
-#include "frame/json/parse_material.h"
+#include "frame/opengl/json/parse_material.h"
 
 namespace test
 {

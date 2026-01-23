@@ -25,7 +25,8 @@
                 "value": "QUAD"
             },
             "shader_vertex": "japanese_flag.vert",
-            "shader_fragment": "japanese_flag.frag"
+            "shader_fragment": "japanese_flag.frag",
+            "shader_compute": ""
         }
     ],
     "materials": [

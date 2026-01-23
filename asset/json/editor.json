@@ -33,6 +33,7 @@
             },
             "shader_vertex": "cubemap.vert",
             "shader_fragment": "cubemap.frag",
+            "shader_compute": "",
             "uniforms": [
                 {
                     "name": "projection",
@@ -60,6 +61,7 @@
             "input_scene_root_name": "root",
             "shader_vertex": "scene_simple.vert",
             "shader_fragment": "scene_simple.frag",
+            "shader_compute": "",
             "uniforms": [
                 {
                     "name": "projection",
