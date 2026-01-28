@@ -281,7 +281,7 @@ class VulkanRayTracingComputeTest : public ::testing::Test
             1,
             "Frame",
             1,
-            VK_API_VERSION_1_1);
+            VK_API_VERSION_1_4);
         vk::InstanceCreateInfo instance_info({}, &app_info);
         try
         {
@@ -308,6 +308,12 @@ class VulkanRayTracingComputeTest : public ::testing::Test
             vk::PhysicalDeviceType::eCpu)
         {
             GTEST_SKIP() << "Skipping on CPU Vulkan device.";
+            return;
+        }
+        const auto api_version = physical_device_.getProperties().apiVersion;
+        if (api_version < VK_API_VERSION_1_4)
+        {
+            GTEST_SKIP() << "Skipping Vulkan tests: requires Vulkan 1.4.";
             return;
         }
 
@@ -338,7 +344,6 @@ class VulkanRayTracingComputeTest : public ::testing::Test
             {}, graphics_family_index_, 1, &priority);
         const auto supported = physical_device_.getFeatures();
         vk::PhysicalDeviceFeatures features{};
-        features.geometryShader = supported.geometryShader;
         features.shaderStorageImageExtendedFormats =
             supported.shaderStorageImageExtendedFormats;
         if (!features.shaderStorageImageExtendedFormats)

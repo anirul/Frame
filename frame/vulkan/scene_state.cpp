@@ -86,18 +86,6 @@ SceneState BuildSceneState(
                     break;
                 }
             }
-            // Special-case legacy AppleMesh naming: if present, resolve directly.
-            if (!model_set)
-            {
-                auto apple_id = level.GetIdFromName("AppleMesh");
-                if (apple_id != frame::NullId)
-                {
-                    auto& node = level.GetSceneNodeFromId(apple_id);
-                    state.model = node.GetLocalModel(
-                        static_cast<double>(elapsed_time_seconds));
-                    model_set = true;
-                }
-            }
         }
         if (!model_set && preferred_material != frame::NullId)
         {

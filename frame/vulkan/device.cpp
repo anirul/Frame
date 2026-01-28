@@ -7,7 +7,6 @@
 #include <string>
 #include <unordered_set>
 #include <vector>
-#include <filesystem>
 
 #include <stdexcept>
 #include "absl/flags/flag.h"
@@ -89,7 +88,7 @@ Device::Device(
     for (const auto& physical_device : physical_devices)
     {
         const auto properties = physical_device.getProperties();
-        const auto features = physical_device.getFeatures();
+        const auto api_version = properties.apiVersion;
 
         int score = 0;
         if (properties.deviceType == vk::PhysicalDeviceType::eDiscreteGpu)
@@ -97,12 +96,17 @@ Device::Device(
             score += 1000;
         }
         score += static_cast<int>(properties.limits.maxImageDimension2D);
-        if (!features.geometryShader)
-        {
-            continue;
-        }
 
         const std::string device_name(properties.deviceName.data());
+        if (api_version < VK_API_VERSION_1_4)
+        {
+            logger_->info(
+                "Skipping Vulkan device {} (API {}.{}), requires Vulkan 1.4.",
+                device_name,
+                VK_VERSION_MAJOR(api_version),
+                VK_VERSION_MINOR(api_version));
+            continue;
+        }
         logger_->info("Evaluated Vulkan device: {}", device_name);
         if (score > best_score)
         {
@@ -114,7 +118,7 @@ Device::Device(
     if (!vk_physical_device_)
     {
         throw std::runtime_error(
-            "No suitable Vulkan physical device with geometry shader support.");
+            "No suitable Vulkan physical device with Vulkan 1.4 support.");
     }
 
     const auto queue_families = vk_physical_device_.getQueueFamilyProperties();
@@ -192,8 +196,6 @@ Device::Device(
 
     const auto supported_features = vk_physical_device_.getFeatures();
     vk::PhysicalDeviceFeatures device_features{};
-    device_features.geometryShader = supported_features.geometryShader;
-    device_features.samplerAnisotropy = supported_features.samplerAnisotropy;
     device_features.shaderStorageImageExtendedFormats =
         supported_features.shaderStorageImageExtendedFormats;
     if (!device_features.shaderStorageImageExtendedFormats &&

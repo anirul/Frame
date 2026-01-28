@@ -17,6 +17,66 @@
 namespace frame::vulkan
 {
 
+namespace
+{
+
+vk::Filter ToVkFilter(
+    const frame::proto::TextureFilter& filter,
+    vk::Filter fallback)
+{
+    switch (filter.value())
+    {
+    case frame::proto::TextureFilter::NEAREST:
+    case frame::proto::TextureFilter::NEAREST_MIPMAP_NEAREST:
+    case frame::proto::TextureFilter::NEAREST_MIPMAP_LINEAR:
+        return vk::Filter::eNearest;
+    case frame::proto::TextureFilter::LINEAR:
+    case frame::proto::TextureFilter::LINEAR_MIPMAP_NEAREST:
+    case frame::proto::TextureFilter::LINEAR_MIPMAP_LINEAR:
+        return vk::Filter::eLinear;
+    default:
+        return fallback;
+    }
+}
+
+vk::SamplerMipmapMode ToVkMipmapMode(
+    const frame::proto::TextureFilter& filter,
+    vk::SamplerMipmapMode fallback)
+{
+    switch (filter.value())
+    {
+    case frame::proto::TextureFilter::NEAREST_MIPMAP_NEAREST:
+    case frame::proto::TextureFilter::LINEAR_MIPMAP_NEAREST:
+        return vk::SamplerMipmapMode::eNearest;
+    case frame::proto::TextureFilter::NEAREST_MIPMAP_LINEAR:
+    case frame::proto::TextureFilter::LINEAR_MIPMAP_LINEAR:
+        return vk::SamplerMipmapMode::eLinear;
+    default:
+        return fallback;
+    }
+}
+
+vk::SamplerAddressMode ToVkAddressMode(
+    const frame::proto::TextureFilter& filter,
+    vk::SamplerAddressMode fallback)
+{
+    switch (filter.value())
+    {
+    case frame::proto::TextureFilter::CLAMP_TO_EDGE:
+        return vk::SamplerAddressMode::eClampToEdge;
+    case frame::proto::TextureFilter::MIRRORED_REPEAT:
+        return vk::SamplerAddressMode::eMirroredRepeat;
+    case frame::proto::TextureFilter::REPEAT:
+        return vk::SamplerAddressMode::eRepeat;
+    case frame::proto::TextureFilter::CLAMP_TO_BORDER:
+        return vk::SamplerAddressMode::eClampToBorder;
+    default:
+        return fallback;
+    }
+}
+
+} // namespace
+
 TextureResources::TextureResources(Device& owner)
     : owner_(owner)
 {
@@ -496,14 +556,29 @@ void TextureResources::UploadTexture(
         {vk::ImageAspectFlagBits::eColor, 0, 1, 0, layer_count});
     auto view = owner_.vk_unique_device_->createImageViewUnique(view_info);
 
+    const vk::Filter fallback_filter = vk::Filter::eLinear;
+    const vk::SamplerAddressMode fallback_address =
+        is_cubemap ? vk::SamplerAddressMode::eClampToEdge
+                   : vk::SamplerAddressMode::eRepeat;
+    const vk::Filter min_filter = ToVkFilter(
+        proto.min_filter(), fallback_filter);
+    const vk::Filter mag_filter = ToVkFilter(
+        proto.mag_filter(), fallback_filter);
+    const vk::SamplerMipmapMode mipmap_mode = ToVkMipmapMode(
+        proto.min_filter(), vk::SamplerMipmapMode::eNearest);
+    const vk::SamplerAddressMode wrap_s = ToVkAddressMode(
+        proto.wrap_s(), fallback_address);
+    const vk::SamplerAddressMode wrap_t = ToVkAddressMode(
+        proto.wrap_t(), fallback_address);
+
     vk::SamplerCreateInfo sampler_info(
         vk::SamplerCreateFlags{},
-        vk::Filter::eLinear,
-        vk::Filter::eLinear,
-        vk::SamplerMipmapMode::eLinear,
-        is_cubemap ? vk::SamplerAddressMode::eClampToEdge : vk::SamplerAddressMode::eRepeat,
-        is_cubemap ? vk::SamplerAddressMode::eClampToEdge : vk::SamplerAddressMode::eRepeat,
-        is_cubemap ? vk::SamplerAddressMode::eClampToEdge : vk::SamplerAddressMode::eRepeat,
+        min_filter,
+        mag_filter,
+        mipmap_mode,
+        wrap_s,
+        wrap_t,
+        fallback_address,
         0.0f,
         VK_FALSE,
         1.0f,

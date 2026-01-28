@@ -35,7 +35,7 @@ class VulkanResourceFixture : public ::testing::Test
             1,
             "Frame",
             1,
-            VK_API_VERSION_1_1);
+            VK_API_VERSION_1_4);
         vk::InstanceCreateInfo instance_info({}, &app_info);
         try
         {
@@ -62,6 +62,12 @@ class VulkanResourceFixture : public ::testing::Test
             vk::PhysicalDeviceType::eCpu)
         {
             GTEST_SKIP() << "Skipping on CPU Vulkan device.";
+            return;
+        }
+        const auto api_version = physical_device_.getProperties().apiVersion;
+        if (api_version < VK_API_VERSION_1_4)
+        {
+            GTEST_SKIP() << "Skipping Vulkan tests: requires Vulkan 1.4.";
             return;
         }
 
