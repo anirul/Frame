@@ -85,3 +85,5 @@ endif()
 if(TARGET AssetShaderVulkanSpv)
   add_dependencies(FrameVulkan AssetShaderVulkanSpv)
 endif()
+
+add_subdirectory(gui)

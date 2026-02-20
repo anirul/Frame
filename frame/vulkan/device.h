@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <filesystem>
+#include <functional>
 #include <memory>
 #include <optional>
 #include <string>
@@ -35,6 +36,8 @@ class TextureResources;
 class Device : public DeviceInterface
 {
   public:
+    using GuiRenderCallback = std::function<void(vk::CommandBuffer)>;
+
     Device(
         void* vk_instance,
         glm::uvec2 size,
@@ -61,6 +64,8 @@ class Device : public DeviceInterface
     glm::uvec2 GetSize() const final;
     void Display(double dt = 0.0) final;
     void ScreenShot(const std::string& file) const final;
+    void SetGuiRenderCallback(GuiRenderCallback callback);
+    void ClearGuiRenderCallback();
     std::unique_ptr<BufferInterface> CreatePointBuffer(
         std::vector<float>&& vector) final;
     std::unique_ptr<BufferInterface> CreateIndexBuffer(
@@ -92,6 +97,38 @@ class Device : public DeviceInterface
     RenderingAPIEnum GetDeviceEnum() const final
     {
         return RenderingAPIEnum::VULKAN;
+    }
+    vk::Instance GetVkInstance() const
+    {
+        return vk_instance_;
+    }
+    vk::PhysicalDevice GetVkPhysicalDevice() const
+    {
+        return vk_physical_device_;
+    }
+    vk::Device GetVkDevice() const
+    {
+        return vk_unique_device_ ? vk_unique_device_.get() : vk::Device{};
+    }
+    vk::Queue GetGraphicsQueue() const
+    {
+        return graphics_queue_;
+    }
+    std::uint32_t GetGraphicsQueueFamilyIndex() const
+    {
+        return graphics_queue_family_index_;
+    }
+    std::uint32_t GetMaxFramesInFlight() const
+    {
+        return static_cast<std::uint32_t>(kMaxFramesInFlight);
+    }
+    const SwapchainResources* GetSwapchainResources() const
+    {
+        return swapchain_resources_.get();
+    }
+    const CommandResources* GetCommandResources() const
+    {
+        return command_resources_.get();
     }
 
   private:
@@ -207,6 +244,7 @@ class Device : public DeviceInterface
     float elapsed_time_seconds_ = 0.0f;
     vk::ShaderStageFlags push_constant_stages_ = {};
     std::uint32_t push_constant_size_ = 0;
+    GuiRenderCallback gui_render_callback_;
 };
 
 } // namespace frame::vulkan

@@ -284,6 +284,8 @@ SDLVulkanWindow::~SDLVulkanWindow()
         vk_surface_ = VK_NULL_HANDLE;
     }
 
+    // Destroy instance-scoped debug messenger before destroying the instance.
+    debug_messenger_.reset();
     vk_unique_instance_.reset();
     SDL_Vulkan_UnloadLibrary();
 

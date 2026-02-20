@@ -626,6 +626,16 @@ void Device::AddPlugin(std::unique_ptr<PluginInterface>&& plugin_interface)
     plugin_interfaces_.push_back(std::move(plugin_interface));
 }
 
+void Device::SetGuiRenderCallback(GuiRenderCallback callback)
+{
+    gui_render_callback_ = std::move(callback);
+}
+
+void Device::ClearGuiRenderCallback()
+{
+    gui_render_callback_ = nullptr;
+}
+
 std::vector<PluginInterface*> Device::GetPluginPtrs()
 {
     std::vector<PluginInterface*> plugins;
@@ -669,6 +679,16 @@ void Device::Cleanup()
         }
     }
 
+    gui_render_callback_ = nullptr;
+    for (auto& plugin : plugin_interfaces_)
+    {
+        if (plugin)
+        {
+            plugin->End();
+        }
+    }
+    plugin_interfaces_.clear();
+
     DestroyComputePipeline();
     DestroyGraphicsPipeline();
     if (swapchain_resources_)
@@ -695,15 +715,6 @@ void Device::Cleanup()
         sync_resources_->Destroy();
     }
     current_level_data_.reset();
-
-    for (auto& plugin : plugin_interfaces_)
-    {
-        if (plugin)
-        {
-            plugin->End();
-        }
-    }
-    plugin_interfaces_.clear();
     level_.reset();
     elapsed_time_seconds_ = 0.0f;
     active_program_info_.reset();
@@ -757,7 +768,11 @@ void Device::Display(double dt)
     {
         return;
     }
-    if (!graphics_pipeline_ || !pipeline_layout_)
+    const bool has_scene_pipeline =
+        static_cast<bool>(graphics_pipeline_) &&
+        static_cast<bool>(pipeline_layout_);
+    const bool has_gui_render = static_cast<bool>(gui_render_callback_);
+    if (!has_scene_pipeline && !has_gui_render)
     {
         return;
     }
@@ -1293,6 +1308,18 @@ void Device::RecordCommandBuffer(
             {
                 command_buffer.draw(mesh.index_count, 1, 0, 0);
             }
+        }
+    }
+
+    if (gui_render_callback_)
+    {
+        try
+        {
+            gui_render_callback_(command_buffer);
+        }
+        catch (const std::exception& ex)
+        {
+            logger_->error("Failed to render Vulkan GUI: {}", ex.what());
         }
     }
 

@@ -123,6 +123,7 @@ set(FRAME_CORE_LIBS
   FrameOpenGL
   FrameOpenGLFile
   FrameOpenGLGui
+  FrameVulkanGui
   FrameGui
   FrameProto
 )

@@ -26,11 +26,15 @@ WindowCubemap::WindowCubemap(TextureInterface& texture_interface)
         display_size.x,
         display_size.y);
 
-    opengl::Cubemap& texture_cubemap =
-        dynamic_cast<opengl::Cubemap&>(texture_interface_);
-    auto pixel_size = texture_cubemap.GetData().pixel_element_size();
-    auto pixel_struct = texture_cubemap.GetData().pixel_structure();
-    auto face_size = texture_cubemap.GetSize();
+    auto* texture_cubemap = dynamic_cast<opengl::Cubemap*>(&texture_interface_);
+    if (!texture_cubemap)
+    {
+        return;
+    }
+
+    auto pixel_size = texture_cubemap->GetData().pixel_element_size();
+    auto pixel_struct = texture_cubemap->GetData().pixel_structure();
+    auto face_size = texture_cubemap->GetSize();
     std::uint32_t channels = 3;
     switch (pixel_struct.value())
     {
@@ -58,7 +62,7 @@ WindowCubemap::WindowCubemap(TextureInterface& texture_interface)
 
     if (pixel_size.value() == proto::PixelElementSize::BYTE)
     {
-        auto data = texture_cubemap.GetTextureByte();
+        auto data = texture_cubemap->GetTextureByte();
         for (int i = 0; i < 6; ++i)
         {
             face_textures_[i] = std::make_unique<opengl::Texture>(
@@ -72,7 +76,7 @@ WindowCubemap::WindowCubemap(TextureInterface& texture_interface)
         pixel_size.value() == proto::PixelElementSize::SHORT ||
         pixel_size.value() == proto::PixelElementSize::HALF)
     {
-        auto data = texture_cubemap.GetTextureWord();
+        auto data = texture_cubemap->GetTextureWord();
         for (int i = 0; i < 6; ++i)
         {
             face_textures_[i] = std::make_unique<opengl::Texture>(
@@ -84,7 +88,7 @@ WindowCubemap::WindowCubemap(TextureInterface& texture_interface)
     }
     else if (pixel_size.value() == proto::PixelElementSize::FLOAT)
     {
-        auto data = texture_cubemap.GetTextureFloat();
+        auto data = texture_cubemap->GetTextureFloat();
         for (int i = 0; i < 6; ++i)
         {
             face_textures_[i] = std::make_unique<opengl::Texture>(
@@ -98,6 +102,13 @@ WindowCubemap::WindowCubemap(TextureInterface& texture_interface)
 
 bool WindowCubemap::DrawCallback()
 {
+    if (!face_textures_[0])
+    {
+        ImGui::TextUnformatted(
+            "Cubemap preview sub-windows currently support OpenGL textures only.");
+        return true;
+    }
+
     ImVec2 content = ImGui::GetContentRegionAvail();
     float cell_w = content.x / 3.0f;
     float cell_h = content.y / 2.0f;
