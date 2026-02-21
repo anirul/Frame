@@ -53,16 +53,22 @@ void TextureResources::Build(
         const auto texture_start = Clock::now();
         try
         {
-            UploadTexture(texture_id, *texture_ptr);
+            if (!texture_ptr->HasGpuResources())
+            {
+                UploadTexture(texture_id, *texture_ptr);
+            }
             textures_[texture_id] = texture_ptr;
             ++uploaded_count;
             const auto elapsed =
                 std::chrono::duration_cast<std::chrono::milliseconds>(
                     Clock::now() - texture_start);
-            owner_.logger_->info(
-                "Uploaded texture {} in {} ms.",
-                proto_texture.name(),
-                elapsed.count());
+            if (texture_ptr->HasGpuResources())
+            {
+                owner_.logger_->info(
+                    "Prepared texture {} in {} ms.",
+                    proto_texture.name(),
+                    elapsed.count());
+            }
         }
         catch (const std::exception& ex)
         {

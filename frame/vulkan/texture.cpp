@@ -223,6 +223,26 @@ void Texture::SetGpuResources(
     sampler_ = std::move(sampler);
 }
 
+bool Texture::MoveGpuResourcesTo(Texture& target)
+{
+    if (!HasGpuResources())
+    {
+        return false;
+    }
+
+    target.ResetGpuResources();
+    target.gpu_format_ = gpu_format_;
+    target.view_type_ = view_type_;
+    target.image_ = std::move(image_);
+    target.memory_ = std::move(memory_);
+    target.view_ = std::move(view_);
+    target.sampler_ = std::move(sampler_);
+
+    gpu_format_ = vk::Format::eUndefined;
+    view_type_ = vk::ImageViewType::e2D;
+    return true;
+}
+
 void Texture::ResetGpuResources()
 {
     sampler_.reset();

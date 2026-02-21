@@ -1,11 +1,44 @@
 #include "frame/vulkan/scene_state.h"
 
+#include <exception>
+#include <optional>
+#include <string>
+
 #include <glm/gtc/matrix_inverse.hpp>
 
 #include "frame/camera.h"
 
 namespace frame::vulkan
 {
+
+namespace
+{
+
+std::optional<frame::EntityId> FindSceneNodeIdByName(
+    frame::LevelInterface& level, const std::string& name)
+{
+    if (name.empty())
+    {
+        return std::nullopt;
+    }
+    for (const auto node_id : level.GetSceneNodes())
+    {
+        try
+        {
+            if (level.GetNameFromId(node_id) == name)
+            {
+                return node_id;
+            }
+        }
+        catch (const std::exception&)
+        {
+            // Keep scanning when stale/invalid entries are encountered.
+        }
+    }
+    return std::nullopt;
+}
+
+} // namespace
 
 SceneState BuildSceneState(
     frame::LevelInterface& level,
@@ -62,9 +95,11 @@ SceneState BuildSceneState(
         if (!preferred_scene_root.empty() &&
             preferred_scene_root != "root")
         {
-            auto root_id = level.GetIdFromName(preferred_scene_root);
-            if (root_id != frame::NullId)
+            if (auto maybe_root_id =
+                    FindSceneNodeIdByName(level, preferred_scene_root);
+                maybe_root_id)
             {
+                const auto root_id = *maybe_root_id;
                 auto& node = level.GetSceneNodeFromId(root_id);
                 state.model = node.GetLocalModel(
                     static_cast<double>(elapsed_time_seconds));
@@ -76,9 +111,10 @@ SceneState BuildSceneState(
             auto& material = level.GetMaterialFromId(preferred_material);
             for (const auto& node_name : material.GetNodeNames())
             {
-                auto node_id = level.GetIdFromName(node_name);
-                if (node_id != frame::NullId)
+                if (auto maybe_node_id = FindSceneNodeIdByName(level, node_name);
+                    maybe_node_id)
                 {
+                    const auto node_id = *maybe_node_id;
                     auto& node = level.GetSceneNodeFromId(node_id);
                     state.model = node.GetLocalModel(
                         static_cast<double>(elapsed_time_seconds));
@@ -89,9 +125,11 @@ SceneState BuildSceneState(
             // Special-case legacy AppleMesh naming: if present, resolve directly.
             if (!model_set)
             {
-                auto apple_id = level.GetIdFromName("AppleMesh");
-                if (apple_id != frame::NullId)
+                if (auto maybe_apple_id =
+                        FindSceneNodeIdByName(level, "AppleMesh");
+                    maybe_apple_id)
                 {
+                    const auto apple_id = *maybe_apple_id;
                     auto& node = level.GetSceneNodeFromId(apple_id);
                     state.model = node.GetLocalModel(
                         static_cast<double>(elapsed_time_seconds));

@@ -58,6 +58,7 @@ class Texture : public frame::TextureInterface
         vk::UniqueDeviceMemory memory,
         vk::UniqueImageView view,
         vk::UniqueSampler sampler);
+    bool MoveGpuResourcesTo(Texture& target);
     void ResetGpuResources();
     vk::DescriptorImageInfo GetDescriptorInfo() const;
 

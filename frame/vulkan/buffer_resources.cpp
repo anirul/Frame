@@ -69,7 +69,18 @@ void BufferResourceManager::BuildStorageBuffers(
     LevelInterface& level,
     const std::vector<EntityId>& buffer_ids)
 {
+    struct PendingUpload
+    {
+        vk::UniqueBuffer staging_buffer;
+        vk::UniqueDeviceMemory staging_memory;
+        vk::Buffer destination = VK_NULL_HANDLE;
+        vk::DeviceSize size = 0;
+    };
+
     storage_buffers_.clear();
+    std::vector<PendingUpload> pending_uploads;
+    pending_uploads.reserve(buffer_ids.size());
+
     for (auto buffer_id : buffer_ids)
     {
         try
@@ -84,10 +95,47 @@ void BufferResourceManager::BuildStorageBuffers(
                     buffer_id);
                 continue;
             }
-            auto res = MakeGpuBuffer(
-                level.GetNameFromId(buffer_id),
-                buffer->GetRawData(),
-                vk::BufferUsageFlagBits::eStorageBuffer);
+
+            const auto& bytes = buffer->GetRawData();
+            if (bytes.empty())
+            {
+                (*logger_)->warn(
+                    "Skipping empty storage buffer {}.",
+                    level.GetNameFromId(buffer_id));
+                continue;
+            }
+
+            PendingUpload upload{};
+            upload.staging_buffer = memory_manager_->CreateBuffer(
+                bytes.size(),
+                vk::BufferUsageFlagBits::eTransferSrc,
+                vk::MemoryPropertyFlagBits::eHostVisible |
+                    vk::MemoryPropertyFlagBits::eHostCoherent,
+                upload.staging_memory);
+
+            void* mapped = device_.mapMemory(
+                *upload.staging_memory, 0, bytes.size());
+            std::memcpy(mapped, bytes.data(), bytes.size());
+            device_.unmapMemory(*upload.staging_memory);
+
+            vk::UniqueDeviceMemory gpu_memory;
+            auto gpu_buffer = memory_manager_->CreateBuffer(
+                bytes.size(),
+                vk::BufferUsageFlagBits::eTransferDst |
+                    vk::BufferUsageFlagBits::eTransferSrc |
+                    vk::BufferUsageFlagBits::eStorageBuffer,
+                vk::MemoryPropertyFlagBits::eDeviceLocal,
+                gpu_memory);
+
+            upload.destination = *gpu_buffer;
+            upload.size = static_cast<vk::DeviceSize>(bytes.size());
+            pending_uploads.push_back(std::move(upload));
+
+            BufferResource res{};
+            res.name = level.GetNameFromId(buffer_id);
+            res.size = bytes.size();
+            res.buffer = std::move(gpu_buffer);
+            res.memory = std::move(gpu_memory);
             storage_buffers_.push_back(std::move(res));
         }
         catch (const std::exception& ex)
@@ -97,6 +145,22 @@ void BufferResourceManager::BuildStorageBuffers(
                 buffer_id,
                 ex.what());
         }
+    }
+
+    if (!pending_uploads.empty())
+    {
+        command_queue_->SubmitOneTime(
+            [&](vk::CommandBuffer command_buffer)
+            {
+                for (const auto& upload : pending_uploads)
+                {
+                    vk::BufferCopy copy_region(0, 0, upload.size);
+                    command_buffer.copyBuffer(
+                        *upload.staging_buffer,
+                        upload.destination,
+                        copy_region);
+                }
+            });
     }
 }
 

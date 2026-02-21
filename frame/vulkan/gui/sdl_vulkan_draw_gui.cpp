@@ -23,6 +23,7 @@ namespace
 
 constexpr std::uint32_t kDescriptorPoolSize = 1000;
 constexpr std::uint32_t kDefaultMinImageCount = 2;
+constexpr bool kShowDefaultOutputPreviewWhenDockVisible = false;
 
 } // namespace
 
@@ -268,7 +269,10 @@ bool SDLVulkanDrawGui::Update(DeviceInterface& device, double dt)
     }
     else
     {
-        ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
+        ImGui::DockSpaceOverViewport(
+            0,
+            ImGui::GetMainViewport(),
+            ImGuiDockNodeFlags_PassthruCentralNode);
         std::vector<std::string> windows_to_remove;
         for (auto& [name, data] : window_callbacks_)
         {
@@ -301,113 +305,118 @@ bool SDLVulkanDrawGui::Update(DeviceInterface& device, double dt)
         }
     }
 
-    auto default_texture_id = level.GetDefaultOutputTextureId();
-    for (const EntityId& id : level.GetTextures())
+    const bool draw_default_output_texture =
+        !is_visible_ || kShowDefaultOutputPreviewWhenDockVisible;
+    if (draw_default_output_texture)
     {
-        frame::TextureInterface& texture_interface = level.GetTextureFromId(id);
-        if (texture_interface.GetData().cubemap())
+        auto default_texture_id = level.GetDefaultOutputTextureId();
+        for (const EntityId& id : level.GetTextures())
         {
-            continue;
-        }
-        auto* texture = dynamic_cast<frame::vulkan::Texture*>(&texture_interface);
-        if (!texture || !texture->HasGpuResources())
-        {
-            continue;
-        }
-        if (id != default_texture_id)
-        {
-            continue;
-        }
-
-        VkDescriptorSet imgui_texture = GetOrCreateTextureId(id, *texture);
-        if (imgui_texture == VK_NULL_HANDLE)
-        {
-            continue;
-        }
-
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-        original_image_size_ = texture->GetSize();
-
-        if (!is_visible_)
-        {
-            ImGui::Begin(
-                std::format(
-                    "<fullscreen> - [{}] - ({}, {})",
-                    texture->GetName(),
-                    texture->GetSize().x,
-                    texture->GetSize().y)
-                    .c_str(),
-                nullptr,
-                ImGuiWindowFlags_NoDecoration);
-        }
-        else
-        {
-            ImGui::Begin(
-                std::format(
-                    "default - [{}] - ({}, {})",
-                    texture->GetName(),
-                    texture->GetSize().x,
-                    texture->GetSize().y)
-                    .c_str());
-        }
-
-        if (modal_callback_)
-        {
-            if (!start_modal_)
+            frame::TextureInterface& texture_interface = level.GetTextureFromId(id);
+            if (texture_interface.GetData().cubemap())
             {
-                glm::vec2 modal_size = modal_callback_->GetInitialSize();
-                if (modal_size.x > 0.f || modal_size.y > 0.f)
-                {
-                    ImGui::SetNextWindowSize(
-                        ImVec2(modal_size.x, modal_size.y),
-                        ImGuiCond_Appearing);
-                }
-                ImGui::OpenPopup(modal_callback_->GetName().c_str());
-                start_modal_ = true;
+                continue;
             }
-            if (ImGui::BeginPopupModal(
-                    modal_callback_->GetName().c_str(),
+            auto* texture = dynamic_cast<frame::vulkan::Texture*>(&texture_interface);
+            if (!texture || !texture->HasGpuResources())
+            {
+                continue;
+            }
+            if (id != default_texture_id)
+            {
+                continue;
+            }
+
+            VkDescriptorSet imgui_texture = GetOrCreateTextureId(id, *texture);
+            if (imgui_texture == VK_NULL_HANDLE)
+            {
+                continue;
+            }
+
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+            original_image_size_ = texture->GetSize();
+
+            if (!is_visible_)
+            {
+                ImGui::Begin(
+                    std::format(
+                        "<fullscreen> - [{}] - ({}, {})",
+                        texture->GetName(),
+                        texture->GetSize().x,
+                        texture->GetSize().y)
+                        .c_str(),
                     nullptr,
-                    ImGuiWindowFlags_NoMove))
-            {
-                modal_callback_->DrawCallback();
-                if (modal_callback_->End())
-                {
-                    start_modal_ = false;
-                    ImGui::CloseCurrentPopup();
-                    modal_callback_.reset();
-                }
-                ImGui::EndPopup();
+                    ImGuiWindowFlags_NoDecoration);
             }
-        }
+            else
+            {
+                ImGui::Begin(
+                    std::format(
+                        "default - [{}] - ({}, {})",
+                        texture->GetName(),
+                        texture->GetSize().x,
+                        texture->GetSize().y)
+                        .c_str());
+            }
 
-        if (ImGui::IsWindowHovered())
-        {
-            is_keyboard_passed_ = true;
-        }
+            if (modal_callback_)
+            {
+                if (!start_modal_)
+                {
+                    glm::vec2 modal_size = modal_callback_->GetInitialSize();
+                    if (modal_size.x > 0.f || modal_size.y > 0.f)
+                    {
+                        ImGui::SetNextWindowSize(
+                            ImVec2(modal_size.x, modal_size.y),
+                            ImGuiCond_Appearing);
+                    }
+                    ImGui::OpenPopup(modal_callback_->GetName().c_str());
+                    start_modal_ = true;
+                }
+                if (ImGui::BeginPopupModal(
+                        modal_callback_->GetName().c_str(),
+                        nullptr,
+                        ImGuiWindowFlags_NoMove))
+                {
+                    modal_callback_->DrawCallback();
+                    if (modal_callback_->End())
+                    {
+                        start_modal_ = false;
+                        ImGui::CloseCurrentPopup();
+                        modal_callback_.reset();
+                    }
+                    ImGui::EndPopup();
+                }
+            }
 
-        ImVec2 content_window = ImGui::GetContentRegionAvail();
-        auto texture_size = texture->GetSize();
-        if (texture_size.y == 0)
-        {
+            if (ImGui::IsWindowHovered())
+            {
+                is_keyboard_passed_ = true;
+            }
+
+            ImVec2 content_window = ImGui::GetContentRegionAvail();
+            auto texture_size = texture->GetSize();
+            if (texture_size.y == 0)
+            {
+                ImGui::End();
+                ImGui::PopStyleVar();
+                continue;
+            }
+            float aspect_ratio = static_cast<float>(texture_size.x) /
+                                 static_cast<float>(texture_size.y);
+            ImVec2 image_size{};
+            if (content_window.x / aspect_ratio > content_window.y)
+            {
+                image_size = ImVec2(content_window.y * aspect_ratio, content_window.y);
+            }
+            else
+            {
+                image_size = ImVec2(content_window.x, content_window.x / aspect_ratio);
+            }
+            ImGui::Image(reinterpret_cast<ImTextureID>(imgui_texture), image_size);
             ImGui::End();
             ImGui::PopStyleVar();
-            continue;
         }
-        float aspect_ratio = static_cast<float>(texture_size.x) /
-                             static_cast<float>(texture_size.y);
-        ImVec2 image_size{};
-        if (content_window.x / aspect_ratio > content_window.y)
-        {
-            image_size = ImVec2(content_window.y * aspect_ratio, content_window.y);
-        }
-        else
-        {
-            image_size = ImVec2(content_window.x, content_window.x / aspect_ratio);
-        }
-        ImGui::Image(reinterpret_cast<ImTextureID>(imgui_texture), image_size);
-        ImGui::End();
-        ImGui::PopStyleVar();
     }
 
     if (!is_visible_)

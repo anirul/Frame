@@ -352,14 +352,13 @@ WindowReturnEnum SDLVulkanWindow::Run(std::function<bool()> lambda)
 
         if (device_)
         {
-            try
+            if (!lambda())
             {
-                device_->Display(dt);
+                window_return_enum = WindowReturnEnum::RESTART;
             }
-            catch (const std::exception& ex)
+            if (window_return_enum != WindowReturnEnum::CONTINUE)
             {
-                logger_->error("Vulkan Display failed: {}", ex.what());
-                window_return_enum = WindowReturnEnum::QUIT;
+                break;
             }
 
             for (const auto& plugin_interface : device_->GetPluginPtrs())
@@ -370,6 +369,20 @@ WindowReturnEnum SDLVulkanWindow::Run(std::function<bool()> lambda)
                     window_return_enum = WindowReturnEnum::RESTART;
                 }
             }
+            if (window_return_enum != WindowReturnEnum::CONTINUE)
+            {
+                break;
+            }
+
+            try
+            {
+                device_->Display(dt);
+            }
+            catch (const std::exception& ex)
+            {
+                logger_->error("Vulkan Display failed: {}", ex.what());
+                window_return_enum = WindowReturnEnum::QUIT;
+            }
         }
 
         std::string title = "Frame - Vulkan";
@@ -379,11 +392,6 @@ WindowReturnEnum SDLVulkanWindow::Run(std::function<bool()> lambda)
         }
         title += std::format(" - {:.2f}", GetFPS(dt));
         SetWindowTitle(title);
-
-        if (!lambda())
-        {
-            window_return_enum = WindowReturnEnum::RESTART;
-        }
 
         SDL_Delay(1);
     }

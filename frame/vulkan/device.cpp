@@ -65,6 +65,72 @@ vk::ShaderStageFlags ToShaderStageFlags(
     return flags;
 }
 
+bool AreTexturesCompatibleForReuse(
+    const frame::vulkan::Texture& old_texture,
+    const frame::vulkan::Texture& new_texture)
+{
+    const auto& old_data = old_texture.GetData();
+    const auto& new_data = new_texture.GetData();
+
+    if (!old_texture.HasGpuResources())
+    {
+        return false;
+    }
+    if (old_texture.GetViewType() != new_texture.GetViewType())
+    {
+        return false;
+    }
+    if (old_data.has_size() != new_data.has_size())
+    {
+        return false;
+    }
+    if (old_data.has_size())
+    {
+        if (old_data.size().x() != new_data.size().x() ||
+            old_data.size().y() != new_data.size().y())
+        {
+            return false;
+        }
+    }
+    return old_data.pixel_element_size().value() ==
+               new_data.pixel_element_size().value() &&
+           old_data.pixel_structure().value() ==
+               new_data.pixel_structure().value();
+}
+
+std::size_t TransferTextureGpuResources(
+    frame::LevelInterface& old_level,
+    frame::LevelInterface& new_level)
+{
+    std::size_t transfer_count = 0;
+    for (const auto new_texture_id : new_level.GetTextures())
+    {
+        const std::string texture_name = new_level.GetNameFromId(new_texture_id);
+        const auto old_texture_id = old_level.GetIdFromName(texture_name);
+        if (old_texture_id == frame::NullId)
+        {
+            continue;
+        }
+        auto* old_texture = dynamic_cast<frame::vulkan::Texture*>(
+            &old_level.GetTextureFromId(old_texture_id));
+        auto* new_texture = dynamic_cast<frame::vulkan::Texture*>(
+            &new_level.GetTextureFromId(new_texture_id));
+        if (!old_texture || !new_texture)
+        {
+            continue;
+        }
+        if (!AreTexturesCompatibleForReuse(*old_texture, *new_texture))
+        {
+            continue;
+        }
+        if (old_texture->MoveGpuResourcesTo(*new_texture))
+        {
+            ++transfer_count;
+        }
+    }
+    return transfer_count;
+}
+
 } // namespace
 
 Device::Device(
@@ -423,10 +489,23 @@ void Device::StartupFromLevelData(const frame::json::LevelData& level_data)
         }
     }
 
+    auto previous_level = std::move(level_);
+    std::size_t transferred_texture_count = 0;
     {
         ScopedTimer timer(logger_, "BuildLevel");
         auto built = BuildLevel(GetSize(), level_data);
+        if (previous_level && built.level)
+        {
+            transferred_texture_count =
+                TransferTextureGpuResources(*previous_level, *built.level);
+        }
         level_ = std::move(built.level);
+    }
+    if (transferred_texture_count > 0)
+    {
+        logger_->info(
+            "Reused {} Vulkan texture GPU resources.",
+            transferred_texture_count);
     }
 
     if (active_program_info_ && level_)
@@ -542,6 +621,8 @@ void Device::StartupFromLevelData(const frame::json::LevelData& level_data)
     DestroyComputePipeline();
     DestroyGraphicsPipeline();
     DestroyDescriptorResources();
+    // TextureResources keeps raw pointers to textures owned by the previous level.
+    // Clear the resource map after resource transfer and before dropping old level.
     DestroyTextureResources();
     if (mesh_resources_)
     {
@@ -554,21 +635,13 @@ void Device::StartupFromLevelData(const frame::json::LevelData& level_data)
             ScopedTimer timer(logger_, "CreateTextureResources");
             CreateTextureResources(level_data);
         }
-        if (swapchain_resources_)
-        {
-            swapchain_resources_->Destroy();
-        }
-        if (command_resources_)
-        {
-            command_resources_->FreeBuffers();
-        }
         {
             ScopedTimer timer(logger_, "CreateSwapchainResources");
-            if (swapchain_resources_)
+            if (swapchain_resources_ && !swapchain_resources_->IsValid())
             {
                 swapchain_resources_->Create(size_);
             }
-            if (command_resources_)
+            if (command_resources_ && command_resources_->GetBuffers().empty())
             {
                 command_resources_->AllocateBuffers(
                     static_cast<std::uint32_t>(kMaxFramesInFlight));
@@ -615,6 +688,8 @@ void Device::StartupFromLevelData(const frame::json::LevelData& level_data)
     {
         sync_resources_->Create();
     }
+
+    previous_level.reset();
 }
 
 void Device::AddPlugin(std::unique_ptr<PluginInterface>&& plugin_interface)
@@ -908,23 +983,6 @@ void Device::Display(double dt)
             device_lost_ = true;
         }
         return;
-    }
-
-    if (absl::GetFlag(FLAGS_vk_validation))
-    {
-        const VkResult present_wait = vkQueueWaitIdle(
-            static_cast<VkQueue>(present_queue_));
-        if (present_wait != VK_SUCCESS)
-        {
-            logger_->error(
-                "vkQueueWaitIdle after present failed: {}",
-                vk::to_string(static_cast<vk::Result>(present_wait)));
-            if (present_wait == VK_ERROR_DEVICE_LOST)
-            {
-                device_lost_ = true;
-            }
-            return;
-        }
     }
 
     current_frame_ = (current_frame_ + 1) % kMaxFramesInFlight;

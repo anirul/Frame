@@ -225,6 +225,19 @@ WindowReturnEnum SDLVulkanNone::Run(std::function<bool()> lambda)
 
     if (device_)
     {
+        if (!lambda())
+        {
+            return WindowReturnEnum::RESTART;
+        }
+
+        for (const auto& plugin_interface : device_->GetPluginPtrs())
+        {
+            if (plugin_interface)
+            {
+                plugin_interface->Update(*device_, 0.0);
+            }
+        }
+
         try
         {
             device_->Display(0.0);
@@ -234,16 +247,8 @@ WindowReturnEnum SDLVulkanNone::Run(std::function<bool()> lambda)
             logger_->error("Vulkan Display failed: {}", ex.what());
             return WindowReturnEnum::QUIT;
         }
-        for (const auto& plugin_interface : device_->GetPluginPtrs())
-        {
-            if (plugin_interface)
-            {
-                plugin_interface->Update(*device_, 0.0);
-            }
-        }
     }
-
-    if (!lambda())
+    else if (!lambda())
     {
         return WindowReturnEnum::RESTART;
     }
