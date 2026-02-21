@@ -130,6 +130,7 @@ class Device : public DeviceInterface
     {
         return command_resources_.get();
     }
+    std::optional<vk::DescriptorImageInfo> GetComputeOutputDescriptorInfo() const;
 
   private:
     friend class TextureResources;

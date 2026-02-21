@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <array>
 #include <format>
+#include <limits>
 #include <imgui.h>
 #include <imgui_impl_sdl3.h>
 #include <imgui_impl_vulkan.h>
@@ -23,7 +24,7 @@ namespace
 
 constexpr std::uint32_t kDescriptorPoolSize = 1000;
 constexpr std::uint32_t kDefaultMinImageCount = 2;
-constexpr bool kShowDefaultOutputPreviewWhenDockVisible = false;
+constexpr bool kShowDefaultOutputPreviewWhenDockVisible = true;
 
 } // namespace
 
@@ -269,10 +270,7 @@ bool SDLVulkanDrawGui::Update(DeviceInterface& device, double dt)
     }
     else
     {
-        ImGui::DockSpaceOverViewport(
-            0,
-            ImGui::GetMainViewport(),
-            ImGuiDockNodeFlags_PassthruCentralNode);
+        ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
         std::vector<std::string> windows_to_remove;
         for (auto& [name, data] : window_callbacks_)
         {
@@ -309,41 +307,84 @@ bool SDLVulkanDrawGui::Update(DeviceInterface& device, double dt)
         !is_visible_ || kShowDefaultOutputPreviewWhenDockVisible;
     if (draw_default_output_texture)
     {
-        auto default_texture_id = level.GetDefaultOutputTextureId();
-        for (const EntityId& id : level.GetTextures())
+        VkDescriptorSet imgui_texture = VK_NULL_HANDLE;
+        std::string preview_name = "output";
+        glm::uvec2 preview_size = {0, 0};
+
+        constexpr EntityId kComputeOutputPreviewTextureId =
+            std::numeric_limits<EntityId>::max();
+
+        if (auto compute_output_info =
+                vulkan_device_.GetComputeOutputDescriptorInfo();
+            compute_output_info.has_value())
         {
-            frame::TextureInterface& texture_interface = level.GetTextureFromId(id);
-            if (texture_interface.GetData().cubemap())
+            if (auto it = texture_bindings_.find(kComputeOutputPreviewTextureId);
+                it != texture_bindings_.end() && renderer_initialized_)
             {
-                continue;
+                if (it->second != VK_NULL_HANDLE)
+                {
+                    ImGui_ImplVulkan_RemoveTexture(it->second);
+                }
+                texture_bindings_.erase(it);
             }
-            auto* texture = dynamic_cast<frame::vulkan::Texture*>(&texture_interface);
-            if (!texture || !texture->HasGpuResources())
+            imgui_texture = GetOrCreateTextureId(
+                kComputeOutputPreviewTextureId,
+                *compute_output_info);
+            preview_name = "swapchain";
+            if (const auto* swapchain = vulkan_device_.GetSwapchainResources();
+                swapchain && swapchain->IsValid())
             {
-                continue;
+                const auto extent = swapchain->GetExtent();
+                preview_size = {extent.width, extent.height};
             }
-            if (id != default_texture_id)
-            {
-                continue;
-            }
+        }
 
-            VkDescriptorSet imgui_texture = GetOrCreateTextureId(id, *texture);
-            if (imgui_texture == VK_NULL_HANDLE)
+        if (imgui_texture == VK_NULL_HANDLE)
+        {
+            const auto default_texture_id = level.GetDefaultOutputTextureId();
+            for (const EntityId& id : level.GetTextures())
             {
-                continue;
-            }
+                frame::TextureInterface& texture_interface =
+                    level.GetTextureFromId(id);
+                if (texture_interface.GetData().cubemap())
+                {
+                    continue;
+                }
+                auto* texture =
+                    dynamic_cast<frame::vulkan::Texture*>(&texture_interface);
+                if (!texture || !texture->HasGpuResources())
+                {
+                    continue;
+                }
+                if (id != default_texture_id)
+                {
+                    continue;
+                }
 
+                imgui_texture = GetOrCreateTextureId(id, *texture);
+                preview_name = texture->GetName();
+                preview_size = texture->GetSize();
+                break;
+            }
+        }
+
+        if (imgui_texture == VK_NULL_HANDLE)
+        {
+            // No renderable preview image is available yet.
+        }
+        else
+        {
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-            original_image_size_ = texture->GetSize();
+            original_image_size_ = preview_size;
 
             if (!is_visible_)
             {
                 ImGui::Begin(
                     std::format(
                         "<fullscreen> - [{}] - ({}, {})",
-                        texture->GetName(),
-                        texture->GetSize().x,
-                        texture->GetSize().y)
+                        preview_name,
+                        preview_size.x,
+                        preview_size.y)
                         .c_str(),
                     nullptr,
                     ImGuiWindowFlags_NoDecoration);
@@ -353,9 +394,9 @@ bool SDLVulkanDrawGui::Update(DeviceInterface& device, double dt)
                 ImGui::Begin(
                     std::format(
                         "default - [{}] - ({}, {})",
-                        texture->GetName(),
-                        texture->GetSize().x,
-                        texture->GetSize().y)
+                        preview_name,
+                        preview_size.x,
+                        preview_size.y)
                         .c_str());
             }
 
@@ -395,27 +436,32 @@ bool SDLVulkanDrawGui::Update(DeviceInterface& device, double dt)
             }
 
             ImVec2 content_window = ImGui::GetContentRegionAvail();
-            auto texture_size = texture->GetSize();
-            if (texture_size.y == 0)
+            if (preview_size.y == 0)
             {
                 ImGui::End();
                 ImGui::PopStyleVar();
-                continue;
-            }
-            float aspect_ratio = static_cast<float>(texture_size.x) /
-                                 static_cast<float>(texture_size.y);
-            ImVec2 image_size{};
-            if (content_window.x / aspect_ratio > content_window.y)
-            {
-                image_size = ImVec2(content_window.y * aspect_ratio, content_window.y);
             }
             else
             {
-                image_size = ImVec2(content_window.x, content_window.x / aspect_ratio);
+                const float aspect_ratio = static_cast<float>(preview_size.x) /
+                                           static_cast<float>(preview_size.y);
+                ImVec2 image_size{};
+                if (content_window.x / aspect_ratio > content_window.y)
+                {
+                    image_size =
+                        ImVec2(content_window.y * aspect_ratio, content_window.y);
+                }
+                else
+                {
+                    image_size =
+                        ImVec2(content_window.x, content_window.x / aspect_ratio);
+                }
+                ImGui::Image(
+                    reinterpret_cast<ImTextureID>(imgui_texture),
+                    image_size);
+                ImGui::End();
+                ImGui::PopStyleVar();
             }
-            ImGui::Image(reinterpret_cast<ImTextureID>(imgui_texture), image_size);
-            ImGui::End();
-            ImGui::PopStyleVar();
         }
     }
 
@@ -555,7 +601,7 @@ frame::gui::GuiWindowInterface& SDLVulkanDrawGui::GetWindow(
 
 VkDescriptorSet SDLVulkanDrawGui::GetOrCreateTextureId(
     EntityId texture_id,
-    frame::vulkan::Texture& texture)
+    const vk::DescriptorImageInfo& descriptor_info)
 {
     if (!renderer_initialized_)
     {
@@ -566,13 +612,19 @@ VkDescriptorSet SDLVulkanDrawGui::GetOrCreateTextureId(
         return it->second;
     }
 
-    auto descriptor_info = texture.GetDescriptorInfo();
     VkDescriptorSet descriptor_set = ImGui_ImplVulkan_AddTexture(
         static_cast<VkSampler>(descriptor_info.sampler),
         static_cast<VkImageView>(descriptor_info.imageView),
         static_cast<VkImageLayout>(descriptor_info.imageLayout));
     texture_bindings_.emplace(texture_id, descriptor_set);
     return descriptor_set;
+}
+
+VkDescriptorSet SDLVulkanDrawGui::GetOrCreateTextureId(
+    EntityId texture_id,
+    frame::vulkan::Texture& texture)
+{
+    return GetOrCreateTextureId(texture_id, texture.GetDescriptorInfo());
 }
 
 void SDLVulkanDrawGui::ClearTextureBindings()

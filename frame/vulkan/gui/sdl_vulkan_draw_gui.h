@@ -109,6 +109,9 @@ class SDLVulkanDrawGui : public frame::gui::DrawGuiInterface
     void RenderDrawData(vk::CommandBuffer command_buffer);
     VkDescriptorSet GetOrCreateTextureId(
         EntityId texture_id,
+        const vk::DescriptorImageInfo& descriptor_info);
+    VkDescriptorSet GetOrCreateTextureId(
+        EntityId texture_id,
         frame::vulkan::Texture& texture);
     void ClearTextureBindings();
 

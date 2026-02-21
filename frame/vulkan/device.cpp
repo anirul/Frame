@@ -816,6 +816,18 @@ glm::uvec2 Device::GetSize() const
     return size_;
 }
 
+std::optional<vk::DescriptorImageInfo> Device::GetComputeOutputDescriptorInfo() const
+{
+    if (!compute_output_sampler_ || !compute_output_view_)
+    {
+        return std::nullopt;
+    }
+    return vk::DescriptorImageInfo(
+        *compute_output_sampler_,
+        *compute_output_view_,
+        vk::ImageLayout::eShaderReadOnlyOptimal);
+}
+
 void Device::Display(double dt)
 {
     if (device_lost_)
