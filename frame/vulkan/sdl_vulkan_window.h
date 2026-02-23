@@ -79,6 +79,10 @@ class SDLVulkanWindow : public WindowInterface
 
   public:
     vk::SurfaceKHR& GetVulkanSurfaceKHR();
+    static bool IsGuiToggleKey(std::int32_t key)
+    {
+        return key == SDLK_F11;
+    }
     const vk::SurfaceKHR& GetVulkanSurfaceKHR() const
     {
         return vk_surface_;

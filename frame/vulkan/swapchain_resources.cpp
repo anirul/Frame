@@ -55,7 +55,8 @@ void SwapchainResources::Create(glm::uvec2 size)
         surface_format.colorSpace,
         extent,
         1,
-        vk::ImageUsageFlagBits::eColorAttachment);
+        vk::ImageUsageFlagBits::eColorAttachment |
+            vk::ImageUsageFlagBits::eTransferSrc);
 
     std::array<std::uint32_t, 2> queue_family_indices = {
         graphics_queue_family_index_,
@@ -106,8 +107,8 @@ void SwapchainResources::Create(glm::uvec2 size)
         vk::AttachmentStoreOp::eStore,
         vk::AttachmentLoadOp::eDontCare,
         vk::AttachmentStoreOp::eDontCare,
-        vk::ImageLayout::eUndefined,
-        vk::ImageLayout::ePresentSrcKHR);
+        ScenePassInitialLayout(),
+        ScenePassFinalLayout());
 
     vk::AttachmentReference color_ref(
         0, vk::ImageLayout::eColorAttachmentOptimal);
@@ -159,6 +160,74 @@ void SwapchainResources::Create(glm::uvec2 size)
             device_.createFramebufferUnique(framebuffer_info));
     }
 
+    vk::AttachmentDescription gui_color_attachment(
+        {},
+        image_format_,
+        vk::SampleCountFlagBits::e1,
+        vk::AttachmentLoadOp::eLoad,
+        vk::AttachmentStoreOp::eStore,
+        vk::AttachmentLoadOp::eDontCare,
+        vk::AttachmentStoreOp::eDontCare,
+        GuiPassInitialLayout(),
+        GuiPassFinalLayout());
+
+    vk::AttachmentReference gui_color_ref(
+        0, vk::ImageLayout::eColorAttachmentOptimal);
+
+    vk::SubpassDescription gui_subpass(
+        {},
+        vk::PipelineBindPoint::eGraphics,
+        0,
+        nullptr,
+        1,
+        &gui_color_ref,
+        nullptr,
+        nullptr,
+        0,
+        nullptr);
+
+    std::array<vk::SubpassDependency, 2> gui_dependencies = {
+        vk::SubpassDependency(
+            VK_SUBPASS_EXTERNAL,
+            0,
+            vk::PipelineStageFlagBits::eTransfer,
+            vk::PipelineStageFlagBits::eColorAttachmentOutput,
+            vk::AccessFlagBits::eTransferRead,
+            vk::AccessFlagBits::eColorAttachmentWrite),
+        vk::SubpassDependency(
+            0,
+            VK_SUBPASS_EXTERNAL,
+            vk::PipelineStageFlagBits::eColorAttachmentOutput,
+            vk::PipelineStageFlagBits::eBottomOfPipe,
+            vk::AccessFlagBits::eColorAttachmentWrite,
+            {})};
+
+    vk::RenderPassCreateInfo gui_render_pass_info(
+        {},
+        1,
+        &gui_color_attachment,
+        1,
+        &gui_subpass,
+        static_cast<std::uint32_t>(gui_dependencies.size()),
+        gui_dependencies.data());
+    gui_render_pass_ = device_.createRenderPassUnique(gui_render_pass_info);
+
+    gui_framebuffers_.clear();
+    gui_framebuffers_.reserve(image_views_.size());
+    for (const auto& view : image_views_)
+    {
+        vk::FramebufferCreateInfo framebuffer_info(
+            {},
+            *gui_render_pass_,
+            1,
+            &view.get(),
+            extent_.width,
+            extent_.height,
+            1);
+        gui_framebuffers_.push_back(
+            device_.createFramebufferUnique(framebuffer_info));
+    }
+
     logger_->info(
         "Created Vulkan swapchain ({}x{}, {} images).",
         extent_.width,
@@ -168,6 +237,8 @@ void SwapchainResources::Create(glm::uvec2 size)
 
 void SwapchainResources::Destroy()
 {
+    gui_framebuffers_.clear();
+    gui_render_pass_.reset();
     framebuffers_.clear();
     render_pass_.reset();
     image_views_.clear();

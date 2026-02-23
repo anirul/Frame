@@ -322,21 +322,23 @@ WindowReturnEnum SDLVulkanWindow::Run(std::function<bool()> lambda)
         SDL_Event event;
         while (SDL_PollEvent(&event))
         {
-            bool consumed = false;
+            if (!RunEvent(event, dt))
+            {
+                window_return_enum = WindowReturnEnum::QUIT;
+            }
+            if (window_return_enum != WindowReturnEnum::CONTINUE)
+            {
+                break;
+            }
             if (device_)
             {
                 for (const auto& plugin_interface : device_->GetPluginPtrs())
                 {
-                    if (plugin_interface && plugin_interface->PollEvent(&event))
+                    if (plugin_interface)
                     {
-                        consumed = true;
+                        plugin_interface->PollEvent(&event);
                     }
                 }
-            }
-
-            if (!consumed && !RunEvent(event, dt))
-            {
-                window_return_enum = WindowReturnEnum::QUIT;
             }
         }
 
@@ -535,9 +537,8 @@ bool SDLVulkanWindow::RunEvent(const SDL_Event& event, const double dt)
 
     if (event.type == SDL_EVENT_KEY_DOWN)
     {
-        switch (event.key.key)
+        if (IsGuiToggleKey(event.key.key))
         {
-        case SDLK_ESCAPE:
             if (has_window_plugin)
             {
                 for (PluginInterface* plugin : device_->GetPluginPtrs())
@@ -552,7 +553,9 @@ bool SDLVulkanWindow::RunEvent(const SDL_Event& event, const double dt)
                 }
                 return true;
             }
-            return false;
+        }
+        switch (event.key.key)
+        {
         case SDLK_PRINTSCREEN:
             if (device_)
             {

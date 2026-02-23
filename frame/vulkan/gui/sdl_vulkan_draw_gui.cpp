@@ -110,7 +110,7 @@ void SDLVulkanDrawGui::EnsureRendererBackend()
     }
 
     const VkRenderPass render_pass =
-        static_cast<VkRenderPass>(swapchain->GetRenderPass().get());
+        static_cast<VkRenderPass>(swapchain->GetGuiRenderPass().get());
     const std::uint32_t image_count =
         static_cast<std::uint32_t>(swapchain->GetImages().size());
     if (render_pass == VK_NULL_HANDLE || image_count == 0)
@@ -245,7 +245,6 @@ bool SDLVulkanDrawGui::Update(DeviceInterface& device, double dt)
     auto& level = device.GetLevel();
     if (last_level_ != &level)
     {
-        ClearTextureBindings();
         last_level_ = &level;
     }
 
@@ -313,23 +312,32 @@ bool SDLVulkanDrawGui::Update(DeviceInterface& device, double dt)
 
         constexpr EntityId kComputeOutputPreviewTextureId =
             std::numeric_limits<EntityId>::max();
+        constexpr EntityId kSwapchainPreviewTextureId =
+            std::numeric_limits<EntityId>::max() - 1;
 
         if (auto compute_output_info =
                 vulkan_device_.GetComputeOutputDescriptorInfo();
             compute_output_info.has_value())
         {
-            if (auto it = texture_bindings_.find(kComputeOutputPreviewTextureId);
-                it != texture_bindings_.end() && renderer_initialized_)
-            {
-                if (it->second != VK_NULL_HANDLE)
-                {
-                    ImGui_ImplVulkan_RemoveTexture(it->second);
-                }
-                texture_bindings_.erase(it);
-            }
             imgui_texture = GetOrCreateTextureId(
                 kComputeOutputPreviewTextureId,
                 *compute_output_info);
+            preview_name = "swapchain";
+            if (const auto* swapchain = vulkan_device_.GetSwapchainResources();
+                swapchain && swapchain->IsValid())
+            {
+                const auto extent = swapchain->GetExtent();
+                preview_size = {extent.width, extent.height};
+            }
+        }
+        else if (
+            auto swapchain_preview_info =
+                vulkan_device_.GetSwapchainPreviewDescriptorInfo();
+            swapchain_preview_info.has_value())
+        {
+            imgui_texture = GetOrCreateTextureId(
+                kSwapchainPreviewTextureId,
+                *swapchain_preview_info);
             preview_name = "swapchain";
             if (const auto* swapchain = vulkan_device_.GetSwapchainResources();
                 swapchain && swapchain->IsValid())
@@ -607,16 +615,39 @@ VkDescriptorSet SDLVulkanDrawGui::GetOrCreateTextureId(
     {
         return VK_NULL_HANDLE;
     }
+    const VkSampler sampler = static_cast<VkSampler>(descriptor_info.sampler);
+    const VkImageView image_view =
+        static_cast<VkImageView>(descriptor_info.imageView);
+    const VkImageLayout image_layout =
+        static_cast<VkImageLayout>(descriptor_info.imageLayout);
+
     if (auto it = texture_bindings_.find(texture_id); it != texture_bindings_.end())
     {
-        return it->second;
+        const TextureBindingInfo& binding = it->second;
+        if (binding.sampler == sampler &&
+            binding.image_view == image_view &&
+            binding.image_layout == image_layout)
+        {
+            return binding.descriptor_set;
+        }
+        if (binding.descriptor_set != VK_NULL_HANDLE)
+        {
+            ImGui_ImplVulkan_RemoveTexture(binding.descriptor_set);
+        }
+        texture_bindings_.erase(it);
     }
 
     VkDescriptorSet descriptor_set = ImGui_ImplVulkan_AddTexture(
-        static_cast<VkSampler>(descriptor_info.sampler),
-        static_cast<VkImageView>(descriptor_info.imageView),
-        static_cast<VkImageLayout>(descriptor_info.imageLayout));
-    texture_bindings_.emplace(texture_id, descriptor_set);
+        sampler,
+        image_view,
+        image_layout);
+    texture_bindings_.emplace(
+        texture_id,
+        TextureBindingInfo{
+            descriptor_set,
+            sampler,
+            image_view,
+            image_layout});
     return descriptor_set;
 }
 
@@ -631,11 +662,11 @@ void SDLVulkanDrawGui::ClearTextureBindings()
 {
     if (renderer_initialized_)
     {
-        for (const auto& [_, descriptor_set] : texture_bindings_)
+        for (const auto& [_, binding] : texture_bindings_)
         {
-            if (descriptor_set != VK_NULL_HANDLE)
+            if (binding.descriptor_set != VK_NULL_HANDLE)
             {
-                ImGui_ImplVulkan_RemoveTexture(descriptor_set);
+                ImGui_ImplVulkan_RemoveTexture(binding.descriptor_set);
             }
         }
     }

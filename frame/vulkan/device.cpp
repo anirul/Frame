@@ -648,6 +648,10 @@ void Device::StartupFromLevelData(const frame::json::LevelData& level_data)
             }
         }
         {
+            ScopedTimer timer(logger_, "CreateSwapchainPreviewImage");
+            CreateSwapchainPreviewImage();
+        }
+        {
             ScopedTimer timer(logger_, "CreateDescriptorResources");
             CreateDescriptorResources();
         }
@@ -766,6 +770,7 @@ void Device::Cleanup()
 
     DestroyComputePipeline();
     DestroyGraphicsPipeline();
+    DestroySwapchainPreviewImage();
     if (swapchain_resources_)
     {
         swapchain_resources_->Destroy();
@@ -825,6 +830,19 @@ std::optional<vk::DescriptorImageInfo> Device::GetComputeOutputDescriptorInfo() 
     return vk::DescriptorImageInfo(
         *compute_output_sampler_,
         *compute_output_view_,
+        vk::ImageLayout::eShaderReadOnlyOptimal);
+}
+
+std::optional<vk::DescriptorImageInfo> Device::GetSwapchainPreviewDescriptorInfo() const
+{
+    if (!swapchain_preview_in_shader_read_ || !swapchain_preview_sampler_ ||
+        !swapchain_preview_view_)
+    {
+        return std::nullopt;
+    }
+    return vk::DescriptorImageInfo(
+        *swapchain_preview_sampler_,
+        *swapchain_preview_view_,
         vk::ImageLayout::eShaderReadOnlyOptimal);
 }
 
@@ -1048,12 +1066,14 @@ void Device::RecreateSwapchain()
     DestroyComputePipeline();
     DestroyDescriptorResources();
     DestroyGraphicsPipeline();
+    DestroySwapchainPreviewImage();
     swapchain_resources_->Destroy();
     command_resources_->FreeBuffers();
 
     swapchain_resources_->Create(size_);
     command_resources_->AllocateBuffers(
         static_cast<std::uint32_t>(kMaxFramesInFlight));
+    CreateSwapchainPreviewImage();
 
     CreateDescriptorResources();
     CreateGraphicsPipeline();
@@ -1071,8 +1091,11 @@ void Device::RecordCommandBuffer(
     command_buffer.begin(begin_info);
 
     const auto extent = swapchain_resources_->GetExtent();
+    const auto& images = swapchain_resources_->GetImages();
     const auto& render_pass = swapchain_resources_->GetRenderPass();
     const auto& framebuffers = swapchain_resources_->GetFramebuffers();
+    const auto& gui_render_pass = swapchain_resources_->GetGuiRenderPass();
+    const auto& gui_framebuffers = swapchain_resources_->GetGuiFramebuffers();
 
     std::string preferred_scene_root;
     if (level_ && active_program_info_ &&
@@ -1227,19 +1250,11 @@ void Device::RecordCommandBuffer(
         0.1f,
         1.0f});
 
-    vk::RenderPassBeginInfo render_pass_info(
-        *render_pass,
-        *framebuffers[image_index],
-        vk::Rect2D({0, 0}, extent),
-        static_cast<std::uint32_t>(clear_values.size()),
-        clear_values.data());
-
-    command_buffer.beginRenderPass(
-        render_pass_info,
-        vk::SubpassContents::eInline);
-
-    if (graphics_pipeline_)
-    {
+    auto draw_scene = [&]() -> bool {
+        if (!graphics_pipeline_)
+        {
+            return false;
+        }
         command_buffer.bindPipeline(
             vk::PipelineBindPoint::eGraphics,
             *graphics_pipeline_);
@@ -1362,6 +1377,7 @@ void Device::RecordCommandBuffer(
         if (use_procedural_quad_pipeline_)
         {
             command_buffer.draw(6, 1, 0, 0);
+            return true;
         }
         else if (mesh_resources_ && !mesh_resources_->Empty())
         {
@@ -1378,11 +1394,147 @@ void Device::RecordCommandBuffer(
             {
                 command_buffer.draw(mesh.index_count, 1, 0, 0);
             }
+            return true;
         }
+        return false;
+    };
+
+    bool scene_pass_executed = false;
+    bool scene_content_rendered = false;
+    if (render_pass && image_index < framebuffers.size())
+    {
+        vk::RenderPassBeginInfo render_pass_info(
+            *render_pass,
+            *framebuffers[image_index],
+            vk::Rect2D({0, 0}, extent),
+            static_cast<std::uint32_t>(clear_values.size()),
+            clear_values.data());
+
+        command_buffer.beginRenderPass(
+            render_pass_info,
+            vk::SubpassContents::eInline);
+        scene_content_rendered = draw_scene();
+        command_buffer.endRenderPass();
+        scene_pass_executed = true;
     }
 
-    if (gui_render_callback_)
+    if (!scene_pass_executed && image_index < images.size())
     {
+        const vk::Image swapchain_image = images[image_index];
+        vk::ImageMemoryBarrier to_transfer_src(
+            {},
+            vk::AccessFlagBits::eTransferRead,
+            vk::ImageLayout::ePresentSrcKHR,
+            vk::ImageLayout::eTransferSrcOptimal,
+            VK_QUEUE_FAMILY_IGNORED,
+            VK_QUEUE_FAMILY_IGNORED,
+            swapchain_image,
+            {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1});
+        command_buffer.pipelineBarrier(
+            vk::PipelineStageFlagBits::eTopOfPipe,
+            vk::PipelineStageFlagBits::eTransfer,
+            {},
+            nullptr,
+            nullptr,
+            to_transfer_src);
+    }
+
+    if (swapchain_preview_image_ && scene_content_rendered &&
+        image_index < images.size() &&
+        extent.width > 0 && extent.height > 0)
+    {
+        const vk::Image swapchain_image = images[image_index];
+
+        std::array<vk::ImageMemoryBarrier, 2> to_copy_barriers = {
+            vk::ImageMemoryBarrier(
+                vk::AccessFlagBits::eColorAttachmentWrite,
+                vk::AccessFlagBits::eTransferRead,
+                vk::ImageLayout::eTransferSrcOptimal,
+                vk::ImageLayout::eTransferSrcOptimal,
+                VK_QUEUE_FAMILY_IGNORED,
+                VK_QUEUE_FAMILY_IGNORED,
+                swapchain_image,
+                {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1}),
+            vk::ImageMemoryBarrier(
+                swapchain_preview_in_shader_read_
+                    ? vk::AccessFlagBits::eShaderRead
+                    : vk::AccessFlags{},
+                vk::AccessFlagBits::eTransferWrite,
+                swapchain_preview_in_shader_read_
+                    ? vk::ImageLayout::eShaderReadOnlyOptimal
+                    : vk::ImageLayout::eUndefined,
+                vk::ImageLayout::eTransferDstOptimal,
+                VK_QUEUE_FAMILY_IGNORED,
+                VK_QUEUE_FAMILY_IGNORED,
+                *swapchain_preview_image_,
+                {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1})};
+
+        command_buffer.pipelineBarrier(
+            vk::PipelineStageFlagBits::eAllCommands,
+            vk::PipelineStageFlagBits::eTransfer,
+            {},
+            nullptr,
+            nullptr,
+            to_copy_barriers);
+
+        vk::ImageCopy copy_region(
+            {vk::ImageAspectFlagBits::eColor, 0, 0, 1},
+            {0, 0, 0},
+            {vk::ImageAspectFlagBits::eColor, 0, 0, 1},
+            {0, 0, 0},
+            {extent.width, extent.height, 1});
+        command_buffer.copyImage(
+            swapchain_image,
+            vk::ImageLayout::eTransferSrcOptimal,
+            *swapchain_preview_image_,
+            vk::ImageLayout::eTransferDstOptimal,
+            copy_region);
+
+        std::array<vk::ImageMemoryBarrier, 2> from_copy_barriers = {
+            vk::ImageMemoryBarrier(
+                vk::AccessFlagBits::eTransferRead,
+                gui_render_callback_
+                    ? vk::AccessFlagBits::eTransferRead
+                    : vk::AccessFlags{},
+                vk::ImageLayout::eTransferSrcOptimal,
+                vk::ImageLayout::eTransferSrcOptimal,
+                VK_QUEUE_FAMILY_IGNORED,
+                VK_QUEUE_FAMILY_IGNORED,
+                swapchain_image,
+                {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1}),
+            vk::ImageMemoryBarrier(
+                vk::AccessFlagBits::eTransferWrite,
+                vk::AccessFlagBits::eShaderRead,
+                vk::ImageLayout::eTransferDstOptimal,
+                vk::ImageLayout::eShaderReadOnlyOptimal,
+                VK_QUEUE_FAMILY_IGNORED,
+                VK_QUEUE_FAMILY_IGNORED,
+                *swapchain_preview_image_,
+                {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1})};
+
+        command_buffer.pipelineBarrier(
+            vk::PipelineStageFlagBits::eTransfer,
+            vk::PipelineStageFlagBits::eAllCommands,
+            {},
+            nullptr,
+            nullptr,
+            from_copy_barriers);
+
+        swapchain_preview_in_shader_read_ = true;
+    }
+
+    if (gui_render_callback_ && gui_render_pass &&
+        image_index < gui_framebuffers.size())
+    {
+        vk::RenderPassBeginInfo gui_pass_info(
+            *gui_render_pass,
+            *gui_framebuffers[image_index],
+            vk::Rect2D({0, 0}, extent),
+            0,
+            nullptr);
+        command_buffer.beginRenderPass(
+            gui_pass_info,
+            vk::SubpassContents::eInline);
         try
         {
             gui_render_callback_(command_buffer);
@@ -1391,9 +1543,29 @@ void Device::RecordCommandBuffer(
         {
             logger_->error("Failed to render Vulkan GUI: {}", ex.what());
         }
+        command_buffer.endRenderPass();
+    }
+    else if (image_index < images.size())
+    {
+        const vk::Image swapchain_image = images[image_index];
+        vk::ImageMemoryBarrier to_present(
+            vk::AccessFlagBits::eTransferRead,
+            {},
+            vk::ImageLayout::eTransferSrcOptimal,
+            vk::ImageLayout::ePresentSrcKHR,
+            VK_QUEUE_FAMILY_IGNORED,
+            VK_QUEUE_FAMILY_IGNORED,
+            swapchain_image,
+            {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1});
+        command_buffer.pipelineBarrier(
+            vk::PipelineStageFlagBits::eTransfer,
+            vk::PipelineStageFlagBits::eBottomOfPipe,
+            {},
+            nullptr,
+            nullptr,
+            to_present);
     }
 
-    command_buffer.endRenderPass();
     command_buffer.end();
 }
 
@@ -1880,6 +2052,118 @@ void Device::DestroyComputeOutputImage()
     compute_output_image_.reset();
     compute_output_memory_.reset();
     compute_output_in_shader_read_ = false;
+}
+
+void Device::CreateSwapchainPreviewImage()
+{
+    if (!vk_unique_device_ || !swapchain_resources_ ||
+        !swapchain_resources_->IsValid() || !gpu_memory_manager_)
+    {
+        return;
+    }
+
+    const auto extent = swapchain_resources_->GetExtent();
+    if (extent.width == 0 || extent.height == 0)
+    {
+        return;
+    }
+
+    const vk::Format swapchain_format = swapchain_resources_->GetImageFormat();
+    const glm::uvec2 swapchain_size = {extent.width, extent.height};
+
+    const bool has_valid_preview_resources =
+        static_cast<bool>(swapchain_preview_image_) &&
+        static_cast<bool>(swapchain_preview_view_) &&
+        static_cast<bool>(swapchain_preview_sampler_);
+    if (has_valid_preview_resources &&
+        swapchain_preview_format_ == swapchain_format &&
+        swapchain_preview_size_ == swapchain_size)
+    {
+        // Keep the existing preview image alive across level rebuilds.
+        return;
+    }
+
+    DestroySwapchainPreviewImage();
+    swapchain_preview_format_ = swapchain_format;
+    swapchain_preview_size_ = swapchain_size;
+
+    const auto format_props =
+        vk_physical_device_.getFormatProperties(swapchain_preview_format_);
+    if (!(format_props.optimalTilingFeatures &
+          vk::FormatFeatureFlagBits::eSampledImage))
+    {
+        logger_->warn(
+            "Swapchain format {} cannot be sampled; windowed Vulkan preview disabled.",
+            vk::to_string(swapchain_preview_format_));
+        return;
+    }
+
+    vk::ImageCreateInfo image_info(
+        vk::ImageCreateFlags{},
+        vk::ImageType::e2D,
+        swapchain_preview_format_,
+        vk::Extent3D(extent.width, extent.height, 1),
+        1,
+        1,
+        vk::SampleCountFlagBits::e1,
+        vk::ImageTiling::eOptimal,
+        vk::ImageUsageFlagBits::eTransferDst |
+            vk::ImageUsageFlagBits::eSampled);
+    swapchain_preview_image_ = vk_unique_device_->createImageUnique(image_info);
+
+    auto requirements =
+        vk_unique_device_->getImageMemoryRequirements(*swapchain_preview_image_);
+    vk::MemoryAllocateInfo allocate_info(
+        requirements.size,
+        gpu_memory_manager_->FindMemoryType(
+            requirements.memoryTypeBits,
+            vk::MemoryPropertyFlagBits::eDeviceLocal));
+    swapchain_preview_memory_ =
+        vk_unique_device_->allocateMemoryUnique(allocate_info);
+    vk_unique_device_->bindImageMemory(
+        *swapchain_preview_image_, *swapchain_preview_memory_, 0);
+
+    vk::ImageViewCreateInfo view_info(
+        vk::ImageViewCreateFlags{},
+        *swapchain_preview_image_,
+        vk::ImageViewType::e2D,
+        swapchain_preview_format_,
+        {},
+        {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1});
+    swapchain_preview_view_ =
+        vk_unique_device_->createImageViewUnique(view_info);
+
+    vk::SamplerCreateInfo sampler_info(
+        vk::SamplerCreateFlags{},
+        vk::Filter::eLinear,
+        vk::Filter::eLinear,
+        vk::SamplerMipmapMode::eLinear,
+        vk::SamplerAddressMode::eClampToEdge,
+        vk::SamplerAddressMode::eClampToEdge,
+        vk::SamplerAddressMode::eClampToEdge,
+        0.0f,
+        VK_FALSE,
+        1.0f,
+        VK_FALSE,
+        vk::CompareOp::eAlways,
+        0.0f,
+        0.0f,
+        vk::BorderColor::eIntOpaqueBlack,
+        VK_FALSE);
+    swapchain_preview_sampler_ =
+        vk_unique_device_->createSamplerUnique(sampler_info);
+    swapchain_preview_in_shader_read_ = false;
+}
+
+void Device::DestroySwapchainPreviewImage()
+{
+    swapchain_preview_sampler_.reset();
+    swapchain_preview_view_.reset();
+    swapchain_preview_image_.reset();
+    swapchain_preview_memory_.reset();
+    swapchain_preview_in_shader_read_ = false;
+    swapchain_preview_format_ = vk::Format::eUndefined;
+    swapchain_preview_size_ = {0, 0};
 }
 
 

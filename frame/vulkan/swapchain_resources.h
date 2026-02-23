@@ -14,6 +14,23 @@ namespace frame::vulkan
 class SwapchainResources
 {
   public:
+    static constexpr vk::ImageLayout ScenePassInitialLayout()
+    {
+        return vk::ImageLayout::ePresentSrcKHR;
+    }
+    static constexpr vk::ImageLayout ScenePassFinalLayout()
+    {
+        return vk::ImageLayout::eTransferSrcOptimal;
+    }
+    static constexpr vk::ImageLayout GuiPassInitialLayout()
+    {
+        return vk::ImageLayout::eTransferSrcOptimal;
+    }
+    static constexpr vk::ImageLayout GuiPassFinalLayout()
+    {
+        return vk::ImageLayout::ePresentSrcKHR;
+    }
+
     SwapchainResources(
         vk::PhysicalDevice physical_device,
         vk::Device device,
@@ -50,10 +67,18 @@ class SwapchainResources
     {
         return render_pass_;
     }
+    const vk::UniqueRenderPass& GetGuiRenderPass() const
+    {
+        return gui_render_pass_;
+    }
 
     const std::vector<vk::UniqueFramebuffer>& GetFramebuffers() const
     {
         return framebuffers_;
+    }
+    const std::vector<vk::UniqueFramebuffer>& GetGuiFramebuffers() const
+    {
+        return gui_framebuffers_;
     }
 
     vk::Extent2D GetExtent() const
@@ -88,6 +113,8 @@ class SwapchainResources
     std::vector<vk::UniqueImageView> image_views_;
     vk::UniqueRenderPass render_pass_;
     std::vector<vk::UniqueFramebuffer> framebuffers_;
+    vk::UniqueRenderPass gui_render_pass_;
+    std::vector<vk::UniqueFramebuffer> gui_framebuffers_;
 };
 
 } // namespace frame::vulkan

@@ -102,6 +102,13 @@ class SDLVulkanDrawGui : public frame::gui::DrawGuiInterface
         glm::vec2 size = {0.0f, 0.0f};
         bool open = true;
     };
+    struct TextureBindingInfo
+    {
+        VkDescriptorSet descriptor_set = VK_NULL_HANDLE;
+        VkSampler sampler = VK_NULL_HANDLE;
+        VkImageView image_view = VK_NULL_HANDLE;
+        VkImageLayout image_layout = VK_IMAGE_LAYOUT_UNDEFINED;
+    };
 
     static void CheckVkResult(VkResult err);
     void EnsureRendererBackend();
@@ -121,7 +128,7 @@ class SDLVulkanDrawGui : public frame::gui::DrawGuiInterface
     std::unique_ptr<frame::gui::GuiWindowInterface> modal_callback_ = nullptr;
     std::unique_ptr<frame::gui::GuiMenuBarInterface> menubar_callback_ =
         nullptr;
-    std::unordered_map<EntityId, VkDescriptorSet> texture_bindings_ = {};
+    std::unordered_map<EntityId, TextureBindingInfo> texture_bindings_ = {};
     const frame::LevelInterface* last_level_ = nullptr;
     std::filesystem::path font_path_;
     frame::WindowInterface& window_;

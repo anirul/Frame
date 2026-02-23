@@ -225,9 +225,8 @@ bool SDLOpenGLWindow::RunEvent(const SDL_Event& event, const double dt)
     }
     if (event.type == SDL_EVENT_KEY_DOWN)
     {
-        switch (event.key.key)
+        if (IsGuiToggleKey(event.key.key))
         {
-        case SDLK_F11:
             if (has_window_plugin)
             {
                 for (PluginInterface* plugin : device_->GetPluginPtrs())
@@ -242,7 +241,9 @@ bool SDLOpenGLWindow::RunEvent(const SDL_Event& event, const double dt)
                 }
                 return true;
             }
-            break;
+        }
+        switch (event.key.key)
+        {
         case SDLK_PRINTSCREEN:
             device_->ScreenShot("ScreenShot.png");
             return true;

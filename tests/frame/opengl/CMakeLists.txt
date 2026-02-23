@@ -62,3 +62,33 @@ gtest_add_tests(TARGET FrameOpenGLTest)
 add_subdirectory(file)
 
 set_property(TARGET FrameOpenGLTest PROPERTY FOLDER "FrameTest/OpenGL")
+
+add_executable(FrameOpenGLGUITest
+  gui_test.cpp
+)
+
+target_include_directories(FrameOpenGLGUITest
+  PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../..
+    ${CMAKE_CURRENT_SOURCE_DIR}/../..
+    ${CMAKE_CURRENT_BINARY_DIR}
+    ${CMAKE_BINARY_DIR}/frame/proto/generated
+    ${CMAKE_BINARY_DIR}/external/frame/frame/proto/generated
+)
+
+target_link_libraries(FrameOpenGLGUITest
+  PUBLIC
+    GTest::gtest
+    GTest::gtest_main
+)
+
+set_target_properties(FrameOpenGLGUITest PROPERTIES
+  RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+
+if(MSVC)
+  target_compile_options(FrameOpenGLGUITest PRIVATE /utf-8)
+endif()
+
+gtest_add_tests(TARGET FrameOpenGLGUITest)
+
+set_property(TARGET FrameOpenGLGUITest PROPERTY FOLDER "FrameTest/OpenGL")

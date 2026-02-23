@@ -74,6 +74,10 @@ class SDLOpenGLWindow : public WindowInterface
     }
 
   public:
+    static bool IsGuiToggleKey(std::int32_t key)
+    {
+        return key == SDLK_F11;
+    }
     WindowReturnEnum Run(std::function<bool()> lambda) override;
     void* GetGraphicContext() const override;
     void Resize(glm::uvec2 size, FullScreenEnum fullscreen_enum) override;

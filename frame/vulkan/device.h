@@ -131,6 +131,7 @@ class Device : public DeviceInterface
         return command_resources_.get();
     }
     std::optional<vk::DescriptorImageInfo> GetComputeOutputDescriptorInfo() const;
+    std::optional<vk::DescriptorImageInfo> GetSwapchainPreviewDescriptorInfo() const;
 
   private:
     friend class TextureResources;
@@ -140,6 +141,8 @@ class Device : public DeviceInterface
     void DestroyComputePipeline();
     void CreateComputeOutputImage();
     void DestroyComputeOutputImage();
+    void CreateSwapchainPreviewImage();
+    void DestroySwapchainPreviewImage();
     void RecreateSwapchain();
     vk::UniqueShaderModule CreateShaderModule(
         const std::vector<std::uint32_t>& code) const;
@@ -211,6 +214,13 @@ class Device : public DeviceInterface
     vk::UniqueImageView compute_output_view_;
     vk::UniqueSampler compute_output_sampler_;
     bool compute_output_in_shader_read_ = false;
+    vk::UniqueImage swapchain_preview_image_;
+    vk::UniqueDeviceMemory swapchain_preview_memory_;
+    vk::UniqueImageView swapchain_preview_view_;
+    vk::UniqueSampler swapchain_preview_sampler_;
+    bool swapchain_preview_in_shader_read_ = false;
+    vk::Format swapchain_preview_format_ = vk::Format::eUndefined;
+    glm::uvec2 swapchain_preview_size_ = {0, 0};
     bool storage_buffers_ready_ = false;
     vk::Format compute_output_format_ = vk::Format::eR16G16B16A16Sfloat;
     bool device_lost_ = false;
