@@ -12,7 +12,7 @@ set(FRAME_VULKAN_JSON_SOURCES
   parse_texture.h
 )
 
-add_library(FrameVulkanJson OBJECT ${FRAME_VULKAN_JSON_SOURCES})
+add_library(FrameVulkanJson STATIC ${FRAME_VULKAN_JSON_SOURCES})
 
 target_include_directories(FrameVulkanJson
   PUBLIC

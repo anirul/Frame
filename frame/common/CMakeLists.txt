@@ -1,7 +1,7 @@
 # Sample Common.
 
 add_library(FrameCommon
-  OBJECT
+  STATIC
     application.cpp
     application.h
     draw.cpp
