@@ -23,6 +23,8 @@ jobs:
         sudo apt-get install -y \
           ninja-build \
           build-essential \
+          xvfb \
+          libvulkan-dev \
           libxi-dev \
           libxmu-dev \
           libx11-dev \
@@ -49,9 +51,6 @@ jobs:
           pkg-config \
           gperf \
           python3-jinja2
-
-    - name: Ensure Python Jinja2 available
-      run: pip install jinja2
         
     #- name: Install Vulkan SDK
     #  run: |
@@ -62,7 +61,6 @@ jobs:
       run: |
         cd external/vcpkg
         ./bootstrap-vcpkg.sh
-        ./vcpkg integrate install
 
     # No need for a manual vcpkg install step, the manifest mode will handle it
 

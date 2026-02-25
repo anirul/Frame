@@ -58,6 +58,10 @@ find_package(Vulkan REQUIRED)
 if(UNIX AND NOT APPLE AND TARGET Vulkan::Vulkan)
   set(_frame_vulkan_system_loader "")
   set(_frame_vulkan_system_candidates
+    /usr/lib/x86_64-linux-gnu/libvulkan.so.1
+    /usr/lib/x86_64-linux-gnu/libvulkan.so
+    /usr/lib/aarch64-linux-gnu/libvulkan.so.1
+    /usr/lib/aarch64-linux-gnu/libvulkan.so
     /usr/lib64/libvulkan.so.1
     /usr/lib64/libvulkan.so
     /usr/lib/libvulkan.so.1
@@ -66,6 +70,14 @@ if(UNIX AND NOT APPLE AND TARGET Vulkan::Vulkan)
     /lib64/libvulkan.so
     /lib/libvulkan.so.1
     /lib/libvulkan.so)
+
+  if(CMAKE_LIBRARY_ARCHITECTURE)
+    list(PREPEND _frame_vulkan_system_candidates
+      /usr/lib/${CMAKE_LIBRARY_ARCHITECTURE}/libvulkan.so.1
+      /usr/lib/${CMAKE_LIBRARY_ARCHITECTURE}/libvulkan.so
+      /lib/${CMAKE_LIBRARY_ARCHITECTURE}/libvulkan.so.1
+      /lib/${CMAKE_LIBRARY_ARCHITECTURE}/libvulkan.so)
+  endif()
   foreach(_frame_vulkan_system ${_frame_vulkan_system_candidates})
     if(EXISTS "${_frame_vulkan_system}")
       set(_frame_vulkan_system_loader "${_frame_vulkan_system}")

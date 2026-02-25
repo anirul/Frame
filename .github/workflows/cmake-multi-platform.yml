@@ -19,12 +19,12 @@ jobs:
         build_type: [Release]
         c_compiler: [gcc]
         cpp_compiler: [g++]
-        triplet: [x64-linux-release]
+        triplet: [x64-linux]
         include:
           - os: ubuntu-latest
             c_compiler: gcc
             cpp_compiler: g++
-            triplet: x64-linux-release
+            triplet: x64-linux
 
     steps:
     - name: Checkout code
@@ -45,6 +45,8 @@ jobs:
         sudo apt install -y \
           ninja-build \
           build-essential \
+          xvfb \
+          libvulkan-dev \
           libxi-dev \
           libxmu-dev \
           libx11-dev \
@@ -71,11 +73,8 @@ jobs:
           pkg-config \
           gperf \
           python3-jinja2
-    - name: Ensure Python Jinja2 available
-      if: ${{ matrix.os == 'ubuntu-latest' }}
-      run: pip install jinja2
-      # the dependency list is too big but at least it works
-      # https://packages.ubuntu.com/search
+    # the dependency list is too big but at least it works
+    # https://packages.ubuntu.com/search
     - name: vcpkg build
       id: vcpkg
       uses: johnwason/vcpkg-action@v6 #cache build so improve the build time a lot

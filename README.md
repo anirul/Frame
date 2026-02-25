@@ -1,79 +1,113 @@
 # Frame
 
-Welcome to Frame, a versatile 3D engine harnessing the power of OpenGL, with forthcoming support for Vulkan or DirectX 12. Designed to facilitate an immersive dive into computer graphics, Frame accepts models in OBJ format and images readable by stb (jpg, png, hdr, and more).
+Frame is a C++23 3D engine with both Vulkan and OpenGL backends. Backend
+selection is runtime-configurable, and the sample apps, editor, and tests are
+built from the same engine code.
 
-![A Scene rendering made with ShaderGL.](examples/raytracing.png)
+![A Scene rendering made with Frame.](examples/raytracing.png)
 
-## Getting Started
+## Highlights
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+- Runtime backend switch: `--device=vulkan` or `--device=opengl`
+- Automatic fallback from Vulkan to OpenGL when Vulkan startup fails
+- Scene loading from JSON definitions in `asset/json/`
+- Model loading (OBJ/PLY) and texture loading via stb-supported formats
+- Sample apps under `examples/` and integration tests under `tests/frame/`
 
-### Prerequisites
+## Prerequisites
 
-What you need to build and run Frame:
+- Git (with submodule support)
+- CMake 3.21+
+- A C++23-capable compiler
+  - Windows: Visual Studio 2022 (`v143`) recommended
+  - Linux: GCC or Clang
+- Ninja (for Linux presets)
+- Vulkan loader/driver installed if running the Vulkan backend
 
-- *GIT* - Essential for cloning the repository. You can download it here.
-- *Compiler* - Necessary for building the project. Options include:
-  - Visual Studio (Community Edition is sufficient)
-  - Alternatives like clang or gcc
-- *CMake* - Required for creating the build system. Download it [here](https://cmake.org/).
-- *VCPKG* - Frame uses VCPKG for managing C++ libraries, it will be install automatically [VCPKG GitHub](https://github.com/Microsoft/vcpkg/).
-- *Ninja* - Linux build presets rely on the Ninja generator. Install it from your package manager or set the generator to `Unix Makefiles`.
+## Setup
 
-### Building Frame with CMake
+Clone and initialize external dependencies:
 
-Update the local VCPKG and other externals dependencies:
-
-```shell
+```sh
 git submodule update --init --recursive
 ```
 
-#### Under windows
+If your environment uses Git LFS assets, also run:
 
-Navigate to your Frame directory and use the following commands to build the project:
-
-```shell
-cmake --preset windows
+```sh
+git lfs pull
 ```
 
-After setting up, you can build the project using Visual Studio or via the command line with the following command:
+## Build
 
-```shell
+### Windows
+
+```sh
+cmake --preset windows
+cmake --build --preset windows-debug
+# or
 cmake --build --preset windows-release
 ```
 
-Or if you want the debug version you can use:
+### Linux
 
-```shell
-cmake --build --preset windows-debug
-```
-
-#### Under linux
-
-Navigate to your Frame directory and use the following commands to build the project:
-
-```shell
-cmake --preset linux-release
-```
-
-Or if you want the debug version:
-
-```shell
+```sh
 cmake --preset linux-debug
-```
-
-After setting up, you can build the project using Visual Studio or via the command line with the following command:
-
-```shell
+cmake --build --preset linux-debug
+# or
+cmake --preset linux-release
 cmake --build --preset linux-release
 ```
 
-Or if you want to build the debug version:
+## Run Examples
 
-```shell
-cmake --build --preset linux-debug
+The samples are built into `build/<preset>/bin/`.
+
+Windows example:
+
+```sh
+build/windows/bin/Debug/03_RayTracing.exe --device=vulkan
+build/windows/bin/Debug/03_RayTracing.exe --device=opengl
 ```
 
-## Dive in with Examples
+Linux example:
 
-Explore various practical examples to get accustomed to what Frame is capable of! Check them out [here](examples/README.md).
+```sh
+./build/linux-debug/bin/03_RayTracing --device=vulkan
+./build/linux-debug/bin/03_RayTracing --device=opengl
+```
+
+Available examples:
+
+- `00_JapaneseFlag`
+- `01_RayMarching`
+- `02_Cubemap`
+- `03_RayTracing`
+- `04_RayTracingBvh`
+
+Useful runtime flags:
+
+- `--device={vulkan|opengl}`: choose rendering backend
+- `--vk_validation={true|false}`: toggle Vulkan validation layers
+
+## Run Tests
+
+Linux:
+
+```sh
+cmake --build --preset linux-debug --target FrameTest FrameOpenGLTest FrameVulkanTest
+ctest --test-dir build/linux-debug --output-on-failure
+```
+
+Windows:
+
+```sh
+cmake --build --preset windows-debug --target FrameTest FrameOpenGLTest FrameVulkanTest
+ctest --test-dir build/windows -C Debug --output-on-failure
+```
+
+## Examples and Docs
+
+- Example overview: [`examples/README.md`](examples/README.md)
+- Engine source: `frame/`
+- Editor application: `editor/`
