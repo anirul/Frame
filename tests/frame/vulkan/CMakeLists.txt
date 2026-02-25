@@ -54,7 +54,12 @@ target_link_libraries(FrameVulkanGUITest
   PUBLIC
     GTest::gtest
     GTest::gtest_main
+    spdlog::spdlog
 )
+
+if(TARGET fmt::fmt)
+  target_link_libraries(FrameVulkanGUITest PUBLIC fmt::fmt)
+endif()
 
 set_target_properties(FrameVulkanGUITest PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)

@@ -80,7 +80,12 @@ target_link_libraries(FrameOpenGLGUITest
   PUBLIC
     GTest::gtest
     GTest::gtest_main
+    spdlog::spdlog
 )
+
+if(TARGET fmt::fmt)
+  target_link_libraries(FrameOpenGLGUITest PUBLIC fmt::fmt)
+endif()
 
 set_target_properties(FrameOpenGLGUITest PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
