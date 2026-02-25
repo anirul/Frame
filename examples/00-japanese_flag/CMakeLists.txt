@@ -18,8 +18,8 @@ target_link_libraries(00_JapaneseFlag
     ${FRAME_LINK_GROUP_BEGIN}
     ${FRAME_CORE_LIBS}
     ${FRAME_VULKAN_LIBS}
-    ${FRAME_LINK_GROUP_END}
     FrameCommon
+    ${FRAME_LINK_GROUP_END}
 )
 
 set_property(TARGET 00_JapaneseFlag PROPERTY FOLDER "FrameExamples")

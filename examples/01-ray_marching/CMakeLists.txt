@@ -20,8 +20,8 @@ target_link_libraries(01_RayMarching
     ${FRAME_LINK_GROUP_BEGIN}
     ${FRAME_CORE_LIBS}
     ${FRAME_VULKAN_LIBS}
-    ${FRAME_LINK_GROUP_END}
     FrameCommon
+    ${FRAME_LINK_GROUP_END}
 )
 
 set_property(TARGET 01_RayMarching PROPERTY FOLDER "FrameExamples")

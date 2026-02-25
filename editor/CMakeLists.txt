@@ -39,8 +39,8 @@ target_link_libraries(FrameEditor
     ${FRAME_LINK_GROUP_BEGIN}
     ${FRAME_CORE_LIBS}
     ${FRAME_VULKAN_LIBS}
-    ${FRAME_LINK_GROUP_END}
     FrameCommon
+    ${FRAME_LINK_GROUP_END}
     ImNodeFlow
     imgui::imgui
     ImGuiColorTextEdit

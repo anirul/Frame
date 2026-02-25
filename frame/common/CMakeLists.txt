@@ -29,4 +29,8 @@ target_link_libraries(FrameCommon
     protobuf::libprotobuf
 )
 
+# Keep FrameCommon's dependency closure local; example/editor targets link
+# FRAME_CORE_LIBS explicitly (inside a GNU ld link group on Linux).
+set_property(TARGET FrameCommon PROPERTY INTERFACE_LINK_LIBRARIES "")
+
 set_property(TARGET FrameCommon PROPERTY FOLDER "Frame")

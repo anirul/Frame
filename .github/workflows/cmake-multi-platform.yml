@@ -45,6 +45,8 @@ jobs:
         sudo apt install -y \
           ninja-build \
           build-essential \
+          zip \
+          unzip \
           xvfb \
           libvulkan-dev \
           libxi-dev \

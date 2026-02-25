@@ -55,6 +55,7 @@ set(FRAME_VULKAN_SOURCES
 
 add_library(FrameVulkan
   STATIC
+    $<TARGET_OBJECTS:FrameVulkanJson>
     ${FRAME_VULKAN_SOURCES}
 )
 
@@ -73,8 +74,6 @@ target_link_libraries(FrameVulkan
     FrameJson
     Vulkan::Vulkan
     shaderc::shaderc_combined
-  PRIVATE
-    FrameVulkanJson
 )
 
 set_property(TARGET FrameVulkan PROPERTY FOLDER "Frame/Vulkan")

@@ -18,8 +18,8 @@ target_link_libraries(04_RayTracingBvh
     ${FRAME_LINK_GROUP_BEGIN}
     ${FRAME_CORE_LIBS}
     ${FRAME_VULKAN_LIBS}
-    ${FRAME_LINK_GROUP_END}
     FrameCommon
+    ${FRAME_LINK_GROUP_END}
 )
 
 set_property(TARGET 04_RayTracingBvh PROPERTY FOLDER "FrameExamples")
