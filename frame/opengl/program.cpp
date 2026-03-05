@@ -539,8 +539,8 @@ void Program::SetTemporarySceneRoot(const std::string& name)
 
 std::unique_ptr<ProgramInterface> CreateProgram(
     const std::string& name,
-    const std::string& vertex_shader_name,
-    const std::string& fragment_shader_name,
+    const std::string& /*vertex_shader_name*/,
+    const std::string& /*fragment_shader_name*/,
     std::istream& vertex_shader_code,
     std::istream& pixel_shader_code)
 {
@@ -566,8 +566,6 @@ std::unique_ptr<ProgramInterface> CreateProgram(
     program->AddShader(vertex);
     program->AddShader(fragment);
     program->LinkShader();
-    program->GetData().set_shader_vertex(vertex_shader_name);
-    program->GetData().set_shader_fragment(fragment_shader_name);
 #ifdef _DEBUG
     logger->info("with pointer := {}", static_cast<void*>(program.get()));
 #endif // _DEBUG
@@ -588,6 +586,7 @@ std::unique_ptr<ProgramInterface> CreateProgram(
     logger->info("Creating program");
 #endif // _DEBUG
     auto program = std::make_unique<Program>(proto_program.name());
+    program->FromProto(proto::Program(proto_program));
     Shader vertex(ShaderEnum::VERTEX_SHADER);
     Shader fragment(ShaderEnum::FRAGMENT_SHADER);
     if (!vertex.LoadFromSource(vertex_source))
@@ -618,8 +617,6 @@ std::unique_ptr<ProgramInterface> CreateProgram(
             program->AddUniform(std::move(uniform_interface));
         }
     }
-    program->GetData().set_shader_vertex(proto_program.shader_vertex());
-    program->GetData().set_shader_fragment(proto_program.shader_fragment());
 #ifdef _DEBUG
     logger->info("with pointer := {}", static_cast<void*>(program.get()));
 #endif // _DEBUG
@@ -629,6 +626,25 @@ std::unique_ptr<ProgramInterface> CreateProgram(
 void Program::AddBuffer(EntityId id, const std::string& name, int binding)
 {
     buffer_map_[id] = {name, binding};
+}
+
+void Program::UploadMatrix4ArrayUniform(
+    const std::string& name, const std::vector<glm::mat4>& values) const
+{
+    if (!is_used_ || values.empty())
+    {
+        return;
+    }
+    if (!HasUniform(name) && !HasUniform(name + "[0]"))
+    {
+        return;
+    }
+    const int location = GetMemoizeUniformLocation(name);
+    glUniformMatrix4fv(
+        location,
+        static_cast<GLsizei>(values.size()),
+        GL_FALSE,
+        glm::value_ptr(values[0]));
 }
 
 } // End namespace frame::opengl.

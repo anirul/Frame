@@ -46,7 +46,7 @@
             "pixel_structure": {
                 "value": "RGB"
             },
-            "file_name": "asset/plastic/plastic_albedo.png"
+            "file_name": "asset/material/plastic/plastic_albedo.png"
         },
         {
             "name": "normal_texture",
@@ -57,7 +57,7 @@
             "pixel_structure": {
                 "value": "RGB"
             },
-            "file_name": "asset/plastic/plastic_normal.png"
+            "file_name": "asset/material/plastic/plastic_normal.png"
         },
         {
             "name": "roughness_texture",
@@ -68,7 +68,7 @@
             "pixel_structure": {
                 "value": "GREY"
             },
-            "file_name": "asset/plastic/plastic_roughness.png"
+            "file_name": "asset/material/plastic/plastic_roughness.png"
         },
         {
             "name": "metallic_texture",
@@ -79,7 +79,7 @@
             "pixel_structure": {
                 "value": "GREY"
             },
-            "file_name": "asset/plastic/plastic_metallic.png"
+            "file_name": "asset/material/plastic/plastic_metallic.png"
         },
         {
             "name": "ao_texture",
@@ -90,61 +90,50 @@
             "pixel_structure": {
                 "value": "GREY"
             },
-            "file_name": "asset/plastic/plastic_ao.png"
+            "file_name": "asset/material/plastic/plastic_ao.png"
         }
     ],
     "materials": [
         {
-            "name": "CubeMapMaterial",
-            "program_name": "CubeMapProgram",
-            "texture_names": [
-                "skybox"
-            ],
-            "inner_names": [
-                "Skybox"
-            ]
+            "name": "CubeMapMaterial"
         },
         {
             "name": "RayTraceMaterial",
-            "program_name": "RayTraceProgram",
-            "preprocess_program_name": "RayTracePreprocessProgram",
-            "texture_names": [
-                "albedo_texture",
-                "normal_texture",
-                "roughness_texture",
-                "metallic_texture",
-                "ao_texture",
-                "skybox",
-                "skybox_env"
-            ],
-            "inner_names": [
-                "albedo_texture",
-                "normal_texture",
-                "roughness_texture",
-                "metallic_texture",
-                "ao_texture",
-                "skybox",
-                "skybox_env"
-            ],
             "buffer_names": [
-                "AppleMesh.0.triangle",
-                "AppleMesh.0.bvh"
+                "DragonMesh.0.triangle",
+                "DragonMesh.0.bvh"
             ],
             "inner_buffer_names": [
                 "TriangleBuffer",
                 "BvhBuffer"
             ],
             "node_names": [
-                "AppleMesh"
+                "DragonMesh"
             ],
             "inner_node_names": [
                 "model"
             ]
         }
     ],
+    "render_pass_programs": [
+        {
+            "render_time_enum": "SKYBOX_RENDER_TIME",
+            "program_name": "CubeMapProgram"
+        },
+        {
+            "render_time_enum": "SCENE_RENDER_TIME",
+            "program_name": "RayTraceProgram"
+        },
+        {
+            "render_time_enum": "PRE_RENDER_TIME",
+            "program_name": "RayTraceProgram",
+            "preprocess_program_name": "RayTracePreprocessProgram"
+        }
+    ],
     "programs": [
         {
             "name": "CubeMapProgram",
+            "pipeline_name": "cubemap",
             "input_texture_names": [
                 "skybox"
             ],
@@ -154,9 +143,6 @@
             "input_scene_type": {
                 "value": "CUBE"
             },
-            "shader_vertex": "cubemap.vert",
-            "shader_fragment": "cubemap.frag",
-            "shader_compute": "",
             "bindings": [
                 {
                     "name": "Skybox",
@@ -184,6 +170,7 @@
         },
         {
             "name": "RayTraceProgram",
+            "pipeline_name": "raytracing_bvh",
             "output_texture_names": [
                 "albedo"
             ],
@@ -200,9 +187,6 @@
                 "value": "QUAD"
             },
             "input_scene_root_name": "mesh_holder",
-            "shader_vertex": "raytracing_bvh.vert",
-            "shader_fragment": "raytracing_bvh.frag",
-            "shader_compute": "raytracing_bvh.comp",
             "bindings": [
                 {
                     "name": "output_image",
@@ -342,12 +326,10 @@
         },
         {
             "name": "RayTracePreprocessProgram",
+            "pipeline_name": "raytracing_bvh_preprocess",
             "input_scene_type": {
                 "value": "SCENE"
             },
-            "shader_vertex": "raytracing_bvh.vert",
-            "shader_fragment": "raytracing_bvh.frag",
-            "shader_compute": "",
             "uniforms": [
                 {
                     "name": "projection",
@@ -446,7 +428,7 @@
                 }
             }
         ],
-        "node_static_meshes": [
+        "node_meshes": [
             {
                 "name": "CubeMapMesh",
                 "parent": "env_holder",
@@ -461,9 +443,9 @@
                 "material_name": "RayTraceMaterial"
             },
             {
-                "name": "AppleMesh",
+                "name": "DragonMesh",
                 "parent": "mesh_holder",
-                "file_name": "dragon.obj",
+                "file_name": "dragon.glb",
                 "acceleration_structure_enum": "BVH_ACCELERATION",
                 "material_name": "RayTraceMaterial",
                 "render_time_enum": "PRE_RENDER_TIME"
@@ -472,7 +454,7 @@
         "node_lights": [
             {
                 "name": "sun",
-                "parent": "env_holder",
+                "parent": "root",
                 "light_type": "DIRECTIONAL_LIGHT",
                 "shadow_type": "HARD_SHADOW",
                 "direction": {
@@ -489,3 +471,5 @@
         ]
     }
 }
+
+

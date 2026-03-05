@@ -9,6 +9,7 @@
 
 #include "frame/common/application.h"
 #include "frame/file/file_system.h"
+#include "frame/logger.h"
 
 #include "absl/flags/usage.h"
 
@@ -46,10 +47,14 @@ try
 #endif
 catch (const std::exception& ex)
 {
+    auto& logger = frame::Logger::GetInstance();
+    logger->error("Unhandled exception in 02_Cubemap: {}", ex.what());
+    logger->flush();
 #if defined(_WIN32) || defined(_WIN64)
     MessageBox(nullptr, ex.what(), "Exception", MB_ICONEXCLAMATION);
 #else
     std::cerr << "Error: " << ex.what() << std::endl;
+    std::cerr.flush();
 #endif
     return -2;
 }

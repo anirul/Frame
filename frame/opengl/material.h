@@ -101,11 +101,6 @@ class Material : public MaterialInterface
         const std::string& name, const std::string& inner_name) override;
     std::vector<std::string> GetNodeNames() const override;
 
-    void SetPreprocessProgramName(const std::string& name)
-    {
-        preprocess_program_name_ = name;
-    }
-
   private:
     std::map<EntityId, std::string> id_name_map_ = {};
     // Preserve insertion order for buffer bindings to match shader layout
@@ -114,9 +109,6 @@ class Material : public MaterialInterface
     mutable std::array<EntityId, 32> id_array_ = {};
     mutable EntityId program_id_ = 0;
     mutable EntityId preprocess_program_id_ = 0;
-    std::string name_;
-    std::string program_name_;
-    std::string preprocess_program_name_;
 };
 
 } // End namespace frame::opengl.

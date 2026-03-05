@@ -21,3 +21,10 @@ Great for experimenting with screen-space shading without scene assets.
 The primary sample for Frame. It loads `asset/json/raytracing.json`, builds the
 scene acceleration data, and shades the results with physically-based textures.
 Use this as the reference when extending the renderer or adding compute stages.
+
+## 05 Skinned Mesh
+
+Loads `asset/model/fox/Fox.glb` through the OpenGL glTF import path and renders
+it with the `scene_simple` raster pipeline. If the glTF contains skinning data,
+the mesh currently renders in bind pose while animation playback is still being
+implemented.

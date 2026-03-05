@@ -5,10 +5,10 @@
   "description": "Frame graphic library.",
   "dependencies": [
     "abseil",
+    "assimp",
     "glm",
     "glad",
     "gtest",
-    "happly",
     {
       "name": "imgui",
       "features": [
@@ -26,7 +26,6 @@
     },
     "spdlog",
     "stb",
-    "tinyobjloader",
     {
       "name": "vulkan"
     },

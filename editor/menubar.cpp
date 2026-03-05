@@ -4,8 +4,10 @@
 #include "frame/gui/window_glsl_file.h"
 #include "frame/gui/window_logger.h"
 #include "frame/gui/window_resolution.h"
+#include "frame/json/program_catalog.h"
 #include "frame/logger.h"
 #include "window_level.h"
+#include "window_start.h"
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
 #include <set>
@@ -28,6 +30,20 @@ void Menubar::MenuFile()
 {
     if (ImGui::BeginMenu("File"))
     {
+        if (ImGui::MenuItem("Start Menu"))
+        {
+            menubar_view_.GetDrawGui().AddWindow(
+                std::make_unique<WindowStart>(menubar_file_));
+        }
+        if (ImGui::MenuItem("Level Editor"))
+        {
+            menubar_view_.GetDrawGui().AddWindow(
+                std::make_unique<WindowLevel>(
+                    device_,
+                    menubar_view_.GetDrawGui(),
+                    menubar_file_.GetFileName()));
+        }
+        ImGui::Separator();
         if (ImGui::MenuItem("New Project", "Ctrl+N"))
         {
             menubar_file_.ShowNewProject();
@@ -83,14 +99,35 @@ void Menubar::MenuEdit()
         if (ImGui::BeginMenu("Shader"))
         {
             std::set<std::string> shader_names;
+            const auto backend =
+                device_.GetDeviceEnum() == frame::RenderingAPIEnum::VULKAN
+                    ? frame::json::ShaderBackend::Vulkan
+                    : frame::json::ShaderBackend::OpenGL;
+            const std::string shader_root =
+                backend == frame::json::ShaderBackend::Vulkan
+                    ? "asset/shader/vulkan/"
+                    : "asset/shader/opengl/";
             auto& level = device_.GetLevel();
             for (auto program_id : level.GetPrograms())
             {
                 auto& program = level.GetProgramFromId(program_id);
                 if (!program.SerializeEnable())
                     continue; // Skip internal programs such as DisplayProgram
-                shader_names.insert(program.GetData().shader_vertex());
-                shader_names.insert(program.GetData().shader_fragment());
+                auto shader_files = frame::json::ResolveProgramShaderFiles(
+                    program.GetData(),
+                    backend);
+                if (!shader_files)
+                {
+                    continue;
+                }
+                if (!shader_files->vertex_shader.empty())
+                {
+                    shader_names.insert(shader_files->vertex_shader);
+                }
+                if (!shader_files->fragment_shader.empty())
+                {
+                    shader_names.insert(shader_files->fragment_shader);
+                }
             }
             for (const auto& shader : shader_names)
             {
@@ -98,7 +135,7 @@ void Menubar::MenuEdit()
                 {
                     menubar_view_.GetDrawGui().AddWindow(
                         std::make_unique<WindowGlslFile>(
-                            std::string("asset/shader/opengl/") + shader,
+                            shader_root + shader,
                             device_,
                             menubar_file_.GetFileName()));
                 }

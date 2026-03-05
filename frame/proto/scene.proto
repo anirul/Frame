@@ -7,9 +7,8 @@ import "plugin.proto";
 package frame.proto;
 
 // Scene is a way to load meshes.
-// For now it only load them from obj, mtl files but ths will be able to load
-// from fbx files as soon as we switch to this assimp library. This will add
-// skeleton animation so a new type of mesh.
+// Mesh files are loaded through Assimp with a glTF-first workflow
+// (.gltf/.glb) and support skeletal animation data.
 
 // Matrix
 // Next 6
@@ -33,9 +32,9 @@ message NodeMatrix {
 	}
 }
 
-// Static Mesh.
-// Next 14
-message NodeStaticMesh {
+// Mesh.
+// Next 18
+message NodeMesh {
 	// This is the name of the mesh.
 	string name = 1;
 	// Give the name of the parent (if present).
@@ -60,7 +59,7 @@ message NodeStaticMesh {
 	oneof mesh_oneof {
 		// If any of the clean buffer is activated, then only this is used!
 		CleanBuffer clean_buffer = 7;
-		// This can be a static mesh enum.
+		// This can be a built-in mesh enum.
 		MeshEnum mesh_enum = 6;
 		// Where the file is loaded from.
 		string file_name = 3;
@@ -108,6 +107,20 @@ message NodeStaticMesh {
 
 	// Which acceleration structure to use (default = NO_ACCELERATION).
 	AccelerationStructureEnum acceleration_structure_enum = 13;
+
+	// Enable skeletal animation playback for skinned meshes.
+	// Default is false (bind pose).
+	bool play_animation = 14;
+
+	// Playback speed multiplier for skeletal animation.
+	// Default is 1.0 when omitted.
+	optional float animation_speed = 15;
+
+	// Name of the animation clip to play (for example: "idle", "walk", "run").
+	optional string animation_clip_name = 16;
+
+	// Clip index fallback (used when animation_clip_name is not found).
+	optional uint32 animation_clip_index = 17;
 }
 
 // Camera
@@ -188,9 +201,10 @@ message SceneTree {
 	// This is a list of scene matrices.
 	repeated NodeMatrix node_matrices = 3;
 	// This is a list of scene meshes.
-	repeated NodeStaticMesh node_static_meshes = 4;
+	repeated NodeMesh node_meshes = 4;
 	// This is the camera scene node.
 	repeated NodeCamera node_cameras = 5;
 	// This is the node for the lights.
 	repeated NodeLight node_lights = 6;
 }
+

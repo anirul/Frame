@@ -30,7 +30,7 @@ std::string MenubarFile::GetFileName() const
 
 void MenubarFile::SetFleName(const std::string& file_name)
 {
-    file_name_ = file_name_;
+    file_name_ = file_name;
 }
 
 FileDialogEnum MenubarFile::GetFileDialogEnum() const

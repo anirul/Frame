@@ -10,7 +10,7 @@ namespace frame
 
 class DeviceInterface;
 class LevelInterface;
-class StaticMeshInterface;
+class MeshInterface;
 class MaterialInterface;
 
 } // End namespace frame.
@@ -68,13 +68,13 @@ class Draw : public frame::PluginInterface
      * @param uniform[in, out]: The uniform data.
      * @param device: The device.
      * @param level: The level.
-     * @param static_mesh: The static mesh.
+     * @param mesh: The mesh.
      * @param material: The material associated with the mesh.
      */
     void PreRender(
         UniformCollectionInterface& uniform_collection_interface,
         DeviceInterface& device,
-        StaticMeshInterface& static_mesh,
+        MeshInterface& mesh,
         MaterialInterface& material) override;
     /**
      * @brief Called to update variables, called after the main render
@@ -141,3 +141,5 @@ class Draw : public frame::PluginInterface
 };
 
 } // End namespace frame::common.
+
+

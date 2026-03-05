@@ -29,6 +29,8 @@ set(FRAME_VULKAN_SOURCES
   scoped_timer.h
   shader_compiler.cpp
   shader_compiler.h
+  skinned_mesh.cpp
+  skinned_mesh.h
   static_mesh.cpp
   static_mesh.h
   swapchain_resources.cpp
@@ -55,7 +57,6 @@ set(FRAME_VULKAN_SOURCES
 
 add_library(FrameVulkan
   STATIC
-    $<TARGET_OBJECTS:FrameVulkanJson>
     ${FRAME_VULKAN_SOURCES}
 )
 
@@ -69,6 +70,7 @@ target_include_directories(FrameVulkan
 
 target_link_libraries(FrameVulkan
   PUBLIC
+    FrameVulkanJson
     Frame
     FrameFile
     FrameJson

@@ -14,6 +14,8 @@ add_custom_target(AssetJson
     ray_marching.json
     raytracing.json
     raytracing_bvh.json
+    skinned_mesh.json
+    program_catalog.json
     renderer_test.json
     scene_tree_test.json
 )

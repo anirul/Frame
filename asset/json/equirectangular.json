@@ -4,12 +4,22 @@
     "programs": [
         {
             "name": "EquirectangularProgram",
-            "shader_vertex": "equirectangular_cubemap.vert",
-            "shader_fragment": "equirectangular_cubemap.frag",
-            "shader_compute": "",
+            "input_texture_names": [
+                "InputTexture"
+            ],
             "input_scene_type": {
                 "value": "QUAD"
             },
+            "bindings": [
+                {
+                    "name": "Equirectangular",
+                    "binding": 0,
+                    "binding_type": "COMBINED_IMAGE_SAMPLER",
+                    "stages": [
+                        "FRAGMENT"
+                    ]
+                }
+            ],
             "uniforms": [
                 {
                     "name": "projection",
@@ -47,7 +57,7 @@
                 "parent": "root"
             }
         ],
-        "node_static_meshes": [
+        "node_meshes": [
             {
                 "name": "Cube",
                 "mesh_enum": "CUBE",
@@ -99,14 +109,14 @@
     ],
     "materials": [
         {
-            "name": "EquirectangularMaterial",
-            "program_name": "EquirectangularProgram",
-            "texture_names": [
-                "InputTexture"
-            ],
-            "inner_names": [
-                "Equirectangular"
-            ]
+            "name": "EquirectangularMaterial"
+        }
+    ],
+    "render_pass_programs": [
+        {
+            "render_time_enum": "SCENE_RENDER_TIME",
+            "program_name": "EquirectangularProgram"
         }
     ]
 }
+

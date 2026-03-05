@@ -41,8 +41,7 @@ bool WindowJsonFile::DrawCallback()
         try
         {
             std::string content = editor_.GetText();
-            auto level = frame::json::ParseLevel(device_.GetSize(), content);
-            device_.Startup(std::move(level));
+            ApplyJsonContent(content);
             error_message_.clear();
         }
         catch (const std::exception& e)
@@ -150,6 +149,12 @@ std::string WindowJsonFile::GetEditorText() const
 const std::string& WindowJsonFile::GetFileName() const
 {
     return file_name_;
+}
+
+void WindowJsonFile::ApplyJsonContent(const std::string& content)
+{
+    auto level = frame::json::ParseLevel(device_.GetSize(), content);
+    device_.Startup(std::move(level));
 }
 
 } // End namespace frame::gui.

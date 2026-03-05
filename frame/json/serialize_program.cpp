@@ -14,12 +14,11 @@ proto::Program SerializeProgram(
 {
     proto::Program proto_program;
     proto_program.set_name(program_interface.GetName());
-    proto_program.set_shader_vertex(
-        program_interface.GetData().shader_vertex());
-    proto_program.set_shader_fragment(
-        program_interface.GetData().shader_fragment());
-    proto_program.set_shader_compute(
-        program_interface.GetData().shader_compute());
+    if (program_interface.GetData().has_pipeline_name())
+    {
+        proto_program.set_pipeline_name(
+            program_interface.GetData().pipeline_name());
+    }
     for (const auto& binding : program_interface.GetData().bindings())
     {
         *proto_program.add_bindings() = binding;
@@ -39,11 +38,11 @@ proto::Program SerializeProgram(
     if (program_interface.GetTemporarySceneRoot() == "")
     {
         auto id = program_interface.GetSceneRoot();
-        if (id == level_interface.GetDefaultStaticMeshQuadId())
+        if (id == level_interface.GetDefaultMeshQuadId())
         {
             proto_scene_type.set_value(proto::SceneType::QUAD);
         }
-        else if (id == level_interface.GetDefaultStaticMeshCubeId())
+        else if (id == level_interface.GetDefaultMeshCubeId())
         {
             proto_scene_type.set_value(proto::SceneType::CUBE);
         }
@@ -89,3 +88,4 @@ proto::Program SerializeProgram(
 }
 
 } // namespace frame::json.
+

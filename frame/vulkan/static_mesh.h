@@ -1,15 +1,15 @@
 #pragma once
 
 #include "frame/level_interface.h"
-#include "frame/static_mesh_interface.h"
+#include "frame/mesh_interface.h"
 
 namespace frame::vulkan
 {
 
-class StaticMesh : public frame::StaticMeshInterface
+class StaticMesh : public frame::MeshInterface
 {
   public:
-    StaticMesh(const frame::StaticMeshParameter& parameters, bool clear_buffer);
+    StaticMesh(const frame::MeshParameter& parameters, bool clear_buffer);
     ~StaticMesh() override = default;
 
     EntityId GetPointBufferId() const override
@@ -54,7 +54,7 @@ class StaticMesh : public frame::StaticMeshInterface
     }
 
   private:
-    frame::StaticMeshParameter parameter_ = {};
+    frame::MeshParameter parameter_ = {};
     std::size_t index_size_ = 0;
     bool clear_buffer_ = true;
 };
@@ -63,3 +63,4 @@ frame::EntityId CreateQuadStaticMesh(frame::LevelInterface& level);
 frame::EntityId CreateCubeStaticMesh(frame::LevelInterface& level);
 
 } // namespace frame::vulkan
+

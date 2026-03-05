@@ -4,7 +4,7 @@
 #include "frame/node_camera.h"
 #include "frame/node_light.h"
 #include "frame/node_matrix.h"
-#include "frame/node_static_mesh.h"
+#include "frame/node_mesh.h"
 #include <absl/strings/str_split.h>
 #include <unordered_set>
 
@@ -96,46 +96,46 @@ proto::NodeMatrix SerializeNodeMatrix(const NodeInterface& node_interface)
     return proto_scene_matrix;
 }
 
-void SerializeNodeStaticMeshEnum(
-    proto::NodeStaticMesh& proto_node_static_mesh,
-    const NodeStaticMesh& node_static_mesh,
+void SerializeNodeMeshEnum(
+    proto::NodeMesh& proto_node_mesh,
+    const NodeMesh& node_mesh,
     const LevelInterface& level_interface)
 {
-    proto_node_static_mesh.set_mesh_enum(proto::NodeStaticMesh::INVALID);
-    if (node_static_mesh.GetLocalMesh() ==
-        level_interface.GetDefaultStaticMeshCubeId())
+    proto_node_mesh.set_mesh_enum(proto::NodeMesh::INVALID);
+    if (node_mesh.GetLocalMesh() ==
+        level_interface.GetDefaultMeshCubeId())
     {
-        proto_node_static_mesh.set_mesh_enum(proto::NodeStaticMesh::CUBE);
+        proto_node_mesh.set_mesh_enum(proto::NodeMesh::CUBE);
     }
-    if (node_static_mesh.GetLocalMesh() ==
-        level_interface.GetDefaultStaticMeshQuadId())
+    if (node_mesh.GetLocalMesh() ==
+        level_interface.GetDefaultMeshQuadId())
     {
-        proto_node_static_mesh.set_mesh_enum(proto::NodeStaticMesh::QUAD);
+        proto_node_mesh.set_mesh_enum(proto::NodeMesh::QUAD);
     }
-    if (proto_node_static_mesh.mesh_enum() == proto::NodeStaticMesh::INVALID)
+    if (proto_node_mesh.mesh_enum() == proto::NodeMesh::INVALID)
     {
         throw std::runtime_error(
             std::format(
                 "Couldn't find any mesh for this node: [{}].",
-                node_static_mesh.GetData().name()));
+                node_mesh.GetData().name()));
     }
-    proto_node_static_mesh.set_material_name(
-        node_static_mesh.GetData().material_name());
-    proto_node_static_mesh.set_render_time_enum(
-        node_static_mesh.GetData().render_time_enum());
+    proto_node_mesh.set_material_name(
+        node_mesh.GetData().material_name());
+    proto_node_mesh.set_render_time_enum(
+        node_mesh.GetData().render_time_enum());
 }
 
-void SerializeNodeStaticMeshFileName(
-    proto::NodeStaticMesh& proto_node_static_mesh,
+void SerializeNodeMeshFileName(
+    proto::NodeMesh& proto_node_mesh,
     const std::string& mesh_name,
-    const NodeStaticMesh& node_static_mesh,
+    const NodeMesh& node_mesh,
     const LevelInterface& level_interface)
 {
-    proto_node_static_mesh.set_file_name(mesh_name);
-    proto_node_static_mesh.set_material_name(
-        node_static_mesh.GetData().material_name());
-    proto_node_static_mesh.set_render_time_enum(
-        node_static_mesh.GetData().render_time_enum());
+    proto_node_mesh.set_file_name(mesh_name);
+    proto_node_mesh.set_material_name(
+        node_mesh.GetData().material_name());
+    proto_node_mesh.set_render_time_enum(
+        node_mesh.GetData().render_time_enum());
 }
 
 proto::CleanBuffer SerializeCleanBuffer(std::uint32_t clean_buffer)
@@ -152,59 +152,76 @@ proto::CleanBuffer SerializeCleanBuffer(std::uint32_t clean_buffer)
     return proto_clean_buffer;
 }
 
-proto::NodeStaticMesh SerializeNodeStaticMesh(
+proto::NodeMesh SerializeNodeMesh(
     const NodeInterface& node_interface, const LevelInterface& level_interface)
 {
-    proto::NodeStaticMesh proto_node_static_mesh;
-    const NodeStaticMesh& node_static_mesh =
-        dynamic_cast<const NodeStaticMesh&>(node_interface);
-    proto_node_static_mesh.set_name(node_static_mesh.GetData().name());
-    proto_node_static_mesh.set_parent(node_static_mesh.GetParentName());
+    proto::NodeMesh proto_node_mesh;
+    const NodeMesh& node_mesh =
+        dynamic_cast<const NodeMesh&>(node_interface);
+    proto_node_mesh.set_name(node_mesh.GetData().name());
+    proto_node_mesh.set_parent(node_mesh.GetParentName());
 
     // Determine which representation of the mesh we should serialize.
-    if (node_static_mesh.GetLocalMesh() == NullId)
+    if (node_mesh.GetLocalMesh() == NullId)
     {
-        *proto_node_static_mesh.mutable_clean_buffer() =
-            node_static_mesh.GetData().clean_buffer();
+        *proto_node_mesh.mutable_clean_buffer() =
+            node_mesh.GetData().clean_buffer();
     }
     else if (
-        node_static_mesh.GetLocalMesh() ==
-            level_interface.GetDefaultStaticMeshCubeId() ||
-        node_static_mesh.GetLocalMesh() ==
-            level_interface.GetDefaultStaticMeshQuadId())
+        node_mesh.GetLocalMesh() ==
+            level_interface.GetDefaultMeshCubeId() ||
+        node_mesh.GetLocalMesh() ==
+            level_interface.GetDefaultMeshQuadId())
     {
-        SerializeNodeStaticMeshEnum(
-            proto_node_static_mesh, node_static_mesh, level_interface);
+        SerializeNodeMeshEnum(
+            proto_node_mesh, node_mesh, level_interface);
     }
     else
     {
         std::string mesh_name;
-        if (node_static_mesh.GetData().has_file_name())
+        if (node_mesh.GetData().has_file_name())
         {
-            mesh_name = node_static_mesh.GetData().file_name();
+            mesh_name = node_mesh.GetData().file_name();
         }
         else
         {
             mesh_name =
                 level_interface
-                    .GetStaticMeshFromId(node_static_mesh.GetLocalMesh())
+                    .GetMeshFromId(node_mesh.GetLocalMesh())
                     .GetData()
                     .file_name();
         }
-        SerializeNodeStaticMeshFileName(
-            proto_node_static_mesh,
+        SerializeNodeMeshFileName(
+            proto_node_mesh,
             mesh_name,
-            node_static_mesh,
+            node_mesh,
             level_interface);
     }
 
-    proto_node_static_mesh.set_material_name(
-        node_static_mesh.GetData().material_name());
-    proto_node_static_mesh.set_render_time_enum(
-        node_static_mesh.GetData().render_time_enum());
-    proto_node_static_mesh.set_acceleration_structure_enum(
-        node_static_mesh.GetData().acceleration_structure_enum());
-    return proto_node_static_mesh;
+    proto_node_mesh.set_material_name(
+        node_mesh.GetData().material_name());
+    proto_node_mesh.set_render_time_enum(
+        node_mesh.GetData().render_time_enum());
+    proto_node_mesh.set_acceleration_structure_enum(
+        node_mesh.GetData().acceleration_structure_enum());
+    proto_node_mesh.set_play_animation(
+        node_mesh.GetData().play_animation());
+    if (node_mesh.GetData().has_animation_speed())
+    {
+        proto_node_mesh.set_animation_speed(
+            node_mesh.GetData().animation_speed());
+    }
+    if (node_mesh.GetData().has_animation_clip_name())
+    {
+        proto_node_mesh.set_animation_clip_name(
+            node_mesh.GetData().animation_clip_name());
+    }
+    if (node_mesh.GetData().has_animation_clip_index())
+    {
+        proto_node_mesh.set_animation_clip_index(
+            node_mesh.GetData().animation_clip_index());
+    }
+    return proto_node_mesh;
 }
 
 void SerializeNode(
@@ -232,9 +249,9 @@ void SerializeNode(
         *proto_scene_tree.add_node_matrices() =
             SerializeNodeMatrix(node_interface);
         break;
-    case NodeTypeEnum::NODE_STATIC_MESH:
-        *proto_scene_tree.add_node_static_meshes() =
-            SerializeNodeStaticMesh(node_interface, level_interface);
+    case NodeTypeEnum::NODE_MESH:
+        *proto_scene_tree.add_node_meshes() =
+            SerializeNodeMesh(node_interface, level_interface);
         break;
     case NodeTypeEnum::NODE_UKNOWN:
         [[fallthrough]];
@@ -279,3 +296,5 @@ proto::SceneTree SerializeSceneTree(const LevelInterface& level_interface)
 }
 
 } // End namespace frame::json.
+
+

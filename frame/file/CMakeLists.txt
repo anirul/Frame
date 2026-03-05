@@ -10,12 +10,6 @@ add_library(FrameFile
     image_stb.h
     image_cache.cpp
     image_cache.h
-    obj_cache.cpp
-    obj_cache.h
-    obj.cpp
-    obj.h
-    ply.cpp
-    ply.h
 )
 
 target_include_directories(FrameFile
@@ -24,7 +18,6 @@ target_include_directories(FrameFile
     ${CMAKE_CURRENT_SOURCE_DIR}/../..
     ${CMAKE_CURRENT_BINARY_DIR}
   PRIVATE
-    ${HAPPLY_INCLUDE_DIRS}
     ${STB_INCLUDE_DIRS}
 )
 
@@ -36,7 +29,6 @@ target_link_libraries(FrameFile
     glm::glm
     protobuf::libprotobuf
     spdlog::spdlog
-    tinyobjloader::tinyobjloader
 )
 
 set_property(TARGET FrameFile PROPERTY FOLDER "Frame")

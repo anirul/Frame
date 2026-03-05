@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "frame/name_interface.h"
-#include "frame/static_mesh_interface.h"
+#include "frame/mesh_interface.h"
 
 namespace frame
 {
@@ -17,7 +17,7 @@ enum class NodeTypeEnum
 {
     NODE_UKNOWN = 0,
     NODE_MATRIX = 1,
-    NODE_STATIC_MESH = 2,
+    NODE_MESH = 2,
     NODE_LIGHT = 3,
     NODE_CAMERA = 4,
 };
@@ -96,3 +96,5 @@ struct NodeInterface
 };
 
 } // End namespace frame.
+
+

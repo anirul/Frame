@@ -83,7 +83,7 @@ void ConfigureSceneRoot(
     switch (scene_type)
     {
     case frame::proto::SceneType::QUAD: {
-        auto quad_id = level.GetDefaultStaticMeshQuadId();
+        auto quad_id = level.GetDefaultMeshQuadId();
         if (!quad_id)
         {
             throw std::runtime_error("Default quad static mesh not available.");
@@ -92,7 +92,7 @@ void ConfigureSceneRoot(
         break;
     }
     case frame::proto::SceneType::CUBE: {
-        auto cube_id = level.GetDefaultStaticMeshCubeId();
+        auto cube_id = level.GetDefaultMeshCubeId();
         if (!cube_id)
         {
             throw std::runtime_error("Default cube static mesh not available.");
@@ -168,3 +168,4 @@ std::unique_ptr<frame::ProgramInterface> ParseProgram(
 }
 
 } // namespace frame::vulkan::json
+

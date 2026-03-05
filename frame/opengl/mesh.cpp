@@ -1,0 +1,547 @@
+#include "frame/opengl/mesh.h"
+
+#include <algorithm>
+#include <format>
+#include <glad/glad.h>
+#include <memory>
+#include <numeric>
+#include <stdexcept>
+#include <vector>
+
+namespace frame::opengl
+{
+
+Mesh::Mesh(LevelInterface& level, const MeshParameter& parameter)
+    : level_(level), point_buffer_id_(parameter.point_buffer_id),
+      point_buffer_size_(parameter.point_buffer_size),
+      color_buffer_id_(parameter.color_buffer_id),
+      color_buffer_size_(parameter.color_buffer_size),
+      normal_buffer_id_(parameter.normal_buffer_id),
+      normal_buffer_size_(parameter.normal_buffer_size),
+      texture_buffer_id_(parameter.texture_buffer_id),
+      texture_buffer_size_(parameter.texture_buffer_size),
+      index_buffer_id_(parameter.index_buffer_id),
+      triangle_buffer_id_(parameter.triangle_buffer_id),
+      bvh_buffer_id_(parameter.bvh_buffer_id)
+{
+    data_.set_shadow_effect_enum(parameter.shadow_effect_enum);
+    data_.set_render_primitive_enum(parameter.render_primitive_enum);
+    if (!point_buffer_id_)
+    {
+        throw std::runtime_error("No point buffer specified.");
+    }
+    glGenVertexArrays(1, &vertex_array_object_);
+    glBindVertexArray(vertex_array_object_);
+
+    auto& point_buffer_ref =
+        dynamic_cast<Buffer&>(level_.GetBufferFromId(point_buffer_id_));
+    point_buffer_ref.Bind();
+    glVertexAttribPointer(
+        0, point_buffer_size_, GL_FLOAT, GL_FALSE, 0, nullptr);
+    point_buffer_ref.UnBind();
+
+    std::uint32_t vertex_array_count = 0;
+    static std::uint32_t count = 0;
+    const std::size_t point_size_element =
+        point_buffer_ref.GetSize() / sizeof(float);
+
+    if (color_buffer_id_)
+    {
+        auto& gl_color_buffer =
+            dynamic_cast<Buffer&>(level.GetBufferFromId(color_buffer_id_));
+        gl_color_buffer.Bind();
+        glVertexAttribPointer(
+            ++vertex_array_count,
+            color_buffer_size_,
+            GL_FLOAT,
+            GL_FALSE,
+            0,
+            nullptr);
+        gl_color_buffer.UnBind();
+    }
+    else if (std::count(
+                 parameter.generate_list.begin(),
+                 parameter.generate_list.end(),
+                 MeshParameter::MeshParameterEnum::GENERATE_COLOR))
+    {
+        std::vector<float> color(point_size_element, 1.0f);
+        std::unique_ptr<BufferInterface> gl_color_buffer =
+            std::make_unique<Buffer>();
+        gl_color_buffer->SetName(std::format("Mesh.Buffer.Color.{}", count));
+        gl_color_buffer->Copy(color);
+        color_buffer_id_ = level_.AddBuffer(std::move(gl_color_buffer));
+        auto& color_buffer_ref =
+            dynamic_cast<Buffer&>(level_.GetBufferFromId(color_buffer_id_));
+        color_buffer_ref.Bind();
+        glVertexAttribPointer(
+            ++vertex_array_count,
+            color_buffer_size_,
+            GL_FLOAT,
+            GL_FALSE,
+            0,
+            nullptr);
+        color_buffer_ref.UnBind();
+    }
+
+    if (normal_buffer_id_)
+    {
+        auto& gl_normal_buffer =
+            dynamic_cast<Buffer&>(level.GetBufferFromId(normal_buffer_id_));
+        gl_normal_buffer.Bind();
+        glVertexAttribPointer(
+            ++vertex_array_count,
+            normal_buffer_size_,
+            GL_FLOAT,
+            GL_TRUE,
+            0,
+            nullptr);
+        gl_normal_buffer.UnBind();
+    }
+    else if (std::count(
+                 parameter.generate_list.begin(),
+                 parameter.generate_list.end(),
+                 MeshParameter::MeshParameterEnum::GENERATE_NORMAL))
+    {
+        std::vector<float> normal(point_size_element, 0.0f);
+        for (std::size_t i = 0; i < point_size_element; i += 3)
+        {
+            normal[i] = -1.0f;
+        }
+        std::unique_ptr<BufferInterface> gl_normal_buffer =
+            std::make_unique<Buffer>();
+        gl_normal_buffer->SetName(std::format("Mesh.Buffer.Normal.{}", count));
+        gl_normal_buffer->Copy(normal);
+        normal_buffer_id_ = level_.AddBuffer(std::move(gl_normal_buffer));
+        auto& normal_buffer_ref =
+            dynamic_cast<Buffer&>(level_.GetBufferFromId(normal_buffer_id_));
+        normal_buffer_ref.Bind();
+        glVertexAttribPointer(
+            ++vertex_array_count,
+            normal_buffer_size_,
+            GL_FLOAT,
+            GL_TRUE,
+            0,
+            nullptr);
+        normal_buffer_ref.UnBind();
+    }
+
+    if (texture_buffer_id_)
+    {
+        auto& gl_texture_buffer =
+            dynamic_cast<Buffer&>(level.GetBufferFromId(texture_buffer_id_));
+        gl_texture_buffer.Bind();
+        glVertexAttribPointer(
+            ++vertex_array_count,
+            texture_buffer_size_,
+            GL_FLOAT,
+            GL_FALSE,
+            0,
+            nullptr);
+        gl_texture_buffer.UnBind();
+    }
+    else if (std::count(
+                 parameter.generate_list.begin(),
+                 parameter.generate_list.end(),
+                 MeshParameter::MeshParameterEnum::
+                     GENERATE_TEXTURE_COORDINATE))
+    {
+        const std::size_t texture_coordinate_size =
+            static_cast<std::size_t>(point_size_element * 2.0 / 3.0);
+        std::vector<float> texture_coordinate(texture_coordinate_size, 0.5f);
+        std::unique_ptr<BufferInterface> gl_texture_coordinate =
+            std::make_unique<Buffer>();
+        gl_texture_coordinate->SetName(
+            std::format("Mesh.Buffer.TexCoord.{}", count));
+        gl_texture_coordinate->Copy(texture_coordinate);
+        texture_buffer_id_ = level_.AddBuffer(std::move(gl_texture_coordinate));
+        auto& texture_buffer_ref =
+            dynamic_cast<Buffer&>(level_.GetBufferFromId(texture_buffer_id_));
+        texture_buffer_ref.Bind();
+        glVertexAttribPointer(
+            ++vertex_array_count,
+            texture_buffer_size_,
+            GL_FLOAT,
+            GL_FALSE,
+            0,
+            nullptr);
+        texture_buffer_ref.UnBind();
+    }
+
+    if (!index_buffer_id_)
+    {
+        if (data_.render_primitive_enum() !=
+            proto::NodeMesh::POINT_PRIMITIVE)
+        {
+            throw std::runtime_error(
+                "No index buffer and render type is not set to point.");
+        }
+        if (!std::count(
+                parameter.generate_list.begin(),
+                parameter.generate_list.end(),
+                MeshParameter::MeshParameterEnum::GENERATE_INDEX))
+        {
+            throw std::runtime_error("No GENERATE_INDEX in the generate list.");
+        }
+        const std::size_t index_size_element = point_size_element / 3;
+        index_size_ = index_size_element * sizeof(std::uint32_t);
+        std::vector<std::uint32_t> index(index_size_element);
+        std::iota(index.begin(), index.end(), 0);
+        std::unique_ptr<BufferInterface> gl_index_buffer =
+            std::make_unique<Buffer>(
+                BufferTypeEnum::ELEMENT_ARRAY_BUFFER,
+                BufferUsageEnum::STREAM_DRAW);
+        gl_index_buffer->SetName(std::format("Mesh.Buffer.Index.{}", count));
+        gl_index_buffer->Copy(index);
+        index_buffer_id_ = level_.AddBuffer(std::move(gl_index_buffer));
+    }
+    else
+    {
+        index_size_ = level_.GetBufferFromId(index_buffer_id_).GetSize();
+    }
+
+    ++count;
+
+    for (std::uint32_t i = 0; i <= vertex_array_count; ++i)
+    {
+        glEnableVertexAttribArray(i);
+    }
+    glBindVertexArray(0);
+}
+
+Mesh::~Mesh()
+{
+    glDeleteVertexArrays(1, &vertex_array_object_);
+    if (point_buffer_id_)
+    {
+        level_.RemoveBuffer(point_buffer_id_);
+    }
+    if (color_buffer_id_)
+    {
+        level_.RemoveBuffer(color_buffer_id_);
+    }
+    if (normal_buffer_id_)
+    {
+        level_.RemoveBuffer(normal_buffer_id_);
+    }
+    if (texture_buffer_id_)
+    {
+        level_.RemoveBuffer(texture_buffer_id_);
+    }
+    if (index_buffer_id_)
+    {
+        level_.RemoveBuffer(index_buffer_id_);
+    }
+    if (triangle_buffer_id_)
+    {
+        level_.RemoveBuffer(triangle_buffer_id_);
+    }
+    if (bvh_buffer_id_)
+    {
+        level_.RemoveBuffer(bvh_buffer_id_);
+    }
+}
+
+void Mesh::Bind(const unsigned int slot /*= 0*/) const
+{
+    if (locked_bind_)
+    {
+        return;
+    }
+    glBindVertexArray(vertex_array_object_);
+}
+
+void Mesh::UnBind() const
+{
+    if (locked_bind_)
+    {
+        return;
+    }
+    glBindVertexArray(0);
+}
+
+EntityId CreateQuadMesh(LevelInterface& level)
+{
+    std::vector<float> points = {
+        -1.f,
+        1.f,
+        0.f,
+        1.f,
+        1.f,
+        0.f,
+        -1.f,
+        -1.f,
+        0.f,
+        1.f,
+        -1.f,
+        0.f,
+    };
+    std::vector<float> normals = {
+        0.f,
+        0.f,
+        1.f,
+        0.f,
+        0.f,
+        1.f,
+        0.f,
+        0.f,
+        1.f,
+        0.f,
+        0.f,
+        1.f,
+    };
+    std::vector<float> textures = {
+        0,
+        1,
+        1,
+        1,
+        0,
+        0,
+        1,
+        0,
+    };
+    std::vector<std::uint32_t> indices = {
+        0,
+        1,
+        2,
+        1,
+        3,
+        2,
+    };
+    auto point_buffer = std::make_unique<Buffer>();
+    auto normal_buffer = std::make_unique<Buffer>();
+    auto texture_buffer = std::make_unique<Buffer>();
+    auto index_buffer =
+        std::make_unique<Buffer>(BufferTypeEnum::ELEMENT_ARRAY_BUFFER);
+    point_buffer->Copy(points);
+    normal_buffer->Copy(normals);
+    texture_buffer->Copy(textures);
+    index_buffer->Copy(indices);
+    static std::int64_t count = 0;
+    count++;
+    point_buffer->SetName(std::format("QuadPoint.{}", count));
+    normal_buffer->SetName(std::format("QuadNormal.{}", count));
+    texture_buffer->SetName(std::format("QuadTexture.{}", count));
+    index_buffer->SetName(std::format("QuadIndex.{}", count));
+    auto maybe_point_buffer_id = level.AddBuffer(std::move(point_buffer));
+    if (!maybe_point_buffer_id)
+    {
+        return NullId;
+    }
+    auto maybe_normal_buffer_id = level.AddBuffer(std::move(normal_buffer));
+    if (!maybe_normal_buffer_id)
+    {
+        return NullId;
+    }
+    auto maybe_texture_buffer_id = level.AddBuffer(std::move(texture_buffer));
+    if (!maybe_texture_buffer_id)
+    {
+        return NullId;
+    }
+    auto maybe_index_buffer_id = level.AddBuffer(std::move(index_buffer));
+    if (!maybe_index_buffer_id)
+    {
+        return NullId;
+    }
+    MeshParameter parameter = {};
+    parameter.point_buffer_id = maybe_point_buffer_id;
+    parameter.normal_buffer_id = maybe_normal_buffer_id;
+    parameter.texture_buffer_id = maybe_texture_buffer_id;
+    parameter.index_buffer_id = maybe_index_buffer_id;
+    parameter.render_primitive_enum = proto::NodeMesh::TRIANGLE_PRIMITIVE;
+    auto mesh = std::make_unique<Mesh>(level, parameter);
+    mesh->SetName(std::format("QuadMesh.{}", count));
+    return level.AddMesh(std::move(mesh));
+}
+
+EntityId CreateCubeMesh(LevelInterface& level)
+{
+    std::vector<float> points = {
+        // clang-format off
+              // Face front.
+              -0.5f, -0.5f, -0.5f,
+               0.5f, -0.5f, -0.5f,
+               0.5f,  0.5f, -0.5f,
+               0.5f,  0.5f, -0.5f,
+              -0.5f,  0.5f, -0.5f,
+              -0.5f, -0.5f, -0.5f,
+              // Face back
+              -0.5f, -0.5f,  0.5f,
+               0.5f, -0.5f,  0.5f,
+               0.5f,  0.5f,  0.5f,
+               0.5f,  0.5f,  0.5f,
+              -0.5f,  0.5f,  0.5f,
+              -0.5f, -0.5f,  0.5f,
+              // Face left.
+              -0.5f,  0.5f,  0.5f,
+              -0.5f,  0.5f, -0.5f,
+              -0.5f, -0.5f, -0.5f,
+              -0.5f, -0.5f, -0.5f,
+              -0.5f, -0.5f,  0.5f,
+              -0.5f,  0.5f,  0.5f,
+              // Face right.
+               0.5f,  0.5f,  0.5f,
+               0.5f,  0.5f, -0.5f,
+               0.5f, -0.5f, -0.5f,
+               0.5f, -0.5f, -0.5f,
+               0.5f, -0.5f,  0.5f,
+               0.5f,  0.5f,  0.5f,
+               // Face bottom.
+               -0.5f, -0.5f, -0.5f,
+                0.5f, -0.5f, -0.5f,
+                0.5f, -0.5f,  0.5f,
+                0.5f, -0.5f,  0.5f,
+               -0.5f, -0.5f,  0.5f,
+               -0.5f, -0.5f, -0.5f,
+               // Face top.
+               -0.5f,  0.5f, -0.5f,
+                0.5f,  0.5f, -0.5f,
+                0.5f,  0.5f,  0.5f,
+                0.5f,  0.5f,  0.5f,
+               -0.5f,  0.5f,  0.5f,
+               -0.5f,  0.5f, -0.5f,
+        // clang-format on
+    };
+    std::vector<float> normals = {
+        // clang-format off
+              // Face front.
+              .0f, .0f, -1.f,
+              .0f, .0f, -1.f,
+              .0f, .0f, -1.f,
+              .0f, .0f, -1.f,
+              .0f, .0f, -1.f,
+              .0f, .0f, -1.f,
+              // Face back.
+              .0f, .0f, 1.f,
+              .0f, .0f, 1.f,
+              .0f, .0f, 1.f,
+              .0f, .0f, 1.f,
+              .0f, .0f, 1.f,
+              .0f, .0f, 1.f,
+              // Face left.
+              -1.f, .0f, .0f,
+              -1.f, .0f, .0f,
+              -1.f, .0f, .0f,
+              -1.f, .0f, .0f,
+              -1.f, .0f, .0f,
+              -1.f, .0f, .0f,
+              // Face right.
+              1.f, .0f, .0f,
+              1.f, .0f, .0f,
+              1.f, .0f, .0f,
+              1.f, .0f, .0f,
+              1.f, .0f, .0f,
+              1.f, .0f, .0f,
+              // Face bottom.
+              .0f, -1.f, -.0f,
+              .0f, -1.f, -.0f,
+              .0f, -1.f, -.0f,
+              .0f, -1.f, -.0f,
+              .0f, -1.f, -.0f,
+              .0f, -1.f, -.0f,
+              // Face top.
+              .0f, 1.f, 0.f,
+              .0f, 1.f, 0.f,
+              .0f, 1.f, 0.f,
+              .0f, 1.f, 0.f,
+              .0f, 1.f, 0.f,
+              .0f, 1.f, 0.f,
+        // clang-format on
+    };
+    std::vector<float> textures = {
+        // clang-format off
+              // Face front.
+              0.0f, 0.0f,
+              1.0f, 0.0f,
+              1.0f, 1.0f,
+              1.0f, 1.0f,
+              0.0f, 1.0f,
+              0.0f, 0.0f,
+              // Face back.
+              0.0f, 0.0f,
+              1.0f, 0.0f,
+              1.0f, 1.0f,
+              1.0f, 1.0f,
+              0.0f, 1.0f,
+              0.0f, 0.0f,
+              // Face left.
+              1.0f, 0.0f,
+              1.0f, 1.0f,
+              0.0f, 1.0f,
+              0.0f, 1.0f,
+              0.0f, 0.0f,
+              1.0f, 0.0f,
+              // Face right.
+              1.0f, 0.0f,
+              1.0f, 1.0f,
+              0.0f, 1.0f,
+              0.0f, 1.0f,
+              0.0f, 0.0f,
+              1.0f, 0.0f,
+              // Face bottom.
+              0.0f, 1.0f,
+              1.0f, 1.0f,
+              1.0f, 0.0f,
+              1.0f, 0.0f,
+              0.0f, 0.0f,
+              0.0f, 1.0f,
+              // Face top.
+              0.0f, 1.0f,
+              1.0f, 1.0f,
+              1.0f, 0.0f,
+              1.0f, 0.0f,
+              0.0f, 0.0f,
+              0.0f, 1.0f
+        // clang-format on
+    };
+    std::vector<std::uint32_t> indices;
+    indices.resize(18 * 3);
+    std::iota(indices.begin(), indices.end(), 0);
+    auto point_buffer = std::make_unique<Buffer>();
+    auto normal_buffer = std::make_unique<Buffer>();
+    auto texture_buffer = std::make_unique<Buffer>();
+    auto index_buffer =
+        std::make_unique<Buffer>(BufferTypeEnum::ELEMENT_ARRAY_BUFFER);
+    point_buffer->Copy(points);
+    normal_buffer->Copy(normals);
+    texture_buffer->Copy(textures);
+    index_buffer->Copy(indices);
+    static std::int64_t count = 0;
+    count++;
+    point_buffer->SetName(std::format("CubePoint.{}", count));
+    normal_buffer->SetName(std::format("CubeNormal.{}", count));
+    texture_buffer->SetName(std::format("CubeTexture.{}", count));
+    index_buffer->SetName(std::format("CubeIndex.{}", count));
+    auto maybe_point_buffer_id = level.AddBuffer(std::move(point_buffer));
+    if (!maybe_point_buffer_id)
+    {
+        return NullId;
+    }
+    auto maybe_normal_buffer_id = level.AddBuffer(std::move(normal_buffer));
+    if (!maybe_normal_buffer_id)
+    {
+        return NullId;
+    }
+    auto maybe_texture_buffer_id = level.AddBuffer(std::move(texture_buffer));
+    if (!maybe_texture_buffer_id)
+    {
+        return NullId;
+    }
+    auto maybe_index_buffer_id = level.AddBuffer(std::move(index_buffer));
+    if (!maybe_index_buffer_id)
+    {
+        return NullId;
+    }
+    MeshParameter parameter = {};
+    parameter.point_buffer_id = maybe_point_buffer_id;
+    parameter.normal_buffer_id = maybe_normal_buffer_id;
+    parameter.texture_buffer_id = maybe_texture_buffer_id;
+    parameter.index_buffer_id = maybe_index_buffer_id;
+    parameter.render_primitive_enum = proto::NodeMesh::TRIANGLE_PRIMITIVE;
+    auto mesh = std::make_unique<Mesh>(level, parameter);
+    mesh->SetName(std::format("CubeMesh.{}", count));
+    return level.AddMesh(std::move(mesh));
+}
+
+} // End namespace frame::opengl.
+
+

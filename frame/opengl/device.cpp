@@ -15,6 +15,7 @@
 #include "frame/opengl/frame_buffer.h"
 #include "frame/opengl/render_buffer.h"
 #include "frame/opengl/renderer.h"
+#include "frame/opengl/mesh.h"
 
 namespace frame::opengl
 {
@@ -57,13 +58,13 @@ void Device::Startup(std::unique_ptr<frame::LevelInterface>&& level)
     // Add a callback to allow plugins to be called at pre-render step.
     renderer_->SetMeshRenderCallback([this](
                                          UniformCollectionInterface& uniform,
-                                         StaticMeshInterface& static_mesh,
+                                         MeshInterface& mesh,
                                          MaterialInterface& material) {
         for (auto* plugin : GetPluginPtrs())
         {
             if (!plugin)
                 continue;
-            plugin->PreRender(uniform, *this, static_mesh, material);
+            plugin->PreRender(uniform, *this, mesh, material);
         }
     });
 }
@@ -303,11 +304,11 @@ std::unique_ptr<frame::BufferInterface> Device::CreateIndexBuffer(
     return opengl::CreateIndexBuffer(std::move(vector));
 }
 
-std::unique_ptr<frame::StaticMeshInterface> Device::CreateStaticMesh(
-    const StaticMeshParameter& static_mesh_parameter)
+std::unique_ptr<frame::MeshInterface> Device::CreateMesh(
+    const MeshParameter& mesh_parameter)
 {
-    return std::make_unique<opengl::StaticMesh>(
-        GetLevel(), static_mesh_parameter);
+    return std::make_unique<opengl::Mesh>(
+        GetLevel(), mesh_parameter);
 }
 
 void Device::Resize(glm::uvec2 size)
@@ -335,3 +336,7 @@ glm::uvec2 Device::GetSize() const
 }
 
 } // End namespace frame::opengl.
+
+
+
+

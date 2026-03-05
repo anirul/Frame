@@ -3,8 +3,8 @@
 add_executable(FrameOpenGLFileTest
   load_program_test.cpp
   load_program_test.h
-  load_static_mesh_test.cpp
-  load_static_mesh_test.h
+  load_mesh_test.cpp
+  load_mesh_test.h
   load_texture_test.cpp
   load_texture_test.h
   main.cpp
@@ -34,3 +34,4 @@ include(GoogleTest)
 gtest_add_tests(TARGET FrameOpenGLFileTest)
 
 set_property(TARGET FrameOpenGLFileTest PROPERTY FOLDER "FrameTest/OpenGL")
+

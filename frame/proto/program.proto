@@ -21,7 +21,7 @@ message SceneType
 
 // Program binding stage.
 // Next 4
-enum ShaderStage
+enum ProgramStage
 {
     INVALID_STAGE = 0;
     VERTEX = 1;
@@ -45,11 +45,11 @@ message ProgramBinding
         OUTPUT_SAMPLER = 5;
     }
     BindingType binding_type = 3;
-    repeated ShaderStage stages = 4;
+    repeated ProgramStage stages = 4;
 }
 
 // Description of an effect that can be used as a 2D effect on a rendering or
-// as a shader for material.
+// as a rendering pipeline for materials.
 // Next 12
 message Program
 {
@@ -64,14 +64,15 @@ message Program
     SceneType input_scene_type = 9;
     // Input Scenes name.
     string input_scene_root_name = 5;
-    // Vertex shader file name (including the extension).
-    string shader_vertex = 6;
-    // Fragment shader file name (including the extension).
-    string shader_fragment = 8;
-    // Compute shader file name (including the extension).
-    string shader_compute = 10;
+    // Engine pipeline key used to resolve backend code internally.
+    // If omitted, the program name is used as the lookup key.
+    optional string pipeline_name = 12;
     // Explicit descriptor bindings for this program.
     repeated ProgramBinding bindings = 11;
-    // Additionnal uniforms for the shader.
+    // Additional uniforms for the pipeline.
     repeated Uniform uniforms = 7;
+
+    reserved 6;
+    reserved 8;
+    reserved 10;
 }

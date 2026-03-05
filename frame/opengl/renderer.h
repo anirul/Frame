@@ -6,12 +6,14 @@
 #include "frame/opengl/render_buffer.h"
 #include "frame/program_interface.h"
 #include "frame/renderer_interface.h"
-#include "frame/static_mesh_interface.h"
+#include "frame/mesh_interface.h"
 #include "frame/uniform_interface.h"
 #include "frame/window_interface.h"
 
 namespace frame::opengl
 {
+
+class SkinnedMesh;
 
 /**
  * @class Renderer
@@ -97,12 +99,12 @@ class Renderer : public RendererInterface
   public:
     /**
      * @brief Render to a mesh at a dt time.
-     * @param static_mesh: Static mesh to render.
+     * @param mesh: Mesh to render.
      * @param material: Material to be used (or null).
      * @param model_mat: Model matrix to be used.
      */
     void RenderMesh(
-        StaticMeshInterface& static_mesh,
+        MeshInterface& mesh,
         MaterialInterface& material,
         const glm::mat4& projection,
         const glm::mat4& view = glm::mat4(1.0f),
@@ -122,10 +124,13 @@ class Renderer : public RendererInterface
         const glm::mat4& view) override;
 
   private:
+    void UpdateRaytraceBuffersIfNeeded(SkinnedMesh& skinned_mesh);
+
+  private:
     LevelInterface& level_;
     double delta_time_ = 0.0;
-    proto::NodeStaticMesh::RenderTimeEnum render_time_ =
-        proto::NodeStaticMesh::SCENE_RENDER_TIME;
+    proto::NodeMesh::RenderTimeEnum render_time_ =
+        proto::NodeMesh::SCENE_RENDER_TIME;
     Logger& logger_ = Logger::GetInstance();
     glm::mat4 env_map_model_ = glm::mat4(1.0f);
     // Viewport top left and bottom right.
@@ -141,8 +146,11 @@ class Renderer : public RendererInterface
     bool first_render_ = true;
     // The render callback it will be called once per mesh.
     RenderCallback callback_ = [](UniformCollectionInterface&,
-                                  StaticMeshInterface&,
+                                  MeshInterface&,
                                   MaterialInterface&) {};
 };
 
 } // End namespace frame::opengl.
+
+
+

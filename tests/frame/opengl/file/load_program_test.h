@@ -2,7 +2,6 @@
 
 #include <gtest/gtest.h>
 
-#include "frame/file/obj.h"
 #include "frame/window_factory.h"
 
 namespace test

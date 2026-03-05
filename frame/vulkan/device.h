@@ -70,8 +70,8 @@ class Device : public DeviceInterface
         std::vector<float>&& vector) final;
     std::unique_ptr<BufferInterface> CreateIndexBuffer(
         std::vector<std::uint32_t>&& vector) final;
-    std::unique_ptr<StaticMeshInterface> CreateStaticMesh(
-        const StaticMeshParameter& static_mesh_parameter) final;
+    std::unique_ptr<MeshInterface> CreateMesh(
+        const MeshParameter& mesh_parameter) final;
 
   public:
     LevelInterface& GetLevel() final
@@ -153,6 +153,7 @@ class Device : public DeviceInterface
     void DestroyTextureResources();
     void CreateDescriptorResources();
     void DestroyDescriptorResources();
+    void UpdateSkinnedRaytraceBuffers();
     void CopyBuffer(vk::Buffer src, vk::Buffer dst, vk::DeviceSize size);
     void TransitionImageLayout(
         vk::Image image,
@@ -259,3 +260,5 @@ class Device : public DeviceInterface
 };
 
 } // namespace frame::vulkan
+
+

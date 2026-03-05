@@ -1,0 +1,40 @@
+{
+    "opengl": {
+        "entries": [
+            { "key": "display", "vertex_shader": "display.vert", "fragment_shader": "display.frag" },
+            { "key": "displayprogram", "vertex_shader": "display.vert", "fragment_shader": "display.frag" },
+            { "key": "blur", "vertex_shader": "blur.vert", "fragment_shader": "blur.frag" },
+            { "key": "program", "vertex_shader": "blur.vert", "fragment_shader": "blur.frag" },
+            { "key": "cubemap", "vertex_shader": "cubemap.vert", "fragment_shader": "cubemap.frag" },
+            { "key": "cubemapprogram", "vertex_shader": "cubemap.vert", "fragment_shader": "cubemap.frag" },
+            { "key": "scene_simple", "vertex_shader": "scene_simple.vert", "fragment_shader": "scene_simple.frag" },
+            { "key": "frameeditorprogram", "vertex_shader": "scene_simple.vert", "fragment_shader": "scene_simple.frag" },
+            { "key": "equirectangular_cubemap", "vertex_shader": "equirectangular_cubemap.vert", "fragment_shader": "equirectangular_cubemap.frag" },
+            { "key": "equirectangularprogram", "vertex_shader": "equirectangular_cubemap.vert", "fragment_shader": "equirectangular_cubemap.frag" },
+            { "key": "japaneseflagprogram", "vertex_shader": "japanese_flag.vert", "fragment_shader": "japanese_flag.frag" },
+            { "key": "ray_marching", "vertex_shader": "ray_marching.vert", "fragment_shader": "ray_marching.frag" },
+            { "key": "raymarchingprogram", "vertex_shader": "ray_marching.vert", "fragment_shader": "ray_marching.frag" },
+            { "key": "raytracing_simple", "vertex_shader": "raytracing_simple.vert", "fragment_shader": "raytracing_simple.frag" },
+            { "key": "raytracing_simple_preprocess", "vertex_shader": "raytracing_simple.vert", "fragment_shader": "raytracing_simple.frag" },
+            { "key": "raytracing_bvh", "vertex_shader": "raytracing_bvh.vert", "fragment_shader": "raytracing_bvh.frag" },
+            { "key": "raytracing_bvh_preprocess", "vertex_shader": "raytracing_bvh.vert", "fragment_shader": "raytracing_bvh.frag" },
+            { "key": "raytraceprogram", "vertex_shader": "raytracing_bvh.vert", "fragment_shader": "raytracing_bvh.frag" },
+            { "key": "raytracepreprocessprogram", "vertex_shader": "raytracing_bvh.vert", "fragment_shader": "raytracing_bvh.frag" }
+        ]
+    },
+    "vulkan": {
+        "entries": [
+            { "key": "cubemap", "vertex_shader": "cubemap.vert", "fragment_shader": "cubemap.frag" },
+            { "key": "cubemapprogram", "vertex_shader": "cubemap.vert", "fragment_shader": "cubemap.frag" },
+            { "key": "japaneseflagprogram", "vertex_shader": "japanese_flag.vert", "fragment_shader": "japanese_flag.frag" },
+            { "key": "ray_marching", "vertex_shader": "ray_marching.vert", "fragment_shader": "ray_marching.frag" },
+            { "key": "raymarchingprogram", "vertex_shader": "ray_marching.vert", "fragment_shader": "ray_marching.frag" },
+            { "key": "raytracing_simple", "vertex_shader": "raytracing_simple.vert", "fragment_shader": "raytracing_simple.frag", "compute_shader": "raytracing_dual.comp" },
+            { "key": "raytracing_simple_preprocess", "vertex_shader": "raytracing_simple.vert", "fragment_shader": "raytracing_simple.frag" },
+            { "key": "raytracing_bvh", "vertex_shader": "raytracing_bvh.vert", "fragment_shader": "raytracing_bvh.frag", "compute_shader": "raytracing_bvh.comp" },
+            { "key": "raytracing_bvh_preprocess", "vertex_shader": "raytracing_bvh.vert", "fragment_shader": "raytracing_bvh.frag" },
+            { "key": "raytraceprogram", "vertex_shader": "raytracing_bvh.vert", "fragment_shader": "raytracing_bvh.frag", "compute_shader": "raytracing_bvh.comp" },
+            { "key": "raytracepreprocessprogram", "vertex_shader": "raytracing_bvh.vert", "fragment_shader": "raytracing_bvh.frag" }
+        ]
+    }
+}

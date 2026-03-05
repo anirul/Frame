@@ -23,18 +23,18 @@
             "output_texture_names": "billboard",
             "input_scene_type": {
                 "value": "QUAD"
-            },
-            "shader_vertex": "japanese_flag.vert",
-            "shader_fragment": "japanese_flag.frag",
-            "shader_compute": ""
+            }
         }
     ],
     "materials": [
         {
-            "name": "JapaneseFlagMaterial",
-            "program_name": "JapaneseFlagProgram",
-            "texture_names": [],
-            "inner_names": []
+            "name": "JapaneseFlagMaterial"
+        }
+    ],
+    "render_pass_programs": [
+        {
+            "render_time_enum": "SCENE_RENDER_TIME",
+            "program_name": "JapaneseFlagProgram"
         }
     ],
     "scene_tree": {
@@ -76,7 +76,7 @@
                 }
             }
         ],
-        "node_static_meshes": [
+        "node_meshes": [
             {
                 "name": "JapaneseFlagRendering",
                 "parent": "root",
@@ -86,3 +86,4 @@
         ]
     }
 }
+

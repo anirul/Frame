@@ -7,20 +7,14 @@ package frame.proto;
 message Material {
         // Name of the material.
         string name = 1;
-        // Program reference.
-        string program_name = 5;
-        // Optional preprocess program reference.
-        optional string preprocess_program_name = 10;
-        // Reference name of the texture names in the texture file.
-        repeated string texture_names = 3;
-	// Reference to the name inside the material in the shader file.
-	repeated string inner_names = 4;
+        // Reserved legacy fields.
+        reserved 3, 4, 5, 10;
         // Reference name of the buffer names in the buffer file.
         repeated string buffer_names = 6;
-        // Reference to the name inside the material in the shader file.
+        // Reference to the name used by the material pipeline.
         repeated string inner_buffer_names = 7;
         // Reference name of the node transforms in the scene tree.
         repeated string node_names = 8;
-        // Reference to the uniform name inside the material in the shader file.
+        // Reference to the uniform name inside the material pipeline.
         repeated string inner_node_names = 9;
 }

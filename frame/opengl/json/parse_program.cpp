@@ -44,7 +44,7 @@ std::unique_ptr<frame::ProgramInterface> ParseProgramOpenGL(
     switch (proto_program.input_scene_type().value())
     {
     case proto::SceneType::QUAD: {
-        EntityId quad_id = level.GetDefaultStaticMeshQuadId();
+        EntityId quad_id = level.GetDefaultMeshQuadId();
         if (!quad_id)
         {
             return nullptr;
@@ -53,7 +53,7 @@ std::unique_ptr<frame::ProgramInterface> ParseProgramOpenGL(
         break;
     }
     case proto::SceneType::CUBE: {
-        auto maybe_cube_id = level.GetDefaultStaticMeshCubeId();
+        auto maybe_cube_id = level.GetDefaultMeshCubeId();
         if (!maybe_cube_id)
             return nullptr;
         EntityId cube_id = maybe_cube_id;
@@ -172,3 +172,4 @@ std::unique_ptr<frame::ProgramInterface> ParseProgramOpenGL(
 }
 
 } // End namespace frame::json.
+

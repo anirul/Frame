@@ -7,6 +7,16 @@ import "material.proto";
 
 package frame.proto;
 
+// Program configuration for a render pass.
+message RenderPassProgram {
+	// Which pass this configuration applies to.
+	NodeMesh.RenderTimeEnum render_time_enum = 1;
+	// Main program for this pass.
+	string program_name = 2;
+	// Optional preprocess program for this pass.
+	optional string preprocess_program_name = 3;
+}
+
 // Level this describe the level loading of the app.
 // Next 9
 message Level {
@@ -22,4 +32,6 @@ message Level {
 	SceneTree scene_tree = 7;
 	// Contains the needed materials.
 	repeated Material materials = 8;
+	// Program selection per render pass.
+	repeated RenderPassProgram render_pass_programs = 9;
 }

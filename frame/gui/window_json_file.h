@@ -33,6 +33,13 @@ class WindowJsonFile : public GuiWindowInterface
     /** @brief Get the file name associated with this window. */
     const std::string& GetFileName() const;
 
+  protected:
+    /**
+     * @brief Apply JSON content to the current device.
+     * Derived classes can override this to provide backend-specific loading.
+     */
+    virtual void ApplyJsonContent(const std::string& content);
+
   private:
     std::string name_;
     std::string file_name_;

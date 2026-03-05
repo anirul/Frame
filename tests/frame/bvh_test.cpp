@@ -75,7 +75,7 @@ TEST(BvhCacheTest, RoundTrip)
     frame::BvhCacheMetadata metadata;
     metadata.cache_path = cache_path;
     metadata.cache_relative = frame::file::PurifyFilePath(cache_path);
-    metadata.source_relative = "asset/model/dragon.obj";
+    metadata.source_relative = "asset/model/dragon.glb";
     metadata.source_size = 42;
     metadata.source_mtime_ns = 123456789ull;
 
@@ -101,7 +101,7 @@ TEST(BvhCacheTest, RejectsOutdatedMetadata)
     frame::BvhCacheMetadata metadata;
     metadata.cache_path = cache_path;
     metadata.cache_relative = frame::file::PurifyFilePath(cache_path);
-    metadata.source_relative = "asset/model/dragon.obj";
+    metadata.source_relative = "asset/model/dragon.glb";
     metadata.source_size = 5;
     metadata.source_mtime_ns = 1000;
     frame::SaveBvhCache(metadata, nodes);
@@ -115,3 +115,4 @@ TEST(BvhCacheTest, RejectsOutdatedMetadata)
 }
 
 } // namespace test
+

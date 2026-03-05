@@ -6,7 +6,7 @@
 
 #include "frame/camera_interface.h"
 #include "frame/material_interface.h"
-#include "frame/static_mesh_interface.h"
+#include "frame/mesh_interface.h"
 
 namespace frame
 {
@@ -65,14 +65,14 @@ struct RendererInterface
     virtual void SetDepthTest(bool enable) = 0;
 	/**
      * @brief Render to a mesh at a dt time.
-     * @param static_mesh: Static mesh to render.
+     * @param mesh: Mesh to render.
      * @param material: Material to be used (or null).
      * @param projection: Projection matrix used.
      * @param view: View matrix used.
      * @param model: Model matrix to be used.
      */
     virtual void RenderMesh(
-        StaticMeshInterface& static_mesh,
+        MeshInterface& mesh,
         MaterialInterface& material,
         const glm::mat4& projection,
         const glm::mat4& view = glm::mat4(1.0f),
@@ -100,7 +100,7 @@ struct RendererInterface
     using RenderCallback =
 		std::function<void(
 			UniformCollectionInterface&,
-			StaticMeshInterface&,
+			MeshInterface&,
 			MaterialInterface&)>;
     /**
      * @brief Set the mesh render callback.
@@ -110,3 +110,5 @@ struct RendererInterface
 };
 
 } // End namespace frame.
+
+

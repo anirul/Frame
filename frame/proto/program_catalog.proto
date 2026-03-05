@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package frame.proto;
+
+message ProgramCatalogEntry {
+	string key = 1;
+	string vertex_shader = 2;
+	string fragment_shader = 3;
+	string compute_shader = 4;
+}
+
+message ProgramCatalogBackend {
+	repeated ProgramCatalogEntry entries = 1;
+}
+
+message ProgramCatalog {
+	ProgramCatalogBackend opengl = 1;
+	ProgramCatalogBackend vulkan = 2;
+}

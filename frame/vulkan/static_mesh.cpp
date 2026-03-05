@@ -13,7 +13,7 @@ namespace frame::vulkan
 {
 
 StaticMesh::StaticMesh(
-    const frame::StaticMeshParameter& parameters, bool clear_buffer)
+    const frame::MeshParameter& parameters, bool clear_buffer)
     : parameter_(parameters), clear_buffer_(clear_buffer)
 {
     index_size_ = 0;
@@ -70,18 +70,18 @@ frame::EntityId CreateQuadStaticMesh(frame::LevelInterface& level)
     auto texture_buffer_id = level.AddBuffer(std::move(texture_buffer));
     auto index_buffer_id = level.AddBuffer(std::move(index_buffer));
 
-    frame::StaticMeshParameter parameter = {};
+    frame::MeshParameter parameter = {};
     parameter.point_buffer_id = point_buffer_id;
     parameter.normal_buffer_id = normal_buffer_id;
     parameter.texture_buffer_id = texture_buffer_id;
     parameter.index_buffer_id = index_buffer_id;
     parameter.render_primitive_enum =
-        frame::proto::NodeStaticMesh::TRIANGLE_PRIMITIVE;
+        frame::proto::NodeMesh::TRIANGLE_PRIMITIVE;
 
     auto mesh = std::make_unique<StaticMesh>(parameter, true);
     mesh->SetName(std::format("QuadMesh.{}", count));
     mesh->SetIndexSize(indices.size() * sizeof(std::uint32_t));
-    return level.AddStaticMesh(std::move(mesh));
+    return level.AddMesh(std::move(mesh));
 }
 
 frame::EntityId CreateCubeStaticMesh(frame::LevelInterface& level)
@@ -215,18 +215,20 @@ frame::EntityId CreateCubeStaticMesh(frame::LevelInterface& level)
     auto texture_buffer_id = level.AddBuffer(std::move(texture_buffer));
     auto index_buffer_id = level.AddBuffer(std::move(index_buffer));
 
-    frame::StaticMeshParameter parameter = {};
+    frame::MeshParameter parameter = {};
     parameter.point_buffer_id = point_buffer_id;
     parameter.normal_buffer_id = normal_buffer_id;
     parameter.texture_buffer_id = texture_buffer_id;
     parameter.index_buffer_id = index_buffer_id;
     parameter.render_primitive_enum =
-        frame::proto::NodeStaticMesh::TRIANGLE_PRIMITIVE;
+        frame::proto::NodeMesh::TRIANGLE_PRIMITIVE;
 
     auto mesh = std::make_unique<StaticMesh>(parameter, true);
     mesh->SetName(std::format("CubeMesh.{}", count));
     mesh->SetIndexSize(indices.size() * sizeof(std::uint32_t));
-    return level.AddStaticMesh(std::move(mesh));
+    return level.AddMesh(std::move(mesh));
 }
 
 } // namespace frame::vulkan
+
+

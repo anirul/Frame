@@ -52,8 +52,7 @@ int Run(int argc, char** argv)
     gui_window->SetMenuBar(
         std::make_unique<frame::gui::Menubar>(
             "Menu", menubar_file, menubar_view, gui_window->GetDevice()));
-    gui_window->AddModalWindow(
-        std::make_unique<frame::gui::WindowStart>(menubar_file));
+    gui_window->AddWindow(std::make_unique<frame::gui::WindowStart>(menubar_file));
     // Set the main window in full.
     device.AddPlugin(std::move(gui_window));
 

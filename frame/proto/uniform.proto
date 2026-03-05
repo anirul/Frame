@@ -5,8 +5,8 @@ import "plugin.proto";
 
 package frame.proto;
 
-// This is the definition of an Uniform parameter.
-// These are parameters that are passed to the shader.
+// This is the definition of a uniform parameter.
+// These are parameters that are passed to the rendering pipeline.
 // Next 21
 message Uniform {
 	enum TypeEnum {
@@ -33,9 +33,9 @@ message Uniform {
 		LIGHT_COLOR_VEC3 = 9;
 		CAMERA_POSITION_VEC3 = 10;
 	}
-	// Name of the uniform (should be the same as declared in the shader!).
+	// Name of the uniform (should match the program declaration).
 	string name = 1;
-	// Type of the uniform (should be the same as declared in the shader!).
+	// Type of the uniform (should match the program declaration).
 	TypeEnum type = 3;
 	// Value of the uniform (same as before).
 	oneof value_oneof {

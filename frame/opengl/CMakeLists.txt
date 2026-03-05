@@ -24,8 +24,10 @@ add_library(FrameOpenGL
     json/parse_texture.h
     material.cpp
     material.h
-    static_mesh.cpp
-    static_mesh.h
+    mesh.cpp
+    mesh.h
+    skinned_mesh.cpp
+    skinned_mesh.h
     pixel.cpp
     pixel.h
     message_callback.cpp

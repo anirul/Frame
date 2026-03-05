@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "frame/vulkan/vulkan_dispatch.h"
@@ -35,6 +36,9 @@ class BufferResourceManager
     void BuildStorageBuffers(
         LevelInterface& level,
         const std::vector<EntityId>& buffer_ids);
+    bool UpdateStorageBuffer(
+        const std::string& name,
+        const std::vector<std::uint8_t>& bytes);
     void BuildUniformBuffer(vk::DeviceSize size_bytes);
     void UpdateUniform(const void* data, std::size_t byte_count) const;
 
@@ -64,6 +68,7 @@ class BufferResourceManager
     CommandQueue* command_queue_;
     const Logger* logger_;
     std::vector<BufferResource> storage_buffers_;
+    std::unordered_map<std::string, std::size_t> storage_buffer_indices_;
     BufferResource uniform_buffer_;
 };
 

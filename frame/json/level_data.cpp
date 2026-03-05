@@ -1,5 +1,7 @@
 #include "frame/json/level_data.h"
 
+#include "frame/json/program_catalog.h"
+
 namespace frame::json
 {
 
@@ -31,9 +33,14 @@ LevelData BuildLevelData(
     {
         ProgramInfo program_info;
         program_info.name = proto_program.name();
-        program_info.vertex_shader = proto_program.shader_vertex();
-        program_info.fragment_shader = proto_program.shader_fragment();
-        program_info.compute_shader = proto_program.shader_compute();
+        if (auto shader_files = ResolveProgramShaderFiles(
+                proto_program,
+                ShaderBackend::Vulkan))
+        {
+            program_info.vertex_shader = shader_files->vertex_shader;
+            program_info.fragment_shader = shader_files->fragment_shader;
+            program_info.compute_shader = shader_files->compute_shader;
+        }
         data.programs.push_back(std::move(program_info));
     }
 
@@ -41,16 +48,12 @@ LevelData BuildLevelData(
     {
         MaterialInfo material_info;
         material_info.name = proto_material.name();
-        material_info.program_name = proto_material.program_name();
-        material_info.texture_names.assign(
-            proto_material.texture_names().begin(),
-            proto_material.texture_names().end());
         data.materials.push_back(std::move(material_info));
     }
 
-    for (const auto& node : proto_level.scene_tree().node_static_meshes())
+    for (const auto& node : proto_level.scene_tree().node_meshes())
     {
-        if (node.mesh_enum() == frame::proto::NodeStaticMesh::QUAD)
+        if (node.mesh_enum() == frame::proto::NodeMesh::QUAD)
         {
             StaticMeshInfo mesh_info;
             mesh_info.name = node.name();
@@ -67,7 +70,7 @@ LevelData BuildLevelData(
             mesh_info.indices = {0, 1, 2, 2, 3, 0};
             data.meshes.push_back(std::move(mesh_info));
         }
-        else if (node.mesh_enum() == frame::proto::NodeStaticMesh::CUBE)
+        else if (node.mesh_enum() == frame::proto::NodeMesh::CUBE)
         {
             StaticMeshInfo mesh_info;
             mesh_info.name = node.name();
@@ -167,3 +170,4 @@ LevelData BuildLevelData(
 }
 
 } // namespace frame::json
+

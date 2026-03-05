@@ -34,14 +34,14 @@ add_library(Frame
     node_light.h
     node_matrix.cpp
     node_matrix.h
-    node_static_mesh.cpp
-    node_static_mesh.h
+    node_mesh.cpp
+    node_mesh.h
     plugin_interface.h
     program_interface.h
     renderer_interface.h
     serialize.h
     serialize_interface.h
-    static_mesh_interface.h
+    mesh_interface.h
     texture_interface.h
     uniform.cpp
     uniform.h
@@ -84,3 +84,4 @@ add_subdirectory(common)
 add_subdirectory(file)
 add_subdirectory(gui)
 add_subdirectory(json)
+

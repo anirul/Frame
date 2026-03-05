@@ -28,18 +28,18 @@ class Level : public LevelInterface
      */
     virtual ~Level() override;
     /**
-     * @brief Set default quad static mesh id.
-     * @param id: Id of the default quad static mesh.
+     * @brief Set default quad mesh id.
+     * @param id: Id of the default quad mesh.
      */
-    void SetDefaultStaticMeshQuadId(EntityId id) final
+    void SetDefaultMeshQuadId(EntityId id) final
     {
         quad_id_ = id;
     }
     /**
-     * @brief Set default cube static mesh id.
-     * @param id: Id of the default cube static mesh.
+     * @brief Set default cube mesh id.
+     * @param id: Id of the default cube mesh.
      */
-    void SetDefaultStaticMeshCubeId(EntityId id) final
+    void SetDefaultMeshCubeId(EntityId id) final
     {
         cube_id_ = id;
     }
@@ -89,13 +89,13 @@ class Level : public LevelInterface
         return *id_buffer_map_.at(id).get();
     }
     /**
-     * @brief Will get a static mesh from an id.
-     * @param id: The id to get the static mesh from.
-     * @return A pointer to a static mesh or null.
+     * @brief Will get a mesh from an id.
+     * @param id: The id to get the mesh from.
+     * @return A pointer to a mesh or null.
      */
-    StaticMeshInterface& GetStaticMeshFromId(EntityId id) const override
+    MeshInterface& GetMeshFromId(EntityId id) const override
     {
-        return *id_static_mesh_map_.at(id).get();
+        return *id_mesh_map_.at(id).get();
     }
     /**
      * @brief Get all light from the level.
@@ -113,13 +113,13 @@ class Level : public LevelInterface
      */
     CameraInterface& GetCameraFromId(EntityId id) const override;
     /**
-     * @brief Get a vector of static mesh id and corresponding material id.
-     * @return Vector of static mesh id and corresponding material id and
+     * @brief Get a vector of mesh id and corresponding material id.
+     * @return Vector of mesh id and corresponding material id and
      * RenderTimeEnum.
      */
-    std::vector<std::pair<EntityId, EntityId>> GetStaticMeshMaterialIds(
-        proto::NodeStaticMesh::RenderTimeEnum render_time_enum =
-            proto::NodeStaticMesh::SCENE_RENDER_TIME) const override;
+    std::vector<std::pair<EntityId, EntityId>> GetMeshMaterialIds(
+        proto::NodeMesh::RenderTimeEnum render_time_enum =
+            proto::NodeMesh::SCENE_RENDER_TIME) const override;
     /**
      * @brief Get the default output texture id.
      * @return Id of the default output texture.
@@ -197,8 +197,16 @@ class Level : public LevelInterface
     void AddMeshMaterialId(
         EntityId node_id,
         EntityId material_id,
-        proto::NodeStaticMesh::RenderTimeEnum render_time_enum =
-            proto::NodeStaticMesh::SCENE_RENDER_TIME) override;
+        proto::NodeMesh::RenderTimeEnum render_time_enum =
+            proto::NodeMesh::SCENE_RENDER_TIME) override;
+    void SetRenderPassProgramIds(
+        proto::NodeMesh::RenderTimeEnum render_time_enum,
+        EntityId program_id,
+        EntityId preprocess_program_id = NullId) override;
+    EntityId GetRenderPassProgramId(
+        proto::NodeMesh::RenderTimeEnum render_time_enum) const override;
+    EntityId GetRenderPassPreprocessProgramId(
+        proto::NodeMesh::RenderTimeEnum render_time_enum) const override;
     /**
      * @brief Get enum type from Id.
      * @param id: Id to be returned.
@@ -227,15 +235,15 @@ class Level : public LevelInterface
 
   public:
     /**
-     * @brief Get the default quad static mesh id.
-     * @return The id of the quad static mesh id or error.
+     * @brief Get the default quad mesh id.
+     * @return The id of the quad mesh id or error.
      */
-    EntityId GetDefaultStaticMeshQuadId() const final;
+    EntityId GetDefaultMeshQuadId() const final;
     /**
-     * @brief Get the default cube static mesh id.
-     * @return The id of the cube static mesh id or error.
+     * @brief Get the default cube mesh id.
+     * @return The id of the cube mesh id or error.
      */
-    EntityId GetDefaultStaticMeshCubeId() const final;
+    EntityId GetDefaultMeshCubeId() const final;
     /**
      * @brief Get the id of an element from a name string.
      * @param name: The name string of the element.
@@ -301,12 +309,12 @@ class Level : public LevelInterface
      */
     void RemoveBuffer(EntityId buffer) override;
     /**
-     * @brief Add a static mesh to the level.
-     * @param static_mesh: Move a buffer in the level.
+     * @brief Add a mesh to the level.
+     * @param mesh: Move a buffer in the level.
      * @return Assigned entity id or error.
      */
-    EntityId AddStaticMesh(
-        std::unique_ptr<StaticMeshInterface>&& static_mesh) override;
+    EntityId AddMesh(
+        std::unique_ptr<MeshInterface>&& mesh) override;
     /**
      * @brief Get the list of children from an id in the node list.
      * @param id: The node id you want to get the children.
@@ -382,7 +390,7 @@ class Level : public LevelInterface
      * @param id: The id to replace the mesh.
      */
     void ReplaceMesh(
-        std::unique_ptr<StaticMeshInterface>&& mesh, EntityId id) override;
+        std::unique_ptr<MeshInterface>&& mesh, EntityId id) override;
 
   protected:
     /**
@@ -429,7 +437,7 @@ class Level : public LevelInterface
      * @brief Increase the internal counter and return the value.
      * @return Current counter + 1.
      */
-    EntityId GetStaticMeshNewId() const
+    EntityId GetMeshNewId() const
     {
         return ++next_id_maker_;
     }
@@ -466,8 +474,7 @@ class Level : public LevelInterface
     std::map<EntityId, std::unique_ptr<ProgramInterface>> id_program_map_;
     std::map<EntityId, std::unique_ptr<MaterialInterface>> id_material_map_;
     std::map<EntityId, std::unique_ptr<BufferInterface>> id_buffer_map_;
-    std::map<EntityId, std::unique_ptr<StaticMeshInterface>>
-        id_static_mesh_map_;
+    std::map<EntityId, std::unique_ptr<MeshInterface>> id_mesh_map_;
     std::map<EntityId, std::unique_ptr<LightInterface>> id_light_map_;
     std::map<EntityId, EntityId> node_light_to_light_map_;
     // These are storage specifiers.
@@ -479,6 +486,12 @@ class Level : public LevelInterface
     std::vector<std::pair<EntityId, EntityId>> mesh_material_pre_render_ids_;
     std::vector<std::pair<EntityId, EntityId>> mesh_material_post_proccess_ids_;
     std::vector<std::pair<EntityId, EntityId>> mesh_material_skybox_ids_;
+    std::map<proto::NodeMesh::RenderTimeEnum, EntityId> render_program_ids_;
+    std::map<proto::NodeMesh::RenderTimeEnum, EntityId>
+        render_preprocess_program_ids_;
 };
 
 } // End namespace frame.
+
+
+

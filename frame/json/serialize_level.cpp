@@ -1,5 +1,7 @@
 #include "frame/json/serialize_level.h"
 
+#include <array>
+
 #include "frame/json/serialize_material.h"
 #include "frame/json/serialize_program.h"
 #include "frame/json/serialize_scene_tree.h"
@@ -8,27 +10,6 @@
 
 namespace frame::json
 {
-
-namespace
-{
-
-std::string GetMaterialNameFromProgramName(
-    const std::string& program_name, const proto::Level& proto_level)
-{
-    for (const auto& material : proto_level.materials())
-    {
-        if (material.program_name() == program_name)
-        {
-            return material.name();
-        }
-    }
-    throw std::runtime_error(
-        std::format(
-            "Couldn't find material name from program name: [{}]?",
-            program_name));
-}
-
-} // End anonymous namespace.
 
 proto::Level SerializeLevel(const LevelInterface& level_interface)
 {
@@ -73,6 +54,29 @@ proto::Level SerializeLevel(const LevelInterface& level_interface)
         proto::Program proto_program =
             SerializeProgram(program_interface, level_interface);
         *proto_level.add_programs() = proto_program;
+    }
+    constexpr std::array<proto::NodeMesh::RenderTimeEnum, 4> kRenderTimes = {
+        proto::NodeMesh::PRE_RENDER_TIME,
+        proto::NodeMesh::SCENE_RENDER_TIME,
+        proto::NodeMesh::POST_PROCESS_TIME,
+        proto::NodeMesh::SKYBOX_RENDER_TIME};
+    for (const auto render_time : kRenderTimes)
+    {
+        const auto program_id = level_interface.GetRenderPassProgramId(render_time);
+        if (!program_id)
+        {
+            continue;
+        }
+        auto* pass = proto_level.add_render_pass_programs();
+        pass->set_render_time_enum(render_time);
+        pass->set_program_name(level_interface.GetNameFromId(program_id));
+        const auto preprocess_id =
+            level_interface.GetRenderPassPreprocessProgramId(render_time);
+        if (preprocess_id)
+        {
+            pass->set_preprocess_program_name(
+                level_interface.GetNameFromId(preprocess_id));
+        }
     }
     *proto_level.mutable_scene_tree() = SerializeSceneTree(level_interface);
     return proto_level;

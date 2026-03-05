@@ -2,13 +2,13 @@
 
 add_library(FrameProto STATIC
   bvh_cache.proto
-  obj_cache.proto
   image_cache.proto
   level.proto
   material.proto
   math.proto
   pixel.proto
   plugin.proto
+  program_catalog.proto
   program.proto
   scene.proto
   size.proto

@@ -17,7 +17,7 @@ enum class EntityTypeEnum : std::uint8_t
     PROGRAM = 3,
     MATERIAL = 4,
     BUFFER = 5,
-    STATIC_MESH = 6,
+    MESH = 6,
     PLUGIN = 7,
     LIGHT = 8,
 };

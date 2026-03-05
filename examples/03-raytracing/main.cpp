@@ -7,11 +7,13 @@
 #include <frame/common/application.h>
 #include <frame/file/file_system.h>
 #include <frame/file/image_stb.h>
+#include <frame/logger.h>
 #include <frame/window_factory.h>
 
 #include "absl/flags/usage.h"
 
 #include <exception>
+#include <iostream>
 #include <glm/glm.hpp>
 
 // From: https://sourceforge.net/p/predef/wiki/OperatingSystems/
@@ -40,10 +42,14 @@ try
 }
 catch (const std::exception& e)
 {
+    auto& logger = frame::Logger::GetInstance();
+    logger->error("Unhandled exception in 03_RayTracing: {}", e.what());
+    logger->flush();
 #if defined(_WIN32) || defined(_WIN64)
     MessageBoxA(nullptr, e.what(), "Error", MB_OK | MB_ICONERROR);
 #else
     std::cerr << e.what() << std::endl;
+    std::cerr.flush();
 #endif
     return 1;
 }

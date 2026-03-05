@@ -12,8 +12,10 @@ add_executable(FrameOpenGLTest
   main.cpp
   material_test.cpp
   material_test.h
-  static_mesh_test.cpp
-  static_mesh_test.h
+  mesh_test.cpp
+  mesh_test.h
+  skinned_mesh_test.cpp
+  skinned_mesh_test.h
   pixel_test.cpp
   pixel_test.h
   program_test.cpp

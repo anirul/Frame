@@ -22,6 +22,7 @@ BufferResourceManager::BufferResourceManager(
 void BufferResourceManager::Clear()
 {
     storage_buffers_.clear();
+    storage_buffer_indices_.clear();
     uniform_buffer_ = {};
 }
 
@@ -78,6 +79,7 @@ void BufferResourceManager::BuildStorageBuffers(
     };
 
     storage_buffers_.clear();
+    storage_buffer_indices_.clear();
     std::vector<PendingUpload> pending_uploads;
     pending_uploads.reserve(buffer_ids.size());
 
@@ -137,6 +139,8 @@ void BufferResourceManager::BuildStorageBuffers(
             res.buffer = std::move(gpu_buffer);
             res.memory = std::move(gpu_memory);
             storage_buffers_.push_back(std::move(res));
+            storage_buffer_indices_[storage_buffers_.back().name] =
+                storage_buffers_.size() - 1;
         }
         catch (const std::exception& ex)
         {
@@ -162,6 +166,52 @@ void BufferResourceManager::BuildStorageBuffers(
                 }
             });
     }
+}
+
+bool BufferResourceManager::UpdateStorageBuffer(
+    const std::string& name,
+    const std::vector<std::uint8_t>& bytes)
+{
+    if (bytes.empty())
+    {
+        return false;
+    }
+    auto it = storage_buffer_indices_.find(name);
+    if (it == storage_buffer_indices_.end())
+    {
+        return false;
+    }
+    auto& resource = storage_buffers_[it->second];
+    if (!resource.buffer || resource.size == 0)
+    {
+        return false;
+    }
+    if (bytes.size() != resource.size)
+    {
+        (*logger_)->warn(
+            "Storage buffer '{}' update size mismatch: {} != {}.",
+            name,
+            bytes.size(),
+            static_cast<std::size_t>(resource.size));
+        return false;
+    }
+
+    vk::UniqueDeviceMemory staging_memory;
+    auto staging_buffer = memory_manager_->CreateBuffer(
+        bytes.size(),
+        vk::BufferUsageFlagBits::eTransferSrc,
+        vk::MemoryPropertyFlagBits::eHostVisible |
+            vk::MemoryPropertyFlagBits::eHostCoherent,
+        staging_memory);
+    void* mapped = device_.mapMemory(
+        *staging_memory, 0, bytes.size());
+    std::memcpy(mapped, bytes.data(), bytes.size());
+    device_.unmapMemory(*staging_memory);
+    command_queue_->CopyBuffer(
+        *staging_buffer,
+        *resource.buffer,
+        resource.size);
+    return true;
 }
 
 void BufferResourceManager::BuildUniformBuffer(vk::DeviceSize size_bytes)

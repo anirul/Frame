@@ -31,8 +31,6 @@ struct ProgramInfo
 struct MaterialInfo
 {
     std::string name;
-    std::string program_name;
-    std::vector<std::string> texture_names;
 };
 
 struct StaticMeshInfo

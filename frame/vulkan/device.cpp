@@ -2,9 +2,11 @@
 
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include <limits>
 #include <optional>
 #include <string>
+#include <unordered_map>
 #include <unordered_set>
 #include <vector>
 #include <filesystem>
@@ -12,9 +14,12 @@
 #include <stdexcept>
 #include "absl/flags/flag.h"
 
+#include "frame/bvh.h"
 #include "frame/camera.h"
+#include "frame/json/program_catalog.h"
 #include "frame/level.h"
 #include "frame/common/application.h"
+#include "frame/node_mesh.h"
 #include "frame/vulkan/buffer.h"
 #include "frame/vulkan/buffer_resources.h"
 #include "frame/vulkan/build_level.h"
@@ -30,6 +35,7 @@
 #include "frame/vulkan/sync_resources.h"
 #include "frame/vulkan/texture.h"
 #include "frame/vulkan/texture_resources.h"
+#include "frame/vulkan/skinned_mesh.h"
 #include "frame/proto/uniform.pb.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
@@ -48,16 +54,16 @@ vk::ShaderStageFlags ToShaderStageFlags(
     {
         switch (stage)
         {
-        case frame::proto::ShaderStage::VERTEX:
+        case frame::proto::ProgramStage::VERTEX:
             flags |= vk::ShaderStageFlagBits::eVertex;
             break;
-        case frame::proto::ShaderStage::FRAGMENT:
+        case frame::proto::ProgramStage::FRAGMENT:
             flags |= vk::ShaderStageFlagBits::eFragment;
             break;
-        case frame::proto::ShaderStage::COMPUTE:
+        case frame::proto::ProgramStage::COMPUTE:
             flags |= vk::ShaderStageFlagBits::eCompute;
             break;
-        case frame::proto::ShaderStage::INVALID_STAGE:
+        case frame::proto::ProgramStage::INVALID_STAGE:
         default:
             break;
         }
@@ -328,28 +334,14 @@ void Device::StartupFromLevelData(const frame::json::LevelData& level_data)
     compute_output_in_shader_read_ = false;
     elapsed_time_seconds_ = 0.0f;
 
-    // Prefer the program referenced by scene materials; otherwise fall back to
-    // the first available program.
+    // Prefer programs configured for render passes; otherwise fall back to the
+    // first available program.
     {
         ScopedTimer timer(logger_, "Select program");
         auto pick_program = [&]() -> std::optional<frame::json::ProgramInfo> {
-            auto find_program_for_material =
-                [&](const std::string& material_name)
+            auto find_program_by_name =
+                [&](const std::string& program_name)
                 -> std::optional<frame::json::ProgramInfo> {
-                    if (material_name.empty())
-                    {
-                        return std::nullopt;
-                    }
-                    std::string program_name;
-                    for (const auto& proto_material :
-                         level_data.proto.materials())
-                    {
-                        if (proto_material.name() == material_name)
-                        {
-                            program_name = proto_material.program_name();
-                            break;
-                        }
-                    }
                     if (program_name.empty())
                     {
                         return std::nullopt;
@@ -363,69 +355,80 @@ void Device::StartupFromLevelData(const frame::json::LevelData& level_data)
                     }
                     return std::nullopt;
                 };
-
-            if (level_data.proto.has_scene_tree())
-            {
-                const auto& meshes =
-                    level_data.proto.scene_tree().node_static_meshes();
-                auto pick_from_meshes =
-                    [&](auto predicate)
-                    -> std::optional<frame::json::ProgramInfo> {
-                        for (const auto& mesh : meshes)
+            auto find_proto_program_by_name =
+                [&](const std::string& program_name)
+                -> const frame::proto::Program* {
+                    if (program_name.empty())
+                    {
+                        return nullptr;
+                    }
+                    for (const auto& proto_program : level_data.proto.programs())
+                    {
+                        if (proto_program.name() == program_name)
                         {
-                            if (!predicate(mesh))
-                            {
-                                continue;
-                            }
-                            if (auto program =
-                                    find_program_for_material(
-                                        mesh.material_name()))
-                            {
-                                return program;
-                            }
+                            return &proto_program;
                         }
-                        return std::nullopt;
-                    };
+                    }
+                    return nullptr;
+                };
+            auto is_raytracing_bvh_program =
+                [&](const std::string& program_name) {
+                    const auto* proto_program =
+                        find_proto_program_by_name(program_name);
+                    if (!proto_program)
+                    {
+                        return false;
+                    }
+                    const auto key =
+                        frame::json::ResolveProgramKey(*proto_program);
+                    return frame::json::IsRaytracingBvhProgramKey(key);
+                };
 
-                auto is_scene_quad =
-                    [&](const frame::proto::NodeStaticMesh& mesh) {
-                        return mesh.render_time_enum() ==
-                                   frame::proto::NodeStaticMesh::SCENE_RENDER_TIME &&
-                            mesh.mesh_oneof_case() ==
-                                frame::proto::NodeStaticMesh::kMeshEnum &&
-                            mesh.mesh_enum() ==
-                                frame::proto::NodeStaticMesh::QUAD;
-                    };
-                auto is_scene_mesh =
-                    [&](const frame::proto::NodeStaticMesh& mesh) {
-                        return mesh.render_time_enum() ==
-                            frame::proto::NodeStaticMesh::SCENE_RENDER_TIME;
-                    };
-                auto is_non_skybox =
-                    [&](const frame::proto::NodeStaticMesh& mesh) {
-                        return mesh.render_time_enum() !=
-                            frame::proto::NodeStaticMesh::SKYBOX_RENDER_TIME;
-                    };
-
-                if (auto program = pick_from_meshes(is_scene_quad))
+            constexpr std::array<frame::proto::NodeMesh::RenderTimeEnum, 4>
+                kPreferredPasses = {
+                    frame::proto::NodeMesh::PRE_RENDER_TIME,
+                    frame::proto::NodeMesh::SCENE_RENDER_TIME,
+                    frame::proto::NodeMesh::POST_PROCESS_TIME,
+                    frame::proto::NodeMesh::SKYBOX_RENDER_TIME};
+            std::optional<frame::json::ProgramInfo> first_pass_program =
+                std::nullopt;
+            for (const auto pass : kPreferredPasses)
+            {
+                for (const auto& pass_program :
+                     level_data.proto.render_pass_programs())
                 {
-                    return program;
+                    if (pass_program.render_time_enum() != pass)
+                    {
+                        continue;
+                    }
+                    if (auto program =
+                            find_program_by_name(pass_program.program_name()))
+                    {
+                        if (!first_pass_program)
+                        {
+                            first_pass_program = program;
+                        }
+                        if (is_raytracing_bvh_program(pass_program.program_name()))
+                        {
+                            return program;
+                        }
+                    }
                 }
-                if (auto program = pick_from_meshes(is_scene_mesh))
+            }
+            if (first_pass_program)
+            {
+                return first_pass_program;
+            }
+            for (const auto& program_info : level_data.programs)
+            {
+                if (is_raytracing_bvh_program(program_info.name))
                 {
-                    return program;
+                    return program_info;
                 }
-                if (auto program = pick_from_meshes(is_non_skybox))
-                {
-                    return program;
-                }
-                if (auto program = pick_from_meshes(
-                        [](const frame::proto::NodeStaticMesh&) {
-                            return true;
-                        }))
-                {
-                    return program;
-                }
+            }
+            if (!level_data.programs.empty())
+            {
+                return level_data.programs.front();
             }
             return std::nullopt;
         };
@@ -484,8 +487,8 @@ void Device::StartupFromLevelData(const frame::json::LevelData& level_data)
         else
         {
             logger_->error(
-                "No Vulkan program selected from scene materials; "
-                "add a program reference in the JSON material.");
+                "No Vulkan program selected; configure "
+                "level.render_pass_programs.");
         }
     }
 
@@ -576,7 +579,7 @@ void Device::StartupFromLevelData(const frame::json::LevelData& level_data)
             current_level_data_)
         {
             logger_->warn(
-                "Compute program {} has no shader_compute in JSON.",
+                "Compute program {} has no mapped compute pipeline source.",
                 active_program_info_->program_name);
         }
     }
@@ -821,6 +824,136 @@ glm::uvec2 Device::GetSize() const
     return size_;
 }
 
+void Device::UpdateSkinnedRaytraceBuffers()
+{
+    if (!level_ || !buffer_resources_ || !use_compute_raytracing_)
+    {
+        return;
+    }
+
+    auto sample_triangle_data = [](const std::vector<float>& triangles) {
+        std::array<float, 6> sample = {};
+        if (triangles.empty())
+        {
+            return sample;
+        }
+        const std::array<float, 6> ratios = {
+            0.0f, 0.17f, 0.33f, 0.51f, 0.73f, 0.91f};
+        const std::size_t max_index = triangles.size() - 1;
+        for (std::size_t i = 0; i < ratios.size(); ++i)
+        {
+            const std::size_t index = static_cast<std::size_t>(
+                ratios[i] * static_cast<float>(max_index));
+            sample[i] = triangles[index];
+        }
+        return sample;
+    };
+
+    static std::unordered_map<EntityId, std::array<float, 6>> previous_samples;
+    static bool logged_motion = false;
+    std::size_t updated_buffer_count = 0;
+    for (const auto node_id : level_->GetSceneNodes())
+    {
+        auto* node_mesh =
+            dynamic_cast<frame::NodeMesh*>(&level_->GetSceneNodeFromId(node_id));
+        if (!node_mesh)
+        {
+            continue;
+        }
+        const auto mesh_id = node_mesh->GetLocalMesh();
+        if (!mesh_id)
+        {
+            continue;
+        }
+        auto* skinned_mesh = dynamic_cast<frame::vulkan::SkinnedMesh*>(
+            &level_->GetMeshFromId(mesh_id));
+        if (!skinned_mesh)
+        {
+            continue;
+        }
+
+        const double skinning_time = skinned_mesh->GetSkinningTime(
+            static_cast<double>(elapsed_time_seconds_));
+
+        const auto triangle_buffer_id = skinned_mesh->GetTriangleBufferId();
+        if (triangle_buffer_id && skinned_mesh->HasRaytraceTriangleCallback())
+        {
+            auto triangles = skinned_mesh->EvaluateRaytraceTriangles(skinning_time);
+            if (!triangles.empty())
+            {
+                const auto sample = sample_triangle_data(triangles);
+                if (!logged_motion)
+                {
+                    if (auto it = previous_samples.find(triangle_buffer_id);
+                        it != previous_samples.end())
+                    {
+                        bool changed = false;
+                        for (std::size_t i = 0; i < sample.size(); ++i)
+                        {
+                            if (std::abs(sample[i] - it->second[i]) > 1.0e-5f)
+                            {
+                                changed = true;
+                                break;
+                            }
+                        }
+                        if (changed)
+                        {
+                            logger_->info(
+                                "Detected Vulkan skinned animation updates for mesh '{}'.",
+                                level_->GetNameFromId(mesh_id));
+                            logged_motion = true;
+                        }
+                    }
+                    previous_samples[triangle_buffer_id] = sample;
+                }
+
+                auto& triangle_buffer = dynamic_cast<frame::vulkan::Buffer&>(
+                    level_->GetBufferFromId(triangle_buffer_id));
+                triangle_buffer.Copy(triangles);
+                if (buffer_resources_->UpdateStorageBuffer(
+                    level_->GetNameFromId(triangle_buffer_id),
+                    triangle_buffer.GetRawData()))
+                {
+                    ++updated_buffer_count;
+                }
+            }
+        }
+
+        const auto bvh_buffer_id = skinned_mesh->GetBvhBufferId();
+        if (bvh_buffer_id && skinned_mesh->HasRaytraceBvhCallback())
+        {
+            auto bvh_nodes = skinned_mesh->EvaluateRaytraceBvh(skinning_time);
+            if (!bvh_nodes.empty())
+            {
+                auto& bvh_buffer = dynamic_cast<frame::vulkan::Buffer&>(
+                    level_->GetBufferFromId(bvh_buffer_id));
+                bvh_buffer.Copy(
+                    bvh_nodes.size() * sizeof(frame::BVHNode),
+                    bvh_nodes.data());
+                if (buffer_resources_->UpdateStorageBuffer(
+                    level_->GetNameFromId(bvh_buffer_id),
+                    bvh_buffer.GetRawData()))
+                {
+                    ++updated_buffer_count;
+                }
+            }
+        }
+    }
+    if (updated_buffer_count > 0)
+    {
+        // Re-arm transfer->compute visibility barrier after dynamic SSBO writes.
+        storage_buffers_ready_ = false;
+    }
+    static bool logged_once = false;
+    if (!logged_once && updated_buffer_count > 0)
+    {
+        logger_->info(
+            "Updated {} skinned Vulkan raytracing buffer(s) this frame.",
+            updated_buffer_count);
+        logged_once = true;
+    }
+}
+
 std::optional<vk::DescriptorImageInfo> Device::GetComputeOutputDescriptorInfo() const
 {
     if (!compute_output_sampler_ || !compute_output_view_)
@@ -858,6 +991,7 @@ void Device::Display(double dt)
     if (level_)
     {
         level_->UpdateLights(static_cast<double>(elapsed_time_seconds_));
+        UpdateSkinnedRaytraceBuffers();
     }
 
     if (!vk_unique_device_ || !swapchain_resources_ ||
@@ -1042,10 +1176,10 @@ std::unique_ptr<frame::BufferInterface> Device::CreateIndexBuffer(
     throw std::runtime_error("Vulkan index buffer support not implemented yet.");
 }
 
-std::unique_ptr<frame::StaticMeshInterface> Device::CreateStaticMesh(
-    const StaticMeshParameter& /*static_mesh_parameter*/)
+std::unique_ptr<frame::MeshInterface> Device::CreateMesh(
+    const MeshParameter& /*mesh_parameter*/)
 {
-    throw std::runtime_error("Vulkan static mesh support not implemented yet.");
+    throw std::runtime_error("Vulkan mesh support not implemented yet.");
 }
 
 void Device::RecreateSwapchain()
@@ -1327,7 +1461,7 @@ void Device::RecordCommandBuffer(
                 view = rotation * view;
 
                 const auto mesh_pairs =
-                    level_->GetStaticMeshMaterialIds();
+                    level_->GetMeshMaterialIds();
                 if (!mesh_pairs.empty())
                 {
                     auto node_id = mesh_pairs.front().first;
@@ -2576,3 +2710,7 @@ void Device::CreateDescriptorResources()
 
 
 } // namespace frame::vulkan
+
+
+
+

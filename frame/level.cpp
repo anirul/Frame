@@ -9,7 +9,7 @@
 #include "frame/node_camera.h"
 #include "frame/node_light.h"
 #include "frame/node_matrix.h"
-#include "frame/node_static_mesh.h"
+#include "frame/node_mesh.h"
 #include "frame/opengl/light.h"
 
 namespace frame
@@ -18,21 +18,21 @@ namespace frame
 Level::~Level()
 {
     // This has to be deleted first (it has reference to buffers).
-    id_static_mesh_map_.clear();
+    id_mesh_map_.clear();
 }
 
-std::vector<std::pair<EntityId, EntityId>> Level::GetStaticMeshMaterialIds(
-    proto::NodeStaticMesh::RenderTimeEnum render_time_enum) const
+std::vector<std::pair<EntityId, EntityId>> Level::GetMeshMaterialIds(
+    proto::NodeMesh::RenderTimeEnum render_time_enum) const
 {
     switch (render_time_enum)
     {
-    case proto::NodeStaticMesh::PRE_RENDER_TIME:
+    case proto::NodeMesh::PRE_RENDER_TIME:
         return mesh_material_pre_render_ids_;
-    case proto::NodeStaticMesh::SCENE_RENDER_TIME:
+    case proto::NodeMesh::SCENE_RENDER_TIME:
         return mesh_material_scene_render_ids_;
-    case proto::NodeStaticMesh::POST_PROCESS_TIME:
+    case proto::NodeMesh::POST_PROCESS_TIME:
         return mesh_material_post_proccess_ids_;
-    case proto::NodeStaticMesh::SKYBOX_RENDER_TIME:
+    case proto::NodeMesh::SKYBOX_RENDER_TIME:
         return mesh_material_skybox_ids_;
     default:
         throw std::runtime_error("Unknown render time?");
@@ -42,20 +42,20 @@ std::vector<std::pair<EntityId, EntityId>> Level::GetStaticMeshMaterialIds(
 void Level::AddMeshMaterialId(
     EntityId node_id,
     EntityId material_id,
-    proto::NodeStaticMesh::RenderTimeEnum render_time_enum)
+    proto::NodeMesh::RenderTimeEnum render_time_enum)
 {
     switch (render_time_enum)
     {
-    case proto::NodeStaticMesh::PRE_RENDER_TIME:
+    case proto::NodeMesh::PRE_RENDER_TIME:
         mesh_material_pre_render_ids_.push_back({node_id, material_id});
         break;
-    case proto::NodeStaticMesh::SCENE_RENDER_TIME:
+    case proto::NodeMesh::SCENE_RENDER_TIME:
         mesh_material_scene_render_ids_.push_back({node_id, material_id});
         break;
-    case proto::NodeStaticMesh::POST_PROCESS_TIME:
+    case proto::NodeMesh::POST_PROCESS_TIME:
         mesh_material_post_proccess_ids_.push_back({node_id, material_id});
         break;
-    case proto::NodeStaticMesh::SKYBOX_RENDER_TIME:
+    case proto::NodeMesh::SKYBOX_RENDER_TIME:
         mesh_material_skybox_ids_.push_back({node_id, material_id});
         break;
     default:
@@ -63,7 +63,52 @@ void Level::AddMeshMaterialId(
     }
 }
 
-EntityId Level::GetDefaultStaticMeshQuadId() const
+void Level::SetRenderPassProgramIds(
+    proto::NodeMesh::RenderTimeEnum render_time_enum,
+    EntityId program_id,
+    EntityId preprocess_program_id)
+{
+    if (!program_id)
+    {
+        render_program_ids_.erase(render_time_enum);
+        render_preprocess_program_ids_.erase(render_time_enum);
+        return;
+    }
+    render_program_ids_[render_time_enum] = program_id;
+    if (preprocess_program_id)
+    {
+        render_preprocess_program_ids_[render_time_enum] =
+            preprocess_program_id;
+    }
+    else
+    {
+        render_preprocess_program_ids_.erase(render_time_enum);
+    }
+}
+
+EntityId Level::GetRenderPassProgramId(
+    proto::NodeMesh::RenderTimeEnum render_time_enum) const
+{
+    if (auto it = render_program_ids_.find(render_time_enum);
+        it != render_program_ids_.end())
+    {
+        return it->second;
+    }
+    return NullId;
+}
+
+EntityId Level::GetRenderPassPreprocessProgramId(
+    proto::NodeMesh::RenderTimeEnum render_time_enum) const
+{
+    if (auto it = render_preprocess_program_ids_.find(render_time_enum);
+        it != render_preprocess_program_ids_.end())
+    {
+        return it->second;
+    }
+    return NullId;
+}
+
+EntityId Level::GetDefaultMeshQuadId() const
 {
     if (quad_id_)
     {
@@ -72,7 +117,7 @@ EntityId Level::GetDefaultStaticMeshQuadId() const
     return NullId;
 }
 
-EntityId Level::GetDefaultStaticMeshCubeId() const
+EntityId Level::GetDefaultMeshCubeId() const
 {
     if (cube_id_)
     {
@@ -85,7 +130,6 @@ EntityId Level::GetIdFromName(const std::string& name) const
 {
     if (name.empty())
     {
-        logger_->warn("name is empty.");
         return NullId;
     }
     try
@@ -94,7 +138,7 @@ EntityId Level::GetIdFromName(const std::string& name) const
     }
     catch (std::out_of_range& ex)
     {
-        logger_->warn(ex.what());
+        logger_->warn("No id for name '{}': {}", name, ex.what());
         return NullId;
     }
 }
@@ -226,6 +270,27 @@ void Level::RemoveProgram(EntityId program_id)
         {
         }
     }
+    for (const auto& [render_time, configured_program_id] : render_program_ids_)
+    {
+        if (configured_program_id == program_id)
+        {
+            throw std::runtime_error(std::format(
+                "Program '{}' is configured for render pass {}.",
+                id_name_map_.at(program_id),
+                static_cast<int>(render_time)));
+        }
+    }
+    for (const auto& [render_time, configured_program_id] :
+         render_preprocess_program_ids_)
+    {
+        if (configured_program_id == program_id)
+        {
+            throw std::runtime_error(std::format(
+                "Program '{}' is configured as preprocess for render pass {}.",
+                id_name_map_.at(program_id),
+                static_cast<int>(render_time)));
+        }
+    }
     std::string name = id_name_map_.at(program_id);
     id_program_map_.erase(program_id);
     id_name_map_.erase(program_id);
@@ -310,21 +375,21 @@ void Level::RemoveBuffer(EntityId buffer_id)
     id_enum_map_.erase(buffer_id);
 }
 
-EntityId Level::AddStaticMesh(
-    std::unique_ptr<StaticMeshInterface>&& static_mesh)
+EntityId Level::AddMesh(
+    std::unique_ptr<MeshInterface>&& mesh)
 {
-    EntityId id = GetStaticMeshNewId();
-    std::string name = static_mesh->GetName();
+    EntityId id = GetMeshNewId();
+    std::string name = mesh->GetName();
     // CHECKME(anirul): maybe this should return std::nullopt.
     if (string_set_.count(name))
     {
         throw std::runtime_error("Name: " + name + " is already in!");
     }
     string_set_.insert(name);
-    id_static_mesh_map_.insert({id, std::move(static_mesh)});
+    id_mesh_map_.insert({id, std::move(mesh)});
     id_name_map_.insert({id, name});
     name_id_map_.insert({name, id});
-    id_enum_map_.insert({id, EntityTypeEnum::STATIC_MESH});
+    id_enum_map_.insert({id, EntityTypeEnum::MESH});
     return id;
 }
 
@@ -490,9 +555,9 @@ void Level::ReplaceTexture(
 }
 
 void Level::ReplaceMesh(
-    std::unique_ptr<StaticMeshInterface>&& mesh, EntityId id)
+    std::unique_ptr<MeshInterface>&& mesh, EntityId id)
 {
-    if (!id_static_mesh_map_.count(id))
+    if (!id_mesh_map_.count(id))
     {
         throw std::runtime_error(
             std::format(
@@ -500,8 +565,8 @@ void Level::ReplaceMesh(
                 mesh->GetName(),
                 id));
     }
-    id_static_mesh_map_.erase(id);
-    id_static_mesh_map_.emplace(id, std::move(mesh));
+    id_mesh_map_.erase(id);
+    id_mesh_map_.emplace(id, std::move(mesh));
 }
 
 std::string Level::GetNameFromNodeInterface(const NodeInterface& node) const
@@ -514,8 +579,8 @@ std::string Level::GetNameFromNodeInterface(const NodeInterface& node) const
         return dynamic_cast<const NodeCamera&>(node).GetData().name();
     case NodeTypeEnum::NODE_LIGHT:
         return dynamic_cast<const NodeLight&>(node).GetData().name();
-    case NodeTypeEnum::NODE_STATIC_MESH:
-        return dynamic_cast<const NodeStaticMesh&>(node).GetData().name();
+    case NodeTypeEnum::NODE_MESH:
+        return dynamic_cast<const NodeMesh&>(node).GetData().name();
     default:
         throw std::runtime_error(
             std::format(
@@ -532,3 +597,6 @@ CameraInterface& Level::GetCameraFromId(EntityId id) const
 }
 
 } // End namespace frame.
+
+
+

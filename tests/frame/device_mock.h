@@ -45,9 +45,9 @@ class DeviceMock : public frame::DeviceInterface
         ((std::vector<std::uint32_t>&&)),
         (override));
     MOCK_METHOD(
-        std::unique_ptr<frame::StaticMeshInterface>,
-        CreateStaticMesh,
-        ((const frame::StaticMeshParameter&)),
+        std::unique_ptr<frame::MeshInterface>,
+        CreateMesh,
+        ((const frame::MeshParameter&)),
         (override));
     MOCK_METHOD(
         std::unique_ptr<frame::TextureInterface>,
@@ -57,3 +57,4 @@ class DeviceMock : public frame::DeviceInterface
 };
 
 } // End namespace test.
+

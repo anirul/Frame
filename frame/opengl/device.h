@@ -16,7 +16,7 @@
 #include "frame/opengl/material.h"
 #include "frame/opengl/program.h"
 #include "frame/opengl/renderer.h"
-#include "frame/opengl/static_mesh.h"
+#include "frame/opengl/mesh.h"
 #include "frame/opengl/texture.h"
 #include "frame/uniform_interface.h"
 
@@ -172,12 +172,12 @@ class Device : public DeviceInterface
     std::unique_ptr<BufferInterface> CreateIndexBuffer(
         std::vector<std::uint32_t>&& vector) final;
     /**
-     * @brief Create a static mesh from a vector of floats.
+     * @brief Create a mesh from a vector of floats.
      * @param vector: A vector that is moved into the device and level.
      * @param point_buffer_size: The size of a point in float.
      */
-    std::unique_ptr<StaticMeshInterface> CreateStaticMesh(
-        const StaticMeshParameter& static_mesh_parameter) final;
+    std::unique_ptr<MeshInterface> CreateMesh(
+        const MeshParameter& mesh_parameter) final;
 
   protected:
     void DisplayCamera(
@@ -212,3 +212,6 @@ class Device : public DeviceInterface
 };
 
 } // End namespace frame::opengl.
+
+
+

@@ -53,13 +53,13 @@ class SDLOpenGLDrawGui : public frame::gui::DrawGuiInterface
      * @param uniform[in, out]: The uniform data.
      * @param device: The device.
      * @param level: The level.
-     * @param static_mesh: The static mesh.
+     * @param mesh: The Mesh.
      * @param material: The material associated with the mesh.
      */
     void PreRender(
         UniformCollectionInterface& uniform,
         DeviceInterface& device,
-        StaticMeshInterface& static_mesh,
+        MeshInterface& mesh,
         MaterialInterface& material) override
     {
     }
@@ -224,3 +224,5 @@ class SDLOpenGLDrawGui : public frame::gui::DrawGuiInterface
 };
 
 } // End namespace frame::opengl::gui.
+
+

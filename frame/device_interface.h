@@ -136,14 +136,17 @@ class DeviceInterface
     virtual std::unique_ptr<BufferInterface> CreateIndexBuffer(
         std::vector<std::uint32_t>&& vector) = 0;
     /**
-     * @brief Create a static mesh from a vector of floats and a vector of
+     * @brief Create a mesh from a vector of floats and a vector of
      *        float.
-     * @param static_mesh_parameter: A struct containing the parameters to
-     *        create a static mesh.
-     * @return A unique pointer to a static mesh.
+     * @param mesh_parameter: A struct containing the parameters to
+     *        create a mesh.
+     * @return A unique pointer to a mesh.
      */
-    virtual std::unique_ptr<StaticMeshInterface> CreateStaticMesh(
-        const StaticMeshParameter& static_mesh_parameter) = 0;
+    virtual std::unique_ptr<MeshInterface> CreateMesh(
+        const MeshParameter& mesh_parameter) = 0;
 };
 
 } // End namespace frame.
+
+
+

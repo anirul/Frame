@@ -59,9 +59,11 @@ bool Draw::Update(DeviceInterface& device, double dt)
 void Draw::PreRender(
     UniformCollectionInterface& uniform_collection_interface,
     DeviceInterface& device,
-    StaticMeshInterface& static_mesh,
+    MeshInterface& mesh,
     MaterialInterface& material)
 {
 }
 
 } // End namespace frame::common.
+
+

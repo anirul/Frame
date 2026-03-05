@@ -122,15 +122,15 @@ SceneState BuildSceneState(
                     break;
                 }
             }
-            // Special-case legacy AppleMesh naming: if present, resolve directly.
+            // Fallback for scenes that bind the traced model as DragonMesh.
             if (!model_set)
             {
-                if (auto maybe_apple_id =
-                        FindSceneNodeIdByName(level, "AppleMesh");
-                    maybe_apple_id)
+                if (auto maybe_dragon_id =
+                        FindSceneNodeIdByName(level, "DragonMesh");
+                    maybe_dragon_id)
                 {
-                    const auto apple_id = *maybe_apple_id;
-                    auto& node = level.GetSceneNodeFromId(apple_id);
+                    const auto dragon_id = *maybe_dragon_id;
+                    auto& node = level.GetSceneNodeFromId(dragon_id);
                     state.model = node.GetLocalModel(
                         static_cast<double>(elapsed_time_seconds));
                     model_set = true;
@@ -139,7 +139,7 @@ SceneState BuildSceneState(
         }
         if (!model_set && preferred_material != frame::NullId)
         {
-            for (const auto& pair : level.GetStaticMeshMaterialIds())
+            for (const auto& pair : level.GetMeshMaterialIds())
             {
                 if (pair.second == preferred_material)
                 {
@@ -155,13 +155,13 @@ SceneState BuildSceneState(
         {
             // Search all render-time buckets for a mesh using this material.
             for (auto render_time :
-                 {frame::proto::NodeStaticMesh::SCENE_RENDER_TIME,
-                  frame::proto::NodeStaticMesh::PRE_RENDER_TIME,
-                  frame::proto::NodeStaticMesh::POST_PROCESS_TIME,
-                  frame::proto::NodeStaticMesh::SKYBOX_RENDER_TIME,
-                  frame::proto::NodeStaticMesh::SHADOW_RENDER_TIME})
+                 {frame::proto::NodeMesh::SCENE_RENDER_TIME,
+                  frame::proto::NodeMesh::PRE_RENDER_TIME,
+                  frame::proto::NodeMesh::POST_PROCESS_TIME,
+                  frame::proto::NodeMesh::SKYBOX_RENDER_TIME,
+                  frame::proto::NodeMesh::SHADOW_RENDER_TIME})
             {
-                const auto pairs = level.GetStaticMeshMaterialIds(render_time);
+                const auto pairs = level.GetMeshMaterialIds(render_time);
                 for (const auto& pair : pairs)
                 {
                     if (pair.second == preferred_material)
@@ -181,7 +181,7 @@ SceneState BuildSceneState(
         }
         if (!model_set)
         {
-            const auto mesh_pairs = level.GetStaticMeshMaterialIds();
+            const auto mesh_pairs = level.GetMeshMaterialIds();
             if (!mesh_pairs.empty())
             {
                 auto node_id = mesh_pairs.front().first;
@@ -198,8 +198,8 @@ SceneState BuildSceneState(
 
     try
     {
-        const auto skybox_pairs = level.GetStaticMeshMaterialIds(
-            frame::proto::NodeStaticMesh::SKYBOX_RENDER_TIME);
+        const auto skybox_pairs = level.GetMeshMaterialIds(
+            frame::proto::NodeMesh::SKYBOX_RENDER_TIME);
         if (!skybox_pairs.empty())
         {
             auto& node = level.GetSceneNodeFromId(skybox_pairs.front().first);
@@ -249,3 +249,5 @@ UniformBlock MakeUniformBlock(
 }
 
 } // namespace frame::vulkan
+
+

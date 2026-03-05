@@ -10,30 +10,14 @@ namespace frame::vulkan
 
 EntityId Material::GetProgramId(const LevelInterface* level) const
 {
-    if (program_id_ != NullId || !level)
-    {
-        return program_id_;
-    }
-    const auto& proto = GetData();
-    if (proto.program_name().empty())
-    {
-        return NullId;
-    }
-    return level->GetIdFromName(proto.program_name());
+    (void)level;
+    return program_id_;
 }
 
 EntityId Material::GetPreprocessProgramId(const LevelInterface* level) const
 {
-    if (preprocess_program_id_ != NullId || !level)
-    {
-        return preprocess_program_id_;
-    }
-    const auto& proto = GetData();
-    if (proto.preprocess_program_name().empty())
-    {
-        return NullId;
-    }
-    return level->GetIdFromName(proto.preprocess_program_name());
+    (void)level;
+    return preprocess_program_id_;
 }
 
 std::string Material::GetInnerName(EntityId id) const

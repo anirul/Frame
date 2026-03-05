@@ -220,8 +220,8 @@ TEST_F(VulkanRayTracingParseTest, BuildsTriangleAndBvhBuffersFromScene)
     auto& material = level.GetMaterialFromId(material_id);
 
     const std::vector<std::string> expected_buffers = {
-        "AppleMesh.0.triangle",
-        "AppleMesh.0.bvh"};
+        "DragonMesh.0.triangle",
+        "DragonMesh.0.bvh"};
     for (const auto& name : expected_buffers)
     {
         auto names = material.GetBufferNames();
@@ -243,8 +243,8 @@ TEST_F(VulkanRayTracingParseTest, TriangleAndBvhDataLooksValid)
     ASSERT_NE(built.level, nullptr);
     auto& level = *built.level;
 
-    auto triangle_id = level.GetIdFromName("AppleMesh.0.triangle");
-    auto bvh_id = level.GetIdFromName("AppleMesh.0.bvh");
+    auto triangle_id = level.GetIdFromName("DragonMesh.0.triangle");
+    auto bvh_id = level.GetIdFromName("DragonMesh.0.bvh");
     ASSERT_NE(triangle_id, frame::NullId);
     ASSERT_NE(bvh_id, frame::NullId);
 
@@ -395,8 +395,8 @@ TEST_F(VulkanRayTracingParseTest, CpuTraversesBvhFromCameraCenterRay)
     ASSERT_NE(built.level, nullptr);
     auto& level = *built.level;
 
-    auto triangle_id = level.GetIdFromName("AppleMesh.0.triangle");
-    auto bvh_id = level.GetIdFromName("AppleMesh.0.bvh");
+    auto triangle_id = level.GetIdFromName("DragonMesh.0.triangle");
+    auto bvh_id = level.GetIdFromName("DragonMesh.0.bvh");
     ASSERT_NE(triangle_id, frame::NullId);
     ASSERT_NE(bvh_id, frame::NullId);
     auto* tri_buffer =
@@ -437,8 +437,8 @@ TEST_F(VulkanRayTracingParseTest, ShaderLikeRayFromCenterHitsGeometry)
     ASSERT_NE(built.level, nullptr);
     auto& level = *built.level;
 
-    auto triangle_id = level.GetIdFromName("AppleMesh.0.triangle");
-    auto bvh_id = level.GetIdFromName("AppleMesh.0.bvh");
+    auto triangle_id = level.GetIdFromName("DragonMesh.0.triangle");
+    auto bvh_id = level.GetIdFromName("DragonMesh.0.bvh");
     ASSERT_NE(triangle_id, frame::NullId);
     ASSERT_NE(bvh_id, frame::NullId);
     auto* tri_buffer =
@@ -506,12 +506,12 @@ TEST_F(VulkanRayTracingParseTest, MapsRayTracingNodesForUniforms)
 
     auto node_names = material.GetNodeNames();
     EXPECT_NE(
-        std::find(node_names.begin(), node_names.end(), "AppleMesh"),
+        std::find(node_names.begin(), node_names.end(), "DragonMesh"),
         node_names.end());
 
-    const auto node_id = level.GetIdFromName("AppleMesh");
+    const auto node_id = level.GetIdFromName("DragonMesh");
     ASSERT_NE(node_id, frame::NullId);
-    EXPECT_EQ(material.GetInnerNodeName("AppleMesh"), "model");
+    EXPECT_EQ(material.GetInnerNodeName("DragonMesh"), "model");
     EXPECT_NO_THROW(level.GetSceneNodeFromId(node_id));
 }
 

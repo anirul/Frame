@@ -3,6 +3,8 @@ add_library(FrameJson
   STATIC
     level_data.cpp
     level_data.h
+    program_catalog.cpp
+    program_catalog.h
     parse_json.h
     parse_level.h
     parse_pixel.cpp
@@ -36,6 +38,7 @@ target_include_directories(FrameJson
 target_link_libraries(FrameJson
   PRIVATE
     Frame
+    FrameFile
     FrameProto
     glm::glm
     protobuf::libprotobuf

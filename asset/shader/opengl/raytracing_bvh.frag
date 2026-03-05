@@ -232,6 +232,96 @@ bool anyHitBVH(const vec3 ray_origin, const vec3 ray_dir)
     return false;
 }
 
+vec3 SampleEnvSpecular(
+    vec3 dir_world,
+    mat3 env_rot_inv,
+    float roughness,
+    float max_env_lod)
+{
+    float specular_lod = clamp(roughness * max_env_lod, 0.0, max_env_lod);
+    vec3 env_dir = env_rot_inv * dir_world;
+    vec3 lookup_dir = vec3(env_dir.x, -env_dir.y, env_dir.z);
+    return textureLod(skybox_env, lookup_dir, specular_lod).rgb;
+}
+
+vec3 SampleEnvDiffuse(vec3 normal_world, mat3 env_rot_inv, float max_env_lod)
+{
+    vec3 env_dir = env_rot_inv * normal_world;
+    vec3 lookup_dir = vec3(env_dir.x, -env_dir.y, env_dir.z);
+    return textureLod(skybox_env, lookup_dir, max_env_lod).rgb;
+}
+
+vec3 SampleReflection(
+    vec3 origin_model,
+    vec3 dir_model,
+    vec3 dir_world,
+    mat3 model_inv3,
+    mat3 normal_matrix,
+    mat3 env_rot_inv,
+    float roughness,
+    float max_env_lod)
+{
+    const int kMaxReflectionDepth = 3;
+    vec3 accumulated = vec3(0.0);
+    vec3 throughput = vec3(1.0);
+    vec3 current_origin_model = origin_model;
+    vec3 current_dir_model = normalize(dir_model);
+    vec3 current_dir_world = normalize(dir_world);
+
+    for (int depth = 0; depth < kMaxReflectionDepth; ++depth)
+    {
+        vec3 env_color = SampleEnvSpecular(
+            current_dir_world, env_rot_inv, roughness, max_env_lod);
+
+        float hit_t;
+        vec2 hit_bary;
+        int hit_tri;
+        if (!traverseBVH(
+                current_origin_model,
+                current_dir_model,
+                hit_t,
+                hit_bary,
+                hit_tri))
+        {
+            accumulated += throughput * env_color;
+            break;
+        }
+
+        Triangle hit_triangle = triangles[hit_tri];
+        float hit_w = 1.0 - hit_bary.x - hit_bary.y;
+        vec2 hit_uv =
+            hit_triangle.v0.uv * hit_w +
+            hit_triangle.v1.uv * hit_bary.x +
+            hit_triangle.v2.uv * hit_bary.y;
+        vec3 hit_albedo = texture(albedo_texture, hit_uv).rgb;
+        vec3 hit_color = mix(env_color, hit_albedo, 0.7);
+        accumulated += throughput * hit_color;
+
+        vec3 hit_normal_model = normalize(
+            hit_triangle.v0.normal * hit_w +
+            hit_triangle.v1.normal * hit_bary.x +
+            hit_triangle.v2.normal * hit_bary.y);
+        vec3 hit_normal_world = normalize(normal_matrix * hit_normal_model);
+        vec3 hit_pos_model = current_origin_model + hit_t * current_dir_model;
+
+        current_dir_world =
+            normalize(reflect(current_dir_world, hit_normal_world));
+        current_dir_model = normalize(model_inv3 * current_dir_world);
+        float side =
+            dot(current_dir_model, hit_normal_model) > 0.0 ? 1.0 : -1.0;
+        current_origin_model =
+            hit_pos_model + hit_normal_model * side * 0.0015;
+
+        throughput *= 0.45;
+        if (max(max(throughput.x, throughput.y), throughput.z) < 0.02)
+        {
+            break;
+        }
+    }
+
+    return accumulated;
+}
+
 void main()
 {
     // Reconstruct the view ray for this fragment.
@@ -322,14 +412,21 @@ void main()
 
         // Cast a shadow ray toward the light in model space.
         vec3 shadow_dir = normalize(model_inv3 * -dir);
-        vec3 shadow_origin = hit_pos_model + hit_normal_model * 0.0015;
-        bool in_shadow = anyHitBVH(shadow_origin, shadow_dir);
+        vec3 shadow_origin =
+            hit_pos_model + hit_normal_model * 0.0015 + shadow_dir * 0.0015;
+        float shadow_t = 0.0;
+        vec2 shadow_bary = vec2(0.0);
+        int shadow_tri = -1;
+        bool shadow_hit = traverseBVH(
+            shadow_origin, shadow_dir, shadow_t, shadow_bary, shadow_tri);
+        bool in_shadow =
+            shadow_hit && shadow_tri != tri_index && shadow_t > 0.0005;
 
-        float shadow_factor = in_shadow ? 0.3 : 1.0;
+        float shadow_factor = in_shadow ? 0.0 : 1.0;
         vec3 albedo = texture(albedo_texture, hit_uv).rgb;
         float roughness = texture(roughness_texture, hit_uv).r;
         float metallic = texture(metallic_texture, hit_uv).r;
-        float ao = texture(ao_texture, hit_uv).r;
+        float ao = max(texture(ao_texture, hit_uv).r, 0.25);
         vec3 V = normalize(camera_position - (model * vec4(hit_pos_model, 1.0)).xyz);
         vec3 L = normalize(-dir);
         vec3 H = normalize(V + L);
@@ -346,49 +443,30 @@ void main()
         float NdotL = max(dot(hit_normal, L), 0.0);
         float NdotV = max(dot(hit_normal, V), 0.0);
         vec3 reflection_dir_world = normalize(reflect(-ray_dir_world, hit_normal));
-        vec3 env_lookup_dir = env_rot_inv * reflection_dir_world;
-        env_lookup_dir = vec3(env_lookup_dir.x, -env_lookup_dir.y, env_lookup_dir.z);
-        vec3 env_diffuse_dir = env_rot_inv * N;
-        env_diffuse_dir = vec3(env_diffuse_dir.x, -env_diffuse_dir.y, env_diffuse_dir.z);
         int env_levels = textureQueryLevels(skybox_env);
         float max_env_lod = env_levels > 0 ? float(env_levels - 1) : 0.0;
-        float specular_lod = clamp(roughness * max_env_lod, 0.0, max_env_lod);
-        vec3 env_color = textureLod(skybox_env, env_lookup_dir, specular_lod).rgb;
-        vec3 env_diffuse = textureLod(skybox_env, env_diffuse_dir, max_env_lod).rgb;
+        vec3 env_color = SampleEnvSpecular(
+            reflection_dir_world, env_rot_inv, roughness, max_env_lod);
+        vec3 env_diffuse = SampleEnvDiffuse(N, env_rot_inv, max_env_lod);
         vec3 reflection_sample = env_color;
         bool should_trace_reflection = (NdotV > 0.2) && (roughness < 0.65);
         if (should_trace_reflection)
         {
             vec3 reflection_origin_model = hit_pos_model + hit_normal_model * 0.0015;
             vec3 reflection_dir_model = normalize(model_inv3 * reflection_dir_world);
-            float reflection_t;
-            vec2 reflection_bary;
-            int reflection_tri;
-            if (traverseBVH(
-                    reflection_origin_model,
-                    reflection_dir_model,
-                    reflection_t,
-                    reflection_bary,
-                    reflection_tri))
-            {
-                Triangle reflection_triangle = triangles[reflection_tri];
-                float reflection_w =
-                    1.0 - reflection_bary.x - reflection_bary.y;
-                vec2 reflection_uv =
-                    reflection_triangle.v0.uv * reflection_w +
-                    reflection_triangle.v1.uv * reflection_bary.x +
-                    reflection_triangle.v2.uv * reflection_bary.y;
-                reflection_sample = texture(albedo_texture, reflection_uv).rgb;
-            }
-            else
-            {
-                // Secondary ray missed; keep environment contribution instead of going black.
-                reflection_sample = env_color;
-            }
-            reflection_sample = mix(env_color, reflection_sample, 0.7);
+            reflection_sample = SampleReflection(
+                reflection_origin_model,
+                reflection_dir_model,
+                reflection_dir_world,
+                model_inv3,
+                normal_matrix,
+                env_rot_inv,
+                roughness,
+                max_env_lod);
         }
-        vec3 ambient = kD * albedo * 0.05 * ao +
-                       kD * albedo / 3.14159265 * env_diffuse * ao;
+        vec3 ambient = kD * albedo * 0.08 * ao +
+                       kD * albedo / 3.14159265 * env_diffuse * ao +
+                       0.015 * albedo;
         vec3 env_specular = specular * reflection_sample * ao * (in_shadow ? 0.0 : 1.0);
         env_specular = clamp(env_specular, 0.0, 10.0);
         vec3 Lo = diffuse * col * NdotL * shadow_factor +

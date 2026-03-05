@@ -20,7 +20,8 @@
 #include "frame/opengl/program.h"
 #include "frame/opengl/render_buffer.h"
 #include "frame/opengl/renderer.h"
-#include "frame/opengl/static_mesh.h"
+#include "frame/opengl/mesh.h"
+#include "frame/opengl/texture.h"
 
 namespace frame::opengl
 {
@@ -323,8 +324,11 @@ void Cubemap::CreateCubemapFromPointer(
     {
         throw std::runtime_error("Couldn't load cubemap from single ptr.");
     }
-    // Seams correct when you are less than 2048 in height you get 512.
-    std::uint32_t cube_single_res = PowerFloor(size.y);
+    // Cap cubemap face resolution to avoid excessive GPU memory usage on large
+    // HDR inputs.
+    constexpr std::uint32_t kMaxCubemapFaceResolution = 1024u;
+    std::uint32_t cube_single_res = std::min(
+        PowerFloor(size.y), kMaxCubemapFaceResolution);
     glm::uvec2 cube_pair_res = {cube_single_res, cube_single_res};
     std::map<std::string, std::string> filling_map = {
         {"<filename>", data_.file_name()},
@@ -353,7 +357,7 @@ void Cubemap::CreateCubemapFromPointer(
     auto& out_texture_ref = level->GetTextureFromId(out_texture_id);
     Renderer renderer(*level.get(), {0, 0, cube_pair_res.x, cube_pair_res.y});
     auto& mesh_ref =
-        level->GetStaticMeshFromId(level->GetDefaultStaticMeshCubeId());
+        level->GetMeshFromId(level->GetDefaultMeshCubeId());
     auto material_id = level->GetIdFromName("EquirectangularMaterial");
     if (!material_id)
         throw std::runtime_error(
@@ -633,3 +637,5 @@ proto::TextureFrame Cubemap::GetTextureFrameFromPosition(int i)
 }
 
 } // End namespace frame::opengl.
+
+

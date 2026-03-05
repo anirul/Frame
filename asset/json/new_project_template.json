@@ -1,57 +1,401 @@
 {
-  "name": "DeviceTest",
-  "default_texture_name": "DefaultTexture",
-  "textures": [
-    {
-      "name": "DefaultTexture",
-      "size": {
-        "x": -1,
-        "y": -1
-      },
-      "pixel_element_size": { "value": "BYTE" },
-      "pixel_structure": { "value": "RGB" }
-    }
-  ],
-  "programs": [],
-  "scene_tree": {
-    "default_root_name": "DeviceScene",
-    "default_camera_name": "camera",
-    "node_matrices": [
-      {
-        "name": "root",
-        "quaternion": {
-          "w": 1,
-          "x": 0,
-          "y": 0,
-          "z": 0
+    "name": "NewProject",
+    "default_texture_name": "albedo",
+    "textures": [
+        {
+            "name": "albedo",
+            "size": {
+                "x": -1,
+                "y": -1
+            },
+            "pixel_element_size": {
+                "value": "BYTE"
+            },
+            "pixel_structure": {
+                "value": "RGB"
+            }
+        },
+        {
+            "name": "skybox",
+            "cubemap": true,
+            "pixel_element_size": {
+                "value": "BYTE"
+            },
+            "pixel_structure": {
+                "value": "RGB"
+            },
+            "file_names": {
+                "positive_x": "asset/cubemap/negative_x.png",
+                "negative_x": "asset/cubemap/positive_x.png",
+                "positive_y": "asset/cubemap/negative_y.png",
+                "negative_y": "asset/cubemap/positive_y.png",
+                "positive_z": "asset/cubemap/negative_z.png",
+                "negative_z": "asset/cubemap/positive_z.png"
+            }
+        },
+        {
+            "name": "skybox_env",
+            "cubemap": true,
+            "pixel_element_size": {
+                "value": "BYTE"
+            },
+            "pixel_structure": {
+                "value": "RGB"
+            },
+            "file_names": {
+                "positive_x": "asset/cubemap/negative_x.png",
+                "negative_x": "asset/cubemap/positive_x.png",
+                "positive_y": "asset/cubemap/negative_y.png",
+                "negative_y": "asset/cubemap/positive_y.png",
+                "positive_z": "asset/cubemap/negative_z.png",
+                "negative_z": "asset/cubemap/positive_z.png"
+            }
+        },
+        {
+            "name": "albedo_texture",
+            "pixel_element_size": {
+                "value": "BYTE"
+            },
+            "pixel_structure": {
+                "value": "RGB"
+            },
+            "file_name": "asset/material/plastic/plastic_albedo.png"
+        },
+        {
+            "name": "normal_texture",
+            "pixel_element_size": {
+                "value": "BYTE"
+            },
+            "pixel_structure": {
+                "value": "RGB"
+            },
+            "file_name": "asset/material/plastic/plastic_normal.png"
+        },
+        {
+            "name": "roughness_texture",
+            "pixel_element_size": {
+                "value": "BYTE"
+            },
+            "pixel_structure": {
+                "value": "GREY"
+            },
+            "file_name": "asset/material/plastic/plastic_roughness.png"
+        },
+        {
+            "name": "metallic_texture",
+            "pixel_element_size": {
+                "value": "BYTE"
+            },
+            "pixel_structure": {
+                "value": "GREY"
+            },
+            "file_name": "asset/material/plastic/plastic_metallic.png"
+        },
+        {
+            "name": "ao_texture",
+            "pixel_element_size": {
+                "value": "BYTE"
+            },
+            "pixel_structure": {
+                "value": "GREY"
+            },
+            "file_name": "asset/material/plastic/plastic_ao.png"
         }
-      }
     ],
-    "node_cameras": [
-      {
-        "name": "camera",
-        "parent": "root",
-        "position": {
-          "x": 0,
-          "y": 0,
-          "z": 0
+    "materials": [
+        {
+            "name": "CubeMapMaterial"
+        }
+    ],
+    "render_pass_programs": [
+        {
+            "render_time_enum": "SKYBOX_RENDER_TIME",
+            "program_name": "CubeMapProgram"
         },
-        "target": {
-          "x": 0,
-          "y": 0,
-          "z": 1
+        {
+            "render_time_enum": "SCENE_RENDER_TIME",
+            "program_name": "RayTraceProgram"
+        }
+    ],
+    "programs": [
+        {
+            "name": "CubeMapProgram",
+            "pipeline_name": "cubemap",
+            "input_texture_names": [
+                "skybox"
+            ],
+            "output_texture_names": [
+                "albedo"
+            ],
+            "input_scene_type": {
+                "value": "CUBE"
+            },
+            "bindings": [
+                {
+                    "name": "Skybox",
+                    "binding": 0,
+                    "binding_type": "COMBINED_IMAGE_SAMPLER",
+                    "stages": [
+                        "FRAGMENT"
+                    ]
+                }
+            ],
+            "uniforms": [
+                {
+                    "name": "projection",
+                    "uniform_enum": "PROJECTION_MAT4"
+                },
+                {
+                    "name": "view",
+                    "uniform_enum": "VIEW_MAT4"
+                },
+                {
+                    "name": "model",
+                    "uniform_enum": "MODEL_MAT4"
+                }
+            ]
         },
-        "up": {
-          "x": 0,
-          "y": 1,
-          "z": 0
-        },
-        "fov_degrees": 65.0,
-        "aspect_ratio": 1.6,
-        "near_clip": 0.1,
-        "far_clip": 10000.0
-      }
-    ]
-  },
-  "materials": []
+        {
+            "name": "RayTraceProgram",
+            "pipeline_name": "raytracing_bvh",
+            "output_texture_names": [
+                "albedo"
+            ],
+            "input_texture_names": [
+                "albedo_texture",
+                "normal_texture",
+                "roughness_texture",
+                "metallic_texture",
+                "ao_texture",
+                "skybox",
+                "skybox_env"
+            ],
+            "input_scene_type": {
+                "value": "QUAD"
+            },
+            "input_scene_root_name": "mesh_holder",
+            "bindings": [
+                {
+                    "name": "output_image",
+                    "binding": 0,
+                    "binding_type": "STORAGE_IMAGE",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                },
+                {
+                    "name": "raytrace_output",
+                    "binding": 1,
+                    "binding_type": "OUTPUT_SAMPLER",
+                    "stages": [
+                        "FRAGMENT"
+                    ]
+                },
+                {
+                    "name": "albedo_texture",
+                    "binding": 2,
+                    "binding_type": "COMBINED_IMAGE_SAMPLER",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                },
+                {
+                    "name": "normal_texture",
+                    "binding": 3,
+                    "binding_type": "COMBINED_IMAGE_SAMPLER",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                },
+                {
+                    "name": "roughness_texture",
+                    "binding": 4,
+                    "binding_type": "COMBINED_IMAGE_SAMPLER",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                },
+                {
+                    "name": "metallic_texture",
+                    "binding": 5,
+                    "binding_type": "COMBINED_IMAGE_SAMPLER",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                },
+                {
+                    "name": "ao_texture",
+                    "binding": 6,
+                    "binding_type": "COMBINED_IMAGE_SAMPLER",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                },
+                {
+                    "name": "skybox_env",
+                    "binding": 7,
+                    "binding_type": "COMBINED_IMAGE_SAMPLER",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                },
+                {
+                    "name": "TriangleBuffer",
+                    "binding": 8,
+                    "binding_type": "STORAGE_BUFFER",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                },
+                {
+                    "name": "BvhBuffer",
+                    "binding": 9,
+                    "binding_type": "STORAGE_BUFFER",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                },
+                {
+                    "name": "UniformBlock",
+                    "binding": 10,
+                    "binding_type": "UNIFORM_BUFFER",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                },
+                {
+                    "name": "skybox",
+                    "binding": 11,
+                    "binding_type": "COMBINED_IMAGE_SAMPLER",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                }
+            ],
+            "uniforms": [
+                {
+                    "name": "projection",
+                    "uniform_enum": "PROJECTION_MAT4"
+                },
+                {
+                    "name": "view",
+                    "uniform_enum": "VIEW_MAT4"
+                },
+                {
+                    "name": "projection_inv",
+                    "uniform_enum": "PROJECTION_INV_MAT4"
+                },
+                {
+                    "name": "view_inv",
+                    "uniform_enum": "VIEW_INV_MAT4"
+                },
+                {
+                    "name": "model",
+                    "uniform_enum": "MODEL_MAT4"
+                },
+                {
+                    "name": "model_inv",
+                    "uniform_enum": "MODEL_INV_MAT4"
+                },
+                {
+                    "name": "camera_position",
+                    "uniform_enum": "CAMERA_POSITION_VEC3"
+                },
+                {
+                    "name": "light_dir",
+                    "uniform_enum": "LIGHT_POSITION_VEC3"
+                },
+                {
+                    "name": "light_color",
+                    "uniform_enum": "LIGHT_COLOR_VEC3"
+                }
+            ]
+        }
+    ],
+    "scene_tree": {
+        "default_camera_name": "camera",
+        "default_root_name": "root",
+        "node_matrices": [
+            {
+                "name": "root",
+                "matrix": {
+                    "m11": 1,
+                    "m22": 1,
+                    "m33": 1,
+                    "m44": 1
+                }
+            },
+            {
+                "name": "mesh_holder",
+                "parent": "root",
+                "matrix": {
+                    "m11": 1,
+                    "m22": 1,
+                    "m33": 1,
+                    "m44": 1
+                }
+            },
+            {
+                "name": "env_holder",
+                "parent": "root",
+                "matrix": {
+                    "m11": 1,
+                    "m22": 1,
+                    "m33": 1,
+                    "m44": 1
+                }
+            }
+        ],
+        "node_cameras": [
+            {
+                "name": "camera",
+                "parent": "root",
+                "fov_degrees": 65.0,
+                "near_clip": 0.01,
+                "far_clip": 1000.0,
+                "position": {
+                    "x": 0,
+                    "y": 0.5,
+                    "z": -2.2
+                },
+                "target": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                },
+                "up": {
+                    "x": 0,
+                    "y": 1,
+                    "z": 0
+                }
+            }
+        ],
+        "node_meshes": [
+            {
+                "name": "CubeMapMesh",
+                "parent": "env_holder",
+                "material_name": "CubeMapMaterial",
+                "mesh_enum": "CUBE",
+                "render_time_enum": "SKYBOX_RENDER_TIME"
+            }
+        ],
+        "node_lights": [
+            {
+                "name": "sun",
+                "parent": "root",
+                "light_type": "DIRECTIONAL_LIGHT",
+                "shadow_type": "HARD_SHADOW",
+                "direction": {
+                    "x": 1.0,
+                    "y": -1.0,
+                    "z": 0.0
+                },
+                "color": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                }
+            }
+        ]
+    }
 }

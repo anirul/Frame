@@ -11,7 +11,7 @@
 #include "frame/material_interface.h"
 #include "frame/node_interface.h"
 #include "frame/program_interface.h"
-#include "frame/static_mesh_interface.h"
+#include "frame/mesh_interface.h"
 #include "frame/texture_interface.h"
 
 namespace frame
@@ -23,7 +23,7 @@ namespace frame
  *        description of a Scene and all the object you need to render.
  *
  * This include the scene tree the materials the programs and the meshes
- * (for now only static meshes).
+ * (for now only meshes).
  */
 class LevelInterface : public NameInterface
 {
@@ -61,11 +61,11 @@ class LevelInterface : public NameInterface
      */
     virtual BufferInterface& GetBufferFromId(EntityId id) const = 0;
     /**
-     * @brief Will get a static mesh from an id.
-     * @param id: The id to get the static mesh from.
-     * @return A pointer to a static mesh or null.
+     * @brief Will get a mesh from an id.
+     * @param id: The id to get the mesh from.
+     * @return A pointer to a mesh or null.
      */
-    virtual StaticMeshInterface& GetStaticMeshFromId(EntityId id) const = 0;
+    virtual MeshInterface& GetMeshFromId(EntityId id) const = 0;
     /**
      * @brief Get all light from the level.
      * @param id: The id to get the light from.
@@ -79,12 +79,12 @@ class LevelInterface : public NameInterface
      */
     virtual CameraInterface& GetCameraFromId(EntityId id) const = 0;
     /**
-     * @brief Get a vector of static mesh id and corresponding material id.
-     * @return Vector of static mesh id and corresponding material id.
+     * @brief Get a vector of mesh id and corresponding material id.
+     * @return Vector of mesh id and corresponding material id.
      */
-    virtual std::vector<std::pair<EntityId, EntityId>> GetStaticMeshMaterialIds(
-        proto::NodeStaticMesh::RenderTimeEnum render_time_enum =
-            proto::NodeStaticMesh::SCENE_RENDER_TIME) const = 0;
+    virtual std::vector<std::pair<EntityId, EntityId>> GetMeshMaterialIds(
+        proto::NodeMesh::RenderTimeEnum render_time_enum =
+            proto::NodeMesh::SCENE_RENDER_TIME) const = 0;
     /**
      * @brief Get the id of an element from a name string.
      * @param name: The name string of the element.
@@ -154,25 +154,25 @@ class LevelInterface : public NameInterface
      */
     virtual EntityId GetParentId(EntityId id) const = 0;
     /**
-     * @brief Get the default quad static mesh id.
-     * @return The id of the quad static mesh id or error.
+     * @brief Get the default quad mesh id.
+     * @return The id of the quad mesh id or error.
      */
-    virtual EntityId GetDefaultStaticMeshQuadId() const = 0;
+    virtual EntityId GetDefaultMeshQuadId() const = 0;
     /**
-     * @brief Set default quad static mesh id.
-     * @param id: Id of the default quad static mesh.
+     * @brief Set default quad mesh id.
+     * @param id: Id of the default quad mesh.
      */
-    virtual void SetDefaultStaticMeshQuadId(EntityId id) = 0;
+    virtual void SetDefaultMeshQuadId(EntityId id) = 0;
     /**
-     * @brief Get the default cube static mesh id.
-     * @return The id of the cube static mesh id or error.
+     * @brief Get the default cube mesh id.
+     * @return The id of the cube mesh id or error.
      */
-    virtual EntityId GetDefaultStaticMeshCubeId() const = 0;
+    virtual EntityId GetDefaultMeshCubeId() const = 0;
     /**
-     * @brief Set default cube static mesh id.
-     * @param id: Id of the default cube static mesh.
+     * @brief Set default cube mesh id.
+     * @param id: Id of the default cube mesh.
      */
-    virtual void SetDefaultStaticMeshCubeId(EntityId id) = 0;
+    virtual void SetDefaultMeshCubeId(EntityId id) = 0;
     /**
      * @brief Add scene node to the scene tree.
      * @param scene_node: Move a scene node to the scene tree.
@@ -223,12 +223,12 @@ class LevelInterface : public NameInterface
      */
     virtual void RemoveBuffer(EntityId buffer) = 0;
     /**
-     * @brief Add a static mesh to the level.
-     * @param static_mesh: Move a buffer in the level.
+     * @brief Add a mesh to the level.
+     * @param mesh: Move a buffer in the level.
      * @return Assigned entity id or error.
      */
-    virtual EntityId AddStaticMesh(
-        std::unique_ptr<StaticMeshInterface>&& static_mesh) = 0;
+    virtual EntityId AddMesh(
+        std::unique_ptr<MeshInterface>&& mesh) = 0;
     /**
      * @brief Add a light to the level.
      * @param light: Move a light in the level.
@@ -244,8 +244,32 @@ class LevelInterface : public NameInterface
     virtual void AddMeshMaterialId(
         EntityId node_id,
         EntityId material_id,
-        proto::NodeStaticMesh::RenderTimeEnum render_time_enum =
-            proto::NodeStaticMesh::SCENE_RENDER_TIME) = 0;
+        proto::NodeMesh::RenderTimeEnum render_time_enum =
+            proto::NodeMesh::SCENE_RENDER_TIME) = 0;
+    /**
+     * @brief Set the program ids used for a render pass.
+     * @param render_time_enum: The render pass.
+     * @param program_id: Main program id.
+     * @param preprocess_program_id: Optional preprocess program id.
+     */
+    virtual void SetRenderPassProgramIds(
+        proto::NodeMesh::RenderTimeEnum render_time_enum,
+        EntityId program_id,
+        EntityId preprocess_program_id = NullId) = 0;
+    /**
+     * @brief Get the main program id configured for a render pass.
+     * @param render_time_enum: The render pass.
+     * @return Program id or NullId if not configured.
+     */
+    virtual EntityId GetRenderPassProgramId(
+        proto::NodeMesh::RenderTimeEnum render_time_enum) const = 0;
+    /**
+     * @brief Get the preprocess program id configured for a render pass.
+     * @param render_time_enum: The render pass.
+     * @return Program id or NullId if not configured.
+     */
+    virtual EntityId GetRenderPassPreprocessProgramId(
+        proto::NodeMesh::RenderTimeEnum render_time_enum) const = 0;
     /**
      * @brief Get all texture from the level.
      * @return A vector of texture ids.
@@ -315,7 +339,10 @@ class LevelInterface : public NameInterface
      * @param id: The id to replace the mesh.
      */
     virtual void ReplaceMesh(
-        std::unique_ptr<StaticMeshInterface>&& mesh, EntityId id) = 0;
+        std::unique_ptr<MeshInterface>&& mesh, EntityId id) = 0;
 };
 
 } // End namespace frame.
+
+
+

@@ -7,18 +7,31 @@
 #include <stdexcept>
 
 #include "frame/json/parse_uniform.h"
+#include "frame/json/program_catalog.h"
 #include "frame/node_matrix.h"
-#include "frame/node_static_mesh.h"
+#include "frame/node_mesh.h"
 #include "frame/opengl/cubemap.h"
 #include "frame/opengl/cubemap_views.h"
 #include "frame/opengl/file/load_program.h"
 #include "frame/opengl/material.h"
-#include "frame/opengl/static_mesh.h"
+#include "frame/opengl/mesh.h"
+#include "frame/opengl/skinned_mesh.h"
 #include "frame/opengl/texture.h"
 #include "frame/uniform_collection_wrapper.h"
 
 namespace frame::opengl
 {
+
+namespace
+{
+
+bool IsRaytracingProgram(const ProgramInterface& program)
+{
+    const auto key = frame::json::ResolveProgramKey(program.GetData());
+    return frame::json::IsRaytracingProgramKey(key);
+}
+
+} // namespace
 
 Renderer::Renderer(LevelInterface& level, glm::uvec4 viewport)
     : level_(level), viewport_(viewport)
@@ -31,8 +44,7 @@ Renderer::Renderer(LevelInterface& level, glm::uvec4 viewport)
     frame_buffer_->AttachRender(*render_buffer_);
     proto::Program proto_program;
     proto_program.set_name("display");
-    proto_program.set_shader_vertex("display.vert");
-    proto_program.set_shader_fragment("display.frag");
+    proto_program.set_pipeline_name("display");
     auto program = file::LoadProgram(proto_program);
     if (!program)
         throw std::runtime_error("No program!");
@@ -66,6 +78,44 @@ Renderer::Renderer(LevelInterface& level, glm::uvec4 viewport)
     }
 }
 
+void Renderer::UpdateRaytraceBuffersIfNeeded(SkinnedMesh& skinned_mesh)
+{
+    const double skinning_time = skinned_mesh.GetSkinningTime(delta_time_);
+
+    if (skinned_mesh.HasRaytraceTriangleCallback())
+    {
+        const EntityId triangle_buffer_id = skinned_mesh.GetTriangleBufferId();
+        if (triangle_buffer_id)
+        {
+            auto triangles =
+                skinned_mesh.EvaluateRaytraceTriangles(skinning_time);
+            if (!triangles.empty())
+            {
+                auto& triangle_buffer = dynamic_cast<Buffer&>(
+                    level_.GetBufferFromId(triangle_buffer_id));
+                triangle_buffer.Copy(triangles);
+            }
+        }
+    }
+
+    if (skinned_mesh.HasRaytraceBvhCallback())
+    {
+        const EntityId bvh_buffer_id = skinned_mesh.GetBvhBufferId();
+        if (bvh_buffer_id)
+        {
+            auto bvh_nodes = skinned_mesh.EvaluateRaytraceBvh(skinning_time);
+            if (!bvh_nodes.empty())
+            {
+                auto& bvh_buffer =
+                    dynamic_cast<Buffer&>(level_.GetBufferFromId(bvh_buffer_id));
+                bvh_buffer.Copy(
+                    bvh_nodes.size() * sizeof(frame::BVHNode),
+                    bvh_nodes.data());
+            }
+        }
+    }
+}
+
 std::optional<glm::mat4> Renderer::RenderNode(
     EntityId node_id,
     EntityId material_id,
@@ -77,8 +127,8 @@ std::optional<glm::mat4> Renderer::RenderNode(
         return std::nullopt;
     // Check current node.
     auto& node = level_.GetSceneNodeFromId(node_id);
-    // Try to cast to a node static mesh.
-    auto& node_static_mesh = dynamic_cast<NodeStaticMesh&>(node);
+    // Try to cast to a node Mesh.
+    auto& node_mesh = dynamic_cast<NodeMesh&>(node);
     auto mesh_id = node.GetLocalMesh();
     // In case no mesh then this is a clear event.
     if (!mesh_id)
@@ -86,17 +136,17 @@ std::optional<glm::mat4> Renderer::RenderNode(
         GLbitfield bit_field = 0;
         std::uint32_t clean_buffer = 0;
         for (const auto clean_elem :
-             node_static_mesh.GetData().clean_buffer().values())
+             node_mesh.GetData().clean_buffer().values())
         {
             clean_buffer |= static_cast<std::uint32_t>(clean_elem);
         }
-        if (clean_buffer | proto::CleanBuffer::CLEAR_COLOR)
+        if (clean_buffer & proto::CleanBuffer::CLEAR_COLOR)
         {
-            bit_field += GL_COLOR_BUFFER_BIT;
+            bit_field |= GL_COLOR_BUFFER_BIT;
         }
-        if (clean_buffer | proto::CleanBuffer::CLEAR_DEPTH)
+        if (clean_buffer & proto::CleanBuffer::CLEAR_DEPTH)
         {
-            bit_field += GL_DEPTH_BUFFER_BIT;
+            bit_field |= GL_DEPTH_BUFFER_BIT;
         }
         if (bit_field)
         {
@@ -104,20 +154,47 @@ std::optional<glm::mat4> Renderer::RenderNode(
         }
         return std::nullopt;
     }
-    auto& static_mesh = level_.GetStaticMeshFromId(mesh_id);
+    auto& mesh = level_.GetMeshFromId(mesh_id);
     // Try to find the material for the mesh.
     if (material_id == NullId)
     {
         throw std::runtime_error("No material?");
     }
     MaterialInterface& material = level_.GetMaterialFromId(material_id);
+    EntityId program_id = material.GetProgramId(&level_);
+    if (!program_id)
+    {
+        program_id = level_.GetRenderPassProgramId(
+            node_mesh.GetData().render_time_enum());
+        if (program_id)
+        {
+            material.SetProgramId(program_id);
+        }
+    }
+    if (!program_id)
+    {
+        throw std::runtime_error("No program configured for material.");
+    }
+    auto& program = level_.GetProgramFromId(program_id);
     glm::mat4 model = node.GetLocalModel(delta_time_);
-    RenderMesh(static_mesh, material, projection, view, model);
+    MeshInterface* mesh_to_render = &mesh;
+    const EntityId quad_id = level_.GetDefaultMeshQuadId();
+    if (quad_id != NullId &&
+        mesh_id != quad_id &&
+        IsRaytracingProgram(program))
+    {
+        if (auto* gl_skinned_mesh = dynamic_cast<SkinnedMesh*>(&mesh))
+        {
+            UpdateRaytraceBuffersIfNeeded(*gl_skinned_mesh);
+        }
+        mesh_to_render = &level_.GetMeshFromId(quad_id);
+    }
+    RenderMesh(*mesh_to_render, material, projection, view, model);
     return model;
 }
 
 void Renderer::RenderMesh(
-    StaticMeshInterface& static_mesh,
+    MeshInterface& mesh,
     MaterialInterface& material,
     const glm::mat4& projection,
     const glm::mat4& view,
@@ -148,14 +225,14 @@ void Renderer::RenderMesh(
             std::make_unique<Uniform>(
                 "light_color", light.GetColorIntensity()));
     }
-    if (render_time_ == proto::NodeStaticMesh::SCENE_RENDER_TIME)
+    if (render_time_ == proto::NodeMesh::SCENE_RENDER_TIME)
     {
         std::unique_ptr<UniformInterface> env_map_uniform =
             std::make_unique<Uniform>("env_map_model", env_map_model_);
         uniform_collection_wrapper.AddUniform(std::move(env_map_uniform));
     }
     // Go through the callback.
-    callback_(uniform_collection_wrapper, static_mesh, material);
+    callback_(uniform_collection_wrapper, mesh, material);
 
     // Add node-based model matrices.
     for (const auto& name : material.GetNodeNames())
@@ -187,7 +264,37 @@ void Renderer::RenderMesh(
         dynamic_cast<opengl::Program&>(program).AddBuffer(id, inner_name, j++);
     }
 
+    auto& gl_mesh = dynamic_cast<Mesh&>(mesh);
+    auto* gl_skinned_mesh = dynamic_cast<SkinnedMesh*>(&gl_mesh);
+    if (gl_skinned_mesh)
+    {
+        UpdateRaytraceBuffersIfNeeded(*gl_skinned_mesh);
+    }
     program.Use(uniform_collection_wrapper, &level_);
+    int skinning_enabled = 0;
+    auto& gl_program = dynamic_cast<opengl::Program&>(program);
+    if (gl_skinned_mesh && gl_skinned_mesh->HasSkinning())
+    {
+        const double skinning_time =
+            gl_skinned_mesh->GetSkinningTime(delta_time_);
+        auto bone_matrices = gl_skinned_mesh->EvaluateSkinning(skinning_time);
+        if (!bone_matrices.empty())
+        {
+            constexpr std::size_t kMaxBones = 128;
+            if (bone_matrices.size() > kMaxBones)
+            {
+                bone_matrices.resize(kMaxBones);
+            }
+            gl_program.UploadMatrix4ArrayUniform(
+                "bone_matrices", bone_matrices);
+            skinning_enabled = 1;
+        }
+    }
+    if (program.HasUniform("skinning_enabled"))
+    {
+        program.AddUniform(
+            std::make_unique<Uniform>("skinning_enabled", skinning_enabled));
+    }
 
     auto texture_out_ids = program.GetOutputTextureIds();
     glViewport(viewport_.x, viewport_.y, viewport_.z, viewport_.w);
@@ -266,37 +373,36 @@ void Renderer::RenderMesh(
         program.AddUniform(std::move(uniform_interface));
     }
 
-    auto& gl_static_mesh = dynamic_cast<StaticMesh&>(static_mesh);
-    glBindVertexArray(gl_static_mesh.GetId());
+    glBindVertexArray(gl_mesh.GetId());
 
-    auto& index_buffer = level_.GetBufferFromId(static_mesh.GetIndexBufferId());
+    auto& index_buffer = level_.GetBufferFromId(mesh.GetIndexBufferId());
     auto& gl_index_buffer = dynamic_cast<Buffer&>(index_buffer);
     // This was crashing the driver so...
-    if (static_mesh.GetIndexSize())
+    if (mesh.GetIndexSize())
     {
         gl_index_buffer.Bind();
-        switch (static_mesh.GetData().render_primitive_enum())
+        switch (mesh.GetData().render_primitive_enum())
         {
-        case proto::NodeStaticMesh::TRIANGLE_PRIMITIVE:
+        case proto::NodeMesh::TRIANGLE_PRIMITIVE:
             glDrawElements(
                 GL_TRIANGLES,
-                static_cast<GLsizei>(static_mesh.GetIndexSize()) /
+                static_cast<GLsizei>(mesh.GetIndexSize()) /
                     sizeof(std::uint32_t),
                 GL_UNSIGNED_INT,
                 nullptr);
             break;
-        case proto::NodeStaticMesh::POINT_PRIMITIVE:
+        case proto::NodeMesh::POINT_PRIMITIVE:
             glDrawElements(
                 GL_POINTS,
-                static_cast<GLsizei>(static_mesh.GetIndexSize()) /
+                static_cast<GLsizei>(mesh.GetIndexSize()) /
                     sizeof(std::uint32_t),
                 GL_UNSIGNED_INT,
                 nullptr);
             break;
-        case proto::NodeStaticMesh::LINE_PRIMITIVE:
+        case proto::NodeMesh::LINE_PRIMITIVE:
             glDrawElements(
                 GL_LINES,
-                static_cast<GLsizei>(static_mesh.GetIndexSize()) /
+                static_cast<GLsizei>(mesh.GetIndexSize()) /
                     sizeof(std::uint32_t),
                 GL_UNSIGNED_INT,
                 nullptr);
@@ -305,8 +411,8 @@ void Renderer::RenderMesh(
             throw std::runtime_error(
                 std::format(
                     "Couldn't draw primitive {}",
-                    proto::NodeStaticMesh_RenderPrimitiveEnum_Name(
-                        static_mesh.GetData().render_primitive_enum())));
+                    proto::NodeMesh_RenderPrimitiveEnum_Name(
+                        mesh.GetData().render_primitive_enum())));
         }
         gl_index_buffer.UnBind();
     }
@@ -336,7 +442,7 @@ void Renderer::RenderMesh(
     }
     material.DisableAll();
 
-    if (static_mesh.IsClearBuffer())
+    if (mesh.IsClearBuffer())
     {
         glClear(GL_DEPTH_BUFFER_BIT);
     }
@@ -344,10 +450,10 @@ void Renderer::RenderMesh(
 
 void Renderer::PresentFinal()
 {
-    auto maybe_quad_id = level_.GetDefaultStaticMeshQuadId();
+    auto maybe_quad_id = level_.GetDefaultMeshQuadId();
     if (maybe_quad_id == NullId)
         throw std::runtime_error("No quad id.");
-    auto& quad = level_.GetStaticMeshFromId(maybe_quad_id);
+    auto& quad = level_.GetMeshFromId(maybe_quad_id);
     auto& program = level_.GetProgramFromId(display_program_id_);
     UniformCollectionWrapper uniform_collection_wrapper{};
     program.Use(uniform_collection_wrapper, &level_);
@@ -362,7 +468,7 @@ void Renderer::PresentFinal()
             std::make_unique<Uniform>(p.first, p.second);
         program.AddUniform(std::move(uniform_interface));
     }
-    auto& gl_quad = dynamic_cast<StaticMesh&>(quad);
+    auto& gl_quad = dynamic_cast<Mesh&>(quad);
     glBindVertexArray(gl_quad.GetId());
     auto& index_buffer = level_.GetBufferFromId(quad.GetIndexBufferId());
     auto& gl_index_buffer = dynamic_cast<Buffer&>(index_buffer);
@@ -401,19 +507,30 @@ void Renderer::SetDepthTest(bool enable)
 
 void Renderer::PreRender()
 {
-    render_time_ = proto::NodeStaticMesh::PRE_RENDER_TIME;
+    render_time_ = proto::NodeMesh::PRE_RENDER_TIME;
     // This will ensure that it is only true once.
     auto first_render = std::exchange(first_render_, false);
-    for (const auto& p : level_.GetStaticMeshMaterialIds(
-             proto::NodeStaticMesh::PRE_RENDER_TIME))
+    for (const auto& p : level_.GetMeshMaterialIds(
+             proto::NodeMesh::PRE_RENDER_TIME))
     {
+        auto& node = level_.GetSceneNodeFromId(p.first);
+        if (node.GetLocalMesh())
+        {
+            auto& mesh = level_.GetMeshFromId(node.GetLocalMesh());
+            auto* gl_skinned_mesh =
+                dynamic_cast<SkinnedMesh*>(&mesh);
+            if (gl_skinned_mesh)
+            {
+                UpdateRaytraceBuffersIfNeeded(*gl_skinned_mesh);
+            }
+        }
         if (first_render)
         {
             auto material_id = p.second;
             auto temp_viewport = viewport_;
             // Query textures from the material.
             auto& material = level_.GetMaterialFromId(material_id);
-            if (!material.GetData().preprocess_program_name().empty())
+            if (material.GetPreprocessProgramId())
             {
                 auto saved_program = material.GetProgramId();
                 auto preprocess_id = material.GetPreprocessProgramId();
@@ -491,9 +608,9 @@ void Renderer::PreRender()
 
 void Renderer::RenderSkybox(const CameraInterface& camera)
 {
-    render_time_ = proto::NodeStaticMesh::SKYBOX_RENDER_TIME;
-    for (const auto& p : level_.GetStaticMeshMaterialIds(
-             proto::NodeStaticMesh::SKYBOX_RENDER_TIME))
+    render_time_ = proto::NodeMesh::SKYBOX_RENDER_TIME;
+    for (const auto& p : level_.GetMeshMaterialIds(
+             proto::NodeMesh::SKYBOX_RENDER_TIME))
     {
         auto maybe_model = RenderNode(
             p.first,
@@ -509,9 +626,9 @@ void Renderer::RenderSkybox(const CameraInterface& camera)
 
 void Renderer::RenderScene(const CameraInterface& camera)
 {
-    render_time_ = proto::NodeStaticMesh::SCENE_RENDER_TIME;
-    for (const auto& p : level_.GetStaticMeshMaterialIds(
-             proto::NodeStaticMesh::SCENE_RENDER_TIME))
+    render_time_ = proto::NodeMesh::SCENE_RENDER_TIME;
+    for (const auto& p : level_.GetMeshMaterialIds(
+             proto::NodeMesh::SCENE_RENDER_TIME))
     {
         RenderNode(
             p.first,
@@ -523,9 +640,9 @@ void Renderer::RenderScene(const CameraInterface& camera)
 
 void Renderer::PostProcess()
 {
-    render_time_ = proto::NodeStaticMesh::POST_PROCESS_TIME;
-    for (const auto& p : level_.GetStaticMeshMaterialIds(
-             proto::NodeStaticMesh::POST_PROCESS_TIME))
+    render_time_ = proto::NodeMesh::POST_PROCESS_TIME;
+    for (const auto& p : level_.GetMeshMaterialIds(
+             proto::NodeMesh::POST_PROCESS_TIME))
     {
         // Is it correct for projection and view? This is a post process?
         RenderNode(p.first, p.second, glm::mat4(1.0), glm::mat4(1.0));
@@ -533,3 +650,6 @@ void Renderer::PostProcess()
 }
 
 } // End namespace frame::opengl.
+
+
+

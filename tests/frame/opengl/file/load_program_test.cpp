@@ -9,8 +9,7 @@ TEST_F(LoadProgramTest, LoadFromNameTest)
 {
     frame::proto::Program proto_program;
     proto_program.set_name("blur");
-    proto_program.set_shader_vertex("blur.vert");
-    proto_program.set_shader_fragment("blur.frag");
+    proto_program.set_pipeline_name("blur");
     ASSERT_TRUE(frame::opengl::file::LoadProgram(proto_program));
 }
 
@@ -18,8 +17,7 @@ TEST_F(LoadProgramTest, LoadFromFileTest)
 {
     frame::proto::Program proto_program;
     proto_program.set_name("blur");
-    proto_program.set_shader_vertex("blur.vert");
-    proto_program.set_shader_fragment("blur.frag");
+    proto_program.set_pipeline_name("blur");
     ASSERT_TRUE(
         frame::opengl::file::LoadProgram(
             proto_program,

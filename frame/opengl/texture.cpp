@@ -18,7 +18,7 @@
 #include "frame/opengl/program.h"
 #include "frame/opengl/render_buffer.h"
 #include "frame/opengl/renderer.h"
-#include "frame/opengl/static_mesh.h"
+#include "frame/opengl/mesh.h"
 
 namespace frame::opengl
 {
@@ -474,3 +474,4 @@ void Texture::Update(
 }
 
 } // End namespace frame::opengl.
+

@@ -1,6 +1,7 @@
 #include "frame/vulkan/json/parse_texture.h"
 
 #include <algorithm>
+#include <array>
 #include <chrono>
 #include <cctype>
 #include <cstring>
@@ -88,8 +89,12 @@ std::vector<std::uint8_t> ConvertEquirectangularToCubemap(
     // Typical equirectangular is 2:1. Derive square face size conservatively.
     const std::uint32_t face = static_cast<std::uint32_t>(
         std::max<std::uint32_t>(1, std::min(size.x / 4, size.y / 3)));
-    out_face_size = {face, face};
-    const std::size_t face_pixels = static_cast<std::size_t>(face) * face;
+    constexpr std::uint32_t kMaxCubemapFaceResolution = 1024u;
+    const std::uint32_t clamped_face =
+        std::min(face, kMaxCubemapFaceResolution);
+    out_face_size = {clamped_face, clamped_face};
+    const std::size_t face_pixels =
+        static_cast<std::size_t>(clamped_face) * clamped_face;
     std::vector<std::uint8_t> out(face_pixels * 6 * bytes_per_pixel, 0);
 
     auto dir_from_face_uv = [](int face_idx, glm::vec2 uv) -> glm::vec3 {
@@ -172,13 +177,15 @@ std::vector<std::uint8_t> ConvertEquirectangularToCubemap(
 
     for (int face_idx = 0; face_idx < 6; ++face_idx)
     {
-        for (std::uint32_t y = 0; y < face; ++y)
+        for (std::uint32_t y = 0; y < clamped_face; ++y)
         {
-            for (std::uint32_t x = 0; x < face; ++x)
+            for (std::uint32_t x = 0; x < clamped_face; ++x)
             {
                 const glm::vec2 uv(
-                    (static_cast<float>(x) + 0.5f) / static_cast<float>(face),
-                    (static_cast<float>(y) + 0.5f) / static_cast<float>(face));
+                    (static_cast<float>(x) + 0.5f) /
+                        static_cast<float>(clamped_face),
+                    (static_cast<float>(y) + 0.5f) /
+                        static_cast<float>(clamped_face));
                 glm::vec3 dir = dir_from_face_uv(face_idx, uv);
                 const float theta = std::atan2(dir.z, dir.x);
                 const float phi = std::asin(std::clamp(dir.y, -1.0f, 1.0f));
@@ -189,7 +196,7 @@ std::vector<std::uint8_t> ConvertEquirectangularToCubemap(
 
                 const std::size_t pixel_index =
                     (static_cast<std::size_t>(face_idx) * face_pixels) +
-                    (static_cast<std::size_t>(y) * face + x);
+                    (static_cast<std::size_t>(y) * clamped_face + x);
                 const std::size_t base = pixel_index * bytes_per_pixel;
                 write_pixel(base, sample);
             }
@@ -437,6 +444,84 @@ std::unique_ptr<frame::TextureInterface> ParseTexture(
     if (proto_texture.cubemap())
     {
         texture->SetViewType(vk::ImageViewType::eCube);
+    }
+
+    if (proto_texture.cubemap() && proto_texture.has_file_names())
+    {
+        const auto bytes_per_component =
+            frame::vulkan::Texture::BytesPerComponent(
+                proto_texture.pixel_element_size().value());
+        const auto component_count = frame::vulkan::Texture::ComponentCount(
+            proto_texture.pixel_structure().value());
+        if (bytes_per_component == 0 || component_count == 0)
+        {
+            throw std::runtime_error(
+                "Unsupported cubemap component configuration.");
+        }
+
+        const auto& files = proto_texture.file_names();
+        const std::array<std::filesystem::path, 6> face_paths = {
+            files.positive_x(),
+            files.negative_x(),
+            files.positive_y(),
+            files.negative_y(),
+            files.positive_z(),
+            files.negative_z()};
+
+        const std::size_t bytes_per_pixel =
+            static_cast<std::size_t>(bytes_per_component) * component_count;
+        glm::uvec2 face_size = {0u, 0u};
+        std::vector<std::uint8_t> packed_faces = {};
+
+        for (std::size_t i = 0; i < face_paths.size(); ++i)
+        {
+            frame::file::Image image(
+                face_paths[i],
+                proto_texture.pixel_element_size(),
+                proto_texture.pixel_structure());
+            const auto current_size = image.GetSize();
+            if (current_size.x <= 0 || current_size.y <= 0)
+            {
+                throw std::runtime_error(std::format(
+                    "Invalid cubemap face size for {}.",
+                    face_paths[i].string()));
+            }
+            if (i == 0)
+            {
+                face_size = glm::uvec2(
+                    static_cast<std::uint32_t>(current_size.x),
+                    static_cast<std::uint32_t>(current_size.y));
+            }
+            else if (face_size.x != static_cast<std::uint32_t>(current_size.x) ||
+                     face_size.y != static_cast<std::uint32_t>(current_size.y))
+            {
+                throw std::runtime_error(std::format(
+                    "Cubemap face size mismatch at {}.",
+                    face_paths[i].string()));
+            }
+
+            const std::size_t face_bytes =
+                static_cast<std::size_t>(face_size.x) * face_size.y *
+                bytes_per_pixel;
+            const auto* src = static_cast<const std::uint8_t*>(image.Data());
+            if (!src)
+            {
+                throw std::runtime_error(std::format(
+                    "Failed to read cubemap face {}.",
+                    face_paths[i].string()));
+            }
+            packed_faces.insert(
+                packed_faces.end(),
+                src,
+                src + face_bytes);
+        }
+
+        texture->Update(
+            std::move(packed_faces),
+            face_size,
+            static_cast<std::uint8_t>(bytes_per_pixel));
+        texture->SetSerializeEnable(true);
+        return texture;
     }
 
     if (proto_texture.has_file_name())

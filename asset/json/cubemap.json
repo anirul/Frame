@@ -19,10 +19,13 @@
     ],
     "materials": [
         {
-            "name": "CubemapMaterial",
-            "program_name": "CubemapProgram",
-            "texture_names": ["skybox"],
-            "inner_names": ["Skybox"]
+            "name": "CubemapMaterial"
+        }
+    ],
+    "render_pass_programs": [
+        {
+            "render_time_enum": "SKYBOX_RENDER_TIME",
+            "program_name": "CubemapProgram"
         }
     ],
     "scene_tree": {
@@ -54,7 +57,7 @@
                 "up": {"x": 0.0, "y": 1.0, "z": 0.0}
             }
         ],
-        "node_static_meshes": [
+        "node_meshes": [
             {
                 "name": "Skybox",
                 "parent": "root",
@@ -70,9 +73,6 @@
             "input_texture_names": ["skybox"],
             "output_texture_names": ["output"],
             "input_scene_type": {"value": "CUBE"},
-            "shader_vertex": "cubemap.vert",
-            "shader_fragment": "cubemap.frag",
-            "shader_compute": "",
             "bindings": [
                 {
                     "name": "Skybox",
@@ -92,3 +92,4 @@
         }
     ]
 }
+

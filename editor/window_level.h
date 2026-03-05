@@ -5,6 +5,7 @@
 #include "frame/device_interface.h"
 #include "frame/gui/draw_gui_interface.h"
 #include "frame/gui/window_json_file.h"
+#include "frame/json/proto.h"
 
 #include "tab_materials.h"
 #include "tab_programs.h"
@@ -28,7 +29,17 @@ class WindowLevel : public WindowJsonFile
 
     bool DrawCallback() override;
 
+  protected:
+    void ApplyJsonContent(const std::string& content) override;
+
   private:
+    void ShowImportGltfDialog();
+    void ImportGltfSceneFromFile(const std::string& file_name);
+    void ShowSkyboxFileDialog();
+    void SetSkyboxFromFile(const std::string& file_name);
+    bool AddSkyboxNode();
+    void ApplyProtoLevel(const frame::proto::Level& proto_level);
+
     DeviceInterface& device_;
     DrawGuiInterface& draw_gui_;
     TabTextures tab_textures_;

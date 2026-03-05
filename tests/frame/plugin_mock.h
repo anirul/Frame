@@ -18,7 +18,7 @@ class PluginMock : public frame::PluginInterface
         PreRender,
         (frame::UniformCollectionInterface&,
          frame::DeviceInterface&,
-         frame::StaticMeshInterface&,
+         frame::MeshInterface&,
          frame::MaterialInterface&),
         (override));
     MOCK_METHOD(bool, Update, (frame::DeviceInterface&, double), (override));
@@ -29,3 +29,4 @@ class PluginMock : public frame::PluginInterface
 };
 
 } // End namespace test.
+

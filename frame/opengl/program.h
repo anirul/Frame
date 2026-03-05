@@ -115,6 +115,8 @@ class Program : public ProgramInterface
      * @param binding: Binding point of the buffer.
      */
     void AddBuffer(EntityId id, const std::string& name, int binding);
+    void UploadMatrix4ArrayUniform(
+        const std::string& name, const std::vector<glm::mat4>& values) const;
 
   private:
     /**

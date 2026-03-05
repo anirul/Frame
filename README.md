@@ -11,7 +11,7 @@ built from the same engine code.
 - Runtime backend switch: `--device=vulkan` or `--device=opengl`
 - Automatic fallback from Vulkan to OpenGL when Vulkan startup fails
 - Scene loading from JSON definitions in `asset/json/`
-- Model loading (OBJ/PLY) and texture loading via stb-supported formats
+- Model loading (glTF/glb) and texture loading via stb-supported formats
 - Sample apps under `examples/` and integration tests under `tests/frame/`
 
 ## Prerequisites
@@ -84,6 +84,7 @@ Available examples:
 - `02_Cubemap`
 - `03_RayTracing`
 - `04_RayTracingBvh`
+- `05_SkinnedMesh`
 
 Useful runtime flags:
 

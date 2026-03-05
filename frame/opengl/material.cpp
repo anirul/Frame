@@ -101,36 +101,15 @@ std::vector<EntityId> Material::GetTextureIds() const
 frame::EntityId Material::GetProgramId(
     const LevelInterface* level /*= nullptr*/) const
 {
-    if (program_id_)
-    {
-        return program_id_;
-    }
-    auto maybe_id = level->GetIdFromName(program_name_);
-    if (maybe_id)
-    {
-        program_id_ = maybe_id;
-        return program_id_;
-    }
-    throw std::runtime_error("No valid program!");
+    (void)level;
+    return program_id_;
 }
 
 frame::EntityId Material::GetPreprocessProgramId(
     const LevelInterface* level /*= nullptr*/) const
 {
-    if (preprocess_program_id_)
-    {
-        return preprocess_program_id_;
-    }
-    if (!preprocess_program_name_.empty() && level)
-    {
-        auto maybe_id = level->GetIdFromName(preprocess_program_name_);
-        if (maybe_id)
-        {
-            preprocess_program_id_ = maybe_id;
-            return preprocess_program_id_;
-        }
-    }
-    return NullId;
+    (void)level;
+    return preprocess_program_id_;
 }
 
 void Material::SetProgramId(EntityId id)

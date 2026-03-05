@@ -3,10 +3,13 @@
     "default_texture_name": "billboard",
     "materials": [
         {
-            "name": "RayMarchingMaterial",
-            "program_name": "RayMarchingProgram",
-            "texture_names": [],
-            "inner_names": []
+            "name": "RayMarchingMaterial"
+        }
+    ],
+    "render_pass_programs": [
+        {
+            "render_time_enum": "SCENE_RENDER_TIME",
+            "program_name": "RayMarchingProgram"
         }
     ],
     "programs": [
@@ -16,9 +19,6 @@
             "input_scene_type": {
                 "value": "QUAD"
             },
-            "shader_vertex": "ray_marching.vert",
-            "shader_fragment": "ray_marching.frag",
-            "shader_compute": "",
             "uniforms": [
                 {
                     "name": "time_s",
@@ -91,7 +91,7 @@
                 }
             }
         ],
-        "node_static_meshes": [
+        "node_meshes": [
             {
                 "name": "RayMarchingRendering",
                 "parent": "root",
@@ -101,3 +101,4 @@
         ]
     }
 }
+

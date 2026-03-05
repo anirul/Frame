@@ -11,7 +11,7 @@ namespace frame
 
 class DeviceInterface;
 class MaterialInterface;
-class StaticMeshInterface;
+class MeshInterface;
 class UniformCollectionInterface;
 
 /**
@@ -40,13 +40,13 @@ class PluginInterface : public NameInterface
      * @param uniform[in, out]: The uniform data.
      * @param device: The device.
      * @param level: The level.
-     * @param static_mesh: The static mesh.
+     * @param mesh: The mesh.
      * @param material: The material associated with the mesh.
      */
     virtual void PreRender(
         UniformCollectionInterface& uniform,
         DeviceInterface& device,
-        StaticMeshInterface& static_mesh,
+        MeshInterface& mesh,
         MaterialInterface& material) = 0;
     /**
      * @brief Called to update variables, called after the main render
@@ -65,3 +65,5 @@ class PluginInterface : public NameInterface
 };
 
 } // End namespace frame.
+
+

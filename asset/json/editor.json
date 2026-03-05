@@ -3,24 +3,20 @@
     "default_texture_name": "albedo",
     "materials": [
         {
-            "name": "FrameEditorMaterial",
-            "program_name": "FrameEditorProgram",
-            "texture_names": [
-                "apple_texture"
-            ],
-            "inner_names": [
-                "Color"
-            ]
+            "name": "FrameEditorMaterial"
         },
         {
-            "name": "CubeMapMaterial",
-            "program_name": "CubeMapProgram",
-            "texture_names": [
-                "skybox"
-            ],
-            "inner_names": [
-                "Skybox"
-            ]
+            "name": "CubeMapMaterial"
+        }
+    ],
+    "render_pass_programs": [
+        {
+            "render_time_enum": "SKYBOX_RENDER_TIME",
+            "program_name": "CubeMapProgram"
+        },
+        {
+            "render_time_enum": "SCENE_RENDER_TIME",
+            "program_name": "FrameEditorProgram"
         }
     ],
     "programs": [
@@ -31,9 +27,6 @@
             "input_scene_type": {
                 "value": "CUBE"
             },
-            "shader_vertex": "cubemap.vert",
-            "shader_fragment": "cubemap.frag",
-            "shader_compute": "",
             "uniforms": [
                 {
                     "name": "projection",
@@ -51,6 +44,9 @@
         },
         {
             "name": "FrameEditorProgram",
+            "input_texture_names": [
+                "apple_texture"
+            ],
             "output_texture_names": [
                 "albedo",
                 "zbuffer"
@@ -59,9 +55,16 @@
                 "value": "SCENE"
             },
             "input_scene_root_name": "root",
-            "shader_vertex": "scene_simple.vert",
-            "shader_fragment": "scene_simple.frag",
-            "shader_compute": "",
+            "bindings": [
+                {
+                    "name": "Color",
+                    "binding": 0,
+                    "binding_type": "COMBINED_IMAGE_SAMPLER",
+                    "stages": [
+                        "FRAGMENT"
+                    ]
+                }
+            ],
             "uniforms": [
                 {
                     "name": "projection",
@@ -110,7 +113,7 @@
             "pixel_structure": {
                 "value": "RGB"
             },
-            "file_name": "asset/apple/color.jpg"
+            "file_name": "asset/material/apple/color.jpg"
         },
         {
             "name": "albedo",
@@ -175,7 +178,7 @@
                 }
             }
         ],
-        "node_static_meshes": [
+        "node_meshes": [
             {
                 "name": "InitCleanBuffer",
                 "clean_buffer": {
@@ -205,7 +208,7 @@
             {
                 "name": "AppleMesh",
                 "parent": "mesh_holder",
-                "file_name": "apple.obj",
+                "file_name": "apple.glb",
                 "material_name": "FrameEditorMaterial",
                 "render_time_enum": "SCENE_RENDER_TIME"
             }
@@ -253,3 +256,5 @@
         ]
     }
 }
+
+

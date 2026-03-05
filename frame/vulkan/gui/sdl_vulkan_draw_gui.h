@@ -45,7 +45,7 @@ class SDLVulkanDrawGui : public frame::gui::DrawGuiInterface
     void PreRender(
         UniformCollectionInterface& uniform,
         DeviceInterface& device,
-        StaticMeshInterface& static_mesh,
+        MeshInterface& static_mesh,
         MaterialInterface& material) override
     {
     }
@@ -149,3 +149,4 @@ class SDLVulkanDrawGui : public frame::gui::DrawGuiInterface
 };
 
 } // namespace frame::vulkan::gui
+
