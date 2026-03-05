@@ -17,6 +17,11 @@ ABSL_FLAG(bool, vk_validation, true, "Enable Vulkan validation layers.");
 #else
 ABSL_FLAG(bool, vk_validation, false, "Enable Vulkan validation layers.");
 #endif
+ABSL_FLAG(
+    double,
+    auto_exit_seconds,
+    0.0,
+    "Auto-exit executable after N seconds (0 disables).");
 
 namespace frame::common
 {

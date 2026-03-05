@@ -1,7 +1,8 @@
 #pragma once
 
-#include <memory>
 #include <filesystem>
+#include <memory>
+#include <vector>
 
 #include "frame/device_interface.h"
 #include "frame/gui/draw_gui_interface.h"
@@ -198,6 +199,7 @@ class SDLOpenGLDrawGui : public frame::gui::DrawGuiInterface
     bool PollEvent(void* event) override;
 
   protected:
+    void FlushPendingWindowDeletions();
     struct CallbackData {
         std::unique_ptr<frame::gui::GuiWindowInterface> callback = nullptr;
         glm::vec2 position = {0.0f, 0.0f};
@@ -220,6 +222,8 @@ class SDLOpenGLDrawGui : public frame::gui::DrawGuiInterface
 	bool is_keyboard_passed_locked_ = false;
     bool is_keyboard_passed_ = false;
     bool is_visible_ = true;
+    bool is_updating_windows_ = false;
+    std::vector<std::string> pending_window_deletions_ = {};
 	float font_size_ = 20.0f;
 };
 

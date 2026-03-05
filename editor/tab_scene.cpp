@@ -1,82 +1,112 @@
 #include "tab_scene.h"
 
-#define IMGUI_DEFINE_MATH_OPERATORS
-#include <imgui.h>
-
+#include <cstdint>
+#include <exception>
+#include <functional>
+#include <string>
 #include <unordered_set>
+#include <imgui.h>
 
 namespace frame::gui
 {
 
-void TabScene::BuildScene(LevelInterface& level)
+namespace
 {
-    std::vector<EntityId> ids = level.GetSceneNodes();
-    std::unordered_set<EntityId> alive(ids.begin(), ids.end());
 
-    for (auto it = nodes_.begin(); it != nodes_.end();)
+const char* NodeTypeToLabel(frame::NodeTypeEnum type)
+{
+    switch (type)
     {
-        if (!alive.count(it->first))
-        {
-            it->second->destroy();
-            it = nodes_.erase(it);
-        }
-        else
-        {
-            ++it;
-        }
-    }
-
-    auto root = level.GetDefaultRootSceneNodeId();
-    std::function<void(EntityId, int)> add = [&](EntityId id, int depth) {
-        if (nodes_.count(id))
-        {
-            for (auto child : level.GetChildList(id))
-                add(child, depth + 1);
-            return;
-        }
-        auto name = level.GetNameFromId(id);
-        auto node = node_flow_.addLambdaNode(
-            [](ImFlow::BaseNode*) {}, ImVec2(depth * 100.0f, depth * 60.0f));
-        node->setTitle(name);
-        node->addIN<int>("in", 0, ImFlow::ConnectionFilter::None());
-        static_cast<void>(node->addOUT<int>("out"));
-        nodes_[id] = node;
-        for (auto child : level.GetChildList(id))
-            add(child, depth + 1);
-    };
-    if (root != frame::NullId)
-        add(root, 0);
-
-    for (const auto& [id, node] : nodes_)
-    {
-        auto in_pin = node->inPin("in");
-        auto parent_id = level.GetParentId(id);
-        if (parent_id != frame::NullId && nodes_.count(parent_id))
-        {
-            auto parent_pin = nodes_[parent_id]->outPin("out");
-            auto link = in_pin->getLink();
-            if (link.expired() || link.lock()->left() != parent_pin)
-            {
-                if (in_pin->isConnected())
-                    in_pin->deleteLink();
-                parent_pin->createLink(in_pin);
-            }
-        }
-        else if (in_pin->isConnected())
-        {
-            in_pin->deleteLink();
-        }
+    case frame::NodeTypeEnum::NODE_MATRIX:
+        return "Matrix";
+    case frame::NodeTypeEnum::NODE_MESH:
+        return "Mesh";
+    case frame::NodeTypeEnum::NODE_LIGHT:
+        return "Light";
+    case frame::NodeTypeEnum::NODE_CAMERA:
+        return "Camera";
+    case frame::NodeTypeEnum::NODE_UKNOWN:
+    default:
+        return "Unknown";
     }
 }
 
+} // namespace
+
 void TabScene::Draw(LevelInterface& level)
 {
-    ImVec2 avail = ImGui::GetContentRegionAvail();
-    node_flow_.setSize(avail);
+    ImGui::TextUnformatted("Scene Tree");
+    ImGui::Separator();
 
-    BuildScene(level);
+    const auto root_id = level.GetDefaultRootSceneNodeId();
+    if (!root_id)
+    {
+        ImGui::TextUnformatted("No root scene node.");
+        return;
+    }
 
-    node_flow_.update();
+    std::unordered_set<EntityId> visited = {};
+    std::function<void(EntityId)> draw_node = [&](EntityId node_id) {
+        if (!node_id)
+        {
+            return;
+        }
+        if (visited.contains(node_id))
+        {
+            ImGui::Text(
+                "Cyclic reference detected (id=%lld).",
+                static_cast<long long>(node_id));
+            return;
+        }
+        visited.insert(node_id);
+
+        std::string node_name = "<invalid>";
+        const frame::NodeInterface* node_ptr = nullptr;
+        try
+        {
+            node_name = level.GetNameFromId(node_id);
+            node_ptr = &level.GetSceneNodeFromId(node_id);
+        }
+        catch (const std::exception&)
+        {
+            ImGui::Text(
+                "Invalid scene node (id=%lld).",
+                static_cast<long long>(node_id));
+            return;
+        }
+
+        const auto children = level.GetChildList(node_id);
+        const bool is_leaf = children.empty();
+        ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_SpanAvailWidth;
+        if (is_leaf)
+        {
+            flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+        }
+        else
+        {
+            flags |= ImGuiTreeNodeFlags_DefaultOpen;
+        }
+
+        const char* node_type = NodeTypeToLabel(node_ptr->GetNodeType());
+        const bool open = ImGui::TreeNodeEx(
+            reinterpret_cast<void*>(static_cast<std::uintptr_t>(node_id)),
+            flags,
+            "%s [%s]##%lld",
+            node_name.c_str(),
+            node_type,
+            static_cast<long long>(node_id));
+        if (!is_leaf && open)
+        {
+            for (const auto child_id : children)
+            {
+                draw_node(child_id);
+            }
+            ImGui::TreePop();
+        }
+    };
+
+    draw_node(root_id);
+
 }
 
 } // namespace frame::gui

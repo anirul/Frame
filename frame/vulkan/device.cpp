@@ -86,6 +86,83 @@ bool AreTexturesCompatibleForReuse(
     {
         return false;
     }
+    if (old_data.texture_oneof_case() != new_data.texture_oneof_case())
+    {
+        return false;
+    }
+    if (old_data.has_file_name() != new_data.has_file_name())
+    {
+        return false;
+    }
+    if (old_data.has_file_name() &&
+        old_data.file_name() != new_data.file_name())
+    {
+        return false;
+    }
+    if (old_data.has_file_names() != new_data.has_file_names())
+    {
+        return false;
+    }
+    if (old_data.has_file_names())
+    {
+        const auto& old_files = old_data.file_names();
+        const auto& new_files = new_data.file_names();
+        if (old_files.positive_x() != new_files.positive_x() ||
+            old_files.negative_x() != new_files.negative_x() ||
+            old_files.positive_y() != new_files.positive_y() ||
+            old_files.negative_y() != new_files.negative_y() ||
+            old_files.positive_z() != new_files.positive_z() ||
+            old_files.negative_z() != new_files.negative_z())
+        {
+            return false;
+        }
+    }
+    // Pixel-backed textures may change without size/format changes.
+    // Force re-upload for those cases.
+    if (old_data.has_pixels() || new_data.has_pixels())
+    {
+        return false;
+    }
+    if (old_data.has_min_filter() != new_data.has_min_filter())
+    {
+        return false;
+    }
+    if (old_data.has_min_filter() &&
+        old_data.min_filter().value() != new_data.min_filter().value())
+    {
+        return false;
+    }
+    if (old_data.has_mag_filter() != new_data.has_mag_filter())
+    {
+        return false;
+    }
+    if (old_data.has_mag_filter() &&
+        old_data.mag_filter().value() != new_data.mag_filter().value())
+    {
+        return false;
+    }
+    if (old_data.has_wrap_s() != new_data.has_wrap_s())
+    {
+        return false;
+    }
+    if (old_data.has_wrap_s() &&
+        old_data.wrap_s().value() != new_data.wrap_s().value())
+    {
+        return false;
+    }
+    if (old_data.has_wrap_t() != new_data.has_wrap_t())
+    {
+        return false;
+    }
+    if (old_data.has_wrap_t() &&
+        old_data.wrap_t().value() != new_data.wrap_t().value())
+    {
+        return false;
+    }
+    if (old_data.mipmap() != new_data.mipmap())
+    {
+        return false;
+    }
     if (old_data.has_size() != new_data.has_size())
     {
         return false;
@@ -383,17 +460,54 @@ void Device::StartupFromLevelData(const frame::json::LevelData& level_data)
                         frame::json::ResolveProgramKey(*proto_program);
                     return frame::json::IsRaytracingBvhProgramKey(key);
                 };
+            auto pass_has_renderable_mesh =
+                [&](frame::proto::NodeMesh::RenderTimeEnum pass) {
+                    if (!level_data.proto.has_scene_tree())
+                    {
+                        return false;
+                    }
+                    for (const auto& node_mesh :
+                         level_data.proto.scene_tree().node_meshes())
+                    {
+                        if (node_mesh.render_time_enum() != pass)
+                        {
+                            continue;
+                        }
+                        // Clean-buffer nodes do not contribute renderable
+                        // geometry for pass selection.
+                        if (node_mesh.has_clean_buffer())
+                        {
+                            continue;
+                        }
+                        return true;
+                    }
+                    return false;
+                };
 
             constexpr std::array<frame::proto::NodeMesh::RenderTimeEnum, 4>
                 kPreferredPasses = {
-                    frame::proto::NodeMesh::PRE_RENDER_TIME,
                     frame::proto::NodeMesh::SCENE_RENDER_TIME,
+                    frame::proto::NodeMesh::PRE_RENDER_TIME,
                     frame::proto::NodeMesh::POST_PROCESS_TIME,
                     frame::proto::NodeMesh::SKYBOX_RENDER_TIME};
+            bool has_renderable_mesh_in_preferred_pass = false;
+            for (const auto pass : kPreferredPasses)
+            {
+                if (pass_has_renderable_mesh(pass))
+                {
+                    has_renderable_mesh_in_preferred_pass = true;
+                    break;
+                }
+            }
             std::optional<frame::json::ProgramInfo> first_pass_program =
                 std::nullopt;
             for (const auto pass : kPreferredPasses)
             {
+                if (has_renderable_mesh_in_preferred_pass &&
+                    !pass_has_renderable_mesh(pass))
+                {
+                    continue;
+                }
                 for (const auto& pass_program :
                      level_data.proto.render_pass_programs())
                 {
@@ -483,6 +597,9 @@ void Device::StartupFromLevelData(const frame::json::LevelData& level_data)
                 }
             }
             active_program_info_ = std::move(pipeline_info);
+            logger_->info(
+                "Vulkan startup selected active program '{}'.",
+                active_program_info_->program_name);
         }
         else
         {
@@ -523,40 +640,97 @@ void Device::StartupFromLevelData(const frame::json::LevelData& level_data)
         {
             try
             {
-                for (auto material_id : level_->GetMaterials())
-                {
-                    auto& material = level_->GetMaterialFromId(material_id);
-                    if (material.GetProgramId(level_.get()) ==
-                        active_program_info_->program_id)
-                    {
-                        active_program_info_->material_id = material_id;
-                        for (auto texture_id : material.GetTextureIds())
+                std::vector<EntityId> candidate_material_ids = {};
+                std::unordered_set<EntityId> candidate_material_seen = {};
+                std::unordered_set<EntityId> mesh_bound_material_ids = {};
+                auto append_mesh_material_candidates =
+                    [&](frame::proto::NodeMesh::RenderTimeEnum render_time) {
+                        if (level_->GetRenderPassProgramId(render_time) !=
+                            active_program_info_->program_id)
                         {
-                            const auto inner_name =
-                                material.GetInnerName(texture_id);
-                            if (!inner_name.empty())
-                            {
-                                active_program_info_->texture_ids_by_inner[inner_name] =
-                                    texture_id;
-                            }
+                            return;
                         }
-                        for (const auto& buffer_name : material.GetBufferNames())
+                        for (const auto& pair :
+                             level_->GetMeshMaterialIds(render_time))
                         {
-                            const auto inner_name =
-                                material.GetInnerBufferName(buffer_name);
-                            if (inner_name.empty())
+                            const auto material_id = pair.second;
+                            if (material_id == NullId)
                             {
                                 continue;
                             }
-                            const auto buffer_id =
-                                level_->GetIdFromName(buffer_name);
-                            if (buffer_id != NullId)
+                            mesh_bound_material_ids.insert(material_id);
+                            if (candidate_material_seen.insert(material_id).second)
                             {
-                                active_program_info_->buffer_ids_by_inner[inner_name] =
-                                    buffer_id;
+                                candidate_material_ids.push_back(material_id);
                             }
                         }
-                        break;
+                    };
+                append_mesh_material_candidates(
+                    frame::proto::NodeMesh::SCENE_RENDER_TIME);
+                append_mesh_material_candidates(
+                    frame::proto::NodeMesh::PRE_RENDER_TIME);
+                append_mesh_material_candidates(
+                    frame::proto::NodeMesh::POST_PROCESS_TIME);
+                append_mesh_material_candidates(
+                    frame::proto::NodeMesh::SKYBOX_RENDER_TIME);
+                for (const auto material_id : level_->GetMaterials())
+                {
+                    if (candidate_material_seen.insert(material_id).second)
+                    {
+                        candidate_material_ids.push_back(material_id);
+                    }
+                }
+
+                EntityId selected_material_id = NullId;
+                int selected_material_score = std::numeric_limits<int>::min();
+                for (const auto material_id : candidate_material_ids)
+                {
+                    auto& material = level_->GetMaterialFromId(material_id);
+                    if (material.GetProgramId(level_.get()) !=
+                        active_program_info_->program_id)
+                    {
+                        continue;
+                    }
+                    const int score =
+                        static_cast<int>(material.GetTextureIds().size()) +
+                        (mesh_bound_material_ids.contains(material_id)
+                             ? 1000
+                             : 0);
+                    if (score > selected_material_score)
+                    {
+                        selected_material_score = score;
+                        selected_material_id = material_id;
+                    }
+                }
+
+                if (selected_material_id != NullId)
+                {
+                    auto& material =
+                        level_->GetMaterialFromId(selected_material_id);
+                    active_program_info_->material_id = selected_material_id;
+                    for (auto texture_id : material.GetTextureIds())
+                    {
+                        const auto inner_name = material.GetInnerName(texture_id);
+                        if (!inner_name.empty())
+                        {
+                            active_program_info_->texture_ids_by_inner[inner_name] =
+                                texture_id;
+                        }
+                    }
+                    for (const auto& buffer_name : material.GetBufferNames())
+                    {
+                        const auto inner_name =
+                            material.GetInnerBufferName(buffer_name);
+                        if (inner_name.empty())
+                        {
+                            continue;
+                        }
+                        const auto buffer_id = level_->GetIdFromName(buffer_name);
+                        if (buffer_id != NullId)
+                        {
+                            active_program_info_->buffer_ids_by_inner[inner_name] =
+                                buffer_id;
+                        }
                     }
                 }
             }

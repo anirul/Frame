@@ -41,7 +41,6 @@ target_link_libraries(FrameEditor
     ${FRAME_VULKAN_LIBS}
     FrameCommon
     ${FRAME_LINK_GROUP_END}
-    ImNodeFlow
     imgui::imgui
     ImGuiColorTextEdit
 )

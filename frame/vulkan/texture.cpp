@@ -76,7 +76,6 @@ void Texture::Clear(const glm::vec4 color)
     if (component_count == 0 || bytes_per_component == 0)
     {
         std::fill(data_.begin(), data_.end(), 0);
-        SyncProtoPixels();
         return;
     }
 
@@ -121,7 +120,6 @@ void Texture::Clear(const glm::vec4 color)
             }
         }
     }
-    SyncProtoPixels();
 }
 
 std::vector<std::uint8_t> Texture::GetTextureByte() const
@@ -162,7 +160,6 @@ void Texture::Update(
     size_ = size;
     bytes_per_pixel_ = bytes_per_pixel;
     SyncProtoSize();
-    SyncProtoPixels();
 }
 
 std::uint8_t Texture::BytesPerComponent(proto::PixelElementSize::Enum value)
@@ -271,12 +268,6 @@ void Texture::SyncProtoSize()
     auto* proto_size = proto.mutable_size();
     proto_size->set_x(static_cast<int>(size_.x));
     proto_size->set_y(static_cast<int>(size_.y));
-}
-
-void Texture::SyncProtoPixels()
-{
-    auto& proto = GetData();
-    proto.set_pixels(data_.data(), data_.size());
 }
 
 } // namespace frame::vulkan

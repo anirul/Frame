@@ -95,6 +95,7 @@ class SDLVulkanDrawGui : public frame::gui::DrawGuiInterface
     bool PollEvent(void* event) override;
 
   private:
+    void FlushPendingWindowDeletions();
     struct CallbackData
     {
         std::unique_ptr<frame::gui::GuiWindowInterface> callback = nullptr;
@@ -141,6 +142,8 @@ class SDLVulkanDrawGui : public frame::gui::DrawGuiInterface
     bool is_keyboard_passed_locked_ = false;
     bool is_keyboard_passed_ = false;
     bool is_visible_ = true;
+    bool is_updating_windows_ = false;
+    std::vector<std::string> pending_window_deletions_ = {};
     float font_size_ = 20.0f;
     vk::UniqueDescriptorPool descriptor_pool_;
     bool renderer_initialized_ = false;

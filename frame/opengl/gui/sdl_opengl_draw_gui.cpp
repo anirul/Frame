@@ -1,6 +1,7 @@
 #include "frame/opengl/gui/sdl_opengl_draw_gui.h"
 
 #include <SDL3/SDL.h>
+#include <algorithm>
 #include <format>
 #include <imgui.h>
 #include <imgui_impl_opengl3.h>
@@ -82,6 +83,7 @@ bool SDLOpenGLDrawGui::Update(DeviceInterface& device, double dt)
     // Local variables.
     bool returned_value = true;
     is_keyboard_passed_ = false;
+    is_updating_windows_ = true;
     ImGuiIO& io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
     io.ConfigWindowsMoveFromTitleBarOnly = true;
@@ -105,6 +107,11 @@ bool SDLOpenGLDrawGui::Update(DeviceInterface& device, double dt)
         std::vector<std::string> windows_to_remove;
         for (auto& [name, data] : window_callbacks_)
         {
+            if (!data.open)
+            {
+                windows_to_remove.push_back(name);
+                continue;
+            }
             // Call the callback!
             ImGui::Begin(data.callback->GetName().c_str(), &data.open);
             if (!data.callback->DrawCallback())
@@ -133,107 +140,129 @@ bool SDLOpenGLDrawGui::Update(DeviceInterface& device, double dt)
         }
     }
 
-    // Go through all texture and create a window for the main output.
-    for (const EntityId& id : device.GetLevel().GetTextures())
+    // Draw only the default output texture preview.
+    auto* level_ptr = &device.GetLevel();
+    const auto default_texture_id = level_ptr->GetDefaultOutputTextureId();
+    if (default_texture_id != NullId)
     {
-        frame::TextureInterface& texture_interface =
-            device.GetLevel().GetTextureFromId(id);
-        if (texture_interface.GetData().cubemap())
+        const auto texture_ids = level_ptr->GetTextures();
+        const bool has_default_texture =
+            std::find(
+                texture_ids.begin(),
+                texture_ids.end(),
+                default_texture_id) != texture_ids.end();
+        if (has_default_texture)
         {
-            continue;
-        }
-        opengl::Texture& texture = dynamic_cast<opengl::Texture&>(
-            device.GetLevel().GetTextureFromId(id));
-        auto& level = device.GetLevel();
-        bool is_default_output = level.GetIdFromName(texture.GetName()) ==
-                                 level.GetDefaultOutputTextureId();
-        // This is not the default window so skip.
-        if (!is_default_output)
-        {
-            continue;
-        }
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-        original_image_size_ = texture.GetSize();
-
-        if (!is_visible_)
-        {
-            ImGui::Begin(
-                std::format(
-                    "<fullscreen> - [{}] - ({}, {})",
-                    texture.GetName(),
-                    texture.GetSize().x,
-                    texture.GetSize().y)
-                    .c_str(),
-                nullptr,
-                ImGuiWindowFlags_NoDecoration);
-        }
-        else
-        {
-            ImGui::Begin(
-                std::format(
-                    "default - [{}] - ({}, {})",
-                    texture.GetName(),
-                    texture.GetSize().x,
-                    texture.GetSize().y)
-                    .c_str());
-        }
-        if (modal_callback_)
-        {
-            if (!start_modal_)
+            auto& texture_interface = level_ptr->GetTextureFromId(default_texture_id);
+            if (!texture_interface.GetData().cubemap())
             {
-                glm::vec2 size = modal_callback_->GetInitialSize();
-                if (size.x > 0.f || size.y > 0.f)
-                    ImGui::SetNextWindowSize(
-                        ImVec2(size.x, size.y), ImGuiCond_Appearing);
-                ImGui::OpenPopup(modal_callback_->GetName().c_str());
-                start_modal_ = true;
-            }
-            if (ImGui::BeginPopupModal(
-                    modal_callback_->GetName().c_str(),
-                    nullptr,
-                    ImGuiWindowFlags_NoMove))
-            {
-                modal_callback_->DrawCallback();
-                if (modal_callback_->End())
+                auto* texture = dynamic_cast<opengl::Texture*>(&texture_interface);
+                if (texture && texture->GetId() != 0)
                 {
-                    start_modal_ = false;
-                    ImGui::CloseCurrentPopup();
-                    modal_callback_.reset();
+                    const auto preview_size = texture->GetSize();
+                    const std::string preview_name = texture->GetName();
+                    const ImTextureID preview_texture_id =
+                        static_cast<ImTextureID>(texture->GetId());
+
+                    if (preview_size.x != 0 && preview_size.y != 0)
+                    {
+                        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+                        original_image_size_ = preview_size;
+
+                        if (!is_visible_)
+                        {
+                            ImGui::Begin(
+                                std::format(
+                                    "<fullscreen> - [{}] - ({}, {})",
+                                    preview_name,
+                                    preview_size.x,
+                                    preview_size.y)
+                                    .c_str(),
+                                nullptr,
+                                ImGuiWindowFlags_NoDecoration);
+                        }
+                        else
+                        {
+                            ImGui::Begin(
+                                std::format(
+                                    "default - [{}] - ({}, {})",
+                                    preview_name,
+                                    preview_size.x,
+                                    preview_size.y)
+                                    .c_str());
+                        }
+
+                        if (modal_callback_)
+                        {
+                            if (!start_modal_)
+                            {
+                                glm::vec2 size = modal_callback_->GetInitialSize();
+                                if (size.x > 0.f || size.y > 0.f)
+                                {
+                                    ImGui::SetNextWindowSize(
+                                        ImVec2(size.x, size.y),
+                                        ImGuiCond_Appearing);
+                                }
+                                ImGui::OpenPopup(modal_callback_->GetName().c_str());
+                                start_modal_ = true;
+                            }
+                            if (ImGui::BeginPopupModal(
+                                    modal_callback_->GetName().c_str(),
+                                    nullptr,
+                                    ImGuiWindowFlags_NoMove))
+                            {
+                                modal_callback_->DrawCallback();
+                                if (modal_callback_->End())
+                                {
+                                    start_modal_ = false;
+                                    ImGui::CloseCurrentPopup();
+                                    modal_callback_.reset();
+                                }
+                                ImGui::EndPopup();
+                            }
+                        }
+
+                        // Import/reload from modal can replace the whole level.
+                        const bool level_changed = &device.GetLevel() != level_ptr;
+                        if (level_changed)
+                        {
+                            ImGui::End();
+                            ImGui::PopStyleVar();
+                        }
+                        else
+                        {
+                            if (ImGui::IsWindowHovered())
+                            {
+                                is_keyboard_passed_ = true;
+                            }
+                            ImVec2 content_window = ImGui::GetContentRegionAvail();
+                            const float aspect_ratio =
+                                static_cast<float>(preview_size.x) /
+                                static_cast<float>(preview_size.y);
+                            ImVec2 window_range{};
+                            if (content_window.x / aspect_ratio > content_window.y)
+                            {
+                                window_range = ImVec2(
+                                    content_window.y * aspect_ratio,
+                                    content_window.y);
+                            }
+                            else
+                            {
+                                window_range = ImVec2(
+                                    content_window.x,
+                                    content_window.x / aspect_ratio);
+                            }
+                            ImGui::Image(
+                                preview_texture_id,
+                                window_range,
+                                ImVec2(0, 1),
+                                ImVec2(1, 0));
+                            ImGui::End();
+                            ImGui::PopStyleVar();
+                        }
+                    }
                 }
-                ImGui::EndPopup();
             }
-        }
-        // Check if you should enable default window keyboard and mouse.
-        if (ImGui::IsWindowHovered())
-        {
-            is_keyboard_passed_ = true;
-        }
-        // Get the window width.
-        ImVec2 content_window = ImGui::GetContentRegionAvail();
-        auto size = texture.GetSize();
-        // Compute the aspect ratio.
-        float aspect_ratio =
-            static_cast<float>(size.x) / static_cast<float>(size.y);
-        // Cast the opengl windows id.
-        ImTextureID gl_id = static_cast<ImTextureID>(texture.GetId());
-        // Compute the final size.
-        ImVec2 window_range{};
-        if (content_window.x / aspect_ratio > content_window.y)
-        {
-            window_range =
-                ImVec2(content_window.y * aspect_ratio, content_window.y);
-        }
-        else
-        {
-            window_range =
-                ImVec2(content_window.x, content_window.x / aspect_ratio);
-        }
-        // Draw the image.
-        ImGui::Image(gl_id, window_range, ImVec2(0, 1), ImVec2(1, 0));
-        ImGui::End();
-        if (is_default_output)
-        {
-            ImGui::PopStyleVar();
         }
     }
 
@@ -241,6 +270,10 @@ bool SDLOpenGLDrawGui::Update(DeviceInterface& device, double dt)
     {
         for (const auto& pair : overlay_callbacks_)
         {
+            if (!pair.second.open)
+            {
+                continue;
+            }
             ImGui::SetNextWindowPos(ImVec2(
                 static_cast<float>(pair.second.position.x),
                 static_cast<float>(pair.second.position.y)));
@@ -258,6 +291,9 @@ bool SDLOpenGLDrawGui::Update(DeviceInterface& device, double dt)
             ImGui::End();
         }
     }
+
+    is_updating_windows_ = false;
+    FlushPendingWindowDeletions();
 
     // Rendering
     ImGui::Render();
@@ -336,6 +372,19 @@ std::vector<std::string> SDLOpenGLDrawGui::GetWindowTitles() const
 
 void SDLOpenGLDrawGui::DeleteWindow(const std::string& name)
 {
+    if (is_updating_windows_)
+    {
+        if (window_callbacks_.contains(name))
+        {
+            window_callbacks_.at(name).open = false;
+        }
+        if (overlay_callbacks_.contains(name))
+        {
+            overlay_callbacks_.at(name).open = false;
+        }
+        pending_window_deletions_.push_back(name);
+        return;
+    }
     if (window_callbacks_.contains(name))
     {
         window_callbacks_.erase(name);
@@ -344,6 +393,20 @@ void SDLOpenGLDrawGui::DeleteWindow(const std::string& name)
     {
         overlay_callbacks_.erase(name);
     }
+}
+
+void SDLOpenGLDrawGui::FlushPendingWindowDeletions()
+{
+    if (pending_window_deletions_.empty())
+    {
+        return;
+    }
+    for (const auto& name : pending_window_deletions_)
+    {
+        window_callbacks_.erase(name);
+        overlay_callbacks_.erase(name);
+    }
+    pending_window_deletions_.clear();
 }
 
 void SDLOpenGLDrawGui::SetMenuBar(

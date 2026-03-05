@@ -1,12 +1,12 @@
 #include "tab_textures.h"
 #include "frame/entity_id.h"
-#include "frame/file/file_system.h"
 #include "frame/gui/window_message_box.h"
+#include "frame/gui/window_file_dialog.h"
 #include "frame/logger.h"
 #include "frame/material_interface.h"
-#include "frame/opengl/texture.h"
 #include "frame/program_interface.h"
 #include <algorithm>
+#include <stdexcept>
 #include <string>
 
 #include <imgui.h>
@@ -16,6 +16,12 @@ namespace frame::gui
 
 void TabTextures::Draw(LevelInterface& level)
 {
+    if (selected_texture_id_ != frame::NullId &&
+        !HasTextureId(level, selected_texture_id_))
+    {
+        selected_texture_id_ = frame::NullId;
+    }
+
     const float button_size = ImGui::GetFrameHeight();
     bool open = ImGui::CollapsingHeader(
         "Textures",
@@ -32,13 +38,21 @@ void TabTextures::Draw(LevelInterface& level)
     ImGui::SetCursorScreenPos({header_max.x - button_size - 4.f, header_min.y});
     if (ImGui::Button("+##texture", ImVec2(button_size, button_size)))
     {
-        draw_gui_.AddModalWindow(
-            std::make_unique<WindowFileDialog>(
-                "",
-                FileDialogEnum::OPEN,
-                [this, &level](const std::string& file) {
-                    AddTextureFromFile(level, file);
-                }));
+        ImGui::OpenPopup("##add_texture_popup");
+    }
+    if (ImGui::BeginPopup("##add_texture_popup"))
+    {
+        if (ImGui::Selectable("Import 2D Texture"))
+        {
+            ShowImportTextureDialog(false);
+            ImGui::CloseCurrentPopup();
+        }
+        if (ImGui::Selectable("Import Cubemap (equirect/HDR)"))
+        {
+            ShowImportTextureDialog(true);
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndPopup();
     }
     if (open)
     {
@@ -63,29 +77,56 @@ void TabTextures::Draw(LevelInterface& level)
 }
 
 void TabTextures::AddTextureFromFile(
-    LevelInterface& level, const std::string& file)
+    const std::string& file, bool as_cubemap)
 {
     try
     {
-        auto texture = std::make_unique<opengl::Texture>(file);
-        std::filesystem::path path = file;
-        std::string base_name = path.stem().string();
-        std::string name = base_name;
-        int counter = 1;
-        while (level.GetIdFromName(name) != frame::NullId)
+        if (file.empty())
         {
-            name = base_name + "_" + std::to_string(counter++);
+            throw std::runtime_error("No texture file selected.");
         }
-        texture->SetName(name);
-        texture->SetSerializeEnable(true);
-        level.AddTexture(std::move(texture));
-        if (update_json_callback_)
-            update_json_callback_();
+        if (!import_texture_callback_)
+        {
+            throw std::runtime_error(
+                "Texture import callback is not configured.");
+        }
+        import_texture_callback_(file, as_cubemap);
     }
-    catch (const std::exception&)
+    catch (const std::exception& e)
     {
-        // Ignore errors when loading texture
+        frame::Logger::GetInstance()->error(e.what());
+        draw_gui_.AddModalWindow(
+            std::make_unique<WindowMessageBox>(
+                "Texture import failed",
+                e.what()));
     }
+}
+
+void TabTextures::ShowImportTextureDialog(bool as_cubemap)
+{
+    draw_gui_.AddModalWindow(
+        std::make_unique<WindowFileDialog>(
+            "",
+            FileDialogEnum::OPEN,
+            [this, as_cubemap](const std::string& file) {
+                AddTextureFromFile(file, as_cubemap);
+            }));
+}
+
+void TabTextures::ResetSelection()
+{
+    selected_texture_id_ = frame::NullId;
+}
+
+bool TabTextures::HasTextureId(const LevelInterface& level, EntityId id) const
+{
+    if (id == frame::NullId)
+    {
+        return false;
+    }
+    const auto texture_ids = level.GetTextures();
+    return std::find(texture_ids.begin(), texture_ids.end(), id) !=
+           texture_ids.end();
 }
 
 bool TabTextures::IsTextureUsed(const LevelInterface& level, EntityId id) const
@@ -132,6 +173,15 @@ void TabTextures::RemoveSelectedTexture(LevelInterface& level)
         draw_gui_.AddModalWindow(
             std::make_unique<WindowMessageBox>(
                 "Warning", "No texture selected."));
+        return;
+    }
+    if (!HasTextureId(level, selected_texture_id_))
+    {
+        selected_texture_id_ = frame::NullId;
+        draw_gui_.AddModalWindow(
+            std::make_unique<WindowMessageBox>(
+                "Warning",
+                "Selected texture is no longer valid. Please reselect."));
         return;
     }
     std::string name = level.GetTextureFromId(selected_texture_id_).GetName();

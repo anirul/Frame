@@ -2,6 +2,8 @@
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 
+#include <unordered_map>
+
 #include "frame/device_interface.h"
 #include "frame/gui/draw_gui_interface.h"
 #include "frame/gui/window_json_file.h"
@@ -33,10 +35,20 @@ class WindowLevel : public WindowJsonFile
     void ApplyJsonContent(const std::string& content) override;
 
   private:
+    enum class ViewMode
+    {
+        Scene = 0,
+        Json = 1,
+        Advanced = 2,
+    };
+
     void ShowImportGltfDialog();
+    void ShowImportCubemapDialog();
     void ImportGltfSceneFromFile(const std::string& file_name);
-    void ShowSkyboxFileDialog();
-    void SetSkyboxFromFile(const std::string& file_name);
+    void ImportTextureFromFile(
+        const std::string& file_name, bool as_cubemap);
+    void SetSkyboxFromCubemapName(const std::string& cubemap_name);
+    void CaptureCubemapSourceSnapshots(const frame::proto::Level& proto_level);
     bool AddSkyboxNode();
     void ApplyProtoLevel(const frame::proto::Level& proto_level);
 
@@ -46,7 +58,10 @@ class WindowLevel : public WindowJsonFile
     TabPrograms tab_programs_;
     TabMaterials tab_materials_;
     TabScene tab_scene_;
-    bool show_json_ = false;
+    ViewMode view_mode_ = ViewMode::Scene;
+    std::string selected_skybox_cubemap_name_ = {};
+    std::unordered_map<std::string, frame::proto::Texture>
+        cubemap_source_snapshots_ = {};
 };
 
 } // namespace frame::gui

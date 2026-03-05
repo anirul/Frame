@@ -2,6 +2,7 @@
 #include <iostream>
 #include <exception>
 #include <chrono>
+#include <format>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -20,17 +21,12 @@
 #include "frame/file/file_system.h"
 #include "frame/logger.h"
 
-ABSL_FLAG(
-    double,
-    auto_exit_seconds,
-    8.0,
-    "Auto-close the sample after N seconds (<= 0 disables auto-exit).");
-
 namespace
 {
 
 constexpr glm::uvec2 kDefaultSize{1280u, 720u};
 constexpr const char* kLevelPath = "asset/json/skinned_mesh.json";
+constexpr double kDefaultAutoExitSeconds = 8.0;
 
 int Run(int argc, char** argv)
 {
@@ -41,6 +37,7 @@ int Run(int argc, char** argv)
     args.reserve(static_cast<std::size_t>(argc));
     args.emplace_back(argv[0]);
     bool has_device = false;
+    bool has_auto_exit = false;
     for (int i = 1; i < argc; ++i)
     {
         const std::string_view arg(argv[i]);
@@ -49,10 +46,19 @@ int Run(int argc, char** argv)
         {
             has_device = true;
         }
+        if (arg.rfind("--auto_exit_seconds", 0) == 0)
+        {
+            has_auto_exit = true;
+        }
     }
     if (!has_device)
     {
         args.emplace_back("--device=opengl");
+    }
+    if (!has_auto_exit)
+    {
+        args.emplace_back(
+            std::format("--auto_exit_seconds={}", kDefaultAutoExitSeconds));
     }
     std::vector<char*> app_argv;
     app_argv.reserve(args.size());

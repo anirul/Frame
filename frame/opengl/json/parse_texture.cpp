@@ -60,6 +60,7 @@ std::unique_ptr<TextureInterface> ParseCubemap(
     }
     std::unique_ptr<TextureInterface> texture_interface =
         std::make_unique<opengl::Cubemap>(proto_texture, size);
+    texture_interface->GetData().set_cubemap(true);
     if (proto_texture.has_file_names())
     {
         *texture_interface->GetData().mutable_file_names() =

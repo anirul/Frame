@@ -1,5 +1,7 @@
 #include "window_level.h"
+#include "skybox_logic.h"
 
+#include <algorithm>
 #include <cstdint>
 #include <fstream>
 #include <filesystem>
@@ -9,6 +11,7 @@
 #include <stdexcept>
 #include <string_view>
 #include <optional>
+#include <vector>
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
 #include <stb_image.h>
@@ -102,6 +105,84 @@ std::string MakeUniqueNodeName(
         candidate = std::format("{}_{}", root_name, suffix++);
     }
     return candidate;
+}
+
+void CloseTexturePreviewWindows(DrawGuiInterface& draw_gui)
+{
+    for (const auto& window_name : draw_gui.GetWindowTitles())
+    {
+        if (window_name.starts_with("texture - ") ||
+            window_name.starts_with("cubemap - "))
+        {
+            draw_gui.DeleteWindow(window_name);
+        }
+    }
+}
+
+std::string MakeUniqueTextureName(
+    const LevelInterface& level, const std::string& base_name)
+{
+    const std::string root_name = base_name.empty() ? "Texture" : base_name;
+    std::string candidate = root_name;
+    int suffix = 1;
+    while (level.GetIdFromName(candidate) != frame::NullId)
+    {
+        candidate = std::format("{}_{}", root_name, suffix++);
+    }
+    return candidate;
+}
+
+std::string ToLower(std::string value)
+{
+    std::transform(
+        value.begin(),
+        value.end(),
+        value.begin(),
+        [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+    return value;
+}
+
+bool IsHighDynamicRangeExtension(const std::filesystem::path& file_name)
+{
+    const std::string ext = ToLower(file_name.extension().string());
+    return ext == ".hdr" || ext == ".exr";
+}
+
+void ValidateCubemapImportSource(const std::filesystem::path& file_name)
+{
+    const auto absolute_path =
+        std::filesystem::absolute(file_name).lexically_normal();
+    if (!std::filesystem::exists(absolute_path))
+    {
+        throw std::runtime_error(
+            std::format("Cubemap source does not exist: {}", absolute_path.string()));
+    }
+
+    int width = 0;
+    int height = 0;
+    int channels = 0;
+    if (stbi_info(absolute_path.string().c_str(), &width, &height, &channels) == 0)
+    {
+        // Let the regular image loader provide detailed decoding errors later.
+        return;
+    }
+    if (width <= 0 || height <= 0)
+    {
+        throw std::runtime_error(
+            std::format("Invalid cubemap source image size: {}x{}.", width, height));
+    }
+
+    constexpr std::uint64_t kMaxCubemapSourcePixels =
+        8ull * 1024ull * 4ull * 1024ull; // ~8Kx4K equirectangular
+    const std::uint64_t pixel_count =
+        static_cast<std::uint64_t>(width) * static_cast<std::uint64_t>(height);
+    if (pixel_count > kMaxCubemapSourcePixels)
+    {
+        throw std::runtime_error(std::format(
+            "Cubemap source too large: {}x{}. Maximum supported is about 8Kx4K.",
+            width,
+            height));
+    }
 }
 
 void EnsureNodeMatrix(
@@ -263,59 +344,6 @@ frame::proto::NodeMesh::AccelerationStructureEnum SelectAccelerationStructure(
     return frame::proto::NodeMesh::NO_ACCELERATION;
 }
 
-std::string ResolveSerializedFilePath(const std::filesystem::path& file)
-{
-    auto normalized = file.lexically_normal();
-    if (!normalized.is_absolute())
-    {
-        return normalized.generic_string();
-    }
-    const auto asset_root = frame::file::FindDirectory("asset");
-    std::error_code ec;
-    const auto relative = std::filesystem::relative(normalized, asset_root, ec);
-    const std::string relative_generic = relative.generic_string();
-    if (!ec && !relative_generic.empty() && !relative_generic.starts_with(".."))
-    {
-        return std::format("asset/{}", relative_generic);
-    }
-    return normalized.generic_string();
-}
-
-void ValidateSkyboxSourceFile(const std::filesystem::path& selected_path)
-{
-    const auto absolute = std::filesystem::absolute(selected_path).lexically_normal();
-    if (!std::filesystem::exists(absolute))
-    {
-        throw std::runtime_error(
-            std::format("Skybox file does not exist: {}", absolute.string()));
-    }
-
-    int width = 0;
-    int height = 0;
-    int channels = 0;
-    if (stbi_info(absolute.string().c_str(), &width, &height, &channels) == 0)
-    {
-        return;
-    }
-
-    if (width <= 0 || height <= 0)
-    {
-        throw std::runtime_error(std::format(
-            "Invalid skybox image size: {}x{}.", width, height));
-    }
-
-    constexpr std::uint64_t kMaxSkyboxPixelCount = 8ull * 1024ull * 4ull * 1024ull;
-    const std::uint64_t pixel_count =
-        static_cast<std::uint64_t>(width) * static_cast<std::uint64_t>(height);
-    if (pixel_count > kMaxSkyboxPixelCount)
-    {
-        throw std::runtime_error(std::format(
-            "Skybox image too large ({}x{}). Maximum supported import size is about 8Kx4K.",
-            width,
-            height));
-    }
-}
-
 frame::proto::Texture* FindTextureByName(
     frame::proto::Level& proto_level, const std::string& name)
 {
@@ -374,6 +402,22 @@ void ConfigureFileTexture(
     structure.set_value(pixel_structure.value());
     texture.mutable_pixel_structure()->CopyFrom(structure);
     texture.set_file_name(file_name);
+}
+
+void ConfigureDefaultPngCubemapTexture(frame::proto::Texture& texture)
+{
+    texture.set_cubemap(true);
+    texture.mutable_pixel_element_size()->CopyFrom(
+        frame::json::PixelElementSize_BYTE());
+    texture.mutable_pixel_structure()->CopyFrom(
+        frame::json::PixelStructure_RGB());
+    auto* file_names = texture.mutable_file_names();
+    file_names->set_positive_x("asset/cubemap/negative_x.png");
+    file_names->set_negative_x("asset/cubemap/positive_x.png");
+    file_names->set_positive_y("asset/cubemap/negative_y.png");
+    file_names->set_negative_y("asset/cubemap/positive_y.png");
+    file_names->set_positive_z("asset/cubemap/negative_z.png");
+    file_names->set_negative_z("asset/cubemap/positive_z.png");
 }
 
 void EnsureSkyboxProgram(frame::proto::Level& proto_level)
@@ -481,17 +525,7 @@ void EnsureProgramInputTextures(frame::proto::Level& proto_level)
             }
             else if (texture_name == "skybox" || texture_name == "skybox_env")
             {
-                texture->set_cubemap(true);
-                texture->mutable_pixel_element_size()->CopyFrom(
-                    frame::json::PixelElementSize_BYTE());
-                texture->mutable_pixel_structure()->CopyFrom(rgb);
-                auto* file_names = texture->mutable_file_names();
-                file_names->set_positive_x("asset/cubemap/negative_x.png");
-                file_names->set_negative_x("asset/cubemap/positive_x.png");
-                file_names->set_positive_y("asset/cubemap/negative_y.png");
-                file_names->set_negative_y("asset/cubemap/positive_y.png");
-                file_names->set_positive_z("asset/cubemap/negative_z.png");
-                file_names->set_negative_z("asset/cubemap/positive_z.png");
+                ConfigureDefaultPngCubemapTexture(*texture);
             }
             else
             {
@@ -577,14 +611,17 @@ void EnsureSkyboxRenderPass(frame::proto::Level& proto_level)
     pass->set_program_name(*program_name);
 }
 
-void ConfigureCubemapTexture(
-    frame::proto::Texture& texture, const std::string& serialized_path)
+void ConfigureCubemapTextureFromReference(
+    frame::proto::Texture& destination,
+    const frame::proto::Texture& source)
 {
-    texture.set_cubemap(true);
-    texture.mutable_pixel_element_size()->CopyFrom(
-        frame::json::PixelElementSize_BYTE());
-    texture.mutable_pixel_structure()->CopyFrom(frame::json::PixelStructure_RGB());
-    texture.set_file_name(serialized_path);
+    if (!source.cubemap())
+    {
+        throw std::runtime_error("Selected texture is not a cubemap.");
+    }
+    const std::string destination_name = destination.name();
+    destination.CopyFrom(source);
+    destination.set_name(destination_name);
 }
 
 void EnsureSkyboxNode(
@@ -625,9 +662,15 @@ WindowLevel::WindowLevel(
     DrawGuiInterface& draw_gui,
     const std::string& file_name)
     : WindowJsonFile(file_name, device), device_(device), draw_gui_(draw_gui),
-      tab_textures_(draw_gui, [this]() { UpdateJsonEditor(); }),
+      tab_textures_(
+          draw_gui,
+          [this]() { UpdateJsonEditor(); },
+          [this](const std::string& file_name, bool as_cubemap) {
+              ImportTextureFromFile(file_name, as_cubemap);
+          }),
       tab_programs_(draw_gui, [this]() { UpdateJsonEditor(); })
 {
+    CaptureCubemapSourceSnapshots(frame::json::SerializeLevel(device_.GetLevel()));
 }
 
 void WindowLevel::UpdateJsonEditor()
@@ -675,9 +718,44 @@ void WindowLevel::ApplyJsonContent(const std::string& content)
     throw std::runtime_error("Unsupported rendering backend in editor.");
 }
 
+void WindowLevel::CaptureCubemapSourceSnapshots(
+    const frame::proto::Level& proto_level)
+{
+    std::unordered_set<std::string> current_cubemap_names = {};
+    for (const auto& texture : proto_level.textures())
+    {
+        if (texture.cubemap() && !texture.name().empty())
+        {
+            current_cubemap_names.insert(texture.name());
+        }
+    }
+
+    bool has_common_name = cubemap_source_snapshots_.empty();
+    if (!has_common_name)
+    {
+        for (const auto& [name, _] : cubemap_source_snapshots_)
+        {
+            if (current_cubemap_names.contains(name))
+            {
+                has_common_name = true;
+                break;
+            }
+        }
+    }
+    if (!has_common_name)
+    {
+        cubemap_source_snapshots_.clear();
+    }
+
+    skybox::CaptureCubemapSnapshots(proto_level, cubemap_source_snapshots_);
+}
+
 void WindowLevel::ApplyProtoLevel(const frame::proto::Level& proto_level)
 {
     auto& logger = frame::Logger::GetInstance();
+    CaptureCubemapSourceSnapshots(proto_level);
+    CloseTexturePreviewWindows(draw_gui_);
+    tab_textures_.ResetSelection();
     const std::string json = frame::json::SaveProtoToJson(proto_level);
     SetEditorText(json);
     if (!GetFileName().empty())
@@ -711,7 +789,7 @@ void WindowLevel::ShowImportGltfDialog()
         }));
 }
 
-void WindowLevel::ShowSkyboxFileDialog()
+void WindowLevel::ShowImportCubemapDialog()
 {
     draw_gui_.AddModalWindow(std::make_unique<WindowFileDialog>(
         "",
@@ -719,16 +797,94 @@ void WindowLevel::ShowSkyboxFileDialog()
         [this](const std::string& file_name) {
             try
             {
-                SetSkyboxFromFile(file_name);
+                ImportTextureFromFile(file_name, true);
             }
             catch (const std::exception& e)
             {
                 frame::Logger::GetInstance()->error(e.what());
                 draw_gui_.AddModalWindow(std::make_unique<WindowMessageBox>(
-                    "Set Skybox failed",
+                    "Import cubemap failed",
                     e.what()));
             }
         }));
+}
+
+void WindowLevel::ImportTextureFromFile(
+    const std::string& file_name, bool as_cubemap)
+{
+    if (file_name.empty())
+    {
+        throw std::runtime_error("No texture file selected.");
+    }
+
+    std::filesystem::path input_path(file_name);
+    if (!input_path.is_absolute())
+    {
+        input_path = std::filesystem::absolute(input_path);
+    }
+    if (as_cubemap)
+    {
+        ValidateCubemapImportSource(input_path);
+    }
+
+    auto proto_level = frame::json::SerializeLevel(device_.GetLevel());
+    const auto before_cubemap_names =
+        skybox::CollectCubemapTextureNames(device_.GetLevel());
+    std::string base_name = input_path.stem().string();
+    if (base_name.empty())
+    {
+        base_name = as_cubemap ? "Cubemap" : "Texture";
+    }
+    const std::string unique_name =
+        MakeUniqueTextureName(device_.GetLevel(), base_name);
+
+    auto* texture = proto_level.add_textures();
+    texture->set_name(unique_name);
+    texture->set_cubemap(as_cubemap);
+    texture->set_file_name(frame::file::PurifyFilePath(input_path));
+    texture->mutable_pixel_structure()->CopyFrom(frame::json::PixelStructure_RGB());
+    if (as_cubemap && IsHighDynamicRangeExtension(input_path))
+    {
+        texture->mutable_pixel_element_size()->CopyFrom(
+            frame::json::PixelElementSize_FLOAT());
+    }
+    else
+    {
+        texture->mutable_pixel_element_size()->CopyFrom(
+            frame::json::PixelElementSize_BYTE());
+    }
+
+    if (as_cubemap)
+    {
+        texture->mutable_min_filter()->set_value(frame::proto::TextureFilter::LINEAR);
+        texture->mutable_mag_filter()->set_value(frame::proto::TextureFilter::LINEAR);
+        texture->mutable_wrap_s()->set_value(
+            frame::proto::TextureFilter::CLAMP_TO_EDGE);
+        texture->mutable_wrap_t()->set_value(
+            frame::proto::TextureFilter::CLAMP_TO_EDGE);
+    }
+
+    ApplyProtoLevel(proto_level);
+
+    if (as_cubemap)
+    {
+        selected_skybox_cubemap_name_ = unique_name;
+        const auto after_cubemap_names =
+            skybox::CollectCubemapTextureNames(device_.GetLevel());
+        frame::Logger::GetInstance()->info(
+            "Imported cubemap texture '{}' from '{}' (cubemap assets: {} -> {}).",
+            unique_name,
+            frame::file::PurifyFilePath(input_path),
+            before_cubemap_names.size(),
+            after_cubemap_names.size());
+    }
+    else
+    {
+        frame::Logger::GetInstance()->info(
+            "Imported texture '{}' from '{}'.",
+            unique_name,
+            frame::file::PurifyFilePath(input_path));
+    }
 }
 
 void WindowLevel::ImportGltfSceneFromFile(const std::string& file_name)
@@ -778,39 +934,61 @@ void WindowLevel::ImportGltfSceneFromFile(const std::string& file_name)
         mesh_file_name);
 }
 
-void WindowLevel::SetSkyboxFromFile(const std::string& file_name)
+void WindowLevel::SetSkyboxFromCubemapName(const std::string& cubemap_name)
 {
-    if (file_name.empty())
+    if (cubemap_name.empty())
     {
-        throw std::runtime_error("No skybox file selected.");
+        throw std::runtime_error("No cubemap selected.");
     }
-    const std::filesystem::path selected_path(file_name);
-    const std::string extension =
-        selected_path.extension().string();
-    if (extension.empty())
-    {
-        throw std::runtime_error("Skybox file must have an extension.");
-    }
-    ValidateSkyboxSourceFile(selected_path);
 
     auto proto_level = frame::json::SerializeLevel(device_.GetLevel());
-    EnsureDefaultSceneTree(proto_level);
-    const std::string serialized_path =
-        ResolveSerializedFilePath(std::filesystem::absolute(selected_path));
-
-    auto* skybox_texture = EnsureTexture(proto_level, "skybox");
-    auto* skybox_env_texture = EnsureTexture(proto_level, "skybox_env");
-    ConfigureCubemapTexture(*skybox_texture, serialized_path);
-    ConfigureCubemapTexture(*skybox_env_texture, serialized_path);
-
-    const std::string material_name = EnsureSkyboxMaterialName(proto_level);
     EnsureSkyboxRenderPass(proto_level);
     EnsureProgramInputTextures(proto_level);
-    EnsureSkyboxNode(proto_level, material_name);
-    ApplyProtoLevel(proto_level);
+    const auto destination_names =
+        skybox::CollectSkyboxDestinationTextureNames(proto_level);
+    if (destination_names.empty())
+    {
+        throw std::runtime_error(
+            "Cannot resolve skybox destination textures from render pass setup.");
+    }
 
+    CaptureCubemapSourceSnapshots(proto_level);
+    const auto source_texture = skybox::ResolveCubemapSourceTexture(
+        proto_level,
+        cubemap_source_snapshots_,
+        cubemap_name,
+        destination_names);
+    if (!source_texture.has_value())
+    {
+        throw std::runtime_error(
+            std::format("Cubemap texture '{}' not found.", cubemap_name));
+    }
+
+    const std::string before_json = frame::json::SaveProtoToJson(proto_level);
+
+    for (const auto& destination_name : destination_names)
+    {
+        auto* destination_texture = EnsureTexture(proto_level, destination_name);
+        ConfigureCubemapTextureFromReference(
+            *destination_texture,
+            *source_texture);
+    }
+
+    const std::string material_name = EnsureSkyboxMaterialName(proto_level);
+    EnsureSkyboxNode(proto_level, material_name);
+
+    const std::string after_json = frame::json::SaveProtoToJson(proto_level);
+    if (before_json == after_json)
+    {
+        frame::Logger::GetInstance()->info(
+            "Skybox already uses cubemap '{}'; no change applied.",
+            cubemap_name);
+        return;
+    }
+
+    ApplyProtoLevel(proto_level);
     frame::Logger::GetInstance()->info(
-        "Skybox textures updated from '{}'.", serialized_path);
+        "Skybox now references cubemap '{}'.", cubemap_name);
 }
 
 bool WindowLevel::AddSkyboxNode()
@@ -849,61 +1027,25 @@ bool WindowLevel::DrawCallback()
             : "OpenGL");
     ImGui::Separator();
 
-    if (show_json_)
-    {
-        ImGui::BeginDisabled();
-        ImGui::Button("JSON Editor");
-        ImGui::EndDisabled();
-        ImGui::SameLine();
-        if (ImGui::Button("Node Editor"))
+    auto mode_button = [&](const char* label, ViewMode mode) {
+        if (view_mode_ == mode)
         {
-            show_json_ = false;
+            ImGui::BeginDisabled();
+            ImGui::Button(label);
+            ImGui::EndDisabled();
         }
-    }
-    else
-    {
-        if (ImGui::Button("JSON Editor"))
+        else if (ImGui::Button(label))
         {
-            show_json_ = true;
+            view_mode_ = mode;
         }
-        ImGui::SameLine();
-        ImGui::BeginDisabled();
-        ImGui::Button("Node Editor");
-        ImGui::EndDisabled();
-    }
-
-    ImGui::Separator();
-    if (ImGui::Button("Import glTF"))
-    {
-        ShowImportGltfDialog();
-    }
+    };
+    mode_button("Scene Editor", ViewMode::Scene);
     ImGui::SameLine();
-    if (ImGui::Button("Set Skybox"))
-    {
-        ShowSkyboxFileDialog();
-    }
+    mode_button("JSON Editor", ViewMode::Json);
     ImGui::SameLine();
-    if (ImGui::Button("Add Skybox Node"))
-    {
-        try
-        {
-            if (!AddSkyboxNode())
-            {
-                draw_gui_.AddModalWindow(std::make_unique<WindowMessageBox>(
-                    "Skybox already exists",
-                    "Scene already has a skybox node and pass setup."));
-            }
-        }
-        catch (const std::exception& e)
-        {
-            frame::Logger::GetInstance()->error(e.what());
-            draw_gui_.AddModalWindow(std::make_unique<WindowMessageBox>(
-                "Skybox setup failed",
-                e.what()));
-        }
-    }
+    mode_button("Advanced", ViewMode::Advanced);
     ImGui::SameLine();
-    if (ImGui::Button("Save##level"))
+    if (ImGui::Button("Save Project"))
     {
         if (GetFileName().empty())
         {
@@ -920,21 +1062,162 @@ bool WindowLevel::DrawCallback()
     }
     ImGui::Separator();
 
-    if (show_json_)
+    if (view_mode_ == ViewMode::Json)
     {
         WindowJsonFile::DrawCallback();
     }
+    else if (view_mode_ == ViewMode::Advanced)
+    {
+        auto& level = device_.GetLevel();
+        ImGui::TextUnformatted(
+            "Advanced tools for engine internals (textures/materials/programs).");
+        ImGui::Separator();
+        ImGui::BeginChild("##advanced_content", ImVec2(0.0f, 0.0f), false);
+        tab_textures_.Draw(level);
+        tab_programs_.Draw(level);
+        tab_materials_.Draw(level);
+        ImGui::Separator();
+        if (ImGui::Button("Add Skybox Node"))
+        {
+            try
+            {
+                if (!AddSkyboxNode())
+                {
+                    draw_gui_.AddModalWindow(std::make_unique<WindowMessageBox>(
+                        "Skybox already exists",
+                        "Scene already has a skybox node and pass setup."));
+                }
+            }
+            catch (const std::exception& e)
+            {
+                frame::Logger::GetInstance()->error(e.what());
+                draw_gui_.AddModalWindow(std::make_unique<WindowMessageBox>(
+                    "Skybox setup failed",
+                    e.what()));
+            }
+        }
+        ImGui::EndChild();
+    }
     else
     {
-        auto& level_assets = device_.GetLevel();
-        ImGui::Begin("Assets", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
-        tab_textures_.Draw(level_assets);
-        tab_programs_.Draw(level_assets);
-        tab_materials_.Draw(level_assets);
-        ImGui::End();
+        auto& level = device_.GetLevel();
 
-        auto& level_scene = device_.GetLevel();
-        tab_scene_.Draw(level_scene);
+        if (ImGui::BeginTable(
+                "##scene_editor_layout",
+                2,
+                ImGuiTableFlags_Resizable | ImGuiTableFlags_BordersInnerV |
+                    ImGuiTableFlags_SizingStretchProp))
+        {
+            ImGui::TableSetupColumn(
+                "Scene", ImGuiTableColumnFlags_WidthStretch, 0.68f);
+            ImGui::TableSetupColumn(
+                "Actions", ImGuiTableColumnFlags_WidthStretch, 0.32f);
+
+            ImGui::TableNextColumn();
+            ImGui::BeginChild("##scene_tree_content", ImVec2(0.0f, 0.0f), false);
+            tab_scene_.Draw(level);
+            ImGui::EndChild();
+
+            ImGui::TableNextColumn();
+            ImGui::BeginChild("##scene_actions_content", ImVec2(0.0f, 0.0f), false);
+            ImGui::TextUnformatted("Scene Actions");
+            ImGui::Separator();
+            if (ImGui::Button("Import glTF", ImVec2(-1.0f, 0.0f)))
+            {
+                ShowImportGltfDialog();
+            }
+            ImGui::Spacing();
+            ImGui::TextUnformatted("Skybox");
+            if (ImGui::Button("Import Cubemap", ImVec2(-1.0f, 0.0f)))
+            {
+                ShowImportCubemapDialog();
+            }
+            const auto cubemap_names =
+                skybox::CollectCubemapTextureNames(level);
+            if (cubemap_names.empty())
+            {
+                ImGui::TextWrapped(
+                    "No cubemap texture asset found in this level. "
+                    "Import one, then apply it as skybox.");
+            }
+            else
+            {
+                if (selected_skybox_cubemap_name_.empty() ||
+                    std::find(
+                        cubemap_names.begin(),
+                        cubemap_names.end(),
+                        selected_skybox_cubemap_name_) == cubemap_names.end())
+                {
+                    selected_skybox_cubemap_name_ = cubemap_names.front();
+                }
+                const auto proto_level_for_skybox =
+                    frame::json::SerializeLevel(level);
+                const auto destination_names =
+                    skybox::CollectSkyboxDestinationTextureNames(
+                        proto_level_for_skybox);
+                const auto current_skybox_name =
+                    skybox::FindCurrentSkyboxSourceName(
+                        level,
+                        cubemap_names,
+                        destination_names);
+                if (current_skybox_name.has_value())
+                {
+                    ImGui::Text(
+                        "Current Skybox: %s", current_skybox_name->c_str());
+                }
+                else
+                {
+                    ImGui::TextUnformatted("Current Skybox: <unresolved>");
+                }
+
+                if (ImGui::BeginCombo(
+                        "Skybox Cubemap",
+                        selected_skybox_cubemap_name_.c_str()))
+                {
+                    for (const auto& name : cubemap_names)
+                    {
+                        const bool selected = name == selected_skybox_cubemap_name_;
+                        if (ImGui::Selectable(name.c_str(), selected))
+                        {
+                            selected_skybox_cubemap_name_ = name;
+                        }
+                        if (selected)
+                        {
+                            ImGui::SetItemDefaultFocus();
+                        }
+                    }
+                    ImGui::EndCombo();
+                }
+                if (ImGui::Button("Apply Selected Cubemap", ImVec2(-1.0f, 0.0f)))
+                {
+                    try
+                    {
+                        SetSkyboxFromCubemapName(selected_skybox_cubemap_name_);
+                    }
+                    catch (const std::exception& e)
+                    {
+                        frame::Logger::GetInstance()->error(e.what());
+                        draw_gui_.AddModalWindow(
+                            std::make_unique<WindowMessageBox>(
+                                "Set Skybox failed",
+                                e.what()));
+                    }
+                }
+            }
+            ImGui::Spacing();
+            ImGui::TextWrapped(
+                "Use 'Import glTF' to add models under mesh_holder.");
+            ImGui::TextWrapped(
+                "Skybox is assigned from an existing cubemap texture asset.");
+            ImGui::EndChild();
+
+            ImGui::EndTable();
+        }
+        else
+        {
+            // Fallback: still show the scene in case table creation fails.
+            tab_scene_.Draw(level);
+        }
     }
     return true;
 }

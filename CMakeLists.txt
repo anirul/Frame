@@ -144,12 +144,9 @@ set(FRAME_VULKAN_LIBS
   FrameVulkan
 )
 
-include(cmake/AddImNodeFlow.cmake)
-
 # Sources.
 add_subdirectory(external/ImGuiColorTextEdit)
 set_property(TARGET ImGuiColorTextEdit PROPERTY FOLDER "external/ImGuiColorTextEditor")
-set_property(TARGET ImNodeFlow PROPERTY FOLDER "external/ImNodeFlow")
 add_subdirectory(asset/shader/opengl)
 add_subdirectory(asset/shader/vulkan)
 add_subdirectory(asset/json)

@@ -241,6 +241,7 @@ bool SDLVulkanDrawGui::Update(DeviceInterface& device, double dt)
 {
     bool returned_value = true;
     is_keyboard_passed_ = false;
+    is_updating_windows_ = true;
 
     auto& level = device.GetLevel();
     if (last_level_ != &level)
@@ -273,6 +274,11 @@ bool SDLVulkanDrawGui::Update(DeviceInterface& device, double dt)
         std::vector<std::string> windows_to_remove;
         for (auto& [name, data] : window_callbacks_)
         {
+            if (!data.open)
+            {
+                windows_to_remove.push_back(name);
+                continue;
+            }
             ImGui::Begin(data.callback->GetName().c_str(), &data.open);
             if (!data.callback->DrawCallback())
             {
@@ -438,37 +444,49 @@ bool SDLVulkanDrawGui::Update(DeviceInterface& device, double dt)
                 }
             }
 
-            if (ImGui::IsWindowHovered())
-            {
-                is_keyboard_passed_ = true;
-            }
-
-            ImVec2 content_window = ImGui::GetContentRegionAvail();
-            if (preview_size.y == 0)
+            // Import/reload from modal can replace the whole level.
+            const bool level_changed = &device.GetLevel() != &level;
+            if (level_changed)
             {
                 ImGui::End();
                 ImGui::PopStyleVar();
             }
             else
             {
-                const float aspect_ratio = static_cast<float>(preview_size.x) /
-                                           static_cast<float>(preview_size.y);
-                ImVec2 image_size{};
-                if (content_window.x / aspect_ratio > content_window.y)
+                if (ImGui::IsWindowHovered())
                 {
-                    image_size =
-                        ImVec2(content_window.y * aspect_ratio, content_window.y);
+                    is_keyboard_passed_ = true;
+                }
+
+                ImVec2 content_window = ImGui::GetContentRegionAvail();
+                if (preview_size.y == 0)
+                {
+                    ImGui::End();
+                    ImGui::PopStyleVar();
                 }
                 else
                 {
-                    image_size =
-                        ImVec2(content_window.x, content_window.x / aspect_ratio);
+                    const float aspect_ratio = static_cast<float>(preview_size.x) /
+                                               static_cast<float>(preview_size.y);
+                    ImVec2 image_size{};
+                    if (content_window.x / aspect_ratio > content_window.y)
+                    {
+                        image_size = ImVec2(
+                            content_window.y * aspect_ratio,
+                            content_window.y);
+                    }
+                    else
+                    {
+                        image_size = ImVec2(
+                            content_window.x,
+                            content_window.x / aspect_ratio);
+                    }
+                    ImGui::Image(
+                        reinterpret_cast<ImTextureID>(imgui_texture),
+                        image_size);
+                    ImGui::End();
+                    ImGui::PopStyleVar();
                 }
-                ImGui::Image(
-                    reinterpret_cast<ImTextureID>(imgui_texture),
-                    image_size);
-                ImGui::End();
-                ImGui::PopStyleVar();
             }
         }
     }
@@ -477,6 +495,10 @@ bool SDLVulkanDrawGui::Update(DeviceInterface& device, double dt)
     {
         for (const auto& pair : overlay_callbacks_)
         {
+            if (!pair.second.open)
+            {
+                continue;
+            }
             ImGui::SetNextWindowPos(ImVec2(
                 static_cast<float>(pair.second.position.x),
                 static_cast<float>(pair.second.position.y)));
@@ -493,6 +515,9 @@ bool SDLVulkanDrawGui::Update(DeviceInterface& device, double dt)
             ImGui::End();
         }
     }
+
+    is_updating_windows_ = false;
+    FlushPendingWindowDeletions();
 
     ImGui::Render();
     io.DisplaySize = ImVec2(static_cast<float>(size_.x), static_cast<float>(size_.y));
@@ -553,6 +578,19 @@ std::vector<std::string> SDLVulkanDrawGui::GetWindowTitles() const
 
 void SDLVulkanDrawGui::DeleteWindow(const std::string& name)
 {
+    if (is_updating_windows_)
+    {
+        if (window_callbacks_.contains(name))
+        {
+            window_callbacks_.at(name).open = false;
+        }
+        if (overlay_callbacks_.contains(name))
+        {
+            overlay_callbacks_.at(name).open = false;
+        }
+        pending_window_deletions_.push_back(name);
+        return;
+    }
     if (window_callbacks_.contains(name))
     {
         window_callbacks_.erase(name);
@@ -561,6 +599,20 @@ void SDLVulkanDrawGui::DeleteWindow(const std::string& name)
     {
         overlay_callbacks_.erase(name);
     }
+}
+
+void SDLVulkanDrawGui::FlushPendingWindowDeletions()
+{
+    if (pending_window_deletions_.empty())
+    {
+        return;
+    }
+    for (const auto& name : pending_window_deletions_)
+    {
+        window_callbacks_.erase(name);
+        overlay_callbacks_.erase(name);
+    }
+    pending_window_deletions_.clear();
 }
 
 void SDLVulkanDrawGui::SetMenuBar(

@@ -2,6 +2,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <chrono>
 
 // From: https://sourceforge.net/p/predef/wiki/OperatingSystems/
 #if defined(_WIN32) || defined(_WIN64)
@@ -16,7 +17,9 @@
 #include "frame/gui/window_logger.h"
 #include "frame/gui/window_resolution.h"
 #include "frame/json/parse_level.h"
+#include "frame/logger.h"
 #include <SDL3/SDL.h>
+#include "absl/flags/flag.h"
 #include "absl/flags/usage.h"
 #include "menubar.h"
 #include "menubar_file.h"
@@ -31,9 +34,14 @@ constexpr glm::uvec2 kDefaultSize{1280u, 720u};
 
 int Run(int argc, char** argv)
 {
-    absl::SetProgramUsageMessage("FrameEditor --device={vulkan|opengl}");
+    absl::SetProgramUsageMessage(
+        "FrameEditor --device={vulkan|opengl} "
+        "[--auto_exit_seconds=<seconds>]");
 
     frame::common::Application app(argc, argv, kDefaultSize);
+    const double auto_exit_seconds = absl::GetFlag(FLAGS_auto_exit_seconds);
+    const auto run_start = std::chrono::steady_clock::now();
+    bool auto_exit_triggered = false;
     auto& window = app.GetWindow();
     auto& device = window.GetDevice();
     auto gui_window = frame::gui::CreateDrawGui(window, {}, 20.0f);
@@ -74,11 +82,41 @@ int Run(int argc, char** argv)
             }
             app.Startup(frame::file::FindFile(menubar_file.GetFileName()));
         }
-        switch (app.Run([&menubar_file] { return !menubar_file.HasChanged(); }))
+        switch (app.Run(
+            [&menubar_file,
+             auto_exit_seconds,
+             run_start,
+             &auto_exit_triggered] {
+                if (menubar_file.HasChanged())
+                {
+                    return false;
+                }
+                if (auto_exit_seconds <= 0.0)
+                {
+                    return true;
+                }
+                const auto now = std::chrono::steady_clock::now();
+                const std::chrono::duration<double> elapsed = now - run_start;
+                const bool keep_running = elapsed.count() < auto_exit_seconds;
+                if (!keep_running && !auto_exit_triggered)
+                {
+                    auto& logger = frame::Logger::GetInstance();
+                    logger->info(
+                        "FrameEditor auto exit triggered after {:.3f} seconds.",
+                        auto_exit_seconds);
+                    logger->flush();
+                    auto_exit_triggered = true;
+                }
+                return keep_running;
+            }))
         {
         case frame::WindowReturnEnum::QUIT:
             return 0;
         case frame::WindowReturnEnum::RESTART:
+            if (auto_exit_triggered)
+            {
+                return 0;
+            }
             if (menubar_view.GetWindowResolution())
             {
                 app.Resize(

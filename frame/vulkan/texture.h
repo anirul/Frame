@@ -67,7 +67,6 @@ class Texture : public frame::TextureInterface
   private:
 
     void SyncProtoSize();
-    void SyncProtoPixels();
 
     glm::uvec2 size_{0, 0};
     glm::uvec2 display_size_{0, 0};
