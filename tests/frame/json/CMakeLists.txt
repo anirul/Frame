@@ -36,15 +36,7 @@ target_link_libraries(FrameJsonTest
   GTest::gmock
   GTest::gtest
   ${FRAME_LINK_GROUP_BEGIN}
-    Frame
-    FrameFile
-    FrameJson
-    FrameOpenGL
-    FrameOpenGLFile
-    FrameOpenGLGui
-    FrameGui
-    FrameProto
-    FrameVulkan
+    ${FRAME_CORE_LIBS}
   ${FRAME_LINK_GROUP_END}
 )
 

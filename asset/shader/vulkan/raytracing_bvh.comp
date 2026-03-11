@@ -11,6 +11,11 @@ layout(set = 0, binding = 5) uniform sampler2D metallic_texture;
 layout(set = 0, binding = 6) uniform sampler2D ao_texture;
 layout(set = 0, binding = 7) uniform samplerCube skybox_env;
 layout(set = 0, binding = 11) uniform samplerCube skybox;
+layout(set = 0, binding = 12) uniform sampler2D transmission_texture;
+layout(set = 0, binding = 13) uniform sampler2D ior_texture;
+layout(set = 0, binding = 14) uniform sampler2D thickness_texture;
+layout(set = 0, binding = 15) uniform sampler2D attenuation_color_texture;
+layout(set = 0, binding = 16) uniform sampler2D attenuation_distance_texture;
 
 struct Vertex
 {
@@ -104,6 +109,73 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
 vec3 fresnelSchlick(float cosTheta, vec3 F0)
 {
     return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+}
+
+float fresnelDielectric(float cosTheta, float ior)
+{
+    float r0 = (ior - 1.0) / (ior + 1.0);
+    r0 = r0 * r0;
+    return r0 + (1.0 - r0) * pow(1.0 - cosTheta, 5.0);
+}
+
+float SampleTransmission(vec2 uv)
+{
+    return clamp(texture(transmission_texture, uv).r, 0.0, 1.0);
+}
+
+float SampleIor(vec2 uv)
+{
+    return max(texture(ior_texture, uv).r, 1.0);
+}
+
+float SampleThickness(vec2 uv)
+{
+    return max(texture(thickness_texture, uv).r, 0.0);
+}
+
+vec3 SampleAttenuationColor(vec2 uv)
+{
+    return clamp(texture(attenuation_color_texture, uv).rgb, 0.0, 1.0);
+}
+
+float SampleAttenuationDistance(vec2 uv)
+{
+    return max(texture(attenuation_distance_texture, uv).r, 0.0001);
+}
+
+vec3 ComputeAbsorption(vec3 attenuation_color, float attenuation_distance)
+{
+    if (attenuation_distance >= 999999.0)
+    {
+        return vec3(0.0);
+    }
+    return -log(clamp(attenuation_color, vec3(0.001), vec3(1.0))) /
+           attenuation_distance;
+}
+
+bool RefractDir(
+    vec3 ray_dir,
+    vec3 normal,
+    float ior,
+    out vec3 refract_dir,
+    out float out_cosi)
+{
+    float cosi = clamp(dot(ray_dir, normal), -1.0, 1.0);
+    float etai = 1.0;
+    float etat = ior;
+    vec3 n = normal;
+    if (cosi > 0.0)
+    {
+        n = -normal;
+        float tmp = etai;
+        etai = etat;
+        etat = tmp;
+    }
+    cosi = abs(cosi);
+    out_cosi = cosi;
+    float eta = etai / etat;
+    refract_dir = refract(ray_dir, n, eta);
+    return length(refract_dir) > 0.001;
 }
 
 bool rayTriangleIntersect(
@@ -493,6 +565,123 @@ vec3 ShadeSurface(
     return ambient + Lo;
 }
 
+vec3 ShadeGlass(
+    const HitInfo hit,
+    vec3 ray_dir_world,
+    mat3 model_inv3,
+    mat3 normal_matrix,
+    vec3 light_dir_world,
+    vec3 light_color_world,
+    mat3 env_rot_inv,
+    float max_env_lod)
+{
+    const int kMaxGlassDepth = 4;
+    const float kSurfaceBias = 0.01;
+    const float kGlassFresnelBoost = 1.2;
+
+    const float root_thickness = SampleThickness(hit.uv);
+    const vec3 root_absorption = ComputeAbsorption(
+        SampleAttenuationColor(hit.uv),
+        SampleAttenuationDistance(hit.uv));
+
+    vec3 accum = vec3(0.0);
+    vec3 throughput = vec3(1.0);
+    vec3 dir_world = normalize(ray_dir_world);
+    vec3 origin_model = hit.pos_model;
+    vec3 dir_model = normalize(model_inv3 * dir_world);
+    HitInfo current_hit = hit;
+    bool inside = false;
+    bool terminated = false;
+
+    for (int depth = 0; depth < kMaxGlassDepth; ++depth)
+    {
+        if (depth > 0)
+        {
+            current_hit = TraceScene(origin_model, dir_model);
+            if (!current_hit.hit)
+            {
+                accum += throughput *
+                         SampleEnvSpecular(
+                             dir_world, env_rot_inv, 0.0, max_env_lod);
+                terminated = true;
+                break;
+            }
+        }
+
+        if (inside)
+        {
+            float travel = current_hit.t * max(root_thickness, 1.0);
+            throughput *= exp(-root_absorption * travel);
+        }
+
+        float hit_transmission = SampleTransmission(current_hit.uv);
+        if (hit_transmission <= 0.01)
+        {
+            accum += throughput * ShadeSurface(
+                current_hit,
+                dir_world,
+                model_inv3,
+                normal_matrix,
+                light_dir_world,
+                light_color_world,
+                env_rot_inv,
+                max_env_lod);
+            terminated = true;
+            break;
+        }
+
+        vec3 N = normalize(normal_matrix * current_hit.normal_model);
+        vec3 I = normalize(dir_world);
+        vec3 refract_dir_world;
+        float cosi;
+        float ior = SampleIor(current_hit.uv);
+        bool has_refraction =
+            RefractDir(I, N, ior, refract_dir_world, cosi);
+        float fresnel = clamp(
+            fresnelDielectric(cosi, ior) * kGlassFresnelBoost,
+            0.0,
+            1.0);
+
+        float roughness = clamp(texture(roughness_texture, current_hit.uv).r, 0.0, 0.15);
+        vec3 reflect_dir_world = normalize(reflect(I, N));
+        vec3 reflect_dir_model = normalize(model_inv3 * reflect_dir_world);
+        vec3 reflect_origin_model =
+            current_hit.pos_model + current_hit.normal_model * 0.0015;
+        vec3 reflect_color = SampleReflection(
+            reflect_origin_model,
+            reflect_dir_model,
+            reflect_dir_world,
+            model_inv3,
+            normal_matrix,
+            env_rot_inv,
+            roughness,
+            max_env_lod);
+        accum += throughput * fresnel * reflect_color;
+
+        if (!has_refraction)
+        {
+            terminated = true;
+            break;
+        }
+
+        throughput *= (1.0 - fresnel);
+
+        dir_world = normalize(refract_dir_world);
+        dir_model = normalize(model_inv3 * dir_world);
+        vec3 normal_model = normalize(current_hit.normal_model);
+        float side = dot(dir_model, normal_model) > 0.0 ? 1.0 : -1.0;
+        origin_model = current_hit.pos_model + normal_model * side * kSurfaceBias;
+        inside = !inside;
+    }
+
+    if (!terminated)
+    {
+        accum += throughput *
+                 SampleEnvSpecular(dir_world, env_rot_inv, 0.0, max_env_lod);
+    }
+    return accum;
+}
+
 void main()
 {
     ivec2 pixel = ivec2(gl_GlobalInvocationID.xy);
@@ -573,7 +762,7 @@ void main()
         vec3 light_col = length(ubo.light_color.xyz) > 0.0
             ? ubo.light_color.xyz
             : vec3(1.0);
-        vec3 color = ShadeSurface(
+        vec3 opaque_color = ShadeSurface(
             hit,
             ray_dir_world,
             model_inv3,
@@ -582,6 +771,21 @@ void main()
             light_col,
             env_rot_inv,
             max_env_lod);
+        float transmission = SampleTransmission(hit.uv);
+        vec3 color = opaque_color;
+        if (transmission > 0.01)
+        {
+            vec3 glass_color = ShadeGlass(
+                hit,
+                ray_dir_world,
+                model_inv3,
+                normal_matrix,
+                light_dir_world,
+                light_col,
+                env_rot_inv,
+                max_env_lod);
+            color = mix(opaque_color, glass_color, transmission);
+        }
         final_color = vec4(color, 1.0);
     }
 

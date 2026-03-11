@@ -24,7 +24,7 @@ TextureResources::TextureResources(Device& owner)
 
 void TextureResources::Build(
     LevelInterface& level,
-    const frame::json::LevelData& level_data)
+    const frame::json::LevelData& /*level_data*/)
 {
     Destroy();
 
@@ -32,13 +32,9 @@ void TextureResources::Build(
     const auto total_start = Clock::now();
     std::size_t uploaded_count = 0;
 
-    for (const auto& proto_texture : level_data.proto.textures())
+    for (const auto texture_id : level.GetTextures())
     {
-        auto texture_id = level.GetIdFromName(proto_texture.name());
-        if (!texture_id)
-        {
-            continue;
-        }
+        const auto texture_name = level.GetNameFromId(texture_id);
 
         auto* texture_ptr = dynamic_cast<frame::vulkan::Texture*>(
             &level.GetTextureFromId(texture_id));
@@ -46,7 +42,7 @@ void TextureResources::Build(
         {
             owner_.logger_->warn(
                 "Texture {} is not a Vulkan texture instance.",
-                proto_texture.name());
+                texture_name);
             continue;
         }
 
@@ -66,7 +62,7 @@ void TextureResources::Build(
             {
                 owner_.logger_->info(
                     "Prepared texture {} in {} ms.",
-                    proto_texture.name(),
+                    texture_name,
                     elapsed.count());
             }
         }
@@ -77,7 +73,7 @@ void TextureResources::Build(
                     Clock::now() - texture_start);
             owner_.logger_->warn(
                 "Skipping texture {} after {} ms: {}",
-                proto_texture.name(),
+                texture_name,
                 elapsed.count(),
                 ex.what());
             texture_ptr->ResetGpuResources();

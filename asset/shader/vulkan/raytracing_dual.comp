@@ -11,6 +11,11 @@ layout(set = 0, binding = 5) uniform sampler2D metallic_texture;
 layout(set = 0, binding = 6) uniform sampler2D ao_texture;
 layout(set = 0, binding = 7) uniform samplerCube skybox_env;
 layout(set = 0, binding = 11) uniform samplerCube skybox;
+layout(set = 0, binding = 12) uniform sampler2D transmission_texture;
+layout(set = 0, binding = 13) uniform sampler2D ior_texture;
+layout(set = 0, binding = 14) uniform sampler2D thickness_texture;
+layout(set = 0, binding = 15) uniform sampler2D attenuation_color_texture;
+layout(set = 0, binding = 16) uniform sampler2D attenuation_distance_texture;
 
 struct Vertex
 {
@@ -128,6 +133,40 @@ float fresnelDielectric(float cosTheta, float ior)
     float r0 = (ior - 1.0) / (ior + 1.0);
     r0 = r0 * r0;
     return r0 + (1.0 - r0) * pow(1.0 - cosTheta, 5.0);
+}
+
+float SampleTransmission(vec2 uv)
+{
+    return clamp(texture(transmission_texture, uv).r, 0.0, 1.0);
+}
+
+float SampleIor(vec2 uv)
+{
+    return max(texture(ior_texture, uv).r, 1.0);
+}
+
+float SampleThickness(vec2 uv)
+{
+    return max(texture(thickness_texture, uv).r, 0.0);
+}
+
+vec3 SampleAttenuationColor(vec2 uv)
+{
+    return clamp(texture(attenuation_color_texture, uv).rgb, 0.0, 1.0);
+}
+
+float SampleAttenuationDistance(vec2 uv)
+{
+    return max(texture(attenuation_distance_texture, uv).r, 0.0001);
+}
+
+vec3 ComputeAbsorption(vec2 uv, float travel)
+{
+    vec3 attenuation_color = SampleAttenuationColor(uv);
+    float attenuation_distance = SampleAttenuationDistance(uv);
+    vec3 attenuation_coeff =
+        -log(max(attenuation_color, vec3(0.0001))) / attenuation_distance;
+    return exp(-attenuation_coeff * max(travel, 0.0));
 }
 
 bool rayTriangleIntersect(
@@ -480,13 +519,13 @@ vec3 ShadeGlass(
     float max_env_lod)
 {
     const int kMaxGlassDepth = 4;
-    const float ior = 1.5;
     const float kSurfaceBias = 0.01;
     const float kGlassFresnelBoost = 1.35;
     const float kGlassRimStrength = 0.25;
     const float kGlassRimPower = 3.0;
-    const vec3 glass_tint = vec3(0.9, 0.95, 1.0);
-    const vec3 absorption = vec3(0.15, 0.07, 0.02);
+    const float ior = SampleIor(hit.uv);
+    const float thickness = SampleThickness(hit.uv);
+    const vec3 glass_tint = SampleAttenuationColor(hit.uv);
 
     vec3 accum = vec3(0.0);
     vec3 throughput = vec3(1.0);
@@ -515,7 +554,11 @@ vec3 ShadeGlass(
         if (inside)
         {
             float travel = current_hit.t;
-            throughput *= exp(-absorption * travel);
+            if (thickness > 0.0)
+            {
+                travel = min(travel, thickness);
+            }
+            throughput *= ComputeAbsorption(hit.uv, travel);
         }
 
         if (IsGround(current_hit))
@@ -677,7 +720,8 @@ void main()
             : vec3(1.0);
 
         vec3 color;
-        if (IsGround(hit))
+        float transmission = SampleTransmission(hit.uv);
+        if (IsGround(hit) || transmission <= 0.01)
         {
             color = ShadeOpaque(
                 hit,
@@ -692,7 +736,17 @@ void main()
         }
         else
         {
-            color = ShadeGlass(
+            vec3 opaque_color = ShadeOpaque(
+                hit,
+                ray_dir_world,
+                model_inv3,
+                normal_matrix,
+                light_dir_world,
+                light_col,
+                env_rot_inv,
+                max_env_lod,
+                true);
+            vec3 glass_color = ShadeGlass(
                 hit,
                 ray_dir_world,
                 model_inv3,
@@ -701,6 +755,7 @@ void main()
                 light_col,
                 env_rot_inv,
                 max_env_lod);
+            color = mix(opaque_color, glass_color, transmission);
         }
         final_color = vec4(color, 1.0);
     }

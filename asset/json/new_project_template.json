@@ -167,6 +167,11 @@
                 "roughness_texture",
                 "metallic_texture",
                 "ao_texture",
+                "transmission_texture",
+                "ior_texture",
+                "thickness_texture",
+                "attenuation_color_texture",
+                "attenuation_distance_texture",
                 "skybox",
                 "skybox_env"
             ],
@@ -226,6 +231,46 @@
                 {
                     "name": "ao_texture",
                     "binding": 6,
+                    "binding_type": "COMBINED_IMAGE_SAMPLER",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                },
+                {
+                    "name": "transmission_texture",
+                    "binding": 12,
+                    "binding_type": "COMBINED_IMAGE_SAMPLER",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                },
+                {
+                    "name": "ior_texture",
+                    "binding": 13,
+                    "binding_type": "COMBINED_IMAGE_SAMPLER",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                },
+                {
+                    "name": "thickness_texture",
+                    "binding": 14,
+                    "binding_type": "COMBINED_IMAGE_SAMPLER",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                },
+                {
+                    "name": "attenuation_color_texture",
+                    "binding": 15,
+                    "binding_type": "COMBINED_IMAGE_SAMPLER",
+                    "stages": [
+                        "COMPUTE"
+                    ]
+                },
+                {
+                    "name": "attenuation_distance_texture",
+                    "binding": 16,
                     "binding_type": "COMBINED_IMAGE_SAMPLER",
                     "stages": [
                         "COMPUTE"

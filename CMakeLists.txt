@@ -135,6 +135,9 @@ set(FRAME_CORE_LIBS
   FrameOpenGL
   FrameOpenGLFile
   FrameOpenGLGui
+  # Keep both Vulkan static archives inside the final GNU ld rescan group.
+  FrameVulkan
+  FrameVulkanJson
   FrameVulkanGui
   FrameGui
   FrameProto

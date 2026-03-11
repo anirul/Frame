@@ -1,10 +1,14 @@
 #include "frame/vulkan/json/parse_program.h"
 
+#include <array>
 #include <format>
 #include <stdexcept>
 
+#include "frame/json/parse_pixel.h"
+#include "frame/json/program_catalog.h"
 #include "frame/json/parse_uniform.h"
 #include "frame/uniform.h"
+#include "frame/vulkan/json/parse_texture.h"
 #include "frame/vulkan/program.h"
 
 namespace frame::vulkan::json
@@ -12,6 +16,93 @@ namespace frame::vulkan::json
 
 namespace
 {
+
+struct GeneratedTextureSpec
+{
+    std::array<float, 4> color = {0.0f, 0.0f, 0.0f, 1.0f};
+    frame::proto::PixelElementSize::Enum element =
+        frame::proto::PixelElementSize::BYTE;
+};
+
+std::optional<GeneratedTextureSpec> GetRaytracingTextureSpec(
+    const std::string& texture_name)
+{
+    if (texture_name == "transmission_texture")
+    {
+        return GeneratedTextureSpec{};
+    }
+    if (texture_name == "ior_texture")
+    {
+        return GeneratedTextureSpec{
+            .color = {1.5f, 1.5f, 1.5f, 1.0f},
+            .element = frame::proto::PixelElementSize::FLOAT};
+    }
+    if (texture_name == "thickness_texture")
+    {
+        return GeneratedTextureSpec{
+            .color = {0.0f, 0.0f, 0.0f, 1.0f},
+            .element = frame::proto::PixelElementSize::FLOAT};
+    }
+    if (texture_name == "attenuation_color_texture")
+    {
+        return GeneratedTextureSpec{
+            .color = {1.0f, 1.0f, 1.0f, 1.0f},
+            .element = frame::proto::PixelElementSize::BYTE};
+    }
+    if (texture_name == "attenuation_distance_texture")
+    {
+        return GeneratedTextureSpec{
+            .color = {1000000.0f, 1000000.0f, 1000000.0f, 1.0f},
+            .element = frame::proto::PixelElementSize::FLOAT};
+    }
+    return std::nullopt;
+}
+
+frame::EntityId EnsureRaytracingDefaultTexture(
+    const frame::proto::Program& proto_program,
+    const std::string& texture_name,
+    frame::LevelInterface& level)
+{
+    const auto key = frame::json::ResolveProgramKey(proto_program);
+    if (!frame::json::IsRaytracingProgramKey(key))
+    {
+        return frame::NullId;
+    }
+    const auto spec = GetRaytracingTextureSpec(texture_name);
+    if (!spec)
+    {
+        return frame::NullId;
+    }
+
+    frame::proto::Texture proto_texture;
+    proto_texture.set_name(texture_name);
+    proto_texture.mutable_size()->set_x(1);
+    proto_texture.mutable_size()->set_y(1);
+    proto_texture.mutable_pixel_structure()->CopyFrom(
+        frame::json::PixelStructure_RGB_ALPHA());
+    proto_texture.mutable_pixel_element_size()->set_value(spec->element);
+    if (spec->element == frame::proto::PixelElementSize::FLOAT)
+    {
+        proto_texture.set_pixels(
+            reinterpret_cast<const char*>(spec->color.data()),
+            static_cast<int>(spec->color.size() * sizeof(float)));
+    }
+    else
+    {
+        std::array<std::uint8_t, 4> pixels = {
+            static_cast<std::uint8_t>(spec->color[0] * 255.0f),
+            static_cast<std::uint8_t>(spec->color[1] * 255.0f),
+            static_cast<std::uint8_t>(spec->color[2] * 255.0f),
+            static_cast<std::uint8_t>(spec->color[3] * 255.0f)};
+        proto_texture.set_pixels(
+            reinterpret_cast<const char*>(pixels.data()),
+            static_cast<int>(pixels.size()));
+    }
+    auto texture = frame::vulkan::json::ParseTexture(proto_texture, {1u, 1u});
+    texture->SetName(texture_name);
+    texture->SetSerializeEnable(false);
+    return level.AddTexture(std::move(texture));
+}
 
 std::unique_ptr<frame::UniformInterface> MakeUniform(
     const frame::proto::Uniform& proto_uniform)
@@ -132,6 +223,11 @@ std::unique_ptr<frame::ProgramInterface> ParseProgram(
         auto texture_id = level.GetIdFromName(texture_name);
         if (texture_id == frame::NullId)
         {
+            texture_id = EnsureRaytracingDefaultTexture(
+                proto_program, texture_name, level);
+        }
+        if (texture_id == frame::NullId)
+        {
             throw std::runtime_error(std::format(
                 "Input texture {} not found for program {}.",
                 texture_name,
@@ -168,4 +264,3 @@ std::unique_ptr<frame::ProgramInterface> ParseProgram(
 }
 
 } // namespace frame::vulkan::json
-

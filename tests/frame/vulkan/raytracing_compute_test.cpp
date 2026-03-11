@@ -43,6 +43,11 @@ constexpr std::uint32_t kBindingRoughness = 4;
 constexpr std::uint32_t kBindingMetallic = 5;
 constexpr std::uint32_t kBindingAo = 6;
 constexpr std::uint32_t kBindingSkybox = 7;
+constexpr std::uint32_t kBindingTransmission = 12;
+constexpr std::uint32_t kBindingIor = 13;
+constexpr std::uint32_t kBindingThickness = 14;
+constexpr std::uint32_t kBindingAttenuationColor = 15;
+constexpr std::uint32_t kBindingAttenuationDistance = 16;
 constexpr std::uint32_t kBindingTriangleBuffer = 8;
 constexpr std::uint32_t kBindingBvhBuffer = 9;
 constexpr std::uint32_t kBindingTriangleBufferGlass = 8;
@@ -608,6 +613,14 @@ TEST_F(VulkanRayTracingComputeTest, DispatchProducesLitPixel)
     ImageResource roughness_tex = CreateTexture2D(roughness_rgba);
     ImageResource metallic_tex = CreateTexture2D(metallic_rgba);
     ImageResource ao_tex = CreateTexture2D(ao_rgba);
+    ImageResource transmission_tex = CreateTexture2D(metallic_rgba);
+    ImageResource ior_tex =
+        CreateTexture2D({1.5f, 1.5f, 1.5f, 1.0f});
+    ImageResource thickness_tex = CreateTexture2D(metallic_rgba);
+    ImageResource attenuation_color_tex =
+        CreateTexture2D({1.0f, 1.0f, 1.0f, 1.0f});
+    ImageResource attenuation_distance_tex =
+        CreateTexture2D({1000000.0f, 1000000.0f, 1000000.0f, 1.0f});
     ImageResource skybox_tex = CreateCubemap(sky_rgba);
 
     // Output image (storage + sampled).
@@ -741,23 +754,23 @@ TEST_F(VulkanRayTracingComputeTest, DispatchProducesLitPixel)
          vk::DescriptorType::eCombinedImageSampler,
          1,
          vk::ShaderStageFlagBits::eCompute},
-        {kBindingSkyboxBackground,
+        {kBindingTransmission,
          vk::DescriptorType::eCombinedImageSampler,
          1,
          vk::ShaderStageFlagBits::eCompute},
-        {kBindingSkyboxBackground,
+        {kBindingIor,
          vk::DescriptorType::eCombinedImageSampler,
          1,
          vk::ShaderStageFlagBits::eCompute},
-        {kBindingSkyboxBackground,
+        {kBindingThickness,
          vk::DescriptorType::eCombinedImageSampler,
          1,
          vk::ShaderStageFlagBits::eCompute},
-        {kBindingSkyboxBackground,
+        {kBindingAttenuationColor,
          vk::DescriptorType::eCombinedImageSampler,
          1,
          vk::ShaderStageFlagBits::eCompute},
-        {kBindingSkyboxBackground,
+        {kBindingAttenuationDistance,
          vk::DescriptorType::eCombinedImageSampler,
          1,
          vk::ShaderStageFlagBits::eCompute},
@@ -779,7 +792,7 @@ TEST_F(VulkanRayTracingComputeTest, DispatchProducesLitPixel)
 
     std::vector<vk::DescriptorPoolSize> pool_sizes = {
         {vk::DescriptorType::eStorageImage, 1},
-        {vk::DescriptorType::eCombinedImageSampler, 8},
+        {vk::DescriptorType::eCombinedImageSampler, 13},
         {vk::DescriptorType::eStorageBuffer, 1},
         {vk::DescriptorType::eUniformBuffer, 1},
     };
@@ -819,7 +832,7 @@ TEST_F(VulkanRayTracingComputeTest, DispatchProducesLitPixel)
         vk::DescriptorType::eCombinedImageSampler,
         &output_sample);
 
-    const std::array<std::pair<std::uint32_t, ImageResource*>, 7> textures = {
+    const std::array<std::pair<std::uint32_t, ImageResource*>, 12> textures = {
         std::pair{kBindingAlbedo, &albedo_tex},
         std::pair{kBindingNormal, &normal_tex},
         std::pair{kBindingRoughness, &roughness_tex},
@@ -827,6 +840,11 @@ TEST_F(VulkanRayTracingComputeTest, DispatchProducesLitPixel)
         std::pair{kBindingAo, &ao_tex},
         std::pair{kBindingSkybox, &skybox_tex},
         std::pair{kBindingSkyboxBackground, &skybox_tex},
+        std::pair{kBindingTransmission, &transmission_tex},
+        std::pair{kBindingIor, &ior_tex},
+        std::pair{kBindingThickness, &thickness_tex},
+        std::pair{kBindingAttenuationColor, &attenuation_color_tex},
+        std::pair{kBindingAttenuationDistance, &attenuation_distance_tex},
     };
     std::vector<vk::DescriptorImageInfo> texture_infos;
     texture_infos.reserve(textures.size());
@@ -975,6 +993,14 @@ TEST_F(VulkanRayTracingComputeTest, BvhDispatchMaskShowsHit)
     ImageResource roughness_tex = CreateTexture2D(black_rgba);
     ImageResource metallic_tex = CreateTexture2D(black_rgba);
     ImageResource ao_tex = CreateTexture2D(black_rgba);
+    ImageResource transmission_tex = CreateTexture2D(black_rgba);
+    ImageResource ior_tex =
+        CreateTexture2D({1.5f, 1.5f, 1.5f, 1.0f});
+    ImageResource thickness_tex = CreateTexture2D(black_rgba);
+    ImageResource attenuation_color_tex =
+        CreateTexture2D({1.0f, 1.0f, 1.0f, 1.0f});
+    ImageResource attenuation_distance_tex =
+        CreateTexture2D({1000000.0f, 1000000.0f, 1000000.0f, 1.0f});
     ImageResource skybox_tex = CreateCubemap(sky_rgba);
 
     vk::ImageCreateInfo out_info(
@@ -1119,6 +1145,30 @@ TEST_F(VulkanRayTracingComputeTest, BvhDispatchMaskShowsHit)
          vk::DescriptorType::eCombinedImageSampler,
          1,
          vk::ShaderStageFlagBits::eCompute},
+        {kBindingSkyboxBackground,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTransmission,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingIor,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingThickness,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingAttenuationColor,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingAttenuationDistance,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
         {kBindingTriangleBuffer,
          vk::DescriptorType::eStorageBuffer,
          1,
@@ -1141,7 +1191,7 @@ TEST_F(VulkanRayTracingComputeTest, BvhDispatchMaskShowsHit)
 
     std::vector<vk::DescriptorPoolSize> pool_sizes = {
         {vk::DescriptorType::eStorageImage, 1},
-        {vk::DescriptorType::eCombinedImageSampler, 8},
+        {vk::DescriptorType::eCombinedImageSampler, 13},
         {vk::DescriptorType::eStorageBuffer, 2},
         {vk::DescriptorType::eUniformBuffer, 1},
     };
@@ -1179,7 +1229,7 @@ TEST_F(VulkanRayTracingComputeTest, BvhDispatchMaskShowsHit)
         vk::DescriptorType::eCombinedImageSampler,
         &output_sample);
 
-    const std::array<std::pair<std::uint32_t, ImageResource*>, 7> textures = {
+    const std::array<std::pair<std::uint32_t, ImageResource*>, 12> textures = {
         std::pair{kBindingAlbedo, &albedo_tex},
         std::pair{kBindingNormal, &normal_tex},
         std::pair{kBindingRoughness, &roughness_tex},
@@ -1187,6 +1237,11 @@ TEST_F(VulkanRayTracingComputeTest, BvhDispatchMaskShowsHit)
         std::pair{kBindingAo, &ao_tex},
         std::pair{kBindingSkybox, &skybox_tex},
         std::pair{kBindingSkyboxBackground, &skybox_tex},
+        std::pair{kBindingTransmission, &transmission_tex},
+        std::pair{kBindingIor, &ior_tex},
+        std::pair{kBindingThickness, &thickness_tex},
+        std::pair{kBindingAttenuationColor, &attenuation_color_tex},
+        std::pair{kBindingAttenuationDistance, &attenuation_distance_tex},
     };
     std::vector<vk::DescriptorImageInfo> texture_infos;
     texture_infos.reserve(textures.size());
@@ -1341,6 +1396,14 @@ TEST_F(VulkanRayTracingComputeTest, DualDispatchMaskShowsGlassHit)
     ImageResource roughness_tex = CreateTexture2D(black_rgba);
     ImageResource metallic_tex = CreateTexture2D(black_rgba);
     ImageResource ao_tex = CreateTexture2D(black_rgba);
+    ImageResource transmission_tex = CreateTexture2D(black_rgba);
+    ImageResource ior_tex =
+        CreateTexture2D({1.5f, 1.5f, 1.5f, 1.0f});
+    ImageResource thickness_tex = CreateTexture2D(black_rgba);
+    ImageResource attenuation_color_tex =
+        CreateTexture2D({1.0f, 1.0f, 1.0f, 1.0f});
+    ImageResource attenuation_distance_tex =
+        CreateTexture2D({1000000.0f, 1000000.0f, 1000000.0f, 1.0f});
     ImageResource skybox_tex = CreateCubemap(sky_rgba);
 
     vk::ImageCreateInfo out_info(
@@ -1482,6 +1545,30 @@ TEST_F(VulkanRayTracingComputeTest, DualDispatchMaskShowsGlassHit)
          vk::DescriptorType::eCombinedImageSampler,
          1,
          vk::ShaderStageFlagBits::eCompute},
+        {kBindingSkyboxBackground,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTransmission,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingIor,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingThickness,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingAttenuationColor,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingAttenuationDistance,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
         {kBindingTriangleBufferGlass,
          vk::DescriptorType::eStorageBuffer,
          1,
@@ -1504,7 +1591,7 @@ TEST_F(VulkanRayTracingComputeTest, DualDispatchMaskShowsGlassHit)
 
     std::vector<vk::DescriptorPoolSize> pool_sizes = {
         {vk::DescriptorType::eStorageImage, 1},
-        {vk::DescriptorType::eCombinedImageSampler, 8},
+        {vk::DescriptorType::eCombinedImageSampler, 13},
         {vk::DescriptorType::eStorageBuffer, 2},
         {vk::DescriptorType::eUniformBuffer, 1},
     };
@@ -1542,7 +1629,7 @@ TEST_F(VulkanRayTracingComputeTest, DualDispatchMaskShowsGlassHit)
         vk::DescriptorType::eCombinedImageSampler,
         &output_sample);
 
-    const std::array<std::pair<std::uint32_t, ImageResource*>, 7> textures = {
+    const std::array<std::pair<std::uint32_t, ImageResource*>, 12> textures = {
         std::pair{kBindingAlbedo, &albedo_tex},
         std::pair{kBindingNormal, &normal_tex},
         std::pair{kBindingRoughness, &roughness_tex},
@@ -1550,6 +1637,11 @@ TEST_F(VulkanRayTracingComputeTest, DualDispatchMaskShowsGlassHit)
         std::pair{kBindingAo, &ao_tex},
         std::pair{kBindingSkybox, &skybox_tex},
         std::pair{kBindingSkyboxBackground, &skybox_tex},
+        std::pair{kBindingTransmission, &transmission_tex},
+        std::pair{kBindingIor, &ior_tex},
+        std::pair{kBindingThickness, &thickness_tex},
+        std::pair{kBindingAttenuationColor, &attenuation_color_tex},
+        std::pair{kBindingAttenuationDistance, &attenuation_distance_tex},
     };
     std::vector<vk::DescriptorImageInfo> texture_infos;
     texture_infos.reserve(textures.size());
@@ -1704,6 +1796,14 @@ TEST_F(VulkanRayTracingComputeTest, DualDispatchMaskShowsGroundHit)
     ImageResource roughness_tex = CreateTexture2D(black_rgba);
     ImageResource metallic_tex = CreateTexture2D(black_rgba);
     ImageResource ao_tex = CreateTexture2D(black_rgba);
+    ImageResource transmission_tex = CreateTexture2D(black_rgba);
+    ImageResource ior_tex =
+        CreateTexture2D({1.5f, 1.5f, 1.5f, 1.0f});
+    ImageResource thickness_tex = CreateTexture2D(black_rgba);
+    ImageResource attenuation_color_tex =
+        CreateTexture2D({1.0f, 1.0f, 1.0f, 1.0f});
+    ImageResource attenuation_distance_tex =
+        CreateTexture2D({1000000.0f, 1000000.0f, 1000000.0f, 1.0f});
     ImageResource skybox_tex = CreateCubemap(sky_rgba);
 
     vk::ImageCreateInfo out_info(
@@ -1845,6 +1945,30 @@ TEST_F(VulkanRayTracingComputeTest, DualDispatchMaskShowsGroundHit)
          vk::DescriptorType::eCombinedImageSampler,
          1,
          vk::ShaderStageFlagBits::eCompute},
+        {kBindingSkyboxBackground,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTransmission,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingIor,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingThickness,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingAttenuationColor,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingAttenuationDistance,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
         {kBindingTriangleBufferGlass,
          vk::DescriptorType::eStorageBuffer,
          1,
@@ -1867,7 +1991,7 @@ TEST_F(VulkanRayTracingComputeTest, DualDispatchMaskShowsGroundHit)
 
     std::vector<vk::DescriptorPoolSize> pool_sizes = {
         {vk::DescriptorType::eStorageImage, 1},
-        {vk::DescriptorType::eCombinedImageSampler, 8},
+        {vk::DescriptorType::eCombinedImageSampler, 13},
         {vk::DescriptorType::eStorageBuffer, 2},
         {vk::DescriptorType::eUniformBuffer, 1},
     };
@@ -1905,7 +2029,7 @@ TEST_F(VulkanRayTracingComputeTest, DualDispatchMaskShowsGroundHit)
         vk::DescriptorType::eCombinedImageSampler,
         &output_sample);
 
-    const std::array<std::pair<std::uint32_t, ImageResource*>, 7> textures = {
+    const std::array<std::pair<std::uint32_t, ImageResource*>, 12> textures = {
         std::pair{kBindingAlbedo, &albedo_tex},
         std::pair{kBindingNormal, &normal_tex},
         std::pair{kBindingRoughness, &roughness_tex},
@@ -1913,6 +2037,11 @@ TEST_F(VulkanRayTracingComputeTest, DualDispatchMaskShowsGroundHit)
         std::pair{kBindingAo, &ao_tex},
         std::pair{kBindingSkybox, &skybox_tex},
         std::pair{kBindingSkyboxBackground, &skybox_tex},
+        std::pair{kBindingTransmission, &transmission_tex},
+        std::pair{kBindingIor, &ior_tex},
+        std::pair{kBindingThickness, &thickness_tex},
+        std::pair{kBindingAttenuationColor, &attenuation_color_tex},
+        std::pair{kBindingAttenuationDistance, &attenuation_distance_tex},
     };
     std::vector<vk::DescriptorImageInfo> texture_infos;
     texture_infos.reserve(textures.size());
@@ -2113,6 +2242,14 @@ TEST_F(VulkanRayTracingComputeTest, SceneHitMaskMatchesCpuIntersections)
     ImageResource roughness_tex = CreateTexture2D(black_rgba);
     ImageResource metallic_tex = CreateTexture2D(black_rgba);
     ImageResource ao_tex = CreateTexture2D(black_rgba);
+    ImageResource transmission_tex = CreateTexture2D(black_rgba);
+    ImageResource ior_tex =
+        CreateTexture2D({1.5f, 1.5f, 1.5f, 1.0f});
+    ImageResource thickness_tex = CreateTexture2D(black_rgba);
+    ImageResource attenuation_color_tex =
+        CreateTexture2D({1.0f, 1.0f, 1.0f, 1.0f});
+    ImageResource attenuation_distance_tex =
+        CreateTexture2D({1000000.0f, 1000000.0f, 1000000.0f, 1.0f});
     ImageResource skybox_tex = CreateCubemap(sky_rgba);
 
     vk::ImageCreateInfo out_info(
@@ -2235,6 +2372,30 @@ TEST_F(VulkanRayTracingComputeTest, SceneHitMaskMatchesCpuIntersections)
          vk::DescriptorType::eCombinedImageSampler,
          1,
          vk::ShaderStageFlagBits::eCompute},
+        {kBindingSkyboxBackground,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTransmission,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingIor,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingThickness,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingAttenuationColor,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingAttenuationDistance,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
         {kBindingTriangleBufferGlass,
          vk::DescriptorType::eStorageBuffer,
          1,
@@ -2257,7 +2418,7 @@ TEST_F(VulkanRayTracingComputeTest, SceneHitMaskMatchesCpuIntersections)
 
     std::vector<vk::DescriptorPoolSize> pool_sizes = {
         {vk::DescriptorType::eStorageImage, 1},
-        {vk::DescriptorType::eCombinedImageSampler, 8},
+        {vk::DescriptorType::eCombinedImageSampler, 13},
         {vk::DescriptorType::eStorageBuffer, 2},
         {vk::DescriptorType::eUniformBuffer, 1},
     };
@@ -2295,7 +2456,7 @@ TEST_F(VulkanRayTracingComputeTest, SceneHitMaskMatchesCpuIntersections)
         vk::DescriptorType::eCombinedImageSampler,
         &output_sample);
 
-    const std::array<std::pair<std::uint32_t, ImageResource*>, 7> textures = {
+    const std::array<std::pair<std::uint32_t, ImageResource*>, 12> textures = {
         std::pair{kBindingAlbedo, &albedo_tex},
         std::pair{kBindingNormal, &normal_tex},
         std::pair{kBindingRoughness, &roughness_tex},
@@ -2303,6 +2464,11 @@ TEST_F(VulkanRayTracingComputeTest, SceneHitMaskMatchesCpuIntersections)
         std::pair{kBindingAo, &ao_tex},
         std::pair{kBindingSkybox, &skybox_tex},
         std::pair{kBindingSkyboxBackground, &skybox_tex},
+        std::pair{kBindingTransmission, &transmission_tex},
+        std::pair{kBindingIor, &ior_tex},
+        std::pair{kBindingThickness, &thickness_tex},
+        std::pair{kBindingAttenuationColor, &attenuation_color_tex},
+        std::pair{kBindingAttenuationDistance, &attenuation_distance_tex},
     };
     std::vector<vk::DescriptorImageInfo> texture_infos;
     texture_infos.reserve(textures.size());

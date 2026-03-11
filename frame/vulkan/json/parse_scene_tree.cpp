@@ -130,6 +130,146 @@ EntityId FindTextureIdByName(
     return NullId;
 }
 
+float ReadTextureFirstChannel(
+    LevelInterface& level, EntityId texture_id)
+{
+    if (!texture_id)
+    {
+        return 0.0f;
+    }
+
+    const auto& texture = level.GetTextureFromId(texture_id);
+    const auto element_size = texture.GetData().pixel_element_size().value();
+    switch (element_size)
+    {
+    case frame::proto::PixelElementSize::FLOAT: {
+        const auto data = texture.GetTextureFloat();
+        return data.empty() ? 0.0f : data.front();
+    }
+    case frame::proto::PixelElementSize::SHORT:
+    case frame::proto::PixelElementSize::HALF: {
+        const auto data = texture.GetTextureWord();
+        return data.empty() ? 0.0f
+                            : static_cast<float>(data.front()) / 65535.0f;
+    }
+    case frame::proto::PixelElementSize::BYTE:
+    default: {
+        const auto data = texture.GetTextureByte();
+        return data.empty() ? 0.0f
+                            : static_cast<float>(data.front()) / 255.0f;
+    }
+    }
+}
+
+struct GeneratedTextureSpec
+{
+    glm::vec4 color = glm::vec4(0.0f);
+    frame::proto::PixelElementSize element_size =
+        frame::json::PixelElementSize_BYTE();
+};
+
+glm::uvec2 ResolveTextureDisplaySize(LevelInterface& level);
+
+bool IsRaytracingProgram(const ProgramInterface& program)
+{
+    const auto key = frame::json::ResolveProgramKey(program.GetData());
+    return frame::json::IsRaytracingProgramKey(key);
+}
+
+std::optional<GeneratedTextureSpec> GetDefaultRaytracingTextureSpec(
+    const std::string& binding_name)
+{
+    if (binding_name == "transmission_texture")
+    {
+        return GeneratedTextureSpec{
+            .color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f),
+            .element_size = frame::json::PixelElementSize_BYTE()};
+    }
+    if (binding_name == "ior_texture")
+    {
+        return GeneratedTextureSpec{
+            .color = glm::vec4(1.5f, 1.5f, 1.5f, 1.0f),
+            .element_size = frame::json::PixelElementSize_FLOAT()};
+    }
+    if (binding_name == "thickness_texture")
+    {
+        return GeneratedTextureSpec{
+            .color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f),
+            .element_size = frame::json::PixelElementSize_FLOAT()};
+    }
+    if (binding_name == "attenuation_color_texture")
+    {
+        return GeneratedTextureSpec{
+            .color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),
+            .element_size = frame::json::PixelElementSize_BYTE()};
+    }
+    if (binding_name == "attenuation_distance_texture")
+    {
+        return GeneratedTextureSpec{
+            .color = glm::vec4(1000000.0f, 1000000.0f, 1000000.0f, 1.0f),
+            .element_size = frame::json::PixelElementSize_FLOAT()};
+    }
+    return std::nullopt;
+}
+
+EntityId EnsureDefaultRaytracingTexture(
+    LevelInterface& level, const std::string& binding_name)
+{
+    const auto spec = GetDefaultRaytracingTextureSpec(binding_name);
+    if (!spec)
+    {
+        return NullId;
+    }
+
+    const std::string texture_name =
+        std::format(".__raytrace_default_{}", binding_name);
+    if (const EntityId existing = FindTextureIdByName(level, texture_name))
+    {
+        return existing;
+    }
+
+    frame::proto::Texture proto_texture;
+    proto_texture.set_name(texture_name);
+    proto_texture.mutable_pixel_element_size()->CopyFrom(spec->element_size);
+    proto_texture.mutable_pixel_structure()->CopyFrom(
+        frame::json::PixelStructure_RGB_ALPHA());
+    proto_texture.mutable_size()->set_x(1);
+    proto_texture.mutable_size()->set_y(1);
+    if (spec->element_size.value() ==
+        frame::proto::PixelElementSize::FLOAT)
+    {
+        std::array<float, 4> pixels = {
+            spec->color.x,
+            spec->color.y,
+            spec->color.z,
+            spec->color.w};
+        proto_texture.set_pixels(
+            reinterpret_cast<const char*>(pixels.data()),
+            static_cast<int>(pixels.size() * sizeof(float)));
+    }
+    else
+    {
+        std::array<std::uint8_t, 4> pixels = {
+            static_cast<std::uint8_t>(
+                std::clamp(spec->color.x, 0.0f, 1.0f) * 255.0f),
+            static_cast<std::uint8_t>(
+                std::clamp(spec->color.y, 0.0f, 1.0f) * 255.0f),
+            static_cast<std::uint8_t>(
+                std::clamp(spec->color.z, 0.0f, 1.0f) * 255.0f),
+            static_cast<std::uint8_t>(
+                std::clamp(spec->color.w, 0.0f, 1.0f) * 255.0f)};
+        proto_texture.set_pixels(
+            reinterpret_cast<const char*>(pixels.data()),
+            static_cast<int>(pixels.size()));
+    }
+
+    auto texture = frame::vulkan::json::ParseTexture(
+        proto_texture, ResolveTextureDisplaySize(level));
+    texture->SetName(texture_name);
+    texture->SetSerializeEnable(false);
+    return level.AddTexture(std::move(texture));
+}
+
 void BindMaterialTexturesFromProgram(
     MaterialInterface& material,
     LevelInterface& level,
@@ -160,7 +300,11 @@ void BindMaterialTexturesFromProgram(
         {
             continue;
         }
-        const auto texture_id = FindTextureIdByName(level, binding.name());
+        EntityId texture_id = FindTextureIdByName(level, binding.name());
+        if (!texture_id && IsRaytracingProgram(program))
+        {
+            texture_id = EnsureDefaultRaytracingTexture(level, binding.name());
+        }
         if (!texture_id || !bound_texture_ids.insert(texture_id).second)
         {
             continue;
@@ -235,7 +379,7 @@ void ReplaceTextureBindingByInnerName(
     material.AddTextureId(texture_id, inner_name);
 }
 
-void AdoptGltfPbrTextures(
+void AdoptGltfRaytracingTextures(
     LevelInterface& level,
     EntityId source_material_id,
     EntityId target_material_id)
@@ -243,10 +387,6 @@ void AdoptGltfPbrTextures(
     if (!source_material_id ||
         !target_material_id ||
         source_material_id == target_material_id)
-    {
-        return;
-    }
-    if (!IsRaytracingBvhMaterial(level, target_material_id))
     {
         return;
     }
@@ -272,13 +412,22 @@ void AdoptGltfPbrTextures(
         }
         return NullId;
     };
+    const EntityId source_transmission_texture_id =
+        find_source_texture("transmission_texture");
+    const bool source_has_transmission =
+        ReadTextureFirstChannel(level, source_transmission_texture_id) > 0.01f;
 
-    std::array<std::pair<const char*, const char*>, 5> pbr_mappings = {{
+    std::array<std::pair<const char*, const char*>, 10> pbr_mappings = {{
         {"albedo_texture", "Color"},
         {"normal_texture", nullptr},
         {"roughness_texture", nullptr},
         {"metallic_texture", nullptr},
         {"ao_texture", nullptr},
+        {"transmission_texture", nullptr},
+        {"ior_texture", nullptr},
+        {"thickness_texture", nullptr},
+        {"attenuation_color_texture", nullptr},
+        {"attenuation_distance_texture", nullptr},
     }};
     for (const auto& [target_name, fallback_name] : pbr_mappings)
     {
@@ -292,23 +441,41 @@ void AdoptGltfPbrTextures(
             continue;
         }
         const auto source_texture_name = level.GetNameFromId(source_id);
-        // Only adopt file-backed glTF textures so explicit level textures are
-        // not overwritten by generated solid-color fallbacks.
-        if (source_texture_name.find(".__gltf_tex_") == std::string::npos)
+        const bool source_is_generated_gltf =
+            source_texture_name.find(".__gltf_tex_") != std::string::npos ||
+            source_texture_name.find(".__gltf_solid_") != std::string::npos;
+        if (!source_is_generated_gltf)
         {
             continue;
         }
 
         const EntityId existing_target_id =
             find_target_texture(target_name);
+        const bool is_glass_only_binding =
+            std::string_view(target_name) == "transmission_texture" ||
+            std::string_view(target_name) == "ior_texture" ||
+            std::string_view(target_name) == "thickness_texture" ||
+            std::string_view(target_name) == "attenuation_color_texture" ||
+            std::string_view(target_name) == "attenuation_distance_texture";
+        if (is_glass_only_binding &&
+            existing_target_id != NullId &&
+            !source_has_transmission)
+        {
+            continue;
+        }
         if (existing_target_id != NullId)
         {
             const auto existing_target_texture_name =
                 level.GetNameFromId(existing_target_id);
+            const auto& existing_target_texture =
+                level.GetTextureFromId(existing_target_id);
             const bool replace_generated_target =
                 existing_target_texture_name.find(".__gltf_solid_") !=
                     std::string::npos ||
                 existing_target_texture_name.find(".__gltf_tex_") !=
+                    std::string::npos ||
+                !existing_target_texture.SerializeEnable() ||
+                existing_target_texture_name.find(".__raytrace_default_") !=
                     std::string::npos;
             if (!replace_generated_target)
             {
@@ -502,6 +669,24 @@ std::optional<std::filesystem::path> FindFirstMaterialTexturePath(
     return std::nullopt;
 }
 
+std::optional<std::filesystem::path> FindMaterialTexturePath(
+    const aiMaterial* material,
+    const std::filesystem::path& model_path,
+    const aiTextureType type,
+    const unsigned int index)
+{
+    if (!material || material->GetTextureCount(type) <= index)
+    {
+        return std::nullopt;
+    }
+    aiString texture_path;
+    if (material->GetTexture(type, index, &texture_path) != aiReturn_SUCCESS)
+    {
+        return std::nullopt;
+    }
+    return ResolveMaterialTexturePath(model_path, texture_path);
+}
+
 glm::vec4 ReadBaseColorFactor(const aiMaterial* material)
 {
     aiColor4D color(1.0f, 1.0f, 1.0f, 1.0f);
@@ -541,6 +726,67 @@ float ReadMetallicFactor(const aiMaterial* material)
         return std::clamp(static_cast<float>(metallic), 0.0f, 1.0f);
     }
     return 0.0f;
+}
+
+float ReadTransmissionFactor(const aiMaterial* material)
+{
+    ai_real transmission = 0.0f;
+    if (material &&
+        material->Get(AI_MATKEY_TRANSMISSION_FACTOR, transmission) ==
+            aiReturn_SUCCESS)
+    {
+        return std::clamp(static_cast<float>(transmission), 0.0f, 1.0f);
+    }
+    return 0.0f;
+}
+
+float ReadIorFactor(const aiMaterial* material)
+{
+    ai_real ior = 1.5f;
+    if (material && material->Get(AI_MATKEY_REFRACTI, ior) == aiReturn_SUCCESS)
+    {
+        return std::max(static_cast<float>(ior), 1.0f);
+    }
+    return 1.5f;
+}
+
+float ReadThicknessFactor(const aiMaterial* material)
+{
+    ai_real thickness = 0.0f;
+    if (material &&
+        material->Get(AI_MATKEY_VOLUME_THICKNESS_FACTOR, thickness) ==
+            aiReturn_SUCCESS)
+    {
+        return std::max(static_cast<float>(thickness), 0.0f);
+    }
+    return 0.0f;
+}
+
+float ReadAttenuationDistance(const aiMaterial* material)
+{
+    ai_real distance = 1000000.0f;
+    if (material &&
+        material->Get(AI_MATKEY_VOLUME_ATTENUATION_DISTANCE, distance) ==
+            aiReturn_SUCCESS)
+    {
+        return std::max(static_cast<float>(distance), 0.0001f);
+    }
+    return 1000000.0f;
+}
+
+glm::vec3 ReadAttenuationColor(const aiMaterial* material)
+{
+    aiColor3D color(1.0f, 1.0f, 1.0f);
+    if (material &&
+        material->Get(AI_MATKEY_VOLUME_ATTENUATION_COLOR, color) ==
+            aiReturn_SUCCESS)
+    {
+        return {
+            std::clamp(color.r, 0.0f, 1.0f),
+            std::clamp(color.g, 0.0f, 1.0f),
+            std::clamp(color.b, 0.0f, 1.0f)};
+    }
+    return {1.0f, 1.0f, 1.0f};
 }
 
 glm::mat4 AiToGlm(const aiMatrix4x4& matrix)
@@ -1416,15 +1662,19 @@ bool ParseNodeMesh(
             return texture_id;
         };
 
-        auto create_solid_texture = [&](const glm::vec4& color,
-                                        const std::string& semantic) -> EntityId {
+        auto create_solid_texture =
+            [&](const glm::vec4& color,
+                const std::string& semantic,
+                const frame::proto::PixelElementSize& element_size =
+                    frame::json::PixelElementSize_BYTE()) -> EntityId {
             const std::string cache_key = std::format(
-                "{}|{}|{}|{}|{}",
+                "{}|{}|{}|{}|{}|{}",
                 semantic,
                 color.x,
                 color.y,
                 color.z,
-                color.w);
+                color.w,
+                static_cast<int>(element_size.value()));
             if (auto it = solid_texture_cache.find(cache_key);
                 it != solid_texture_cache.end())
             {
@@ -1437,19 +1687,36 @@ bool ParseNodeMesh(
                 semantic,
                 generated_texture_counter++);
             proto_texture.set_name(texture_name);
-            proto_texture.mutable_pixel_element_size()->CopyFrom(
-                frame::json::PixelElementSize_BYTE());
+            proto_texture.mutable_pixel_element_size()->CopyFrom(element_size);
             proto_texture.mutable_pixel_structure()->CopyFrom(
                 frame::json::PixelStructure_RGB_ALPHA());
             proto_texture.mutable_size()->set_x(1);
             proto_texture.mutable_size()->set_y(1);
-            std::array<std::uint8_t, 4> pixels = {
-                static_cast<std::uint8_t>(std::clamp(color.x, 0.0f, 1.0f) * 255.0f),
-                static_cast<std::uint8_t>(std::clamp(color.y, 0.0f, 1.0f) * 255.0f),
-                static_cast<std::uint8_t>(std::clamp(color.z, 0.0f, 1.0f) * 255.0f),
-                static_cast<std::uint8_t>(std::clamp(color.w, 0.0f, 1.0f) * 255.0f)};
-            proto_texture.set_pixels(
-                reinterpret_cast<const char*>(pixels.data()), pixels.size());
+            if (element_size.value() == frame::proto::PixelElementSize::FLOAT)
+            {
+                std::array<float, 4> pixels = {
+                    color.x,
+                    color.y,
+                    color.z,
+                    color.w};
+                proto_texture.set_pixels(
+                    reinterpret_cast<const char*>(pixels.data()),
+                    pixels.size() * sizeof(float));
+            }
+            else
+            {
+                std::array<std::uint8_t, 4> pixels = {
+                    static_cast<std::uint8_t>(
+                        std::clamp(color.x, 0.0f, 1.0f) * 255.0f),
+                    static_cast<std::uint8_t>(
+                        std::clamp(color.y, 0.0f, 1.0f) * 255.0f),
+                    static_cast<std::uint8_t>(
+                        std::clamp(color.z, 0.0f, 1.0f) * 255.0f),
+                    static_cast<std::uint8_t>(
+                        std::clamp(color.w, 0.0f, 1.0f) * 255.0f)};
+                proto_texture.set_pixels(
+                    reinterpret_cast<const char*>(pixels.data()), pixels.size());
+            }
             auto texture =
                 frame::vulkan::json::ParseTexture(
                     proto_texture, texture_display_size);
@@ -1487,10 +1754,21 @@ bool ParseNodeMesh(
                 ai_material, path, {aiTextureType_METALNESS});
             const auto ao_texture_path = FindFirstMaterialTexturePath(
                 ai_material, path, {aiTextureType_AMBIENT_OCCLUSION, aiTextureType_LIGHTMAP});
+            const auto transmission_texture_path = FindMaterialTexturePath(
+                ai_material, path, aiTextureType_TRANSMISSION, 0);
+            const auto thickness_texture_path = FindMaterialTexturePath(
+                ai_material, path, aiTextureType_TRANSMISSION, 1);
 
             const glm::vec4 base_color_factor = ReadBaseColorFactor(ai_material);
             const float roughness_factor = ReadRoughnessFactor(ai_material);
             const float metallic_factor = ReadMetallicFactor(ai_material);
+            const float transmission_factor = ReadTransmissionFactor(ai_material);
+            const float ior_factor = ReadIorFactor(ai_material);
+            const float thickness_factor = ReadThicknessFactor(ai_material);
+            const float attenuation_distance =
+                ReadAttenuationDistance(ai_material);
+            const glm::vec3 attenuation_color =
+                ReadAttenuationColor(ai_material);
 
             const EntityId base_texture_id = base_color_texture_path
                 ? create_texture_from_path(*base_color_texture_path, "base_color")
@@ -1520,6 +1798,42 @@ bool ParseNodeMesh(
             const EntityId ao_texture_id = ao_texture_path
                 ? create_texture_from_path(*ao_texture_path, "ao")
                 : create_solid_texture(glm::vec4(1.0f), "ao");
+            const EntityId transmission_texture_id =
+                transmission_texture_path
+                ? create_texture_from_path(*transmission_texture_path, "transmission")
+                : create_solid_texture(
+                      glm::vec4(
+                          transmission_factor,
+                          transmission_factor,
+                          transmission_factor,
+                          1.0f),
+                      "transmission");
+            const EntityId ior_texture_id = create_solid_texture(
+                glm::vec4(ior_factor, ior_factor, ior_factor, 1.0f),
+                "ior",
+                frame::json::PixelElementSize_FLOAT());
+            const EntityId thickness_texture_id =
+                thickness_texture_path
+                ? create_texture_from_path(*thickness_texture_path, "thickness")
+                : create_solid_texture(
+                      glm::vec4(
+                          thickness_factor,
+                          thickness_factor,
+                          thickness_factor,
+                          1.0f),
+                      "thickness",
+                      frame::json::PixelElementSize_FLOAT());
+            const EntityId attenuation_color_texture_id = create_solid_texture(
+                glm::vec4(attenuation_color, 1.0f),
+                "attenuation_color");
+            const EntityId attenuation_distance_texture_id = create_solid_texture(
+                glm::vec4(
+                    attenuation_distance,
+                    attenuation_distance,
+                    attenuation_distance,
+                    1.0f),
+                "attenuation_distance",
+                frame::json::PixelElementSize_FLOAT());
 
             auto material = std::make_unique<frame::vulkan::Material>();
             const std::string material_name = std::format(
@@ -1561,6 +1875,26 @@ bool ParseNodeMesh(
                 {
                     texture_id = ao_texture_id;
                 }
+                else if (binding_name == "transmission_texture")
+                {
+                    texture_id = transmission_texture_id;
+                }
+                else if (binding_name == "ior_texture")
+                {
+                    texture_id = ior_texture_id;
+                }
+                else if (binding_name == "thickness_texture")
+                {
+                    texture_id = thickness_texture_id;
+                }
+                else if (binding_name == "attenuation_color_texture")
+                {
+                    texture_id = attenuation_color_texture_id;
+                }
+                else if (binding_name == "attenuation_distance_texture")
+                {
+                    texture_id = attenuation_distance_texture_id;
+                }
                 else
                 {
                     texture_id = level.GetIdFromName(binding_name);
@@ -1593,9 +1927,12 @@ bool ParseNodeMesh(
                 gltf_material_id =
                     create_material_from_gltf(mesh->mMaterialIndex);
             }
-            if (explicit_material_id && gltf_material_id)
+            if (explicit_material_id &&
+                gltf_material_id &&
+                selected_program &&
+                IsRaytracingProgram(*selected_program))
             {
-                AdoptGltfPbrTextures(
+                AdoptGltfRaytracingTextures(
                     level, gltf_material_id, explicit_material_id);
             }
             const EntityId material_id =
@@ -2163,5 +2500,3 @@ bool ParseSceneTree(
 }
 
 } // namespace frame::vulkan::json
-
-
