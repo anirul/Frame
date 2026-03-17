@@ -33,8 +33,8 @@ try
 {
 #endif
     constexpr glm::uvec2 kDefaultSize{1280u, 720u};
-    constexpr const char* kLevelPath = "asset/json/raytracing_bvh.json";
-    absl::SetProgramUsageMessage("04_RayTracingBvh --device={vulkan|opengl}");
+    constexpr const char* kLevelPath = "asset/json/dragon.json";
+    absl::SetProgramUsageMessage("02_Dragon --device={vulkan|opengl}");
     frame::common::Application app(ac, av, kDefaultSize);
     app.Startup(frame::file::FindFile(kLevelPath));
     app.Run();
@@ -43,7 +43,7 @@ try
 catch (const std::exception& e)
 {
     auto& logger = frame::Logger::GetInstance();
-    logger->error("Unhandled exception in 04_RayTracingBvh: {}", e.what());
+    logger->error("Unhandled exception in 02_Dragon: {}", e.what());
     logger->flush();
 #if defined(_WIN32) || defined(_WIN64)
     MessageBoxA(nullptr, e.what(), "Error", MB_OK | MB_ICONERROR);

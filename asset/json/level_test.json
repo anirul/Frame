@@ -1,18 +1,33 @@
 {
   "name": "LevelTest",
-  "default_texture_name": "DefaultTexture",
+  "default_texture_name": "output",
   "textures": [
     {
-      "name": "DefaultTexture",
-      "size": {
-        "x": "640",
-        "y": "480"
+      "name": "skybox",
+      "cubemap": true,
+      "file_name": "asset/cubemap/hamarikyu.hdr",
+      "pixel_element_size": {
+        "value": "FLOAT"
       },
-      "pixel_element_size": { "value": "BYTE" },
-      "pixel_structure": { "value": "RGB" }
+      "pixel_structure": {
+        "value": "RGB"
+      }
+    },
+    {
+      "name": "output",
+      "cubemap": false,
+      "size": {
+        "x": 320,
+        "y": 200
+      },
+      "pixel_element_size": {
+        "value": "BYTE"
+      },
+      "pixel_structure": {
+        "value": "RGB"
+      }
     }
   ],
-  "programs": [],
   "scene_tree": {
     "default_root_name": "root",
     "default_camera_name": "camera",
@@ -50,6 +65,14 @@
         "aspect_ratio": 1.6,
         "near_clip": 0.1,
         "far_clip": 10000.0
+      }
+    ],
+    "node_meshes": [
+      {
+        "name": "Skybox",
+        "parent": "root",
+        "mesh_enum": "CUBE",
+        "render_time_enum": "SKYBOX_RENDER_TIME"
       }
     ]
   }

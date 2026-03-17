@@ -2,8 +2,6 @@
 
 #include <gtest/gtest.h>
 
-#include "frame/file/file_system.h"
-#include "frame/json/parse_level.h"
 #include "frame/level.h"
 #include "frame/material_interface.h"
 #include "frame/window_factory.h"
@@ -27,14 +25,7 @@ class ParseMaterialTest : public testing::Test
 
         try
         {
-            auto level = frame::json::ParseLevel(
-                {320, 200},
-                frame::file::FindFile("asset/json/material_test.json"));
-            if (!level)
-            {
-                GTEST_SKIP() << "Couldn't create level.";
-            }
-            level_ = std::move(level);
+            level_ = std::make_unique<frame::Level>();
         }
         catch (const std::exception& ex)
         {
@@ -42,8 +33,8 @@ class ParseMaterialTest : public testing::Test
         }
     }
 
-    std::shared_ptr<frame::LevelInterface> level_ = nullptr;
-    std::shared_ptr<frame::MaterialInterface> material_ = nullptr;
+    std::unique_ptr<frame::LevelInterface> level_ = nullptr;
+    std::unique_ptr<frame::MaterialInterface> material_ = nullptr;
     std::unique_ptr<frame::WindowInterface> window_ = nullptr;
 };
 

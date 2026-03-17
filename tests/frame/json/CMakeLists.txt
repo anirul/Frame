@@ -17,11 +17,9 @@ add_executable(FrameJsonTest
   parse_uniform_test.cpp
   parse_uniform_test.h
   ${CMAKE_CURRENT_SOURCE_DIR}/../../../asset/json/level_test.json
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../../asset/json/material_test.json
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../../asset/json/program_test.json
   ${CMAKE_CURRENT_SOURCE_DIR}/../../../asset/json/scene_tree_test.json
   ${CMAKE_CURRENT_SOURCE_DIR}/../../../asset/json/raytracing.json
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../../asset/json/raytracing_bvh.json
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../../asset/json/dragon.json
 )
 
 target_include_directories(FrameJsonTest

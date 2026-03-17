@@ -42,16 +42,31 @@ constexpr std::uint32_t kBindingNormal = 3;
 constexpr std::uint32_t kBindingRoughness = 4;
 constexpr std::uint32_t kBindingMetallic = 5;
 constexpr std::uint32_t kBindingAo = 6;
+constexpr std::uint32_t kBindingOpaqueAlbedo = 2;
+constexpr std::uint32_t kBindingOpaqueNormal = 3;
+constexpr std::uint32_t kBindingOpaqueRoughness = 4;
+constexpr std::uint32_t kBindingOpaqueMetallic = 5;
+constexpr std::uint32_t kBindingOpaqueAo = 6;
 constexpr std::uint32_t kBindingSkybox = 7;
 constexpr std::uint32_t kBindingTransmission = 12;
 constexpr std::uint32_t kBindingIor = 13;
 constexpr std::uint32_t kBindingThickness = 14;
 constexpr std::uint32_t kBindingAttenuationColor = 15;
 constexpr std::uint32_t kBindingAttenuationDistance = 16;
+constexpr std::uint32_t kBindingTransmissiveAlbedo = 22;
+constexpr std::uint32_t kBindingTransmissiveNormal = 23;
+constexpr std::uint32_t kBindingTransmissiveRoughness = 24;
+constexpr std::uint32_t kBindingTransmissiveMetallic = 25;
+constexpr std::uint32_t kBindingTransmissiveAo = 26;
+constexpr std::uint32_t kBindingTransmissiveTransmission = 27;
+constexpr std::uint32_t kBindingTransmissiveIor = 28;
+constexpr std::uint32_t kBindingTransmissiveThickness = 29;
+constexpr std::uint32_t kBindingTransmissiveAttenuationColor = 30;
+constexpr std::uint32_t kBindingTransmissiveAttenuationDistance = 31;
 constexpr std::uint32_t kBindingTriangleBuffer = 8;
 constexpr std::uint32_t kBindingBvhBuffer = 9;
-constexpr std::uint32_t kBindingTriangleBufferGlass = 8;
-constexpr std::uint32_t kBindingTriangleBufferGround = 9;
+constexpr std::uint32_t kBindingTriangleBufferTransmissive = 8;
+constexpr std::uint32_t kBindingTriangleBufferOpaque = 9;
 constexpr std::uint32_t kBindingUniform = 10;
 constexpr std::uint32_t kBindingSkyboxBackground = 11;
 
@@ -979,7 +994,7 @@ TEST_F(VulkanRayTracingComputeTest, DispatchProducesLitPixel)
 TEST_F(VulkanRayTracingComputeTest, BvhDispatchMaskShowsHit)
 {
     const auto shader_path = frame::file::FindFile(
-        "asset/shader/vulkan/raytracing_bvh.comp");
+        "asset/shader/vulkan/dragon.comp");
     ASSERT_FALSE(shader_path.empty());
     vk::ShaderModule compute_module =
         CompileShader(shader_path, *device_);
@@ -1569,11 +1584,51 @@ TEST_F(VulkanRayTracingComputeTest, DualDispatchMaskShowsGlassHit)
          vk::DescriptorType::eCombinedImageSampler,
          1,
          vk::ShaderStageFlagBits::eCompute},
-        {kBindingTriangleBufferGlass,
+        {kBindingTransmissiveAlbedo,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTransmissiveNormal,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTransmissiveRoughness,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTransmissiveMetallic,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTransmissiveAo,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTransmissiveTransmission,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTransmissiveIor,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTransmissiveThickness,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTransmissiveAttenuationColor,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTransmissiveAttenuationDistance,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTriangleBufferTransmissive,
          vk::DescriptorType::eStorageBuffer,
          1,
          vk::ShaderStageFlagBits::eCompute},
-        {kBindingTriangleBufferGround,
+        {kBindingTriangleBufferOpaque,
          vk::DescriptorType::eStorageBuffer,
          1,
          vk::ShaderStageFlagBits::eCompute},
@@ -1591,7 +1646,7 @@ TEST_F(VulkanRayTracingComputeTest, DualDispatchMaskShowsGlassHit)
 
     std::vector<vk::DescriptorPoolSize> pool_sizes = {
         {vk::DescriptorType::eStorageImage, 1},
-        {vk::DescriptorType::eCombinedImageSampler, 13},
+        {vk::DescriptorType::eCombinedImageSampler, 23},
         {vk::DescriptorType::eStorageBuffer, 2},
         {vk::DescriptorType::eUniformBuffer, 1},
     };
@@ -1629,7 +1684,7 @@ TEST_F(VulkanRayTracingComputeTest, DualDispatchMaskShowsGlassHit)
         vk::DescriptorType::eCombinedImageSampler,
         &output_sample);
 
-    const std::array<std::pair<std::uint32_t, ImageResource*>, 12> textures = {
+    const std::array<std::pair<std::uint32_t, ImageResource*>, 22> textures = {
         std::pair{kBindingAlbedo, &albedo_tex},
         std::pair{kBindingNormal, &normal_tex},
         std::pair{kBindingRoughness, &roughness_tex},
@@ -1642,6 +1697,16 @@ TEST_F(VulkanRayTracingComputeTest, DualDispatchMaskShowsGlassHit)
         std::pair{kBindingThickness, &thickness_tex},
         std::pair{kBindingAttenuationColor, &attenuation_color_tex},
         std::pair{kBindingAttenuationDistance, &attenuation_distance_tex},
+        std::pair{kBindingTransmissiveAlbedo, &albedo_tex},
+        std::pair{kBindingTransmissiveNormal, &normal_tex},
+        std::pair{kBindingTransmissiveRoughness, &roughness_tex},
+        std::pair{kBindingTransmissiveMetallic, &metallic_tex},
+        std::pair{kBindingTransmissiveAo, &ao_tex},
+        std::pair{kBindingTransmissiveTransmission, &transmission_tex},
+        std::pair{kBindingTransmissiveIor, &ior_tex},
+        std::pair{kBindingTransmissiveThickness, &thickness_tex},
+        std::pair{kBindingTransmissiveAttenuationColor, &attenuation_color_tex},
+        std::pair{kBindingTransmissiveAttenuationDistance, &attenuation_distance_tex},
     };
     std::vector<vk::DescriptorImageInfo> texture_infos;
     texture_infos.reserve(textures.size());
@@ -1664,7 +1729,7 @@ TEST_F(VulkanRayTracingComputeTest, DualDispatchMaskShowsGlassHit)
         *glass_buffer, 0, sizeof(glm::vec4) * glass_tri.size());
     writes.emplace_back(
         descriptor_set,
-        kBindingTriangleBufferGlass,
+        kBindingTriangleBufferTransmissive,
         0,
         1,
         vk::DescriptorType::eStorageBuffer,
@@ -1674,7 +1739,7 @@ TEST_F(VulkanRayTracingComputeTest, DualDispatchMaskShowsGlassHit)
         *ground_buffer, 0, sizeof(glm::vec4) * ground_tri.size());
     writes.emplace_back(
         descriptor_set,
-        kBindingTriangleBufferGround,
+        kBindingTriangleBufferOpaque,
         0,
         1,
         vk::DescriptorType::eStorageBuffer,
@@ -1775,6 +1840,462 @@ TEST_F(VulkanRayTracingComputeTest, DualDispatchMaskShowsGlassHit)
     EXPECT_GT(rg.x, 0.9f);
     EXPECT_LT(rg.y, 0.1f);
     EXPECT_LT(ba.x, 0.1f);
+    EXPECT_GE(ba.y, 0.9f);
+    device_->destroyShaderModule(compute_module);
+}
+
+TEST_F(
+    VulkanRayTracingComputeTest,
+    DualDispatchGlassRemainsTransparentWithoutTransmissionTexture)
+{
+    const auto shader_path = frame::file::FindFile(
+        "asset/shader/vulkan/raytracing_dual.comp");
+    ASSERT_FALSE(shader_path.empty());
+    vk::ShaderModule compute_module =
+        CompileShader(shader_path, *device_);
+
+    std::vector<float> black_rgba = {0.0f, 0.0f, 0.0f, 1.0f};
+    std::vector<float> normal_rgba = {0.5f, 0.5f, 1.0f, 1.0f};
+    std::vector<float> green_rgba = {0.0f, 1.0f, 0.0f, 1.0f};
+    std::vector<float> white_rgba(6 * 4, 1.0f);
+
+    ImageResource albedo_tex = CreateTexture2D(black_rgba);
+    ImageResource normal_tex = CreateTexture2D(normal_rgba);
+    ImageResource roughness_tex = CreateTexture2D(black_rgba);
+    ImageResource metallic_tex = CreateTexture2D(black_rgba);
+    ImageResource ao_tex = CreateTexture2D(black_rgba);
+    ImageResource transmission_tex = CreateTexture2D(black_rgba);
+    ImageResource ior_tex =
+        CreateTexture2D({1.0f, 1.0f, 1.0f, 1.0f});
+    ImageResource thickness_tex = CreateTexture2D(black_rgba);
+    ImageResource attenuation_color_tex = CreateTexture2D(green_rgba);
+    ImageResource attenuation_distance_tex =
+        CreateTexture2D({1000000.0f, 1000000.0f, 1000000.0f, 1.0f});
+    ImageResource skybox_tex = CreateCubemap(white_rgba);
+
+    vk::ImageCreateInfo out_info(
+        vk::ImageCreateFlags{},
+        vk::ImageType::e2D,
+        vk::Format::eR16G16B16A16Sfloat,
+        {1, 1, 1},
+        1,
+        1,
+        vk::SampleCountFlagBits::e1,
+        vk::ImageTiling::eOptimal,
+        vk::ImageUsageFlagBits::eStorage |
+            vk::ImageUsageFlagBits::eSampled |
+            vk::ImageUsageFlagBits::eTransferSrc);
+    vk::UniqueImage out_image = device_->createImageUnique(out_info);
+    auto out_req = device_->getImageMemoryRequirements(*out_image);
+    vk::MemoryAllocateInfo out_alloc(
+        out_req.size,
+        memory_manager_->FindMemoryType(
+            out_req.memoryTypeBits,
+            vk::MemoryPropertyFlagBits::eDeviceLocal));
+    vk::UniqueDeviceMemory out_memory =
+        device_->allocateMemoryUnique(out_alloc);
+    device_->bindImageMemory(*out_image, *out_memory, 0);
+    vk::ImageViewCreateInfo out_view_info(
+        vk::ImageViewCreateFlags{},
+        *out_image,
+        vk::ImageViewType::e2D,
+        vk::Format::eR16G16B16A16Sfloat,
+        {},
+        {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1});
+    vk::UniqueImageView out_view =
+        device_->createImageViewUnique(out_view_info);
+    vk::UniqueSampler out_sampler = MakeSampler(*device_);
+
+    command_queue_->TransitionImageLayout(
+        *out_image,
+        vk::Format::eR16G16B16A16Sfloat,
+        vk::ImageLayout::eUndefined,
+        vk::ImageLayout::eGeneral);
+
+    auto make_triangle = [](float z, float x_offset) {
+        std::array<glm::vec4, kTriangleVec4Count> tri{};
+        tri[0] = glm::vec4(-0.5f + x_offset, -0.5f, z, 0.0f);
+        tri[1] = glm::vec4(0.0f, 0.0f, 1.0f, 0.0f);
+        tri[2] = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+        tri[3] = glm::vec4(0.5f + x_offset, -0.5f, z, 0.0f);
+        tri[4] = glm::vec4(0.0f, 0.0f, 1.0f, 0.0f);
+        tri[5] = glm::vec4(1.0f, 0.0f, 0.0f, 0.0f);
+        tri[6] = glm::vec4(0.0f + x_offset, 0.5f, z, 0.0f);
+        tri[7] = glm::vec4(0.0f, 0.0f, 1.0f, 0.0f);
+        tri[8] = glm::vec4(0.5f, 1.0f, 0.0f, 0.0f);
+        return tri;
+    };
+
+    std::array<glm::vec4, kTriangleVec4Count> glass_tri =
+        make_triangle(0.0f, 0.0f);
+    std::array<glm::vec4, kTriangleVec4Count> ground_tri =
+        make_triangle(-2.0f, 2.0f);
+
+    vk::UniqueBuffer glass_buffer;
+    auto glass_memory = MakeBufferWithData(
+        glass_tri.data(),
+        sizeof(glm::vec4) * glass_tri.size(),
+        glass_buffer,
+        vk::BufferUsageFlagBits::eStorageBuffer);
+    vk::UniqueBuffer ground_buffer;
+    auto ground_memory = MakeBufferWithData(
+        ground_tri.data(),
+        sizeof(glm::vec4) * ground_tri.size(),
+        ground_buffer,
+        vk::BufferUsageFlagBits::eStorageBuffer);
+
+    UniformBlock ubo{};
+    const glm::vec3 eye(0.0f, 0.0f, 1.5f);
+    ubo.projection = glm::mat4(1.0f);
+    ubo.view = glm::mat4(1.0f);
+    ubo.projection_inv = glm::mat4(1.0f);
+    ubo.view_inv = glm::mat4(1.0f);
+    ubo.model = glm::mat4(1.0f);
+    ubo.model_inv = glm::mat4(1.0f);
+    ubo.env_map_model = glm::mat4(1.0f);
+    ubo.camera_position = glm::vec4(eye, 1.0f);
+    ubo.light_dir = glm::vec4(0.0f, 0.0f, 1.0f, 0.0f);
+    ubo.light_color = glm::vec4(8.0f);
+    ubo.time_s = glm::vec4(0.0f);
+    vk::UniqueDeviceMemory uniform_memory;
+    vk::UniqueBuffer uniform_buffer;
+    {
+        vk::BufferCreateInfo buf_info(
+            {},
+            sizeof(UniformBlock),
+            vk::BufferUsageFlagBits::eUniformBuffer,
+            vk::SharingMode::eExclusive);
+        uniform_buffer = device_->createBufferUnique(buf_info);
+        auto req = device_->getBufferMemoryRequirements(*uniform_buffer);
+        vk::MemoryAllocateInfo alloc(
+            req.size,
+            memory_manager_->FindMemoryType(
+                req.memoryTypeBits,
+                vk::MemoryPropertyFlagBits::eHostVisible |
+                    vk::MemoryPropertyFlagBits::eHostCoherent));
+        uniform_memory = device_->allocateMemoryUnique(alloc);
+        device_->bindBufferMemory(*uniform_buffer, *uniform_memory, 0);
+        void* mapped = device_->mapMemory(
+            *uniform_memory, 0, sizeof(UniformBlock));
+        std::memcpy(mapped, &ubo, sizeof(UniformBlock));
+        device_->unmapMemory(*uniform_memory);
+    }
+
+    std::vector<vk::DescriptorSetLayoutBinding> layout_bindings = {
+        {kBindingOutputImage,
+         vk::DescriptorType::eStorageImage,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingOutputSampler,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingAlbedo,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingNormal,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingRoughness,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingMetallic,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingAo,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingSkybox,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingSkyboxBackground,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTransmission,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingIor,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingThickness,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingAttenuationColor,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingAttenuationDistance,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTransmissiveAlbedo,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTransmissiveNormal,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTransmissiveRoughness,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTransmissiveMetallic,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTransmissiveAo,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTransmissiveTransmission,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTransmissiveIor,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTransmissiveThickness,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTransmissiveAttenuationColor,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTransmissiveAttenuationDistance,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTriangleBufferTransmissive,
+         vk::DescriptorType::eStorageBuffer,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTriangleBufferOpaque,
+         vk::DescriptorType::eStorageBuffer,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingUniform,
+         vk::DescriptorType::eUniformBuffer,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+    };
+    vk::DescriptorSetLayoutCreateInfo layout_info(
+        {},
+        static_cast<std::uint32_t>(layout_bindings.size()),
+        layout_bindings.data());
+    vk::UniqueDescriptorSetLayout set_layout =
+        device_->createDescriptorSetLayoutUnique(layout_info);
+
+    std::vector<vk::DescriptorPoolSize> pool_sizes = {
+        {vk::DescriptorType::eStorageImage, 1},
+        {vk::DescriptorType::eCombinedImageSampler, 23},
+        {vk::DescriptorType::eStorageBuffer, 2},
+        {vk::DescriptorType::eUniformBuffer, 1},
+    };
+    vk::DescriptorPoolCreateInfo pool_info(
+        vk::DescriptorPoolCreateFlags{},
+        1,
+        static_cast<std::uint32_t>(pool_sizes.size()),
+        pool_sizes.data());
+    vk::UniqueDescriptorPool descriptor_pool =
+        device_->createDescriptorPoolUnique(pool_info);
+
+    vk::DescriptorSetAllocateInfo alloc_info(
+        *descriptor_pool, 1, &set_layout.get());
+    auto sets = device_->allocateDescriptorSetsUnique(alloc_info);
+    vk::DescriptorSet descriptor_set = sets.front().get();
+
+    std::vector<vk::WriteDescriptorSet> writes;
+    vk::DescriptorImageInfo storage_image_info(
+        nullptr, *out_view, vk::ImageLayout::eGeneral);
+    writes.emplace_back(
+        descriptor_set,
+        kBindingOutputImage,
+        0,
+        1,
+        vk::DescriptorType::eStorageImage,
+        &storage_image_info);
+
+    vk::DescriptorImageInfo output_sample(
+        *out_sampler, *out_view, vk::ImageLayout::eGeneral);
+    writes.emplace_back(
+        descriptor_set,
+        kBindingOutputSampler,
+        0,
+        1,
+        vk::DescriptorType::eCombinedImageSampler,
+        &output_sample);
+
+    const std::array<std::pair<std::uint32_t, ImageResource*>, 22> textures = {
+        std::pair{kBindingAlbedo, &albedo_tex},
+        std::pair{kBindingNormal, &normal_tex},
+        std::pair{kBindingRoughness, &roughness_tex},
+        std::pair{kBindingMetallic, &metallic_tex},
+        std::pair{kBindingAo, &ao_tex},
+        std::pair{kBindingSkybox, &skybox_tex},
+        std::pair{kBindingSkyboxBackground, &skybox_tex},
+        std::pair{kBindingTransmission, &transmission_tex},
+        std::pair{kBindingIor, &ior_tex},
+        std::pair{kBindingThickness, &thickness_tex},
+        std::pair{kBindingAttenuationColor, &attenuation_color_tex},
+        std::pair{kBindingAttenuationDistance, &attenuation_distance_tex},
+        std::pair{kBindingTransmissiveAlbedo, &albedo_tex},
+        std::pair{kBindingTransmissiveNormal, &normal_tex},
+        std::pair{kBindingTransmissiveRoughness, &roughness_tex},
+        std::pair{kBindingTransmissiveMetallic, &metallic_tex},
+        std::pair{kBindingTransmissiveAo, &ao_tex},
+        std::pair{kBindingTransmissiveTransmission, &transmission_tex},
+        std::pair{kBindingTransmissiveIor, &ior_tex},
+        std::pair{kBindingTransmissiveThickness, &thickness_tex},
+        std::pair{kBindingTransmissiveAttenuationColor, &attenuation_color_tex},
+        std::pair{kBindingTransmissiveAttenuationDistance, &attenuation_distance_tex},
+    };
+    std::vector<vk::DescriptorImageInfo> texture_infos;
+    texture_infos.reserve(textures.size());
+    for (const auto& entry : textures)
+    {
+        texture_infos.emplace_back(
+            *entry.second->sampler,
+            *entry.second->view,
+            vk::ImageLayout::eShaderReadOnlyOptimal);
+        writes.emplace_back(
+            descriptor_set,
+            entry.first,
+            0,
+            1,
+            vk::DescriptorType::eCombinedImageSampler,
+            &texture_infos.back());
+    }
+
+    vk::DescriptorBufferInfo glass_info(
+        *glass_buffer, 0, sizeof(glm::vec4) * glass_tri.size());
+    writes.emplace_back(
+        descriptor_set,
+        kBindingTriangleBufferTransmissive,
+        0,
+        1,
+        vk::DescriptorType::eStorageBuffer,
+        nullptr,
+        &glass_info);
+    vk::DescriptorBufferInfo ground_info(
+        *ground_buffer, 0, sizeof(glm::vec4) * ground_tri.size());
+    writes.emplace_back(
+        descriptor_set,
+        kBindingTriangleBufferOpaque,
+        0,
+        1,
+        vk::DescriptorType::eStorageBuffer,
+        nullptr,
+        &ground_info);
+    vk::DescriptorBufferInfo uniform_info(
+        *uniform_buffer, 0, sizeof(UniformBlock));
+    writes.emplace_back(
+        descriptor_set,
+        kBindingUniform,
+        0,
+        1,
+        vk::DescriptorType::eUniformBuffer,
+        nullptr,
+        &uniform_info);
+    device_->updateDescriptorSets(
+        static_cast<std::uint32_t>(writes.size()),
+        writes.data(),
+        0,
+        nullptr);
+
+    vk::PipelineLayoutCreateInfo layout_ci(
+        {}, 1, &set_layout.get(), 0, nullptr);
+    vk::UniquePipelineLayout pipeline_layout =
+        device_->createPipelineLayoutUnique(layout_ci);
+
+    vk::PipelineShaderStageCreateInfo stage_info(
+        vk::PipelineShaderStageCreateFlags{},
+        vk::ShaderStageFlagBits::eCompute,
+        compute_module,
+        "main");
+    vk::ComputePipelineCreateInfo pipeline_info(
+        vk::PipelineCreateFlags{},
+        stage_info,
+        *pipeline_layout);
+    auto pipeline_result =
+        device_->createComputePipelineUnique(nullptr, pipeline_info);
+    ASSERT_EQ(pipeline_result.result, vk::Result::eSuccess);
+    vk::UniquePipeline pipeline = std::move(pipeline_result.value);
+
+    auto cmd = BeginCommands();
+    cmd->bindPipeline(vk::PipelineBindPoint::eCompute, *pipeline);
+    cmd->bindDescriptorSets(
+        vk::PipelineBindPoint::eCompute,
+        *pipeline_layout,
+        0,
+        descriptor_set,
+        {});
+    cmd->dispatch(1, 1, 1);
+
+    vk::ImageMemoryBarrier to_transfer(
+        vk::AccessFlagBits::eShaderWrite,
+        vk::AccessFlagBits::eTransferRead,
+        vk::ImageLayout::eGeneral,
+        vk::ImageLayout::eTransferSrcOptimal,
+        VK_QUEUE_FAMILY_IGNORED,
+        VK_QUEUE_FAMILY_IGNORED,
+        *out_image,
+        {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1});
+    cmd->pipelineBarrier(
+        vk::PipelineStageFlagBits::eComputeShader,
+        vk::PipelineStageFlagBits::eTransfer,
+        {},
+        nullptr,
+        nullptr,
+        to_transfer);
+
+    const vk::DeviceSize copy_size = sizeof(std::uint16_t) * 4;
+    vk::UniqueDeviceMemory readback_memory;
+    auto readback = memory_manager_->CreateBuffer(
+        copy_size,
+        vk::BufferUsageFlagBits::eTransferDst,
+        vk::MemoryPropertyFlagBits::eHostVisible |
+            vk::MemoryPropertyFlagBits::eHostCoherent,
+        readback_memory);
+    vk::BufferImageCopy region(
+        0,
+        0,
+        0,
+        {vk::ImageAspectFlagBits::eColor, 0, 0, 1},
+        {0, 0, 0},
+        {1, 1, 1});
+    cmd->copyImageToBuffer(
+        *out_image,
+        vk::ImageLayout::eTransferSrcOptimal,
+        *readback,
+        region);
+    EndCommands(cmd);
+
+    const auto* raw16 = static_cast<const std::uint16_t*>(
+        device_->mapMemory(*readback_memory, 0, copy_size));
+    glm::vec2 rg = glm::unpackHalf2x16(
+        (static_cast<std::uint32_t>(raw16[1]) << 16) | raw16[0]);
+    glm::vec2 ba = glm::unpackHalf2x16(
+        (static_cast<std::uint32_t>(raw16[3]) << 16) | raw16[2]);
+    device_->unmapMemory(*readback_memory);
+
+    EXPECT_GT(rg.y, 0.35f);
+    EXPECT_LT(rg.x, 0.35f);
+    EXPECT_LT(ba.x, 0.35f);
+    EXPECT_GT(rg.y, rg.x + 0.25f);
+    EXPECT_GT(rg.y, ba.x + 0.25f);
     EXPECT_GE(ba.y, 0.9f);
     device_->destroyShaderModule(compute_module);
 }
@@ -1969,11 +2490,51 @@ TEST_F(VulkanRayTracingComputeTest, DualDispatchMaskShowsGroundHit)
          vk::DescriptorType::eCombinedImageSampler,
          1,
          vk::ShaderStageFlagBits::eCompute},
-        {kBindingTriangleBufferGlass,
+        {kBindingTransmissiveAlbedo,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTransmissiveNormal,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTransmissiveRoughness,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTransmissiveMetallic,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTransmissiveAo,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTransmissiveTransmission,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTransmissiveIor,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTransmissiveThickness,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTransmissiveAttenuationColor,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTransmissiveAttenuationDistance,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTriangleBufferTransmissive,
          vk::DescriptorType::eStorageBuffer,
          1,
          vk::ShaderStageFlagBits::eCompute},
-        {kBindingTriangleBufferGround,
+        {kBindingTriangleBufferOpaque,
          vk::DescriptorType::eStorageBuffer,
          1,
          vk::ShaderStageFlagBits::eCompute},
@@ -1991,7 +2552,7 @@ TEST_F(VulkanRayTracingComputeTest, DualDispatchMaskShowsGroundHit)
 
     std::vector<vk::DescriptorPoolSize> pool_sizes = {
         {vk::DescriptorType::eStorageImage, 1},
-        {vk::DescriptorType::eCombinedImageSampler, 13},
+        {vk::DescriptorType::eCombinedImageSampler, 23},
         {vk::DescriptorType::eStorageBuffer, 2},
         {vk::DescriptorType::eUniformBuffer, 1},
     };
@@ -2029,7 +2590,7 @@ TEST_F(VulkanRayTracingComputeTest, DualDispatchMaskShowsGroundHit)
         vk::DescriptorType::eCombinedImageSampler,
         &output_sample);
 
-    const std::array<std::pair<std::uint32_t, ImageResource*>, 12> textures = {
+    const std::array<std::pair<std::uint32_t, ImageResource*>, 22> textures = {
         std::pair{kBindingAlbedo, &albedo_tex},
         std::pair{kBindingNormal, &normal_tex},
         std::pair{kBindingRoughness, &roughness_tex},
@@ -2042,6 +2603,16 @@ TEST_F(VulkanRayTracingComputeTest, DualDispatchMaskShowsGroundHit)
         std::pair{kBindingThickness, &thickness_tex},
         std::pair{kBindingAttenuationColor, &attenuation_color_tex},
         std::pair{kBindingAttenuationDistance, &attenuation_distance_tex},
+        std::pair{kBindingTransmissiveAlbedo, &albedo_tex},
+        std::pair{kBindingTransmissiveNormal, &normal_tex},
+        std::pair{kBindingTransmissiveRoughness, &roughness_tex},
+        std::pair{kBindingTransmissiveMetallic, &metallic_tex},
+        std::pair{kBindingTransmissiveAo, &ao_tex},
+        std::pair{kBindingTransmissiveTransmission, &transmission_tex},
+        std::pair{kBindingTransmissiveIor, &ior_tex},
+        std::pair{kBindingTransmissiveThickness, &thickness_tex},
+        std::pair{kBindingTransmissiveAttenuationColor, &attenuation_color_tex},
+        std::pair{kBindingTransmissiveAttenuationDistance, &attenuation_distance_tex},
     };
     std::vector<vk::DescriptorImageInfo> texture_infos;
     texture_infos.reserve(textures.size());
@@ -2064,7 +2635,7 @@ TEST_F(VulkanRayTracingComputeTest, DualDispatchMaskShowsGroundHit)
         *glass_buffer, 0, sizeof(glm::vec4) * glass_tri.size());
     writes.emplace_back(
         descriptor_set,
-        kBindingTriangleBufferGlass,
+        kBindingTriangleBufferTransmissive,
         0,
         1,
         vk::DescriptorType::eStorageBuffer,
@@ -2074,7 +2645,7 @@ TEST_F(VulkanRayTracingComputeTest, DualDispatchMaskShowsGroundHit)
         *ground_buffer, 0, sizeof(glm::vec4) * ground_tri.size());
     writes.emplace_back(
         descriptor_set,
-        kBindingTriangleBufferGround,
+        kBindingTriangleBufferOpaque,
         0,
         1,
         vk::DescriptorType::eStorageBuffer,
@@ -2203,11 +2774,11 @@ TEST_F(VulkanRayTracingComputeTest, SceneHitMaskMatchesCpuIntersections)
     for (const auto& name : material.GetBufferNames())
     {
         const auto inner = material.GetInnerBufferName(name);
-        if (inner == "TriangleBufferGlass")
+        if (inner == "TriangleBufferTransmissive")
         {
             glass_id = level.GetIdFromName(name);
         }
-        else if (inner == "TriangleBufferGround")
+        else if (inner == "TriangleBufferOpaque")
         {
             ground_id = level.GetIdFromName(name);
         }
@@ -2396,11 +2967,51 @@ TEST_F(VulkanRayTracingComputeTest, SceneHitMaskMatchesCpuIntersections)
          vk::DescriptorType::eCombinedImageSampler,
          1,
          vk::ShaderStageFlagBits::eCompute},
-        {kBindingTriangleBufferGlass,
+        {kBindingTransmissiveAlbedo,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTransmissiveNormal,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTransmissiveRoughness,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTransmissiveMetallic,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTransmissiveAo,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTransmissiveTransmission,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTransmissiveIor,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTransmissiveThickness,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTransmissiveAttenuationColor,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTransmissiveAttenuationDistance,
+         vk::DescriptorType::eCombinedImageSampler,
+         1,
+         vk::ShaderStageFlagBits::eCompute},
+        {kBindingTriangleBufferTransmissive,
          vk::DescriptorType::eStorageBuffer,
          1,
          vk::ShaderStageFlagBits::eCompute},
-        {kBindingTriangleBufferGround,
+        {kBindingTriangleBufferOpaque,
          vk::DescriptorType::eStorageBuffer,
          1,
          vk::ShaderStageFlagBits::eCompute},
@@ -2418,7 +3029,7 @@ TEST_F(VulkanRayTracingComputeTest, SceneHitMaskMatchesCpuIntersections)
 
     std::vector<vk::DescriptorPoolSize> pool_sizes = {
         {vk::DescriptorType::eStorageImage, 1},
-        {vk::DescriptorType::eCombinedImageSampler, 13},
+        {vk::DescriptorType::eCombinedImageSampler, 23},
         {vk::DescriptorType::eStorageBuffer, 2},
         {vk::DescriptorType::eUniformBuffer, 1},
     };
@@ -2456,7 +3067,7 @@ TEST_F(VulkanRayTracingComputeTest, SceneHitMaskMatchesCpuIntersections)
         vk::DescriptorType::eCombinedImageSampler,
         &output_sample);
 
-    const std::array<std::pair<std::uint32_t, ImageResource*>, 12> textures = {
+    const std::array<std::pair<std::uint32_t, ImageResource*>, 22> textures = {
         std::pair{kBindingAlbedo, &albedo_tex},
         std::pair{kBindingNormal, &normal_tex},
         std::pair{kBindingRoughness, &roughness_tex},
@@ -2469,6 +3080,16 @@ TEST_F(VulkanRayTracingComputeTest, SceneHitMaskMatchesCpuIntersections)
         std::pair{kBindingThickness, &thickness_tex},
         std::pair{kBindingAttenuationColor, &attenuation_color_tex},
         std::pair{kBindingAttenuationDistance, &attenuation_distance_tex},
+        std::pair{kBindingTransmissiveAlbedo, &albedo_tex},
+        std::pair{kBindingTransmissiveNormal, &normal_tex},
+        std::pair{kBindingTransmissiveRoughness, &roughness_tex},
+        std::pair{kBindingTransmissiveMetallic, &metallic_tex},
+        std::pair{kBindingTransmissiveAo, &ao_tex},
+        std::pair{kBindingTransmissiveTransmission, &transmission_tex},
+        std::pair{kBindingTransmissiveIor, &ior_tex},
+        std::pair{kBindingTransmissiveThickness, &thickness_tex},
+        std::pair{kBindingTransmissiveAttenuationColor, &attenuation_color_tex},
+        std::pair{kBindingTransmissiveAttenuationDistance, &attenuation_distance_tex},
     };
     std::vector<vk::DescriptorImageInfo> texture_infos;
     texture_infos.reserve(textures.size());
@@ -2491,7 +3112,7 @@ TEST_F(VulkanRayTracingComputeTest, SceneHitMaskMatchesCpuIntersections)
         *glass_buffer, 0, glass_bytes.size());
     writes.emplace_back(
         descriptor_set,
-        kBindingTriangleBufferGlass,
+        kBindingTriangleBufferTransmissive,
         0,
         1,
         vk::DescriptorType::eStorageBuffer,
@@ -2501,7 +3122,7 @@ TEST_F(VulkanRayTracingComputeTest, SceneHitMaskMatchesCpuIntersections)
         *ground_buffer, 0, ground_bytes.size());
     writes.emplace_back(
         descriptor_set,
-        kBindingTriangleBufferGround,
+        kBindingTriangleBufferOpaque,
         0,
         1,
         vk::DescriptorType::eStorageBuffer,

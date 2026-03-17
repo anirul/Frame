@@ -31,7 +31,7 @@ constexpr double kDefaultAutoExitSeconds = 8.0;
 int Run(int argc, char** argv)
 {
     absl::SetProgramUsageMessage(
-        "05_SkinnedMesh [--device={vulkan|opengl}] "
+        "03_SkinnedMesh [--device={vulkan|opengl}] "
         "[--auto_exit_seconds=<seconds>] (defaults to opengl)");
     std::vector<std::string> args = {};
     args.reserve(static_cast<std::size_t>(argc));
@@ -118,7 +118,7 @@ try
 catch (const std::exception& ex)
 {
     auto& logger = frame::Logger::GetInstance();
-    logger->error("Unhandled exception in 05_SkinnedMesh: {}", ex.what());
+    logger->error("Unhandled exception in 03_SkinnedMesh: {}", ex.what());
     logger->flush();
 #if defined(_WIN32) || defined(_WIN64)
     MessageBoxA(nullptr, ex.what(), "Error", MB_OK | MB_ICONERROR);

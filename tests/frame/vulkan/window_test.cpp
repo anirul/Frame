@@ -17,7 +17,7 @@ class VulkanBuildLevelTest : public ::testing::Test
         level_path_ = frame::file::FindFile("asset/json/level_test.json");
         level_proto_ = frame::json::LoadLevelProto(level_path_);
         level_data_ = frame::json::ParseLevelData(
-            glm::uvec2(320, 200), level_proto_, asset_root_);
+            glm::uvec2(320, 200), level_path_, asset_root_);
     }
 
     std::filesystem::path asset_root_;
@@ -59,30 +59,25 @@ TEST_F(VulkanBuildLevelTest, BuildLevelRegistersProgramsMaterialsAndTextures)
             built.level->GetIdFromName(proto_texture.name()), frame::NullId);
     }
 
-    for (const auto& proto_program : level_proto_.programs())
+    for (const auto& program_info : level_data_.programs)
     {
         EXPECT_NE(
-            built.level->GetIdFromName(proto_program.name()), frame::NullId);
+            built.level->GetIdFromName(program_info.name), frame::NullId);
     }
 
-    for (const auto& proto_material : level_proto_.materials())
+    const auto material_ids = built.level->GetMaterials();
+    ASSERT_FALSE(material_ids.empty());
+    for (const auto material_id : material_ids)
     {
-        EXPECT_NE(
-            built.level->GetIdFromName(proto_material.name()), frame::NullId);
+        EXPECT_NE(material_id, frame::NullId);
     }
 }
 
 TEST_F(VulkanBuildLevelTest, BuildMeshVerticesFromStaticMeshInfo)
 {
-    const auto mesh_level_path =
-        frame::file::FindFile("asset/json/japanese_flag.json");
-    const auto mesh_level_proto =
-        frame::json::LoadLevelProto(mesh_level_path);
-    const auto mesh_level_data = frame::json::ParseLevelData(
-        glm::uvec2(320, 200), mesh_level_proto, asset_root_);
-    ASSERT_FALSE(mesh_level_data.meshes.empty());
+    ASSERT_FALSE(level_data_.meshes.empty());
 
-    const auto& mesh_info = mesh_level_data.meshes.front();
+    const auto& mesh_info = level_data_.meshes.front();
     const auto vertices = frame::vulkan::BuildMeshVertices(mesh_info);
     ASSERT_EQ(vertices.size(), mesh_info.positions.size() / 3);
     EXPECT_FLOAT_EQ(vertices.front().position.x, mesh_info.positions[0]);

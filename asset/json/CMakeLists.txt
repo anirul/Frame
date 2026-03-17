@@ -3,17 +3,14 @@
 add_custom_target(AssetJson
   SOURCES
     device_test.json
-    editor.json
     new_project_template.json
     equirectangular.json
     japanese_flag.json
     level_test.json
-    material_test.json
-    program_test.json
     cubemap.json
     ray_marching.json
     raytracing.json
-    raytracing_bvh.json
+    dragon.json
     skinned_mesh.json
     program_catalog.json
     renderer_test.json

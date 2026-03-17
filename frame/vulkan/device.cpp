@@ -432,33 +432,33 @@ void Device::StartupFromLevelData(const frame::json::LevelData& level_data)
                     }
                     return std::nullopt;
                 };
-            auto find_proto_program_by_name =
+            auto find_program_info_by_name =
                 [&](const std::string& program_name)
-                -> const frame::proto::Program* {
+                -> const frame::json::ProgramInfo* {
                     if (program_name.empty())
                     {
                         return nullptr;
                     }
-                    for (const auto& proto_program : level_data.proto.programs())
+                    for (const auto& program_info : level_data.programs)
                     {
-                        if (proto_program.name() == program_name)
+                        if (program_info.name == program_name)
                         {
-                            return &proto_program;
+                            return &program_info;
                         }
                     }
                     return nullptr;
                 };
-            auto is_raytracing_bvh_program =
+            auto is_dragon_program =
                 [&](const std::string& program_name) {
-                    const auto* proto_program =
-                        find_proto_program_by_name(program_name);
-                    if (!proto_program)
+                    const auto* program_info =
+                        find_program_info_by_name(program_name);
+                    if (!program_info)
                     {
                         return false;
                     }
                     const auto key =
-                        frame::json::ResolveProgramKey(*proto_program);
-                    return frame::json::IsRaytracingBvhProgramKey(key);
+                        frame::json::ResolveProgramKey(program_info->proto);
+                    return frame::json::IsDragonProgramKey(key);
                 };
             auto pass_has_renderable_mesh =
                 [&](frame::proto::NodeMesh::RenderTimeEnum pass) {
@@ -509,20 +509,20 @@ void Device::StartupFromLevelData(const frame::json::LevelData& level_data)
                     continue;
                 }
                 for (const auto& pass_program :
-                     level_data.proto.render_pass_programs())
+                     level_data.render_pass_programs)
                 {
-                    if (pass_program.render_time_enum() != pass)
+                    if (pass_program.render_time != pass)
                     {
                         continue;
                     }
                     if (auto program =
-                            find_program_by_name(pass_program.program_name()))
+                            find_program_by_name(pass_program.program_name))
                     {
                         if (!first_pass_program)
                         {
                             first_pass_program = program;
                         }
-                        if (is_raytracing_bvh_program(pass_program.program_name()))
+                        if (is_dragon_program(pass_program.program_name))
                         {
                             return program;
                         }
@@ -535,7 +535,7 @@ void Device::StartupFromLevelData(const frame::json::LevelData& level_data)
             }
             for (const auto& program_info : level_data.programs)
             {
-                if (is_raytracing_bvh_program(program_info.name))
+                if (is_dragon_program(program_info.name))
                 {
                     return program_info;
                 }
@@ -554,47 +554,40 @@ void Device::StartupFromLevelData(const frame::json::LevelData& level_data)
             pipeline_info.program_name = program_info.name;
             const auto shader_root =
                 level_data.asset_root / "shader" / "vulkan";
-            pipeline_info.vertex_shader = shader_root / program_info.vertex_shader;
+            pipeline_info.vertex_shader =
+                shader_root / program_info.vulkan.vertex_shader;
             pipeline_info.fragment_shader =
-                shader_root / program_info.fragment_shader;
-            pipeline_info.use_compute = !program_info.compute_shader.empty();
+                shader_root / program_info.vulkan.fragment_shader;
+            pipeline_info.use_compute =
+                !program_info.vulkan.compute_shader.empty();
             if (pipeline_info.use_compute)
             {
                 pipeline_info.compute_shader =
-                    shader_root / program_info.compute_shader;
+                    shader_root / program_info.vulkan.compute_shader;
             }
-            pipeline_info.scene_type = frame::proto::SceneType::NONE;
-            for (const auto& proto_program : level_data.proto.programs())
+            pipeline_info.scene_type =
+                program_info.proto.input_scene_type().value();
+            for (const auto& uniform : program_info.proto.uniforms())
             {
-                if (proto_program.name() == program_info.name)
+                if (uniform.value_oneof_case() ==
+                        frame::proto::Uniform::kUniformEnum &&
+                    uniform.uniform_enum() ==
+                        frame::proto::Uniform::FLOAT_TIME_S)
                 {
-                    pipeline_info.scene_type =
-                        proto_program.input_scene_type().value();
-                    for (const auto& uniform : proto_program.uniforms())
-                    {
-                        if (uniform.value_oneof_case() ==
-                                frame::proto::Uniform::kUniformEnum &&
-                            uniform.uniform_enum() ==
-                                frame::proto::Uniform::FLOAT_TIME_S)
-                        {
-                            pipeline_info.uses_time_uniform = true;
-                        }
-                    }
-                    pipeline_info.bindings.clear();
-                    pipeline_info.bindings.reserve(
-                        static_cast<std::size_t>(proto_program.bindings_size()));
-                    for (const auto& binding : proto_program.bindings())
-                    {
-                        ProgramPipelineInfo::BindingInfo binding_info;
-                        binding_info.name = binding.name();
-                        binding_info.binding = binding.binding();
-                        binding_info.binding_type = binding.binding_type();
-                        binding_info.stages = ToShaderStageFlags(binding);
-                        pipeline_info.bindings.push_back(
-                            std::move(binding_info));
-                    }
-                    break;
+                    pipeline_info.uses_time_uniform = true;
                 }
+            }
+            pipeline_info.bindings.clear();
+            pipeline_info.bindings.reserve(
+                static_cast<std::size_t>(program_info.proto.bindings_size()));
+            for (const auto& binding : program_info.proto.bindings())
+            {
+                ProgramPipelineInfo::BindingInfo binding_info;
+                binding_info.name = binding.name();
+                binding_info.binding = binding.binding();
+                binding_info.binding_type = binding.binding_type();
+                binding_info.stages = ToShaderStageFlags(binding);
+                pipeline_info.bindings.push_back(std::move(binding_info));
             }
             active_program_info_ = std::move(pipeline_info);
             logger_->info(
@@ -604,8 +597,7 @@ void Device::StartupFromLevelData(const frame::json::LevelData& level_data)
         else
         {
             logger_->error(
-                "No Vulkan program selected; configure "
-                "level.render_pass_programs.");
+                "No Vulkan program selected from the internal render setup.");
         }
     }
 

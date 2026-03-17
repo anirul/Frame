@@ -28,7 +28,7 @@ std::optional<ProgramShaderFiles> ResolveProgramShaderFiles(
     ShaderBackend backend);
 
 bool IsRaytracingProgramKey(const std::string& program_key);
-bool IsRaytracingBvhProgramKey(const std::string& program_key);
+bool IsDragonProgramKey(const std::string& program_key);
 
 } // namespace frame::json
 

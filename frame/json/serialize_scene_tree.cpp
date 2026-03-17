@@ -119,8 +119,6 @@ void SerializeNodeMeshEnum(
                 "Couldn't find any mesh for this node: [{}].",
                 node_mesh.GetData().name()));
     }
-    proto_node_mesh.set_material_name(
-        node_mesh.GetData().material_name());
     proto_node_mesh.set_render_time_enum(
         node_mesh.GetData().render_time_enum());
 }
@@ -132,8 +130,6 @@ void SerializeNodeMeshFileName(
     const LevelInterface& level_interface)
 {
     proto_node_mesh.set_file_name(mesh_name);
-    proto_node_mesh.set_material_name(
-        node_mesh.GetData().material_name());
     proto_node_mesh.set_render_time_enum(
         node_mesh.GetData().render_time_enum());
 }
@@ -198,8 +194,6 @@ proto::NodeMesh SerializeNodeMesh(
             level_interface);
     }
 
-    proto_node_mesh.set_material_name(
-        node_mesh.GetData().material_name());
     proto_node_mesh.set_render_time_enum(
         node_mesh.GetData().render_time_enum());
     proto_node_mesh.set_acceleration_structure_enum(

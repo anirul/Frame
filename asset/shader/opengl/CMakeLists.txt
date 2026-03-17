@@ -32,8 +32,8 @@ add_custom_target(AssetShaderOpenGL
     monte_carlo_prefilter.vert
     physically_based_rendering.frag
     physically_based_rendering.vert
-    raytracing_bvh.frag
-    raytracing_bvh.vert
+    dragon.frag
+    dragon.vert
     raytracing_simple.frag
     raytracing_simple.vert
     ray_marching.frag

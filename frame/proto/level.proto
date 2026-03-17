@@ -1,24 +1,12 @@
 syntax = "proto3";
 
 import "texture.proto";
-import "program.proto";
 import "scene.proto";
-import "material.proto";
 
 package frame.proto;
 
-// Program configuration for a render pass.
-message RenderPassProgram {
-	// Which pass this configuration applies to.
-	NodeMesh.RenderTimeEnum render_time_enum = 1;
-	// Main program for this pass.
-	string program_name = 2;
-	// Optional preprocess program for this pass.
-	optional string preprocess_program_name = 3;
-}
-
 // Level this describe the level loading of the app.
-// Next 9
+// Next 8
 message Level {
 	// Level name.
 	string name = 1;
@@ -26,12 +14,6 @@ message Level {
 	string default_texture_name = 2;
 	// Contains the needed textures.
 	repeated Texture textures = 5;
-	// Contains the needed programs.
-	repeated Program programs = 6;
 	// Contains the scene tree.
 	SceneTree scene_tree = 7;
-	// Contains the needed materials.
-	repeated Material materials = 8;
-	// Program selection per render pass.
-	repeated RenderPassProgram render_pass_programs = 9;
 }

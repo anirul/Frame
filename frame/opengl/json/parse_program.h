@@ -3,6 +3,7 @@
 #include <memory>
 #include <optional>
 
+#include "frame/json/level_data.h"
 #include "frame/json/proto.h"
 #include "frame/level_interface.h"
 #include "frame/program_interface.h"
@@ -18,5 +19,9 @@ namespace frame::json
  */
 std::unique_ptr<ProgramInterface> ParseProgramOpenGL(
     const proto::Program& proto_program, LevelInterface& level);
+std::unique_ptr<ProgramInterface> ParseProgramOpenGL(
+    const proto::Program& proto_program,
+    const ShaderFiles& shader_files,
+    LevelInterface& level);
 
 } // End namespace frame::json.

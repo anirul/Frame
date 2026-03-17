@@ -157,7 +157,7 @@
         },
         {
             "name": "RayTraceProgram",
-            "pipeline_name": "raytracing_bvh",
+            "pipeline_name": "dragon",
             "output_texture_names": [
                 "albedo"
             ],

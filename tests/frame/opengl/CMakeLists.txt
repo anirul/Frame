@@ -22,6 +22,8 @@ add_executable(FrameOpenGLTest
   program_test.h
   render_buffer_test.cpp
   render_buffer_test.h
+  raytracing_test.cpp
+  raytracing_test.h
   renderer_test.cpp
   renderer_test.h
   shader_test.cpp

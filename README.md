@@ -1,8 +1,8 @@
 # Frame
 
 Frame is a C++23 3D engine with both Vulkan and OpenGL backends. Backend
-selection is runtime-configurable, and the sample apps, editor, and tests are
-built from the same engine code.
+selection is runtime-configurable, and the sample apps and tests are built
+from the same engine code.
 
 ![A Scene rendering made with Frame.](examples/raytracing.png)
 
@@ -66,25 +66,23 @@ The samples are built into `build/<preset>/bin/`.
 Windows example:
 
 ```sh
-build/windows/bin/Debug/03_RayTracing.exe --device=vulkan
-build/windows/bin/Debug/03_RayTracing.exe --device=opengl
+build/windows/bin/Debug/01_RayTracing.exe --device=vulkan
+build/windows/bin/Debug/01_RayTracing.exe --device=opengl
 ```
 
 Linux example:
 
 ```sh
-./build/linux-debug/bin/03_RayTracing --device=vulkan
-./build/linux-debug/bin/03_RayTracing --device=opengl
+./build/linux-debug/bin/01_RayTracing --device=vulkan
+./build/linux-debug/bin/01_RayTracing --device=opengl
 ```
 
 Available examples:
 
-- `00_JapaneseFlag`
-- `01_RayMarching`
-- `02_Cubemap`
-- `03_RayTracing`
-- `04_RayTracingBvh`
-- `05_SkinnedMesh`
+- `00_Cubemap`
+- `01_RayTracing`
+- `02_Dragon`
+- `03_SkinnedMesh`
 
 Useful runtime flags:
 
@@ -111,4 +109,3 @@ ctest --test-dir build/windows -C Debug --output-on-failure
 
 - Example overview: [`examples/README.md`](examples/README.md)
 - Engine source: `frame/`
-- Editor application: `editor/`

@@ -67,9 +67,6 @@ message NodeMesh {
 		MultiPlugin multi_plugin = 10;
 	}
 
-	// Material name.
-	string material_name = 5;
-
     // Render time enum.
 	enum RenderTimeEnum {
         // This will be rendered at all frames (this is default).

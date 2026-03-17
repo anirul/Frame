@@ -1,8 +1,6 @@
-# Sample.
+# Active samples.
 
-add_subdirectory(00-japanese_flag)
-add_subdirectory(01-ray_marching)
-add_subdirectory(02-cubemap)
-add_subdirectory(03-raytracing)
-add_subdirectory(04-raytracing_bvh)
-add_subdirectory(05-skinned_mesh)
+add_subdirectory(00-cubemap)
+add_subdirectory(01-raytracing)
+add_subdirectory(02-dragon)
+add_subdirectory(03-skinned_mesh)

@@ -101,14 +101,14 @@ bool IsRaytracingProgramKey(const std::string& program_key)
 {
     const std::string lowered = ToLowerAscii(program_key);
     return lowered.find("raytrace") != std::string::npos ||
-           lowered.find("raytracing") != std::string::npos;
+           lowered.find("raytracing") != std::string::npos ||
+           lowered.find("dragon") != std::string::npos;
 }
 
-bool IsRaytracingBvhProgramKey(const std::string& program_key)
+bool IsDragonProgramKey(const std::string& program_key)
 {
     const std::string lowered = ToLowerAscii(program_key);
-    return IsRaytracingProgramKey(lowered) &&
-           lowered.find("bvh") != std::string::npos;
+    return lowered.find("dragon") != std::string::npos;
 }
 
 } // namespace frame::json

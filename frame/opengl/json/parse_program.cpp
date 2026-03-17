@@ -3,6 +3,7 @@
 #include <array>
 #include <filesystem>
 #include <fstream>
+#include <string_view>
 
 #include "frame/file/file_system.h"
 #include "frame/json/parse_pixel.h"
@@ -19,6 +20,12 @@ namespace frame::json
 namespace
 {
 
+bool EndsWith(std::string_view value, std::string_view suffix)
+{
+    return value.size() >= suffix.size() &&
+           value.substr(value.size() - suffix.size()) == suffix;
+}
+
 struct GeneratedTextureSpec
 {
     std::array<float, 4> color = {0.0f, 0.0f, 0.0f, 1.0f};
@@ -29,29 +36,59 @@ struct GeneratedTextureSpec
 std::optional<GeneratedTextureSpec> GetRaytracingTextureSpec(
     const std::string& texture_name)
 {
-    if (texture_name == "transmission_texture")
-    {
-        return GeneratedTextureSpec{};
-    }
-    if (texture_name == "ior_texture")
-    {
-        return GeneratedTextureSpec{
-            .color = {1.5f, 1.5f, 1.5f, 1.0f},
-            .element = frame::proto::PixelElementSize::FLOAT};
-    }
-    if (texture_name == "thickness_texture")
-    {
-        return GeneratedTextureSpec{
-            .color = {0.0f, 0.0f, 0.0f, 1.0f},
-            .element = frame::proto::PixelElementSize::FLOAT};
-    }
-    if (texture_name == "attenuation_color_texture")
+    if (EndsWith(texture_name, "albedo_texture"))
     {
         return GeneratedTextureSpec{
             .color = {1.0f, 1.0f, 1.0f, 1.0f},
             .element = frame::proto::PixelElementSize::BYTE};
     }
-    if (texture_name == "attenuation_distance_texture")
+    if (EndsWith(texture_name, "normal_texture"))
+    {
+        return GeneratedTextureSpec{
+            .color = {0.5f, 0.5f, 1.0f, 1.0f},
+            .element = frame::proto::PixelElementSize::BYTE};
+    }
+    if (EndsWith(texture_name, "roughness_texture"))
+    {
+        return GeneratedTextureSpec{
+            .color = {1.0f, 1.0f, 1.0f, 1.0f},
+            .element = frame::proto::PixelElementSize::BYTE};
+    }
+    if (EndsWith(texture_name, "metallic_texture"))
+    {
+        return GeneratedTextureSpec{
+            .color = {0.0f, 0.0f, 0.0f, 1.0f},
+            .element = frame::proto::PixelElementSize::BYTE};
+    }
+    if (EndsWith(texture_name, "ao_texture"))
+    {
+        return GeneratedTextureSpec{
+            .color = {1.0f, 1.0f, 1.0f, 1.0f},
+            .element = frame::proto::PixelElementSize::BYTE};
+    }
+    if (EndsWith(texture_name, "transmission_texture"))
+    {
+        return GeneratedTextureSpec{};
+    }
+    if (EndsWith(texture_name, "ior_texture"))
+    {
+        return GeneratedTextureSpec{
+            .color = {1.5f, 1.5f, 1.5f, 1.0f},
+            .element = frame::proto::PixelElementSize::FLOAT};
+    }
+    if (EndsWith(texture_name, "thickness_texture"))
+    {
+        return GeneratedTextureSpec{
+            .color = {0.0f, 0.0f, 0.0f, 1.0f},
+            .element = frame::proto::PixelElementSize::FLOAT};
+    }
+    if (EndsWith(texture_name, "attenuation_color_texture"))
+    {
+        return GeneratedTextureSpec{
+            .color = {1.0f, 1.0f, 1.0f, 1.0f},
+            .element = frame::proto::PixelElementSize::BYTE};
+    }
+    if (EndsWith(texture_name, "attenuation_distance_texture"))
     {
         return GeneratedTextureSpec{
             .color = {1000000.0f, 1000000.0f, 1000000.0f, 1.0f},
@@ -111,9 +148,34 @@ EntityId EnsureRaytracingDefaultTexture(
 std::unique_ptr<frame::ProgramInterface> ParseProgramOpenGL(
     const proto::Program& proto_program, LevelInterface& level)
 {
+    auto shader_files = frame::json::ResolveProgramShaderFiles(
+        proto_program,
+        frame::json::ShaderBackend::OpenGL);
+    if (!shader_files)
+    {
+        throw std::runtime_error(std::format(
+            "No OpenGL shader mapping for program '{}'.",
+            proto_program.name()));
+    }
+    return ParseProgramOpenGL(
+        proto_program,
+        ShaderFiles{
+            .vertex_shader = shader_files->vertex_shader,
+            .fragment_shader = shader_files->fragment_shader,
+            .compute_shader = shader_files->compute_shader},
+        level);
+}
+
+std::unique_ptr<frame::ProgramInterface> ParseProgramOpenGL(
+    const proto::Program& proto_program,
+    const ShaderFiles& shader_files,
+    LevelInterface& level)
+{
     Logger& logger = Logger::GetInstance();
-    // Create the program.
-    auto program = opengl::file::LoadProgram(proto_program);
+    auto program = opengl::file::LoadProgram(
+        proto_program,
+        std::string("asset/shader/opengl/" + shader_files.vertex_shader),
+        std::string("asset/shader/opengl/" + shader_files.fragment_shader));
     if (!program)
     {
         return nullptr;

@@ -20,7 +20,7 @@ constexpr const char* kLevelPath = "asset/json/cubemap.json";
 
 int Run(int argc, char** argv)
 {
-    absl::SetProgramUsageMessage("02_Cubemap --device={vulkan|opengl}");
+    absl::SetProgramUsageMessage("00_Cubemap --device={vulkan|opengl}");
     frame::common::Application app(argc, argv, kDefaultSize);
     app.Startup(frame::file::FindFile(kLevelPath));
     app.Run();
@@ -48,7 +48,7 @@ try
 catch (const std::exception& ex)
 {
     auto& logger = frame::Logger::GetInstance();
-    logger->error("Unhandled exception in 02_Cubemap: {}", ex.what());
+    logger->error("Unhandled exception in 00_Cubemap: {}", ex.what());
     logger->flush();
 #if defined(_WIN32) || defined(_WIN64)
     MessageBox(nullptr, ex.what(), "Exception", MB_ICONEXCLAMATION);

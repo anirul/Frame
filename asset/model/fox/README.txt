@@ -1,4 +1,4 @@
-Fox sample assets used by 05_SkinnedMesh.
+Fox sample assets used by 03_SkinnedMesh.
 
 Source:
 https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/Fox

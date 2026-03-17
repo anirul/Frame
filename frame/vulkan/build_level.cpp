@@ -1,13 +1,11 @@
 #include "frame/vulkan/build_level.h"
 
 #include <format>
-#include <string>
+#include <stdexcept>
 
 #include "frame/level.h"
 #include "frame/logger.h"
-#include "frame/json/program_catalog.h"
 #include "frame/vulkan/scoped_timer.h"
-#include "frame/vulkan/json/parse_material.h"
 #include "frame/vulkan/json/parse_program.h"
 #include "frame/vulkan/json/parse_scene_tree.h"
 #include "frame/vulkan/json/parse_texture.h"
@@ -19,145 +17,36 @@ namespace frame::vulkan
 namespace
 {
 
-EntityId FindProgramBySceneType(
-    const frame::LevelInterface& level,
-    frame::proto::SceneType::Enum scene_type)
-{
-    for (const auto program_id : level.GetPrograms())
-    {
-        const auto& program = level.GetProgramFromId(program_id);
-        if (program.GetData().input_scene_type().value() == scene_type)
-        {
-            return program_id;
-        }
-    }
-    return NullId;
-}
-
-EntityId FindRaytracingBvhProgramBySceneType(
-    const frame::LevelInterface& level,
-    frame::proto::SceneType::Enum scene_type)
-{
-    for (const auto program_id : level.GetPrograms())
-    {
-        const auto& program = level.GetProgramFromId(program_id);
-        if (program.GetData().input_scene_type().value() != scene_type)
-        {
-            continue;
-        }
-        const auto key = frame::json::ResolveProgramKey(program.GetData());
-        if (frame::json::IsRaytracingBvhProgramKey(key))
-        {
-            return program_id;
-        }
-    }
-    return NullId;
-}
-
-EntityId FindRaytracingPreprocessProgram(
-    const frame::LevelInterface& level)
-{
-    for (const auto program_id : level.GetPrograms())
-    {
-        const auto& program = level.GetProgramFromId(program_id);
-        const auto key = frame::json::ResolveProgramKey(program.GetData());
-        if (frame::json::IsRaytracingProgramKey(key) &&
-            key.find("preprocess") != std::string::npos)
-        {
-            return program_id;
-        }
-    }
-    return NullId;
-}
-
 void ConfigureRenderPassPrograms(
     frame::LevelInterface& level,
-    const frame::proto::Level& proto_level)
+    const frame::json::LevelData& level_data)
 {
-    bool has_explicit_config = false;
-    for (const auto& pass : proto_level.render_pass_programs())
+    for (const auto& pass : level_data.render_pass_programs)
     {
-        const auto program_id = level.GetIdFromName(pass.program_name());
+        const auto program_id = level.GetIdFromName(pass.program_name);
         if (!program_id)
         {
             throw std::runtime_error(std::format(
-                "Unknown program '{}' in render_pass_programs.",
-                pass.program_name()));
+                "Unknown internal program '{}' for Vulkan render pass {}.",
+                pass.program_name,
+                static_cast<int>(pass.render_time)));
         }
         EntityId preprocess_id = NullId;
-        if (pass.has_preprocess_program_name() &&
-            !pass.preprocess_program_name().empty())
+        if (!pass.preprocess_program_name.empty())
         {
-            preprocess_id =
-                level.GetIdFromName(pass.preprocess_program_name());
+            preprocess_id = level.GetIdFromName(pass.preprocess_program_name);
             if (!preprocess_id)
             {
                 throw std::runtime_error(std::format(
-                    "Unknown preprocess program '{}' in render_pass_programs.",
-                    pass.preprocess_program_name()));
+                    "Unknown internal preprocess program '{}' for Vulkan render pass {}.",
+                    pass.preprocess_program_name,
+                    static_cast<int>(pass.render_time)));
             }
         }
         level.SetRenderPassProgramIds(
-            pass.render_time_enum(),
+            pass.render_time,
             program_id,
             preprocess_id);
-        has_explicit_config = true;
-    }
-    if (has_explicit_config)
-    {
-        return;
-    }
-
-    const auto skybox_program_id = FindProgramBySceneType(
-        level,
-        frame::proto::SceneType::CUBE);
-    if (skybox_program_id)
-    {
-        level.SetRenderPassProgramIds(
-            frame::proto::NodeMesh::SKYBOX_RENDER_TIME,
-            skybox_program_id);
-    }
-
-    EntityId scene_program_id = FindRaytracingBvhProgramBySceneType(
-        level,
-        frame::proto::SceneType::QUAD);
-    if (!scene_program_id)
-    {
-        scene_program_id = FindRaytracingBvhProgramBySceneType(
-            level,
-            frame::proto::SceneType::SCENE);
-    }
-    if (!scene_program_id)
-    {
-        scene_program_id = FindProgramBySceneType(
-            level,
-            frame::proto::SceneType::SCENE);
-    }
-    if (!scene_program_id)
-    {
-        scene_program_id = FindProgramBySceneType(
-            level,
-            frame::proto::SceneType::QUAD);
-    }
-    if (scene_program_id)
-    {
-        EntityId preprocess_id = NullId;
-        const auto& scene_program = level.GetProgramFromId(scene_program_id);
-        const auto key = frame::json::ResolveProgramKey(scene_program.GetData());
-        if (frame::json::IsRaytracingBvhProgramKey(key))
-        {
-            preprocess_id = FindRaytracingPreprocessProgram(level);
-        }
-        level.SetRenderPassProgramIds(
-            frame::proto::NodeMesh::SCENE_RENDER_TIME,
-            scene_program_id);
-        level.SetRenderPassProgramIds(
-            frame::proto::NodeMesh::PRE_RENDER_TIME,
-            scene_program_id,
-            preprocess_id);
-        level.SetRenderPassProgramIds(
-            frame::proto::NodeMesh::POST_PROCESS_TIME,
-            scene_program_id);
     }
 }
 
@@ -217,41 +106,21 @@ BuiltLevel BuildLevel(
     }
 
     {
-        ScopedTimer timer(logger, "Parse programs");
-        for (const auto& proto_program : level_data.proto.programs())
+        ScopedTimer timer(logger, "Parse internal programs");
+        for (const auto& program_info : level_data.programs)
         {
-            auto program = json::ParseProgram(proto_program, *level);
-            program->SetName(proto_program.name());
+            auto program = json::ParseProgram(program_info.proto, *level);
+            program->SetName(program_info.name);
             if (!level->AddProgram(std::move(program)))
             {
                 throw std::runtime_error(std::format(
-                    "Unable to add program {} to Vulkan level.",
-                    proto_program.name()));
+                    "Unable to add internal program {} to Vulkan level.",
+                    program_info.name));
             }
         }
     }
 
-    {
-        ScopedTimer timer(logger, "Parse materials");
-        for (const auto& proto_material : level_data.proto.materials())
-        {
-            auto material = json::ParseMaterial(proto_material, *level);
-            if (!material)
-            {
-                throw std::runtime_error(std::format(
-                    "Invalid material {} while building Vulkan level.",
-                    proto_material.name()));
-            }
-            if (!level->AddMaterial(std::move(material)))
-            {
-                throw std::runtime_error(std::format(
-                    "Unable to add material {} to Vulkan level.",
-                    proto_material.name()));
-            }
-        }
-    }
-
-    ConfigureRenderPassPrograms(*level, level_data.proto);
+    ConfigureRenderPassPrograms(*level, level_data);
 
     {
         ScopedTimer timer(logger, "Parse scene tree");
@@ -273,4 +142,3 @@ BuiltLevel BuildLevel(
 }
 
 } // namespace frame::vulkan
-

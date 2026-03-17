@@ -17,17 +17,6 @@
             "pixel_structure": {"value": "RGB"}
         }
     ],
-    "materials": [
-        {
-            "name": "CubemapMaterial"
-        }
-    ],
-    "render_pass_programs": [
-        {
-            "render_time_enum": "SKYBOX_RENDER_TIME",
-            "program_name": "CubemapProgram"
-        }
-    ],
     "scene_tree": {
         "default_camera_name": "camera",
         "default_root_name": "root",
@@ -62,34 +51,9 @@
                 "name": "Skybox",
                 "parent": "root",
                 "mesh_enum": "CUBE",
-                "material_name": "CubemapMaterial",
                 "render_time_enum": "SKYBOX_RENDER_TIME"
             }
         ]
-    },
-    "programs": [
-        {
-            "name": "CubemapProgram",
-            "input_texture_names": ["skybox"],
-            "output_texture_names": ["output"],
-            "input_scene_type": {"value": "CUBE"},
-            "bindings": [
-                {
-                    "name": "Skybox",
-                    "binding": 0,
-                    "binding_type": "COMBINED_IMAGE_SAMPLER",
-                    "stages": [
-                        "FRAGMENT"
-                    ]
-                }
-            ],
-            "uniforms": [
-                {"name": "projection", "uniform_enum": "PROJECTION_MAT4"},
-                {"name": "view", "uniform_enum": "VIEW_MAT4"},
-                {"name": "model", "uniform_enum": "MODEL_MAT4"},
-                {"name": "time_s", "uniform_enum": "FLOAT_TIME_S"}
-            ]
-        }
-    ]
+    }
 }
 

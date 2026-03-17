@@ -43,6 +43,11 @@ LevelData ParseLevelData(
     const std::filesystem::path& asset_root);
 LevelData ParseLevelData(
     glm::uvec2 size,
+    const proto::Level& proto,
+    const std::filesystem::path& asset_root,
+    const std::filesystem::path& source_path);
+LevelData ParseLevelData(
+    glm::uvec2 size,
     const std::string& content,
     const std::filesystem::path& asset_root);
 LevelData ParseLevelData(

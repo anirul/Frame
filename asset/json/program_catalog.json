@@ -16,10 +16,10 @@
             { "key": "raymarchingprogram", "vertex_shader": "ray_marching.vert", "fragment_shader": "ray_marching.frag" },
             { "key": "raytracing_simple", "vertex_shader": "raytracing_simple.vert", "fragment_shader": "raytracing_simple.frag" },
             { "key": "raytracing_simple_preprocess", "vertex_shader": "raytracing_simple.vert", "fragment_shader": "raytracing_simple.frag" },
-            { "key": "raytracing_bvh", "vertex_shader": "raytracing_bvh.vert", "fragment_shader": "raytracing_bvh.frag" },
-            { "key": "raytracing_bvh_preprocess", "vertex_shader": "raytracing_bvh.vert", "fragment_shader": "raytracing_bvh.frag" },
-            { "key": "raytraceprogram", "vertex_shader": "raytracing_bvh.vert", "fragment_shader": "raytracing_bvh.frag" },
-            { "key": "raytracepreprocessprogram", "vertex_shader": "raytracing_bvh.vert", "fragment_shader": "raytracing_bvh.frag" }
+            { "key": "dragon", "vertex_shader": "dragon.vert", "fragment_shader": "dragon.frag" },
+            { "key": "dragon_preprocess", "vertex_shader": "dragon.vert", "fragment_shader": "dragon.frag" },
+            { "key": "raytraceprogram", "vertex_shader": "dragon.vert", "fragment_shader": "dragon.frag" },
+            { "key": "raytracepreprocessprogram", "vertex_shader": "dragon.vert", "fragment_shader": "dragon.frag" }
         ]
     },
     "vulkan": {
@@ -31,10 +31,10 @@
             { "key": "raymarchingprogram", "vertex_shader": "ray_marching.vert", "fragment_shader": "ray_marching.frag" },
             { "key": "raytracing_simple", "vertex_shader": "raytracing_simple.vert", "fragment_shader": "raytracing_simple.frag", "compute_shader": "raytracing_dual.comp" },
             { "key": "raytracing_simple_preprocess", "vertex_shader": "raytracing_simple.vert", "fragment_shader": "raytracing_simple.frag" },
-            { "key": "raytracing_bvh", "vertex_shader": "raytracing_bvh.vert", "fragment_shader": "raytracing_bvh.frag", "compute_shader": "raytracing_bvh.comp" },
-            { "key": "raytracing_bvh_preprocess", "vertex_shader": "raytracing_bvh.vert", "fragment_shader": "raytracing_bvh.frag" },
-            { "key": "raytraceprogram", "vertex_shader": "raytracing_bvh.vert", "fragment_shader": "raytracing_bvh.frag", "compute_shader": "raytracing_bvh.comp" },
-            { "key": "raytracepreprocessprogram", "vertex_shader": "raytracing_bvh.vert", "fragment_shader": "raytracing_bvh.frag" }
+            { "key": "dragon", "vertex_shader": "dragon.vert", "fragment_shader": "dragon.frag", "compute_shader": "dragon.comp" },
+            { "key": "dragon_preprocess", "vertex_shader": "dragon.vert", "fragment_shader": "dragon.frag" },
+            { "key": "raytraceprogram", "vertex_shader": "dragon.vert", "fragment_shader": "dragon.frag", "compute_shader": "dragon.comp" },
+            { "key": "raytracepreprocessprogram", "vertex_shader": "dragon.vert", "fragment_shader": "dragon.frag" }
         ]
     }
 }

@@ -53,14 +53,14 @@ std::filesystem::path ResolveAssetPath(std::filesystem::path file)
     return (asset_root / file).lexically_normal();
 }
 
-bool IsRaytracingBvhProgram(const ProgramInterface* program)
+bool IsDragonProgram(const ProgramInterface* program)
 {
     if (!program)
     {
         return false;
     }
     const auto key = frame::json::ResolveProgramKey(program->GetData());
-    return frame::json::IsRaytracingBvhProgramKey(key);
+    return frame::json::IsDragonProgramKey(key);
 }
 
 EntityId SelectGltfProgramId(LevelInterface& level)
@@ -68,8 +68,8 @@ EntityId SelectGltfProgramId(LevelInterface& level)
     EntityId first_program_id = NullId;
     EntityId first_scene_program_id = NullId;
     EntityId first_quad_program_id = NullId;
-    EntityId raytracing_bvh_scene_program_id = NullId;
-    EntityId raytracing_bvh_quad_program_id = NullId;
+    EntityId dragon_scene_program_id = NullId;
+    EntityId dragon_quad_program_id = NullId;
     for (const auto program_id : level.GetPrograms())
     {
         if (!first_program_id)
@@ -87,28 +87,28 @@ EntityId SelectGltfProgramId(LevelInterface& level)
             first_quad_program_id = program_id;
         }
         const auto key = frame::json::ResolveProgramKey(program.GetData());
-        if (!frame::json::IsRaytracingBvhProgramKey(key))
+        if (!frame::json::IsDragonProgramKey(key))
         {
             continue;
         }
         if (scene_type == proto::SceneType::SCENE &&
-            !raytracing_bvh_scene_program_id)
+            !dragon_scene_program_id)
         {
-            raytracing_bvh_scene_program_id = program_id;
+            dragon_scene_program_id = program_id;
         }
         if (scene_type == proto::SceneType::QUAD &&
-            !raytracing_bvh_quad_program_id)
+            !dragon_quad_program_id)
         {
-            raytracing_bvh_quad_program_id = program_id;
+            dragon_quad_program_id = program_id;
         }
     }
-    if (raytracing_bvh_quad_program_id)
+    if (dragon_quad_program_id)
     {
-        return raytracing_bvh_quad_program_id;
+        return dragon_quad_program_id;
     }
-    if (raytracing_bvh_scene_program_id)
+    if (dragon_scene_program_id)
     {
-        return raytracing_bvh_scene_program_id;
+        return dragon_scene_program_id;
     }
     if (first_scene_program_id)
     {
@@ -190,6 +190,24 @@ std::optional<std::filesystem::path> FindFirstMaterialTexturePath(
     return std::nullopt;
 }
 
+std::optional<std::filesystem::path> FindMaterialTexturePath(
+    const aiMaterial* material,
+    const std::filesystem::path& model_path,
+    aiTextureType type,
+    unsigned int index)
+{
+    if (!material || material->GetTextureCount(type) <= index)
+    {
+        return std::nullopt;
+    }
+    aiString texture_path;
+    if (material->GetTexture(type, index, &texture_path) != aiReturn_SUCCESS)
+    {
+        return std::nullopt;
+    }
+    return ResolveMaterialTexturePath(model_path, texture_path);
+}
+
 glm::vec4 ReadBaseColorFactor(const aiMaterial* material)
 {
     aiColor4D color(1.0f, 1.0f, 1.0f, 1.0f);
@@ -229,6 +247,67 @@ float ReadMetallicFactor(const aiMaterial* material)
         return std::clamp(static_cast<float>(metallic), 0.0f, 1.0f);
     }
     return 0.0f;
+}
+
+float ReadTransmissionFactor(const aiMaterial* material)
+{
+    ai_real transmission = 0.0f;
+    if (material &&
+        material->Get(AI_MATKEY_TRANSMISSION_FACTOR, transmission) ==
+            aiReturn_SUCCESS)
+    {
+        return std::clamp(static_cast<float>(transmission), 0.0f, 1.0f);
+    }
+    return 0.0f;
+}
+
+float ReadIorFactor(const aiMaterial* material)
+{
+    ai_real ior = 1.5f;
+    if (material && material->Get(AI_MATKEY_REFRACTI, ior) == aiReturn_SUCCESS)
+    {
+        return std::max(static_cast<float>(ior), 1.0f);
+    }
+    return 1.5f;
+}
+
+float ReadThicknessFactor(const aiMaterial* material)
+{
+    ai_real thickness = 0.0f;
+    if (material &&
+        material->Get(AI_MATKEY_VOLUME_THICKNESS_FACTOR, thickness) ==
+            aiReturn_SUCCESS)
+    {
+        return std::max(static_cast<float>(thickness), 0.0f);
+    }
+    return 0.0f;
+}
+
+float ReadAttenuationDistance(const aiMaterial* material)
+{
+    ai_real distance = 1000000.0f;
+    if (material &&
+        material->Get(AI_MATKEY_VOLUME_ATTENUATION_DISTANCE, distance) ==
+            aiReturn_SUCCESS)
+    {
+        return std::max(static_cast<float>(distance), 0.0001f);
+    }
+    return 1000000.0f;
+}
+
+glm::vec3 ReadAttenuationColor(const aiMaterial* material)
+{
+    aiColor3D color(1.0f, 1.0f, 1.0f);
+    if (material &&
+        material->Get(AI_MATKEY_VOLUME_ATTENUATION_COLOR, color) ==
+            aiReturn_SUCCESS)
+    {
+        return {
+            std::clamp(color.r, 0.0f, 1.0f),
+            std::clamp(color.g, 0.0f, 1.0f),
+            std::clamp(color.b, 0.0f, 1.0f)};
+    }
+    return {1.0f, 1.0f, 1.0f};
 }
 
 template <typename T>
@@ -908,8 +987,8 @@ std::vector<std::pair<EntityId, EntityId>> LoadMeshesFromGltfFile(
         (selected_program_id != NullId)
             ? &level.GetProgramFromId(selected_program_id)
             : nullptr;
-    const bool selected_program_is_raytracing_bvh =
-        IsRaytracingBvhProgram(selected_program);
+    const bool selected_program_is_dragon =
+        IsDragonProgram(selected_program);
     const glm::uvec2 texture_display_size = ResolveTextureDisplaySize(level);
     std::unordered_map<std::string, EntityId> file_texture_cache = {};
     std::unordered_map<std::string, EntityId> solid_texture_cache = {};
@@ -983,7 +1062,7 @@ std::vector<std::pair<EntityId, EntityId>> LoadMeshesFromGltfFile(
         {
             return NullId;
         }
-        const bool cache_material = !selected_program_is_raytracing_bvh;
+        const bool cache_material = !selected_program_is_dragon;
         if (cache_material)
         {
             if (auto it = gltf_material_cache.find(material_index);
@@ -1003,10 +1082,21 @@ std::vector<std::pair<EntityId, EntityId>> LoadMeshesFromGltfFile(
             ai_material, file, {aiTextureType_METALNESS});
         const auto ao_texture_path = FindFirstMaterialTexturePath(
             ai_material, file, {aiTextureType_AMBIENT_OCCLUSION, aiTextureType_LIGHTMAP});
+        const auto transmission_texture_path = FindMaterialTexturePath(
+            ai_material, file, aiTextureType_TRANSMISSION, 0);
+        const auto thickness_texture_path = FindMaterialTexturePath(
+            ai_material, file, aiTextureType_TRANSMISSION, 1);
 
         const glm::vec4 base_color_factor = ReadBaseColorFactor(ai_material);
         const float roughness_factor = ReadRoughnessFactor(ai_material);
         const float metallic_factor = ReadMetallicFactor(ai_material);
+        const float transmission_factor = ReadTransmissionFactor(ai_material);
+        const float ior_factor = ReadIorFactor(ai_material);
+        const float thickness_factor = ReadThicknessFactor(ai_material);
+        const float attenuation_distance =
+            ReadAttenuationDistance(ai_material);
+        const glm::vec3 attenuation_color =
+            ReadAttenuationColor(ai_material);
 
         const EntityId base_texture_id = base_color_texture_path
             ? create_texture_from_path(*base_color_texture_path, "base_color")
@@ -1035,6 +1125,39 @@ std::vector<std::pair<EntityId, EntityId>> LoadMeshesFromGltfFile(
         const EntityId ao_texture_id = ao_texture_path
             ? create_texture_from_path(*ao_texture_path, "ao")
             : create_solid_texture(glm::vec4(1.0f), "ao");
+        const EntityId transmission_texture_id =
+            transmission_texture_path
+            ? create_texture_from_path(*transmission_texture_path, "transmission")
+            : create_solid_texture(
+                  glm::vec4(
+                      transmission_factor,
+                      transmission_factor,
+                      transmission_factor,
+                      1.0f),
+                  "transmission");
+        const EntityId ior_texture_id = create_solid_texture(
+            glm::vec4(ior_factor, ior_factor, ior_factor, 1.0f),
+            "ior");
+        const EntityId thickness_texture_id =
+            thickness_texture_path
+            ? create_texture_from_path(*thickness_texture_path, "thickness")
+            : create_solid_texture(
+                  glm::vec4(
+                      thickness_factor,
+                      thickness_factor,
+                      thickness_factor,
+                      1.0f),
+                  "thickness");
+        const EntityId attenuation_color_texture_id = create_solid_texture(
+            glm::vec4(attenuation_color, 1.0f),
+            "attenuation_color");
+        const EntityId attenuation_distance_texture_id = create_solid_texture(
+            glm::vec4(
+                attenuation_distance,
+                attenuation_distance,
+                attenuation_distance,
+                1.0f),
+            "attenuation_distance");
 
         auto material = std::make_unique<frame::opengl::Material>();
         const std::string material_name_generated = std::format(
@@ -1044,7 +1167,7 @@ std::vector<std::pair<EntityId, EntityId>> LoadMeshesFromGltfFile(
         material->SetName(material_name_generated);
         material->SetSerializeEnable(true);
         material->SetProgramId(selected_program_id);
-        if (selected_program_is_raytracing_bvh)
+        if (selected_program_is_dragon)
         {
             const auto preprocess_id =
                 level.GetIdFromName("RayTracePreprocessProgram");
@@ -1086,6 +1209,26 @@ std::vector<std::pair<EntityId, EntityId>> LoadMeshesFromGltfFile(
                 else if (binding_name == "ao_texture")
                 {
                     texture_id = ao_texture_id;
+                }
+                else if (binding_name == "transmission_texture")
+                {
+                    texture_id = transmission_texture_id;
+                }
+                else if (binding_name == "ior_texture")
+                {
+                    texture_id = ior_texture_id;
+                }
+                else if (binding_name == "thickness_texture")
+                {
+                    texture_id = thickness_texture_id;
+                }
+                else if (binding_name == "attenuation_color_texture")
+                {
+                    texture_id = attenuation_color_texture_id;
+                }
+                else if (binding_name == "attenuation_distance_texture")
+                {
+                    texture_id = attenuation_distance_texture_id;
                 }
                 else
                 {
@@ -1130,6 +1273,37 @@ std::vector<std::pair<EntityId, EntityId>> LoadMeshesFromGltfFile(
                 selected_program->HasUniform("ao_texture"))
             {
                 material->AddTextureId(ao_texture_id, "ao_texture");
+            }
+            if (!selected_program ||
+                selected_program->HasUniform("transmission_texture"))
+            {
+                material->AddTextureId(
+                    transmission_texture_id, "transmission_texture");
+            }
+            if (!selected_program ||
+                selected_program->HasUniform("ior_texture"))
+            {
+                material->AddTextureId(ior_texture_id, "ior_texture");
+            }
+            if (!selected_program ||
+                selected_program->HasUniform("thickness_texture"))
+            {
+                material->AddTextureId(
+                    thickness_texture_id, "thickness_texture");
+            }
+            if (!selected_program ||
+                selected_program->HasUniform("attenuation_color_texture"))
+            {
+                material->AddTextureId(
+                    attenuation_color_texture_id,
+                    "attenuation_color_texture");
+            }
+            if (!selected_program ||
+                selected_program->HasUniform("attenuation_distance_texture"))
+            {
+                material->AddTextureId(
+                    attenuation_distance_texture_id,
+                    "attenuation_distance_texture");
             }
             auto skybox_id = level.GetIdFromName("skybox");
             if (skybox_id && (!selected_program ||
@@ -1246,7 +1420,7 @@ std::vector<std::pair<EntityId, EntityId>> LoadMeshesFromGltfFile(
 
     std::size_t skinned_mesh_count = 0;
     const bool build_bvh =
-        selected_program_is_raytracing_bvh ||
+        selected_program_is_dragon ||
         acceleration_structure_enum == proto::NodeMesh::BVH_ACCELERATION;
     Bounds3 local_model_bounds;
     Bounds3 transformed_model_bounds;

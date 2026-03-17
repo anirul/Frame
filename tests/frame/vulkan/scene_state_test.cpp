@@ -18,7 +18,7 @@ class VulkanSceneStateTest : public ::testing::Test
     VulkanSceneStateTest()
     {
         asset_root_ = frame::file::FindDirectory("asset");
-        level_path_ = frame::file::FindFile("asset/json/raytracing_bvh.json");
+        level_path_ = frame::file::FindFile("asset/json/dragon.json");
         level_proto_ = frame::json::LoadLevelProto(level_path_);
         level_data_ = frame::json::ParseLevelData(
             glm::uvec2(1280, 720), level_proto_, asset_root_);

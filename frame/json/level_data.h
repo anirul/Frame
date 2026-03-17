@@ -7,7 +7,7 @@
 
 #include <glm/glm.hpp>
 
-#include "frame/proto/level.pb.h"
+#include "frame/json/proto.h"
 
 namespace frame::json
 {
@@ -20,17 +20,27 @@ struct TextureInfo
     glm::uvec2 size{};
 };
 
-struct ProgramInfo
+struct ShaderFiles
 {
-    std::string name;
     std::string vertex_shader;
     std::string fragment_shader;
     std::string compute_shader;
 };
 
-struct MaterialInfo
+struct ProgramInfo
 {
     std::string name;
+    proto::Program proto;
+    ShaderFiles opengl;
+    ShaderFiles vulkan;
+};
+
+struct RenderPassProgramInfo
+{
+    proto::NodeMesh::RenderTimeEnum render_time =
+        proto::NodeMesh::SCENE_RENDER_TIME;
+    std::string program_name;
+    std::string preprocess_program_name;
 };
 
 struct StaticMeshInfo
@@ -45,15 +55,17 @@ struct LevelData
 {
     proto::Level proto;
     std::filesystem::path asset_root;
+    std::filesystem::path source_path;
     std::vector<TextureInfo> textures;
     std::vector<ProgramInfo> programs;
-    std::vector<MaterialInfo> materials;
+    std::vector<RenderPassProgramInfo> render_pass_programs;
     std::vector<StaticMeshInfo> meshes;
 };
 
 LevelData BuildLevelData(
     glm::uvec2 size,
     const proto::Level& proto_level,
-    const std::filesystem::path& asset_root);
+    const std::filesystem::path& asset_root,
+    const std::filesystem::path& source_path = {});
 
 } // namespace frame::json

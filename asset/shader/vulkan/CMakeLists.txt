@@ -7,9 +7,9 @@ set(_frame_vulkan_shader_sources
   ray_marching.vert
   cubemap.frag
   cubemap.vert
-  raytracing_bvh.vert
-  raytracing_bvh.frag
-  raytracing_bvh.comp
+  dragon.vert
+  dragon.frag
+  dragon.comp
   raytracing_simple.vert
   raytracing_simple.frag
   raytracing.comp

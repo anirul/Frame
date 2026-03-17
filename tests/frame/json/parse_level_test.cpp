@@ -14,8 +14,8 @@ TEST_F(ParseLevelTest, BuildVulkanLevelFromJson)
     const auto level_path =
         frame::file::FindFile("asset/json/level_test.json");
     const auto level_proto = frame::json::LoadLevelProto(level_path);
-    const auto level_data = frame::json::ParseLevelData(
-        glm::uvec2(320, 200), level_proto, asset_root);
+    const auto level_data =
+        frame::json::ParseLevelData(glm::uvec2(320, 200), level_path, asset_root);
 
     auto built = frame::vulkan::BuildLevel(glm::uvec2(320, 200), level_data);
     ASSERT_NE(built.level, nullptr);
@@ -32,8 +32,9 @@ TEST_F(ParseLevelTest, CreateLevelDataFromPath)
         frame::file::FindFile("asset/json/level_test.json"),
         asset_root);
     EXPECT_EQ(level_data.proto.name(), "LevelTest");
-    ASSERT_EQ(level_data.textures.size(), 1u);
-    EXPECT_EQ(level_data.textures.front().name, "DefaultTexture");
+    ASSERT_EQ(level_data.textures.size(), 2u);
+    EXPECT_EQ(level_data.textures.front().name, "skybox");
+    EXPECT_EQ(level_data.textures.back().name, "output");
     EXPECT_EQ(level_data.asset_root, asset_root);
 }
 
@@ -45,8 +46,9 @@ TEST_F(ParseLevelTest, CreateLevelDataFromPathVulkan)
         frame::file::FindFile("asset/json/level_test.json"),
         asset_root);
     EXPECT_EQ(level_data.proto.name(), "LevelTest");
-    ASSERT_EQ(level_data.textures.size(), 1u);
-    EXPECT_EQ(level_data.textures.front().name, "DefaultTexture");
+    ASSERT_EQ(level_data.textures.size(), 2u);
+    EXPECT_EQ(level_data.textures.front().name, "skybox");
+    EXPECT_EQ(level_data.textures.back().name, "output");
     EXPECT_EQ(level_data.asset_root, asset_root);
 }
 

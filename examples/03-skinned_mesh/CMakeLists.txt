@@ -1,6 +1,6 @@
 # Skinned Mesh
 
-add_executable(05_SkinnedMesh
+add_executable(03_SkinnedMesh
   WIN32
     main.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../../asset/json/skinned_mesh.json
@@ -11,14 +11,14 @@ add_executable(05_SkinnedMesh
     ${CMAKE_CURRENT_SOURCE_DIR}/../../asset/model/fox/metadata.json
 )
 
-target_include_directories(05_SkinnedMesh
+target_include_directories(03_SkinnedMesh
   PUBLIC
-    examples/05-skinned_mesh
+    examples/03-skinned_mesh
     ${CMAKE_CURRENT_SOURCE_DIR}/../..
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-target_link_libraries(05_SkinnedMesh
+target_link_libraries(03_SkinnedMesh
   PUBLIC
     ${FRAME_LINK_GROUP_BEGIN}
     ${FRAME_CORE_LIBS}
@@ -27,4 +27,4 @@ target_link_libraries(05_SkinnedMesh
     ${FRAME_LINK_GROUP_END}
 )
 
-set_property(TARGET 05_SkinnedMesh PROPERTY FOLDER "FrameExamples")
+set_property(TARGET 03_SkinnedMesh PROPERTY FOLDER "FrameExamples")

@@ -3,6 +3,7 @@
 #include <array>
 #include <format>
 #include <stdexcept>
+#include <string_view>
 
 #include "frame/json/parse_pixel.h"
 #include "frame/json/program_catalog.h"
@@ -17,6 +18,12 @@ namespace frame::vulkan::json
 namespace
 {
 
+bool EndsWith(std::string_view value, std::string_view suffix)
+{
+    return value.size() >= suffix.size() &&
+           value.substr(value.size() - suffix.size()) == suffix;
+}
+
 struct GeneratedTextureSpec
 {
     std::array<float, 4> color = {0.0f, 0.0f, 0.0f, 1.0f};
@@ -27,29 +34,59 @@ struct GeneratedTextureSpec
 std::optional<GeneratedTextureSpec> GetRaytracingTextureSpec(
     const std::string& texture_name)
 {
-    if (texture_name == "transmission_texture")
-    {
-        return GeneratedTextureSpec{};
-    }
-    if (texture_name == "ior_texture")
-    {
-        return GeneratedTextureSpec{
-            .color = {1.5f, 1.5f, 1.5f, 1.0f},
-            .element = frame::proto::PixelElementSize::FLOAT};
-    }
-    if (texture_name == "thickness_texture")
-    {
-        return GeneratedTextureSpec{
-            .color = {0.0f, 0.0f, 0.0f, 1.0f},
-            .element = frame::proto::PixelElementSize::FLOAT};
-    }
-    if (texture_name == "attenuation_color_texture")
+    if (EndsWith(texture_name, "albedo_texture"))
     {
         return GeneratedTextureSpec{
             .color = {1.0f, 1.0f, 1.0f, 1.0f},
             .element = frame::proto::PixelElementSize::BYTE};
     }
-    if (texture_name == "attenuation_distance_texture")
+    if (EndsWith(texture_name, "normal_texture"))
+    {
+        return GeneratedTextureSpec{
+            .color = {0.5f, 0.5f, 1.0f, 1.0f},
+            .element = frame::proto::PixelElementSize::BYTE};
+    }
+    if (EndsWith(texture_name, "roughness_texture"))
+    {
+        return GeneratedTextureSpec{
+            .color = {1.0f, 1.0f, 1.0f, 1.0f},
+            .element = frame::proto::PixelElementSize::BYTE};
+    }
+    if (EndsWith(texture_name, "metallic_texture"))
+    {
+        return GeneratedTextureSpec{
+            .color = {0.0f, 0.0f, 0.0f, 1.0f},
+            .element = frame::proto::PixelElementSize::BYTE};
+    }
+    if (EndsWith(texture_name, "ao_texture"))
+    {
+        return GeneratedTextureSpec{
+            .color = {1.0f, 1.0f, 1.0f, 1.0f},
+            .element = frame::proto::PixelElementSize::BYTE};
+    }
+    if (EndsWith(texture_name, "transmission_texture"))
+    {
+        return GeneratedTextureSpec{};
+    }
+    if (EndsWith(texture_name, "ior_texture"))
+    {
+        return GeneratedTextureSpec{
+            .color = {1.5f, 1.5f, 1.5f, 1.0f},
+            .element = frame::proto::PixelElementSize::FLOAT};
+    }
+    if (EndsWith(texture_name, "thickness_texture"))
+    {
+        return GeneratedTextureSpec{
+            .color = {0.0f, 0.0f, 0.0f, 1.0f},
+            .element = frame::proto::PixelElementSize::FLOAT};
+    }
+    if (EndsWith(texture_name, "attenuation_color_texture"))
+    {
+        return GeneratedTextureSpec{
+            .color = {1.0f, 1.0f, 1.0f, 1.0f},
+            .element = frame::proto::PixelElementSize::BYTE};
+    }
+    if (EndsWith(texture_name, "attenuation_distance_texture"))
     {
         return GeneratedTextureSpec{
             .color = {1000000.0f, 1000000.0f, 1000000.0f, 1.0f},

@@ -2,14 +2,14 @@
 
 #include <glm/glm.hpp>
 
+#include "frame/json/level_data.h"
 #include "frame/level_interface.h"
-#include "frame/proto/level.pb.h"
 
 namespace frame::opengl
 {
 
-std::unique_ptr<frame::LevelInterface> BuildLevelFromProto(
+std::unique_ptr<frame::LevelInterface> BuildLevel(
     glm::uvec2 size,
-    const frame::proto::Level& proto_level);
+    const frame::json::LevelData& level_data);
 
 }
