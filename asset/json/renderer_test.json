@@ -19,6 +19,7 @@
     "node_matrices": [
       {
         "name": "root",
+        "matrix_type_enum": "STATIC_MATRIX",
         "quaternion": {
           "w": 1,
           "x": 0,

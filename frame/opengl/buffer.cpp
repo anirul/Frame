@@ -1,5 +1,6 @@
 #include "buffer.h"
 
+#include <cstring>
 #include <exception>
 #include <stdexcept>
 
@@ -41,6 +42,11 @@ void Buffer::BindBase(int binding) const
 
 void Buffer::Copy(const std::size_t size, const void* data /*= nullptr*/) const
 {
+    raw_data_.assign(size, 0);
+    if (data && size > 0)
+    {
+        std::memcpy(raw_data_.data(), data, size);
+    }
     Bind();
     glBufferData(
         static_cast<GLenum>(buffer_type_),
@@ -52,6 +58,14 @@ void Buffer::Copy(const std::size_t size, const void* data /*= nullptr*/) const
 
 void Buffer::Copy(const std::vector<float>& vector) const
 {
+    raw_data_.resize(vector.size() * sizeof(float));
+    if (!vector.empty())
+    {
+        std::memcpy(
+            raw_data_.data(),
+            vector.data(),
+            raw_data_.size());
+    }
     Bind();
     glBufferData(
         static_cast<GLenum>(buffer_type_),
@@ -63,6 +77,14 @@ void Buffer::Copy(const std::vector<float>& vector) const
 
 void Buffer::Copy(const std::vector<unsigned int>& vector) const
 {
+    raw_data_.resize(vector.size() * sizeof(unsigned int));
+    if (!vector.empty())
+    {
+        std::memcpy(
+            raw_data_.data(),
+            vector.data(),
+            raw_data_.size());
+    }
     Bind();
     glBufferData(
         static_cast<GLenum>(buffer_type_),
@@ -74,6 +96,7 @@ void Buffer::Copy(const std::vector<unsigned int>& vector) const
 
 void Buffer::Copy(const std::vector<std::uint8_t>& vector) const
 {
+    raw_data_ = vector;
     Bind();
     glBufferData(
         static_cast<GLenum>(buffer_type_),
@@ -97,6 +120,7 @@ std::size_t Buffer::GetSize() const
 
 void Buffer::Clear() const
 {
+    std::fill(raw_data_.begin(), raw_data_.end(), 0);
     Bind();
     glClearBufferData(
         static_cast<GLenum>(buffer_type_),

@@ -18,8 +18,6 @@ namespace frame::json
  * @return A unique pointer to a program interface or error.
  */
 std::unique_ptr<ProgramInterface> ParseProgramOpenGL(
-    const proto::Program& proto_program, LevelInterface& level);
-std::unique_ptr<ProgramInterface> ParseProgramOpenGL(
     const proto::Program& proto_program,
     const ShaderFiles& shader_files,
     LevelInterface& level);

@@ -61,6 +61,7 @@
         "node_matrices": [
             {
                 "name": "root",
+                "matrix_type_enum": "STATIC_MATRIX",
                 "matrix": {
                     "m11": "1.0",
                     "m22": "1.0",

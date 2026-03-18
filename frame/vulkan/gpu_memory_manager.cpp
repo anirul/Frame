@@ -25,7 +25,8 @@ vk::UniqueBuffer GpuMemoryManager::CreateBuffer(
     vk::DeviceSize size,
     vk::BufferUsageFlags usage,
     vk::MemoryPropertyFlags properties,
-    vk::UniqueDeviceMemory& out_memory) const
+    vk::UniqueDeviceMemory& out_memory,
+    vk::MemoryAllocateFlags allocate_flags) const
 {
     vk::BufferCreateInfo buffer_info(
         vk::BufferCreateFlags{},
@@ -37,6 +38,12 @@ vk::UniqueBuffer GpuMemoryManager::CreateBuffer(
     vk::MemoryAllocateInfo allocate_info(
         requirements.size,
         FindMemoryType(requirements.memoryTypeBits, properties));
+    vk::MemoryAllocateFlagsInfo flags_info;
+    if (allocate_flags != vk::MemoryAllocateFlags{})
+    {
+        flags_info.setFlags(allocate_flags);
+        allocate_info.setPNext(&flags_info);
+    }
     out_memory = device_.allocateMemoryUnique(allocate_info);
     device_.bindBufferMemory(*buffer, *out_memory, 0);
     return buffer;

@@ -8,6 +8,7 @@
 #include <system_error>
 
 #include <shaderc/shaderc.hpp>
+#include <shaderc/env.h>
 
 namespace frame::vulkan
 {
@@ -112,6 +113,10 @@ std::vector<std::uint32_t> ShaderCompiler::CompileFile(
     shaderc::Compiler compiler;
     shaderc::CompileOptions options;
     options.SetOptimizationLevel(shaderc_optimization_level_performance);
+    options.SetTargetEnvironment(
+        shaderc_target_env_vulkan,
+        shaderc_env_version_vulkan_1_2);
+    options.SetTargetSpirv(shaderc_spirv_version_1_4);
 
     auto result = compiler.CompileGlslToSpv(
         shader_source,
@@ -148,6 +153,10 @@ std::vector<std::uint32_t> ShaderCompiler::CompileSource(
     shaderc::Compiler compiler;
     shaderc::CompileOptions options;
     options.SetOptimizationLevel(shaderc_optimization_level_performance);
+    options.SetTargetEnvironment(
+        shaderc_target_env_vulkan,
+        shaderc_env_version_vulkan_1_2);
+    options.SetTargetSpirv(shaderc_spirv_version_1_4);
     auto result = compiler.CompileGlslToSpv(
         source,
         kind,

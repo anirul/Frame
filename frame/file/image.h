@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <cstddef>
 #include <filesystem>
 #include <memory>
 #include <string>
@@ -48,6 +49,19 @@ class Image : public ImageInterface
      */
     Image(
         const std::filesystem::path& file,
+        proto::PixelElementSize pixel_element_size =
+            json::PixelElementSize_BYTE(),
+        proto::PixelStructure pixel_structure = json::PixelStructure_RGB());
+    /**
+     * @brief Constructor that decodes an encoded image from memory.
+     * @param data: Pointer to the encoded image bytes.
+     * @param size_bytes: Number of bytes in the encoded image.
+     * @param pixel_element_size: Desired pixel element size.
+     * @param pixel_structure: Desired pixel structure.
+     */
+    Image(
+        const void* data,
+        std::size_t size_bytes,
         proto::PixelElementSize pixel_element_size =
             json::PixelElementSize_BYTE(),
         proto::PixelStructure pixel_structure = json::PixelStructure_RGB());

@@ -9,13 +9,6 @@ namespace frame::opengl::file
 {
 
 /**
- * @brief Load from a name (something like "Blur").
- * @param name: Program name.
- * @return A unique pointer to a program interface or an error.
- */
-std::unique_ptr<ProgramInterface> LoadProgram(
-    const proto::Program& proto_program);
-/**
  * @brief Load from 2 file names one for vertex and one for fragment.
  * @param name: Program name.
  * @param vertex_file: File containing a vertex shader (full path should be

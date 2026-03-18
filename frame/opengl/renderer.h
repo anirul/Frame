@@ -125,6 +125,7 @@ class Renderer : public RendererInterface
 
   private:
     void UpdateRaytraceBuffersIfNeeded(SkinnedMesh& skinned_mesh);
+    void UpdateAggregateRaytraceSceneBuffers();
 
   private:
     LevelInterface& level_;
@@ -144,6 +145,7 @@ class Renderer : public RendererInterface
     // Texture frame (used in render mesh).
     frame::proto::TextureFrame texture_frame_;
     bool first_render_ = true;
+    double last_raytrace_scene_buffer_update_time_ = -1.0;
     // The render callback it will be called once per mesh.
     RenderCallback callback_ = [](UniformCollectionInterface&,
                                   MeshInterface&,

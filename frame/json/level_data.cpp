@@ -18,9 +18,7 @@ enum class SupportedScenePreset
 {
     Unknown,
     Cubemap,
-    RaytracingSimple,
-    Dragon,
-    SkinnedMesh,
+    Raytrace,
 };
 
 std::string ToLowerAscii(std::string value)
@@ -129,29 +127,14 @@ void AddSharedRaytracingInputs(
     const std::string& output_texture_name)
 {
     program.add_output_texture_names(output_texture_name);
-    program.add_input_texture_names("albedo_texture");
-    program.add_input_texture_names("normal_texture");
-    program.add_input_texture_names("roughness_texture");
-    program.add_input_texture_names("metallic_texture");
-    program.add_input_texture_names("ao_texture");
-    program.add_input_texture_names("transmission_texture");
-    program.add_input_texture_names("ior_texture");
-    program.add_input_texture_names("thickness_texture");
-    program.add_input_texture_names("attenuation_color_texture");
-    program.add_input_texture_names("attenuation_distance_texture");
     program.add_input_texture_names("skybox");
     program.add_input_texture_names("skybox_env");
     program.mutable_input_scene_type()->set_value(proto::SceneType::QUAD);
     program.set_input_scene_root_name("mesh_holder");
 }
 
-void AddSimpleRaytracingSceneMaterialInputs(proto::Program& program)
+void AddRaytraceSceneMaterialInputs(proto::Program& program)
 {
-    program.add_input_texture_names("opaque_albedo_texture");
-    program.add_input_texture_names("opaque_normal_texture");
-    program.add_input_texture_names("opaque_roughness_texture");
-    program.add_input_texture_names("opaque_metallic_texture");
-    program.add_input_texture_names("opaque_ao_texture");
     program.add_input_texture_names("transmissive_albedo_texture");
     program.add_input_texture_names("transmissive_normal_texture");
     program.add_input_texture_names("transmissive_roughness_texture");
@@ -162,15 +145,22 @@ void AddSimpleRaytracingSceneMaterialInputs(proto::Program& program)
     program.add_input_texture_names("transmissive_thickness_texture");
     program.add_input_texture_names("transmissive_attenuation_color_texture");
     program.add_input_texture_names("transmissive_attenuation_distance_texture");
+    program.add_input_texture_names("opaque_albedo_texture");
+    program.add_input_texture_names("opaque_normal_texture");
+    program.add_input_texture_names("opaque_roughness_texture");
+    program.add_input_texture_names("opaque_metallic_texture");
+    program.add_input_texture_names("opaque_ao_texture");
+    program.add_input_texture_names("opaque_specular_factor_texture");
+    program.add_input_texture_names("opaque_specular_color_texture");
 }
 
-ProgramInfo MakeRaytracingSimpleProgram(const std::string& output_texture_name)
+ProgramInfo MakeRaytraceProgram(const std::string& output_texture_name)
 {
     proto::Program program;
     program.set_name("RayTraceProgram");
-    program.set_pipeline_name("raytracing_simple");
+    program.set_pipeline_name("raytrace");
     AddSharedRaytracingInputs(program, output_texture_name);
-    AddSimpleRaytracingSceneMaterialInputs(program);
+    AddRaytraceSceneMaterialInputs(program);
     *program.add_bindings() = MakeBinding(
         "output_image",
         0,
@@ -182,27 +172,27 @@ ProgramInfo MakeRaytracingSimpleProgram(const std::string& output_texture_name)
         proto::ProgramBinding::OUTPUT_SAMPLER,
         {proto::ProgramStage::FRAGMENT});
     *program.add_bindings() = MakeBinding(
-        "albedo_texture",
+        "opaque_albedo_texture",
         2,
         proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
         {proto::ProgramStage::COMPUTE});
     *program.add_bindings() = MakeBinding(
-        "normal_texture",
+        "opaque_normal_texture",
         3,
         proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
         {proto::ProgramStage::COMPUTE});
     *program.add_bindings() = MakeBinding(
-        "roughness_texture",
+        "opaque_roughness_texture",
         4,
         proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
         {proto::ProgramStage::COMPUTE});
     *program.add_bindings() = MakeBinding(
-        "metallic_texture",
+        "opaque_metallic_texture",
         5,
         proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
         {proto::ProgramStage::COMPUTE});
     *program.add_bindings() = MakeBinding(
-        "ao_texture",
+        "opaque_ao_texture",
         6,
         proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
         {proto::ProgramStage::COMPUTE});
@@ -217,228 +207,100 @@ ProgramInfo MakeRaytracingSimpleProgram(const std::string& output_texture_name)
         proto::ProgramBinding::STORAGE_BUFFER,
         {proto::ProgramStage::COMPUTE});
     *program.add_bindings() = MakeBinding(
-        "TriangleBufferOpaque",
+        "BvhBufferTransmissive",
         9,
         proto::ProgramBinding::STORAGE_BUFFER,
         {proto::ProgramStage::COMPUTE});
     *program.add_bindings() = MakeBinding(
-        "UniformBlock",
+        "TriangleBufferOpaque",
         10,
+        proto::ProgramBinding::STORAGE_BUFFER,
+        {proto::ProgramStage::COMPUTE});
+    *program.add_bindings() = MakeBinding(
+        "BvhBufferOpaque",
+        11,
+        proto::ProgramBinding::STORAGE_BUFFER,
+        {proto::ProgramStage::COMPUTE});
+    *program.add_bindings() = MakeBinding(
+        "UniformBlock",
+        12,
         proto::ProgramBinding::UNIFORM_BUFFER,
         {proto::ProgramStage::COMPUTE});
     *program.add_bindings() = MakeBinding(
         "skybox",
-        11,
-        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
-        {proto::ProgramStage::COMPUTE});
-    *program.add_bindings() = MakeBinding(
-        "transmission_texture",
-        12,
-        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
-        {proto::ProgramStage::COMPUTE});
-    *program.add_bindings() = MakeBinding(
-        "ior_texture",
         13,
-        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
-        {proto::ProgramStage::COMPUTE});
-    *program.add_bindings() = MakeBinding(
-        "thickness_texture",
-        14,
-        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
-        {proto::ProgramStage::COMPUTE});
-    *program.add_bindings() = MakeBinding(
-        "attenuation_color_texture",
-        15,
-        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
-        {proto::ProgramStage::COMPUTE});
-    *program.add_bindings() = MakeBinding(
-        "attenuation_distance_texture",
-        16,
-        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
-        {proto::ProgramStage::COMPUTE});
-    *program.add_bindings() = MakeBinding(
-        "opaque_albedo_texture",
-        17,
-        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
-        {proto::ProgramStage::COMPUTE});
-    *program.add_bindings() = MakeBinding(
-        "opaque_normal_texture",
-        18,
-        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
-        {proto::ProgramStage::COMPUTE});
-    *program.add_bindings() = MakeBinding(
-        "opaque_roughness_texture",
-        19,
-        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
-        {proto::ProgramStage::COMPUTE});
-    *program.add_bindings() = MakeBinding(
-        "opaque_metallic_texture",
-        20,
-        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
-        {proto::ProgramStage::COMPUTE});
-    *program.add_bindings() = MakeBinding(
-        "opaque_ao_texture",
-        21,
         proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
         {proto::ProgramStage::COMPUTE});
     *program.add_bindings() = MakeBinding(
         "transmissive_albedo_texture",
-        22,
-        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
-        {proto::ProgramStage::COMPUTE});
-    *program.add_bindings() = MakeBinding(
-        "transmissive_normal_texture",
-        23,
-        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
-        {proto::ProgramStage::COMPUTE});
-    *program.add_bindings() = MakeBinding(
-        "transmissive_roughness_texture",
-        24,
-        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
-        {proto::ProgramStage::COMPUTE});
-    *program.add_bindings() = MakeBinding(
-        "transmissive_metallic_texture",
-        25,
-        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
-        {proto::ProgramStage::COMPUTE});
-    *program.add_bindings() = MakeBinding(
-        "transmissive_ao_texture",
-        26,
-        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
-        {proto::ProgramStage::COMPUTE});
-    *program.add_bindings() = MakeBinding(
-        "transmissive_transmission_texture",
-        27,
-        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
-        {proto::ProgramStage::COMPUTE});
-    *program.add_bindings() = MakeBinding(
-        "transmissive_ior_texture",
-        28,
-        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
-        {proto::ProgramStage::COMPUTE});
-    *program.add_bindings() = MakeBinding(
-        "transmissive_thickness_texture",
-        29,
-        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
-        {proto::ProgramStage::COMPUTE});
-    *program.add_bindings() = MakeBinding(
-        "transmissive_attenuation_color_texture",
-        30,
-        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
-        {proto::ProgramStage::COMPUTE});
-    *program.add_bindings() = MakeBinding(
-        "transmissive_attenuation_distance_texture",
-        31,
-        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
-        {proto::ProgramStage::COMPUTE});
-    AddSharedRaytracingUniforms(program);
-    return MakeProgramInfo(
-        std::move(program),
-        {.vertex_shader = "raytracing_simple.vert",
-         .fragment_shader = "raytracing_simple.frag"},
-        {.vertex_shader = "raytracing_simple.vert",
-         .fragment_shader = "raytracing_simple.frag",
-         .compute_shader = "raytracing_dual.comp"});
-}
-
-ProgramInfo MakeDragonProgram(const std::string& output_texture_name)
-{
-    proto::Program program;
-    program.set_name("RayTraceProgram");
-    program.set_pipeline_name("dragon");
-    AddSharedRaytracingInputs(program, output_texture_name);
-    *program.add_bindings() = MakeBinding(
-        "output_image",
-        0,
-        proto::ProgramBinding::STORAGE_IMAGE,
-        {proto::ProgramStage::COMPUTE});
-    *program.add_bindings() = MakeBinding(
-        "raytrace_output",
-        1,
-        proto::ProgramBinding::OUTPUT_SAMPLER,
-        {proto::ProgramStage::FRAGMENT});
-    *program.add_bindings() = MakeBinding(
-        "albedo_texture",
-        2,
-        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
-        {proto::ProgramStage::COMPUTE});
-    *program.add_bindings() = MakeBinding(
-        "normal_texture",
-        3,
-        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
-        {proto::ProgramStage::COMPUTE});
-    *program.add_bindings() = MakeBinding(
-        "roughness_texture",
-        4,
-        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
-        {proto::ProgramStage::COMPUTE});
-    *program.add_bindings() = MakeBinding(
-        "metallic_texture",
-        5,
-        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
-        {proto::ProgramStage::COMPUTE});
-    *program.add_bindings() = MakeBinding(
-        "ao_texture",
-        6,
-        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
-        {proto::ProgramStage::COMPUTE});
-    *program.add_bindings() = MakeBinding(
-        "skybox_env",
-        7,
-        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
-        {proto::ProgramStage::COMPUTE});
-    *program.add_bindings() = MakeBinding(
-        "TriangleBuffer",
-        8,
-        proto::ProgramBinding::STORAGE_BUFFER,
-        {proto::ProgramStage::COMPUTE});
-    *program.add_bindings() = MakeBinding(
-        "BvhBuffer",
-        9,
-        proto::ProgramBinding::STORAGE_BUFFER,
-        {proto::ProgramStage::COMPUTE});
-    *program.add_bindings() = MakeBinding(
-        "UniformBlock",
-        10,
-        proto::ProgramBinding::UNIFORM_BUFFER,
-        {proto::ProgramStage::COMPUTE});
-    *program.add_bindings() = MakeBinding(
-        "skybox",
-        11,
-        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
-        {proto::ProgramStage::COMPUTE});
-    *program.add_bindings() = MakeBinding(
-        "transmission_texture",
-        12,
-        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
-        {proto::ProgramStage::COMPUTE});
-    *program.add_bindings() = MakeBinding(
-        "ior_texture",
-        13,
-        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
-        {proto::ProgramStage::COMPUTE});
-    *program.add_bindings() = MakeBinding(
-        "thickness_texture",
         14,
         proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
         {proto::ProgramStage::COMPUTE});
     *program.add_bindings() = MakeBinding(
-        "attenuation_color_texture",
+        "transmissive_normal_texture",
         15,
         proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
         {proto::ProgramStage::COMPUTE});
     *program.add_bindings() = MakeBinding(
-        "attenuation_distance_texture",
+        "transmissive_roughness_texture",
         16,
+        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
+        {proto::ProgramStage::COMPUTE});
+    *program.add_bindings() = MakeBinding(
+        "transmissive_metallic_texture",
+        17,
+        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
+        {proto::ProgramStage::COMPUTE});
+    *program.add_bindings() = MakeBinding(
+        "transmissive_ao_texture",
+        18,
+        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
+        {proto::ProgramStage::COMPUTE});
+    *program.add_bindings() = MakeBinding(
+        "transmissive_transmission_texture",
+        19,
+        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
+        {proto::ProgramStage::COMPUTE});
+    *program.add_bindings() = MakeBinding(
+        "transmissive_ior_texture",
+        20,
+        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
+        {proto::ProgramStage::COMPUTE});
+    *program.add_bindings() = MakeBinding(
+        "transmissive_thickness_texture",
+        21,
+        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
+        {proto::ProgramStage::COMPUTE});
+    *program.add_bindings() = MakeBinding(
+        "transmissive_attenuation_color_texture",
+        22,
+        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
+        {proto::ProgramStage::COMPUTE});
+    *program.add_bindings() = MakeBinding(
+        "transmissive_attenuation_distance_texture",
+        23,
+        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
+        {proto::ProgramStage::COMPUTE});
+    *program.add_bindings() = MakeBinding(
+        "opaque_specular_factor_texture",
+        24,
+        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
+        {proto::ProgramStage::COMPUTE});
+    *program.add_bindings() = MakeBinding(
+        "opaque_specular_color_texture",
+        25,
         proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
         {proto::ProgramStage::COMPUTE});
     AddSharedRaytracingUniforms(program);
     return MakeProgramInfo(
         std::move(program),
-        {.vertex_shader = "dragon.vert", .fragment_shader = "dragon.frag"},
-        {.vertex_shader = "dragon.vert",
-         .fragment_shader = "dragon.frag",
-         .compute_shader = "dragon.comp"});
+        {.vertex_shader = "raytrace.vert", .fragment_shader = "raytrace.frag"},
+        {.vertex_shader = "raytrace.vert",
+         .fragment_shader = "raytrace.frag",
+         .compute_shader = "raytrace.comp",
+         .raygen_shader = "raytrace.rgen",
+         .miss_shader = "raytrace.rmiss",
+         .closesthit_shader = "raytrace.rchit"});
 }
 
 ProgramInfo MakeRaytracingPreprocessProgram(
@@ -465,25 +327,14 @@ std::vector<ProgramInfo> BuildProgramsForPreset(
     {
     case SupportedScenePreset::Cubemap:
         return {MakeCubemapProgram(proto_level.default_texture_name())};
-    case SupportedScenePreset::RaytracingSimple:
+    case SupportedScenePreset::Raytrace:
         return {
             MakeCubemapProgram(proto_level.default_texture_name()),
-            MakeRaytracingSimpleProgram(proto_level.default_texture_name()),
+            MakeRaytraceProgram(proto_level.default_texture_name()),
             MakeRaytracingPreprocessProgram(
-                "raytracing_simple_preprocess",
-                {.vertex_shader = "raytracing_simple.vert",
-                 .fragment_shader = "raytracing_simple.frag"},
-                {.vertex_shader = "raytracing_simple.vert",
-                 .fragment_shader = "raytracing_simple.frag"})};
-    case SupportedScenePreset::Dragon:
-    case SupportedScenePreset::SkinnedMesh:
-        return {
-            MakeCubemapProgram(proto_level.default_texture_name()),
-            MakeDragonProgram(proto_level.default_texture_name()),
-            MakeRaytracingPreprocessProgram(
-                "dragon_preprocess",
-                {.vertex_shader = "dragon.vert", .fragment_shader = "dragon.frag"},
-                {.vertex_shader = "dragon.vert", .fragment_shader = "dragon.frag"})};
+                "raytrace_preprocess",
+                {.vertex_shader = "raytrace.vert", .fragment_shader = "raytrace.frag"},
+                {.vertex_shader = "raytrace.vert", .fragment_shader = "raytrace.frag"})};
     case SupportedScenePreset::Unknown:
     default:
         throw std::runtime_error("Unsupported internal render preset.");
@@ -499,9 +350,7 @@ std::vector<RenderPassProgramInfo> BuildRenderPassProgramsForPreset(
         return {{
             .render_time = proto::NodeMesh::SKYBOX_RENDER_TIME,
             .program_name = "CubemapProgram"}};
-    case SupportedScenePreset::RaytracingSimple:
-    case SupportedScenePreset::Dragon:
-    case SupportedScenePreset::SkinnedMesh:
+    case SupportedScenePreset::Raytrace:
         return {
             {.render_time = proto::NodeMesh::SKYBOX_RENDER_TIME,
              .program_name = "CubemapProgram"},
@@ -538,44 +387,7 @@ SupportedScenePreset InferScenePreset(
     const proto::Level& proto_level,
     const std::filesystem::path& source_path)
 {
-    const auto stem = ToLowerAscii(source_path.stem().string());
-    if (stem == "cubemap")
-    {
-        return SupportedScenePreset::Cubemap;
-    }
-    if (stem == "raytracing")
-    {
-        return SupportedScenePreset::RaytracingSimple;
-    }
-    if (stem == "dragon")
-    {
-        return SupportedScenePreset::Dragon;
-    }
-    if (stem == "skinned_mesh")
-    {
-        return SupportedScenePreset::SkinnedMesh;
-    }
-
-    for (const auto& node : proto_level.scene_tree().node_meshes())
-    {
-        if (node.play_animation())
-        {
-            return SupportedScenePreset::SkinnedMesh;
-        }
-    }
-    if (HasMeshFile(proto_level, "fox.glb"))
-    {
-        return SupportedScenePreset::SkinnedMesh;
-    }
-    if (HasMeshFile(proto_level, "dragon.glb"))
-    {
-        return SupportedScenePreset::Dragon;
-    }
-    if (HasMeshFile(proto_level, "ico.glb") || HasMeshFile(proto_level, "plate.glb"))
-    {
-        return SupportedScenePreset::RaytracingSimple;
-    }
-
+    (void)source_path;
     bool has_non_skybox_mesh = false;
     bool has_skybox_cube = false;
     for (const auto& node : proto_level.scene_tree().node_meshes())
@@ -595,6 +407,10 @@ SupportedScenePreset InferScenePreset(
     if (has_skybox_cube && !has_non_skybox_mesh)
     {
         return SupportedScenePreset::Cubemap;
+    }
+    if (has_non_skybox_mesh)
+    {
+        return SupportedScenePreset::Raytrace;
     }
     return SupportedScenePreset::Unknown;
 }

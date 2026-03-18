@@ -45,6 +45,7 @@
         "node_matrices": [
             {
                 "name": "root",
+                "matrix_type_enum": "STATIC_MATRIX",
                 "matrix": {
                     "m11": 1,
                     "m22": 1,
@@ -54,7 +55,8 @@
             },
             {
                 "name": "camera_boon",
-                "parent": "root"
+                "parent": "root",
+                "matrix_type_enum": "STATIC_MATRIX"
             }
         ],
         "node_meshes": [

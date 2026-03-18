@@ -42,7 +42,8 @@ SceneState BuildSceneState(
     float elapsed_time_seconds,
     frame::EntityId preferred_material = frame::NullId,
     bool flip_projection_y = true,
-    const std::string& preferred_scene_root = {});
+    const std::string& preferred_scene_root = {},
+    bool force_identity_model = false);
 
 UniformBlock MakeUniformBlock(
     const SceneState& state, float elapsed_time_seconds);

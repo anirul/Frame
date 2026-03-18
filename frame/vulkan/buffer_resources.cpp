@@ -99,30 +99,32 @@ void BufferResourceManager::BuildStorageBuffers(
             }
 
             const auto& bytes = buffer->GetRawData();
-            if (bytes.empty())
-            {
-                (*logger_)->warn(
-                    "Skipping empty storage buffer {}.",
-                    level.GetNameFromId(buffer_id));
-                continue;
-            }
+            const bool is_empty_buffer = bytes.empty();
+            const auto upload_size = is_empty_buffer ? std::size_t{1} : bytes.size();
 
             PendingUpload upload{};
             upload.staging_buffer = memory_manager_->CreateBuffer(
-                bytes.size(),
+                upload_size,
                 vk::BufferUsageFlagBits::eTransferSrc,
                 vk::MemoryPropertyFlagBits::eHostVisible |
                     vk::MemoryPropertyFlagBits::eHostCoherent,
                 upload.staging_memory);
 
             void* mapped = device_.mapMemory(
-                *upload.staging_memory, 0, bytes.size());
-            std::memcpy(mapped, bytes.data(), bytes.size());
+                *upload.staging_memory, 0, upload_size);
+            if (is_empty_buffer)
+            {
+                std::memset(mapped, 0, upload_size);
+            }
+            else
+            {
+                std::memcpy(mapped, bytes.data(), bytes.size());
+            }
             device_.unmapMemory(*upload.staging_memory);
 
             vk::UniqueDeviceMemory gpu_memory;
             auto gpu_buffer = memory_manager_->CreateBuffer(
-                bytes.size(),
+                upload_size,
                 vk::BufferUsageFlagBits::eTransferDst |
                     vk::BufferUsageFlagBits::eTransferSrc |
                     vk::BufferUsageFlagBits::eStorageBuffer,
@@ -130,12 +132,12 @@ void BufferResourceManager::BuildStorageBuffers(
                 gpu_memory);
 
             upload.destination = *gpu_buffer;
-            upload.size = static_cast<vk::DeviceSize>(bytes.size());
+            upload.size = static_cast<vk::DeviceSize>(upload_size);
             pending_uploads.push_back(std::move(upload));
 
             BufferResource res{};
             res.name = level.GetNameFromId(buffer_id);
-            res.size = bytes.size();
+            res.size = upload_size;
             res.buffer = std::move(gpu_buffer);
             res.memory = std::move(gpu_memory);
             storage_buffers_.push_back(std::move(res));

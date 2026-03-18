@@ -21,7 +21,11 @@
         "default_camera_name": "camera",
         "default_root_name": "root",
         "node_matrices": [
-            {"name": "root", "matrix": {"m11": 1, "m22": 1, "m33": 1, "m44": 1}},
+            {
+                "name": "root",
+                "matrix_type_enum": "STATIC_MATRIX",
+                "matrix": {"m11": 1, "m22": 1, "m33": 1, "m44": 1}
+            },
             {
                 "name": "camera_rot",
                 "parent": "root",

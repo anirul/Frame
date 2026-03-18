@@ -54,7 +54,8 @@ void ConfigureRenderPassPrograms(
 
 BuiltLevel BuildLevel(
     glm::uvec2 size,
-    const frame::json::LevelData& level_data)
+    const frame::json::LevelData& level_data,
+    const BuildLevelOptions& options)
 {
     auto& logger = frame::Logger::GetInstance();
     ScopedTimer total_timer(logger, "Vulkan BuildLevel");
@@ -124,7 +125,11 @@ BuiltLevel BuildLevel(
 
     {
         ScopedTimer timer(logger, "Parse scene tree");
-        if (!json::ParseSceneTree(level_data.proto.scene_tree(), *level))
+        if (!json::ParseSceneTree(
+                level_data.proto.scene_tree(),
+                *level,
+                {.prefer_hardware_raytracing =
+                     options.prefer_hardware_raytracing}))
         {
             throw std::runtime_error("Failed to parse scene tree for Vulkan level.");
         }

@@ -7,7 +7,7 @@
 
 #include "frame/file/file_system.h"
 #include "frame/json/parse_pixel.h"
-#include "frame/json/program_catalog.h"
+#include "frame/json/program_key.h"
 #include "frame/json/parse_uniform.h"
 #include "frame/opengl/file/load_program.h"
 #include "frame/opengl/json/parse_texture.h"
@@ -61,6 +61,18 @@ std::optional<GeneratedTextureSpec> GetRaytracingTextureSpec(
             .element = frame::proto::PixelElementSize::BYTE};
     }
     if (EndsWith(texture_name, "ao_texture"))
+    {
+        return GeneratedTextureSpec{
+            .color = {1.0f, 1.0f, 1.0f, 1.0f},
+            .element = frame::proto::PixelElementSize::BYTE};
+    }
+    if (EndsWith(texture_name, "specular_factor_texture"))
+    {
+        return GeneratedTextureSpec{
+            .color = {1.0f, 1.0f, 1.0f, 1.0f},
+            .element = frame::proto::PixelElementSize::BYTE};
+    }
+    if (EndsWith(texture_name, "specular_color_texture"))
     {
         return GeneratedTextureSpec{
             .color = {1.0f, 1.0f, 1.0f, 1.0f},
@@ -144,27 +156,6 @@ EntityId EnsureRaytracingDefaultTexture(
 }
 
 } // namespace
-
-std::unique_ptr<frame::ProgramInterface> ParseProgramOpenGL(
-    const proto::Program& proto_program, LevelInterface& level)
-{
-    auto shader_files = frame::json::ResolveProgramShaderFiles(
-        proto_program,
-        frame::json::ShaderBackend::OpenGL);
-    if (!shader_files)
-    {
-        throw std::runtime_error(std::format(
-            "No OpenGL shader mapping for program '{}'.",
-            proto_program.name()));
-    }
-    return ParseProgramOpenGL(
-        proto_program,
-        ShaderFiles{
-            .vertex_shader = shader_files->vertex_shader,
-            .fragment_shader = shader_files->fragment_shader,
-            .compute_shader = shader_files->compute_shader},
-        level);
-}
 
 std::unique_ptr<frame::ProgramInterface> ParseProgramOpenGL(
     const proto::Program& proto_program,

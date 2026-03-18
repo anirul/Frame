@@ -11,6 +11,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
+#include <limits>
 #include <optional>
 #include <set>
 #include <string_view>
@@ -394,6 +395,78 @@ Image::Image(
             buffer);
         logger->info("Saved image cache {}.", cache_metadata->cache_relative);
     }
+}
+
+Image::Image(
+    const void* data,
+    std::size_t size_bytes,
+    proto::PixelElementSize pixel_element_size,
+    proto::PixelStructure pixel_structure)
+    : pixel_element_size_(pixel_element_size), pixel_structure_(pixel_structure)
+{
+    if (!data || size_bytes == 0)
+    {
+        throw std::runtime_error("Cannot decode image from empty memory.");
+    }
+    if (size_bytes >
+        static_cast<std::size_t>(std::numeric_limits<int>::max()))
+    {
+        throw std::runtime_error("Encoded image is too large for stb_image.");
+    }
+
+    const int desired_channels = DesiredChannels(pixel_structure);
+    int channels = 0;
+    glm::ivec2 size = glm::ivec2(0, 0);
+    stbi_set_flip_vertically_on_load(true);
+    switch (pixel_element_size.value())
+    {
+    case proto::PixelElementSize::BYTE: {
+        image_ = stbi_load_from_memory(
+            static_cast<const stbi_uc*>(data),
+            static_cast<int>(size_bytes),
+            &size.x,
+            &size.y,
+            &channels,
+            desired_channels);
+        break;
+    }
+    case proto::PixelElementSize::SHORT: {
+        image_ = stbi_load_16_from_memory(
+            static_cast<const stbi_uc*>(data),
+            static_cast<int>(size_bytes),
+            &size.x,
+            &size.y,
+            &channels,
+            desired_channels);
+        break;
+    }
+    case proto::PixelElementSize::HALF:
+        [[fallthrough]];
+    case proto::PixelElementSize::FLOAT: {
+        image_ = stbi_loadf_from_memory(
+            static_cast<const stbi_uc*>(data),
+            static_cast<int>(size_bytes),
+            &size.x,
+            &size.y,
+            &channels,
+            desired_channels);
+        break;
+    }
+    default:
+        throw std::runtime_error(
+            "unsupported element size : " +
+            std::to_string(static_cast<int>(pixel_element_size_.value())));
+    }
+    if (!image_)
+    {
+        std::string stbi_error = stbi_failure_reason();
+        throw std::runtime_error(
+            std::format(
+                "unsupported in-memory image, reason: {}",
+                stbi_error));
+    }
+    free_ = true;
+    size_ = size;
 }
 
 Image::Image(

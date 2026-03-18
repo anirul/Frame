@@ -4,6 +4,7 @@
 #include <array>
 #include <algorithm>
 #include <cmath>
+#include <cstdint>
 #include <limits>
 #include <memory>
 #include <optional>
@@ -19,12 +20,13 @@
 #include <glm/glm.hpp>
 
 #include "frame/file/file_system.h"
+#include "frame/file/image.h"
 #include "frame/logger.h"
 #include "frame/opengl/file/load_texture.h"
 #include "frame/opengl/buffer.h"
 #include "frame/bvh.h"
 #include "frame/opengl/json/parse_texture.h"
-#include "frame/json/program_catalog.h"
+#include "frame/json/program_key.h"
 #include "frame/json/parse_pixel.h"
 #include "frame/opengl/material.h"
 #include "frame/opengl/skinned_mesh.h"
@@ -53,14 +55,14 @@ std::filesystem::path ResolveAssetPath(std::filesystem::path file)
     return (asset_root / file).lexically_normal();
 }
 
-bool IsDragonProgram(const ProgramInterface* program)
+bool IsRaytracingProgram(const ProgramInterface* program)
 {
     if (!program)
     {
         return false;
     }
     const auto key = frame::json::ResolveProgramKey(program->GetData());
-    return frame::json::IsDragonProgramKey(key);
+    return frame::json::IsRaytracingProgramKey(key);
 }
 
 EntityId SelectGltfProgramId(LevelInterface& level)
@@ -68,8 +70,8 @@ EntityId SelectGltfProgramId(LevelInterface& level)
     EntityId first_program_id = NullId;
     EntityId first_scene_program_id = NullId;
     EntityId first_quad_program_id = NullId;
-    EntityId dragon_scene_program_id = NullId;
-    EntityId dragon_quad_program_id = NullId;
+    EntityId raytrace_scene_program_id = NullId;
+    EntityId raytrace_quad_program_id = NullId;
     for (const auto program_id : level.GetPrograms())
     {
         if (!first_program_id)
@@ -87,28 +89,28 @@ EntityId SelectGltfProgramId(LevelInterface& level)
             first_quad_program_id = program_id;
         }
         const auto key = frame::json::ResolveProgramKey(program.GetData());
-        if (!frame::json::IsDragonProgramKey(key))
+        if (!frame::json::IsRaytracingProgramKey(key))
         {
             continue;
         }
         if (scene_type == proto::SceneType::SCENE &&
-            !dragon_scene_program_id)
+            !raytrace_scene_program_id)
         {
-            dragon_scene_program_id = program_id;
+            raytrace_scene_program_id = program_id;
         }
         if (scene_type == proto::SceneType::QUAD &&
-            !dragon_quad_program_id)
+            !raytrace_quad_program_id)
         {
-            dragon_quad_program_id = program_id;
+            raytrace_quad_program_id = program_id;
         }
     }
-    if (dragon_quad_program_id)
+    if (raytrace_quad_program_id)
     {
-        return dragon_quad_program_id;
+        return raytrace_quad_program_id;
     }
-    if (dragon_scene_program_id)
+    if (raytrace_scene_program_id)
     {
-        return dragon_scene_program_id;
+        return raytrace_scene_program_id;
     }
     if (first_scene_program_id)
     {
@@ -131,29 +133,60 @@ glm::uvec2 ResolveTextureDisplaySize(LevelInterface& level)
     return level.GetTextureFromId(output_id).GetSize();
 }
 
-std::optional<std::filesystem::path> ResolveMaterialTexturePath(
+struct MaterialTextureSource
+{
+    std::optional<std::filesystem::path> file_path = std::nullopt;
+    const aiTexture* embedded_texture = nullptr;
+    std::string cache_key = {};
+};
+
+std::optional<MaterialTextureSource> ResolveMaterialTextureSource(
+    const aiScene* scene,
     const std::filesystem::path& model_path,
     const aiString& texture_path)
 {
     const std::string raw = texture_path.C_Str();
-    if (raw.empty() || raw.front() == '*')
+    if (raw.empty())
     {
         return std::nullopt;
+    }
+    if (raw.front() == '*')
+    {
+        if (!scene)
+        {
+            return std::nullopt;
+        }
+        const aiTexture* embedded_texture =
+            scene->GetEmbeddedTexture(raw.c_str());
+        if (!embedded_texture)
+        {
+            return std::nullopt;
+        }
+        return MaterialTextureSource{
+            .embedded_texture = embedded_texture,
+            .cache_key = raw};
     }
     const std::filesystem::path parsed(raw);
     if (parsed.is_absolute() && std::filesystem::exists(parsed))
     {
-        return parsed.lexically_normal();
+        return MaterialTextureSource{
+            .file_path = parsed.lexically_normal(),
+            .cache_key = parsed.lexically_normal().generic_string()};
     }
     const auto local =
         (model_path.parent_path() / parsed).lexically_normal();
     if (std::filesystem::exists(local))
     {
-        return local;
+        return MaterialTextureSource{
+            .file_path = local,
+            .cache_key = local.generic_string()};
     }
     try
     {
-        return frame::file::FindFile(parsed).lexically_normal();
+        const auto resolved = frame::file::FindFile(parsed).lexically_normal();
+        return MaterialTextureSource{
+            .file_path = resolved,
+            .cache_key = resolved.generic_string()};
     }
     catch (const std::exception&)
     {
@@ -161,7 +194,8 @@ std::optional<std::filesystem::path> ResolveMaterialTexturePath(
     }
 }
 
-std::optional<std::filesystem::path> FindFirstMaterialTexturePath(
+std::optional<MaterialTextureSource> FindFirstMaterialTextureSource(
+    const aiScene* scene,
     const aiMaterial* material,
     const std::filesystem::path& model_path,
     std::initializer_list<aiTextureType> types)
@@ -181,7 +215,8 @@ std::optional<std::filesystem::path> FindFirstMaterialTexturePath(
         {
             continue;
         }
-        auto resolved = ResolveMaterialTexturePath(model_path, texture_path);
+        auto resolved = ResolveMaterialTextureSource(
+            scene, model_path, texture_path);
         if (resolved)
         {
             return resolved;
@@ -190,7 +225,8 @@ std::optional<std::filesystem::path> FindFirstMaterialTexturePath(
     return std::nullopt;
 }
 
-std::optional<std::filesystem::path> FindMaterialTexturePath(
+std::optional<MaterialTextureSource> FindMaterialTextureSource(
+    const aiScene* scene,
     const aiMaterial* material,
     const std::filesystem::path& model_path,
     aiTextureType type,
@@ -205,7 +241,7 @@ std::optional<std::filesystem::path> FindMaterialTexturePath(
     {
         return std::nullopt;
     }
-    return ResolveMaterialTexturePath(model_path, texture_path);
+    return ResolveMaterialTextureSource(scene, model_path, texture_path);
 }
 
 glm::vec4 ReadBaseColorFactor(const aiMaterial* material)
@@ -259,6 +295,32 @@ float ReadTransmissionFactor(const aiMaterial* material)
         return std::clamp(static_cast<float>(transmission), 0.0f, 1.0f);
     }
     return 0.0f;
+}
+
+float ReadSpecularFactor(const aiMaterial* material)
+{
+    ai_real specular = 1.0f;
+    if (material &&
+        material->Get(AI_MATKEY_SPECULAR_FACTOR, specular) ==
+            aiReturn_SUCCESS)
+    {
+        return std::clamp(static_cast<float>(specular), 0.0f, 1.0f);
+    }
+    return 1.0f;
+}
+
+glm::vec3 ReadSpecularColor(const aiMaterial* material)
+{
+    aiColor3D color(1.0f, 1.0f, 1.0f);
+    if (material &&
+        material->Get(AI_MATKEY_COLOR_SPECULAR, color) == aiReturn_SUCCESS)
+    {
+        return {
+            std::clamp(color.r, 0.0f, 1.0f),
+            std::clamp(color.g, 0.0f, 1.0f),
+            std::clamp(color.b, 0.0f, 1.0f)};
+    }
+    return {1.0f, 1.0f, 1.0f};
 }
 
 float ReadIorFactor(const aiMaterial* material)
@@ -987,14 +1049,84 @@ std::vector<std::pair<EntityId, EntityId>> LoadMeshesFromGltfFile(
         (selected_program_id != NullId)
             ? &level.GetProgramFromId(selected_program_id)
             : nullptr;
-    const bool selected_program_is_dragon =
-        IsDragonProgram(selected_program);
+    const bool selected_program_is_raytracing =
+        IsRaytracingProgram(selected_program);
     const glm::uvec2 texture_display_size = ResolveTextureDisplaySize(level);
     std::unordered_map<std::string, EntityId> file_texture_cache = {};
     std::unordered_map<std::string, EntityId> solid_texture_cache = {};
     std::unordered_map<unsigned int, EntityId> gltf_material_cache = {};
     int generated_texture_counter = 0;
     int generated_material_counter = 0;
+
+    auto bytes_per_component = [](const proto::PixelElementSize& element_size) {
+        switch (element_size.value())
+        {
+        case proto::PixelElementSize::BYTE:
+            return sizeof(std::uint8_t);
+        case proto::PixelElementSize::SHORT:
+        case proto::PixelElementSize::HALF:
+            return sizeof(std::uint16_t);
+        case proto::PixelElementSize::FLOAT:
+            return sizeof(float);
+        default:
+            throw std::runtime_error("Unsupported texture element size.");
+        }
+    };
+    auto component_count = [](const proto::PixelStructure& pixel_structure) {
+        switch (pixel_structure.value())
+        {
+        case proto::PixelStructure::GREY:
+        case proto::PixelStructure::DEPTH:
+            return 1u;
+        case proto::PixelStructure::GREY_ALPHA:
+            return 2u;
+        case proto::PixelStructure::RGB:
+        case proto::PixelStructure::BGR:
+            return 3u;
+        case proto::PixelStructure::RGB_ALPHA:
+        case proto::PixelStructure::BGR_ALPHA:
+            return 4u;
+        default:
+            throw std::runtime_error("Unsupported texture pixel structure.");
+        }
+    };
+    auto create_texture_from_inline_pixels =
+        [&](const void* pixels,
+            glm::uvec2 size,
+            const proto::PixelElementSize& element_size,
+            const proto::PixelStructure& pixel_structure,
+            const std::string& cache_key,
+            const std::string& semantic) -> EntityId {
+        if (auto it = file_texture_cache.find(cache_key);
+            it != file_texture_cache.end())
+        {
+            return it->second;
+        }
+        proto::Texture proto_texture;
+        const std::string texture_name = std::format(
+            "{}.__gltf_tex_{}_{}",
+            name,
+            semantic,
+            generated_texture_counter++);
+        proto_texture.set_name(texture_name);
+        proto_texture.mutable_pixel_element_size()->CopyFrom(element_size);
+        proto_texture.mutable_pixel_structure()->CopyFrom(pixel_structure);
+        proto_texture.mutable_size()->set_x(static_cast<int>(size.x));
+        proto_texture.mutable_size()->set_y(static_cast<int>(size.y));
+        const std::size_t pixel_bytes =
+            static_cast<std::size_t>(size.x) * size.y *
+            component_count(pixel_structure) * bytes_per_component(element_size);
+        proto_texture.set_pixels(
+            reinterpret_cast<const char*>(pixels),
+            static_cast<int>(pixel_bytes));
+        auto texture =
+            frame::json::ParseTexture(proto_texture, texture_display_size);
+        texture->SetName(texture_name);
+        texture->SetSerializeEnable(true);
+        EntityId texture_id = level.AddTexture(std::move(texture));
+        file_texture_cache.emplace(cache_key, texture_id);
+        return texture_id;
+    };
 
     auto create_texture_from_path =
         [&](const std::filesystem::path& path,
@@ -1028,6 +1160,66 @@ std::vector<std::pair<EntityId, EntityId>> LoadMeshesFromGltfFile(
         file_texture_cache.emplace(cache_key, texture_id);
         return texture_id;
     };
+    auto create_texture_from_embedded =
+        [&](const aiTexture& embedded_texture,
+            const std::string& source_key,
+            const std::string& semantic) -> EntityId {
+        const std::string cache_key =
+            std::format("{}|{}", semantic, source_key);
+        if (embedded_texture.mHeight == 0)
+        {
+            const frame::file::Image image(
+                embedded_texture.pcData,
+                embedded_texture.mWidth,
+                frame::json::PixelElementSize_BYTE(),
+                frame::json::PixelStructure_RGB_ALPHA());
+            return create_texture_from_inline_pixels(
+                image.Data(),
+                image.GetSize(),
+                image.GetPixelElementSize(),
+                image.GetPixelStructure(),
+                cache_key,
+                semantic);
+        }
+
+        std::vector<std::uint8_t> rgba_pixels;
+        rgba_pixels.reserve(
+            static_cast<std::size_t>(embedded_texture.mWidth) *
+            embedded_texture.mHeight * 4);
+        for (unsigned int i = 0;
+             i < embedded_texture.mWidth * embedded_texture.mHeight;
+             ++i)
+        {
+            const auto& texel = embedded_texture.pcData[i];
+            rgba_pixels.push_back(texel.r);
+            rgba_pixels.push_back(texel.g);
+            rgba_pixels.push_back(texel.b);
+            rgba_pixels.push_back(texel.a);
+        }
+        return create_texture_from_inline_pixels(
+            rgba_pixels.data(),
+            {embedded_texture.mWidth, embedded_texture.mHeight},
+            frame::json::PixelElementSize_BYTE(),
+            frame::json::PixelStructure_RGB_ALPHA(),
+            cache_key,
+            semantic);
+    };
+    auto create_texture_from_source =
+        [&](const MaterialTextureSource& source,
+            const std::string& semantic) -> EntityId {
+        if (source.file_path)
+        {
+            return create_texture_from_path(*source.file_path, semantic);
+        }
+        if (source.embedded_texture)
+        {
+            return create_texture_from_embedded(
+                *source.embedded_texture,
+                source.cache_key,
+                semantic);
+        }
+        return NullId;
+    };
 
     auto create_solid_texture = [&](const glm::vec4& color,
                                     const std::string& semantic) -> EntityId {
@@ -1056,40 +1248,81 @@ std::vector<std::pair<EntityId, EntityId>> LoadMeshesFromGltfFile(
         return texture_id;
     };
 
+    auto find_level_texture = [&](std::initializer_list<std::string_view> names)
+        -> EntityId {
+            for (const auto name_view : names)
+            {
+                const auto texture_id = level.GetIdFromName(
+                    std::string(name_view));
+                if (texture_id != NullId)
+                {
+                    return texture_id;
+                }
+            }
+            return NullId;
+        };
+
     auto create_material_from_gltf = [&](unsigned int material_index) -> EntityId {
         if (selected_program_id == NullId ||
             material_index >= scene->mNumMaterials)
         {
             return NullId;
         }
-        const bool cache_material = !selected_program_is_dragon;
-        if (cache_material)
+        if (auto it = gltf_material_cache.find(material_index);
+            it != gltf_material_cache.end())
         {
-            if (auto it = gltf_material_cache.find(material_index);
-                it != gltf_material_cache.end())
-            {
-                return it->second;
-            }
+            return it->second;
         }
         const aiMaterial* ai_material = scene->mMaterials[material_index];
-        const auto base_color_texture_path = FindFirstMaterialTexturePath(
-            ai_material, file, {aiTextureType_BASE_COLOR, aiTextureType_DIFFUSE});
-        const auto normal_texture_path = FindFirstMaterialTexturePath(
-            ai_material, file, {aiTextureType_NORMALS, aiTextureType_HEIGHT});
-        const auto roughness_texture_path = FindFirstMaterialTexturePath(
-            ai_material, file, {aiTextureType_DIFFUSE_ROUGHNESS});
-        const auto metallic_texture_path = FindFirstMaterialTexturePath(
-            ai_material, file, {aiTextureType_METALNESS});
-        const auto ao_texture_path = FindFirstMaterialTexturePath(
-            ai_material, file, {aiTextureType_AMBIENT_OCCLUSION, aiTextureType_LIGHTMAP});
-        const auto transmission_texture_path = FindMaterialTexturePath(
-            ai_material, file, aiTextureType_TRANSMISSION, 0);
-        const auto thickness_texture_path = FindMaterialTexturePath(
-            ai_material, file, aiTextureType_TRANSMISSION, 1);
+        const auto base_color_texture = FindFirstMaterialTextureSource(
+            scene,
+            ai_material,
+            file,
+            {aiTextureType_BASE_COLOR, aiTextureType_DIFFUSE});
+        const auto normal_texture = FindFirstMaterialTextureSource(
+            scene,
+            ai_material,
+            file,
+            {aiTextureType_NORMALS, aiTextureType_HEIGHT});
+        const auto roughness_texture = FindFirstMaterialTextureSource(
+            scene,
+            ai_material,
+            file,
+            {aiTextureType_DIFFUSE_ROUGHNESS});
+        const auto metallic_texture = FindFirstMaterialTextureSource(
+            scene,
+            ai_material,
+            file,
+            {aiTextureType_METALNESS});
+        const auto ao_texture = FindFirstMaterialTextureSource(
+            scene,
+            ai_material,
+            file,
+            {aiTextureType_AMBIENT_OCCLUSION, aiTextureType_LIGHTMAP});
+        const auto specular_texture = FindMaterialTextureSource(
+            scene,
+            ai_material,
+            file,
+            aiTextureType_SPECULAR,
+            0);
+        const auto transmission_texture = FindMaterialTextureSource(
+            scene,
+            ai_material,
+            file,
+            aiTextureType_TRANSMISSION,
+            0);
+        const auto thickness_texture = FindMaterialTextureSource(
+            scene,
+            ai_material,
+            file,
+            aiTextureType_TRANSMISSION,
+            1);
 
         const glm::vec4 base_color_factor = ReadBaseColorFactor(ai_material);
         const float roughness_factor = ReadRoughnessFactor(ai_material);
         const float metallic_factor = ReadMetallicFactor(ai_material);
+        const float specular_factor = ReadSpecularFactor(ai_material);
+        const glm::vec3 specular_color = ReadSpecularColor(ai_material);
         const float transmission_factor = ReadTransmissionFactor(ai_material);
         const float ior_factor = ReadIorFactor(ai_material);
         const float thickness_factor = ReadThicknessFactor(ai_material);
@@ -1097,67 +1330,118 @@ std::vector<std::pair<EntityId, EntityId>> LoadMeshesFromGltfFile(
             ReadAttenuationDistance(ai_material);
         const glm::vec3 attenuation_color =
             ReadAttenuationColor(ai_material);
+        const bool prefer_scene_fallback_textures =
+            transmission_factor <= 0.01f && !transmission_texture.has_value();
 
-        const EntityId base_texture_id = base_color_texture_path
-            ? create_texture_from_path(*base_color_texture_path, "base_color")
-            : create_solid_texture(base_color_factor, "base_color");
-        const EntityId normal_texture_id = normal_texture_path
-            ? create_texture_from_path(*normal_texture_path, "normal")
-            : create_solid_texture(glm::vec4(0.5f, 0.5f, 1.0f, 1.0f), "normal");
-        const EntityId roughness_texture_id = roughness_texture_path
-            ? create_texture_from_path(*roughness_texture_path, "roughness")
-            : create_solid_texture(
-                  glm::vec4(
-                      roughness_factor,
-                      roughness_factor,
-                      roughness_factor,
-                      1.0f),
-                  "roughness");
-        const EntityId metallic_texture_id = metallic_texture_path
-            ? create_texture_from_path(*metallic_texture_path, "metallic")
-            : create_solid_texture(
-                  glm::vec4(
-                      metallic_factor,
-                      metallic_factor,
-                      metallic_factor,
-                      1.0f),
-                  "metallic");
-        const EntityId ao_texture_id = ao_texture_path
-            ? create_texture_from_path(*ao_texture_path, "ao")
-            : create_solid_texture(glm::vec4(1.0f), "ao");
-        const EntityId transmission_texture_id =
-            transmission_texture_path
-            ? create_texture_from_path(*transmission_texture_path, "transmission")
-            : create_solid_texture(
-                  glm::vec4(
-                      transmission_factor,
-                      transmission_factor,
-                      transmission_factor,
-                      1.0f),
-                  "transmission");
-        const EntityId ior_texture_id = create_solid_texture(
-            glm::vec4(ior_factor, ior_factor, ior_factor, 1.0f),
-            "ior");
-        const EntityId thickness_texture_id =
-            thickness_texture_path
-            ? create_texture_from_path(*thickness_texture_path, "thickness")
-            : create_solid_texture(
-                  glm::vec4(
-                      thickness_factor,
-                      thickness_factor,
-                      thickness_factor,
-                      1.0f),
-                  "thickness");
-        const EntityId attenuation_color_texture_id = create_solid_texture(
-            glm::vec4(attenuation_color, 1.0f),
-            "attenuation_color");
-        const EntityId attenuation_distance_texture_id = create_solid_texture(
-            glm::vec4(
-                attenuation_distance,
-                attenuation_distance,
-                attenuation_distance,
-                1.0f),
-            "attenuation_distance");
+        auto use_scene_texture_or =
+            [&](std::initializer_list<std::string_view> names,
+                EntityId fallback_texture_id) -> EntityId {
+                if (!prefer_scene_fallback_textures)
+                {
+                    return fallback_texture_id;
+                }
+                const auto texture_id = find_level_texture(names);
+                return texture_id != NullId ? texture_id : fallback_texture_id;
+            };
+
+        const EntityId base_texture_id = base_color_texture
+            ? create_texture_from_source(*base_color_texture, "base_color")
+            : use_scene_texture_or(
+                  {"albedo_texture", "Color"},
+                  create_solid_texture(base_color_factor, "base_color"));
+        const EntityId normal_texture_id = normal_texture
+            ? create_texture_from_source(*normal_texture, "normal")
+            : use_scene_texture_or(
+                  {"normal_texture"},
+                  create_solid_texture(
+                      glm::vec4(0.5f, 0.5f, 1.0f, 1.0f),
+                      "normal"));
+        const EntityId roughness_texture_id = roughness_texture
+            ? create_texture_from_source(*roughness_texture, "roughness")
+            : use_scene_texture_or(
+                  {"roughness_texture"},
+                  create_solid_texture(
+                      glm::vec4(
+                          roughness_factor,
+                          roughness_factor,
+                          roughness_factor,
+                          1.0f),
+                      "roughness"));
+        const EntityId metallic_texture_id = metallic_texture
+            ? create_texture_from_source(*metallic_texture, "metallic")
+            : use_scene_texture_or(
+                  {"metallic_texture"},
+                  create_solid_texture(
+                      glm::vec4(
+                          metallic_factor,
+                          metallic_factor,
+                          metallic_factor,
+                          1.0f),
+                      "metallic"));
+        const EntityId ao_texture_id = ao_texture
+            ? create_texture_from_source(*ao_texture, "ao")
+            : use_scene_texture_or(
+                  {"ao_texture"},
+                  create_solid_texture(glm::vec4(1.0f), "ao"));
+        const EntityId specular_color_texture_id = specular_texture
+            ? create_texture_from_source(*specular_texture, "specular")
+            : use_scene_texture_or(
+                  {"specular_color_texture"},
+                  create_solid_texture(
+                      glm::vec4(specular_color, 1.0f),
+                      "specular_color"));
+        const EntityId specular_factor_texture_id = specular_texture
+            ? specular_color_texture_id
+            : use_scene_texture_or(
+                  {"specular_factor_texture"},
+                  create_solid_texture(
+                      glm::vec4(
+                          specular_factor,
+                          specular_factor,
+                          specular_factor,
+                          specular_factor),
+                      "specular_factor"));
+        const EntityId transmission_texture_id = transmission_texture
+            ? create_texture_from_source(*transmission_texture, "transmission")
+            : use_scene_texture_or(
+                  {"transmission_texture"},
+                  create_solid_texture(
+                      glm::vec4(
+                          transmission_factor,
+                          transmission_factor,
+                          transmission_factor,
+                          1.0f),
+                      "transmission"));
+        const EntityId ior_texture_id = use_scene_texture_or(
+            {"ior_texture"},
+            create_solid_texture(
+                glm::vec4(ior_factor, ior_factor, ior_factor, 1.0f),
+                "ior"));
+        const EntityId thickness_texture_id = thickness_texture
+            ? create_texture_from_source(*thickness_texture, "thickness")
+            : use_scene_texture_or(
+                  {"thickness_texture"},
+                  create_solid_texture(
+                      glm::vec4(
+                          thickness_factor,
+                          thickness_factor,
+                          thickness_factor,
+                          1.0f),
+                      "thickness"));
+        const EntityId attenuation_color_texture_id = use_scene_texture_or(
+            {"attenuation_color_texture"},
+            create_solid_texture(
+                glm::vec4(attenuation_color, 1.0f),
+                "attenuation_color"));
+        const EntityId attenuation_distance_texture_id = use_scene_texture_or(
+            {"attenuation_distance_texture"},
+            create_solid_texture(
+                glm::vec4(
+                    attenuation_distance,
+                    attenuation_distance,
+                    attenuation_distance,
+                    1.0f),
+                "attenuation_distance"));
 
         auto material = std::make_unique<frame::opengl::Material>();
         const std::string material_name_generated = std::format(
@@ -1167,7 +1451,7 @@ std::vector<std::pair<EntityId, EntityId>> LoadMeshesFromGltfFile(
         material->SetName(material_name_generated);
         material->SetSerializeEnable(true);
         material->SetProgramId(selected_program_id);
-        if (selected_program_is_dragon)
+        if (selected_program_is_raytracing)
         {
             const auto preprocess_id =
                 level.GetIdFromName("RayTracePreprocessProgram");
@@ -1176,154 +1460,204 @@ std::vector<std::pair<EntityId, EntityId>> LoadMeshesFromGltfFile(
                 material->SetPreprocessProgramId(preprocess_id);
             }
         }
-
-        bool has_bound_from_bindings = false;
-        if (selected_program)
+        if (selected_program_is_raytracing)
         {
-            for (const auto& binding : selected_program->GetData().bindings())
-            {
-                if (binding.binding_type() !=
-                    frame::proto::ProgramBinding::COMBINED_IMAGE_SAMPLER)
-                {
-                    continue;
-                }
-                EntityId texture_id = NullId;
-                const std::string& binding_name = binding.name();
-                if (binding_name == "Color" ||
-                    binding_name == "albedo_texture")
-                {
-                    texture_id = base_texture_id;
-                }
-                else if (binding_name == "normal_texture")
-                {
-                    texture_id = normal_texture_id;
-                }
-                else if (binding_name == "roughness_texture")
-                {
-                    texture_id = roughness_texture_id;
-                }
-                else if (binding_name == "metallic_texture")
-                {
-                    texture_id = metallic_texture_id;
-                }
-                else if (binding_name == "ao_texture")
-                {
-                    texture_id = ao_texture_id;
-                }
-                else if (binding_name == "transmission_texture")
-                {
-                    texture_id = transmission_texture_id;
-                }
-                else if (binding_name == "ior_texture")
-                {
-                    texture_id = ior_texture_id;
-                }
-                else if (binding_name == "thickness_texture")
-                {
-                    texture_id = thickness_texture_id;
-                }
-                else if (binding_name == "attenuation_color_texture")
-                {
-                    texture_id = attenuation_color_texture_id;
-                }
-                else if (binding_name == "attenuation_distance_texture")
-                {
-                    texture_id = attenuation_distance_texture_id;
-                }
-                else
-                {
-                    texture_id = level.GetIdFromName(binding_name);
-                }
-                if (texture_id == NullId)
-                {
-                    continue;
-                }
-                material->AddTextureId(texture_id, binding_name);
-                has_bound_from_bindings = true;
-            }
+            material->AddTextureId(base_texture_id, "albedo_texture");
+            material->AddTextureId(normal_texture_id, "normal_texture");
+            material->AddTextureId(
+                roughness_texture_id, "roughness_texture");
+            material->AddTextureId(
+                metallic_texture_id, "metallic_texture");
+            material->AddTextureId(ao_texture_id, "ao_texture");
+            material->AddTextureId(
+                specular_factor_texture_id, "specular_factor_texture");
+            material->AddTextureId(
+                specular_color_texture_id, "specular_color_texture");
+            material->AddTextureId(
+                transmission_texture_id, "transmission_texture");
+            material->AddTextureId(ior_texture_id, "ior_texture");
+            material->AddTextureId(
+                thickness_texture_id, "thickness_texture");
+            material->AddTextureId(
+                attenuation_color_texture_id,
+                "attenuation_color_texture");
+            material->AddTextureId(
+                attenuation_distance_texture_id,
+                "attenuation_distance_texture");
         }
-        if (!has_bound_from_bindings)
+        else
         {
-            if (!selected_program ||
-                selected_program->HasUniform("albedo_texture"))
+            bool has_bound_from_bindings = false;
+            if (selected_program)
             {
-                material->AddTextureId(base_texture_id, "albedo_texture");
+                for (const auto& binding : selected_program->GetData().bindings())
+                {
+                    if (binding.binding_type() !=
+                        frame::proto::ProgramBinding::COMBINED_IMAGE_SAMPLER)
+                    {
+                        continue;
+                    }
+                    EntityId texture_id = NullId;
+                    const std::string& binding_name = binding.name();
+                    if (binding_name == "Color" ||
+                        binding_name == "albedo_texture")
+                    {
+                        texture_id = base_texture_id;
+                    }
+                    else if (binding_name == "normal_texture")
+                    {
+                        texture_id = normal_texture_id;
+                    }
+                    else if (binding_name == "roughness_texture")
+                    {
+                        texture_id = roughness_texture_id;
+                    }
+                    else if (binding_name == "metallic_texture")
+                    {
+                        texture_id = metallic_texture_id;
+                    }
+                    else if (binding_name == "ao_texture")
+                    {
+                        texture_id = ao_texture_id;
+                    }
+                    else if (binding_name == "specular_factor_texture")
+                    {
+                        texture_id = specular_factor_texture_id;
+                    }
+                    else if (binding_name == "specular_color_texture")
+                    {
+                        texture_id = specular_color_texture_id;
+                    }
+                    else if (binding_name == "transmission_texture")
+                    {
+                        texture_id = transmission_texture_id;
+                    }
+                    else if (binding_name == "ior_texture")
+                    {
+                        texture_id = ior_texture_id;
+                    }
+                    else if (binding_name == "thickness_texture")
+                    {
+                        texture_id = thickness_texture_id;
+                    }
+                    else if (binding_name == "attenuation_color_texture")
+                    {
+                        texture_id = attenuation_color_texture_id;
+                    }
+                    else if (binding_name == "attenuation_distance_texture")
+                    {
+                        texture_id = attenuation_distance_texture_id;
+                    }
+                    else
+                    {
+                        texture_id = level.GetIdFromName(binding_name);
+                    }
+                    if (texture_id == NullId)
+                    {
+                        continue;
+                    }
+                    material->AddTextureId(texture_id, binding_name);
+                    has_bound_from_bindings = true;
+                }
             }
-            else if (selected_program->HasUniform("Color"))
+            if (!has_bound_from_bindings)
             {
-                material->AddTextureId(base_texture_id, "Color");
-            }
-            if (!selected_program ||
-                selected_program->HasUniform("normal_texture"))
-            {
-                material->AddTextureId(normal_texture_id, "normal_texture");
-            }
-            if (!selected_program ||
-                selected_program->HasUniform("roughness_texture"))
-            {
-                material->AddTextureId(
-                    roughness_texture_id, "roughness_texture");
-            }
-            if (!selected_program ||
-                selected_program->HasUniform("metallic_texture"))
-            {
-                material->AddTextureId(metallic_texture_id, "metallic_texture");
-            }
-            if (!selected_program ||
-                selected_program->HasUniform("ao_texture"))
-            {
-                material->AddTextureId(ao_texture_id, "ao_texture");
-            }
-            if (!selected_program ||
-                selected_program->HasUniform("transmission_texture"))
-            {
-                material->AddTextureId(
-                    transmission_texture_id, "transmission_texture");
-            }
-            if (!selected_program ||
-                selected_program->HasUniform("ior_texture"))
-            {
-                material->AddTextureId(ior_texture_id, "ior_texture");
-            }
-            if (!selected_program ||
-                selected_program->HasUniform("thickness_texture"))
-            {
-                material->AddTextureId(
-                    thickness_texture_id, "thickness_texture");
-            }
-            if (!selected_program ||
-                selected_program->HasUniform("attenuation_color_texture"))
-            {
-                material->AddTextureId(
-                    attenuation_color_texture_id,
-                    "attenuation_color_texture");
-            }
-            if (!selected_program ||
-                selected_program->HasUniform("attenuation_distance_texture"))
-            {
-                material->AddTextureId(
-                    attenuation_distance_texture_id,
-                    "attenuation_distance_texture");
-            }
-            auto skybox_id = level.GetIdFromName("skybox");
-            if (skybox_id && (!selected_program ||
-                              selected_program->HasUniform("skybox")))
-            {
-                material->AddTextureId(skybox_id, "skybox");
-            }
-            auto skybox_env_id = level.GetIdFromName("skybox_env");
-            if (skybox_env_id && (!selected_program ||
-                                  selected_program->HasUniform("skybox_env")))
-            {
-                material->AddTextureId(skybox_env_id, "skybox_env");
+                if (!selected_program ||
+                    selected_program->HasUniform("albedo_texture"))
+                {
+                    material->AddTextureId(
+                        base_texture_id, "albedo_texture");
+                }
+                else if (selected_program->HasUniform("Color"))
+                {
+                    material->AddTextureId(base_texture_id, "Color");
+                }
+                if (!selected_program ||
+                    selected_program->HasUniform("normal_texture"))
+                {
+                    material->AddTextureId(
+                        normal_texture_id, "normal_texture");
+                }
+                if (!selected_program ||
+                    selected_program->HasUniform("roughness_texture"))
+                {
+                    material->AddTextureId(
+                        roughness_texture_id, "roughness_texture");
+                }
+                if (!selected_program ||
+                    selected_program->HasUniform("metallic_texture"))
+                {
+                    material->AddTextureId(
+                        metallic_texture_id, "metallic_texture");
+                }
+                if (!selected_program ||
+                    selected_program->HasUniform("ao_texture"))
+                {
+                    material->AddTextureId(ao_texture_id, "ao_texture");
+                }
+                if (!selected_program ||
+                    selected_program->HasUniform("specular_factor_texture"))
+                {
+                    material->AddTextureId(
+                        specular_factor_texture_id,
+                        "specular_factor_texture");
+                }
+                if (!selected_program ||
+                    selected_program->HasUniform("specular_color_texture"))
+                {
+                    material->AddTextureId(
+                        specular_color_texture_id,
+                        "specular_color_texture");
+                }
+                if (!selected_program ||
+                    selected_program->HasUniform("transmission_texture"))
+                {
+                    material->AddTextureId(
+                        transmission_texture_id,
+                        "transmission_texture");
+                }
+                if (!selected_program ||
+                    selected_program->HasUniform("ior_texture"))
+                {
+                    material->AddTextureId(ior_texture_id, "ior_texture");
+                }
+                if (!selected_program ||
+                    selected_program->HasUniform("thickness_texture"))
+                {
+                    material->AddTextureId(
+                        thickness_texture_id, "thickness_texture");
+                }
+                if (!selected_program ||
+                    selected_program->HasUniform("attenuation_color_texture"))
+                {
+                    material->AddTextureId(
+                        attenuation_color_texture_id,
+                        "attenuation_color_texture");
+                }
+                if (!selected_program ||
+                    selected_program->HasUniform("attenuation_distance_texture"))
+                {
+                    material->AddTextureId(
+                        attenuation_distance_texture_id,
+                        "attenuation_distance_texture");
+                }
+                auto skybox_id = level.GetIdFromName("skybox");
+                if (skybox_id && (!selected_program ||
+                                  selected_program->HasUniform("skybox")))
+                {
+                    material->AddTextureId(skybox_id, "skybox");
+                }
+                auto skybox_env_id = level.GetIdFromName("skybox_env");
+                if (skybox_env_id && (!selected_program ||
+                                      selected_program->HasUniform("skybox_env")))
+                {
+                    material->AddTextureId(skybox_env_id, "skybox_env");
+                }
             }
         }
 
         const EntityId material_id = level.AddMaterial(std::move(material));
-        if (cache_material)
-        {
-            gltf_material_cache.emplace(material_index, material_id);
-        }
+        gltf_material_cache.emplace(material_index, material_id);
         return material_id;
     };
 
@@ -1420,7 +1754,7 @@ std::vector<std::pair<EntityId, EntityId>> LoadMeshesFromGltfFile(
 
     std::size_t skinned_mesh_count = 0;
     const bool build_bvh =
-        selected_program_is_dragon ||
+        selected_program_is_raytracing ||
         acceleration_structure_enum == proto::NodeMesh::BVH_ACCELERATION;
     Bounds3 local_model_bounds;
     Bounds3 transformed_model_bounds;
@@ -1462,6 +1796,31 @@ std::vector<std::pair<EntityId, EntityId>> LoadMeshesFromGltfFile(
 
         const bool has_normals = mesh->HasNormals();
         const bool has_texcoords = mesh->HasTextureCoords(0);
+        Bounds3 generated_uv_bounds;
+        if (!has_texcoords)
+        {
+            for (unsigned int v = 0; v < mesh->mNumVertices; ++v)
+            {
+                generated_uv_bounds.Expand(mesh_transform * mesh->mVertices[v]);
+            }
+        }
+        const aiVector3D generated_uv_center = generated_uv_bounds.valid
+            ? generated_uv_bounds.Center()
+            : aiVector3D(0.0f, 0.0f, 0.0f);
+        auto generate_uv = [&](const aiVector3D& position) {
+            constexpr float kPi = 3.14159265358979323846f;
+            aiVector3D direction = position - generated_uv_center;
+            if (direction.SquareLength() <= 1.0e-10f)
+            {
+                direction = aiVector3D(0.0f, 1.0f, 0.0f);
+            }
+            direction.Normalize();
+            const float u =
+                0.5f + std::atan2(direction.z, direction.x) / (2.0f * kPi);
+            const float v = 0.5f -
+                std::asin(std::clamp(direction.y, -1.0f, 1.0f)) / kPi;
+            return std::pair<float, float>(u, v);
+        };
         for (unsigned int v = 0; v < mesh->mNumVertices; ++v)
         {
             const aiVector3D local_p = mesh->mVertices[v];
@@ -1497,8 +1856,9 @@ std::vector<std::pair<EntityId, EntityId>> LoadMeshesFromGltfFile(
             }
             else
             {
-                textures.push_back(0.5f);
-                textures.push_back(0.5f);
+                const auto [u, v_coord] = generate_uv(p);
+                textures.push_back(u);
+                textures.push_back(v_coord);
             }
         }
 

@@ -6,7 +6,7 @@
 #include <string_view>
 
 #include "frame/json/parse_pixel.h"
-#include "frame/json/program_catalog.h"
+#include "frame/json/program_key.h"
 #include "frame/json/parse_uniform.h"
 #include "frame/uniform.h"
 #include "frame/vulkan/json/parse_texture.h"
@@ -59,6 +59,18 @@ std::optional<GeneratedTextureSpec> GetRaytracingTextureSpec(
             .element = frame::proto::PixelElementSize::BYTE};
     }
     if (EndsWith(texture_name, "ao_texture"))
+    {
+        return GeneratedTextureSpec{
+            .color = {1.0f, 1.0f, 1.0f, 1.0f},
+            .element = frame::proto::PixelElementSize::BYTE};
+    }
+    if (EndsWith(texture_name, "specular_factor_texture"))
+    {
+        return GeneratedTextureSpec{
+            .color = {1.0f, 1.0f, 1.0f, 1.0f},
+            .element = frame::proto::PixelElementSize::BYTE};
+    }
+    if (EndsWith(texture_name, "specular_color_texture"))
     {
         return GeneratedTextureSpec{
             .color = {1.0f, 1.0f, 1.0f, 1.0f},

@@ -8,7 +8,6 @@ add_library(FrameProto STATIC
   math.proto
   pixel.proto
   plugin.proto
-  program_catalog.proto
   program.proto
   scene.proto
   size.proto

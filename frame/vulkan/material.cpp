@@ -41,6 +41,7 @@ void Material::SetPreprocessProgramId(EntityId id)
 
 bool Material::AddTextureId(EntityId id, const std::string& name)
 {
+    RemoveTextureId(id);
     const int slot = static_cast<int>(texture_order_.size());
     auto [it, inserted] =
         texture_map_.insert({id, {name, slot}});

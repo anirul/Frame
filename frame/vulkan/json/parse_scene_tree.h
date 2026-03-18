@@ -6,8 +6,14 @@
 namespace frame::vulkan::json
 {
 
+struct ParseSceneTreeOptions
+{
+    bool prefer_hardware_raytracing = false;
+};
+
 [[nodiscard]] bool ParseSceneTree(
     const frame::proto::SceneTree& proto_scene_tree,
-    frame::LevelInterface& level);
+    frame::LevelInterface& level,
+    const ParseSceneTreeOptions& options = {});
 
 } // namespace frame::vulkan::json

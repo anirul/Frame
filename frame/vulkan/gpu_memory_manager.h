@@ -22,7 +22,8 @@ class GpuMemoryManager
         vk::DeviceSize size,
         vk::BufferUsageFlags usage,
         vk::MemoryPropertyFlags properties,
-        vk::UniqueDeviceMemory& out_memory) const;
+        vk::UniqueDeviceMemory& out_memory,
+        vk::MemoryAllocateFlags allocate_flags = {}) const;
 
   private:
     vk::PhysicalDevice physical_device_;

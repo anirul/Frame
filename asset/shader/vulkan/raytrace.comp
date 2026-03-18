@@ -4,18 +4,25 @@ layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
 
 layout(set = 0, binding = 0, rgba16f) uniform writeonly image2D output_image;
 layout(set = 0, binding = 1) uniform sampler2D raytrace_output;
-layout(set = 0, binding = 2) uniform sampler2D albedo_texture;
-layout(set = 0, binding = 3) uniform sampler2D normal_texture;
-layout(set = 0, binding = 4) uniform sampler2D roughness_texture;
-layout(set = 0, binding = 5) uniform sampler2D metallic_texture;
-layout(set = 0, binding = 6) uniform sampler2D ao_texture;
+layout(set = 0, binding = 2) uniform sampler2D opaque_albedo_texture;
+layout(set = 0, binding = 3) uniform sampler2D opaque_normal_texture;
+layout(set = 0, binding = 4) uniform sampler2D opaque_roughness_texture;
+layout(set = 0, binding = 5) uniform sampler2D opaque_metallic_texture;
+layout(set = 0, binding = 6) uniform sampler2D opaque_ao_texture;
+layout(set = 0, binding = 24) uniform sampler2D opaque_specular_factor_texture;
+layout(set = 0, binding = 25) uniform sampler2D opaque_specular_color_texture;
 layout(set = 0, binding = 7) uniform samplerCube skybox_env;
-layout(set = 0, binding = 11) uniform samplerCube skybox;
-layout(set = 0, binding = 12) uniform sampler2D transmission_texture;
-layout(set = 0, binding = 13) uniform sampler2D ior_texture;
-layout(set = 0, binding = 14) uniform sampler2D thickness_texture;
-layout(set = 0, binding = 15) uniform sampler2D attenuation_color_texture;
-layout(set = 0, binding = 16) uniform sampler2D attenuation_distance_texture;
+layout(set = 0, binding = 13) uniform samplerCube skybox;
+layout(set = 0, binding = 14) uniform sampler2D transmissive_albedo_texture;
+layout(set = 0, binding = 15) uniform sampler2D transmissive_normal_texture;
+layout(set = 0, binding = 16) uniform sampler2D transmissive_roughness_texture;
+layout(set = 0, binding = 17) uniform sampler2D transmissive_metallic_texture;
+layout(set = 0, binding = 18) uniform sampler2D transmissive_ao_texture;
+layout(set = 0, binding = 19) uniform sampler2D transmissive_transmission_texture;
+layout(set = 0, binding = 20) uniform sampler2D transmissive_ior_texture;
+layout(set = 0, binding = 21) uniform sampler2D transmissive_thickness_texture;
+layout(set = 0, binding = 22) uniform sampler2D transmissive_attenuation_color_texture;
+layout(set = 0, binding = 23) uniform sampler2D transmissive_attenuation_distance_texture;
 
 struct Vertex
 {
@@ -34,12 +41,42 @@ struct Triangle
     Vertex v2;
 };
 
-layout(std430, set = 0, binding = 8) buffer TriangleBuffer
+struct BvhNode
 {
-    Triangle triangles[];
+    vec3 min;
+    float pad0;
+    vec3 max;
+    float pad1;
+    int left;
+    int right;
+    int first_triangle;
+    int triangle_count;
 };
 
-layout(set = 0, binding = 10) uniform UniformBlock
+layout(std430, set = 0, binding = 8) buffer TriangleBufferTransmissive
+{
+    Triangle transmissive_triangles[];
+};
+
+layout(std430, set = 0, binding = 9) buffer BvhBufferTransmissive
+{
+    BvhNode transmissive_nodes[];
+};
+
+layout(std430, set = 0, binding = 10) buffer TriangleBufferOpaque
+{
+    Triangle opaque_triangles[];
+};
+
+const int kMaterialTransmissive = 0;
+const int kMaterialOpaque = 1;
+
+layout(std430, set = 0, binding = 11) buffer BvhBufferOpaque
+{
+    BvhNode opaque_nodes[];
+};
+
+layout(set = 0, binding = 12) uniform UniformBlock
 {
     mat4 projection;
     mat4 view;
@@ -60,6 +97,7 @@ struct HitInfo
     float t;
     vec2 bary;
     int tri_index;
+    int material_id;
     vec3 pos_model;
     vec3 normal_model;
     vec3 tangent_model;
@@ -67,14 +105,24 @@ struct HitInfo
     vec2 uv;
 };
 
-int TriangleCount()
+int TriangleCountTransmissive()
 {
     int uniform_count = max(0, int(ubo.time_s.y + 0.5));
     if (uniform_count > 0)
     {
         return uniform_count;
     }
-    return int(triangles.length());
+    return int(transmissive_triangles.length());
+}
+
+int TriangleCountOpaque()
+{
+    int uniform_count = max(0, int(ubo.time_s.z + 0.5));
+    if (uniform_count > 0)
+    {
+        return uniform_count;
+    }
+    return int(opaque_triangles.length());
 }
 
 // ----------------------------------------------------------------------------
@@ -116,39 +164,121 @@ float fresnelDielectric(float cosTheta, float ior)
     return r0 + (1.0 - r0) * pow(1.0 - cosTheta, 5.0);
 }
 
-float SampleTransmission(vec2 uv)
+bool IsOpaque(const HitInfo hit)
 {
-    return clamp(texture(transmission_texture, uv).r, 0.0, 1.0);
+    return hit.material_id == kMaterialOpaque;
 }
 
-float SampleIor(vec2 uv)
+vec3 SampleAlbedo(const HitInfo hit)
 {
-    return max(texture(ior_texture, uv).r, 1.0);
+    return IsOpaque(hit)
+        ? texture(opaque_albedo_texture, hit.uv).rgb
+        : texture(transmissive_albedo_texture, hit.uv).rgb;
 }
 
-float SampleThickness(vec2 uv)
+vec3 SampleNormalMap(const HitInfo hit)
 {
-    return max(texture(thickness_texture, uv).r, 0.0);
+    return IsOpaque(hit)
+        ? texture(opaque_normal_texture, hit.uv).xyz
+        : texture(transmissive_normal_texture, hit.uv).xyz;
 }
 
-vec3 SampleAttenuationColor(vec2 uv)
+float SampleRoughness(const HitInfo hit)
 {
-    return clamp(texture(attenuation_color_texture, uv).rgb, 0.0, 1.0);
+    return IsOpaque(hit)
+        ? texture(opaque_roughness_texture, hit.uv).r
+        : texture(transmissive_roughness_texture, hit.uv).r;
 }
 
-float SampleAttenuationDistance(vec2 uv)
+float SampleMetallic(const HitInfo hit)
 {
-    return max(texture(attenuation_distance_texture, uv).r, 0.0001);
+    return IsOpaque(hit)
+        ? texture(opaque_metallic_texture, hit.uv).r
+        : texture(transmissive_metallic_texture, hit.uv).r;
 }
 
-vec3 ComputeAbsorption(vec3 attenuation_color, float attenuation_distance)
+float SampleAo(const HitInfo hit)
 {
-    if (attenuation_distance >= 999999.0)
+    return IsOpaque(hit)
+        ? texture(opaque_ao_texture, hit.uv).r
+        : texture(transmissive_ao_texture, hit.uv).r;
+}
+
+float SampleSpecularFactor(const HitInfo hit)
+{
+    if (!IsOpaque(hit))
     {
-        return vec3(0.0);
+        return 1.0;
     }
-    return -log(clamp(attenuation_color, vec3(0.001), vec3(1.0))) /
-           attenuation_distance;
+    return clamp(texture(opaque_specular_factor_texture, hit.uv).a, 0.0, 1.0);
+}
+
+vec3 SampleSpecularColor(const HitInfo hit)
+{
+    if (!IsOpaque(hit))
+    {
+        return vec3(1.0);
+    }
+    return clamp(texture(opaque_specular_color_texture, hit.uv).rgb, 0.0, 1.0);
+}
+
+float SampleTransmission(const HitInfo hit)
+{
+    if (IsOpaque(hit))
+    {
+        return 0.0;
+    }
+    return clamp(texture(transmissive_transmission_texture, hit.uv).r, 0.0, 1.0);
+}
+
+float SampleIor(const HitInfo hit)
+{
+    if (IsOpaque(hit))
+    {
+        return 1.0;
+    }
+    return max(texture(transmissive_ior_texture, hit.uv).r, 1.0);
+}
+
+float SampleThickness(const HitInfo hit)
+{
+    if (IsOpaque(hit))
+    {
+        return 0.0;
+    }
+    return max(texture(transmissive_thickness_texture, hit.uv).r, 0.0);
+}
+
+vec3 SampleAttenuationColor(const HitInfo hit)
+{
+    if (IsOpaque(hit))
+    {
+        return vec3(1.0);
+    }
+    return clamp(
+        texture(transmissive_attenuation_color_texture, hit.uv).rgb,
+        0.0,
+        1.0);
+}
+
+float SampleAttenuationDistance(const HitInfo hit)
+{
+    if (IsOpaque(hit))
+    {
+        return 1000000.0;
+    }
+    return max(
+        texture(transmissive_attenuation_distance_texture, hit.uv).r,
+        0.0001);
+}
+
+vec3 ComputeAbsorption(const HitInfo hit, float travel)
+{
+    vec3 attenuation_color = SampleAttenuationColor(hit);
+    float attenuation_distance = SampleAttenuationDistance(hit);
+    vec3 attenuation_coeff =
+        -log(max(attenuation_color, vec3(0.0001))) / attenuation_distance;
+    return exp(-attenuation_coeff * max(travel, 0.0));
 }
 
 bool rayTriangleIntersect(
@@ -184,16 +314,202 @@ bool rayTriangleIntersect(
     return false;
 }
 
+bool rayAabbIntersect(
+    const vec3 ray_origin,
+    const vec3 inv_ray_dir,
+    const BvhNode node)
+{
+    vec3 t0 = (node.min - ray_origin) * inv_ray_dir;
+    vec3 t1 = (node.max - ray_origin) * inv_ray_dir;
+    vec3 tmin = min(t0, t1);
+    vec3 tmax = max(t0, t1);
+    float t_enter = max(max(tmin.x, tmin.y), tmin.z);
+    float t_exit = min(min(tmax.x, tmax.y), tmax.z);
+    return t_exit >= max(t_enter, 0.0);
+}
+
+bool traverseTransmissiveBVH(
+    const vec3 ray_origin,
+    const vec3 ray_dir,
+    out float out_t,
+    out vec2 out_bary,
+    out int out_tri)
+{
+    if (transmissive_nodes.length() == 0)
+    {
+        return false;
+    }
+    vec3 inv_ray_dir = 1.0 / ray_dir;
+    int stack[64];
+    int stack_ptr = 0;
+    stack[stack_ptr++] = 0;
+    out_t = 1e20;
+    out_tri = -1;
+    bool hit = false;
+    while (stack_ptr > 0)
+    {
+        int node_index = stack[--stack_ptr];
+        BvhNode node = transmissive_nodes[node_index];
+        if (!rayAabbIntersect(ray_origin, inv_ray_dir, node))
+        {
+            continue;
+        }
+        if (node.triangle_count > 0)
+        {
+            for (int i = 0; i < node.triangle_count; ++i)
+            {
+                int tri_index = node.first_triangle + i;
+                float t;
+                vec2 bary;
+                if (rayTriangleIntersect(
+                        ray_origin,
+                        ray_dir,
+                        transmissive_triangles[tri_index],
+                        t,
+                        bary) &&
+                    t < out_t)
+                {
+                    out_t = t;
+                    out_bary = bary;
+                    out_tri = tri_index;
+                    hit = true;
+                }
+            }
+        }
+        else
+        {
+            if (node.left >= 0)
+            {
+                stack[stack_ptr++] = node.left;
+            }
+            if (node.right >= 0)
+            {
+                stack[stack_ptr++] = node.right;
+            }
+        }
+    }
+    return hit;
+}
+
+bool traverseOpaqueBVH(
+    const vec3 ray_origin,
+    const vec3 ray_dir,
+    out float out_t,
+    out vec2 out_bary,
+    out int out_tri)
+{
+    if (opaque_nodes.length() == 0)
+    {
+        return false;
+    }
+    vec3 inv_ray_dir = 1.0 / ray_dir;
+    int stack[64];
+    int stack_ptr = 0;
+    stack[stack_ptr++] = 0;
+    out_t = 1e20;
+    out_tri = -1;
+    bool hit = false;
+    while (stack_ptr > 0)
+    {
+        int node_index = stack[--stack_ptr];
+        BvhNode node = opaque_nodes[node_index];
+        if (!rayAabbIntersect(ray_origin, inv_ray_dir, node))
+        {
+            continue;
+        }
+        if (node.triangle_count > 0)
+        {
+            for (int i = 0; i < node.triangle_count; ++i)
+            {
+                int tri_index = node.first_triangle + i;
+                float t;
+                vec2 bary;
+                if (rayTriangleIntersect(
+                        ray_origin,
+                        ray_dir,
+                        opaque_triangles[tri_index],
+                        t,
+                        bary) &&
+                    t < out_t)
+                {
+                    out_t = t;
+                    out_bary = bary;
+                    out_tri = tri_index;
+                    hit = true;
+                }
+            }
+        }
+        else
+        {
+            if (node.left >= 0)
+            {
+                stack[stack_ptr++] = node.left;
+            }
+            if (node.right >= 0)
+            {
+                stack[stack_ptr++] = node.right;
+            }
+        }
+    }
+    return hit;
+}
+
 bool anyHitTriangles(const vec3 ray_origin, const vec3 ray_dir)
 {
-    const int tri_count = TriangleCount();
-    for (int i = 0; i < tri_count; ++i)
+    if (transmissive_nodes.length() > 0)
     {
-        float t;
-        vec2 bary;
-        if (rayTriangleIntersect(ray_origin, ray_dir, triangles[i], t, bary))
+        float t = 0.0;
+        vec2 bary = vec2(0.0);
+        int tri_index = -1;
+        if (traverseTransmissiveBVH(ray_origin, ray_dir, t, bary, tri_index))
         {
             return true;
+        }
+    }
+    else
+    {
+        const int tri_count = TriangleCountTransmissive();
+        for (int i = 0; i < tri_count; ++i)
+        {
+            float t;
+            vec2 bary;
+            if (rayTriangleIntersect(
+                    ray_origin,
+                    ray_dir,
+                    transmissive_triangles[i],
+                    t,
+                    bary))
+            {
+                return true;
+            }
+        }
+    }
+    if (opaque_nodes.length() > 0)
+    {
+        float t = 0.0;
+        vec2 bary = vec2(0.0);
+        int tri_index = -1;
+        if (traverseOpaqueBVH(ray_origin, ray_dir, t, bary, tri_index))
+        {
+            return true;
+        }
+    }
+    else
+    {
+        const int opaque_count = TriangleCountOpaque();
+        for (int i = 0; i < opaque_count; ++i)
+        {
+            float t;
+            vec2 bary;
+            if (rayTriangleIntersect(
+                    ray_origin,
+                    ray_dir,
+                    opaque_triangles[i],
+                    t,
+                    bary))
+            {
+                return true;
+            }
         }
     }
     return false;
@@ -206,6 +522,7 @@ HitInfo TraceScene(const vec3 ray_origin, const vec3 ray_dir)
     info.t = 0.0;
     info.bary = vec2(0.0);
     info.tri_index = -1;
+    info.material_id = -1;
     info.pos_model = vec3(0.0);
     info.normal_model = vec3(0.0);
     info.tangent_model = vec3(0.0);
@@ -215,17 +532,87 @@ HitInfo TraceScene(const vec3 ray_origin, const vec3 ray_dir)
     float best_t = 1e20;
     vec2 best_bary = vec2(0.0);
     int best_tri = -1;
-    const int tri_count = TriangleCount();
-    for (int i = 0; i < tri_count; ++i)
+    int best_material = -1;
+    if (transmissive_nodes.length() > 0)
     {
-        float t;
-        vec2 bary;
-        if (rayTriangleIntersect(ray_origin, ray_dir, triangles[i], t, bary) &&
+        float t = 0.0;
+        vec2 bary = vec2(0.0);
+        int tri_index = -1;
+        if (traverseTransmissiveBVH(
+                ray_origin,
+                ray_dir,
+                t,
+                bary,
+                tri_index) &&
             t < best_t)
         {
             best_t = t;
             best_bary = bary;
-            best_tri = i;
+            best_tri = tri_index;
+            best_material = kMaterialTransmissive;
+        }
+    }
+    else
+    {
+        const int tri_count = TriangleCountTransmissive();
+        for (int i = 0; i < tri_count; ++i)
+        {
+            float t;
+            vec2 bary;
+            if (rayTriangleIntersect(
+                    ray_origin,
+                    ray_dir,
+                    transmissive_triangles[i],
+                    t,
+                    bary) &&
+                t < best_t)
+            {
+                best_t = t;
+                best_bary = bary;
+                best_tri = i;
+                best_material = kMaterialTransmissive;
+            }
+        }
+    }
+    if (opaque_nodes.length() > 0)
+    {
+        float t = 0.0;
+        vec2 bary = vec2(0.0);
+        int tri_index = -1;
+        if (traverseOpaqueBVH(
+                ray_origin,
+                ray_dir,
+                t,
+                bary,
+                tri_index) &&
+            t < best_t)
+        {
+            best_t = t;
+            best_bary = bary;
+            best_tri = tri_index;
+            best_material = kMaterialOpaque;
+        }
+    }
+    else
+    {
+        const int opaque_count = TriangleCountOpaque();
+        for (int i = 0; i < opaque_count; ++i)
+        {
+            float t;
+            vec2 bary;
+            if (rayTriangleIntersect(
+                    ray_origin,
+                    ray_dir,
+                    opaque_triangles[i],
+                    t,
+                    bary) &&
+                t < best_t)
+            {
+                best_t = t;
+                best_bary = bary;
+                best_tri = i;
+                best_material = kMaterialOpaque;
+            }
         }
     }
     if (best_tri < 0)
@@ -237,9 +624,12 @@ HitInfo TraceScene(const vec3 ray_origin, const vec3 ray_dir)
     info.t = best_t;
     info.bary = best_bary;
     info.tri_index = best_tri;
+    info.material_id = best_material;
     info.pos_model = ray_origin + best_t * ray_dir;
 
-    Triangle tri = triangles[best_tri];
+    Triangle tri = (best_material == kMaterialOpaque)
+        ? opaque_triangles[best_tri]
+        : transmissive_triangles[best_tri];
     float w = 1.0 - best_bary.x - best_bary.y;
     info.normal_model = normalize(
         tri.v0.normal * w +
@@ -262,11 +652,6 @@ HitInfo TraceScene(const vec3 ray_origin, const vec3 ray_dir)
             normalize(f * (-delta_uv2.x * edge1 + delta_uv1.x * edge2));
     }
     return info;
-}
-
-bool IsGround(const HitInfo hit)
-{
-    return hit.pos_model.y < -1.0 && abs(hit.normal_model.y) > 0.95;
 }
 
 vec3 SampleEnvSpecular(
@@ -305,7 +690,7 @@ vec3 SampleReflection(
     HitInfo reflection_hit = TraceScene(origin_model, dir_model);
     if (reflection_hit.hit)
     {
-        reflection_sample = texture(albedo_texture, reflection_hit.uv).rgb;
+        reflection_sample = SampleAlbedo(reflection_hit);
         reflection_sample = mix(env_color, reflection_sample, 0.7);
     }
     return reflection_sample;
@@ -355,7 +740,7 @@ vec3 ShadeOpaque(
         T = normalize(cross(axis, N));
         B = normalize(cross(N, T));
     }
-    vec3 normal_map = texture(normal_texture, hit.uv).xyz * 2.0 - 1.0;
+    vec3 normal_map = SampleNormalMap(hit) * 2.0 - 1.0;
     vec3 hit_normal = normalize(mat3(T, B, N) * normal_map);
     if (length(hit_normal) < 0.001)
     {
@@ -372,24 +757,18 @@ vec3 ShadeOpaque(
     bool in_shadow = anyHitTriangles(shadow_origin, shadow_dir);
     float shadow_factor = in_shadow ? 0.3 : 1.0;
 
-    vec3 albedo = texture(albedo_texture, hit.uv).rgb;
-    float roughness = texture(roughness_texture, hit.uv).r;
-    float metallic = texture(metallic_texture, hit.uv).r;
-    float ao = texture(ao_texture, hit.uv).r;
-
-    bool is_ground = IsGround(hit);
-    if (is_ground)
-    {
-        albedo = mix(albedo, vec3(0.08), 0.6);
-        roughness = min(roughness, 0.25);
-        metallic = min(metallic, 0.05);
-        ao = 1.0;
-    }
+    vec3 albedo = SampleAlbedo(hit);
+    float roughness = SampleRoughness(hit);
+    float metallic = SampleMetallic(hit);
+    float ao = SampleAo(hit);
+    float specular_factor = SampleSpecularFactor(hit);
+    vec3 specular_color = SampleSpecularColor(hit);
 
     vec3 V = normalize(-ray_dir_world);
     vec3 L = normalize(-dir);
     vec3 H = normalize(V + L);
-    vec3 F0 = mix(vec3(0.04), albedo, metallic);
+    vec3 dielectric_f0 = vec3(0.04) * specular_factor * specular_color;
+    vec3 F0 = mix(dielectric_f0, albedo, metallic);
     vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
     float D = DistributionGGX(hit_normal, H, roughness);
     float G = GeometrySmith(hit_normal, V, L, roughness);
@@ -412,7 +791,7 @@ vec3 ShadeOpaque(
 
     vec3 reflection_sample = env_color;
     bool should_trace_reflection = allow_reflection &&
-        (is_ground || (NdotV > 0.2 && roughness < 0.65));
+        (NdotV > 0.2 && roughness < 0.65);
     if (should_trace_reflection)
     {
         vec3 reflection_origin_model = hit.pos_model + hit.normal_model * 0.0015;
@@ -429,10 +808,6 @@ vec3 ShadeOpaque(
                    kD * albedo / 3.14159265 * env_diffuse * ao;
     vec3 env_specular =
         specular * reflection_sample * ao * (in_shadow ? 0.0 : 1.0);
-    if (is_ground)
-    {
-        env_specular *= 1.35;
-    }
     env_specular = clamp(env_specular, 0.0, 10.0);
     vec3 Lo = diffuse * col * NdotL * shadow_factor +
               specular * col * NdotL * (in_shadow ? 0.0 : 1.0) +
@@ -455,10 +830,9 @@ vec3 ShadeGlass(
     const float kGlassFresnelBoost = 1.35;
     const float kGlassRimStrength = 0.25;
     const float kGlassRimPower = 3.0;
-    const float root_thickness = SampleThickness(hit.uv);
-    const vec3 root_absorption = ComputeAbsorption(
-        SampleAttenuationColor(hit.uv),
-        SampleAttenuationDistance(hit.uv));
+    const float ior = SampleIor(hit);
+    const float thickness = SampleThickness(hit);
+    const vec3 glass_tint = SampleAttenuationColor(hit);
 
     vec3 accum = vec3(0.0);
     vec3 throughput = vec3(1.0);
@@ -486,11 +860,15 @@ vec3 ShadeGlass(
 
         if (inside)
         {
-            float travel = current_hit.t * max(root_thickness, 1.0);
-            throughput *= exp(-root_absorption * travel);
+            float travel = current_hit.t;
+            if (thickness > 0.0)
+            {
+                travel = min(travel, thickness);
+            }
+            throughput *= ComputeAbsorption(hit, travel);
         }
 
-        if (IsGround(current_hit))
+        if (IsOpaque(current_hit))
         {
             accum += throughput * ShadeOpaque(
                 current_hit,
@@ -510,7 +888,6 @@ vec3 ShadeGlass(
         vec3 I = normalize(dir_world);
         vec3 refract_dir_world;
         float cosi;
-        float ior = SampleIor(current_hit.uv);
         bool has_refraction =
             RefractDir(I, N, ior, refract_dir_world, cosi);
         float fresnel = fresnelDielectric(cosi, ior);
@@ -540,6 +917,10 @@ vec3 ShadeGlass(
         }
 
         throughput *= (1.0 - reflect_weight);
+        if (!inside)
+        {
+            throughput *= glass_tint;
+        }
 
         dir_world = normalize(refract_dir_world);
         dir_model = normalize(model_inv3 * dir_world);
@@ -564,7 +945,7 @@ void main()
     if (pixel.x >= size.x || pixel.y >= size.y)
         return;
 
-    if (TriangleCount() == 0)
+    if (TriangleCountTransmissive() == 0 && TriangleCountOpaque() == 0)
     {
         imageStore(output_image, pixel, vec4(0.0, 0.0, 0.0, 1.0));
         return;
@@ -573,10 +954,12 @@ void main()
     vec2 uv = (vec2(pixel) + vec2(0.5)) / vec2(size);
     uv.y = 1.0 - uv.y;
     vec2 ndc = uv * 2.0 - 1.0;
-    vec4 clip_pos = vec4(ndc, -1.0, 1.0);
+    vec4 clip_pos = vec4(ndc, 1.0, 1.0);
     vec4 view_pos = ubo.projection_inv * clip_pos;
-    view_pos = vec4(view_pos.xy, -1.0, 0.0);
-    vec3 ray_dir_world = normalize((ubo.view_inv * view_pos).xyz);
+    float view_w = abs(view_pos.w) > 1e-6 ? view_pos.w : 1.0;
+    vec3 ray_dir_view = normalize(view_pos.xyz / view_w);
+    vec3 ray_dir_world = normalize(
+        (ubo.view_inv * vec4(ray_dir_view, 0.0)).xyz);
 
     mat4 inv_model4 = ubo.model_inv;
     mat3 model_inv3 = mat3(inv_model4);
@@ -593,14 +976,22 @@ void main()
     HitInfo hit = TraceScene(ray_origin, ray_dir);
     if (ubo.time_s.w > 8.5)
     {
-        float tri_count = float(TriangleCount());
-        vec3 count_color = vec3(clamp(tri_count / 32.0, 0.0, 1.0), 0.0, 0.0);
+        float glass_count = float(TriangleCountTransmissive());
+        float ground_count = float(TriangleCountOpaque());
+        vec3 count_color = vec3(
+            clamp(glass_count / 32.0, 0.0, 1.0),
+            clamp(ground_count / 32.0, 0.0, 1.0),
+            0.0);
         imageStore(output_image, pixel, vec4(count_color, 1.0));
         return;
     }
     if (ubo.time_s.w > 5.5)
     {
-        vec3 mask = hit.hit ? vec3(1.0, 0.0, 0.0) : vec3(0.0);
+        vec3 mask = vec3(0.0);
+        if (hit.hit)
+        {
+            mask = IsOpaque(hit) ? vec3(0.0, 1.0, 0.0) : vec3(1.0, 0.0, 0.0);
+        }
         imageStore(output_image, pixel, vec4(mask, 1.0));
         return;
     }
@@ -638,8 +1029,7 @@ void main()
             : vec3(1.0);
 
         vec3 color;
-        float transmission = SampleTransmission(hit.uv);
-        if (IsGround(hit))
+        if (IsOpaque(hit))
         {
             color = ShadeOpaque(
                 hit,
@@ -654,7 +1044,7 @@ void main()
         }
         else
         {
-            vec3 opaque_color = ShadeOpaque(
+            color = ShadeGlass(
                 hit,
                 ray_dir_world,
                 model_inv3,
@@ -662,25 +1052,7 @@ void main()
                 light_dir_world,
                 light_col,
                 env_rot_inv,
-                max_env_lod,
-                false);
-            if (transmission > 0.01)
-            {
-                vec3 glass_color = ShadeGlass(
-                    hit,
-                    ray_dir_world,
-                    model_inv3,
-                    normal_matrix,
-                    light_dir_world,
-                    light_col,
-                    env_rot_inv,
-                    max_env_lod);
-                color = mix(opaque_color, glass_color, transmission);
-            }
-            else
-            {
-                color = opaque_color;
-            }
+                max_env_lod);
         }
         final_color = vec4(color, 1.0);
     }

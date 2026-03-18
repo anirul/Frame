@@ -110,6 +110,10 @@ class Buffer : public BindInterface, public BufferInterface
      * @param binding: The attachment point.
      */
     void BindBase(int binding) const override;
+    const std::vector<std::uint8_t>& GetRawData() const
+    {
+        return raw_data_;
+    }
 
   public:
     /**
@@ -157,6 +161,7 @@ class Buffer : public BindInterface, public BufferInterface
   private:
     std::string name_ = "buffer???";
     mutable bool locked_bind_ = false;
+    mutable std::vector<std::uint8_t> raw_data_ = {};
     const BufferTypeEnum buffer_type_ = BufferTypeEnum::ARRAY_BUFFER;
     const BufferUsageEnum buffer_usage_ = BufferUsageEnum::STATIC_DRAW;
     unsigned int buffer_object_ = 0;

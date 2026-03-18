@@ -20,7 +20,9 @@ constexpr const char* kLevelPath = "asset/json/cubemap.json";
 
 int Run(int argc, char** argv)
 {
-    absl::SetProgramUsageMessage("00_Cubemap --device={vulkan|opengl}");
+    absl::SetProgramUsageMessage(
+        "00_Cubemap --device={vulkan|opengl} "
+        "[--auto_exit_seconds=<seconds>] (defaults to vulkan)");
     frame::common::Application app(argc, argv, kDefaultSize);
     app.Startup(frame::file::FindFile(kLevelPath));
     app.Run();

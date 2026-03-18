@@ -4,7 +4,6 @@ add_executable(FrameVulkanTest
   main.cpp
   command_queue_test.cpp
   raytracing_test.cpp
-  raytracing_compute_test.cpp
   scene_state_test.cpp
   resource_manager_test.cpp
   window_test.cpp

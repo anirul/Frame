@@ -50,61 +50,6 @@
                 "positive_z": "asset/cubemap/negative_z.png",
                 "negative_z": "asset/cubemap/positive_z.png"
             }
-        },
-        {
-            "name": "albedo_texture",
-            "cubemap": false,
-            "pixel_element_size": {
-                "value": "BYTE"
-            },
-            "pixel_structure": {
-                "value": "RGB_ALPHA"
-            },
-            "file_name": "asset/model/fox/Texture.png"
-        },
-        {
-            "name": "normal_texture",
-            "cubemap": false,
-            "pixel_element_size": {
-                "value": "BYTE"
-            },
-            "pixel_structure": {
-                "value": "RGB"
-            },
-            "file_name": "asset/material/plastic/plastic_normal.png"
-        },
-        {
-            "name": "roughness_texture",
-            "cubemap": false,
-            "pixel_element_size": {
-                "value": "BYTE"
-            },
-            "pixel_structure": {
-                "value": "GREY"
-            },
-            "file_name": "asset/material/plastic/plastic_roughness.png"
-        },
-        {
-            "name": "metallic_texture",
-            "cubemap": false,
-            "pixel_element_size": {
-                "value": "BYTE"
-            },
-            "pixel_structure": {
-                "value": "GREY"
-            },
-            "file_name": "asset/material/plastic/plastic_metallic.png"
-        },
-        {
-            "name": "ao_texture",
-            "cubemap": false,
-            "pixel_element_size": {
-                "value": "BYTE"
-            },
-            "pixel_structure": {
-                "value": "GREY"
-            },
-            "file_name": "asset/material/plastic/plastic_ao.png"
         }
     ],
     "scene_tree": {
@@ -113,6 +58,7 @@
         "node_matrices": [
             {
                 "name": "root",
+                "matrix_type_enum": "STATIC_MATRIX",
                 "matrix": {
                     "m11": 1,
                     "m22": 1,
@@ -123,6 +69,7 @@
             {
                 "name": "mesh_scale",
                 "parent": "root",
+                "matrix_type_enum": "STATIC_MATRIX",
                 "matrix": {
                     "m11": 0.01,
                     "m22": 0.01,
@@ -133,6 +80,7 @@
             {
                 "name": "mesh_holder",
                 "parent": "mesh_scale",
+                "matrix_type_enum": "ROTATION_MATRIX",
                 "quaternion": {
                     "x": 0.0,
                     "y": 0.1979232,
@@ -143,6 +91,7 @@
             {
                 "name": "env_holder",
                 "parent": "root",
+                "matrix_type_enum": "ROTATION_MATRIX",
                 "quaternion": {
                     "x": 0.0,
                     "y": 0.0499792,

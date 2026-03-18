@@ -12,7 +12,6 @@ add_custom_target(AssetJson
     raytracing.json
     dragon.json
     skinned_mesh.json
-    program_catalog.json
     renderer_test.json
     scene_tree_test.json
 )

@@ -18,12 +18,12 @@ message NodeMatrix {
 	// Give the name of the parent (if present).
 	string parent = 2;
 
-	// Is it a rotation or a static move?
+	// Is it a rotation or a static move? This must be explicitly set.
 	enum MatrixTypeEnum {
 		STATIC_MATRIX = 0;
 		ROTATION_MATRIX = 1;
 	}
-	MatrixTypeEnum matrix_type_enum = 5;
+	optional MatrixTypeEnum matrix_type_enum = 5;
 
 	// Could be a matrix or a quaternion.
 	oneof matrix_oneof {

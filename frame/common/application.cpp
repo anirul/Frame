@@ -1,6 +1,9 @@
 #include "frame/common/application.h"
 
+#include <chrono>
 #include <stdexcept>
+#include <string_view>
+#include <vector>
 
 #include "absl/flags/flag.h"
 #include "absl/flags/parse.h"
@@ -22,6 +25,54 @@ ABSL_FLAG(
     auto_exit_seconds,
     0.0,
     "Auto-exit executable after N seconds (0 disables).");
+ABSL_FLAG(
+    bool,
+    screenshot_on_exit,
+    false,
+    "Save ScreenShot.png immediately before auto-exit triggers.");
+
+namespace
+{
+
+bool StartsWith(std::string_view value, std::string_view prefix)
+{
+    return value.size() >= prefix.size() &&
+           value.substr(0, prefix.size()) == prefix;
+}
+
+std::string NormalizeKnownFlag(std::string_view arg)
+{
+    constexpr std::array<std::string_view, 4> kKnownFlags = {
+        "device",
+        "vk_validation",
+        "auto_exit_seconds",
+        "screenshot_on_exit"};
+    for (const auto flag_name : kKnownFlags)
+    {
+        const std::string short_prefix = std::string("-") + std::string(flag_name);
+        const std::string slash_prefix = std::string("/") + std::string(flag_name);
+        if (arg == short_prefix || arg == slash_prefix ||
+            StartsWith(arg, short_prefix + "=") ||
+            StartsWith(arg, slash_prefix + "="))
+        {
+            return std::string("--") + std::string(arg.substr(1));
+        }
+    }
+    return std::string(arg);
+}
+
+std::vector<std::string> NormalizeCommandLineArgs(int argc, char** argv)
+{
+    std::vector<std::string> normalized_args = {};
+    normalized_args.reserve(static_cast<std::size_t>(std::max(argc, 0)));
+    for (int i = 0; i < argc; ++i)
+    {
+        normalized_args.push_back(NormalizeKnownFlag(argv[i]));
+    }
+    return normalized_args;
+}
+
+} // namespace
 
 namespace frame::common
 {
@@ -41,7 +92,16 @@ Application::Application(
     glm::uvec2 size,
     DrawingTargetEnum drawing_target)
 {
-    absl::ParseCommandLine(argc, argv);
+    auto normalized_args = NormalizeCommandLineArgs(argc, argv);
+    std::vector<char*> normalized_argv = {};
+    normalized_argv.reserve(normalized_args.size());
+    for (auto& arg : normalized_args)
+    {
+        normalized_argv.push_back(arg.data());
+    }
+    absl::ParseCommandLine(
+        static_cast<int>(normalized_argv.size()),
+        normalized_argv.data());
     InitializeFromArgs(argc, argv, size, drawing_target);
 }
 
@@ -90,7 +150,48 @@ void Application::Resize(glm::uvec2 size, FullScreenEnum fullscreen_enum)
 
 WindowReturnEnum Application::Run(std::function<bool()> lambda)
 {
-    return GetWindow().Run(std::move(lambda));
+    const double auto_exit_seconds = absl::GetFlag(FLAGS_auto_exit_seconds);
+    if (auto_exit_seconds <= 0.0)
+    {
+        return GetWindow().Run(std::move(lambda));
+    }
+
+    auto& logger = frame::Logger::GetInstance();
+    const auto start = std::chrono::steady_clock::now();
+    bool auto_exit_logged = false;
+    return GetWindow().Run(
+        [lambda = std::move(lambda),
+         auto_exit_seconds,
+         start,
+         this,
+         &logger,
+         auto_exit_logged]() mutable {
+            const auto now = std::chrono::steady_clock::now();
+            const std::chrono::duration<double> elapsed = now - start;
+            const bool keep_running = elapsed.count() < auto_exit_seconds;
+            if (!keep_running && !auto_exit_logged)
+            {
+                if (absl::GetFlag(FLAGS_screenshot_on_exit))
+                {
+                    try
+                    {
+                        GetWindow().GetDevice().ScreenShot("ScreenShot.png");
+                    }
+                    catch (const std::exception& ex)
+                    {
+                        logger->warn(
+                            "Failed to save screenshot on exit: {}",
+                            ex.what());
+                    }
+                }
+                logger->info(
+                    "Auto exit triggered after {:.3f} seconds.",
+                    auto_exit_seconds);
+                logger->flush();
+                auto_exit_logged = true;
+            }
+            return keep_running && lambda();
+        });
 }
 
 RenderingAPIEnum Application::ParseDeviceFlag(const std::string& value) const

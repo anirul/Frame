@@ -47,7 +47,8 @@ SceneState BuildSceneState(
     float elapsed_time_seconds,
     frame::EntityId preferred_material,
     bool flip_projection_y,
-    const std::string& preferred_scene_root)
+    const std::string& preferred_scene_root,
+    bool force_identity_model)
 {
     SceneState state;
 
@@ -92,7 +93,8 @@ SceneState BuildSceneState(
     try
     {
         bool model_set = false;
-        if (!preferred_scene_root.empty() &&
+        if (!force_identity_model &&
+            !preferred_scene_root.empty() &&
             preferred_scene_root != "root")
         {
             if (auto maybe_root_id =
@@ -106,7 +108,7 @@ SceneState BuildSceneState(
                 model_set = true;
             }
         }
-        if (preferred_material != frame::NullId)
+        if (!force_identity_model && preferred_material != frame::NullId)
         {
             auto& material = level.GetMaterialFromId(preferred_material);
             for (const auto& node_name : material.GetNodeNames())
@@ -122,22 +124,10 @@ SceneState BuildSceneState(
                     break;
                 }
             }
-            // Fallback for scenes that bind the traced model as DragonMesh.
-            if (!model_set)
-            {
-                if (auto maybe_dragon_id =
-                        FindSceneNodeIdByName(level, "DragonMesh");
-                    maybe_dragon_id)
-                {
-                    const auto dragon_id = *maybe_dragon_id;
-                    auto& node = level.GetSceneNodeFromId(dragon_id);
-                    state.model = node.GetLocalModel(
-                        static_cast<double>(elapsed_time_seconds));
-                    model_set = true;
-                }
-            }
         }
-        if (!model_set && preferred_material != frame::NullId)
+        if (!force_identity_model &&
+            !model_set &&
+            preferred_material != frame::NullId)
         {
             for (const auto& pair : level.GetMeshMaterialIds())
             {
@@ -151,7 +141,9 @@ SceneState BuildSceneState(
                 }
             }
         }
-        if (!model_set && preferred_material != frame::NullId)
+        if (!force_identity_model &&
+            !model_set &&
+            preferred_material != frame::NullId)
         {
             // Search all render-time buckets for a mesh using this material.
             for (auto render_time :
@@ -179,7 +171,7 @@ SceneState BuildSceneState(
                 }
             }
         }
-        if (!model_set)
+        if (!force_identity_model && !model_set)
         {
             const auto mesh_pairs = level.GetMeshMaterialIds();
             if (!mesh_pairs.empty())

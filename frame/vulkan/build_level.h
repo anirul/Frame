@@ -10,6 +10,11 @@
 namespace frame::vulkan
 {
 
+struct BuildLevelOptions
+{
+    bool prefer_hardware_raytracing = false;
+};
+
 struct BuiltLevel
 {
     std::unique_ptr<frame::LevelInterface> level;
@@ -18,6 +23,7 @@ struct BuiltLevel
 
 BuiltLevel BuildLevel(
     glm::uvec2 size,
-    const frame::json::LevelData& level_data);
+    const frame::json::LevelData& level_data,
+    const BuildLevelOptions& options = {});
 
 }

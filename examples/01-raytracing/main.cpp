@@ -34,7 +34,9 @@ try
 #endif
     constexpr glm::uvec2 kDefaultSize{1280u, 720u};
     constexpr const char* kLevelPath = "asset/json/raytracing.json";
-    absl::SetProgramUsageMessage("01_RayTracing --device={vulkan|opengl}");
+    absl::SetProgramUsageMessage(
+        "01_RayTracing --device={vulkan|opengl} "
+        "[--auto_exit_seconds=<seconds>] (defaults to vulkan)");
     frame::common::Application app(ac, av, kDefaultSize);
     app.Startup(frame::file::FindFile(kLevelPath));
     app.Run();

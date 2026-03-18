@@ -2,18 +2,20 @@
 
 #include <array>
 #include <cctype>
+#include <cstring>
 #include <format>
 #include <optional>
 #include <unordered_set>
 
 #include "frame/file/file_system.h"
 #include "frame/json/parse_uniform.h"
-#include "frame/json/program_catalog.h"
+#include "frame/json/program_key.h"
 #include "frame/logger.h"
 #include "frame/node_camera.h"
 #include "frame/node_light.h"
 #include "frame/node_matrix.h"
 #include "frame/node_mesh.h"
+#include "frame/opengl/json/parse_texture.h"
 #include "frame/opengl/buffer.h"
 #include "frame/opengl/file/load_mesh.h"
 #include "frame/opengl/material.h"
@@ -262,7 +264,7 @@ EntityId CreateAutoMaterial(
     return material_id;
 }
 
-bool IsDragonMaterial(LevelInterface& level, EntityId material_id)
+bool IsRaytracingMaterial(LevelInterface& level, EntityId material_id)
 {
     if (!material_id)
     {
@@ -276,10 +278,11 @@ bool IsDragonMaterial(LevelInterface& level, EntityId material_id)
     }
     const auto& program = level.GetProgramFromId(program_id);
     const auto key = frame::json::ResolveProgramKey(program.GetData());
-    return frame::json::IsDragonProgramKey(key);
+    return frame::json::IsRaytracingProgramKey(key);
 }
 
 void ReplaceTextureBindingByInnerName(
+    LevelInterface& level,
     MaterialInterface& material,
     const std::string& inner_name,
     EntityId texture_id)
@@ -300,137 +303,31 @@ void ReplaceTextureBindingByInnerName(
     {
         material.RemoveTextureId(id);
     }
-    material.AddTextureId(texture_id, inner_name);
-}
 
-void AdoptGltfPbrTextures(
-    LevelInterface& level,
-    EntityId source_material_id,
-    EntityId target_material_id)
-{
-    if (!source_material_id ||
-        !target_material_id ||
-        source_material_id == target_material_id)
+    EntityId bound_texture_id = texture_id;
+    for (const auto existing_id : material.GetTextureIds())
     {
-        return;
-    }
-    if (!IsDragonMaterial(level, target_material_id))
-    {
-        return;
-    }
-    auto& source = level.GetMaterialFromId(source_material_id);
-    auto& target = level.GetMaterialFromId(target_material_id);
-    const auto find_source_texture = [&](const std::string& inner_name) {
-        for (const auto texture_id : source.GetTextureIds())
-        {
-            if (source.GetInnerName(texture_id) == inner_name)
-            {
-                return texture_id;
-            }
-        }
-        return NullId;
-    };
-    const auto find_target_texture = [&](const std::string& inner_name) {
-        for (const auto texture_id : target.GetTextureIds())
-        {
-            if (target.GetInnerName(texture_id) == inner_name)
-            {
-                return texture_id;
-            }
-        }
-        return NullId;
-    };
-
-    std::array<std::pair<const char*, const char*>, 5> pbr_mappings = {{
-        {"albedo_texture", "Color"},
-        {"normal_texture", nullptr},
-        {"roughness_texture", nullptr},
-        {"metallic_texture", nullptr},
-        {"ao_texture", nullptr},
-    }};
-    for (const auto& [target_name, fallback_name] : pbr_mappings)
-    {
-        EntityId source_id = find_source_texture(target_name);
-        if (!source_id && fallback_name)
-        {
-            source_id = find_source_texture(fallback_name);
-        }
-        if (!source_id)
-        {
-            continue;
-        }
-        const auto source_texture_name = level.GetNameFromId(source_id);
-        // Only adopt file-backed glTF textures. This avoids overriding
-        // explicit level textures with generated solid-color fallbacks.
-        if (source_texture_name.find(".__gltf_tex_") == std::string::npos)
+        if (existing_id != texture_id ||
+            material.GetInnerName(existing_id) == inner_name)
         {
             continue;
         }
 
-        const EntityId existing_target_id =
-            find_target_texture(target_name);
-        if (existing_target_id != NullId)
-        {
-            const auto existing_target_texture_name =
-                level.GetNameFromId(existing_target_id);
-            const bool replace_generated_target =
-                existing_target_texture_name.find(".__gltf_solid_") !=
-                    std::string::npos ||
-                existing_target_texture_name.find(".__gltf_tex_") !=
-                    std::string::npos;
-            if (!replace_generated_target)
-            {
-                continue;
-            }
-        }
-        ReplaceTextureBindingByInnerName(target, target_name, source_id);
+        auto proto_texture = level.GetTextureFromId(texture_id).ToProto();
+        proto_texture.set_name(std::format(
+            "{}.__binding_alias_{}_{}",
+            level.GetNameFromId(texture_id),
+            inner_name,
+            level.GetTextures().size()));
+        auto alias_texture = frame::json::ParseTexture(
+            proto_texture,
+            level.GetTextureFromId(texture_id).GetSize());
+        alias_texture->SetName(proto_texture.name());
+        alias_texture->SetSerializeEnable(false);
+        bound_texture_id = level.AddTexture(std::move(alias_texture));
+        break;
     }
-}
-
-void EnsureDragonBuffers(
-    LevelInterface& level, EntityId material_id, const MeshInterface& mesh)
-{
-    if (!IsDragonMaterial(level, material_id))
-    {
-        return;
-    }
-    auto& material = level.GetMaterialFromId(material_id);
-    const auto triangle_buffer_id = mesh.GetTriangleBufferId();
-    if (!triangle_buffer_id)
-    {
-        return;
-    }
-    material.AddBufferName(
-        level.GetNameFromId(triangle_buffer_id),
-        "TriangleBuffer");
-
-    const auto bvh_buffer_id = mesh.GetBvhBufferId();
-    if (!bvh_buffer_id)
-    {
-        Logger::GetInstance()->warn(
-            "Raytracing material '{}' has no BVH buffer bound.",
-            material.GetData().name());
-        return;
-    }
-    material.AddBufferName(level.GetNameFromId(bvh_buffer_id), "BvhBuffer");
-}
-
-bool IsRaytracingSimpleMaterial(LevelInterface& level, EntityId material_id)
-{
-    if (!material_id)
-    {
-        return false;
-    }
-    auto& material = level.GetMaterialFromId(material_id);
-    const auto program_id = material.GetProgramId(&level);
-    if (!program_id)
-    {
-        return false;
-    }
-    const auto& program = level.GetProgramFromId(program_id);
-    const auto key = frame::json::ResolveProgramKey(program.GetData());
-    return frame::json::IsRaytracingProgramKey(key) &&
-           !frame::json::IsDragonProgramKey(key);
+    material.AddTextureId(bound_texture_id, inner_name);
 }
 
 EntityId FindTextureIdByInnerName(
@@ -465,7 +362,7 @@ bool IsTransmissiveRaytracingSourceMaterial(
     return ReadTextureFirstChannel(level, transmission_texture_id) > 0.01f;
 }
 
-void AdoptRaytracingSimpleTextures(
+void AdoptRaytracingSceneTextures(
     LevelInterface& level,
     EntityId source_material_id,
     EntityId target_material_id,
@@ -488,12 +385,14 @@ void AdoptRaytracingSimpleTextures(
         const char* target_name;
     };
 
-    const std::array<Mapping, 5> opaque_mappings = {{
+    const std::array<Mapping, 7> opaque_mappings = {{
         {"albedo_texture", "Color", "opaque_albedo_texture"},
         {"normal_texture", nullptr, "opaque_normal_texture"},
         {"roughness_texture", nullptr, "opaque_roughness_texture"},
         {"metallic_texture", nullptr, "opaque_metallic_texture"},
         {"ao_texture", nullptr, "opaque_ao_texture"},
+        {"specular_factor_texture", nullptr, "opaque_specular_factor_texture"},
+        {"specular_color_texture", nullptr, "opaque_specular_color_texture"},
     }};
     const std::array<Mapping, 10> transmissive_mappings = {{
         {"albedo_texture", "Color", "transmissive_albedo_texture"},
@@ -521,11 +420,6 @@ void AdoptRaytracingSimpleTextures(
             {
                 return;
             }
-            const auto source_texture_name = level.GetNameFromId(source_id);
-            if (!IsGeneratedGltfTextureName(source_texture_name))
-            {
-                return;
-            }
             const EntityId existing_target_id =
                 FindTextureIdByInnerName(target, target_name);
             if (existing_target_id != NullId)
@@ -542,7 +436,8 @@ void AdoptRaytracingSimpleTextures(
                     return;
                 }
             }
-            ReplaceTextureBindingByInnerName(target, target_name, source_id);
+            ReplaceTextureBindingByInnerName(
+                level, target, target_name, source_id);
         };
 
     if (transmissive)
@@ -565,43 +460,210 @@ void AdoptRaytracingSimpleTextures(
     }
 }
 
-void EnsureRaytracingSimpleBuffers(
-    LevelInterface& level,
-    EntityId material_id,
-    EntityId source_material_id,
-    const MeshInterface& mesh,
-    bool& has_transmissive_buffer,
-    bool& has_opaque_buffer)
+template <typename T>
+std::vector<T> ReadTypedBufferData(const opengl::Buffer& buffer)
 {
-    const auto triangle_buffer_id = mesh.GetTriangleBufferId();
-    if (!triangle_buffer_id)
+    const auto& raw = buffer.GetRawData();
+    if (raw.empty() || raw.size() % sizeof(T) != 0)
     {
-        return;
+        return {};
     }
+    std::vector<T> result(raw.size() / sizeof(T));
+    std::memcpy(result.data(), raw.data(), raw.size());
+    return result;
+}
 
-    const bool transmissive =
-        IsTransmissiveRaytracingSourceMaterial(level, source_material_id);
-    const auto inner_name = transmissive
-        ? "TriangleBufferTransmissive"
-        : "TriangleBufferOpaque";
-
-    auto& material = level.GetMaterialFromId(material_id);
-    const auto buffer_name = level.GetNameFromId(triangle_buffer_id);
-    if (transmissive)
-    {
-        if (has_transmissive_buffer)
+std::vector<float> BuildRaytraceTriangles(
+    const std::vector<float>& points,
+    const std::vector<float>& normals,
+    const std::vector<float>& textures,
+    const std::vector<std::uint32_t>& indices)
+{
+    std::vector<float> triangles = {};
+    triangles.reserve(indices.size() * 16);
+    auto append_vertex = [&](const std::uint32_t index) {
+        const auto point_offset = static_cast<std::size_t>(index) * 3;
+        if (point_offset + 2 >= points.size())
         {
             return;
         }
-        has_transmissive_buffer =
-            material.AddBufferName(buffer_name, inner_name);
-        return;
-    }
-    if (has_opaque_buffer)
+        triangles.push_back(points[point_offset]);
+        triangles.push_back(points[point_offset + 1]);
+        triangles.push_back(points[point_offset + 2]);
+        triangles.push_back(0.0f);
+
+        if (point_offset + 2 < normals.size())
+        {
+            triangles.push_back(normals[point_offset]);
+            triangles.push_back(normals[point_offset + 1]);
+            triangles.push_back(normals[point_offset + 2]);
+        }
+        else
+        {
+            triangles.insert(triangles.end(), {0.0f, 0.0f, 0.0f});
+        }
+        triangles.push_back(0.0f);
+
+        const auto texture_offset = static_cast<std::size_t>(index) * 2;
+        if (texture_offset + 1 < textures.size())
+        {
+            triangles.push_back(textures[texture_offset]);
+            triangles.push_back(textures[texture_offset + 1]);
+        }
+        else
+        {
+            triangles.insert(triangles.end(), {0.0f, 0.0f});
+        }
+        triangles.push_back(0.0f);
+        triangles.push_back(0.0f);
+    };
+    for (std::size_t i = 0; i + 2 < indices.size(); i += 3)
     {
-        return;
+        append_vertex(indices[i]);
+        append_vertex(indices[i + 1]);
+        append_vertex(indices[i + 2]);
     }
-    has_opaque_buffer = material.AddBufferName(buffer_name, inner_name);
+    return triangles;
+}
+
+EntityId CreateStorageBuffer(
+    LevelInterface& level,
+    std::size_t size,
+    const void* data,
+    const std::string& name)
+{
+    auto buffer = std::make_unique<opengl::Buffer>(
+        opengl::BufferTypeEnum::SHADER_STORAGE_BUFFER);
+    buffer->SetName(name);
+    if (size == 0)
+    {
+        const std::uint8_t zero = 0;
+        buffer->Copy(sizeof(zero), &zero);
+    }
+    else
+    {
+        buffer->Copy(size, data);
+    }
+    return level.AddBuffer(std::move(buffer));
+}
+
+template <typename T>
+EntityId CreateStorageBuffer(
+    LevelInterface& level,
+    const std::vector<T>& values,
+    const std::string& name)
+{
+    return CreateStorageBuffer(
+        level,
+        values.size() * sizeof(T),
+        values.empty() ? nullptr : values.data(),
+        name);
+}
+
+struct RaytraceAggregateBuffers
+{
+    EntityId triangle_buffer_id = NullId;
+    EntityId bvh_buffer_id = NullId;
+};
+
+RaytraceAggregateBuffers BuildRaytraceAggregateBuffers(
+    LevelInterface& level,
+    bool transmissive,
+    const std::string& base_name)
+{
+    std::vector<float> aggregate_points = {};
+    std::vector<float> aggregate_normals = {};
+    std::vector<float> aggregate_textures = {};
+    std::vector<std::uint32_t> aggregate_indices = {};
+
+    for (const auto& [pre_node_id, pre_material_id] :
+         level.GetMeshMaterialIds(proto::NodeMesh::PRE_RENDER_TIME))
+    {
+        if (IsTransmissiveRaytracingSourceMaterial(level, pre_material_id) !=
+            transmissive)
+        {
+            continue;
+        }
+        auto& node =
+            dynamic_cast<NodeMesh&>(level.GetSceneNodeFromId(pre_node_id));
+        const auto mesh_id = node.GetLocalMesh();
+        if (!mesh_id)
+        {
+            continue;
+        }
+        const auto& mesh = level.GetMeshFromId(mesh_id);
+        if (!mesh.GetPointBufferId() || !mesh.GetIndexBufferId())
+        {
+            continue;
+        }
+        auto* point_buffer = dynamic_cast<opengl::Buffer*>(
+            &level.GetBufferFromId(mesh.GetPointBufferId()));
+        auto* normal_buffer = mesh.GetNormalBufferId()
+            ? dynamic_cast<opengl::Buffer*>(
+                  &level.GetBufferFromId(mesh.GetNormalBufferId()))
+            : nullptr;
+        auto* texture_buffer = mesh.GetTextureBufferId()
+            ? dynamic_cast<opengl::Buffer*>(
+                  &level.GetBufferFromId(mesh.GetTextureBufferId()))
+            : nullptr;
+        auto* index_buffer = dynamic_cast<opengl::Buffer*>(
+            &level.GetBufferFromId(mesh.GetIndexBufferId()));
+        if (!point_buffer || !index_buffer)
+        {
+            continue;
+        }
+        const auto points = ReadTypedBufferData<float>(*point_buffer);
+        const auto normals = normal_buffer
+            ? ReadTypedBufferData<float>(*normal_buffer)
+            : std::vector<float>{};
+        const auto textures = texture_buffer
+            ? ReadTypedBufferData<float>(*texture_buffer)
+            : std::vector<float>{};
+        const auto indices = ReadTypedBufferData<std::uint32_t>(*index_buffer);
+        if (points.empty() || indices.empty())
+        {
+            continue;
+        }
+        const auto base_index = static_cast<std::uint32_t>(
+            aggregate_points.size() / 3);
+        aggregate_points.insert(
+            aggregate_points.end(),
+            points.begin(),
+            points.end());
+        aggregate_normals.insert(
+            aggregate_normals.end(),
+            normals.begin(),
+            normals.end());
+        aggregate_textures.insert(
+            aggregate_textures.end(),
+            textures.begin(),
+            textures.end());
+        for (const auto index : indices)
+        {
+            aggregate_indices.push_back(base_index + index);
+        }
+    }
+
+    const auto triangle_name =
+        std::format("{}.triangle", base_name);
+    const auto bvh_name =
+        std::format("{}.bvh", base_name);
+    if (aggregate_indices.empty())
+    {
+        return {
+            CreateStorageBuffer(level, 0, nullptr, triangle_name),
+            CreateStorageBuffer(level, 0, nullptr, bvh_name)};
+    }
+
+    const auto triangles = BuildRaytraceTriangles(
+        aggregate_points,
+        aggregate_normals,
+        aggregate_textures,
+        aggregate_indices);
+    const auto bvh_nodes = frame::BuildBVH(aggregate_points, aggregate_indices);
+    return {
+        CreateStorageBuffer(level, triangles, triangle_name),
+        CreateStorageBuffer(level, bvh_nodes, bvh_name)};
 }
 
 void FinalizeRaytracingSceneMaterials(LevelInterface& level)
@@ -610,78 +672,25 @@ void FinalizeRaytracingSceneMaterials(LevelInterface& level)
          level.GetMeshMaterialIds(proto::NodeMesh::SCENE_RENDER_TIME))
     {
         (void)scene_node_id;
-        if (!scene_material_id)
+        if (!scene_material_id ||
+            !IsRaytracingMaterial(level, scene_material_id))
         {
             continue;
         }
 
-        auto& scene_material = level.GetMaterialFromId(scene_material_id);
-        if (IsDragonMaterial(level, scene_material_id))
-        {
-            for (const auto& [pre_node_id, pre_material_id] :
-                 level.GetMeshMaterialIds(proto::NodeMesh::PRE_RENDER_TIME))
-            {
-                (void)pre_material_id;
-                auto& node =
-                    dynamic_cast<NodeMesh&>(level.GetSceneNodeFromId(pre_node_id));
-                const auto mesh_id = node.GetLocalMesh();
-                if (!mesh_id)
-                {
-                    continue;
-                }
-                auto& mesh = level.GetMeshFromId(mesh_id);
-                if (!mesh.GetTriangleBufferId())
-                {
-                    continue;
-                }
-                EnsureDragonBuffers(level, scene_material_id, mesh);
-                scene_material.AddNodeName(level.GetNameFromId(pre_node_id), "model");
-                break;
-            }
-            continue;
-        }
-
-        if (!IsRaytracingSimpleMaterial(level, scene_material_id))
-        {
-            continue;
-        }
-
-        bool has_transmissive_buffer = false;
-        bool has_opaque_buffer = false;
         bool adopted_transmissive = false;
         bool adopted_opaque = false;
-        for (const auto& buffer_name : scene_material.GetBufferNames())
-        {
-            const auto inner_name = scene_material.GetInnerBufferName(buffer_name);
-            if (inner_name == "TriangleBufferTransmissive")
-            {
-                has_transmissive_buffer = true;
-            }
-            else if (inner_name == "TriangleBufferOpaque")
-            {
-                has_opaque_buffer = true;
-            }
-        }
-
         for (const auto& [pre_node_id, pre_material_id] :
              level.GetMeshMaterialIds(proto::NodeMesh::PRE_RENDER_TIME))
         {
-            (void)pre_material_id;
-            auto& node =
-                dynamic_cast<NodeMesh&>(level.GetSceneNodeFromId(pre_node_id));
-            const auto mesh_id = node.GetLocalMesh();
-            if (!mesh_id)
-            {
-                continue;
-            }
-            auto& mesh = level.GetMeshFromId(mesh_id);
-            const bool transmissive =
+            (void)pre_node_id;
+            const bool source_is_transmissive =
                 IsTransmissiveRaytracingSourceMaterial(level, pre_material_id);
-            if (transmissive)
+            if (source_is_transmissive)
             {
                 if (!adopted_transmissive)
                 {
-                    AdoptRaytracingSimpleTextures(
+                    AdoptRaytracingSceneTextures(
                         level,
                         pre_material_id,
                         scene_material_id,
@@ -691,28 +700,38 @@ void FinalizeRaytracingSceneMaterials(LevelInterface& level)
             }
             else if (!adopted_opaque)
             {
-                AdoptRaytracingSimpleTextures(
+                AdoptRaytracingSceneTextures(
                     level,
                     pre_material_id,
                     scene_material_id,
                     false);
                 adopted_opaque = true;
             }
-            EnsureRaytracingSimpleBuffers(
-                level,
-                scene_material_id,
-                pre_material_id,
-                mesh,
-                has_transmissive_buffer,
-                has_opaque_buffer);
-            if (has_transmissive_buffer &&
-                has_opaque_buffer &&
-                adopted_transmissive &&
-                adopted_opaque)
-            {
-                break;
-            }
         }
+
+        auto& scene_material = level.GetMaterialFromId(scene_material_id);
+        const auto buffer_base_name =
+            std::format("{}.scene", scene_material.GetData().name());
+        const auto transmissive_buffers = BuildRaytraceAggregateBuffers(
+            level,
+            true,
+            buffer_base_name + "_transmissive");
+        const auto opaque_buffers = BuildRaytraceAggregateBuffers(
+            level,
+            false,
+            buffer_base_name + "_opaque");
+        scene_material.AddBufferName(
+            level.GetNameFromId(transmissive_buffers.triangle_buffer_id),
+            "TriangleBufferTransmissive");
+        scene_material.AddBufferName(
+            level.GetNameFromId(transmissive_buffers.bvh_buffer_id),
+            "BvhBufferTransmissive");
+        scene_material.AddBufferName(
+            level.GetNameFromId(opaque_buffers.triangle_buffer_id),
+            "TriangleBufferOpaque");
+        scene_material.AddBufferName(
+            level.GetNameFromId(opaque_buffers.bvh_buffer_id),
+            "BvhBufferOpaque");
     }
 }
 
@@ -788,14 +807,15 @@ void ApplyAnimationPlayback(
 [[nodiscard]] bool ParseNodeMatrix(
     LevelInterface& level, const proto::NodeMatrix& proto_scene_matrix)
 {
+    if (!proto_scene_matrix.has_matrix_type_enum())
+    {
+        throw std::runtime_error(std::format(
+            "Node matrix '{}' must explicitly set matrix_type_enum to STATIC_MATRIX or ROTATION_MATRIX.",
+            proto_scene_matrix.name()));
+    }
     std::unique_ptr<frame::NodeMatrix> scene_matrix = nullptr;
-    // Determine if the node should behave as a rotation matrix. Older scene
-    // files didn't specify the matrix_type_enum but provided a quaternion when
-    // rotation was expected, so infer the rotation flag from either the proto
-    // field or the presence of a quaternion.
-    bool rotation = proto_scene_matrix.matrix_type_enum() ==
-                        proto::NodeMatrix::ROTATION_MATRIX ||
-                    proto_scene_matrix.has_quaternion();
+    const bool rotation = proto_scene_matrix.matrix_type_enum() ==
+        proto::NodeMatrix::ROTATION_MATRIX;
 
     if (proto_scene_matrix.has_matrix())
     {
@@ -965,7 +985,6 @@ void ApplyAnimationPlayback(
         mesh_node.GetData().set_render_time_enum(
             proto_scene_mesh.render_time_enum());
         ApplyAnimationPlayback(proto_scene_mesh, mesh_node, &mesh);
-        EnsureDragonBuffers(level, material_id, mesh);
         if (!material_id)
         {
             throw std::runtime_error(std::format(

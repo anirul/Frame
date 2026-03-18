@@ -1,13 +1,17 @@
 #include "renderer.h"
 
+#include <array>
 #include <cassert>
+#include <cstring>
 #include <format>
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
+#include <numeric>
 #include <stdexcept>
 
+#include "frame/bvh.h"
 #include "frame/json/parse_uniform.h"
-#include "frame/json/program_catalog.h"
+#include "frame/json/program_key.h"
 #include "frame/node_matrix.h"
 #include "frame/node_mesh.h"
 #include "frame/opengl/cubemap.h"
@@ -31,6 +35,261 @@ bool IsRaytracingProgram(const ProgramInterface& program)
     return frame::json::IsRaytracingProgramKey(key);
 }
 
+bool RaytraceSceneRequiresWorldSpaceBuffers(frame::LevelInterface& level)
+{
+    for (const auto& [node_id, material_id] :
+         level.GetMeshMaterialIds(proto::NodeMesh::PRE_RENDER_TIME))
+    {
+        (void)material_id;
+        auto* node =
+            dynamic_cast<NodeMesh*>(&level.GetSceneNodeFromId(node_id));
+        if (!node)
+        {
+            continue;
+        }
+        const auto mesh_id = node->GetLocalMesh();
+        if (!mesh_id)
+        {
+            continue;
+        }
+        auto* skinned_mesh =
+            dynamic_cast<SkinnedMesh*>(&level.GetMeshFromId(mesh_id));
+        if (!skinned_mesh)
+        {
+            continue;
+        }
+        if (skinned_mesh->HasSkinning() ||
+            skinned_mesh->HasRaytraceTriangleCallback())
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+std::vector<std::pair<EntityId, std::string>> GetActiveTextureBindings(
+    const MaterialInterface& material,
+    const ProgramInterface& program)
+{
+    std::vector<std::pair<EntityId, std::string>> bindings = {};
+    for (const auto texture_id : material.GetTextureIds())
+    {
+        const auto inner_name = material.GetInnerName(texture_id);
+        if (!program.HasUniform(inner_name))
+        {
+            continue;
+        }
+        bindings.emplace_back(texture_id, inner_name);
+    }
+    std::sort(
+        bindings.begin(),
+        bindings.end(),
+        [](const auto& lhs, const auto& rhs) {
+            return lhs.second < rhs.second;
+        });
+    return bindings;
+}
+
+float ReadTextureFirstChannel(const frame::TextureInterface& texture)
+{
+    switch (texture.GetData().pixel_element_size().value())
+    {
+    case frame::proto::PixelElementSize::FLOAT: {
+        const auto data = texture.GetTextureFloat();
+        return data.empty() ? 0.0f : data.front();
+    }
+    case frame::proto::PixelElementSize::SHORT:
+    case frame::proto::PixelElementSize::HALF: {
+        const auto data = texture.GetTextureWord();
+        return data.empty() ? 0.0f
+                            : static_cast<float>(data.front()) / 65535.0f;
+    }
+    case frame::proto::PixelElementSize::BYTE:
+    default: {
+        const auto data = texture.GetTextureByte();
+        return data.empty() ? 0.0f
+                            : static_cast<float>(data.front()) / 255.0f;
+    }
+    }
+}
+
+bool IsTransmissiveMaterial(
+    frame::LevelInterface& level, frame::EntityId material_id)
+{
+    if (!material_id)
+    {
+        return false;
+    }
+    const auto& material = level.GetMaterialFromId(material_id);
+    for (const auto texture_id : material.GetTextureIds())
+    {
+        if (material.GetInnerName(texture_id) != "transmission_texture")
+        {
+            continue;
+        }
+        return ReadTextureFirstChannel(level.GetTextureFromId(texture_id)) >
+            0.01f;
+    }
+    return false;
+}
+
+constexpr std::size_t kRaytraceFloatsPerVertex = 12;
+constexpr std::size_t kRaytraceTriangleVertexStrideBytes =
+    sizeof(float) * kRaytraceFloatsPerVertex;
+
+struct RaytraceVertex
+{
+    float px;
+    float py;
+    float pz;
+    float pad0;
+    float nx;
+    float ny;
+    float nz;
+    float pad1;
+    float u;
+    float v;
+    float pad2;
+    float pad3;
+};
+
+std::vector<std::uint8_t> TransformTriangleBytes(
+    const std::vector<std::uint8_t>& raw,
+    const glm::mat4& model)
+{
+    if (raw.empty() || model == glm::mat4(1.0f))
+    {
+        return raw;
+    }
+    if (raw.size() % sizeof(RaytraceVertex) != 0)
+    {
+        throw std::runtime_error(
+            "Animated OpenGL raytrace triangle buffer size is not aligned to the expected vertex stride.");
+    }
+
+    std::vector<std::uint8_t> transformed = raw;
+    auto* vertices = reinterpret_cast<RaytraceVertex*>(transformed.data());
+    const std::size_t vertex_count = transformed.size() / sizeof(RaytraceVertex);
+
+    glm::mat3 normal_matrix = glm::mat3(1.0f);
+    const float det = glm::determinant(glm::mat3(model));
+    if (std::abs(det) > 1.0e-8f)
+    {
+        normal_matrix = glm::transpose(glm::inverse(glm::mat3(model)));
+    }
+
+    for (std::size_t i = 0; i < vertex_count; ++i)
+    {
+        const glm::vec3 position = glm::vec3(
+            model * glm::vec4(vertices[i].px, vertices[i].py, vertices[i].pz, 1.0f));
+        vertices[i].px = position.x;
+        vertices[i].py = position.y;
+        vertices[i].pz = position.z;
+
+        glm::vec3 normal = normal_matrix *
+            glm::vec3(vertices[i].nx, vertices[i].ny, vertices[i].nz);
+        if (glm::length(normal) > 1.0e-6f)
+        {
+            normal = glm::normalize(normal);
+        }
+        vertices[i].nx = normal.x;
+        vertices[i].ny = normal.y;
+        vertices[i].nz = normal.z;
+    }
+    return transformed;
+}
+
+std::vector<std::uint8_t> BuildAggregateTriangleBytes(
+    frame::LevelInterface& level,
+    bool transmissive,
+    double time_seconds)
+{
+    std::vector<std::uint8_t> aggregate_triangle_bytes = {};
+    for (const auto& [pre_node_id, pre_material_id] :
+         level.GetMeshMaterialIds(proto::NodeMesh::PRE_RENDER_TIME))
+    {
+        if (IsTransmissiveMaterial(level, pre_material_id) != transmissive)
+        {
+            continue;
+        }
+
+        auto* node =
+            dynamic_cast<NodeMesh*>(&level.GetSceneNodeFromId(pre_node_id));
+        if (!node)
+        {
+            continue;
+        }
+        const auto mesh_id = node->GetLocalMesh();
+        if (!mesh_id)
+        {
+            continue;
+        }
+
+        const auto& mesh = level.GetMeshFromId(mesh_id);
+        const auto triangle_buffer_id = mesh.GetTriangleBufferId();
+        if (!triangle_buffer_id)
+        {
+            continue;
+        }
+
+        auto* triangle_buffer = dynamic_cast<opengl::Buffer*>(
+            &level.GetBufferFromId(triangle_buffer_id));
+        if (!triangle_buffer)
+        {
+            continue;
+        }
+
+        const auto transformed = TransformTriangleBytes(
+            triangle_buffer->GetRawData(),
+            node->GetLocalModel(time_seconds));
+        aggregate_triangle_bytes.insert(
+            aggregate_triangle_bytes.end(),
+            transformed.begin(),
+            transformed.end());
+    }
+    return aggregate_triangle_bytes;
+}
+
+std::vector<std::uint8_t> BuildAggregateBvhBytes(
+    const std::vector<std::uint8_t>& triangle_bytes)
+{
+    if (triangle_bytes.empty())
+    {
+        return {};
+    }
+    if (triangle_bytes.size() % kRaytraceTriangleVertexStrideBytes != 0)
+    {
+        throw std::runtime_error(
+            "Animated OpenGL raytrace triangle buffer size is not aligned to the expected vertex stride.");
+    }
+
+    const auto* triangle_floats =
+        reinterpret_cast<const float*>(triangle_bytes.data());
+    const std::size_t vertex_count =
+        triangle_bytes.size() / kRaytraceTriangleVertexStrideBytes;
+    std::vector<float> points = {};
+    points.reserve(vertex_count * 3);
+    for (std::size_t vertex_index = 0; vertex_index < vertex_count; ++vertex_index)
+    {
+        const std::size_t base = vertex_index * kRaytraceFloatsPerVertex;
+        points.push_back(triangle_floats[base + 0]);
+        points.push_back(triangle_floats[base + 1]);
+        points.push_back(triangle_floats[base + 2]);
+    }
+
+    std::vector<std::uint32_t> indices(vertex_count);
+    std::iota(indices.begin(), indices.end(), 0u);
+    const auto bvh_nodes = frame::BuildBVH(points, indices);
+
+    std::vector<std::uint8_t> bytes(
+        bvh_nodes.size() * sizeof(frame::BVHNode));
+    if (!bytes.empty())
+    {
+        std::memcpy(bytes.data(), bvh_nodes.data(), bytes.size());
+    }
+    return bytes;
+}
+
 } // namespace
 
 Renderer::Renderer(LevelInterface& level, glm::uvec4 viewport)
@@ -45,7 +304,10 @@ Renderer::Renderer(LevelInterface& level, glm::uvec4 viewport)
     proto::Program proto_program;
     proto_program.set_name("display");
     proto_program.set_pipeline_name("display");
-    auto program = file::LoadProgram(proto_program);
+    auto program = file::LoadProgram(
+        proto_program,
+        "asset/shader/opengl/display.vert",
+        "asset/shader/opengl/display.frag");
     if (!program)
         throw std::runtime_error("No program!");
     auto material = std::make_unique<Material>();
@@ -114,6 +376,84 @@ void Renderer::UpdateRaytraceBuffersIfNeeded(SkinnedMesh& skinned_mesh)
             }
         }
     }
+
+    if (RaytraceSceneRequiresWorldSpaceBuffers(level_))
+    {
+        UpdateAggregateRaytraceSceneBuffers();
+    }
+}
+
+void Renderer::UpdateAggregateRaytraceSceneBuffers()
+{
+    if (last_raytrace_scene_buffer_update_time_ == delta_time_)
+    {
+        return;
+    }
+
+    const auto transmissive_triangles = BuildAggregateTriangleBytes(
+        level_,
+        true,
+        delta_time_);
+    const auto opaque_triangles = BuildAggregateTriangleBytes(
+        level_,
+        false,
+        delta_time_);
+    const auto transmissive_bvh = BuildAggregateBvhBytes(transmissive_triangles);
+    const auto opaque_bvh = BuildAggregateBvhBytes(opaque_triangles);
+
+    auto update_named_buffer = [&](MaterialInterface& material,
+                                   const char* inner_name,
+                                   const std::vector<std::uint8_t>& bytes) {
+        for (const auto& buffer_name : material.GetBufferNames())
+        {
+            if (material.GetInnerBufferName(buffer_name) != inner_name)
+            {
+                continue;
+            }
+            const auto buffer_id = level_.GetIdFromName(buffer_name);
+            if (!buffer_id)
+            {
+                continue;
+            }
+            auto* buffer = dynamic_cast<Buffer*>(&level_.GetBufferFromId(buffer_id));
+            if (!buffer || buffer->GetRawData() == bytes)
+            {
+                return;
+            }
+            buffer->Copy(bytes);
+            return;
+        }
+    };
+
+    for (const auto& [node_id, material_id] :
+         level_.GetMeshMaterialIds(proto::NodeMesh::SCENE_RENDER_TIME))
+    {
+        (void)node_id;
+        if (!material_id)
+        {
+            continue;
+        }
+        auto& material = level_.GetMaterialFromId(material_id);
+        auto program_id = material.GetProgramId(&level_);
+        if (!program_id)
+        {
+            continue;
+        }
+        auto& program = level_.GetProgramFromId(program_id);
+        if (!IsRaytracingProgram(program))
+        {
+            continue;
+        }
+
+        update_named_buffer(
+            material, "TriangleBufferTransmissive", transmissive_triangles);
+        update_named_buffer(
+            material, "BvhBufferTransmissive", transmissive_bvh);
+        update_named_buffer(material, "TriangleBufferOpaque", opaque_triangles);
+        update_named_buffer(material, "BvhBufferOpaque", opaque_bvh);
+    }
+
+    last_raytrace_scene_buffer_update_time_ = delta_time_;
 }
 
 std::optional<glm::mat4> Renderer::RenderNode(
@@ -203,7 +543,24 @@ void Renderer::RenderMesh(
     auto program_id = material.GetProgramId();
     auto& program = level_.GetProgramFromId(program_id);
     glm::mat4 model_matrix = model;
-    if (!program.GetTemporarySceneRoot().empty())
+    if (IsRaytracingProgram(program) &&
+        render_time_ == proto::NodeMesh::SCENE_RENDER_TIME)
+    {
+        if (RaytraceSceneRequiresWorldSpaceBuffers(level_))
+        {
+            model_matrix = glm::mat4(1.0f);
+        }
+        else if (!program.GetTemporarySceneRoot().empty())
+        {
+            auto temp_id = level_.GetIdFromName(program.GetTemporarySceneRoot());
+            if (temp_id != NullId)
+            {
+                auto& temp_node = level_.GetSceneNodeFromId(temp_id);
+                model_matrix = temp_node.GetLocalModel(delta_time_);
+            }
+        }
+    }
+    else if (!program.GetTemporarySceneRoot().empty())
     {
         auto temp_id = level_.GetIdFromName(program.GetTemporarySceneRoot());
         if (temp_id != NullId)
@@ -339,8 +696,9 @@ void Renderer::RenderMesh(
         glReadBuffer(GL_NONE);
     }
 
-    std::map<std::string, std::vector<std::int32_t>> uniform_include;
-    for (const auto& id : material.GetTextureIds())
+    const auto active_texture_bindings =
+        GetActiveTextureBindings(material, program);
+    for (const auto& [id, inner_name] : active_texture_bindings)
     {
         EntityId texture_id = NullId;
         if (level_.GetEnumTypeFromId(id) == EntityTypeEnum::TEXTURE)
@@ -353,7 +711,6 @@ void Renderer::RenderMesh(
             // associated with the stream.
             texture_id = id + 1;
         }
-        // TODO(anirul): Why? id and not texture id?
         const auto p = material.EnableTextureId(id);
         auto& texture = level_.GetTextureFromId(texture_id);
         if (texture.GetData().cubemap())
@@ -369,7 +726,7 @@ void Renderer::RenderMesh(
             gl_texture.Bind(p.second);
         }
         std::unique_ptr<UniformInterface> uniform_interface =
-            std::make_unique<Uniform>(p.first, p.second);
+            std::make_unique<Uniform>(inner_name, p.second);
         program.AddUniform(std::move(uniform_interface));
     }
 
@@ -419,8 +776,9 @@ void Renderer::RenderMesh(
     program.UnUse();
     glBindVertexArray(0);
 
-    for (const auto id : material.GetTextureIds())
+    for (const auto& [id, inner_name] : active_texture_bindings)
     {
+        (void)inner_name;
         EntityId texture_id = id;
         if (level_.GetEnumTypeFromId(id) != EntityTypeEnum::TEXTURE)
         {
@@ -458,14 +816,16 @@ void Renderer::PresentFinal()
     UniformCollectionWrapper uniform_collection_wrapper{};
     program.Use(uniform_collection_wrapper, &level_);
     auto& material = level_.GetMaterialFromId(display_material_id_);
-    for (const auto id : material.GetTextureIds())
+    const auto active_texture_bindings =
+        GetActiveTextureBindings(material, program);
+    for (const auto& [id, inner_name] : active_texture_bindings)
     {
         auto& opengl_texture =
             dynamic_cast<Texture&>(level_.GetTextureFromId(id));
         const auto p = material.EnableTextureId(id);
         opengl_texture.Bind(p.second);
         std::unique_ptr<UniformInterface> uniform_interface =
-            std::make_unique<Uniform>(p.first, p.second);
+            std::make_unique<Uniform>(inner_name, p.second);
         program.AddUniform(std::move(uniform_interface));
     }
     auto& gl_quad = dynamic_cast<Mesh&>(quad);
@@ -484,8 +844,9 @@ void Renderer::PresentFinal()
     program.UnUse();
     glBindVertexArray(0);
 
-    for (const auto id : material.GetTextureIds())
+    for (const auto& [id, inner_name] : active_texture_bindings)
     {
+        (void)inner_name;
         auto& opengl_texture =
             dynamic_cast<Texture&>(level_.GetTextureFromId(id));
         opengl_texture.UnBind();
@@ -603,6 +964,10 @@ void Renderer::PreRender()
             }
             viewport_ = temp_viewport;
         }
+    }
+    if (RaytraceSceneRequiresWorldSpaceBuffers(level_))
+    {
+        UpdateAggregateRaytraceSceneBuffers();
     }
 }
 

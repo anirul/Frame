@@ -25,6 +25,9 @@ struct ShaderFiles
     std::string vertex_shader;
     std::string fragment_shader;
     std::string compute_shader;
+    std::string raygen_shader;
+    std::string miss_shader;
+    std::string closesthit_shader;
 };
 
 struct ProgramInfo

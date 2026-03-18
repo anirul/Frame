@@ -15,6 +15,7 @@
 #include "frame/vulkan/buffer.h"
 #include "frame/vulkan/build_level.h"
 #include "frame/vulkan/scene_state.h"
+#include "frame/vulkan/skinned_mesh.h"
 #include <glm/glm.hpp>
 
 namespace test
@@ -54,6 +55,36 @@ bool EndsWith(const std::string& value, const std::string& suffix)
         return false;
     }
     return value.compare(value.size() - suffix.size(), suffix.size(), suffix) == 0;
+}
+
+const frame::json::ProgramInfo* FindProgramInfoByName(
+    const frame::json::LevelData& level_data,
+    const std::string& name)
+{
+    for (const auto& program_info : level_data.programs)
+    {
+        if (program_info.name == name)
+        {
+            return &program_info;
+        }
+    }
+    return nullptr;
+}
+
+frame::EntityId FindBufferByInnerName(
+    const frame::LevelInterface& level,
+    const frame::MaterialInterface& material,
+    const std::string& expected_inner_name)
+{
+    for (const auto& name : material.GetBufferNames())
+    {
+        if (material.GetInnerBufferName(name) != expected_inner_name)
+        {
+            continue;
+        }
+        return level.GetIdFromName(name);
+    }
+    return frame::NullId;
 }
 
 frame::EntityId FindMaterialForNode(
@@ -244,6 +275,24 @@ class VulkanRayTracingParseTest : public ::testing::Test
     frame::json::LevelData level_data_;
 };
 
+class VulkanSkinnedRayTracingParseTest : public ::testing::Test
+{
+  protected:
+    VulkanSkinnedRayTracingParseTest()
+    {
+        asset_root_ = frame::file::FindDirectory("asset");
+        level_path_ = frame::file::FindFile("asset/json/skinned_mesh.json");
+        level_proto_ = frame::json::LoadLevelProto(level_path_);
+        level_data_ = frame::json::ParseLevelData(
+            glm::uvec2(512, 288), level_proto_, asset_root_);
+    }
+
+    std::filesystem::path asset_root_;
+    std::filesystem::path level_path_;
+    frame::proto::Level level_proto_;
+    frame::json::LevelData level_data_;
+};
+
 class VulkanRayTracingDualParseTest : public ::testing::Test
 {
   protected:
@@ -272,22 +321,153 @@ TEST_F(VulkanRayTracingDualParseTest, BuildsTriangleBuffersFromScene)
     ASSERT_NE(material_id, frame::NullId);
     auto& material = level.GetMaterialFromId(material_id);
 
-    bool found_triangle_buffer = false;
-    for (const auto& name : material.GetBufferNames())
+    const std::vector<std::string> expected_buffers = {
+        "TriangleBufferTransmissive",
+        "BvhBufferTransmissive",
+        "TriangleBufferOpaque",
+        "BvhBufferOpaque"};
+    for (const auto& inner_name : expected_buffers)
     {
-        if (!EndsWith(name, ".triangle"))
-        {
-            continue;
-        }
-        found_triangle_buffer = true;
-        auto id = level.GetIdFromName(name);
-        ASSERT_NE(id, frame::NullId) << "Missing buffer " << name;
+        auto id = FindBufferByInnerName(level, material, inner_name);
+        ASSERT_NE(id, frame::NullId) << "Missing buffer " << inner_name;
         auto* buffer =
             dynamic_cast<frame::vulkan::Buffer*>(&level.GetBufferFromId(id));
-        ASSERT_NE(buffer, nullptr) << "Unexpected buffer type for " << name;
-        EXPECT_GT(buffer->GetSize(), 0u) << "Empty buffer " << name;
+        ASSERT_NE(buffer, nullptr) << "Unexpected buffer type for " << inner_name;
+        EXPECT_GT(buffer->GetSize(), 0u) << "Empty buffer " << inner_name;
     }
-    EXPECT_TRUE(found_triangle_buffer);
+}
+
+TEST_F(VulkanRayTracingDualParseTest, UsesHardwareRaytracingStageFiles)
+{
+    const auto* program_info = FindProgramInfoByName(
+        level_data_, "RayTraceProgram");
+    ASSERT_NE(program_info, nullptr);
+    EXPECT_EQ(program_info->vulkan.raygen_shader, "raytrace.rgen");
+    EXPECT_EQ(program_info->vulkan.miss_shader, "raytrace.rmiss");
+    EXPECT_EQ(program_info->vulkan.closesthit_shader, "raytrace.rchit");
+}
+
+TEST_F(VulkanRayTracingDualParseTest, SceneMaterialCarriesAllSharedBindings)
+{
+    auto built = frame::vulkan::BuildLevel(glm::uvec2(512, 288), level_data_);
+    ASSERT_NE(built.level, nullptr);
+    auto& level = *built.level;
+
+    const auto material_id = level.GetIdFromName("RayTraceMaterial");
+    ASSERT_NE(material_id, frame::NullId);
+    const auto& material = level.GetMaterialFromId(material_id);
+    std::vector<std::string> actual_texture_bindings = {};
+    for (const auto texture_id : material.GetTextureIds())
+    {
+        actual_texture_bindings.push_back(material.GetInnerName(texture_id));
+    }
+    SCOPED_TRACE(::testing::Message()
+                 << "Actual scene texture bindings: "
+                 << ::testing::PrintToString(actual_texture_bindings));
+
+    const std::vector<std::string> expected_textures = {
+        "opaque_albedo_texture",
+        "opaque_normal_texture",
+        "opaque_roughness_texture",
+        "opaque_metallic_texture",
+        "opaque_ao_texture",
+        "opaque_specular_factor_texture",
+        "opaque_specular_color_texture",
+        "transmissive_albedo_texture",
+        "transmissive_normal_texture",
+        "transmissive_roughness_texture",
+        "transmissive_metallic_texture",
+        "transmissive_ao_texture",
+        "transmissive_transmission_texture",
+        "transmissive_ior_texture",
+        "transmissive_thickness_texture",
+        "transmissive_attenuation_color_texture",
+        "transmissive_attenuation_distance_texture",
+        "skybox",
+        "skybox_env"};
+    for (const auto& inner_name : expected_textures)
+    {
+        EXPECT_NE(FindTextureByInnerName(material, inner_name), frame::NullId)
+            << "Missing texture binding " << inner_name;
+    }
+
+    const std::vector<std::string> expected_buffers = {
+        "TriangleBufferTransmissive",
+        "BvhBufferTransmissive",
+        "TriangleBufferOpaque",
+        "BvhBufferOpaque"};
+    for (const auto& inner_name : expected_buffers)
+    {
+        EXPECT_NE(FindBufferByInnerName(level, material, inner_name), frame::NullId)
+            << "Missing buffer binding " << inner_name;
+    }
+}
+
+TEST_F(VulkanRayTracingDualParseTest, StaticRaytraceSceneStateUsesMeshHolderTransform)
+{
+    auto built = frame::vulkan::BuildLevel(glm::uvec2(512, 288), level_data_);
+    ASSERT_NE(built.level, nullptr);
+    auto& level = *built.level;
+
+    const auto material_id = level.GetIdFromName("RayTraceMaterial");
+    ASSERT_NE(material_id, frame::NullId);
+
+    const auto scene_state = frame::vulkan::BuildSceneState(
+        level,
+        frame::Logger::GetInstance(),
+        {512u, 288u},
+        1.0f,
+        material_id,
+        false,
+        "mesh_holder");
+
+    EXPECT_GT(std::abs(scene_state.model[0][2]), 1.0e-4f);
+    EXPECT_GT(std::abs(scene_state.env_map_model[0][2]), 1.0e-4f);
+}
+
+TEST_F(VulkanRayTracingDualParseTest, HardwarePreferredBuildSkipsCpuBvhData)
+{
+    auto built = frame::vulkan::BuildLevel(
+        glm::uvec2(512, 288),
+        level_data_,
+        {.prefer_hardware_raytracing = true});
+    ASSERT_NE(built.level, nullptr);
+    auto& level = *built.level;
+
+    const auto material_id = level.GetIdFromName("RayTraceMaterial");
+    ASSERT_NE(material_id, frame::NullId);
+    auto& material = level.GetMaterialFromId(material_id);
+
+    const auto transmissive_triangle_id = FindBufferByInnerName(
+        level, material, "TriangleBufferTransmissive");
+    const auto transmissive_bvh_id = FindBufferByInnerName(
+        level, material, "BvhBufferTransmissive");
+    const auto opaque_triangle_id = FindBufferByInnerName(
+        level, material, "TriangleBufferOpaque");
+    const auto opaque_bvh_id = FindBufferByInnerName(
+        level, material, "BvhBufferOpaque");
+    ASSERT_NE(transmissive_triangle_id, frame::NullId);
+    ASSERT_NE(transmissive_bvh_id, frame::NullId);
+    ASSERT_NE(opaque_triangle_id, frame::NullId);
+    ASSERT_NE(opaque_bvh_id, frame::NullId);
+
+    auto* transmissive_triangle = dynamic_cast<frame::vulkan::Buffer*>(
+        &level.GetBufferFromId(transmissive_triangle_id));
+    auto* transmissive_bvh = dynamic_cast<frame::vulkan::Buffer*>(
+        &level.GetBufferFromId(transmissive_bvh_id));
+    auto* opaque_triangle = dynamic_cast<frame::vulkan::Buffer*>(
+        &level.GetBufferFromId(opaque_triangle_id));
+    auto* opaque_bvh = dynamic_cast<frame::vulkan::Buffer*>(
+        &level.GetBufferFromId(opaque_bvh_id));
+    ASSERT_NE(transmissive_triangle, nullptr);
+    ASSERT_NE(transmissive_bvh, nullptr);
+    ASSERT_NE(opaque_triangle, nullptr);
+    ASSERT_NE(opaque_bvh, nullptr);
+
+    EXPECT_GT(transmissive_triangle->GetSize(), 0u);
+    EXPECT_GT(opaque_triangle->GetSize(), 0u);
+    EXPECT_EQ(transmissive_bvh->GetSize(), 0u);
+    EXPECT_EQ(opaque_bvh->GetSize(), 0u);
 }
 
 TEST_F(VulkanRayTracingDualParseTest, TriangleDataLooksValid)
@@ -300,17 +480,14 @@ TEST_F(VulkanRayTracingDualParseTest, TriangleDataLooksValid)
     ASSERT_NE(material_id, frame::NullId);
     auto& material = level.GetMaterialFromId(material_id);
 
-    for (const auto& name : material.GetBufferNames())
+    for (const auto& inner_name :
+         {"TriangleBufferTransmissive", "TriangleBufferOpaque"})
     {
-        if (!EndsWith(name, ".triangle"))
-        {
-            continue;
-        }
-        auto id = level.GetIdFromName(name);
-        ASSERT_NE(id, frame::NullId) << "Missing buffer " << name;
+        auto id = FindBufferByInnerName(level, material, inner_name);
+        ASSERT_NE(id, frame::NullId) << "Missing buffer " << inner_name;
         auto* buffer =
             dynamic_cast<frame::vulkan::Buffer*>(&level.GetBufferFromId(id));
-        ASSERT_NE(buffer, nullptr) << "Unexpected buffer type for " << name;
+        ASSERT_NE(buffer, nullptr) << "Unexpected buffer type for " << inner_name;
         ExpectTriangleBufferValid(*buffer);
     }
 }
@@ -337,12 +514,32 @@ TEST_F(VulkanRayTracingDualParseTest, ImportsGltfGlassMaterialFromIco)
         material, "attenuation_color_texture");
     const auto attenuation_distance_texture_id = FindTextureByInnerName(
         material, "attenuation_distance_texture");
+    const auto albedo_texture_id = FindTextureByInnerName(
+        material, "albedo_texture");
+    const auto normal_texture_id = FindTextureByInnerName(
+        material, "normal_texture");
+    const auto roughness_texture_id = FindTextureByInnerName(
+        material, "roughness_texture");
+    const auto metallic_texture_id = FindTextureByInnerName(
+        material, "metallic_texture");
+    const auto ao_texture_id = FindTextureByInnerName(
+        material, "ao_texture");
 
     ASSERT_NE(transmission_texture_id, frame::NullId);
     ASSERT_NE(ior_texture_id, frame::NullId);
     ASSERT_NE(thickness_texture_id, frame::NullId);
     ASSERT_NE(attenuation_color_texture_id, frame::NullId);
     ASSERT_NE(attenuation_distance_texture_id, frame::NullId);
+    ASSERT_NE(albedo_texture_id, frame::NullId);
+    ASSERT_NE(normal_texture_id, frame::NullId);
+    ASSERT_NE(roughness_texture_id, frame::NullId);
+    ASSERT_NE(metallic_texture_id, frame::NullId);
+    ASSERT_NE(ao_texture_id, frame::NullId);
+    EXPECT_NE(albedo_texture_id, level.GetIdFromName("albedo_texture"));
+    EXPECT_NE(normal_texture_id, level.GetIdFromName("normal_texture"));
+    EXPECT_NE(roughness_texture_id, level.GetIdFromName("roughness_texture"));
+    EXPECT_NE(metallic_texture_id, level.GetIdFromName("metallic_texture"));
+    EXPECT_NE(ao_texture_id, level.GetIdFromName("ao_texture"));
 
     EXPECT_NEAR(
         ReadTextureFirstChannel(level, transmission_texture_id),
@@ -368,6 +565,238 @@ TEST_F(VulkanRayTracingDualParseTest, ImportsGltfGlassMaterialFromIco)
     EXPECT_NEAR(attenuation_color[2], 0.90f, 0.03f);
 }
 
+TEST_F(VulkanRayTracingDualParseTest, ImportsGltfOpaqueSpecularFromPlate)
+{
+    auto built = frame::vulkan::BuildLevel(glm::uvec2(512, 288), level_data_);
+    ASSERT_NE(built.level, nullptr);
+    auto& level = *built.level;
+
+    const auto plate_material_id = FindMaterialForNode(
+        level,
+        frame::proto::NodeMesh::PRE_RENDER_TIME,
+        "Plate");
+    ASSERT_NE(plate_material_id, frame::NullId);
+    const auto scene_material_id = level.GetIdFromName("RayTraceMaterial");
+    ASSERT_NE(scene_material_id, frame::NullId);
+
+    const auto& plate_material = level.GetMaterialFromId(plate_material_id);
+    const auto& scene_material = level.GetMaterialFromId(scene_material_id);
+    const auto plate_specular_factor_id = FindTextureByInnerName(
+        plate_material, "specular_factor_texture");
+    const auto plate_specular_color_id = FindTextureByInnerName(
+        plate_material, "specular_color_texture");
+    const auto plate_albedo_id = FindTextureByInnerName(
+        plate_material, "albedo_texture");
+    const auto plate_normal_id = FindTextureByInnerName(
+        plate_material, "normal_texture");
+    const auto plate_roughness_id = FindTextureByInnerName(
+        plate_material, "roughness_texture");
+    const auto plate_metallic_id = FindTextureByInnerName(
+        plate_material, "metallic_texture");
+    const auto plate_ao_id = FindTextureByInnerName(
+        plate_material, "ao_texture");
+    const auto scene_specular_factor_id = FindTextureByInnerName(
+        scene_material, "opaque_specular_factor_texture");
+    const auto scene_specular_color_id = FindTextureByInnerName(
+        scene_material, "opaque_specular_color_texture");
+
+    ASSERT_NE(plate_specular_factor_id, frame::NullId);
+    ASSERT_NE(plate_specular_color_id, frame::NullId);
+    ASSERT_NE(plate_albedo_id, frame::NullId);
+    ASSERT_NE(plate_normal_id, frame::NullId);
+    ASSERT_NE(plate_roughness_id, frame::NullId);
+    ASSERT_NE(plate_metallic_id, frame::NullId);
+    ASSERT_NE(plate_ao_id, frame::NullId);
+    ASSERT_NE(scene_specular_factor_id, frame::NullId);
+    ASSERT_NE(scene_specular_color_id, frame::NullId);
+    EXPECT_EQ(scene_specular_factor_id, plate_specular_factor_id);
+    EXPECT_EQ(scene_specular_color_id, plate_specular_color_id);
+    EXPECT_EQ(plate_albedo_id, level.GetIdFromName("albedo_texture"));
+    EXPECT_EQ(plate_normal_id, level.GetIdFromName("normal_texture"));
+    EXPECT_EQ(plate_roughness_id, level.GetIdFromName("roughness_texture"));
+    EXPECT_EQ(plate_metallic_id, level.GetIdFromName("metallic_texture"));
+    EXPECT_EQ(plate_ao_id, level.GetIdFromName("ao_texture"));
+    EXPECT_NEAR(
+        ReadTextureFirstChannel(level, plate_specular_factor_id),
+        1.0f,
+        0.02f);
+
+    const auto specular_color = ReadTextureRgb(level, plate_specular_color_id);
+    EXPECT_NEAR(specular_color[0], 0.0f, 0.02f);
+    EXPECT_NEAR(specular_color[1], 0.0f, 0.02f);
+    EXPECT_NEAR(specular_color[2], 0.0f, 0.02f);
+}
+
+TEST_F(
+    VulkanSkinnedRayTracingParseTest,
+    HardwarePreferredBuildSkipsCpuBvhForAnimatedScene)
+{
+    auto built = frame::vulkan::BuildLevel(
+        glm::uvec2(512, 288),
+        level_data_,
+        {.prefer_hardware_raytracing = true});
+    ASSERT_NE(built.level, nullptr);
+    auto& level = *built.level;
+
+    const auto material_id = level.GetIdFromName("RayTraceMaterial");
+    ASSERT_NE(material_id, frame::NullId);
+    auto& material = level.GetMaterialFromId(material_id);
+
+    const auto triangle_id = FindBufferByInnerName(
+        level, material, "TriangleBufferOpaque");
+    const auto bvh_id = FindBufferByInnerName(
+        level, material, "BvhBufferOpaque");
+    ASSERT_NE(triangle_id, frame::NullId);
+    ASSERT_NE(bvh_id, frame::NullId);
+
+    auto* triangle_buffer =
+        dynamic_cast<frame::vulkan::Buffer*>(&level.GetBufferFromId(triangle_id));
+    auto* bvh_buffer =
+        dynamic_cast<frame::vulkan::Buffer*>(&level.GetBufferFromId(bvh_id));
+    ASSERT_NE(triangle_buffer, nullptr);
+    ASSERT_NE(bvh_buffer, nullptr);
+    EXPECT_GT(triangle_buffer->GetSize(), 0u);
+    EXPECT_EQ(bvh_buffer->GetSize(), 0u);
+
+    const auto fox_node_id = level.GetIdFromName("FoxMesh");
+    ASSERT_NE(fox_node_id, frame::NullId);
+    auto& fox_node = level.GetSceneNodeFromId(fox_node_id);
+    const auto fox_mesh_id = fox_node.GetLocalMesh();
+    ASSERT_NE(fox_mesh_id, frame::NullId);
+    auto* skinned_mesh = dynamic_cast<frame::vulkan::SkinnedMesh*>(
+        &level.GetMeshFromId(fox_mesh_id));
+    ASSERT_NE(skinned_mesh, nullptr);
+    EXPECT_TRUE(skinned_mesh->HasRaytraceTriangleCallback());
+    EXPECT_FALSE(skinned_mesh->HasRaytraceBvhCallback());
+    EXPECT_EQ(skinned_mesh->GetBvhBufferId(), frame::NullId);
+}
+
+TEST_F(VulkanSkinnedRayTracingParseTest, FoxAnimationChangesRaytraceTriangles)
+{
+    auto built = frame::vulkan::BuildLevel(
+        glm::uvec2(512, 288),
+        level_data_,
+        {.prefer_hardware_raytracing = true});
+    ASSERT_NE(built.level, nullptr);
+    auto& level = *built.level;
+
+    const auto fox_node_id = level.GetIdFromName("FoxMesh");
+    ASSERT_NE(fox_node_id, frame::NullId);
+    auto& fox_node = level.GetSceneNodeFromId(fox_node_id);
+    const auto fox_mesh_id = fox_node.GetLocalMesh();
+    ASSERT_NE(fox_mesh_id, frame::NullId);
+    auto* skinned_mesh = dynamic_cast<frame::vulkan::SkinnedMesh*>(
+        &level.GetMeshFromId(fox_mesh_id));
+    ASSERT_NE(skinned_mesh, nullptr);
+
+    const auto triangles_at_start =
+        skinned_mesh->EvaluateRaytraceTriangles(skinned_mesh->GetSkinningTime(0.0));
+    const auto triangles_during_walk =
+        skinned_mesh->EvaluateRaytraceTriangles(skinned_mesh->GetSkinningTime(0.35));
+    ASSERT_FALSE(triangles_at_start.empty());
+    ASSERT_EQ(triangles_at_start.size(), triangles_during_walk.size());
+
+    bool found_difference = false;
+    for (std::size_t i = 0; i < triangles_at_start.size(); i += 97)
+    {
+        if (std::abs(triangles_at_start[i] - triangles_during_walk[i]) > 1.0e-5f)
+        {
+            found_difference = true;
+            break;
+        }
+    }
+    EXPECT_TRUE(found_difference);
+}
+
+TEST_F(VulkanSkinnedRayTracingParseTest, SceneMaterialUsesImportedFoxTextures)
+{
+    auto built = frame::vulkan::BuildLevel(
+        glm::uvec2(512, 288),
+        level_data_);
+    ASSERT_NE(built.level, nullptr);
+    auto& level = *built.level;
+
+    const auto scene_material_id = level.GetIdFromName("RayTraceMaterial");
+    ASSERT_NE(scene_material_id, frame::NullId);
+    const auto fox_material_id = FindMaterialForNode(
+        level,
+        frame::proto::NodeMesh::PRE_RENDER_TIME,
+        "FoxMesh");
+    ASSERT_NE(fox_material_id, frame::NullId);
+
+    const auto& scene_material = level.GetMaterialFromId(scene_material_id);
+    const auto& fox_material = level.GetMaterialFromId(fox_material_id);
+
+    const auto scene_albedo_id = FindTextureByInnerName(
+        scene_material, "opaque_albedo_texture");
+    const auto scene_normal_id = FindTextureByInnerName(
+        scene_material, "opaque_normal_texture");
+    const auto fox_albedo_id = FindTextureByInnerName(
+        fox_material, "albedo_texture");
+    const auto fox_normal_id = FindTextureByInnerName(
+        fox_material, "normal_texture");
+
+    ASSERT_NE(scene_albedo_id, frame::NullId);
+    ASSERT_NE(scene_normal_id, frame::NullId);
+    ASSERT_NE(fox_albedo_id, frame::NullId);
+    ASSERT_NE(fox_normal_id, frame::NullId);
+    EXPECT_EQ(scene_albedo_id, fox_albedo_id);
+    EXPECT_EQ(scene_normal_id, fox_normal_id);
+    EXPECT_GT(level.GetTextureFromId(fox_albedo_id).GetSize().x, 1u);
+    EXPECT_GT(level.GetTextureFromId(fox_albedo_id).GetSize().y, 1u);
+}
+
+TEST_F(VulkanSkinnedRayTracingParseTest, QuaternionNodesStillRotate)
+{
+    auto built = frame::vulkan::BuildLevel(
+        glm::uvec2(512, 288),
+        level_data_);
+    ASSERT_NE(built.level, nullptr);
+    auto& level = *built.level;
+
+    const auto env_holder_id = level.GetIdFromName("env_holder");
+    ASSERT_NE(env_holder_id, frame::NullId);
+    const auto& env_holder = level.GetSceneNodeFromId(env_holder_id);
+
+    const glm::mat4 model_at_zero = env_holder.GetLocalModel(0.0);
+    const glm::mat4 model_at_one = env_holder.GetLocalModel(1.0);
+
+    EXPECT_NEAR(model_at_zero[0][2], 0.0f, 1.0e-5f);
+    EXPECT_GT(std::abs(model_at_one[0][2]), 1.0e-4f);
+}
+
+TEST_F(
+    VulkanSkinnedRayTracingParseTest,
+    WorldSpaceRaytraceSceneStateUsesIdentityModelForSkinnedScene)
+{
+    auto built = frame::vulkan::BuildLevel(glm::uvec2(512, 288), level_data_);
+    ASSERT_NE(built.level, nullptr);
+    auto& level = *built.level;
+
+    const auto material_id = level.GetIdFromName("RayTraceMaterial");
+    ASSERT_NE(material_id, frame::NullId);
+
+    const auto scene_state = frame::vulkan::BuildSceneState(
+        level,
+        frame::Logger::GetInstance(),
+        {512u, 288u},
+        1.0f,
+        material_id,
+        false,
+        "mesh_holder",
+        true);
+
+    for (int row = 0; row < 4; ++row)
+    {
+        for (int col = 0; col < 4; ++col)
+        {
+            const float expected = row == col ? 1.0f : 0.0f;
+            EXPECT_NEAR(scene_state.model[row][col], expected, 1.0e-5f);
+        }
+    }
+    EXPECT_GT(std::abs(scene_state.env_map_model[0][2]), 1.0e-4f);
+}
+
 TEST_F(VulkanRayTracingParseTest, BuildsTriangleAndBvhBuffersFromScene)
 {
     auto built = frame::vulkan::BuildLevel(glm::uvec2(512, 288), level_data_);
@@ -379,21 +808,97 @@ TEST_F(VulkanRayTracingParseTest, BuildsTriangleAndBvhBuffersFromScene)
     auto& material = level.GetMaterialFromId(material_id);
 
     const std::vector<std::string> expected_buffers = {
-        "DragonMesh.0.triangle",
-        "DragonMesh.0.bvh"};
-    for (const auto& name : expected_buffers)
+        "TriangleBufferTransmissive",
+        "BvhBufferTransmissive",
+        "TriangleBufferOpaque",
+        "BvhBufferOpaque"};
+    for (const auto& inner_name : expected_buffers)
     {
-        auto names = material.GetBufferNames();
-        EXPECT_NE(
-            std::find(names.begin(), names.end(), name), names.end())
-            << "Material should expose buffer " << name;
-        auto id = level.GetIdFromName(name);
-        ASSERT_NE(id, frame::NullId) << "Missing buffer " << name;
+        auto id = FindBufferByInnerName(level, material, inner_name);
+        ASSERT_NE(id, frame::NullId) << "Missing buffer " << inner_name;
         auto* buffer =
             dynamic_cast<frame::vulkan::Buffer*>(&level.GetBufferFromId(id));
-        ASSERT_NE(buffer, nullptr) << "Unexpected buffer type for " << name;
-        EXPECT_GT(buffer->GetSize(), 0u) << "Empty buffer " << name;
+        ASSERT_NE(buffer, nullptr) << "Unexpected buffer type for " << inner_name;
+        if (inner_name.find("Opaque") != std::string::npos)
+        {
+            EXPECT_GT(buffer->GetSize(), 0u) << "Empty buffer " << inner_name;
+        }
     }
+}
+
+TEST_F(VulkanRayTracingParseTest, UsesHardwareRaytracingStageFiles)
+{
+    const auto* program_info = FindProgramInfoByName(
+        level_data_, "RayTraceProgram");
+    ASSERT_NE(program_info, nullptr);
+    EXPECT_EQ(program_info->vulkan.raygen_shader, "raytrace.rgen");
+    EXPECT_EQ(program_info->vulkan.miss_shader, "raytrace.rmiss");
+    EXPECT_EQ(program_info->vulkan.closesthit_shader, "raytrace.rchit");
+}
+
+TEST_F(VulkanRayTracingParseTest, DragonSceneUsesSceneFallbackPbrTextures)
+{
+    auto built = frame::vulkan::BuildLevel(glm::uvec2(512, 288), level_data_);
+    ASSERT_NE(built.level, nullptr);
+    auto& level = *built.level;
+
+    const auto material_id = level.GetIdFromName("RayTraceMaterial");
+    ASSERT_NE(material_id, frame::NullId);
+    const auto& material = level.GetMaterialFromId(material_id);
+
+    const auto albedo_id = FindTextureByInnerName(
+        material, "opaque_albedo_texture");
+    const auto normal_id = FindTextureByInnerName(
+        material, "opaque_normal_texture");
+    const auto roughness_id = FindTextureByInnerName(
+        material, "opaque_roughness_texture");
+    const auto metallic_id = FindTextureByInnerName(
+        material, "opaque_metallic_texture");
+    const auto ao_id = FindTextureByInnerName(
+        material, "opaque_ao_texture");
+
+    ASSERT_NE(albedo_id, frame::NullId);
+    ASSERT_NE(normal_id, frame::NullId);
+    ASSERT_NE(roughness_id, frame::NullId);
+    ASSERT_NE(metallic_id, frame::NullId);
+    ASSERT_NE(ao_id, frame::NullId);
+
+    EXPECT_EQ(albedo_id, level.GetIdFromName("albedo_texture"));
+    EXPECT_EQ(normal_id, level.GetIdFromName("normal_texture"));
+    EXPECT_EQ(roughness_id, level.GetIdFromName("roughness_texture"));
+    EXPECT_EQ(metallic_id, level.GetIdFromName("metallic_texture"));
+    EXPECT_EQ(ao_id, level.GetIdFromName("ao_texture"));
+}
+
+TEST_F(VulkanRayTracingParseTest, HardwarePreferredBuildSkipsCpuBvhData)
+{
+    auto built = frame::vulkan::BuildLevel(
+        glm::uvec2(512, 288),
+        level_data_,
+        {.prefer_hardware_raytracing = true});
+    ASSERT_NE(built.level, nullptr);
+    auto& level = *built.level;
+
+    const auto material_id = level.GetIdFromName("RayTraceMaterial");
+    ASSERT_NE(material_id, frame::NullId);
+    auto& material = level.GetMaterialFromId(material_id);
+
+    const auto triangle_id = FindBufferByInnerName(
+        level, material, "TriangleBufferOpaque");
+    const auto bvh_id = FindBufferByInnerName(
+        level, material, "BvhBufferOpaque");
+    ASSERT_NE(triangle_id, frame::NullId);
+    ASSERT_NE(bvh_id, frame::NullId);
+
+    auto* tri_buffer =
+        dynamic_cast<frame::vulkan::Buffer*>(&level.GetBufferFromId(triangle_id));
+    auto* bvh_buffer =
+        dynamic_cast<frame::vulkan::Buffer*>(&level.GetBufferFromId(bvh_id));
+    ASSERT_NE(tri_buffer, nullptr);
+    ASSERT_NE(bvh_buffer, nullptr);
+
+    EXPECT_GT(tri_buffer->GetSize(), 0u);
+    EXPECT_EQ(bvh_buffer->GetSize(), 0u);
 }
 
 TEST_F(VulkanRayTracingParseTest, TriangleAndBvhDataLooksValid)
@@ -402,8 +907,14 @@ TEST_F(VulkanRayTracingParseTest, TriangleAndBvhDataLooksValid)
     ASSERT_NE(built.level, nullptr);
     auto& level = *built.level;
 
-    auto triangle_id = level.GetIdFromName("DragonMesh.0.triangle");
-    auto bvh_id = level.GetIdFromName("DragonMesh.0.bvh");
+    const auto material_id = level.GetIdFromName("RayTraceMaterial");
+    ASSERT_NE(material_id, frame::NullId);
+    auto& material = level.GetMaterialFromId(material_id);
+
+    auto triangle_id = FindBufferByInnerName(
+        level, material, "TriangleBufferOpaque");
+    auto bvh_id = FindBufferByInnerName(
+        level, material, "BvhBufferOpaque");
     ASSERT_NE(triangle_id, frame::NullId);
     ASSERT_NE(bvh_id, frame::NullId);
 
@@ -439,6 +950,47 @@ TEST_F(VulkanRayTracingParseTest, TriangleAndBvhDataLooksValid)
     std::memcpy(&root, bvh_bytes.data(), sizeof(BvhNode));
     EXPECT_TRUE(root.triangle_count > 0 || root.left >= 0 || root.right >= 0);
     EXPECT_LT(root.min.x, root.max.x);
+}
+
+TEST_F(VulkanRayTracingParseTest, DragonTriangleUvsVaryWhenMeshHasNoTexcoords)
+{
+    auto built = frame::vulkan::BuildLevel(glm::uvec2(512, 288), level_data_);
+    ASSERT_NE(built.level, nullptr);
+    auto& level = *built.level;
+
+    const auto material_id = level.GetIdFromName("RayTraceMaterial");
+    ASSERT_NE(material_id, frame::NullId);
+    auto& material = level.GetMaterialFromId(material_id);
+
+    const auto triangle_id = FindBufferByInnerName(
+        level, material, "TriangleBufferOpaque");
+    ASSERT_NE(triangle_id, frame::NullId);
+
+    auto* tri_buffer =
+        dynamic_cast<frame::vulkan::Buffer*>(&level.GetBufferFromId(triangle_id));
+    ASSERT_NE(tri_buffer, nullptr);
+
+    const auto& raw = tri_buffer->GetRawData();
+    ASSERT_GE(raw.size(), sizeof(float) * kFloatsPerVertex);
+    ASSERT_EQ(raw.size() % sizeof(float), 0u);
+
+    const auto* data = reinterpret_cast<const float*>(raw.data());
+    const std::size_t vertex_count = raw.size() / (sizeof(float) * kFloatsPerVertex);
+    float min_u = std::numeric_limits<float>::max();
+    float max_u = std::numeric_limits<float>::lowest();
+    float min_v = std::numeric_limits<float>::max();
+    float max_v = std::numeric_limits<float>::lowest();
+    for (std::size_t i = 0; i < vertex_count; ++i)
+    {
+        const std::size_t base = i * kFloatsPerVertex;
+        min_u = std::min(min_u, data[base + 8]);
+        max_u = std::max(max_u, data[base + 8]);
+        min_v = std::min(min_v, data[base + 9]);
+        max_v = std::max(max_v, data[base + 9]);
+    }
+
+    EXPECT_GT(max_u - min_u, 0.25f);
+    EXPECT_GT(max_v - min_v, 0.25f);
 }
 
 namespace
@@ -554,8 +1106,14 @@ TEST_F(VulkanRayTracingParseTest, CpuTraversesBvhFromCameraCenterRay)
     ASSERT_NE(built.level, nullptr);
     auto& level = *built.level;
 
-    auto triangle_id = level.GetIdFromName("DragonMesh.0.triangle");
-    auto bvh_id = level.GetIdFromName("DragonMesh.0.bvh");
+    const auto material_id = level.GetIdFromName("RayTraceMaterial");
+    ASSERT_NE(material_id, frame::NullId);
+    auto& material = level.GetMaterialFromId(material_id);
+
+    auto triangle_id = FindBufferByInnerName(
+        level, material, "TriangleBufferOpaque");
+    auto bvh_id = FindBufferByInnerName(
+        level, material, "BvhBufferOpaque");
     ASSERT_NE(triangle_id, frame::NullId);
     ASSERT_NE(bvh_id, frame::NullId);
     auto* tri_buffer =
@@ -596,8 +1154,14 @@ TEST_F(VulkanRayTracingParseTest, ShaderLikeRayFromCenterHitsGeometry)
     ASSERT_NE(built.level, nullptr);
     auto& level = *built.level;
 
-    auto triangle_id = level.GetIdFromName("DragonMesh.0.triangle");
-    auto bvh_id = level.GetIdFromName("DragonMesh.0.bvh");
+    const auto material_id = level.GetIdFromName("RayTraceMaterial");
+    ASSERT_NE(material_id, frame::NullId);
+    auto& material = level.GetMaterialFromId(material_id);
+
+    auto triangle_id = FindBufferByInnerName(
+        level, material, "TriangleBufferOpaque");
+    auto bvh_id = FindBufferByInnerName(
+        level, material, "BvhBufferOpaque");
     ASSERT_NE(triangle_id, frame::NullId);
     ASSERT_NE(bvh_id, frame::NullId);
     auto* tri_buffer =
@@ -653,7 +1217,7 @@ TEST_F(VulkanRayTracingParseTest, ShaderLikeRayFromCenterHitsGeometry)
     ASSERT_TRUE(RayAabbIntersect(ray_origin, 1.0f / ray_dir, nodes.front()));
     EXPECT_TRUE(TraverseBvh(nodes, tris, ray_origin, ray_dir));
 }
-TEST_F(VulkanRayTracingParseTest, MapsRayTracingNodesForUniforms)
+TEST_F(VulkanRayTracingParseTest, BuildsSceneStateWithoutExplicitModelNodeBinding)
 {
     auto built = frame::vulkan::BuildLevel(glm::uvec2(512, 288), level_data_);
     ASSERT_NE(built.level, nullptr);
@@ -662,16 +1226,22 @@ TEST_F(VulkanRayTracingParseTest, MapsRayTracingNodesForUniforms)
     const auto material_id = level.GetIdFromName("RayTraceMaterial");
     ASSERT_NE(material_id, frame::NullId);
     auto& material = level.GetMaterialFromId(material_id);
+    EXPECT_TRUE(material.GetNodeNames().empty());
 
-    auto node_names = material.GetNodeNames();
-    EXPECT_NE(
-        std::find(node_names.begin(), node_names.end(), "DragonMesh"),
-        node_names.end());
-
-    const auto node_id = level.GetIdFromName("DragonMesh");
-    ASSERT_NE(node_id, frame::NullId);
-    EXPECT_EQ(material.GetInnerNodeName("DragonMesh"), "model");
-    EXPECT_NO_THROW(level.GetSceneNodeFromId(node_id));
+    auto scene_state = frame::vulkan::BuildSceneState(
+        level,
+        frame::Logger::GetInstance(),
+        {512u, 288u},
+        0.0f,
+        material_id,
+        false);
+    for (int row = 0; row < 4; ++row)
+    {
+        for (int col = 0; col < 4; ++col)
+        {
+            EXPECT_TRUE(std::isfinite(scene_state.model[row][col]));
+        }
+    }
 }
 
 } // namespace test
