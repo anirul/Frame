@@ -446,10 +446,14 @@ LevelData BuildLevelData(
     const auto preset = InferScenePreset(proto_level, source_path);
     if (preset == SupportedScenePreset::Unknown)
     {
-        throw std::runtime_error(std::format(
-            "Unable to infer internal render preset for level '{}' from '{}'.",
-            proto_level.name(),
-            source_path.string()));
+        if (!proto_level.scene_tree().node_meshes().empty())
+        {
+            throw std::runtime_error(std::format(
+                "Unable to infer internal render preset for level '{}' from '{}'.",
+                proto_level.name(),
+                source_path.string()));
+        }
+        return data;
     }
     data.programs = BuildProgramsForPreset(preset, proto_level);
     data.render_pass_programs = BuildRenderPassProgramsForPreset(preset);
