@@ -132,6 +132,76 @@ float ReadTextureFirstChannel(const frame::TextureInterface& texture)
     }
 }
 
+std::array<float, 4> ReadTextureColor(const frame::TextureInterface& texture)
+{
+    constexpr std::array<float, 4> kWhite = {1.0f, 1.0f, 1.0f, 1.0f};
+    const auto pixel_structure = texture.GetData().pixel_structure().value();
+    std::size_t red_index = 0;
+    std::size_t green_index = 0;
+    std::size_t blue_index = 0;
+    int alpha_index = -1;
+    std::size_t channel_count = 1;
+    switch (pixel_structure)
+    {
+    case frame::proto::PixelStructure::GREY:
+        channel_count = 1;
+        break;
+    case frame::proto::PixelStructure::GREY_ALPHA:
+        channel_count = 2;
+        alpha_index = 1;
+        break;
+    case frame::proto::PixelStructure::RGB:
+        channel_count = 3;
+        break;
+    case frame::proto::PixelStructure::RGB_ALPHA:
+        channel_count = 4;
+        alpha_index = 3;
+        break;
+    case frame::proto::PixelStructure::BGR:
+        channel_count = 3;
+        red_index = 2;
+        blue_index = 0;
+        break;
+    case frame::proto::PixelStructure::BGR_ALPHA:
+        channel_count = 4;
+        red_index = 2;
+        blue_index = 0;
+        alpha_index = 3;
+        break;
+    default:
+        return kWhite;
+    }
+
+    const auto build_color = [&](const auto& data, float scale) {
+        if (data.size() < channel_count)
+        {
+            return kWhite;
+        }
+        const auto read_channel = [&](std::size_t index) {
+            return static_cast<float>(data[index]) / scale;
+        };
+        const float red = read_channel(red_index);
+        const float green = read_channel(green_index);
+        const float blue = read_channel(blue_index);
+        const float alpha =
+            alpha_index >= 0 ? read_channel(static_cast<std::size_t>(alpha_index))
+                             : 1.0f;
+        return std::array<float, 4>{red, green, blue, alpha};
+    };
+
+    switch (texture.GetData().pixel_element_size().value())
+    {
+    case frame::proto::PixelElementSize::FLOAT:
+        return build_color(texture.GetTextureFloat(), 1.0f);
+    case frame::proto::PixelElementSize::SHORT:
+    case frame::proto::PixelElementSize::HALF:
+        return build_color(texture.GetTextureWord(), 65535.0f);
+    case frame::proto::PixelElementSize::BYTE:
+    default:
+        return build_color(texture.GetTextureByte(), 255.0f);
+    }
+}
+
 bool IsTransmissiveMaterial(
     frame::LevelInterface& level, frame::EntityId material_id)
 {
@@ -150,6 +220,77 @@ bool IsTransmissiveMaterial(
             0.01f;
     }
     return false;
+}
+
+frame::EntityId FindTextureIdByInnerName(
+    const frame::MaterialInterface& material,
+    const std::string& expected_inner_name)
+{
+    for (const auto texture_id : material.GetTextureIds())
+    {
+        if (material.GetInnerName(texture_id) == expected_inner_name)
+        {
+            return texture_id;
+        }
+    }
+    return frame::NullId;
+}
+
+std::array<float, 4> ResolveRaytracingSourceMaterialColor(
+    frame::LevelInterface& level,
+    frame::EntityId material_id)
+{
+    constexpr std::array<float, 4> kWhite = {1.0f, 1.0f, 1.0f, 1.0f};
+    if (!material_id)
+    {
+        return kWhite;
+    }
+
+    const auto& material = level.GetMaterialFromId(material_id);
+    auto color_texture_id = FindTextureIdByInnerName(material, "albedo_texture");
+    if (!color_texture_id)
+    {
+        color_texture_id = FindTextureIdByInnerName(material, "Color");
+    }
+    if (!color_texture_id)
+    {
+        return kWhite;
+    }
+    return ReadTextureColor(level.GetTextureFromId(color_texture_id));
+}
+
+std::array<float, 4> ResolveRaytracingReferenceColor(
+    frame::LevelInterface& level,
+    bool transmissive)
+{
+    constexpr std::array<float, 4> kWhite = {1.0f, 1.0f, 1.0f, 1.0f};
+    for (const auto& [pre_node_id, pre_material_id] :
+         level.GetMeshMaterialIds(frame::proto::NodeMesh::PRE_RENDER_TIME))
+    {
+        (void)pre_node_id;
+        if (IsTransmissiveMaterial(level, pre_material_id) == transmissive)
+        {
+            return ResolveRaytracingSourceMaterialColor(level, pre_material_id);
+        }
+    }
+    return kWhite;
+}
+
+std::array<float, 4> ResolveRaytracingColorMultiplier(
+    const std::array<float, 4>& source_color,
+    const std::array<float, 4>& reference_color)
+{
+    std::array<float, 4> multiplier = {1.0f, 1.0f, 1.0f, source_color[3]};
+    for (std::size_t channel = 0; channel < 3; ++channel)
+    {
+        float value = source_color[channel];
+        if (reference_color[channel] > 0.0001f)
+        {
+            value /= reference_color[channel];
+        }
+        multiplier[channel] = std::clamp(value, 0.0f, 4.0f);
+    }
+    return multiplier;
 }
 
 bool RaytraceSceneRequiresWorldSpaceBuffers(frame::LevelInterface& level)
@@ -203,6 +344,33 @@ struct RaytraceVertex
     float pad2;
     float pad3;
 };
+
+std::vector<std::uint8_t> ApplyTriangleColorMultiplier(
+    const std::vector<std::uint8_t>& raw,
+    const std::array<float, 4>& color)
+{
+    if (raw.empty())
+    {
+        return raw;
+    }
+    if (raw.size() % sizeof(RaytraceVertex) != 0)
+    {
+        throw std::runtime_error(
+            "Animated Vulkan raytrace triangle buffer size is not aligned to the expected vertex stride.");
+    }
+
+    std::vector<std::uint8_t> tinted = raw;
+    auto* vertices = reinterpret_cast<RaytraceVertex*>(tinted.data());
+    const std::size_t vertex_count = tinted.size() / sizeof(RaytraceVertex);
+    for (std::size_t i = 0; i < vertex_count; ++i)
+    {
+        vertices[i].pad0 = color[0];
+        vertices[i].pad1 = color[1];
+        vertices[i].pad2 = color[2];
+        vertices[i].pad3 = color[3];
+    }
+    return tinted;
+}
 
 std::vector<std::uint8_t> TransformTriangleBytes(
     const std::vector<std::uint8_t>& raw,
@@ -449,6 +617,8 @@ std::vector<std::uint8_t> BuildAggregateTriangleBytes(
     double time_seconds)
 {
     std::vector<std::uint8_t> aggregate_triangle_bytes = {};
+    const auto reference_color =
+        ResolveRaytracingReferenceColor(level, transmissive);
     for (const auto& [pre_node_id, pre_material_id] :
          level.GetMeshMaterialIds(frame::proto::NodeMesh::PRE_RENDER_TIME))
     {
@@ -483,13 +653,20 @@ std::vector<std::uint8_t> BuildAggregateTriangleBytes(
             continue;
         }
 
+        const auto source_color =
+            ResolveRaytracingSourceMaterialColor(level, pre_material_id);
+        const auto color_multiplier = ResolveRaytracingColorMultiplier(
+            source_color,
+            reference_color);
         const auto transformed = TransformTriangleBytes(
             triangle_buffer->GetRawData(),
             node->GetLocalModel(time_seconds));
+        const auto tinted =
+            ApplyTriangleColorMultiplier(transformed, color_multiplier);
         aggregate_triangle_bytes.insert(
             aggregate_triangle_bytes.end(),
-            transformed.begin(),
-            transformed.end());
+            tinted.begin(),
+            tinted.end());
     }
     return aggregate_triangle_bytes;
 }

@@ -181,6 +181,90 @@ float ReadTextureFirstChannel(
     }
 }
 
+std::array<float, 4> ReadTextureColor(
+    LevelInterface& level, EntityId texture_id)
+{
+    constexpr std::array<float, 4> kWhite = {1.0f, 1.0f, 1.0f, 1.0f};
+    if (!texture_id)
+    {
+        return kWhite;
+    }
+
+    const auto& texture = level.GetTextureFromId(texture_id);
+    const auto pixel_structure = texture.GetData().pixel_structure().value();
+    std::size_t red_index = 0;
+    std::size_t green_index = 0;
+    std::size_t blue_index = 0;
+    std::optional<std::size_t> alpha_index = std::nullopt;
+    std::size_t channel_count = 1;
+    switch (pixel_structure)
+    {
+    case frame::proto::PixelStructure::GREY:
+        channel_count = 1;
+        break;
+    case frame::proto::PixelStructure::GREY_ALPHA:
+        channel_count = 2;
+        alpha_index = 1;
+        break;
+    case frame::proto::PixelStructure::RGB:
+        channel_count = 3;
+        red_index = 0;
+        green_index = 1;
+        blue_index = 2;
+        break;
+    case frame::proto::PixelStructure::RGB_ALPHA:
+        channel_count = 4;
+        red_index = 0;
+        green_index = 1;
+        blue_index = 2;
+        alpha_index = 3;
+        break;
+    case frame::proto::PixelStructure::BGR:
+        channel_count = 3;
+        red_index = 2;
+        green_index = 1;
+        blue_index = 0;
+        break;
+    case frame::proto::PixelStructure::BGR_ALPHA:
+        channel_count = 4;
+        red_index = 2;
+        green_index = 1;
+        blue_index = 0;
+        alpha_index = 3;
+        break;
+    default:
+        return kWhite;
+    }
+
+    const auto build_color = [&](const auto& data, float scale) {
+        if (data.size() < channel_count)
+        {
+            return kWhite;
+        }
+        const auto read_channel = [&](std::size_t index) {
+            return static_cast<float>(data[index]) / scale;
+        };
+        const float red = read_channel(red_index);
+        const float green = read_channel(green_index);
+        const float blue = read_channel(blue_index);
+        const float alpha = alpha_index ? read_channel(*alpha_index) : 1.0f;
+        return std::array<float, 4>{red, green, blue, alpha};
+    };
+
+    const auto element_size = texture.GetData().pixel_element_size().value();
+    switch (element_size)
+    {
+    case frame::proto::PixelElementSize::FLOAT:
+        return build_color(texture.GetTextureFloat(), 1.0f);
+    case frame::proto::PixelElementSize::SHORT:
+    case frame::proto::PixelElementSize::HALF:
+        return build_color(texture.GetTextureWord(), 65535.0f);
+    case frame::proto::PixelElementSize::BYTE:
+    default:
+        return build_color(texture.GetTextureByte(), 255.0f);
+    }
+}
+
 struct GeneratedTextureSpec
 {
     glm::vec4 color = glm::vec4(0.0f);
@@ -523,6 +607,62 @@ EntityId FindTextureIdByInnerName(
     return NullId;
 }
 
+bool IsTransmissiveRaytracingSourceMaterial(
+    LevelInterface& level, EntityId material_id);
+
+std::array<float, 4> ResolveRaytracingSourceMaterialColor(
+    LevelInterface& level, EntityId material_id)
+{
+    constexpr std::array<float, 4> kWhite = {1.0f, 1.0f, 1.0f, 1.0f};
+    if (!material_id)
+    {
+        return kWhite;
+    }
+    const auto& material = level.GetMaterialFromId(material_id);
+    EntityId color_texture_id = FindTextureIdByInnerName(
+        material, "albedo_texture");
+    if (!color_texture_id)
+    {
+        color_texture_id = FindTextureIdByInnerName(material, "Color");
+    }
+    return ReadTextureColor(level, color_texture_id);
+}
+
+std::array<float, 4> ResolveRaytracingReferenceColor(
+    LevelInterface& level, bool transmissive)
+{
+    constexpr std::array<float, 4> kWhite = {1.0f, 1.0f, 1.0f, 1.0f};
+    for (const auto& [pre_node_id, pre_material_id] :
+         level.GetMeshMaterialIds(frame::proto::NodeMesh::PRE_RENDER_TIME))
+    {
+        (void)pre_node_id;
+        if (IsTransmissiveRaytracingSourceMaterial(level, pre_material_id) ==
+            transmissive)
+        {
+            return ResolveRaytracingSourceMaterialColor(level, pre_material_id);
+        }
+    }
+    return kWhite;
+}
+
+std::array<float, 4> ResolveRaytracingColorMultiplier(
+    const std::array<float, 4>& source_color,
+    const std::array<float, 4>& reference_color)
+{
+    std::array<float, 4> multiplier = {1.0f, 1.0f, 1.0f, source_color[3]};
+    for (std::size_t channel = 0; channel < 3; ++channel)
+    {
+        float value = source_color[channel];
+        if (reference_color[channel] > 0.0001f)
+        {
+            value /= reference_color[channel];
+        }
+        value = std::clamp(value, 0.0f, 4.0f);
+        multiplier[channel] = value;
+    }
+    return multiplier;
+}
+
 bool IsGeneratedGltfTextureName(const std::string& texture_name)
 {
     return texture_name.find(".__gltf_tex_") != std::string::npos ||
@@ -661,6 +801,13 @@ std::vector<float> BuildRaytraceTriangles(
     const std::vector<float>& textures,
     const std::vector<std::uint32_t>& indices);
 
+std::vector<float> BuildRaytraceTriangles(
+    const std::vector<float>& points,
+    const std::vector<float>& normals,
+    const std::vector<float>& textures,
+    const std::vector<std::uint32_t>& indices,
+    const std::array<float, 4>& color);
+
 EntityId CreateStorageBuffer(
     LevelInterface& level,
     std::size_t size,
@@ -701,7 +848,10 @@ RaytraceAggregateBuffers BuildRaytraceAggregateBuffers(
     std::vector<float> aggregate_points = {};
     std::vector<float> aggregate_normals = {};
     std::vector<float> aggregate_textures = {};
+    std::vector<float> aggregate_triangles = {};
     std::vector<std::uint32_t> aggregate_indices = {};
+    const auto reference_color =
+        ResolveRaytracingReferenceColor(level, transmissive);
 
     for (const auto& [pre_node_id, pre_material_id] :
          level.GetMeshMaterialIds(frame::proto::NodeMesh::PRE_RENDER_TIME))
@@ -751,6 +901,10 @@ RaytraceAggregateBuffers BuildRaytraceAggregateBuffers(
         {
             continue;
         }
+        const auto source_color = ResolveRaytracingSourceMaterialColor(
+            level, pre_material_id);
+        const auto color_multiplier = ResolveRaytracingColorMultiplier(
+            source_color, reference_color);
         const auto base_index = static_cast<std::uint32_t>(
             aggregate_points.size() / 3);
         aggregate_points.insert(
@@ -769,6 +923,16 @@ RaytraceAggregateBuffers BuildRaytraceAggregateBuffers(
         {
             aggregate_indices.push_back(base_index + index);
         }
+        const auto mesh_triangles = BuildRaytraceTriangles(
+            points,
+            normals,
+            textures,
+            indices,
+            color_multiplier);
+        aggregate_triangles.insert(
+            aggregate_triangles.end(),
+            mesh_triangles.begin(),
+            mesh_triangles.end());
     }
 
     const auto triangle_name = std::format("{}.triangle", base_name);
@@ -780,20 +944,15 @@ RaytraceAggregateBuffers BuildRaytraceAggregateBuffers(
             CreateStorageBuffer(level, 0, nullptr, bvh_name)};
     }
 
-    const auto triangles = BuildRaytraceTriangles(
-        aggregate_points,
-        aggregate_normals,
-        aggregate_textures,
-        aggregate_indices);
     if (!build_software_bvh)
     {
         return {
-            CreateStorageBuffer(level, triangles, triangle_name),
+            CreateStorageBuffer(level, aggregate_triangles, triangle_name),
             CreateStorageBuffer(level, 0, nullptr, bvh_name)};
     }
     const auto bvh_nodes = frame::BuildBVH(aggregate_points, aggregate_indices);
     return {
-        CreateStorageBuffer(level, triangles, triangle_name),
+        CreateStorageBuffer(level, aggregate_triangles, triangle_name),
         CreateStorageBuffer(level, bvh_nodes, bvh_name)};
 }
 
@@ -1621,7 +1780,8 @@ std::vector<float> BuildRaytraceTriangles(
     const std::vector<float>& points,
     const std::vector<float>& normals,
     const std::vector<float>& textures,
-    const std::vector<std::uint32_t>& indices)
+    const std::vector<std::uint32_t>& indices,
+    const std::array<float, 4>& color)
 {
     std::vector<float> triangles = {};
     triangles.reserve(indices.size() * 16);
@@ -1631,7 +1791,7 @@ std::vector<float> BuildRaytraceTriangles(
         triangles.push_back(points[base + 0]);
         triangles.push_back(points[base + 1]);
         triangles.push_back(points[base + 2]);
-        triangles.push_back(0.0f);
+        triangles.push_back(color[0]);
         if (!normals.empty())
         {
             triangles.push_back(normals[base + 0]);
@@ -1644,7 +1804,7 @@ std::vector<float> BuildRaytraceTriangles(
             triangles.push_back(0.0f);
             triangles.push_back(0.0f);
         }
-        triangles.push_back(0.0f);
+        triangles.push_back(color[1]);
         if (!textures.empty())
         {
             triangles.push_back(textures[uv_base + 0]);
@@ -1655,8 +1815,8 @@ std::vector<float> BuildRaytraceTriangles(
             triangles.push_back(0.0f);
             triangles.push_back(0.0f);
         }
-        triangles.push_back(0.0f);
-        triangles.push_back(0.0f);
+        triangles.push_back(color[2]);
+        triangles.push_back(color[3]);
     };
     for (std::size_t i = 0; i + 2 < indices.size(); i += 3)
     {
@@ -1665,6 +1825,20 @@ std::vector<float> BuildRaytraceTriangles(
         push_vertex(indices[i + 2]);
     }
     return triangles;
+}
+
+std::vector<float> BuildRaytraceTriangles(
+    const std::vector<float>& points,
+    const std::vector<float>& normals,
+    const std::vector<float>& textures,
+    const std::vector<std::uint32_t>& indices)
+{
+    return BuildRaytraceTriangles(
+        points,
+        normals,
+        textures,
+        indices,
+        {1.0f, 1.0f, 1.0f, 1.0f});
 }
 
 std::vector<float> EvaluateSkinnedTriangles(

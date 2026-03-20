@@ -14,7 +14,9 @@ T LoadProtoFromJson(const std::string& json)
 {
     T proto{};
     google::protobuf::util::JsonParseOptions options{};
-    options.ignore_unknown_fields = false;
+    // Keep older level JSON files loadable while the proto drops legacy
+    // top-level fields that are now synthesized internally.
+    options.ignore_unknown_fields = true;
     auto status =
         google::protobuf::util::JsonStringToMessage(json, &proto, options);
     if (!status.ok())
