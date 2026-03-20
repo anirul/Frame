@@ -65,6 +65,36 @@ bool IsRaytracingProgram(const ProgramInterface* program)
     return frame::json::IsRaytracingProgramKey(key);
 }
 
+constexpr float kMaterialFactorEpsilon = 0.01f;
+constexpr float kDefaultIor = 1.5f;
+constexpr float kDefaultAttenuationDistance = 1000000.0f;
+
+bool NearlyEqual(float lhs, float rhs, float epsilon = kMaterialFactorEpsilon)
+{
+    return std::abs(lhs - rhs) <= epsilon;
+}
+
+bool NearlyEqual(
+    const glm::vec3& lhs,
+    const glm::vec3& rhs,
+    float epsilon = kMaterialFactorEpsilon)
+{
+    return NearlyEqual(lhs.x, rhs.x, epsilon) &&
+           NearlyEqual(lhs.y, rhs.y, epsilon) &&
+           NearlyEqual(lhs.z, rhs.z, epsilon);
+}
+
+bool NearlyEqual(
+    const glm::vec4& lhs,
+    const glm::vec4& rhs,
+    float epsilon = kMaterialFactorEpsilon)
+{
+    return NearlyEqual(lhs.x, rhs.x, epsilon) &&
+           NearlyEqual(lhs.y, rhs.y, epsilon) &&
+           NearlyEqual(lhs.z, rhs.z, epsilon) &&
+           NearlyEqual(lhs.w, rhs.w, epsilon);
+}
+
 EntityId SelectGltfProgramId(LevelInterface& level)
 {
     EntityId first_program_id = NullId;
@@ -1335,8 +1365,9 @@ std::vector<std::pair<EntityId, EntityId>> LoadMeshesFromGltfFile(
 
         auto use_scene_texture_or =
             [&](std::initializer_list<std::string_view> names,
-                EntityId fallback_texture_id) -> EntityId {
-                if (!prefer_scene_fallback_textures)
+                EntityId fallback_texture_id,
+                bool allow_scene_texture = true) -> EntityId {
+                if (!prefer_scene_fallback_textures || !allow_scene_texture)
                 {
                     return fallback_texture_id;
                 }
@@ -1348,7 +1379,8 @@ std::vector<std::pair<EntityId, EntityId>> LoadMeshesFromGltfFile(
             ? create_texture_from_source(*base_color_texture, "base_color")
             : use_scene_texture_or(
                   {"albedo_texture", "Color"},
-                  create_solid_texture(base_color_factor, "base_color"));
+                  create_solid_texture(base_color_factor, "base_color"),
+                  NearlyEqual(base_color_factor, glm::vec4(1.0f)));
         const EntityId normal_texture_id = normal_texture
             ? create_texture_from_source(*normal_texture, "normal")
             : use_scene_texture_or(
@@ -1366,7 +1398,8 @@ std::vector<std::pair<EntityId, EntityId>> LoadMeshesFromGltfFile(
                           roughness_factor,
                           roughness_factor,
                           1.0f),
-                      "roughness"));
+                      "roughness"),
+                  NearlyEqual(roughness_factor, 1.0f));
         const EntityId metallic_texture_id = metallic_texture
             ? create_texture_from_source(*metallic_texture, "metallic")
             : use_scene_texture_or(
@@ -1377,7 +1410,8 @@ std::vector<std::pair<EntityId, EntityId>> LoadMeshesFromGltfFile(
                           metallic_factor,
                           metallic_factor,
                           1.0f),
-                      "metallic"));
+                      "metallic"),
+                  NearlyEqual(metallic_factor, 0.0f));
         const EntityId ao_texture_id = ao_texture
             ? create_texture_from_source(*ao_texture, "ao")
             : use_scene_texture_or(
@@ -1389,7 +1423,8 @@ std::vector<std::pair<EntityId, EntityId>> LoadMeshesFromGltfFile(
                   {"specular_color_texture"},
                   create_solid_texture(
                       glm::vec4(specular_color, 1.0f),
-                      "specular_color"));
+                      "specular_color"),
+                  NearlyEqual(specular_color, glm::vec3(1.0f)));
         const EntityId specular_factor_texture_id = specular_texture
             ? specular_color_texture_id
             : use_scene_texture_or(
@@ -1400,7 +1435,8 @@ std::vector<std::pair<EntityId, EntityId>> LoadMeshesFromGltfFile(
                           specular_factor,
                           specular_factor,
                           specular_factor),
-                      "specular_factor"));
+                      "specular_factor"),
+                  NearlyEqual(specular_factor, 1.0f));
         const EntityId transmission_texture_id = transmission_texture
             ? create_texture_from_source(*transmission_texture, "transmission")
             : use_scene_texture_or(
@@ -1411,12 +1447,14 @@ std::vector<std::pair<EntityId, EntityId>> LoadMeshesFromGltfFile(
                           transmission_factor,
                           transmission_factor,
                           1.0f),
-                      "transmission"));
+                      "transmission"),
+                  NearlyEqual(transmission_factor, 0.0f));
         const EntityId ior_texture_id = use_scene_texture_or(
             {"ior_texture"},
             create_solid_texture(
                 glm::vec4(ior_factor, ior_factor, ior_factor, 1.0f),
-                "ior"));
+                "ior"),
+            NearlyEqual(ior_factor, kDefaultIor));
         const EntityId thickness_texture_id = thickness_texture
             ? create_texture_from_source(*thickness_texture, "thickness")
             : use_scene_texture_or(
@@ -1427,12 +1465,14 @@ std::vector<std::pair<EntityId, EntityId>> LoadMeshesFromGltfFile(
                           thickness_factor,
                           thickness_factor,
                           1.0f),
-                      "thickness"));
+                      "thickness"),
+                  NearlyEqual(thickness_factor, 0.0f));
         const EntityId attenuation_color_texture_id = use_scene_texture_or(
             {"attenuation_color_texture"},
             create_solid_texture(
                 glm::vec4(attenuation_color, 1.0f),
-                "attenuation_color"));
+                "attenuation_color"),
+            NearlyEqual(attenuation_color, glm::vec3(1.0f)));
         const EntityId attenuation_distance_texture_id = use_scene_texture_or(
             {"attenuation_distance_texture"},
             create_solid_texture(
@@ -1441,7 +1481,10 @@ std::vector<std::pair<EntityId, EntityId>> LoadMeshesFromGltfFile(
                     attenuation_distance,
                     attenuation_distance,
                     1.0f),
-                "attenuation_distance"));
+                "attenuation_distance"),
+            NearlyEqual(
+                attenuation_distance,
+                kDefaultAttenuationDistance));
 
         auto material = std::make_unique<frame::opengl::Material>();
         const std::string material_name_generated = std::format(
