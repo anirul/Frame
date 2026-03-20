@@ -109,6 +109,7 @@ struct HitInfo
     vec3 tangent_model;
     vec3 bitangent_model;
     vec2 uv;
+    vec4 color;
 };
 
 // ----------------------------------------------------------------------------
@@ -162,9 +163,10 @@ vec4 SampleTextureLod0(sampler2D sampler_texture, vec2 uv)
 
 vec3 SampleAlbedo(const HitInfo hit)
 {
-    return IsOpaque(hit)
+    vec3 base = IsOpaque(hit)
         ? SampleTextureLod0(opaque_albedo_texture, hit.uv).rgb
         : SampleTextureLod0(transmissive_albedo_texture, hit.uv).rgb;
+    return base * hit.color.rgb;
 }
 
 vec3 SampleNormalMap(const HitInfo hit)
@@ -530,6 +532,7 @@ HitInfo TraceScene(const vec3 ray_origin, const vec3 ray_dir)
     info.tangent_model = vec3(0.0);
     info.bitangent_model = vec3(0.0);
     info.uv = vec2(0.0);
+    info.color = vec4(1.0);
 
     float best_t = 1e20;
     vec2 best_bary = vec2(0.0);
@@ -639,6 +642,19 @@ HitInfo TraceScene(const vec3 ray_origin, const vec3 ray_dir)
         tri.v2.normal * best_bary.y);
     info.uv = tri.v0.uv * w + tri.v1.uv * best_bary.x +
               tri.v2.uv * best_bary.y;
+    info.color = vec4(
+        tri.v0.pad0 * w +
+            tri.v1.pad0 * best_bary.x +
+            tri.v2.pad0 * best_bary.y,
+        tri.v0.pad1 * w +
+            tri.v1.pad1 * best_bary.x +
+            tri.v2.pad1 * best_bary.y,
+        tri.v0.pad2.x * w +
+            tri.v1.pad2.x * best_bary.x +
+            tri.v2.pad2.x * best_bary.y,
+        tri.v0.pad2.y * w +
+            tri.v1.pad2.y * best_bary.x +
+            tri.v2.pad2.y * best_bary.y);
 
     vec3 edge1 = tri.v1.position - tri.v0.position;
     vec3 edge2 = tri.v2.position - tri.v0.position;
