@@ -212,6 +212,7 @@ SceneState BuildSceneState(
             auto& light = level.GetLightFromId(lights.front());
             state.light_dir = light.GetVector();
             state.light_color = light.GetColorIntensity();
+            state.light_type = static_cast<float>(light.GetType());
         }
     }
     catch (const std::exception& ex)
@@ -234,7 +235,7 @@ UniformBlock MakeUniformBlock(
     block.model_inv = glm::inverse(state.model);
     block.env_map_model = state.env_map_model;
     block.camera_position = glm::vec4(state.camera_position, 1.0f);
-    block.light_dir = glm::vec4(state.light_dir, 0.0f);
+    block.light_dir = glm::vec4(state.light_dir, state.light_type);
     block.light_color = glm::vec4(state.light_color, 1.0f);
     block.time_s = glm::vec4(elapsed_time_seconds, 0.0f, 0.0f, 0.0f);
     return block;

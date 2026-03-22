@@ -758,6 +758,9 @@ void Renderer::RenderMesh(
             std::make_unique<Uniform>("light_dir", light.GetVector()));
         uniform_collection_wrapper.AddUniform(
             std::make_unique<Uniform>(
+                "light_type", static_cast<int>(light.GetType())));
+        uniform_collection_wrapper.AddUniform(
+            std::make_unique<Uniform>(
                 "light_color", light.GetColorIntensity()));
     }
     if (render_time_ == proto::NodeMesh::SCENE_RENDER_TIME)
