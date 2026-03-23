@@ -159,8 +159,8 @@ message NodeLight {
 		DIRECTIONAL_LIGHT = 3;
 		SPOT_LIGHT = 4;
 	}
-	// The light type of this light.
-	LightTypeEnum light_type = 3;
+	// The light type of this light. This must be explicitly set.
+	optional LightTypeEnum light_type = 3;
 	
 	// Position of the light.
 	// not considered in case this is AMBIENT, DIRECTIONAL.

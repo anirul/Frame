@@ -33,6 +33,7 @@ struct SceneState
     glm::vec3 camera_position = glm::vec3(0.0f);
     glm::vec3 light_dir = glm::vec3(0.0f);
     glm::vec3 light_color = glm::vec3(1.0f);
+    float light_type = 0.0f;
 };
 
 SceneState BuildSceneState(

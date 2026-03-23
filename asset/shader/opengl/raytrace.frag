@@ -14,6 +14,7 @@ uniform vec3 camera_position;
 uniform mat4 env_map_model;
 // Direction from the light toward the scene.
 uniform vec3 light_dir;
+uniform int light_type;
 uniform vec3 light_color;
 uniform sampler2D opaque_albedo_texture;
 uniform sampler2D opaque_normal_texture;
@@ -86,6 +87,11 @@ layout(std430, binding = 3) buffer BvhBufferOpaque
 
 const int kMaterialTransmissive = 0;
 const int kMaterialOpaque = 1;
+const int kLightTypePoint = 2;
+const float kPointLightLinearAttenuation = 0.45;
+const float kPointLightQuadraticAttenuation = 0.35;
+const float kPointLightFadeStart = 3.5;
+const float kPointLightFadeEnd = 11.0;
 
 int TriangleCountTransmissive()
 {
@@ -285,6 +291,17 @@ vec3 ComputeAbsorption(const HitInfo hit, float travel)
     return exp(-attenuation_coeff * max(travel, 0.0));
 }
 
+float ComputePointLightVisibility(const float distance_to_light)
+{
+    float attenuation =
+        1.0 /
+        (1.0 + kPointLightLinearAttenuation * distance_to_light +
+         kPointLightQuadraticAttenuation * distance_to_light * distance_to_light);
+    float fade =
+        1.0 - smoothstep(kPointLightFadeStart, kPointLightFadeEnd, distance_to_light);
+    return attenuation * fade;
+}
+
 bool rayTriangleIntersect(
     const vec3 ray_origin,
     const vec3 ray_direction,
@@ -335,6 +352,7 @@ bool rayAabbIntersect(
 bool traverseTransmissiveBVH(
     const vec3 ray_origin,
     const vec3 ray_dir,
+    const float max_t,
     out float out_t,
     out vec2 out_bary,
     out int out_tri)
@@ -371,7 +389,8 @@ bool traverseTransmissiveBVH(
                         transmissive_triangles[tri_index],
                         t,
                         bary) &&
-                    t < out_t)
+                    t < out_t &&
+                    t < max_t)
                 {
                     out_t = t;
                     out_bary = bary;
@@ -398,6 +417,7 @@ bool traverseTransmissiveBVH(
 bool traverseOpaqueBVH(
     const vec3 ray_origin,
     const vec3 ray_dir,
+    const float max_t,
     out float out_t,
     out vec2 out_bary,
     out int out_tri)
@@ -434,7 +454,8 @@ bool traverseOpaqueBVH(
                         opaque_triangles[tri_index],
                         t,
                         bary) &&
-                    t < out_t)
+                    t < out_t &&
+                    t < max_t)
                 {
                     out_t = t;
                     out_bary = bary;
@@ -458,14 +479,14 @@ bool traverseOpaqueBVH(
     return hit;
 }
 
-bool anyHitTriangles(const vec3 ray_origin, const vec3 ray_dir)
+bool anyHitTriangles(const vec3 ray_origin, const vec3 ray_dir, const float max_t)
 {
     if (transmissive_nodes.length() > 0)
     {
         float t = 0.0;
         vec2 bary = vec2(0.0);
         int tri_index = -1;
-        if (traverseTransmissiveBVH(ray_origin, ray_dir, t, bary, tri_index))
+        if (traverseTransmissiveBVH(ray_origin, ray_dir, max_t, t, bary, tri_index))
         {
             return true;
         }
@@ -482,7 +503,8 @@ bool anyHitTriangles(const vec3 ray_origin, const vec3 ray_dir)
                     ray_dir,
                     transmissive_triangles[i],
                     t,
-                    bary))
+                    bary) &&
+                t < max_t)
             {
                 return true;
             }
@@ -493,7 +515,7 @@ bool anyHitTriangles(const vec3 ray_origin, const vec3 ray_dir)
         float t = 0.0;
         vec2 bary = vec2(0.0);
         int tri_index = -1;
-        if (traverseOpaqueBVH(ray_origin, ray_dir, t, bary, tri_index))
+        if (traverseOpaqueBVH(ray_origin, ray_dir, max_t, t, bary, tri_index))
         {
             return true;
         }
@@ -510,13 +532,19 @@ bool anyHitTriangles(const vec3 ray_origin, const vec3 ray_dir)
                     ray_dir,
                     opaque_triangles[i],
                     t,
-                    bary))
+                    bary) &&
+                t < max_t)
             {
                 return true;
             }
         }
     }
     return false;
+}
+
+bool anyHitTriangles(const vec3 ray_origin, const vec3 ray_dir)
+{
+    return anyHitTriangles(ray_origin, ray_dir, 1e20);
 }
 
 HitInfo TraceScene(const vec3 ray_origin, const vec3 ray_dir)
@@ -546,6 +574,7 @@ HitInfo TraceScene(const vec3 ray_origin, const vec3 ray_dir)
         if (traverseTransmissiveBVH(
                 ray_origin,
                 ray_dir,
+                1e20,
                 t,
                 bary,
                 tri_index) &&
@@ -587,6 +616,7 @@ HitInfo TraceScene(const vec3 ray_origin, const vec3 ray_dir)
         if (traverseOpaqueBVH(
                 ray_origin,
                 ray_dir,
+                1e20,
                 t,
                 bary,
                 tri_index) &&
@@ -739,6 +769,7 @@ vec3 ShadeOpaque(
     vec3 ray_dir_world,
     mat3 model_inv3,
     mat3 normal_matrix,
+    int scene_light_type,
     vec3 light_dir_world,
     vec3 light_color_world,
     mat3 env_rot_inv,
@@ -761,14 +792,43 @@ vec3 ShadeOpaque(
         hit_normal = N;
     }
 
-    vec3 dir = length(light_dir_world) > 0.0 ? light_dir_world
-                                             : vec3(1.0, -1.0, 1.0);
     vec3 col = length(light_color_world) > 0.0 ? light_color_world
                                                : vec3(1.0);
+    vec3 hit_pos_world = (model * vec4(hit.pos_model, 1.0)).xyz;
+    vec3 L = vec3(0.0, 1.0, 0.0);
+    vec3 shadow_dir = vec3(0.0, 1.0, 0.0);
+    float shadow_tmax = 1e20;
+    float light_visibility = 1.0;
 
-    vec3 shadow_dir = normalize(model_inv3 * -dir);
+    if (scene_light_type == kLightTypePoint)
+    {
+        vec3 to_light = light_dir_world - hit_pos_world;
+        float light_distance = length(to_light);
+        if (light_distance > 0.001)
+        {
+            L = to_light / light_distance;
+            shadow_dir = normalize(model_inv3 * L);
+            shadow_tmax = max(light_distance - 0.02, 0.0);
+            light_visibility = ComputePointLightVisibility(light_distance);
+        }
+    }
+    else
+    {
+        vec3 dir = length(light_dir_world) > 0.0 ? light_dir_world
+                                                 : vec3(1.0, -1.0, 1.0);
+        L = normalize(-dir);
+        shadow_dir = normalize(model_inv3 * -dir);
+    }
+
     vec3 shadow_origin = hit.pos_model + hit.normal_model * 0.0015;
-    bool in_shadow = anyHitTriangles(shadow_origin, shadow_dir);
+    bool in_shadow = false;
+    if (light_visibility > 0.0)
+    {
+        in_shadow = scene_light_type == kLightTypePoint
+            ? (shadow_tmax > 0.001 &&
+               anyHitTriangles(shadow_origin, shadow_dir, shadow_tmax))
+            : anyHitTriangles(shadow_origin, shadow_dir);
+    }
     float shadow_factor = in_shadow ? 0.3 : 1.0;
 
     vec3 albedo = SampleAlbedo(hit);
@@ -779,7 +839,6 @@ vec3 ShadeOpaque(
     vec3 specular_color = SampleSpecularColor(hit);
 
     vec3 V = normalize(-ray_dir_world);
-    vec3 L = normalize(-dir);
     vec3 H = normalize(V + L);
     vec3 dielectric_f0 = vec3(0.04) * specular_factor * specular_color;
     vec3 F0 = mix(dielectric_f0, albedo, metallic);
@@ -830,7 +889,12 @@ vec3 ShadeOpaque(
     vec3 Lo = diffuse * col * NdotL * shadow_factor +
               specular * col * NdotL * (in_shadow ? 0.0 : 1.0) +
               env_specular;
-    return ambient + Lo;
+    vec3 shaded = ambient + Lo;
+    if (scene_light_type == kLightTypePoint)
+    {
+        shaded *= light_visibility;
+    }
+    return shaded;
 }
 
 vec3 ShadeGlass(
@@ -838,6 +902,7 @@ vec3 ShadeGlass(
     vec3 ray_dir_world,
     mat3 model_inv3,
     mat3 normal_matrix,
+    int scene_light_type,
     vec3 light_dir_world,
     vec3 light_color_world,
     mat3 env_rot_inv,
@@ -893,6 +958,7 @@ vec3 ShadeGlass(
                 dir_world,
                 model_inv3,
                 normal_matrix,
+                scene_light_type,
                 light_dir_world,
                 light_color_world,
                 env_rot_inv,
@@ -1007,6 +1073,7 @@ void main()
             ray_dir_world,
             model_inv3,
             normal_matrix,
+            light_type,
             light_dir,
             light_color,
             env_rot_inv,
@@ -1020,6 +1087,7 @@ void main()
             ray_dir_world,
             model_inv3,
             normal_matrix,
+            light_type,
             light_dir,
             light_color,
             env_rot_inv,

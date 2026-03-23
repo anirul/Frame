@@ -342,6 +342,25 @@ class LevelInterface : public NameInterface
         std::unique_ptr<MeshInterface>&& mesh, EntityId id) = 0;
 };
 
+[[nodiscard]] inline EntityId FindPreferredRaytraceLightId(
+    const LevelInterface& level)
+{
+    const auto lights = level.GetLights();
+    if (lights.empty())
+    {
+        return NullId;
+    }
+    for (const auto light_id : lights)
+    {
+        if (level.GetLightFromId(light_id).GetType() ==
+            LightTypeEnum::POINT_LIGHT)
+        {
+            return light_id;
+        }
+    }
+    return lights.front();
+}
+
 } // End namespace frame.
 
 

@@ -1289,6 +1289,12 @@ void ApplyAnimationPlayback(
 [[nodiscard]] bool ParseNodeLight(
     LevelInterface& level, const proto::NodeLight& proto_scene_light)
 {
+    if (!proto_scene_light.has_light_type())
+    {
+        throw std::runtime_error(std::format(
+            "Light '{}' must explicitly set light_type.",
+            proto_scene_light.name()));
+    }
     switch (proto_scene_light.light_type())
     {
     case proto::NodeLight::POINT_LIGHT: {

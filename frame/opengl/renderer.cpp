@@ -751,11 +751,15 @@ void Renderer::RenderMesh(
     // In case the camera doesn't exist it will create a basic one.
     UniformCollectionWrapper uniform_collection_wrapper(
         projection, view, model_matrix, delta_time_);
-    if (level_.GetLights().size() > 0)
+    const auto light_id = FindPreferredRaytraceLightId(level_);
+    if (light_id != NullId)
     {
-        auto& light = level_.GetLightFromId(level_.GetLights()[0]);
+        auto& light = level_.GetLightFromId(light_id);
         uniform_collection_wrapper.AddUniform(
             std::make_unique<Uniform>("light_dir", light.GetVector()));
+        uniform_collection_wrapper.AddUniform(
+            std::make_unique<Uniform>(
+                "light_type", static_cast<int>(light.GetType())));
         uniform_collection_wrapper.AddUniform(
             std::make_unique<Uniform>(
                 "light_color", light.GetColorIntensity()));
