@@ -1374,49 +1374,56 @@ std::vector<std::pair<EntityId, EntityId>> LoadMeshesFromGltfFile(
                 const auto texture_id = find_level_texture(names);
                 return texture_id != NullId ? texture_id : fallback_texture_id;
             };
+        auto use_scene_texture_first_or =
+            [&](std::initializer_list<std::string_view> names,
+                EntityId fallback_texture_id) -> EntityId {
+                if (!prefer_scene_fallback_textures)
+                {
+                    return fallback_texture_id;
+                }
+                const auto texture_id = find_level_texture(names);
+                return texture_id != NullId ? texture_id : fallback_texture_id;
+            };
 
-        const EntityId base_texture_id = base_color_texture
-            ? create_texture_from_source(*base_color_texture, "base_color")
-            : use_scene_texture_or(
-                  {"albedo_texture", "Color"},
-                  create_solid_texture(base_color_factor, "base_color"),
-                  NearlyEqual(base_color_factor, glm::vec4(1.0f)));
-        const EntityId normal_texture_id = normal_texture
-            ? create_texture_from_source(*normal_texture, "normal")
-            : use_scene_texture_or(
-                  {"normal_texture"},
-                  create_solid_texture(
+        const EntityId base_texture_id = use_scene_texture_first_or(
+            {"albedo_texture", "Color"},
+            base_color_texture
+                ? create_texture_from_source(*base_color_texture, "base_color")
+                : create_solid_texture(base_color_factor, "base_color"));
+        const EntityId normal_texture_id = use_scene_texture_first_or(
+            {"normal_texture"},
+            normal_texture
+                ? create_texture_from_source(*normal_texture, "normal")
+                : create_solid_texture(
                       glm::vec4(0.5f, 0.5f, 1.0f, 1.0f),
                       "normal"));
-        const EntityId roughness_texture_id = roughness_texture
-            ? create_texture_from_source(*roughness_texture, "roughness")
-            : use_scene_texture_or(
-                  {"roughness_texture"},
-                  create_solid_texture(
+        const EntityId roughness_texture_id = use_scene_texture_first_or(
+            {"roughness_texture"},
+            roughness_texture
+                ? create_texture_from_source(*roughness_texture, "roughness")
+                : create_solid_texture(
                       glm::vec4(
                           roughness_factor,
                           roughness_factor,
                           roughness_factor,
                           1.0f),
-                      "roughness"),
-                  NearlyEqual(roughness_factor, 1.0f));
-        const EntityId metallic_texture_id = metallic_texture
-            ? create_texture_from_source(*metallic_texture, "metallic")
-            : use_scene_texture_or(
-                  {"metallic_texture"},
-                  create_solid_texture(
+                      "roughness"));
+        const EntityId metallic_texture_id = use_scene_texture_first_or(
+            {"metallic_texture"},
+            metallic_texture
+                ? create_texture_from_source(*metallic_texture, "metallic")
+                : create_solid_texture(
                       glm::vec4(
                           metallic_factor,
                           metallic_factor,
                           metallic_factor,
                           1.0f),
-                      "metallic"),
-                  NearlyEqual(metallic_factor, 0.0f));
-        const EntityId ao_texture_id = ao_texture
-            ? create_texture_from_source(*ao_texture, "ao")
-            : use_scene_texture_or(
-                  {"ao_texture"},
-                  create_solid_texture(glm::vec4(1.0f), "ao"));
+                      "metallic"));
+        const EntityId ao_texture_id = use_scene_texture_first_or(
+            {"ao_texture"},
+            ao_texture
+                ? create_texture_from_source(*ao_texture, "ao")
+                : create_solid_texture(glm::vec4(1.0f), "ao"));
         const EntityId specular_color_texture_id = specular_texture
             ? create_texture_from_source(*specular_texture, "specular")
             : use_scene_texture_or(
