@@ -5,7 +5,10 @@
 
 #include "frame/file/file_system.h"
 #include "frame/json/parse_level.h"
+#include "frame/level.h"
 #include "frame/logger.h"
+#include "frame/node_camera.h"
+#include "frame/node_light.h"
 #include "frame/vulkan/build_level.h"
 #include "frame/vulkan/scene_state.h"
 
@@ -67,6 +70,56 @@ TEST_F(VulkanSceneStateTest, CarriesLightInformation)
     EXPECT_NEAR(state.light_dir.x, 0.7071f, 1e-3f);
     EXPECT_NEAR(state.light_dir.y, -0.7071f, 1e-3f);
     EXPECT_NEAR(state.light_dir.z, 0.0f, 1e-3f);
+}
+
+TEST_F(VulkanSceneStateTest, PrefersPointLightInformationWhenAvailable)
+{
+    frame::Level level;
+    auto func = [&level](const std::string& name) -> frame::NodeInterface* {
+        auto id = level.GetIdFromName(name);
+        if (id == frame::NullId)
+        {
+            return nullptr;
+        }
+        return &level.GetSceneNodeFromId(id);
+    };
+
+    auto directional_light = std::make_unique<frame::NodeLight>(
+        func,
+        frame::LightTypeEnum::DIRECTIONAL_LIGHT,
+        glm::vec3(0.0f, -1.0f, 0.0f),
+        glm::vec3(1.0f, 1.0f, 1.0f));
+    directional_light->SetName("sun");
+    level.AddSceneNode(std::move(directional_light));
+
+    auto camera = std::make_unique<frame::NodeCamera>(
+        func,
+        glm::vec3(0.0f, 0.0f, 5.0f),
+        glm::vec3(0.0f, 0.0f, 0.0f));
+    camera->SetName("camera");
+    level.SetDefaultCameraName("camera");
+    level.AddSceneNode(std::move(camera));
+
+    auto point_light = std::make_unique<frame::NodeLight>(
+        func,
+        frame::LightTypeEnum::POINT_LIGHT,
+        glm::vec3(2.0f, 3.0f, 4.0f),
+        glm::vec3(1.0f, 0.8f, 0.6f));
+    point_light->SetName("torch");
+    level.AddSceneNode(std::move(point_light));
+
+    const auto state = frame::vulkan::BuildSceneState(
+        level,
+        frame::Logger::GetInstance(),
+        {320u, 200u},
+        0.0f,
+        frame::NullId,
+        true);
+
+    EXPECT_FLOAT_EQ(
+        state.light_type,
+        static_cast<float>(frame::LightTypeEnum::POINT_LIGHT));
+    EXPECT_EQ(state.light_dir, glm::vec3(2.0f, 3.0f, 4.0f));
 }
 
 } // namespace test

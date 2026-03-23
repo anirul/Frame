@@ -206,10 +206,10 @@ SceneState BuildSceneState(
 
     try
     {
-        const auto lights = level.GetLights();
-        if (!lights.empty())
+        const auto light_id = frame::FindPreferredRaytraceLightId(level);
+        if (light_id != frame::NullId)
         {
-            auto& light = level.GetLightFromId(lights.front());
+            auto& light = level.GetLightFromId(light_id);
             state.light_dir = light.GetVector();
             state.light_color = light.GetColorIntensity();
             state.light_type = static_cast<float>(light.GetType());

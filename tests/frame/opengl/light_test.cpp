@@ -92,4 +92,40 @@ TEST_F(LightTest, DirectionalLightUsesParentRotation)
     EXPECT_NEAR(1.0f, glm::length(dir), 1e-5f);
 }
 
+TEST_F(LightTest, RaytracingPrefersPointLightWhenAvailable)
+{
+    frame::Level level;
+    auto func = [&level](const std::string& name) -> frame::NodeInterface* {
+        auto id = level.GetIdFromName(name);
+        if (id == frame::NullId)
+        {
+            return nullptr;
+        }
+        return &level.GetSceneNodeFromId(id);
+    };
+
+    auto directional_light = std::make_unique<frame::NodeLight>(
+        func,
+        frame::LightTypeEnum::DIRECTIONAL_LIGHT,
+        glm::vec3(0.0f, -1.0f, 0.0f),
+        glm::vec3(1.0f, 1.0f, 1.0f));
+    directional_light->SetName("sun");
+    level.AddSceneNode(std::move(directional_light));
+
+    auto point_light = std::make_unique<frame::NodeLight>(
+        func,
+        frame::LightTypeEnum::POINT_LIGHT,
+        glm::vec3(2.0f, 3.0f, 4.0f),
+        glm::vec3(1.0f, 0.8f, 0.6f));
+    point_light->SetName("torch");
+    level.AddSceneNode(std::move(point_light));
+
+    const auto selected_id = frame::FindPreferredRaytraceLightId(level);
+    ASSERT_NE(selected_id, frame::NullId);
+
+    const auto& light = level.GetLightFromId(selected_id);
+    EXPECT_EQ(light.GetType(), frame::LightTypeEnum::POINT_LIGHT);
+    EXPECT_EQ(light.GetVector(), glm::vec3(2.0f, 3.0f, 4.0f));
+}
+
 } // End namespace test.
