@@ -30,9 +30,30 @@ TEST_F(ParseSceneTreeTest, RejectNodeMatrixWithoutExplicitMatrixType)
 
     level_ = std::make_unique<frame::Level>();
     EXPECT_THROW(
-        frame::json::ParseSceneTreeFile(
+        static_cast<void>(frame::json::ParseSceneTreeFile(
             proto_scene_tree,
-            dynamic_cast<frame::LevelInterface&>(*level_.get())),
+            dynamic_cast<frame::LevelInterface&>(*level_.get()))),
+        std::runtime_error);
+}
+
+TEST_F(ParseSceneTreeTest, RejectNodeLightWithoutExplicitLightType)
+{
+    auto proto_scene_tree = proto_level_.scene_tree();
+    auto* proto_light = proto_scene_tree.add_node_lights();
+    proto_light->set_name("missing-light-type");
+    proto_light->mutable_position()->set_x(0.0f);
+    proto_light->mutable_position()->set_y(0.0f);
+    proto_light->mutable_position()->set_z(0.0f);
+    proto_light->mutable_color()->set_x(1.0f);
+    proto_light->mutable_color()->set_y(1.0f);
+    proto_light->mutable_color()->set_z(1.0f);
+    proto_light->clear_light_type();
+
+    level_ = std::make_unique<frame::Level>();
+    EXPECT_THROW(
+        static_cast<void>(frame::json::ParseSceneTreeFile(
+            proto_scene_tree,
+            dynamic_cast<frame::LevelInterface&>(*level_.get()))),
         std::runtime_error);
 }
 

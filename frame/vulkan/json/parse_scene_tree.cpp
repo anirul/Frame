@@ -3337,6 +3337,12 @@ bool ParseNodeLight(
     LevelInterface& level,
     const frame::proto::NodeLight& proto_light)
 {
+    if (!proto_light.has_light_type())
+    {
+        throw std::runtime_error(std::format(
+            "Light '{}' must explicitly set light_type.",
+            proto_light.name()));
+    }
     switch (proto_light.light_type())
     {
     case frame::proto::NodeLight::POINT_LIGHT: {
