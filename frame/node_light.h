@@ -25,8 +25,7 @@ class NodeLight : public NodeInterface, public Serialize<proto::NodeLight>
      */
     NodeLight(
         std::function<NodeInterface*(const std::string&)> func,
-        const glm::vec3 color,
-        const bool use_for_raytracing);
+        const glm::vec3 color);
     /**
      * @brief Create a point or directional light.
      * @param func: This function return the ID from a string (it will need
@@ -35,14 +34,12 @@ class NodeLight : public NodeInterface, public Serialize<proto::NodeLight>
      * @param position_or_direction: Position (if point light) or direction
      *        (if directional light).
      * @param color: Color of the light in vec3 format.
-     * @param use_for_raytracing: Explicit raytracing-light selector.
      */
     NodeLight(
         std::function<NodeInterface*(const std::string&)> func,
         const frame::LightTypeEnum light_type,
         const glm::vec3 position_or_direction,
-        const glm::vec3 color,
-        const bool use_for_raytracing);
+        const glm::vec3 color);
     /**
      * @brief Create a spot light.
      * @param func: This function return the ID from a string (it will need
@@ -52,7 +49,6 @@ class NodeLight : public NodeInterface, public Serialize<proto::NodeLight>
      * @param color: Color in a vec3 format.
      * @param dot_inner_limit: Inner limit of the total light in dot format.
      * @param dot_outer_limit: Outer limit of the total light in dot format.
-     * @param use_for_raytracing: Explicit raytracing-light selector.
      */
     NodeLight(
         std::function<NodeInterface*(const std::string&)> func,
@@ -60,8 +56,7 @@ class NodeLight : public NodeInterface, public Serialize<proto::NodeLight>
         const glm::vec3 direction,
         const glm::vec3 color,
         const float dot_inner_limit,
-        const float dot_outer_limit,
-        const bool use_for_raytracing);
+        const float dot_outer_limit);
     //! @brief Virtual destructor.
     ~NodeLight() override;
 

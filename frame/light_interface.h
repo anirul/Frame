@@ -51,11 +51,6 @@ struct LightInterface : public NameInterface
      */
     virtual ShadowTypeEnum GetShadowType() const = 0;
     /**
-     * @brief Get whether this light should be used for raytracing.
-     * @return True when this light is explicitly selected for raytracing.
-     */
-    virtual bool GetUseForRaytracing() const = 0;
-    /**
      * @brief Get the position of the light or the direction in case this is
      * a directional light.
      * @return Return the position of a light.

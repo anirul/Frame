@@ -152,7 +152,6 @@
                 "name": "sun",
                 "parent": "env_holder",
                 "light_type": "DIRECTIONAL_LIGHT",
-                "use_for_raytracing": true,
                 "shadow_type": "HARD_SHADOW",
                 "direction": {
                     "x": 1.0,

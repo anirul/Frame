@@ -1289,12 +1289,6 @@ void ApplyAnimationPlayback(
 [[nodiscard]] bool ParseNodeLight(
     LevelInterface& level, const proto::NodeLight& proto_scene_light)
 {
-    if (!proto_scene_light.has_use_for_raytracing())
-    {
-        throw std::runtime_error(std::format(
-            "Light '{}' must set use_for_raytracing.",
-            proto_scene_light.name()));
-    }
     switch (proto_scene_light.light_type())
     {
     case proto::NodeLight::POINT_LIGHT: {
@@ -1303,8 +1297,7 @@ void ApplyAnimationPlayback(
             GetFunctor(level),
             LightTypeEnum::POINT_LIGHT,
             ParseUniform(proto_scene_light.position()),
-            ParseUniform(proto_scene_light.color()),
-            proto_scene_light.use_for_raytracing());
+            ParseUniform(proto_scene_light.color()));
         node_light->GetData().set_name(proto_scene_light.name());
         node_light->SetParentName(proto_scene_light.parent());
         node_light->GetData().set_shadow_type(proto_scene_light.shadow_type());
@@ -1317,8 +1310,7 @@ void ApplyAnimationPlayback(
             GetFunctor(level),
             LightTypeEnum::DIRECTIONAL_LIGHT,
             ParseUniform(proto_scene_light.direction()),
-            ParseUniform(proto_scene_light.color()),
-            proto_scene_light.use_for_raytracing());
+            ParseUniform(proto_scene_light.color()));
         node_light->GetData().set_name(proto_scene_light.name());
         node_light->SetParentName(proto_scene_light.parent());
         node_light->GetData().set_shadow_type(proto_scene_light.shadow_type());

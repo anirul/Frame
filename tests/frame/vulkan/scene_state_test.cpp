@@ -72,7 +72,7 @@ TEST_F(VulkanSceneStateTest, CarriesLightInformation)
     EXPECT_NEAR(state.light_dir.z, 0.0f, 1e-3f);
 }
 
-TEST_F(VulkanSceneStateTest, UsesExplicitPointLightSpecifier)
+TEST_F(VulkanSceneStateTest, PrefersPointLightInformationWhenAvailable)
 {
     frame::Level level;
     auto func = [&level](const std::string& name) -> frame::NodeInterface* {
@@ -88,8 +88,7 @@ TEST_F(VulkanSceneStateTest, UsesExplicitPointLightSpecifier)
         func,
         frame::LightTypeEnum::DIRECTIONAL_LIGHT,
         glm::vec3(0.0f, -1.0f, 0.0f),
-        glm::vec3(1.0f, 1.0f, 1.0f),
-        false);
+        glm::vec3(1.0f, 1.0f, 1.0f));
     directional_light->SetName("sun");
     level.AddSceneNode(std::move(directional_light));
 
@@ -105,8 +104,7 @@ TEST_F(VulkanSceneStateTest, UsesExplicitPointLightSpecifier)
         func,
         frame::LightTypeEnum::POINT_LIGHT,
         glm::vec3(2.0f, 3.0f, 4.0f),
-        glm::vec3(1.0f, 0.8f, 0.6f),
-        true);
+        glm::vec3(1.0f, 0.8f, 0.6f));
     point_light->SetName("torch");
     level.AddSceneNode(std::move(point_light));
 

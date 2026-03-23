@@ -2,7 +2,6 @@
 
 #include <memory>
 #include <optional>
-#include <stdexcept>
 #include <unordered_map>
 
 #include "frame/buffer_interface.h"
@@ -343,7 +342,7 @@ class LevelInterface : public NameInterface
         std::unique_ptr<MeshInterface>&& mesh, EntityId id) = 0;
 };
 
-[[nodiscard]] inline EntityId FindRaytracingLightId(
+[[nodiscard]] inline EntityId FindPreferredRaytraceLightId(
     const LevelInterface& level)
 {
     const auto lights = level.GetLights();
@@ -351,25 +350,15 @@ class LevelInterface : public NameInterface
     {
         return NullId;
     }
-    EntityId selected_light_id = NullId;
     for (const auto light_id : lights)
     {
-        if (level.GetLightFromId(light_id).GetUseForRaytracing())
+        if (level.GetLightFromId(light_id).GetType() ==
+            LightTypeEnum::POINT_LIGHT)
         {
-            if (selected_light_id != NullId)
-            {
-                throw std::runtime_error(
-                    "Multiple lights are marked use_for_raytracing.");
-            }
-            selected_light_id = light_id;
+            return light_id;
         }
     }
-    if (selected_light_id == NullId)
-    {
-        throw std::runtime_error(
-            "Scene lights must explicitly set use_for_raytracing.");
-    }
-    return selected_light_id;
+    return lights.front();
 }
 
 } // End namespace frame.

@@ -27,11 +27,9 @@ class LightPoint : public LightInterface
     LightPoint(
         const glm::vec3 position,
         const glm::vec3 color_intensity,
-        const bool use_for_raytracing,
         ShadowTypeEnum shadow_type_enum = ShadowTypeEnum::NO_SHADOW)
         : position_(position), color_intensity_(color_intensity),
-          shadow_type_enum_(shadow_type_enum),
-          use_for_raytracing_(use_for_raytracing)
+          shadow_type_enum_(shadow_type_enum)
     {
     }
 
@@ -68,10 +66,6 @@ class LightPoint : public LightInterface
     {
         return shadow_type_enum_;
     }
-    bool GetUseForRaytracing() const override
-    {
-        return use_for_raytracing_;
-    }
     /**
      * @brief Get the position of the light, coming from the light
      * interface.
@@ -104,7 +98,6 @@ class LightPoint : public LightInterface
     glm::vec3 position_;
     glm::vec3 color_intensity_;
     ShadowTypeEnum shadow_type_enum_ = ShadowTypeEnum::NO_SHADOW;
-    bool use_for_raytracing_ = false;
     std::string name_;
 };
 
@@ -125,11 +118,9 @@ class LightDirectional : public LightInterface
     LightDirectional(
         const glm::vec3 direction,
         const glm::vec3 color_intensity,
-        const bool use_for_raytracing,
         ShadowTypeEnum shadow_type_enum = ShadowTypeEnum::NO_SHADOW)
         : direction_(direction), color_intensity_(color_intensity),
-          shadow_type_enum_(shadow_type_enum),
-          use_for_raytracing_(use_for_raytracing)
+          shadow_type_enum_(shadow_type_enum)
     {
     }
 
@@ -166,10 +157,6 @@ class LightDirectional : public LightInterface
     {
         return shadow_type_enum_;
     }
-    bool GetUseForRaytracing() const override
-    {
-        return use_for_raytracing_;
-    }
     /**
      * @brief Get the position of the light, coming from the light
      * interface.
@@ -202,7 +189,6 @@ class LightDirectional : public LightInterface
     glm::vec3 direction_;
     glm::vec3 color_intensity_;
     ShadowTypeEnum shadow_type_enum_ = ShadowTypeEnum::NO_SHADOW;
-    bool use_for_raytracing_ = false;
     std::string name_;
 };
 
