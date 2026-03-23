@@ -870,6 +870,51 @@ TEST_F(VulkanRayTracingParseTest, DragonSceneUsesSceneFallbackPbrTextures)
     EXPECT_EQ(ao_id, level.GetIdFromName("ao_texture"));
 }
 
+TEST(VulkanRayTracingTintedMeshTest, ImportedBaseColorTintOverridesColorTexture)
+{
+    const auto asset_root = frame::file::FindDirectory("asset");
+    const auto level_path = frame::file::FindFile("asset/json/tinted_mesh.json");
+    const auto level_proto = frame::json::LoadLevelProto(level_path);
+    const auto level_data = frame::json::ParseLevelData(
+        glm::uvec2(512, 288), level_proto, asset_root);
+
+    auto built = frame::vulkan::BuildLevel(glm::uvec2(512, 288), level_data);
+    ASSERT_NE(built.level, nullptr);
+    auto& level = *built.level;
+
+    const auto tinted_material_id = FindMaterialForNode(
+        level,
+        frame::proto::NodeMesh::PRE_RENDER_TIME,
+        "TintedTriangle");
+    ASSERT_NE(tinted_material_id, frame::NullId);
+    const auto& tinted_material = level.GetMaterialFromId(tinted_material_id);
+
+    auto tinted_albedo_id = FindTextureByInnerName(
+        tinted_material, "albedo_texture");
+    if (tinted_albedo_id == frame::NullId)
+    {
+        tinted_albedo_id = FindTextureByInnerName(tinted_material, "Color");
+    }
+    ASSERT_NE(tinted_albedo_id, frame::NullId);
+
+    const auto fallback_color_id = level.GetIdFromName("Color");
+    ASSERT_NE(fallback_color_id, frame::NullId);
+    EXPECT_NE(tinted_albedo_id, fallback_color_id);
+
+    const auto tinted_albedo = ReadTextureRgb(level, tinted_albedo_id);
+    EXPECT_NEAR(tinted_albedo[0], 1.0f, 0.02f);
+    EXPECT_NEAR(tinted_albedo[1], 0.0f, 0.02f);
+    EXPECT_NEAR(tinted_albedo[2], 0.0f, 0.02f);
+
+    const auto scene_material_id = level.GetIdFromName("RayTraceMaterial");
+    ASSERT_NE(scene_material_id, frame::NullId);
+    const auto& scene_material = level.GetMaterialFromId(scene_material_id);
+    const auto scene_albedo_id = FindTextureByInnerName(
+        scene_material, "opaque_albedo_texture");
+    ASSERT_NE(scene_albedo_id, frame::NullId);
+    EXPECT_EQ(scene_albedo_id, tinted_albedo_id);
+}
+
 TEST_F(VulkanRayTracingParseTest, HardwarePreferredBuildSkipsCpuBvhData)
 {
     auto built = frame::vulkan::BuildLevel(
