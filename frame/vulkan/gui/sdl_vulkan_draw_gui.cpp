@@ -167,24 +167,32 @@ void SDLVulkanDrawGui::EnsureRendererBackend()
     init_info.Device = static_cast<VkDevice>(vk_device);
     init_info.QueueFamily = vulkan_device_.GetGraphicsQueueFamilyIndex();
     init_info.Queue = static_cast<VkQueue>(vulkan_device_.GetGraphicsQueue());
-    init_info.RenderPass = render_pass;
     init_info.PipelineCache = VK_NULL_HANDLE;
     init_info.DescriptorPool = static_cast<VkDescriptorPool>(descriptor_pool_.get());
-    init_info.Subpass = 0;
     init_info.MinImageCount = std::max(kDefaultMinImageCount, image_count);
     init_info.ImageCount = image_count;
-    init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
     init_info.Allocator = nullptr;
     init_info.CheckVkResultFn = CheckVkResult;
+#if IMGUI_VERSION_NUM >= 19240
+    init_info.PipelineInfoMain.RenderPass = render_pass;
+    init_info.PipelineInfoMain.Subpass = 0;
+    init_info.PipelineInfoMain.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
+#else
+    init_info.RenderPass = render_pass;
+    init_info.Subpass = 0;
+    init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
+#endif
 
     if (!ImGui_ImplVulkan_Init(&init_info))
     {
         throw std::runtime_error("Failed to initialize ImGui Vulkan backend.");
     }
+#if IMGUI_VERSION_NUM < 19200
     if (!ImGui_ImplVulkan_CreateFontsTexture())
     {
         throw std::runtime_error("Failed to upload ImGui Vulkan font texture.");
     }
+#endif
 
     renderer_initialized_ = true;
     renderer_render_pass_ = render_pass;
@@ -208,7 +216,9 @@ void SDLVulkanDrawGui::ShutdownRendererBackend()
     }
 
     ClearTextureBindings();
+#if IMGUI_VERSION_NUM < 19200
     ImGui_ImplVulkan_DestroyFontsTexture();
+#endif
     ImGui_ImplVulkan_Shutdown();
     descriptor_pool_.reset();
     renderer_initialized_ = false;
