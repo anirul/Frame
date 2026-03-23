@@ -186,6 +186,9 @@ message NodeLight {
 
 	// Shadow type for the light.
 	ShadowTypeEnum shadow_type = 9;
+	// Must be explicitly set for every scene light. Exactly one light in a
+	// lit scene should be used for raytracing.
+	optional bool use_for_raytracing = 10;
 }
 
 // Scene definition.

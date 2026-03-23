@@ -70,6 +70,8 @@ proto::NodeLight SerializeNodeLight(const NodeInterface& node_interface)
     proto_scene_light.set_dot_outer_limit(
         node_light.GetData().dot_outer_limit());
     *proto_scene_light.mutable_color() = node_light.GetData().color();
+    proto_scene_light.set_use_for_raytracing(
+        node_light.GetData().use_for_raytracing());
     return proto_scene_light;
 }
 

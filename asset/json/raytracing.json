@@ -184,6 +184,7 @@
                 "name": "sun",
                 "parent": "root",
                 "light_type": "DIRECTIONAL_LIGHT",
+                "use_for_raytracing": true,
                 "shadow_type": "HARD_SHADOW",
                 "direction": {
                     "x": 1.0,

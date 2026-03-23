@@ -206,7 +206,7 @@ SceneState BuildSceneState(
 
     try
     {
-        const auto light_id = frame::FindPreferredRaytraceLightId(level);
+        const auto light_id = frame::FindRaytracingLightId(level);
         if (light_id != frame::NullId)
         {
             auto& light = level.GetLightFromId(light_id);

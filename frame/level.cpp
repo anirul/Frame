@@ -187,6 +187,7 @@ EntityId Level::AddSceneNode(std::unique_ptr<NodeInterface>&& scene_node)
             light = std::make_unique<opengl::LightPoint>(
                 pos,
                 json::ParseUniform(data.color()),
+                data.use_for_raytracing(),
                 static_cast<ShadowTypeEnum>(data.shadow_type()));
             break;
         }
@@ -198,6 +199,7 @@ EntityId Level::AddSceneNode(std::unique_ptr<NodeInterface>&& scene_node)
             light = std::make_unique<opengl::LightDirectional>(
                 world_dir,
                 json::ParseUniform(data.color()),
+                data.use_for_raytracing(),
                 static_cast<ShadowTypeEnum>(data.shadow_type()));
             break;
         }

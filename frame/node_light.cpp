@@ -12,10 +12,12 @@ NodeLight::~NodeLight() = default;
 
 NodeLight::NodeLight(
     std::function<NodeInterface*(const std::string&)> func,
-    const glm::vec3 color)
+    const glm::vec3 color,
+    const bool use_for_raytracing)
     : NodeInterface(func)
 {
     data_.set_light_type(proto::NodeLight::AMBIENT_LIGHT);
+    data_.set_use_for_raytracing(use_for_raytracing);
     proto::UniformVector3 proto_uniform_vector3;
     proto_uniform_vector3.set_x(color.x);
     proto_uniform_vector3.set_y(color.y);
@@ -27,11 +29,13 @@ NodeLight::NodeLight(
     std::function<NodeInterface*(const std::string&)> func,
     const LightTypeEnum light_type,
     const glm::vec3 position_or_direction,
-    const glm::vec3 color)
+    const glm::vec3 color,
+    const bool use_for_raytracing)
     : NodeInterface(func)
 {
     data_.set_light_type(
         static_cast<proto::NodeLight::LightTypeEnum>(light_type));
+    data_.set_use_for_raytracing(use_for_raytracing);
     data_.mutable_color()->CopyFrom(json::SerializeUniformVector3(color));
     switch (data_.light_type())
     {
@@ -57,12 +61,14 @@ NodeLight::NodeLight(
     const glm::vec3 direction,
     const glm::vec3 color,
     const float dot_inner_limit,
-    const float dot_outer_limit)
+    const float dot_outer_limit,
+    const bool use_for_raytracing)
     : NodeInterface(func)
 {
     data_.set_light_type(
         static_cast<proto::NodeLight::LightTypeEnum>(
             LightTypeEnum::SPOT_LIGHT));
+    data_.set_use_for_raytracing(use_for_raytracing);
     data_.mutable_position()->CopyFrom(json::SerializeUniformVector3(position));
     data_.mutable_direction()->CopyFrom(
         json::SerializeUniformVector3(direction));

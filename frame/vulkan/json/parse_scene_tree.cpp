@@ -3337,6 +3337,12 @@ bool ParseNodeLight(
     LevelInterface& level,
     const frame::proto::NodeLight& proto_light)
 {
+    if (!proto_light.has_use_for_raytracing())
+    {
+        throw std::runtime_error(std::format(
+            "Light '{}' must set use_for_raytracing.",
+            proto_light.name()));
+    }
     switch (proto_light.light_type())
     {
     case frame::proto::NodeLight::POINT_LIGHT: {
@@ -3344,7 +3350,8 @@ bool ParseNodeLight(
             MakeResolver(level),
             frame::LightTypeEnum::POINT_LIGHT,
             frame::json::ParseUniform(proto_light.position()),
-            frame::json::ParseUniform(proto_light.color()));
+            frame::json::ParseUniform(proto_light.color()),
+            proto_light.use_for_raytracing());
         light->GetData().set_name(proto_light.name());
         light->SetParentName(proto_light.parent());
         light->GetData().set_shadow_type(proto_light.shadow_type());
@@ -3355,7 +3362,8 @@ bool ParseNodeLight(
             MakeResolver(level),
             frame::LightTypeEnum::DIRECTIONAL_LIGHT,
             frame::json::ParseUniform(proto_light.direction()),
-            frame::json::ParseUniform(proto_light.color()));
+            frame::json::ParseUniform(proto_light.color()),
+            proto_light.use_for_raytracing());
         light->GetData().set_name(proto_light.name());
         light->SetParentName(proto_light.parent());
         light->GetData().set_shadow_type(proto_light.shadow_type());
