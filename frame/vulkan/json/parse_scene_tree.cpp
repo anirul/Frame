@@ -128,6 +128,93 @@ bool NearlyEqual(
            NearlyEqual(lhs.w, rhs.w, epsilon);
 }
 
+std::uint8_t ComponentCount(frame::proto::PixelStructure::Enum structure)
+{
+    switch (structure)
+    {
+    case frame::proto::PixelStructure::GREY:
+    case frame::proto::PixelStructure::DEPTH:
+        return 1;
+    case frame::proto::PixelStructure::GREY_ALPHA:
+        return 2;
+    case frame::proto::PixelStructure::RGB:
+    case frame::proto::PixelStructure::BGR:
+        return 3;
+    case frame::proto::PixelStructure::RGB_ALPHA:
+    case frame::proto::PixelStructure::BGR_ALPHA:
+        return 4;
+    default:
+        return 0;
+    }
+}
+
+template <typename T>
+glm::vec3 ReadFirstRgbSample(
+    const std::vector<T>& data,
+    frame::proto::PixelStructure::Enum structure,
+    float scale)
+{
+    const std::uint8_t component_count = ComponentCount(structure);
+    if (component_count == 0 || data.size() < component_count)
+    {
+        return glm::vec3(0.0f);
+    }
+
+    auto component = [&](std::size_t index) {
+        return static_cast<float>(data[index]) / scale;
+    };
+
+    switch (structure)
+    {
+    case frame::proto::PixelStructure::GREY:
+    case frame::proto::PixelStructure::DEPTH:
+    case frame::proto::PixelStructure::GREY_ALPHA:
+        return glm::vec3(component(0));
+    case frame::proto::PixelStructure::RGB:
+    case frame::proto::PixelStructure::RGB_ALPHA:
+        return glm::vec3(component(0), component(1), component(2));
+    case frame::proto::PixelStructure::BGR:
+    case frame::proto::PixelStructure::BGR_ALPHA:
+        return glm::vec3(component(2), component(1), component(0));
+    default:
+        return glm::vec3(0.0f);
+    }
+}
+
+glm::vec3 ReadFirstTextureRgb(TextureInterface& texture)
+{
+    const auto structure = texture.GetData().pixel_structure().value();
+    switch (texture.GetData().pixel_element_size().value())
+    {
+    case frame::proto::PixelElementSize::FLOAT:
+        return ReadFirstRgbSample(texture.GetTextureFloat(), structure, 1.0f);
+    case frame::proto::PixelElementSize::SHORT:
+    case frame::proto::PixelElementSize::HALF:
+        return ReadFirstRgbSample(
+            texture.GetTextureWord(), structure, 65535.0f);
+    case frame::proto::PixelElementSize::BYTE:
+    default:
+        return ReadFirstRgbSample(
+            texture.GetTextureByte(), structure, 255.0f);
+    }
+}
+
+bool IsNeutralBaseFallbackTexture(TextureInterface& texture)
+{
+    if (texture.GetData().has_file_name() || texture.GetData().cubemap())
+    {
+        return false;
+    }
+
+    const glm::uvec2 size = texture.GetSize();
+    if (size.x != 1u || size.y != 1u)
+    {
+        return false;
+    }
+
+    return NearlyEqual(ReadFirstTextureRgb(texture), glm::vec3(1.0f));
+}
+
 std::optional<std::string> ResolveSamplerNameForTexture(
     const ProgramInterface& program,
     const std::string& texture_name)
@@ -2570,11 +2657,38 @@ bool ParseNodeMesh(
                     return texture_id != NullId ? texture_id : fallback_texture_id;
                 };
 
-            const EntityId base_texture_id = use_scene_texture_first_or(
-                {"albedo_texture", "Color"},
-                base_color_texture
-                    ? create_texture_from_source(*base_color_texture, "base_color")
-                    : create_solid_texture(base_color_factor, "base_color"));
+            const EntityId imported_base_texture_id = base_color_texture
+                ? create_texture_from_source(*base_color_texture, "base_color")
+                : create_solid_texture(base_color_factor, "base_color");
+            const bool imported_base_is_authored =
+                base_color_texture.has_value() ||
+                !NearlyEqual(base_color_factor, glm::vec4(1.0f));
+            const EntityId base_texture_id = [&]() -> EntityId {
+                if (!prefer_scene_fallback_textures)
+                {
+                    return imported_base_texture_id;
+                }
+
+                for (const std::string_view texture_name :
+                     {"albedo_texture", "Color"})
+                {
+                    const auto texture_id = find_level_texture({texture_name});
+                    if (texture_id == NullId)
+                    {
+                        continue;
+                    }
+                    if (imported_base_is_authored)
+                    {
+                        auto& scene_texture = level.GetTextureFromId(texture_id);
+                        if (IsNeutralBaseFallbackTexture(scene_texture))
+                        {
+                            continue;
+                        }
+                    }
+                    return texture_id;
+                }
+                return imported_base_texture_id;
+            }();
             const EntityId normal_texture_id = use_scene_texture_first_or(
                 {"normal_texture"},
                 normal_texture

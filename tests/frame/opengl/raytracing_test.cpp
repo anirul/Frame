@@ -186,16 +186,19 @@ std::array<float, 3> ReadTextureRgb(
 }
 
 std::vector<std::uint8_t> RenderOutputBytes(
-    frame::LevelInterface& level, double time_seconds = 0.0)
+    frame::LevelInterface& level,
+    double time_seconds = 0.0,
+    int width = 1280,
+    int height = 720)
 {
     frame::opengl::Renderer renderer(
         level,
-        glm::uvec4(0, 0, 1280, 720));
+        glm::uvec4(0, 0, width, height));
     renderer.SetDepthTest(true);
     renderer.SetDeltaTime(time_seconds);
 
     frame::Camera camera(level.GetDefaultCamera());
-    camera.SetAspectRatio(1280.0f / 720.0f);
+    camera.SetAspectRatio(static_cast<float>(width) / height);
     renderer.PreRender();
     renderer.RenderSkybox(camera);
     renderer.RenderScene(camera);
@@ -219,6 +222,121 @@ std::vector<std::uint8_t> RenderOutputBytes(
         throw std::runtime_error("Expected byte output texture for OpenGL render test.");
     }
     return output_texture->GetTextureByte();
+}
+
+struct PixelColorStats
+{
+    std::array<double, 3> average = {0.0, 0.0, 0.0};
+    std::size_t sample_count = 0;
+    int center_x = -1;
+    int center_y = -1;
+    bool flip_y = false;
+};
+
+int InferPixelStride(
+    const std::vector<std::uint8_t>& frame_bytes, int width, int height)
+{
+    if (width <= 0 || height <= 0)
+    {
+        return 0;
+    }
+
+    const std::size_t pixel_count =
+        static_cast<std::size_t>(width) * static_cast<std::size_t>(height);
+    if (pixel_count == 0 || frame_bytes.size() % pixel_count != 0)
+    {
+        return 0;
+    }
+
+    return static_cast<int>(frame_bytes.size() / pixel_count);
+}
+
+PixelColorStats SampleFramePatch(
+    const std::vector<std::uint8_t>& frame_bytes,
+    int width,
+    int height,
+    int center_x,
+    int center_y,
+    int radius,
+    bool flip_y)
+{
+    PixelColorStats stats = {};
+    stats.center_x = center_x;
+    stats.center_y = center_y;
+    stats.flip_y = flip_y;
+    if (width <= 0 || height <= 0)
+    {
+        return stats;
+    }
+    const int pixel_stride = InferPixelStride(frame_bytes, width, height);
+    if (pixel_stride < 3)
+    {
+        return stats;
+    }
+
+    double accum_r = 0.0;
+    double accum_g = 0.0;
+    double accum_b = 0.0;
+    for (int y = center_y - radius; y <= center_y + radius; ++y)
+    {
+        if (y < 0 || y >= height)
+        {
+            continue;
+        }
+        for (int x = center_x - radius; x <= center_x + radius; ++x)
+        {
+            if (x < 0 || x >= width)
+            {
+                continue;
+            }
+
+            const int sample_y = flip_y ? (height - 1 - y) : y;
+            const std::size_t base =
+                (static_cast<std::size_t>(sample_y) * width + x) * pixel_stride;
+            if (base + 2 >= frame_bytes.size())
+            {
+                continue;
+            }
+            accum_r += frame_bytes[base + 0];
+            accum_g += frame_bytes[base + 1];
+            accum_b += frame_bytes[base + 2];
+            ++stats.sample_count;
+        }
+    }
+
+    if (stats.sample_count == 0)
+    {
+        return stats;
+    }
+
+    const double scale = static_cast<double>(stats.sample_count) * 255.0;
+    stats.average = {accum_r / scale, accum_g / scale, accum_b / scale};
+    return stats;
+}
+
+PixelColorStats ComputeBestCenteredFrameColor(
+    const std::vector<std::uint8_t>& frame_bytes,
+    int width,
+    int height)
+{
+    const int center_x = width / 2;
+    const int center_y = height / 2;
+    const auto direct = SampleFramePatch(
+        frame_bytes, width, height, center_x, center_y, 2, false);
+    const auto flipped = SampleFramePatch(
+        frame_bytes, width, height, center_x, center_y, 2, true);
+    const auto dominance = [](const PixelColorStats& stats) {
+        if (stats.sample_count == 0)
+        {
+            return -1.0;
+        }
+        return stats.average[0] - std::max(stats.average[1], stats.average[2]);
+    };
+    if (dominance(direct) >= dominance(flipped))
+    {
+        return direct;
+    }
+    return flipped;
 }
 
 double ComputeAverageNormalizedDifference(
@@ -498,6 +616,81 @@ TEST_F(OpenGLRayTracingLevelTest, DragonLevelUsesSceneFallbackPbrTextures)
     EXPECT_EQ(roughness_id, level->GetIdFromName("roughness_texture"));
     EXPECT_EQ(metallic_id, level->GetIdFromName("metallic_texture"));
     EXPECT_EQ(ao_id, level->GetIdFromName("ao_texture"));
+}
+
+TEST_F(
+    OpenGLRayTracingLevelTest,
+    ImportedGltfBaseColorTintOverridesSceneFallbackColorTexture)
+{
+    auto level = LoadLevel("asset/json/tinted_mesh.json");
+    ASSERT_NE(level, nullptr);
+
+    const auto tinted_material_id = FindMaterialForNode(
+        *level,
+        frame::proto::NodeMesh::PRE_RENDER_TIME,
+        "TintedTriangle");
+    ASSERT_NE(tinted_material_id, frame::NullId);
+    const auto& tinted_material = level->GetMaterialFromId(tinted_material_id);
+
+    auto tinted_albedo_id = FindTextureByInnerName(
+        tinted_material, "albedo_texture");
+    if (tinted_albedo_id == frame::NullId)
+    {
+        tinted_albedo_id = FindTextureByInnerName(tinted_material, "Color");
+    }
+    ASSERT_NE(tinted_albedo_id, frame::NullId);
+
+    const auto fallback_color_id = level->GetIdFromName("Color");
+    ASSERT_NE(fallback_color_id, frame::NullId);
+    EXPECT_NE(tinted_albedo_id, fallback_color_id);
+
+    const auto tinted_albedo = ReadTextureRgb(*level, tinted_albedo_id);
+    EXPECT_NEAR(tinted_albedo[0], 1.0f, 0.02f);
+    EXPECT_NEAR(tinted_albedo[1], 0.0f, 0.02f);
+    EXPECT_NEAR(tinted_albedo[2], 0.0f, 0.02f);
+
+    const auto scene_material_id = level->GetIdFromName("RayTraceMaterial");
+    ASSERT_NE(scene_material_id, frame::NullId);
+    const auto& scene_material = level->GetMaterialFromId(scene_material_id);
+    const auto scene_albedo_id = FindTextureByInnerName(
+        scene_material, "opaque_albedo_texture");
+    ASSERT_NE(scene_albedo_id, frame::NullId);
+    EXPECT_EQ(scene_albedo_id, tinted_albedo_id);
+}
+
+TEST_F(OpenGLRayTracingLevelTest, TintedTriangleRenderStaysRedUnderRaytracing)
+{
+    constexpr int kRenderWidth = 1280;
+    constexpr int kRenderHeight = 720;
+
+    auto level = LoadLevel("asset/json/tinted_mesh.json");
+    ASSERT_NE(level, nullptr);
+    // The fixture places a single triangle at the view center so the
+    // center patch must stay red if the tint survives the raytracing path.
+    const auto frame = RenderOutputBytes(*level, 0.0, kRenderWidth, kRenderHeight);
+    const auto stats = ComputeBestCenteredFrameColor(
+        frame,
+        kRenderWidth,
+        kRenderHeight);
+    ASSERT_GT(stats.sample_count, 0u)
+        << "display_size=(" << kRenderWidth << ", " << kRenderHeight
+        << "), frame_bytes=" << frame.size();
+    EXPECT_GT(stats.average[0], 0.20)
+        << "sample=(" << stats.center_x << ", " << stats.center_y
+        << "), flip_y=" << stats.flip_y << ", display_size=("
+        << kRenderWidth << ", " << kRenderHeight << ")";
+    EXPECT_GT(stats.average[0] - stats.average[1], 0.08)
+        << "rgb=(" << stats.average[0] << ", " << stats.average[1]
+        << ", " << stats.average[2] << ")";
+    EXPECT_GT(stats.average[0] - stats.average[2], 0.08)
+        << "rgb=(" << stats.average[0] << ", " << stats.average[1]
+        << ", " << stats.average[2] << ")";
+    EXPECT_LT(stats.average[1], 0.28)
+        << "rgb=(" << stats.average[0] << ", " << stats.average[1]
+        << ", " << stats.average[2] << ")";
+    EXPECT_LT(stats.average[2], 0.28)
+        << "rgb=(" << stats.average[0] << ", " << stats.average[1]
+        << ", " << stats.average[2] << ")";
 }
 
 TEST_F(OpenGLRayTracingLevelTest, DragonLevelGeneratesUvCoordinatesForUnwrappedMesh)
