@@ -87,7 +87,6 @@ Available examples:
 Useful runtime flags:
 
 - `--device={vulkan|opengl}`: choose rendering backend
-- `--vk_validation={true|false}`: toggle Vulkan validation layers
 
 ## Run Tests
 

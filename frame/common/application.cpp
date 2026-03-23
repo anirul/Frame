@@ -15,11 +15,6 @@
 #include "frame/vulkan/window_factory.h"
 
 ABSL_FLAG(std::string, device, "vulkan", "Rendering backend (vulkan|opengl).");
-#if defined(_DEBUG)
-ABSL_FLAG(bool, vk_validation, true, "Enable Vulkan validation layers.");
-#else
-ABSL_FLAG(bool, vk_validation, false, "Enable Vulkan validation layers.");
-#endif
 ABSL_FLAG(
     double,
     auto_exit_seconds,
@@ -42,9 +37,8 @@ bool StartsWith(std::string_view value, std::string_view prefix)
 
 std::string NormalizeKnownFlag(std::string_view arg)
 {
-    constexpr std::array<std::string_view, 4> kKnownFlags = {
+    constexpr std::array<std::string_view, 3> kKnownFlags = {
         "device",
-        "vk_validation",
         "auto_exit_seconds",
         "screenshot_on_exit"};
     for (const auto flag_name : kKnownFlags)
