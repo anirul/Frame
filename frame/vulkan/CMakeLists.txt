@@ -42,6 +42,8 @@ set(FRAME_VULKAN_SOURCES
   texture_resources.cpp
   texture_resources.h
   dispatcher.cpp
+  debug_callback.cpp
+  debug_callback.h
   device.h
   device.cpp
   sdl_vulkan_none.h
