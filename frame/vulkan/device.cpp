@@ -367,6 +367,11 @@ bool RaytraceSceneRequiresWorldSpaceBuffers(frame::LevelInterface& level)
     return false;
 }
 
+bool HasRaytracingSourceMeshes(frame::LevelInterface& level)
+{
+    return !GetRaytracingSourceMeshMaterials(level).empty();
+}
+
 constexpr std::size_t kRaytraceFloatsPerVertex = 12;
 constexpr std::size_t kRaytraceTriangleVertexStrideBytes =
     sizeof(float) * kRaytraceFloatsPerVertex;
@@ -1823,7 +1828,7 @@ void Device::UpdateRaytraceBuffers()
         }
     }
     bool updated_aggregate_scene = false;
-    if (RaytraceSceneRequiresWorldSpaceBuffers(*level_))
+    if (HasRaytracingSourceMeshes(*level_))
     {
         updated_aggregate_scene = UpdateAggregateRaytracingSceneBuffers(
             !use_hardware_raytracing_);
@@ -2469,7 +2474,7 @@ void Device::RecordCommandBuffer(
     const bool use_world_space_raytrace_scene =
         level_ &&
         (use_compute_raytracing_ || use_raytracing_pipeline_) &&
-        RaytraceSceneRequiresWorldSpaceBuffers(*level_);
+        HasRaytracingSourceMeshes(*level_);
     std::string preferred_scene_root;
     if (!use_world_space_raytrace_scene &&
         level_ &&
