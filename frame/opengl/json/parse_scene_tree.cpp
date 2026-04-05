@@ -308,27 +308,65 @@ std::string GetAutoMaterialName(
     const std::string& base_name,
     proto::NodeMesh::RenderTimeEnum render_time_enum)
 {
-    const auto program_id = level.GetRenderPassProgramId(render_time_enum);
-    if (program_id != NullId)
-    {
-        const auto& program = level.GetProgramFromId(program_id);
-        const auto key = frame::json::ResolveProgramKey(program.GetData());
-        if (render_time_enum == proto::NodeMesh::SCENE_RENDER_TIME &&
-            frame::json::IsRaytracingProgramKey(key))
-        {
-            return "RayTraceMaterial";
-        }
-    }
     return std::format(
         "{}.__auto_material_{}",
         base_name,
         static_cast<int>(render_time_enum));
 }
 
+constexpr const char* kRaytracingResolveNodeName = "RayTracingRendering";
+constexpr const char* kRaytracingResolveMaterialName = "RayTraceMaterial";
+
+bool EqualsIgnoreCaseAscii(
+    const std::string& lhs, const std::string& rhs)
+{
+    if (lhs.size() != rhs.size())
+    {
+        return false;
+    }
+    for (std::size_t i = 0; i < lhs.size(); ++i)
+    {
+        if (std::tolower(static_cast<unsigned char>(lhs[i])) !=
+            std::tolower(static_cast<unsigned char>(rhs[i])))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool IsRaytracingRenderTime(
+    LevelInterface& level,
+    proto::NodeMesh::RenderTimeEnum render_time_enum)
+{
+    const auto program_id = level.GetRenderPassProgramId(render_time_enum);
+    if (program_id == NullId)
+    {
+        return false;
+    }
+    const auto& program = level.GetProgramFromId(program_id);
+    const auto key = frame::json::ResolveProgramKey(program.GetData());
+    return frame::json::IsRaytracingProgramKey(key);
+}
+
+bool IsExplicitRaytracingResolveNode(
+    LevelInterface& level, const proto::NodeMesh& proto_scene_mesh)
+{
+    return proto_scene_mesh.render_time_enum() ==
+               proto::NodeMesh::SCENE_RENDER_TIME &&
+           proto_scene_mesh.has_mesh_enum() &&
+           proto_scene_mesh.mesh_enum() == proto::NodeMesh::QUAD &&
+           IsRaytracingRenderTime(level, proto_scene_mesh.render_time_enum()) &&
+           EqualsIgnoreCaseAscii(
+               proto_scene_mesh.name(),
+               kRaytracingResolveNodeName);
+}
+
 EntityId CreateAutoMaterial(
     LevelInterface& level,
     const std::string& base_name,
-    proto::NodeMesh::RenderTimeEnum render_time_enum)
+    proto::NodeMesh::RenderTimeEnum render_time_enum,
+    const std::string& explicit_name = {})
 {
     const auto program_id = level.GetRenderPassProgramId(render_time_enum);
     if (!program_id)
@@ -340,7 +378,10 @@ EntityId CreateAutoMaterial(
     }
 
     auto material = std::make_unique<frame::opengl::Material>();
-    material->SetName(GetAutoMaterialName(level, base_name, render_time_enum));
+    material->SetName(
+        explicit_name.empty()
+            ? GetAutoMaterialName(level, base_name, render_time_enum)
+            : explicit_name);
     material->SetSerializeEnable(false);
     const auto material_id = level.AddMaterial(std::move(material));
     ConfigureMaterialProgramsForRenderTime(level, material_id, render_time_enum);
@@ -362,6 +403,109 @@ bool IsRaytracingMaterial(LevelInterface& level, EntityId material_id)
     const auto& program = level.GetProgramFromId(program_id);
     const auto key = frame::json::ResolveProgramKey(program.GetData());
     return frame::json::IsRaytracingProgramKey(key);
+}
+
+void ConfigureRaytracingSourceMaterial(
+    LevelInterface& level, EntityId material_id)
+{
+    if (!IsRaytracingMaterial(level, material_id))
+    {
+        return;
+    }
+    const auto preprocess_program_id =
+        level.GetRenderPassPreprocessProgramId(proto::NodeMesh::PRE_RENDER_TIME);
+    if (!preprocess_program_id)
+    {
+        return;
+    }
+    level.GetMaterialFromId(material_id)
+        .SetPreprocessProgramId(preprocess_program_id);
+}
+
+bool IsRaytracingSourceMaterial(LevelInterface& level, EntityId material_id)
+{
+    if (!IsRaytracingMaterial(level, material_id))
+    {
+        return false;
+    }
+    return level.GetMaterialFromId(material_id).GetPreprocessProgramId(&level) !=
+        NullId;
+}
+
+bool IsRaytracingResolveMaterial(LevelInterface& level, EntityId material_id)
+{
+    if (!IsRaytracingMaterial(level, material_id))
+    {
+        return false;
+    }
+    return level.GetMaterialFromId(material_id).GetPreprocessProgramId(&level) ==
+        NullId;
+}
+
+bool ShouldTreatAsRaytracingSourceNode(
+    LevelInterface& level, const proto::NodeMesh& proto_scene_mesh)
+{
+    if (proto_scene_mesh.has_clean_buffer() ||
+        !IsRaytracingRenderTime(level, proto_scene_mesh.render_time_enum()))
+    {
+        return false;
+    }
+    if (proto_scene_mesh.render_time_enum() == proto::NodeMesh::PRE_RENDER_TIME)
+    {
+        return true;
+    }
+    if (proto_scene_mesh.render_time_enum() !=
+        proto::NodeMesh::SCENE_RENDER_TIME)
+    {
+        return false;
+    }
+    return !IsExplicitRaytracingResolveNode(level, proto_scene_mesh);
+}
+
+std::vector<std::pair<EntityId, EntityId>> GetRaytracingSourceMeshMaterials(
+    LevelInterface& level)
+{
+    std::vector<std::pair<EntityId, EntityId>> pairs = {};
+    const auto append_pairs =
+        [&](proto::NodeMesh::RenderTimeEnum render_time_enum) {
+            for (const auto& pair : level.GetMeshMaterialIds(render_time_enum))
+            {
+                if (IsRaytracingSourceMaterial(level, pair.second))
+                {
+                    pairs.push_back(pair);
+                }
+            }
+        };
+    append_pairs(proto::NodeMesh::PRE_RENDER_TIME);
+    append_pairs(proto::NodeMesh::SCENE_RENDER_TIME);
+    return pairs;
+}
+
+EntityId FindMaterialIdByName(
+    LevelInterface& level, const std::string& expected_name)
+{
+    for (const auto material_id : level.GetMaterials())
+    {
+        if (level.GetNameFromId(material_id) == expected_name)
+        {
+            return material_id;
+        }
+    }
+    return NullId;
+}
+
+EntityId FindRaytracingResolveMaterialId(LevelInterface& level)
+{
+    for (const auto& [scene_node_id, scene_material_id] :
+         level.GetMeshMaterialIds(proto::NodeMesh::SCENE_RENDER_TIME))
+    {
+        (void)scene_node_id;
+        if (IsRaytracingResolveMaterial(level, scene_material_id))
+        {
+            return scene_material_id;
+        }
+    }
+    return NullId;
 }
 
 void ReplaceTextureBindingByInnerName(
@@ -451,14 +595,15 @@ std::array<float, 4> ResolveRaytracingReferenceColor(
     LevelInterface& level, bool transmissive)
 {
     constexpr std::array<float, 4> kWhite = {1.0f, 1.0f, 1.0f, 1.0f};
-    for (const auto& [pre_node_id, pre_material_id] :
-         level.GetMeshMaterialIds(proto::NodeMesh::PRE_RENDER_TIME))
+    for (const auto& [source_node_id, source_material_id] :
+         GetRaytracingSourceMeshMaterials(level))
     {
-        (void)pre_node_id;
-        if (IsTransmissiveRaytracingSourceMaterial(level, pre_material_id) ==
+        (void)source_node_id;
+        if (IsTransmissiveRaytracingSourceMaterial(level, source_material_id) ==
             transmissive)
         {
-            return ResolveRaytracingSourceMaterialColor(level, pre_material_id);
+            return ResolveRaytracingSourceMaterialColor(
+                level, source_material_id);
         }
     }
     return kWhite;
@@ -740,16 +885,16 @@ RaytraceAggregateBuffers BuildRaytraceAggregateBuffers(
     const auto reference_color =
         ResolveRaytracingReferenceColor(level, transmissive);
 
-    for (const auto& [pre_node_id, pre_material_id] :
-         level.GetMeshMaterialIds(proto::NodeMesh::PRE_RENDER_TIME))
+    for (const auto& [source_node_id, source_material_id] :
+         GetRaytracingSourceMeshMaterials(level))
     {
-        if (IsTransmissiveRaytracingSourceMaterial(level, pre_material_id) !=
+        if (IsTransmissiveRaytracingSourceMaterial(level, source_material_id) !=
             transmissive)
         {
             continue;
         }
         auto& node =
-            dynamic_cast<NodeMesh&>(level.GetSceneNodeFromId(pre_node_id));
+            dynamic_cast<NodeMesh&>(level.GetSceneNodeFromId(source_node_id));
         const auto mesh_id = node.GetLocalMesh();
         if (!mesh_id)
         {
@@ -789,7 +934,7 @@ RaytraceAggregateBuffers BuildRaytraceAggregateBuffers(
             continue;
         }
         const auto source_color = ResolveRaytracingSourceMaterialColor(
-            level, pre_material_id);
+            level, source_material_id);
         const auto color_multiplier = ResolveRaytracingColorMultiplier(
             source_color, reference_color);
         const auto base_index = static_cast<std::uint32_t>(
@@ -839,33 +984,80 @@ RaytraceAggregateBuffers BuildRaytraceAggregateBuffers(
         CreateStorageBuffer(level, bvh_nodes, bvh_name)};
 }
 
+void EnsureRaytracingResolveNode(LevelInterface& level)
+{
+    if (!IsRaytracingRenderTime(level, proto::NodeMesh::SCENE_RENDER_TIME) ||
+        FindRaytracingResolveMaterialId(level) != NullId)
+    {
+        return;
+    }
+    if (GetRaytracingSourceMeshMaterials(level).empty())
+    {
+        return;
+    }
+
+    auto material_id = FindMaterialIdByName(
+        level, kRaytracingResolveMaterialName);
+    if (material_id == NullId)
+    {
+        material_id = CreateAutoMaterial(
+            level,
+            kRaytracingResolveNodeName,
+            proto::NodeMesh::SCENE_RENDER_TIME,
+            kRaytracingResolveMaterialName);
+    }
+
+    const auto quad_id = level.GetDefaultMeshQuadId();
+    if (quad_id == NullId)
+    {
+        throw std::runtime_error(
+            "Default quad mesh not available for raytracing resolve node.");
+    }
+
+    auto node = std::make_unique<NodeMesh>(GetFunctor(level), quad_id);
+    node->GetData().set_name(kRaytracingResolveNodeName);
+    node->GetData().set_render_time_enum(proto::NodeMesh::SCENE_RENDER_TIME);
+    if (const auto root_id = level.GetDefaultRootSceneNodeId(); root_id)
+    {
+        node->SetParentName(level.GetNameFromId(root_id));
+    }
+    const auto scene_id = level.AddSceneNode(std::move(node));
+    level.AddMeshMaterialId(
+        scene_id,
+        material_id,
+        proto::NodeMesh::SCENE_RENDER_TIME);
+}
+
 void FinalizeRaytracingSceneMaterials(LevelInterface& level)
 {
+    EnsureRaytracingResolveNode(level);
+
     for (const auto& [scene_node_id, scene_material_id] :
          level.GetMeshMaterialIds(proto::NodeMesh::SCENE_RENDER_TIME))
     {
         (void)scene_node_id;
         if (!scene_material_id ||
-            !IsRaytracingMaterial(level, scene_material_id))
+            !IsRaytracingResolveMaterial(level, scene_material_id))
         {
             continue;
         }
 
         bool adopted_transmissive = false;
         bool adopted_opaque = false;
-        for (const auto& [pre_node_id, pre_material_id] :
-             level.GetMeshMaterialIds(proto::NodeMesh::PRE_RENDER_TIME))
+        for (const auto& [source_node_id, source_material_id] :
+             GetRaytracingSourceMeshMaterials(level))
         {
-            (void)pre_node_id;
+            (void)source_node_id;
             const bool source_is_transmissive =
-                IsTransmissiveRaytracingSourceMaterial(level, pre_material_id);
+                IsTransmissiveRaytracingSourceMaterial(
+                    level, source_material_id);
             if (source_is_transmissive)
             {
                 if (!adopted_transmissive)
                 {
                     AdoptRaytracingSceneTextures(
                         level,
-                        pre_material_id,
+                        source_material_id,
                         scene_material_id,
                         true);
                     adopted_transmissive = true;
@@ -875,7 +1067,7 @@ void FinalizeRaytracingSceneMaterials(LevelInterface& level)
             {
                 AdoptRaytracingSceneTextures(
                     level,
-                    pre_material_id,
+                    source_material_id,
                     scene_material_id,
                     false);
                 adopted_opaque = true;
@@ -1078,7 +1270,14 @@ void ApplyAnimationPlayback(
     const EntityId material_id = CreateAutoMaterial(
         level,
         proto_scene_mesh.name(),
-        proto_scene_mesh.render_time_enum());
+        proto_scene_mesh.render_time_enum(),
+        IsExplicitRaytracingResolveNode(level, proto_scene_mesh)
+            ? kRaytracingResolveMaterialName
+            : "");
+    if (ShouldTreatAsRaytracingSourceNode(level, proto_scene_mesh))
+    {
+        ConfigureRaytracingSourceMaterial(level, material_id);
+    }
     auto& mesh = level.GetMeshFromId(mesh_id);
     mesh.GetData().set_render_primitive_enum(
         proto_scene_mesh.render_primitive_enum());
@@ -1131,6 +1330,10 @@ void ApplyAnimationPlayback(
             level,
             material_id,
             proto_scene_mesh.render_time_enum());
+        if (ShouldTreatAsRaytracingSourceNode(level, proto_scene_mesh))
+        {
+            ConfigureRaytracingSourceMaterial(level, material_id);
+        }
         auto& node = level.GetSceneNodeFromId(node_id);
         auto& mesh = level.GetMeshFromId(node.GetLocalMesh());
         mesh.GetData().set_file_name(proto_scene_mesh.file_name());
@@ -1213,6 +1416,10 @@ void ApplyAnimationPlayback(
         level,
         proto_scene_mesh.name(),
         proto_scene_mesh.render_time_enum());
+    if (ShouldTreatAsRaytracingSourceNode(level, proto_scene_mesh))
+    {
+        ConfigureRaytracingSourceMaterial(level, material_id);
+    }
     // Create the node corresponding to the mesh.
     auto& mesh_ref = level.GetMeshFromId(mesh_id);
     mesh_ref.GetData().set_render_primitive_enum(

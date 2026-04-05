@@ -19,7 +19,6 @@ reference for the acceleration-structure path across both backends.
 
 ## 03 Skinned Mesh
 
-Loads `asset/model/fox/Fox.glb` through the OpenGL glTF import path and renders
-it with the `scene_simple` raster pipeline. If the glTF contains skinning data,
-the mesh currently renders in bind pose while animation playback is still being
-implemented.
+Loads `asset/json/skinned_mesh.json`, which imports `asset/model/fox/Fox.glb`
+as raytraced scene geometry in `SCENE_RENDER_TIME` and plays the `Walk`
+animation through the shared raytracing pipeline.

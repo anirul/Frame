@@ -36,10 +36,71 @@ bool IsRaytracingProgram(const ProgramInterface& program)
     return frame::json::IsRaytracingProgramKey(key);
 }
 
+bool IsRaytracingSourceMaterial(
+    frame::LevelInterface& level, frame::EntityId material_id)
+{
+    if (material_id == frame::NullId)
+    {
+        return false;
+    }
+    auto& material = level.GetMaterialFromId(material_id);
+    const auto program_id = material.GetProgramId(&level);
+    if (program_id == frame::NullId)
+    {
+        return false;
+    }
+    const auto& program = level.GetProgramFromId(program_id);
+    if (!IsRaytracingProgram(program))
+    {
+        return false;
+    }
+    return material.GetPreprocessProgramId(&level) != frame::NullId;
+}
+
+bool IsRaytracingResolveMaterial(
+    frame::LevelInterface& level, frame::EntityId material_id)
+{
+    if (material_id == frame::NullId)
+    {
+        return false;
+    }
+    auto& material = level.GetMaterialFromId(material_id);
+    const auto program_id = material.GetProgramId(&level);
+    if (program_id == frame::NullId)
+    {
+        return false;
+    }
+    const auto& program = level.GetProgramFromId(program_id);
+    if (!IsRaytracingProgram(program))
+    {
+        return false;
+    }
+    return material.GetPreprocessProgramId(&level) == frame::NullId;
+}
+
+std::vector<std::pair<frame::EntityId, frame::EntityId>>
+GetRaytracingSourceMeshMaterials(frame::LevelInterface& level)
+{
+    std::vector<std::pair<frame::EntityId, frame::EntityId>> pairs = {};
+    const auto append_pairs =
+        [&](frame::proto::NodeMesh::RenderTimeEnum render_time_enum) {
+            for (const auto& pair : level.GetMeshMaterialIds(render_time_enum))
+            {
+                if (IsRaytracingSourceMaterial(level, pair.second))
+                {
+                    pairs.push_back(pair);
+                }
+            }
+        };
+    append_pairs(frame::proto::NodeMesh::PRE_RENDER_TIME);
+    append_pairs(frame::proto::NodeMesh::SCENE_RENDER_TIME);
+    return pairs;
+}
+
 bool RaytraceSceneRequiresWorldSpaceBuffers(frame::LevelInterface& level)
 {
     for (const auto& [node_id, material_id] :
-         level.GetMeshMaterialIds(proto::NodeMesh::PRE_RENDER_TIME))
+         GetRaytracingSourceMeshMaterials(level))
     {
         (void)material_id;
         auto* node =
@@ -246,13 +307,14 @@ std::array<float, 4> ResolveRaytracingReferenceColor(
     bool transmissive)
 {
     constexpr std::array<float, 4> kWhite = {1.0f, 1.0f, 1.0f, 1.0f};
-    for (const auto& [pre_node_id, pre_material_id] :
-         level.GetMeshMaterialIds(proto::NodeMesh::PRE_RENDER_TIME))
+    for (const auto& [source_node_id, source_material_id] :
+         GetRaytracingSourceMeshMaterials(level))
     {
-        (void)pre_node_id;
-        if (IsTransmissiveMaterial(level, pre_material_id) == transmissive)
+        (void)source_node_id;
+        if (IsTransmissiveMaterial(level, source_material_id) == transmissive)
         {
-            return ResolveRaytracingSourceMaterialColor(level, pre_material_id);
+            return ResolveRaytracingSourceMaterialColor(
+                level, source_material_id);
         }
     }
     return kWhite;
@@ -376,16 +438,16 @@ std::vector<std::uint8_t> BuildAggregateTriangleBytes(
     std::vector<std::uint8_t> aggregate_triangle_bytes = {};
     const auto reference_color =
         ResolveRaytracingReferenceColor(level, transmissive);
-    for (const auto& [pre_node_id, pre_material_id] :
-         level.GetMeshMaterialIds(proto::NodeMesh::PRE_RENDER_TIME))
+    for (const auto& [source_node_id, source_material_id] :
+         GetRaytracingSourceMeshMaterials(level))
     {
-        if (IsTransmissiveMaterial(level, pre_material_id) != transmissive)
+        if (IsTransmissiveMaterial(level, source_material_id) != transmissive)
         {
             continue;
         }
 
         auto* node =
-            dynamic_cast<NodeMesh*>(&level.GetSceneNodeFromId(pre_node_id));
+            dynamic_cast<NodeMesh*>(&level.GetSceneNodeFromId(source_node_id));
         if (!node)
         {
             continue;
@@ -411,7 +473,7 @@ std::vector<std::uint8_t> BuildAggregateTriangleBytes(
         }
 
         const auto source_color =
-            ResolveRaytracingSourceMaterialColor(level, pre_material_id);
+            ResolveRaytracingSourceMaterialColor(level, source_material_id);
         const auto color_multiplier = ResolveRaytracingColorMultiplier(
             source_color,
             reference_color);
@@ -607,21 +669,12 @@ void Renderer::UpdateAggregateRaytraceSceneBuffers()
          level_.GetMeshMaterialIds(proto::NodeMesh::SCENE_RENDER_TIME))
     {
         (void)node_id;
-        if (!material_id)
+        if (!material_id ||
+            !IsRaytracingResolveMaterial(level_, material_id))
         {
             continue;
         }
         auto& material = level_.GetMaterialFromId(material_id);
-        auto program_id = material.GetProgramId(&level_);
-        if (!program_id)
-        {
-            continue;
-        }
-        auto& program = level_.GetProgramFromId(program_id);
-        if (!IsRaytracingProgram(program))
-        {
-            continue;
-        }
 
         update_named_buffer(
             material, "TriangleBufferTransmissive", transmissive_triangles);
@@ -1053,9 +1106,7 @@ void Renderer::PreRender()
     render_time_ = proto::NodeMesh::PRE_RENDER_TIME;
     // This will ensure that it is only true once.
     auto first_render = std::exchange(first_render_, false);
-    for (const auto& p : level_.GetMeshMaterialIds(
-             proto::NodeMesh::PRE_RENDER_TIME))
-    {
+    auto preprocess_entry = [&](const std::pair<EntityId, EntityId>& p) {
         auto& node = level_.GetSceneNodeFromId(p.first);
         if (node.GetLocalMesh())
         {
@@ -1067,37 +1118,27 @@ void Renderer::PreRender()
                 UpdateRaytraceBuffersIfNeeded(*gl_skinned_mesh);
             }
         }
-        if (first_render)
+        if (!first_render)
         {
-            auto material_id = p.second;
-            auto temp_viewport = viewport_;
-            // Query textures from the material.
-            auto& material = level_.GetMaterialFromId(material_id);
-            if (material.GetPreprocessProgramId())
+            return;
+        }
+
+        auto material_id = p.second;
+        auto temp_viewport = viewport_;
+        // Query textures from the material.
+        auto& material = level_.GetMaterialFromId(material_id);
+        if (material.GetPreprocessProgramId())
+        {
+            auto saved_program = material.GetProgramId();
+            auto preprocess_id = material.GetPreprocessProgramId();
+            if (preprocess_id)
             {
-                auto saved_program = material.GetProgramId();
-                auto preprocess_id = material.GetPreprocessProgramId();
-                if (preprocess_id)
+                auto& preprocess_program =
+                    level_.GetProgramFromId(preprocess_id);
+                auto out_ids = preprocess_program.GetOutputTextureIds();
+                if (out_ids.empty())
                 {
-                    auto& preprocess_program =
-                        level_.GetProgramFromId(preprocess_id);
-                    auto out_ids = preprocess_program.GetOutputTextureIds();
-                    if (out_ids.empty())
-                    {
-                        texture_frame_.set_value(proto::TextureFrame::TEXTURE_2D);
-                        material.SetProgramId(preprocess_id);
-                        RenderNode(
-                            p.first,
-                            material_id,
-                            kProjectionCubemap,
-                            kViewsCubemap[0]);
-                        material.SetProgramId(saved_program);
-                        viewport_ = temp_viewport;
-                        continue;
-                    }
-                    auto& tex = level_.GetTextureFromId(*out_ids.begin());
-                    auto size = json::ParseSize(tex.GetData().size());
-                    viewport_ = glm::ivec4(0, 0, size.x, size.y);
+                    texture_frame_.set_value(proto::TextureFrame::TEXTURE_2D);
                     material.SetProgramId(preprocess_id);
                     RenderNode(
                         p.first,
@@ -1106,46 +1147,72 @@ void Renderer::PreRender()
                         kViewsCubemap[0]);
                     material.SetProgramId(saved_program);
                     viewport_ = temp_viewport;
+                    return;
                 }
-                continue;
-            }
-            auto ids = material.GetTextureIds();
-            if (ids.empty())
-            {
-                // Mesh has no target texture: just render once to populate
-                // buffers without touching the framebuffer.
+                auto& tex = level_.GetTextureFromId(*out_ids.begin());
+                auto size = json::ParseSize(tex.GetData().size());
+                viewport_ = glm::ivec4(0, 0, size.x, size.y);
+                material.SetProgramId(preprocess_id);
                 RenderNode(
-                    p.first, material_id, kProjectionCubemap, kViewsCubemap[0]);
-                continue;
+                    p.first,
+                    material_id,
+                    kProjectionCubemap,
+                    kViewsCubemap[0]);
+                material.SetProgramId(saved_program);
+                viewport_ = temp_viewport;
             }
-            auto& texture = level_.GetTextureFromId(ids[0]);
-            auto size = json::ParseSize(texture.GetData().size());
-            viewport_ = glm::ivec4(0, 0, size.x, size.y);
-            if (texture.GetData().cubemap())
-            {
-                for (std::uint32_t i = 0; i < 6; ++i)
-                {
-                    proto::TextureFrame texture_frame;
-                    texture_frame.set_value(
-                        static_cast<proto::TextureFrame::Enum>(
-                            proto::TextureFrame::CUBE_MAP_POSITIVE_X + i));
-                    SetCubeMapTarget(texture_frame);
-                    RenderNode(
-                        p.first,
-                        material_id,
-                        kProjectionCubemap,
-                        kViewsCubemap[i]);
-                }
-            }
-            else
-            {
-                // Regular 2D texture target.
-                texture_frame_.set_value(proto::TextureFrame::TEXTURE_2D);
-                RenderNode(
-                    p.first, material_id, kProjectionCubemap, kViewsCubemap[0]);
-            }
-            viewport_ = temp_viewport;
+            return;
         }
+        auto ids = material.GetTextureIds();
+        if (ids.empty())
+        {
+            // Mesh has no target texture: just render once to populate
+            // buffers without touching the framebuffer.
+            RenderNode(
+                p.first, material_id, kProjectionCubemap, kViewsCubemap[0]);
+            return;
+        }
+        auto& texture = level_.GetTextureFromId(ids[0]);
+        auto size = json::ParseSize(texture.GetData().size());
+        viewport_ = glm::ivec4(0, 0, size.x, size.y);
+        if (texture.GetData().cubemap())
+        {
+            for (std::uint32_t i = 0; i < 6; ++i)
+            {
+                proto::TextureFrame texture_frame;
+                texture_frame.set_value(
+                    static_cast<proto::TextureFrame::Enum>(
+                        proto::TextureFrame::CUBE_MAP_POSITIVE_X + i));
+                SetCubeMapTarget(texture_frame);
+                RenderNode(
+                    p.first,
+                    material_id,
+                    kProjectionCubemap,
+                    kViewsCubemap[i]);
+            }
+        }
+        else
+        {
+            // Regular 2D texture target.
+            texture_frame_.set_value(proto::TextureFrame::TEXTURE_2D);
+            RenderNode(
+                p.first, material_id, kProjectionCubemap, kViewsCubemap[0]);
+        }
+        viewport_ = temp_viewport;
+    };
+    for (const auto& p : level_.GetMeshMaterialIds(
+             proto::NodeMesh::PRE_RENDER_TIME))
+    {
+        preprocess_entry(p);
+    }
+    for (const auto& p : level_.GetMeshMaterialIds(
+             proto::NodeMesh::SCENE_RENDER_TIME))
+    {
+        if (!IsRaytracingSourceMaterial(level_, p.second))
+        {
+            continue;
+        }
+        preprocess_entry(p);
     }
     if (RaytraceSceneRequiresWorldSpaceBuffers(level_))
     {
@@ -1177,6 +1244,10 @@ void Renderer::RenderScene(const CameraInterface& camera)
     for (const auto& p : level_.GetMeshMaterialIds(
              proto::NodeMesh::SCENE_RENDER_TIME))
     {
+        if (IsRaytracingSourceMaterial(level_, p.second))
+        {
+            continue;
+        }
         RenderNode(
             p.first,
             p.second,

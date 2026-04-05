@@ -236,6 +236,47 @@ frame::EntityId FindTextureIdByInnerName(
     return frame::NullId;
 }
 
+bool IsRaytracingSourceMaterial(
+    frame::LevelInterface& level, frame::EntityId material_id)
+{
+    if (material_id == frame::NullId)
+    {
+        return false;
+    }
+    auto& material = level.GetMaterialFromId(material_id);
+    const auto program_id = material.GetProgramId(&level);
+    if (program_id == frame::NullId)
+    {
+        return false;
+    }
+    const auto& program = level.GetProgramFromId(program_id);
+    const auto key = frame::json::ResolveProgramKey(program.GetData());
+    if (!frame::json::IsRaytracingProgramKey(key))
+    {
+        return false;
+    }
+    return material.GetPreprocessProgramId(&level) != frame::NullId;
+}
+
+std::vector<std::pair<frame::EntityId, frame::EntityId>>
+GetRaytracingSourceMeshMaterials(frame::LevelInterface& level)
+{
+    std::vector<std::pair<frame::EntityId, frame::EntityId>> pairs = {};
+    const auto append_pairs =
+        [&](frame::proto::NodeMesh::RenderTimeEnum render_time_enum) {
+            for (const auto& pair : level.GetMeshMaterialIds(render_time_enum))
+            {
+                if (IsRaytracingSourceMaterial(level, pair.second))
+                {
+                    pairs.push_back(pair);
+                }
+            }
+        };
+    append_pairs(frame::proto::NodeMesh::PRE_RENDER_TIME);
+    append_pairs(frame::proto::NodeMesh::SCENE_RENDER_TIME);
+    return pairs;
+}
+
 std::array<float, 4> ResolveRaytracingSourceMaterialColor(
     frame::LevelInterface& level,
     frame::EntityId material_id)
@@ -264,13 +305,14 @@ std::array<float, 4> ResolveRaytracingReferenceColor(
     bool transmissive)
 {
     constexpr std::array<float, 4> kWhite = {1.0f, 1.0f, 1.0f, 1.0f};
-    for (const auto& [pre_node_id, pre_material_id] :
-         level.GetMeshMaterialIds(frame::proto::NodeMesh::PRE_RENDER_TIME))
+    for (const auto& [source_node_id, source_material_id] :
+         GetRaytracingSourceMeshMaterials(level))
     {
-        (void)pre_node_id;
-        if (IsTransmissiveMaterial(level, pre_material_id) == transmissive)
+        (void)source_node_id;
+        if (IsTransmissiveMaterial(level, source_material_id) == transmissive)
         {
-            return ResolveRaytracingSourceMaterialColor(level, pre_material_id);
+            return ResolveRaytracingSourceMaterialColor(
+                level, source_material_id);
         }
     }
     return kWhite;
@@ -296,7 +338,7 @@ std::array<float, 4> ResolveRaytracingColorMultiplier(
 bool RaytraceSceneRequiresWorldSpaceBuffers(frame::LevelInterface& level)
 {
     for (const auto& [node_id, material_id] :
-         level.GetMeshMaterialIds(frame::proto::NodeMesh::PRE_RENDER_TIME))
+         GetRaytracingSourceMeshMaterials(level))
     {
         (void)material_id;
         auto* node =
@@ -619,16 +661,17 @@ std::vector<std::uint8_t> BuildAggregateTriangleBytes(
     std::vector<std::uint8_t> aggregate_triangle_bytes = {};
     const auto reference_color =
         ResolveRaytracingReferenceColor(level, transmissive);
-    for (const auto& [pre_node_id, pre_material_id] :
-         level.GetMeshMaterialIds(frame::proto::NodeMesh::PRE_RENDER_TIME))
+    for (const auto& [source_node_id, source_material_id] :
+         GetRaytracingSourceMeshMaterials(level))
     {
-        if (IsTransmissiveMaterial(level, pre_material_id) != transmissive)
+        if (IsTransmissiveMaterial(level, source_material_id) != transmissive)
         {
             continue;
         }
 
         auto* node =
-            dynamic_cast<frame::NodeMesh*>(&level.GetSceneNodeFromId(pre_node_id));
+            dynamic_cast<frame::NodeMesh*>(
+                &level.GetSceneNodeFromId(source_node_id));
         if (!node)
         {
             continue;
@@ -654,7 +697,7 @@ std::vector<std::uint8_t> BuildAggregateTriangleBytes(
         }
 
         const auto source_color =
-            ResolveRaytracingSourceMaterialColor(level, pre_material_id);
+            ResolveRaytracingSourceMaterialColor(level, source_material_id);
         const auto color_multiplier = ResolveRaytracingColorMultiplier(
             source_color,
             reference_color);

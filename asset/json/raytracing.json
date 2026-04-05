@@ -170,13 +170,13 @@
                 "name": "Ico",
                 "parent": "mesh_holder",
                 "file_name": "ico.glb",
-                "render_time_enum": "PRE_RENDER_TIME"
+                "render_time_enum": "SCENE_RENDER_TIME"
             },
             {
                 "name": "Plate",
                 "parent": "mesh_holder",
                 "file_name": "plate.glb",
-                "render_time_enum": "PRE_RENDER_TIME"
+                "render_time_enum": "SCENE_RENDER_TIME"
             }
         ],
         "node_lights": [

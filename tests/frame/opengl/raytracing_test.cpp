@@ -514,6 +514,61 @@ TEST_F(OpenGLRayTracingLevelTest, RaytracingLevelBindsSceneTriangleBuffers)
 
 TEST_F(
     OpenGLRayTracingLevelTest,
+    SceneRenderTimeSourceMeshGetsPreprocessMaterialAndAutoResolve)
+{
+    auto level = LoadLevel("asset/json/raytracing_scene_source.json");
+    ASSERT_NE(level, nullptr);
+
+    const auto scene_cube_material_id = FindMaterialForNode(
+        *level,
+        frame::proto::NodeMesh::SCENE_RENDER_TIME,
+        "SceneCube");
+    ASSERT_NE(scene_cube_material_id, frame::NullId);
+    const auto& scene_cube_material =
+        level->GetMaterialFromId(scene_cube_material_id);
+    EXPECT_NE(level->GetNameFromId(scene_cube_material_id), "RayTraceMaterial");
+    EXPECT_NE(
+        scene_cube_material.GetPreprocessProgramId(level.get()),
+        frame::NullId);
+
+    const auto resolve_material_id = FindMaterialForNode(
+        *level,
+        frame::proto::NodeMesh::SCENE_RENDER_TIME,
+        "RayTracingRendering");
+    ASSERT_NE(resolve_material_id, frame::NullId);
+    EXPECT_EQ(resolve_material_id, level->GetIdFromName("RayTraceMaterial"));
+    const auto& resolve_material = level->GetMaterialFromId(resolve_material_id);
+    EXPECT_EQ(resolve_material.GetPreprocessProgramId(level.get()), frame::NullId);
+}
+
+TEST_F(
+    OpenGLRayTracingLevelTest,
+    SceneRenderTimeSourceMeshBuildsAggregateBuffersOnResolveMaterial)
+{
+    auto level = LoadLevel("asset/json/raytracing_scene_source.json");
+    ASSERT_NE(level, nullptr);
+
+    frame::opengl::Renderer renderer(
+        *level,
+        glm::uvec4(0, 0, 1280, 720));
+    renderer.SetDeltaTime(0.0);
+    renderer.PreRender();
+
+    const auto resolve_material_id = level->GetIdFromName("RayTraceMaterial");
+    ASSERT_NE(resolve_material_id, frame::NullId);
+    const auto& resolve_material = level->GetMaterialFromId(resolve_material_id);
+    const auto triangle_id = FindBufferByInnerName(
+        *level, resolve_material, "TriangleBufferOpaque");
+    ASSERT_NE(triangle_id, frame::NullId);
+
+    auto* triangle_buffer = dynamic_cast<frame::opengl::Buffer*>(
+        &level->GetBufferFromId(triangle_id));
+    ASSERT_NE(triangle_buffer, nullptr);
+    EXPECT_GT(triangle_buffer->GetRawData().size(), 0u);
+}
+
+TEST_F(
+    OpenGLRayTracingLevelTest,
     StaticRaytracingSceneKeepsAggregateBuffersStableAcrossFrames)
 {
     auto level = LoadLevel("asset/json/raytracing.json");
@@ -627,7 +682,7 @@ TEST_F(
 
     const auto tinted_material_id = FindMaterialForNode(
         *level,
-        frame::proto::NodeMesh::PRE_RENDER_TIME,
+        frame::proto::NodeMesh::SCENE_RENDER_TIME,
         "TintedTriangle");
     ASSERT_NE(tinted_material_id, frame::NullId);
     const auto& tinted_material = level->GetMaterialFromId(tinted_material_id);
@@ -739,7 +794,7 @@ TEST_F(OpenGLRayTracingLevelTest, ImportsGltfGlassMaterialFromIco)
 
     const auto material_id = FindMaterialForNode(
         *level,
-        frame::proto::NodeMesh::PRE_RENDER_TIME,
+        frame::proto::NodeMesh::SCENE_RENDER_TIME,
         "Ico");
     ASSERT_NE(material_id, frame::NullId);
     const auto& material = level->GetMaterialFromId(material_id);
@@ -791,7 +846,7 @@ TEST_F(OpenGLRayTracingLevelTest, ImportsGltfOpaqueSpecularFromPlate)
 
     const auto plate_material_id = FindMaterialForNode(
         *level,
-        frame::proto::NodeMesh::PRE_RENDER_TIME,
+        frame::proto::NodeMesh::SCENE_RENDER_TIME,
         "Plate");
     ASSERT_NE(plate_material_id, frame::NullId);
     const auto scene_material_id = level->GetIdFromName("RayTraceMaterial");
@@ -874,7 +929,7 @@ TEST_F(OpenGLRayTracingLevelTest, SkinnedMeshSceneMaterialUsesImportedFoxTexture
     EXPECT_EQ(scene_material_id, level->GetIdFromName("RayTraceMaterial"));
     const auto fox_material_id = FindMaterialForNode(
         *level,
-        frame::proto::NodeMesh::PRE_RENDER_TIME,
+        frame::proto::NodeMesh::SCENE_RENDER_TIME,
         "FoxMesh");
     ASSERT_NE(fox_material_id, frame::NullId);
 
@@ -907,7 +962,7 @@ TEST_F(OpenGLRayTracingLevelTest, SkinnedMeshFoxMaterialRemainsOpaque)
 
     const auto fox_material_id = FindMaterialForNode(
         *level,
-        frame::proto::NodeMesh::PRE_RENDER_TIME,
+        frame::proto::NodeMesh::SCENE_RENDER_TIME,
         "FoxMesh");
     ASSERT_NE(fox_material_id, frame::NullId);
 
