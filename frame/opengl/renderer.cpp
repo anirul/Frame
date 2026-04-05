@@ -129,6 +129,11 @@ bool RaytraceSceneRequiresWorldSpaceBuffers(frame::LevelInterface& level)
     return false;
 }
 
+bool HasRaytracingSourceMeshes(frame::LevelInterface& level)
+{
+    return !GetRaytracingSourceMeshMaterials(level).empty();
+}
+
 std::vector<std::pair<EntityId, std::string>> GetActiveTextureBindings(
     const MaterialInterface& material,
     const ProgramInterface& program)
@@ -617,7 +622,7 @@ void Renderer::UpdateRaytraceBuffersIfNeeded(SkinnedMesh& skinned_mesh)
         }
     }
 
-    if (RaytraceSceneRequiresWorldSpaceBuffers(level_))
+    if (HasRaytracingSourceMeshes(level_))
     {
         UpdateAggregateRaytraceSceneBuffers();
     }
@@ -1106,7 +1111,9 @@ void Renderer::PreRender()
     render_time_ = proto::NodeMesh::PRE_RENDER_TIME;
     // This will ensure that it is only true once.
     auto first_render = std::exchange(first_render_, false);
-    auto preprocess_entry = [&](const std::pair<EntityId, EntityId>& p) {
+    auto preprocess_entry = [&](
+                                const std::pair<EntityId, EntityId>& p,
+                                bool preprocess_every_frame) {
         auto& node = level_.GetSceneNodeFromId(p.first);
         if (node.GetLocalMesh())
         {
@@ -1118,7 +1125,7 @@ void Renderer::PreRender()
                 UpdateRaytraceBuffersIfNeeded(*gl_skinned_mesh);
             }
         }
-        if (!first_render)
+        if (!first_render && !preprocess_every_frame)
         {
             return;
         }
@@ -1203,7 +1210,7 @@ void Renderer::PreRender()
     for (const auto& p : level_.GetMeshMaterialIds(
              proto::NodeMesh::PRE_RENDER_TIME))
     {
-        preprocess_entry(p);
+        preprocess_entry(p, false);
     }
     for (const auto& p : level_.GetMeshMaterialIds(
              proto::NodeMesh::SCENE_RENDER_TIME))
@@ -1212,7 +1219,7 @@ void Renderer::PreRender()
         {
             continue;
         }
-        preprocess_entry(p);
+        preprocess_entry(p, true);
     }
     if (RaytraceSceneRequiresWorldSpaceBuffers(level_))
     {
