@@ -171,7 +171,7 @@
                 "parent": "mesh_holder",
                 "file_name": "dragon.glb",
                 "acceleration_structure_enum": "BVH_ACCELERATION",
-                "render_time_enum": "PRE_RENDER_TIME"
+                "render_time_enum": "SCENE_RENDER_TIME"
             }
         ],
         "node_lights": [

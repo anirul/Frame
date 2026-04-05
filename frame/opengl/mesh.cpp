@@ -494,7 +494,8 @@ EntityId CreateCubeMesh(LevelInterface& level)
         // clang-format on
     };
     std::vector<std::uint32_t> indices;
-    indices.resize(18 * 3);
+    // The cube data above is authored as 12 triangles / 36 vertices.
+    indices.resize(12 * 3);
     std::iota(indices.begin(), indices.end(), 0);
     auto point_buffer = std::make_unique<Buffer>();
     auto normal_buffer = std::make_unique<Buffer>();

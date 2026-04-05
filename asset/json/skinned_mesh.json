@@ -144,7 +144,7 @@
                 "play_animation": true,
                 "animation_speed": 1.0,
                 "animation_clip_name": "Walk",
-                "render_time_enum": "PRE_RENDER_TIME"
+                "render_time_enum": "SCENE_RENDER_TIME"
             }
         ],
         "node_lights": [

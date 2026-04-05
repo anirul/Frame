@@ -311,6 +311,25 @@ class VulkanRayTracingDualParseTest : public ::testing::Test
     frame::json::LevelData level_data_;
 };
 
+class VulkanRayTracingSceneSourceParseTest : public ::testing::Test
+{
+  protected:
+    VulkanRayTracingSceneSourceParseTest()
+    {
+        asset_root_ = frame::file::FindDirectory("asset");
+        level_path_ = frame::file::FindFile(
+            "asset/json/raytracing_scene_source.json");
+        level_proto_ = frame::json::LoadLevelProto(level_path_);
+        level_data_ = frame::json::ParseLevelData(
+            glm::uvec2(512, 288), level_proto_, asset_root_);
+    }
+
+    std::filesystem::path asset_root_;
+    std::filesystem::path level_path_;
+    frame::proto::Level level_proto_;
+    frame::json::LevelData level_data_;
+};
+
 TEST_F(VulkanRayTracingDualParseTest, BuildsTriangleBuffersFromScene)
 {
     auto built = frame::vulkan::BuildLevel(glm::uvec2(512, 288), level_data_);
@@ -335,6 +354,57 @@ TEST_F(VulkanRayTracingDualParseTest, BuildsTriangleBuffersFromScene)
         ASSERT_NE(buffer, nullptr) << "Unexpected buffer type for " << inner_name;
         EXPECT_GT(buffer->GetSize(), 0u) << "Empty buffer " << inner_name;
     }
+}
+
+TEST_F(
+    VulkanRayTracingSceneSourceParseTest,
+    SceneRenderTimeSourceMeshGetsPreprocessMaterialAndAutoResolve)
+{
+    auto built = frame::vulkan::BuildLevel(glm::uvec2(512, 288), level_data_);
+    ASSERT_NE(built.level, nullptr);
+    auto& level = *built.level;
+
+    const auto scene_cube_material_id = FindMaterialForNode(
+        level,
+        frame::proto::NodeMesh::SCENE_RENDER_TIME,
+        "SceneCube");
+    ASSERT_NE(scene_cube_material_id, frame::NullId);
+    const auto& scene_cube_material = level.GetMaterialFromId(
+        scene_cube_material_id);
+    EXPECT_NE(level.GetNameFromId(scene_cube_material_id), "RayTraceMaterial");
+    EXPECT_NE(
+        scene_cube_material.GetPreprocessProgramId(&level),
+        frame::NullId);
+
+    const auto resolve_material_id = FindMaterialForNode(
+        level,
+        frame::proto::NodeMesh::SCENE_RENDER_TIME,
+        "RayTracingRendering");
+    ASSERT_NE(resolve_material_id, frame::NullId);
+    EXPECT_EQ(resolve_material_id, level.GetIdFromName("RayTraceMaterial"));
+    const auto& resolve_material = level.GetMaterialFromId(resolve_material_id);
+    EXPECT_EQ(resolve_material.GetPreprocessProgramId(&level), frame::NullId);
+}
+
+TEST_F(
+    VulkanRayTracingSceneSourceParseTest,
+    SceneRenderTimeSourceMeshBuildsAggregateBuffersOnResolveMaterial)
+{
+    auto built = frame::vulkan::BuildLevel(glm::uvec2(512, 288), level_data_);
+    ASSERT_NE(built.level, nullptr);
+    auto& level = *built.level;
+
+    const auto resolve_material_id = level.GetIdFromName("RayTraceMaterial");
+    ASSERT_NE(resolve_material_id, frame::NullId);
+    const auto& resolve_material = level.GetMaterialFromId(resolve_material_id);
+    const auto triangle_id = FindBufferByInnerName(
+        level, resolve_material, "TriangleBufferOpaque");
+    ASSERT_NE(triangle_id, frame::NullId);
+
+    auto* triangle_buffer = dynamic_cast<frame::vulkan::Buffer*>(
+        &level.GetBufferFromId(triangle_id));
+    ASSERT_NE(triangle_buffer, nullptr);
+    EXPECT_GT(triangle_buffer->GetSize(), 0u);
 }
 
 TEST_F(VulkanRayTracingDualParseTest, UsesHardwareRaytracingStageFiles)
@@ -500,7 +570,7 @@ TEST_F(VulkanRayTracingDualParseTest, ImportsGltfGlassMaterialFromIco)
 
     const auto material_id = FindMaterialForNode(
         level,
-        frame::proto::NodeMesh::PRE_RENDER_TIME,
+        frame::proto::NodeMesh::SCENE_RENDER_TIME,
         "Ico");
     ASSERT_NE(material_id, frame::NullId);
     const auto& material = level.GetMaterialFromId(material_id);
@@ -573,7 +643,7 @@ TEST_F(VulkanRayTracingDualParseTest, ImportsGltfOpaqueSpecularFromPlate)
 
     const auto plate_material_id = FindMaterialForNode(
         level,
-        frame::proto::NodeMesh::PRE_RENDER_TIME,
+        frame::proto::NodeMesh::SCENE_RENDER_TIME,
         "Plate");
     ASSERT_NE(plate_material_id, frame::NullId);
     const auto scene_material_id = level.GetIdFromName("RayTraceMaterial");
@@ -720,7 +790,7 @@ TEST_F(VulkanSkinnedRayTracingParseTest, SceneMaterialUsesImportedFoxTextures)
     ASSERT_NE(scene_material_id, frame::NullId);
     const auto fox_material_id = FindMaterialForNode(
         level,
-        frame::proto::NodeMesh::PRE_RENDER_TIME,
+        frame::proto::NodeMesh::SCENE_RENDER_TIME,
         "FoxMesh");
     ASSERT_NE(fox_material_id, frame::NullId);
 
@@ -884,7 +954,7 @@ TEST(VulkanRayTracingTintedMeshTest, ImportedBaseColorTintOverridesColorTexture)
 
     const auto tinted_material_id = FindMaterialForNode(
         level,
-        frame::proto::NodeMesh::PRE_RENDER_TIME,
+        frame::proto::NodeMesh::SCENE_RENDER_TIME,
         "TintedTriangle");
     ASSERT_NE(tinted_material_id, frame::NullId);
     const auto& tinted_material = level.GetMaterialFromId(tinted_material_id);
