@@ -170,6 +170,21 @@ bool CanUseSharedRaytraceSceneTransform(
     return true;
 }
 
+bool RequiresRuntimeRaytraceSceneBuffers(
+    frame::LevelInterface& level,
+    double time_seconds)
+{
+    if (!HasRaytracingSourceMeshes(level))
+    {
+        return false;
+    }
+    if (RaytraceSceneRequiresWorldSpaceBuffers(level))
+    {
+        return true;
+    }
+    return !CanUseSharedRaytraceSceneTransform(level, time_seconds);
+}
+
 std::vector<std::pair<EntityId, std::string>> GetActiveTextureBindings(
     const MaterialInterface& material,
     const ProgramInterface& program)
@@ -1022,6 +1037,10 @@ void Renderer::UpdateAggregateRaytraceSceneBuffers()
     const bool use_shared_scene_transform =
         !use_world_space_buffers &&
         CanUseSharedRaytraceSceneTransform(level_, delta_time_);
+    if (use_shared_scene_transform)
+    {
+        return;
+    }
     const auto scene_entries = CollectRaytraceSceneEntries(level_, delta_time_);
     if (scene_entries.empty())
     {
@@ -1064,23 +1083,10 @@ void Renderer::UpdateAggregateRaytraceSceneBuffers()
     std::vector<std::uint8_t> opaque_triangles = {};
     std::vector<std::uint8_t> transmissive_bvh = {};
     std::vector<std::uint8_t> opaque_bvh = {};
-    std::vector<std::uint8_t> raytrace_instances = {};
+    std::vector<std::uint8_t> raytrace_instances =
+        EncodeRaytraceInstanceData(std::vector<RaytraceInstanceData>{});
     const bool update_instance_buffer =
-        geometry_changed || !use_world_space_buffers;
-    const auto count_triangles =
-        [&](bool transmissive) -> std::uint32_t {
-            std::uint32_t triangle_count = 0;
-            for (const auto& entry : scene_entries)
-            {
-                if (entry.transmissive == transmissive)
-                {
-                    triangle_count += entry.triangle_count;
-                }
-            }
-            return triangle_count;
-        };
-    const std::uint32_t transmissive_triangle_count = count_triangles(true);
-    const std::uint32_t opaque_triangle_count = count_triangles(false);
+        geometry_changed || (!use_world_space_buffers && !use_shared_scene_transform);
     if (geometry_changed)
     {
         const auto prepared_entries = PrepareRaytraceSceneEntries(
@@ -1102,10 +1108,6 @@ void Renderer::UpdateAggregateRaytraceSceneBuffers()
         {
             transmissive_bvh = BuildAggregateBvhBytes(transmissive_triangles);
             opaque_bvh = BuildAggregateBvhBytes(opaque_triangles);
-            raytrace_instances = BuildSharedTransformRaytraceInstanceBytes(
-                scene_entries.front().model,
-                transmissive_triangle_count,
-                opaque_triangle_count);
         }
         else
         {
@@ -1115,14 +1117,9 @@ void Renderer::UpdateAggregateRaytraceSceneBuffers()
                 BuildPerMeshAggregateBvhBytes(prepared_entries, false);
         }
     }
-    if (!use_world_space_buffers)
+    if (!use_world_space_buffers && !use_shared_scene_transform)
     {
-        raytrace_instances = use_shared_scene_transform
-            ? BuildSharedTransformRaytraceInstanceBytes(
-                  scene_entries.front().model,
-                  transmissive_triangle_count,
-                  opaque_triangle_count)
-            : BuildPerMeshRaytraceInstanceBytes(scene_entries);
+        raytrace_instances = BuildPerMeshRaytraceInstanceBytes(scene_entries);
     }
 
     for (const auto& [node_id, material_id] :
@@ -1249,7 +1246,19 @@ void Renderer::RenderMesh(
     {
         if (HasRaytracingSourceMeshes(level_))
         {
-            model_matrix = glm::mat4(1.0f);
+            if (RequiresRuntimeRaytraceSceneBuffers(level_, delta_time_))
+            {
+                model_matrix = glm::mat4(1.0f);
+            }
+            else if (!program.GetTemporarySceneRoot().empty())
+            {
+                auto temp_id = level_.GetIdFromName(program.GetTemporarySceneRoot());
+                if (temp_id != NullId)
+                {
+                    auto& temp_node = level_.GetSceneNodeFromId(temp_id);
+                    model_matrix = temp_node.GetLocalModel(delta_time_);
+                }
+            }
         }
         else if (!program.GetTemporarySceneRoot().empty())
         {
@@ -1686,7 +1695,7 @@ void Renderer::PreRender()
         }
         preprocess_entry(p, true);
     }
-    if (HasRaytracingSourceMeshes(level_))
+    if (RequiresRuntimeRaytraceSceneBuffers(level_, delta_time_))
     {
         UpdateAggregateRaytraceSceneBuffers();
     }

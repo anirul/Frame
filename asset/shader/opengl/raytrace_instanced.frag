@@ -85,6 +85,18 @@ layout(std430, binding = 3) buffer BvhBufferOpaque
     BvhNode opaque_nodes[];
 };
 
+struct RaytraceInstanceData
+{
+    mat4 object_to_world;
+    mat4 world_to_object;
+    uvec4 metadata;
+};
+
+layout(std430, binding = 4) readonly buffer RaytraceInstanceBuffer
+{
+    RaytraceInstanceData raytrace_instances[];
+};
+
 const int kMaterialTransmissive = 0;
 const int kMaterialOpaque = 1;
 const int kLightTypePoint = 2;
@@ -109,14 +121,49 @@ struct HitInfo
     float t;
     vec2 bary;
     int tri_index;
+    int instance_index;
     int material_id;
     vec3 pos_model;
+    vec3 pos_world;
     vec3 normal_model;
     vec3 tangent_model;
     vec3 bitangent_model;
     vec2 uv;
     vec4 color;
 };
+
+int RaytraceInstanceCount()
+{
+    return raytrace_instances.length();
+}
+
+RaytraceInstanceData DefaultRaytraceInstanceData()
+{
+    RaytraceInstanceData data;
+    data.object_to_world = mat4(1.0);
+    data.world_to_object = mat4(1.0);
+    data.metadata = uvec4(0u);
+    return data;
+}
+
+RaytraceInstanceData GetRaytraceInstanceData(const int instance_index)
+{
+    if (instance_index < 0 || instance_index >= RaytraceInstanceCount())
+    {
+        return DefaultRaytraceInstanceData();
+    }
+    return raytrace_instances[instance_index];
+}
+
+vec3 TransformPoint(const mat4 matrix, const vec3 point)
+{
+    return (matrix * vec4(point, 1.0)).xyz;
+}
+
+mat3 GetNormalMatrix(const RaytraceInstanceData instance_data)
+{
+    return transpose(mat3(instance_data.world_to_object));
+}
 
 // ----------------------------------------------------------------------------
 float DistributionGGX(vec3 N, vec3 H, float roughness)
@@ -349,22 +396,60 @@ bool rayAabbIntersect(
     return t_exit >= max(t_enter, 0.0);
 }
 
-bool traverseTransmissiveBVH(
+bool traverseTrianglesRange(
     const vec3 ray_origin,
     const vec3 ray_dir,
     const float max_t,
+    const int first_triangle,
+    const int triangle_count,
+    const bool transmissive,
     out float out_t,
     out vec2 out_bary,
     out int out_tri)
 {
-    if (transmissive_nodes.length() == 0)
+    out_t = 1e20;
+    out_tri = -1;
+    bool hit = false;
+    for (int i = 0; i < triangle_count; ++i)
+    {
+        const int tri_index = first_triangle + i;
+        const Triangle triangle = transmissive
+            ? transmissive_triangles[tri_index]
+            : opaque_triangles[tri_index];
+        float t;
+        vec2 bary;
+        if (rayTriangleIntersect(ray_origin, ray_dir, triangle, t, bary) &&
+            t < out_t &&
+            t < max_t)
+        {
+            out_t = t;
+            out_bary = bary;
+            out_tri = tri_index;
+            hit = true;
+        }
+    }
+    return hit;
+}
+
+bool traverseTransmissiveBVHFromRoot(
+    const vec3 ray_origin,
+    const vec3 ray_dir,
+    const float max_t,
+    const int root_index,
+    out float out_t,
+    out vec2 out_bary,
+    out int out_tri)
+{
+    if (transmissive_nodes.length() == 0 ||
+        root_index < 0 ||
+        root_index >= transmissive_nodes.length())
     {
         return false;
     }
     vec3 inv_ray_dir = 1.0 / ray_dir;
     int stack[64];
     int stack_ptr = 0;
-    stack[stack_ptr++] = 0;
+    stack[stack_ptr++] = root_index;
     out_t = 1e20;
     out_tri = -1;
     bool hit = false;
@@ -380,7 +465,7 @@ bool traverseTransmissiveBVH(
         {
             for (int i = 0; i < node.triangle_count; ++i)
             {
-                int tri_index = node.first_triangle + i;
+                const int tri_index = node.first_triangle + i;
                 float t;
                 vec2 bary;
                 if (rayTriangleIntersect(
@@ -414,22 +499,25 @@ bool traverseTransmissiveBVH(
     return hit;
 }
 
-bool traverseOpaqueBVH(
+bool traverseOpaqueBVHFromRoot(
     const vec3 ray_origin,
     const vec3 ray_dir,
     const float max_t,
+    const int root_index,
     out float out_t,
     out vec2 out_bary,
     out int out_tri)
 {
-    if (opaque_nodes.length() == 0)
+    if (opaque_nodes.length() == 0 ||
+        root_index < 0 ||
+        root_index >= opaque_nodes.length())
     {
         return false;
     }
     vec3 inv_ray_dir = 1.0 / ray_dir;
     int stack[64];
     int stack_ptr = 0;
-    stack[stack_ptr++] = 0;
+    stack[stack_ptr++] = root_index;
     out_t = 1e20;
     out_tri = -1;
     bool hit = false;
@@ -445,7 +533,7 @@ bool traverseOpaqueBVH(
         {
             for (int i = 0; i < node.triangle_count; ++i)
             {
-                int tri_index = node.first_triangle + i;
+                const int tri_index = node.first_triangle + i;
                 float t;
                 vec2 bary;
                 if (rayTriangleIntersect(
@@ -479,83 +567,133 @@ bool traverseOpaqueBVH(
     return hit;
 }
 
-bool anyHitTriangles(const vec3 ray_origin, const vec3 ray_dir, const float max_t)
+bool TraceInstanceHit(
+    const int instance_index,
+    const vec3 ray_origin_world,
+    const vec3 ray_dir_world,
+    const float max_t_world,
+    out float out_t_world,
+    out vec2 out_bary,
+    out int out_tri,
+    out vec3 out_pos_model,
+    out vec3 out_pos_world)
 {
-    if (transmissive_nodes.length() > 0)
+    const RaytraceInstanceData instance_data =
+        GetRaytraceInstanceData(instance_index);
+    const int triangle_offset = int(instance_data.metadata.x);
+    const int material_id = int(instance_data.metadata.y);
+    const int bvh_root_index = int(instance_data.metadata.z);
+    const int triangle_count = int(instance_data.metadata.w);
+    if (triangle_count <= 0)
     {
-        float t = 0.0;
+        return false;
+    }
+
+    const bool transmissive = material_id == kMaterialTransmissive;
+    const vec3 ray_origin_model =
+        TransformPoint(instance_data.world_to_object, ray_origin_world);
+    const vec3 ray_dir_model =
+        normalize(mat3(instance_data.world_to_object) * ray_dir_world);
+    float t_model = 0.0;
+    vec2 bary = vec2(0.0);
+    int tri_index = -1;
+    bool hit = transmissive
+        ? traverseTransmissiveBVHFromRoot(
+              ray_origin_model,
+              ray_dir_model,
+              1e20,
+              bvh_root_index,
+              t_model,
+              bary,
+              tri_index)
+        : traverseOpaqueBVHFromRoot(
+              ray_origin_model,
+              ray_dir_model,
+              1e20,
+              bvh_root_index,
+              t_model,
+              bary,
+              tri_index);
+    if (!hit)
+    {
+        hit = traverseTrianglesRange(
+            ray_origin_model,
+            ray_dir_model,
+            1e20,
+            triangle_offset,
+            triangle_count,
+            transmissive,
+            t_model,
+            bary,
+            tri_index);
+    }
+    if (!hit)
+    {
+        return false;
+    }
+
+    const vec3 pos_model = ray_origin_model + t_model * ray_dir_model;
+    const vec3 pos_world = TransformPoint(instance_data.object_to_world, pos_model);
+    const float t_world = dot(pos_world - ray_origin_world, ray_dir_world);
+    if (t_world <= 0.0001 || t_world >= max_t_world)
+    {
+        return false;
+    }
+
+    out_t_world = t_world;
+    out_bary = bary;
+    out_tri = tri_index;
+    out_pos_model = pos_model;
+    out_pos_world = pos_world;
+    return true;
+}
+
+bool anyHitTriangles(
+    const vec3 ray_origin_world,
+    const vec3 ray_dir_world,
+    const float max_t_world)
+{
+    const int instance_count = RaytraceInstanceCount();
+    for (int instance_index = 0; instance_index < instance_count; ++instance_index)
+    {
+        float t_world = 0.0;
         vec2 bary = vec2(0.0);
         int tri_index = -1;
-        if (traverseTransmissiveBVH(ray_origin, ray_dir, max_t, t, bary, tri_index))
+        vec3 pos_model = vec3(0.0);
+        vec3 pos_world = vec3(0.0);
+        if (TraceInstanceHit(
+                instance_index,
+                ray_origin_world,
+                ray_dir_world,
+                max_t_world,
+                t_world,
+                bary,
+                tri_index,
+                pos_model,
+                pos_world))
         {
             return true;
-        }
-    }
-    else
-    {
-        int tri_count = TriangleCountTransmissive();
-        for (int i = 0; i < tri_count; ++i)
-        {
-            float t;
-            vec2 bary;
-            if (rayTriangleIntersect(
-                    ray_origin,
-                    ray_dir,
-                    transmissive_triangles[i],
-                    t,
-                    bary) &&
-                t < max_t)
-            {
-                return true;
-            }
-        }
-    }
-    if (opaque_nodes.length() > 0)
-    {
-        float t = 0.0;
-        vec2 bary = vec2(0.0);
-        int tri_index = -1;
-        if (traverseOpaqueBVH(ray_origin, ray_dir, max_t, t, bary, tri_index))
-        {
-            return true;
-        }
-    }
-    else
-    {
-        int opaque_count = TriangleCountOpaque();
-        for (int i = 0; i < opaque_count; ++i)
-        {
-            float t;
-            vec2 bary;
-            if (rayTriangleIntersect(
-                    ray_origin,
-                    ray_dir,
-                    opaque_triangles[i],
-                    t,
-                    bary) &&
-                t < max_t)
-            {
-                return true;
-            }
         }
     }
     return false;
 }
 
-bool anyHitTriangles(const vec3 ray_origin, const vec3 ray_dir)
+bool anyHitTriangles(const vec3 ray_origin_world, const vec3 ray_dir_world)
 {
-    return anyHitTriangles(ray_origin, ray_dir, 1e20);
+    return anyHitTriangles(ray_origin_world, ray_dir_world, 1e20);
 }
 
-HitInfo TraceScene(const vec3 ray_origin, const vec3 ray_dir)
+HitInfo TraceScene(const vec3 ray_origin_world, const vec3 ray_dir_world)
 {
     HitInfo info;
     info.hit = false;
     info.t = 0.0;
     info.bary = vec2(0.0);
     info.tri_index = -1;
+    info.instance_index = -1;
     info.material_id = -1;
     info.pos_model = vec3(0.0);
+    info.pos_world = vec3(0.0);
     info.normal_model = vec3(0.0);
     info.tangent_model = vec3(0.0);
     info.bitangent_model = vec3(0.0);
@@ -565,91 +703,44 @@ HitInfo TraceScene(const vec3 ray_origin, const vec3 ray_dir)
     float best_t = 1e20;
     vec2 best_bary = vec2(0.0);
     int best_tri = -1;
+    int best_instance = -1;
     int best_material = -1;
-    if (transmissive_nodes.length() > 0)
+    vec3 best_pos_model = vec3(0.0);
+    vec3 best_pos_world = vec3(0.0);
+
+    const int instance_count = RaytraceInstanceCount();
+    for (int instance_index = 0; instance_index < instance_count; ++instance_index)
     {
-        float t = 0.0;
+        float t_world = 0.0;
         vec2 bary = vec2(0.0);
         int tri_index = -1;
-        if (traverseTransmissiveBVH(
-                ray_origin,
-                ray_dir,
-                1e20,
-                t,
+        vec3 pos_model = vec3(0.0);
+        vec3 pos_world = vec3(0.0);
+        if (!TraceInstanceHit(
+                instance_index,
+                ray_origin_world,
+                ray_dir_world,
+                best_t,
+                t_world,
                 bary,
-                tri_index) &&
-            t < best_t)
+                tri_index,
+                pos_model,
+                pos_world))
         {
-            best_t = t;
-            best_bary = bary;
-            best_tri = tri_index;
-            best_material = kMaterialTransmissive;
+            continue;
         }
+
+        const RaytraceInstanceData instance_data =
+            GetRaytraceInstanceData(instance_index);
+        best_t = t_world;
+        best_bary = bary;
+        best_tri = tri_index;
+        best_instance = instance_index;
+        best_material = int(instance_data.metadata.y);
+        best_pos_model = pos_model;
+        best_pos_world = pos_world;
     }
-    else
-    {
-        int tri_count = TriangleCountTransmissive();
-        for (int i = 0; i < tri_count; ++i)
-        {
-            float t;
-            vec2 bary;
-            if (rayTriangleIntersect(
-                    ray_origin,
-                    ray_dir,
-                    transmissive_triangles[i],
-                    t,
-                    bary) &&
-                t < best_t)
-            {
-                best_t = t;
-                best_bary = bary;
-                best_tri = i;
-                best_material = kMaterialTransmissive;
-            }
-        }
-    }
-    if (opaque_nodes.length() > 0)
-    {
-        float t = 0.0;
-        vec2 bary = vec2(0.0);
-        int tri_index = -1;
-        if (traverseOpaqueBVH(
-                ray_origin,
-                ray_dir,
-                1e20,
-                t,
-                bary,
-                tri_index) &&
-            t < best_t)
-        {
-            best_t = t;
-            best_bary = bary;
-            best_tri = tri_index;
-            best_material = kMaterialOpaque;
-        }
-    }
-    else
-    {
-        int opaque_count = TriangleCountOpaque();
-        for (int i = 0; i < opaque_count; ++i)
-        {
-            float t;
-            vec2 bary;
-            if (rayTriangleIntersect(
-                    ray_origin,
-                    ray_dir,
-                    opaque_triangles[i],
-                    t,
-                    bary) &&
-                t < best_t)
-            {
-                best_t = t;
-                best_bary = bary;
-                best_tri = i;
-                best_material = kMaterialOpaque;
-            }
-        }
-    }
+
     if (best_tri < 0)
     {
         return info;
@@ -659,13 +750,15 @@ HitInfo TraceScene(const vec3 ray_origin, const vec3 ray_dir)
     info.t = best_t;
     info.bary = best_bary;
     info.tri_index = best_tri;
+    info.instance_index = best_instance;
     info.material_id = best_material;
-    info.pos_model = ray_origin + best_t * ray_dir;
+    info.pos_model = best_pos_model;
+    info.pos_world = best_pos_world;
 
-    Triangle tri = (best_material == kMaterialOpaque)
+    const Triangle tri = (best_material == kMaterialOpaque)
         ? opaque_triangles[best_tri]
         : transmissive_triangles[best_tri];
-    float w = 1.0 - best_bary.x - best_bary.y;
+    const float w = 1.0 - best_bary.x - best_bary.y;
     info.normal_model = normalize(
         tri.v0.normal * w +
         tri.v1.normal * best_bary.x +
@@ -686,11 +779,11 @@ HitInfo TraceScene(const vec3 ray_origin, const vec3 ray_dir)
             tri.v1.pad2.y * best_bary.x +
             tri.v2.pad2.y * best_bary.y);
 
-    vec3 edge1 = tri.v1.position - tri.v0.position;
-    vec3 edge2 = tri.v2.position - tri.v0.position;
-    vec2 deltaUV1 = tri.v1.uv - tri.v0.uv;
-    vec2 deltaUV2 = tri.v2.uv - tri.v0.uv;
-    float f = 1.0 / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+    const vec3 edge1 = tri.v1.position - tri.v0.position;
+    const vec3 edge2 = tri.v2.position - tri.v0.position;
+    const vec2 deltaUV1 = tri.v1.uv - tri.v0.uv;
+    const vec2 deltaUV2 = tri.v2.uv - tri.v0.uv;
+    const float f = 1.0 / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
     if (!isinf(f))
     {
         info.tangent_model =
@@ -721,8 +814,7 @@ vec3 SampleEnvDiffuse(vec3 normal_world, mat3 env_rot_inv, float max_env_lod)
 }
 
 vec3 SampleReflection(
-    vec3 origin_model,
-    vec3 dir_model,
+    vec3 origin_world,
     vec3 dir_world,
     mat3 env_rot_inv,
     float roughness,
@@ -731,7 +823,7 @@ vec3 SampleReflection(
     vec3 env_color =
         SampleEnvSpecular(dir_world, env_rot_inv, roughness, max_env_lod);
     vec3 reflection_sample = env_color;
-    HitInfo reflection_hit = TraceScene(origin_model, dir_model);
+    HitInfo reflection_hit = TraceScene(origin_world, dir_world);
     if (reflection_hit.hit)
     {
         reflection_sample = SampleAlbedo(reflection_hit);
@@ -767,8 +859,6 @@ bool RefractDir(
 vec3 ShadeOpaque(
     const HitInfo hit,
     vec3 ray_dir_world,
-    mat3 model_inv3,
-    mat3 normal_matrix,
     int scene_light_type,
     vec3 light_dir_world,
     vec3 light_color_world,
@@ -776,6 +866,9 @@ vec3 ShadeOpaque(
     float max_env_lod,
     bool allow_reflection)
 {
+    const RaytraceInstanceData instance_data =
+        GetRaytraceInstanceData(hit.instance_index);
+    const mat3 normal_matrix = GetNormalMatrix(instance_data);
     vec3 N = normalize(normal_matrix * hit.normal_model);
     vec3 T = normalize(normal_matrix * hit.tangent_model);
     vec3 B = normalize(normal_matrix * hit.bitangent_model);
@@ -794,7 +887,7 @@ vec3 ShadeOpaque(
 
     vec3 col = length(light_color_world) > 0.0 ? light_color_world
                                                : vec3(1.0);
-    vec3 hit_pos_world = (model * vec4(hit.pos_model, 1.0)).xyz;
+    vec3 hit_pos_world = hit.pos_world;
     vec3 L = vec3(0.0, 1.0, 0.0);
     vec3 shadow_dir = vec3(0.0, 1.0, 0.0);
     float shadow_tmax = 1e20;
@@ -807,7 +900,7 @@ vec3 ShadeOpaque(
         if (light_distance > 0.001)
         {
             L = to_light / light_distance;
-            shadow_dir = normalize(model_inv3 * L);
+            shadow_dir = normalize(L);
             shadow_tmax = max(light_distance - 0.02, 0.0);
             light_visibility = ComputePointLightVisibility(light_distance);
         }
@@ -817,10 +910,10 @@ vec3 ShadeOpaque(
         vec3 dir = length(light_dir_world) > 0.0 ? light_dir_world
                                                  : vec3(1.0, -1.0, 1.0);
         L = normalize(-dir);
-        shadow_dir = normalize(model_inv3 * -dir);
+        shadow_dir = normalize(-dir);
     }
 
-    vec3 shadow_origin = hit.pos_model + hit.normal_model * 0.0015;
+    vec3 shadow_origin = hit_pos_world + hit_normal * 0.0015;
     bool in_shadow = false;
     if (light_visibility > 0.0)
     {
@@ -857,7 +950,6 @@ vec3 ShadeOpaque(
     float NdotV = max(dot(hit_normal, V), 0.0);
 
     vec3 reflection_dir_world = normalize(reflect(-ray_dir_world, hit_normal));
-    vec3 reflection_dir_model = normalize(model_inv3 * reflection_dir_world);
     vec3 env_color =
         SampleEnvSpecular(
             reflection_dir_world, env_rot_inv, roughness, max_env_lod);
@@ -869,10 +961,9 @@ vec3 ShadeOpaque(
         (metallic > 0.1 || roughness < 0.25);
     if (should_trace_reflection)
     {
-        vec3 reflection_origin_model = hit.pos_model + hit.normal_model * 0.0015;
+        vec3 reflection_origin_world = hit_pos_world + hit_normal * 0.0015;
         reflection_sample = SampleReflection(
-            reflection_origin_model,
-            reflection_dir_model,
+            reflection_origin_world,
             reflection_dir_world,
             env_rot_inv,
             roughness,
@@ -900,8 +991,6 @@ vec3 ShadeOpaque(
 vec3 ShadeGlass(
     const HitInfo hit,
     vec3 ray_dir_world,
-    mat3 model_inv3,
-    mat3 normal_matrix,
     int scene_light_type,
     vec3 light_dir_world,
     vec3 light_color_world,
@@ -920,8 +1009,7 @@ vec3 ShadeGlass(
     vec3 accum = vec3(0.0);
     vec3 throughput = vec3(1.0);
     vec3 dir_world = normalize(ray_dir_world);
-    vec3 origin_model = hit.pos_model;
-    vec3 dir_model = normalize(model_inv3 * dir_world);
+    vec3 origin_world = hit.pos_world;
     HitInfo current_hit = hit;
     bool inside = false;
     bool terminated = false;
@@ -930,7 +1018,7 @@ vec3 ShadeGlass(
     {
         if (depth > 0)
         {
-            current_hit = TraceScene(origin_model, dir_model);
+            current_hit = TraceScene(origin_world, dir_world);
             if (!current_hit.hit)
             {
                 accum += throughput *
@@ -956,8 +1044,6 @@ vec3 ShadeGlass(
             accum += throughput * ShadeOpaque(
                 current_hit,
                 dir_world,
-                model_inv3,
-                normal_matrix,
                 scene_light_type,
                 light_dir_world,
                 light_color_world,
@@ -968,6 +1054,9 @@ vec3 ShadeGlass(
             break;
         }
 
+        const RaytraceInstanceData instance_data =
+            GetRaytraceInstanceData(current_hit.instance_index);
+        const mat3 normal_matrix = GetNormalMatrix(instance_data);
         vec3 N = normalize(normal_matrix * current_hit.normal_model);
         vec3 I = normalize(dir_world);
         vec3 refract_dir_world;
@@ -983,12 +1072,9 @@ vec3 ShadeGlass(
         float reflect_weight = clamp(fresnel + rim_factor, 0.0, 1.0);
 
         vec3 reflect_dir_world = normalize(reflect(I, N));
-        vec3 reflect_dir_model = normalize(model_inv3 * reflect_dir_world);
-        vec3 reflect_origin_model =
-            current_hit.pos_model + current_hit.normal_model * 0.0015;
+        vec3 reflect_origin_world = current_hit.pos_world + N * 0.0015;
         vec3 reflect_color = SampleReflection(
-            reflect_origin_model,
-            reflect_dir_model,
+            reflect_origin_world,
             reflect_dir_world,
             env_rot_inv,
             0.02,
@@ -1007,10 +1093,8 @@ vec3 ShadeGlass(
         }
 
         dir_world = normalize(refract_dir_world);
-        dir_model = normalize(model_inv3 * dir_world);
-        vec3 normal_model = normalize(current_hit.normal_model);
-        float side = dot(dir_model, normal_model) > 0.0 ? 1.0 : -1.0;
-        origin_model = current_hit.pos_model + normal_model * side * kSurfaceBias;
+        float side = dot(dir_world, N) > 0.0 ? 1.0 : -1.0;
+        origin_world = current_hit.pos_world + N * side * kSurfaceBias;
         inside = !inside;
     }
 
@@ -1032,21 +1116,7 @@ void main()
     vec3 ray_dir_view = normalize(view_pos.xyz / view_w);
     vec3 ray_dir_world =
         normalize((view_inv * vec4(ray_dir_view, 0.0)).xyz);
-
-    // Transform the ray to model space to match the triangle buffer.
-    mat4 inv_model4 = model_inv;
-    mat3 model_inv3 = mat3(inv_model4);
-    float inv_det = abs(determinant(model_inv3));
-    if (inv_det < 1e-8)
-    {
-        inv_model4 = inverse(model);
-        model_inv3 = mat3(inv_model4);
-    }
-    mat3 normal_matrix = transpose(model_inv3);
-    vec3 ray_origin = (inv_model4 * vec4(camera_position, 1.0)).xyz;
-    vec3 ray_dir = normalize(model_inv3 * ray_dir_world);
-
-    HitInfo hit = TraceScene(ray_origin, ray_dir);
+    HitInfo hit = TraceScene(camera_position, ray_dir_world);
     int env_levels = textureQueryLevels(skybox_env);
     float max_env_lod = env_levels > 0 ? float(env_levels - 1) : 0.0;
     mat3 env_rot = mat3(env_map_model);
@@ -1071,8 +1141,6 @@ void main()
         color = ShadeOpaque(
             hit,
             ray_dir_world,
-            model_inv3,
-            normal_matrix,
             light_type,
             light_dir,
             light_color,
@@ -1085,8 +1153,6 @@ void main()
         color = ShadeGlass(
             hit,
             ray_dir_world,
-            model_inv3,
-            normal_matrix,
             light_type,
             light_dir,
             light_color,
