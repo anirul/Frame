@@ -131,11 +131,6 @@ bool RaytraceSceneRequiresWorldSpaceBuffers(frame::LevelInterface& level)
     return false;
 }
 
-bool HasRaytracingSourceMeshes(frame::LevelInterface& level)
-{
-    return !GetRaytracingSourceMeshMaterials(level).empty();
-}
-
 std::vector<std::pair<EntityId, std::string>> GetActiveTextureBindings(
     const MaterialInterface& material,
     const ProgramInterface& program)
@@ -1310,7 +1305,7 @@ void Renderer::PreRender()
         }
         preprocess_entry(p, true);
     }
-    if (HasRaytracingSourceMeshes(level_))
+    if (RaytraceSceneRequiresWorldSpaceBuffers(level_))
     {
         UpdateAggregateRaytraceSceneBuffers();
     }
