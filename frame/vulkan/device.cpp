@@ -370,9 +370,11 @@ void HashMatrix(std::size_t& seed, const glm::mat4& matrix)
 
 std::size_t BuildRaytracingSourceStateHash(
     frame::LevelInterface& level,
-    double time_seconds)
+    double time_seconds,
+    bool include_node_matrices)
 {
     std::size_t state_hash = 0;
+    HashCombine(state_hash, include_node_matrices);
     const auto source_mesh_materials = GetRaytracingSourceMeshMaterials(level);
     HashCombine(state_hash, source_mesh_materials.size());
     for (const auto& [source_node_id, source_material_id] : source_mesh_materials)
@@ -387,7 +389,10 @@ std::size_t BuildRaytracingSourceStateHash(
             continue;
         }
 
-        HashMatrix(state_hash, node->GetLocalModel(time_seconds));
+        if (include_node_matrices)
+        {
+            HashMatrix(state_hash, node->GetLocalModel(time_seconds));
+        }
         HashCombine(
             state_hash,
             IsTransmissiveMaterial(level, source_material_id));
@@ -2120,10 +2125,7 @@ void Device::UpdateRaytraceBuffers()
         {
             updated_aggregate_scene =
                 UpdateAggregateRaytracingSceneBuffers(false);
-            if (updated_aggregate_scene)
-            {
-                UpdateHardwareRaytracingScene();
-            }
+            UpdateHardwareRaytracingScene();
         }
     }
     else if (RaytraceSceneRequiresWorldSpaceBuffers(*level_))
@@ -2163,7 +2165,8 @@ bool Device::UpdateAggregateRaytracingSceneBuffers(bool build_software_bvh)
     const std::size_t scene_state_hash =
         BuildRaytracingSourceStateHash(
             *level_,
-            static_cast<double>(elapsed_time_seconds_));
+            static_cast<double>(elapsed_time_seconds_),
+            build_software_bvh);
     if (has_raytrace_scene_state_hash_ &&
         last_raytrace_scene_state_hash_ == scene_state_hash)
     {
