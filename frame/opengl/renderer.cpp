@@ -136,6 +136,40 @@ bool HasRaytracingSourceMeshes(frame::LevelInterface& level)
     return !GetRaytracingSourceMeshMaterials(level).empty();
 }
 
+bool CanUseSharedRaytraceSceneTransform(
+    frame::LevelInterface& level,
+    double time_seconds)
+{
+    const auto source_mesh_materials = GetRaytracingSourceMeshMaterials(level);
+    if (source_mesh_materials.empty())
+    {
+        return false;
+    }
+
+    std::optional<glm::mat4> shared_model = std::nullopt;
+    for (const auto& [source_node_id, source_material_id] : source_mesh_materials)
+    {
+        (void)source_material_id;
+        auto* node =
+            dynamic_cast<NodeMesh*>(&level.GetSceneNodeFromId(source_node_id));
+        if (!node)
+        {
+            return false;
+        }
+        const glm::mat4 model = node->GetLocalModel(time_seconds);
+        if (!shared_model)
+        {
+            shared_model = model;
+            continue;
+        }
+        if (*shared_model != model)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
 std::vector<std::pair<EntityId, std::string>> GetActiveTextureBindings(
     const MaterialInterface& material,
     const ProgramInterface& program)
@@ -863,6 +897,35 @@ std::vector<std::uint8_t> BuildWorldSpaceRaytraceInstanceBytes(
     return EncodeRaytraceInstanceData(instances);
 }
 
+std::vector<std::uint8_t> BuildSharedTransformRaytraceInstanceBytes(
+    const glm::mat4& shared_model,
+    std::uint32_t transmissive_triangle_count,
+    std::uint32_t opaque_triangle_count)
+{
+    std::vector<RaytraceInstanceData> instances = {};
+    const float determinant = glm::determinant(glm::mat3(shared_model));
+    const glm::mat4 world_to_object =
+        std::abs(determinant) > 1.0e-8f ? glm::inverse(shared_model)
+                                        : glm::mat4(1.0f);
+    const auto append_instance =
+        [&](std::uint32_t material_id,
+            std::uint32_t triangle_count) {
+            if (triangle_count == 0)
+            {
+                return;
+            }
+            RaytraceInstanceData instance = {};
+            instance.object_to_world = shared_model;
+            instance.world_to_object = world_to_object;
+            instance.metadata =
+                glm::uvec4(0u, material_id, 0u, triangle_count);
+            instances.push_back(std::move(instance));
+        };
+    append_instance(kRaytraceMaterialTransmissive, transmissive_triangle_count);
+    append_instance(kRaytraceMaterialOpaque, opaque_triangle_count);
+    return EncodeRaytraceInstanceData(instances);
+}
+
 } // namespace
 
 Renderer::Renderer(LevelInterface& level, glm::uvec4 viewport)
@@ -956,6 +1019,9 @@ void Renderer::UpdateAggregateRaytraceSceneBuffers()
 {
     const bool use_world_space_buffers =
         RaytraceSceneRequiresWorldSpaceBuffers(level_);
+    const bool use_shared_scene_transform =
+        !use_world_space_buffers &&
+        CanUseSharedRaytraceSceneTransform(level_, delta_time_);
     const auto scene_entries = CollectRaytraceSceneEntries(level_, delta_time_);
     if (scene_entries.empty())
     {
@@ -1001,6 +1067,20 @@ void Renderer::UpdateAggregateRaytraceSceneBuffers()
     std::vector<std::uint8_t> raytrace_instances = {};
     const bool update_instance_buffer =
         geometry_changed || !use_world_space_buffers;
+    const auto count_triangles =
+        [&](bool transmissive) -> std::uint32_t {
+            std::uint32_t triangle_count = 0;
+            for (const auto& entry : scene_entries)
+            {
+                if (entry.transmissive == transmissive)
+                {
+                    triangle_count += entry.triangle_count;
+                }
+            }
+            return triangle_count;
+        };
+    const std::uint32_t transmissive_triangle_count = count_triangles(true);
+    const std::uint32_t opaque_triangle_count = count_triangles(false);
     if (geometry_changed)
     {
         const auto prepared_entries = PrepareRaytraceSceneEntries(
@@ -1018,6 +1098,15 @@ void Renderer::UpdateAggregateRaytraceSceneBuffers()
                 transmissive_triangles,
                 opaque_triangles);
         }
+        else if (use_shared_scene_transform)
+        {
+            transmissive_bvh = BuildAggregateBvhBytes(transmissive_triangles);
+            opaque_bvh = BuildAggregateBvhBytes(opaque_triangles);
+            raytrace_instances = BuildSharedTransformRaytraceInstanceBytes(
+                scene_entries.front().model,
+                transmissive_triangle_count,
+                opaque_triangle_count);
+        }
         else
         {
             transmissive_bvh =
@@ -1028,7 +1117,12 @@ void Renderer::UpdateAggregateRaytraceSceneBuffers()
     }
     if (!use_world_space_buffers)
     {
-        raytrace_instances = BuildPerMeshRaytraceInstanceBytes(scene_entries);
+        raytrace_instances = use_shared_scene_transform
+            ? BuildSharedTransformRaytraceInstanceBytes(
+                  scene_entries.front().model,
+                  transmissive_triangle_count,
+                  opaque_triangle_count)
+            : BuildPerMeshRaytraceInstanceBytes(scene_entries);
     }
 
     for (const auto& [node_id, material_id] :
