@@ -291,6 +291,11 @@ ProgramInfo MakeRaytraceProgram(const std::string& output_texture_name)
         25,
         proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
         {proto::ProgramStage::COMPUTE});
+    *program.add_bindings() = MakeBinding(
+        "RaytraceInstanceBuffer",
+        31,
+        proto::ProgramBinding::STORAGE_BUFFER,
+        {proto::ProgramStage::COMPUTE});
     AddSharedRaytracingUniforms(program);
     return MakeProgramInfo(
         std::move(program),

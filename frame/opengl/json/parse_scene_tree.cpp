@@ -1097,6 +1097,14 @@ void FinalizeRaytracingSceneMaterials(LevelInterface& level)
         scene_material.AddBufferName(
             level.GetNameFromId(opaque_buffers.bvh_buffer_id),
             "BvhBufferOpaque");
+        const auto instance_buffer_id = CreateStorageBuffer(
+            level,
+            0,
+            nullptr,
+            buffer_base_name + "_instances");
+        scene_material.AddBufferName(
+            level.GetNameFromId(instance_buffer_id),
+            "RaytraceInstanceBuffer");
     }
 }
 

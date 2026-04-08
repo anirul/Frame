@@ -282,10 +282,13 @@ class Device : public DeviceInterface
         raytracing_pipeline_features_ = {};
     vk::PhysicalDeviceRayTracingPipelinePropertiesKHR
         raytracing_pipeline_properties_ = {};
+  public:
     struct HardwareRaytracingGeometry
     {
-        std::string source_inner_name;
+        EntityId source_node_id = NullId;
+        EntityId source_material_id = NullId;
         EntityId source_buffer_id = NullId;
+        std::uint64_t source_generation = 0;
         vk::UniqueBuffer vertex_buffer;
         vk::UniqueDeviceMemory vertex_memory;
         vk::DeviceSize vertex_buffer_size = 0;
@@ -298,8 +301,16 @@ class Device : public DeviceInterface
         vk::UniqueAccelerationStructureKHR blas;
         vk::DeviceAddress blas_address = 0;
         std::uint32_t triangle_count = 0;
-        std::uint32_t instance_custom_index = 0;
+        std::uint32_t triangle_offset = 0;
+        std::uint32_t material_id = 0;
     };
+    struct HardwareRaytracingInstanceData
+    {
+        glm::mat4 object_to_world = glm::mat4(1.0f);
+        glm::mat4 world_to_object = glm::mat4(1.0f);
+        glm::uvec4 metadata = glm::uvec4(0u);
+    };
+  private:
     std::vector<HardwareRaytracingGeometry> hardware_raytracing_geometries_;
     vk::UniqueBuffer hardware_raytracing_instance_buffer_;
     vk::UniqueDeviceMemory hardware_raytracing_instance_memory_;
