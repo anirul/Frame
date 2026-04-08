@@ -6,10 +6,24 @@
 namespace frame::vulkan
 {
 
+CommandQueue::CommandQueue(
+    vk::Device device,
+    vk::Queue queue,
+    std::uint32_t queue_family_index)
+    : device_(device),
+      queue_(queue)
+{
+    vk::CommandPoolCreateInfo pool_info(
+        vk::CommandPoolCreateFlagBits::eTransient |
+            vk::CommandPoolCreateFlagBits::eResetCommandBuffer,
+        queue_family_index);
+    pool_ = device_.createCommandPoolUnique(pool_info);
+}
+
 vk::CommandBuffer CommandQueue::BeginOneTime() const
 {
     vk::CommandBufferAllocateInfo alloc_info(
-        pool_,
+        *pool_,
         vk::CommandBufferLevel::ePrimary,
         1);
     auto command_buffers = device_.allocateCommandBuffers(alloc_info);
@@ -29,7 +43,7 @@ void CommandQueue::EndOneTime(vk::CommandBuffer command_buffer) const
         0, nullptr);
     queue_.submit(submit_info);
     queue_.waitIdle();
-    device_.freeCommandBuffers(pool_, command_buffer);
+    FreeOneTime(command_buffer);
 }
 
 void CommandQueue::CopyBuffer(
@@ -187,6 +201,27 @@ void CommandQueue::SubmitOneTime(
     auto command_buffer = BeginOneTime();
     recorder(command_buffer);
     EndOneTime(command_buffer);
+}
+
+CommandQueue::PendingSubmission CommandQueue::SubmitOneTimeAsync(
+    const std::function<void(vk::CommandBuffer)>& recorder) const
+{
+    PendingSubmission submission = {};
+    submission.command_buffer = BeginOneTime();
+    recorder(submission.command_buffer);
+    submission.command_buffer.end();
+
+    submission.fence = device_.createFenceUnique({});
+    vk::SubmitInfo submit_info(
+        0,
+        nullptr,
+        nullptr,
+        1,
+        &submission.command_buffer,
+        0,
+        nullptr);
+    queue_.submit(submit_info, *submission.fence);
+    return submission;
 }
 
 } // namespace frame::vulkan

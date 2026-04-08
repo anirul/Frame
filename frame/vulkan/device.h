@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <cstdint>
 #include <filesystem>
 #include <functional>
@@ -37,6 +38,9 @@ class Device : public DeviceInterface
 {
   public:
     using GuiRenderCallback = std::function<void(vk::CommandBuffer)>;
+    struct HardwareRaytracingGeometry;
+    struct HardwareRaytracingSceneSlot;
+    struct HardwareRaytracingInstanceData;
 
     Device(
         void* vk_instance,
@@ -160,7 +164,28 @@ class Device : public DeviceInterface
     void UpdateRaytraceBuffers();
     bool UpdateAggregateRaytracingSceneBuffers(bool build_software_bvh);
     void UpdateHardwareRaytracingScene();
-    void UpdateHardwareRaytracingDescriptor();
+    void UpdateHardwareRaytracingDescriptor(
+        std::optional<std::size_t> frame_index = std::nullopt);
+    void WaitForAllInFlightFrames();
+    void PollHardwareRaytracingSceneBuilds();
+    bool IsHardwareRaytracingSceneSlotInUse(std::size_t slot_index) const;
+    std::optional<std::size_t> AcquireHardwareRaytracingSceneSlot() const;
+    void DestroyHardwareRaytracingSceneSlot(
+        struct HardwareRaytracingSceneSlot& scene);
+    void EnsureHardwareRaytracingSceneSlotResources(
+        struct HardwareRaytracingSceneSlot& scene,
+        std::uint32_t instance_count,
+        vk::DeviceSize shader_instance_bytes,
+        vk::DeviceSize build_instance_bytes,
+        vk::AccelerationStructureBuildGeometryInfoKHR build_info,
+        const vk::AccelerationStructureBuildSizesInfoKHR& size_info);
+    void BuildHardwareRaytracingSceneSlot(
+        std::size_t slot_index,
+        const std::vector<HardwareRaytracingInstanceData>& instance_data,
+        const std::vector<vk::AccelerationStructureInstanceKHR>& instances,
+        std::size_t state_hash,
+        bool async_submit);
+    vk::DescriptorSet GetDescriptorSet(std::size_t frame_index) const;
     void CopyBuffer(vk::Buffer src, vk::Buffer dst, vk::DeviceSize size);
     void TransitionImageLayout(
         vk::Image image,
@@ -211,12 +236,17 @@ class Device : public DeviceInterface
     std::unique_ptr<class CommandQueue> command_queue_;
     std::unique_ptr<class BufferResourceManager> buffer_resources_;
     std::unique_ptr<class MeshResources> mesh_resources_;
+    static constexpr std::size_t kMaxFramesInFlight = 2;
     vk::UniqueDescriptorSetLayout descriptor_set_layout_;
     vk::UniqueDescriptorPool descriptor_pool_;
-    vk::DescriptorSet descriptor_set_ = VK_NULL_HANDLE;
+    std::array<vk::DescriptorSet, kMaxFramesInFlight> descriptor_sets_ = {};
     std::unique_ptr<TextureResources> texture_resources_;
-    static constexpr std::size_t kMaxFramesInFlight = 2;
     std::size_t current_frame_ = 0;
+    std::array<bool, kMaxFramesInFlight> frame_in_flight_ = {};
+    std::array<std::optional<std::size_t>, kMaxFramesInFlight>
+        frame_scene_indices_ = {};
+    std::array<std::optional<std::size_t>, kMaxFramesInFlight>
+        descriptor_scene_indices_ = {};
     bool framebuffer_resized_ = false;
     bool use_compute_raytracing_ = false;
     bool use_raytracing_pipeline_ = false;
@@ -304,6 +334,26 @@ class Device : public DeviceInterface
         std::uint32_t triangle_offset = 0;
         std::uint32_t material_id = 0;
     };
+    struct HardwareRaytracingSceneSlot
+    {
+        vk::UniqueBuffer shader_instance_buffer;
+        vk::UniqueDeviceMemory shader_instance_memory;
+        vk::DeviceSize shader_instance_buffer_size = 0;
+        vk::UniqueBuffer build_instance_buffer;
+        vk::UniqueDeviceMemory build_instance_memory;
+        vk::DeviceSize build_instance_buffer_size = 0;
+        vk::UniqueBuffer tlas_buffer;
+        vk::UniqueDeviceMemory tlas_memory;
+        vk::UniqueAccelerationStructureKHR tlas;
+        vk::DeviceSize tlas_size = 0;
+        std::uint32_t instance_count = 0;
+        std::size_t state_hash = 0;
+        bool ready = false;
+        vk::CommandBuffer pending_command_buffer = VK_NULL_HANDLE;
+        vk::UniqueFence pending_fence;
+        vk::UniqueBuffer pending_scratch_buffer;
+        vk::UniqueDeviceMemory pending_scratch_memory;
+    };
     struct HardwareRaytracingInstanceData
     {
         glm::mat4 object_to_world = glm::mat4(1.0f);
@@ -312,11 +362,10 @@ class Device : public DeviceInterface
     };
   private:
     std::vector<HardwareRaytracingGeometry> hardware_raytracing_geometries_;
-    vk::UniqueBuffer hardware_raytracing_instance_buffer_;
-    vk::UniqueDeviceMemory hardware_raytracing_instance_memory_;
-    vk::UniqueBuffer hardware_raytracing_tlas_buffer_;
-    vk::UniqueDeviceMemory hardware_raytracing_tlas_memory_;
-    vk::UniqueAccelerationStructureKHR hardware_raytracing_tlas_;
+    std::array<HardwareRaytracingSceneSlot, kMaxFramesInFlight>
+        hardware_raytracing_scene_slots_ = {};
+    std::optional<std::size_t> active_hardware_raytracing_scene_index_ = 0;
+    std::optional<std::size_t> pending_hardware_raytracing_scene_index_;
     vk::UniqueBuffer raytracing_sbt_buffer_;
     vk::UniqueDeviceMemory raytracing_sbt_memory_;
     vk::StridedDeviceAddressRegionKHR raygen_sbt_region_ = {};
