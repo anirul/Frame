@@ -17,13 +17,14 @@ CommandQueue::CommandQueue(
         vk::CommandPoolCreateFlagBits::eTransient |
             vk::CommandPoolCreateFlagBits::eResetCommandBuffer,
         queue_family_index);
-    pool_ = device_.createCommandPoolUnique(pool_info);
+    owned_pool_ = device_.createCommandPoolUnique(pool_info);
+    pool_ = *owned_pool_;
 }
 
 vk::CommandBuffer CommandQueue::BeginOneTime() const
 {
     vk::CommandBufferAllocateInfo alloc_info(
-        *pool_,
+        pool_,
         vk::CommandBufferLevel::ePrimary,
         1);
     auto command_buffers = device_.allocateCommandBuffers(alloc_info);

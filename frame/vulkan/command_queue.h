@@ -21,12 +21,16 @@ class CommandQueue
         vk::Device device,
         vk::Queue queue,
         std::uint32_t queue_family_index);
+    CommandQueue(vk::Device device, vk::Queue queue, vk::CommandPool pool)
+        : device_(device), queue_(queue), pool_(pool)
+    {
+    }
 
     void FreeOneTime(vk::CommandBuffer command_buffer) const
     {
         if (command_buffer && pool_)
         {
-            device_.freeCommandBuffers(*pool_, command_buffer);
+            device_.freeCommandBuffers(pool_, command_buffer);
         }
     }
 
@@ -56,7 +60,8 @@ class CommandQueue
   private:
     vk::Device device_;
     vk::Queue queue_;
-    vk::UniqueCommandPool pool_;
+    vk::CommandPool pool_ = VK_NULL_HANDLE;
+    vk::UniqueCommandPool owned_pool_;
 };
 
 } // namespace frame::vulkan
