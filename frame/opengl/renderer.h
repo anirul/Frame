@@ -145,7 +145,8 @@ class Renderer : public RendererInterface
     // Texture frame (used in render mesh).
     frame::proto::TextureFrame texture_frame_;
     bool first_render_ = true;
-    double last_raytrace_scene_buffer_update_time_ = -1.0;
+    std::size_t last_raytrace_scene_state_hash_ = 0;
+    bool has_raytrace_scene_state_hash_ = false;
     // The render callback it will be called once per mesh.
     RenderCallback callback_ = [](UniformCollectionInterface&,
                                   MeshInterface&,

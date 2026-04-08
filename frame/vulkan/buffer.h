@@ -30,6 +30,10 @@ class Buffer : public frame::BufferInterface
     {
         return data_;
     }
+    std::uint64_t GetGeneration() const
+    {
+        return generation_;
+    }
 
     std::string GetName() const override
     {
@@ -46,6 +50,7 @@ class Buffer : public frame::BufferInterface
         const void* data, std::size_t size, std::vector<std::uint8_t>& dst);
 
     mutable std::vector<std::uint8_t> data_ = {};
+    mutable std::uint64_t generation_ = 0;
     std::string name_ = {};
 };
 

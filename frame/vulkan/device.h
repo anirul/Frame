@@ -269,7 +269,8 @@ class Device : public DeviceInterface
     std::optional<ProgramPipelineInfo> active_program_info_;
     bool use_procedural_quad_pipeline_ = false;
     float elapsed_time_seconds_ = 0.0f;
-    float last_raytrace_scene_buffer_update_time_ = -1.0f;
+    std::size_t last_raytrace_scene_state_hash_ = 0;
+    bool has_raytrace_scene_state_hash_ = false;
     vk::ShaderStageFlags push_constant_stages_ = {};
     std::uint32_t push_constant_size_ = 0;
     GuiRenderCallback gui_render_callback_;

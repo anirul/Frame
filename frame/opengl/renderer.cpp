@@ -3,7 +3,9 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
+#include <cstdint>
 #include <cstring>
+#include <functional>
 #include <format>
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -127,11 +129,6 @@ bool RaytraceSceneRequiresWorldSpaceBuffers(frame::LevelInterface& level)
         }
     }
     return false;
-}
-
-bool HasRaytracingSourceMeshes(frame::LevelInterface& level)
-{
-    return !GetRaytracingSourceMeshMaterials(level).empty();
 }
 
 std::vector<std::pair<EntityId, std::string>> GetActiveTextureBindings(
@@ -340,6 +337,93 @@ std::array<float, 4> ResolveRaytracingColorMultiplier(
         multiplier[channel] = std::clamp(value, 0.0f, 4.0f);
     }
     return multiplier;
+}
+
+template <typename T>
+void HashCombine(std::size_t& seed, const T& value)
+{
+    seed ^= std::hash<T>{}(value) + 0x9e3779b9u + (seed << 6u) + (seed >> 2u);
+}
+
+void HashFloat(std::size_t& seed, float value)
+{
+    std::uint32_t bits = 0;
+    std::memcpy(&bits, &value, sizeof(bits));
+    HashCombine(seed, bits);
+}
+
+void HashColor(std::size_t& seed, const std::array<float, 4>& color)
+{
+    for (const float channel : color)
+    {
+        HashFloat(seed, channel);
+    }
+}
+
+void HashMatrix(std::size_t& seed, const glm::mat4& matrix)
+{
+    const float* values = glm::value_ptr(matrix);
+    for (int i = 0; i < 16; ++i)
+    {
+        HashFloat(seed, values[i]);
+    }
+}
+
+std::size_t BuildRaytracingSourceStateHash(
+    frame::LevelInterface& level,
+    double time_seconds)
+{
+    std::size_t state_hash = 0;
+    const auto source_mesh_materials = GetRaytracingSourceMeshMaterials(level);
+    HashCombine(state_hash, source_mesh_materials.size());
+    for (const auto& [source_node_id, source_material_id] : source_mesh_materials)
+    {
+        HashCombine(state_hash, static_cast<std::uint64_t>(source_node_id));
+        HashCombine(state_hash, static_cast<std::uint64_t>(source_material_id));
+
+        auto* node =
+            dynamic_cast<NodeMesh*>(&level.GetSceneNodeFromId(source_node_id));
+        if (!node)
+        {
+            continue;
+        }
+
+        HashMatrix(state_hash, node->GetLocalModel(time_seconds));
+        HashCombine(
+            state_hash,
+            IsTransmissiveMaterial(level, source_material_id));
+        HashColor(
+            state_hash,
+            ResolveRaytracingSourceMaterialColor(level, source_material_id));
+
+        const auto mesh_id = node->GetLocalMesh();
+        HashCombine(state_hash, static_cast<std::uint64_t>(mesh_id));
+        if (!mesh_id)
+        {
+            continue;
+        }
+
+        const auto triangle_buffer_id =
+            level.GetMeshFromId(mesh_id).GetTriangleBufferId();
+        HashCombine(
+            state_hash,
+            static_cast<std::uint64_t>(triangle_buffer_id));
+        if (!triangle_buffer_id)
+        {
+            continue;
+        }
+
+        auto* triangle_buffer = dynamic_cast<Buffer*>(
+            &level.GetBufferFromId(triangle_buffer_id));
+        if (!triangle_buffer)
+        {
+            continue;
+        }
+
+        HashCombine(state_hash, triangle_buffer->GetGeneration());
+        HashCombine(state_hash, triangle_buffer->GetRawData().size());
+    }
+    return state_hash;
 }
 
 constexpr std::size_t kRaytraceFloatsPerVertex = 12;
@@ -622,15 +706,14 @@ void Renderer::UpdateRaytraceBuffersIfNeeded(SkinnedMesh& skinned_mesh)
         }
     }
 
-    if (HasRaytracingSourceMeshes(level_))
-    {
-        UpdateAggregateRaytraceSceneBuffers();
-    }
 }
 
 void Renderer::UpdateAggregateRaytraceSceneBuffers()
 {
-    if (last_raytrace_scene_buffer_update_time_ == delta_time_)
+    const std::size_t scene_state_hash =
+        BuildRaytracingSourceStateHash(level_, delta_time_);
+    if (has_raytrace_scene_state_hash_ &&
+        last_raytrace_scene_state_hash_ == scene_state_hash)
     {
         return;
     }
@@ -689,7 +772,8 @@ void Renderer::UpdateAggregateRaytraceSceneBuffers()
         update_named_buffer(material, "BvhBufferOpaque", opaque_bvh);
     }
 
-    last_raytrace_scene_buffer_update_time_ = delta_time_;
+    last_raytrace_scene_state_hash_ = scene_state_hash;
+    has_raytrace_scene_state_hash_ = true;
 }
 
 std::optional<glm::mat4> Renderer::RenderNode(
