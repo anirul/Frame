@@ -11,9 +11,27 @@ namespace frame::vulkan
 class CommandQueue
 {
   public:
+    struct PendingSubmission
+    {
+        vk::CommandBuffer command_buffer = VK_NULL_HANDLE;
+        vk::UniqueFence fence;
+    };
+
+    CommandQueue(
+        vk::Device device,
+        vk::Queue queue,
+        std::uint32_t queue_family_index);
     CommandQueue(vk::Device device, vk::Queue queue, vk::CommandPool pool)
         : device_(device), queue_(queue), pool_(pool)
     {
+    }
+
+    void FreeOneTime(vk::CommandBuffer command_buffer) const
+    {
+        if (command_buffer && pool_)
+        {
+            device_.freeCommandBuffers(pool_, command_buffer);
+        }
     }
 
     void CopyBuffer(vk::Buffer src, vk::Buffer dst, vk::DeviceSize size) const;
@@ -30,6 +48,8 @@ class CommandQueue
         vk::ImageLayout old_layout,
         vk::ImageLayout new_layout,
         std::uint32_t layer_count = 1) const;
+    PendingSubmission SubmitOneTimeAsync(
+        const std::function<void(vk::CommandBuffer)>& recorder) const;
     void SubmitOneTime(
         const std::function<void(vk::CommandBuffer)>& recorder) const;
 
@@ -40,7 +60,8 @@ class CommandQueue
   private:
     vk::Device device_;
     vk::Queue queue_;
-    vk::CommandPool pool_;
+    vk::CommandPool pool_ = VK_NULL_HANDLE;
+    vk::UniqueCommandPool owned_pool_;
 };
 
 } // namespace frame::vulkan
