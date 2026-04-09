@@ -467,6 +467,40 @@ bool HasRaytracingSourceMeshes(frame::LevelInterface& level)
     return !GetRaytracingSourceMeshMaterials(level).empty();
 }
 
+std::optional<glm::mat4> GetSharedRaytraceSceneTransform(
+    frame::LevelInterface& level,
+    double time_seconds)
+{
+    const auto source_mesh_materials = GetRaytracingSourceMeshMaterials(level);
+    if (source_mesh_materials.empty())
+    {
+        return std::nullopt;
+    }
+
+    std::optional<glm::mat4> shared_model = std::nullopt;
+    for (const auto& [source_node_id, source_material_id] : source_mesh_materials)
+    {
+        (void)source_material_id;
+        auto* node =
+            dynamic_cast<NodeMesh*>(&level.GetSceneNodeFromId(source_node_id));
+        if (!node)
+        {
+            return std::nullopt;
+        }
+        const glm::mat4 model = node->GetLocalModel(time_seconds);
+        if (!shared_model)
+        {
+            shared_model = model;
+            continue;
+        }
+        if (*shared_model != model)
+        {
+            return std::nullopt;
+        }
+    }
+    return shared_model;
+}
+
 constexpr std::size_t kRaytraceFloatsPerVertex = 12;
 constexpr std::size_t kRaytraceTriangleVertexStrideBytes =
     sizeof(float) * kRaytraceFloatsPerVertex;
@@ -960,23 +994,37 @@ std::vector<HardwareRaytraceSourceEntry> CollectHardwareRaytraceSourceEntries(
 
 std::vector<frame::vulkan::Device::HardwareRaytracingInstanceData>
 BuildHardwareRaytracingInstanceData(
-    const std::vector<HardwareRaytraceSourceEntry>& entries)
+    const std::vector<HardwareRaytraceSourceEntry>& entries,
+    const std::optional<glm::mat4>& shared_scene_model = std::nullopt)
 {
     std::vector<frame::vulkan::Device::HardwareRaytracingInstanceData> data = {};
     data.reserve(entries.size());
+    const bool use_shared_scene_transform = shared_scene_model.has_value();
     for (const auto& entry : entries)
     {
         frame::vulkan::Device::HardwareRaytracingInstanceData instance = {};
-        instance.object_to_world = entry.model;
-        const float det = glm::determinant(glm::mat3(entry.model));
-        instance.world_to_object =
-            std::abs(det) > 1.0e-8f
-                ? glm::inverse(entry.model)
-                : glm::mat4(1.0f);
+        if (use_shared_scene_transform)
+        {
+            // Shared-transform scenes keep geometry/TLAS in scene-local space.
+            // The current scene matrix is supplied through the uniform block
+            // each frame, so baking it into the instance buffer would make
+            // shading lag behind the animated scene transform.
+            instance.object_to_world = glm::mat4(1.0f);
+            instance.world_to_object = glm::mat4(1.0f);
+        }
+        else
+        {
+            instance.object_to_world = entry.model;
+            const float entry_det = glm::determinant(glm::mat3(entry.model));
+            instance.world_to_object =
+                std::abs(entry_det) > 1.0e-8f
+                    ? glm::inverse(entry.model)
+                    : glm::mat4(1.0f);
+        }
         instance.metadata = glm::uvec4(
             entry.triangle_offset,
             entry.material_id,
-            0u,
+            use_shared_scene_transform ? 1u : 0u,
             0u);
         data.push_back(std::move(instance));
     }
@@ -1025,15 +1073,19 @@ bool HardwareRaytracingLayoutMatches(
 
 std::vector<vk::AccelerationStructureInstanceKHR>
 BuildHardwareRaytracingAsInstances(
-    const std::vector<HardwareRaytraceSourceEntry>& entries)
+    const std::vector<HardwareRaytraceSourceEntry>& entries,
+    const std::optional<glm::mat4>& shared_scene_model = std::nullopt)
 {
     std::vector<vk::AccelerationStructureInstanceKHR> instances = {};
     instances.reserve(entries.size());
+    const bool use_shared_scene_transform = shared_scene_model.has_value();
     for (std::size_t i = 0; i < entries.size(); ++i)
     {
         const auto& entry = entries[i];
         vk::AccelerationStructureInstanceKHR instance{};
-        instance.transform = MakeTransformMatrix(entry.model);
+        instance.transform = use_shared_scene_transform
+            ? MakeIdentityTransform()
+            : MakeTransformMatrix(entry.model);
         instance.instanceCustomIndex = static_cast<std::uint32_t>(i);
         instance.mask = 0xFF;
         instance.instanceShaderBindingTableRecordOffset = 0;
@@ -2377,6 +2429,9 @@ void Device::DestroyHardwareRaytracingSceneSlot(
     scene.instance_count = 0;
     scene.state_hash = 0;
     scene.ready = false;
+    scene.uniform_block = {};
+    scene.has_uniform_block = false;
+    scene.uses_shared_scene_transform = false;
 }
 
 void Device::EnsureHardwareRaytracingSceneSlotResources(
@@ -2471,7 +2526,10 @@ void Device::BuildHardwareRaytracingSceneSlot(
     const std::vector<HardwareRaytracingInstanceData>& instance_data,
     const std::vector<vk::AccelerationStructureInstanceKHR>&
         instances_without_addresses,
+    const UniformBlock& uniform_block,
     std::size_t state_hash,
+    bool use_uniform_snapshot,
+    bool use_shared_scene_transform,
     bool async_submit)
 {
     if (!vk_unique_device_ || !gpu_memory_manager_ || !command_queue_ ||
@@ -2615,6 +2673,9 @@ void Device::BuildHardwareRaytracingSceneSlot(
         &tlas_range_info};
 
     scene.state_hash = state_hash;
+    scene.uniform_block = uniform_block;
+    scene.has_uniform_block = use_uniform_snapshot;
+    scene.uses_shared_scene_transform = use_shared_scene_transform;
     if (async_submit)
     {
         auto submission = command_queue_->SubmitOneTimeAsync(
@@ -2643,6 +2704,39 @@ void Device::BuildHardwareRaytracingSceneSlot(
         scene.ready = true;
         active_hardware_raytracing_scene_index_ = slot_index;
     }
+}
+
+UniformBlock Device::BuildCurrentRaytracingUniformBlock() const
+{
+    if (!level_ || !swapchain_resources_ || !active_program_info_)
+    {
+        return UniformBlock{};
+    }
+
+    const auto extent = swapchain_resources_->GetExtent();
+    const bool use_world_space_raytrace_scene =
+        use_compute_raytracing_ &&
+        !use_hardware_raytracing_ &&
+        RaytraceSceneRequiresWorldSpaceBuffers(*level_);
+    std::string preferred_scene_root;
+    if (!use_world_space_raytrace_scene &&
+        active_program_info_->program_id != NullId)
+    {
+        preferred_scene_root =
+            level_->GetProgramFromId(active_program_info_->program_id)
+                .GetTemporarySceneRoot();
+    }
+
+    const SceneState scene_state = BuildSceneState(
+        *level_,
+        frame::Logger::GetInstance(),
+        {extent.width, extent.height},
+        elapsed_time_seconds_,
+        active_program_info_->material_id,
+        !use_compute_raytracing_,
+        preferred_scene_root,
+        use_world_space_raytrace_scene);
+    return MakeUniformBlock(scene_state, elapsed_time_seconds_);
 }
 
 void Device::PollHardwareRaytracingSceneBuilds()
@@ -2710,6 +2804,12 @@ void Device::UpdateHardwareRaytracingScene()
     const auto entries = CollectHardwareRaytraceSourceEntries(
         *level_,
         static_cast<double>(elapsed_time_seconds_));
+    const auto shared_scene_model =
+        RaytraceSceneRequiresWorldSpaceBuffers(*level_)
+            ? std::nullopt
+            : GetSharedRaytraceSceneTransform(
+                  *level_,
+                  static_cast<double>(elapsed_time_seconds_));
     if (entries.empty() ||
         !HardwareRaytracingLayoutMatches(entries, hardware_raytracing_geometries_))
     {
@@ -2738,7 +2838,7 @@ void Device::UpdateHardwareRaytracingScene()
     const std::size_t state_hash = BuildRaytracingSourceStateHash(
         *level_,
         static_cast<double>(elapsed_time_seconds_),
-        true);
+        !shared_scene_model.has_value());
     if (active_hardware_raytracing_scene_index_)
     {
         const auto& active_scene =
@@ -2766,11 +2866,15 @@ void Device::UpdateHardwareRaytracingScene()
         return;
     }
 
+    const UniformBlock uniform_block = BuildCurrentRaytracingUniformBlock();
     BuildHardwareRaytracingSceneSlot(
         *slot_index,
-        BuildHardwareRaytracingInstanceData(entries),
-        BuildHardwareRaytracingAsInstances(entries),
+        BuildHardwareRaytracingInstanceData(entries, shared_scene_model),
+        BuildHardwareRaytracingAsInstances(entries, shared_scene_model),
+        uniform_block,
         state_hash,
+        !shared_scene_model.has_value(),
+        shared_scene_model.has_value(),
         true);
 }
 
@@ -3217,8 +3321,32 @@ void Device::RecordCommandBuffer(
         {
             return;
         }
-        auto block = MakeUniformBlock(
+        UniformBlock block = MakeUniformBlock(
             state, elapsed_time_seconds_);
+        if (use_hardware_raytracing_ &&
+            descriptor_scene_indices_[current_frame_] &&
+            *descriptor_scene_indices_[current_frame_] <
+                hardware_raytracing_scene_slots_.size())
+        {
+            const auto& scene = hardware_raytracing_scene_slots_
+                [*descriptor_scene_indices_[current_frame_]];
+            if (scene.uses_shared_scene_transform && level_)
+            {
+                if (const auto shared_scene_model =
+                        GetSharedRaytraceSceneTransform(
+                            *level_,
+                            static_cast<double>(elapsed_time_seconds_));
+                    shared_scene_model)
+                {
+                    block.model = *shared_scene_model;
+                    block.model_inv = glm::inverse(*shared_scene_model);
+                }
+            }
+            else if (scene.has_uniform_block)
+            {
+                block = scene.uniform_block;
+            }
+        }
         buffer_resources_->UpdateUniform(
             current_frame_,
             &block, sizeof(UniformBlock));
@@ -4300,6 +4428,12 @@ void Device::CreateHardwareRaytracingScene()
     const auto entries = CollectHardwareRaytraceSourceEntries(
         *level_,
         static_cast<double>(elapsed_time_seconds_));
+    const auto shared_scene_model =
+        RaytraceSceneRequiresWorldSpaceBuffers(*level_)
+            ? std::nullopt
+            : GetSharedRaytraceSceneTransform(
+                  *level_,
+                  static_cast<double>(elapsed_time_seconds_));
     if (entries.empty())
     {
         use_hardware_raytracing_ = false;
@@ -4519,12 +4653,15 @@ void Device::CreateHardwareRaytracingScene()
     pending_hardware_raytracing_scene_index_.reset();
     BuildHardwareRaytracingSceneSlot(
         0u,
-        instance_data,
-        BuildHardwareRaytracingAsInstances(entries),
+        BuildHardwareRaytracingInstanceData(entries, shared_scene_model),
+        BuildHardwareRaytracingAsInstances(entries, shared_scene_model),
+        BuildCurrentRaytracingUniformBlock(),
         BuildRaytracingSourceStateHash(
             *level_,
             static_cast<double>(elapsed_time_seconds_),
-            true),
+            !shared_scene_model.has_value()),
+        !shared_scene_model.has_value(),
+        shared_scene_model.has_value(),
         false);
 
     logger_->info(

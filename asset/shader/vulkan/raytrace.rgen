@@ -151,14 +151,30 @@ HardwareRaytraceInstanceData GetRaytraceInstanceData(const int instance_index)
     return raytrace_instances[instance_index];
 }
 
+bool UseSharedSceneTransform()
+{
+    return raytrace_instances.length() > 0 &&
+           raytrace_instances[0].metadata.z != 0u;
+}
+
 vec3 TransformPoint(const mat4 matrix, const vec3 point)
 {
     return (matrix * vec4(point, 1.0)).xyz;
 }
 
+mat4 GetObjectToWorld(const HardwareRaytraceInstanceData instance_data)
+{
+    return UseSharedSceneTransform() ? ubo.model : instance_data.object_to_world;
+}
+
+mat4 GetWorldToObject(const HardwareRaytraceInstanceData instance_data)
+{
+    return UseSharedSceneTransform() ? ubo.model_inv : instance_data.world_to_object;
+}
+
 mat3 GetNormalMatrix(const HardwareRaytraceInstanceData instance_data)
 {
-    return transpose(mat3(instance_data.world_to_object));
+    return transpose(mat3(GetWorldToObject(instance_data)));
 }
 
 // ----------------------------------------------------------------------------
@@ -392,6 +408,14 @@ bool anyHitTriangles(const vec3 ray_origin, const vec3 ray_dir, const float max_
         return false;
     }
 
+    vec3 trace_origin = ray_origin;
+    vec3 trace_dir = ray_dir;
+    if (UseSharedSceneTransform())
+    {
+        trace_origin = TransformPoint(ubo.model_inv, ray_origin);
+        trace_dir = normalize((ubo.model_inv * vec4(ray_dir, 0.0)).xyz);
+    }
+
     ray_payload.hit_data = vec4(0.0);
     ray_payload.index_data = ivec4(-1);
     traceRayEXT(
@@ -401,9 +425,9 @@ bool anyHitTriangles(const vec3 ray_origin, const vec3 ray_dir, const float max_
         0,
         0,
         0,
-        ray_origin,
+        trace_origin,
         0.001,
-        ray_dir,
+        trace_dir,
         max_t,
         0);
     return ray_payload.hit_data.x != 0.0;
@@ -436,6 +460,14 @@ HitInfo TraceScene(const vec3 ray_origin_world, const vec3 ray_dir_world)
         return info;
     }
 
+    vec3 trace_origin = ray_origin_world;
+    vec3 trace_dir = ray_dir_world;
+    if (UseSharedSceneTransform())
+    {
+        trace_origin = TransformPoint(ubo.model_inv, ray_origin_world);
+        trace_dir = normalize((ubo.model_inv * vec4(ray_dir_world, 0.0)).xyz);
+    }
+
     ray_payload.hit_data = vec4(0.0);
     ray_payload.index_data = ivec4(-1);
     traceRayEXT(
@@ -445,9 +477,9 @@ HitInfo TraceScene(const vec3 ray_origin_world, const vec3 ray_dir_world)
         0,
         0,
         0,
-        ray_origin_world,
+        trace_origin,
         0.001,
-        ray_dir_world,
+        trace_dir,
         1.0e30,
         0);
     if (ray_payload.hit_data.x == 0.0)
@@ -475,7 +507,7 @@ HitInfo TraceScene(const vec3 ray_origin_world, const vec3 ray_dir_world)
         tri.v0.position * w +
         tri.v1.position * info.bary.x +
         tri.v2.position * info.bary.y;
-    info.pos_world = TransformPoint(instance_data.object_to_world, info.pos_model);
+    info.pos_world = TransformPoint(GetObjectToWorld(instance_data), info.pos_model);
     info.normal_model = normalize(
         tri.v0.normal * w +
         tri.v1.normal * info.bary.x +
