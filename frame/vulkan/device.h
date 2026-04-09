@@ -237,6 +237,8 @@ class Device : public DeviceInterface
     std::unique_ptr<class BufferResourceManager> buffer_resources_;
     std::unique_ptr<class MeshResources> mesh_resources_;
     static constexpr std::size_t kMaxFramesInFlight = 2;
+    static constexpr std::size_t kHardwareRaytracingSceneSlotCount =
+        kMaxFramesInFlight + 1;
     vk::UniqueDescriptorSetLayout descriptor_set_layout_;
     vk::UniqueDescriptorPool descriptor_pool_;
     std::array<vk::DescriptorSet, kMaxFramesInFlight> descriptor_sets_ = {};
@@ -362,9 +364,9 @@ class Device : public DeviceInterface
     };
   private:
     std::vector<HardwareRaytracingGeometry> hardware_raytracing_geometries_;
-    std::array<HardwareRaytracingSceneSlot, kMaxFramesInFlight>
+    std::array<HardwareRaytracingSceneSlot, kHardwareRaytracingSceneSlotCount>
         hardware_raytracing_scene_slots_ = {};
-    std::optional<std::size_t> active_hardware_raytracing_scene_index_ = 0;
+    std::optional<std::size_t> active_hardware_raytracing_scene_index_;
     std::optional<std::size_t> pending_hardware_raytracing_scene_index_;
     vk::UniqueBuffer raytracing_sbt_buffer_;
     vk::UniqueDeviceMemory raytracing_sbt_memory_;
