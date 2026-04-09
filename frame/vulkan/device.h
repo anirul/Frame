@@ -18,6 +18,7 @@
 #include "frame/logger.h"
 #include "frame/vulkan/buffer_resources.h"
 #include "frame/vulkan/mesh_resources.h"
+#include "frame/vulkan/scene_state.h"
 #include "frame/vulkan/vulkan_dispatch.h"
  
 namespace frame::vulkan
@@ -183,8 +184,12 @@ class Device : public DeviceInterface
         std::size_t slot_index,
         const std::vector<HardwareRaytracingInstanceData>& instance_data,
         const std::vector<vk::AccelerationStructureInstanceKHR>& instances,
+        const UniformBlock& uniform_block,
         std::size_t state_hash,
+        bool use_uniform_snapshot,
+        bool use_shared_scene_transform,
         bool async_submit);
+    UniformBlock BuildCurrentRaytracingUniformBlock() const;
     vk::DescriptorSet GetDescriptorSet(std::size_t frame_index) const;
     void CopyBuffer(vk::Buffer src, vk::Buffer dst, vk::DeviceSize size);
     void TransitionImageLayout(
@@ -237,6 +242,8 @@ class Device : public DeviceInterface
     std::unique_ptr<class BufferResourceManager> buffer_resources_;
     std::unique_ptr<class MeshResources> mesh_resources_;
     static constexpr std::size_t kMaxFramesInFlight = 2;
+    static constexpr std::size_t kHardwareRaytracingSceneSlotCount =
+        kMaxFramesInFlight + 1;
     vk::UniqueDescriptorSetLayout descriptor_set_layout_;
     vk::UniqueDescriptorPool descriptor_pool_;
     std::array<vk::DescriptorSet, kMaxFramesInFlight> descriptor_sets_ = {};
@@ -353,6 +360,9 @@ class Device : public DeviceInterface
         vk::UniqueFence pending_fence;
         vk::UniqueBuffer pending_scratch_buffer;
         vk::UniqueDeviceMemory pending_scratch_memory;
+        UniformBlock uniform_block = {};
+        bool has_uniform_block = false;
+        bool uses_shared_scene_transform = false;
     };
     struct HardwareRaytracingInstanceData
     {
@@ -362,9 +372,9 @@ class Device : public DeviceInterface
     };
   private:
     std::vector<HardwareRaytracingGeometry> hardware_raytracing_geometries_;
-    std::array<HardwareRaytracingSceneSlot, kMaxFramesInFlight>
+    std::array<HardwareRaytracingSceneSlot, kHardwareRaytracingSceneSlotCount>
         hardware_raytracing_scene_slots_ = {};
-    std::optional<std::size_t> active_hardware_raytracing_scene_index_ = 0;
+    std::optional<std::size_t> active_hardware_raytracing_scene_index_;
     std::optional<std::size_t> pending_hardware_raytracing_scene_index_;
     vk::UniqueBuffer raytracing_sbt_buffer_;
     vk::UniqueDeviceMemory raytracing_sbt_memory_;
