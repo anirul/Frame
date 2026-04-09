@@ -23,7 +23,7 @@ void BufferResourceManager::Clear()
 {
     storage_buffers_.clear();
     storage_buffer_indices_.clear();
-    uniform_buffer_ = {};
+    uniform_buffers_.clear();
 }
 
 BufferResource BufferResourceManager::MakeGpuBuffer(
@@ -216,57 +216,74 @@ bool BufferResourceManager::UpdateStorageBuffer(
     return true;
 }
 
-void BufferResourceManager::BuildUniformBuffer(vk::DeviceSize size_bytes)
+void BufferResourceManager::BuildUniformBuffers(
+    std::size_t count,
+    vk::DeviceSize size_bytes)
 {
-    if (size_bytes == 0)
+    if (count == 0 || size_bytes == 0)
     {
-        throw std::runtime_error("Uniform buffer size must be non-zero.");
+        throw std::runtime_error(
+            "Uniform buffer count and size must be non-zero.");
     }
 
-    vk::UniqueDeviceMemory uniform_memory;
-    auto uniform_buf = memory_manager_->CreateBuffer(
-        size_bytes,
-        vk::BufferUsageFlagBits::eUniformBuffer,
-        vk::MemoryPropertyFlagBits::eHostVisible |
-            vk::MemoryPropertyFlagBits::eHostCoherent,
-        uniform_memory);
+    uniform_buffers_.clear();
+    uniform_buffers_.reserve(count);
+    for (std::size_t i = 0; i < count; ++i)
+    {
+        vk::UniqueDeviceMemory uniform_memory;
+        auto uniform_buf = memory_manager_->CreateBuffer(
+            size_bytes,
+            vk::BufferUsageFlagBits::eUniformBuffer,
+            vk::MemoryPropertyFlagBits::eHostVisible |
+                vk::MemoryPropertyFlagBits::eHostCoherent,
+            uniform_memory);
 
-    uniform_buffer_.name = "uniforms";
-    uniform_buffer_.size = size_bytes;
-    uniform_buffer_.buffer = std::move(uniform_buf);
-    uniform_buffer_.memory = std::move(uniform_memory);
+        BufferResource uniform_buffer = {};
+        uniform_buffer.name = "uniforms_" + std::to_string(i);
+        uniform_buffer.size = size_bytes;
+        uniform_buffer.buffer = std::move(uniform_buf);
+        uniform_buffer.memory = std::move(uniform_memory);
+        uniform_buffers_.push_back(std::move(uniform_buffer));
+    }
 }
 
 void BufferResourceManager::UpdateUniform(
+    std::size_t index,
     const void* data,
     std::size_t byte_count) const
 {
-    if (!uniform_buffer_.buffer ||
-        !uniform_buffer_.memory ||
-        uniform_buffer_.size == 0)
+    if (index >= uniform_buffers_.size())
+    {
+        (*logger_)->warn("Uniform buffer index {} is out of range.", index);
+        return;
+    }
+    const auto& uniform_buffer = uniform_buffers_[index];
+    if (!uniform_buffer.buffer ||
+        !uniform_buffer.memory ||
+        uniform_buffer.size == 0)
     {
         (*logger_)->warn("Uniform buffer not initialized before update.");
         return;
     }
-    if (byte_count > static_cast<std::size_t>(uniform_buffer_.size))
+    if (byte_count > static_cast<std::size_t>(uniform_buffer.size))
     {
         (*logger_)->warn(
             "Uniform update size {} exceeds buffer capacity {}.",
             byte_count,
-            static_cast<std::size_t>(uniform_buffer_.size));
+            static_cast<std::size_t>(uniform_buffer.size));
         return;
     }
     void* mapped = device_.mapMemory(
-        *uniform_buffer_.memory, 0, uniform_buffer_.size);
+        *uniform_buffer.memory, 0, uniform_buffer.size);
     if (data && byte_count > 0)
     {
         std::memcpy(mapped, data, byte_count);
     }
     else
     {
-        std::memset(mapped, 0, uniform_buffer_.size);
+        std::memset(mapped, 0, uniform_buffer.size);
     }
-    device_.unmapMemory(*uniform_buffer_.memory);
+    device_.unmapMemory(*uniform_buffer.memory);
 }
 
 void BufferResourceManager::LogCpuBufferSamples(

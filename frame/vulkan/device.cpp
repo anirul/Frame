@@ -3213,13 +3213,14 @@ void Device::RecordCommandBuffer(
         {
             return;
         }
-        if (!buffer_resources_->GetUniformBuffer())
+        if (!buffer_resources_->GetUniformBuffer(current_frame_))
         {
             return;
         }
         auto block = MakeUniformBlock(
             state, elapsed_time_seconds_);
         buffer_resources_->UpdateUniform(
+            current_frame_,
             &block, sizeof(UniformBlock));
     };
     update_uniform_buffer(scene_state);
@@ -3314,6 +3315,20 @@ void Device::RecordCommandBuffer(
             raytracing_pipeline_ &&
             raytracing_pipeline_layout_)
         {
+            if (use_hardware_raytracing_)
+            {
+                vk::MemoryBarrier acceleration_structure_barrier(
+                    vk::AccessFlagBits::eAccelerationStructureWriteKHR,
+                    vk::AccessFlagBits::eAccelerationStructureReadKHR |
+                        vk::AccessFlagBits::eShaderRead);
+                command_buffer.pipelineBarrier(
+                    vk::PipelineStageFlagBits::eAccelerationStructureBuildKHR,
+                    vk::PipelineStageFlagBits::eRayTracingShaderKHR,
+                    {},
+                    acceleration_structure_barrier,
+                    nullptr,
+                    nullptr);
+            }
             command_buffer.bindPipeline(
                 vk::PipelineBindPoint::eRayTracingKHR,
                 *raytracing_pipeline_);
@@ -4987,15 +5002,25 @@ void Device::CreateDescriptorResources()
     }
 
 
-    const BufferResource* uniform = nullptr;
+    std::array<const BufferResource*, kMaxFramesInFlight> uniforms = {};
     if (!uniform_bindings.empty())
     {
-        buffer_resources_->BuildUniformBuffer(
+        buffer_resources_->BuildUniformBuffers(
+            kMaxFramesInFlight,
             static_cast<vk::DeviceSize>(sizeof(UniformBlock)));
-        uniform = buffer_resources_->GetUniformBuffer();
-        if (!uniform)
+        bool have_uniforms = true;
+        for (std::size_t frame = 0; frame < uniforms.size(); ++frame)
         {
-            logger_->error("Failed to allocate Vulkan uniform buffer.");
+            uniforms[frame] = buffer_resources_->GetUniformBuffer(frame);
+            if (!uniforms[frame])
+            {
+                have_uniforms = false;
+                break;
+            }
+        }
+        if (!have_uniforms)
+        {
+            logger_->error("Failed to allocate Vulkan uniform buffers.");
             return;
         }
     }
@@ -5211,12 +5236,12 @@ void Device::CreateDescriptorResources()
                 &storage_infos.back());
         }
 
-        if (uniform && !uniform_bindings.empty())
+        if (uniforms[frame] && !uniform_bindings.empty())
         {
             uniform_infos.emplace_back(
-                *uniform->buffer,
+                *uniforms[frame]->buffer,
                 0,
-                uniform->size);
+                uniforms[frame]->size);
             descriptor_writes.emplace_back(
                 descriptor_set,
                 uniform_bindings.front(),
