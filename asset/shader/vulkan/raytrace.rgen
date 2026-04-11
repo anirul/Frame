@@ -113,6 +113,8 @@ struct HitInfo
     vec4 color;
 };
 
+bool IsOpaque(const HitInfo hit);
+
 int TriangleCountTransmissive()
 {
     int uniform_count = max(0, int(ubo.time_s.y + 0.5));
@@ -177,6 +179,54 @@ mat3 GetNormalMatrix(const HardwareRaytraceInstanceData instance_data)
     return transpose(mat3(GetWorldToObject(instance_data)));
 }
 
+vec3 GetObjectScale(const HardwareRaytraceInstanceData instance_data)
+{
+    const mat4 object_to_world = GetObjectToWorld(instance_data);
+    return vec3(
+        length(object_to_world[0].xyz),
+        length(object_to_world[1].xyz),
+        length(object_to_world[2].xyz));
+}
+
+bool IsGroundDebugInstance(
+    const HitInfo hit,
+    const HardwareRaytraceInstanceData instance_data)
+{
+    if (!IsOpaque(hit))
+    {
+        return false;
+    }
+
+    const vec3 object_scale = GetObjectScale(instance_data);
+    if (object_scale.x < 20.0 || object_scale.z < 20.0 || object_scale.y > 2.0)
+    {
+        return false;
+    }
+
+    const vec3 world_normal =
+        normalize(GetNormalMatrix(instance_data) * hit.normal_model);
+    return abs(world_normal.y) > 0.65;
+}
+
+vec2 GetSurfaceUv(const HitInfo hit)
+{
+    if (hit.instance_index < 0)
+    {
+        return hit.uv;
+    }
+
+    const HardwareRaytraceInstanceData instance_data =
+        GetRaytraceInstanceData(hit.instance_index);
+    if (!IsGroundDebugInstance(hit, instance_data))
+    {
+        return hit.uv;
+    }
+
+    const vec3 object_scale = GetObjectScale(instance_data);
+    return hit.uv *
+        max(vec2(1.0), vec2(object_scale.x, object_scale.z)) * 0.125;
+}
+
 // ----------------------------------------------------------------------------
 float DistributionGGX(vec3 N, vec3 H, float roughness)
 {
@@ -228,38 +278,54 @@ vec4 SampleTextureLod0(sampler2D sampler_texture, vec2 uv)
 
 vec3 SampleAlbedo(const HitInfo hit)
 {
-    vec3 base = IsOpaque(hit)
-        ? SampleTextureLod0(opaque_albedo_texture, hit.uv).rgb
-        : SampleTextureLod0(transmissive_albedo_texture, hit.uv).rgb;
+    if (!IsOpaque(hit))
+    {
+        return SampleTextureLod0(transmissive_albedo_texture, hit.uv).rgb *
+            hit.color.rgb;
+    }
+
+    const HardwareRaytraceInstanceData instance_data =
+        GetRaytraceInstanceData(hit.instance_index);
+    if (!IsGroundDebugInstance(hit, instance_data))
+    {
+        return hit.color.rgb;
+    }
+
+    const vec3 base =
+        SampleTextureLod0(opaque_albedo_texture, GetSurfaceUv(hit)).rgb;
     return base * hit.color.rgb;
 }
 
 vec3 SampleNormalMap(const HitInfo hit)
 {
+    const vec2 uv = GetSurfaceUv(hit);
     return IsOpaque(hit)
-        ? SampleTextureLod0(opaque_normal_texture, hit.uv).xyz
-        : SampleTextureLod0(transmissive_normal_texture, hit.uv).xyz;
+        ? SampleTextureLod0(opaque_normal_texture, uv).xyz
+        : SampleTextureLod0(transmissive_normal_texture, uv).xyz;
 }
 
 float SampleRoughness(const HitInfo hit)
 {
+    const vec2 uv = GetSurfaceUv(hit);
     return IsOpaque(hit)
-        ? SampleTextureLod0(opaque_roughness_texture, hit.uv).r
-        : SampleTextureLod0(transmissive_roughness_texture, hit.uv).r;
+        ? SampleTextureLod0(opaque_roughness_texture, uv).r
+        : SampleTextureLod0(transmissive_roughness_texture, uv).r;
 }
 
 float SampleMetallic(const HitInfo hit)
 {
+    const vec2 uv = GetSurfaceUv(hit);
     return IsOpaque(hit)
-        ? SampleTextureLod0(opaque_metallic_texture, hit.uv).r
-        : SampleTextureLod0(transmissive_metallic_texture, hit.uv).r;
+        ? SampleTextureLod0(opaque_metallic_texture, uv).r
+        : SampleTextureLod0(transmissive_metallic_texture, uv).r;
 }
 
 float SampleAo(const HitInfo hit)
 {
+    const vec2 uv = GetSurfaceUv(hit);
     return IsOpaque(hit)
-        ? SampleTextureLod0(opaque_ao_texture, hit.uv).r
-        : SampleTextureLod0(transmissive_ao_texture, hit.uv).r;
+        ? SampleTextureLod0(opaque_ao_texture, uv).r
+        : SampleTextureLod0(transmissive_ao_texture, uv).r;
 }
 
 float SampleSpecularFactor(const HitInfo hit)
@@ -269,7 +335,7 @@ float SampleSpecularFactor(const HitInfo hit)
         return 1.0;
     }
     return clamp(
-        SampleTextureLod0(opaque_specular_factor_texture, hit.uv).a,
+        SampleTextureLod0(opaque_specular_factor_texture, GetSurfaceUv(hit)).a,
         0.0,
         1.0);
 }
@@ -281,7 +347,9 @@ vec3 SampleSpecularColor(const HitInfo hit)
         return vec3(1.0);
     }
     return clamp(
-        SampleTextureLod0(opaque_specular_color_texture, hit.uv).rgb,
+        SampleTextureLod0(
+            opaque_specular_color_texture,
+            GetSurfaceUv(hit)).rgb,
         0.0,
         1.0);
 }
@@ -293,7 +361,7 @@ float SampleTransmission(const HitInfo hit)
         return 0.0;
     }
     return clamp(
-        SampleTextureLod0(transmissive_transmission_texture, hit.uv).r,
+        SampleTextureLod0(transmissive_transmission_texture, GetSurfaceUv(hit)).r,
         0.0,
         1.0);
 }
@@ -304,7 +372,9 @@ float SampleIor(const HitInfo hit)
     {
         return 1.0;
     }
-    return max(SampleTextureLod0(transmissive_ior_texture, hit.uv).r, 1.0);
+    return max(
+        SampleTextureLod0(transmissive_ior_texture, GetSurfaceUv(hit)).r,
+        1.0);
 }
 
 float SampleThickness(const HitInfo hit)
@@ -314,7 +384,7 @@ float SampleThickness(const HitInfo hit)
         return 0.0;
     }
     return max(
-        SampleTextureLod0(transmissive_thickness_texture, hit.uv).r,
+        SampleTextureLod0(transmissive_thickness_texture, GetSurfaceUv(hit)).r,
         0.0);
 }
 
@@ -325,7 +395,9 @@ vec3 SampleAttenuationColor(const HitInfo hit)
         return vec3(1.0);
     }
     return clamp(
-        SampleTextureLod0(transmissive_attenuation_color_texture, hit.uv).rgb,
+        SampleTextureLod0(
+            transmissive_attenuation_color_texture,
+            GetSurfaceUv(hit)).rgb,
         0.0,
         1.0);
 }
@@ -337,7 +409,9 @@ float SampleAttenuationDistance(const HitInfo hit)
         return 1000000.0;
     }
     return max(
-        SampleTextureLod0(transmissive_attenuation_distance_texture, hit.uv).r,
+        SampleTextureLod0(
+            transmissive_attenuation_distance_texture,
+            GetSurfaceUv(hit)).r,
         0.0001);
 }
 
