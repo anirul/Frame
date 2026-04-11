@@ -3342,10 +3342,6 @@ void Device::RecordCommandBuffer(
                     block.model_inv = glm::inverse(*shared_scene_model);
                 }
             }
-            else if (scene.has_uniform_block)
-            {
-                block = scene.uniform_block;
-            }
         }
         buffer_resources_->UpdateUniform(
             current_frame_,
