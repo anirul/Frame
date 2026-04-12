@@ -402,9 +402,11 @@ void HashByteSamples(
 
 std::size_t BuildRaytracingSourceStateHash(
     frame::LevelInterface& level,
-    double time_seconds)
+    double time_seconds,
+    bool include_node_matrices)
 {
     std::size_t state_hash = 0;
+    HashCombine(state_hash, include_node_matrices);
     const auto source_mesh_materials = GetRaytracingSourceMeshMaterials(level);
     HashCombine(state_hash, source_mesh_materials.size());
     for (const auto& [source_node_id, source_material_id] : source_mesh_materials)
@@ -419,7 +421,10 @@ std::size_t BuildRaytracingSourceStateHash(
             continue;
         }
 
-        HashMatrix(state_hash, node->GetLocalModel(time_seconds));
+        if (include_node_matrices)
+        {
+            HashMatrix(state_hash, node->GetLocalModel(time_seconds));
+        }
         HashCombine(
             state_hash,
             IsTransmissiveMaterial(level, source_material_id));
@@ -491,6 +496,48 @@ bool RaytraceSceneRequiresWorldSpaceBuffers(frame::LevelInterface& level)
 bool HasRaytracingSourceMeshes(frame::LevelInterface& level)
 {
     return !GetRaytracingSourceMeshMaterials(level).empty();
+}
+
+std::optional<glm::mat4> GetSharedRaytraceSceneTransform(
+    frame::LevelInterface& level,
+    double time_seconds)
+{
+    const auto source_mesh_materials = GetRaytracingSourceMeshMaterials(level);
+    if (source_mesh_materials.empty())
+    {
+        return std::nullopt;
+    }
+
+    std::optional<glm::mat4> shared_model = std::nullopt;
+    for (const auto& [source_node_id, source_material_id] : source_mesh_materials)
+    {
+        (void)source_material_id;
+        auto* node =
+            dynamic_cast<NodeMesh*>(&level.GetSceneNodeFromId(source_node_id));
+        if (!node)
+        {
+            return std::nullopt;
+        }
+        const glm::mat4 model = node->GetLocalModel(time_seconds);
+        if (!shared_model)
+        {
+            shared_model = model;
+            continue;
+        }
+        if (*shared_model != model)
+        {
+            return std::nullopt;
+        }
+    }
+    return shared_model;
+}
+
+bool CanUseSharedTransformHardwareRaytraceScene(
+    frame::LevelInterface& level,
+    double time_seconds)
+{
+    return !RaytraceSceneRequiresWorldSpaceBuffers(level) &&
+           GetSharedRaytraceSceneTransform(level, time_seconds).has_value();
 }
 
 constexpr std::size_t kRaytraceFloatsPerVertex = 12;
@@ -782,7 +829,8 @@ void UploadDeviceLocalBuffer(
 std::vector<std::uint8_t> BuildAggregateTriangleBytes(
     frame::LevelInterface& level,
     bool transmissive,
-    double time_seconds)
+    double time_seconds,
+    bool apply_node_transform = true)
 {
     std::vector<std::uint8_t> aggregate_triangle_bytes = {};
     const auto reference_color =
@@ -827,9 +875,12 @@ std::vector<std::uint8_t> BuildAggregateTriangleBytes(
         const auto color_multiplier = ResolveRaytracingColorMultiplier(
             source_color,
             reference_color);
-        const auto transformed = TransformTriangleBytes(
-            triangle_buffer->GetRawData(),
-            node->GetLocalModel(time_seconds));
+        const auto transformed =
+            apply_node_transform
+                ? TransformTriangleBytes(
+                      triangle_buffer->GetRawData(),
+                      node->GetLocalModel(time_seconds))
+                : triangle_buffer->GetRawData();
         const auto tinted =
             ApplyTriangleColorMultiplier(transformed, color_multiplier);
         aggregate_triangle_bytes.insert(
@@ -2001,10 +2052,18 @@ bool Device::UpdateAggregateRaytracingSceneBuffers(bool build_software_bvh)
     {
         return false;
     }
+    const bool use_shared_transform_hardware_scene =
+        !build_software_bvh &&
+        CanUseSharedTransformHardwareRaytraceScene(
+            *level_,
+            static_cast<double>(elapsed_time_seconds_));
+    const bool use_world_space_triangles =
+        build_software_bvh || !use_shared_transform_hardware_scene;
     const std::size_t scene_state_hash =
         BuildRaytracingSourceStateHash(
             *level_,
-            static_cast<double>(elapsed_time_seconds_));
+            static_cast<double>(elapsed_time_seconds_),
+            use_world_space_triangles);
     if (has_raytrace_scene_state_hash_ &&
         last_raytrace_scene_state_hash_ == scene_state_hash)
     {
@@ -2050,12 +2109,14 @@ bool Device::UpdateAggregateRaytracingSceneBuffers(bool build_software_bvh)
         BuildAggregateTriangleBytes(
             *level_,
             true,
-            static_cast<double>(elapsed_time_seconds_));
+            static_cast<double>(elapsed_time_seconds_),
+            use_world_space_triangles);
     const auto opaque_triangles =
         BuildAggregateTriangleBytes(
             *level_,
             false,
-            static_cast<double>(elapsed_time_seconds_));
+            static_cast<double>(elapsed_time_seconds_),
+            use_world_space_triangles);
 
     bool updated = false;
     updated |= update_buffer(
@@ -2679,10 +2740,18 @@ void Device::RecordCommandBuffer(
     const auto& gui_render_pass = swapchain_resources_->GetGuiRenderPass();
     const auto& gui_framebuffers = swapchain_resources_->GetGuiFramebuffers();
 
+    const bool has_raytrace_source_meshes =
+        level_ && HasRaytracingSourceMeshes(*level_);
+    const bool use_shared_transform_hardware_scene =
+        has_raytrace_source_meshes &&
+        use_hardware_raytracing_ &&
+        CanUseSharedTransformHardwareRaytraceScene(
+            *level_,
+            static_cast<double>(elapsed_time_seconds_));
     const bool use_world_space_raytrace_scene =
-        level_ &&
+        has_raytrace_source_meshes &&
         (use_compute_raytracing_ || use_raytracing_pipeline_) &&
-        HasRaytracingSourceMeshes(*level_);
+        !use_shared_transform_hardware_scene;
     std::string preferred_scene_root;
     if (!use_world_space_raytrace_scene &&
         level_ &&
