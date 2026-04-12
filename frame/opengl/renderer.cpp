@@ -455,8 +455,6 @@ std::size_t BuildRaytracingSourceStateHash(
 constexpr std::size_t kRaytraceFloatsPerVertex = 12;
 constexpr std::size_t kRaytraceTriangleVertexStrideBytes =
     sizeof(float) * kRaytraceFloatsPerVertex;
-constexpr std::uint32_t kRaytraceMaterialTransmissive = 0;
-constexpr std::uint32_t kRaytraceMaterialOpaque = 1;
 
 struct RaytraceVertex
 {
@@ -473,49 +471,6 @@ struct RaytraceVertex
     float pad2;
     float pad3;
 };
-
-constexpr std::size_t kRaytraceTriangleStrideBytes = sizeof(RaytraceVertex) * 3;
-
-struct RaytraceSceneEntry
-{
-    frame::EntityId source_node_id = frame::NullId;
-    frame::EntityId source_material_id = frame::NullId;
-    frame::EntityId source_buffer_id = frame::NullId;
-    std::uint64_t source_generation = 0;
-    glm::mat4 model = glm::mat4(1.0f);
-    std::uint32_t triangle_offset = 0;
-    std::uint32_t triangle_count = 0;
-    std::uint32_t bvh_root_index = 0;
-    std::uint32_t material_id = kRaytraceMaterialOpaque;
-    bool transmissive = false;
-};
-
-struct PreparedRaytraceSceneEntry
-{
-    RaytraceSceneEntry entry = {};
-    std::vector<std::uint8_t> triangle_bytes = {};
-};
-
-struct RaytraceInstanceData
-{
-    glm::mat4 object_to_world = glm::mat4(1.0f);
-    glm::mat4 world_to_object = glm::mat4(1.0f);
-    glm::uvec4 metadata = glm::uvec4(0u);
-};
-
-std::uint32_t GetRaytraceTriangleCount(const std::vector<std::uint8_t>& bytes)
-{
-    if (bytes.empty())
-    {
-        return 0;
-    }
-    if (bytes.size() % kRaytraceTriangleStrideBytes != 0)
-    {
-        throw std::runtime_error(
-            "OpenGL raytrace triangle buffer size is not aligned to the expected triangle stride.");
-    }
-    return static_cast<std::uint32_t>(bytes.size() / kRaytraceTriangleStrideBytes);
-}
 
 std::vector<std::uint8_t> ApplyTriangleColorMultiplier(
     const std::vector<std::uint8_t>& raw,
@@ -590,18 +545,22 @@ std::vector<std::uint8_t> TransformTriangleBytes(
     return transformed;
 }
 
-std::vector<RaytraceSceneEntry> CollectRaytraceSceneEntries(
+std::vector<std::uint8_t> BuildAggregateTriangleBytes(
     frame::LevelInterface& level,
+    bool transmissive,
     double time_seconds)
 {
-    std::vector<RaytraceSceneEntry> entries = {};
-    std::uint32_t transmissive_triangle_offset = 0;
-    std::uint32_t opaque_triangle_offset = 0;
-    std::uint32_t transmissive_bvh_offset = 0;
-    std::uint32_t opaque_bvh_offset = 0;
+    std::vector<std::uint8_t> aggregate_triangle_bytes = {};
+    const auto reference_color =
+        ResolveRaytracingReferenceColor(level, transmissive);
     for (const auto& [source_node_id, source_material_id] :
          GetRaytracingSourceMeshMaterials(level))
     {
+        if (IsTransmissiveMaterial(level, source_material_id) != transmissive)
+        {
+            continue;
+        }
+
         auto* node =
             dynamic_cast<NodeMesh*>(&level.GetSceneNodeFromId(source_node_id));
         if (!node)
@@ -628,100 +587,25 @@ std::vector<RaytraceSceneEntry> CollectRaytraceSceneEntries(
             continue;
         }
 
-        const auto triangle_count =
-            GetRaytraceTriangleCount(triangle_buffer->GetRawData());
-        if (triangle_count == 0)
-        {
-            continue;
-        }
-
-        RaytraceSceneEntry entry = {};
-        entry.source_node_id = source_node_id;
-        entry.source_material_id = source_material_id;
-        entry.source_buffer_id = triangle_buffer_id;
-        entry.source_generation = triangle_buffer->GetGeneration();
-        entry.model = node->GetLocalModel(time_seconds);
-        entry.triangle_count = triangle_count;
-        entry.transmissive =
-            IsTransmissiveMaterial(level, source_material_id);
-        entry.material_id = entry.transmissive ? kRaytraceMaterialTransmissive
-                                               : kRaytraceMaterialOpaque;
-        if (entry.transmissive)
-        {
-            entry.triangle_offset = transmissive_triangle_offset;
-            entry.bvh_root_index = transmissive_bvh_offset;
-            transmissive_triangle_offset += triangle_count;
-            transmissive_bvh_offset += triangle_count * 2u - 1u;
-        }
-        else
-        {
-            entry.triangle_offset = opaque_triangle_offset;
-            entry.bvh_root_index = opaque_bvh_offset;
-            opaque_triangle_offset += triangle_count;
-            opaque_bvh_offset += triangle_count * 2u - 1u;
-        }
-        entries.push_back(std::move(entry));
-    }
-    return entries;
-}
-
-std::vector<PreparedRaytraceSceneEntry> PrepareRaytraceSceneEntries(
-    frame::LevelInterface& level,
-    const std::vector<RaytraceSceneEntry>& entries,
-    bool apply_node_transform)
-{
-    std::vector<PreparedRaytraceSceneEntry> prepared_entries = {};
-    prepared_entries.reserve(entries.size());
-    const auto transmissive_reference_color =
-        ResolveRaytracingReferenceColor(level, true);
-    const auto opaque_reference_color =
-        ResolveRaytracingReferenceColor(level, false);
-    for (const auto& entry : entries)
-    {
-        auto* triangle_buffer = dynamic_cast<opengl::Buffer*>(
-            &level.GetBufferFromId(entry.source_buffer_id));
-        if (!triangle_buffer)
-        {
-            continue;
-        }
-
         const auto source_color =
-            ResolveRaytracingSourceMaterialColor(level, entry.source_material_id);
+            ResolveRaytracingSourceMaterialColor(level, source_material_id);
         const auto color_multiplier = ResolveRaytracingColorMultiplier(
             source_color,
-            entry.transmissive ? transmissive_reference_color
-                               : opaque_reference_color);
-        auto triangle_bytes = apply_node_transform
-            ? TransformTriangleBytes(triangle_buffer->GetRawData(), entry.model)
-            : triangle_buffer->GetRawData();
-        triangle_bytes =
-            ApplyTriangleColorMultiplier(triangle_bytes, color_multiplier);
-        prepared_entries.push_back(
-            PreparedRaytraceSceneEntry{entry, std::move(triangle_bytes)});
-    }
-    return prepared_entries;
-}
-
-std::vector<std::uint8_t> BuildAggregateTriangleBytes(
-    const std::vector<PreparedRaytraceSceneEntry>& prepared_entries,
-    bool transmissive)
-{
-    std::vector<std::uint8_t> aggregate_triangle_bytes = {};
-    for (const auto& prepared_entry : prepared_entries)
-    {
-        if (prepared_entry.entry.transmissive != transmissive)
-        {
-            continue;
-        }
+            reference_color);
+        const auto transformed = TransformTriangleBytes(
+            triangle_buffer->GetRawData(),
+            node->GetLocalModel(time_seconds));
+        const auto tinted =
+            ApplyTriangleColorMultiplier(transformed, color_multiplier);
         aggregate_triangle_bytes.insert(
             aggregate_triangle_bytes.end(),
-            prepared_entry.triangle_bytes.begin(),
-            prepared_entry.triangle_bytes.end());
+            tinted.begin(),
+            tinted.end());
     }
     return aggregate_triangle_bytes;
 }
 
-std::vector<frame::BVHNode> BuildAggregateBvhNodes(
+std::vector<std::uint8_t> BuildAggregateBvhBytes(
     const std::vector<std::uint8_t>& triangle_bytes)
 {
     if (triangle_bytes.empty())
@@ -750,12 +634,8 @@ std::vector<frame::BVHNode> BuildAggregateBvhNodes(
 
     std::vector<std::uint32_t> indices(vertex_count);
     std::iota(indices.begin(), indices.end(), 0u);
-    return frame::BuildBVH(points, indices);
-}
+    const auto bvh_nodes = frame::BuildBVH(points, indices);
 
-std::vector<std::uint8_t> EncodeBvhNodes(
-    const std::vector<frame::BVHNode>& bvh_nodes)
-{
     std::vector<std::uint8_t> bytes(
         bvh_nodes.size() * sizeof(frame::BVHNode));
     if (!bytes.empty())
@@ -763,149 +643,6 @@ std::vector<std::uint8_t> EncodeBvhNodes(
         std::memcpy(bytes.data(), bvh_nodes.data(), bytes.size());
     }
     return bytes;
-}
-
-std::vector<std::uint8_t> BuildAggregateBvhBytes(
-    const std::vector<std::uint8_t>& triangle_bytes)
-{
-    return EncodeBvhNodes(BuildAggregateBvhNodes(triangle_bytes));
-}
-
-std::vector<std::uint8_t> BuildPerMeshAggregateBvhBytes(
-    const std::vector<PreparedRaytraceSceneEntry>& prepared_entries,
-    bool transmissive)
-{
-    std::vector<frame::BVHNode> aggregate_nodes = {};
-    for (const auto& prepared_entry : prepared_entries)
-    {
-        if (prepared_entry.entry.transmissive != transmissive)
-        {
-            continue;
-        }
-        auto local_nodes = BuildAggregateBvhNodes(prepared_entry.triangle_bytes);
-        if (local_nodes.empty())
-        {
-            continue;
-        }
-        const int node_offset = static_cast<int>(aggregate_nodes.size());
-        for (auto& node : local_nodes)
-        {
-            if (node.left >= 0)
-            {
-                node.left += node_offset;
-            }
-            if (node.right >= 0)
-            {
-                node.right += node_offset;
-            }
-            if (node.triangle_count > 0 && node.first_triangle >= 0)
-            {
-                node.first_triangle +=
-                    static_cast<int>(prepared_entry.entry.triangle_offset);
-            }
-        }
-        aggregate_nodes.insert(
-            aggregate_nodes.end(),
-            local_nodes.begin(),
-            local_nodes.end());
-    }
-    return EncodeBvhNodes(aggregate_nodes);
-}
-
-std::vector<std::uint8_t> EncodeRaytraceInstanceData(
-    const std::vector<RaytraceInstanceData>& instances)
-{
-    if (instances.empty())
-    {
-        return {0u};
-    }
-    std::vector<std::uint8_t> bytes(
-        instances.size() * sizeof(RaytraceInstanceData));
-    std::memcpy(bytes.data(), instances.data(), bytes.size());
-    return bytes;
-}
-
-std::vector<std::uint8_t> BuildPerMeshRaytraceInstanceBytes(
-    const std::vector<RaytraceSceneEntry>& entries)
-{
-    std::vector<RaytraceInstanceData> instances = {};
-    instances.reserve(entries.size());
-    for (const auto& entry : entries)
-    {
-        RaytraceInstanceData instance = {};
-        instance.object_to_world = entry.model;
-        const float determinant = glm::determinant(glm::mat3(entry.model));
-        instance.world_to_object =
-            std::abs(determinant) > 1.0e-8f ? glm::inverse(entry.model)
-                                            : glm::mat4(1.0f);
-        instance.metadata = glm::uvec4(
-            entry.triangle_offset,
-            entry.material_id,
-            entry.bvh_root_index,
-            entry.triangle_count);
-        instances.push_back(std::move(instance));
-    }
-    return EncodeRaytraceInstanceData(instances);
-}
-
-std::vector<std::uint8_t> BuildWorldSpaceRaytraceInstanceBytes(
-    const std::vector<std::uint8_t>& transmissive_triangles,
-    const std::vector<std::uint8_t>& opaque_triangles)
-{
-    std::vector<RaytraceInstanceData> instances = {};
-    const auto transmissive_triangle_count =
-        GetRaytraceTriangleCount(transmissive_triangles);
-    if (transmissive_triangle_count > 0)
-    {
-        RaytraceInstanceData instance = {};
-        instance.metadata = glm::uvec4(
-            0u,
-            kRaytraceMaterialTransmissive,
-            0u,
-            transmissive_triangle_count);
-        instances.push_back(std::move(instance));
-    }
-    const auto opaque_triangle_count = GetRaytraceTriangleCount(opaque_triangles);
-    if (opaque_triangle_count > 0)
-    {
-        RaytraceInstanceData instance = {};
-        instance.metadata = glm::uvec4(
-            0u,
-            kRaytraceMaterialOpaque,
-            0u,
-            opaque_triangle_count);
-        instances.push_back(std::move(instance));
-    }
-    return EncodeRaytraceInstanceData(instances);
-}
-
-std::vector<std::uint8_t> BuildSharedTransformRaytraceInstanceBytes(
-    const glm::mat4& shared_model,
-    std::uint32_t transmissive_triangle_count,
-    std::uint32_t opaque_triangle_count)
-{
-    std::vector<RaytraceInstanceData> instances = {};
-    const float determinant = glm::determinant(glm::mat3(shared_model));
-    const glm::mat4 world_to_object =
-        std::abs(determinant) > 1.0e-8f ? glm::inverse(shared_model)
-                                        : glm::mat4(1.0f);
-    const auto append_instance =
-        [&](std::uint32_t material_id,
-            std::uint32_t triangle_count) {
-            if (triangle_count == 0)
-            {
-                return;
-            }
-            RaytraceInstanceData instance = {};
-            instance.object_to_world = shared_model;
-            instance.world_to_object = world_to_object;
-            instance.metadata =
-                glm::uvec4(0u, material_id, 0u, triangle_count);
-            instances.push_back(std::move(instance));
-        };
-    append_instance(kRaytraceMaterialTransmissive, transmissive_triangle_count);
-    append_instance(kRaytraceMaterialOpaque, opaque_triangle_count);
-    return EncodeRaytraceInstanceData(instances);
 }
 
 } // namespace
@@ -1006,13 +743,16 @@ void Renderer::UpdateAggregateRaytraceSceneBuffers()
         return;
     }
 
-    const std::size_t scene_state_hash = BuildRaytracingSourceStateHash(
+    const auto transmissive_triangles = BuildAggregateTriangleBytes(
         level_,
-        delta_time_,
-        use_world_space_buffers);
-    const bool geometry_changed =
-        !has_raytrace_scene_state_hash_ ||
-        last_raytrace_scene_state_hash_ != scene_state_hash;
+        true,
+        delta_time_);
+    const auto opaque_triangles = BuildAggregateTriangleBytes(
+        level_,
+        false,
+        delta_time_);
+    const auto transmissive_bvh = BuildAggregateBvhBytes(transmissive_triangles);
+    const auto opaque_bvh = BuildAggregateBvhBytes(opaque_triangles);
 
     auto update_named_buffer = [&](MaterialInterface& material,
                                    const char* inner_name,
@@ -1038,49 +778,6 @@ void Renderer::UpdateAggregateRaytraceSceneBuffers()
         }
     };
 
-    std::vector<std::uint8_t> transmissive_triangles = {};
-    std::vector<std::uint8_t> opaque_triangles = {};
-    std::vector<std::uint8_t> transmissive_bvh = {};
-    std::vector<std::uint8_t> opaque_bvh = {};
-    std::vector<std::uint8_t> raytrace_instances =
-        EncodeRaytraceInstanceData(std::vector<RaytraceInstanceData>{});
-    const bool update_instance_buffer =
-        geometry_changed || (!use_world_space_buffers && !use_shared_scene_transform);
-    if (geometry_changed)
-    {
-        const auto prepared_entries = PrepareRaytraceSceneEntries(
-            level_,
-            scene_entries,
-            use_world_space_buffers);
-        transmissive_triangles =
-            BuildAggregateTriangleBytes(prepared_entries, true);
-        opaque_triangles = BuildAggregateTriangleBytes(prepared_entries, false);
-        if (use_world_space_buffers)
-        {
-            transmissive_bvh = BuildAggregateBvhBytes(transmissive_triangles);
-            opaque_bvh = BuildAggregateBvhBytes(opaque_triangles);
-            raytrace_instances = BuildWorldSpaceRaytraceInstanceBytes(
-                transmissive_triangles,
-                opaque_triangles);
-        }
-        else if (use_shared_scene_transform)
-        {
-            transmissive_bvh = BuildAggregateBvhBytes(transmissive_triangles);
-            opaque_bvh = BuildAggregateBvhBytes(opaque_triangles);
-        }
-        else
-        {
-            transmissive_bvh =
-                BuildPerMeshAggregateBvhBytes(prepared_entries, true);
-            opaque_bvh =
-                BuildPerMeshAggregateBvhBytes(prepared_entries, false);
-        }
-    }
-    if (!use_world_space_buffers && !use_shared_scene_transform)
-    {
-        raytrace_instances = BuildPerMeshRaytraceInstanceBytes(scene_entries);
-    }
-
     for (const auto& [node_id, material_id] :
          level_.GetMeshMaterialIds(proto::NodeMesh::SCENE_RENDER_TIME))
     {
@@ -1092,21 +789,12 @@ void Renderer::UpdateAggregateRaytraceSceneBuffers()
         }
         auto& material = level_.GetMaterialFromId(material_id);
 
-        if (geometry_changed)
-        {
-            update_named_buffer(
-                material, "TriangleBufferTransmissive", transmissive_triangles);
-            update_named_buffer(
-                material, "BvhBufferTransmissive", transmissive_bvh);
-            update_named_buffer(
-                material, "TriangleBufferOpaque", opaque_triangles);
-            update_named_buffer(material, "BvhBufferOpaque", opaque_bvh);
-        }
-        if (update_instance_buffer)
-        {
-            update_named_buffer(
-                material, "RaytraceInstanceBuffer", raytrace_instances);
-        }
+        update_named_buffer(
+            material, "TriangleBufferTransmissive", transmissive_triangles);
+        update_named_buffer(
+            material, "BvhBufferTransmissive", transmissive_bvh);
+        update_named_buffer(material, "TriangleBufferOpaque", opaque_triangles);
+        update_named_buffer(material, "BvhBufferOpaque", opaque_bvh);
     }
 
     last_raytrace_scene_state_hash_ = scene_state_hash;
@@ -1203,21 +891,9 @@ void Renderer::RenderMesh(
     if (IsRaytracingProgram(program) &&
         render_time_ == proto::NodeMesh::SCENE_RENDER_TIME)
     {
-        if (HasRaytracingSourceMeshes(level_))
+        if (RaytraceSceneRequiresWorldSpaceBuffers(level_))
         {
-            if (RequiresRuntimeRaytraceSceneBuffers(level_, delta_time_))
-            {
-                model_matrix = glm::mat4(1.0f);
-            }
-            else if (!program.GetTemporarySceneRoot().empty())
-            {
-                auto temp_id = level_.GetIdFromName(program.GetTemporarySceneRoot());
-                if (temp_id != NullId)
-                {
-                    auto& temp_node = level_.GetSceneNodeFromId(temp_id);
-                    model_matrix = temp_node.GetLocalModel(delta_time_);
-                }
-            }
+            model_matrix = glm::mat4(1.0f);
         }
         else if (!program.GetTemporarySceneRoot().empty())
         {
@@ -1654,7 +1330,7 @@ void Renderer::PreRender()
         }
         preprocess_entry(p, true);
     }
-    if (RequiresRuntimeRaytraceSceneBuffers(level_, delta_time_))
+    if (RaytraceSceneRequiresWorldSpaceBuffers(level_))
     {
         UpdateAggregateRaytraceSceneBuffers();
     }
