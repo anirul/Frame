@@ -32,6 +32,9 @@
 #include "frame/vulkan/gpu_memory_manager.h"
 #include "frame/vulkan/mesh_resources.h"
 #include "frame/vulkan/mesh_utils.h"
+#include "frame/vulkan/output_image_resources.h"
+#include "frame/vulkan/pipeline_resources.h"
+#include "frame/vulkan/renderer.h"
 #include "frame/vulkan/scene_state.h"
 #include "frame/vulkan/scoped_timer.h"
 #include "frame/vulkan/shader_compiler.h"
@@ -947,7 +950,10 @@ Device::Device(
     : vk_instance_(static_cast<VkInstance>(vk_instance)),
       size_(size),
       vk_surface_(surface),
-      texture_resources_(std::make_unique<TextureResources>(*this))
+      texture_resources_(std::make_unique<TextureResources>(*this)),
+      pipeline_resources_(std::make_unique<PipelineResources>(*this)),
+      output_image_resources_(std::make_unique<OutputImageResources>(*this)),
+      renderer_(std::make_unique<Renderer>(*this))
 {
     logger_->info("Initializing Vulkan device ({}x{})", size_.x, size_.y);
 
@@ -1189,10 +1195,8 @@ void Device::StartupFromLevelData(const frame::json::LevelData& level_data)
 
     current_level_data_ = level_data;
     active_program_info_.reset();
-    use_procedural_quad_pipeline_ = false;
     use_compute_raytracing_ = false;
     use_raytracing_pipeline_ = false;
-    compute_output_in_shader_read_ = false;
     elapsed_time_seconds_ = 0.0f;
     last_raytrace_scene_state_hash_ = 0;
     has_raytrace_scene_state_hash_ = false;
@@ -1823,6 +1827,10 @@ void Device::RemovePluginByName(const std::string& name)
 
 void Device::Cleanup()
 {
+    if (renderer_)
+    {
+        renderer_->Reset();
+    }
     if (vk_unique_device_)
     {
         const VkResult result =
@@ -1879,10 +1887,7 @@ void Device::Cleanup()
     last_raytrace_scene_state_hash_ = 0;
     has_raytrace_scene_state_hash_ = false;
     active_program_info_.reset();
-    use_procedural_quad_pipeline_ = false;
     use_raytracing_pipeline_ = false;
-    push_constant_stages_ = {};
-    push_constant_size_ = 0;
 }
 
 void Device::Resize(glm::uvec2 size)
@@ -2471,200 +2476,28 @@ void Device::UpdateHardwareRaytracingDescriptor()
 
 std::optional<vk::DescriptorImageInfo> Device::GetComputeOutputDescriptorInfo() const
 {
-    if (!compute_output_sampler_ || !compute_output_view_)
+    if (!output_image_resources_)
     {
         return std::nullopt;
     }
-    return vk::DescriptorImageInfo(
-        *compute_output_sampler_,
-        *compute_output_view_,
-        vk::ImageLayout::eShaderReadOnlyOptimal);
+    return output_image_resources_->GetComputeOutputDescriptorInfo();
 }
 
 std::optional<vk::DescriptorImageInfo> Device::GetSwapchainPreviewDescriptorInfo() const
 {
-    if (!swapchain_preview_in_shader_read_ || !swapchain_preview_sampler_ ||
-        !swapchain_preview_view_)
+    if (!output_image_resources_)
     {
         return std::nullopt;
     }
-    return vk::DescriptorImageInfo(
-        *swapchain_preview_sampler_,
-        *swapchain_preview_view_,
-        vk::ImageLayout::eShaderReadOnlyOptimal);
+    return output_image_resources_->GetSwapchainPreviewDescriptorInfo();
 }
 
 void Device::Display(double dt)
 {
-    if (device_lost_)
+    if (renderer_)
     {
-        return;
+        renderer_->Display(dt);
     }
-
-    elapsed_time_seconds_ += static_cast<float>(dt);
-
-    if (level_)
-    {
-        level_->UpdateLights(static_cast<double>(elapsed_time_seconds_));
-        UpdateRaytraceBuffers();
-    }
-
-    if (!vk_unique_device_ || !swapchain_resources_ ||
-        !swapchain_resources_->IsValid())
-    {
-        return;
-    }
-    if (!command_resources_ || command_resources_->GetBuffers().empty())
-    {
-        return;
-    }
-    if (!sync_resources_ || !sync_resources_->IsCreated())
-    {
-        return;
-    }
-    const bool has_scene_pipeline =
-        static_cast<bool>(graphics_pipeline_) &&
-        static_cast<bool>(pipeline_layout_);
-    const bool has_gui_render = static_cast<bool>(gui_render_callback_);
-    if (!has_scene_pipeline && !has_gui_render)
-    {
-        return;
-    }
-
-    if (framebuffer_resized_)
-    {
-        framebuffer_resized_ = false;
-        RecreateSwapchain();
-        return;
-    }
-
-    const vk::Fence fence = sync_resources_->GetInFlightFence(current_frame_);
-    const VkFence fence_handle = static_cast<VkFence>(fence);
-    const VkResult wait_result = vkWaitForFences(
-        static_cast<VkDevice>(*vk_unique_device_),
-        1,
-        &fence_handle,
-        VK_TRUE,
-        std::numeric_limits<std::uint64_t>::max());
-    if (wait_result != VK_SUCCESS)
-    {
-        logger_->error(
-            "vkWaitForFences failed: {}",
-            vk::to_string(static_cast<vk::Result>(wait_result)));
-        if (wait_result == VK_ERROR_DEVICE_LOST)
-        {
-            device_lost_ = true;
-        }
-        return;
-    }
-
-    const auto& swapchain = swapchain_resources_->GetSwapchain();
-    auto acquire = vk_unique_device_->acquireNextImageKHR(
-        *swapchain,
-        std::numeric_limits<std::uint64_t>::max(),
-        sync_resources_->GetImageAvailable(current_frame_),
-        nullptr);
-
-    if (acquire.result == vk::Result::eErrorOutOfDateKHR)
-    {
-        RecreateSwapchain();
-        return;
-    }
-    if (acquire.result != vk::Result::eSuccess &&
-        acquire.result != vk::Result::eSuboptimalKHR)
-    {
-        logger_->error(
-            "Failed to acquire swapchain image: {}",
-            vk::to_string(acquire.result));
-        if (acquire.result == vk::Result::eErrorDeviceLost)
-        {
-            device_lost_ = true;
-        }
-        return;
-    }
-
-    const std::uint32_t image_index = acquire.value;
-    const VkResult reset_result = vkResetFences(
-        static_cast<VkDevice>(*vk_unique_device_),
-        1,
-        &fence_handle);
-    if (reset_result != VK_SUCCESS)
-    {
-        logger_->error(
-            "vkResetFences failed: {}",
-            vk::to_string(static_cast<vk::Result>(reset_result)));
-        if (reset_result == VK_ERROR_DEVICE_LOST)
-        {
-            device_lost_ = true;
-        }
-        return;
-    }
-
-    vk::CommandBuffer command_buffer =
-        command_resources_->GetBuffer(current_frame_);
-    command_buffer.reset();
-    RecordCommandBuffer(command_buffer, image_index);
-
-    const vk::Semaphore wait_semaphores[] = {
-        sync_resources_->GetImageAvailable(current_frame_)};
-    const vk::PipelineStageFlags wait_stages[] = {
-        vk::PipelineStageFlagBits::eColorAttachmentOutput};
-    const vk::Semaphore signal_semaphores[] = {
-        sync_resources_->GetRenderFinished(image_index)};
-
-    vk::SubmitInfo submit_info(
-        1,
-        wait_semaphores,
-        wait_stages,
-        1,
-        &command_buffer,
-        1,
-        signal_semaphores);
-
-    const VkSubmitInfo submit_info_c = submit_info;
-    const VkResult submit_result = vkQueueSubmit(
-        static_cast<VkQueue>(graphics_queue_),
-        1,
-        &submit_info_c,
-        fence);
-    if (submit_result != VK_SUCCESS)
-    {
-        logger_->error(
-            "vkQueueSubmit failed: {}",
-            vk::to_string(static_cast<vk::Result>(submit_result)));
-        if (submit_result == VK_ERROR_DEVICE_LOST)
-        {
-            device_lost_ = true;
-        }
-        return;
-    }
-
-    vk::PresentInfoKHR present_info(
-        1,
-        signal_semaphores,
-        1,
-        &swapchain.get(),
-        &image_index);
-
-    const vk::Result present_result = present_queue_.presentKHR(present_info);
-    if (present_result == vk::Result::eErrorOutOfDateKHR ||
-        present_result == vk::Result::eSuboptimalKHR)
-    {
-        RecreateSwapchain();
-    }
-    else if (present_result != vk::Result::eSuccess)
-    {
-        logger_->error(
-            "Failed to present swapchain image: {}",
-            vk::to_string(present_result));
-        if (present_result == vk::Result::eErrorDeviceLost)
-        {
-            device_lost_ = true;
-        }
-        return;
-    }
-
-    current_frame_ = (current_frame_ + 1) % kMaxFramesInFlight;
 }
 
 void Device::LogRuntimeConfiguration() const
@@ -2679,9 +2512,9 @@ void Device::LogRuntimeConfiguration() const
         !active_program_info_->miss_shader.empty() &&
         !active_program_info_->closesthit_shader.empty();
     const bool raytracing_pipeline_ready =
-        static_cast<bool>(raytracing_pipeline_);
+        pipeline_resources_ && pipeline_resources_->HasRaytracingPipeline();
     const bool compute_pipeline_ready =
-        static_cast<bool>(compute_pipeline_);
+        pipeline_resources_ && pipeline_resources_->HasComputePipeline();
     const bool hardware_scene_ready =
         static_cast<bool>(hardware_raytracing_tlas_);
 
@@ -2792,6 +2625,10 @@ void Device::RecreateSwapchain()
             swapchain_resources_->GetImages().size());
         sync_resources_->Create();
     }
+    if (renderer_)
+    {
+        renderer_->Reset();
+    }
     CreateSwapchainPreviewImage();
 
     if (use_hardware_raytracing_)
@@ -2884,7 +2721,8 @@ void Device::RecordCommandBuffer(
                                  vk::PipelineStageFlags dst_stage,
                                  vk::AccessFlags src_access,
                                  vk::AccessFlags dst_access) {
-        if (!compute_output_image_)
+        if (!output_image_resources_ ||
+            !output_image_resources_->HasComputeOutputImage())
         {
             return;
         }
@@ -2895,7 +2733,7 @@ void Device::RecordCommandBuffer(
             new_layout,
             VK_QUEUE_FAMILY_IGNORED,
             VK_QUEUE_FAMILY_IGNORED,
-            *compute_output_image_,
+            output_image_resources_->GetComputeOutputImage(),
             {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1});
         command_buffer.pipelineBarrier(
             src_stage,
@@ -2908,7 +2746,8 @@ void Device::RecordCommandBuffer(
 
     if (use_compute_raytracing_ &&
         descriptor_set_ &&
-        compute_output_image_ &&
+        output_image_resources_ &&
+        output_image_resources_->HasComputeOutputImage() &&
         extent.width > 0 &&
         extent.height > 0)
     {
@@ -2948,7 +2787,7 @@ void Device::RecordCommandBuffer(
             storage_buffers_ready_ = true;
         }
 
-        if (compute_output_in_shader_read_)
+        if (output_image_resources_->IsComputeOutputInShaderRead())
         {
             transition_output(
                 vk::ImageLayout::eShaderReadOnlyOptimal,
@@ -2959,39 +2798,42 @@ void Device::RecordCommandBuffer(
                     : vk::PipelineStageFlagBits::eComputeShader,
                 vk::AccessFlagBits::eShaderRead,
                 vk::AccessFlagBits::eShaderWrite);
-            compute_output_in_shader_read_ = false;
+            output_image_resources_->SetComputeOutputInShaderRead(false);
         }
 
         if (use_raytracing_pipeline_ &&
-            raytracing_pipeline_ &&
-            raytracing_pipeline_layout_)
+            pipeline_resources_ &&
+            pipeline_resources_->HasRaytracingPipeline() &&
+            pipeline_resources_->GetRaytracingPipelineLayout())
         {
             command_buffer.bindPipeline(
                 vk::PipelineBindPoint::eRayTracingKHR,
-                *raytracing_pipeline_);
+                pipeline_resources_->GetRaytracingPipeline());
             command_buffer.bindDescriptorSets(
                 vk::PipelineBindPoint::eRayTracingKHR,
-                *raytracing_pipeline_layout_,
+                pipeline_resources_->GetRaytracingPipelineLayout(),
                 0,
                 descriptor_set_,
                 {});
             command_buffer.traceRaysKHR(
-                raygen_sbt_region_,
-                miss_sbt_region_,
-                hit_sbt_region_,
-                callable_sbt_region_,
+                pipeline_resources_->GetRaygenSbtRegion(),
+                pipeline_resources_->GetMissSbtRegion(),
+                pipeline_resources_->GetHitSbtRegion(),
+                pipeline_resources_->GetCallableSbtRegion(),
                 extent.width,
                 extent.height,
                 1);
         }
-        else if (compute_pipeline_ && compute_pipeline_layout_)
+        else if (pipeline_resources_ &&
+                 pipeline_resources_->HasComputePipeline() &&
+                 pipeline_resources_->GetComputePipelineLayout())
         {
             command_buffer.bindPipeline(
                 vk::PipelineBindPoint::eCompute,
-                *compute_pipeline_);
+                pipeline_resources_->GetComputePipeline());
             command_buffer.bindDescriptorSets(
                 vk::PipelineBindPoint::eCompute,
-                *compute_pipeline_layout_,
+                pipeline_resources_->GetComputePipelineLayout(),
                 0,
                 descriptor_set_,
                 {});
@@ -3011,7 +2853,7 @@ void Device::RecordCommandBuffer(
             vk::PipelineStageFlagBits::eFragmentShader,
             vk::AccessFlagBits::eShaderWrite,
             vk::AccessFlagBits::eShaderRead);
-        compute_output_in_shader_read_ = true;
+        output_image_resources_->SetComputeOutputInShaderRead(true);
     }
 
     std::array<vk::ClearValue, 1> clear_values{};
@@ -3022,13 +2864,13 @@ void Device::RecordCommandBuffer(
         1.0f});
 
     auto draw_scene = [&]() -> bool {
-        if (!graphics_pipeline_)
+        if (!pipeline_resources_ || !pipeline_resources_->HasGraphicsPipeline())
         {
             return false;
         }
         command_buffer.bindPipeline(
             vk::PipelineBindPoint::eGraphics,
-            *graphics_pipeline_);
+            pipeline_resources_->GetGraphicsPipeline());
 
         vk::Viewport viewport(
             0.0f,
@@ -3046,7 +2888,7 @@ void Device::RecordCommandBuffer(
         {
             command_buffer.bindDescriptorSets(
                 vk::PipelineBindPoint::eGraphics,
-                *pipeline_layout_,
+                pipeline_resources_->GetGraphicsPipelineLayout(),
                 0,
                 descriptor_set_,
                 {});
@@ -3057,8 +2899,8 @@ void Device::RecordCommandBuffer(
         glm::mat4 model = scene_state.model;
 
         const bool needs_scene_matrices =
-            push_constant_size_ > 0 &&
-            !(use_procedural_quad_pipeline_ &&
+            pipeline_resources_->GetPushConstantSize() > 0 &&
+            !(pipeline_resources_->UsesProceduralQuadPipeline() &&
               active_program_info_ &&
               active_program_info_->uses_time_uniform);
 
@@ -3114,17 +2956,18 @@ void Device::RecordCommandBuffer(
             }
         }
 
-        if (push_constant_size_ > 0)
+        if (pipeline_resources_->GetPushConstantSize() > 0)
         {
-            if (use_procedural_quad_pipeline_ && active_program_info_ &&
+            if (pipeline_resources_->UsesProceduralQuadPipeline() &&
+                active_program_info_ &&
                 active_program_info_->uses_time_uniform)
             {
                 float time = elapsed_time_seconds_;
                 command_buffer.pushConstants(
-                    *pipeline_layout_,
-                    push_constant_stages_,
+                    pipeline_resources_->GetGraphicsPipelineLayout(),
+                    pipeline_resources_->GetPushConstantStages(),
                     0,
-                    push_constant_size_,
+                    pipeline_resources_->GetPushConstantSize(),
                     &time);
             }
             else
@@ -3137,15 +2980,15 @@ void Device::RecordCommandBuffer(
                     float time_s;
                 } push_constants{projection, view, model, elapsed_time_seconds_};
                 command_buffer.pushConstants(
-                    *pipeline_layout_,
-                    push_constant_stages_,
+                    pipeline_resources_->GetGraphicsPipelineLayout(),
+                    pipeline_resources_->GetPushConstantStages(),
                     0,
-                    push_constant_size_,
+                    pipeline_resources_->GetPushConstantSize(),
                     &push_constants);
             }
         }
 
-        if (use_procedural_quad_pipeline_)
+        if (pipeline_resources_->UsesProceduralQuadPipeline())
         {
             command_buffer.draw(6, 1, 0, 0);
             return true;
@@ -3210,7 +3053,9 @@ void Device::RecordCommandBuffer(
             to_transfer_src);
     }
 
-    if (swapchain_preview_image_ && scene_content_rendered &&
+    if (output_image_resources_ &&
+        output_image_resources_->HasSwapchainPreviewImage() &&
+        scene_content_rendered &&
         image_index < images.size() &&
         extent.width > 0 && extent.height > 0)
     {
@@ -3227,17 +3072,17 @@ void Device::RecordCommandBuffer(
                 swapchain_image,
                 {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1}),
             vk::ImageMemoryBarrier(
-                swapchain_preview_in_shader_read_
+                output_image_resources_->IsSwapchainPreviewInShaderRead()
                     ? vk::AccessFlagBits::eShaderRead
                     : vk::AccessFlags{},
                 vk::AccessFlagBits::eTransferWrite,
-                swapchain_preview_in_shader_read_
+                output_image_resources_->IsSwapchainPreviewInShaderRead()
                     ? vk::ImageLayout::eShaderReadOnlyOptimal
                     : vk::ImageLayout::eUndefined,
                 vk::ImageLayout::eTransferDstOptimal,
                 VK_QUEUE_FAMILY_IGNORED,
                 VK_QUEUE_FAMILY_IGNORED,
-                *swapchain_preview_image_,
+                output_image_resources_->GetSwapchainPreviewImage(),
                 {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1})};
 
         command_buffer.pipelineBarrier(
@@ -3257,7 +3102,7 @@ void Device::RecordCommandBuffer(
         command_buffer.copyImage(
             swapchain_image,
             vk::ImageLayout::eTransferSrcOptimal,
-            *swapchain_preview_image_,
+            output_image_resources_->GetSwapchainPreviewImage(),
             vk::ImageLayout::eTransferDstOptimal,
             copy_region);
 
@@ -3280,7 +3125,7 @@ void Device::RecordCommandBuffer(
                 vk::ImageLayout::eShaderReadOnlyOptimal,
                 VK_QUEUE_FAMILY_IGNORED,
                 VK_QUEUE_FAMILY_IGNORED,
-                *swapchain_preview_image_,
+                output_image_resources_->GetSwapchainPreviewImage(),
                 {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1})};
 
         command_buffer.pipelineBarrier(
@@ -3291,7 +3136,7 @@ void Device::RecordCommandBuffer(
             nullptr,
             from_copy_barriers);
 
-        swapchain_preview_in_shader_read_ = true;
+        output_image_resources_->SetSwapchainPreviewInShaderRead(true);
     }
 
     if (gui_render_callback_ && gui_render_pass &&
@@ -3342,527 +3187,50 @@ void Device::RecordCommandBuffer(
 
 void Device::CreateGraphicsPipeline()
 {
-    if (!vk_unique_device_ || !swapchain_resources_ ||
-        !swapchain_resources_->IsValid())
+    if (pipeline_resources_)
     {
-        return;
+        pipeline_resources_->CreateGraphicsPipeline();
     }
-
-    const auto& render_pass = swapchain_resources_->GetRenderPass();
-
-    DestroyGraphicsPipeline();
-
-    if (!texture_resources_ || texture_resources_->Empty())
-    {
-        return;
-    }
-
-    std::vector<std::uint32_t> vert_code;
-    std::vector<std::uint32_t> frag_code;
-    if (!active_program_info_)
-    {
-        logger_->error(
-            "No Vulkan program selected; cannot build graphics pipeline.");
-        return;
-    }
-    if (active_program_info_->vertex_shader.empty() ||
-        active_program_info_->fragment_shader.empty())
-    {
-        logger_->error(
-            "Vulkan program {} is missing shader filenames.",
-            active_program_info_->program_name);
-        return;
-    }
-
-    if (!shader_compiler_)
-    {
-        shader_compiler_ = std::make_unique<ShaderCompiler>();
-    }
-
-    try
-    {
-        vert_code = shader_compiler_->CompileFile(
-            active_program_info_->vertex_shader, shaderc_vertex_shader);
-        frag_code = shader_compiler_->CompileFile(
-            active_program_info_->fragment_shader, shaderc_fragment_shader);
-    }
-    catch (const std::exception& ex)
-    {
-        logger_->warn(
-            "Failed to compile Vulkan shader pair ({} / {}): {}",
-            active_program_info_->vertex_shader.string(),
-            active_program_info_->fragment_shader.string(),
-            ex.what());
-        return;
-    }
-
-    use_procedural_quad_pipeline_ =
-        active_program_info_->scene_type == frame::proto::SceneType::QUAD;
-
-    struct alignas(16) PushConstants
-    {
-        glm::mat4 projection;
-        glm::mat4 view;
-        glm::mat4 model;
-        float time_s;
-    };
-
-    if (use_procedural_quad_pipeline_)
-    {
-        if (active_program_info_ && active_program_info_->uses_time_uniform)
-        {
-            push_constant_size_ = sizeof(float);
-            push_constant_stages_ = vk::ShaderStageFlagBits::eFragment;
-        }
-        else
-        {
-            push_constant_size_ = 0;
-            push_constant_stages_ = {};
-        }
-    }
-    else
-    {
-        push_constant_size_ = static_cast<std::uint32_t>(sizeof(PushConstants));
-        push_constant_stages_ = vk::ShaderStageFlagBits::eVertex;
-    }
-
-    auto vert_module = CreateShaderModule(vert_code);
-    auto frag_module = CreateShaderModule(frag_code);
-
-    vk::PipelineShaderStageCreateInfo shader_stages[] = {
-        {vk::PipelineShaderStageCreateFlags{}, vk::ShaderStageFlagBits::eVertex, *vert_module, "main"},
-        {vk::PipelineShaderStageCreateFlags{}, vk::ShaderStageFlagBits::eFragment, *frag_module, "main"},
-    };
-
-    std::vector<vk::VertexInputBindingDescription> binding_descriptions;
-    std::vector<vk::VertexInputAttributeDescription> attribute_descriptions;
-
-    if (!use_procedural_quad_pipeline_)
-    {
-        binding_descriptions.emplace_back(
-            0,
-            static_cast<std::uint32_t>(sizeof(MeshVertex)),
-            vk::VertexInputRate::eVertex);
-        attribute_descriptions.emplace_back(
-            0,
-            0,
-            vk::Format::eR32G32B32Sfloat,
-            static_cast<std::uint32_t>(offsetof(MeshVertex, position)));
-        attribute_descriptions.emplace_back(
-            1,
-            0,
-            vk::Format::eR32G32Sfloat,
-            static_cast<std::uint32_t>(offsetof(MeshVertex, uv)));
-    }
-
-    vk::PipelineVertexInputStateCreateInfo vertex_input_info(
-        vk::PipelineVertexInputStateCreateFlags{},
-        static_cast<std::uint32_t>(binding_descriptions.size()),
-        binding_descriptions.data(),
-        static_cast<std::uint32_t>(attribute_descriptions.size()),
-        attribute_descriptions.data());
-
-    vk::PipelineInputAssemblyStateCreateInfo input_assembly(
-        vk::PipelineInputAssemblyStateCreateFlags{},
-        vk::PrimitiveTopology::eTriangleList,
-        VK_FALSE);
-
-    vk::PipelineViewportStateCreateInfo viewport_state(
-        vk::PipelineViewportStateCreateFlags{},
-        1,
-        nullptr,
-        1,
-        nullptr);
-
-    vk::PipelineRasterizationStateCreateInfo rasterizer(
-        vk::PipelineRasterizationStateCreateFlags{},
-        VK_FALSE,
-        VK_FALSE,
-        vk::PolygonMode::eFill,
-        vk::CullModeFlagBits::eNone,
-        vk::FrontFace::eCounterClockwise,
-        VK_FALSE,
-        0.0f,
-        0.0f,
-        0.0f,
-        1.0f);
-
-    vk::PipelineMultisampleStateCreateInfo multisampling(
-        vk::PipelineMultisampleStateCreateFlags{},
-        vk::SampleCountFlagBits::e1);
-
-    vk::PipelineColorBlendAttachmentState color_blend_attachment{};
-    color_blend_attachment.colorWriteMask =
-        vk::ColorComponentFlagBits::eR |
-        vk::ColorComponentFlagBits::eG |
-        vk::ColorComponentFlagBits::eB |
-        vk::ColorComponentFlagBits::eA;
-    color_blend_attachment.blendEnable = VK_FALSE;
-
-    vk::PipelineColorBlendStateCreateInfo color_blending(
-        vk::PipelineColorBlendStateCreateFlags{},
-        VK_FALSE,
-        vk::LogicOp::eCopy,
-        1,
-        &color_blend_attachment);
-
-    std::array<vk::DynamicState, 2> dynamic_states = {
-        vk::DynamicState::eViewport,
-        vk::DynamicState::eScissor};
-    vk::PipelineDynamicStateCreateInfo dynamic_state(
-        vk::PipelineDynamicStateCreateFlags{},
-        static_cast<std::uint32_t>(dynamic_states.size()),
-        dynamic_states.data());
-
-    std::vector<vk::DescriptorSetLayout> set_layouts;
-    if (descriptor_set_layout_)
-    {
-        set_layouts.push_back(*descriptor_set_layout_);
-    }
-
-    std::vector<vk::PushConstantRange> push_constant_ranges;
-    if (push_constant_size_ > 0)
-    {
-        push_constant_ranges.emplace_back(
-            push_constant_stages_, 0, push_constant_size_);
-    }
-
-    vk::PipelineLayoutCreateInfo pipeline_layout_info(
-        vk::PipelineLayoutCreateFlags{},
-        static_cast<std::uint32_t>(set_layouts.size()),
-        set_layouts.data(),
-        static_cast<std::uint32_t>(push_constant_ranges.size()),
-        push_constant_ranges.empty() ? nullptr : push_constant_ranges.data());
-    pipeline_layout_ = vk_unique_device_->createPipelineLayoutUnique(pipeline_layout_info);
-
-    vk::GraphicsPipelineCreateInfo pipeline_info(
-        vk::PipelineCreateFlags{},
-        static_cast<std::uint32_t>(std::size(shader_stages)),
-        shader_stages,
-        &vertex_input_info,
-        &input_assembly,
-        nullptr,
-        &viewport_state,
-        &rasterizer,
-        &multisampling,
-        nullptr,
-        &color_blending,
-        &dynamic_state,
-        *pipeline_layout_,
-        *render_pass);
-
-    auto pipeline_result =
-        vk_unique_device_->createGraphicsPipelineUnique(nullptr, pipeline_info);
-    if (pipeline_result.result != vk::Result::eSuccess)
-    {
-        throw std::runtime_error("Failed to create Vulkan graphics pipeline.");
-    }
-    graphics_pipeline_ = std::move(pipeline_result.value);
 }
 
 void Device::DestroyGraphicsPipeline()
 {
-    graphics_pipeline_.reset();
-    pipeline_layout_.reset();
+    if (pipeline_resources_)
+    {
+        pipeline_resources_->DestroyGraphicsPipeline();
+    }
 }
 
 void Device::CreateComputePipeline()
 {
-    if (!use_compute_raytracing_ || !vk_unique_device_)
+    if (pipeline_resources_)
     {
-        return;
+        pipeline_resources_->CreateComputePipeline();
     }
-
-    DestroyComputePipeline();
-
-    if (!descriptor_set_layout_)
-    {
-        logger_->warn(
-            "CreateComputePipeline skipped: descriptor set layout missing.");
-        return;
-    }
-
-    if (!active_program_info_ ||
-        active_program_info_->compute_shader.empty())
-    {
-        logger_->warn(
-            "CreateComputePipeline skipped: no active compute shader.");
-        return;
-    }
-
-    if (!shader_compiler_)
-    {
-        shader_compiler_ = std::make_unique<ShaderCompiler>();
-    }
-
-    std::vector<std::uint32_t> compute_code;
-    try
-    {
-        compute_code = shader_compiler_->CompileFile(
-            active_program_info_->compute_shader, shaderc_compute_shader);
-    }
-    catch (const std::exception& ex)
-    {
-        logger_->warn(
-            "Failed to compile compute shader {}: {}",
-            active_program_info_->compute_shader.string(),
-            ex.what());
-        return;
-    }
-
-    auto compute_module = CreateShaderModule(compute_code);
-
-    vk::PipelineShaderStageCreateInfo stage_info(
-        vk::PipelineShaderStageCreateFlags{},
-        vk::ShaderStageFlagBits::eCompute,
-        *compute_module,
-        "main");
-
-    const vk::DescriptorSetLayout layouts[] = {*descriptor_set_layout_};
-    vk::PipelineLayoutCreateInfo layout_info(
-        vk::PipelineLayoutCreateFlags{},
-        1,
-        layouts);
-    compute_pipeline_layout_ =
-        vk_unique_device_->createPipelineLayoutUnique(layout_info);
-
-    vk::ComputePipelineCreateInfo pipeline_info(
-        vk::PipelineCreateFlags{},
-        stage_info,
-        *compute_pipeline_layout_);
-
-    auto pipeline_result =
-        vk_unique_device_->createComputePipelineUnique(nullptr, pipeline_info);
-    if (pipeline_result.result != vk::Result::eSuccess)
-    {
-        throw std::runtime_error("Failed to create Vulkan compute pipeline.");
-    }
-    compute_pipeline_ = std::move(pipeline_result.value);
-    logger_->info("Created raytracing compute pipeline.");
 }
 
 void Device::DestroyComputePipeline()
 {
-    compute_pipeline_.reset();
-    compute_pipeline_layout_.reset();
-    compute_output_in_shader_read_ = false;
+    if (pipeline_resources_)
+    {
+        pipeline_resources_->DestroyComputePipeline();
+    }
 }
 
 void Device::CreateRaytracingPipeline()
 {
-    if (!use_raytracing_pipeline_ || !vk_unique_device_)
+    if (pipeline_resources_)
     {
-        return;
+        pipeline_resources_->CreateRaytracingPipeline();
     }
-
-    DestroyRaytracingPipeline();
-
-    if (!descriptor_set_layout_)
-    {
-        logger_->warn(
-            "CreateRaytracingPipeline skipped: descriptor set layout missing.");
-        return;
-    }
-    if (!active_program_info_ ||
-        active_program_info_->raygen_shader.empty() ||
-        active_program_info_->miss_shader.empty() ||
-        active_program_info_->closesthit_shader.empty())
-    {
-        logger_->warn(
-            "CreateRaytracingPipeline skipped: missing ray tracing shader stage.");
-        return;
-    }
-    if (!shader_compiler_)
-    {
-        shader_compiler_ = std::make_unique<ShaderCompiler>();
-    }
-
-    std::vector<std::uint32_t> raygen_code;
-    std::vector<std::uint32_t> miss_code;
-    std::vector<std::uint32_t> closesthit_code;
-    try
-    {
-        raygen_code = shader_compiler_->CompileFile(
-            active_program_info_->raygen_shader,
-            shaderc_raygen_shader);
-        miss_code = shader_compiler_->CompileFile(
-            active_program_info_->miss_shader,
-            shaderc_miss_shader);
-        closesthit_code = shader_compiler_->CompileFile(
-            active_program_info_->closesthit_shader,
-            shaderc_closesthit_shader);
-    }
-    catch (const std::exception& ex)
-    {
-        logger_->warn(
-            "Failed to compile Vulkan ray tracing shaders ({}, {}, {}): {}",
-            active_program_info_->raygen_shader.string(),
-            active_program_info_->miss_shader.string(),
-            active_program_info_->closesthit_shader.string(),
-            ex.what());
-        return;
-    }
-
-    auto raygen_module = CreateShaderModule(raygen_code);
-    auto miss_module = CreateShaderModule(miss_code);
-    auto closesthit_module = CreateShaderModule(closesthit_code);
-
-    std::array<vk::PipelineShaderStageCreateInfo, 3> shader_stages = {{
-        {vk::PipelineShaderStageCreateFlags{},
-         vk::ShaderStageFlagBits::eRaygenKHR,
-         *raygen_module,
-         "main"},
-        {vk::PipelineShaderStageCreateFlags{},
-         vk::ShaderStageFlagBits::eMissKHR,
-         *miss_module,
-         "main"},
-        {vk::PipelineShaderStageCreateFlags{},
-         vk::ShaderStageFlagBits::eClosestHitKHR,
-         *closesthit_module,
-         "main"},
-    }};
-
-    std::array<vk::RayTracingShaderGroupCreateInfoKHR, 3> shader_groups = {{
-        {vk::RayTracingShaderGroupTypeKHR::eGeneral,
-         0,
-         VK_SHADER_UNUSED_KHR,
-         VK_SHADER_UNUSED_KHR,
-         VK_SHADER_UNUSED_KHR},
-        {vk::RayTracingShaderGroupTypeKHR::eGeneral,
-         1,
-         VK_SHADER_UNUSED_KHR,
-         VK_SHADER_UNUSED_KHR,
-         VK_SHADER_UNUSED_KHR},
-        {vk::RayTracingShaderGroupTypeKHR::eTrianglesHitGroup,
-         VK_SHADER_UNUSED_KHR,
-         2,
-         VK_SHADER_UNUSED_KHR,
-         VK_SHADER_UNUSED_KHR},
-    }};
-
-    const vk::DescriptorSetLayout layouts[] = {*descriptor_set_layout_};
-    vk::PipelineLayoutCreateInfo layout_info(
-        vk::PipelineLayoutCreateFlags{},
-        1,
-        layouts);
-    raytracing_pipeline_layout_ =
-        vk_unique_device_->createPipelineLayoutUnique(layout_info);
-
-    vk::RayTracingPipelineCreateInfoKHR pipeline_info{};
-    pipeline_info.setStages(shader_stages);
-    pipeline_info.setGroups(shader_groups);
-    pipeline_info.setMaxPipelineRayRecursionDepth(1);
-    pipeline_info.setLayout(*raytracing_pipeline_layout_);
-    auto pipeline_result = vk_unique_device_->createRayTracingPipelineKHRUnique(
-        vk::DeferredOperationKHR{},
-        vk::PipelineCache{},
-        pipeline_info);
-    if (pipeline_result.result != vk::Result::eSuccess)
-    {
-        throw std::runtime_error(
-            "Failed to create Vulkan ray tracing pipeline.");
-    }
-    raytracing_pipeline_ = std::move(pipeline_result.value);
-
-    const std::uint32_t handle_size =
-        raytracing_pipeline_properties_.shaderGroupHandleSize;
-    const std::uint32_t handle_alignment =
-        raytracing_pipeline_properties_.shaderGroupHandleAlignment;
-    const std::uint32_t base_alignment =
-        raytracing_pipeline_properties_.shaderGroupBaseAlignment;
-    const std::uint32_t handle_size_aligned =
-        AlignUp(handle_size, handle_alignment);
-    const std::uint32_t raygen_stride =
-        AlignUp(handle_size_aligned, base_alignment);
-    const std::uint32_t miss_stride = handle_size_aligned;
-    const std::uint32_t hit_stride = handle_size_aligned;
-    const std::uint32_t raygen_size = raygen_stride;
-    const std::uint32_t miss_size =
-        AlignUp(handle_size_aligned, base_alignment);
-    const std::uint32_t hit_size =
-        AlignUp(handle_size_aligned, base_alignment);
-    const vk::DeviceSize sbt_size =
-        static_cast<vk::DeviceSize>(raygen_size + miss_size + hit_size);
-
-    std::vector<std::uint8_t> shader_handles(
-        static_cast<std::size_t>(handle_size * shader_groups.size()));
-    const vk::Result handle_result =
-        vk_unique_device_->getRayTracingShaderGroupHandlesKHR(
-        *raytracing_pipeline_,
-        0,
-        static_cast<std::uint32_t>(shader_groups.size()),
-        shader_handles.size(),
-        shader_handles.data());
-    if (handle_result != vk::Result::eSuccess)
-    {
-        throw std::runtime_error(
-            "Failed to query Vulkan ray tracing shader group handles.");
-    }
-
-    raytracing_sbt_buffer_ = gpu_memory_manager_->CreateBuffer(
-        sbt_size,
-        vk::BufferUsageFlagBits::eShaderBindingTableKHR |
-            vk::BufferUsageFlagBits::eShaderDeviceAddress,
-        vk::MemoryPropertyFlagBits::eHostVisible |
-            vk::MemoryPropertyFlagBits::eHostCoherent,
-        raytracing_sbt_memory_,
-        vk::MemoryAllocateFlagBits::eDeviceAddress);
-    auto* mapped = static_cast<std::uint8_t*>(vk_unique_device_->mapMemory(
-        *raytracing_sbt_memory_,
-        0,
-        sbt_size));
-    std::memset(mapped, 0, static_cast<std::size_t>(sbt_size));
-    std::memcpy(mapped, shader_handles.data(), handle_size);
-    std::memcpy(
-        mapped + raygen_size,
-        shader_handles.data() + handle_size,
-        handle_size);
-    std::memcpy(
-        mapped + raygen_size + miss_size,
-        shader_handles.data() + handle_size * 2,
-        handle_size);
-    vk_unique_device_->unmapMemory(*raytracing_sbt_memory_);
-
-    const vk::DeviceAddress sbt_address = vk_unique_device_->getBufferAddress(
-        vk::BufferDeviceAddressInfo(*raytracing_sbt_buffer_));
-    raygen_sbt_region_ = vk::StridedDeviceAddressRegionKHR(
-        sbt_address,
-        raygen_stride,
-        raygen_size);
-    miss_sbt_region_ = vk::StridedDeviceAddressRegionKHR(
-        sbt_address + raygen_size,
-        miss_stride,
-        miss_size);
-    hit_sbt_region_ = vk::StridedDeviceAddressRegionKHR(
-        sbt_address + raygen_size + miss_size,
-        hit_stride,
-        hit_size);
-    callable_sbt_region_ = vk::StridedDeviceAddressRegionKHR();
-
-    logger_->info("Created Vulkan ray tracing pipeline.");
 }
 
 void Device::DestroyRaytracingPipeline()
 {
-    raytracing_pipeline_.reset();
-    raytracing_pipeline_layout_.reset();
-    raytracing_sbt_buffer_.reset();
-    raytracing_sbt_memory_.reset();
-    raygen_sbt_region_ = vk::StridedDeviceAddressRegionKHR();
-    miss_sbt_region_ = vk::StridedDeviceAddressRegionKHR();
-    hit_sbt_region_ = vk::StridedDeviceAddressRegionKHR();
-    callable_sbt_region_ = vk::StridedDeviceAddressRegionKHR();
-    compute_output_in_shader_read_ = false;
-}
-
-vk::UniqueShaderModule Device::CreateShaderModule(
-    const std::vector<std::uint32_t>& code) const
-{
-    vk::ShaderModuleCreateInfo create_info(
-        vk::ShaderModuleCreateFlags{},
-        code.size() * sizeof(std::uint32_t),
-        code.data());
-    return vk_unique_device_->createShaderModuleUnique(create_info);
+    if (pipeline_resources_)
+    {
+        pipeline_resources_->DestroyRaytracingPipeline();
+    }
 }
 
 void Device::CopyBuffer(vk::Buffer src, vk::Buffer dst, vk::DeviceSize size)
@@ -4250,223 +3618,34 @@ void Device::DestroyHardwareRaytracingScene()
 
 void Device::CreateComputeOutputImage()
 {
-    if (!use_compute_raytracing_ || !vk_unique_device_ || !swapchain_resources_ ||
-        !swapchain_resources_->IsValid())
+    if (output_image_resources_)
     {
-        return;
+        output_image_resources_->CreateComputeOutputImage();
     }
-    const auto extent2d = swapchain_resources_->GetExtent();
-    if (extent2d.width == 0 || extent2d.height == 0)
-    {
-        return;
-    }
-
-    const auto format_props =
-        vk_physical_device_.getFormatProperties(compute_output_format_);
-    if (!(format_props.optimalTilingFeatures &
-          vk::FormatFeatureFlagBits::eStorageImage))
-    {
-        throw std::runtime_error(
-            "Compute output format lacks storage image support on this device.");
-    }
-    if (compute_output_format_ == vk::Format::eR16G16B16A16Sfloat &&
-        !vk_physical_device_.getFeatures().shaderStorageImageExtendedFormats)
-    {
-        throw std::runtime_error(
-            "shaderStorageImageExtendedFormats is required for rgba16f compute output.");
-    }
-
-    vk::Extent3D extent{
-        extent2d.width,
-        extent2d.height,
-        1};
-
-    vk::ImageCreateInfo image_info(
-        vk::ImageCreateFlags{},
-        vk::ImageType::e2D,
-        compute_output_format_,
-        extent,
-        1,
-        1,
-        vk::SampleCountFlagBits::e1,
-        vk::ImageTiling::eOptimal,
-        vk::ImageUsageFlagBits::eStorage |
-            vk::ImageUsageFlagBits::eSampled |
-            vk::ImageUsageFlagBits::eTransferSrc);
-
-    compute_output_image_ = vk_unique_device_->createImageUnique(image_info);
-    auto requirements =
-        vk_unique_device_->getImageMemoryRequirements(*compute_output_image_);
-    vk::MemoryAllocateInfo allocate_info(
-        requirements.size,
-        gpu_memory_manager_->FindMemoryType(
-            requirements.memoryTypeBits,
-            vk::MemoryPropertyFlagBits::eDeviceLocal));
-    compute_output_memory_ =
-        vk_unique_device_->allocateMemoryUnique(allocate_info);
-    vk_unique_device_->bindImageMemory(
-        *compute_output_image_, *compute_output_memory_, 0);
-
-    TransitionImageLayout(
-        *compute_output_image_,
-        compute_output_format_,
-        vk::ImageLayout::eUndefined,
-        vk::ImageLayout::eGeneral);
-
-    vk::ImageViewCreateInfo view_info(
-        vk::ImageViewCreateFlags{},
-        *compute_output_image_,
-        vk::ImageViewType::e2D,
-        compute_output_format_,
-        {},
-        {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1});
-    compute_output_view_ =
-        vk_unique_device_->createImageViewUnique(view_info);
-
-    if (!compute_output_sampler_)
-    {
-        vk::SamplerCreateInfo sampler_info(
-            vk::SamplerCreateFlags{},
-            vk::Filter::eLinear,
-            vk::Filter::eLinear,
-            vk::SamplerMipmapMode::eLinear,
-            vk::SamplerAddressMode::eClampToEdge,
-            vk::SamplerAddressMode::eClampToEdge,
-            vk::SamplerAddressMode::eClampToEdge,
-            0.0f,
-            VK_FALSE,
-            1.0f,
-            VK_FALSE,
-            vk::CompareOp::eAlways,
-            0.0f,
-            0.0f,
-            vk::BorderColor::eIntOpaqueBlack,
-            VK_FALSE);
-        compute_output_sampler_ =
-            vk_unique_device_->createSamplerUnique(sampler_info);
-    }
-    compute_output_in_shader_read_ = false;
 }
 
 void Device::DestroyComputeOutputImage()
 {
-    compute_output_sampler_.reset();
-    compute_output_view_.reset();
-    compute_output_image_.reset();
-    compute_output_memory_.reset();
-    compute_output_in_shader_read_ = false;
+    if (output_image_resources_)
+    {
+        output_image_resources_->DestroyComputeOutputImage();
+    }
 }
 
 void Device::CreateSwapchainPreviewImage()
 {
-    if (!vk_unique_device_ || !swapchain_resources_ ||
-        !swapchain_resources_->IsValid() || !gpu_memory_manager_)
+    if (output_image_resources_)
     {
-        return;
+        output_image_resources_->CreateSwapchainPreviewImage();
     }
-
-    const auto extent = swapchain_resources_->GetExtent();
-    if (extent.width == 0 || extent.height == 0)
-    {
-        return;
-    }
-
-    const vk::Format swapchain_format = swapchain_resources_->GetImageFormat();
-    const glm::uvec2 swapchain_size = {extent.width, extent.height};
-
-    const bool has_valid_preview_resources =
-        static_cast<bool>(swapchain_preview_image_) &&
-        static_cast<bool>(swapchain_preview_view_) &&
-        static_cast<bool>(swapchain_preview_sampler_);
-    if (has_valid_preview_resources &&
-        swapchain_preview_format_ == swapchain_format &&
-        swapchain_preview_size_ == swapchain_size)
-    {
-        // Keep the existing preview image alive across level rebuilds.
-        return;
-    }
-
-    DestroySwapchainPreviewImage();
-    swapchain_preview_format_ = swapchain_format;
-    swapchain_preview_size_ = swapchain_size;
-
-    const auto format_props =
-        vk_physical_device_.getFormatProperties(swapchain_preview_format_);
-    if (!(format_props.optimalTilingFeatures &
-          vk::FormatFeatureFlagBits::eSampledImage))
-    {
-        logger_->warn(
-            "Swapchain format {} cannot be sampled; windowed Vulkan preview disabled.",
-            vk::to_string(swapchain_preview_format_));
-        return;
-    }
-
-    vk::ImageCreateInfo image_info(
-        vk::ImageCreateFlags{},
-        vk::ImageType::e2D,
-        swapchain_preview_format_,
-        vk::Extent3D(extent.width, extent.height, 1),
-        1,
-        1,
-        vk::SampleCountFlagBits::e1,
-        vk::ImageTiling::eOptimal,
-        vk::ImageUsageFlagBits::eTransferDst |
-            vk::ImageUsageFlagBits::eSampled);
-    swapchain_preview_image_ = vk_unique_device_->createImageUnique(image_info);
-
-    auto requirements =
-        vk_unique_device_->getImageMemoryRequirements(*swapchain_preview_image_);
-    vk::MemoryAllocateInfo allocate_info(
-        requirements.size,
-        gpu_memory_manager_->FindMemoryType(
-            requirements.memoryTypeBits,
-            vk::MemoryPropertyFlagBits::eDeviceLocal));
-    swapchain_preview_memory_ =
-        vk_unique_device_->allocateMemoryUnique(allocate_info);
-    vk_unique_device_->bindImageMemory(
-        *swapchain_preview_image_, *swapchain_preview_memory_, 0);
-
-    vk::ImageViewCreateInfo view_info(
-        vk::ImageViewCreateFlags{},
-        *swapchain_preview_image_,
-        vk::ImageViewType::e2D,
-        swapchain_preview_format_,
-        {},
-        {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1});
-    swapchain_preview_view_ =
-        vk_unique_device_->createImageViewUnique(view_info);
-
-    vk::SamplerCreateInfo sampler_info(
-        vk::SamplerCreateFlags{},
-        vk::Filter::eLinear,
-        vk::Filter::eLinear,
-        vk::SamplerMipmapMode::eLinear,
-        vk::SamplerAddressMode::eClampToEdge,
-        vk::SamplerAddressMode::eClampToEdge,
-        vk::SamplerAddressMode::eClampToEdge,
-        0.0f,
-        VK_FALSE,
-        1.0f,
-        VK_FALSE,
-        vk::CompareOp::eAlways,
-        0.0f,
-        0.0f,
-        vk::BorderColor::eIntOpaqueBlack,
-        VK_FALSE);
-    swapchain_preview_sampler_ =
-        vk_unique_device_->createSamplerUnique(sampler_info);
-    swapchain_preview_in_shader_read_ = false;
 }
 
 void Device::DestroySwapchainPreviewImage()
 {
-    swapchain_preview_sampler_.reset();
-    swapchain_preview_view_.reset();
-    swapchain_preview_image_.reset();
-    swapchain_preview_memory_.reset();
-    swapchain_preview_in_shader_read_ = false;
-    swapchain_preview_format_ = vk::Format::eUndefined;
-    swapchain_preview_size_ = {0, 0};
+    if (output_image_resources_)
+    {
+        output_image_resources_->DestroySwapchainPreviewImage();
+    }
 }
 
 
@@ -4759,7 +3938,8 @@ void Device::CreateDescriptorResources()
             return;
         }
         CreateComputeOutputImage();
-        if (!compute_output_view_)
+        if (!output_image_resources_ ||
+            !output_image_resources_->HasComputeOutputView())
         {
             logger_->error(
                 "Failed to create compute output image for program {}.",
@@ -4849,7 +4029,7 @@ void Device::CreateDescriptorResources()
     {
         output_image_infos.emplace_back(
             nullptr,
-            *compute_output_view_,
+            output_image_resources_->GetComputeOutputView(),
             vk::ImageLayout::eGeneral);
         descriptor_writes.emplace_back(
             descriptor_set_,
@@ -4863,8 +4043,8 @@ void Device::CreateDescriptorResources()
     for (auto binding : output_sampler_bindings)
     {
         output_sampler_infos.emplace_back(
-            *compute_output_sampler_,
-            *compute_output_view_,
+            output_image_resources_->GetComputeOutputSampler(),
+            output_image_resources_->GetComputeOutputView(),
             vk::ImageLayout::eShaderReadOnlyOptimal);
         descriptor_writes.emplace_back(
             descriptor_set_,
