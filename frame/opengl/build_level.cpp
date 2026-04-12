@@ -1,11 +1,15 @@
 #include "frame/opengl/build_level.h"
 
 #include <format>
+#include <optional>
 #include <stdexcept>
 
 #include "frame/level.h"
 #include "frame/logger.h"
+#include "frame/json/program_key.h"
+#include "frame/node_mesh.h"
 #include "frame/opengl/mesh.h"
+#include "frame/opengl/skinned_mesh.h"
 #include "frame/opengl/json/parse_program.h"
 #include "frame/opengl/json/parse_scene_tree.h"
 #include "frame/opengl/json/parse_texture.h"
@@ -15,6 +19,136 @@ namespace frame::opengl
 
 namespace
 {
+
+bool IsRaytracingProgram(const ProgramInterface& program)
+{
+    const auto key = frame::json::ResolveProgramKey(program.GetData());
+    return frame::json::IsRaytracingProgramKey(key);
+}
+
+bool IsRaytracingSourceMaterial(
+    frame::LevelInterface& level, frame::EntityId material_id)
+{
+    if (material_id == frame::NullId)
+    {
+        return false;
+    }
+    auto& material = level.GetMaterialFromId(material_id);
+    const auto program_id = material.GetProgramId(&level);
+    if (program_id == frame::NullId)
+    {
+        return false;
+    }
+    const auto& program = level.GetProgramFromId(program_id);
+    if (!IsRaytracingProgram(program))
+    {
+        return false;
+    }
+    return material.GetPreprocessProgramId(&level) != frame::NullId;
+}
+
+std::vector<std::pair<frame::EntityId, frame::EntityId>>
+GetRaytracingSourceMeshMaterials(frame::LevelInterface& level)
+{
+    std::vector<std::pair<frame::EntityId, frame::EntityId>> pairs = {};
+    const auto append_pairs =
+        [&](frame::proto::NodeMesh::RenderTimeEnum render_time_enum) {
+            for (const auto& pair : level.GetMeshMaterialIds(render_time_enum))
+            {
+                if (IsRaytracingSourceMaterial(level, pair.second))
+                {
+                    pairs.push_back(pair);
+                }
+            }
+        };
+    append_pairs(frame::proto::NodeMesh::PRE_RENDER_TIME);
+    append_pairs(frame::proto::NodeMesh::SCENE_RENDER_TIME);
+    return pairs;
+}
+
+bool RaytraceSceneRequiresWorldSpaceBuffers(frame::LevelInterface& level)
+{
+    for (const auto& [node_id, material_id] :
+         GetRaytracingSourceMeshMaterials(level))
+    {
+        (void)material_id;
+        auto* node =
+            dynamic_cast<NodeMesh*>(&level.GetSceneNodeFromId(node_id));
+        if (!node)
+        {
+            continue;
+        }
+        const auto mesh_id = node->GetLocalMesh();
+        if (!mesh_id)
+        {
+            continue;
+        }
+        auto* skinned_mesh =
+            dynamic_cast<SkinnedMesh*>(&level.GetMeshFromId(mesh_id));
+        if (!skinned_mesh)
+        {
+            continue;
+        }
+        if (skinned_mesh->HasSkinning() ||
+            skinned_mesh->HasRaytraceTriangleCallback())
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool HasRaytracingSourceMeshes(frame::LevelInterface& level)
+{
+    return !GetRaytracingSourceMeshMaterials(level).empty();
+}
+
+bool CanUseSharedRaytraceSceneTransform(
+    frame::LevelInterface& level,
+    double time_seconds)
+{
+    const auto source_mesh_materials = GetRaytracingSourceMeshMaterials(level);
+    if (source_mesh_materials.empty())
+    {
+        return false;
+    }
+
+    std::optional<glm::mat4> shared_model = std::nullopt;
+    for (const auto& [source_node_id, source_material_id] : source_mesh_materials)
+    {
+        (void)source_material_id;
+        auto* node =
+            dynamic_cast<NodeMesh*>(&level.GetSceneNodeFromId(source_node_id));
+        if (!node)
+        {
+            return false;
+        }
+        const glm::mat4 model = node->GetLocalModel(time_seconds);
+        if (!shared_model)
+        {
+            shared_model = model;
+            continue;
+        }
+        if (*shared_model != model)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool RequiresInstancedRaytraceProgram(frame::LevelInterface& level)
+{
+    if (!HasRaytracingSourceMeshes(level))
+    {
+        return false;
+    }
+    if (RaytraceSceneRequiresWorldSpaceBuffers(level))
+    {
+        return true;
+    }
+    return !CanUseSharedRaytraceSceneTransform(level, 0.0);
+}
 
 void ConfigureRenderPassPrograms(
     frame::LevelInterface& level,
@@ -46,6 +180,75 @@ void ConfigureRenderPassPrograms(
             pass.render_time,
             program_id,
             preprocess_id);
+    }
+}
+
+void EnableInstancedRaytraceProgramIfNeeded(
+    frame::LevelInterface& level,
+    const frame::json::LevelData& level_data)
+{
+    if (!RequiresInstancedRaytraceProgram(level))
+    {
+        return;
+    }
+
+    const auto shared_program_id = level.GetIdFromName("RayTraceProgram");
+    if (!shared_program_id)
+    {
+        throw std::runtime_error("Missing shared OpenGL raytrace program.");
+    }
+
+    const auto* shared_program_info = [&]() -> const frame::json::ProgramInfo* {
+        for (const auto& program_info : level_data.programs)
+        {
+            if (program_info.name == "RayTraceProgram")
+            {
+                return &program_info;
+            }
+        }
+        return nullptr;
+    }();
+    if (!shared_program_info)
+    {
+        throw std::runtime_error(
+            "Missing embedded RayTraceProgram definition for OpenGL.");
+    }
+
+    auto proto_program = shared_program_info->proto;
+    proto_program.set_name("RayTraceProgramInstanced");
+    auto shader_files = shared_program_info->opengl;
+    shader_files.fragment_shader = "raytrace_instanced.frag";
+    auto instanced_program =
+        frame::json::ParseProgramOpenGL(proto_program, shader_files, level);
+    if (!instanced_program)
+    {
+        throw std::runtime_error(
+            "Could not build OpenGL instanced raytrace program.");
+    }
+    instanced_program->SetName("RayTraceProgramInstanced");
+    const auto instanced_program_id = level.AddProgram(std::move(instanced_program));
+    if (!instanced_program_id)
+    {
+        throw std::runtime_error(
+            "Could not store OpenGL instanced raytrace program.");
+    }
+
+    const auto preprocess_id = level.GetRenderPassPreprocessProgramId(
+        proto::NodeMesh::SCENE_RENDER_TIME);
+    level.SetRenderPassProgramIds(
+        proto::NodeMesh::SCENE_RENDER_TIME,
+        instanced_program_id,
+        preprocess_id);
+
+    for (const auto material_id : level.GetMaterials())
+    {
+        auto& material = level.GetMaterialFromId(material_id);
+        if (material.GetProgramId(&level) != shared_program_id ||
+            material.GetPreprocessProgramId(&level) != NullId)
+        {
+            continue;
+        }
+        material.SetProgramId(instanced_program_id);
     }
 }
 
@@ -135,6 +338,7 @@ std::unique_ptr<frame::LevelInterface> BuildLevel(
         level->SetDefaultRootSceneNodeName(
             level_data.proto.scene_tree().default_root_name());
     }
+    EnableInstancedRaytraceProgramIfNeeded(*level, level_data);
     return level;
 }
 

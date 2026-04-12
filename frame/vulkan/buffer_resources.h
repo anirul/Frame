@@ -39,17 +39,39 @@ class BufferResourceManager
     bool UpdateStorageBuffer(
         const std::string& name,
         const std::vector<std::uint8_t>& bytes);
-    void BuildUniformBuffer(vk::DeviceSize size_bytes);
-    void UpdateUniform(const void* data, std::size_t byte_count) const;
+    void BuildUniformBuffers(
+        std::size_t count,
+        vk::DeviceSize size_bytes);
+    void BuildUniformBuffer(vk::DeviceSize size_bytes)
+    {
+        BuildUniformBuffers(1, size_bytes);
+    }
+    void UpdateUniform(
+        std::size_t index,
+        const void* data,
+        std::size_t byte_count) const;
+    void UpdateUniform(const void* data, std::size_t byte_count) const
+    {
+        UpdateUniform(0, data, byte_count);
+    }
 
     const std::vector<BufferResource>& GetStorageBuffers() const
     {
         return storage_buffers_;
     }
 
+    const BufferResource* GetUniformBuffer(std::size_t index) const
+    {
+        if (index >= uniform_buffers_.size())
+        {
+            return nullptr;
+        }
+        return uniform_buffers_[index].buffer ? &uniform_buffers_[index]
+                                              : nullptr;
+    }
     const BufferResource* GetUniformBuffer() const
     {
-        return uniform_buffer_.buffer ? &uniform_buffer_ : nullptr;
+        return GetUniformBuffer(0);
     }
 
     void LogCpuBufferSamples(
@@ -69,7 +91,7 @@ class BufferResourceManager
     const Logger* logger_;
     std::vector<BufferResource> storage_buffers_;
     std::unordered_map<std::string, std::size_t> storage_buffer_indices_;
-    BufferResource uniform_buffer_;
+    std::vector<BufferResource> uniform_buffers_;
 };
 
 } // namespace frame::vulkan
