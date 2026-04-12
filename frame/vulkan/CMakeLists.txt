@@ -25,6 +25,8 @@ set(FRAME_VULKAN_SOURCES
   program.h
   renderer.cpp
   renderer.h
+  raytrace_scene_renderer.cpp
+  raytrace_scene_renderer.h
   command_queue.cpp
   command_queue.h
   gpu_memory_manager.cpp

@@ -28,12 +28,14 @@ class BufferResourceManager;
 class GpuMemoryManager;
 class OutputImageResources;
 class PipelineResources;
+class RaytraceSceneRenderer;
 class Renderer;
 class ShaderCompiler;
 class SwapchainResources;
 class SyncResources;
 class Texture;
 class TextureResources;
+struct SceneState;
 
 /**
  * @class Device
@@ -143,6 +145,7 @@ class Device : public DeviceInterface
     friend class TextureResources;
     friend class OutputImageResources;
     friend class PipelineResources;
+    friend class RaytraceSceneRenderer;
     friend class Renderer;
     void CreateGraphicsPipeline();
     void DestroyGraphicsPipeline();
@@ -158,9 +161,7 @@ class Device : public DeviceInterface
     void DestroySwapchainPreviewImage();
     void RecreateSwapchain();
     void LogRuntimeConfiguration() const;
-    void RecordCommandBuffer(
-        vk::CommandBuffer command_buffer,
-        std::uint32_t image_index);
+    SceneState BuildFrameSceneState(vk::Extent2D extent) const;
     void CreateTextureResources(const frame::json::LevelData& level_data);
     void DestroyTextureResources();
     void CreateDescriptorResources();
