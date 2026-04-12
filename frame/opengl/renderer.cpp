@@ -378,13 +378,20 @@ void HashByteSamples(
         return;
     }
 
-    constexpr std::array<float, 8> kRatios = {
-        0.0f, 0.11f, 0.23f, 0.37f, 0.53f, 0.67f, 0.83f, 1.0f};
+    constexpr std::array<std::pair<std::size_t, std::size_t>, 8> kRatios = {{
+        {0u, 1u},
+        {11u, 100u},
+        {23u, 100u},
+        {37u, 100u},
+        {53u, 100u},
+        {67u, 100u},
+        {83u, 100u},
+        {1u, 1u},
+    }};
     const std::size_t max_index = bytes.size() - 1;
-    for (const float ratio : kRatios)
+    for (const auto& [numerator, denominator] : kRatios)
     {
-        const auto index = static_cast<std::size_t>(
-            ratio * static_cast<float>(max_index));
+        const auto index = (max_index * numerator) / denominator;
         HashCombine(seed, bytes[index]);
     }
 }
