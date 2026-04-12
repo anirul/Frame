@@ -162,6 +162,7 @@ class Device : public DeviceInterface
     bool UpdateAggregateRaytracingSceneBuffers(bool build_software_bvh);
     void UpdateHardwareRaytracingScene();
     void UpdateHardwareRaytracingDescriptor();
+    bool UpdateHardwareRaytracingInstanceStorageBuffer();
     void CopyBuffer(vk::Buffer src, vk::Buffer dst, vk::DeviceSize size);
     void TransitionImageLayout(
         vk::Image image,
@@ -300,6 +301,7 @@ class Device : public DeviceInterface
         vk::DeviceAddress blas_address = 0;
         std::uint32_t triangle_count = 0;
         std::uint32_t instance_custom_index = 0;
+        std::uint32_t material_id = 0;
     };
     std::vector<HardwareRaytracingGeometry> hardware_raytracing_geometries_;
     vk::UniqueBuffer hardware_raytracing_instance_buffer_;

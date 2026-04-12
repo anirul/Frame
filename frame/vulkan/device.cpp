@@ -642,6 +642,13 @@ vk::TransformMatrixKHR MakeIdentityTransform()
     return transform;
 }
 
+struct alignas(16) HardwareRaytraceInstanceStorageData
+{
+    glm::mat4 object_to_world = glm::mat4(1.0f);
+    glm::mat4 world_to_object = glm::mat4(1.0f);
+    glm::uvec4 metadata = glm::uvec4(0u);
+};
+
 bool AreTexturesCompatibleForReuse(
     const frame::vulkan::Texture& old_texture,
     const frame::vulkan::Texture& new_texture)
@@ -2138,6 +2145,81 @@ bool Device::UpdateAggregateRaytracingSceneBuffers(bool build_software_bvh)
     return updated;
 }
 
+bool Device::UpdateHardwareRaytracingInstanceStorageBuffer()
+{
+    if (!level_ || !active_program_info_)
+    {
+        return false;
+    }
+
+    const auto it =
+        active_program_info_->buffer_ids_by_inner.find("RaytraceInstanceBuffer");
+    if (it == active_program_info_->buffer_ids_by_inner.end())
+    {
+        return false;
+    }
+
+    auto* instance_buffer = dynamic_cast<frame::vulkan::Buffer*>(
+        &level_->GetBufferFromId(it->second));
+    if (!instance_buffer)
+    {
+        return false;
+    }
+
+    const bool use_shared_scene_transform =
+        CanUseSharedTransformHardwareRaytraceScene(
+            *level_,
+            static_cast<double>(elapsed_time_seconds_));
+    std::vector<HardwareRaytraceInstanceStorageData> instances = {};
+    instances.reserve(hardware_raytracing_geometries_.size());
+    for (const auto& geometry : hardware_raytracing_geometries_)
+    {
+        HardwareRaytraceInstanceStorageData instance = {};
+        instance.metadata.y = geometry.material_id;
+        instance.metadata.z = use_shared_scene_transform ? 1u : 0u;
+        instances.push_back(instance);
+    }
+
+    std::vector<std::uint8_t> bytes(
+        instances.size() * sizeof(HardwareRaytraceInstanceStorageData));
+    if (!bytes.empty())
+    {
+        std::memcpy(bytes.data(), instances.data(), bytes.size());
+    }
+
+    const auto previous_bytes = instance_buffer->GetRawData();
+    if (previous_bytes == bytes)
+    {
+        return true;
+    }
+
+    instance_buffer->Copy(bytes);
+
+    if (buffer_resources_ && !bytes.empty())
+    {
+        const auto buffer_name = level_->GetNameFromId(it->second);
+        if (previous_bytes.size() == bytes.size())
+        {
+            if (!buffer_resources_->UpdateStorageBuffer(buffer_name, bytes))
+            {
+                logger_->warn(
+                    "Failed to upload Vulkan raytrace instance buffer '{}'.",
+                    buffer_name);
+            }
+        }
+        else if (!previous_bytes.empty())
+        {
+            logger_->warn(
+                "Vulkan raytrace instance buffer '{}' changed size from {} to {}; GPU upload requires a resource rebuild.",
+                buffer_name,
+                previous_bytes.size(),
+                bytes.size());
+        }
+    }
+
+    return true;
+}
+
 void Device::UpdateHardwareRaytracingScene()
 {
     if (!use_hardware_raytracing_ || !vk_unique_device_ || !level_ ||
@@ -2287,6 +2369,8 @@ void Device::UpdateHardwareRaytracingScene()
                     range_infos);
             });
     }
+
+    UpdateHardwareRaytracingInstanceStorageBuffer();
 
     const std::uint32_t instance_count =
         static_cast<std::uint32_t>(hardware_raytracing_geometries_.size());
@@ -3930,9 +4014,10 @@ void Device::CreateHardwareRaytracingScene()
     std::vector<vk::AccelerationStructureInstanceKHR> instances = {};
     instances.reserve(2);
 
+    std::uint32_t next_instance_custom_index = 0;
     const auto append_geometry =
         [&](const char* inner_name,
-            std::uint32_t instance_custom_index) {
+            std::uint32_t material_id) {
             if (!active_program_info_)
             {
                 return;
@@ -3983,7 +4068,8 @@ void Device::CreateHardwareRaytracingScene()
             geometry.index_buffer_size =
                 static_cast<vk::DeviceSize>(index_bytes.size());
             geometry.triangle_count = primitive_count;
-            geometry.instance_custom_index = instance_custom_index;
+            geometry.instance_custom_index = next_instance_custom_index++;
+            geometry.material_id = material_id;
 
             vk::AccelerationStructureGeometryTrianglesDataKHR triangles(
                 vk::Format::eR32G32B32Sfloat,
@@ -4143,6 +4229,8 @@ void Device::CreateHardwareRaytracingScene()
                 tlas_build_info,
                 tlas_ranges);
         });
+
+    UpdateHardwareRaytracingInstanceStorageBuffer();
 
     logger_->info(
         "Built Vulkan hardware raytracing scene with {} instance(s).",
