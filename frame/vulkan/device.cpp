@@ -3,7 +3,9 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <cstdint>
 #include <cstring>
+#include <functional>
 #include <limits>
 #include <numeric>
 #include <optional>
@@ -41,6 +43,7 @@
 #include "frame/proto/uniform.pb.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 namespace frame::vulkan
 {
@@ -340,6 +343,112 @@ std::array<float, 4> ResolveRaytracingColorMultiplier(
     return multiplier;
 }
 
+template <typename T>
+void HashCombine(std::size_t& seed, const T& value)
+{
+    seed ^= std::hash<T>{}(value) + 0x9e3779b9u + (seed << 6u) + (seed >> 2u);
+}
+
+void HashFloat(std::size_t& seed, float value)
+{
+    std::uint32_t bits = 0;
+    std::memcpy(&bits, &value, sizeof(bits));
+    HashCombine(seed, bits);
+}
+
+void HashColor(std::size_t& seed, const std::array<float, 4>& color)
+{
+    for (const float channel : color)
+    {
+        HashFloat(seed, channel);
+    }
+}
+
+void HashMatrix(std::size_t& seed, const glm::mat4& matrix)
+{
+    const float* values = glm::value_ptr(matrix);
+    for (int i = 0; i < 16; ++i)
+    {
+        HashFloat(seed, values[i]);
+    }
+}
+
+void HashByteSamples(
+    std::size_t& seed, const std::vector<std::uint8_t>& bytes)
+{
+    HashCombine(seed, bytes.size());
+    if (bytes.empty())
+    {
+        return;
+    }
+
+    constexpr std::array<float, 8> kRatios = {
+        0.0f, 0.11f, 0.23f, 0.37f, 0.53f, 0.67f, 0.83f, 1.0f};
+    const std::size_t max_index = bytes.size() - 1;
+    for (const float ratio : kRatios)
+    {
+        const auto index = static_cast<std::size_t>(
+            ratio * static_cast<float>(max_index));
+        HashCombine(seed, bytes[index]);
+    }
+}
+
+std::size_t BuildRaytracingSourceStateHash(
+    frame::LevelInterface& level,
+    double time_seconds)
+{
+    std::size_t state_hash = 0;
+    const auto source_mesh_materials = GetRaytracingSourceMeshMaterials(level);
+    HashCombine(state_hash, source_mesh_materials.size());
+    for (const auto& [source_node_id, source_material_id] : source_mesh_materials)
+    {
+        HashCombine(state_hash, static_cast<std::uint64_t>(source_node_id));
+        HashCombine(state_hash, static_cast<std::uint64_t>(source_material_id));
+
+        auto* node =
+            dynamic_cast<NodeMesh*>(&level.GetSceneNodeFromId(source_node_id));
+        if (!node)
+        {
+            continue;
+        }
+
+        HashMatrix(state_hash, node->GetLocalModel(time_seconds));
+        HashCombine(
+            state_hash,
+            IsTransmissiveMaterial(level, source_material_id));
+        HashColor(
+            state_hash,
+            ResolveRaytracingSourceMaterialColor(level, source_material_id));
+
+        const auto mesh_id = node->GetLocalMesh();
+        HashCombine(state_hash, static_cast<std::uint64_t>(mesh_id));
+        if (!mesh_id)
+        {
+            continue;
+        }
+
+        const auto triangle_buffer_id =
+            level.GetMeshFromId(mesh_id).GetTriangleBufferId();
+        HashCombine(
+            state_hash,
+            static_cast<std::uint64_t>(triangle_buffer_id));
+        if (!triangle_buffer_id)
+        {
+            continue;
+        }
+
+        auto* triangle_buffer = dynamic_cast<Buffer*>(
+            &level.GetBufferFromId(triangle_buffer_id));
+        if (!triangle_buffer)
+        {
+            continue;
+        }
+
+        HashByteSamples(state_hash, triangle_buffer->GetRawData());
+    }
+    return state_hash;
+}
+
 bool RaytraceSceneRequiresWorldSpaceBuffers(frame::LevelInterface& level)
 {
     for (const auto& [node_id, material_id] :
@@ -370,11 +479,6 @@ bool RaytraceSceneRequiresWorldSpaceBuffers(frame::LevelInterface& level)
         }
     }
     return false;
-}
-
-bool HasRaytracingSourceMeshes(frame::LevelInterface& level)
-{
-    return !GetRaytracingSourceMeshMaterials(level).empty();
 }
 
 constexpr std::size_t kRaytraceFloatsPerVertex = 12;
@@ -1020,7 +1124,8 @@ void Device::StartupFromLevelData(const frame::json::LevelData& level_data)
     use_raytracing_pipeline_ = false;
     compute_output_in_shader_read_ = false;
     elapsed_time_seconds_ = 0.0f;
-    last_raytrace_scene_buffer_update_time_ = -1.0f;
+    last_raytrace_scene_state_hash_ = 0;
+    has_raytrace_scene_state_hash_ = false;
 
     // Prefer programs configured for render passes; otherwise fall back to the
     // first available program.
@@ -1701,7 +1806,8 @@ void Device::Cleanup()
     current_level_data_.reset();
     level_.reset();
     elapsed_time_seconds_ = 0.0f;
-    last_raytrace_scene_buffer_update_time_ = -1.0f;
+    last_raytrace_scene_state_hash_ = 0;
+    has_raytrace_scene_state_hash_ = false;
     active_program_info_.reset();
     use_procedural_quad_pipeline_ = false;
     use_raytracing_pipeline_ = false;
@@ -1815,8 +1921,8 @@ void Device::UpdateRaytraceBuffers()
                     level_->GetBufferFromId(triangle_buffer_id));
                 triangle_buffer.Copy(triangles);
                 if (buffer_resources_->UpdateStorageBuffer(
-                    level_->GetNameFromId(triangle_buffer_id),
-                    triangle_buffer.GetRawData()))
+                        level_->GetNameFromId(triangle_buffer_id),
+                        triangle_buffer.GetRawData()))
                 {
                     ++updated_buffer_count;
                 }
@@ -1835,8 +1941,8 @@ void Device::UpdateRaytraceBuffers()
                     bvh_nodes.size() * sizeof(frame::BVHNode),
                     bvh_nodes.data());
                 if (buffer_resources_->UpdateStorageBuffer(
-                    level_->GetNameFromId(bvh_buffer_id),
-                    bvh_buffer.GetRawData()))
+                        level_->GetNameFromId(bvh_buffer_id),
+                        bvh_buffer.GetRawData()))
                 {
                     ++updated_buffer_count;
                 }
@@ -1844,7 +1950,7 @@ void Device::UpdateRaytraceBuffers()
         }
     }
     bool updated_aggregate_scene = false;
-    if (HasRaytracingSourceMeshes(*level_))
+    if (RaytraceSceneRequiresWorldSpaceBuffers(*level_))
     {
         updated_aggregate_scene = UpdateAggregateRaytracingSceneBuffers(
             !use_hardware_raytracing_);
@@ -1883,7 +1989,12 @@ bool Device::UpdateAggregateRaytracingSceneBuffers(bool build_software_bvh)
     {
         return false;
     }
-    if (last_raytrace_scene_buffer_update_time_ == elapsed_time_seconds_)
+    const std::size_t scene_state_hash =
+        BuildRaytracingSourceStateHash(
+            *level_,
+            static_cast<double>(elapsed_time_seconds_));
+    if (has_raytrace_scene_state_hash_ &&
+        last_raytrace_scene_state_hash_ == scene_state_hash)
     {
         return false;
     }
@@ -1949,7 +2060,8 @@ bool Device::UpdateAggregateRaytracingSceneBuffers(bool build_software_bvh)
             BuildAggregateBvhBytes(opaque_triangles));
     }
 
-    last_raytrace_scene_buffer_update_time_ = elapsed_time_seconds_;
+    last_raytrace_scene_state_hash_ = scene_state_hash;
+    has_raytrace_scene_state_hash_ = true;
     return updated;
 }
 
@@ -2558,7 +2670,7 @@ void Device::RecordCommandBuffer(
     const bool use_world_space_raytrace_scene =
         level_ &&
         (use_compute_raytracing_ || use_raytracing_pipeline_) &&
-        HasRaytracingSourceMeshes(*level_);
+        RaytraceSceneRequiresWorldSpaceBuffers(*level_);
     std::string preferred_scene_root;
     if (!use_world_space_raytrace_scene &&
         level_ &&
