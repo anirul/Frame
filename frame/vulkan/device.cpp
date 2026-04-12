@@ -50,6 +50,11 @@ namespace
 
 constexpr std::uint32_t kHardwareRaytracingAsBinding = 32;
 
+const char* BoolToString(bool value)
+{
+    return value ? "on" : "off";
+}
+
 template <typename T>
 T AlignUp(T value, T alignment)
 {
@@ -1553,6 +1558,7 @@ void Device::StartupFromLevelData(const frame::json::LevelData& level_data)
             ScopedTimer timer(logger_, "CreateComputePipeline");
             CreateComputePipeline();
         }
+        LogRuntimeConfiguration();
     }
     catch (const std::exception& ex)
     {
@@ -2390,6 +2396,67 @@ void Device::Display(double dt)
     }
 
     current_frame_ = (current_frame_ + 1) % kMaxFramesInFlight;
+}
+
+void Device::LogRuntimeConfiguration() const
+{
+    const bool validation_enabled = absl::GetFlag(FLAGS_vk_validation);
+    const bool has_active_program = active_program_info_.has_value();
+    const bool has_compute_shader =
+        has_active_program && !active_program_info_->compute_shader.empty();
+    const bool has_raytracing_stage_mapping =
+        has_active_program &&
+        !active_program_info_->raygen_shader.empty() &&
+        !active_program_info_->miss_shader.empty() &&
+        !active_program_info_->closesthit_shader.empty();
+    const bool raytracing_pipeline_ready =
+        static_cast<bool>(raytracing_pipeline_);
+    const bool compute_pipeline_ready =
+        static_cast<bool>(compute_pipeline_);
+    const bool hardware_scene_ready =
+        static_cast<bool>(hardware_raytracing_tlas_);
+
+    std::string active_path = "graphics";
+    if (raytracing_pipeline_ready && hardware_scene_ready)
+    {
+        active_path = "hardware_rt";
+    }
+    else if (compute_pipeline_ready)
+    {
+        active_path = "compute_fallback";
+    }
+    else if (raytracing_pipeline_ready)
+    {
+        active_path = "raytracing_pipeline_without_scene";
+    }
+    else if (use_raytracing_pipeline_)
+    {
+        active_path = "hardware_rt_requested_pipeline_missing";
+    }
+    else if (use_compute_raytracing_)
+    {
+        active_path = "compute_requested_pipeline_missing";
+    }
+
+    std::string material_name = "<none>";
+    if (level_ && has_active_program && active_program_info_->material_id != NullId)
+    {
+        material_name = level_->GetNameFromId(active_program_info_->material_id);
+    }
+
+    logger_->info(
+        "Vulkan runtime summary: validation={}, program='{}', material='{}', path={}, hw_rt_supported={}, hw_rt_requested={}, hw_rt_scene_ready={}, rt_pipeline_ready={}, compute_pipeline_ready={}, compute_shader_mapped={}, rt_stage_mapping={}.",
+        BoolToString(validation_enabled),
+        has_active_program ? active_program_info_->program_name.c_str() : "<none>",
+        material_name,
+        active_path,
+        BoolToString(hardware_raytracing_supported_),
+        BoolToString(use_hardware_raytracing_),
+        BoolToString(hardware_scene_ready),
+        BoolToString(raytracing_pipeline_ready),
+        BoolToString(compute_pipeline_ready),
+        BoolToString(has_compute_shader),
+        BoolToString(has_raytracing_stage_mapping));
 }
 
 

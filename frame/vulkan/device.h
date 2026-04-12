@@ -148,6 +148,7 @@ class Device : public DeviceInterface
     void CreateSwapchainPreviewImage();
     void DestroySwapchainPreviewImage();
     void RecreateSwapchain();
+    void LogRuntimeConfiguration() const;
     vk::UniqueShaderModule CreateShaderModule(
         const std::vector<std::uint32_t>& code) const;
     void RecordCommandBuffer(
