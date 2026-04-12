@@ -23,11 +23,19 @@ namespace frame::vulkan
 {
 
 class CommandResources;
+class CommandQueue;
+class BufferResourceManager;
+class GpuMemoryManager;
+class OutputImageResources;
+class PipelineResources;
+class RaytraceSceneRenderer;
+class Renderer;
 class ShaderCompiler;
 class SwapchainResources;
 class SyncResources;
 class Texture;
 class TextureResources;
+struct SceneState;
 
 /**
  * @class Device
@@ -135,6 +143,10 @@ class Device : public DeviceInterface
 
   private:
     friend class TextureResources;
+    friend class OutputImageResources;
+    friend class PipelineResources;
+    friend class RaytraceSceneRenderer;
+    friend class Renderer;
     void CreateGraphicsPipeline();
     void DestroyGraphicsPipeline();
     void CreateComputePipeline();
@@ -149,11 +161,7 @@ class Device : public DeviceInterface
     void DestroySwapchainPreviewImage();
     void RecreateSwapchain();
     void LogRuntimeConfiguration() const;
-    vk::UniqueShaderModule CreateShaderModule(
-        const std::vector<std::uint32_t>& code) const;
-    void RecordCommandBuffer(
-        vk::CommandBuffer command_buffer,
-        std::uint32_t image_index);
+    SceneState BuildFrameSceneState(vk::Extent2D extent) const;
     void CreateTextureResources(const frame::json::LevelData& level_data);
     void DestroyTextureResources();
     void CreateDescriptorResources();
@@ -202,38 +210,22 @@ class Device : public DeviceInterface
     std::unique_ptr<SwapchainResources> swapchain_resources_;
     std::unique_ptr<CommandResources> command_resources_;
     std::unique_ptr<SyncResources> sync_resources_;
+    std::unique_ptr<PipelineResources> pipeline_resources_;
+    std::unique_ptr<OutputImageResources> output_image_resources_;
+    std::unique_ptr<Renderer> renderer_;
     std::unique_ptr<ShaderCompiler> shader_compiler_;
-    vk::UniquePipelineLayout pipeline_layout_;
-    vk::UniquePipeline graphics_pipeline_;
-    vk::UniquePipeline compute_pipeline_;
-    vk::UniquePipelineLayout compute_pipeline_layout_;
-    vk::UniquePipeline raytracing_pipeline_;
-    vk::UniquePipelineLayout raytracing_pipeline_layout_;
-    std::unique_ptr<class GpuMemoryManager> gpu_memory_manager_;
-    std::unique_ptr<class CommandQueue> command_queue_;
-    std::unique_ptr<class BufferResourceManager> buffer_resources_;
+    std::unique_ptr<GpuMemoryManager> gpu_memory_manager_;
+    std::unique_ptr<CommandQueue> command_queue_;
+    std::unique_ptr<BufferResourceManager> buffer_resources_;
     std::unique_ptr<class MeshResources> mesh_resources_;
     vk::UniqueDescriptorSetLayout descriptor_set_layout_;
     vk::UniqueDescriptorPool descriptor_pool_;
     vk::DescriptorSet descriptor_set_ = VK_NULL_HANDLE;
     std::unique_ptr<TextureResources> texture_resources_;
     static constexpr std::size_t kMaxFramesInFlight = 2;
-    std::size_t current_frame_ = 0;
     bool framebuffer_resized_ = false;
     bool use_compute_raytracing_ = false;
     bool use_raytracing_pipeline_ = false;
-    vk::UniqueImage compute_output_image_;
-    vk::UniqueDeviceMemory compute_output_memory_;
-    vk::UniqueImageView compute_output_view_;
-    vk::UniqueSampler compute_output_sampler_;
-    bool compute_output_in_shader_read_ = false;
-    vk::UniqueImage swapchain_preview_image_;
-    vk::UniqueDeviceMemory swapchain_preview_memory_;
-    vk::UniqueImageView swapchain_preview_view_;
-    vk::UniqueSampler swapchain_preview_sampler_;
-    bool swapchain_preview_in_shader_read_ = false;
-    vk::Format swapchain_preview_format_ = vk::Format::eUndefined;
-    glm::uvec2 swapchain_preview_size_ = {0, 0};
     bool storage_buffers_ready_ = false;
     vk::Format compute_output_format_ = vk::Format::eR16G16B16A16Sfloat;
     bool device_lost_ = false;
@@ -269,12 +261,9 @@ class Device : public DeviceInterface
 
     std::optional<frame::json::LevelData> current_level_data_;
     std::optional<ProgramPipelineInfo> active_program_info_;
-    bool use_procedural_quad_pipeline_ = false;
     float elapsed_time_seconds_ = 0.0f;
     std::size_t last_raytrace_scene_state_hash_ = 0;
     bool has_raytrace_scene_state_hash_ = false;
-    vk::ShaderStageFlags push_constant_stages_ = {};
-    std::uint32_t push_constant_size_ = 0;
     GuiRenderCallback gui_render_callback_;
     vk::PhysicalDeviceBufferDeviceAddressFeatures
         buffer_device_address_features_ = {};
@@ -309,12 +298,6 @@ class Device : public DeviceInterface
     vk::UniqueBuffer hardware_raytracing_tlas_buffer_;
     vk::UniqueDeviceMemory hardware_raytracing_tlas_memory_;
     vk::UniqueAccelerationStructureKHR hardware_raytracing_tlas_;
-    vk::UniqueBuffer raytracing_sbt_buffer_;
-    vk::UniqueDeviceMemory raytracing_sbt_memory_;
-    vk::StridedDeviceAddressRegionKHR raygen_sbt_region_ = {};
-    vk::StridedDeviceAddressRegionKHR miss_sbt_region_ = {};
-    vk::StridedDeviceAddressRegionKHR hit_sbt_region_ = {};
-    vk::StridedDeviceAddressRegionKHR callable_sbt_region_ = {};
 };
 
 } // namespace frame::vulkan
