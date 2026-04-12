@@ -152,7 +152,8 @@ SDLVulkanWindow::SDLVulkanWindow(glm::uvec2 size) : size_(size)
     }
     VULKAN_HPP_DEFAULT_DISPATCHER.init(vk_get_instance_proc_addr);
 
-    const Uint32 window_flags = SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE;
+    const Uint32 window_flags =
+        SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN;
     sdl_window_ =
         SDL_CreateWindow(kDefaultTitle, size_.x, size_.y, window_flags);
     if (!sdl_window_)
@@ -309,6 +310,9 @@ WindowReturnEnum SDLVulkanWindow::Run(std::function<bool()> lambda)
             }
         }
     }
+
+    SDL_ShowWindow(sdl_window_);
+    SDL_RaiseWindow(sdl_window_);
 
     WindowReturnEnum window_return_enum = WindowReturnEnum::CONTINUE;
     auto start = std::chrono::steady_clock::now();
@@ -509,7 +513,8 @@ glm::vec2 SDLVulkanWindow::GetPixelPerInch(std::uint32_t screen) const
 
 bool SDLVulkanWindow::RunEvent(const SDL_Event& event, const double dt)
 {
-    if (event.type == SDL_EVENT_QUIT)
+    if (event.type == SDL_EVENT_QUIT ||
+        event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED)
     {
         return false;
     }

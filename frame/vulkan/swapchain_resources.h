@@ -16,7 +16,7 @@ class SwapchainResources
   public:
     static constexpr vk::ImageLayout ScenePassInitialLayout()
     {
-        return vk::ImageLayout::ePresentSrcKHR;
+        return vk::ImageLayout::eUndefined;
     }
     static constexpr vk::ImageLayout ScenePassFinalLayout()
     {

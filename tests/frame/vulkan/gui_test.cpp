@@ -18,7 +18,7 @@ TEST(VulkanGuiTest, SwapchainGuiStackLayoutsAreStable)
 {
     EXPECT_EQ(
         frame::vulkan::SwapchainResources::ScenePassInitialLayout(),
-        vk::ImageLayout::ePresentSrcKHR);
+        vk::ImageLayout::eUndefined);
     EXPECT_EQ(
         frame::vulkan::SwapchainResources::ScenePassFinalLayout(),
         vk::ImageLayout::eTransferSrcOptimal);

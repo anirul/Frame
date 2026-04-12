@@ -156,4 +156,3 @@ class Renderer : public RendererInterface
 } // End namespace frame::opengl.
 
 
-

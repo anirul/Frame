@@ -128,7 +128,7 @@ void SwapchainResources::Create(glm::uvec2 size)
     vk::SubpassDependency dependency(
         VK_SUBPASS_EXTERNAL,
         0,
-        vk::PipelineStageFlagBits::eColorAttachmentOutput,
+        vk::PipelineStageFlagBits::eTopOfPipe,
         vk::PipelineStageFlagBits::eColorAttachmentOutput,
         {},
         vk::AccessFlagBits::eColorAttachmentWrite);
