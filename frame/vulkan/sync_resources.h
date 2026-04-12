@@ -11,10 +11,13 @@ namespace frame::vulkan
 class SyncResources
 {
   public:
-    SyncResources(vk::Device device, std::size_t max_frames_in_flight);
+    SyncResources(vk::Device device,
+                  std::size_t max_frames_in_flight,
+                  std::size_t swapchain_image_count);
 
     void Create();
     void Destroy();
+    void SetSwapchainImageCount(std::size_t swapchain_image_count);
 
     bool IsCreated() const
     {
@@ -26,14 +29,19 @@ class SyncResources
         return frame_count_;
     }
 
+    std::size_t GetSwapchainImageCount() const
+    {
+        return swapchain_image_count_;
+    }
+
     vk::Semaphore GetImageAvailable(std::size_t frame) const
     {
         return *image_available_.at(frame);
     }
 
-    vk::Semaphore GetRenderFinished(std::size_t frame) const
+    vk::Semaphore GetRenderFinished(std::size_t image_index) const
     {
-        return *render_finished_.at(frame);
+        return *render_finished_.at(image_index);
     }
 
     vk::Fence GetInFlightFence(std::size_t frame) const
@@ -44,6 +52,7 @@ class SyncResources
   private:
     vk::Device device_;
     std::size_t frame_count_ = 0;
+    std::size_t swapchain_image_count_ = 0;
     bool created_ = false;
     std::vector<vk::UniqueSemaphore> image_available_;
     std::vector<vk::UniqueSemaphore> render_finished_;

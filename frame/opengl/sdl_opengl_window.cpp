@@ -58,7 +58,7 @@ SDLOpenGLWindow::SDLOpenGLWindow(glm::uvec2 size) : size_(size)
         "SDL OpenGL",
         size_.x,
         size_.y,
-        SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
+        SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN);
     if (!sdl_window_)
     {
         throw std::runtime_error("Couldn't start a window in SDL3.");
@@ -129,6 +129,10 @@ WindowReturnEnum SDLOpenGLWindow::Run(std::function<bool()> lambda)
             plugin_interface->Startup(size_);
         }
     }
+
+    SDL_ShowWindow(sdl_window_);
+    SDL_RaiseWindow(sdl_window_);
+
     WindowReturnEnum window_return_enum = WindowReturnEnum::CONTINUE;
     auto previous_frame = std::chrono::steady_clock::now();
     while (window_return_enum == WindowReturnEnum::CONTINUE)
@@ -201,7 +205,8 @@ WindowReturnEnum SDLOpenGLWindow::Run(std::function<bool()> lambda)
 
 bool SDLOpenGLWindow::RunEvent(const SDL_Event& event, const double dt)
 {
-    if (event.type == SDL_EVENT_QUIT)
+    if (event.type == SDL_EVENT_QUIT ||
+        event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED)
     {
         return false;
     }

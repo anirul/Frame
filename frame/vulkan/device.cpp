@@ -1572,7 +1572,17 @@ void Device::StartupFromLevelData(const frame::json::LevelData& level_data)
     if (!sync_resources_)
     {
         sync_resources_ = std::make_unique<SyncResources>(
-            *vk_unique_device_, kMaxFramesInFlight);
+            *vk_unique_device_,
+            kMaxFramesInFlight,
+            swapchain_resources_ ? swapchain_resources_->GetImages().size() : 0);
+    }
+    else if (swapchain_resources_ &&
+             sync_resources_->GetSwapchainImageCount() !=
+                 swapchain_resources_->GetImages().size())
+    {
+        sync_resources_->Destroy();
+        sync_resources_->SetSwapchainImageCount(
+            swapchain_resources_->GetImages().size());
     }
     if (sync_resources_ && !sync_resources_->IsCreated())
     {
@@ -2325,7 +2335,7 @@ void Device::Display(double dt)
     const vk::PipelineStageFlags wait_stages[] = {
         vk::PipelineStageFlagBits::eColorAttachmentOutput};
     const vk::Semaphore signal_semaphores[] = {
-        sync_resources_->GetRenderFinished(current_frame_)};
+        sync_resources_->GetRenderFinished(image_index)};
 
     vk::SubmitInfo submit_info(
         1,
@@ -2439,6 +2449,13 @@ void Device::RecreateSwapchain()
     swapchain_resources_->Create(size_);
     command_resources_->AllocateBuffers(
         static_cast<std::uint32_t>(kMaxFramesInFlight));
+    if (sync_resources_)
+    {
+        sync_resources_->Destroy();
+        sync_resources_->SetSwapchainImageCount(
+            swapchain_resources_->GetImages().size());
+        sync_resources_->Create();
+    }
     CreateSwapchainPreviewImage();
 
     if (use_hardware_raytracing_)
