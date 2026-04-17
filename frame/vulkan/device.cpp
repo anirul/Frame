@@ -652,6 +652,119 @@ struct alignas(16) HardwareRaytraceInstanceStorageData
     glm::uvec4 metadata = glm::uvec4(0u);
 };
 
+struct RaytracingSourceGeometryData
+{
+    frame::EntityId source_node_id = frame::NullId;
+    frame::EntityId triangle_buffer_id = frame::NullId;
+    std::uint32_t material_id = 0;
+    std::uint32_t triangle_offset = 0;
+    std::vector<std::uint8_t> triangle_bytes = {};
+};
+
+glm::mat4 InverseOrIdentity(const glm::mat4& matrix)
+{
+    const float determinant = glm::determinant(glm::mat3(matrix));
+    if (std::abs(determinant) <= 1.0e-8f)
+    {
+        return glm::mat4(1.0f);
+    }
+    return glm::inverse(matrix);
+}
+
+vk::TransformMatrixKHR MakeAccelerationStructureTransform(const glm::mat4& matrix)
+{
+    vk::TransformMatrixKHR transform = {};
+    for (int row = 0; row < 3; ++row)
+    {
+        for (int column = 0; column < 4; ++column)
+        {
+            transform.matrix[row][column] = matrix[column][row];
+        }
+    }
+    return transform;
+}
+
+std::vector<RaytracingSourceGeometryData> BuildRaytracingSourceGeometryData(
+    frame::LevelInterface& level,
+    double time_seconds,
+    bool apply_node_transform)
+{
+    std::vector<RaytracingSourceGeometryData> geometries = {};
+    const auto transmissive_reference_color =
+        ResolveRaytracingReferenceColor(level, true);
+    const auto opaque_reference_color =
+        ResolveRaytracingReferenceColor(level, false);
+    std::uint32_t next_transmissive_triangle_offset = 0;
+    std::uint32_t next_opaque_triangle_offset = 0;
+    for (const auto& [source_node_id, source_material_id] :
+         GetRaytracingSourceMeshMaterials(level))
+    {
+        auto* node = dynamic_cast<frame::NodeMesh*>(
+            &level.GetSceneNodeFromId(source_node_id));
+        if (!node)
+        {
+            continue;
+        }
+        const auto mesh_id = node->GetLocalMesh();
+        if (!mesh_id)
+        {
+            continue;
+        }
+
+        const auto& mesh = level.GetMeshFromId(mesh_id);
+        const auto triangle_buffer_id = mesh.GetTriangleBufferId();
+        if (!triangle_buffer_id)
+        {
+            continue;
+        }
+
+        auto* triangle_buffer = dynamic_cast<frame::vulkan::Buffer*>(
+            &level.GetBufferFromId(triangle_buffer_id));
+        if (!triangle_buffer)
+        {
+            continue;
+        }
+
+        const bool transmissive =
+            IsTransmissiveMaterial(level, source_material_id);
+        const auto source_color = ResolveRaytracingSourceMaterialColor(
+            level,
+            source_material_id);
+        const auto color_multiplier = ResolveRaytracingColorMultiplier(
+            source_color,
+            transmissive ? transmissive_reference_color
+                         : opaque_reference_color);
+        const auto transformed =
+            apply_node_transform
+                ? TransformTriangleBytes(
+                      triangle_buffer->GetRawData(),
+                      node->GetLocalModel(time_seconds))
+                : triangle_buffer->GetRawData();
+        RaytracingSourceGeometryData geometry = {};
+        geometry.source_node_id = source_node_id;
+        geometry.triangle_buffer_id = triangle_buffer_id;
+        geometry.material_id = transmissive ? 0u : 1u;
+        geometry.triangle_bytes =
+            ApplyTriangleColorMultiplier(transformed, color_multiplier);
+        const std::uint32_t triangle_count = static_cast<std::uint32_t>(
+            geometry.triangle_bytes.size() /
+            (kRaytraceTriangleVertexStrideBytes * 3u));
+        geometry.triangle_offset = transmissive
+            ? next_transmissive_triangle_offset
+            : next_opaque_triangle_offset;
+        if (transmissive)
+        {
+            next_transmissive_triangle_offset += triangle_count;
+        }
+        else
+        {
+            next_opaque_triangle_offset += triangle_count;
+        }
+        geometries.push_back(std::move(geometry));
+    }
+    return geometries;
+}
+
 bool AreTexturesCompatibleForReuse(
     const frame::vulkan::Texture& old_texture,
     const frame::vulkan::Texture& new_texture)
@@ -2025,16 +2138,25 @@ void Device::UpdateRaytraceBuffers()
         }
     }
     bool updated_aggregate_scene = false;
+    bool updated_hardware_transforms = false;
     if (HasRaytracingSourceMeshes(*level_))
     {
         updated_aggregate_scene = UpdateAggregateRaytracingSceneBuffers(
             !use_hardware_raytracing_);
-        if (use_hardware_raytracing_ && updated_aggregate_scene)
+        if (use_hardware_raytracing_)
         {
-            UpdateHardwareRaytracingScene();
+            if (updated_aggregate_scene)
+            {
+                UpdateHardwareRaytracingScene();
+            }
+            else
+            {
+                updated_hardware_transforms = UpdateHardwareRaytracingTransforms();
+            }
         }
     }
-    if (updated_buffer_count > 0 || updated_aggregate_scene)
+    if (updated_buffer_count > 0 || updated_aggregate_scene ||
+        updated_hardware_transforms)
     {
         // Re-arm transfer->compute visibility barrier after dynamic SSBO writes.
         storage_buffers_ready_ = false;
@@ -2064,13 +2186,8 @@ bool Device::UpdateAggregateRaytracingSceneBuffers(bool build_software_bvh)
     {
         return false;
     }
-    const bool use_shared_transform_hardware_scene =
-        !build_software_bvh &&
-        CanUseSharedTransformHardwareRaytraceScene(
-            *level_,
-            static_cast<double>(elapsed_time_seconds_));
     const bool use_world_space_triangles =
-        build_software_bvh || !use_shared_transform_hardware_scene;
+        build_software_bvh || RaytraceSceneRequiresWorldSpaceBuffers(*level_);
     const std::size_t scene_state_hash =
         BuildRaytracingSourceStateHash(
             *level_,
@@ -2171,17 +2288,26 @@ bool Device::UpdateHardwareRaytracingInstanceStorageBuffer()
         return false;
     }
 
-    const bool use_shared_scene_transform =
-        CanUseSharedTransformHardwareRaytraceScene(
-            *level_,
-            static_cast<double>(elapsed_time_seconds_));
     std::vector<HardwareRaytraceInstanceStorageData> instances = {};
     instances.reserve(hardware_raytracing_geometries_.size());
     for (const auto& geometry : hardware_raytracing_geometries_)
     {
         HardwareRaytraceInstanceStorageData instance = {};
+        if (geometry.source_node_id != NullId)
+        {
+            auto* node = dynamic_cast<NodeMesh*>(
+                &level_->GetSceneNodeFromId(geometry.source_node_id));
+            if (node)
+            {
+                instance.object_to_world = node->GetLocalModel(
+                    static_cast<double>(elapsed_time_seconds_));
+                instance.world_to_object =
+                    InverseOrIdentity(instance.object_to_world);
+            }
+        }
+        instance.metadata.x = geometry.triangle_offset;
         instance.metadata.y = geometry.material_id;
-        instance.metadata.z = use_shared_scene_transform ? 1u : 0u;
+        instance.metadata.z = 0u;
         instances.push_back(instance);
     }
 
@@ -2195,7 +2321,7 @@ bool Device::UpdateHardwareRaytracingInstanceStorageBuffer()
     const auto previous_bytes = instance_buffer->GetRawData();
     if (previous_bytes == bytes)
     {
-        return true;
+        return false;
     }
 
     instance_buffer->Copy(bytes);
@@ -2227,11 +2353,67 @@ bool Device::UpdateHardwareRaytracingInstanceStorageBuffer()
 
 void Device::UpdateHardwareRaytracingScene()
 {
+    CreateHardwareRaytracingScene();
+    UpdateHardwareRaytracingDescriptor();
+}
+
+bool Device::UpdateHardwareRaytracingTransforms()
+{
     if (!use_hardware_raytracing_ || !vk_unique_device_ || !level_ ||
-        !gpu_memory_manager_ || !command_queue_ ||
-        hardware_raytracing_geometries_.empty() || !hardware_raytracing_tlas_)
+        hardware_raytracing_geometries_.empty() || !hardware_raytracing_tlas_ ||
+        !hardware_raytracing_instance_buffer_ || !hardware_raytracing_instance_memory_)
     {
-        return;
+        return false;
+    }
+    if (RaytraceSceneRequiresWorldSpaceBuffers(*level_))
+    {
+        return false;
+    }
+
+    std::vector<vk::AccelerationStructureInstanceKHR> instances = {};
+    instances.reserve(hardware_raytracing_geometries_.size());
+    for (const auto& geometry : hardware_raytracing_geometries_)
+    {
+        vk::AccelerationStructureInstanceKHR instance{};
+        if (geometry.source_node_id != NullId)
+        {
+            auto* node = dynamic_cast<NodeMesh*>(
+                &level_->GetSceneNodeFromId(geometry.source_node_id));
+            if (node)
+            {
+                instance.transform = MakeAccelerationStructureTransform(
+                    node->GetLocalModel(static_cast<double>(elapsed_time_seconds_)));
+            }
+            else
+            {
+                instance.transform = MakeIdentityTransform();
+            }
+        }
+        else
+        {
+            instance.transform = MakeIdentityTransform();
+        }
+        instance.instanceCustomIndex = geometry.instance_custom_index;
+        instance.mask = 0xFF;
+        instance.instanceShaderBindingTableRecordOffset = 0;
+        instance.flags = static_cast<VkGeometryInstanceFlagsKHR>(
+            vk::GeometryInstanceFlagBitsKHR::eTriangleFacingCullDisable);
+        instance.accelerationStructureReference = geometry.blas_address;
+        instances.push_back(instance);
+    }
+
+    std::vector<std::uint8_t> bytes(
+        instances.size() * sizeof(vk::AccelerationStructureInstanceKHR));
+    if (!bytes.empty())
+    {
+        std::memcpy(bytes.data(), instances.data(), bytes.size());
+    }
+
+    const bool storage_buffer_changed =
+        UpdateHardwareRaytracingInstanceStorageBuffer();
+    if (hardware_raytracing_instance_bytes_ == bytes)
+    {
+        return storage_buffer_changed;
     }
 
     if (sync_resources_ && sync_resources_->IsCreated())
@@ -2254,132 +2436,43 @@ void Device::UpdateHardwareRaytracingScene()
             if (wait_result != VK_SUCCESS)
             {
                 logger_->error(
-                    "vkWaitForFences failed before updating hardware raytracing scene: {}",
+                    "vkWaitForFences failed before updating hardware raytracing transforms: {}",
                     vk::to_string(static_cast<vk::Result>(wait_result)));
                 if (wait_result == VK_ERROR_DEVICE_LOST)
                 {
                     device_lost_ = true;
                 }
-                return;
+                return storage_buffer_changed;
             }
         }
     }
 
-    const auto build_scratch_buffer =
-        [&](vk::DeviceSize size,
-            vk::UniqueBuffer& scratch_buffer,
-            vk::UniqueDeviceMemory& scratch_memory) {
-            scratch_buffer = gpu_memory_manager_->CreateBuffer(
-                size,
-                vk::BufferUsageFlagBits::eStorageBuffer |
-                    vk::BufferUsageFlagBits::eShaderDeviceAddress,
-                vk::MemoryPropertyFlagBits::eDeviceLocal,
-                scratch_memory,
-                vk::MemoryAllocateFlagBits::eDeviceAddress);
-            return vk_unique_device_->getBufferAddress(
-                vk::BufferDeviceAddressInfo(*scratch_buffer));
-        };
-
-    for (auto& geometry : hardware_raytracing_geometries_)
+    void* mapped_instances = vk_unique_device_->mapMemory(
+        *hardware_raytracing_instance_memory_,
+        0,
+        static_cast<vk::DeviceSize>(bytes.size()));
+    if (!bytes.empty())
     {
-        if (!geometry.vertex_buffer || !geometry.index_buffer || !geometry.blas)
-        {
-            continue;
-        }
-
-        auto* triangle_buffer = dynamic_cast<frame::vulkan::Buffer*>(
-            &level_->GetBufferFromId(geometry.source_buffer_id));
-        if (!triangle_buffer)
-        {
-            continue;
-        }
-
-        const auto& triangle_bytes = triangle_buffer->GetRawData();
-        if (triangle_bytes.empty())
-        {
-            continue;
-        }
-        if (static_cast<vk::DeviceSize>(triangle_bytes.size()) !=
-                geometry.vertex_buffer_size ||
-            triangle_bytes.size() % kRaytraceTriangleVertexStrideBytes != 0)
-        {
-            logger_->info(
-                "Recreating Vulkan hardware raytracing scene because animated geometry '{}' changed layout.",
-                geometry.source_inner_name);
-            CreateHardwareRaytracingScene();
-            UpdateHardwareRaytracingDescriptor();
-            return;
-        }
-
-        UploadDeviceLocalBuffer(
-            *vk_unique_device_,
-            *gpu_memory_manager_,
-            *command_queue_,
-            triangle_bytes,
-            *geometry.vertex_buffer);
-
-        const auto vertex_address = vk_unique_device_->getBufferAddress(
-            vk::BufferDeviceAddressInfo(*geometry.vertex_buffer));
-        const auto index_address = vk_unique_device_->getBufferAddress(
-            vk::BufferDeviceAddressInfo(*geometry.index_buffer));
-
-        vk::AccelerationStructureGeometryTrianglesDataKHR triangles(
-            vk::Format::eR32G32B32Sfloat,
-            vk::DeviceOrHostAddressConstKHR(vertex_address),
-            kRaytraceTriangleVertexStrideBytes,
-            geometry.vertex_count,
-            vk::IndexType::eUint32,
-            vk::DeviceOrHostAddressConstKHR(index_address));
-        vk::AccelerationStructureGeometryDataKHR geometry_data;
-        geometry_data.setTriangles(triangles);
-        vk::AccelerationStructureGeometryKHR as_geometry(
-            vk::GeometryTypeKHR::eTriangles);
-        as_geometry.setGeometry(geometry_data);
-        as_geometry.setFlags(vk::GeometryFlagBitsKHR::eOpaque);
-
-        vk::AccelerationStructureBuildGeometryInfoKHR build_info(
-            vk::AccelerationStructureTypeKHR::eBottomLevel,
-            vk::BuildAccelerationStructureFlagBitsKHR::ePreferFastTrace,
-            vk::BuildAccelerationStructureModeKHR::eBuild,
-            {},
-            {},
-            as_geometry);
-
-        const auto size_info =
-            vk_unique_device_->getAccelerationStructureBuildSizesKHR(
-                vk::AccelerationStructureBuildTypeKHR::eDevice,
-                build_info,
-                geometry.triangle_count);
-        vk::UniqueBuffer scratch_buffer;
-        vk::UniqueDeviceMemory scratch_memory;
-        const auto scratch_address = build_scratch_buffer(
-            size_info.buildScratchSize,
-            scratch_buffer,
-            scratch_memory);
-
-        build_info.setDstAccelerationStructure(*geometry.blas);
-        build_info.setScratchData(
-            vk::DeviceOrHostAddressKHR(scratch_address));
-        vk::AccelerationStructureBuildRangeInfoKHR range_info(
-            geometry.triangle_count,
-            0,
-            0,
-            0);
-        const vk::AccelerationStructureBuildRangeInfoKHR* range_infos[] = {
-            &range_info};
-        command_queue_->SubmitOneTime(
-            [&](vk::CommandBuffer command_buffer) {
-                command_buffer.buildAccelerationStructuresKHR(
-                    build_info,
-                    range_infos);
-            });
+        std::memcpy(mapped_instances, bytes.data(), bytes.size());
     }
+    vk_unique_device_->unmapMemory(*hardware_raytracing_instance_memory_);
+    hardware_raytracing_instance_bytes_ = bytes;
+    RebuildHardwareRaytracingTlas();
+    return true;
+}
 
-    UpdateHardwareRaytracingInstanceStorageBuffer();
+void Device::RebuildHardwareRaytracingTlas()
+{
+    if (!use_hardware_raytracing_ || !vk_unique_device_ || !gpu_memory_manager_ ||
+        !command_queue_ || !hardware_raytracing_tlas_ ||
+        !hardware_raytracing_instance_buffer_)
+    {
+        return;
+    }
 
     const std::uint32_t instance_count =
         static_cast<std::uint32_t>(hardware_raytracing_geometries_.size());
-    if (instance_count == 0 || !hardware_raytracing_instance_buffer_)
+    if (instance_count == 0)
     {
         return;
     }
@@ -2882,9 +2975,145 @@ void Device::CreateHardwareRaytracingScene()
         };
 
     std::vector<vk::AccelerationStructureInstanceKHR> instances = {};
-    instances.reserve(2);
+    const bool use_source_instances =
+        !RaytraceSceneRequiresWorldSpaceBuffers(*level_);
+    const auto source_geometries = use_source_instances
+        ? BuildRaytracingSourceGeometryData(
+              *level_,
+              static_cast<double>(elapsed_time_seconds_),
+              false)
+        : std::vector<RaytracingSourceGeometryData>{};
+    instances.reserve(
+        use_source_instances ? source_geometries.size() : static_cast<std::size_t>(2));
 
     std::uint32_t next_instance_custom_index = 0;
+    const auto append_source_geometry =
+        [&](const RaytracingSourceGeometryData& source_geometry) {
+            const auto& triangle_bytes = source_geometry.triangle_bytes;
+            const auto vertex_count = static_cast<std::uint32_t>(
+                triangle_bytes.size() / kRaytraceTriangleVertexStrideBytes);
+            const auto primitive_count = vertex_count / 3;
+            if (primitive_count == 0)
+            {
+                return;
+            }
+            const auto index_bytes = BuildSequentialIndexBytes(vertex_count);
+
+            HardwareRaytracingGeometry geometry = {};
+            geometry.source_inner_name =
+                level_->GetNameFromId(source_geometry.source_node_id);
+            geometry.source_node_id = source_geometry.source_node_id;
+            geometry.source_buffer_id = source_geometry.triangle_buffer_id;
+            geometry.triangle_offset = source_geometry.triangle_offset;
+            create_gpu_input_buffer(
+                triangle_bytes,
+                vk::BufferUsageFlagBits::eAccelerationStructureBuildInputReadOnlyKHR,
+                geometry.vertex_buffer,
+                geometry.vertex_memory);
+            create_gpu_input_buffer(
+                index_bytes,
+                vk::BufferUsageFlagBits::eAccelerationStructureBuildInputReadOnlyKHR,
+                geometry.index_buffer,
+                geometry.index_memory);
+
+            const auto vertex_address = vk_unique_device_->getBufferAddress(
+                vk::BufferDeviceAddressInfo(*geometry.vertex_buffer));
+            const auto index_address = vk_unique_device_->getBufferAddress(
+                vk::BufferDeviceAddressInfo(*geometry.index_buffer));
+            geometry.vertex_buffer_size =
+                static_cast<vk::DeviceSize>(triangle_bytes.size());
+            geometry.vertex_count = vertex_count;
+            geometry.index_buffer_size =
+                static_cast<vk::DeviceSize>(index_bytes.size());
+            geometry.triangle_count = primitive_count;
+            geometry.instance_custom_index = next_instance_custom_index++;
+            geometry.material_id = source_geometry.material_id;
+
+            vk::AccelerationStructureGeometryTrianglesDataKHR triangles(
+                vk::Format::eR32G32B32Sfloat,
+                vk::DeviceOrHostAddressConstKHR(vertex_address),
+                kRaytraceTriangleVertexStrideBytes,
+                vertex_count,
+                vk::IndexType::eUint32,
+                vk::DeviceOrHostAddressConstKHR(index_address));
+            vk::AccelerationStructureGeometryDataKHR geometry_data;
+            geometry_data.setTriangles(triangles);
+            vk::AccelerationStructureGeometryKHR as_geometry(
+                vk::GeometryTypeKHR::eTriangles);
+            as_geometry.setGeometry(geometry_data);
+            as_geometry.setFlags(vk::GeometryFlagBitsKHR::eOpaque);
+
+            vk::AccelerationStructureBuildGeometryInfoKHR build_info(
+                vk::AccelerationStructureTypeKHR::eBottomLevel,
+                vk::BuildAccelerationStructureFlagBitsKHR::ePreferFastTrace,
+                vk::BuildAccelerationStructureModeKHR::eBuild,
+                {},
+                {},
+                as_geometry);
+
+            const auto size_info =
+                vk_unique_device_->getAccelerationStructureBuildSizesKHR(
+                    vk::AccelerationStructureBuildTypeKHR::eDevice,
+                    build_info,
+                    primitive_count);
+
+            create_acceleration_structure(
+                vk::AccelerationStructureTypeKHR::eBottomLevel,
+                size_info.accelerationStructureSize,
+                geometry.blas,
+                geometry.blas_buffer,
+                geometry.blas_memory);
+
+            vk::UniqueBuffer scratch_buffer;
+            vk::UniqueDeviceMemory scratch_memory;
+            const auto scratch_address = build_scratch_buffer(
+                size_info.buildScratchSize,
+                scratch_buffer,
+                scratch_memory);
+
+            build_info.setDstAccelerationStructure(*geometry.blas);
+            build_info.setScratchData(
+                vk::DeviceOrHostAddressKHR(scratch_address));
+            vk::AccelerationStructureBuildRangeInfoKHR range_info(
+                primitive_count,
+                0,
+                0,
+                0);
+            const vk::AccelerationStructureBuildRangeInfoKHR* range_infos[] = {
+                &range_info};
+            command_queue_->SubmitOneTime(
+                [&](vk::CommandBuffer command_buffer) {
+                    command_buffer.buildAccelerationStructuresKHR(
+                        build_info,
+                        range_infos);
+                });
+
+            geometry.blas_address =
+                vk_unique_device_->getAccelerationStructureAddressKHR(
+                    vk::AccelerationStructureDeviceAddressInfoKHR(
+                        *geometry.blas));
+
+            vk::AccelerationStructureInstanceKHR instance{};
+            auto* node = dynamic_cast<NodeMesh*>(
+                &level_->GetSceneNodeFromId(source_geometry.source_node_id));
+            if (node)
+            {
+                instance.transform = MakeAccelerationStructureTransform(
+                    node->GetLocalModel(static_cast<double>(elapsed_time_seconds_)));
+            }
+            else
+            {
+                instance.transform = MakeIdentityTransform();
+            }
+            instance.instanceCustomIndex = geometry.instance_custom_index;
+            instance.mask = 0xFF;
+            instance.instanceShaderBindingTableRecordOffset = 0;
+            instance.flags = static_cast<VkGeometryInstanceFlagsKHR>(
+                vk::GeometryInstanceFlagBitsKHR::eTriangleFacingCullDisable);
+            instance.accelerationStructureReference = geometry.blas_address;
+            instances.push_back(instance);
+            hardware_raytracing_geometries_.push_back(std::move(geometry));
+        };
     const auto append_geometry =
         [&](const char* inner_name,
             std::uint32_t material_id) {
@@ -2940,6 +3169,7 @@ void Device::CreateHardwareRaytracingScene()
             geometry.triangle_count = primitive_count;
             geometry.instance_custom_index = next_instance_custom_index++;
             geometry.material_id = material_id;
+            geometry.triangle_offset = 0;
 
             vk::AccelerationStructureGeometryTrianglesDataKHR triangles(
                 vk::Format::eR32G32B32Sfloat,
@@ -3017,8 +3247,18 @@ void Device::CreateHardwareRaytracingScene()
             hardware_raytracing_geometries_.push_back(std::move(geometry));
         };
 
-    append_geometry("TriangleBufferTransmissive", 0u);
-    append_geometry("TriangleBufferOpaque", 1u);
+    if (use_source_instances)
+    {
+        for (const auto& source_geometry : source_geometries)
+        {
+            append_source_geometry(source_geometry);
+        }
+    }
+    else
+    {
+        append_geometry("TriangleBufferTransmissive", 0u);
+        append_geometry("TriangleBufferOpaque", 1u);
+    }
 
     if (instances.empty())
     {
@@ -3045,6 +3285,16 @@ void Device::CreateHardwareRaytracingScene()
         instance_bytes);
     std::memcpy(mapped_instances, instances.data(), static_cast<std::size_t>(instance_bytes));
     vk_unique_device_->unmapMemory(*hardware_raytracing_instance_memory_);
+    hardware_raytracing_instance_bytes_.resize(static_cast<std::size_t>(instance_bytes));
+    if (instance_bytes > 0)
+    {
+        std::memcpy(
+            hardware_raytracing_instance_bytes_.data(),
+            instances.data(),
+            static_cast<std::size_t>(instance_bytes));
+    }
+
+    UpdateHardwareRaytracingInstanceStorageBuffer();
 
     const auto instance_address = vk_unique_device_->getBufferAddress(
         vk::BufferDeviceAddressInfo(*hardware_raytracing_instance_buffer_));
@@ -3115,6 +3365,7 @@ void Device::DestroyHardwareRaytracingScene()
     hardware_raytracing_tlas_memory_.reset();
     hardware_raytracing_instance_buffer_.reset();
     hardware_raytracing_instance_memory_.reset();
+    hardware_raytracing_instance_bytes_.clear();
     hardware_raytracing_geometries_.clear();
 }
 

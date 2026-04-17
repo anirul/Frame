@@ -169,6 +169,8 @@ class Device : public DeviceInterface
     void UpdateRaytraceBuffers();
     bool UpdateAggregateRaytracingSceneBuffers(bool build_software_bvh);
     void UpdateHardwareRaytracingScene();
+    bool UpdateHardwareRaytracingTransforms();
+    void RebuildHardwareRaytracingTlas();
     void UpdateHardwareRaytracingDescriptor();
     bool UpdateHardwareRaytracingInstanceStorageBuffer();
     void CopyBuffer(vk::Buffer src, vk::Buffer dst, vk::DeviceSize size);
@@ -276,6 +278,7 @@ class Device : public DeviceInterface
     struct HardwareRaytracingGeometry
     {
         std::string source_inner_name;
+        EntityId source_node_id = NullId;
         EntityId source_buffer_id = NullId;
         vk::UniqueBuffer vertex_buffer;
         vk::UniqueDeviceMemory vertex_memory;
@@ -291,10 +294,12 @@ class Device : public DeviceInterface
         std::uint32_t triangle_count = 0;
         std::uint32_t instance_custom_index = 0;
         std::uint32_t material_id = 0;
+        std::uint32_t triangle_offset = 0;
     };
     std::vector<HardwareRaytracingGeometry> hardware_raytracing_geometries_;
     vk::UniqueBuffer hardware_raytracing_instance_buffer_;
     vk::UniqueDeviceMemory hardware_raytracing_instance_memory_;
+    std::vector<std::uint8_t> hardware_raytracing_instance_bytes_;
     vk::UniqueBuffer hardware_raytracing_tlas_buffer_;
     vk::UniqueDeviceMemory hardware_raytracing_tlas_memory_;
     vk::UniqueAccelerationStructureKHR hardware_raytracing_tlas_;
