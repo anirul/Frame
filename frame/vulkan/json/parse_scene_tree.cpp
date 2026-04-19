@@ -2761,7 +2761,8 @@ bool ParseNodeMesh(
             [&](std::initializer_list<std::string_view> names) -> EntityId {
                 for (const auto name_view : names)
                 {
-                    const auto texture_id = level.GetIdFromName(
+                    const auto texture_id = FindTextureIdByName(
+                        level,
                         std::string(name_view));
                     if (texture_id != NullId)
                     {
@@ -3109,7 +3110,7 @@ bool ParseNodeMesh(
                     }
                     else
                     {
-                        texture_id = level.GetIdFromName(binding_name);
+                        texture_id = FindTextureIdByName(level, binding_name);
                     }
                     if (texture_id == NullId)
                     {
