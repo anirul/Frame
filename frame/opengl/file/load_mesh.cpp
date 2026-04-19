@@ -65,6 +65,20 @@ bool IsRaytracingProgram(const ProgramInterface* program)
     return frame::json::IsRaytracingProgramKey(key);
 }
 
+EntityId FindTextureIdByName(
+    LevelInterface& level,
+    std::string_view texture_name)
+{
+    for (const auto texture_id : level.GetTextures())
+    {
+        if (level.GetNameFromId(texture_id) == texture_name)
+        {
+            return texture_id;
+        }
+    }
+    return NullId;
+}
+
 constexpr float kMaterialFactorEpsilon = 0.01f;
 constexpr float kDefaultIor = 1.5f;
 constexpr float kDefaultAttenuationDistance = 1000000.0f;
@@ -1369,8 +1383,9 @@ std::vector<std::pair<EntityId, EntityId>> LoadMeshesFromGltfFile(
         -> EntityId {
             for (const auto name_view : names)
             {
-                const auto texture_id = level.GetIdFromName(
-                    std::string(name_view));
+                const auto texture_id = FindTextureIdByName(
+                    level,
+                    name_view);
                 if (texture_id != NullId)
                 {
                     return texture_id;
@@ -1713,7 +1728,7 @@ std::vector<std::pair<EntityId, EntityId>> LoadMeshesFromGltfFile(
                     }
                     else
                     {
-                        texture_id = level.GetIdFromName(binding_name);
+                        texture_id = FindTextureIdByName(level, binding_name);
                     }
                     if (texture_id == NullId)
                     {

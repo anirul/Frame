@@ -26,6 +26,20 @@ bool EndsWith(std::string_view value, std::string_view suffix)
            value.substr(value.size() - suffix.size()) == suffix;
 }
 
+EntityId FindTextureIdByName(
+    LevelInterface& level,
+    std::string_view texture_name)
+{
+    for (const auto texture_id : level.GetTextures())
+    {
+        if (level.GetNameFromId(texture_id) == texture_name)
+        {
+            return texture_id;
+        }
+    }
+    return NullId;
+}
+
 struct GeneratedTextureSpec
 {
     std::array<float, 4> color = {0.0f, 0.0f, 0.0f, 1.0f};
@@ -173,7 +187,7 @@ std::unique_ptr<frame::ProgramInterface> ParseProgramOpenGL(
     }
     for (const auto& texture_name : proto_program.input_texture_names())
     {
-        EntityId texture_id = level.GetIdFromName(texture_name);
+        EntityId texture_id = FindTextureIdByName(level, texture_name);
         if (!texture_id)
         {
             texture_id = EnsureRaytracingDefaultTexture(
@@ -187,7 +201,7 @@ std::unique_ptr<frame::ProgramInterface> ParseProgramOpenGL(
     }
     for (const auto& texture_name : proto_program.output_texture_names())
     {
-        EntityId texture_id = level.GetIdFromName(texture_name);
+        EntityId texture_id = FindTextureIdByName(level, texture_name);
         if (!texture_id)
         {
             return nullptr;
