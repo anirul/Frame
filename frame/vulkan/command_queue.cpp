@@ -48,10 +48,14 @@ void CommandQueue::EndOneTime(vk::CommandBuffer command_buffer) const
 }
 
 void CommandQueue::CopyBuffer(
-    vk::Buffer src, vk::Buffer dst, vk::DeviceSize size) const
+    vk::Buffer src,
+    vk::Buffer dst,
+    vk::DeviceSize size,
+    vk::DeviceSize src_offset,
+    vk::DeviceSize dst_offset) const
 {
     auto command_buffer = BeginOneTime();
-    vk::BufferCopy copy_region(0, 0, size);
+    vk::BufferCopy copy_region(src_offset, dst_offset, size);
     command_buffer.copyBuffer(src, dst, copy_region);
     EndOneTime(command_buffer);
 }

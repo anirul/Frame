@@ -168,8 +168,12 @@ class Device : public DeviceInterface
     void DestroyDescriptorResources();
     void UpdateRaytraceBuffers();
     bool UpdateAggregateRaytracingSceneBuffers(bool build_software_bvh);
+    bool UpdateHardwareRaytracingAggregateSceneBuffers(
+        const std::vector<EntityId>& updated_source_triangle_buffer_ids);
     void UpdateHardwareRaytracingScene();
     bool UpdateHardwareRaytracingDynamicGeometry();
+    bool UpdateHardwareRaytracingDynamicGeometry(
+        const std::vector<EntityId>& updated_source_triangle_buffer_ids);
     bool UpdateHardwareRaytracingTransforms(bool force_tlas_update = false);
     void RebuildHardwareRaytracingTlas();
     void UpdateHardwareRaytracingDescriptor();
@@ -296,6 +300,7 @@ class Device : public DeviceInterface
         std::uint32_t instance_custom_index = 0;
         std::uint32_t material_id = 0;
         std::uint32_t triangle_offset = 0;
+        EntityId source_material_id = NullId;
     };
     std::vector<HardwareRaytracingGeometry> hardware_raytracing_geometries_;
     bool hardware_raytracing_uses_source_instances_ = false;

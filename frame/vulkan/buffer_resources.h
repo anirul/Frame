@@ -39,6 +39,10 @@ class BufferResourceManager
     bool UpdateStorageBuffer(
         const std::string& name,
         const std::vector<std::uint8_t>& bytes);
+    bool UpdateStorageBufferRange(
+        const std::string& name,
+        const std::vector<std::uint8_t>& bytes,
+        std::size_t offset_bytes);
     void BuildUniformBuffers(
         std::size_t count,
         vk::DeviceSize size_bytes);

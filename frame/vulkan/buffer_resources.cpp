@@ -216,6 +216,58 @@ bool BufferResourceManager::UpdateStorageBuffer(
     return true;
 }
 
+bool BufferResourceManager::UpdateStorageBufferRange(
+    const std::string& name,
+    const std::vector<std::uint8_t>& bytes,
+    std::size_t offset_bytes)
+{
+    if (bytes.empty())
+    {
+        return false;
+    }
+    auto it = storage_buffer_indices_.find(name);
+    if (it == storage_buffer_indices_.end())
+    {
+        return false;
+    }
+    auto& resource = storage_buffers_[it->second];
+    if (!resource.buffer || resource.size == 0)
+    {
+        return false;
+    }
+    if (offset_bytes > static_cast<std::size_t>(resource.size) ||
+        bytes.size() >
+            static_cast<std::size_t>(resource.size) - offset_bytes)
+    {
+        (*logger_)->warn(
+            "Storage buffer '{}' range update [{}..{}) exceeds resource size {}.",
+            name,
+            offset_bytes,
+            offset_bytes + bytes.size(),
+            static_cast<std::size_t>(resource.size));
+        return false;
+    }
+
+    vk::UniqueDeviceMemory staging_memory;
+    auto staging_buffer = memory_manager_->CreateBuffer(
+        bytes.size(),
+        vk::BufferUsageFlagBits::eTransferSrc,
+        vk::MemoryPropertyFlagBits::eHostVisible |
+            vk::MemoryPropertyFlagBits::eHostCoherent,
+        staging_memory);
+    void* mapped = device_.mapMemory(
+        *staging_memory, 0, bytes.size());
+    std::memcpy(mapped, bytes.data(), bytes.size());
+    device_.unmapMemory(*staging_memory);
+    command_queue_->CopyBuffer(
+        *staging_buffer,
+        *resource.buffer,
+        static_cast<vk::DeviceSize>(bytes.size()),
+        0,
+        static_cast<vk::DeviceSize>(offset_bytes));
+    return true;
+}
+
 void BufferResourceManager::BuildUniformBuffers(
     std::size_t count,
     vk::DeviceSize size_bytes)
