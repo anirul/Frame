@@ -229,10 +229,11 @@ void SwapchainResources::Create(glm::uvec2 size)
     }
 
     logger_->info(
-        "Created Vulkan swapchain ({}x{}, {} images).",
+        "Created Vulkan swapchain ({}x{}, {} images, present mode {}).",
         extent_.width,
         extent_.height,
-        static_cast<unsigned int>(images_.size()));
+        static_cast<unsigned int>(images_.size()),
+        vk::to_string(present_mode));
 }
 
 void SwapchainResources::Destroy()
@@ -280,6 +281,13 @@ vk::PresentModeKHR SwapchainResources::SelectPresentMode(
     for (const auto& mode : modes)
     {
         if (mode == vk::PresentModeKHR::eMailbox)
+        {
+            return mode;
+        }
+    }
+    for (const auto& mode : modes)
+    {
+        if (mode == vk::PresentModeKHR::eImmediate)
         {
             return mode;
         }

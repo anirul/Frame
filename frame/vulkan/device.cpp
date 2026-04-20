@@ -56,6 +56,12 @@ namespace
 
 constexpr std::uint32_t kHardwareRaytracingAsBinding = 32;
 
+vk::BuildAccelerationStructureFlagsKHR GetHardwareRaytracingBuildFlags()
+{
+    return vk::BuildAccelerationStructureFlagBitsKHR::ePreferFastTrace |
+           vk::BuildAccelerationStructureFlagBitsKHR::eAllowUpdate;
+}
+
 const char* BoolToString(bool value)
 {
     return value ? "on" : "off";
@@ -466,33 +472,10 @@ std::size_t BuildRaytracingSourceStateHash(
 
 bool RaytraceSceneRequiresWorldSpaceBuffers(frame::LevelInterface& level)
 {
-    for (const auto& [node_id, material_id] :
-         GetRaytracingSourceMeshMaterials(level))
-    {
-        (void)material_id;
-        auto* node =
-            dynamic_cast<frame::NodeMesh*>(&level.GetSceneNodeFromId(node_id));
-        if (!node)
-        {
-            continue;
-        }
-        const auto mesh_id = node->GetLocalMesh();
-        if (!mesh_id)
-        {
-            continue;
-        }
-        auto* skinned_mesh = dynamic_cast<frame::vulkan::SkinnedMesh*>(
-            &level.GetMeshFromId(mesh_id));
-        if (!skinned_mesh)
-        {
-            continue;
-        }
-        if (skinned_mesh->HasActiveRaytraceTriangleCallback() ||
-            skinned_mesh->HasActiveRaytraceBvhCallback())
-        {
-            return true;
-        }
-    }
+    // Vulkan raytracing paths can keep dynamic skinned meshes in object space
+    // and update BLAS/TLAS data directly. Software BVH builds still request
+    // world-space triangles separately via the build_software_bvh flag.
+    (void)level;
     return false;
 }
 
@@ -2148,7 +2131,10 @@ void Device::UpdateRaytraceBuffers()
         {
             if (updated_aggregate_scene)
             {
-                UpdateHardwareRaytracingScene();
+                if (!UpdateHardwareRaytracingDynamicGeometry())
+                {
+                    UpdateHardwareRaytracingScene();
+                }
             }
             else
             {
@@ -2352,13 +2338,158 @@ bool Device::UpdateHardwareRaytracingInstanceStorageBuffer()
     return true;
 }
 
+bool Device::UpdateHardwareRaytracingDynamicGeometry()
+{
+    if (!use_hardware_raytracing_ || !vk_unique_device_ || !level_ ||
+        !gpu_memory_manager_ || !command_queue_ ||
+        hardware_raytracing_geometries_.empty() || !hardware_raytracing_tlas_ ||
+        !hardware_raytracing_uses_source_instances_)
+    {
+        return false;
+    }
+
+    const auto source_geometries = BuildRaytracingSourceGeometryData(
+        *level_,
+        static_cast<double>(elapsed_time_seconds_),
+        false);
+    if (source_geometries.size() != hardware_raytracing_geometries_.size())
+    {
+        return false;
+    }
+
+    const auto build_scratch_address =
+        [&](vk::DeviceSize size,
+            vk::UniqueBuffer& scratch_buffer,
+            vk::UniqueDeviceMemory& scratch_memory) {
+            scratch_buffer = gpu_memory_manager_->CreateBuffer(
+                size,
+                vk::BufferUsageFlagBits::eStorageBuffer |
+                    vk::BufferUsageFlagBits::eShaderDeviceAddress,
+                vk::MemoryPropertyFlagBits::eDeviceLocal,
+                scratch_memory,
+                vk::MemoryAllocateFlagBits::eDeviceAddress);
+            return vk_unique_device_->getBufferAddress(
+                vk::BufferDeviceAddressInfo(*scratch_buffer));
+        };
+
+    const auto update_blas =
+        [&](HardwareRaytracingGeometry& geometry,
+            const RaytracingSourceGeometryData& source_geometry) {
+            if (!geometry.blas || !geometry.vertex_buffer || !geometry.index_buffer)
+            {
+                return false;
+            }
+            if (geometry.source_node_id != source_geometry.source_node_id ||
+                geometry.source_buffer_id != source_geometry.triangle_buffer_id ||
+                geometry.material_id != source_geometry.material_id ||
+                geometry.triangle_offset != source_geometry.triangle_offset)
+            {
+                return false;
+            }
+
+            const auto& triangle_bytes = source_geometry.triangle_bytes;
+            if (triangle_bytes.size() !=
+                static_cast<std::size_t>(geometry.vertex_buffer_size))
+            {
+                return false;
+            }
+
+            const auto vertex_count = static_cast<std::uint32_t>(
+                triangle_bytes.size() / kRaytraceTriangleVertexStrideBytes);
+            const auto primitive_count = vertex_count / 3u;
+            if (vertex_count != geometry.vertex_count ||
+                primitive_count != geometry.triangle_count)
+            {
+                return false;
+            }
+
+            UploadDeviceLocalBuffer(
+                *vk_unique_device_,
+                *gpu_memory_manager_,
+                *command_queue_,
+                triangle_bytes,
+                *geometry.vertex_buffer);
+
+            const auto vertex_address = vk_unique_device_->getBufferAddress(
+                vk::BufferDeviceAddressInfo(*geometry.vertex_buffer));
+            const auto index_address = vk_unique_device_->getBufferAddress(
+                vk::BufferDeviceAddressInfo(*geometry.index_buffer));
+
+            vk::AccelerationStructureGeometryTrianglesDataKHR triangles(
+                vk::Format::eR32G32B32Sfloat,
+                vk::DeviceOrHostAddressConstKHR(vertex_address),
+                kRaytraceTriangleVertexStrideBytes,
+                geometry.vertex_count,
+                vk::IndexType::eUint32,
+                vk::DeviceOrHostAddressConstKHR(index_address));
+            vk::AccelerationStructureGeometryDataKHR geometry_data;
+            geometry_data.setTriangles(triangles);
+            vk::AccelerationStructureGeometryKHR as_geometry(
+                vk::GeometryTypeKHR::eTriangles);
+            as_geometry.setGeometry(geometry_data);
+            as_geometry.setFlags(vk::GeometryFlagBitsKHR::eOpaque);
+
+            vk::AccelerationStructureBuildGeometryInfoKHR build_info(
+                vk::AccelerationStructureTypeKHR::eBottomLevel,
+                GetHardwareRaytracingBuildFlags(),
+                vk::BuildAccelerationStructureModeKHR::eUpdate,
+                {},
+                {},
+                as_geometry);
+            build_info.setSrcAccelerationStructure(*geometry.blas);
+            build_info.setDstAccelerationStructure(*geometry.blas);
+
+            const auto size_info =
+                vk_unique_device_->getAccelerationStructureBuildSizesKHR(
+                    vk::AccelerationStructureBuildTypeKHR::eDevice,
+                    build_info,
+                    geometry.triangle_count);
+
+            vk::UniqueBuffer scratch_buffer;
+            vk::UniqueDeviceMemory scratch_memory;
+            const auto scratch_address = build_scratch_address(
+                std::max(
+                    size_info.buildScratchSize,
+                    size_info.updateScratchSize),
+                scratch_buffer,
+                scratch_memory);
+
+            build_info.setScratchData(
+                vk::DeviceOrHostAddressKHR(scratch_address));
+            vk::AccelerationStructureBuildRangeInfoKHR range_info(
+                geometry.triangle_count,
+                0,
+                0,
+                0);
+            const vk::AccelerationStructureBuildRangeInfoKHR* range_infos[] = {
+                &range_info};
+            command_queue_->SubmitOneTime(
+                [&](vk::CommandBuffer command_buffer) {
+                    command_buffer.buildAccelerationStructuresKHR(
+                        build_info,
+                        range_infos);
+                });
+            return true;
+        };
+
+    for (std::size_t i = 0; i < hardware_raytracing_geometries_.size(); ++i)
+    {
+        if (!update_blas(hardware_raytracing_geometries_[i], source_geometries[i]))
+        {
+            return false;
+        }
+    }
+
+    return UpdateHardwareRaytracingTransforms(true);
+}
+
 void Device::UpdateHardwareRaytracingScene()
 {
     CreateHardwareRaytracingScene();
     UpdateHardwareRaytracingDescriptor();
 }
 
-bool Device::UpdateHardwareRaytracingTransforms()
+bool Device::UpdateHardwareRaytracingTransforms(bool force_tlas_update)
 {
     if (!use_hardware_raytracing_ || !vk_unique_device_ || !level_ ||
         hardware_raytracing_geometries_.empty() || !hardware_raytracing_tlas_ ||
@@ -2414,7 +2545,12 @@ bool Device::UpdateHardwareRaytracingTransforms()
         UpdateHardwareRaytracingInstanceStorageBuffer();
     if (hardware_raytracing_instance_bytes_ == bytes)
     {
-        return storage_buffer_changed;
+        if (!force_tlas_update)
+        {
+            return storage_buffer_changed;
+        }
+        RebuildHardwareRaytracingTlas();
+        return true;
     }
 
     if (sync_resources_ && sync_resources_->IsCreated())
@@ -2506,11 +2642,12 @@ void Device::RebuildHardwareRaytracingTlas()
 
     vk::AccelerationStructureBuildGeometryInfoKHR tlas_build_info(
         vk::AccelerationStructureTypeKHR::eTopLevel,
-        vk::BuildAccelerationStructureFlagBitsKHR::ePreferFastTrace,
-        vk::BuildAccelerationStructureModeKHR::eBuild,
+        GetHardwareRaytracingBuildFlags(),
+        vk::BuildAccelerationStructureModeKHR::eUpdate,
         {},
         {},
         tlas_geometry);
+    tlas_build_info.setSrcAccelerationStructure(*hardware_raytracing_tlas_);
     const auto tlas_size = vk_unique_device_->getAccelerationStructureBuildSizesKHR(
         vk::AccelerationStructureBuildTypeKHR::eDevice,
         tlas_build_info,
@@ -2518,7 +2655,7 @@ void Device::RebuildHardwareRaytracingTlas()
     vk::UniqueBuffer tlas_scratch_buffer;
     vk::UniqueDeviceMemory tlas_scratch_memory;
     const auto tlas_scratch_address = build_scratch_address(
-        tlas_size.buildScratchSize,
+        std::max(tlas_size.buildScratchSize, tlas_size.updateScratchSize),
         tlas_scratch_buffer,
         tlas_scratch_memory);
     tlas_build_info.setDstAccelerationStructure(*hardware_raytracing_tlas_);
@@ -2978,6 +3115,7 @@ void Device::CreateHardwareRaytracingScene()
     std::vector<vk::AccelerationStructureInstanceKHR> instances = {};
     const bool use_source_instances =
         !RaytraceSceneRequiresWorldSpaceBuffers(*level_);
+    hardware_raytracing_uses_source_instances_ = use_source_instances;
     const auto source_geometries = use_source_instances
         ? BuildRaytracingSourceGeometryData(
               *level_,
@@ -3046,7 +3184,7 @@ void Device::CreateHardwareRaytracingScene()
 
             vk::AccelerationStructureBuildGeometryInfoKHR build_info(
                 vk::AccelerationStructureTypeKHR::eBottomLevel,
-                vk::BuildAccelerationStructureFlagBitsKHR::ePreferFastTrace,
+                GetHardwareRaytracingBuildFlags(),
                 vk::BuildAccelerationStructureModeKHR::eBuild,
                 {},
                 {},
@@ -3188,7 +3326,7 @@ void Device::CreateHardwareRaytracingScene()
 
             vk::AccelerationStructureBuildGeometryInfoKHR build_info(
                 vk::AccelerationStructureTypeKHR::eBottomLevel,
-                vk::BuildAccelerationStructureFlagBitsKHR::ePreferFastTrace,
+                GetHardwareRaytracingBuildFlags(),
                 vk::BuildAccelerationStructureModeKHR::eBuild,
                 {},
                 {},
@@ -3264,6 +3402,7 @@ void Device::CreateHardwareRaytracingScene()
     if (instances.empty())
     {
         use_hardware_raytracing_ = false;
+        hardware_raytracing_uses_source_instances_ = false;
         logger_->warn(
             "No eligible meshes found for Vulkan hardware raytracing; falling back to software traversal.");
         return;
@@ -3310,7 +3449,7 @@ void Device::CreateHardwareRaytracingScene()
 
     vk::AccelerationStructureBuildGeometryInfoKHR tlas_build_info(
         vk::AccelerationStructureTypeKHR::eTopLevel,
-        vk::BuildAccelerationStructureFlagBitsKHR::ePreferFastTrace,
+        GetHardwareRaytracingBuildFlags(),
         vk::BuildAccelerationStructureModeKHR::eBuild,
         {},
         {},
@@ -3368,6 +3507,7 @@ void Device::DestroyHardwareRaytracingScene()
     hardware_raytracing_instance_memory_.reset();
     hardware_raytracing_instance_bytes_.clear();
     hardware_raytracing_geometries_.clear();
+    hardware_raytracing_uses_source_instances_ = false;
 }
 
 void Device::CreateComputeOutputImage()

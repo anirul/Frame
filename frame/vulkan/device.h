@@ -169,7 +169,8 @@ class Device : public DeviceInterface
     void UpdateRaytraceBuffers();
     bool UpdateAggregateRaytracingSceneBuffers(bool build_software_bvh);
     void UpdateHardwareRaytracingScene();
-    bool UpdateHardwareRaytracingTransforms();
+    bool UpdateHardwareRaytracingDynamicGeometry();
+    bool UpdateHardwareRaytracingTransforms(bool force_tlas_update = false);
     void RebuildHardwareRaytracingTlas();
     void UpdateHardwareRaytracingDescriptor();
     bool UpdateHardwareRaytracingInstanceStorageBuffer();
@@ -297,6 +298,7 @@ class Device : public DeviceInterface
         std::uint32_t triangle_offset = 0;
     };
     std::vector<HardwareRaytracingGeometry> hardware_raytracing_geometries_;
+    bool hardware_raytracing_uses_source_instances_ = false;
     vk::UniqueBuffer hardware_raytracing_instance_buffer_;
     vk::UniqueDeviceMemory hardware_raytracing_instance_memory_;
     std::vector<std::uint8_t> hardware_raytracing_instance_bytes_;
