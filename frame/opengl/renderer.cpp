@@ -122,8 +122,9 @@ bool RaytraceSceneRequiresWorldSpaceBuffers(frame::LevelInterface& level)
         {
             continue;
         }
-        if (skinned_mesh->HasSkinning() ||
-            skinned_mesh->HasRaytraceTriangleCallback())
+        if (skinned_mesh->HasActiveSkinning() ||
+            skinned_mesh->HasActiveRaytraceTriangleCallback() ||
+            skinned_mesh->HasActiveRaytraceBvhCallback())
         {
             return true;
         }
@@ -699,7 +700,7 @@ void Renderer::UpdateRaytraceBuffersIfNeeded(SkinnedMesh& skinned_mesh)
 {
     const double skinning_time = skinned_mesh.GetSkinningTime(delta_time_);
 
-    if (skinned_mesh.HasRaytraceTriangleCallback())
+    if (skinned_mesh.HasActiveRaytraceTriangleCallback())
     {
         const EntityId triangle_buffer_id = skinned_mesh.GetTriangleBufferId();
         if (triangle_buffer_id)
@@ -715,7 +716,7 @@ void Renderer::UpdateRaytraceBuffersIfNeeded(SkinnedMesh& skinned_mesh)
         }
     }
 
-    if (skinned_mesh.HasRaytraceBvhCallback())
+    if (skinned_mesh.HasActiveRaytraceBvhCallback())
     {
         const EntityId bvh_buffer_id = skinned_mesh.GetBvhBufferId();
         if (bvh_buffer_id)
@@ -979,7 +980,7 @@ void Renderer::RenderMesh(
     program.Use(uniform_collection_wrapper, &level_);
     int skinning_enabled = 0;
     auto& gl_program = dynamic_cast<opengl::Program&>(program);
-    if (gl_skinned_mesh && gl_skinned_mesh->HasSkinning())
+    if (gl_skinned_mesh && gl_skinned_mesh->HasActiveSkinning())
     {
         const double skinning_time =
             gl_skinned_mesh->GetSkinningTime(delta_time_);

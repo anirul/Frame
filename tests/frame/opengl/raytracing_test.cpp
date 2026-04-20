@@ -19,6 +19,28 @@ namespace test
 namespace
 {
 
+frame::proto::Level LoadLevelProtoWithFoxAnimationEnabled(bool enabled)
+{
+    auto level_proto = frame::json::LoadLevelProto(
+        frame::file::FindFile("asset/json/skinned_mesh.json"));
+    auto* scene_tree = level_proto.mutable_scene_tree();
+    for (auto& node_mesh : *scene_tree->mutable_node_meshes())
+    {
+        if (node_mesh.name() != "FoxMesh")
+        {
+            continue;
+        }
+        node_mesh.set_play_animation(enabled);
+        if (!enabled)
+        {
+            node_mesh.clear_animation_speed();
+            node_mesh.clear_animation_clip_name();
+            node_mesh.clear_animation_clip_index();
+        }
+    }
+    return level_proto;
+}
+
 struct RaytraceVertex
 {
     float px;
@@ -914,6 +936,44 @@ TEST_F(OpenGLRayTracingLevelTest, SkinnedMeshPreRenderUpdatesAggregateSceneBuffe
 
     EXPECT_NE(triangle_buffer->GetRawData(), triangles_before);
     EXPECT_NE(bvh_buffer->GetRawData(), bvh_before);
+}
+
+TEST_F(OpenGLRayTracingLevelTest, SkinnedMeshBindPoseDoesNotUpdateAggregateSceneBuffers)
+{
+    auto level = frame::json::ParseLevel(
+        {1280u, 720u},
+        LoadLevelProtoWithFoxAnimationEnabled(false));
+    ASSERT_NE(level, nullptr);
+
+    const auto material_id = level->GetIdFromName("RayTraceMaterial");
+    ASSERT_NE(material_id, frame::NullId);
+    const auto& material = level->GetMaterialFromId(material_id);
+
+    const auto triangle_id = FindBufferByInnerName(
+        *level, material, "TriangleBufferOpaque");
+    const auto bvh_id = FindBufferByInnerName(
+        *level, material, "BvhBufferOpaque");
+    ASSERT_NE(triangle_id, frame::NullId);
+    ASSERT_NE(bvh_id, frame::NullId);
+
+    auto* triangle_buffer = dynamic_cast<frame::opengl::Buffer*>(
+        &level->GetBufferFromId(triangle_id));
+    auto* bvh_buffer = dynamic_cast<frame::opengl::Buffer*>(
+        &level->GetBufferFromId(bvh_id));
+    ASSERT_NE(triangle_buffer, nullptr);
+    ASSERT_NE(bvh_buffer, nullptr);
+
+    const auto triangles_before = triangle_buffer->GetRawData();
+    const auto bvh_before = bvh_buffer->GetRawData();
+
+    frame::opengl::Renderer renderer(
+        *level,
+        glm::uvec4(0, 0, 1280, 720));
+    renderer.SetDeltaTime(0.35);
+    renderer.PreRender();
+
+    EXPECT_EQ(triangle_buffer->GetRawData(), triangles_before);
+    EXPECT_EQ(bvh_buffer->GetRawData(), bvh_before);
 }
 
 TEST_F(OpenGLRayTracingLevelTest, SkinnedMeshSceneMaterialUsesImportedFoxTextures)

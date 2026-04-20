@@ -57,6 +57,28 @@ bool EndsWith(const std::string& value, const std::string& suffix)
     return value.compare(value.size() - suffix.size(), suffix.size(), suffix) == 0;
 }
 
+frame::proto::Level LoadSkinnedMeshLevelProtoWithFoxAnimationEnabled(bool enabled)
+{
+    auto level_proto = frame::json::LoadLevelProto(
+        frame::file::FindFile("asset/json/skinned_mesh.json"));
+    auto* scene_tree = level_proto.mutable_scene_tree();
+    for (auto& node_mesh : *scene_tree->mutable_node_meshes())
+    {
+        if (node_mesh.name() != "FoxMesh")
+        {
+            continue;
+        }
+        node_mesh.set_play_animation(enabled);
+        if (!enabled)
+        {
+            node_mesh.clear_animation_speed();
+            node_mesh.clear_animation_clip_name();
+            node_mesh.clear_animation_clip_index();
+        }
+    }
+    return level_proto;
+}
+
 const frame::json::ProgramInfo* FindProgramInfoByName(
     const frame::json::LevelData& level_data,
     const std::string& name)
@@ -776,6 +798,42 @@ TEST_F(VulkanSkinnedRayTracingParseTest, FoxAnimationChangesRaytraceTriangles)
         }
     }
     EXPECT_TRUE(found_difference);
+}
+
+TEST_F(VulkanSkinnedRayTracingParseTest, FoxBindPoseDisablesDynamicRaytraceCallbacks)
+{
+    auto level_proto = LoadSkinnedMeshLevelProtoWithFoxAnimationEnabled(false);
+    auto level_data = frame::json::ParseLevelData(
+        glm::uvec2(512, 288),
+        level_proto,
+        asset_root_);
+    auto built = frame::vulkan::BuildLevel(
+        glm::uvec2(512, 288),
+        level_data,
+        {.prefer_hardware_raytracing = true});
+    ASSERT_NE(built.level, nullptr);
+    auto& level = *built.level;
+
+    const auto fox_node_id = level.GetIdFromName("FoxMesh");
+    ASSERT_NE(fox_node_id, frame::NullId);
+    auto& fox_node = level.GetSceneNodeFromId(fox_node_id);
+    const auto fox_mesh_id = fox_node.GetLocalMesh();
+    ASSERT_NE(fox_mesh_id, frame::NullId);
+    auto* skinned_mesh = dynamic_cast<frame::vulkan::SkinnedMesh*>(
+        &level.GetMeshFromId(fox_mesh_id));
+    ASSERT_NE(skinned_mesh, nullptr);
+
+    EXPECT_FALSE(skinned_mesh->IsSkinningAnimationEnabled());
+    EXPECT_TRUE(skinned_mesh->HasRaytraceTriangleCallback());
+    EXPECT_FALSE(skinned_mesh->HasActiveRaytraceTriangleCallback());
+    EXPECT_FALSE(skinned_mesh->HasActiveRaytraceBvhCallback());
+
+    const auto triangles_at_start =
+        skinned_mesh->EvaluateRaytraceTriangles(skinned_mesh->GetSkinningTime(0.0));
+    const auto triangles_later =
+        skinned_mesh->EvaluateRaytraceTriangles(skinned_mesh->GetSkinningTime(0.35));
+    ASSERT_FALSE(triangles_at_start.empty());
+    EXPECT_EQ(triangles_at_start, triangles_later);
 }
 
 TEST_F(VulkanSkinnedRayTracingParseTest, SceneMaterialUsesImportedFoxTextures)

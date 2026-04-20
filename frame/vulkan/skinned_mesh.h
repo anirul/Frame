@@ -80,6 +80,11 @@ class SkinnedMesh : public StaticMesh
         return static_cast<bool>(raytrace_triangle_callback_);
     }
 
+    bool HasActiveRaytraceTriangleCallback() const
+    {
+        return HasRaytraceTriangleCallback() && skinning_animation_enabled_;
+    }
+
     std::vector<float> EvaluateRaytraceTriangles(double time_s) const
     {
         if (!raytrace_triangle_callback_)
@@ -98,6 +103,11 @@ class SkinnedMesh : public StaticMesh
     bool HasRaytraceBvhCallback() const
     {
         return static_cast<bool>(raytrace_bvh_callback_);
+    }
+
+    bool HasActiveRaytraceBvhCallback() const
+    {
+        return HasRaytraceBvhCallback() && skinning_animation_enabled_;
     }
 
     std::vector<BVHNode> EvaluateRaytraceBvh(double time_s) const

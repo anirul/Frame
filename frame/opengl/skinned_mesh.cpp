@@ -109,6 +109,11 @@ bool SkinnedMesh::HasSkinning() const
     return static_cast<bool>(skinning_callback_);
 }
 
+bool SkinnedMesh::HasActiveSkinning() const
+{
+    return HasSkinning() && skinning_animation_enabled_;
+}
+
 bool SkinnedMesh::IsSkinningAnimationEnabled() const
 {
     return skinning_animation_enabled_;
@@ -152,6 +157,11 @@ bool SkinnedMesh::HasRaytraceTriangleCallback() const
     return static_cast<bool>(raytrace_triangle_callback_);
 }
 
+bool SkinnedMesh::HasActiveRaytraceTriangleCallback() const
+{
+    return HasRaytraceTriangleCallback() && skinning_animation_enabled_;
+}
+
 std::vector<float> SkinnedMesh::EvaluateRaytraceTriangles(double time_s) const
 {
     if (!raytrace_triangle_callback_)
@@ -164,6 +174,11 @@ std::vector<float> SkinnedMesh::EvaluateRaytraceTriangles(double time_s) const
 bool SkinnedMesh::HasRaytraceBvhCallback() const
 {
     return static_cast<bool>(raytrace_bvh_callback_);
+}
+
+bool SkinnedMesh::HasActiveRaytraceBvhCallback() const
+{
+    return HasRaytraceBvhCallback() && skinning_animation_enabled_;
 }
 
 std::vector<BVHNode> SkinnedMesh::EvaluateRaytraceBvh(double time_s) const
