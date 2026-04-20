@@ -42,6 +42,7 @@ class SkinnedMesh : public Mesh
         std::function<std::vector<BVHNode>(double)> callback);
 
     bool HasSkinning() const;
+    bool HasActiveSkinning() const;
     bool IsSkinningAnimationEnabled() const;
     float GetSkinningAnimationSpeed() const;
     const std::string& GetSkinningAnimationClipName() const;
@@ -49,8 +50,10 @@ class SkinnedMesh : public Mesh
     double GetSkinningTime(double time_s) const;
     std::vector<glm::mat4> EvaluateSkinning(double time_s) const;
     bool HasRaytraceTriangleCallback() const;
+    bool HasActiveRaytraceTriangleCallback() const;
     std::vector<float> EvaluateRaytraceTriangles(double time_s) const;
     bool HasRaytraceBvhCallback() const;
+    bool HasActiveRaytraceBvhCallback() const;
     std::vector<BVHNode> EvaluateRaytraceBvh(double time_s) const;
 
   private:

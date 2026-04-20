@@ -487,8 +487,8 @@ bool RaytraceSceneRequiresWorldSpaceBuffers(frame::LevelInterface& level)
         {
             continue;
         }
-        if (skinned_mesh->IsSkinningAnimationEnabled() ||
-            skinned_mesh->HasRaytraceTriangleCallback())
+        if (skinned_mesh->HasActiveRaytraceTriangleCallback() ||
+            skinned_mesh->HasActiveRaytraceBvhCallback())
         {
             return true;
         }
@@ -2074,7 +2074,8 @@ void Device::UpdateRaytraceBuffers()
             static_cast<double>(elapsed_time_seconds_));
 
         const auto triangle_buffer_id = skinned_mesh->GetTriangleBufferId();
-        if (triangle_buffer_id && skinned_mesh->HasRaytraceTriangleCallback())
+        if (triangle_buffer_id &&
+            skinned_mesh->HasActiveRaytraceTriangleCallback())
         {
             auto triangles = skinned_mesh->EvaluateRaytraceTriangles(skinning_time);
             if (!triangles.empty())
@@ -2118,7 +2119,7 @@ void Device::UpdateRaytraceBuffers()
         }
 
         const auto bvh_buffer_id = skinned_mesh->GetBvhBufferId();
-        if (bvh_buffer_id && skinned_mesh->HasRaytraceBvhCallback())
+        if (bvh_buffer_id && skinned_mesh->HasActiveRaytraceBvhCallback())
         {
             auto bvh_nodes = skinned_mesh->EvaluateRaytraceBvh(skinning_time);
             if (!bvh_nodes.empty())

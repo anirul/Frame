@@ -89,8 +89,9 @@ bool RaytraceSceneRequiresWorldSpaceBuffers(frame::LevelInterface& level)
         {
             continue;
         }
-        if (skinned_mesh->HasSkinning() ||
-            skinned_mesh->HasRaytraceTriangleCallback())
+        if (skinned_mesh->HasActiveSkinning() ||
+            skinned_mesh->HasActiveRaytraceTriangleCallback() ||
+            skinned_mesh->HasActiveRaytraceBvhCallback())
         {
             return true;
         }
