@@ -34,7 +34,12 @@ class CommandQueue
         }
     }
 
-    void CopyBuffer(vk::Buffer src, vk::Buffer dst, vk::DeviceSize size) const;
+    void CopyBuffer(
+        vk::Buffer src,
+        vk::Buffer dst,
+        vk::DeviceSize size,
+        vk::DeviceSize src_offset = 0,
+        vk::DeviceSize dst_offset = 0) const;
     void CopyBufferToImage(
         vk::Buffer buffer,
         vk::Image image,

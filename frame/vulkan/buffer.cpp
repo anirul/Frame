@@ -116,6 +116,27 @@ void Buffer::Copy(const std::vector<std::uint8_t>& vector) const
     IncrementGeneration(generation_);
 }
 
+bool Buffer::CopyRange(
+    std::size_t offset,
+    const std::vector<std::uint8_t>& vector) const
+{
+    if (vector.empty())
+    {
+        return false;
+    }
+    if (offset > data_.size() || vector.size() > data_.size() - offset)
+    {
+        throw std::out_of_range("Buffer::CopyRange exceeds destination size.");
+    }
+    if (std::memcmp(data_.data() + offset, vector.data(), vector.size()) == 0)
+    {
+        return false;
+    }
+    std::memcpy(data_.data() + offset, vector.data(), vector.size());
+    IncrementGeneration(generation_);
+    return true;
+}
+
 void Buffer::Clear() const
 {
     const bool already_zero = std::all_of(

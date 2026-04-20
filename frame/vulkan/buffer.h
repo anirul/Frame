@@ -20,6 +20,9 @@ class Buffer : public frame::BufferInterface
     void Copy(const std::vector<float>& vector) const override;
     void Copy(const std::vector<std::uint32_t>& vector) const override;
     void Copy(const std::vector<std::uint8_t>& vector) const override;
+    bool CopyRange(
+        std::size_t offset,
+        const std::vector<std::uint8_t>& vector) const;
     void Clear() const override;
     std::size_t GetSize() const override;
     void BindBase(int /*binding*/) const override
