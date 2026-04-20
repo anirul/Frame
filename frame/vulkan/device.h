@@ -36,6 +36,15 @@ class SyncResources;
 class Texture;
 class TextureResources;
 struct SceneState;
+struct RaytracingSourceGeometryData
+{
+    EntityId source_node_id = NullId;
+    EntityId triangle_buffer_id = NullId;
+    EntityId source_material_id = NullId;
+    std::uint32_t material_id = 0;
+    std::uint32_t triangle_offset = 0;
+    std::vector<std::uint8_t> triangle_bytes = {};
+};
 
 /**
  * @class Device
@@ -170,10 +179,16 @@ class Device : public DeviceInterface
     bool UpdateAggregateRaytracingSceneBuffers(bool build_software_bvh);
     bool UpdateHardwareRaytracingAggregateSceneBuffers(
         const std::vector<EntityId>& updated_source_triangle_buffer_ids);
+    bool UpdateHardwareRaytracingAggregateSceneBuffers(
+        const std::vector<EntityId>& updated_source_triangle_buffer_ids,
+        const std::vector<RaytracingSourceGeometryData>& prepared_source_geometries);
     void UpdateHardwareRaytracingScene();
     bool UpdateHardwareRaytracingDynamicGeometry();
     bool UpdateHardwareRaytracingDynamicGeometry(
         const std::vector<EntityId>& updated_source_triangle_buffer_ids);
+    bool UpdateHardwareRaytracingDynamicGeometry(
+        const std::vector<EntityId>& updated_source_triangle_buffer_ids,
+        const std::vector<RaytracingSourceGeometryData>& prepared_source_geometries);
     bool UpdateHardwareRaytracingTransforms(bool force_tlas_update = false);
     void RebuildHardwareRaytracingTlas();
     void UpdateHardwareRaytracingDescriptor();
