@@ -1,0 +1,112 @@
+#version 460
+
+layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
+
+struct SourceVertex
+{
+    vec4 position;
+    vec4 normal;
+    vec4 uv;
+    uvec4 bone_indices;
+    vec4 bone_weights;
+};
+
+struct OutputVertex
+{
+    vec4 position_color0;
+    vec4 normal_color1;
+    vec4 uv_color23;
+};
+
+layout(std430, set = 0, binding = 0) readonly buffer SourceVertexBuffer
+{
+    SourceVertex source_vertices[];
+};
+
+layout(std430, set = 0, binding = 1) readonly buffer SourceIndexBuffer
+{
+    uint source_indices[];
+};
+
+layout(std430, set = 0, binding = 2) readonly buffer BoneMatrixBuffer
+{
+    mat4 bone_matrices[];
+};
+
+layout(std430, set = 0, binding = 3) writeonly buffer OutputVertexBuffer
+{
+    OutputVertex output_vertices[];
+};
+
+layout(push_constant, std430) uniform PushConstants
+{
+    uint output_vertex_count;
+    uint pad0;
+    uint pad1;
+    uint pad2;
+    vec4 color_multiplier;
+} pc;
+
+mat4 BuildSkinMatrix(const SourceVertex source_vertex)
+{
+    mat4 skin_matrix = mat4(0.0);
+    float weight_sum = 0.0;
+    const uint bone_count = uint(bone_matrices.length());
+    for (uint slot = 0u; slot < 4u; ++slot)
+    {
+        const float weight = source_vertex.bone_weights[slot];
+        if (weight <= 0.0)
+        {
+            continue;
+        }
+
+        const uint bone_index = source_vertex.bone_indices[slot];
+        if (bone_index >= bone_count)
+        {
+            continue;
+        }
+
+        skin_matrix += bone_matrices[bone_index] * weight;
+        weight_sum += weight;
+    }
+
+    if (weight_sum <= 0.0)
+    {
+        return mat4(1.0);
+    }
+    return skin_matrix;
+}
+
+void main()
+{
+    const uint output_vertex_index = gl_GlobalInvocationID.x;
+    if (output_vertex_index >= pc.output_vertex_count)
+    {
+        return;
+    }
+
+    const uint source_vertex_index = source_indices[output_vertex_index];
+    const SourceVertex source_vertex = source_vertices[source_vertex_index];
+    const mat4 skin_matrix = BuildSkinMatrix(source_vertex);
+
+    const vec4 position = skin_matrix * vec4(source_vertex.position.xyz, 1.0);
+    vec3 normal = mat3(skin_matrix) * source_vertex.normal.xyz;
+    const float normal_length = length(normal);
+    if (normal_length > 1.0e-6)
+    {
+        normal /= normal_length;
+    }
+
+    OutputVertex output_vertex;
+    output_vertex.position_color0 = vec4(
+        position.xyz,
+        pc.color_multiplier.x);
+    output_vertex.normal_color1 = vec4(
+        normal,
+        pc.color_multiplier.y);
+    output_vertex.uv_color23 = vec4(
+        source_vertex.uv.xy,
+        pc.color_multiplier.z,
+        pc.color_multiplier.w);
+    output_vertices[output_vertex_index] = output_vertex;
+}
