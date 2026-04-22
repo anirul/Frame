@@ -3313,11 +3313,13 @@ bool ParseNodeMesh(
                 constexpr std::size_t kMaxBones = 128;
                 const std::size_t supported_bones =
                     std::min<std::size_t>(mesh->mNumBones, kMaxBones);
+                aiMatrix4x4 skin_global_inverse = aiMatrix4x4();
+
                 skin_animation_data = std::make_shared<SkinAnimationData>();
                 skin_animation_data->nodes = scene_nodes;
                 skin_animation_data->node_indices = scene_node_indices;
                 skin_animation_data->global_inverse_transform =
-                    scene_global_inverse;
+                    skin_global_inverse;
                 skin_animation_data->bones.resize(supported_bones);
                 skin_animation_data->clips = scene_animation_clips;
                 skin_animation_data->clip_name_to_index =

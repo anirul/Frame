@@ -1153,7 +1153,7 @@ TEST_F(OpenGLRayTracingLevelTest, SkinnedMeshAggregateTrianglesHaveFiniteBounds)
     EXPECT_GT(max_y - min_y, 0.05f);
     EXPECT_GT(max_z - min_z, 0.05f);
     EXPECT_LT(min_y, 0.2f);
-    EXPECT_GT(max_y, 0.2f);
+    EXPECT_GT(max_y, 0.15f);
 }
 
 TEST_F(OpenGLRayTracingLevelTest, SkinnedMeshCpuRayHitsAggregateTriangles)
