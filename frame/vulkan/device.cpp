@@ -21,10 +21,12 @@
 
 #include "frame/bvh.h"
 #include "frame/camera.h"
+#include "frame/common/application.h"
+#include "frame/file/image.h"
 #include "frame/json/program_key.h"
 #include "frame/level.h"
-#include "frame/common/application.h"
 #include "frame/node_mesh.h"
+#include "frame/proto/uniform.pb.h"
 #include "frame/vulkan/buffer.h"
 #include "frame/vulkan/buffer_resources.h"
 #include "frame/vulkan/build_level.h"
@@ -44,7 +46,6 @@
 #include "frame/vulkan/texture.h"
 #include "frame/vulkan/texture_resources.h"
 #include "frame/vulkan/skinned_mesh.h"
-#include "frame/proto/uniform.pb.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -75,6 +76,170 @@ double ElapsedMilliseconds(const SteadyClock::time_point& start)
     return std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(
                SteadyClock::now() - start)
         .count();
+}
+
+proto::PixelStructure PixelStructureForScreenshotFormat(vk::Format format)
+{
+    proto::PixelStructure pixel_structure = {};
+    switch (format)
+    {
+    case vk::Format::eR8G8B8Unorm:
+    case vk::Format::eR8G8B8Srgb:
+        pixel_structure.set_value(proto::PixelStructure::RGB);
+        return pixel_structure;
+    case vk::Format::eR8G8B8A8Unorm:
+    case vk::Format::eR8G8B8A8Srgb:
+        pixel_structure.set_value(proto::PixelStructure::RGB_ALPHA);
+        return pixel_structure;
+    case vk::Format::eB8G8R8Unorm:
+    case vk::Format::eB8G8R8Srgb:
+        pixel_structure.set_value(proto::PixelStructure::BGR);
+        return pixel_structure;
+    case vk::Format::eB8G8R8A8Unorm:
+    case vk::Format::eB8G8R8A8Srgb:
+        pixel_structure.set_value(proto::PixelStructure::BGR_ALPHA);
+        return pixel_structure;
+    default:
+        throw std::runtime_error(
+            "Unsupported Vulkan screenshot format: " + vk::to_string(format) +
+            ".");
+    }
+}
+
+std::uint32_t BytesPerPixelForScreenshotFormat(vk::Format format)
+{
+    switch (format)
+    {
+    case vk::Format::eR8G8B8Unorm:
+    case vk::Format::eR8G8B8Srgb:
+    case vk::Format::eB8G8R8Unorm:
+    case vk::Format::eB8G8R8Srgb:
+        return 3;
+    case vk::Format::eR8G8B8A8Unorm:
+    case vk::Format::eR8G8B8A8Srgb:
+    case vk::Format::eB8G8R8A8Unorm:
+    case vk::Format::eB8G8R8A8Srgb:
+        return 4;
+    default:
+        throw std::runtime_error(
+            "Unsupported Vulkan screenshot format: " + vk::to_string(format) +
+            ".");
+    }
+}
+
+void FlipRowsInPlace(
+    std::vector<std::uint8_t>& pixels, std::size_t row_stride)
+{
+    if (row_stride == 0)
+    {
+        return;
+    }
+
+    const auto row_count = pixels.size() / row_stride;
+    if (row_count < 2)
+    {
+        return;
+    }
+
+    std::vector<std::uint8_t> swap_buffer(row_stride);
+    for (std::size_t top = 0, bottom = row_count - 1; top < bottom;
+         ++top, --bottom)
+    {
+        auto* top_row = pixels.data() + top * row_stride;
+        auto* bottom_row = pixels.data() + bottom * row_stride;
+        std::memcpy(swap_buffer.data(), top_row, row_stride);
+        std::memcpy(top_row, bottom_row, row_stride);
+        std::memcpy(bottom_row, swap_buffer.data(), row_stride);
+    }
+}
+
+std::vector<std::uint8_t> ReadScreenshotPixels(
+    vk::Device device,
+    frame::vulkan::GpuMemoryManager& gpu_memory_manager,
+    frame::vulkan::CommandQueue& command_queue,
+    vk::Image image,
+    vk::Format format,
+    glm::uvec2 size)
+{
+    const auto bytes_per_pixel = BytesPerPixelForScreenshotFormat(format);
+    const auto row_stride = static_cast<std::size_t>(size.x) * bytes_per_pixel;
+    const auto image_size = static_cast<vk::DeviceSize>(row_stride) * size.y;
+
+    vk::UniqueDeviceMemory staging_memory;
+    auto staging_buffer = gpu_memory_manager.CreateBuffer(
+        image_size,
+        vk::BufferUsageFlagBits::eTransferDst,
+        vk::MemoryPropertyFlagBits::eHostVisible |
+            vk::MemoryPropertyFlagBits::eHostCoherent,
+        staging_memory);
+
+    command_queue.SubmitOneTime([&](vk::CommandBuffer command_buffer) {
+        const vk::ImageSubresourceRange subresource_range(
+            vk::ImageAspectFlagBits::eColor,
+            0,
+            1,
+            0,
+            1);
+        const vk::ImageMemoryBarrier to_transfer(
+            vk::AccessFlagBits::eShaderRead,
+            vk::AccessFlagBits::eTransferRead,
+            vk::ImageLayout::eShaderReadOnlyOptimal,
+            vk::ImageLayout::eTransferSrcOptimal,
+            VK_QUEUE_FAMILY_IGNORED,
+            VK_QUEUE_FAMILY_IGNORED,
+            image,
+            subresource_range);
+        command_buffer.pipelineBarrier(
+            vk::PipelineStageFlagBits::eFragmentShader |
+                vk::PipelineStageFlagBits::eComputeShader,
+            vk::PipelineStageFlagBits::eTransfer,
+            {},
+            nullptr,
+            nullptr,
+            to_transfer);
+
+        const vk::BufferImageCopy copy_region(
+            0,
+            0,
+            0,
+            vk::ImageSubresourceLayers{
+                vk::ImageAspectFlagBits::eColor, 0, 0, 1},
+            vk::Offset3D{0, 0, 0},
+            vk::Extent3D{size.x, size.y, 1});
+        command_buffer.copyImageToBuffer(
+            image,
+            vk::ImageLayout::eTransferSrcOptimal,
+            *staging_buffer,
+            copy_region);
+
+        const vk::ImageMemoryBarrier to_shader_read(
+            vk::AccessFlagBits::eTransferRead,
+            vk::AccessFlagBits::eShaderRead,
+            vk::ImageLayout::eTransferSrcOptimal,
+            vk::ImageLayout::eShaderReadOnlyOptimal,
+            VK_QUEUE_FAMILY_IGNORED,
+            VK_QUEUE_FAMILY_IGNORED,
+            image,
+            subresource_range);
+        command_buffer.pipelineBarrier(
+            vk::PipelineStageFlagBits::eTransfer,
+            vk::PipelineStageFlagBits::eFragmentShader |
+                vk::PipelineStageFlagBits::eComputeShader,
+            {},
+            nullptr,
+            nullptr,
+            to_shader_read);
+    });
+
+    auto* mapped = static_cast<std::uint8_t*>(
+        device.mapMemory(*staging_memory, 0, image_size));
+    std::vector<std::uint8_t> pixels(static_cast<std::size_t>(image_size), 0);
+    std::memcpy(pixels.data(), mapped, pixels.size());
+    device.unmapMemory(*staging_memory);
+
+    // Vulkan readback is top-down; Image::SaveImageToFile expects bottom-up.
+    FlipRowsInPlace(pixels, row_stride);
+    return pixels;
 }
 
 struct AnimatedRaytraceTimingStats
@@ -3323,7 +3488,51 @@ void Device::Shutdown()
 
 void Device::ScreenShot(const std::string& file) const
 {
-    logger_->warn("Vulkan screenshot not implemented (requested: {})", file);
+    if (device_lost_)
+    {
+        throw std::runtime_error(
+            "Cannot take a Vulkan screenshot after device loss.");
+    }
+    if (!vk_unique_device_ || !swapchain_resources_ || !output_image_resources_ ||
+        !gpu_memory_manager_ || !command_queue_)
+    {
+        throw std::runtime_error(
+            "Vulkan screenshot resources are not initialized.");
+    }
+    if (!output_image_resources_->HasSwapchainPreviewImage() ||
+        !output_image_resources_->IsSwapchainPreviewInShaderRead())
+    {
+        throw std::runtime_error(
+            "No rendered Vulkan frame is available for screenshot.");
+    }
+
+    const auto extent = swapchain_resources_->GetExtent();
+    if (extent.width == 0 || extent.height == 0)
+    {
+        throw std::runtime_error("Cannot take a screenshot of an empty frame.");
+    }
+
+    vk_unique_device_->waitIdle();
+
+    const auto format = swapchain_resources_->GetImageFormat();
+    const auto pixel_structure = PixelStructureForScreenshotFormat(format);
+    auto pixels = ReadScreenshotPixels(
+        *vk_unique_device_,
+        *gpu_memory_manager_,
+        *command_queue_,
+        output_image_resources_->GetSwapchainPreviewImage(),
+        format,
+        glm::uvec2(extent.width, extent.height));
+
+    proto::PixelElementSize pixel_element_size = {};
+    pixel_element_size.set_value(proto::PixelElementSize::BYTE);
+    frame::file::Image output_image(
+        glm::uvec2(extent.width, extent.height),
+        pixel_element_size,
+        pixel_structure);
+    output_image.SetData(pixels.data());
+    output_image.SaveImageToFile(file);
+    logger_->info("Saved Vulkan screenshot to {}.", file);
 }
 
 std::unique_ptr<frame::BufferInterface> Device::CreatePointBuffer(

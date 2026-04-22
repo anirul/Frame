@@ -1,6 +1,9 @@
 #include "frame/file/image_test.h"
 
+#include <cstdint>
+#include <filesystem>
 #include <memory>
+#include <vector>
 
 #include "frame/file/file_system.h"
 
@@ -76,6 +79,42 @@ TEST_F(ImageTest, CreateCubeMapPointerImageTest)
         EXPECT_FLOAT_EQ(0.014160156f, pointer[position * 4 + 2]);
         EXPECT_FLOAT_EQ(1.0f, pointer[position * 4 + 3]);
     }
+}
+
+TEST_F(ImageTest, SaveBgrAlphaImageWritesValidPng)
+{
+    const auto output_file =
+        std::filesystem::temp_directory_path() /
+        "frame_save_bgr_alpha_image_test.png";
+    std::vector<std::uint8_t> pixels = {
+        0x10, 0x20, 0x30, 0x40,
+        0x50, 0x60, 0x70, 0x80};
+
+    frame::file::Image image(
+        glm::uvec2(2, 1),
+        frame::json::PixelElementSize_BYTE(),
+        frame::json::PixelStructure_BGR_ALPHA());
+    image.SetData(pixels.data());
+    image.SaveImageToFile(output_file.string());
+
+    frame::file::Image loaded_image(
+        output_file,
+        frame::json::PixelElementSize_BYTE(),
+        frame::json::PixelStructure_RGB_ALPHA());
+    const auto* loaded =
+        static_cast<const std::uint8_t*>(loaded_image.Data());
+    ASSERT_NE(loaded, nullptr);
+    EXPECT_EQ(loaded[0], 0x30);
+    EXPECT_EQ(loaded[1], 0x20);
+    EXPECT_EQ(loaded[2], 0x10);
+    EXPECT_EQ(loaded[3], 0x40);
+    EXPECT_EQ(loaded[4], 0x70);
+    EXPECT_EQ(loaded[5], 0x60);
+    EXPECT_EQ(loaded[6], 0x50);
+    EXPECT_EQ(loaded[7], 0x80);
+
+    std::error_code remove_error;
+    std::filesystem::remove(output_file, remove_error);
 }
 
 } // End namespace test.

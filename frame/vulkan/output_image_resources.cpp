@@ -187,6 +187,7 @@ void OutputImageResources::CreateSwapchainPreviewImage()
         vk::SampleCountFlagBits::e1,
         vk::ImageTiling::eOptimal,
         vk::ImageUsageFlagBits::eTransferDst |
+            vk::ImageUsageFlagBits::eTransferSrc |
             vk::ImageUsageFlagBits::eSampled);
     swapchain_preview_image_ =
         device_.vk_unique_device_->createImageUnique(image_info);
