@@ -6,6 +6,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      SCCACHE_GHA_ENABLED: "true"
+      SCCACHE_CACHE_SIZE: "2G"
+      SCCACHE_IGNORE_SERVER_IO_ERROR: "1"
 
     steps:
     - name: Checkout code
@@ -13,6 +17,9 @@ jobs:
       with:
         lfs: true
         submodules: true
+
+    - name: Setup sccache
+      uses: mozilla-actions/sccache-action@v0.0.9
 
     - name: Git-lfs pull
       run: |
@@ -68,7 +75,10 @@ jobs:
     # No need for a manual vcpkg install step, the manifest mode will handle it
 
     - name: Configure with CMake Preset
-      run: cmake --preset linux-release
+      run: >
+        cmake --preset linux-release
+        -DCMAKE_C_COMPILER_LAUNCHER=sccache
+        -DCMAKE_CXX_COMPILER_LAUNCHER=sccache
 
     - name: Build with CMake Preset
       run: cmake --build --preset linux-release
@@ -77,3 +87,7 @@ jobs:
       run: |
         cd build/linux-release
         xvfb-run ctest --output-on-failure
+
+    - name: Show sccache stats
+      if: always()
+      run: ${SCCACHE_PATH} --show-stats
