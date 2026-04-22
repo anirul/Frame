@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <cctype>
 #include <chrono>
+#include <cstdint>
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
@@ -101,6 +102,50 @@ std::filesystem::path StripAssetPrefix(std::filesystem::path input)
         return std::filesystem::path(generic.substr(kPrefix.size()));
     }
     return input;
+}
+
+const std::uint8_t* PreparePngBytes(
+    const void* image,
+    glm::ivec2 size,
+    const proto::PixelStructure& pixel_structure,
+    std::vector<std::uint8_t>& converted)
+{
+    const auto* source = static_cast<const std::uint8_t*>(image);
+    if (!source)
+    {
+        return nullptr;
+    }
+
+    const auto pixel_count = static_cast<std::size_t>(size.x) *
+                             static_cast<std::size_t>(size.y);
+    switch (pixel_structure.value())
+    {
+    case proto::PixelStructure::BGR: {
+        converted.resize(pixel_count * 3);
+        for (std::size_t i = 0; i < pixel_count; ++i)
+        {
+            const auto src = i * 3;
+            converted[src + 0] = source[src + 2];
+            converted[src + 1] = source[src + 1];
+            converted[src + 2] = source[src + 0];
+        }
+        return converted.data();
+    }
+    case proto::PixelStructure::BGR_ALPHA: {
+        converted.resize(pixel_count * 4);
+        for (std::size_t i = 0; i < pixel_count; ++i)
+        {
+            const auto src = i * 4;
+            converted[src + 0] = source[src + 2];
+            converted[src + 1] = source[src + 1];
+            converted[src + 2] = source[src + 0];
+            converted[src + 3] = source[src + 3];
+        }
+        return converted.data();
+    }
+    default:
+        return source;
+    }
 }
 
 } // namespace
@@ -485,19 +530,35 @@ Image::Image(
 
 void Image::SaveImageToFile(const std::string& file) const
 {
-    // For OpenGL it seams...
+    if (pixel_element_size_.value() != proto::PixelElementSize::BYTE)
+    {
+        throw std::runtime_error(
+            "SaveImageToFile only supports BYTE images.");
+    }
+
+    // Frame stores image rows bottom-up, so flip back for PNG output.
     stbi_flip_vertically_on_write(true);
     const auto& logger = frame::Logger::GetInstance();
     logger->info("Saving [{}]...", file);
     if (!image_)
         throw std::runtime_error("no pointer to be saved?");
-    stbi_write_png(
+
+    const int channels = DesiredChannels(pixel_structure_);
+    std::vector<std::uint8_t> converted = {};
+    const auto* output_data =
+        PreparePngBytes(image_, size_, pixel_structure_, converted);
+    const int stride_in_bytes = size_.x * channels;
+    const int written = stbi_write_png(
         file.c_str(),
         size_.x,
         size_.y,
-        pixel_structure_.value(),
-        image_,
-        size_.x * pixel_structure_.value());
+        channels,
+        output_data,
+        stride_in_bytes);
+    if (written == 0)
+    {
+        throw std::runtime_error("failed to write png image.");
+    }
 }
 
 void Image::SetData(void* data)
