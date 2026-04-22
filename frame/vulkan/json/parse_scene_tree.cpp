@@ -3546,6 +3546,29 @@ bool ParseNodeMesh(
                     clip_index = proto_mesh.animation_clip_index();
                 }
                 skinned_mesh->SetSkinningAnimationClip(clip_name, clip_index);
+                skinned_mesh->SetBoneMatricesCallback(
+                    [skin_animation_data,
+                     skinned_mesh](double time_seconds) {
+                        if (!skinned_mesh)
+                        {
+                            return std::vector<glm::mat4>{};
+                        }
+                        return EvaluateBoneMatrices(
+                            skin_animation_data,
+                            time_seconds,
+                            skinned_mesh->GetSkinningAnimationClipName(),
+                            skinned_mesh->GetSkinningAnimationClipIndex());
+                    });
+                std::vector<std::int32_t> bone_indices_i32(
+                    bone_indices_flat.begin(),
+                    bone_indices_flat.end());
+                skinned_mesh->SetGpuSkinningSourceData(
+                    points,
+                    normals,
+                    textures,
+                    *triangle_indices,
+                    std::move(bone_indices_i32),
+                    bone_weights_flat);
                 skinned_mesh->SetRaytraceTriangleCallback(
                     [skin_animation_data,
                      skinned_mesh,

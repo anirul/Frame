@@ -7,6 +7,8 @@
 #include <string>
 #include <vector>
 
+#include <glm/mat4x4.hpp>
+
 #include "frame/bvh.h"
 #include "frame/vulkan/static_mesh.h"
 
@@ -58,6 +60,26 @@ class SkinnedMesh : public StaticMesh
     std::optional<std::uint32_t> GetSkinningAnimationClipIndex() const
     {
         return skinning_animation_clip_index_;
+    }
+
+    void SetBoneMatricesCallback(
+        std::function<std::vector<glm::mat4>(double)> callback)
+    {
+        bone_matrices_callback_ = std::move(callback);
+    }
+
+    bool HasBoneMatricesCallback() const
+    {
+        return static_cast<bool>(bone_matrices_callback_);
+    }
+
+    std::vector<glm::mat4> EvaluateBoneMatrices(double time_s) const
+    {
+        if (!bone_matrices_callback_)
+        {
+            return {};
+        }
+        return bone_matrices_callback_(time_s);
     }
 
     double GetSkinningTime(double time_s) const
@@ -119,15 +141,78 @@ class SkinnedMesh : public StaticMesh
         return raytrace_bvh_callback_(time_s);
     }
 
+    void SetGpuSkinningSourceData(
+        std::vector<float> points,
+        std::vector<float> normals,
+        std::vector<float> textures,
+        std::vector<std::uint32_t> triangle_indices,
+        std::vector<std::int32_t> bone_indices,
+        std::vector<float> bone_weights)
+    {
+        skinning_points_ = std::move(points);
+        skinning_normals_ = std::move(normals);
+        skinning_textures_ = std::move(textures);
+        skinning_triangle_indices_ = std::move(triangle_indices);
+        skinning_bone_indices_ = std::move(bone_indices);
+        skinning_bone_weights_ = std::move(bone_weights);
+    }
+
+    bool HasGpuSkinningSourceData() const
+    {
+        const std::size_t vertex_count = skinning_points_.size() / 3u;
+        return vertex_count > 0 &&
+               !skinning_triangle_indices_.empty() &&
+               skinning_bone_indices_.size() >= vertex_count * 4u &&
+               skinning_bone_weights_.size() >= vertex_count * 4u;
+    }
+
+    const std::vector<float>& GetSkinningPoints() const
+    {
+        return skinning_points_;
+    }
+
+    const std::vector<float>& GetSkinningNormals() const
+    {
+        return skinning_normals_;
+    }
+
+    const std::vector<float>& GetSkinningTextures() const
+    {
+        return skinning_textures_;
+    }
+
+    const std::vector<std::uint32_t>& GetSkinningTriangleIndices() const
+    {
+        return skinning_triangle_indices_;
+    }
+
+    const std::vector<std::int32_t>& GetSkinningBoneIndices() const
+    {
+        return skinning_bone_indices_;
+    }
+
+    const std::vector<float>& GetSkinningBoneWeights() const
+    {
+        return skinning_bone_weights_;
+    }
+
   private:
     bool skinning_animation_enabled_ = false;
     float skinning_animation_speed_ = 1.0f;
     std::string skinning_animation_clip_name_ = {};
     std::optional<std::uint32_t> skinning_animation_clip_index_ = std::nullopt;
+    std::function<std::vector<glm::mat4>(double)> bone_matrices_callback_ =
+        nullptr;
     std::function<std::vector<float>(double)> raytrace_triangle_callback_ =
         nullptr;
     std::function<std::vector<BVHNode>(double)> raytrace_bvh_callback_ =
         nullptr;
+    std::vector<float> skinning_points_ = {};
+    std::vector<float> skinning_normals_ = {};
+    std::vector<float> skinning_textures_ = {};
+    std::vector<std::uint32_t> skinning_triangle_indices_ = {};
+    std::vector<std::int32_t> skinning_bone_indices_ = {};
+    std::vector<float> skinning_bone_weights_ = {};
 };
 
 } // namespace frame::vulkan

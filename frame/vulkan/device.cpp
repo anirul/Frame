@@ -769,6 +769,8 @@ bool CanUseSharedTransformHardwareRaytraceScene(
 constexpr std::size_t kRaytraceFloatsPerVertex = 12;
 constexpr std::size_t kRaytraceTriangleVertexStrideBytes =
     sizeof(float) * kRaytraceFloatsPerVertex;
+constexpr std::uint32_t kGpuSkinningBoneCapacity = 128u;
+constexpr std::uint32_t kGpuSkinningWorkgroupSize = 64u;
 
 struct RaytraceVertex
 {
@@ -785,6 +787,103 @@ struct RaytraceVertex
     float pad2;
     float pad3;
 };
+
+struct alignas(16) GpuSkinningSourceVertex
+{
+    glm::vec4 position = glm::vec4(0.0f);
+    glm::vec4 normal = glm::vec4(0.0f);
+    glm::vec4 uv = glm::vec4(0.0f);
+    glm::uvec4 bone_indices = glm::uvec4(0u);
+    glm::vec4 bone_weights = glm::vec4(0.0f);
+};
+
+struct alignas(16) GpuSkinningPushConstants
+{
+    std::uint32_t output_vertex_count = 0;
+    std::uint32_t pad0 = 0;
+    std::uint32_t pad1 = 0;
+    std::uint32_t pad2 = 0;
+    glm::vec4 color_multiplier = glm::vec4(1.0f);
+};
+
+std::vector<std::uint8_t> BuildGpuSkinningSourceVertexBytes(
+    const std::vector<float>& points,
+    const std::vector<float>& normals,
+    const std::vector<float>& textures,
+    const std::vector<std::int32_t>& bone_indices,
+    const std::vector<float>& bone_weights)
+{
+    const std::size_t vertex_count = points.size() / 3u;
+    std::vector<GpuSkinningSourceVertex> vertices(vertex_count);
+    for (std::size_t vertex = 0; vertex < vertex_count; ++vertex)
+    {
+        const std::size_t point_offset = vertex * 3u;
+        const std::size_t uv_offset = vertex * 2u;
+        const std::size_t bone_offset = vertex * 4u;
+
+        auto& dst = vertices[vertex];
+        dst.position = glm::vec4(
+            points[point_offset + 0u],
+            points[point_offset + 1u],
+            points[point_offset + 2u],
+            1.0f);
+        if (point_offset + 2u < normals.size())
+        {
+            dst.normal = glm::vec4(
+                normals[point_offset + 0u],
+                normals[point_offset + 1u],
+                normals[point_offset + 2u],
+                0.0f);
+        }
+        if (uv_offset + 1u < textures.size())
+        {
+            dst.uv = glm::vec4(
+                textures[uv_offset + 0u],
+                textures[uv_offset + 1u],
+                0.0f,
+                0.0f);
+        }
+        if (bone_offset + 3u < bone_indices.size())
+        {
+            dst.bone_indices = glm::uvec4(
+                static_cast<std::uint32_t>(
+                    std::max<std::int32_t>(bone_indices[bone_offset + 0u], 0)),
+                static_cast<std::uint32_t>(
+                    std::max<std::int32_t>(bone_indices[bone_offset + 1u], 0)),
+                static_cast<std::uint32_t>(
+                    std::max<std::int32_t>(bone_indices[bone_offset + 2u], 0)),
+                static_cast<std::uint32_t>(
+                    std::max<std::int32_t>(bone_indices[bone_offset + 3u], 0)));
+        }
+        if (bone_offset + 3u < bone_weights.size())
+        {
+            dst.bone_weights = glm::vec4(
+                bone_weights[bone_offset + 0u],
+                bone_weights[bone_offset + 1u],
+                bone_weights[bone_offset + 2u],
+                bone_weights[bone_offset + 3u]);
+        }
+    }
+
+    std::vector<std::uint8_t> bytes(
+        vertices.size() * sizeof(GpuSkinningSourceVertex));
+    if (!bytes.empty())
+    {
+        std::memcpy(bytes.data(), vertices.data(), bytes.size());
+    }
+    return bytes;
+}
+
+template <typename T>
+std::vector<std::uint8_t> BuildFlatBytes(const std::vector<T>& values)
+{
+    std::vector<std::uint8_t> bytes(values.size() * sizeof(T));
+    if (!bytes.empty())
+    {
+        std::memcpy(bytes.data(), values.data(), bytes.size());
+    }
+    return bytes;
+}
 
 std::vector<std::uint8_t> ApplyTriangleColorMultiplier(
     const std::vector<std::uint8_t>& raw,
@@ -2138,6 +2237,7 @@ void Device::StartupFromLevelData(const frame::json::LevelData& level_data)
     DestroyGraphicsPipeline();
     DestroyDescriptorResources();
     DestroyHardwareRaytracingScene();
+    DestroyGpuSkinningResources();
     // TextureResources keeps raw pointers to textures owned by the previous level.
     // Clear the resource map after resource transfer and before dropping old level.
     DestroyTextureResources();
@@ -2183,6 +2283,10 @@ void Device::StartupFromLevelData(const frame::json::LevelData& level_data)
             mesh_resources_->Build(level_data);
         }
         {
+            ScopedTimer timer(logger_, "CreateGpuSkinningResources");
+            CreateGpuSkinningResources();
+        }
+        {
             ScopedTimer timer(logger_, "CreateGraphicsPipeline");
             CreateGraphicsPipeline();
         }
@@ -2203,6 +2307,7 @@ void Device::StartupFromLevelData(const frame::json::LevelData& level_data)
         logger_->error("Failed to prepare Vulkan GPU resources: {}", ex.what());
         DestroyDescriptorResources();
         DestroyHardwareRaytracingScene();
+        DestroyGpuSkinningResources();
         DestroyTextureResources();
         if (mesh_resources_)
         {
@@ -2322,6 +2427,7 @@ void Device::Cleanup()
     }
     DestroyDescriptorResources();
     DestroyHardwareRaytracingScene();
+    DestroyGpuSkinningResources();
     DestroyTextureResources();
     if (mesh_resources_)
     {
@@ -2404,6 +2510,20 @@ void Device::UpdateRaytraceBuffers()
     const bool use_incremental_hardware_rt_updates =
         use_hardware_raytracing_ && hardware_raytracing_uses_source_instances_;
     bool animated_triangle_updated = false;
+    const auto gpu_update_start = SteadyClock::now();
+    const auto gpu_updated_source_triangle_buffer_ids = UpdateGpuSkinnedMeshes();
+    animated_rt_stats.dynamic_geometry_total_ms +=
+        ElapsedMilliseconds(gpu_update_start);
+    if (!gpu_updated_source_triangle_buffer_ids.empty())
+    {
+        animated_triangle_updated = true;
+    }
+    std::unordered_set<EntityId> gpu_managed_triangle_buffer_ids = {};
+    gpu_managed_triangle_buffer_ids.reserve(gpu_skinning_resources_.size());
+    for (const auto& resource : gpu_skinning_resources_)
+    {
+        gpu_managed_triangle_buffer_ids.insert(resource.source_triangle_buffer_id);
+    }
     for (const auto node_id : level_->GetSceneNodes())
     {
         auto* node_mesh =
@@ -2427,6 +2547,11 @@ void Device::UpdateRaytraceBuffers()
             static_cast<double>(elapsed_time_seconds_));
 
         const auto triangle_buffer_id = skinned_mesh->GetTriangleBufferId();
+        if (triangle_buffer_id &&
+            gpu_managed_triangle_buffer_ids.contains(triangle_buffer_id))
+        {
+            continue;
+        }
         if (triangle_buffer_id &&
             skinned_mesh->HasActiveRaytraceTriangleCallback())
         {
@@ -2513,6 +2638,17 @@ void Device::UpdateRaytraceBuffers()
     if (HasRaytracingSourceMeshes(*level_))
     {
         bool used_incremental_source_updates = false;
+        if (use_hardware_raytracing_ && hardware_raytracing_uses_source_instances_ &&
+            !gpu_updated_source_triangle_buffer_ids.empty())
+        {
+            used_incremental_source_updates = true;
+            updated_aggregate_scene = true;
+            last_raytrace_scene_state_hash_ = BuildRaytracingSourceStateHash(
+                *level_,
+                static_cast<double>(elapsed_time_seconds_),
+                false);
+            has_raytrace_scene_state_hash_ = true;
+        }
         if (use_hardware_raytracing_ && hardware_raytracing_uses_source_instances_ &&
             !updated_source_triangle_buffer_ids.empty())
         {
@@ -3753,6 +3889,759 @@ void Device::DestroyDescriptorResources()
     }
     storage_buffers_ready_ = false;
     DestroyComputeOutputImage();
+}
+
+void Device::DestroyGpuSkinningResources()
+{
+    gpu_skinning_resources_.clear();
+    gpu_skinning_pipeline_.reset();
+    gpu_skinning_pipeline_layout_.reset();
+    gpu_skinning_descriptor_pool_.reset();
+    gpu_skinning_descriptor_set_layout_.reset();
+}
+
+void Device::CreateGpuSkinningResources()
+{
+    DestroyGpuSkinningResources();
+
+    if (!use_hardware_raytracing_ || !vk_unique_device_ || !level_ ||
+        !gpu_memory_manager_ || !command_queue_)
+    {
+        return;
+    }
+
+    struct PendingGpuSkinningResource
+    {
+        EntityId mesh_id = NullId;
+        EntityId source_triangle_buffer_id = NullId;
+        EntityId source_node_id = NullId;
+        EntityId source_material_id = NullId;
+        std::uint32_t material_id = 0;
+        std::uint32_t triangle_offset = 0;
+        std::uint32_t output_vertex_count = 0;
+        std::uint32_t bone_capacity = 0;
+        vk::DeviceSize output_buffer_size = 0;
+        glm::vec4 color_multiplier = glm::vec4(1.0f);
+        std::vector<std::uint8_t> source_vertex_bytes = {};
+        std::vector<std::uint8_t> source_index_bytes = {};
+    };
+
+    const auto source_geometries = BuildRaytracingSourceGeometryData(
+        *level_,
+        static_cast<double>(elapsed_time_seconds_),
+        false);
+    std::vector<PendingGpuSkinningResource> pending_resources = {};
+    pending_resources.reserve(source_geometries.size());
+
+    for (const auto& source_geometry : source_geometries)
+    {
+        auto* node = dynamic_cast<frame::NodeMesh*>(
+            &level_->GetSceneNodeFromId(source_geometry.source_node_id));
+        if (!node)
+        {
+            continue;
+        }
+
+        const auto mesh_id = node->GetLocalMesh();
+        if (!mesh_id)
+        {
+            continue;
+        }
+
+        auto* skinned_mesh = dynamic_cast<frame::vulkan::SkinnedMesh*>(
+            &level_->GetMeshFromId(mesh_id));
+        if (!skinned_mesh || !skinned_mesh->HasGpuSkinningSourceData() ||
+            !skinned_mesh->HasBoneMatricesCallback())
+        {
+            continue;
+        }
+
+        const auto& triangle_indices = skinned_mesh->GetSkinningTriangleIndices();
+        if (triangle_indices.empty())
+        {
+            continue;
+        }
+
+        PendingGpuSkinningResource pending = {};
+        pending.mesh_id = mesh_id;
+        pending.source_triangle_buffer_id = source_geometry.triangle_buffer_id;
+        pending.source_node_id = source_geometry.source_node_id;
+        pending.source_material_id = source_geometry.source_material_id;
+        pending.material_id = source_geometry.material_id;
+        pending.triangle_offset = source_geometry.triangle_offset;
+        pending.output_vertex_count =
+            static_cast<std::uint32_t>(triangle_indices.size());
+        pending.output_buffer_size = static_cast<vk::DeviceSize>(
+            triangle_indices.size() * sizeof(RaytraceVertex));
+        pending.source_vertex_bytes = BuildGpuSkinningSourceVertexBytes(
+            skinned_mesh->GetSkinningPoints(),
+            skinned_mesh->GetSkinningNormals(),
+            skinned_mesh->GetSkinningTextures(),
+            skinned_mesh->GetSkinningBoneIndices(),
+            skinned_mesh->GetSkinningBoneWeights());
+        pending.source_index_bytes = BuildFlatBytes(triangle_indices);
+        auto bone_matrices = skinned_mesh->EvaluateBoneMatrices(0.0);
+        pending.bone_capacity = std::max<std::uint32_t>(
+            1u,
+            static_cast<std::uint32_t>(bone_matrices.size()));
+
+        const bool transmissive = source_geometry.material_id == 0u;
+        const auto reference_color = ResolveRaytracingReferenceColor(
+            *level_,
+            transmissive);
+        const auto source_color = ResolveRaytracingSourceMaterialColor(
+            *level_,
+            source_geometry.source_material_id);
+        const auto color_multiplier = ResolveRaytracingColorMultiplier(
+            source_color,
+            reference_color);
+        pending.color_multiplier = glm::vec4(
+            color_multiplier[0],
+            color_multiplier[1],
+            color_multiplier[2],
+            color_multiplier[3]);
+
+        if (pending.source_vertex_bytes.empty() ||
+            pending.source_index_bytes.empty() ||
+            pending.output_buffer_size == 0)
+        {
+            continue;
+        }
+
+        pending_resources.push_back(std::move(pending));
+    }
+
+    if (pending_resources.empty())
+    {
+        return;
+    }
+
+    if (!shader_compiler_)
+    {
+        shader_compiler_ = std::make_unique<ShaderCompiler>();
+    }
+
+    const auto shader_path = current_level_data_
+        ? current_level_data_->asset_root / "shader" / "vulkan" / "skinning.comp"
+        : std::filesystem::path("asset/shader/vulkan/skinning.comp");
+    std::vector<std::uint32_t> compute_code = {};
+    try
+    {
+        compute_code = shader_compiler_->CompileFile(
+            shader_path,
+            shaderc_compute_shader);
+    }
+    catch (const std::exception& ex)
+    {
+        logger_->warn(
+            "Failed to compile Vulkan skinning compute shader {}: {}",
+            shader_path.string(),
+            ex.what());
+        return;
+    }
+
+    auto create_shader_module =
+        [&](const std::vector<std::uint32_t>& code) {
+            vk::ShaderModuleCreateInfo shader_info(
+                vk::ShaderModuleCreateFlags{},
+                code.size() * sizeof(std::uint32_t),
+                code.data());
+            return vk_unique_device_->createShaderModuleUnique(shader_info);
+        };
+
+    const std::array<vk::DescriptorSetLayoutBinding, 4> layout_bindings = {{
+        vk::DescriptorSetLayoutBinding(
+            0,
+            vk::DescriptorType::eStorageBuffer,
+            1,
+            vk::ShaderStageFlagBits::eCompute),
+        vk::DescriptorSetLayoutBinding(
+            1,
+            vk::DescriptorType::eStorageBuffer,
+            1,
+            vk::ShaderStageFlagBits::eCompute),
+        vk::DescriptorSetLayoutBinding(
+            2,
+            vk::DescriptorType::eStorageBuffer,
+            1,
+            vk::ShaderStageFlagBits::eCompute),
+        vk::DescriptorSetLayoutBinding(
+            3,
+            vk::DescriptorType::eStorageBuffer,
+            1,
+            vk::ShaderStageFlagBits::eCompute),
+    }};
+    vk::DescriptorSetLayoutCreateInfo layout_info(
+        vk::DescriptorSetLayoutCreateFlags{},
+        static_cast<std::uint32_t>(layout_bindings.size()),
+        layout_bindings.data());
+    gpu_skinning_descriptor_set_layout_ =
+        vk_unique_device_->createDescriptorSetLayoutUnique(layout_info);
+
+    const vk::DescriptorPoolSize pool_size(
+        vk::DescriptorType::eStorageBuffer,
+        static_cast<std::uint32_t>(pending_resources.size() * layout_bindings.size()));
+    vk::DescriptorPoolCreateInfo pool_info(
+        vk::DescriptorPoolCreateFlags{},
+        static_cast<std::uint32_t>(pending_resources.size()),
+        1,
+        &pool_size);
+    gpu_skinning_descriptor_pool_ =
+        vk_unique_device_->createDescriptorPoolUnique(pool_info);
+
+    std::vector<vk::DescriptorSetLayout> set_layouts(
+        pending_resources.size(),
+        *gpu_skinning_descriptor_set_layout_);
+    vk::DescriptorSetAllocateInfo alloc_info(
+        *gpu_skinning_descriptor_pool_,
+        static_cast<std::uint32_t>(set_layouts.size()),
+        set_layouts.data());
+    auto descriptor_sets = vk_unique_device_->allocateDescriptorSets(alloc_info);
+
+    auto shader_module = create_shader_module(compute_code);
+    const vk::PushConstantRange push_constant_range(
+        vk::ShaderStageFlagBits::eCompute,
+        0,
+        sizeof(GpuSkinningPushConstants));
+    const vk::DescriptorSetLayout descriptor_layouts[] = {
+        *gpu_skinning_descriptor_set_layout_};
+    vk::PipelineLayoutCreateInfo pipeline_layout_info(
+        vk::PipelineLayoutCreateFlags{},
+        1,
+        descriptor_layouts,
+        1,
+        &push_constant_range);
+    gpu_skinning_pipeline_layout_ =
+        vk_unique_device_->createPipelineLayoutUnique(pipeline_layout_info);
+
+    vk::PipelineShaderStageCreateInfo stage_info(
+        vk::PipelineShaderStageCreateFlags{},
+        vk::ShaderStageFlagBits::eCompute,
+        *shader_module,
+        "main");
+    vk::ComputePipelineCreateInfo pipeline_info(
+        vk::PipelineCreateFlags{},
+        stage_info,
+        *gpu_skinning_pipeline_layout_);
+    auto pipeline_result = vk_unique_device_->createComputePipelineUnique(
+        nullptr,
+        pipeline_info);
+    if (pipeline_result.result != vk::Result::eSuccess)
+    {
+        throw std::runtime_error(
+            "Failed to create Vulkan GPU skinning compute pipeline.");
+    }
+    gpu_skinning_pipeline_ = std::move(pipeline_result.value);
+
+    auto create_device_local_buffer =
+        [&](vk::DeviceSize size,
+            vk::BufferUsageFlags usage,
+            vk::UniqueBuffer& buffer,
+            vk::UniqueDeviceMemory& memory) {
+            buffer = gpu_memory_manager_->CreateBuffer(
+                size,
+                usage | vk::BufferUsageFlagBits::eTransferDst,
+                vk::MemoryPropertyFlagBits::eDeviceLocal,
+                memory);
+        };
+
+    gpu_skinning_resources_.reserve(pending_resources.size());
+    for (std::size_t i = 0; i < pending_resources.size(); ++i)
+    {
+        const auto& pending = pending_resources[i];
+
+        GpuSkinningResource resource = {};
+        resource.mesh_id = pending.mesh_id;
+        resource.source_triangle_buffer_id = pending.source_triangle_buffer_id;
+        resource.source_node_id = pending.source_node_id;
+        resource.source_material_id = pending.source_material_id;
+        resource.material_id = pending.material_id;
+        resource.triangle_offset = pending.triangle_offset;
+        resource.output_vertex_count = pending.output_vertex_count;
+        resource.bone_capacity = pending.bone_capacity;
+        resource.output_buffer_size = pending.output_buffer_size;
+        resource.color_multiplier = pending.color_multiplier;
+        resource.descriptor_set = descriptor_sets[i];
+
+        create_device_local_buffer(
+            static_cast<vk::DeviceSize>(pending.source_vertex_bytes.size()),
+            vk::BufferUsageFlagBits::eStorageBuffer,
+            resource.source_vertex_buffer,
+            resource.source_vertex_memory);
+        create_device_local_buffer(
+            static_cast<vk::DeviceSize>(pending.source_index_bytes.size()),
+            vk::BufferUsageFlagBits::eStorageBuffer,
+            resource.source_index_buffer,
+            resource.source_index_memory);
+        resource.output_buffer = gpu_memory_manager_->CreateBuffer(
+            pending.output_buffer_size,
+            vk::BufferUsageFlagBits::eStorageBuffer |
+                vk::BufferUsageFlagBits::eTransferSrc,
+            vk::MemoryPropertyFlagBits::eDeviceLocal,
+            resource.output_memory);
+        resource.bone_matrix_buffer = gpu_memory_manager_->CreateBuffer(
+            static_cast<vk::DeviceSize>(
+                resource.bone_capacity * sizeof(glm::mat4)),
+            vk::BufferUsageFlagBits::eStorageBuffer,
+            vk::MemoryPropertyFlagBits::eHostVisible |
+                vk::MemoryPropertyFlagBits::eHostCoherent,
+            resource.bone_matrix_memory);
+
+        UploadDeviceLocalBuffer(
+            *vk_unique_device_,
+            *gpu_memory_manager_,
+            *command_queue_,
+            pending.source_vertex_bytes,
+            *resource.source_vertex_buffer);
+        UploadDeviceLocalBuffer(
+            *vk_unique_device_,
+            *gpu_memory_manager_,
+            *command_queue_,
+            pending.source_index_bytes,
+            *resource.source_index_buffer);
+
+        std::array<vk::DescriptorBufferInfo, 4> buffer_infos = {{
+            vk::DescriptorBufferInfo(
+                *resource.source_vertex_buffer,
+                0,
+                static_cast<vk::DeviceSize>(pending.source_vertex_bytes.size())),
+            vk::DescriptorBufferInfo(
+                *resource.source_index_buffer,
+                0,
+                static_cast<vk::DeviceSize>(pending.source_index_bytes.size())),
+            vk::DescriptorBufferInfo(
+                *resource.bone_matrix_buffer,
+                0,
+                static_cast<vk::DeviceSize>(
+                    resource.bone_capacity * sizeof(glm::mat4))),
+            vk::DescriptorBufferInfo(
+                *resource.output_buffer,
+                0,
+                resource.output_buffer_size),
+        }};
+        const std::array<vk::WriteDescriptorSet, 4> descriptor_writes = {{
+            vk::WriteDescriptorSet(
+                resource.descriptor_set,
+                0,
+                0,
+                1,
+                vk::DescriptorType::eStorageBuffer,
+                nullptr,
+                &buffer_infos[0]),
+            vk::WriteDescriptorSet(
+                resource.descriptor_set,
+                1,
+                0,
+                1,
+                vk::DescriptorType::eStorageBuffer,
+                nullptr,
+                &buffer_infos[1]),
+            vk::WriteDescriptorSet(
+                resource.descriptor_set,
+                2,
+                0,
+                1,
+                vk::DescriptorType::eStorageBuffer,
+                nullptr,
+                &buffer_infos[2]),
+            vk::WriteDescriptorSet(
+                resource.descriptor_set,
+                3,
+                0,
+                1,
+                vk::DescriptorType::eStorageBuffer,
+                nullptr,
+                &buffer_infos[3]),
+        }};
+        vk_unique_device_->updateDescriptorSets(descriptor_writes, {});
+        gpu_skinning_resources_.push_back(std::move(resource));
+    }
+
+    logger_->info(
+        "Created {} Vulkan GPU skinning resource set(s).",
+        gpu_skinning_resources_.size());
+}
+
+std::vector<EntityId> Device::UpdateGpuSkinnedMeshes()
+{
+    if (!vk_unique_device_ || !level_ || !command_queue_ ||
+        !gpu_skinning_pipeline_ || !gpu_skinning_pipeline_layout_ ||
+        gpu_skinning_resources_.empty())
+    {
+        return {};
+    }
+
+    auto find_storage_buffer_resource =
+        [&](EntityId buffer_id) -> const BufferResource* {
+            if (!buffer_resources_ || buffer_id == NullId)
+            {
+                return nullptr;
+            }
+            const auto& name = level_->GetNameFromId(buffer_id);
+            for (const auto& storage : buffer_resources_->GetStorageBuffers())
+            {
+                if (storage.name == name)
+                {
+                    return &storage;
+                }
+            }
+            return nullptr;
+        };
+
+    const BufferResource* transmissive_aggregate = nullptr;
+    const BufferResource* opaque_aggregate = nullptr;
+    if (active_program_info_)
+    {
+        if (const auto it =
+                active_program_info_->buffer_ids_by_inner.find(
+                    "TriangleBufferTransmissive");
+            it != active_program_info_->buffer_ids_by_inner.end())
+        {
+            transmissive_aggregate = find_storage_buffer_resource(it->second);
+        }
+        if (const auto it =
+                active_program_info_->buffer_ids_by_inner.find(
+                    "TriangleBufferOpaque");
+            it != active_program_info_->buffer_ids_by_inner.end())
+        {
+            opaque_aggregate = find_storage_buffer_resource(it->second);
+        }
+    }
+
+    struct PendingGpuDispatch
+    {
+        GpuSkinningResource* resource = nullptr;
+        HardwareRaytracingGeometry* hardware_geometry = nullptr;
+        const BufferResource* aggregate_buffer = nullptr;
+        vk::UniqueBuffer scratch_buffer;
+        vk::UniqueDeviceMemory scratch_memory;
+        vk::AccelerationStructureGeometryTrianglesDataKHR triangles = {};
+        vk::AccelerationStructureGeometryDataKHR geometry_data = {};
+        vk::AccelerationStructureGeometryKHR as_geometry = {};
+        vk::AccelerationStructureBuildGeometryInfoKHR build_info = {};
+        vk::AccelerationStructureBuildRangeInfoKHR range_info = {};
+    };
+
+    auto find_hardware_geometry =
+        [&](GpuSkinningResource& resource) -> HardwareRaytracingGeometry* {
+            for (auto& geometry : hardware_raytracing_geometries_)
+            {
+                if (geometry.source_buffer_id == resource.source_triangle_buffer_id &&
+                    geometry.source_node_id == resource.source_node_id &&
+                    geometry.source_material_id == resource.source_material_id &&
+                    geometry.triangle_offset == resource.triangle_offset)
+                {
+                    return &geometry;
+                }
+            }
+            return nullptr;
+        };
+
+    auto& animated_rt_stats = GetAnimatedRaytraceTimingStats();
+    std::vector<PendingGpuDispatch> pending_dispatches = {};
+    pending_dispatches.reserve(gpu_skinning_resources_.size());
+    std::vector<EntityId> updated_source_triangle_buffer_ids = {};
+    std::unordered_set<EntityId> updated_source_triangle_buffer_seen = {};
+
+    const auto build_scratch_address =
+        [&](vk::DeviceSize size,
+            vk::UniqueBuffer& scratch_buffer,
+            vk::UniqueDeviceMemory& scratch_memory) {
+            scratch_buffer = gpu_memory_manager_->CreateBuffer(
+                size,
+                vk::BufferUsageFlagBits::eStorageBuffer |
+                    vk::BufferUsageFlagBits::eShaderDeviceAddress,
+                vk::MemoryPropertyFlagBits::eDeviceLocal,
+                scratch_memory,
+                vk::MemoryAllocateFlagBits::eDeviceAddress);
+            return vk_unique_device_->getBufferAddress(
+                vk::BufferDeviceAddressInfo(*scratch_buffer));
+        };
+
+    for (auto& resource : gpu_skinning_resources_)
+    {
+        auto* skinned_mesh = dynamic_cast<frame::vulkan::SkinnedMesh*>(
+            &level_->GetMeshFromId(resource.mesh_id));
+        if (!skinned_mesh)
+        {
+            continue;
+        }
+        if (resource.initialized && !skinned_mesh->IsSkinningAnimationEnabled())
+        {
+            continue;
+        }
+
+        const double skinning_time = skinned_mesh->GetSkinningTime(
+            static_cast<double>(elapsed_time_seconds_));
+        const auto bone_eval_start = SteadyClock::now();
+        auto bone_matrices = skinned_mesh->EvaluateBoneMatrices(skinning_time);
+        animated_rt_stats.triangle_eval_ms +=
+            ElapsedMilliseconds(bone_eval_start);
+        if (bone_matrices.empty())
+        {
+            bone_matrices.push_back(glm::mat4(1.0f));
+        }
+        if (bone_matrices.size() > resource.bone_capacity)
+        {
+            bone_matrices.resize(resource.bone_capacity);
+        }
+
+        std::vector<glm::mat4> upload_matrices(
+            resource.bone_capacity,
+            glm::mat4(1.0f));
+        std::copy(
+            bone_matrices.begin(),
+            bone_matrices.end(),
+            upload_matrices.begin());
+        void* mapped = vk_unique_device_->mapMemory(
+            *resource.bone_matrix_memory,
+            0,
+            static_cast<vk::DeviceSize>(
+                resource.bone_capacity * sizeof(glm::mat4)));
+        std::memcpy(
+            mapped,
+            upload_matrices.data(),
+            upload_matrices.size() * sizeof(glm::mat4));
+        vk_unique_device_->unmapMemory(*resource.bone_matrix_memory);
+
+        PendingGpuDispatch pending = {};
+        pending.resource = &resource;
+        pending.aggregate_buffer =
+            resource.material_id == 0u ? transmissive_aggregate : opaque_aggregate;
+        pending.hardware_geometry = find_hardware_geometry(resource);
+        if (pending.hardware_geometry)
+        {
+            if (pending.hardware_geometry->vertex_buffer_size !=
+                resource.output_buffer_size)
+            {
+                logger_->warn(
+                    "Vulkan GPU skinning output size mismatch for mesh '{}'.",
+                    level_->GetNameFromId(resource.mesh_id));
+                continue;
+            }
+
+            const auto vertex_address = vk_unique_device_->getBufferAddress(
+                vk::BufferDeviceAddressInfo(
+                    *pending.hardware_geometry->vertex_buffer));
+            const auto index_address = vk_unique_device_->getBufferAddress(
+                vk::BufferDeviceAddressInfo(
+                    *pending.hardware_geometry->index_buffer));
+            pending.triangles =
+                vk::AccelerationStructureGeometryTrianglesDataKHR(
+                    vk::Format::eR32G32B32Sfloat,
+                    vk::DeviceOrHostAddressConstKHR(vertex_address),
+                    kRaytraceTriangleVertexStrideBytes,
+                    pending.hardware_geometry->vertex_count,
+                    vk::IndexType::eUint32,
+                    vk::DeviceOrHostAddressConstKHR(index_address));
+            pending.geometry_data.setTriangles(pending.triangles);
+            pending.as_geometry = vk::AccelerationStructureGeometryKHR(
+                vk::GeometryTypeKHR::eTriangles);
+            pending.as_geometry.setGeometry(pending.geometry_data);
+            pending.as_geometry.setFlags(vk::GeometryFlagBitsKHR::eOpaque);
+            pending.build_info =
+                vk::AccelerationStructureBuildGeometryInfoKHR(
+                    vk::AccelerationStructureTypeKHR::eBottomLevel,
+                    GetHardwareRaytracingBuildFlags(),
+                    vk::BuildAccelerationStructureModeKHR::eUpdate,
+                    {},
+                    {},
+                    pending.as_geometry);
+            pending.build_info.setSrcAccelerationStructure(
+                *pending.hardware_geometry->blas);
+            pending.build_info.setDstAccelerationStructure(
+                *pending.hardware_geometry->blas);
+            const auto size_info =
+                vk_unique_device_->getAccelerationStructureBuildSizesKHR(
+                    vk::AccelerationStructureBuildTypeKHR::eDevice,
+                    pending.build_info,
+                    pending.hardware_geometry->triangle_count);
+            const auto scratch_address = build_scratch_address(
+                std::max(
+                    size_info.buildScratchSize,
+                    size_info.updateScratchSize),
+                pending.scratch_buffer,
+                pending.scratch_memory);
+            pending.build_info.setScratchData(
+                vk::DeviceOrHostAddressKHR(scratch_address));
+            pending.range_info = vk::AccelerationStructureBuildRangeInfoKHR(
+                pending.hardware_geometry->triangle_count,
+                0,
+                0,
+                0);
+        }
+
+        pending_dispatches.push_back(std::move(pending));
+        animated_rt_stats.uploaded_triangle_bytes +=
+            static_cast<std::size_t>(resource.output_buffer_size);
+        if (updated_source_triangle_buffer_seen.insert(
+                resource.source_triangle_buffer_id)
+                .second)
+        {
+            updated_source_triangle_buffer_ids.push_back(
+                resource.source_triangle_buffer_id);
+        }
+    }
+
+    if (pending_dispatches.empty())
+    {
+        return {};
+    }
+
+    const auto submit_start = SteadyClock::now();
+    command_queue_->SubmitOneTime(
+        [&](vk::CommandBuffer command_buffer) {
+            command_buffer.bindPipeline(
+                vk::PipelineBindPoint::eCompute,
+                *gpu_skinning_pipeline_);
+
+            for (const auto& pending : pending_dispatches)
+            {
+                command_buffer.bindDescriptorSets(
+                    vk::PipelineBindPoint::eCompute,
+                    *gpu_skinning_pipeline_layout_,
+                    0,
+                    pending.resource->descriptor_set,
+                    {});
+
+                GpuSkinningPushConstants push_constants = {};
+                push_constants.output_vertex_count =
+                    pending.resource->output_vertex_count;
+                push_constants.color_multiplier =
+                    pending.resource->color_multiplier;
+                command_buffer.pushConstants(
+                    *gpu_skinning_pipeline_layout_,
+                    vk::ShaderStageFlagBits::eCompute,
+                    0,
+                    sizeof(GpuSkinningPushConstants),
+                    &push_constants);
+
+                const std::uint32_t group_count =
+                    (pending.resource->output_vertex_count +
+                     kGpuSkinningWorkgroupSize - 1u) /
+                    kGpuSkinningWorkgroupSize;
+                command_buffer.dispatch(group_count, 1, 1);
+            }
+
+            std::vector<vk::BufferMemoryBarrier> output_barriers = {};
+            output_barriers.reserve(pending_dispatches.size());
+            for (const auto& pending : pending_dispatches)
+            {
+                output_barriers.emplace_back(
+                    vk::AccessFlagBits::eShaderWrite,
+                    vk::AccessFlagBits::eTransferRead,
+                    VK_QUEUE_FAMILY_IGNORED,
+                    VK_QUEUE_FAMILY_IGNORED,
+                    *pending.resource->output_buffer,
+                    0,
+                    pending.resource->output_buffer_size);
+            }
+            command_buffer.pipelineBarrier(
+                vk::PipelineStageFlagBits::eComputeShader,
+                vk::PipelineStageFlagBits::eTransfer,
+                {},
+                nullptr,
+                output_barriers,
+                nullptr);
+
+            std::vector<vk::BufferMemoryBarrier> geometry_copy_barriers = {};
+            geometry_copy_barriers.reserve(pending_dispatches.size());
+            for (const auto& pending : pending_dispatches)
+            {
+                if (pending.aggregate_buffer && pending.aggregate_buffer->buffer)
+                {
+                    const vk::DeviceSize dst_offset =
+                        static_cast<vk::DeviceSize>(pending.resource->triangle_offset) *
+                        static_cast<vk::DeviceSize>(
+                            kRaytraceTriangleVertexStrideBytes * 3u);
+                    if (dst_offset + pending.resource->output_buffer_size <=
+                        pending.aggregate_buffer->size)
+                    {
+                        command_buffer.copyBuffer(
+                            *pending.resource->output_buffer,
+                            *pending.aggregate_buffer->buffer,
+                            vk::BufferCopy(
+                                0,
+                                dst_offset,
+                                pending.resource->output_buffer_size));
+                    }
+                }
+
+                if (pending.hardware_geometry)
+                {
+                    command_buffer.copyBuffer(
+                        *pending.resource->output_buffer,
+                        *pending.hardware_geometry->vertex_buffer,
+                        vk::BufferCopy(
+                            0,
+                            0,
+                            pending.resource->output_buffer_size));
+                    geometry_copy_barriers.emplace_back(
+                        vk::AccessFlagBits::eTransferWrite,
+                        vk::AccessFlagBits::eAccelerationStructureReadKHR,
+                        VK_QUEUE_FAMILY_IGNORED,
+                        VK_QUEUE_FAMILY_IGNORED,
+                        *pending.hardware_geometry->vertex_buffer,
+                        0,
+                        pending.resource->output_buffer_size);
+                }
+            }
+
+            if (!geometry_copy_barriers.empty())
+            {
+                command_buffer.pipelineBarrier(
+                    vk::PipelineStageFlagBits::eTransfer,
+                    vk::PipelineStageFlagBits::eAccelerationStructureBuildKHR,
+                    {},
+                    nullptr,
+                    geometry_copy_barriers,
+                    nullptr);
+            }
+
+            for (const auto& pending : pending_dispatches)
+            {
+                if (!pending.hardware_geometry)
+                {
+                    continue;
+                }
+                const vk::AccelerationStructureBuildRangeInfoKHR* range_infos[] = {
+                    &pending.range_info};
+                command_buffer.buildAccelerationStructuresKHR(
+                    pending.build_info,
+                    range_infos);
+            }
+        });
+    animated_rt_stats.dynamic_geometry_submit_ms +=
+        ElapsedMilliseconds(submit_start);
+
+    if (!pending_dispatches.empty())
+    {
+        storage_buffers_ready_ = false;
+    }
+
+    const bool has_blas_updates = std::any_of(
+        pending_dispatches.begin(),
+        pending_dispatches.end(),
+        [](const PendingGpuDispatch& pending) {
+            return pending.hardware_geometry != nullptr;
+        });
+    if (has_blas_updates)
+    {
+        const auto transform_start = SteadyClock::now();
+        UpdateHardwareRaytracingTransforms(true);
+        animated_rt_stats.dynamic_geometry_transforms_ms +=
+            ElapsedMilliseconds(transform_start);
+    }
+
+    for (auto& pending : pending_dispatches)
+    {
+        if (pending.resource)
+        {
+            pending.resource->initialized = true;
+        }
+    }
+
+    return updated_source_triangle_buffer_ids;
 }
 
 void Device::CreateHardwareRaytracingScene()

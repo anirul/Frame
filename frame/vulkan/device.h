@@ -8,6 +8,10 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+
+#include <glm/mat4x4.hpp>
+#include <glm/vec4.hpp>
+
 #include "frame/json/level_data.h"
 #include "frame/proto/level.pb.h"
 
@@ -175,7 +179,10 @@ class Device : public DeviceInterface
     void DestroyTextureResources();
     void CreateDescriptorResources();
     void DestroyDescriptorResources();
+    void CreateGpuSkinningResources();
+    void DestroyGpuSkinningResources();
     void UpdateRaytraceBuffers();
+    std::vector<EntityId> UpdateGpuSkinnedMeshes();
     bool UpdateAggregateRaytracingSceneBuffers(bool build_software_bvh);
     bool UpdateHardwareRaytracingAggregateSceneBuffers(
         const std::vector<EntityId>& updated_source_triangle_buffer_ids);
@@ -253,6 +260,34 @@ class Device : public DeviceInterface
     bool device_lost_ = false;
     bool hardware_raytracing_supported_ = false;
     bool use_hardware_raytracing_ = false;
+    struct GpuSkinningResource
+    {
+        EntityId mesh_id = NullId;
+        EntityId source_triangle_buffer_id = NullId;
+        EntityId source_node_id = NullId;
+        EntityId source_material_id = NullId;
+        std::uint32_t material_id = 0;
+        std::uint32_t triangle_offset = 0;
+        std::uint32_t output_vertex_count = 0;
+        std::uint32_t bone_capacity = 0;
+        vk::DeviceSize output_buffer_size = 0;
+        glm::vec4 color_multiplier = glm::vec4(1.0f);
+        vk::UniqueBuffer source_vertex_buffer;
+        vk::UniqueDeviceMemory source_vertex_memory;
+        vk::UniqueBuffer source_index_buffer;
+        vk::UniqueDeviceMemory source_index_memory;
+        vk::UniqueBuffer bone_matrix_buffer;
+        vk::UniqueDeviceMemory bone_matrix_memory;
+        vk::UniqueBuffer output_buffer;
+        vk::UniqueDeviceMemory output_memory;
+        vk::DescriptorSet descriptor_set = VK_NULL_HANDLE;
+        bool initialized = false;
+    };
+    std::vector<GpuSkinningResource> gpu_skinning_resources_;
+    vk::UniqueDescriptorSetLayout gpu_skinning_descriptor_set_layout_;
+    vk::UniqueDescriptorPool gpu_skinning_descriptor_pool_;
+    vk::UniquePipelineLayout gpu_skinning_pipeline_layout_;
+    vk::UniquePipeline gpu_skinning_pipeline_;
     struct ProgramPipelineInfo
     {
         struct BindingInfo
