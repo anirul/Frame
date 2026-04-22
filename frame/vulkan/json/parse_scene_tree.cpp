@@ -3172,6 +3172,7 @@ bool ParseNodeMesh(
             textures.reserve(static_cast<std::size_t>(mesh->mNumVertices) * 2);
             const bool has_normals = mesh->HasNormals();
             const bool has_texcoords = mesh->HasTextureCoords(0);
+            const bool is_skinned_mesh = mesh->HasBones();
             aiVector3D generated_uv_min(
                 std::numeric_limits<float>::max(),
                 std::numeric_limits<float>::max(),
@@ -3188,7 +3189,9 @@ bool ParseNodeMesh(
                      ++vertex_index)
                 {
                     const aiVector3D p =
-                        mesh_transform * mesh->mVertices[vertex_index];
+                        is_skinned_mesh
+                            ? mesh->mVertices[vertex_index]
+                            : mesh_transform * mesh->mVertices[vertex_index];
                     generated_uv_min.x = std::min(generated_uv_min.x, p.x);
                     generated_uv_min.y = std::min(generated_uv_min.y, p.y);
                     generated_uv_min.z = std::min(generated_uv_min.z, p.z);
@@ -3223,14 +3226,18 @@ bool ParseNodeMesh(
                  ++vertex_index)
             {
                 const aiVector3D p =
-                    mesh_transform * mesh->mVertices[vertex_index];
+                    is_skinned_mesh
+                        ? mesh->mVertices[vertex_index]
+                        : mesh_transform * mesh->mVertices[vertex_index];
                 points.push_back(p.x);
                 points.push_back(p.y);
                 points.push_back(p.z);
                 if (has_normals)
                 {
                     aiVector3D n =
-                        normal_transform * mesh->mNormals[vertex_index];
+                        is_skinned_mesh
+                            ? mesh->mNormals[vertex_index]
+                            : normal_transform * mesh->mNormals[vertex_index];
                     n.Normalize();
                     normals.push_back(n.x);
                     normals.push_back(n.y);
