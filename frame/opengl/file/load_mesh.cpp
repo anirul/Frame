@@ -1974,12 +1974,16 @@ std::vector<std::pair<EntityId, EntityId>> LoadMeshesFromGltfFile(
 
         const bool has_normals = mesh->HasNormals();
         const bool has_texcoords = mesh->HasTextureCoords(0);
+        const bool is_skinned_mesh = mesh->HasBones();
         Bounds3 generated_uv_bounds;
         if (!has_texcoords)
         {
             for (unsigned int v = 0; v < mesh->mNumVertices; ++v)
             {
-                generated_uv_bounds.Expand(mesh_transform * mesh->mVertices[v]);
+                generated_uv_bounds.Expand(
+                    is_skinned_mesh
+                        ? mesh->mVertices[v]
+                        : mesh_transform * mesh->mVertices[v]);
             }
         }
         const aiVector3D generated_uv_center = generated_uv_bounds.valid
@@ -2004,7 +2008,8 @@ std::vector<std::pair<EntityId, EntityId>> LoadMeshesFromGltfFile(
             const aiVector3D local_p = mesh->mVertices[v];
             local_mesh_bounds.Expand(local_p);
             local_model_bounds.Expand(local_p);
-            const aiVector3D p = mesh_transform * local_p;
+            const aiVector3D p =
+                is_skinned_mesh ? local_p : mesh_transform * local_p;
             transformed_mesh_bounds.Expand(p);
             transformed_model_bounds.Expand(p);
             points.push_back(p.x);
@@ -2013,7 +2018,10 @@ std::vector<std::pair<EntityId, EntityId>> LoadMeshesFromGltfFile(
 
             if (has_normals)
             {
-                aiVector3D n = normal_transform * mesh->mNormals[v];
+                aiVector3D n =
+                    is_skinned_mesh
+                        ? mesh->mNormals[v]
+                        : normal_transform * mesh->mNormals[v];
                 n.Normalize();
                 normals.push_back(n.x);
                 normals.push_back(n.y);
@@ -2093,10 +2101,12 @@ std::vector<std::pair<EntityId, EntityId>> LoadMeshesFromGltfFile(
                     mesh->mNumBones,
                     supported_bones);
             }
+            aiMatrix4x4 skin_global_inverse = aiMatrix4x4();
+
             skin_animation_data = std::make_shared<SkinAnimationData>();
             skin_animation_data->nodes = scene_nodes;
             skin_animation_data->node_indices = scene_node_indices;
-            skin_animation_data->global_inverse_transform = scene_global_inverse;
+            skin_animation_data->global_inverse_transform = skin_global_inverse;
             skin_animation_data->bones.resize(supported_bones);
             skin_animation_data->clips = scene_animation_clips;
             skin_animation_data->clip_name_to_index = scene_clip_name_to_index;

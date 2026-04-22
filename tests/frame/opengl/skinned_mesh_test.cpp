@@ -8,14 +8,21 @@
 namespace test
 {
 
-TEST_F(SkinnedMeshTest, LoadFoxGlbCreatesSkinnedMeshWithAnimationData)
+namespace
+{
+constexpr const char* kSkinnedMeshAssetPath =
+    "asset/model/cesium_man/CesiumMan.glb";
+constexpr const char* kSkinnedMeshNodeName = "CesiumManMesh";
+} // namespace
+
+TEST_F(SkinnedMeshTest, LoadCesiumManGlbCreatesSkinnedMeshWithAnimationData)
 {
     ASSERT_TRUE(window_);
     auto level = std::make_unique<frame::Level>();
     auto mesh_vec = frame::opengl::file::LoadMeshesFromFile(
         *level,
-        frame::file::FindFile("asset/model/fox/Fox.glb"),
-        "FoxMesh");
+        frame::file::FindFile(kSkinnedMeshAssetPath),
+        kSkinnedMeshNodeName);
     ASSERT_FALSE(mesh_vec.empty());
 
     frame::opengl::SkinnedMesh* skinned = nullptr;
@@ -40,10 +47,10 @@ TEST_F(SkinnedMeshTest, LoadFoxGlbCreatesSkinnedMeshWithAnimationData)
     EXPECT_FALSE(skinned->HasRaytraceBvhCallback());
 
     skinned->SetSkinningAnimation(true, 1.5f);
-    skinned->SetSkinningAnimationClip("Walk", 0);
+    skinned->SetSkinningAnimationClip("", 0);
     EXPECT_TRUE(skinned->IsSkinningAnimationEnabled());
     EXPECT_FLOAT_EQ(1.5f, skinned->GetSkinningAnimationSpeed());
-    EXPECT_EQ("Walk", skinned->GetSkinningAnimationClipName());
+    EXPECT_EQ("", skinned->GetSkinningAnimationClipName());
     EXPECT_TRUE(skinned->GetSkinningAnimationClipIndex().has_value());
     EXPECT_DOUBLE_EQ(3.0, skinned->GetSkinningTime(2.0));
 
@@ -54,14 +61,14 @@ TEST_F(SkinnedMeshTest, LoadFoxGlbCreatesSkinnedMeshWithAnimationData)
     EXPECT_FALSE(triangles.empty());
 }
 
-TEST_F(SkinnedMeshTest, LoadFoxGlbWithBvhCreatesSkinnedBvhData)
+TEST_F(SkinnedMeshTest, LoadCesiumManGlbWithBvhCreatesSkinnedBvhData)
 {
     ASSERT_TRUE(window_);
     auto level = std::make_unique<frame::Level>();
     auto mesh_vec = frame::opengl::file::LoadMeshesFromFile(
         *level,
-        frame::file::FindFile("asset/model/fox/Fox.glb"),
-        "FoxMesh",
+        frame::file::FindFile(kSkinnedMeshAssetPath),
+        kSkinnedMeshNodeName,
         "",
         frame::proto::NodeMesh::BVH_ACCELERATION);
     ASSERT_FALSE(mesh_vec.empty());
@@ -90,4 +97,3 @@ TEST_F(SkinnedMeshTest, LoadFoxGlbWithBvhCreatesSkinnedBvhData)
 }
 
 } // End namespace test.
-

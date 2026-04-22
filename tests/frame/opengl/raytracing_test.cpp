@@ -19,14 +19,16 @@ namespace test
 namespace
 {
 
-frame::proto::Level LoadLevelProtoWithFoxAnimationEnabled(bool enabled)
+constexpr const char* kSkinnedMeshNodeName = "CesiumManMesh";
+
+frame::proto::Level LoadLevelProtoWithSkinnedMeshAnimationEnabled(bool enabled)
 {
     auto level_proto = frame::json::LoadLevelProto(
         frame::file::FindFile("asset/json/skinned_mesh.json"));
     auto* scene_tree = level_proto.mutable_scene_tree();
     for (auto& node_mesh : *scene_tree->mutable_node_meshes())
     {
-        if (node_mesh.name() != "FoxMesh")
+        if (node_mesh.name() != kSkinnedMeshNodeName)
         {
             continue;
         }
@@ -942,7 +944,7 @@ TEST_F(OpenGLRayTracingLevelTest, SkinnedMeshBindPoseDoesNotUpdateAggregateScene
 {
     auto level = frame::json::ParseLevel(
         {1280u, 720u},
-        LoadLevelProtoWithFoxAnimationEnabled(false));
+        LoadLevelProtoWithSkinnedMeshAnimationEnabled(false));
     ASSERT_NE(level, nullptr);
 
     const auto material_id = level->GetIdFromName("RayTraceMaterial");
@@ -976,7 +978,7 @@ TEST_F(OpenGLRayTracingLevelTest, SkinnedMeshBindPoseDoesNotUpdateAggregateScene
     EXPECT_EQ(bvh_buffer->GetRawData(), bvh_before);
 }
 
-TEST_F(OpenGLRayTracingLevelTest, SkinnedMeshSceneMaterialUsesImportedFoxTextures)
+TEST_F(OpenGLRayTracingLevelTest, SkinnedMeshSceneMaterialUsesImportedCharacterTextures)
 {
     auto level = LoadLevel("asset/json/skinned_mesh.json");
     ASSERT_NE(level, nullptr);
@@ -987,48 +989,50 @@ TEST_F(OpenGLRayTracingLevelTest, SkinnedMeshSceneMaterialUsesImportedFoxTexture
         "RayTracingRendering");
     ASSERT_NE(scene_material_id, frame::NullId);
     EXPECT_EQ(scene_material_id, level->GetIdFromName("RayTraceMaterial"));
-    const auto fox_material_id = FindMaterialForNode(
+    const auto mesh_material_id = FindMaterialForNode(
         *level,
         frame::proto::NodeMesh::SCENE_RENDER_TIME,
-        "FoxMesh");
-    ASSERT_NE(fox_material_id, frame::NullId);
+        kSkinnedMeshNodeName);
+    ASSERT_NE(mesh_material_id, frame::NullId);
 
     const auto& scene_material = level->GetMaterialFromId(scene_material_id);
-    const auto& fox_material = level->GetMaterialFromId(fox_material_id);
+    const auto& mesh_material = level->GetMaterialFromId(mesh_material_id);
 
     const auto scene_albedo_id = FindTextureByInnerName(
         scene_material, "opaque_albedo_texture");
     const auto scene_normal_id = FindTextureByInnerName(
         scene_material, "opaque_normal_texture");
-    const auto fox_albedo_id = FindTextureByInnerName(
-        fox_material, "albedo_texture");
-    const auto fox_normal_id = FindTextureByInnerName(
-        fox_material, "normal_texture");
+    const auto mesh_albedo_id = FindTextureByInnerName(
+        mesh_material, "albedo_texture");
+    const auto mesh_normal_id = FindTextureByInnerName(
+        mesh_material, "normal_texture");
 
     ASSERT_NE(scene_albedo_id, frame::NullId);
-    ASSERT_NE(scene_normal_id, frame::NullId);
-    ASSERT_NE(fox_albedo_id, frame::NullId);
-    ASSERT_NE(fox_normal_id, frame::NullId);
-    EXPECT_EQ(scene_albedo_id, fox_albedo_id);
-    EXPECT_EQ(scene_normal_id, fox_normal_id);
-    EXPECT_GT(level->GetTextureFromId(fox_albedo_id).GetSize().x, 1u);
-    EXPECT_GT(level->GetTextureFromId(fox_albedo_id).GetSize().y, 1u);
+    ASSERT_NE(mesh_albedo_id, frame::NullId);
+    EXPECT_EQ(scene_albedo_id, mesh_albedo_id);
+    EXPECT_GT(level->GetTextureFromId(mesh_albedo_id).GetSize().x, 1u);
+    EXPECT_GT(level->GetTextureFromId(mesh_albedo_id).GetSize().y, 1u);
+    if (mesh_normal_id != frame::NullId)
+    {
+        ASSERT_NE(scene_normal_id, frame::NullId);
+        EXPECT_EQ(scene_normal_id, mesh_normal_id);
+    }
 }
 
-TEST_F(OpenGLRayTracingLevelTest, SkinnedMeshFoxMaterialRemainsOpaque)
+TEST_F(OpenGLRayTracingLevelTest, SkinnedMeshMaterialRemainsOpaque)
 {
     auto level = LoadLevel("asset/json/skinned_mesh.json");
     ASSERT_NE(level, nullptr);
 
-    const auto fox_material_id = FindMaterialForNode(
+    const auto mesh_material_id = FindMaterialForNode(
         *level,
         frame::proto::NodeMesh::SCENE_RENDER_TIME,
-        "FoxMesh");
-    ASSERT_NE(fox_material_id, frame::NullId);
+        kSkinnedMeshNodeName);
+    ASSERT_NE(mesh_material_id, frame::NullId);
 
-    const auto& fox_material = level->GetMaterialFromId(fox_material_id);
+    const auto& mesh_material = level->GetMaterialFromId(mesh_material_id);
     const auto transmission_texture_id = FindTextureByInnerName(
-        fox_material, "transmission_texture");
+        mesh_material, "transmission_texture");
     ASSERT_NE(transmission_texture_id, frame::NullId);
     EXPECT_LT(ReadTextureFirstChannel(*level, transmission_texture_id), 0.01f);
 }
@@ -1149,7 +1153,7 @@ TEST_F(OpenGLRayTracingLevelTest, SkinnedMeshAggregateTrianglesHaveFiniteBounds)
     EXPECT_GT(max_y - min_y, 0.05f);
     EXPECT_GT(max_z - min_z, 0.05f);
     EXPECT_LT(min_y, 0.2f);
-    EXPECT_GT(max_y, 0.2f);
+    EXPECT_GT(max_y, 0.15f);
 }
 
 TEST_F(OpenGLRayTracingLevelTest, SkinnedMeshCpuRayHitsAggregateTriangles)
