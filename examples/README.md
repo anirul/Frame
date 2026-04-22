@@ -19,6 +19,7 @@ reference for the acceleration-structure path across both backends.
 
 ## 03 Skinned Mesh
 
-Loads `asset/json/skinned_mesh.json`, which imports `asset/model/fox/Fox.glb`
-as raytraced scene geometry in `SCENE_RENDER_TIME` and plays the `Walk`
-animation through the shared raytracing pipeline.
+Loads `asset/json/skinned_mesh.json`, which imports
+`asset/model/cesium_man/CesiumMan.glb` as raytraced scene geometry in
+`SCENE_RENDER_TIME` and plays the model's first embedded animation through the
+shared raytracing pipeline.

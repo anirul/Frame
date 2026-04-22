@@ -71,9 +71,9 @@
                 "parent": "root",
                 "matrix_type_enum": "STATIC_MATRIX",
                 "matrix": {
-                    "m11": 0.01,
-                    "m22": 0.01,
-                    "m33": 0.01,
+                    "m11": 1.0,
+                    "m22": 1.0,
+                    "m33": 1.0,
                     "m44": 1
                 }
             },
@@ -109,12 +109,12 @@
                 "far_clip": 1000.0,
                 "position": {
                     "x": 0,
-                    "y": 0.2,
-                    "z": -2.4
+                    "y": 0.9,
+                    "z": -3.2
                 },
                 "target": {
                     "x": 0,
-                    "y": 0.1,
+                    "y": 0.75,
                     "z": 0
                 },
                 "up": {
@@ -137,13 +137,12 @@
                 "mesh_enum": "QUAD"
             },
             {
-                "name": "FoxMesh",
+                "name": "CesiumManMesh",
                 "parent": "mesh_holder",
-                "file_name": "fox/Fox.glb",
+                "file_name": "cesium_man/CesiumMan.glb",
                 "acceleration_structure_enum": "BVH_ACCELERATION",
                 "play_animation": true,
                 "animation_speed": 1.0,
-                "animation_clip_name": "Walk",
                 "render_time_enum": "SCENE_RENDER_TIME"
             }
         ],

@@ -47,6 +47,7 @@ struct BvhNode
 
 constexpr std::size_t kFloatsPerVertex = 12;
 constexpr std::size_t kFloatsPerTriangle = kFloatsPerVertex * 3;
+constexpr const char* kSkinnedMeshNodeName = "CesiumManMesh";
 
 bool EndsWith(const std::string& value, const std::string& suffix)
 {
@@ -57,14 +58,14 @@ bool EndsWith(const std::string& value, const std::string& suffix)
     return value.compare(value.size() - suffix.size(), suffix.size(), suffix) == 0;
 }
 
-frame::proto::Level LoadSkinnedMeshLevelProtoWithFoxAnimationEnabled(bool enabled)
+frame::proto::Level LoadSkinnedMeshLevelProtoWithSkinnedMeshAnimationEnabled(bool enabled)
 {
     auto level_proto = frame::json::LoadLevelProto(
         frame::file::FindFile("asset/json/skinned_mesh.json"));
     auto* scene_tree = level_proto.mutable_scene_tree();
     for (auto& node_mesh : *scene_tree->mutable_node_meshes())
     {
-        if (node_mesh.name() != "FoxMesh")
+        if (node_mesh.name() != kSkinnedMeshNodeName)
         {
             continue;
         }
@@ -750,20 +751,20 @@ TEST_F(
     EXPECT_GT(triangle_buffer->GetSize(), 0u);
     EXPECT_EQ(bvh_buffer->GetSize(), 0u);
 
-    const auto fox_node_id = level.GetIdFromName("FoxMesh");
-    ASSERT_NE(fox_node_id, frame::NullId);
-    auto& fox_node = level.GetSceneNodeFromId(fox_node_id);
-    const auto fox_mesh_id = fox_node.GetLocalMesh();
-    ASSERT_NE(fox_mesh_id, frame::NullId);
+    const auto mesh_node_id = level.GetIdFromName(kSkinnedMeshNodeName);
+    ASSERT_NE(mesh_node_id, frame::NullId);
+    auto& mesh_node = level.GetSceneNodeFromId(mesh_node_id);
+    const auto mesh_id = mesh_node.GetLocalMesh();
+    ASSERT_NE(mesh_id, frame::NullId);
     auto* skinned_mesh = dynamic_cast<frame::vulkan::SkinnedMesh*>(
-        &level.GetMeshFromId(fox_mesh_id));
+        &level.GetMeshFromId(mesh_id));
     ASSERT_NE(skinned_mesh, nullptr);
     EXPECT_TRUE(skinned_mesh->HasRaytraceTriangleCallback());
     EXPECT_FALSE(skinned_mesh->HasRaytraceBvhCallback());
     EXPECT_EQ(skinned_mesh->GetBvhBufferId(), frame::NullId);
 }
 
-TEST_F(VulkanSkinnedRayTracingParseTest, FoxAnimationChangesRaytraceTriangles)
+TEST_F(VulkanSkinnedRayTracingParseTest, SkinnedMeshAnimationChangesRaytraceTriangles)
 {
     auto built = frame::vulkan::BuildLevel(
         glm::uvec2(512, 288),
@@ -772,13 +773,13 @@ TEST_F(VulkanSkinnedRayTracingParseTest, FoxAnimationChangesRaytraceTriangles)
     ASSERT_NE(built.level, nullptr);
     auto& level = *built.level;
 
-    const auto fox_node_id = level.GetIdFromName("FoxMesh");
-    ASSERT_NE(fox_node_id, frame::NullId);
-    auto& fox_node = level.GetSceneNodeFromId(fox_node_id);
-    const auto fox_mesh_id = fox_node.GetLocalMesh();
-    ASSERT_NE(fox_mesh_id, frame::NullId);
+    const auto mesh_node_id = level.GetIdFromName(kSkinnedMeshNodeName);
+    ASSERT_NE(mesh_node_id, frame::NullId);
+    auto& mesh_node = level.GetSceneNodeFromId(mesh_node_id);
+    const auto mesh_id = mesh_node.GetLocalMesh();
+    ASSERT_NE(mesh_id, frame::NullId);
     auto* skinned_mesh = dynamic_cast<frame::vulkan::SkinnedMesh*>(
-        &level.GetMeshFromId(fox_mesh_id));
+        &level.GetMeshFromId(mesh_id));
     ASSERT_NE(skinned_mesh, nullptr);
 
     const auto triangles_at_start =
@@ -800,9 +801,9 @@ TEST_F(VulkanSkinnedRayTracingParseTest, FoxAnimationChangesRaytraceTriangles)
     EXPECT_TRUE(found_difference);
 }
 
-TEST_F(VulkanSkinnedRayTracingParseTest, FoxBindPoseDisablesDynamicRaytraceCallbacks)
+TEST_F(VulkanSkinnedRayTracingParseTest, SkinnedMeshBindPoseDisablesDynamicRaytraceCallbacks)
 {
-    auto level_proto = LoadSkinnedMeshLevelProtoWithFoxAnimationEnabled(false);
+    auto level_proto = LoadSkinnedMeshLevelProtoWithSkinnedMeshAnimationEnabled(false);
     auto level_data = frame::json::ParseLevelData(
         glm::uvec2(512, 288),
         level_proto,
@@ -814,13 +815,13 @@ TEST_F(VulkanSkinnedRayTracingParseTest, FoxBindPoseDisablesDynamicRaytraceCallb
     ASSERT_NE(built.level, nullptr);
     auto& level = *built.level;
 
-    const auto fox_node_id = level.GetIdFromName("FoxMesh");
-    ASSERT_NE(fox_node_id, frame::NullId);
-    auto& fox_node = level.GetSceneNodeFromId(fox_node_id);
-    const auto fox_mesh_id = fox_node.GetLocalMesh();
-    ASSERT_NE(fox_mesh_id, frame::NullId);
+    const auto mesh_node_id = level.GetIdFromName(kSkinnedMeshNodeName);
+    ASSERT_NE(mesh_node_id, frame::NullId);
+    auto& mesh_node = level.GetSceneNodeFromId(mesh_node_id);
+    const auto mesh_id = mesh_node.GetLocalMesh();
+    ASSERT_NE(mesh_id, frame::NullId);
     auto* skinned_mesh = dynamic_cast<frame::vulkan::SkinnedMesh*>(
-        &level.GetMeshFromId(fox_mesh_id));
+        &level.GetMeshFromId(mesh_id));
     ASSERT_NE(skinned_mesh, nullptr);
 
     EXPECT_FALSE(skinned_mesh->IsSkinningAnimationEnabled());
@@ -836,7 +837,7 @@ TEST_F(VulkanSkinnedRayTracingParseTest, FoxBindPoseDisablesDynamicRaytraceCallb
     EXPECT_EQ(triangles_at_start, triangles_later);
 }
 
-TEST_F(VulkanSkinnedRayTracingParseTest, SceneMaterialUsesImportedFoxTextures)
+TEST_F(VulkanSkinnedRayTracingParseTest, SceneMaterialUsesImportedCharacterTextures)
 {
     auto built = frame::vulkan::BuildLevel(
         glm::uvec2(512, 288),
@@ -846,32 +847,34 @@ TEST_F(VulkanSkinnedRayTracingParseTest, SceneMaterialUsesImportedFoxTextures)
 
     const auto scene_material_id = level.GetIdFromName("RayTraceMaterial");
     ASSERT_NE(scene_material_id, frame::NullId);
-    const auto fox_material_id = FindMaterialForNode(
+    const auto mesh_material_id = FindMaterialForNode(
         level,
         frame::proto::NodeMesh::SCENE_RENDER_TIME,
-        "FoxMesh");
-    ASSERT_NE(fox_material_id, frame::NullId);
+        kSkinnedMeshNodeName);
+    ASSERT_NE(mesh_material_id, frame::NullId);
 
     const auto& scene_material = level.GetMaterialFromId(scene_material_id);
-    const auto& fox_material = level.GetMaterialFromId(fox_material_id);
+    const auto& mesh_material = level.GetMaterialFromId(mesh_material_id);
 
     const auto scene_albedo_id = FindTextureByInnerName(
         scene_material, "opaque_albedo_texture");
     const auto scene_normal_id = FindTextureByInnerName(
         scene_material, "opaque_normal_texture");
-    const auto fox_albedo_id = FindTextureByInnerName(
-        fox_material, "albedo_texture");
-    const auto fox_normal_id = FindTextureByInnerName(
-        fox_material, "normal_texture");
+    const auto mesh_albedo_id = FindTextureByInnerName(
+        mesh_material, "albedo_texture");
+    const auto mesh_normal_id = FindTextureByInnerName(
+        mesh_material, "normal_texture");
 
     ASSERT_NE(scene_albedo_id, frame::NullId);
-    ASSERT_NE(scene_normal_id, frame::NullId);
-    ASSERT_NE(fox_albedo_id, frame::NullId);
-    ASSERT_NE(fox_normal_id, frame::NullId);
-    EXPECT_EQ(scene_albedo_id, fox_albedo_id);
-    EXPECT_EQ(scene_normal_id, fox_normal_id);
-    EXPECT_GT(level.GetTextureFromId(fox_albedo_id).GetSize().x, 1u);
-    EXPECT_GT(level.GetTextureFromId(fox_albedo_id).GetSize().y, 1u);
+    ASSERT_NE(mesh_albedo_id, frame::NullId);
+    EXPECT_EQ(scene_albedo_id, mesh_albedo_id);
+    EXPECT_GT(level.GetTextureFromId(mesh_albedo_id).GetSize().x, 1u);
+    EXPECT_GT(level.GetTextureFromId(mesh_albedo_id).GetSize().y, 1u);
+    if (mesh_normal_id != frame::NullId)
+    {
+        ASSERT_NE(scene_normal_id, frame::NullId);
+        EXPECT_EQ(scene_normal_id, mesh_normal_id);
+    }
 }
 
 TEST_F(VulkanSkinnedRayTracingParseTest, QuaternionNodesStillRotate)
