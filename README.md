@@ -49,7 +49,7 @@ cmake --build --preset windows-debug
 cmake --build --preset windows-release
 ```
 
-The presets keep vcpkg installs in `build/vcpkg_installed/` so fresh configure
+The presets keep vcpkg installs in `vcpkg_installed/` so fresh configure
 directories can reuse the same dependency tree instead of reinstalling packages
 per build folder.
 

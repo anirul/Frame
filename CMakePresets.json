@@ -15,7 +15,7 @@
                 "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/external/vcpkg/scripts/buildsystems/vcpkg.cmake",
                 "CMAKE_BUILD_TYPE": "Release",
                 "VCPKG_TARGET_TRIPLET": "x64-linux",
-                "VCPKG_INSTALLED_DIR": "${sourceDir}/build/vcpkg_installed/linux"
+                "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkg_installed"
             }
         },
         {
@@ -27,7 +27,7 @@
                 "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/external/vcpkg/scripts/buildsystems/vcpkg.cmake",
                 "CMAKE_BUILD_TYPE": "Debug",
                 "VCPKG_TARGET_TRIPLET": "x64-linux",
-                "VCPKG_INSTALLED_DIR": "${sourceDir}/build/vcpkg_installed/linux"
+                "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkg_installed"
             }
         },
         {
@@ -40,7 +40,7 @@
                 "CMAKE_GENERATOR_TOOLSET": "v143",
                 "CMAKE_GENERATOR_PLATFORM": "x64",
                 "VCPKG_TARGET_TRIPLET": "x64-windows",
-                "VCPKG_INSTALLED_DIR": "${sourceDir}/build/vcpkg_installed/windows"
+                "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkg_installed"
             }
         }
     ],
