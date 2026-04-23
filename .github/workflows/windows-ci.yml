@@ -1,0 +1,66 @@
+name: Windows CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: windows-2022
+    timeout-minutes: 60
+    env:
+      SCCACHE_GHA_ENABLED: "true"
+      SCCACHE_CACHE_SIZE: "2G"
+      SCCACHE_IGNORE_SERVER_IO_ERROR: "1"
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        lfs: true
+        submodules: recursive
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Setup sccache
+      uses: mozilla-actions/sccache-action@v0.0.9
+
+    - name: Cache vcpkg downloads
+      uses: actions/cache@v4
+      with:
+        path: external/vcpkg/downloads
+        key: ${{ runner.os }}-vcpkg-downloads-${{ hashFiles('vcpkg.json', 'CMakePresets.json', '.gitmodules') }}
+        restore-keys: |
+          ${{ runner.os }}-vcpkg-downloads-
+
+    - name: Cache vcpkg installed tree
+      uses: actions/cache@v4
+      with:
+        path: build/vcpkg_installed/windows
+        key: ${{ runner.os }}-x64-windows-vcpkg-installed-${{ hashFiles('vcpkg.json', 'CMakePresets.json', '.gitmodules') }}
+        restore-keys: |
+          ${{ runner.os }}-x64-windows-vcpkg-installed-
+
+    - name: Git-lfs pull
+      run: git lfs pull
+
+    - name: Bootstrap vcpkg
+      run: .\external\vcpkg\bootstrap-vcpkg.bat
+
+    - name: Configure with CMake preset
+      run: >
+        cmake --preset windows --fresh
+        -DCMAKE_C_COMPILER_LAUNCHER=sccache
+        -DCMAKE_CXX_COMPILER_LAUNCHER=sccache
+        -DCMAKE_MSVC_DEBUG_INFORMATION_FORMAT=Embedded
+
+    - name: Build with CMake preset
+      run: cmake --build --preset windows-debug --parallel
+
+    - name: Run tests using CTest
+      run: ctest --test-dir build\windows -C Debug --output-on-failure
+
+    - name: Show sccache stats
+      if: always()
+      run: '& $env:SCCACHE_PATH --show-stats'
