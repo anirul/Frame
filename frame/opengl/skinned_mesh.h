@@ -42,11 +42,20 @@ class SkinnedMesh : public Mesh
         std::function<std::vector<BVHNode>(double)> callback);
 
     bool HasSkinning() const;
+    bool SupportsGpuRaytraceSkinning() const;
     bool HasActiveSkinning() const;
     bool IsSkinningAnimationEnabled() const;
     float GetSkinningAnimationSpeed() const;
     const std::string& GetSkinningAnimationClipName() const;
     std::optional<std::uint32_t> GetSkinningAnimationClipIndex() const;
+    EntityId GetBoneIndexBufferId() const
+    {
+        return bone_index_buffer_id_;
+    }
+    EntityId GetBoneWeightBufferId() const
+    {
+        return bone_weight_buffer_id_;
+    }
     double GetSkinningTime(double time_s) const;
     std::vector<glm::mat4> EvaluateSkinning(double time_s) const;
     bool HasRaytraceTriangleCallback() const;
@@ -55,6 +64,9 @@ class SkinnedMesh : public Mesh
     bool HasRaytraceBvhCallback() const;
     bool HasActiveRaytraceBvhCallback() const;
     std::vector<BVHNode> EvaluateRaytraceBvh(double time_s) const;
+    bool ShouldUpdateRaytraceBuffers(double time_s) const;
+    void MarkRaytraceBuffersUpdated(double time_s);
+    void InvalidateRaytraceBuffers();
 
   private:
     EntityId bone_index_buffer_id_ = NullId;
@@ -70,6 +82,8 @@ class SkinnedMesh : public Mesh
     float skinning_animation_speed_ = 1.0f;
     std::string skinning_animation_clip_name_ = {};
     std::optional<std::uint32_t> skinning_animation_clip_index_ = std::nullopt;
+    bool raytrace_buffers_dirty_ = true;
+    std::optional<double> last_raytrace_update_time_s_ = std::nullopt;
 };
 
 } // End namespace frame::opengl.

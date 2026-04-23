@@ -1,8 +1,11 @@
 #pragma once
 
 #include <memory>
+#include <unordered_map>
 
+#include "frame/opengl/buffer.h"
 #include "frame/opengl/frame_buffer.h"
+#include "frame/opengl/program.h"
 #include "frame/opengl/render_buffer.h"
 #include "frame/program_interface.h"
 #include "frame/renderer_interface.h"
@@ -124,8 +127,13 @@ class Renderer : public RendererInterface
         const glm::mat4& view) override;
 
   private:
-    void UpdateRaytraceBuffersIfNeeded(SkinnedMesh& skinned_mesh);
+    bool UpdateRaytraceBuffersIfNeeded(SkinnedMesh& skinned_mesh);
     void UpdateAggregateRaytraceSceneBuffers();
+    void UpdateSourceInstanceRaytraceSceneBuffers();
+    bool UpdateRaytraceBuffersOnGpuIfPossible(SkinnedMesh& skinned_mesh);
+    void EnsureGpuSkinningProgram();
+    void EnsureGpuRaytraceTriangleCopyProgram();
+    void EnsureGpuRaytraceBvhRefitProgram();
 
   private:
     LevelInterface& level_;
@@ -147,6 +155,18 @@ class Renderer : public RendererInterface
     bool first_render_ = true;
     std::size_t last_raytrace_scene_state_hash_ = 0;
     bool has_raytrace_scene_state_hash_ = false;
+    bool gpu_skinning_program_attempted_ = false;
+    bool gpu_raytrace_triangle_copy_program_attempted_ = false;
+    bool gpu_raytrace_bvh_refit_program_attempted_ = false;
+    std::unique_ptr<Program> gpu_skinning_program_ = nullptr;
+    std::unique_ptr<Program> gpu_raytrace_triangle_copy_program_ = nullptr;
+    std::unique_ptr<Program> gpu_raytrace_bvh_refit_program_ = nullptr;
+    std::unique_ptr<Buffer> gpu_skinning_bone_matrix_buffer_ = nullptr;
+    std::unique_ptr<Buffer> gpu_skinning_empty_buffer_ = nullptr;
+    std::size_t last_source_instance_layout_hash_ = 0;
+    bool has_source_instance_layout_hash_ = false;
+    std::unordered_map<std::uint64_t, std::size_t>
+        raytrace_source_geometry_state_hashes_ = {};
     // The render callback it will be called once per mesh.
     RenderCallback callback_ = [](UniformCollectionInterface&,
                                   MeshInterface&,

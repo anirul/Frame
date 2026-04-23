@@ -1,0 +1,144 @@
+#version 450 core
+
+layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
+
+struct OutputVertex
+{
+    vec4 position_color0;
+    vec4 normal_color1;
+    vec4 uv_color23;
+};
+
+layout(std430, binding = 0) readonly buffer SourcePointBuffer
+{
+    float source_points[];
+};
+
+layout(std430, binding = 1) readonly buffer SourceNormalBuffer
+{
+    float source_normals[];
+};
+
+layout(std430, binding = 2) readonly buffer SourceUvBuffer
+{
+    float source_uvs[];
+};
+
+layout(std430, binding = 3) readonly buffer SourceIndexBuffer
+{
+    uint source_indices[];
+};
+
+layout(std430, binding = 4) readonly buffer BoneIndexBuffer
+{
+    ivec4 source_bone_indices[];
+};
+
+layout(std430, binding = 5) readonly buffer BoneWeightBuffer
+{
+    vec4 source_bone_weights[];
+};
+
+layout(std430, binding = 6) readonly buffer BoneMatrixBuffer
+{
+    mat4 bone_matrices[];
+};
+
+layout(std430, binding = 7) writeonly buffer OutputTriangleBuffer
+{
+    OutputVertex output_vertices[];
+};
+
+mat4 BuildSkinMatrix(const uint source_vertex_index)
+{
+    mat4 skin_matrix = mat4(0.0);
+    float weight_sum = 0.0;
+    const ivec4 bone_indices = source_bone_indices[source_vertex_index];
+    const vec4 bone_weights = source_bone_weights[source_vertex_index];
+    const uint bone_count = uint(bone_matrices.length());
+    for (uint slot = 0u; slot < 4u; ++slot)
+    {
+        const float weight = bone_weights[slot];
+        if (weight <= 0.0)
+        {
+            continue;
+        }
+
+        const int bone_index = bone_indices[slot];
+        if (bone_index < 0 || uint(bone_index) >= bone_count)
+        {
+            continue;
+        }
+
+        skin_matrix += bone_matrices[bone_index] * weight;
+        weight_sum += weight;
+    }
+
+    if (weight_sum <= 0.0)
+    {
+        return mat4(1.0);
+    }
+    return skin_matrix;
+}
+
+vec3 LoadPoint(const uint source_vertex_index)
+{
+    const uint base = source_vertex_index * 3u;
+    return vec3(
+        source_points[base + 0u],
+        source_points[base + 1u],
+        source_points[base + 2u]);
+}
+
+vec3 LoadNormal(const uint source_vertex_index)
+{
+    const uint base = source_vertex_index * 3u;
+    if (base + 2u >= uint(source_normals.length()))
+    {
+        return vec3(0.0);
+    }
+    return vec3(
+        source_normals[base + 0u],
+        source_normals[base + 1u],
+        source_normals[base + 2u]);
+}
+
+vec2 LoadUv(const uint source_vertex_index)
+{
+    const uint base = source_vertex_index * 2u;
+    if (base + 1u >= uint(source_uvs.length()))
+    {
+        return vec2(0.0);
+    }
+    return vec2(
+        source_uvs[base + 0u],
+        source_uvs[base + 1u]);
+}
+
+void main()
+{
+    const uint output_vertex_index = gl_GlobalInvocationID.x;
+    if (output_vertex_index >= uint(source_indices.length()))
+    {
+        return;
+    }
+
+    const uint source_vertex_index = source_indices[output_vertex_index];
+    const mat4 skin_matrix = BuildSkinMatrix(source_vertex_index);
+
+    const vec4 skinned_position =
+        skin_matrix * vec4(LoadPoint(source_vertex_index), 1.0);
+    vec3 skinned_normal =
+        mat3(skin_matrix) * LoadNormal(source_vertex_index);
+    const float skinned_normal_length = length(skinned_normal);
+    if (skinned_normal_length > 1.0e-6)
+    {
+        skinned_normal /= skinned_normal_length;
+    }
+
+    OutputVertex output_vertex;
+    output_vertex.position_color0 = vec4(skinned_position.xyz, 0.0);
+    output_vertex.normal_color1 = vec4(skinned_normal, 0.0);
+    output_vertex.uv_color23 = vec4(LoadUv(source_vertex_index), 0.0, 0.0);
+    output_vertices[output_vertex_index] = output_vertex;
+}

@@ -91,6 +91,34 @@ void Buffer::BindBase(int binding) const
         static_cast<GLenum>(buffer_type_), binding, buffer_object_);
 }
 
+const std::vector<std::uint8_t>& Buffer::ReadBack() const
+{
+    const auto size = GetSize();
+    std::vector<std::uint8_t> bytes(size, 0);
+    if (size > 0)
+    {
+        Bind();
+        glGetBufferSubData(
+            static_cast<GLenum>(buffer_type_),
+            0,
+            static_cast<GLsizeiptr>(size),
+            bytes.data());
+        UnBind();
+    }
+    if (raw_data_ != bytes)
+    {
+        raw_data_ = std::move(bytes);
+        IncrementGeneration(generation_);
+    }
+    return raw_data_;
+}
+
+void Buffer::MarkGpuModified() const
+{
+    raw_data_.clear();
+    IncrementGeneration(generation_);
+}
+
 void Buffer::Copy(const std::size_t size, const void* data /*= nullptr*/) const
 {
     if (MatchesRawBytes(raw_data_, size, data))

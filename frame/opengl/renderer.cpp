@@ -3,16 +3,21 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
+#include <cmath>
 #include <cstdint>
 #include <cstring>
+#include <filesystem>
 #include <functional>
+#include <fstream>
 #include <format>
 #include <glad/glad.h>
+#include <limits>
 #include <glm/gtc/type_ptr.hpp>
 #include <numeric>
 #include <stdexcept>
 
 #include "frame/bvh.h"
+#include "frame/file/file_system.h"
 #include "frame/json/parse_uniform.h"
 #include "frame/json/program_key.h"
 #include "frame/node_matrix.h"
@@ -80,6 +85,79 @@ bool IsRaytracingResolveMaterial(
     return material.GetPreprocessProgramId(&level) == frame::NullId;
 }
 
+std::unique_ptr<Program> CreateGpuSkinningProgram()
+{
+    std::ifstream compute_ifs{
+        frame::file::FindFile(
+            std::filesystem::path("asset/shader/opengl/skinning.comp"))};
+    if (!compute_ifs)
+    {
+        throw std::runtime_error(
+            "Could not open OpenGL GPU skinning compute shader.");
+    }
+
+    std::string compute_source(
+        std::istreambuf_iterator<char>(compute_ifs), {});
+    auto program = std::make_unique<Program>("GpuSkinningProgram");
+    Shader compute_shader(ShaderEnum::COMPUTE_SHADER);
+    if (!compute_shader.LoadFromSource(compute_source))
+    {
+        throw std::runtime_error(compute_shader.GetErrorMessage());
+    }
+    program->AddShader(compute_shader);
+    program->LinkShader();
+    return program;
+}
+
+std::unique_ptr<Program> CreateGpuRaytraceTriangleCopyProgram()
+{
+    std::ifstream compute_ifs{
+        frame::file::FindFile(
+            std::filesystem::path(
+                "asset/shader/opengl/raytrace_triangle_copy.comp"))};
+    if (!compute_ifs)
+    {
+        throw std::runtime_error(
+            "Could not open OpenGL raytrace triangle copy compute shader.");
+    }
+
+    std::string compute_source(
+        std::istreambuf_iterator<char>(compute_ifs), {});
+    auto program = std::make_unique<Program>("GpuRaytraceTriangleCopyProgram");
+    Shader compute_shader(ShaderEnum::COMPUTE_SHADER);
+    if (!compute_shader.LoadFromSource(compute_source))
+    {
+        throw std::runtime_error(compute_shader.GetErrorMessage());
+    }
+    program->AddShader(compute_shader);
+    program->LinkShader();
+    return program;
+}
+
+std::unique_ptr<Program> CreateGpuRaytraceBvhRefitProgram()
+{
+    std::ifstream compute_ifs{
+        frame::file::FindFile(
+            std::filesystem::path("asset/shader/opengl/raytrace_bvh_refit.comp"))};
+    if (!compute_ifs)
+    {
+        throw std::runtime_error(
+            "Could not open OpenGL raytrace BVH refit compute shader.");
+    }
+
+    std::string compute_source(
+        std::istreambuf_iterator<char>(compute_ifs), {});
+    auto program = std::make_unique<Program>("GpuRaytraceBvhRefitProgram");
+    Shader compute_shader(ShaderEnum::COMPUTE_SHADER);
+    if (!compute_shader.LoadFromSource(compute_source))
+    {
+        throw std::runtime_error(compute_shader.GetErrorMessage());
+    }
+    program->AddShader(compute_shader);
+    program->LinkShader();
+    return program;
+}
+
 std::vector<std::pair<frame::EntityId, frame::EntityId>>
 GetRaytracingSourceMeshMaterials(frame::LevelInterface& level)
 {
@@ -97,6 +175,17 @@ GetRaytracingSourceMeshMaterials(frame::LevelInterface& level)
     append_pairs(frame::proto::NodeMesh::PRE_RENDER_TIME);
     append_pairs(frame::proto::NodeMesh::SCENE_RENDER_TIME);
     return pairs;
+}
+
+bool RequiresWorldSpaceRaytraceBuffers(const SkinnedMesh& skinned_mesh)
+{
+    if (!skinned_mesh.HasActiveSkinning() &&
+        !skinned_mesh.HasActiveRaytraceTriangleCallback() &&
+        !skinned_mesh.HasActiveRaytraceBvhCallback())
+    {
+        return false;
+    }
+    return !skinned_mesh.SupportsGpuRaytraceSkinning();
 }
 
 bool RaytraceSceneRequiresWorldSpaceBuffers(frame::LevelInterface& level)
@@ -122,9 +211,7 @@ bool RaytraceSceneRequiresWorldSpaceBuffers(frame::LevelInterface& level)
         {
             continue;
         }
-        if (skinned_mesh->HasActiveSkinning() ||
-            skinned_mesh->HasActiveRaytraceTriangleCallback() ||
-            skinned_mesh->HasActiveRaytraceBvhCallback())
+        if (RequiresWorldSpaceRaytraceBuffers(*skinned_mesh))
         {
             return true;
         }
@@ -370,31 +457,289 @@ void HashMatrix(std::size_t& seed, const glm::mat4& matrix)
     }
 }
 
-void HashByteSamples(
-    std::size_t& seed, const std::vector<std::uint8_t>& bytes)
+glm::mat4 InverseOrIdentity(const glm::mat4& matrix)
 {
-    HashCombine(seed, bytes.size());
-    if (bytes.empty())
+    const float determinant = glm::determinant(glm::mat3(matrix));
+    if (std::abs(determinant) <= 1.0e-8f)
     {
-        return;
+        return glm::mat4(1.0f);
+    }
+    return glm::inverse(matrix);
+}
+
+std::size_t GetBufferSizeBytes(const Buffer& buffer)
+{
+    const auto& raw = buffer.GetRawData();
+    return raw.empty() ? buffer.GetSize() : raw.size();
+}
+
+constexpr std::size_t GetRaytraceTriangleStrideBytes()
+{
+    return sizeof(float) * 12u;
+}
+
+struct alignas(16) RaytraceInstanceStorageData
+{
+    glm::mat4 object_to_world = glm::mat4(1.0f);
+    glm::mat4 world_to_object = glm::mat4(1.0f);
+    glm::uvec4 metadata = glm::uvec4(0u);
+};
+
+struct RaytracingSourceGeometryData
+{
+    EntityId source_node_id = NullId;
+    EntityId source_material_id = NullId;
+    EntityId triangle_buffer_id = NullId;
+    EntityId bvh_buffer_id = NullId;
+    std::uint32_t material_id = 0u;
+    std::uint32_t triangle_offset = 0u;
+    std::uint32_t triangle_count = 0u;
+    std::uint32_t bvh_node_offset = 0u;
+    std::uint32_t bvh_node_count = 0u;
+    std::array<float, 4> color_multiplier = {1.0f, 1.0f, 1.0f, 1.0f};
+};
+
+std::uint64_t BuildSourceGeometryKey(
+    EntityId source_node_id, EntityId source_material_id)
+{
+    return (static_cast<std::uint64_t>(source_node_id) << 32u) |
+           static_cast<std::uint32_t>(source_material_id);
+}
+
+std::vector<RaytracingSourceGeometryData> BuildRaytracingSourceGeometryData(
+    frame::LevelInterface& level)
+{
+    std::vector<RaytracingSourceGeometryData> geometries = {};
+    std::uint32_t next_transmissive_triangle_offset = 0u;
+    std::uint32_t next_opaque_triangle_offset = 0u;
+    std::uint32_t next_transmissive_bvh_offset = 0u;
+    std::uint32_t next_opaque_bvh_offset = 0u;
+    for (const auto& [source_node_id, source_material_id] :
+         GetRaytracingSourceMeshMaterials(level))
+    {
+        auto* node =
+            dynamic_cast<NodeMesh*>(&level.GetSceneNodeFromId(source_node_id));
+        if (!node)
+        {
+            continue;
+        }
+        const auto mesh_id = node->GetLocalMesh();
+        if (!mesh_id)
+        {
+            continue;
+        }
+
+        const auto& mesh = level.GetMeshFromId(mesh_id);
+        const auto triangle_buffer_id = mesh.GetTriangleBufferId();
+        if (!triangle_buffer_id)
+        {
+            continue;
+        }
+
+        auto* triangle_buffer = dynamic_cast<Buffer*>(
+            &level.GetBufferFromId(triangle_buffer_id));
+        if (!triangle_buffer)
+        {
+            continue;
+        }
+
+        const bool transmissive =
+            IsTransmissiveMaterial(level, source_material_id);
+        const auto reference_color = ResolveRaytracingReferenceColor(
+            level,
+            transmissive);
+        const auto source_color = ResolveRaytracingSourceMaterialColor(
+            level,
+            source_material_id);
+        const auto color_multiplier = ResolveRaytracingColorMultiplier(
+            source_color,
+            reference_color);
+
+        const auto triangle_byte_size = GetBufferSizeBytes(*triangle_buffer);
+        const auto triangle_count = static_cast<std::uint32_t>(
+            triangle_byte_size / (GetRaytraceTriangleStrideBytes() * 3u));
+
+        std::uint32_t bvh_node_count = 0u;
+        const auto bvh_buffer_id = mesh.GetBvhBufferId();
+        if (bvh_buffer_id)
+        {
+            auto* bvh_buffer = dynamic_cast<Buffer*>(
+                &level.GetBufferFromId(bvh_buffer_id));
+            if (bvh_buffer)
+            {
+                bvh_node_count = static_cast<std::uint32_t>(
+                    GetBufferSizeBytes(*bvh_buffer) / sizeof(frame::BVHNode));
+            }
+        }
+
+        RaytracingSourceGeometryData geometry = {};
+        geometry.source_node_id = source_node_id;
+        geometry.source_material_id = source_material_id;
+        geometry.triangle_buffer_id = triangle_buffer_id;
+        geometry.bvh_buffer_id = bvh_buffer_id;
+        geometry.material_id = transmissive ? 0u : 1u;
+        geometry.triangle_offset = transmissive
+            ? next_transmissive_triangle_offset
+            : next_opaque_triangle_offset;
+        geometry.triangle_count = triangle_count;
+        geometry.bvh_node_offset = transmissive
+            ? next_transmissive_bvh_offset
+            : next_opaque_bvh_offset;
+        geometry.bvh_node_count = bvh_node_count;
+        geometry.color_multiplier = color_multiplier;
+        geometries.push_back(geometry);
+
+        if (transmissive)
+        {
+            next_transmissive_triangle_offset += triangle_count;
+            next_transmissive_bvh_offset += bvh_node_count;
+        }
+        else
+        {
+            next_opaque_triangle_offset += triangle_count;
+            next_opaque_bvh_offset += bvh_node_count;
+        }
+    }
+    return geometries;
+}
+
+std::size_t BuildSourceInstanceLayoutHash(
+    const std::vector<RaytracingSourceGeometryData>& source_geometries)
+{
+    std::size_t seed = 0;
+    HashCombine(seed, source_geometries.size());
+    for (const auto& geometry : source_geometries)
+    {
+        HashCombine(seed, static_cast<std::uint64_t>(geometry.source_node_id));
+        HashCombine(
+            seed,
+            static_cast<std::uint64_t>(geometry.source_material_id));
+        HashCombine(seed, static_cast<std::uint64_t>(geometry.triangle_buffer_id));
+        HashCombine(seed, static_cast<std::uint64_t>(geometry.bvh_buffer_id));
+        HashCombine(seed, geometry.material_id);
+        HashCombine(seed, geometry.triangle_offset);
+        HashCombine(seed, geometry.triangle_count);
+        HashCombine(seed, geometry.bvh_node_offset);
+        HashCombine(seed, geometry.bvh_node_count);
+    }
+    return seed;
+}
+
+std::size_t BuildSourceGeometryContentStateHash(
+    frame::LevelInterface& level,
+    const RaytracingSourceGeometryData& geometry)
+{
+    std::size_t seed = 0;
+    HashCombine(seed, static_cast<std::uint64_t>(geometry.triangle_buffer_id));
+    auto* triangle_buffer = dynamic_cast<Buffer*>(
+        &level.GetBufferFromId(geometry.triangle_buffer_id));
+    if (triangle_buffer)
+    {
+        HashCombine(seed, triangle_buffer->GetGeneration());
+        HashCombine(seed, GetBufferSizeBytes(*triangle_buffer));
+    }
+    HashCombine(seed, static_cast<std::uint64_t>(geometry.bvh_buffer_id));
+    HashCombine(seed, geometry.triangle_offset);
+    HashCombine(seed, geometry.triangle_count);
+    HashCombine(seed, geometry.bvh_node_offset);
+    HashCombine(seed, geometry.bvh_node_count);
+    HashColor(seed, geometry.color_multiplier);
+    return seed;
+}
+
+std::vector<std::uint8_t> BuildRaytraceInstanceBytes(
+    frame::LevelInterface& level,
+    const std::vector<RaytracingSourceGeometryData>& source_geometries,
+    double time_seconds)
+{
+    std::vector<RaytraceInstanceStorageData> instances = {};
+    instances.reserve(source_geometries.size());
+    for (const auto& geometry : source_geometries)
+    {
+        RaytraceInstanceStorageData instance = {};
+        auto* node = dynamic_cast<NodeMesh*>(
+            &level.GetSceneNodeFromId(geometry.source_node_id));
+        if (node)
+        {
+            instance.object_to_world = node->GetLocalModel(time_seconds);
+            instance.world_to_object =
+                InverseOrIdentity(instance.object_to_world);
+        }
+        instance.metadata.x = geometry.triangle_offset;
+        instance.metadata.y = geometry.material_id;
+        instance.metadata.z = geometry.bvh_node_count > 0u
+            ? geometry.bvh_node_offset
+            : std::numeric_limits<std::uint32_t>::max();
+        instance.metadata.w = geometry.triangle_count;
+        instances.push_back(instance);
     }
 
-    constexpr std::array<std::pair<std::size_t, std::size_t>, 8> kRatios = {{
-        {0u, 1u},
-        {11u, 100u},
-        {23u, 100u},
-        {37u, 100u},
-        {53u, 100u},
-        {67u, 100u},
-        {83u, 100u},
-        {1u, 1u},
-    }};
-    const std::size_t max_index = bytes.size() - 1;
-    for (const auto& [numerator, denominator] : kRatios)
+    std::vector<std::uint8_t> bytes(
+        instances.size() * sizeof(RaytraceInstanceStorageData));
+    if (!bytes.empty())
     {
-        const auto index = (max_index * numerator) / denominator;
-        HashCombine(seed, bytes[index]);
+        std::memcpy(bytes.data(), instances.data(), bytes.size());
     }
+    return bytes;
+}
+
+std::vector<std::uint8_t> BuildSourceInstanceAggregateBvhBytes(
+    frame::LevelInterface& level,
+    const std::vector<RaytracingSourceGeometryData>& source_geometries,
+    std::uint32_t material_id)
+{
+    std::vector<frame::BVHNode> aggregate_nodes = {};
+    for (const auto& geometry : source_geometries)
+    {
+        if (geometry.material_id != material_id || !geometry.bvh_buffer_id ||
+            geometry.bvh_node_count == 0u)
+        {
+            continue;
+        }
+
+        auto* bvh_buffer = dynamic_cast<Buffer*>(
+            &level.GetBufferFromId(geometry.bvh_buffer_id));
+        if (!bvh_buffer)
+        {
+            continue;
+        }
+
+        const auto& raw = bvh_buffer->GetRawData();
+        if (raw.empty() || raw.size() % sizeof(frame::BVHNode) != 0)
+        {
+            continue;
+        }
+
+        const auto* nodes =
+            reinterpret_cast<const frame::BVHNode*>(raw.data());
+        const auto node_count = raw.size() / sizeof(frame::BVHNode);
+        for (std::size_t i = 0; i < node_count; ++i)
+        {
+            auto node = nodes[i];
+            if (node.left >= 0)
+            {
+                node.left += static_cast<int>(geometry.bvh_node_offset);
+            }
+            if (node.right >= 0)
+            {
+                node.right += static_cast<int>(geometry.bvh_node_offset);
+            }
+            if (node.triangle_count > 0 && node.first_triangle >= 0)
+            {
+                node.first_triangle +=
+                    static_cast<int>(geometry.triangle_offset);
+            }
+            aggregate_nodes.push_back(node);
+        }
+    }
+
+    std::vector<std::uint8_t> bytes(
+        aggregate_nodes.size() * sizeof(frame::BVHNode));
+    if (!bytes.empty())
+    {
+        std::memcpy(bytes.data(), aggregate_nodes.data(), bytes.size());
+    }
+    return bytes;
 }
 
 std::size_t BuildRaytracingSourceStateHash(
@@ -448,7 +793,8 @@ std::size_t BuildRaytracingSourceStateHash(
             continue;
         }
 
-        HashByteSamples(state_hash, triangle_buffer->GetRawData());
+        HashCombine(state_hash, triangle_buffer->GetGeneration());
+        HashCombine(state_hash, GetBufferSizeBytes(*triangle_buffer));
     }
     return state_hash;
 }
@@ -456,6 +802,7 @@ std::size_t BuildRaytracingSourceStateHash(
 constexpr std::size_t kRaytraceFloatsPerVertex = 12;
 constexpr std::size_t kRaytraceTriangleVertexStrideBytes =
     sizeof(float) * kRaytraceFloatsPerVertex;
+constexpr std::uint32_t kGpuSkinningWorkgroupSize = 64u;
 
 struct RaytraceVertex
 {
@@ -694,11 +1041,219 @@ Renderer::Renderer(LevelInterface& level, glm::uvec4 viewport)
     {
         throw std::runtime_error("Couldn't add texture to material.");
     }
+    gpu_skinning_bone_matrix_buffer_ = std::make_unique<Buffer>(
+        BufferTypeEnum::SHADER_STORAGE_BUFFER,
+        BufferUsageEnum::DYNAMIC_DRAW);
+    gpu_skinning_bone_matrix_buffer_->SetName(
+        "Renderer.GpuSkinning.BoneMatrices");
+    gpu_skinning_empty_buffer_ = std::make_unique<Buffer>(
+        BufferTypeEnum::SHADER_STORAGE_BUFFER,
+        BufferUsageEnum::STATIC_DRAW);
+    gpu_skinning_empty_buffer_->SetName("Renderer.GpuSkinning.Empty");
+    gpu_skinning_empty_buffer_->Copy(std::vector<float>{0.0f});
 }
 
-void Renderer::UpdateRaytraceBuffersIfNeeded(SkinnedMesh& skinned_mesh)
+void Renderer::EnsureGpuSkinningProgram()
+{
+    if (gpu_skinning_program_attempted_)
+    {
+        return;
+    }
+    gpu_skinning_program_attempted_ = true;
+    if (glDispatchCompute == nullptr)
+    {
+        logger_->warn(
+            "OpenGL compute dispatch is unavailable; GPU skinning fallback "
+            "stays on CPU.");
+        return;
+    }
+    try
+    {
+        gpu_skinning_program_ = CreateGpuSkinningProgram();
+    }
+    catch (const std::exception& error)
+    {
+        logger_->warn(
+            "Failed to create OpenGL GPU skinning program: {}",
+            error.what());
+        gpu_skinning_program_.reset();
+    }
+}
+
+void Renderer::EnsureGpuRaytraceTriangleCopyProgram()
+{
+    if (gpu_raytrace_triangle_copy_program_attempted_)
+    {
+        return;
+    }
+    gpu_raytrace_triangle_copy_program_attempted_ = true;
+    if (glDispatchCompute == nullptr)
+    {
+        logger_->warn(
+            "OpenGL compute dispatch is unavailable; GPU raytrace triangle "
+            "copy is disabled.");
+        return;
+    }
+    try
+    {
+        gpu_raytrace_triangle_copy_program_ =
+            CreateGpuRaytraceTriangleCopyProgram();
+    }
+    catch (const std::exception& error)
+    {
+        logger_->warn(
+            "Failed to create OpenGL raytrace triangle copy program: {}",
+            error.what());
+        gpu_raytrace_triangle_copy_program_.reset();
+    }
+}
+
+void Renderer::EnsureGpuRaytraceBvhRefitProgram()
+{
+    if (gpu_raytrace_bvh_refit_program_attempted_)
+    {
+        return;
+    }
+    gpu_raytrace_bvh_refit_program_attempted_ = true;
+    if (glDispatchCompute == nullptr)
+    {
+        logger_->warn(
+            "OpenGL compute dispatch is unavailable; GPU raytrace BVH refit "
+            "is disabled.");
+        return;
+    }
+    try
+    {
+        gpu_raytrace_bvh_refit_program_ = CreateGpuRaytraceBvhRefitProgram();
+    }
+    catch (const std::exception& error)
+    {
+        logger_->warn(
+            "Failed to create OpenGL raytrace BVH refit program: {}",
+            error.what());
+        gpu_raytrace_bvh_refit_program_.reset();
+    }
+}
+
+bool Renderer::UpdateRaytraceBuffersOnGpuIfPossible(SkinnedMesh& skinned_mesh)
+{
+    if (!skinned_mesh.HasActiveRaytraceTriangleCallback() ||
+        !skinned_mesh.SupportsGpuRaytraceSkinning())
+    {
+        return false;
+    }
+
+    const EntityId point_buffer_id = skinned_mesh.GetPointBufferId();
+    const EntityId index_buffer_id = skinned_mesh.GetIndexBufferId();
+    const EntityId triangle_buffer_id = skinned_mesh.GetTriangleBufferId();
+    const EntityId bone_index_buffer_id = skinned_mesh.GetBoneIndexBufferId();
+    const EntityId bone_weight_buffer_id = skinned_mesh.GetBoneWeightBufferId();
+    if (!point_buffer_id || !index_buffer_id || !triangle_buffer_id ||
+        !bone_index_buffer_id || !bone_weight_buffer_id)
+    {
+        return false;
+    }
+
+    EnsureGpuSkinningProgram();
+    if (!gpu_skinning_program_ || !gpu_skinning_bone_matrix_buffer_ ||
+        !gpu_skinning_empty_buffer_)
+    {
+        return false;
+    }
+
+    const double skinning_time = skinned_mesh.GetSkinningTime(delta_time_);
+    if (!skinned_mesh.ShouldUpdateRaytraceBuffers(skinning_time))
+    {
+        return true;
+    }
+    auto bone_matrices = skinned_mesh.EvaluateSkinning(skinning_time);
+    if (bone_matrices.empty())
+    {
+        bone_matrices.push_back(glm::mat4(1.0f));
+    }
+    gpu_skinning_bone_matrix_buffer_->Copy(
+        bone_matrices.size() * sizeof(glm::mat4),
+        bone_matrices.data());
+
+    auto& point_buffer =
+        dynamic_cast<Buffer&>(level_.GetBufferFromId(point_buffer_id));
+    auto* normal_buffer = skinned_mesh.GetNormalBufferId()
+        ? dynamic_cast<Buffer*>(
+              &level_.GetBufferFromId(skinned_mesh.GetNormalBufferId()))
+        : nullptr;
+    auto* texture_buffer = skinned_mesh.GetTextureBufferId()
+        ? dynamic_cast<Buffer*>(
+              &level_.GetBufferFromId(skinned_mesh.GetTextureBufferId()))
+        : nullptr;
+    auto& index_buffer =
+        dynamic_cast<Buffer&>(level_.GetBufferFromId(index_buffer_id));
+    auto& bone_index_buffer =
+        dynamic_cast<Buffer&>(level_.GetBufferFromId(bone_index_buffer_id));
+    auto& bone_weight_buffer =
+        dynamic_cast<Buffer&>(level_.GetBufferFromId(bone_weight_buffer_id));
+    auto& triangle_buffer =
+        dynamic_cast<Buffer&>(level_.GetBufferFromId(triangle_buffer_id));
+
+    const std::size_t index_count =
+        skinned_mesh.GetIndexSize() / sizeof(std::uint32_t);
+    if (index_count == 0)
+    {
+        skinned_mesh.MarkRaytraceBuffersUpdated(skinning_time);
+        return true;
+    }
+
+    gpu_skinning_program_->Use();
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, point_buffer.GetId());
+    glBindBufferBase(
+        GL_SHADER_STORAGE_BUFFER,
+        1,
+        normal_buffer
+            ? normal_buffer->GetId()
+            : gpu_skinning_empty_buffer_->GetId());
+    glBindBufferBase(
+        GL_SHADER_STORAGE_BUFFER,
+        2,
+        texture_buffer
+            ? texture_buffer->GetId()
+            : gpu_skinning_empty_buffer_->GetId());
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, index_buffer.GetId());
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, bone_index_buffer.GetId());
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 5, bone_weight_buffer.GetId());
+    glBindBufferBase(
+        GL_SHADER_STORAGE_BUFFER,
+        6,
+        gpu_skinning_bone_matrix_buffer_->GetId());
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 7, triangle_buffer.GetId());
+    glDispatchCompute(
+        static_cast<GLuint>(
+            (index_count + kGpuSkinningWorkgroupSize - 1u) /
+            kGpuSkinningWorkgroupSize),
+        1,
+        1);
+    glMemoryBarrier(GL_ALL_BARRIER_BITS);
+    for (GLuint binding = 0; binding < 8u; ++binding)
+    {
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, binding, 0);
+    }
+    gpu_skinning_program_->UnUse();
+    triangle_buffer.MarkGpuModified();
+    skinned_mesh.MarkRaytraceBuffersUpdated(skinning_time);
+    return true;
+}
+
+bool Renderer::UpdateRaytraceBuffersIfNeeded(SkinnedMesh& skinned_mesh)
 {
     const double skinning_time = skinned_mesh.GetSkinningTime(delta_time_);
+    if (!skinned_mesh.ShouldUpdateRaytraceBuffers(skinning_time))
+    {
+        return false;
+    }
+    if (UpdateRaytraceBuffersOnGpuIfPossible(skinned_mesh))
+    {
+        return true;
+    }
+
+    bool updated = false;
 
     if (skinned_mesh.HasActiveRaytraceTriangleCallback())
     {
@@ -712,6 +1267,7 @@ void Renderer::UpdateRaytraceBuffersIfNeeded(SkinnedMesh& skinned_mesh)
                 auto& triangle_buffer = dynamic_cast<Buffer&>(
                     level_.GetBufferFromId(triangle_buffer_id));
                 triangle_buffer.Copy(triangles);
+                updated = true;
             }
         }
     }
@@ -729,9 +1285,291 @@ void Renderer::UpdateRaytraceBuffersIfNeeded(SkinnedMesh& skinned_mesh)
                 bvh_buffer.Copy(
                     bvh_nodes.size() * sizeof(frame::BVHNode),
                     bvh_nodes.data());
+                updated = true;
             }
         }
     }
+    if (updated)
+    {
+        skinned_mesh.MarkRaytraceBuffersUpdated(skinning_time);
+    }
+    return updated;
+}
+
+void Renderer::UpdateSourceInstanceRaytraceSceneBuffers()
+{
+    const std::size_t scene_state_hash =
+        BuildRaytracingSourceStateHash(level_, delta_time_);
+    if (has_raytrace_scene_state_hash_ &&
+        last_raytrace_scene_state_hash_ == scene_state_hash)
+    {
+        return;
+    }
+
+    const auto source_geometries = BuildRaytracingSourceGeometryData(level_);
+    const auto instance_bytes =
+        BuildRaytraceInstanceBytes(level_, source_geometries, delta_time_);
+    const auto layout_hash = BuildSourceInstanceLayoutHash(source_geometries);
+    const bool layout_changed = !has_source_instance_layout_hash_ ||
+        last_source_instance_layout_hash_ != layout_hash;
+
+    std::unordered_map<std::uint64_t, std::size_t> next_geometry_state_hashes = {};
+    next_geometry_state_hashes.reserve(source_geometries.size());
+    std::vector<const RaytracingSourceGeometryData*> updated_geometries = {};
+    updated_geometries.reserve(source_geometries.size());
+    for (const auto& geometry : source_geometries)
+    {
+        const auto key = BuildSourceGeometryKey(
+            geometry.source_node_id,
+            geometry.source_material_id);
+        const auto state_hash =
+            BuildSourceGeometryContentStateHash(level_, geometry);
+        next_geometry_state_hashes[key] = state_hash;
+        const auto previous =
+            raytrace_source_geometry_state_hashes_.find(key);
+        if (layout_changed || previous == raytrace_source_geometry_state_hashes_.end() ||
+            previous->second != state_hash)
+        {
+            updated_geometries.push_back(&geometry);
+        }
+    }
+
+    EnsureGpuRaytraceTriangleCopyProgram();
+    EnsureGpuRaytraceBvhRefitProgram();
+
+    const auto find_named_buffer =
+        [&](MaterialInterface& material, const char* inner_name) -> Buffer* {
+            for (const auto& buffer_name : material.GetBufferNames())
+            {
+                if (material.GetInnerBufferName(buffer_name) != inner_name)
+                {
+                    continue;
+                }
+                const auto buffer_id = level_.GetIdFromName(buffer_name);
+                if (!buffer_id)
+                {
+                    return nullptr;
+                }
+                return dynamic_cast<Buffer*>(&level_.GetBufferFromId(buffer_id));
+            }
+            return nullptr;
+        };
+
+    const auto triangle_bytes_for_material =
+        [&](std::uint32_t material_id) -> std::size_t {
+            std::size_t triangle_count = 0;
+            for (const auto& geometry : source_geometries)
+            {
+                if (geometry.material_id != material_id)
+                {
+                    continue;
+                }
+                triangle_count += geometry.triangle_count;
+            }
+            return triangle_count * GetRaytraceTriangleStrideBytes() * 3u;
+        };
+
+    const auto copy_triangle_range =
+        [&](const RaytracingSourceGeometryData& geometry,
+            Buffer& source_triangle_buffer,
+            Buffer& aggregate_triangle_buffer) {
+            if (!gpu_raytrace_triangle_copy_program_ ||
+                geometry.triangle_count == 0u)
+            {
+                return;
+            }
+
+            UniformCollectionWrapper uniforms = {};
+            uniforms.AddUniform(std::make_unique<Uniform>(
+                "source_vertex_count",
+                static_cast<int>(geometry.triangle_count * 3u)));
+            uniforms.AddUniform(std::make_unique<Uniform>(
+                "destination_vertex_offset",
+                static_cast<int>(geometry.triangle_offset * 3u)));
+            uniforms.AddUniform(std::make_unique<Uniform>(
+                "color_multiplier",
+                glm::vec4(
+                    geometry.color_multiplier[0],
+                    geometry.color_multiplier[1],
+                    geometry.color_multiplier[2],
+                    geometry.color_multiplier[3])));
+            gpu_raytrace_triangle_copy_program_->Use(uniforms, nullptr);
+            glBindBufferBase(
+                GL_SHADER_STORAGE_BUFFER,
+                0,
+                source_triangle_buffer.GetId());
+            glBindBufferBase(
+                GL_SHADER_STORAGE_BUFFER,
+                1,
+                aggregate_triangle_buffer.GetId());
+            glDispatchCompute(
+                static_cast<GLuint>(
+                    (geometry.triangle_count * 3u + kGpuSkinningWorkgroupSize - 1u) /
+                    kGpuSkinningWorkgroupSize),
+                1,
+                1);
+            glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, 0);
+            glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, 0);
+            gpu_raytrace_triangle_copy_program_->UnUse();
+        };
+
+    const auto refit_bvh_range =
+        [&](const RaytracingSourceGeometryData& geometry,
+            Buffer& aggregate_triangle_buffer,
+            Buffer& aggregate_bvh_buffer) {
+            if (!gpu_raytrace_bvh_refit_program_ || geometry.bvh_node_count == 0u)
+            {
+                return;
+            }
+
+            UniformCollectionWrapper uniforms = {};
+            uniforms.AddUniform(std::make_unique<Uniform>(
+                "node_offset",
+                static_cast<int>(geometry.bvh_node_offset)));
+            uniforms.AddUniform(std::make_unique<Uniform>(
+                "node_count",
+                static_cast<int>(geometry.bvh_node_count)));
+            gpu_raytrace_bvh_refit_program_->Use(uniforms, nullptr);
+            glBindBufferBase(
+                GL_SHADER_STORAGE_BUFFER,
+                0,
+                aggregate_triangle_buffer.GetId());
+            glBindBufferBase(
+                GL_SHADER_STORAGE_BUFFER,
+                1,
+                aggregate_bvh_buffer.GetId());
+            glDispatchCompute(1, 1, 1);
+            glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, 0);
+            glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, 0);
+            gpu_raytrace_bvh_refit_program_->UnUse();
+        };
+
+    const auto aggregate_transmissive_bvh =
+        layout_changed
+            ? BuildSourceInstanceAggregateBvhBytes(level_, source_geometries, 0u)
+            : std::vector<std::uint8_t>{};
+    const auto aggregate_opaque_bvh =
+        layout_changed
+            ? BuildSourceInstanceAggregateBvhBytes(level_, source_geometries, 1u)
+            : std::vector<std::uint8_t>{};
+
+    for (const auto& [node_id, material_id] :
+         level_.GetMeshMaterialIds(proto::NodeMesh::SCENE_RENDER_TIME))
+    {
+        (void)node_id;
+        if (!material_id || !IsRaytracingResolveMaterial(level_, material_id))
+        {
+            continue;
+        }
+
+        auto& material = level_.GetMaterialFromId(material_id);
+        auto* transmissive_triangle_buffer =
+            find_named_buffer(material, "TriangleBufferTransmissive");
+        auto* transmissive_bvh_buffer =
+            find_named_buffer(material, "BvhBufferTransmissive");
+        auto* opaque_triangle_buffer =
+            find_named_buffer(material, "TriangleBufferOpaque");
+        auto* opaque_bvh_buffer = find_named_buffer(material, "BvhBufferOpaque");
+        auto* instance_buffer = find_named_buffer(material, "RaytraceInstanceBuffer");
+
+        if (layout_changed)
+        {
+            if (transmissive_triangle_buffer)
+            {
+                transmissive_triangle_buffer->Copy(
+                    std::vector<std::uint8_t>(
+                        triangle_bytes_for_material(0u),
+                        0u));
+            }
+            if (opaque_triangle_buffer)
+            {
+                opaque_triangle_buffer->Copy(
+                    std::vector<std::uint8_t>(
+                        triangle_bytes_for_material(1u),
+                        0u));
+            }
+            if (transmissive_bvh_buffer)
+            {
+                transmissive_bvh_buffer->Copy(aggregate_transmissive_bvh);
+            }
+            if (opaque_bvh_buffer)
+            {
+                opaque_bvh_buffer->Copy(aggregate_opaque_bvh);
+            }
+        }
+
+        if (instance_buffer)
+        {
+            instance_buffer->Copy(instance_bytes);
+        }
+
+        if (updated_geometries.empty())
+        {
+            continue;
+        }
+
+        for (const auto* geometry : updated_geometries)
+        {
+            if (!geometry || geometry->triangle_count == 0u)
+            {
+                continue;
+            }
+
+            auto* source_triangle_buffer = dynamic_cast<Buffer*>(
+                &level_.GetBufferFromId(geometry->triangle_buffer_id));
+            auto* aggregate_triangle_buffer = geometry->material_id == 0u
+                ? transmissive_triangle_buffer
+                : opaque_triangle_buffer;
+            if (!source_triangle_buffer || !aggregate_triangle_buffer)
+            {
+                continue;
+            }
+            copy_triangle_range(
+                *geometry,
+                *source_triangle_buffer,
+                *aggregate_triangle_buffer);
+            aggregate_triangle_buffer->MarkGpuModified();
+        }
+        if (!updated_geometries.empty())
+        {
+            glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+        }
+
+        for (const auto* geometry : updated_geometries)
+        {
+            if (!geometry || geometry->bvh_node_count == 0u)
+            {
+                continue;
+            }
+
+            auto* aggregate_triangle_buffer = geometry->material_id == 0u
+                ? transmissive_triangle_buffer
+                : opaque_triangle_buffer;
+            auto* aggregate_bvh_buffer = geometry->material_id == 0u
+                ? transmissive_bvh_buffer
+                : opaque_bvh_buffer;
+            if (!aggregate_triangle_buffer || !aggregate_bvh_buffer)
+            {
+                continue;
+            }
+            refit_bvh_range(
+                *geometry,
+                *aggregate_triangle_buffer,
+                *aggregate_bvh_buffer);
+            aggregate_bvh_buffer->MarkGpuModified();
+        }
+        if (!updated_geometries.empty())
+        {
+            glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+        }
+    }
+
+    raytrace_source_geometry_state_hashes_ =
+        std::move(next_geometry_state_hashes);
+    last_source_instance_layout_hash_ = layout_hash;
+    has_source_instance_layout_hash_ = true;
+    last_raytrace_scene_state_hash_ = scene_state_hash;
+    has_raytrace_scene_state_hash_ = true;
 }
 
 void Renderer::UpdateAggregateRaytraceSceneBuffers()
@@ -1334,7 +2172,9 @@ void Renderer::PreRender()
     if (RaytraceSceneRequiresWorldSpaceBuffers(level_))
     {
         UpdateAggregateRaytraceSceneBuffers();
+        return;
     }
+    UpdateSourceInstanceRaytraceSceneBuffers();
 }
 
 void Renderer::RenderSkybox(const CameraInterface& camera)

@@ -34,12 +34,15 @@ add_custom_target(AssetShaderOpenGL
     physically_based_rendering.vert
     raytrace.frag
     raytrace.vert
+    raytrace_bvh_refit.comp
+    raytrace_triangle_copy.comp
     ray_marching.frag
     ray_marching.vert
     screen_space_ambient_occlusion.frag
     screen_space_ambient_occlusion.vert
     scene_simple.frag
     scene_simple.vert
+    skinning.comp
     vector_addition.frag
     vector_addition.vert
     vector_multiply.frag

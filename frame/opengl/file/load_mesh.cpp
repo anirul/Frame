@@ -2258,11 +2258,15 @@ std::vector<std::pair<EntityId, EntityId>> LoadMeshesFromGltfFile(
         std::vector<std::uint32_t> trace_indices(indices.begin(), indices.end());
         auto triangles =
             BuildRaytraceTriangles(points, normals, textures, trace_indices);
+        const auto raytrace_buffer_usage = skin_animation_data
+            ? opengl::BufferUsageEnum::DYNAMIC_DRAW
+            : opengl::BufferUsageEnum::STATIC_DRAW;
         auto maybe_triangle_buffer_id = CreateBufferInLevel(
             level,
             triangles,
             std::format("{}.{}.triangle", name, mesh_index),
-            opengl::BufferTypeEnum::SHADER_STORAGE_BUFFER);
+            opengl::BufferTypeEnum::SHADER_STORAGE_BUFFER,
+            raytrace_buffer_usage);
         if (!maybe_triangle_buffer_id)
         {
             return {};
@@ -2277,7 +2281,8 @@ std::vector<std::pair<EntityId, EntityId>> LoadMeshesFromGltfFile(
                 level,
                 bvh_nodes,
                 std::format("{}.{}.bvh", name, mesh_index),
-                opengl::BufferTypeEnum::SHADER_STORAGE_BUFFER);
+                opengl::BufferTypeEnum::SHADER_STORAGE_BUFFER,
+                raytrace_buffer_usage);
             if (!maybe_bvh_buffer_id)
             {
                 return {};

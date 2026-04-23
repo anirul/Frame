@@ -11,6 +11,7 @@
 #include "frame/camera.h"
 #include "frame/opengl/buffer.h"
 #include "frame/opengl/renderer.h"
+#include "frame/opengl/skinned_mesh.h"
 #include "frame/opengl/texture.h"
 
 namespace test
@@ -43,6 +44,23 @@ frame::proto::Level LoadLevelProtoWithSkinnedMeshAnimationEnabled(bool enabled)
     return level_proto;
 }
 
+frame::proto::Level LoadLevelProtoWithoutSkinnedMesh()
+{
+    auto level_proto = frame::json::LoadLevelProto(
+        frame::file::FindFile("asset/json/skinned_mesh.json"));
+    auto* scene_tree = level_proto.mutable_scene_tree();
+    auto* node_meshes = scene_tree->mutable_node_meshes();
+    for (auto it = node_meshes->begin(); it != node_meshes->end(); ++it)
+    {
+        if (it->name() == kSkinnedMeshNodeName)
+        {
+            node_meshes->erase(it);
+            break;
+        }
+    }
+    return level_proto;
+}
+
 struct RaytraceVertex
 {
     float px;
@@ -57,6 +75,13 @@ struct RaytraceVertex
     float v;
     float pad2;
     float pad3;
+};
+
+struct alignas(16) RaytraceInstanceStorageData
+{
+    glm::mat4 object_to_world = glm::mat4(1.0f);
+    glm::mat4 world_to_object = glm::mat4(1.0f);
+    glm::uvec4 metadata = glm::uvec4(0u);
 };
 
 struct PixelRect
@@ -102,6 +127,109 @@ bool RayTriangleIntersect(
     }
     const float t = f * glm::dot(edge2, q);
     return t > kEpsilon;
+}
+
+bool RayAabbIntersect(
+    const glm::vec3& ray_origin,
+    const glm::vec3& ray_direction,
+    const frame::BVHNode& node)
+{
+    const glm::vec3 inv_ray_dir = 1.0f / ray_direction;
+    const glm::vec3 t0 = (node.min - ray_origin) * inv_ray_dir;
+    const glm::vec3 t1 = (node.max - ray_origin) * inv_ray_dir;
+    const glm::vec3 tmin = glm::min(t0, t1);
+    const glm::vec3 tmax = glm::max(t0, t1);
+    const float t_enter = std::max(std::max(tmin.x, tmin.y), tmin.z);
+    const float t_exit = std::min(std::min(tmax.x, tmax.y), tmax.z);
+    return t_exit >= std::max(t_enter, 0.0f);
+}
+
+bool RayBvhIntersect(
+    const glm::vec3& ray_origin,
+    const glm::vec3& ray_direction,
+    const RaytraceVertex* vertices,
+    std::size_t vertex_count,
+    const frame::BVHNode* nodes,
+    std::size_t node_count,
+    int root_index = 0)
+{
+    if (!vertices || vertex_count < 3 || !nodes || node_count == 0 ||
+        root_index < 0 ||
+        root_index >= static_cast<int>(node_count))
+    {
+        return false;
+    }
+
+    std::array<int, 256> stack = {};
+    int stack_ptr = 0;
+    stack[stack_ptr++] = root_index;
+    while (stack_ptr > 0)
+    {
+        const int node_index = stack[--stack_ptr];
+        if (node_index < 0 ||
+            node_index >= static_cast<int>(node_count))
+        {
+            continue;
+        }
+
+        const auto& node = nodes[node_index];
+        if (!RayAabbIntersect(ray_origin, ray_direction, node))
+        {
+            continue;
+        }
+
+        if (node.triangle_count > 0)
+        {
+            for (int i = 0; i < node.triangle_count; ++i)
+            {
+                const int triangle_index = node.first_triangle + i;
+                const std::size_t vertex_index =
+                    static_cast<std::size_t>(triangle_index) * 3u;
+                if (vertex_index + 2u >= vertex_count)
+                {
+                    continue;
+                }
+                if (RayTriangleIntersect(
+                        ray_origin,
+                        ray_direction,
+                        vertices[vertex_index + 0u],
+                        vertices[vertex_index + 1u],
+                        vertices[vertex_index + 2u]))
+                {
+                    return true;
+                }
+            }
+            continue;
+        }
+
+        if (node.left >= 0 && stack_ptr < static_cast<int>(stack.size()))
+        {
+            stack[stack_ptr++] = node.left;
+        }
+        if (node.right >= 0 && stack_ptr < static_cast<int>(stack.size()))
+        {
+            stack[stack_ptr++] = node.right;
+        }
+    }
+    return false;
+}
+
+frame::opengl::SkinnedMesh* FindSkinnedMesh(
+    frame::LevelInterface& level, const std::string& node_name)
+{
+    const auto node_id = level.GetIdFromName(node_name);
+    if (node_id == frame::NullId)
+    {
+        return nullptr;
+    }
+    auto& node = level.GetSceneNodeFromId(node_id);
+    const auto mesh_id = node.GetLocalMesh();
+    if (mesh_id == frame::NullId)
+    {
+        return nullptr;
+    }
+    return dynamic_cast<frame::opengl::SkinnedMesh*>(
+        &level.GetMeshFromId(mesh_id));
 }
 
 frame::EntityId FindMaterialForNode(
@@ -403,6 +531,14 @@ double ComputeAverageNormalizedDifferenceInRect(
         return 0.0;
     }
 
+    const int lhs_pixel_stride = InferPixelStride(lhs, width, height);
+    const int rhs_pixel_stride = InferPixelStride(rhs, width, height);
+    const int pixel_stride = std::min(lhs_pixel_stride, rhs_pixel_stride);
+    if (pixel_stride < 3)
+    {
+        return 0.0;
+    }
+
     double accum = 0.0;
     std::size_t count = 0;
     for (int y = min_y; y <= max_y; ++y)
@@ -410,7 +546,8 @@ double ComputeAverageNormalizedDifferenceInRect(
         for (int x = min_x; x <= max_x; ++x)
         {
             const std::size_t base =
-                (static_cast<std::size_t>(y) * width + x) * 4;
+                (static_cast<std::size_t>(y) * width + x) *
+                static_cast<std::size_t>(pixel_stride);
             if (base + 2 >= lhs.size() || base + 2 >= rhs.size())
             {
                 continue;
@@ -428,6 +565,83 @@ double ComputeAverageNormalizedDifferenceInRect(
         }
     }
     return count == 0 ? 0.0 : accum / (static_cast<double>(count) * 255.0);
+}
+
+std::size_t CountPixelsWithRgbDifferenceAbove(
+    const std::vector<std::uint8_t>& lhs,
+    const std::vector<std::uint8_t>& rhs,
+    int width,
+    int height,
+    double threshold)
+{
+    const int lhs_pixel_stride = InferPixelStride(lhs, width, height);
+    const int rhs_pixel_stride = InferPixelStride(rhs, width, height);
+    const int pixel_stride = std::min(lhs_pixel_stride, rhs_pixel_stride);
+    if (pixel_stride < 3)
+    {
+        return 0u;
+    }
+
+    std::size_t changed_pixel_count = 0u;
+    const std::size_t pixel_count =
+        static_cast<std::size_t>(width) * static_cast<std::size_t>(height);
+    for (std::size_t pixel_index = 0; pixel_index < pixel_count; ++pixel_index)
+    {
+        const std::size_t base = pixel_index * static_cast<std::size_t>(pixel_stride);
+        if (base + 2 >= lhs.size() || base + 2 >= rhs.size())
+        {
+            break;
+        }
+
+        const double difference =
+            (std::abs(static_cast<int>(lhs[base + 0]) -
+                      static_cast<int>(rhs[base + 0])) +
+             std::abs(static_cast<int>(lhs[base + 1]) -
+                      static_cast<int>(rhs[base + 1])) +
+             std::abs(static_cast<int>(lhs[base + 2]) -
+                      static_cast<int>(rhs[base + 2]))) /
+            (3.0 * 255.0);
+        if (difference > threshold)
+        {
+            ++changed_pixel_count;
+        }
+    }
+    return changed_pixel_count;
+}
+
+void WriteFrameAsPpm(
+    const std::filesystem::path& path,
+    const std::vector<std::uint8_t>& frame_bytes,
+    int width,
+    int height)
+{
+    const int pixel_stride = InferPixelStride(frame_bytes, width, height);
+    if (pixel_stride < 3)
+    {
+        throw std::runtime_error(
+            "Expected at least three channels when dumping a frame.");
+    }
+
+    std::ofstream ofs(path, std::ios::binary);
+    if (!ofs)
+    {
+        throw std::runtime_error("Could not open debug frame output file.");
+    }
+
+    ofs << "P6\n" << width << " " << height << "\n255\n";
+    for (int y = 0; y < height; ++y)
+    {
+        const int source_y = height - 1 - y;
+        for (int x = 0; x < width; ++x)
+        {
+            const std::size_t base =
+                (static_cast<std::size_t>(source_y) * width + x) *
+                static_cast<std::size_t>(pixel_stride);
+            ofs.write(
+                reinterpret_cast<const char*>(frame_bytes.data() + base),
+                3);
+        }
+    }
 }
 
 PixelRect ComputeProjectedPixelRect(
@@ -904,7 +1118,7 @@ TEST_F(OpenGLRayTracingLevelTest, ImportsGltfOpaqueSpecularFromPlate)
     EXPECT_NEAR(specular_color[2], 0.0f, 0.02f);
 }
 
-TEST_F(OpenGLRayTracingLevelTest, SkinnedMeshPreRenderUpdatesAggregateSceneBuffers)
+TEST_F(OpenGLRayTracingLevelTest, SkinnedMeshPreRenderPopulatesSourceInstanceSceneBuffers)
 {
     auto level = LoadLevel("asset/json/skinned_mesh.json");
     ASSERT_NE(level, nullptr);
@@ -917,18 +1131,21 @@ TEST_F(OpenGLRayTracingLevelTest, SkinnedMeshPreRenderUpdatesAggregateSceneBuffe
         *level, material, "TriangleBufferOpaque");
     const auto bvh_id = FindBufferByInnerName(
         *level, material, "BvhBufferOpaque");
+    const auto instance_id = FindBufferByInnerName(
+        *level, material, "RaytraceInstanceBuffer");
     ASSERT_NE(triangle_id, frame::NullId);
     ASSERT_NE(bvh_id, frame::NullId);
+    ASSERT_NE(instance_id, frame::NullId);
 
     auto* triangle_buffer = dynamic_cast<frame::opengl::Buffer*>(
         &level->GetBufferFromId(triangle_id));
     auto* bvh_buffer = dynamic_cast<frame::opengl::Buffer*>(
         &level->GetBufferFromId(bvh_id));
+    auto* instance_buffer = dynamic_cast<frame::opengl::Buffer*>(
+        &level->GetBufferFromId(instance_id));
     ASSERT_NE(triangle_buffer, nullptr);
     ASSERT_NE(bvh_buffer, nullptr);
-
-    const auto triangles_before = triangle_buffer->GetRawData();
-    const auto bvh_before = bvh_buffer->GetRawData();
+    ASSERT_NE(instance_buffer, nullptr);
 
     frame::opengl::Renderer renderer(
         *level,
@@ -936,11 +1153,59 @@ TEST_F(OpenGLRayTracingLevelTest, SkinnedMeshPreRenderUpdatesAggregateSceneBuffe
     renderer.SetDeltaTime(0.35);
     renderer.PreRender();
 
-    EXPECT_NE(triangle_buffer->GetRawData(), triangles_before);
-    EXPECT_NE(bvh_buffer->GetRawData(), bvh_before);
+    const auto& triangle_raw = triangle_buffer->ReadBack();
+    const auto& bvh_raw = bvh_buffer->ReadBack();
+    const auto& instance_raw = instance_buffer->GetRawData();
+    ASSERT_FALSE(triangle_raw.empty());
+    ASSERT_FALSE(bvh_raw.empty());
+    ASSERT_EQ(
+        instance_raw.size() % sizeof(RaytraceInstanceStorageData),
+        0u);
+    ASSERT_GE(instance_raw.size(), sizeof(RaytraceInstanceStorageData));
+
+    const auto* instances = reinterpret_cast<const RaytraceInstanceStorageData*>(
+        instance_raw.data());
+    EXPECT_EQ(instances[0].metadata.y, 1u);
+    EXPECT_GT(instances[0].metadata.w, 0u);
+    EXPECT_NE(
+        instances[0].metadata.z,
+        std::numeric_limits<std::uint32_t>::max());
 }
 
-TEST_F(OpenGLRayTracingLevelTest, SkinnedMeshBindPoseDoesNotUpdateAggregateSceneBuffers)
+TEST_F(OpenGLRayTracingLevelTest, SkinnedMeshGpuTrianglesMatchCpuEvaluation)
+{
+    auto level = LoadLevel("asset/json/skinned_mesh.json");
+    ASSERT_NE(level, nullptr);
+
+    auto* skinned_mesh = FindSkinnedMesh(*level, kSkinnedMeshNodeName);
+    ASSERT_NE(skinned_mesh, nullptr);
+    ASSERT_TRUE(skinned_mesh->SupportsGpuRaytraceSkinning());
+
+    constexpr double kTimeSeconds = 0.35;
+    frame::opengl::Renderer renderer(
+        *level,
+        glm::uvec4(0, 0, 1280, 720));
+    renderer.SetDeltaTime(kTimeSeconds);
+    renderer.PreRender();
+
+    auto* triangle_buffer = dynamic_cast<frame::opengl::Buffer*>(
+        &level->GetBufferFromId(skinned_mesh->GetTriangleBufferId()));
+    ASSERT_NE(triangle_buffer, nullptr);
+
+    const auto& raw = triangle_buffer->ReadBack();
+    const auto cpu_triangles =
+        skinned_mesh->EvaluateRaytraceTriangles(
+            skinned_mesh->GetSkinningTime(kTimeSeconds));
+    ASSERT_EQ(raw.size(), cpu_triangles.size() * sizeof(float));
+
+    const auto* gpu_triangles = reinterpret_cast<const float*>(raw.data());
+    for (std::size_t i = 0; i < cpu_triangles.size(); ++i)
+    {
+        EXPECT_NEAR(gpu_triangles[i], cpu_triangles[i], 1.0e-4f);
+    }
+}
+
+TEST_F(OpenGLRayTracingLevelTest, SkinnedMeshBindPoseSecondPreRenderDoesNotUpdateSceneBuffers)
 {
     auto level = frame::json::ParseLevel(
         {1280u, 720u},
@@ -965,17 +1230,18 @@ TEST_F(OpenGLRayTracingLevelTest, SkinnedMeshBindPoseDoesNotUpdateAggregateScene
     ASSERT_NE(triangle_buffer, nullptr);
     ASSERT_NE(bvh_buffer, nullptr);
 
-    const auto triangles_before = triangle_buffer->GetRawData();
-    const auto bvh_before = bvh_buffer->GetRawData();
-
     frame::opengl::Renderer renderer(
         *level,
         glm::uvec4(0, 0, 1280, 720));
     renderer.SetDeltaTime(0.35);
     renderer.PreRender();
+    const auto triangles_after_first = triangle_buffer->ReadBack();
+    const auto bvh_after_first = bvh_buffer->ReadBack();
 
-    EXPECT_EQ(triangle_buffer->GetRawData(), triangles_before);
-    EXPECT_EQ(bvh_buffer->GetRawData(), bvh_before);
+    renderer.PreRender();
+
+    EXPECT_EQ(triangle_buffer->ReadBack(), triangles_after_first);
+    EXPECT_EQ(bvh_buffer->ReadBack(), bvh_after_first);
 }
 
 TEST_F(OpenGLRayTracingLevelTest, SkinnedMeshSceneMaterialUsesImportedCharacterTextures)
@@ -1077,7 +1343,7 @@ TEST_F(OpenGLRayTracingLevelTest, SkinnedMeshAggregateTrianglesCarryUvs)
     auto* triangle_buffer = dynamic_cast<frame::opengl::Buffer*>(
         &level->GetBufferFromId(triangle_id));
     ASSERT_NE(triangle_buffer, nullptr);
-    const auto& raw = triangle_buffer->GetRawData();
+    const auto& raw = triangle_buffer->ReadBack();
     ASSERT_GE(raw.size(), sizeof(RaytraceVertex));
     ASSERT_EQ(raw.size() % sizeof(RaytraceVertex), 0u);
 
@@ -1123,7 +1389,7 @@ TEST_F(OpenGLRayTracingLevelTest, SkinnedMeshAggregateTrianglesHaveFiniteBounds)
     auto* triangle_buffer = dynamic_cast<frame::opengl::Buffer*>(
         &level->GetBufferFromId(triangle_id));
     ASSERT_NE(triangle_buffer, nullptr);
-    const auto& raw = triangle_buffer->GetRawData();
+    const auto& raw = triangle_buffer->ReadBack();
     ASSERT_GE(raw.size(), sizeof(RaytraceVertex));
     ASSERT_EQ(raw.size() % sizeof(RaytraceVertex), 0u);
 
@@ -1175,18 +1441,29 @@ TEST_F(OpenGLRayTracingLevelTest, SkinnedMeshCpuRayHitsAggregateTriangles)
     const auto& scene_material = level->GetMaterialFromId(scene_material_id);
     const auto triangle_id = FindBufferByInnerName(
         *level, scene_material, "TriangleBufferOpaque");
+    const auto instance_id = FindBufferByInnerName(
+        *level, scene_material, "RaytraceInstanceBuffer");
     ASSERT_NE(triangle_id, frame::NullId);
+    ASSERT_NE(instance_id, frame::NullId);
 
     auto* triangle_buffer = dynamic_cast<frame::opengl::Buffer*>(
         &level->GetBufferFromId(triangle_id));
+    auto* instance_buffer = dynamic_cast<frame::opengl::Buffer*>(
+        &level->GetBufferFromId(instance_id));
     ASSERT_NE(triangle_buffer, nullptr);
-    const auto& raw = triangle_buffer->GetRawData();
+    ASSERT_NE(instance_buffer, nullptr);
+    const auto& raw = triangle_buffer->ReadBack();
+    const auto& instance_raw = instance_buffer->GetRawData();
     ASSERT_GE(raw.size(), sizeof(RaytraceVertex) * 3);
     ASSERT_EQ(raw.size() % sizeof(RaytraceVertex), 0u);
+    ASSERT_GE(instance_raw.size(), sizeof(RaytraceInstanceStorageData));
 
     const auto* vertices =
         reinterpret_cast<const RaytraceVertex*>(raw.data());
     const std::size_t vertex_count = raw.size() / sizeof(RaytraceVertex);
+    const auto* instances = reinterpret_cast<const RaytraceInstanceStorageData*>(
+        instance_raw.data());
+    const auto& instance = instances[0];
 
     frame::Camera camera(level->GetDefaultCamera());
     camera.SetAspectRatio(1280.0f / 720.0f);
@@ -1212,16 +1489,28 @@ TEST_F(OpenGLRayTracingLevelTest, SkinnedMeshCpuRayHitsAggregateTriangles)
                 glm::normalize(glm::vec3(view_pos) / view_w);
             const glm::vec3 ray_dir_world = glm::normalize(
                 glm::vec3(view_inv * glm::vec4(ray_dir_view, 0.0f)));
-            const glm::vec3 ray_origin = camera_position;
-            const glm::vec3 ray_dir = ray_dir_world;
-            for (std::size_t i = 0; i + 2 < vertex_count; i += 3)
+            const glm::vec3 ray_origin = glm::vec3(
+                instance.world_to_object *
+                glm::vec4(camera_position, 1.0f));
+            const glm::vec3 ray_dir = glm::normalize(
+                glm::mat3(instance.world_to_object) * ray_dir_world);
+            const std::size_t triangle_offset =
+                static_cast<std::size_t>(instance.metadata.x);
+            const std::size_t triangle_count =
+                static_cast<std::size_t>(instance.metadata.w);
+            for (std::size_t i = 0; i < triangle_count; ++i)
             {
+                const std::size_t vertex_index = (triangle_offset + i) * 3u;
+                if (vertex_index + 2u >= vertex_count)
+                {
+                    continue;
+                }
                 if (RayTriangleIntersect(
                         ray_origin,
                         ray_dir,
-                        vertices[i],
-                        vertices[i + 1],
-                        vertices[i + 2]))
+                        vertices[vertex_index + 0u],
+                        vertices[vertex_index + 1u],
+                        vertices[vertex_index + 2u]))
                 {
                     ++dense_hit_count;
                     break;
@@ -1232,16 +1521,181 @@ TEST_F(OpenGLRayTracingLevelTest, SkinnedMeshCpuRayHitsAggregateTriangles)
     EXPECT_GT(dense_hit_count, 0u);
 }
 
+TEST_F(OpenGLRayTracingLevelTest, SkinnedMeshCpuRayHitsAggregateBvh)
+{
+    auto level = LoadLevel("asset/json/skinned_mesh.json");
+    ASSERT_NE(level, nullptr);
+
+    frame::opengl::Renderer renderer(
+        *level,
+        glm::uvec4(0, 0, 1280, 720));
+    renderer.SetDeltaTime(0.0);
+    renderer.PreRender();
+
+    const auto scene_material_id = FindMaterialForNode(
+        *level,
+        frame::proto::NodeMesh::SCENE_RENDER_TIME,
+        "RayTracingRendering");
+    ASSERT_NE(scene_material_id, frame::NullId);
+    const auto& scene_material = level->GetMaterialFromId(scene_material_id);
+    const auto triangle_id = FindBufferByInnerName(
+        *level, scene_material, "TriangleBufferOpaque");
+    const auto bvh_id = FindBufferByInnerName(
+        *level, scene_material, "BvhBufferOpaque");
+    const auto instance_id = FindBufferByInnerName(
+        *level, scene_material, "RaytraceInstanceBuffer");
+    ASSERT_NE(triangle_id, frame::NullId);
+    ASSERT_NE(bvh_id, frame::NullId);
+    ASSERT_NE(instance_id, frame::NullId);
+
+    auto* triangle_buffer = dynamic_cast<frame::opengl::Buffer*>(
+        &level->GetBufferFromId(triangle_id));
+    auto* bvh_buffer = dynamic_cast<frame::opengl::Buffer*>(
+        &level->GetBufferFromId(bvh_id));
+    auto* instance_buffer = dynamic_cast<frame::opengl::Buffer*>(
+        &level->GetBufferFromId(instance_id));
+    ASSERT_NE(triangle_buffer, nullptr);
+    ASSERT_NE(bvh_buffer, nullptr);
+    ASSERT_NE(instance_buffer, nullptr);
+
+    const auto& triangle_raw = triangle_buffer->ReadBack();
+    const auto& bvh_raw = bvh_buffer->ReadBack();
+    const auto& instance_raw = instance_buffer->GetRawData();
+    ASSERT_GE(triangle_raw.size(), sizeof(RaytraceVertex) * 3);
+    ASSERT_EQ(triangle_raw.size() % sizeof(RaytraceVertex), 0u);
+    ASSERT_GE(bvh_raw.size(), sizeof(frame::BVHNode));
+    ASSERT_EQ(bvh_raw.size() % sizeof(frame::BVHNode), 0u);
+    ASSERT_GE(instance_raw.size(), sizeof(RaytraceInstanceStorageData));
+
+    const auto* vertices =
+        reinterpret_cast<const RaytraceVertex*>(triangle_raw.data());
+    const std::size_t vertex_count = triangle_raw.size() / sizeof(RaytraceVertex);
+    const auto* nodes =
+        reinterpret_cast<const frame::BVHNode*>(bvh_raw.data());
+    const std::size_t node_count = bvh_raw.size() / sizeof(frame::BVHNode);
+    const auto* instances = reinterpret_cast<const RaytraceInstanceStorageData*>(
+        instance_raw.data());
+    const auto& instance = instances[0];
+
+    frame::Camera camera(level->GetDefaultCamera());
+    camera.SetAspectRatio(1280.0f / 720.0f);
+    const glm::mat4 projection_inv = glm::inverse(camera.ComputeProjection());
+    const glm::mat4 view_inv = glm::inverse(camera.ComputeView());
+    const glm::vec3 ray_origin = camera.GetPosition();
+
+    std::size_t dense_hit_count = 0;
+    for (int y = 0; y < 72; ++y)
+    {
+        for (int x = 0; x < 128; ++x)
+        {
+            const glm::vec2 ndc(
+                ((static_cast<float>(x) + 0.5f) / 128.0f) * 2.0f - 1.0f,
+                ((static_cast<float>(y) + 0.5f) / 72.0f) * 2.0f - 1.0f);
+            glm::vec4 clip_pos(ndc.x, ndc.y, 1.0f, 1.0f);
+            glm::vec4 view_pos = projection_inv * clip_pos;
+            const float view_w =
+                std::abs(view_pos.w) > 1.0e-6f ? view_pos.w : 1.0f;
+            const glm::vec3 ray_dir_view =
+                glm::normalize(glm::vec3(view_pos) / view_w);
+            const glm::vec3 ray_dir_world = glm::normalize(
+                glm::vec3(view_inv * glm::vec4(ray_dir_view, 0.0f)));
+            if (RayBvhIntersect(
+                    glm::vec3(
+                        instance.world_to_object *
+                        glm::vec4(ray_origin, 1.0f)),
+                    glm::normalize(
+                        glm::mat3(instance.world_to_object) * ray_dir_world),
+                    vertices,
+                    vertex_count,
+                    nodes,
+                    node_count,
+                    static_cast<int>(instance.metadata.z)))
+            {
+                ++dense_hit_count;
+            }
+        }
+    }
+
+    EXPECT_GT(dense_hit_count, 0u);
+}
+
+TEST_F(OpenGLRayTracingLevelTest, SkinnedMeshRenderDiffersFromSkyboxOnlyScene)
+{
+    constexpr int kRenderWidth = 1280;
+    constexpr int kRenderHeight = 720;
+
+    auto level_with_mesh = LoadLevel("asset/json/skinned_mesh.json");
+    ASSERT_NE(level_with_mesh, nullptr);
+
+    frame::opengl::Renderer aggregate_renderer(
+        *level_with_mesh,
+        glm::uvec4(0, 0, kRenderWidth, kRenderHeight));
+    aggregate_renderer.SetDeltaTime(0.35);
+    aggregate_renderer.PreRender();
+
+    const auto scene_material_id = FindMaterialForNode(
+        *level_with_mesh,
+        frame::proto::NodeMesh::SCENE_RENDER_TIME,
+        "RayTracingRendering");
+    ASSERT_NE(scene_material_id, frame::NullId);
+    const auto& scene_material = level_with_mesh->GetMaterialFromId(
+        scene_material_id);
+    ASSERT_NE(scene_material.GetProgramId(level_with_mesh.get()), frame::NullId);
+    EXPECT_EQ(
+        level_with_mesh->GetNameFromId(
+            scene_material.GetProgramId(level_with_mesh.get())),
+        "RayTraceProgramInstanced");
+
+    const auto frame_with_mesh =
+        RenderOutputBytes(*level_with_mesh, 0.35, kRenderWidth, kRenderHeight);
+    auto level_without_mesh = frame::json::ParseLevel(
+        {static_cast<std::uint32_t>(kRenderWidth),
+         static_cast<std::uint32_t>(kRenderHeight)},
+        LoadLevelProtoWithoutSkinnedMesh());
+    ASSERT_NE(level_without_mesh, nullptr);
+    const auto frame_without_mesh = RenderOutputBytes(
+        *level_without_mesh,
+        0.35,
+        kRenderWidth,
+        kRenderHeight);
+
+    ASSERT_EQ(frame_with_mesh.size(), frame_without_mesh.size());
+    const double full_frame_difference =
+        ComputeAverageNormalizedDifference(frame_with_mesh, frame_without_mesh);
+    EXPECT_GT(full_frame_difference, 0.001);
+
+    EXPECT_GT(
+        CountPixelsWithRgbDifferenceAbove(
+            frame_with_mesh,
+            frame_without_mesh,
+            kRenderWidth,
+            kRenderHeight,
+            0.04),
+        1000u);
+}
+
 TEST_F(OpenGLRayTracingLevelTest, DISABLED_DumpSkinnedMeshDeviceFrame)
 {
     auto level = LoadLevel("asset/json/skinned_mesh.json");
     ASSERT_NE(level, nullptr);
+    constexpr int kRenderWidth = 1280;
+    constexpr int kRenderHeight = 720;
     ASSERT_NE(window_, nullptr);
 
     auto& device = window_->GetDevice();
     device.Startup(std::move(level));
-    device.Display(0.0);
-    device.ScreenShot("build/windows/skinned_mesh_opengl_debug.png");
+    device.Display(0.35);
+    auto output_texture_id = device.GetLevel().GetDefaultOutputTextureId();
+    ASSERT_NE(output_texture_id, frame::NullId);
+    auto* output_texture = dynamic_cast<frame::opengl::Texture*>(
+        &device.GetLevel().GetTextureFromId(output_texture_id));
+    ASSERT_NE(output_texture, nullptr);
+    const auto frame = output_texture->GetTextureByte();
+    WriteFrameAsPpm(
+        "build/windows/skinned_mesh_opengl_debug.ppm",
+        frame,
+        kRenderWidth,
+        kRenderHeight);
 }
 
 TEST_F(OpenGLRayTracingLevelTest, SkinnedMeshSceneMaterialAlbedoTextureCanBeEdited)
