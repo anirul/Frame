@@ -1,0 +1,41 @@
+#version 450 core
+
+layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
+
+struct OutputVertex
+{
+    vec4 position_color0;
+    vec4 normal_color1;
+    vec4 uv_color23;
+};
+
+layout(std430, binding = 0) readonly buffer SourceTriangleBuffer
+{
+    OutputVertex source_vertices[];
+};
+
+layout(std430, binding = 1) writeonly buffer AggregateTriangleBuffer
+{
+    OutputVertex aggregate_vertices[];
+};
+
+uniform int source_vertex_count;
+uniform int destination_vertex_offset;
+uniform vec4 color_multiplier;
+
+void main()
+{
+    const uint source_vertex_index = gl_GlobalInvocationID.x;
+    if (source_vertex_index >= uint(source_vertex_count))
+    {
+        return;
+    }
+
+    OutputVertex vertex = source_vertices[source_vertex_index];
+    vertex.position_color0.w = color_multiplier.x;
+    vertex.normal_color1.w = color_multiplier.y;
+    vertex.uv_color23.z = color_multiplier.z;
+    vertex.uv_color23.w = color_multiplier.w;
+    aggregate_vertices[destination_vertex_offset + int(source_vertex_index)] =
+        vertex;
+}

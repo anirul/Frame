@@ -83,15 +83,20 @@ bool RaytraceSceneRequiresWorldSpaceBuffers(frame::LevelInterface& level)
         {
             continue;
         }
-        auto* skinned_mesh =
-            dynamic_cast<SkinnedMesh*>(&level.GetMeshFromId(mesh_id));
+        auto& mesh = level.GetMeshFromId(mesh_id);
+        if (!mesh.GetTriangleBufferId() || !mesh.GetBvhBufferId())
+        {
+            return true;
+        }
+        auto* skinned_mesh = dynamic_cast<SkinnedMesh*>(&mesh);
         if (!skinned_mesh)
         {
             continue;
         }
-        if (skinned_mesh->HasActiveSkinning() ||
-            skinned_mesh->HasActiveRaytraceTriangleCallback() ||
-            skinned_mesh->HasActiveRaytraceBvhCallback())
+        if ((skinned_mesh->HasActiveSkinning() ||
+             skinned_mesh->HasActiveRaytraceTriangleCallback() ||
+             skinned_mesh->HasActiveRaytraceBvhCallback()) &&
+            !skinned_mesh->SupportsGpuRaytraceSkinning())
         {
             return true;
         }
@@ -138,6 +143,39 @@ bool CanUseSharedRaytraceSceneTransform(
     return true;
 }
 
+bool HasDynamicRaytracingSourceMesh(frame::LevelInterface& level)
+{
+    for (const auto& [node_id, material_id] :
+         GetRaytracingSourceMeshMaterials(level))
+    {
+        (void)material_id;
+        auto* node =
+            dynamic_cast<NodeMesh*>(&level.GetSceneNodeFromId(node_id));
+        if (!node)
+        {
+            continue;
+        }
+        const auto mesh_id = node->GetLocalMesh();
+        if (!mesh_id)
+        {
+            continue;
+        }
+        auto* skinned_mesh =
+            dynamic_cast<SkinnedMesh*>(&level.GetMeshFromId(mesh_id));
+        if (!skinned_mesh)
+        {
+            continue;
+        }
+        if (skinned_mesh->HasActiveSkinning() ||
+            skinned_mesh->HasActiveRaytraceTriangleCallback() ||
+            skinned_mesh->HasActiveRaytraceBvhCallback())
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 bool RequiresInstancedRaytraceProgram(frame::LevelInterface& level)
 {
     if (!HasRaytracingSourceMeshes(level))
@@ -145,6 +183,10 @@ bool RequiresInstancedRaytraceProgram(frame::LevelInterface& level)
         return false;
     }
     if (RaytraceSceneRequiresWorldSpaceBuffers(level))
+    {
+        return false;
+    }
+    if (HasDynamicRaytracingSourceMesh(level))
     {
         return true;
     }

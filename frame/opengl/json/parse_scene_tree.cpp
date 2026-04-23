@@ -836,10 +836,12 @@ EntityId CreateStorageBuffer(
     LevelInterface& level,
     std::size_t size,
     const void* data,
-    const std::string& name)
+    const std::string& name,
+    opengl::BufferUsageEnum buffer_usage = opengl::BufferUsageEnum::STATIC_DRAW)
 {
     auto buffer = std::make_unique<opengl::Buffer>(
-        opengl::BufferTypeEnum::SHADER_STORAGE_BUFFER);
+        opengl::BufferTypeEnum::SHADER_STORAGE_BUFFER,
+        buffer_usage);
     buffer->SetName(name);
     if (size == 0)
     {
@@ -857,13 +859,15 @@ template <typename T>
 EntityId CreateStorageBuffer(
     LevelInterface& level,
     const std::vector<T>& values,
-    const std::string& name)
+    const std::string& name,
+    opengl::BufferUsageEnum buffer_usage = opengl::BufferUsageEnum::STATIC_DRAW)
 {
     return CreateStorageBuffer(
         level,
         values.size() * sizeof(T),
         values.empty() ? nullptr : values.data(),
-        name);
+        name,
+        buffer_usage);
 }
 
 struct RaytraceAggregateBuffers
@@ -974,14 +978,32 @@ RaytraceAggregateBuffers BuildRaytraceAggregateBuffers(
     if (aggregate_indices.empty())
     {
         return {
-            CreateStorageBuffer(level, 0, nullptr, triangle_name),
-            CreateStorageBuffer(level, 0, nullptr, bvh_name)};
+            CreateStorageBuffer(
+                level,
+                0,
+                nullptr,
+                triangle_name,
+                opengl::BufferUsageEnum::DYNAMIC_DRAW),
+            CreateStorageBuffer(
+                level,
+                0,
+                nullptr,
+                bvh_name,
+                opengl::BufferUsageEnum::DYNAMIC_DRAW)};
     }
 
     const auto bvh_nodes = frame::BuildBVH(aggregate_points, aggregate_indices);
     return {
-        CreateStorageBuffer(level, aggregate_triangles, triangle_name),
-        CreateStorageBuffer(level, bvh_nodes, bvh_name)};
+        CreateStorageBuffer(
+            level,
+            aggregate_triangles,
+            triangle_name,
+            opengl::BufferUsageEnum::DYNAMIC_DRAW),
+        CreateStorageBuffer(
+            level,
+            bvh_nodes,
+            bvh_name,
+            opengl::BufferUsageEnum::DYNAMIC_DRAW)};
 }
 
 void EnsureRaytracingResolveNode(LevelInterface& level)
@@ -1101,7 +1123,8 @@ void FinalizeRaytracingSceneMaterials(LevelInterface& level)
             level,
             0,
             nullptr,
-            buffer_base_name + "_instances");
+            buffer_base_name + "_instances",
+            opengl::BufferUsageEnum::DYNAMIC_DRAW);
         scene_material.AddBufferName(
             level.GetNameFromId(instance_buffer_id),
             "RaytraceInstanceBuffer");

@@ -42,6 +42,7 @@ TEST_F(SkinnedMeshTest, LoadCesiumManGlbCreatesSkinnedMeshWithAnimationData)
 
     ASSERT_NE(nullptr, skinned);
     EXPECT_TRUE(skinned->HasSkinning());
+    EXPECT_TRUE(skinned->SupportsGpuRaytraceSkinning());
     EXPECT_NE(frame::NullId, skinned->GetTriangleBufferId());
     EXPECT_TRUE(skinned->HasRaytraceTriangleCallback());
     EXPECT_FALSE(skinned->HasRaytraceBvhCallback());

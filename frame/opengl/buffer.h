@@ -110,6 +110,8 @@ class Buffer : public BindInterface, public BufferInterface
      * @param binding: The attachment point.
      */
     void BindBase(int binding) const override;
+    const std::vector<std::uint8_t>& ReadBack() const;
+    void MarkGpuModified() const;
     const std::vector<std::uint8_t>& GetRawData() const
     {
         return raw_data_;

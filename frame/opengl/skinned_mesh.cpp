@@ -66,12 +66,14 @@ void SkinnedMesh::SetSkinningBuffers(
     glEnableVertexAttribArray(4);
 
     glBindVertexArray(0);
+    InvalidateRaytraceBuffers();
 }
 
 void SkinnedMesh::SetSkinningCallback(
     std::function<std::vector<glm::mat4>(double)> callback)
 {
     skinning_callback_ = std::move(callback);
+    InvalidateRaytraceBuffers();
 }
 
 void SkinnedMesh::SetSkinningAnimation(bool enabled, float speed)
@@ -82,6 +84,7 @@ void SkinnedMesh::SetSkinningAnimation(bool enabled, float speed)
         speed = 1.0f;
     }
     skinning_animation_speed_ = speed;
+    InvalidateRaytraceBuffers();
 }
 
 void SkinnedMesh::SetSkinningAnimationClip(
@@ -90,23 +93,34 @@ void SkinnedMesh::SetSkinningAnimationClip(
 {
     skinning_animation_clip_name_ = std::move(clip_name);
     skinning_animation_clip_index_ = clip_index;
+    InvalidateRaytraceBuffers();
 }
 
 void SkinnedMesh::SetRaytraceTriangleCallback(
     std::function<std::vector<float>(double)> callback)
 {
     raytrace_triangle_callback_ = std::move(callback);
+    InvalidateRaytraceBuffers();
 }
 
 void SkinnedMesh::SetRaytraceBvhCallback(
     std::function<std::vector<BVHNode>(double)> callback)
 {
     raytrace_bvh_callback_ = std::move(callback);
+    InvalidateRaytraceBuffers();
 }
 
 bool SkinnedMesh::HasSkinning() const
 {
     return static_cast<bool>(skinning_callback_);
+}
+
+bool SkinnedMesh::SupportsGpuRaytraceSkinning() const
+{
+    return bone_index_buffer_id_ != NullId &&
+           bone_weight_buffer_id_ != NullId &&
+           bone_index_buffer_size_ == 4u &&
+           bone_weight_buffer_size_ == 4u;
 }
 
 bool SkinnedMesh::HasActiveSkinning() const
@@ -188,6 +202,28 @@ std::vector<BVHNode> SkinnedMesh::EvaluateRaytraceBvh(double time_s) const
         return {};
     }
     return raytrace_bvh_callback_(time_s);
+}
+
+bool SkinnedMesh::ShouldUpdateRaytraceBuffers(double time_s) const
+{
+    if (!HasActiveRaytraceTriangleCallback() && !HasActiveRaytraceBvhCallback())
+    {
+        return false;
+    }
+    return raytrace_buffers_dirty_ || !last_raytrace_update_time_s_ ||
+           *last_raytrace_update_time_s_ != time_s;
+}
+
+void SkinnedMesh::MarkRaytraceBuffersUpdated(double time_s)
+{
+    raytrace_buffers_dirty_ = false;
+    last_raytrace_update_time_s_ = time_s;
+}
+
+void SkinnedMesh::InvalidateRaytraceBuffers()
+{
+    raytrace_buffers_dirty_ = true;
+    last_raytrace_update_time_s_ = std::nullopt;
 }
 
 } // End namespace frame::opengl.

@@ -1,0 +1,104 @@
+#version 450 core
+
+layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+
+struct Vertex
+{
+    vec4 position_color0;
+    vec4 normal_color1;
+    vec4 uv_color23;
+};
+
+struct Triangle
+{
+    Vertex v0;
+    Vertex v1;
+    Vertex v2;
+};
+
+struct BvhNode
+{
+    vec3 min;
+    float pad0;
+    vec3 max;
+    float pad1;
+    int left;
+    int right;
+    int first_triangle;
+    int triangle_count;
+};
+
+layout(std430, binding = 0) readonly buffer TriangleBuffer
+{
+    Triangle triangles[];
+};
+
+layout(std430, binding = 1) buffer BvhBuffer
+{
+    BvhNode nodes[];
+};
+
+uniform int node_offset;
+uniform int node_count;
+
+void ExpandPoint(inout vec3 bounds_min, inout vec3 bounds_max, const vec3 point)
+{
+    bounds_min = min(bounds_min, point);
+    bounds_max = max(bounds_max, point);
+}
+
+void main()
+{
+    if (gl_GlobalInvocationID.x != 0u || node_count <= 0)
+    {
+        return;
+    }
+
+    for (int local_index = node_count - 1; local_index >= 0; --local_index)
+    {
+        const int node_index = node_offset + local_index;
+        BvhNode node = nodes[node_index];
+        vec3 bounds_min = vec3(3.402823e38);
+        vec3 bounds_max = vec3(-3.402823e38);
+
+        if (node.triangle_count > 0)
+        {
+            for (int triangle_index = 0;
+                 triangle_index < node.triangle_count;
+                 ++triangle_index)
+            {
+                const Triangle triangle =
+                    triangles[node.first_triangle + triangle_index];
+                ExpandPoint(
+                    bounds_min,
+                    bounds_max,
+                    triangle.v0.position_color0.xyz);
+                ExpandPoint(
+                    bounds_min,
+                    bounds_max,
+                    triangle.v1.position_color0.xyz);
+                ExpandPoint(
+                    bounds_min,
+                    bounds_max,
+                    triangle.v2.position_color0.xyz);
+            }
+        }
+        else
+        {
+            if (node.left >= 0)
+            {
+                ExpandPoint(bounds_min, bounds_max, nodes[node.left].min);
+                ExpandPoint(bounds_min, bounds_max, nodes[node.left].max);
+            }
+            if (node.right >= 0)
+            {
+                ExpandPoint(bounds_min, bounds_max, nodes[node.right].min);
+                ExpandPoint(bounds_min, bounds_max, nodes[node.right].max);
+            }
+        }
+
+        node.min = bounds_min;
+        node.max = bounds_max;
+        nodes[node_index] = node;
+    }
+}

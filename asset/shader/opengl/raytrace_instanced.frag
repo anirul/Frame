@@ -590,6 +590,13 @@ bool TraceInstanceHit(
     }
 
     const bool transmissive = material_id == kMaterialTransmissive;
+    const bool has_bvh = transmissive
+        ? (transmissive_nodes.length() > 0 &&
+           bvh_root_index >= 0 &&
+           bvh_root_index < transmissive_nodes.length())
+        : (opaque_nodes.length() > 0 &&
+           bvh_root_index >= 0 &&
+           bvh_root_index < opaque_nodes.length());
     const vec3 ray_origin_model =
         TransformPoint(instance_data.world_to_object, ray_origin_world);
     const vec3 ray_dir_model =
@@ -597,24 +604,28 @@ bool TraceInstanceHit(
     float t_model = 0.0;
     vec2 bary = vec2(0.0);
     int tri_index = -1;
-    bool hit = transmissive
-        ? traverseTransmissiveBVHFromRoot(
-              ray_origin_model,
-              ray_dir_model,
-              1e20,
-              bvh_root_index,
-              t_model,
-              bary,
-              tri_index)
-        : traverseOpaqueBVHFromRoot(
-              ray_origin_model,
-              ray_dir_model,
-              1e20,
-              bvh_root_index,
-              t_model,
-              bary,
-              tri_index);
-    if (!hit)
+    bool hit = false;
+    if (has_bvh)
+    {
+        hit = transmissive
+            ? traverseTransmissiveBVHFromRoot(
+                  ray_origin_model,
+                  ray_dir_model,
+                  1e20,
+                  bvh_root_index,
+                  t_model,
+                  bary,
+                  tri_index)
+            : traverseOpaqueBVHFromRoot(
+                  ray_origin_model,
+                  ray_dir_model,
+                  1e20,
+                  bvh_root_index,
+                  t_model,
+                  bary,
+                  tri_index);
+    }
+    else
     {
         hit = traverseTrianglesRange(
             ray_origin_model,
