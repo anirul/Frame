@@ -205,8 +205,12 @@ bool RaytraceSceneRequiresWorldSpaceBuffers(frame::LevelInterface& level)
         {
             continue;
         }
-        auto* skinned_mesh =
-            dynamic_cast<SkinnedMesh*>(&level.GetMeshFromId(mesh_id));
+        auto& mesh = level.GetMeshFromId(mesh_id);
+        if (!mesh.GetTriangleBufferId() || !mesh.GetBvhBufferId())
+        {
+            return true;
+        }
+        auto* skinned_mesh = dynamic_cast<SkinnedMesh*>(&mesh);
         if (!skinned_mesh)
         {
             continue;
@@ -425,6 +429,19 @@ std::array<float, 4> ResolveRaytracingColorMultiplier(
         multiplier[channel] = std::clamp(value, 0.0f, 4.0f);
     }
     return multiplier;
+}
+
+template <typename T>
+std::vector<T> ReadTypedBufferData(const opengl::Buffer& buffer)
+{
+    const auto& raw = buffer.GetRawData();
+    if (raw.empty() || raw.size() % sizeof(T) != 0)
+    {
+        return {};
+    }
+    std::vector<T> result(raw.size() / sizeof(T));
+    std::memcpy(result.data(), raw.data(), raw.size());
+    return result;
 }
 
 template <typename T>
@@ -820,6 +837,94 @@ struct RaytraceVertex
     float pad3;
 };
 
+std::vector<std::uint8_t> BuildTriangleBytesFromMeshBuffers(
+    frame::LevelInterface& level,
+    const frame::MeshInterface& mesh)
+{
+    if (!mesh.GetPointBufferId() || !mesh.GetIndexBufferId())
+    {
+        return {};
+    }
+
+    auto* point_buffer = dynamic_cast<opengl::Buffer*>(
+        &level.GetBufferFromId(mesh.GetPointBufferId()));
+    auto* normal_buffer = mesh.GetNormalBufferId()
+        ? dynamic_cast<opengl::Buffer*>(
+              &level.GetBufferFromId(mesh.GetNormalBufferId()))
+        : nullptr;
+    auto* texture_buffer = mesh.GetTextureBufferId()
+        ? dynamic_cast<opengl::Buffer*>(
+              &level.GetBufferFromId(mesh.GetTextureBufferId()))
+        : nullptr;
+    auto* index_buffer = dynamic_cast<opengl::Buffer*>(
+        &level.GetBufferFromId(mesh.GetIndexBufferId()));
+    if (!point_buffer || !index_buffer)
+    {
+        return {};
+    }
+
+    const auto points = ReadTypedBufferData<float>(*point_buffer);
+    const auto normals = normal_buffer
+        ? ReadTypedBufferData<float>(*normal_buffer)
+        : std::vector<float>{};
+    const auto textures = texture_buffer
+        ? ReadTypedBufferData<float>(*texture_buffer)
+        : std::vector<float>{};
+    const auto indices = ReadTypedBufferData<std::uint32_t>(*index_buffer);
+    if (points.empty() || indices.empty())
+    {
+        return {};
+    }
+
+    std::vector<RaytraceVertex> triangles = {};
+    triangles.reserve(indices.size());
+    const auto append_vertex = [&](std::uint32_t index) {
+        const auto point_offset = static_cast<std::size_t>(index) * 3u;
+        if (point_offset + 2u >= points.size())
+        {
+            return;
+        }
+
+        RaytraceVertex vertex = {};
+        vertex.px = points[point_offset + 0u];
+        vertex.py = points[point_offset + 1u];
+        vertex.pz = points[point_offset + 2u];
+        vertex.pad0 = 1.0f;
+
+        if (point_offset + 2u < normals.size())
+        {
+            vertex.nx = normals[point_offset + 0u];
+            vertex.ny = normals[point_offset + 1u];
+            vertex.nz = normals[point_offset + 2u];
+        }
+        vertex.pad1 = 1.0f;
+
+        const auto texture_offset = static_cast<std::size_t>(index) * 2u;
+        if (texture_offset + 1u < textures.size())
+        {
+            vertex.u = textures[texture_offset + 0u];
+            vertex.v = textures[texture_offset + 1u];
+        }
+        vertex.pad2 = 1.0f;
+        vertex.pad3 = 1.0f;
+        triangles.push_back(vertex);
+    };
+
+    for (std::size_t i = 0; i + 2u < indices.size(); i += 3u)
+    {
+        append_vertex(indices[i + 0u]);
+        append_vertex(indices[i + 1u]);
+        append_vertex(indices[i + 2u]);
+    }
+
+    std::vector<std::uint8_t> bytes(triangles.size() * sizeof(RaytraceVertex));
+    if (!bytes.empty())
+    {
+        std::memcpy(bytes.data(), triangles.data(), bytes.size());
+    }
+    return bytes;
+}
+
 std::vector<std::uint8_t> ApplyTriangleColorMultiplier(
     const std::vector<std::uint8_t>& raw,
     const std::array<float, 4>& color)
@@ -922,26 +1027,33 @@ std::vector<std::uint8_t> BuildAggregateTriangleBytes(
         }
 
         const auto& mesh = level.GetMeshFromId(mesh_id);
-        const auto triangle_buffer_id = mesh.GetTriangleBufferId();
-        if (!triangle_buffer_id)
-        {
-            continue;
-        }
-
-        auto* triangle_buffer = dynamic_cast<opengl::Buffer*>(
-            &level.GetBufferFromId(triangle_buffer_id));
-        if (!triangle_buffer)
-        {
-            continue;
-        }
-
         const auto source_color =
             ResolveRaytracingSourceMaterialColor(level, source_material_id);
         const auto color_multiplier = ResolveRaytracingColorMultiplier(
             source_color,
             reference_color);
+        std::vector<std::uint8_t> source_triangle_bytes = {};
+        const auto triangle_buffer_id = mesh.GetTriangleBufferId();
+        if (triangle_buffer_id)
+        {
+            auto* triangle_buffer = dynamic_cast<opengl::Buffer*>(
+                &level.GetBufferFromId(triangle_buffer_id));
+            if (triangle_buffer)
+            {
+                source_triangle_bytes = triangle_buffer->GetRawData();
+            }
+        }
+        if (source_triangle_bytes.empty())
+        {
+            source_triangle_bytes =
+                BuildTriangleBytesFromMeshBuffers(level, mesh);
+        }
+        if (source_triangle_bytes.empty())
+        {
+            continue;
+        }
         const auto transformed = TransformTriangleBytes(
-            triangle_buffer->GetRawData(),
+            source_triangle_bytes,
             node->GetLocalModel(time_seconds));
         const auto tinted =
             ApplyTriangleColorMultiplier(transformed, color_multiplier);

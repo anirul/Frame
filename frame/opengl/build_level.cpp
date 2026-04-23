@@ -83,8 +83,12 @@ bool RaytraceSceneRequiresWorldSpaceBuffers(frame::LevelInterface& level)
         {
             continue;
         }
-        auto* skinned_mesh =
-            dynamic_cast<SkinnedMesh*>(&level.GetMeshFromId(mesh_id));
+        auto& mesh = level.GetMeshFromId(mesh_id);
+        if (!mesh.GetTriangleBufferId() || !mesh.GetBvhBufferId())
+        {
+            return true;
+        }
+        auto* skinned_mesh = dynamic_cast<SkinnedMesh*>(&mesh);
         if (!skinned_mesh)
         {
             continue;

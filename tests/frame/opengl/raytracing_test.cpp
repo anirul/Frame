@@ -802,7 +802,7 @@ TEST_F(
     auto* triangle_buffer = dynamic_cast<frame::opengl::Buffer*>(
         &level->GetBufferFromId(triangle_id));
     ASSERT_NE(triangle_buffer, nullptr);
-    EXPECT_GT(triangle_buffer->GetRawData().size(), 0u);
+    EXPECT_GT(triangle_buffer->ReadBack().size(), 0u);
 }
 
 TEST_F(
