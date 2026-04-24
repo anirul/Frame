@@ -22,6 +22,7 @@ layout(std430, binding = 1) writeonly buffer AggregateTriangleBuffer
 uniform int source_vertex_count;
 uniform int destination_vertex_offset;
 uniform vec4 color_multiplier;
+uniform vec4 atlas_uv_bounds;
 
 void main()
 {
@@ -34,6 +35,9 @@ void main()
     OutputVertex vertex = source_vertices[source_vertex_index];
     vertex.position_color0.w = color_multiplier.x;
     vertex.normal_color1.w = color_multiplier.y;
+    vertex.uv_color23.xy = vec2(
+        mix(atlas_uv_bounds.x, atlas_uv_bounds.y, clamp(vertex.uv_color23.x, 0.0, 1.0)),
+        mix(atlas_uv_bounds.z, atlas_uv_bounds.w, clamp(vertex.uv_color23.y, 0.0, 1.0)));
     vertex.uv_color23.z = color_multiplier.z;
     vertex.uv_color23.w = color_multiplier.w;
     aggregate_vertices[destination_vertex_offset + int(source_vertex_index)] =

@@ -45,6 +45,7 @@ layout(push_constant, std430) uniform PushConstants
     uint pad1;
     uint pad2;
     vec4 color_multiplier;
+    vec4 atlas_uv_bounds;
 } pc;
 
 mat4 BuildSkinMatrix(const SourceVertex source_vertex)
@@ -104,8 +105,11 @@ void main()
     output_vertex.normal_color1 = vec4(
         normal,
         pc.color_multiplier.y);
+    const vec2 atlas_uv = vec2(
+        mix(pc.atlas_uv_bounds.x, pc.atlas_uv_bounds.y, clamp(source_vertex.uv.x, 0.0, 1.0)),
+        mix(pc.atlas_uv_bounds.z, pc.atlas_uv_bounds.w, clamp(source_vertex.uv.y, 0.0, 1.0)));
     output_vertex.uv_color23 = vec4(
-        source_vertex.uv.xy,
+        atlas_uv,
         pc.color_multiplier.z,
         pc.color_multiplier.w);
     output_vertices[output_vertex_index] = output_vertex;

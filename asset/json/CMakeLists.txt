@@ -10,6 +10,7 @@ add_custom_target(AssetJson
     cubemap.json
     ray_marching.json
     raytracing.json
+    raytracing_multi_material.json
     dragon.json
     skinned_mesh.json
     renderer_test.json

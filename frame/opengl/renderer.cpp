@@ -15,6 +15,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <numeric>
 #include <stdexcept>
+#include <unordered_map>
 
 #include "frame/bvh.h"
 #include "frame/file/file_system.h"
@@ -431,6 +432,152 @@ std::array<float, 4> ResolveRaytracingColorMultiplier(
     return multiplier;
 }
 
+struct RaytracingTextureMapping
+{
+    const char* source_name;
+    const char* fallback_name;
+    const char* target_name;
+};
+
+constexpr std::array<RaytracingTextureMapping, 7>
+    kOpaqueRaytracingTextureMappings = {{
+        {"albedo_texture", "Color", "opaque_albedo_texture"},
+        {"normal_texture", nullptr, "opaque_normal_texture"},
+        {"roughness_texture", nullptr, "opaque_roughness_texture"},
+        {"metallic_texture", nullptr, "opaque_metallic_texture"},
+        {"ao_texture", nullptr, "opaque_ao_texture"},
+        {"specular_factor_texture", nullptr, "opaque_specular_factor_texture"},
+        {"specular_color_texture", nullptr, "opaque_specular_color_texture"},
+    }};
+
+constexpr std::array<RaytracingTextureMapping, 10>
+    kTransmissiveRaytracingTextureMappings = {{
+        {"albedo_texture", "Color", "transmissive_albedo_texture"},
+        {"normal_texture", nullptr, "transmissive_normal_texture"},
+        {"roughness_texture", nullptr, "transmissive_roughness_texture"},
+        {"metallic_texture", nullptr, "transmissive_metallic_texture"},
+        {"ao_texture", nullptr, "transmissive_ao_texture"},
+        {"transmission_texture", nullptr, "transmissive_transmission_texture"},
+        {"ior_texture", nullptr, "transmissive_ior_texture"},
+        {"thickness_texture", nullptr, "transmissive_thickness_texture"},
+        {"attenuation_color_texture", nullptr, "transmissive_attenuation_color_texture"},
+        {"attenuation_distance_texture", nullptr, "transmissive_attenuation_distance_texture"},
+    }};
+
+struct RaytracingTextureAtlasLayout
+{
+    std::vector<frame::EntityId> material_ids = {};
+    std::unordered_map<frame::EntityId, std::uint32_t> slot_by_material_id = {};
+    std::uint32_t columns = 1u;
+    std::uint32_t rows = 1u;
+    std::uint32_t tile_width = 1u;
+    std::uint32_t tile_height = 1u;
+    std::uint32_t atlas_width = 1u;
+    std::uint32_t atlas_height = 1u;
+};
+
+frame::EntityId ResolveRaytracingMappedTextureId(
+    const frame::MaterialInterface& material,
+    const RaytracingTextureMapping& mapping)
+{
+    auto texture_id = FindTextureIdByInnerName(material, mapping.source_name);
+    if (!texture_id && mapping.fallback_name)
+    {
+        texture_id = FindTextureIdByInnerName(material, mapping.fallback_name);
+    }
+    return texture_id;
+}
+
+template <typename MappingArray>
+std::optional<RaytracingTextureAtlasLayout> BuildRaytracingTextureAtlasLayout(
+    frame::LevelInterface& level,
+    bool transmissive,
+    const MappingArray& mappings)
+{
+    std::vector<frame::EntityId> material_ids = {};
+    std::unordered_set<frame::EntityId> seen_material_ids = {};
+    for (const auto& [source_node_id, source_material_id] :
+         GetRaytracingSourceMeshMaterials(level))
+    {
+        (void)source_node_id;
+        if (IsTransmissiveMaterial(level, source_material_id) != transmissive ||
+            !source_material_id ||
+            !seen_material_ids.insert(source_material_id).second)
+        {
+            continue;
+        }
+        material_ids.push_back(source_material_id);
+    }
+    if (material_ids.size() <= 1u)
+    {
+        return std::nullopt;
+    }
+
+    RaytracingTextureAtlasLayout layout = {};
+    layout.material_ids = std::move(material_ids);
+    for (std::size_t i = 0; i < layout.material_ids.size(); ++i)
+    {
+        layout.slot_by_material_id.emplace(
+            layout.material_ids[i],
+            static_cast<std::uint32_t>(i));
+    }
+
+    for (const auto material_id : layout.material_ids)
+    {
+        const auto& material = level.GetMaterialFromId(material_id);
+        for (const auto& mapping : mappings)
+        {
+            const auto texture_id = ResolveRaytracingMappedTextureId(
+                material,
+                mapping);
+            if (!texture_id)
+            {
+                continue;
+            }
+            const auto size = level.GetTextureFromId(texture_id).GetSize();
+            layout.tile_width = std::max(layout.tile_width, std::max(1u, size.x));
+            layout.tile_height = std::max(
+                layout.tile_height,
+                std::max(1u, size.y));
+        }
+    }
+
+    const auto material_count = static_cast<double>(layout.material_ids.size());
+    layout.columns = std::max(
+        1u,
+        static_cast<std::uint32_t>(std::ceil(std::sqrt(material_count))));
+    layout.rows = std::max(
+        1u,
+        static_cast<std::uint32_t>(
+            (layout.material_ids.size() + layout.columns - 1u) /
+            layout.columns));
+    layout.atlas_width = std::max(1u, layout.columns * layout.tile_width);
+    layout.atlas_height = std::max(1u, layout.rows * layout.tile_height);
+    return layout;
+}
+
+bool HasBoundRaytracingTextureAtlas(
+    frame::LevelInterface& level,
+    bool transmissive)
+{
+    const auto scene_material_id = level.GetIdFromName("RayTraceMaterial");
+    if (scene_material_id == frame::NullId)
+    {
+        return false;
+    }
+    const auto& scene_material = level.GetMaterialFromId(scene_material_id);
+    const auto* target_name = transmissive
+        ? "transmissive_albedo_texture"
+        : "opaque_albedo_texture";
+    const auto texture_id = FindTextureIdByInnerName(scene_material, target_name);
+    if (texture_id == frame::NullId)
+    {
+        return false;
+    }
+    return level.GetNameFromId(texture_id).find(".__raytrace_atlas_") !=
+        std::string::npos;
+}
+
 template <typename T>
 std::vector<T> ReadTypedBufferData(const opengl::Buffer& buffer)
 {
@@ -514,7 +661,11 @@ struct RaytracingSourceGeometryData
     std::uint32_t bvh_node_offset = 0u;
     std::uint32_t bvh_node_count = 0u;
     std::array<float, 4> color_multiplier = {1.0f, 1.0f, 1.0f, 1.0f};
+    std::array<float, 4> atlas_uv_bounds = {0.0f, 1.0f, 0.0f, 1.0f};
 };
+
+std::array<float, 4> GetRaytracingAtlasUvBounds(
+    const RaytracingTextureAtlasLayout& layout, EntityId material_id);
 
 std::uint64_t BuildSourceGeometryKey(
     EntityId source_node_id, EntityId source_material_id)
@@ -527,6 +678,20 @@ std::vector<RaytracingSourceGeometryData> BuildRaytracingSourceGeometryData(
     frame::LevelInterface& level)
 {
     std::vector<RaytracingSourceGeometryData> geometries = {};
+    const auto transmissive_atlas_layout =
+        HasBoundRaytracingTextureAtlas(level, true)
+            ? BuildRaytracingTextureAtlasLayout(
+                  level,
+                  true,
+                  kTransmissiveRaytracingTextureMappings)
+            : std::nullopt;
+    const auto opaque_atlas_layout =
+        HasBoundRaytracingTextureAtlas(level, false)
+            ? BuildRaytracingTextureAtlasLayout(
+                  level,
+                  false,
+                  kOpaqueRaytracingTextureMappings)
+            : std::nullopt;
     std::uint32_t next_transmissive_triangle_offset = 0u;
     std::uint32_t next_opaque_triangle_offset = 0u;
     std::uint32_t next_transmissive_bvh_offset = 0u;
@@ -595,6 +760,15 @@ std::vector<RaytracingSourceGeometryData> BuildRaytracingSourceGeometryData(
         geometry.triangle_buffer_id = triangle_buffer_id;
         geometry.bvh_buffer_id = bvh_buffer_id;
         geometry.material_id = transmissive ? 0u : 1u;
+        geometry.atlas_uv_bounds = transmissive && transmissive_atlas_layout
+            ? GetRaytracingAtlasUvBounds(
+                  *transmissive_atlas_layout,
+                  source_material_id)
+            : (!transmissive && opaque_atlas_layout)
+            ? GetRaytracingAtlasUvBounds(
+                  *opaque_atlas_layout,
+                  source_material_id)
+            : std::array<float, 4>{0.0f, 1.0f, 0.0f, 1.0f};
         geometry.triangle_offset = transmissive
             ? next_transmissive_triangle_offset
             : next_opaque_triangle_offset;
@@ -638,6 +812,7 @@ std::size_t BuildSourceInstanceLayoutHash(
         HashCombine(seed, geometry.triangle_count);
         HashCombine(seed, geometry.bvh_node_offset);
         HashCombine(seed, geometry.bvh_node_count);
+        HashColor(seed, geometry.atlas_uv_bounds);
     }
     return seed;
 }
@@ -661,6 +836,7 @@ std::size_t BuildSourceGeometryContentStateHash(
     HashCombine(seed, geometry.bvh_node_offset);
     HashCombine(seed, geometry.bvh_node_count);
     HashColor(seed, geometry.color_multiplier);
+    HashColor(seed, geometry.atlas_uv_bounds);
     return seed;
 }
 
@@ -837,6 +1013,64 @@ struct RaytraceVertex
     float pad3;
 };
 
+std::array<float, 4> GetRaytracingAtlasUvBounds(
+    const RaytracingTextureAtlasLayout& layout,
+    frame::EntityId material_id)
+{
+    const auto it = layout.slot_by_material_id.find(material_id);
+    if (it == layout.slot_by_material_id.end())
+    {
+        return {0.0f, 1.0f, 0.0f, 1.0f};
+    }
+
+    const std::uint32_t slot = it->second;
+    const std::uint32_t column = slot % layout.columns;
+    const std::uint32_t row = slot / layout.columns;
+    const float atlas_width = static_cast<float>(layout.atlas_width);
+    const float atlas_height = static_cast<float>(layout.atlas_height);
+    const float u0 =
+        (static_cast<float>(column * layout.tile_width) + 0.5f) / atlas_width;
+    const float u1 =
+        (static_cast<float>((column + 1u) * layout.tile_width) - 0.5f) /
+        atlas_width;
+    const float v0 =
+        (static_cast<float>(row * layout.tile_height) + 0.5f) / atlas_height;
+    const float v1 =
+        (static_cast<float>((row + 1u) * layout.tile_height) - 0.5f) /
+        atlas_height;
+    return {u0, std::max(u0, u1), v0, std::max(v0, v1)};
+}
+
+std::vector<std::uint8_t> RemapRaytracingAtlasTriangleUvs(
+    const std::vector<std::uint8_t>& raw,
+    const std::optional<RaytracingTextureAtlasLayout>& layout,
+    frame::EntityId material_id)
+{
+    if (!layout || raw.empty() ||
+        !layout->slot_by_material_id.contains(material_id))
+    {
+        return raw;
+    }
+    if (raw.size() % sizeof(RaytraceVertex) != 0u)
+    {
+        throw std::runtime_error(
+            "OpenGL raytrace triangle buffer size is not aligned to the expected vertex stride.");
+    }
+
+    const auto bounds = GetRaytracingAtlasUvBounds(*layout, material_id);
+    std::vector<std::uint8_t> remapped = raw;
+    auto* vertices = reinterpret_cast<RaytraceVertex*>(remapped.data());
+    const std::size_t vertex_count = remapped.size() / sizeof(RaytraceVertex);
+    for (std::size_t i = 0; i < vertex_count; ++i)
+    {
+        const float u = std::clamp(vertices[i].u, 0.0f, 1.0f);
+        const float v = std::clamp(vertices[i].v, 0.0f, 1.0f);
+        vertices[i].u = bounds[0] + (bounds[1] - bounds[0]) * u;
+        vertices[i].v = bounds[2] + (bounds[3] - bounds[2]) * v;
+    }
+    return remapped;
+}
+
 std::vector<std::uint8_t> BuildTriangleBytesFromMeshBuffers(
     frame::LevelInterface& level,
     const frame::MeshInterface& mesh)
@@ -1006,6 +1240,17 @@ std::vector<std::uint8_t> BuildAggregateTriangleBytes(
     std::vector<std::uint8_t> aggregate_triangle_bytes = {};
     const auto reference_color =
         ResolveRaytracingReferenceColor(level, transmissive);
+    const auto atlas_layout = HasBoundRaytracingTextureAtlas(level, transmissive)
+        ? (transmissive
+               ? BuildRaytracingTextureAtlasLayout(
+                     level,
+                     true,
+                     kTransmissiveRaytracingTextureMappings)
+               : BuildRaytracingTextureAtlasLayout(
+                     level,
+                     false,
+                     kOpaqueRaytracingTextureMappings))
+        : std::nullopt;
     for (const auto& [source_node_id, source_material_id] :
          GetRaytracingSourceMeshMaterials(level))
     {
@@ -1052,6 +1297,10 @@ std::vector<std::uint8_t> BuildAggregateTriangleBytes(
         {
             continue;
         }
+        source_triangle_bytes = RemapRaytracingAtlasTriangleUvs(
+            source_triangle_bytes,
+            atlas_layout,
+            source_material_id);
         const auto transformed = TransformTriangleBytes(
             source_triangle_bytes,
             node->GetLocalModel(time_seconds));
@@ -1505,6 +1754,13 @@ void Renderer::UpdateSourceInstanceRaytraceSceneBuffers()
                     geometry.color_multiplier[1],
                     geometry.color_multiplier[2],
                     geometry.color_multiplier[3])));
+            uniforms.AddUniform(std::make_unique<Uniform>(
+                "atlas_uv_bounds",
+                glm::vec4(
+                    geometry.atlas_uv_bounds[0],
+                    geometry.atlas_uv_bounds[1],
+                    geometry.atlas_uv_bounds[2],
+                    geometry.atlas_uv_bounds[3])));
             gpu_raytrace_triangle_copy_program_->Use(uniforms, nullptr);
             glBindBufferBase(
                 GL_SHADER_STORAGE_BUFFER,
