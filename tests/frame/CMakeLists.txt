@@ -35,7 +35,9 @@ set_target_properties(FrameTest PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
 
 include(GoogleTest)
-gtest_add_tests(TARGET FrameTest)
+gtest_add_tests(TARGET FrameTest TEST_LIST FRAME_TESTS)
+set_tests_properties(WindowFactoryTest.CreateWindowOpenGLTest
+  PROPERTIES LABELS requires-opengl)
 
 add_subdirectory(file)
 add_subdirectory(json)

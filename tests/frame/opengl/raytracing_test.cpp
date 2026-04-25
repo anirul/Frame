@@ -6,6 +6,8 @@
 #include <cstdint>
 #include <fstream>
 #include <stdexcept>
+#include <string>
+#include <unordered_set>
 #include <vector>
 
 #include "frame/camera.h"
@@ -58,6 +60,35 @@ frame::proto::Level LoadLevelProtoWithoutSkinnedMesh()
             break;
         }
     }
+    return level_proto;
+}
+
+frame::proto::Level LoadRaytracingProtoWithAdditionalSceneMesh(
+    const std::string& node_name, const std::string& file_name)
+{
+    auto level_proto = frame::json::LoadLevelProto(
+        frame::file::FindFile("asset/json/raytracing.json"));
+    auto* textures = level_proto.mutable_textures();
+    for (int i = 0; i < textures->size();)
+    {
+        const auto& texture = textures->Get(i);
+        if (texture.name() == "albedo_texture" ||
+            texture.name() == "normal_texture" ||
+            texture.name() == "roughness_texture" ||
+            texture.name() == "metallic_texture" ||
+            texture.name() == "ao_texture")
+        {
+            textures->DeleteSubrange(i, 1);
+            continue;
+        }
+        ++i;
+    }
+    auto* scene_tree = level_proto.mutable_scene_tree();
+    auto* node_mesh = scene_tree->add_node_meshes();
+    node_mesh->set_name(node_name);
+    node_mesh->set_parent("mesh_holder");
+    node_mesh->set_file_name(file_name);
+    node_mesh->set_render_time_enum(frame::proto::NodeMesh::SCENE_RENDER_TIME);
     return level_proto;
 }
 
@@ -1116,6 +1147,66 @@ TEST_F(OpenGLRayTracingLevelTest, ImportsGltfOpaqueSpecularFromPlate)
     EXPECT_NEAR(specular_color[0], 0.0f, 0.02f);
     EXPECT_NEAR(specular_color[1], 0.0f, 0.02f);
     EXPECT_NEAR(specular_color[2], 0.0f, 0.02f);
+}
+
+TEST_F(OpenGLRayTracingLevelTest, BuildsOpaqueAtlasForMultipleOpaqueGltfMaterials)
+{
+    auto level = frame::json::ParseLevel(
+        {1280u, 720u},
+        LoadRaytracingProtoWithAdditionalSceneMesh(
+            "TexturedScene",
+            "scene.glb"));
+    ASSERT_NE(level, nullptr);
+
+    const auto scene_material_id = level->GetIdFromName("RayTraceMaterial");
+    ASSERT_NE(scene_material_id, frame::NullId);
+    const auto& scene_material = level->GetMaterialFromId(scene_material_id);
+    const auto scene_albedo_texture_id = FindTextureByInnerName(
+        scene_material,
+        "opaque_albedo_texture");
+    ASSERT_NE(scene_albedo_texture_id, frame::NullId);
+
+    std::unordered_set<frame::EntityId> opaque_albedo_texture_ids = {};
+    for (const auto& mesh_material :
+         level->GetMeshMaterialIds(frame::proto::NodeMesh::SCENE_RENDER_TIME))
+    {
+        const auto material_id = mesh_material.second;
+        if (material_id == frame::NullId ||
+            material_id == scene_material_id)
+        {
+            continue;
+        }
+
+        const auto& material = level->GetMaterialFromId(material_id);
+        const auto transmission_texture_id = FindTextureByInnerName(
+            material,
+            "transmission_texture");
+        if (transmission_texture_id != frame::NullId &&
+            ReadTextureFirstChannel(*level, transmission_texture_id) > 0.01f)
+        {
+            continue;
+        }
+
+        const auto albedo_texture_id = FindTextureByInnerName(
+            material,
+            "albedo_texture");
+        if (albedo_texture_id != frame::NullId)
+        {
+            opaque_albedo_texture_ids.insert(albedo_texture_id);
+        }
+    }
+
+    ASSERT_GT(opaque_albedo_texture_ids.size(), 1u);
+    for (const auto texture_id : opaque_albedo_texture_ids)
+    {
+        EXPECT_NE(scene_albedo_texture_id, texture_id);
+    }
+
+    const auto scene_albedo_texture_name =
+        level->GetNameFromId(scene_albedo_texture_id);
+    EXPECT_NE(
+        scene_albedo_texture_name.find(".__raytrace_atlas_"),
+        std::string::npos);
 }
 
 TEST_F(OpenGLRayTracingLevelTest, SkinnedMeshPreRenderPopulatesSourceInstanceSceneBuffers)

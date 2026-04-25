@@ -61,7 +61,9 @@ set_target_properties(FrameOpenGLTest PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
 
 include(GoogleTest)
-gtest_add_tests(TARGET FrameOpenGLTest)
+gtest_add_tests(TARGET FrameOpenGLTest TEST_LIST FRAME_OPENGL_TESTS)
+set_tests_properties(${FRAME_OPENGL_TESTS}
+  PROPERTIES LABELS requires-opengl)
 
 add_subdirectory(file)
 
@@ -98,6 +100,8 @@ if(MSVC)
   target_compile_options(FrameOpenGLGUITest PRIVATE /utf-8)
 endif()
 
-gtest_add_tests(TARGET FrameOpenGLGUITest)
+gtest_add_tests(TARGET FrameOpenGLGUITest TEST_LIST FRAME_OPENGL_GUI_TESTS)
+set_tests_properties(${FRAME_OPENGL_GUI_TESTS}
+  PROPERTIES LABELS requires-opengl)
 
 set_property(TARGET FrameOpenGLGUITest PROPERTY FOLDER "FrameTest/OpenGL")

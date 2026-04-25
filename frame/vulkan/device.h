@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <cstdint>
 #include <filesystem>
 #include <functional>
@@ -47,6 +48,7 @@ struct RaytracingSourceGeometryData
     EntityId source_material_id = NullId;
     std::uint32_t material_id = 0;
     std::uint32_t triangle_offset = 0;
+    std::array<float, 4> atlas_uv_bounds = {0.0f, 1.0f, 0.0f, 1.0f};
     std::vector<std::uint8_t> triangle_bytes = {};
 };
 
@@ -272,6 +274,7 @@ class Device : public DeviceInterface
         std::uint32_t bone_capacity = 0;
         vk::DeviceSize output_buffer_size = 0;
         glm::vec4 color_multiplier = glm::vec4(1.0f);
+        glm::vec4 atlas_uv_bounds = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);
         vk::UniqueBuffer source_vertex_buffer;
         vk::UniqueDeviceMemory source_vertex_memory;
         vk::UniqueBuffer source_index_buffer;

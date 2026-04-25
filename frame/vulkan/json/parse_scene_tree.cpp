@@ -615,6 +615,66 @@ std::string GetAutoMaterialName(
 constexpr const char* kRaytracingResolveNodeName = "RayTracingRendering";
 constexpr const char* kRaytracingResolveMaterialName = "RayTraceMaterial";
 
+struct RaytracingTextureMapping
+{
+    const char* source_name;
+    const char* fallback_name;
+    const char* target_name;
+};
+
+constexpr std::array<RaytracingTextureMapping, 7>
+    kOpaqueRaytracingTextureMappings = {{
+        {"albedo_texture", "Color", "opaque_albedo_texture"},
+        {"normal_texture", nullptr, "opaque_normal_texture"},
+        {"roughness_texture", nullptr, "opaque_roughness_texture"},
+        {"metallic_texture", nullptr, "opaque_metallic_texture"},
+        {"ao_texture", nullptr, "opaque_ao_texture"},
+        {"specular_factor_texture", nullptr, "opaque_specular_factor_texture"},
+        {"specular_color_texture", nullptr, "opaque_specular_color_texture"},
+    }};
+
+constexpr std::array<RaytracingTextureMapping, 10>
+    kTransmissiveRaytracingTextureMappings = {{
+        {"albedo_texture", "Color", "transmissive_albedo_texture"},
+        {"normal_texture", nullptr, "transmissive_normal_texture"},
+        {"roughness_texture", nullptr, "transmissive_roughness_texture"},
+        {"metallic_texture", nullptr, "transmissive_metallic_texture"},
+        {"ao_texture", nullptr, "transmissive_ao_texture"},
+        {"transmission_texture", nullptr, "transmissive_transmission_texture"},
+        {"ior_texture", nullptr, "transmissive_ior_texture"},
+        {"thickness_texture", nullptr, "transmissive_thickness_texture"},
+        {"attenuation_color_texture", nullptr, "transmissive_attenuation_color_texture"},
+        {"attenuation_distance_texture", nullptr, "transmissive_attenuation_distance_texture"},
+    }};
+
+struct RaytracingTextureAtlasLayout
+{
+    std::vector<EntityId> material_ids = {};
+    std::unordered_map<EntityId, std::uint32_t> slot_by_material_id = {};
+    std::uint32_t columns = 1u;
+    std::uint32_t rows = 1u;
+    std::uint32_t tile_width = 1u;
+    std::uint32_t tile_height = 1u;
+    std::uint32_t atlas_width = 1u;
+    std::uint32_t atlas_height = 1u;
+};
+
+std::string GetRaytracingAtlasTextureName(
+    LevelInterface& level,
+    EntityId material_id,
+    std::string_view target_name)
+{
+    return std::format(
+        "{}.__raytrace_atlas_{}",
+        level.GetNameFromId(material_id),
+        target_name);
+}
+
+bool IsRaytracingAtlasTextureName(const std::string& texture_name)
+{
+    return texture_name.find(".__raytrace_atlas_") != std::string::npos;
+}
+
 bool EqualsIgnoreCaseAscii(
     const std::string& lhs, const std::string& rhs)
 {
@@ -931,6 +991,461 @@ bool IsGeneratedGltfTextureName(const std::string& texture_name)
            texture_name.find(".__gltf_solid_") != std::string::npos;
 }
 
+EntityId ResolveRaytracingMappedTextureId(
+    const MaterialInterface& material,
+    const RaytracingTextureMapping& mapping)
+{
+    EntityId texture_id = FindTextureIdByInnerName(material, mapping.source_name);
+    if (!texture_id && mapping.fallback_name)
+    {
+        texture_id = FindTextureIdByInnerName(material, mapping.fallback_name);
+    }
+    return texture_id;
+}
+
+bool ShouldReplaceRaytracingSceneTextureBinding(
+    LevelInterface& level,
+    const MaterialInterface& material,
+    std::string_view target_name)
+{
+    const EntityId texture_id = FindTextureIdByInnerName(
+        material,
+        std::string(target_name));
+    if (texture_id == NullId)
+    {
+        return true;
+    }
+
+    const auto texture_name = level.GetNameFromId(texture_id);
+    const auto& texture = level.GetTextureFromId(texture_id);
+    return IsGeneratedGltfTextureName(texture_name) ||
+           IsRaytracingAtlasTextureName(texture_name) ||
+           !texture.SerializeEnable() ||
+           texture_name.find(".__raytrace_default_") != std::string::npos;
+}
+
+template <typename MappingArray>
+std::optional<RaytracingTextureAtlasLayout> BuildRaytracingTextureAtlasLayout(
+    LevelInterface& level,
+    bool transmissive,
+    const MappingArray& mappings)
+{
+    std::vector<EntityId> material_ids = {};
+    std::unordered_set<EntityId> seen_material_ids = {};
+    for (const auto& [source_node_id, source_material_id] :
+         GetRaytracingSourceMeshMaterials(level))
+    {
+        (void)source_node_id;
+        if (IsTransmissiveRaytracingSourceMaterial(level, source_material_id) !=
+                transmissive ||
+            !source_material_id ||
+            !seen_material_ids.insert(source_material_id).second)
+        {
+            continue;
+        }
+        material_ids.push_back(source_material_id);
+    }
+    if (material_ids.size() <= 1u)
+    {
+        return std::nullopt;
+    }
+
+    RaytracingTextureAtlasLayout layout = {};
+    layout.material_ids = std::move(material_ids);
+    for (std::size_t i = 0; i < layout.material_ids.size(); ++i)
+    {
+        layout.slot_by_material_id.emplace(
+            layout.material_ids[i],
+            static_cast<std::uint32_t>(i));
+    }
+
+    for (const auto material_id : layout.material_ids)
+    {
+        const auto& material = level.GetMaterialFromId(material_id);
+        for (const auto& mapping : mappings)
+        {
+            EntityId texture_id = ResolveRaytracingMappedTextureId(
+                material,
+                mapping);
+            if (!texture_id)
+            {
+                texture_id = EnsureDefaultRaytracingTexture(
+                    level,
+                    mapping.target_name);
+            }
+            if (!texture_id)
+            {
+                continue;
+            }
+
+            const auto size = level.GetTextureFromId(texture_id).GetSize();
+            layout.tile_width = std::max(layout.tile_width, std::max(1u, size.x));
+            layout.tile_height = std::max(
+                layout.tile_height,
+                std::max(1u, size.y));
+        }
+    }
+
+    const auto material_count = static_cast<double>(layout.material_ids.size());
+    layout.columns = std::max(
+        1u,
+        static_cast<std::uint32_t>(std::ceil(std::sqrt(material_count))));
+    layout.rows = std::max(
+        1u,
+        static_cast<std::uint32_t>(
+            (layout.material_ids.size() + layout.columns - 1u) /
+            layout.columns));
+    layout.atlas_width = std::max(1u, layout.columns * layout.tile_width);
+    layout.atlas_height = std::max(1u, layout.rows * layout.tile_height);
+    return layout;
+}
+
+std::array<float, 4> GetRaytracingAtlasUvBounds(
+    const RaytracingTextureAtlasLayout& layout,
+    EntityId material_id)
+{
+    const auto it = layout.slot_by_material_id.find(material_id);
+    if (it == layout.slot_by_material_id.end())
+    {
+        return {0.0f, 1.0f, 0.0f, 1.0f};
+    }
+
+    const std::uint32_t slot = it->second;
+    const std::uint32_t column = slot % layout.columns;
+    const std::uint32_t row = slot / layout.columns;
+    const float atlas_width = static_cast<float>(layout.atlas_width);
+    const float atlas_height = static_cast<float>(layout.atlas_height);
+    const float u0 =
+        (static_cast<float>(column * layout.tile_width) + 0.5f) / atlas_width;
+    const float u1 =
+        (static_cast<float>((column + 1u) * layout.tile_width) - 0.5f) /
+        atlas_width;
+    const float v0 =
+        (static_cast<float>(row * layout.tile_height) + 0.5f) / atlas_height;
+    const float v1 =
+        (static_cast<float>((row + 1u) * layout.tile_height) - 0.5f) /
+        atlas_height;
+    return {u0, std::max(u0, u1), v0, std::max(v0, v1)};
+}
+
+std::vector<float> RemapRaytracingAtlasUvs(
+    const std::vector<float>& textures,
+    const std::optional<RaytracingTextureAtlasLayout>& layout,
+    EntityId material_id)
+{
+    if (!layout || textures.empty() ||
+        !layout->slot_by_material_id.contains(material_id))
+    {
+        return textures;
+    }
+
+    const auto bounds = GetRaytracingAtlasUvBounds(*layout, material_id);
+    std::vector<float> remapped = textures;
+    for (std::size_t i = 0; i + 1u < remapped.size(); i += 2u)
+    {
+        const float u = std::clamp(remapped[i], 0.0f, 1.0f);
+        const float v = std::clamp(remapped[i + 1u], 0.0f, 1.0f);
+        remapped[i] = bounds[0] + (bounds[1] - bounds[0]) * u;
+        remapped[i + 1u] = bounds[2] + (bounds[3] - bounds[2]) * v;
+    }
+    return remapped;
+}
+
+template <typename SampleType>
+std::vector<float> ConvertTextureDataToFloatRgba(
+    const std::vector<SampleType>& data,
+    std::size_t pixel_count,
+    frame::proto::PixelStructure::Enum structure,
+    float scale)
+{
+    std::vector<float> rgba(pixel_count * 4u, 1.0f);
+    std::size_t channel_count = 4u;
+    switch (structure)
+    {
+    case frame::proto::PixelStructure::GREY:
+        channel_count = 1u;
+        break;
+    case frame::proto::PixelStructure::GREY_ALPHA:
+        channel_count = 2u;
+        break;
+    case frame::proto::PixelStructure::RGB:
+    case frame::proto::PixelStructure::BGR:
+        channel_count = 3u;
+        break;
+    case frame::proto::PixelStructure::RGB_ALPHA:
+    case frame::proto::PixelStructure::BGR_ALPHA:
+    default:
+        channel_count = 4u;
+        break;
+    }
+    if (data.size() < pixel_count * channel_count)
+    {
+        return rgba;
+    }
+
+    for (std::size_t pixel = 0; pixel < pixel_count; ++pixel)
+    {
+        const std::size_t src = pixel * channel_count;
+        const auto sample = [&](std::size_t index) {
+            return static_cast<float>(data[src + index]) / scale;
+        };
+
+        float red = 1.0f;
+        float green = 1.0f;
+        float blue = 1.0f;
+        float alpha = 1.0f;
+        switch (structure)
+        {
+        case frame::proto::PixelStructure::GREY:
+            red = green = blue = sample(0u);
+            break;
+        case frame::proto::PixelStructure::GREY_ALPHA:
+            red = green = blue = sample(0u);
+            alpha = sample(1u);
+            break;
+        case frame::proto::PixelStructure::RGB:
+            red = sample(0u);
+            green = sample(1u);
+            blue = sample(2u);
+            break;
+        case frame::proto::PixelStructure::RGB_ALPHA:
+            red = sample(0u);
+            green = sample(1u);
+            blue = sample(2u);
+            alpha = sample(3u);
+            break;
+        case frame::proto::PixelStructure::BGR:
+            red = sample(2u);
+            green = sample(1u);
+            blue = sample(0u);
+            break;
+        case frame::proto::PixelStructure::BGR_ALPHA:
+            red = sample(2u);
+            green = sample(1u);
+            blue = sample(0u);
+            alpha = sample(3u);
+            break;
+        default:
+            break;
+        }
+
+        const std::size_t dst = pixel * 4u;
+        rgba[dst + 0u] = red;
+        rgba[dst + 1u] = green;
+        rgba[dst + 2u] = blue;
+        rgba[dst + 3u] = alpha;
+    }
+    return rgba;
+}
+
+std::vector<float> ConvertTextureToFloatRgba(TextureInterface& texture)
+{
+    const auto size = texture.GetSize();
+    const std::size_t pixel_count =
+        static_cast<std::size_t>(size.x) * size.y;
+    const auto structure = texture.GetData().pixel_structure().value();
+    switch (texture.GetData().pixel_element_size().value())
+    {
+    case frame::proto::PixelElementSize::FLOAT:
+        return ConvertTextureDataToFloatRgba(
+            texture.GetTextureFloat(),
+            pixel_count,
+            structure,
+            1.0f);
+    case frame::proto::PixelElementSize::SHORT:
+    case frame::proto::PixelElementSize::HALF:
+        return ConvertTextureDataToFloatRgba(
+            texture.GetTextureWord(),
+            pixel_count,
+            structure,
+            65535.0f);
+    case frame::proto::PixelElementSize::BYTE:
+    default:
+        return ConvertTextureDataToFloatRgba(
+            texture.GetTextureByte(),
+            pixel_count,
+            structure,
+            255.0f);
+    }
+}
+
+void CopyTextureIntoRaytracingAtlas(
+    std::vector<float>& atlas_pixels,
+    const RaytracingTextureAtlasLayout& layout,
+    std::uint32_t slot,
+    TextureInterface& texture)
+{
+    const auto size = texture.GetSize();
+    if (size.x == 0u || size.y == 0u)
+    {
+        return;
+    }
+
+    const auto rgba = ConvertTextureToFloatRgba(texture);
+    const std::uint32_t column = slot % layout.columns;
+    const std::uint32_t row = slot / layout.columns;
+    const std::uint32_t start_x = column * layout.tile_width;
+    const std::uint32_t start_y = row * layout.tile_height;
+    for (std::uint32_t y = 0; y < layout.tile_height; ++y)
+    {
+        const std::uint32_t source_y = std::min(
+            size.y - 1u,
+            static_cast<std::uint32_t>(
+                (static_cast<std::uint64_t>(y) * size.y) /
+                layout.tile_height));
+        for (std::uint32_t x = 0; x < layout.tile_width; ++x)
+        {
+            const std::uint32_t source_x = std::min(
+                size.x - 1u,
+                static_cast<std::uint32_t>(
+                    (static_cast<std::uint64_t>(x) * size.x) /
+                    layout.tile_width));
+            const std::size_t src =
+                (static_cast<std::size_t>(source_y) * size.x + source_x) * 4u;
+            const std::size_t dst =
+                (static_cast<std::size_t>(start_y + y) * layout.atlas_width +
+                 (start_x + x)) *
+                4u;
+            atlas_pixels[dst + 0u] = rgba[src + 0u];
+            atlas_pixels[dst + 1u] = rgba[src + 1u];
+            atlas_pixels[dst + 2u] = rgba[src + 2u];
+            atlas_pixels[dst + 3u] = rgba[src + 3u];
+        }
+    }
+}
+
+EntityId CreateRaytracingAtlasTexture(
+    LevelInterface& level,
+    const std::string& texture_name,
+    const RaytracingTextureAtlasLayout& layout,
+    const std::vector<float>& atlas_pixels)
+{
+    frame::proto::Texture proto_texture;
+    proto_texture.set_name(texture_name);
+    proto_texture.mutable_pixel_element_size()->CopyFrom(
+        frame::json::PixelElementSize_FLOAT());
+    proto_texture.mutable_pixel_structure()->CopyFrom(
+        frame::json::PixelStructure_RGB_ALPHA());
+    proto_texture.mutable_size()->set_x(static_cast<int>(layout.atlas_width));
+    proto_texture.mutable_size()->set_y(static_cast<int>(layout.atlas_height));
+    proto_texture.set_pixels(
+        reinterpret_cast<const char*>(atlas_pixels.data()),
+        static_cast<int>(atlas_pixels.size() * sizeof(float)));
+
+    auto atlas_texture = frame::vulkan::json::ParseTexture(
+        proto_texture,
+        {layout.atlas_width, layout.atlas_height});
+    atlas_texture->SetName(texture_name);
+    atlas_texture->SetSerializeEnable(false);
+    return level.AddTexture(std::move(atlas_texture));
+}
+
+template <typename MappingArray>
+bool BuildAndBindRaytracingTextureAtlases(
+    LevelInterface& level,
+    EntityId scene_material_id,
+    const MappingArray& mappings,
+    bool transmissive)
+{
+    if (!scene_material_id)
+    {
+        return false;
+    }
+
+    auto layout = BuildRaytracingTextureAtlasLayout(
+        level,
+        transmissive,
+        mappings);
+    if (!layout)
+    {
+        return false;
+    }
+
+    auto& scene_material = level.GetMaterialFromId(scene_material_id);
+    for (const auto& mapping : mappings)
+    {
+        if (!ShouldReplaceRaytracingSceneTextureBinding(
+                level,
+                scene_material,
+                mapping.target_name))
+        {
+            return false;
+        }
+    }
+
+    for (const auto& mapping : mappings)
+    {
+        std::vector<float> atlas_pixels(
+            static_cast<std::size_t>(layout->atlas_width) *
+                layout->atlas_height * 4u,
+            0.0f);
+        for (const auto material_id : layout->material_ids)
+        {
+            const std::uint32_t slot = layout->slot_by_material_id.at(material_id);
+            const auto& source_material = level.GetMaterialFromId(material_id);
+            EntityId texture_id = ResolveRaytracingMappedTextureId(
+                source_material,
+                mapping);
+            if (!texture_id)
+            {
+                texture_id = EnsureDefaultRaytracingTexture(
+                    level,
+                    mapping.target_name);
+            }
+            if (!texture_id)
+            {
+                continue;
+            }
+
+            auto& texture = level.GetTextureFromId(texture_id);
+            CopyTextureIntoRaytracingAtlas(
+                atlas_pixels,
+                *layout,
+                slot,
+                texture);
+        }
+
+        const auto atlas_texture_id = CreateRaytracingAtlasTexture(
+            level,
+            GetRaytracingAtlasTextureName(
+                level,
+                scene_material_id,
+                mapping.target_name),
+            *layout,
+            atlas_pixels);
+        ReplaceTextureBindingByInnerName(
+            level,
+            scene_material,
+            mapping.target_name,
+            atlas_texture_id);
+    }
+    return true;
+}
+
+bool HasBoundRaytracingTextureAtlas(
+    LevelInterface& level,
+    EntityId scene_material_id,
+    bool transmissive)
+{
+    if (!scene_material_id)
+    {
+        return false;
+    }
+
+    const auto& scene_material = level.GetMaterialFromId(scene_material_id);
+    const auto target_name = transmissive
+        ? "transmissive_albedo_texture"
+        : "opaque_albedo_texture";
+    const EntityId texture_id = FindTextureIdByInnerName(
+        scene_material,
+        target_name);
+    if (!texture_id)
+    {
+        return false;
+    }
+    return IsRaytracingAtlasTextureName(level.GetNameFromId(texture_id));
+}
+
 bool IsTransmissiveRaytracingSourceMaterial(
     LevelInterface& level, EntityId material_id)
 {
@@ -960,35 +1475,6 @@ void AdoptRaytracingSceneTextures(
     auto& source = level.GetMaterialFromId(source_material_id);
     auto& target = level.GetMaterialFromId(target_material_id);
 
-    struct Mapping
-    {
-        const char* source_name;
-        const char* fallback_name;
-        const char* target_name;
-    };
-
-    const std::array<Mapping, 7> opaque_mappings = {{
-        {"albedo_texture", "Color", "opaque_albedo_texture"},
-        {"normal_texture", nullptr, "opaque_normal_texture"},
-        {"roughness_texture", nullptr, "opaque_roughness_texture"},
-        {"metallic_texture", nullptr, "opaque_metallic_texture"},
-        {"ao_texture", nullptr, "opaque_ao_texture"},
-        {"specular_factor_texture", nullptr, "opaque_specular_factor_texture"},
-        {"specular_color_texture", nullptr, "opaque_specular_color_texture"},
-    }};
-    const std::array<Mapping, 10> transmissive_mappings = {{
-        {"albedo_texture", "Color", "transmissive_albedo_texture"},
-        {"normal_texture", nullptr, "transmissive_normal_texture"},
-        {"roughness_texture", nullptr, "transmissive_roughness_texture"},
-        {"metallic_texture", nullptr, "transmissive_metallic_texture"},
-        {"ao_texture", nullptr, "transmissive_ao_texture"},
-        {"transmission_texture", nullptr, "transmissive_transmission_texture"},
-        {"ior_texture", nullptr, "transmissive_ior_texture"},
-        {"thickness_texture", nullptr, "transmissive_thickness_texture"},
-        {"attenuation_color_texture", nullptr, "transmissive_attenuation_color_texture"},
-        {"attenuation_distance_texture", nullptr, "transmissive_attenuation_distance_texture"},
-    }};
-
     const auto copy_mapping =
         [&](const char* source_name,
             const char* fallback_name,
@@ -1002,23 +1488,12 @@ void AdoptRaytracingSceneTextures(
             {
                 return;
             }
-            const EntityId existing_target_id =
-                FindTextureIdByInnerName(target, target_name);
-            if (existing_target_id != NullId)
+            if (!ShouldReplaceRaytracingSceneTextureBinding(
+                    level,
+                    target,
+                    target_name))
             {
-                const auto existing_target_texture_name =
-                    level.GetNameFromId(existing_target_id);
-                const auto& existing_target_texture =
-                    level.GetTextureFromId(existing_target_id);
-                const bool replace_generated_target =
-                    IsGeneratedGltfTextureName(existing_target_texture_name) ||
-                    !existing_target_texture.SerializeEnable() ||
-                    existing_target_texture_name.find(".__raytrace_default_") !=
-                        std::string::npos;
-                if (!replace_generated_target)
-                {
-                    return;
-                }
+                return;
             }
             ReplaceTextureBindingByInnerName(
                 level, target, target_name, source_id);
@@ -1026,7 +1501,7 @@ void AdoptRaytracingSceneTextures(
 
     if (transmissive)
     {
-        for (const auto& mapping : transmissive_mappings)
+        for (const auto& mapping : kTransmissiveRaytracingTextureMappings)
         {
             copy_mapping(
                 mapping.source_name,
@@ -1035,7 +1510,7 @@ void AdoptRaytracingSceneTextures(
         }
         return;
     }
-    for (const auto& mapping : opaque_mappings)
+    for (const auto& mapping : kOpaqueRaytracingTextureMappings)
     {
         copy_mapping(
             mapping.source_name,
@@ -1103,6 +1578,7 @@ struct RaytraceAggregateBuffers
 
 RaytraceAggregateBuffers BuildRaytraceAggregateBuffers(
     LevelInterface& level,
+    EntityId scene_material_id,
     bool transmissive,
     const std::string& base_name,
     bool build_software_bvh)
@@ -1114,6 +1590,20 @@ RaytraceAggregateBuffers BuildRaytraceAggregateBuffers(
     std::vector<std::uint32_t> aggregate_indices = {};
     const auto reference_color =
         ResolveRaytracingReferenceColor(level, transmissive);
+    const auto atlas_layout = HasBoundRaytracingTextureAtlas(
+        level,
+        scene_material_id,
+        transmissive)
+        ? (transmissive
+               ? BuildRaytracingTextureAtlasLayout(
+                     level,
+                     true,
+                     kTransmissiveRaytracingTextureMappings)
+               : BuildRaytracingTextureAtlasLayout(
+                     level,
+                     false,
+                     kOpaqueRaytracingTextureMappings))
+        : std::nullopt;
 
     for (const auto& [source_node_id, source_material_id] :
          GetRaytracingSourceMeshMaterials(level))
@@ -1163,6 +1653,10 @@ RaytraceAggregateBuffers BuildRaytraceAggregateBuffers(
         {
             continue;
         }
+        const auto remapped_textures = RemapRaytracingAtlasUvs(
+            textures,
+            atlas_layout,
+            source_material_id);
         const auto source_color = ResolveRaytracingSourceMaterialColor(
             level, source_material_id);
         const auto color_multiplier = ResolveRaytracingColorMultiplier(
@@ -1179,8 +1673,8 @@ RaytraceAggregateBuffers BuildRaytraceAggregateBuffers(
             normals.end());
         aggregate_textures.insert(
             aggregate_textures.end(),
-            textures.begin(),
-            textures.end());
+            remapped_textures.begin(),
+            remapped_textures.end());
         for (const auto index : indices)
         {
             aggregate_indices.push_back(base_index + index);
@@ -1188,7 +1682,7 @@ RaytraceAggregateBuffers BuildRaytraceAggregateBuffers(
         const auto mesh_triangles = BuildRaytraceTriangles(
             points,
             normals,
-            textures,
+            remapped_textures,
             indices,
             color_multiplier);
         aggregate_triangles.insert(
@@ -1281,8 +1775,16 @@ void FinalizeRaytracingSceneMaterials(
             continue;
         }
 
-        bool adopted_transmissive = false;
-        bool adopted_opaque = false;
+        bool adopted_transmissive = BuildAndBindRaytracingTextureAtlases(
+            level,
+            scene_material_id,
+            kTransmissiveRaytracingTextureMappings,
+            true);
+        bool adopted_opaque = BuildAndBindRaytracingTextureAtlases(
+            level,
+            scene_material_id,
+            kOpaqueRaytracingTextureMappings,
+            false);
         for (const auto& [source_node_id, source_material_id] :
              GetRaytracingSourceMeshMaterials(level))
         {
@@ -1318,11 +1820,13 @@ void FinalizeRaytracingSceneMaterials(
             std::format("{}.scene", scene_material.GetData().name());
         const auto transmissive_buffers = BuildRaytraceAggregateBuffers(
             level,
+            scene_material_id,
             true,
             buffer_base_name + "_transmissive",
             build_software_bvh);
         const auto opaque_buffers = BuildRaytraceAggregateBuffers(
             level,
+            scene_material_id,
             false,
             buffer_base_name + "_opaque",
             build_software_bvh);
