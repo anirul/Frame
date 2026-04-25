@@ -31,7 +31,9 @@ set_target_properties(FrameOpenGLFileTest PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
 
 include(GoogleTest)
-gtest_add_tests(TARGET FrameOpenGLFileTest)
+gtest_add_tests(TARGET FrameOpenGLFileTest TEST_LIST FRAME_OPENGL_FILE_TESTS)
+set_tests_properties(${FRAME_OPENGL_FILE_TESTS}
+  PROPERTIES LABELS requires-opengl)
 
 set_property(TARGET FrameOpenGLFileTest PROPERTY FOLDER "FrameTest/OpenGL")
 
