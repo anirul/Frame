@@ -43,6 +43,15 @@ set_target_properties(FrameJsonTest PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
 
 include(GoogleTest)
-gtest_discover_tests(FrameJsonTest)
+gtest_add_tests(TARGET FrameJsonTest TEST_LIST FRAME_JSON_TESTS)
+set(FRAME_JSON_OPENGL_TESTS
+  ParseMaterialTest.CreateParseMaterialTest
+  ParseProgramTest.CreateParseProgramTest
+  ParseProgramTest.CreateParseProgramUniformTest
+  ParseTextureTest.CreateInvalidTextureFromProtoTest
+  ParseTextureTest.CreateTextureFromProtoCheckSizeTest
+  ParseTextureTest.CreateTextureFromProtoWrongSizeTest)
+set_tests_properties(${FRAME_JSON_OPENGL_TESTS}
+  PROPERTIES LABELS requires-opengl)
 
 set_property(TARGET FrameJsonTest PROPERTY FOLDER "FrameTest")
