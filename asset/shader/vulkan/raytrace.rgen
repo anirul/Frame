@@ -133,6 +133,25 @@ int TriangleCountOpaque()
     return int(opaque_triangles.length());
 }
 
+bool IsValidMaterialId(const int material_id)
+{
+    return material_id == kMaterialOpaque ||
+           material_id == kMaterialTransmissive;
+}
+
+int TriangleCountForMaterial(const int material_id)
+{
+    if (material_id == kMaterialOpaque)
+    {
+        return TriangleCountOpaque();
+    }
+    if (material_id == kMaterialTransmissive)
+    {
+        return TriangleCountTransmissive();
+    }
+    return 0;
+}
+
 HardwareRaytraceInstanceData DefaultRaytraceInstanceData()
 {
     HardwareRaytraceInstanceData data;
@@ -500,6 +519,12 @@ HitInfo TraceScene(const vec3 ray_origin_world, const vec3 ray_dir_world)
         raytrace_instances[info.instance_index];
     info.material_id = int(instance_data.metadata.y);
     info.tri_index = int(instance_data.metadata.x) + ray_payload.index_data.x;
+    if (!IsValidMaterialId(info.material_id) || info.tri_index < 0 ||
+        info.tri_index >= TriangleCountForMaterial(info.material_id))
+    {
+        info.hit = false;
+        return info;
+    }
 
     Triangle tri = GetTriangle(info.material_id, info.tri_index);
     float w = 1.0 - info.bary.x - info.bary.y;
