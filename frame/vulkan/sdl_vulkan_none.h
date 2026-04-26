@@ -1,5 +1,7 @@
 #pragma once
 
+#include "frame/backend_internal.h"
+
 #include <SDL3/SDL.h>
 #include <map>
 #include <functional>

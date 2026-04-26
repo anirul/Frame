@@ -6,6 +6,8 @@ add_library(FrameOpenGLGui
     sdl_opengl_draw_gui.h
 )
 
+frame_enable_internal_backend_access(FrameOpenGLGui)
+
 target_include_directories(FrameOpenGLGui
   PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/../../..

@@ -1,12 +1,10 @@
 #include "frame/common/draw.h"
 
-#include <fstream>
+#include <stdexcept>
 
 #include "frame/file/file_system.h"
-#include "frame/json/level_data.h"
 #include "frame/json/parse_level.h"
-#include "frame/vulkan/device.h"
-#include "frame/logger.h"
+#include "frame/level_data_startup_internal.h"
 
 namespace frame::common
 {
@@ -17,31 +15,19 @@ void Draw::Startup(glm::uvec2 size)
     size_ = size;
     if (draw_type_based_ == DrawTypeEnum::PATH)
     {
-        const auto backend = device_.GetDeviceEnum();
-        if (backend == frame::RenderingAPIEnum::OPENGL)
+        const auto asset_root = frame::file::FindDirectory("asset");
+        const auto level_data =
+            frame::json::ParseLevelData(size_, path_, asset_root);
+        auto* level_data_startup =
+            dynamic_cast<frame::internal::LevelDataStartupInterface*>(
+                &device_);
+        if (!level_data_startup)
         {
-            level_ = frame::json::ParseLevel(size_, path_);
+            throw std::runtime_error(
+                "Device does not support JSON level loading.");
         }
-        else if (backend == frame::RenderingAPIEnum::VULKAN)
-        {
-            const auto asset_root = frame::file::FindDirectory("asset");
-            const auto level_data = frame::json::ParseLevelData(
-                size_, path_, asset_root);
-            auto* vulkan_device = dynamic_cast<frame::vulkan::Device*>(&device_);
-            if (!vulkan_device)
-            {
-                throw std::runtime_error("Vulkan device not available.");
-            }
-            vulkan_device->StartupFromLevelData(level_data);
-            return;
-        }
-        else
-        {
-            frame::Logger::GetInstance()->error(
-                "Unsupported rendering backend {} for JSON level loading.",
-                static_cast<int>(backend));
-            throw std::runtime_error("Unsupported rendering backend.");
-        }
+        level_data_startup->StartupFromLevelData(level_data);
+        return;
     }
     if (!level_)
     {

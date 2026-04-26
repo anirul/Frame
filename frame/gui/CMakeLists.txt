@@ -36,6 +36,8 @@ add_library(FrameGui
     window_message_box.h
 )
 
+frame_enable_internal_backend_access(FrameGui)
+
 target_include_directories(FrameGui
   PUBLIC
     ${CMAKE_BINARY_DIR}/frame/proto/generated

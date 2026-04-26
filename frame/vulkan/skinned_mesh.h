@@ -1,5 +1,7 @@
 #pragma once
 
+#include "frame/backend_internal.h"
+
 #include <cmath>
 #include <cstdint>
 #include <functional>

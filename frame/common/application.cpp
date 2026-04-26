@@ -12,7 +12,7 @@
 #include "frame/common/draw.h"
 #include "frame/logger.h"
 #include "frame/window_factory.h"
-#include "frame/vulkan/window_factory.h"
+#include "frame/window_factory_internal.h"
 
 ABSL_FLAG(std::string, device, "vulkan", "Rendering backend (vulkan|opengl).");
 #if defined(_DEBUG)
@@ -218,7 +218,7 @@ std::unique_ptr<frame::WindowInterface> Application::CreateWindowOrThrow(
 {
     if (api == RenderingAPIEnum::VULKAN)
     {
-        frame::vulkan::EnsureWindowFactoryRegistered();
+        frame::internal::RegisterBuiltinWindowFactories();
     }
     auto window = frame::CreateNewWindow(drawing_target, api, size);
     if (!window)

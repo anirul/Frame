@@ -10,6 +10,8 @@ add_executable(FrameVulkanTest
   window_input_test.cpp
 )
 
+frame_enable_internal_backend_access(FrameVulkanTest)
+
 target_include_directories(FrameVulkanTest
   PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/../../..
@@ -39,6 +41,8 @@ set_property(TARGET FrameVulkanTest PROPERTY FOLDER "FrameTest/Vulkan")
 add_executable(FrameVulkanGUITest
   gui_test.cpp
 )
+
+frame_enable_internal_backend_access(FrameVulkanGUITest)
 
 target_include_directories(FrameVulkanGUITest
   PUBLIC

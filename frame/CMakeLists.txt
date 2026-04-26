@@ -7,6 +7,7 @@ add_subdirectory(proto)
 add_library(Frame
   STATIC
     api.h
+    backend_internal.h
     buffer_interface.h
     bvh.cpp
     bvh.h
@@ -21,6 +22,7 @@ add_library(Frame
     input_interface.h
     level.cpp
     level.h
+    level_data_startup_internal.h
     level_interface.h
     light_interface.h
     logger.cpp
@@ -51,8 +53,11 @@ add_library(Frame
     uniform_collection_wrapper.h
     window_factory.cpp
     window_factory.h
+    window_factory_internal.h
     window_interface.h
 )
+
+frame_enable_internal_backend_access(Frame)
 
 target_include_directories(Frame
   PUBLIC

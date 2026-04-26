@@ -68,6 +68,8 @@ add_library(FrameVulkan
     ${FRAME_VULKAN_SOURCES}
 )
 
+frame_enable_internal_backend_access(FrameVulkan)
+
 target_include_directories(FrameVulkan
   PUBLIC
     ${CMAKE_BINARY_DIR}/frame/proto/generated

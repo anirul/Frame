@@ -10,6 +10,8 @@ add_library(FrameOpenGLFile
     load_texture.h
 )
 
+frame_enable_internal_backend_access(FrameOpenGLFile)
+
 target_include_directories(FrameOpenGLFile
   PUBLIC
     ${CMAKE_BINARY_DIR}/frame/proto/generated

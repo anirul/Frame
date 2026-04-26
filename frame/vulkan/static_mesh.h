@@ -1,5 +1,7 @@
 #pragma once
 
+#include "frame/backend_internal.h"
+
 #include "frame/level_interface.h"
 #include "frame/mesh_interface.h"
 

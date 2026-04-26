@@ -40,6 +40,8 @@ add_executable(FrameOpenGLTest
   ${CMAKE_CURRENT_SOURCE_DIR}/../../../asset/json/renderer_test.json
 )
 
+frame_enable_internal_backend_access(FrameOpenGLTest)
+
 target_include_directories(FrameOpenGLTest
   PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/../../..
@@ -72,6 +74,8 @@ set_property(TARGET FrameOpenGLTest PROPERTY FOLDER "FrameTest/OpenGL")
 add_executable(FrameOpenGLGUITest
   gui_test.cpp
 )
+
+frame_enable_internal_backend_access(FrameOpenGLGUITest)
 
 target_include_directories(FrameOpenGLGUITest
   PUBLIC

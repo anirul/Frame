@@ -10,6 +10,7 @@
 #include <utility>
 
 #include "frame/window_factory.h"
+#include "frame/window_factory_internal.h"
 #include "frame/vulkan/device.h"
 #include "frame/vulkan/sdl_vulkan_none.h"
 #include "frame/vulkan/sdl_vulkan_window.h"
@@ -58,11 +59,21 @@ namespace frame::vulkan
 void EnsureWindowFactoryRegistered()
 {
     std::call_once(g_register_vulkan_factory_once, [] {
-        frame::RegisterVulkanWindowFactory(
-            frame::VulkanWindowFactory{
+        frame::internal::RegisterVulkanWindowFactory(
+            frame::internal::VulkanWindowFactory{
                 frame::vulkan::CreateSDLVulkanWindow,
                 frame::vulkan::CreateSDLVulkanNone});
     });
 }
 
 } // namespace frame::vulkan
+
+namespace frame::internal
+{
+
+void RegisterBuiltinWindowFactories()
+{
+    frame::vulkan::EnsureWindowFactoryRegistered();
+}
+
+} // namespace frame::internal

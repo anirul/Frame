@@ -9,6 +9,8 @@ add_library(FrameCommon
     path_interface.h
 )
 
+frame_enable_internal_backend_access(FrameCommon)
+
 target_include_directories(FrameCommon
   PUBLIC
     ${CMAKE_BINARY_DIR}/frame/proto/generated

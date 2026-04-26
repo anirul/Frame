@@ -1,5 +1,7 @@
 #pragma once
 
+#include "frame/backend_internal.h"
+
 #include <SDL3/SDL.h>
 
 #include <array>
@@ -10,6 +12,7 @@
 
 #include "frame/camera_interface.h"
 #include "frame/device_interface.h"
+#include "frame/level_data_startup_internal.h"
 #include "frame/logger.h"
 #include "frame/node_camera.h"
 #include "frame/opengl/buffer.h"
@@ -27,7 +30,9 @@ namespace frame::opengl
  * @class Device
  * @brief This is the OpenGL implementation of the device interface.
  */
-class Device : public DeviceInterface
+class Device :
+    public DeviceInterface,
+    public frame::internal::LevelDataStartupInterface
 {
   public:
     //! @brief Constructor will initialize the GL context and make the GLEW
@@ -62,6 +67,8 @@ class Device : public DeviceInterface
      * @param level: Move the level into the scene.
      */
     void Startup(std::unique_ptr<LevelInterface>&& level) final;
+    void StartupFromLevelData(
+        const frame::json::LevelData& level_data) final;
     /**
      * @brief Add a plugin interface.
      * @param plugin_interface: The plugin interface to be moved.

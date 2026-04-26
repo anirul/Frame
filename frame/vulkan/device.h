@@ -1,5 +1,7 @@
 #pragma once
 
+#include "frame/backend_internal.h"
+
 #include <array>
 #include <cstdint>
 #include <filesystem>
@@ -18,6 +20,7 @@
 
 #include "frame/camera.h"
 #include "frame/device_interface.h"
+#include "frame/level_data_startup_internal.h"
 #include "frame/texture_interface.h"
 #include "frame/logger.h"
 #include "frame/vulkan/buffer_resources.h"
@@ -56,7 +59,9 @@ struct RaytracingSourceGeometryData
  * @class Device
  * @brief This is the Vulkan implementation of the device interface.
  */
-class Device : public DeviceInterface
+class Device :
+    public DeviceInterface,
+    public frame::internal::LevelDataStartupInterface
 {
   public:
     using GuiRenderCallback = std::function<void(vk::CommandBuffer)>;
@@ -76,7 +81,7 @@ class Device : public DeviceInterface
     void Clear(
         const glm::vec4& color = glm::vec4(.2f, 0.f, .2f, 1.0f)) const final;
     void Startup(std::unique_ptr<LevelInterface>&& level) final;
-    void StartupFromLevelData(const frame::json::LevelData& level_data);
+    void StartupFromLevelData(const frame::json::LevelData& level_data) final;
     void AddPlugin(std::unique_ptr<PluginInterface>&& plugin_interface) final;
     std::vector<PluginInterface*> GetPluginPtrs() final;
     std::vector<std::string> GetPluginNames() const final;
