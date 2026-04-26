@@ -55,6 +55,8 @@ add_library(FrameOpenGL
     window_factory.h
 )
 
+frame_enable_internal_backend_access(FrameOpenGL)
+
 target_include_directories(FrameOpenGL
   PUBLIC
     ${CMAKE_BINARY_DIR}/frame/proto/generated

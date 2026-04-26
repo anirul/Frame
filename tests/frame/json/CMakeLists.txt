@@ -22,6 +22,8 @@ add_executable(FrameJsonTest
   ${CMAKE_CURRENT_SOURCE_DIR}/../../../asset/json/dragon.json
 )
 
+frame_enable_internal_backend_access(FrameJsonTest)
+
 target_include_directories(FrameJsonTest
   PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/../../..

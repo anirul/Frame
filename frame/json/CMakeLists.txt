@@ -28,6 +28,7 @@ add_library(FrameJson
     proto.cpp
     proto.h
 )
+frame_enable_internal_backend_access(FrameJson)
 target_include_directories(FrameJson 
   PUBLIC
     ${CMAKE_BINARY_DIR}/frame/proto/generated

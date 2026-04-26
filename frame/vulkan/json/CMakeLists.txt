@@ -14,6 +14,8 @@ set(FRAME_VULKAN_JSON_SOURCES
 
 add_library(FrameVulkanJson STATIC ${FRAME_VULKAN_JSON_SOURCES})
 
+frame_enable_internal_backend_access(FrameVulkanJson)
+
 target_include_directories(FrameVulkanJson
   PUBLIC
     ${CMAKE_BINARY_DIR}/frame/proto/generated

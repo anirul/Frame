@@ -1,5 +1,7 @@
 #pragma once
 
+#include "frame/backend_internal.h"
+
 #include "frame/vulkan/vulkan_dispatch.h"
 
 namespace frame::vulkan

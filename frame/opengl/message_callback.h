@@ -1,5 +1,7 @@
 #pragma once
 
+#include "frame/backend_internal.h"
+
 #include <glad/glad.h>
 
 namespace frame::opengl

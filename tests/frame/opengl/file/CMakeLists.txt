@@ -10,6 +10,8 @@ add_executable(FrameOpenGLFileTest
   main.cpp
 )
 
+frame_enable_internal_backend_access(FrameOpenGLFileTest)
+
 target_include_directories(FrameOpenGLFileTest
   PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../..

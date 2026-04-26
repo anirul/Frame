@@ -6,6 +6,8 @@ add_library(FrameVulkanGui
     sdl_vulkan_draw_gui.h
 )
 
+frame_enable_internal_backend_access(FrameVulkanGui)
+
 target_include_directories(FrameVulkanGui
   PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/../../..

@@ -6,14 +6,15 @@
 
 #include "frame/api.h"
 #include "frame/opengl/window_factory.h"
+#include "frame/window_factory_internal.h"
 
 namespace
 {
 
-std::atomic<frame::VulkanWindowFactory::FactoryFn> g_create_vulkan_window =
-    nullptr;
-std::atomic<frame::VulkanWindowFactory::FactoryFn> g_create_vulkan_none =
-    nullptr;
+std::atomic<frame::internal::VulkanWindowFactory::FactoryFn>
+    g_create_vulkan_window = nullptr;
+std::atomic<frame::internal::VulkanWindowFactory::FactoryFn>
+    g_create_vulkan_none = nullptr;
 
 } // namespace
 
@@ -66,6 +67,11 @@ std::unique_ptr<frame::WindowInterface> CreateNewWindow(
     }
 }
 
+} // End namespace frame.
+
+namespace frame::internal
+{
+
 void RegisterVulkanWindowFactory(VulkanWindowFactory factory)
 {
     g_create_vulkan_window.store(
@@ -79,4 +85,4 @@ bool HasVulkanWindowFactory()
            g_create_vulkan_none.load(std::memory_order_acquire) != nullptr;
 }
 
-} // End namespace frame.
+} // namespace frame::internal

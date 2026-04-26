@@ -11,6 +11,7 @@
 #include "frame/file/image.h"
 #include "frame/json/parse_uniform.h"
 #include "frame/level.h"
+#include "frame/opengl/build_level.h"
 #include "frame/opengl/cubemap.h"
 #include "frame/opengl/frame_buffer.h"
 #include "frame/opengl/render_buffer.h"
@@ -67,6 +68,11 @@ void Device::Startup(std::unique_ptr<frame::LevelInterface>&& level)
             plugin->PreRender(uniform, *this, mesh, material);
         }
     });
+}
+
+void Device::StartupFromLevelData(const frame::json::LevelData& level_data)
+{
+    Startup(frame::opengl::BuildLevel(size_, level_data));
 }
 
 void Device::AddPlugin(std::unique_ptr<PluginInterface>&& plugin_interface)

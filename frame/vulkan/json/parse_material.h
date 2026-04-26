@@ -1,5 +1,7 @@
 #pragma once
 
+#include "frame/backend_internal.h"
+
 #include <memory>
 
 #include "frame/json/proto.h"
