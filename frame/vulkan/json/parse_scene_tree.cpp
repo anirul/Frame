@@ -1128,6 +1128,15 @@ std::array<float, 4> GetRaytracingAtlasUvBounds(
     return {u0, std::max(u0, u1), v0, std::max(v0, v1)};
 }
 
+float WrapRaytracingAtlasUv(float value)
+{
+    if (!std::isfinite(value))
+    {
+        return 0.0f;
+    }
+    return value - std::floor(value);
+}
+
 std::vector<float> RemapRaytracingAtlasUvs(
     const std::vector<float>& textures,
     const std::optional<RaytracingTextureAtlasLayout>& layout,
@@ -1143,8 +1152,8 @@ std::vector<float> RemapRaytracingAtlasUvs(
     std::vector<float> remapped = textures;
     for (std::size_t i = 0; i + 1u < remapped.size(); i += 2u)
     {
-        const float u = std::clamp(remapped[i], 0.0f, 1.0f);
-        const float v = std::clamp(remapped[i + 1u], 0.0f, 1.0f);
+        const float u = WrapRaytracingAtlasUv(remapped[i]);
+        const float v = WrapRaytracingAtlasUv(remapped[i + 1u]);
         remapped[i] = bounds[0] + (bounds[1] - bounds[0]) * u;
         remapped[i + 1u] = bounds[2] + (bounds[3] - bounds[2]) * v;
     }
@@ -1948,6 +1957,106 @@ glm::uvec2 ResolveTextureDisplaySize(LevelInterface& level)
         return {1u, 1u};
     }
     return level.GetTextureFromId(output_id).GetSize();
+}
+
+glm::vec3 NormalizeBasisVector(
+    glm::vec3 value,
+    glm::vec3 fallback,
+    const char* field_name,
+    const std::string& mesh_name)
+{
+    if (glm::length(value) <= 1.0e-6f)
+    {
+        if (glm::length(fallback) <= 1.0e-6f)
+        {
+            throw std::runtime_error(std::format(
+                "NodeMesh {} has invalid {} basis vector.",
+                mesh_name,
+                field_name));
+        }
+        value = fallback;
+    }
+    return glm::normalize(value);
+}
+
+glm::mat4 BuildAssetBasisCorrection(
+    const frame::proto::NodeMesh& proto_mesh)
+{
+    glm::vec3 asset_front = proto_mesh.has_asset_front()
+        ? frame::json::ParseUniform(proto_mesh.asset_front())
+        : glm::vec3(1.0f, 0.0f, 0.0f);
+    glm::vec3 asset_up = proto_mesh.has_asset_up()
+        ? frame::json::ParseUniform(proto_mesh.asset_up())
+        : glm::vec3(0.0f, 1.0f, 0.0f);
+
+    asset_front = NormalizeBasisVector(
+        asset_front,
+        glm::vec3(1.0f, 0.0f, 0.0f),
+        "asset_front",
+        proto_mesh.name());
+    asset_up = NormalizeBasisVector(
+        asset_up,
+        glm::vec3(0.0f, 1.0f, 0.0f),
+        "asset_up",
+        proto_mesh.name());
+
+    glm::vec3 asset_side = glm::cross(asset_front, asset_up);
+    if (glm::length(asset_side) <= 1.0e-6f)
+    {
+        throw std::runtime_error(std::format(
+            "NodeMesh {} has parallel asset_front and asset_up vectors.",
+            proto_mesh.name()));
+    }
+    asset_side = glm::normalize(asset_side);
+    const glm::vec3 corrected_asset_up =
+        glm::normalize(glm::cross(asset_side, asset_front));
+
+    const glm::mat3 asset_basis(
+        asset_front,
+        corrected_asset_up,
+        asset_side);
+    return glm::mat4(glm::inverse(asset_basis));
+}
+
+std::string AddAssetBasisNodeIfNeeded(
+    LevelInterface& level,
+    const frame::proto::NodeMesh& proto_mesh)
+{
+    if (!proto_mesh.has_asset_front() && !proto_mesh.has_asset_up())
+    {
+        return proto_mesh.parent();
+    }
+
+    const std::string basis_node_name =
+        std::format("{}.__asset_basis", proto_mesh.name());
+    auto basis_node = std::make_unique<frame::NodeMatrix>(
+        MakeResolver(level),
+        BuildAssetBasisCorrection(proto_mesh),
+        false);
+    basis_node->GetData().set_name(basis_node_name);
+    basis_node->SetParentName(proto_mesh.parent());
+    const auto basis_node_id = level.AddSceneNode(std::move(basis_node));
+    if (!basis_node_id)
+    {
+        throw std::runtime_error(std::format(
+            "Failed to add asset basis node for mesh {}.",
+            proto_mesh.name()));
+    }
+    return basis_node_name;
+}
+
+void CopyAssetBasisFields(
+    frame::proto::NodeMesh& destination,
+    const frame::proto::NodeMesh& source)
+{
+    if (source.has_asset_front())
+    {
+        destination.mutable_asset_front()->CopyFrom(source.asset_front());
+    }
+    if (source.has_asset_up())
+    {
+        destination.mutable_asset_up()->CopyFrom(source.asset_up());
+    }
 }
 
 struct MaterialTextureSource
@@ -2944,6 +3053,8 @@ bool ParseNodeMesh(
             scene_global_inverse = scene->mRootNode->mTransformation;
             scene_global_inverse.Inverse();
         }
+        const std::string mesh_parent =
+            AddAssetBasisNodeIfNeeded(level, proto_mesh);
         scene_animation_clips.reserve(scene->mNumAnimations);
         for (unsigned int animation_index = 0;
              animation_index < scene->mNumAnimations;
@@ -4140,7 +4251,7 @@ bool ParseNodeMesh(
                                               proto_mesh.name(),
                                               counter);
             node->SetName(node_name);
-            node->SetParentName(proto_mesh.parent());
+            node->SetParentName(mesh_parent);
             node->GetData().set_render_time_enum(proto_mesh.render_time_enum());
             node->GetData().set_acceleration_structure_enum(
                 proto_mesh.acceleration_structure_enum());
@@ -4160,6 +4271,7 @@ bool ParseNodeMesh(
                 node->GetData().set_animation_clip_index(
                     proto_mesh.animation_clip_index());
             }
+            CopyAssetBasisFields(node->GetData(), proto_mesh);
 
             auto scene_id = level.AddSceneNode(std::move(node));
             if (!material_id)

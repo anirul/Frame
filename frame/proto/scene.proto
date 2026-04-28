@@ -33,7 +33,7 @@ message NodeMatrix {
 }
 
 // Mesh.
-// Next 18
+// Next 20
 message NodeMesh {
 	// This is the name of the mesh.
 	string name = 1;
@@ -118,6 +118,11 @@ message NodeMesh {
 
 	// Clip index fallback (used when animation_clip_name is not found).
 	optional uint32 animation_clip_index = 17;
+
+	// Mesh asset basis in local asset coordinates. The loader maps this basis
+	// to Frame's +X front / +Y up convention before scene-parent transforms.
+	optional UniformVector3 asset_front = 18;
+	optional UniformVector3 asset_up = 19;
 }
 
 // Camera

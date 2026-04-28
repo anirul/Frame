@@ -918,6 +918,11 @@ constexpr std::size_t kRaytraceTriangleVertexStrideBytes =
 constexpr std::uint32_t kGpuSkinningBoneCapacity = 128u;
 constexpr std::uint32_t kGpuSkinningWorkgroupSize = 64u;
 
+std::uint32_t GetAccelerationStructureMaxVertex(std::uint32_t vertex_count)
+{
+    return vertex_count > 0u ? vertex_count - 1u : 0u;
+}
+
 struct RaytraceVertex
 {
     float px;
@@ -962,6 +967,15 @@ std::array<float, 4> GetRaytracingAtlasUvBounds(
     return {u0, std::max(u0, u1), v0, std::max(v0, v1)};
 }
 
+float WrapRaytracingAtlasUv(float value)
+{
+    if (!std::isfinite(value))
+    {
+        return 0.0f;
+    }
+    return value - std::floor(value);
+}
+
 std::vector<std::uint8_t> RemapRaytracingAtlasTriangleUvs(
     const std::vector<std::uint8_t>& raw,
     const std::optional<RaytracingTextureAtlasLayout>& layout,
@@ -984,8 +998,8 @@ std::vector<std::uint8_t> RemapRaytracingAtlasTriangleUvs(
     const std::size_t vertex_count = remapped.size() / sizeof(RaytraceVertex);
     for (std::size_t i = 0; i < vertex_count; ++i)
     {
-        const float u = std::clamp(vertices[i].u, 0.0f, 1.0f);
-        const float v = std::clamp(vertices[i].v, 0.0f, 1.0f);
+        const float u = WrapRaytracingAtlasUv(vertices[i].u);
+        const float v = WrapRaytracingAtlasUv(vertices[i].v);
         vertices[i].u = bounds[0] + (bounds[1] - bounds[0]) * u;
         vertices[i].v = bounds[2] + (bounds[3] - bounds[2]) * v;
     }
@@ -3437,7 +3451,7 @@ bool Device::UpdateHardwareRaytracingDynamicGeometry(
             vk::Format::eR32G32B32Sfloat,
             vk::DeviceOrHostAddressConstKHR(vertex_address),
             kRaytraceTriangleVertexStrideBytes,
-            geometry.vertex_count,
+            GetAccelerationStructureMaxVertex(geometry.vertex_count),
             vk::IndexType::eUint32,
             vk::DeviceOrHostAddressConstKHR(index_address));
         pending.geometry_data.setTriangles(pending.triangles);
@@ -3480,6 +3494,12 @@ bool Device::UpdateHardwareRaytracingDynamicGeometry(
     if (pending_updates.empty())
     {
         return false;
+    }
+
+    for (auto& pending : pending_updates)
+    {
+        // build_info keeps a pointer to as_geometry; refresh it after vector moves.
+        pending.build_info.setGeometries(pending.as_geometry);
     }
 
     const auto submit_start = SteadyClock::now();
@@ -4678,7 +4698,8 @@ std::vector<EntityId> Device::UpdateGpuSkinnedMeshes()
                     vk::Format::eR32G32B32Sfloat,
                     vk::DeviceOrHostAddressConstKHR(vertex_address),
                     kRaytraceTriangleVertexStrideBytes,
-                    pending.hardware_geometry->vertex_count,
+                    GetAccelerationStructureMaxVertex(
+                        pending.hardware_geometry->vertex_count),
                     vk::IndexType::eUint32,
                     vk::DeviceOrHostAddressConstKHR(index_address));
             pending.geometry_data.setTriangles(pending.triangles);
@@ -4733,6 +4754,15 @@ std::vector<EntityId> Device::UpdateGpuSkinnedMeshes()
     if (pending_dispatches.empty())
     {
         return {};
+    }
+
+    for (auto& pending : pending_dispatches)
+    {
+        if (pending.hardware_geometry)
+        {
+            // build_info keeps a pointer to as_geometry; refresh it after vector moves.
+            pending.build_info.setGeometries(pending.as_geometry);
+        }
     }
 
     const auto submit_start = SteadyClock::now();
@@ -5042,7 +5072,7 @@ void Device::CreateHardwareRaytracingScene()
                 vk::Format::eR32G32B32Sfloat,
                 vk::DeviceOrHostAddressConstKHR(vertex_address),
                 kRaytraceTriangleVertexStrideBytes,
-                vertex_count,
+                GetAccelerationStructureMaxVertex(vertex_count),
                 vk::IndexType::eUint32,
                 vk::DeviceOrHostAddressConstKHR(index_address));
             vk::AccelerationStructureGeometryDataKHR geometry_data;
@@ -5184,7 +5214,7 @@ void Device::CreateHardwareRaytracingScene()
                 vk::Format::eR32G32B32Sfloat,
                 vk::DeviceOrHostAddressConstKHR(vertex_address),
                 kRaytraceTriangleVertexStrideBytes,
-                vertex_count,
+                GetAccelerationStructureMaxVertex(vertex_count),
                 vk::IndexType::eUint32,
                 vk::DeviceOrHostAddressConstKHR(index_address));
             vk::AccelerationStructureGeometryDataKHR geometry_data;

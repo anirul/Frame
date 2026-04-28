@@ -215,6 +215,16 @@ proto::NodeMesh SerializeNodeMesh(
         proto_node_mesh.set_animation_clip_index(
             node_mesh.GetData().animation_clip_index());
     }
+    if (node_mesh.GetData().has_asset_front())
+    {
+        proto_node_mesh.mutable_asset_front()->CopyFrom(
+            node_mesh.GetData().asset_front());
+    }
+    if (node_mesh.GetData().has_asset_up())
+    {
+        proto_node_mesh.mutable_asset_up()->CopyFrom(
+            node_mesh.GetData().asset_up());
+    }
     return proto_node_mesh;
 }
 
