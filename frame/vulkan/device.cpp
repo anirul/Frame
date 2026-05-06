@@ -32,6 +32,7 @@
 #include "frame/vulkan/build_level.h"
 #include "frame/vulkan/command_resources.h"
 #include "frame/vulkan/command_queue.h"
+#include "frame/vulkan/frame_profiler.h"
 #include "frame/vulkan/gpu_memory_manager.h"
 #include "frame/vulkan/mesh_resources.h"
 #include "frame/vulkan/mesh_utils.h"
@@ -2736,6 +2737,8 @@ void Device::UpdateRaytraceBuffers()
         return;
     }
 
+    VulkanProfileScope profile_scope("raytrace.update_buffers");
+
     auto& animated_rt_stats = GetAnimatedRaytraceTimingStats();
     const auto total_update_start = SteadyClock::now();
 
@@ -2964,6 +2967,21 @@ void Device::UpdateRaytraceBuffers()
         // Re-arm transfer->compute visibility barrier after dynamic SSBO writes.
         storage_buffers_ready_ = false;
     }
+    RecordVulkanProfileCounter(
+        "raytrace.updated_cpu_storage_buffers",
+        updated_buffer_count);
+    if (updated_aggregate_scene)
+    {
+        RecordVulkanProfileCounter("raytrace.updated_aggregate_scenes");
+    }
+    if (updated_hardware_transforms)
+    {
+        RecordVulkanProfileCounter("raytrace.updated_hardware_transforms");
+    }
+    if (animated_triangle_updated)
+    {
+        RecordVulkanProfileCounter("raytrace.updated_animated_triangles");
+    }
     if (animated_triangle_updated)
     {
         ++animated_rt_stats.frame_count;
@@ -2983,6 +3001,8 @@ void Device::UpdateRaytraceBuffers()
 
 bool Device::UpdateAggregateRaytracingSceneBuffers(bool build_software_bvh)
 {
+    VulkanProfileScope profile_scope("raytrace.aggregate_scene_update");
+
     if (!level_ || !buffer_resources_ || !active_program_info_)
     {
         return false;
@@ -3173,6 +3193,9 @@ bool Device::UpdateHardwareRaytracingAggregateSceneBuffers(
     const std::vector<EntityId>& updated_source_triangle_buffer_ids,
     const std::vector<RaytracingSourceGeometryData>& prepared_source_geometries)
 {
+    VulkanProfileScope profile_scope(
+        "raytrace.hardware_aggregate_scene_update");
+
     if (!level_ || !buffer_resources_ || !active_program_info_ ||
         !hardware_raytracing_uses_source_instances_ ||
         updated_source_triangle_buffer_ids.empty())
@@ -3321,6 +3344,8 @@ bool Device::UpdateHardwareRaytracingDynamicGeometry(
     {
         return false;
     }
+
+    VulkanProfileScope profile_scope("raytrace.blas_update");
 
     auto& animated_rt_stats = GetAnimatedRaytraceTimingStats();
 
@@ -3495,6 +3520,7 @@ bool Device::UpdateHardwareRaytracingDynamicGeometry(
     {
         return false;
     }
+    RecordVulkanProfileCounter("raytrace.blas_updates", pending_updates.size());
 
     for (auto& pending : pending_updates)
     {
@@ -3503,44 +3529,48 @@ bool Device::UpdateHardwareRaytracingDynamicGeometry(
     }
 
     const auto submit_start = SteadyClock::now();
-    command_queue_->SubmitOneTime(
-        [&](vk::CommandBuffer command_buffer) {
-            std::vector<vk::BufferMemoryBarrier> copy_barriers = {};
-            copy_barriers.reserve(pending_updates.size());
-            for (const auto& pending : pending_updates)
+    {
+        VulkanProfileScope submit_scope("raytrace.blas_update_submit_wait");
+        command_queue_->SubmitOneTime(
+            [&](vk::CommandBuffer command_buffer)
             {
-                command_buffer.copyBuffer(
-                    *pending.staging_buffer,
-                    *pending.geometry->vertex_buffer,
-                    vk::BufferCopy(0, 0, pending.upload_size));
-                copy_barriers.emplace_back(
-                    vk::AccessFlagBits::eTransferWrite,
-                    vk::AccessFlagBits::eAccelerationStructureReadKHR,
-                    VK_QUEUE_FAMILY_IGNORED,
-                    VK_QUEUE_FAMILY_IGNORED,
-                    *pending.geometry->vertex_buffer,
-                    0,
-                    pending.upload_size);
-            }
-            if (!copy_barriers.empty())
-            {
-                command_buffer.pipelineBarrier(
-                    vk::PipelineStageFlagBits::eTransfer,
-                    vk::PipelineStageFlagBits::eAccelerationStructureBuildKHR,
-                    {},
-                    nullptr,
-                    copy_barriers,
-                    nullptr);
-            }
-            for (const auto& pending : pending_updates)
-            {
-                const vk::AccelerationStructureBuildRangeInfoKHR* range_infos[] = {
-                    &pending.range_info};
-                command_buffer.buildAccelerationStructuresKHR(
-                    pending.build_info,
-                    range_infos);
-            }
-        });
+                std::vector<vk::BufferMemoryBarrier> copy_barriers = {};
+                copy_barriers.reserve(pending_updates.size());
+                for (const auto& pending : pending_updates)
+                {
+                    command_buffer.copyBuffer(
+                        *pending.staging_buffer,
+                        *pending.geometry->vertex_buffer,
+                        vk::BufferCopy(0, 0, pending.upload_size));
+                    copy_barriers.emplace_back(
+                        vk::AccessFlagBits::eTransferWrite,
+                        vk::AccessFlagBits::eAccelerationStructureReadKHR,
+                        VK_QUEUE_FAMILY_IGNORED,
+                        VK_QUEUE_FAMILY_IGNORED,
+                        *pending.geometry->vertex_buffer,
+                        0,
+                        pending.upload_size);
+                }
+                if (!copy_barriers.empty())
+                {
+                    command_buffer.pipelineBarrier(
+                        vk::PipelineStageFlagBits::eTransfer,
+                        vk::PipelineStageFlagBits::eAccelerationStructureBuildKHR,
+                        {},
+                        nullptr,
+                        copy_barriers,
+                        nullptr);
+                }
+                for (const auto& pending : pending_updates)
+                {
+                    const vk::AccelerationStructureBuildRangeInfoKHR*
+                        range_infos[] = {&pending.range_info};
+                    command_buffer.buildAccelerationStructuresKHR(
+                        pending.build_info,
+                        range_infos);
+                }
+            });
+    }
     animated_rt_stats.dynamic_geometry_submit_ms +=
         ElapsedMilliseconds(submit_start);
 
@@ -3553,6 +3583,9 @@ bool Device::UpdateHardwareRaytracingDynamicGeometry(
 
 void Device::UpdateHardwareRaytracingScene()
 {
+    VulkanProfileScope profile_scope("raytrace.hardware_scene_rebuild");
+    RecordVulkanProfileCounter("raytrace.hardware_scene_rebuilds");
+
     CreateHardwareRaytracingScene();
     UpdateHardwareRaytracingDescriptor();
 }
@@ -3569,6 +3602,9 @@ bool Device::UpdateHardwareRaytracingTransforms(bool force_tlas_update)
     {
         return false;
     }
+
+    VulkanProfileScope profile_scope("raytrace.hardware_transform_update");
+    RecordVulkanProfileCounter("raytrace.hardware_transform_checks");
 
     auto& animated_rt_stats = GetAnimatedRaytraceTimingStats();
     const auto total_start = SteadyClock::now();
@@ -3618,6 +3654,7 @@ bool Device::UpdateHardwareRaytracingTransforms(bool force_tlas_update)
     {
         if (!force_tlas_update)
         {
+            RecordVulkanProfileCounter("raytrace.hardware_transform_unchanged");
             animated_rt_stats.transform_total_ms +=
                 ElapsedMilliseconds(total_start);
             return storage_buffer_changed;
@@ -3673,6 +3710,7 @@ bool Device::UpdateHardwareRaytracingTransforms(bool force_tlas_update)
     vk_unique_device_->unmapMemory(*hardware_raytracing_instance_memory_);
     hardware_raytracing_instance_bytes_ = bytes;
     animated_rt_stats.transform_upload_ms += ElapsedMilliseconds(upload_start);
+    RecordVulkanProfileCounter("raytrace.hardware_transform_uploads");
     RebuildHardwareRaytracingTlas();
     animated_rt_stats.transform_total_ms += ElapsedMilliseconds(total_start);
     return true;
@@ -3693,6 +3731,10 @@ void Device::RebuildHardwareRaytracingTlas()
     {
         return;
     }
+
+    VulkanProfileScope profile_scope("raytrace.tlas_update");
+    RecordVulkanProfileCounter("raytrace.tlas_updates");
+    RecordVulkanProfileCounter("raytrace.tlas_instances", instance_count);
 
     const auto build_scratch_address =
         [&](vk::DeviceSize size,
@@ -3749,12 +3791,16 @@ void Device::RebuildHardwareRaytracingTlas()
     const vk::AccelerationStructureBuildRangeInfoKHR* tlas_ranges[] = {
         &tlas_range_info};
     const auto rebuild_start = SteadyClock::now();
-    command_queue_->SubmitOneTime(
-        [&](vk::CommandBuffer command_buffer) {
-            command_buffer.buildAccelerationStructuresKHR(
-                tlas_build_info,
-                tlas_ranges);
-        });
+    {
+        VulkanProfileScope submit_scope("raytrace.tlas_update_submit_wait");
+        command_queue_->SubmitOneTime(
+            [&](vk::CommandBuffer command_buffer)
+            {
+                command_buffer.buildAccelerationStructuresKHR(
+                    tlas_build_info,
+                    tlas_ranges);
+            });
+    }
     GetAnimatedRaytraceTimingStats().tlas_rebuild_ms +=
         ElapsedMilliseconds(rebuild_start);
 }
@@ -4007,6 +4053,8 @@ void Device::RecreateSwapchain()
 
 SceneState Device::BuildFrameSceneState(vk::Extent2D extent) const
 {
+    VulkanProfileScope profile_scope("scene.build_frame_state");
+
     const bool has_raytrace_source_meshes =
         level_ && HasRaytracingSourceMeshes(*level_);
     const bool use_shared_transform_hardware_scene =
@@ -4538,6 +4586,8 @@ std::vector<EntityId> Device::UpdateGpuSkinnedMeshes()
         return {};
     }
 
+    VulkanProfileScope profile_scope("raytrace.gpu_skinning_update");
+
     auto find_storage_buffer_resource =
         [&](EntityId buffer_id) -> const BufferResource* {
             if (!buffer_resources_ || buffer_id == NullId)
@@ -4755,6 +4805,9 @@ std::vector<EntityId> Device::UpdateGpuSkinnedMeshes()
     {
         return {};
     }
+    RecordVulkanProfileCounter(
+        "raytrace.gpu_skinning_dispatches",
+        pending_dispatches.size());
 
     for (auto& pending : pending_dispatches)
     {
@@ -4766,130 +4819,136 @@ std::vector<EntityId> Device::UpdateGpuSkinnedMeshes()
     }
 
     const auto submit_start = SteadyClock::now();
-    command_queue_->SubmitOneTime(
-        [&](vk::CommandBuffer command_buffer) {
-            command_buffer.bindPipeline(
-                vk::PipelineBindPoint::eCompute,
-                *gpu_skinning_pipeline_);
-
-            for (const auto& pending : pending_dispatches)
+    {
+        VulkanProfileScope submit_scope("raytrace.gpu_skinning_submit_wait");
+        command_queue_->SubmitOneTime(
+            [&](vk::CommandBuffer command_buffer)
             {
-                command_buffer.bindDescriptorSets(
+                command_buffer.bindPipeline(
                     vk::PipelineBindPoint::eCompute,
-                    *gpu_skinning_pipeline_layout_,
-                    0,
-                    pending.resource->descriptor_set,
-                    {});
+                    *gpu_skinning_pipeline_);
 
-                GpuSkinningPushConstants push_constants = {};
-                push_constants.output_vertex_count =
-                    pending.resource->output_vertex_count;
-                push_constants.color_multiplier =
-                    pending.resource->color_multiplier;
-                push_constants.atlas_uv_bounds =
-                    pending.resource->atlas_uv_bounds;
-                command_buffer.pushConstants(
-                    *gpu_skinning_pipeline_layout_,
-                    vk::ShaderStageFlagBits::eCompute,
-                    0,
-                    sizeof(GpuSkinningPushConstants),
-                    &push_constants);
-
-                const std::uint32_t group_count =
-                    (pending.resource->output_vertex_count +
-                     kGpuSkinningWorkgroupSize - 1u) /
-                    kGpuSkinningWorkgroupSize;
-                command_buffer.dispatch(group_count, 1, 1);
-            }
-
-            std::vector<vk::BufferMemoryBarrier> output_barriers = {};
-            output_barriers.reserve(pending_dispatches.size());
-            for (const auto& pending : pending_dispatches)
-            {
-                output_barriers.emplace_back(
-                    vk::AccessFlagBits::eShaderWrite,
-                    vk::AccessFlagBits::eTransferRead,
-                    VK_QUEUE_FAMILY_IGNORED,
-                    VK_QUEUE_FAMILY_IGNORED,
-                    *pending.resource->output_buffer,
-                    0,
-                    pending.resource->output_buffer_size);
-            }
-            command_buffer.pipelineBarrier(
-                vk::PipelineStageFlagBits::eComputeShader,
-                vk::PipelineStageFlagBits::eTransfer,
-                {},
-                nullptr,
-                output_barriers,
-                nullptr);
-
-            std::vector<vk::BufferMemoryBarrier> geometry_copy_barriers = {};
-            geometry_copy_barriers.reserve(pending_dispatches.size());
-            for (const auto& pending : pending_dispatches)
-            {
-                if (pending.aggregate_buffer && pending.aggregate_buffer->buffer)
+                for (const auto& pending : pending_dispatches)
                 {
-                    const vk::DeviceSize dst_offset =
-                        static_cast<vk::DeviceSize>(pending.resource->triangle_offset) *
-                        static_cast<vk::DeviceSize>(
-                            kRaytraceTriangleVertexStrideBytes * 3u);
-                    if (dst_offset + pending.resource->output_buffer_size <=
-                        pending.aggregate_buffer->size)
-                    {
-                        command_buffer.copyBuffer(
-                            *pending.resource->output_buffer,
-                            *pending.aggregate_buffer->buffer,
-                            vk::BufferCopy(
-                                0,
-                                dst_offset,
-                                pending.resource->output_buffer_size));
-                    }
+                    command_buffer.bindDescriptorSets(
+                        vk::PipelineBindPoint::eCompute,
+                        *gpu_skinning_pipeline_layout_,
+                        0,
+                        pending.resource->descriptor_set,
+                        {});
+
+                    GpuSkinningPushConstants push_constants = {};
+                    push_constants.output_vertex_count =
+                        pending.resource->output_vertex_count;
+                    push_constants.color_multiplier =
+                        pending.resource->color_multiplier;
+                    push_constants.atlas_uv_bounds =
+                        pending.resource->atlas_uv_bounds;
+                    command_buffer.pushConstants(
+                        *gpu_skinning_pipeline_layout_,
+                        vk::ShaderStageFlagBits::eCompute,
+                        0,
+                        sizeof(GpuSkinningPushConstants),
+                        &push_constants);
+
+                    const std::uint32_t group_count =
+                        (pending.resource->output_vertex_count +
+                         kGpuSkinningWorkgroupSize - 1u) /
+                        kGpuSkinningWorkgroupSize;
+                    command_buffer.dispatch(group_count, 1, 1);
                 }
 
-                if (pending.hardware_geometry)
+                std::vector<vk::BufferMemoryBarrier> output_barriers = {};
+                output_barriers.reserve(pending_dispatches.size());
+                for (const auto& pending : pending_dispatches)
                 {
-                    command_buffer.copyBuffer(
+                    output_barriers.emplace_back(
+                        vk::AccessFlagBits::eShaderWrite,
+                        vk::AccessFlagBits::eTransferRead,
+                        VK_QUEUE_FAMILY_IGNORED,
+                        VK_QUEUE_FAMILY_IGNORED,
                         *pending.resource->output_buffer,
-                        *pending.hardware_geometry->vertex_buffer,
-                        vk::BufferCopy(
-                            0,
-                            0,
-                            pending.resource->output_buffer_size));
-                    geometry_copy_barriers.emplace_back(
-                        vk::AccessFlagBits::eTransferWrite,
-                        vk::AccessFlagBits::eAccelerationStructureReadKHR,
-                        VK_QUEUE_FAMILY_IGNORED,
-                        VK_QUEUE_FAMILY_IGNORED,
-                        *pending.hardware_geometry->vertex_buffer,
                         0,
                         pending.resource->output_buffer_size);
                 }
-            }
-
-            if (!geometry_copy_barriers.empty())
-            {
                 command_buffer.pipelineBarrier(
+                    vk::PipelineStageFlagBits::eComputeShader,
                     vk::PipelineStageFlagBits::eTransfer,
-                    vk::PipelineStageFlagBits::eAccelerationStructureBuildKHR,
                     {},
                     nullptr,
-                    geometry_copy_barriers,
+                    output_barriers,
                     nullptr);
-            }
 
-            for (const auto& pending : pending_dispatches)
-            {
-                if (!pending.hardware_geometry)
+                std::vector<vk::BufferMemoryBarrier> geometry_copy_barriers = {};
+                geometry_copy_barriers.reserve(pending_dispatches.size());
+                for (const auto& pending : pending_dispatches)
                 {
-                    continue;
+                    if (pending.aggregate_buffer &&
+                        pending.aggregate_buffer->buffer)
+                    {
+                        const vk::DeviceSize dst_offset =
+                            static_cast<vk::DeviceSize>(
+                                pending.resource->triangle_offset) *
+                            static_cast<vk::DeviceSize>(
+                                kRaytraceTriangleVertexStrideBytes * 3u);
+                        if (dst_offset + pending.resource->output_buffer_size <=
+                            pending.aggregate_buffer->size)
+                        {
+                            command_buffer.copyBuffer(
+                                *pending.resource->output_buffer,
+                                *pending.aggregate_buffer->buffer,
+                                vk::BufferCopy(
+                                    0,
+                                    dst_offset,
+                                    pending.resource->output_buffer_size));
+                        }
+                    }
+
+                    if (pending.hardware_geometry)
+                    {
+                        command_buffer.copyBuffer(
+                            *pending.resource->output_buffer,
+                            *pending.hardware_geometry->vertex_buffer,
+                            vk::BufferCopy(
+                                0,
+                                0,
+                                pending.resource->output_buffer_size));
+                        geometry_copy_barriers.emplace_back(
+                            vk::AccessFlagBits::eTransferWrite,
+                            vk::AccessFlagBits::eAccelerationStructureReadKHR,
+                            VK_QUEUE_FAMILY_IGNORED,
+                            VK_QUEUE_FAMILY_IGNORED,
+                            *pending.hardware_geometry->vertex_buffer,
+                            0,
+                            pending.resource->output_buffer_size);
+                    }
                 }
-                const vk::AccelerationStructureBuildRangeInfoKHR* range_infos[] = {
-                    &pending.range_info};
-                command_buffer.buildAccelerationStructuresKHR(
-                    pending.build_info,
-                    range_infos);
-            }
-        });
+
+                if (!geometry_copy_barriers.empty())
+                {
+                    command_buffer.pipelineBarrier(
+                        vk::PipelineStageFlagBits::eTransfer,
+                        vk::PipelineStageFlagBits::eAccelerationStructureBuildKHR,
+                        {},
+                        nullptr,
+                        geometry_copy_barriers,
+                        nullptr);
+                }
+
+                for (const auto& pending : pending_dispatches)
+                {
+                    if (!pending.hardware_geometry)
+                    {
+                        continue;
+                    }
+                    const vk::AccelerationStructureBuildRangeInfoKHR*
+                        range_infos[] = {&pending.range_info};
+                    command_buffer.buildAccelerationStructuresKHR(
+                        pending.build_info,
+                        range_infos);
+                }
+            });
+    }
     animated_rt_stats.dynamic_geometry_submit_ms +=
         ElapsedMilliseconds(submit_start);
 
@@ -4904,6 +4963,15 @@ std::vector<EntityId> Device::UpdateGpuSkinnedMeshes()
         [](const PendingGpuDispatch& pending) {
             return pending.hardware_geometry != nullptr;
         });
+    const std::size_t blas_update_count = static_cast<std::size_t>(std::count_if(
+        pending_dispatches.begin(),
+        pending_dispatches.end(),
+        [](const PendingGpuDispatch& pending) {
+            return pending.hardware_geometry != nullptr;
+        }));
+    RecordVulkanProfileCounter(
+        "raytrace.gpu_skinning_blas_updates",
+        blas_update_count);
     if (has_blas_updates)
     {
         const auto transform_start = SteadyClock::now();

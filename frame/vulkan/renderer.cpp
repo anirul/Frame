@@ -12,6 +12,7 @@
 #include "frame/camera.h"
 #include "frame/vulkan/device.h"
 #include "frame/vulkan/command_resources.h"
+#include "frame/vulkan/frame_profiler.h"
 #include "frame/vulkan/mesh_resources.h"
 #include "frame/vulkan/output_image_resources.h"
 #include "frame/vulkan/pipeline_resources.h"
@@ -38,13 +39,22 @@ void Renderer::Display(double dt)
         return;
     }
 
+    VulkanProfileFrame profile_frame(device_.logger_);
+    VulkanProfileScope display_scope("renderer.display");
+
     device_.elapsed_time_seconds_ += static_cast<float>(dt);
 
     if (device_.level_)
     {
-        device_.level_->UpdateLights(
-            static_cast<double>(device_.elapsed_time_seconds_));
-        device_.UpdateRaytraceBuffers();
+        {
+            VulkanProfileScope scope("renderer.update_lights");
+            device_.level_->UpdateLights(
+                static_cast<double>(device_.elapsed_time_seconds_));
+        }
+        {
+            VulkanProfileScope scope("renderer.update_raytrace_buffers");
+            device_.UpdateRaytraceBuffers();
+        }
     }
 
     if (!device_.vk_unique_device_ || !device_.swapchain_resources_ ||
@@ -81,12 +91,16 @@ void Renderer::Display(double dt)
     const vk::Fence fence =
         device_.sync_resources_->GetInFlightFence(current_frame_);
     const VkFence fence_handle = static_cast<VkFence>(fence);
-    const VkResult wait_result = vkWaitForFences(
-        static_cast<VkDevice>(*device_.vk_unique_device_),
-        1,
-        &fence_handle,
-        VK_TRUE,
-        std::numeric_limits<std::uint64_t>::max());
+    const VkResult wait_result = [&]()
+    {
+        VulkanProfileScope scope("renderer.wait_fence");
+        return vkWaitForFences(
+            static_cast<VkDevice>(*device_.vk_unique_device_),
+            1,
+            &fence_handle,
+            VK_TRUE,
+            std::numeric_limits<std::uint64_t>::max());
+    }();
     if (wait_result != VK_SUCCESS)
     {
         device_.logger_->error(
@@ -100,11 +114,15 @@ void Renderer::Display(double dt)
     }
 
     const auto& swapchain = device_.swapchain_resources_->GetSwapchain();
-    auto acquire = device_.vk_unique_device_->acquireNextImageKHR(
-        *swapchain,
-        std::numeric_limits<std::uint64_t>::max(),
-        device_.sync_resources_->GetImageAvailable(current_frame_),
-        nullptr);
+    auto acquire = [&]()
+    {
+        VulkanProfileScope scope("renderer.acquire_image");
+        return device_.vk_unique_device_->acquireNextImageKHR(
+            *swapchain,
+            std::numeric_limits<std::uint64_t>::max(),
+            device_.sync_resources_->GetImageAvailable(current_frame_),
+            nullptr);
+    }();
 
     if (acquire.result == vk::Result::eErrorOutOfDateKHR)
     {
@@ -125,10 +143,14 @@ void Renderer::Display(double dt)
     }
 
     const std::uint32_t image_index = acquire.value;
-    const VkResult reset_result = vkResetFences(
-        static_cast<VkDevice>(*device_.vk_unique_device_),
-        1,
-        &fence_handle);
+    const VkResult reset_result = [&]()
+    {
+        VulkanProfileScope scope("renderer.reset_fence");
+        return vkResetFences(
+            static_cast<VkDevice>(*device_.vk_unique_device_),
+            1,
+            &fence_handle);
+    }();
     if (reset_result != VK_SUCCESS)
     {
         device_.logger_->error(
@@ -143,8 +165,14 @@ void Renderer::Display(double dt)
 
     vk::CommandBuffer command_buffer =
         device_.command_resources_->GetBuffer(current_frame_);
-    command_buffer.reset();
-    RecordCommandBuffer(command_buffer, image_index);
+    {
+        VulkanProfileScope scope("renderer.reset_command_buffer");
+        command_buffer.reset();
+    }
+    {
+        VulkanProfileScope scope("renderer.record_command_buffer");
+        RecordCommandBuffer(command_buffer, image_index);
+    }
 
     const vk::Semaphore wait_semaphores[] = {
         device_.sync_resources_->GetImageAvailable(current_frame_)};
@@ -163,11 +191,15 @@ void Renderer::Display(double dt)
         signal_semaphores);
 
     const VkSubmitInfo submit_info_c = submit_info;
-    const VkResult submit_result = vkQueueSubmit(
-        static_cast<VkQueue>(device_.graphics_queue_),
-        1,
-        &submit_info_c,
-        fence);
+    const VkResult submit_result = [&]()
+    {
+        VulkanProfileScope scope("renderer.queue_submit");
+        return vkQueueSubmit(
+            static_cast<VkQueue>(device_.graphics_queue_),
+            1,
+            &submit_info_c,
+            fence);
+    }();
     if (submit_result != VK_SUCCESS)
     {
         device_.logger_->error(
@@ -187,8 +219,11 @@ void Renderer::Display(double dt)
         &swapchain.get(),
         &image_index);
 
-    const vk::Result present_result =
-        device_.present_queue_.presentKHR(present_info);
+    const vk::Result present_result = [&]()
+    {
+        VulkanProfileScope scope("renderer.present");
+        return device_.present_queue_.presentKHR(present_info);
+    }();
     if (present_result == vk::Result::eErrorOutOfDateKHR ||
         present_result == vk::Result::eSuboptimalKHR)
     {
@@ -218,8 +253,13 @@ void Renderer::RecordCommandBuffer(
     vk::CommandBuffer command_buffer,
     std::uint32_t image_index)
 {
+    VulkanProfileScope record_scope("renderer.record_body");
+
     vk::CommandBufferBeginInfo begin_info;
-    command_buffer.begin(begin_info);
+    {
+        VulkanProfileScope scope("renderer.command_begin");
+        command_buffer.begin(begin_info);
+    }
 
     const auto extent = device_.swapchain_resources_->GetExtent();
     const auto& images = device_.swapchain_resources_->GetImages();
@@ -230,15 +270,26 @@ void Renderer::RecordCommandBuffer(
     const auto& gui_framebuffers =
         device_.swapchain_resources_->GetGuiFramebuffers();
 
-    const SceneState scene_state = device_.BuildFrameSceneState(extent);
-    raytrace_scene_renderer_->UpdateUniformBuffer(scene_state);
-    raytrace_scene_renderer_->Render(command_buffer, extent);
+    const SceneState scene_state = [&]()
+    {
+        VulkanProfileScope scope("renderer.build_scene_state");
+        return device_.BuildFrameSceneState(extent);
+    }();
+    {
+        VulkanProfileScope scope("renderer.update_uniforms");
+        raytrace_scene_renderer_->UpdateUniformBuffer(scene_state);
+    }
+    {
+        VulkanProfileScope scope("renderer.raytrace_render_record");
+        raytrace_scene_renderer_->Render(command_buffer, extent);
+    }
 
     std::array<vk::ClearValue, 1> clear_values{};
     clear_values[0].color = vk::ClearColorValue(
         std::array<float, 4>{0.1f, 0.1f, 0.1f, 1.0f});
 
     auto draw_scene = [&]() -> bool {
+        VulkanProfileScope scope("renderer.draw_scene_record");
         if (!device_.pipeline_resources_ ||
             !device_.pipeline_resources_->HasGraphicsPipeline())
         {
@@ -399,6 +450,7 @@ void Renderer::RecordCommandBuffer(
     bool scene_content_rendered = false;
     if (render_pass && image_index < framebuffers.size())
     {
+        VulkanProfileScope scope("renderer.graphics_pass_record");
         vk::RenderPassBeginInfo render_pass_info(
             *render_pass,
             *framebuffers[image_index],
@@ -441,6 +493,7 @@ void Renderer::RecordCommandBuffer(
         image_index < images.size() &&
         extent.width > 0 && extent.height > 0)
     {
+        VulkanProfileScope scope("renderer.preview_copy_record");
         const vk::Image swapchain_image = images[image_index];
 
         std::array<vk::ImageMemoryBarrier, 2> to_copy_barriers = {
@@ -524,6 +577,7 @@ void Renderer::RecordCommandBuffer(
     if (device_.gui_render_callback_ && gui_render_pass &&
         image_index < gui_framebuffers.size())
     {
+        VulkanProfileScope scope("renderer.gui_record");
         vk::RenderPassBeginInfo gui_pass_info(
             *gui_render_pass,
             *gui_framebuffers[image_index],
@@ -564,7 +618,10 @@ void Renderer::RecordCommandBuffer(
             to_present);
     }
 
-    command_buffer.end();
+    {
+        VulkanProfileScope scope("renderer.command_end");
+        command_buffer.end();
+    }
 }
 
 } // namespace frame::vulkan

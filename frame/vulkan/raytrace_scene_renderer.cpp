@@ -5,6 +5,7 @@
 #include "frame/vulkan/device.h"
 
 #include "frame/vulkan/buffer_resources.h"
+#include "frame/vulkan/frame_profiler.h"
 #include "frame/vulkan/output_image_resources.h"
 #include "frame/vulkan/pipeline_resources.h"
 #include "frame/vulkan/scene_state.h"
@@ -18,6 +19,8 @@ RaytraceSceneRenderer::RaytraceSceneRenderer(Device& device) : device_(device)
 
 void RaytraceSceneRenderer::UpdateUniformBuffer(const SceneState& state)
 {
+    VulkanProfileScope scope("raytrace.update_uniform_buffer");
+
     if (!device_.buffer_resources_)
     {
         return;
@@ -34,6 +37,8 @@ void RaytraceSceneRenderer::Render(
     vk::CommandBuffer command_buffer,
     vk::Extent2D extent)
 {
+    VulkanProfileScope scope("raytrace.render_record");
+
     auto transition_output = [&](vk::ImageLayout old_layout,
                                  vk::ImageLayout new_layout,
                                  vk::PipelineStageFlags src_stage,
@@ -73,6 +78,8 @@ void RaytraceSceneRenderer::Render(
 
     if (!device_.storage_buffers_ready_ && device_.buffer_resources_)
     {
+        VulkanProfileScope barrier_scope(
+            "raytrace.storage_buffer_barrier_record");
         const auto& storage_buffers =
             device_.buffer_resources_->GetStorageBuffers();
         std::vector<vk::BufferMemoryBarrier> buffer_barriers;
@@ -109,6 +116,8 @@ void RaytraceSceneRenderer::Render(
 
     if (device_.output_image_resources_->IsComputeOutputInShaderRead())
     {
+        VulkanProfileScope transition_scope(
+            "raytrace.output_to_general_record");
         transition_output(
             vk::ImageLayout::eShaderReadOnlyOptimal,
             vk::ImageLayout::eGeneral,
@@ -125,6 +134,7 @@ void RaytraceSceneRenderer::Render(
         device_.pipeline_resources_->HasRaytracingPipeline() &&
         device_.pipeline_resources_->GetRaytracingPipelineLayout())
     {
+        VulkanProfileScope dispatch_scope("raytrace.trace_rays_record");
         command_buffer.bindPipeline(
             vk::PipelineBindPoint::eRayTracingKHR,
             device_.pipeline_resources_->GetRaytracingPipeline());
@@ -142,11 +152,13 @@ void RaytraceSceneRenderer::Render(
             extent.width,
             extent.height,
             1);
+        RecordVulkanProfileCounter("raytrace.trace_rays_dispatches");
     }
     else if (device_.pipeline_resources_ &&
              device_.pipeline_resources_->HasComputePipeline() &&
              device_.pipeline_resources_->GetComputePipelineLayout())
     {
+        VulkanProfileScope dispatch_scope("raytrace.compute_dispatch_record");
         command_buffer.bindPipeline(
             vk::PipelineBindPoint::eCompute,
             device_.pipeline_resources_->GetComputePipeline());
@@ -159,17 +171,22 @@ void RaytraceSceneRenderer::Render(
         const std::uint32_t group_x = (extent.width + 7) / 8;
         const std::uint32_t group_y = (extent.height + 7) / 8;
         command_buffer.dispatch(group_x, group_y, 1);
+        RecordVulkanProfileCounter("raytrace.compute_dispatches");
     }
 
-    transition_output(
-        vk::ImageLayout::eGeneral,
-        vk::ImageLayout::eShaderReadOnlyOptimal,
-        device_.use_raytracing_pipeline_
-            ? vk::PipelineStageFlagBits::eRayTracingShaderKHR
-            : vk::PipelineStageFlagBits::eComputeShader,
-        vk::PipelineStageFlagBits::eFragmentShader,
-        vk::AccessFlagBits::eShaderWrite,
-        vk::AccessFlagBits::eShaderRead);
+    {
+        VulkanProfileScope transition_scope(
+            "raytrace.output_to_shader_read_record");
+        transition_output(
+            vk::ImageLayout::eGeneral,
+            vk::ImageLayout::eShaderReadOnlyOptimal,
+            device_.use_raytracing_pipeline_
+                ? vk::PipelineStageFlagBits::eRayTracingShaderKHR
+                : vk::PipelineStageFlagBits::eComputeShader,
+            vk::PipelineStageFlagBits::eFragmentShader,
+            vk::AccessFlagBits::eShaderWrite,
+            vk::AccessFlagBits::eShaderRead);
+    }
     device_.output_image_resources_->SetComputeOutputInShaderRead(true);
 }
 
