@@ -16,7 +16,7 @@ from the same engine code.
 
 ## Prerequisites
 
-- Git (with submodule support)
+- Git (with submodule support) and Git LFS for binary assets
 - CMake 3.21+
 - A C++23-capable compiler
   - Windows: Visual Studio 2022 (`v143`) recommended
@@ -32,9 +32,10 @@ Clone and initialize external dependencies:
 git submodule update --init --recursive
 ```
 
-If your environment uses Git LFS assets, also run:
+Initialize Git LFS and fetch binary assets:
 
 ```sh
+git lfs install
 git lfs pull
 ```
 
