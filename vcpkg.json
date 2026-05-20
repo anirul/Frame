@@ -22,7 +22,8 @@
     "protobuf",
     {
       "name": "sdl3",
-      "features": [ "vulkan" ]
+      "default-features": false,
+      "features": [ "vulkan", "wayland" ]
     },
     "spdlog",
     "stb",

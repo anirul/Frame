@@ -23,6 +23,10 @@ from the same engine code.
   - Linux: GCC or Clang
 - Ninja (for Linux presets)
 - Vulkan loader/driver installed if running the Vulkan backend
+- Linux Wayland development packages when building with the Linux presets
+  (`libwayland-dev`, `libxkbcommon-dev`, and `libegl1-mesa-dev` on Debian-like
+  distributions, or `wayland`, `wayland-protocols`, `libxkbcommon`, and `mesa`
+  with Homebrew/Linuxbrew)
 
 ## Setup
 
@@ -63,6 +67,13 @@ cmake --build --preset linux-debug
 cmake --preset linux-release
 cmake --build --preset linux-release
 ```
+
+The Linux presets use repository vcpkg overlays for a Wayland-first build. SDL3
+is built without its default X11 feature, DBus is built without its default
+systemd feature, and the Vulkan loader overlay disables XCB/Xlib WSI support.
+On Homebrew/Linuxbrew systems, the triplet discovers the prefix from
+`HOMEBREW_PREFIX` or `brew --prefix` so vcpkg can find global and formula-local
+pkg-config metadata without committing local machine paths.
 
 ## Run Examples
 
