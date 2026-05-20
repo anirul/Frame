@@ -24,9 +24,11 @@ from the same engine code.
 - Ninja (for Linux presets)
 - Vulkan loader/driver installed if running the Vulkan backend
 - Linux Wayland development packages when building with the Linux presets
-  (`libwayland-dev`, `libxkbcommon-dev`, and `libegl1-mesa-dev` on Debian-like
-  distributions, or `wayland`, `wayland-protocols`, `libxkbcommon`, and `mesa`
-  with Homebrew/Linuxbrew)
+  (`libwayland-dev`, `libxkbcommon-dev`, `libegl1-mesa-dev`, and
+  `libdecor-0-dev` on Debian-like distributions, or `wayland`,
+  `wayland-protocols`, `libxkbcommon`, `mesa`, and `libdecor` with
+  Homebrew/Linuxbrew). `libdecor` gives SDL client-side Wayland decorations, so
+  sample windows keep their title text, FPS updates, and close button.
 
 ## Setup
 
