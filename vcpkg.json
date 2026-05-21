@@ -23,7 +23,13 @@
     {
       "name": "sdl3",
       "default-features": false,
-      "features": [ "vulkan", "wayland" ]
+      "features": [
+        "vulkan",
+        {
+          "name": "wayland",
+          "platform": "linux"
+        }
+      ]
     },
     "spdlog",
     "stb",
