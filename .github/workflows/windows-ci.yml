@@ -60,8 +60,7 @@ jobs:
       run: cmake --build --preset windows-debug --parallel
 
     - name: Run tests using CTest
-      # GitHub-hosted Windows runners do not provide a reliable OpenGL 4.5
-      # context. Linux runs those tests under xvfb/Mesa.
+      # GitHub-hosted runners do not provide a reliable OpenGL 4.5 context.
       run: ctest --test-dir build\windows -C Debug --output-on-failure -LE requires-opengl
 
     - name: Show sccache stats
