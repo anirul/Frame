@@ -35,7 +35,7 @@ jobs:
           build-essential \
           zip \
           unzip \
-          xvfb \
+          weston \
           libvulkan-dev \
           libxi-dev \
           libxmu-dev \
@@ -87,8 +87,32 @@ jobs:
         
     - name: Run tests using CTest
       run: |
+        export XDG_RUNTIME_DIR="${RUNNER_TEMP}/xdg-runtime"
+        mkdir -p "${XDG_RUNTIME_DIR}"
+        chmod 700 "${XDG_RUNTIME_DIR}"
+        weston --backend=headless-backend.so --socket=wayland-ci --idle-time=0 --log="${RUNNER_TEMP}/weston.log" &
+        WESTON_PID=$!
+        cleanup() {
+          status=$?
+          if [ "${status}" -ne 0 ] && [ -f "${RUNNER_TEMP}/weston.log" ]; then
+            cat "${RUNNER_TEMP}/weston.log"
+          fi
+          kill "${WESTON_PID}" 2>/dev/null || true
+          exit "${status}"
+        }
+        trap cleanup EXIT
+        for attempt in {1..20}; do
+          if [ -S "${XDG_RUNTIME_DIR}/wayland-ci" ]; then
+            break
+          fi
+          sleep 0.5
+        done
+        if [ ! -S "${XDG_RUNTIME_DIR}/wayland-ci" ]; then
+          echo "Weston did not create the Wayland socket."
+          exit 1
+        fi
         cd build/linux-release
-        xvfb-run ctest --output-on-failure
+        WAYLAND_DISPLAY=wayland-ci SDL_VIDEODRIVER=wayland ctest --output-on-failure
 
     - name: Show sccache stats
       if: always()
