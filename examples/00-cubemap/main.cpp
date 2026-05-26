@@ -22,13 +22,14 @@ int Run(int argc, char** argv)
 {
     absl::SetProgramUsageMessage(
         "00_Cubemap --device={vulkan|opengl} "
+        "[--rendering={auto|rasterise|raytrace}] "
         "[--auto_exit_seconds=<seconds>] (defaults to vulkan)");
     frame::common::Application app(argc, argv, kDefaultSize);
     app.Startup(frame::file::FindFile(kLevelPath));
     app.Run();
     return 0;
 }
-}
+} // namespace
 
 #if defined(_WIN32) || defined(_WIN64)
 int WINAPI WinMain(

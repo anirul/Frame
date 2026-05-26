@@ -107,13 +107,23 @@ SDLOpenGLWindow::SDLOpenGLWindow(glm::uvec2 size) : size_(size)
 
 SDLOpenGLWindow::~SDLOpenGLWindow()
 {
-    // Destroy the context we own; don't touch device_ here.
+    if (gl_context_ && sdl_window_)
+    {
+        SDL_GL_MakeCurrent(sdl_window_, gl_context_);
+    }
+    device_.reset();
+    input_interface_.reset();
+
     if (gl_context_)
     {
         SDL_GL_DestroyContext(gl_context_);
         gl_context_ = nullptr;
     }
-    SDL_DestroyWindow(sdl_window_);
+    if (sdl_window_)
+    {
+        SDL_DestroyWindow(sdl_window_);
+        sdl_window_ = nullptr;
+    }
     SDL_Quit();
 }
 

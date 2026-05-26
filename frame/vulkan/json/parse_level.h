@@ -26,6 +26,15 @@ inline LevelData ParseLevelData(
 
 inline LevelData ParseLevelData(
     glm::uvec2 size,
+    const frame::proto::Level& proto_level,
+    const std::filesystem::path& asset_root,
+    const frame::json::LevelDataOptions& options)
+{
+    return frame::json::ParseLevelData(size, proto_level, asset_root, options);
+}
+
+inline LevelData ParseLevelData(
+    glm::uvec2 size,
     const std::string& content,
     const std::filesystem::path& asset_root)
 {
@@ -34,10 +43,28 @@ inline LevelData ParseLevelData(
 
 inline LevelData ParseLevelData(
     glm::uvec2 size,
+    const std::string& content,
+    const std::filesystem::path& asset_root,
+    const frame::json::LevelDataOptions& options)
+{
+    return frame::json::ParseLevelData(size, content, asset_root, options);
+}
+
+inline LevelData ParseLevelData(
+    glm::uvec2 size,
     const std::filesystem::path& path,
     const std::filesystem::path& asset_root)
 {
     return frame::json::ParseLevelData(size, path, asset_root);
+}
+
+inline LevelData ParseLevelData(
+    glm::uvec2 size,
+    const std::filesystem::path& path,
+    const std::filesystem::path& asset_root,
+    const frame::json::LevelDataOptions& options)
+{
+    return frame::json::ParseLevelData(size, path, asset_root, options);
 }
 
 } // namespace frame::vulkan::json

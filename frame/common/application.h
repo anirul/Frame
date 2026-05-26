@@ -11,6 +11,7 @@
 #include "frame/window_interface.h"
 
 ABSL_DECLARE_FLAG(bool, vk_validation);
+ABSL_DECLARE_FLAG(std::string, rendering);
 ABSL_DECLARE_FLAG(double, auto_exit_seconds);
 ABSL_DECLARE_FLAG(bool, screenshot_on_exit);
 

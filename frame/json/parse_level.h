@@ -45,14 +45,35 @@ LevelData ParseLevelData(
     glm::uvec2 size,
     const proto::Level& proto,
     const std::filesystem::path& asset_root,
+    const LevelDataOptions& options);
+LevelData ParseLevelData(
+    glm::uvec2 size,
+    const proto::Level& proto,
+    const std::filesystem::path& asset_root,
     const std::filesystem::path& source_path);
+LevelData ParseLevelData(
+    glm::uvec2 size,
+    const proto::Level& proto,
+    const std::filesystem::path& asset_root,
+    const std::filesystem::path& source_path,
+    const LevelDataOptions& options);
 LevelData ParseLevelData(
     glm::uvec2 size,
     const std::string& content,
     const std::filesystem::path& asset_root);
 LevelData ParseLevelData(
     glm::uvec2 size,
+    const std::string& content,
+    const std::filesystem::path& asset_root,
+    const LevelDataOptions& options);
+LevelData ParseLevelData(
+    glm::uvec2 size,
     const std::filesystem::path& path,
     const std::filesystem::path& asset_root);
+LevelData ParseLevelData(
+    glm::uvec2 size,
+    const std::filesystem::path& path,
+    const std::filesystem::path& asset_root,
+    const LevelDataOptions& options);
 
 } // End namespace frame::json.

@@ -71,27 +71,28 @@ The samples are built into `build/<preset>/bin/`.
 Windows example:
 
 ```sh
-build/windows/bin/Debug/01_RayTracing.exe --device=vulkan
-build/windows/bin/Debug/01_RayTracing.exe --device=opengl
+build/windows/bin/Debug/01_Refraction.exe --device=vulkan
+build/windows/bin/Debug/01_Refraction.exe --device=opengl
 ```
 
 Linux example:
 
 ```sh
-./build/linux-debug/bin/01_RayTracing --device=vulkan
-./build/linux-debug/bin/01_RayTracing --device=opengl
+./build/linux-debug/bin/01_Refraction --device=vulkan
+./build/linux-debug/bin/01_Refraction --device=opengl
 ```
 
 Available examples:
 
 - `00_Cubemap`
-- `01_RayTracing`
+- `01_Refraction`
 - `02_Dragon`
 - `03_SkinnedMesh`
 
 Useful runtime flags:
 
 - `--device={vulkan|opengl}`: choose rendering backend
+- `--rendering={auto|rasterise|raytrace}`: choose generated render path
 - `--vk_validation={true|false}`: toggle Vulkan validation layers
 
 ## Run Tests
