@@ -36,6 +36,7 @@ try
     constexpr const char* kLevelPath = "asset/json/dragon.json";
     absl::SetProgramUsageMessage(
         "02_Dragon --device={vulkan|opengl} "
+        "[--rendering={auto|rasterise|raytrace}] "
         "[--auto_exit_seconds=<seconds>] (defaults to vulkan)");
     frame::common::Application app(ac, av, kDefaultSize);
     app.Startup(frame::file::FindFile(kLevelPath));

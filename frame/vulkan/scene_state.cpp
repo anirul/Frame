@@ -1,10 +1,13 @@
 #include "frame/vulkan/scene_state.h"
 
+#include <cmath>
 #include <exception>
 #include <optional>
 #include <string>
 
+#include <glm/ext/matrix_clip_space.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "frame/camera.h"
 
@@ -64,9 +67,10 @@ SceneState BuildSceneState(
             auto inverse_model = glm::inverse(matrix_node);
             camera_for_frame.SetFront(
                 level.GetDefaultCamera().GetFront() * glm::mat3(inverse_model));
-            camera_for_frame.SetPosition(glm::vec3(
-                glm::vec4(level.GetDefaultCamera().GetPosition(), 1.0f) *
-                inverse_model));
+            camera_for_frame.SetPosition(
+                glm::vec3(
+                    glm::vec4(level.GetDefaultCamera().GetPosition(), 1.0f) *
+                    inverse_model));
         }
 
         if (swapchain_extent.y != 0)
@@ -93,8 +97,7 @@ SceneState BuildSceneState(
     try
     {
         bool model_set = false;
-        if (!force_identity_model &&
-            !preferred_scene_root.empty() &&
+        if (!force_identity_model && !preferred_scene_root.empty() &&
             preferred_scene_root != "root")
         {
             if (auto maybe_root_id =
@@ -113,7 +116,8 @@ SceneState BuildSceneState(
             auto& material = level.GetMaterialFromId(preferred_material);
             for (const auto& node_name : material.GetNodeNames())
             {
-                if (auto maybe_node_id = FindSceneNodeIdByName(level, node_name);
+                if (auto maybe_node_id =
+                        FindSceneNodeIdByName(level, node_name);
                     maybe_node_id)
                 {
                     const auto node_id = *maybe_node_id;
@@ -125,8 +129,7 @@ SceneState BuildSceneState(
                 }
             }
         }
-        if (!force_identity_model &&
-            !model_set &&
+        if (!force_identity_model && !model_set &&
             preferred_material != frame::NullId)
         {
             for (const auto& pair : level.GetMeshMaterialIds())
@@ -141,8 +144,7 @@ SceneState BuildSceneState(
                 }
             }
         }
-        if (!force_identity_model &&
-            !model_set &&
+        if (!force_identity_model && !model_set &&
             preferred_material != frame::NullId)
         {
             // Search all render-time buckets for a mesh using this material.
@@ -195,8 +197,8 @@ SceneState BuildSceneState(
         if (!skybox_pairs.empty())
         {
             auto& node = level.GetSceneNodeFromId(skybox_pairs.front().first);
-            state.env_map_model = node.GetLocalModel(
-                static_cast<double>(elapsed_time_seconds));
+            state.env_map_model =
+                node.GetLocalModel(static_cast<double>(elapsed_time_seconds));
         }
     }
     catch (const std::exception& ex)
@@ -213,6 +215,25 @@ SceneState BuildSceneState(
             state.light_dir = light.GetVector();
             state.light_color = light.GetColorIntensity();
             state.light_type = static_cast<float>(light.GetType());
+            if (light.GetShadowType() != frame::ShadowTypeEnum::NO_SHADOW &&
+                light.GetType() == frame::LightTypeEnum::DIRECTIONAL_LIGHT &&
+                glm::length(state.light_dir) > 0.0f)
+            {
+                const glm::vec3 direction = glm::normalize(state.light_dir);
+                const glm::vec3 center(0.0f, 0.0f, 0.0f);
+                const glm::vec3 up =
+                    std::abs(glm::dot(direction, glm::vec3(0.0f, 1.0f, 0.0f))) >
+                            0.95f
+                        ? glm::vec3(1.0f, 0.0f, 0.0f)
+                        : glm::vec3(0.0f, 1.0f, 0.0f);
+                const glm::vec3 position = center - direction * 8.0f;
+                const glm::mat4 light_view =
+                    glm::lookAtRH(position, center, up);
+                const glm::mat4 light_projection =
+                    glm::orthoRH_ZO(-6.0f, 6.0f, -6.0f, 6.0f, 0.1f, 20.0f);
+                state.light_view_projection = light_projection * light_view;
+                state.shadow_enabled = 1.0f;
+            }
         }
     }
     catch (const std::exception& ex)
@@ -238,9 +259,10 @@ UniformBlock MakeUniformBlock(
     block.light_dir = glm::vec4(state.light_dir, state.light_type);
     block.light_color = glm::vec4(state.light_color, 1.0f);
     block.time_s = glm::vec4(elapsed_time_seconds, 0.0f, 0.0f, 0.0f);
+    block.light_view_projection = state.light_view_projection;
+    block.shadow_params = glm::vec4(
+        state.shadow_enabled, state.shadow_bias, state.shadow_map_size, 0.0f);
     return block;
 }
 
 } // namespace frame::vulkan
-
-

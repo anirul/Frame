@@ -61,8 +61,7 @@ TEST_F(VulkanBuildLevelTest, BuildLevelRegistersProgramsMaterialsAndTextures)
 
     for (const auto& program_info : level_data_.programs)
     {
-        EXPECT_NE(
-            built.level->GetIdFromName(program_info.name), frame::NullId);
+        EXPECT_NE(built.level->GetIdFromName(program_info.name), frame::NullId);
     }
 
     const auto material_ids = built.level->GetMaterials();
@@ -83,6 +82,12 @@ TEST_F(VulkanBuildLevelTest, BuildMeshVerticesFromStaticMeshInfo)
     EXPECT_FLOAT_EQ(vertices.front().position.x, mesh_info.positions[0]);
     EXPECT_FLOAT_EQ(vertices.front().position.y, mesh_info.positions[1]);
     EXPECT_FLOAT_EQ(vertices.front().position.z, mesh_info.positions[2]);
+    if (!mesh_info.normals.empty())
+    {
+        EXPECT_FLOAT_EQ(vertices.front().normal.x, mesh_info.normals[0]);
+        EXPECT_FLOAT_EQ(vertices.front().normal.y, mesh_info.normals[1]);
+        EXPECT_FLOAT_EQ(vertices.front().normal.z, mesh_info.normals[2]);
+    }
     if (!mesh_info.uvs.empty())
     {
         EXPECT_FLOAT_EQ(vertices.front().uv.x, mesh_info.uvs[0]);

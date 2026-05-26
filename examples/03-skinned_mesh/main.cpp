@@ -23,6 +23,7 @@ int Run(int argc, char** argv)
 {
     absl::SetProgramUsageMessage(
         "03_SkinnedMesh --device={vulkan|opengl} "
+        "[--rendering={auto|rasterise|raytrace}] "
         "[--auto_exit_seconds=<seconds>] (defaults to vulkan)");
     frame::common::Application app(argc, argv, kDefaultSize);
     app.Startup(frame::file::FindFile(kLevelPath));

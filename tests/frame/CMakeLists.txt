@@ -5,6 +5,7 @@ add_executable(FrameTest
   camera_test.cpp
   camera_test.h
   device_mock.h
+  draw_test.cpp
   main.cpp
   plugin_mock.h
   program_mock.h
@@ -12,6 +13,8 @@ add_executable(FrameTest
   window_factory_test.cpp
   window_factory_test.h
 )
+
+frame_enable_internal_backend_access(FrameTest)
 
 target_include_directories(FrameTest
   PUBLIC
@@ -26,6 +29,7 @@ target_link_libraries(FrameTest
     GTest::gmock
     GTest::gtest
     ${FRAME_LINK_GROUP_BEGIN}
+    FrameCommon
     ${FRAME_CORE_LIBS}
     ${FRAME_LINK_GROUP_END}
 )

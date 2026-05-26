@@ -7,6 +7,9 @@ set(_frame_vulkan_shader_sources
   ray_marching.vert
   cubemap.frag
   cubemap.vert
+  raster_gltf.frag
+  raster_gltf.vert
+  raster_shadow.vert
   raytrace.vert
   raytrace.frag
   raytrace.comp

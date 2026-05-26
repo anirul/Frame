@@ -17,6 +17,7 @@ namespace
 enum class SupportedScenePreset
 {
     Unknown,
+    Raster,
     Cubemap,
     Raytrace,
 };
@@ -24,18 +25,14 @@ enum class SupportedScenePreset
 std::string ToLowerAscii(std::string value)
 {
     std::transform(
-        value.begin(),
-        value.end(),
-        value.begin(),
-        [](unsigned char c) {
+        value.begin(), value.end(), value.begin(), [](unsigned char c) {
             return static_cast<char>(std::tolower(c));
         });
     return value;
 }
 
 proto::Uniform MakeUniformEnum(
-    const std::string& name,
-    proto::Uniform::UniformEnum uniform_enum)
+    const std::string& name, proto::Uniform::UniformEnum uniform_enum)
 {
     proto::Uniform uniform;
     uniform.set_name(name);
@@ -86,14 +83,14 @@ ProgramInfo MakeCubemapProgram(const std::string& output_texture_name)
         0,
         proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
         {proto::ProgramStage::FRAGMENT});
-    *program.add_uniforms() = MakeUniformEnum(
-        "projection", proto::Uniform::PROJECTION_MAT4);
-    *program.add_uniforms() = MakeUniformEnum(
-        "view", proto::Uniform::VIEW_MAT4);
-    *program.add_uniforms() = MakeUniformEnum(
-        "model", proto::Uniform::MODEL_MAT4);
-    *program.add_uniforms() = MakeUniformEnum(
-        "time_s", proto::Uniform::FLOAT_TIME_S);
+    *program.add_uniforms() =
+        MakeUniformEnum("projection", proto::Uniform::PROJECTION_MAT4);
+    *program.add_uniforms() =
+        MakeUniformEnum("view", proto::Uniform::VIEW_MAT4);
+    *program.add_uniforms() =
+        MakeUniformEnum("model", proto::Uniform::MODEL_MAT4);
+    *program.add_uniforms() =
+        MakeUniformEnum("time_s", proto::Uniform::FLOAT_TIME_S);
     return MakeProgramInfo(
         std::move(program),
         {.vertex_shader = "cubemap.vert", .fragment_shader = "cubemap.frag"},
@@ -102,29 +99,28 @@ ProgramInfo MakeCubemapProgram(const std::string& output_texture_name)
 
 void AddSharedRaytracingUniforms(proto::Program& program)
 {
-    *program.add_uniforms() = MakeUniformEnum(
-        "projection", proto::Uniform::PROJECTION_MAT4);
-    *program.add_uniforms() = MakeUniformEnum(
-        "view", proto::Uniform::VIEW_MAT4);
-    *program.add_uniforms() = MakeUniformEnum(
-        "projection_inv", proto::Uniform::PROJECTION_INV_MAT4);
-    *program.add_uniforms() = MakeUniformEnum(
-        "view_inv", proto::Uniform::VIEW_INV_MAT4);
-    *program.add_uniforms() = MakeUniformEnum(
-        "model", proto::Uniform::MODEL_MAT4);
-    *program.add_uniforms() = MakeUniformEnum(
-        "model_inv", proto::Uniform::MODEL_INV_MAT4);
+    *program.add_uniforms() =
+        MakeUniformEnum("projection", proto::Uniform::PROJECTION_MAT4);
+    *program.add_uniforms() =
+        MakeUniformEnum("view", proto::Uniform::VIEW_MAT4);
+    *program.add_uniforms() =
+        MakeUniformEnum("projection_inv", proto::Uniform::PROJECTION_INV_MAT4);
+    *program.add_uniforms() =
+        MakeUniformEnum("view_inv", proto::Uniform::VIEW_INV_MAT4);
+    *program.add_uniforms() =
+        MakeUniformEnum("model", proto::Uniform::MODEL_MAT4);
+    *program.add_uniforms() =
+        MakeUniformEnum("model_inv", proto::Uniform::MODEL_INV_MAT4);
     *program.add_uniforms() = MakeUniformEnum(
         "camera_position", proto::Uniform::CAMERA_POSITION_VEC3);
-    *program.add_uniforms() = MakeUniformEnum(
-        "light_dir", proto::Uniform::LIGHT_POSITION_VEC3);
-    *program.add_uniforms() = MakeUniformEnum(
-        "light_color", proto::Uniform::LIGHT_COLOR_VEC3);
+    *program.add_uniforms() =
+        MakeUniformEnum("light_dir", proto::Uniform::LIGHT_POSITION_VEC3);
+    *program.add_uniforms() =
+        MakeUniformEnum("light_color", proto::Uniform::LIGHT_COLOR_VEC3);
 }
 
 void AddSharedRaytracingInputs(
-    proto::Program& program,
-    const std::string& output_texture_name)
+    proto::Program& program, const std::string& output_texture_name)
 {
     program.add_output_texture_names(output_texture_name);
     program.add_input_texture_names("skybox");
@@ -144,7 +140,8 @@ void AddRaytraceSceneMaterialInputs(proto::Program& program)
     program.add_input_texture_names("transmissive_ior_texture");
     program.add_input_texture_names("transmissive_thickness_texture");
     program.add_input_texture_names("transmissive_attenuation_color_texture");
-    program.add_input_texture_names("transmissive_attenuation_distance_texture");
+    program.add_input_texture_names(
+        "transmissive_attenuation_distance_texture");
     program.add_input_texture_names("opaque_albedo_texture");
     program.add_input_texture_names("opaque_normal_texture");
     program.add_input_texture_names("opaque_roughness_texture");
@@ -308,6 +305,104 @@ ProgramInfo MakeRaytraceProgram(const std::string& output_texture_name)
          .closesthit_shader = "raytrace.rchit"});
 }
 
+ProgramInfo MakeRasterSceneProgram(const std::string& output_texture_name)
+{
+    proto::Program program;
+    program.set_name("RasterSceneProgram");
+    program.set_pipeline_name("raster_scene");
+    program.add_output_texture_names(output_texture_name);
+    program.mutable_input_scene_type()->set_value(proto::SceneType::SCENE);
+    *program.add_bindings() = MakeBinding(
+        "albedo_texture",
+        0,
+        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
+        {proto::ProgramStage::FRAGMENT});
+    program.add_input_texture_names("skybox");
+    *program.add_bindings() = MakeBinding(
+        "skybox",
+        1,
+        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
+        {proto::ProgramStage::FRAGMENT});
+    program.add_input_texture_names("skybox_env");
+    *program.add_bindings() = MakeBinding(
+        "skybox_env",
+        2,
+        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
+        {proto::ProgramStage::FRAGMENT});
+    *program.add_bindings() = MakeBinding(
+        "normal_texture",
+        3,
+        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
+        {proto::ProgramStage::FRAGMENT});
+    *program.add_bindings() = MakeBinding(
+        "roughness_texture",
+        4,
+        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
+        {proto::ProgramStage::FRAGMENT});
+    *program.add_bindings() = MakeBinding(
+        "metallic_texture",
+        5,
+        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
+        {proto::ProgramStage::FRAGMENT});
+    *program.add_bindings() = MakeBinding(
+        "ao_texture",
+        6,
+        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
+        {proto::ProgramStage::FRAGMENT});
+    *program.add_bindings() = MakeBinding(
+        "transmission_texture",
+        7,
+        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
+        {proto::ProgramStage::FRAGMENT});
+    *program.add_bindings() = MakeBinding(
+        "ior_texture",
+        8,
+        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
+        {proto::ProgramStage::FRAGMENT});
+    *program.add_bindings() = MakeBinding(
+        "thickness_texture",
+        9,
+        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
+        {proto::ProgramStage::FRAGMENT});
+    *program.add_bindings() = MakeBinding(
+        "attenuation_color_texture",
+        10,
+        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
+        {proto::ProgramStage::FRAGMENT});
+    *program.add_bindings() = MakeBinding(
+        "specular_factor_texture",
+        11,
+        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
+        {proto::ProgramStage::FRAGMENT});
+    *program.add_bindings() = MakeBinding(
+        "specular_color_texture",
+        12,
+        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
+        {proto::ProgramStage::FRAGMENT});
+    *program.add_bindings() = MakeBinding(
+        "shadow_map",
+        13,
+        proto::ProgramBinding::COMBINED_IMAGE_SAMPLER,
+        {proto::ProgramStage::FRAGMENT});
+    *program.add_bindings() = MakeBinding(
+        "UniformBlock",
+        14,
+        proto::ProgramBinding::UNIFORM_BUFFER,
+        {proto::ProgramStage::FRAGMENT});
+    *program.add_uniforms() =
+        MakeUniformEnum("projection", proto::Uniform::PROJECTION_MAT4);
+    *program.add_uniforms() =
+        MakeUniformEnum("view", proto::Uniform::VIEW_MAT4);
+    *program.add_uniforms() =
+        MakeUniformEnum("model", proto::Uniform::MODEL_MAT4);
+    return MakeProgramInfo(
+        std::move(program),
+        {.vertex_shader = "raster_gltf.vert",
+         .fragment_shader = "raster_gltf.frag"},
+        {.vertex_shader = "raster_gltf.vert",
+         .fragment_shader = "raster_gltf.frag"});
+}
+
 ProgramInfo MakeRaytracingPreprocessProgram(
     const std::string& pipeline_name,
     ShaderFiles opengl_files,
@@ -319,17 +414,27 @@ ProgramInfo MakeRaytracingPreprocessProgram(
     program.mutable_input_scene_type()->set_value(proto::SceneType::SCENE);
     AddSharedRaytracingUniforms(program);
     return MakeProgramInfo(
-        std::move(program),
-        std::move(opengl_files),
-        std::move(vulkan_files));
+        std::move(program), std::move(opengl_files), std::move(vulkan_files));
 }
 
+bool HasSkyboxRenderPass(const proto::Level& proto_level);
+
 std::vector<ProgramInfo> BuildProgramsForPreset(
-    SupportedScenePreset preset,
-    const proto::Level& proto_level)
+    SupportedScenePreset preset, const proto::Level& proto_level)
 {
     switch (preset)
     {
+    case SupportedScenePreset::Raster: {
+        std::vector<ProgramInfo> programs = {};
+        if (HasSkyboxRenderPass(proto_level))
+        {
+            programs.push_back(
+                MakeCubemapProgram(proto_level.default_texture_name()));
+        }
+        programs.push_back(
+            MakeRasterSceneProgram(proto_level.default_texture_name()));
+        return programs;
+    }
     case SupportedScenePreset::Cubemap:
         return {MakeCubemapProgram(proto_level.default_texture_name())};
     case SupportedScenePreset::Raytrace:
@@ -338,23 +443,71 @@ std::vector<ProgramInfo> BuildProgramsForPreset(
             MakeRaytraceProgram(proto_level.default_texture_name()),
             MakeRaytracingPreprocessProgram(
                 "raytrace_preprocess",
-                {.vertex_shader = "raytrace.vert", .fragment_shader = "raytrace.frag"},
-                {.vertex_shader = "raytrace.vert", .fragment_shader = "raytrace.frag"})};
+                {.vertex_shader = "raytrace.vert",
+                 .fragment_shader = "raytrace.frag"},
+                {.vertex_shader = "raytrace.vert",
+                 .fragment_shader = "raytrace.frag"})};
     case SupportedScenePreset::Unknown:
     default:
         throw std::runtime_error("Unsupported internal render preset.");
     }
 }
 
+bool HasSkyboxRenderPass(const proto::Level& proto_level)
+{
+    for (const auto& node : proto_level.scene_tree().node_meshes())
+    {
+        if (node.render_time_enum() == proto::NodeMesh::SKYBOX_RENDER_TIME)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool HasRasterSceneMesh(const proto::Level& proto_level)
+{
+    for (const auto& node : proto_level.scene_tree().node_meshes())
+    {
+        if (node.render_time_enum() != proto::NodeMesh::SCENE_RENDER_TIME)
+        {
+            continue;
+        }
+        if (node.has_clean_buffer())
+        {
+            continue;
+        }
+        if (ToLowerAscii(node.name()) == "raytracingrendering")
+        {
+            continue;
+        }
+        return true;
+    }
+    return false;
+}
+
 std::vector<RenderPassProgramInfo> BuildRenderPassProgramsForPreset(
-    SupportedScenePreset preset)
+    SupportedScenePreset preset, const proto::Level& proto_level)
 {
     switch (preset)
     {
+    case SupportedScenePreset::Raster: {
+        std::vector<RenderPassProgramInfo> passes = {};
+        if (HasSkyboxRenderPass(proto_level))
+        {
+            passes.push_back(
+                {.render_time = proto::NodeMesh::SKYBOX_RENDER_TIME,
+                 .program_name = "CubemapProgram"});
+        }
+        passes.push_back(
+            {.render_time = proto::NodeMesh::SCENE_RENDER_TIME,
+             .program_name = "RasterSceneProgram"});
+        return passes;
+    }
     case SupportedScenePreset::Cubemap:
-        return {{
-            .render_time = proto::NodeMesh::SKYBOX_RENDER_TIME,
-            .program_name = "CubemapProgram"}};
+        return {
+            {.render_time = proto::NodeMesh::SKYBOX_RENDER_TIME,
+             .program_name = "CubemapProgram"}};
     case SupportedScenePreset::Raytrace:
         return {
             {.render_time = proto::NodeMesh::SKYBOX_RENDER_TIME,
@@ -370,8 +523,7 @@ std::vector<RenderPassProgramInfo> BuildRenderPassProgramsForPreset(
     }
 }
 
-bool HasMeshFile(
-    const proto::Level& proto_level, const std::string& file_name)
+bool HasMeshFile(const proto::Level& proto_level, const std::string& file_name)
 {
     const auto expected = ToLowerAscii(file_name);
     for (const auto& node : proto_level.scene_tree().node_meshes())
@@ -388,18 +540,61 @@ bool HasMeshFile(
     return false;
 }
 
+void RemoveRaytracingResolveNodes(proto::Level& proto_level)
+{
+    if (!proto_level.has_scene_tree())
+    {
+        return;
+    }
+    auto* node_meshes = proto_level.mutable_scene_tree()->mutable_node_meshes();
+    for (int i = node_meshes->size() - 1; i >= 0; --i)
+    {
+        if (ToLowerAscii(node_meshes->Get(i).name()) == "raytracingrendering")
+        {
+            node_meshes->DeleteSubrange(i, 1);
+        }
+    }
+}
+
+void DisableRaytracingAcceleration(proto::Level& proto_level)
+{
+    if (!proto_level.has_scene_tree())
+    {
+        return;
+    }
+    for (auto& node : *proto_level.mutable_scene_tree()->mutable_node_meshes())
+    {
+        node.set_acceleration_structure_enum(proto::NodeMesh::NO_ACCELERATION);
+    }
+}
+
 SupportedScenePreset InferScenePreset(
     const proto::Level& proto_level,
-    const std::filesystem::path& source_path)
+    const std::filesystem::path& source_path,
+    const LevelDataOptions& options)
 {
     (void)source_path;
+    switch (options.render_preset)
+    {
+    case RenderPreset::Raster:
+        return HasRasterSceneMesh(proto_level) ? SupportedScenePreset::Raster
+                                               : SupportedScenePreset::Cubemap;
+    case RenderPreset::Cubemap:
+        return SupportedScenePreset::Cubemap;
+    case RenderPreset::Raytrace:
+        return HasRasterSceneMesh(proto_level) ? SupportedScenePreset::Raytrace
+                                               : SupportedScenePreset::Cubemap;
+    case RenderPreset::Auto:
+    default:
+        break;
+    }
+
     bool has_non_skybox_mesh = false;
     bool has_skybox_cube = false;
     for (const auto& node : proto_level.scene_tree().node_meshes())
     {
         if (node.render_time_enum() == proto::NodeMesh::SKYBOX_RENDER_TIME &&
-            node.has_mesh_enum() &&
-            node.mesh_enum() == proto::NodeMesh::CUBE)
+            node.has_mesh_enum() && node.mesh_enum() == proto::NodeMesh::CUBE)
         {
             has_skybox_cube = true;
             continue;
@@ -426,14 +621,23 @@ LevelData BuildLevelData(
     glm::uvec2 /*size*/,
     const proto::Level& proto_level,
     const std::filesystem::path& asset_root,
-    const std::filesystem::path& source_path)
+    const std::filesystem::path& source_path,
+    const LevelDataOptions& options)
 {
+    proto::Level prepared_level = proto_level;
+    const auto preset = InferScenePreset(prepared_level, source_path, options);
+    if (preset == SupportedScenePreset::Raster)
+    {
+        RemoveRaytracingResolveNodes(prepared_level);
+        DisableRaytracingAcceleration(prepared_level);
+    }
+
     LevelData data;
-    data.proto = proto_level;
+    data.proto = prepared_level;
     data.asset_root = asset_root;
     data.source_path = source_path;
 
-    for (const auto& proto_texture : proto_level.textures())
+    for (const auto& proto_texture : prepared_level.textures())
     {
         TextureInfo texture_info;
         texture_info.name = proto_texture.name();
@@ -448,37 +652,56 @@ LevelData BuildLevelData(
         data.textures.push_back(std::move(texture_info));
     }
 
-    const auto preset = InferScenePreset(proto_level, source_path);
     if (preset == SupportedScenePreset::Unknown)
     {
-        if (!proto_level.scene_tree().node_meshes().empty())
+        if (!prepared_level.scene_tree().node_meshes().empty())
         {
-            throw std::runtime_error(std::format(
-                "Unable to infer internal render preset for level '{}' from '{}'.",
-                proto_level.name(),
-                source_path.string()));
+            throw std::runtime_error(
+                std::format(
+                    "Unable to infer internal render preset for level '{}' "
+                    "from '{}'.",
+                    prepared_level.name(),
+                    source_path.string()));
         }
         return data;
     }
-    data.programs = BuildProgramsForPreset(preset, proto_level);
-    data.render_pass_programs = BuildRenderPassProgramsForPreset(preset);
+    data.programs = BuildProgramsForPreset(preset, prepared_level);
+    data.render_pass_programs =
+        BuildRenderPassProgramsForPreset(preset, prepared_level);
 
-    for (const auto& node : proto_level.scene_tree().node_meshes())
+    for (const auto& node : prepared_level.scene_tree().node_meshes())
     {
         if (node.mesh_enum() == frame::proto::NodeMesh::QUAD)
         {
             StaticMeshInfo mesh_info;
             mesh_info.name = node.name();
             mesh_info.positions = {
-                -0.5f, -0.5f, 0.0f,
-                0.5f, -0.5f, 0.0f,
-                0.5f, 0.5f, 0.0f,
-                -0.5f, 0.5f, 0.0f};
-            mesh_info.uvs = {
-                0.0f, 0.0f,
-                1.0f, 0.0f,
-                1.0f, 1.0f,
-                0.0f, 1.0f};
+                -0.5f,
+                -0.5f,
+                0.0f,
+                0.5f,
+                -0.5f,
+                0.0f,
+                0.5f,
+                0.5f,
+                0.0f,
+                -0.5f,
+                0.5f,
+                0.0f};
+            mesh_info.uvs = {0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f};
+            mesh_info.normals = {
+                0.0f,
+                0.0f,
+                1.0f,
+                0.0f,
+                0.0f,
+                1.0f,
+                0.0f,
+                0.0f,
+                1.0f,
+                0.0f,
+                0.0f,
+                1.0f};
             mesh_info.indices = {0, 1, 2, 2, 3, 0};
             data.meshes.push_back(std::move(mesh_info));
         }
@@ -488,90 +711,313 @@ LevelData BuildLevelData(
             mesh_info.name = node.name();
             mesh_info.positions = {
                 // Front.
-                -0.5f, -0.5f, -0.5f,
-                0.5f, -0.5f, -0.5f,
-                0.5f, 0.5f, -0.5f,
-                0.5f, 0.5f, -0.5f,
-                -0.5f, 0.5f, -0.5f,
-                -0.5f, -0.5f, -0.5f,
+                -0.5f,
+                -0.5f,
+                -0.5f,
+                0.5f,
+                -0.5f,
+                -0.5f,
+                0.5f,
+                0.5f,
+                -0.5f,
+                0.5f,
+                0.5f,
+                -0.5f,
+                -0.5f,
+                0.5f,
+                -0.5f,
+                -0.5f,
+                -0.5f,
+                -0.5f,
                 // Back.
-                -0.5f, -0.5f, 0.5f,
-                0.5f, -0.5f, 0.5f,
-                0.5f, 0.5f, 0.5f,
-                0.5f, 0.5f, 0.5f,
-                -0.5f, 0.5f, 0.5f,
-                -0.5f, -0.5f, 0.5f,
+                -0.5f,
+                -0.5f,
+                0.5f,
+                0.5f,
+                -0.5f,
+                0.5f,
+                0.5f,
+                0.5f,
+                0.5f,
+                0.5f,
+                0.5f,
+                0.5f,
+                -0.5f,
+                0.5f,
+                0.5f,
+                -0.5f,
+                -0.5f,
+                0.5f,
                 // Left.
-                -0.5f, 0.5f, 0.5f,
-                -0.5f, 0.5f, -0.5f,
-                -0.5f, -0.5f, -0.5f,
-                -0.5f, -0.5f, -0.5f,
-                -0.5f, -0.5f, 0.5f,
-                -0.5f, 0.5f, 0.5f,
+                -0.5f,
+                0.5f,
+                0.5f,
+                -0.5f,
+                0.5f,
+                -0.5f,
+                -0.5f,
+                -0.5f,
+                -0.5f,
+                -0.5f,
+                -0.5f,
+                -0.5f,
+                -0.5f,
+                -0.5f,
+                0.5f,
+                -0.5f,
+                0.5f,
+                0.5f,
                 // Right.
-                0.5f, 0.5f, 0.5f,
-                0.5f, 0.5f, -0.5f,
-                0.5f, -0.5f, -0.5f,
-                0.5f, -0.5f, -0.5f,
-                0.5f, -0.5f, 0.5f,
-                0.5f, 0.5f, 0.5f,
+                0.5f,
+                0.5f,
+                0.5f,
+                0.5f,
+                0.5f,
+                -0.5f,
+                0.5f,
+                -0.5f,
+                -0.5f,
+                0.5f,
+                -0.5f,
+                -0.5f,
+                0.5f,
+                -0.5f,
+                0.5f,
+                0.5f,
+                0.5f,
+                0.5f,
                 // Bottom.
-                -0.5f, -0.5f, -0.5f,
-                0.5f, -0.5f, -0.5f,
-                0.5f, -0.5f, 0.5f,
-                0.5f, -0.5f, 0.5f,
-                -0.5f, -0.5f, 0.5f,
-                -0.5f, -0.5f, -0.5f,
+                -0.5f,
+                -0.5f,
+                -0.5f,
+                0.5f,
+                -0.5f,
+                -0.5f,
+                0.5f,
+                -0.5f,
+                0.5f,
+                0.5f,
+                -0.5f,
+                0.5f,
+                -0.5f,
+                -0.5f,
+                0.5f,
+                -0.5f,
+                -0.5f,
+                -0.5f,
                 // Top.
-                -0.5f, 0.5f, -0.5f,
-                0.5f, 0.5f, -0.5f,
-                0.5f, 0.5f, 0.5f,
-                0.5f, 0.5f, 0.5f,
-                -0.5f, 0.5f, 0.5f,
-                -0.5f, 0.5f, -0.5f};
+                -0.5f,
+                0.5f,
+                -0.5f,
+                0.5f,
+                0.5f,
+                -0.5f,
+                0.5f,
+                0.5f,
+                0.5f,
+                0.5f,
+                0.5f,
+                0.5f,
+                -0.5f,
+                0.5f,
+                0.5f,
+                -0.5f,
+                0.5f,
+                -0.5f};
             mesh_info.uvs = {
                 // Front.
-                0.0f, 0.0f,
-                1.0f, 0.0f,
-                1.0f, 1.0f,
-                1.0f, 1.0f,
-                0.0f, 1.0f,
-                0.0f, 0.0f,
+                0.0f,
+                0.0f,
+                1.0f,
+                0.0f,
+                1.0f,
+                1.0f,
+                1.0f,
+                1.0f,
+                0.0f,
+                1.0f,
+                0.0f,
+                0.0f,
                 // Back.
-                0.0f, 0.0f,
-                1.0f, 0.0f,
-                1.0f, 1.0f,
-                1.0f, 1.0f,
-                0.0f, 1.0f,
-                0.0f, 0.0f,
+                0.0f,
+                0.0f,
+                1.0f,
+                0.0f,
+                1.0f,
+                1.0f,
+                1.0f,
+                1.0f,
+                0.0f,
+                1.0f,
+                0.0f,
+                0.0f,
                 // Left.
-                1.0f, 0.0f,
-                1.0f, 1.0f,
-                0.0f, 1.0f,
-                0.0f, 1.0f,
-                0.0f, 0.0f,
-                1.0f, 0.0f,
+                1.0f,
+                0.0f,
+                1.0f,
+                1.0f,
+                0.0f,
+                1.0f,
+                0.0f,
+                1.0f,
+                0.0f,
+                0.0f,
+                1.0f,
+                0.0f,
                 // Right.
-                1.0f, 0.0f,
-                1.0f, 1.0f,
-                0.0f, 1.0f,
-                0.0f, 1.0f,
-                0.0f, 0.0f,
-                1.0f, 0.0f,
+                1.0f,
+                0.0f,
+                1.0f,
+                1.0f,
+                0.0f,
+                1.0f,
+                0.0f,
+                1.0f,
+                0.0f,
+                0.0f,
+                1.0f,
+                0.0f,
                 // Bottom.
-                0.0f, 1.0f,
-                1.0f, 1.0f,
-                1.0f, 0.0f,
-                1.0f, 0.0f,
-                0.0f, 0.0f,
-                0.0f, 1.0f,
+                0.0f,
+                1.0f,
+                1.0f,
+                1.0f,
+                1.0f,
+                0.0f,
+                1.0f,
+                0.0f,
+                0.0f,
+                0.0f,
+                0.0f,
+                1.0f,
                 // Top.
-                0.0f, 1.0f,
-                1.0f, 1.0f,
-                1.0f, 0.0f,
-                1.0f, 0.0f,
-                0.0f, 0.0f,
-                0.0f, 1.0f};
+                0.0f,
+                1.0f,
+                1.0f,
+                1.0f,
+                1.0f,
+                0.0f,
+                1.0f,
+                0.0f,
+                0.0f,
+                0.0f,
+                0.0f,
+                1.0f};
+            mesh_info.normals = {
+                // Front.
+                0.0f,
+                0.0f,
+                -1.0f,
+                0.0f,
+                0.0f,
+                -1.0f,
+                0.0f,
+                0.0f,
+                -1.0f,
+                0.0f,
+                0.0f,
+                -1.0f,
+                0.0f,
+                0.0f,
+                -1.0f,
+                0.0f,
+                0.0f,
+                -1.0f,
+                // Back.
+                0.0f,
+                0.0f,
+                1.0f,
+                0.0f,
+                0.0f,
+                1.0f,
+                0.0f,
+                0.0f,
+                1.0f,
+                0.0f,
+                0.0f,
+                1.0f,
+                0.0f,
+                0.0f,
+                1.0f,
+                0.0f,
+                0.0f,
+                1.0f,
+                // Left.
+                -1.0f,
+                0.0f,
+                0.0f,
+                -1.0f,
+                0.0f,
+                0.0f,
+                -1.0f,
+                0.0f,
+                0.0f,
+                -1.0f,
+                0.0f,
+                0.0f,
+                -1.0f,
+                0.0f,
+                0.0f,
+                -1.0f,
+                0.0f,
+                0.0f,
+                // Right.
+                1.0f,
+                0.0f,
+                0.0f,
+                1.0f,
+                0.0f,
+                0.0f,
+                1.0f,
+                0.0f,
+                0.0f,
+                1.0f,
+                0.0f,
+                0.0f,
+                1.0f,
+                0.0f,
+                0.0f,
+                1.0f,
+                0.0f,
+                0.0f,
+                // Bottom.
+                0.0f,
+                -1.0f,
+                0.0f,
+                0.0f,
+                -1.0f,
+                0.0f,
+                0.0f,
+                -1.0f,
+                0.0f,
+                0.0f,
+                -1.0f,
+                0.0f,
+                0.0f,
+                -1.0f,
+                0.0f,
+                0.0f,
+                -1.0f,
+                0.0f,
+                // Top.
+                0.0f,
+                1.0f,
+                0.0f,
+                0.0f,
+                1.0f,
+                0.0f,
+                0.0f,
+                1.0f,
+                0.0f,
+                0.0f,
+                1.0f,
+                0.0f,
+                0.0f,
+                1.0f,
+                0.0f,
+                0.0f,
+                1.0f,
+                0.0f};
             mesh_info.indices.resize(36);
             std::iota(mesh_info.indices.begin(), mesh_info.indices.end(), 0);
             data.meshes.push_back(std::move(mesh_info));

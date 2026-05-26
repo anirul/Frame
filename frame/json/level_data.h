@@ -1,7 +1,7 @@
 #pragma once
 
-#include <filesystem>
 #include <cstdint>
+#include <filesystem>
 #include <string>
 #include <vector>
 
@@ -11,6 +11,19 @@
 
 namespace frame::json
 {
+
+enum class RenderPreset
+{
+    Auto,
+    Raster,
+    Cubemap,
+    Raytrace,
+};
+
+struct LevelDataOptions
+{
+    RenderPreset render_preset = RenderPreset::Auto;
+};
 
 struct TextureInfo
 {
@@ -50,6 +63,7 @@ struct StaticMeshInfo
 {
     std::string name;
     std::vector<float> positions;
+    std::vector<float> normals;
     std::vector<float> uvs;
     std::vector<std::uint32_t> indices;
 };
@@ -69,6 +83,7 @@ LevelData BuildLevelData(
     glm::uvec2 size,
     const proto::Level& proto_level,
     const std::filesystem::path& asset_root,
-    const std::filesystem::path& source_path = {});
+    const std::filesystem::path& source_path = {},
+    const LevelDataOptions& options = {});
 
 } // namespace frame::json

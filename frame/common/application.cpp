@@ -1,5 +1,7 @@
 #include "frame/common/application.h"
 
+#include <algorithm>
+#include <array>
 #include <chrono>
 #include <stdexcept>
 #include <string_view>
@@ -15,6 +17,13 @@
 #include "frame/window_factory_internal.h"
 
 ABSL_FLAG(std::string, device, "vulkan", "Rendering backend (vulkan|opengl).");
+ABSL_FLAG(
+    std::string,
+    rendering,
+    "auto",
+    "Rendering technique "
+    "(auto|raytrace|raytracing|rasterise|rasterising|rasterize|rasterizing|"
+    "raster).");
 #if defined(_DEBUG)
 ABSL_FLAG(bool, vk_validation, true, "Enable Vulkan validation layers.");
 #else
@@ -42,15 +51,18 @@ bool StartsWith(std::string_view value, std::string_view prefix)
 
 std::string NormalizeKnownFlag(std::string_view arg)
 {
-    constexpr std::array<std::string_view, 4> kKnownFlags = {
+    constexpr std::array<std::string_view, 5> kKnownFlags = {
         "device",
+        "rendering",
         "vk_validation",
         "auto_exit_seconds",
         "screenshot_on_exit"};
     for (const auto flag_name : kKnownFlags)
     {
-        const std::string short_prefix = std::string("-") + std::string(flag_name);
-        const std::string slash_prefix = std::string("/") + std::string(flag_name);
+        const std::string short_prefix =
+            std::string("-") + std::string(flag_name);
+        const std::string slash_prefix =
+            std::string("/") + std::string(flag_name);
         if (arg == short_prefix || arg == slash_prefix ||
             StartsWith(arg, short_prefix + "=") ||
             StartsWith(arg, slash_prefix + "="))
@@ -87,10 +99,7 @@ Application::Application(std::unique_ptr<frame::WindowInterface> window)
 }
 
 Application::Application(
-    int argc,
-    char** argv,
-    glm::uvec2 size,
-    DrawingTargetEnum drawing_target)
+    int argc, char** argv, glm::uvec2 size, DrawingTargetEnum drawing_target)
 {
     auto normalized_args = NormalizeCommandLineArgs(argc, argv);
     std::vector<char*> normalized_argv = {};
@@ -100,8 +109,7 @@ Application::Application(
         normalized_argv.push_back(arg.data());
     }
     absl::ParseCommandLine(
-        static_cast<int>(normalized_argv.size()),
-        normalized_argv.data());
+        static_cast<int>(normalized_argv.size()), normalized_argv.data());
     InitializeFromArgs(argc, argv, size, drawing_target);
 }
 
@@ -159,39 +167,36 @@ WindowReturnEnum Application::Run(std::function<bool()> lambda)
     auto& logger = frame::Logger::GetInstance();
     const auto start = std::chrono::steady_clock::now();
     bool auto_exit_logged = false;
-    return GetWindow().Run(
-        [lambda = std::move(lambda),
-         auto_exit_seconds,
-         start,
-         this,
-         &logger,
-         auto_exit_logged]() mutable {
-            const auto now = std::chrono::steady_clock::now();
-            const std::chrono::duration<double> elapsed = now - start;
-            const bool keep_running = elapsed.count() < auto_exit_seconds;
-            if (!keep_running && !auto_exit_logged)
+    return GetWindow().Run([lambda = std::move(lambda),
+                            auto_exit_seconds,
+                            start,
+                            this,
+                            &logger,
+                            auto_exit_logged]() mutable {
+        const auto now = std::chrono::steady_clock::now();
+        const std::chrono::duration<double> elapsed = now - start;
+        const bool keep_running = elapsed.count() < auto_exit_seconds;
+        if (!keep_running && !auto_exit_logged)
+        {
+            if (absl::GetFlag(FLAGS_screenshot_on_exit))
             {
-                if (absl::GetFlag(FLAGS_screenshot_on_exit))
+                try
                 {
-                    try
-                    {
-                        GetWindow().GetDevice().ScreenShot("ScreenShot.png");
-                    }
-                    catch (const std::exception& ex)
-                    {
-                        logger->warn(
-                            "Failed to save screenshot on exit: {}",
-                            ex.what());
-                    }
+                    GetWindow().GetDevice().ScreenShot("ScreenShot.png");
                 }
-                logger->info(
-                    "Auto exit triggered after {:.3f} seconds.",
-                    auto_exit_seconds);
-                logger->flush();
-                auto_exit_logged = true;
+                catch (const std::exception& ex)
+                {
+                    logger->warn(
+                        "Failed to save screenshot on exit: {}", ex.what());
+                }
             }
-            return keep_running && lambda();
-        });
+            logger->info(
+                "Auto exit triggered after {:.3f} seconds.", auto_exit_seconds);
+            logger->flush();
+            auto_exit_logged = true;
+        }
+        return keep_running && lambda();
+    });
 }
 
 RenderingAPIEnum Application::ParseDeviceFlag(const std::string& value) const
@@ -206,8 +211,7 @@ RenderingAPIEnum Application::ParseDeviceFlag(const std::string& value) const
         return RenderingAPIEnum::VULKAN;
     }
     frame::Logger::GetInstance()->warn(
-        "Unknown rendering device '{}', defaulting to Vulkan.",
-        value);
+        "Unknown rendering device '{}', defaulting to Vulkan.", value);
     return RenderingAPIEnum::VULKAN;
 }
 
@@ -250,15 +254,13 @@ void Application::InitializeFromArgs(
         catch (const std::exception& ex)
         {
             frame::Logger::GetInstance()->warn(
-                "Vulkan startup failed, falling back to OpenGL: {}",
-                ex.what());
+                "Vulkan startup failed, falling back to OpenGL: {}", ex.what());
         }
     }
 
     window_ = attempt(
-        requested == RenderingAPIEnum::VULKAN
-            ? RenderingAPIEnum::OPENGL
-            : requested);
+        requested == RenderingAPIEnum::VULKAN ? RenderingAPIEnum::OPENGL
+                                              : requested);
 }
 
 } // namespace frame::common
