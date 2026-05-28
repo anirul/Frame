@@ -36,6 +36,7 @@ class Renderer : public RendererInterface
      * @param viewport: The viewport.
      */
     Renderer(LevelInterface& level, glm::uvec4 viewport);
+    ~Renderer() override;
 
   public:
     /**
@@ -136,6 +137,9 @@ class Renderer : public RendererInterface
     void EnsureGpuSkinningProgram();
     void EnsureGpuRaytraceTriangleCopyProgram();
     void EnsureGpuRaytraceBvhRefitProgram();
+    void EnsureShadowResources();
+    bool UpdateShadowState();
+    void RenderShadowMap();
 
   private:
     LevelInterface& level_;
@@ -163,8 +167,13 @@ class Renderer : public RendererInterface
     std::unique_ptr<Program> gpu_skinning_program_ = nullptr;
     std::unique_ptr<Program> gpu_raytrace_triangle_copy_program_ = nullptr;
     std::unique_ptr<Program> gpu_raytrace_bvh_refit_program_ = nullptr;
+    std::unique_ptr<Program> shadow_program_ = nullptr;
     std::unique_ptr<Buffer> gpu_skinning_bone_matrix_buffer_ = nullptr;
     std::unique_ptr<Buffer> gpu_skinning_empty_buffer_ = nullptr;
+    unsigned int shadow_frame_buffer_ = 0;
+    unsigned int shadow_depth_texture_ = 0;
+    glm::mat4 shadow_light_view_projection_ = glm::mat4(1.0f);
+    bool shadow_enabled_ = false;
     std::size_t last_source_instance_layout_hash_ = 0;
     bool has_source_instance_layout_hash_ = false;
     std::unordered_map<std::uint64_t, std::size_t>
@@ -176,5 +185,4 @@ class Renderer : public RendererInterface
 };
 
 } // End namespace frame::opengl.
-
 

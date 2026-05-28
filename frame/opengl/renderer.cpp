@@ -12,6 +12,8 @@
 #include <format>
 #include <glad/glad.h>
 #include <limits>
+#include <glm/ext/matrix_clip_space.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <numeric>
 #include <stdexcept>
@@ -38,10 +40,66 @@ namespace frame::opengl
 namespace
 {
 
+constexpr int kShadowMapSize = 2048;
+constexpr int kShadowTextureUnit = 15;
+constexpr float kShadowBias = 0.003f;
+
 bool IsRaytracingProgram(const ProgramInterface& program)
 {
     const auto key = frame::json::ResolveProgramKey(program.GetData());
     return frame::json::IsRaytracingProgramKey(key);
+}
+
+std::unique_ptr<Program> CreateRasterShadowProgram()
+{
+    static constexpr const char* kVertexSource = R"(#version 330 core
+
+layout(location = 0) in vec3 in_position;
+layout(location = 3) in ivec4 in_bone_ids;
+layout(location = 4) in vec4 in_bone_weights;
+
+uniform mat4 light_view_projection;
+uniform mat4 model;
+uniform int skinning_enabled;
+uniform mat4 bone_matrices[128];
+
+void main()
+{
+    vec4 local_position = vec4(in_position, 1.0);
+    if (skinning_enabled != 0)
+    {
+        mat4 skin =
+            in_bone_weights.x * bone_matrices[in_bone_ids.x] +
+            in_bone_weights.y * bone_matrices[in_bone_ids.y] +
+            in_bone_weights.z * bone_matrices[in_bone_ids.z] +
+            in_bone_weights.w * bone_matrices[in_bone_ids.w];
+        local_position = skin * local_position;
+    }
+    gl_Position = light_view_projection * model * local_position;
+}
+)";
+    static constexpr const char* kFragmentSource = R"(#version 330 core
+
+void main()
+{
+}
+)";
+
+    auto program = std::make_unique<Program>("RasterShadowProgram");
+    Shader vertex_shader(ShaderEnum::VERTEX_SHADER);
+    if (!vertex_shader.LoadFromSource(kVertexSource))
+    {
+        throw std::runtime_error(vertex_shader.GetErrorMessage());
+    }
+    Shader fragment_shader(ShaderEnum::FRAGMENT_SHADER);
+    if (!fragment_shader.LoadFromSource(kFragmentSource))
+    {
+        throw std::runtime_error(fragment_shader.GetErrorMessage());
+    }
+    program->AddShader(vertex_shader);
+    program->AddShader(fragment_shader);
+    program->LinkShader();
+    return program;
 }
 
 bool IsRaytracingSourceMaterial(
@@ -63,6 +121,23 @@ bool IsRaytracingSourceMaterial(
         return false;
     }
     return material.GetPreprocessProgramId(&level) != frame::NullId;
+}
+
+bool IsRaytracingMaterial(
+    frame::LevelInterface& level, frame::EntityId material_id)
+{
+    if (material_id == frame::NullId)
+    {
+        return false;
+    }
+    auto& material = level.GetMaterialFromId(material_id);
+    const auto program_id = material.GetProgramId(&level);
+    if (program_id == frame::NullId)
+    {
+        return false;
+    }
+    const auto& program = level.GetProgramFromId(program_id);
+    return IsRaytracingProgram(program);
 }
 
 bool IsRaytracingResolveMaterial(
@@ -1414,6 +1489,230 @@ Renderer::Renderer(LevelInterface& level, glm::uvec4 viewport)
     gpu_skinning_empty_buffer_->Copy(std::vector<float>{0.0f});
 }
 
+Renderer::~Renderer()
+{
+    if (shadow_depth_texture_ != 0)
+    {
+        glDeleteTextures(1, &shadow_depth_texture_);
+        shadow_depth_texture_ = 0;
+    }
+    if (shadow_frame_buffer_ != 0)
+    {
+        glDeleteFramebuffers(1, &shadow_frame_buffer_);
+        shadow_frame_buffer_ = 0;
+    }
+}
+
+void Renderer::EnsureShadowResources()
+{
+    if (!shadow_program_)
+    {
+        shadow_program_ = CreateRasterShadowProgram();
+    }
+    if (shadow_frame_buffer_ != 0 && shadow_depth_texture_ != 0)
+    {
+        return;
+    }
+
+    glGenFramebuffers(1, &shadow_frame_buffer_);
+    glGenTextures(1, &shadow_depth_texture_);
+    glBindTexture(GL_TEXTURE_2D, shadow_depth_texture_);
+    glTexImage2D(
+        GL_TEXTURE_2D,
+        0,
+        GL_DEPTH_COMPONENT32F,
+        kShadowMapSize,
+        kShadowMapSize,
+        0,
+        GL_DEPTH_COMPONENT,
+        GL_FLOAT,
+        nullptr);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    const std::array<float, 4> border_color = {1.0f, 1.0f, 1.0f, 1.0f};
+    glTexParameterfv(
+        GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border_color.data());
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, shadow_frame_buffer_);
+    glFramebufferTexture2D(
+        GL_FRAMEBUFFER,
+        GL_DEPTH_ATTACHMENT,
+        GL_TEXTURE_2D,
+        shadow_depth_texture_,
+        0);
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        throw std::runtime_error("OpenGL raster shadow framebuffer incomplete.");
+    }
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+bool Renderer::UpdateShadowState()
+{
+    shadow_enabled_ = false;
+    shadow_light_view_projection_ = glm::mat4(1.0f);
+
+    const auto light_id = FindPreferredRaytraceLightId(level_);
+    if (light_id == NullId)
+    {
+        return false;
+    }
+    auto& light = level_.GetLightFromId(light_id);
+    if (light.GetShadowType() == ShadowTypeEnum::NO_SHADOW ||
+        light.GetType() != LightTypeEnum::DIRECTIONAL_LIGHT ||
+        glm::length(light.GetVector()) <= 0.0f)
+    {
+        return false;
+    }
+
+    const glm::vec3 direction = glm::normalize(light.GetVector());
+    const glm::vec3 center(0.0f, 0.0f, 0.0f);
+    const glm::vec3 up =
+        std::abs(glm::dot(direction, glm::vec3(0.0f, 1.0f, 0.0f))) > 0.95f
+        ? glm::vec3(1.0f, 0.0f, 0.0f)
+        : glm::vec3(0.0f, 1.0f, 0.0f);
+    const glm::vec3 position = center - direction * 8.0f;
+    const glm::mat4 light_view = glm::lookAtRH(position, center, up);
+    const glm::mat4 light_projection =
+        glm::orthoRH_NO(-6.0f, 6.0f, -6.0f, 6.0f, 0.1f, 20.0f);
+    shadow_light_view_projection_ = light_projection * light_view;
+    shadow_enabled_ = true;
+    return true;
+}
+
+void Renderer::RenderShadowMap()
+{
+    const auto scene_pairs =
+        level_.GetMeshMaterialIds(proto::NodeMesh::SCENE_RENDER_TIME);
+    bool has_shadow_caster = false;
+    for (const auto& p : scene_pairs)
+    {
+        if (IsRaytracingMaterial(level_, p.second))
+        {
+            continue;
+        }
+        auto& node = level_.GetSceneNodeFromId(p.first);
+        if (!node.GetLocalMesh())
+        {
+            continue;
+        }
+        auto& mesh = level_.GetMeshFromId(node.GetLocalMesh());
+        if (mesh.GetData().render_primitive_enum() ==
+                proto::NodeMesh::TRIANGLE_PRIMITIVE &&
+            mesh.GetIndexSize())
+        {
+            has_shadow_caster = true;
+            break;
+        }
+    }
+    if (!has_shadow_caster)
+    {
+        shadow_enabled_ = false;
+        return;
+    }
+
+    if (!UpdateShadowState())
+    {
+        return;
+    }
+
+    EnsureShadowResources();
+
+    std::array<GLint, 4> previous_viewport = {};
+    glGetIntegerv(GL_VIEWPORT, previous_viewport.data());
+    GLboolean previous_color_mask[4] = {};
+    glGetBooleanv(GL_COLOR_WRITEMASK, previous_color_mask);
+
+    glViewport(0, 0, kShadowMapSize, kShadowMapSize);
+    glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+    glBindFramebuffer(GL_FRAMEBUFFER, shadow_frame_buffer_);
+    glClear(GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_POLYGON_OFFSET_FILL);
+    glPolygonOffset(1.25f, 1.75f);
+
+    shadow_program_->Use();
+    shadow_program_->AddUniform(
+        std::make_unique<Uniform>(
+            "light_view_projection", shadow_light_view_projection_));
+    for (const auto& p : scene_pairs)
+    {
+        if (IsRaytracingMaterial(level_, p.second))
+        {
+            continue;
+        }
+        auto& node = level_.GetSceneNodeFromId(p.first);
+        auto* node_mesh = dynamic_cast<NodeMesh*>(&node);
+        if (!node_mesh || !node.GetLocalMesh())
+        {
+            continue;
+        }
+        auto& mesh = level_.GetMeshFromId(node.GetLocalMesh());
+        if (mesh.GetData().render_primitive_enum() !=
+                proto::NodeMesh::TRIANGLE_PRIMITIVE ||
+            !mesh.GetIndexSize())
+        {
+            continue;
+        }
+
+        auto& gl_mesh = dynamic_cast<Mesh&>(mesh);
+        auto* gl_skinned_mesh = dynamic_cast<SkinnedMesh*>(&gl_mesh);
+        int skinning_enabled = 0;
+        if (gl_skinned_mesh && gl_skinned_mesh->HasActiveSkinning())
+        {
+            auto bone_matrices = gl_skinned_mesh->EvaluateSkinning(
+                gl_skinned_mesh->GetSkinningTime(delta_time_));
+            constexpr std::size_t kMaxBones = 128;
+            if (bone_matrices.size() > kMaxBones)
+            {
+                bone_matrices.resize(kMaxBones);
+            }
+            if (!bone_matrices.empty())
+            {
+                shadow_program_->UploadMatrix4ArrayUniform(
+                    "bone_matrices", bone_matrices);
+                skinning_enabled = 1;
+            }
+        }
+        shadow_program_->AddUniform(
+            std::make_unique<Uniform>("skinning_enabled", skinning_enabled));
+        shadow_program_->AddUniform(
+            std::make_unique<Uniform>("model", node.GetLocalModel(delta_time_)));
+
+        glBindVertexArray(gl_mesh.GetId());
+        auto& index_buffer = level_.GetBufferFromId(mesh.GetIndexBufferId());
+        auto& gl_index_buffer = dynamic_cast<Buffer&>(index_buffer);
+        gl_index_buffer.Bind();
+        glDrawElements(
+            GL_TRIANGLES,
+            static_cast<GLsizei>(mesh.GetIndexSize()) / sizeof(std::uint32_t),
+            GL_UNSIGNED_INT,
+            nullptr);
+        gl_index_buffer.UnBind();
+        glBindVertexArray(0);
+    }
+    shadow_program_->UnUse();
+
+    glDisable(GL_POLYGON_OFFSET_FILL);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glColorMask(
+        previous_color_mask[0],
+        previous_color_mask[1],
+        previous_color_mask[2],
+        previous_color_mask[3]);
+    glViewport(
+        previous_viewport[0],
+        previous_viewport[1],
+        previous_viewport[2],
+        previous_viewport[3]);
+}
+
 void Renderer::EnsureGpuSkinningProgram()
 {
     if (gpu_skinning_program_attempted_)
@@ -2143,6 +2442,20 @@ void Renderer::RenderMesh(
         std::unique_ptr<UniformInterface> env_map_uniform =
             std::make_unique<Uniform>("env_map_model", env_map_model_);
         uniform_collection_wrapper.AddUniform(std::move(env_map_uniform));
+        uniform_collection_wrapper.AddUniform(
+            std::make_unique<Uniform>(
+                "light_view_projection", shadow_light_view_projection_));
+        uniform_collection_wrapper.AddUniform(
+            std::make_unique<Uniform>(
+                "shadow_enabled",
+                shadow_enabled_ && shadow_depth_texture_ != 0 ? 1 : 0));
+        uniform_collection_wrapper.AddUniform(
+            std::make_unique<Uniform>("shadow_bias", kShadowBias));
+        uniform_collection_wrapper.AddUniform(
+            std::make_unique<Uniform>(
+                "shadow_map_size", static_cast<float>(kShadowMapSize)));
+        uniform_collection_wrapper.AddUniform(
+            std::make_unique<Uniform>("shadow_map", kShadowTextureUnit));
     }
     // Go through the callback.
     callback_(uniform_collection_wrapper, mesh, material);
@@ -2182,6 +2495,15 @@ void Renderer::RenderMesh(
     if (gl_skinned_mesh)
     {
         UpdateRaytraceBuffersIfNeeded(*gl_skinned_mesh);
+    }
+    const bool bind_shadow_map =
+        render_time_ == proto::NodeMesh::SCENE_RENDER_TIME &&
+        shadow_depth_texture_ != 0 &&
+        program.HasUniform("shadow_map");
+    if (bind_shadow_map)
+    {
+        glActiveTexture(GL_TEXTURE0 + kShadowTextureUnit);
+        glBindTexture(GL_TEXTURE_2D, shadow_depth_texture_);
     }
     program.Use(uniform_collection_wrapper, &level_);
     int skinning_enabled = 0;
@@ -2354,9 +2676,14 @@ void Renderer::RenderMesh(
             gl_texture.UnBind();
         }
     }
+    if (bind_shadow_map)
+    {
+        glActiveTexture(GL_TEXTURE0 + kShadowTextureUnit);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
     material.DisableAll();
 
-    if (mesh.IsClearBuffer())
+    if (mesh.IsClearBuffer() && render_time_ != proto::NodeMesh::SCENE_RENDER_TIME)
     {
         glClear(GL_DEPTH_BUFFER_BIT);
     }
@@ -2566,6 +2893,11 @@ void Renderer::RenderSkybox(const CameraInterface& camera)
 void Renderer::RenderScene(const CameraInterface& camera)
 {
     render_time_ = proto::NodeMesh::SCENE_RENDER_TIME;
+    RenderShadowMap();
+    {
+        ScopedBind scoped_frame(*frame_buffer_);
+        glClear(GL_DEPTH_BUFFER_BIT);
+    }
     for (const auto& p : level_.GetMeshMaterialIds(
              proto::NodeMesh::SCENE_RENDER_TIME))
     {

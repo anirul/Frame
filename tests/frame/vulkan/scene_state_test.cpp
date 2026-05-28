@@ -1,7 +1,7 @@
 #include <cmath>
 #include <filesystem>
-#include <gtest/gtest.h>
 #include <glm/glm.hpp>
+#include <gtest/gtest.h>
 
 #include "frame/file/file_system.h"
 #include "frame/json/parse_level.h"
@@ -49,7 +49,8 @@ TEST_F(VulkanSceneStateTest, BuildsProjectionViewAndModelMatrices)
     // Projection Y is flipped for Vulkan.
     EXPECT_LT(state.projection[1][1], 0.0f);
     EXPECT_NE(state.view, glm::mat4(1.0f));
-    // Model may be identity if the mesh root is at the origin; ensure it's finite.
+    // Model may be identity if the mesh root is at the origin; ensure it's
+    // finite.
     EXPECT_TRUE(std::isfinite(state.model[0][0]));
 }
 
@@ -70,6 +71,44 @@ TEST_F(VulkanSceneStateTest, CarriesLightInformation)
     EXPECT_NEAR(state.light_dir.x, 0.7071f, 1e-3f);
     EXPECT_NEAR(state.light_dir.y, -0.7071f, 1e-3f);
     EXPECT_NEAR(state.light_dir.z, 0.0f, 1e-3f);
+}
+
+TEST_F(VulkanSceneStateTest, EnablesShadowStateForDirectionalShadowLight)
+{
+    auto built = frame::vulkan::BuildLevel(glm::uvec2(320, 200), level_data_);
+    ASSERT_NE(built.level, nullptr);
+
+    const auto state = frame::vulkan::BuildSceneState(
+        *built.level,
+        frame::Logger::GetInstance(),
+        {320u, 200u},
+        0.0f,
+        frame::NullId,
+        true);
+
+    EXPECT_FLOAT_EQ(state.shadow_enabled, 1.0f);
+    EXPECT_FLOAT_EQ(state.shadow_bias, 0.0035f);
+    EXPECT_FLOAT_EQ(state.shadow_map_size, 2048.0f);
+
+    float total_delta_from_identity = 0.0f;
+    const glm::mat4 identity(1.0f);
+    for (int column = 0; column < 4; ++column)
+    {
+        for (int row = 0; row < 4; ++row)
+        {
+            EXPECT_TRUE(
+                std::isfinite(state.light_view_projection[column][row]));
+            total_delta_from_identity += std::abs(
+                state.light_view_projection[column][row] -
+                identity[column][row]);
+        }
+    }
+    EXPECT_GT(total_delta_from_identity, 0.0f);
+
+    const auto block = frame::vulkan::MakeUniformBlock(state, 0.0f);
+    EXPECT_FLOAT_EQ(block.shadow_params.x, 1.0f);
+    EXPECT_FLOAT_EQ(block.shadow_params.y, state.shadow_bias);
+    EXPECT_FLOAT_EQ(block.shadow_params.z, state.shadow_map_size);
 }
 
 TEST_F(VulkanSceneStateTest, PrefersPointLightInformationWhenAvailable)
@@ -93,9 +132,7 @@ TEST_F(VulkanSceneStateTest, PrefersPointLightInformationWhenAvailable)
     level.AddSceneNode(std::move(directional_light));
 
     auto camera = std::make_unique<frame::NodeCamera>(
-        func,
-        glm::vec3(0.0f, 0.0f, 5.0f),
-        glm::vec3(0.0f, 0.0f, 0.0f));
+        func, glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f, 0.0f, 0.0f));
     camera->SetName("camera");
     level.SetDefaultCameraName("camera");
     level.AddSceneNode(std::move(camera));

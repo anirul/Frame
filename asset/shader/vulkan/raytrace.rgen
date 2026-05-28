@@ -72,6 +72,8 @@ layout(set = 0, binding = 12) uniform UniformBlock
     vec4 light_dir;
     vec4 light_color;
     vec4 time_s;
+    mat4 light_view_projection;
+    vec4 shadow_params;
 } ubo;
 
 struct HardwareRaytraceInstanceData

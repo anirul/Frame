@@ -84,28 +84,36 @@ The samples are built into `build/<preset>/bin/`.
 Windows example:
 
 ```sh
-build/windows/bin/Debug/01_RayTracing.exe --device=vulkan
-build/windows/bin/Debug/01_RayTracing.exe --device=opengl
+build/windows/bin/Debug/01_Refraction.exe --device=vulkan
+build/windows/bin/Debug/01_Refraction.exe --device=opengl
 ```
 
 Linux example:
 
 ```sh
-./build/linux-debug/bin/01_RayTracing --device=vulkan
-./build/linux-debug/bin/01_RayTracing --device=opengl
+./build/linux-debug/bin/01_Refraction --device=vulkan
+./build/linux-debug/bin/01_Refraction --device=opengl
 ```
 
 Available examples:
 
 - `00_Cubemap`
-- `01_RayTracing`
+- `01_Refraction`
 - `02_Dragon`
 - `03_SkinnedMesh`
 
-Useful runtime flags:
+## Command-line Arguments
 
-- `--device={vulkan|opengl}`: choose rendering backend
-- `--vk_validation={true|false}`: toggle Vulkan validation layers
+Samples accept the following runtime flags. The short `-flag=value` and Windows
+`/flag=value` forms are normalized to the same options.
+
+| Argument | Values | Default | Description |
+| --- | --- | --- | --- |
+| `--device` | `vulkan`, `opengl` | `vulkan` | Chooses the rendering backend. If Vulkan startup fails, the app falls back to OpenGL. |
+| `--rendering` | `auto`, `raster`, `raytracing` | `auto` | Overrides the render path generated from the level JSON. `auto` keeps the level default. Aliases include `rasterise`, `rasterize`, and `raytrace`. |
+| `--vk_validation` | `true`, `false` | `true` in debug, `false` in release | Enables Vulkan validation layers when using the Vulkan backend. |
+| `--auto_exit_seconds` | number of seconds | `0.0` | Exits automatically after the given duration. `0.0` disables auto-exit. |
+| `--screenshot_on_exit` | `true`, `false` | `false` | Saves `ScreenShot.png` before an auto-exit. |
 
 ## Run Tests
 

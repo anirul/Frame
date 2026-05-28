@@ -21,12 +21,12 @@
 #include "frame/camera.h"
 #include "frame/device_interface.h"
 #include "frame/level_data_startup_internal.h"
-#include "frame/texture_interface.h"
 #include "frame/logger.h"
+#include "frame/texture_interface.h"
 #include "frame/vulkan/buffer_resources.h"
 #include "frame/vulkan/mesh_resources.h"
 #include "frame/vulkan/vulkan_dispatch.h"
- 
+
 namespace frame::vulkan
 {
 
@@ -59,17 +59,13 @@ struct RaytracingSourceGeometryData
  * @class Device
  * @brief This is the Vulkan implementation of the device interface.
  */
-class Device :
-    public DeviceInterface,
-    public frame::internal::LevelDataStartupInterface
+class Device : public DeviceInterface,
+               public frame::internal::LevelDataStartupInterface
 {
   public:
     using GuiRenderCallback = std::function<void(vk::CommandBuffer)>;
 
-    Device(
-        void* vk_instance,
-        glm::uvec2 size,
-        vk::SurfaceKHR& surface);
+    Device(void* vk_instance, glm::uvec2 size, vk::SurfaceKHR& surface);
     ~Device();
 
   public:
@@ -158,8 +154,10 @@ class Device :
     {
         return command_resources_.get();
     }
-    std::optional<vk::DescriptorImageInfo> GetComputeOutputDescriptorInfo() const;
-    std::optional<vk::DescriptorImageInfo> GetSwapchainPreviewDescriptorInfo() const;
+    std::optional<vk::DescriptorImageInfo> GetComputeOutputDescriptorInfo()
+        const;
+    std::optional<vk::DescriptorImageInfo> GetSwapchainPreviewDescriptorInfo()
+        const;
 
   private:
     friend class TextureResources;
@@ -173,6 +171,11 @@ class Device :
     void DestroyComputePipeline();
     void CreateRaytracingPipeline();
     void DestroyRaytracingPipeline();
+    void CreateShadowMapResources();
+    void DestroyShadowMapResources();
+    void CreateShadowMapPipeline();
+    void DestroyShadowMapPipeline();
+    std::optional<vk::DescriptorImageInfo> GetShadowMapDescriptorInfo() const;
     void CreateHardwareRaytracingScene();
     void DestroyHardwareRaytracingScene();
     void CreateComputeOutputImage();
@@ -186,6 +189,7 @@ class Device :
     void DestroyTextureResources();
     void CreateDescriptorResources();
     void DestroyDescriptorResources();
+    vk::DescriptorSet GetDescriptorSetForMaterial(EntityId material_id) const;
     void CreateGpuSkinningResources();
     void DestroyGpuSkinningResources();
     void UpdateRaytraceBuffers();
@@ -195,14 +199,16 @@ class Device :
         const std::vector<EntityId>& updated_source_triangle_buffer_ids);
     bool UpdateHardwareRaytracingAggregateSceneBuffers(
         const std::vector<EntityId>& updated_source_triangle_buffer_ids,
-        const std::vector<RaytracingSourceGeometryData>& prepared_source_geometries);
+        const std::vector<RaytracingSourceGeometryData>&
+            prepared_source_geometries);
     void UpdateHardwareRaytracingScene();
     bool UpdateHardwareRaytracingDynamicGeometry();
     bool UpdateHardwareRaytracingDynamicGeometry(
         const std::vector<EntityId>& updated_source_triangle_buffer_ids);
     bool UpdateHardwareRaytracingDynamicGeometry(
         const std::vector<EntityId>& updated_source_triangle_buffer_ids,
-        const std::vector<RaytracingSourceGeometryData>& prepared_source_geometries);
+        const std::vector<RaytracingSourceGeometryData>&
+            prepared_source_geometries);
     bool UpdateHardwareRaytracingTransforms(bool force_tlas_update = false);
     void RebuildHardwareRaytracingTlas();
     void UpdateHardwareRaytracingDescriptor();
@@ -257,7 +263,17 @@ class Device :
     vk::UniqueDescriptorSetLayout descriptor_set_layout_;
     vk::UniqueDescriptorPool descriptor_pool_;
     vk::DescriptorSet descriptor_set_ = VK_NULL_HANDLE;
+    std::unordered_map<EntityId, vk::DescriptorSet> material_descriptor_sets_;
     std::unique_ptr<TextureResources> texture_resources_;
+    static constexpr std::uint32_t kShadowMapSize = 2048;
+    vk::UniqueImage shadow_map_image_;
+    vk::UniqueDeviceMemory shadow_map_memory_;
+    vk::UniqueImageView shadow_map_view_;
+    vk::UniqueSampler shadow_map_sampler_;
+    vk::UniqueRenderPass shadow_map_render_pass_;
+    vk::UniqueFramebuffer shadow_map_framebuffer_;
+    vk::UniquePipelineLayout shadow_map_pipeline_layout_;
+    vk::UniquePipeline shadow_map_pipeline_;
     static constexpr std::size_t kMaxFramesInFlight = 2;
     bool framebuffer_resized_ = false;
     bool use_compute_raytracing_ = false;
@@ -316,7 +332,8 @@ class Device :
         std::filesystem::path raygen_shader;
         std::filesystem::path miss_shader;
         std::filesystem::path closesthit_shader;
-        frame::proto::SceneType::Enum scene_type = frame::proto::SceneType::NONE;
+        frame::proto::SceneType::Enum scene_type =
+            frame::proto::SceneType::NONE;
         bool uses_time_uniform = false;
         bool use_compute = false;
         std::vector<BindingInfo> bindings;
@@ -371,5 +388,3 @@ class Device :
 };
 
 } // namespace frame::vulkan
-
-

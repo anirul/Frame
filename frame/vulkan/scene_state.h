@@ -5,8 +5,8 @@
 #include <glm/glm.hpp>
 #include <string>
 
-#include "frame/logger.h"
 #include "frame/level_interface.h"
+#include "frame/logger.h"
 
 namespace frame::vulkan
 {
@@ -24,6 +24,8 @@ struct alignas(16) UniformBlock
     glm::vec4 light_dir;
     glm::vec4 light_color;
     glm::vec4 time_s;
+    glm::mat4 light_view_projection;
+    glm::vec4 shadow_params;
 };
 
 struct SceneState
@@ -36,6 +38,10 @@ struct SceneState
     glm::vec3 light_dir = glm::vec3(0.0f);
     glm::vec3 light_color = glm::vec3(1.0f);
     float light_type = 0.0f;
+    glm::mat4 light_view_projection = glm::mat4(1.0f);
+    float shadow_enabled = 0.0f;
+    float shadow_bias = 0.0035f;
+    float shadow_map_size = 2048.0f;
 };
 
 SceneState BuildSceneState(

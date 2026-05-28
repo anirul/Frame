@@ -92,6 +92,10 @@ class SwapchainResources
     {
         return image_format_;
     }
+    vk::Format GetDepthFormat() const
+    {
+        return depth_format_;
+    }
 
   private:
     vk::SurfaceFormatKHR SelectSurfaceFormat(
@@ -99,8 +103,11 @@ class SwapchainResources
     vk::PresentModeKHR SelectPresentMode(
         const std::vector<vk::PresentModeKHR>& modes) const;
     vk::Extent2D SelectSwapExtent(
-        const vk::SurfaceCapabilitiesKHR& capabilities,
-        glm::uvec2 size) const;
+        const vk::SurfaceCapabilitiesKHR& capabilities, glm::uvec2 size) const;
+    vk::Format SelectDepthFormat() const;
+    std::uint32_t FindMemoryType(
+        std::uint32_t type_filter, vk::MemoryPropertyFlags properties) const;
+    void CreateDepthResources();
 
     vk::PhysicalDevice physical_device_;
     vk::Device device_;
@@ -109,10 +116,14 @@ class SwapchainResources
     std::uint32_t present_queue_family_index_ = 0;
     const Logger& logger_;
     vk::Format image_format_ = vk::Format::eUndefined;
+    vk::Format depth_format_ = vk::Format::eUndefined;
     vk::Extent2D extent_{};
     vk::UniqueSwapchainKHR swapchain_;
     std::vector<vk::Image> images_;
     std::vector<vk::UniqueImageView> image_views_;
+    std::vector<vk::UniqueImage> depth_images_;
+    std::vector<vk::UniqueDeviceMemory> depth_memories_;
+    std::vector<vk::UniqueImageView> depth_image_views_;
     vk::UniqueRenderPass render_pass_;
     std::vector<vk::UniqueFramebuffer> framebuffers_;
     vk::UniqueRenderPass gui_render_pass_;

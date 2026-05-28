@@ -1,4 +1,4 @@
-// Ray tracing example using a simple icosahedron scene.
+// Refraction example using a simple icosahedron scene.
 // From: https://sourceforge.net/p/predef/wiki/OperatingSystems/
 #if defined(_WIN32) || defined(_WIN64)
 #define WINDOWS_LEAN_AND_MEAN
@@ -35,7 +35,8 @@ try
     constexpr glm::uvec2 kDefaultSize{1280u, 720u};
     constexpr const char* kLevelPath = "asset/json/raytracing.json";
     absl::SetProgramUsageMessage(
-        "01_RayTracing --device={vulkan|opengl} "
+        "01_Refraction --device={vulkan|opengl} "
+        "[--rendering={auto|rasterise|raytrace}] "
         "[--auto_exit_seconds=<seconds>] (defaults to vulkan)");
     frame::common::Application app(ac, av, kDefaultSize);
     app.Startup(frame::file::FindFile(kLevelPath));
@@ -45,7 +46,7 @@ try
 catch (const std::exception& e)
 {
     auto& logger = frame::Logger::GetInstance();
-    logger->error("Unhandled exception in 01_RayTracing: {}", e.what());
+    logger->error("Unhandled exception in 01_Refraction: {}", e.what());
     logger->flush();
 #if defined(_WIN32) || defined(_WIN64)
     MessageBoxA(nullptr, e.what(), "Error", MB_OK | MB_ICONERROR);
