@@ -8,7 +8,7 @@ on:
 jobs:
   build-and-test:
     runs-on: windows-2022
-    timeout-minutes: 60
+    timeout-minutes: 90
     env:
       SCCACHE_GHA_ENABLED: "true"
       SCCACHE_CACHE_SIZE: "2G"
@@ -60,8 +60,7 @@ jobs:
       run: cmake --build --preset windows-debug --parallel
 
     - name: Run tests using CTest
-      # GitHub-hosted Windows runners do not provide a reliable OpenGL 4.5
-      # context. Linux runs those tests under xvfb/Mesa.
+      # GitHub-hosted runners do not provide a reliable OpenGL 4.5 context.
       run: ctest --test-dir build\windows -C Debug --output-on-failure -LE requires-opengl
 
     - name: Show sccache stats

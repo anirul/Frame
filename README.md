@@ -23,6 +23,12 @@ from the same engine code.
   - Linux: GCC or Clang
 - Ninja (for Linux presets)
 - Vulkan loader/driver installed if running the Vulkan backend
+- Linux Wayland development packages when building with the Linux presets
+  (`libwayland-dev`, `libxkbcommon-dev`, `libegl1-mesa-dev`, and
+  `libdecor-0-dev` on Debian-like distributions, or `wayland`,
+  `wayland-protocols`, `libxkbcommon`, `mesa`, and `libdecor` with
+  Homebrew/Linuxbrew). `libdecor` gives SDL client-side Wayland decorations, so
+  sample windows keep their title text, FPS updates, and close button.
 
 ## Setup
 
@@ -64,6 +70,13 @@ cmake --preset linux-release
 cmake --build --preset linux-release
 ```
 
+The Linux presets use repository vcpkg overlays for a Wayland-first build. SDL3
+is built without its default X11 feature, DBus is built without its default
+systemd feature, and the Vulkan loader overlay disables XCB/Xlib WSI support.
+On Homebrew/Linuxbrew systems, the triplet discovers the prefix from
+`HOMEBREW_PREFIX` or `brew --prefix` so vcpkg can find global and formula-local
+pkg-config metadata without committing local machine paths.
+
 ## Run Examples
 
 The samples are built into `build/<preset>/bin/`.
@@ -89,11 +102,18 @@ Available examples:
 - `02_Dragon`
 - `03_SkinnedMesh`
 
-Useful runtime flags:
+## Command-line Arguments
 
-- `--device={vulkan|opengl}`: choose rendering backend
-- `--rendering={auto|rasterise|raytrace}`: choose generated render path
-- `--vk_validation={true|false}`: toggle Vulkan validation layers
+Samples accept the following runtime flags. The short `-flag=value` and Windows
+`/flag=value` forms are normalized to the same options.
+
+| Argument | Values | Default | Description |
+| --- | --- | --- | --- |
+| `--device` | `vulkan`, `opengl` | `vulkan` | Chooses the rendering backend. If Vulkan startup fails, the app falls back to OpenGL. |
+| `--rendering` | `auto`, `raster`, `raytracing` | `auto` | Overrides the render path generated from the level JSON. `auto` keeps the level default. Aliases include `rasterise`, `rasterize`, and `raytrace`. |
+| `--vk_validation` | `true`, `false` | `true` in debug, `false` in release | Enables Vulkan validation layers when using the Vulkan backend. |
+| `--auto_exit_seconds` | number of seconds | `0.0` | Exits automatically after the given duration. `0.0` disables auto-exit. |
+| `--screenshot_on_exit` | `true`, `false` | `false` | Saves `ScreenShot.png` before an auto-exit. |
 
 ## Run Tests
 
