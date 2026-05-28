@@ -21,6 +21,7 @@
 
 #include "frame/bvh.h"
 #include "frame/camera.h"
+#include "frame/common/application.h"
 #include "frame/file/image.h"
 #include "frame/json/program_key.h"
 #include "frame/level.h"
@@ -49,12 +50,6 @@
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
-#if defined(_DEBUG)
-ABSL_FLAG(bool, vk_validation, true, "Enable Vulkan validation layers.");
-#else
-ABSL_FLAG(bool, vk_validation, false, "Enable Vulkan validation layers.");
-#endif
 
 namespace frame::vulkan
 {

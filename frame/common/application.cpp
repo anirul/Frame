@@ -24,6 +24,11 @@ ABSL_FLAG(
     "Rendering technique "
     "(auto|raytrace|raytracing|rasterise|rasterising|rasterize|rasterizing|"
     "raster).");
+#if defined(_DEBUG)
+ABSL_FLAG(bool, vk_validation, true, "Enable Vulkan validation layers.");
+#else
+ABSL_FLAG(bool, vk_validation, false, "Enable Vulkan validation layers.");
+#endif
 ABSL_FLAG(
     double,
     auto_exit_seconds,
