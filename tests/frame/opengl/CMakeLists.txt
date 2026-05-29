@@ -83,7 +83,7 @@ target_include_directories(FrameOpenGLGUITest
     ${CMAKE_CURRENT_SOURCE_DIR}/../..
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_BINARY_DIR}/frame/proto/generated
-    ${CMAKE_BINARY_DIR}/external/frame/frame/proto/generated
+    ${CMAKE_BINARY_DIR}/external/Frame/frame/proto/generated
 )
 
 target_link_libraries(FrameOpenGLGUITest
