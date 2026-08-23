@@ -2,7 +2,6 @@
 
 #include "frame/backend_internal.h"
 
-#include <array>
 #include <cstdint>
 #include <filesystem>
 #include <functional>
@@ -39,21 +38,13 @@ class PipelineResources;
 class RaytraceSceneRenderer;
 class Renderer;
 class ShaderCompiler;
+class ShadowResources;
 class SwapchainResources;
 class SyncResources;
 class Texture;
 class TextureResources;
 struct SceneState;
-struct RaytracingSourceGeometryData
-{
-    EntityId source_node_id = NullId;
-    EntityId triangle_buffer_id = NullId;
-    EntityId source_material_id = NullId;
-    std::uint32_t material_id = 0;
-    std::uint32_t triangle_offset = 0;
-    std::array<float, 4> atlas_uv_bounds = {0.0f, 1.0f, 0.0f, 1.0f};
-    std::vector<std::uint8_t> triangle_bytes = {};
-};
+struct RaytracingSourceGeometryData;
 
 /**
  * @class Device
@@ -265,15 +256,7 @@ class Device : public DeviceInterface,
     vk::DescriptorSet descriptor_set_ = VK_NULL_HANDLE;
     std::unordered_map<EntityId, vk::DescriptorSet> material_descriptor_sets_;
     std::unique_ptr<TextureResources> texture_resources_;
-    static constexpr std::uint32_t kShadowMapSize = 2048;
-    vk::UniqueImage shadow_map_image_;
-    vk::UniqueDeviceMemory shadow_map_memory_;
-    vk::UniqueImageView shadow_map_view_;
-    vk::UniqueSampler shadow_map_sampler_;
-    vk::UniqueRenderPass shadow_map_render_pass_;
-    vk::UniqueFramebuffer shadow_map_framebuffer_;
-    vk::UniquePipelineLayout shadow_map_pipeline_layout_;
-    vk::UniquePipeline shadow_map_pipeline_;
+    std::unique_ptr<ShadowResources> shadow_resources_;
     static constexpr std::size_t kMaxFramesInFlight = 2;
     bool framebuffer_resized_ = false;
     bool use_compute_raytracing_ = false;

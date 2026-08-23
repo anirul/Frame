@@ -4,6 +4,7 @@
 #include <array>
 #include <algorithm>
 #include <cmath>
+#include <cctype>
 #include <cstdint>
 #include <limits>
 #include <memory>
@@ -32,6 +33,7 @@
 #include "frame/opengl/skinned_mesh.h"
 #include "frame/opengl/mesh.h"
 #include "frame/opengl/program.h"
+#include "frame/wow/m2_reader.h"
 
 namespace frame::opengl::file
 {
@@ -2470,6 +2472,118 @@ std::vector<std::pair<EntityId, EntityId>> LoadMeshesFromGltfFile(
     return entity_id_vec;
 }
 
+std::vector<std::pair<EntityId, EntityId>> LoadMeshFromM2File(
+    LevelInterface& level,
+    const std::filesystem::path& file,
+    const std::string& name,
+    proto::NodeMesh::AccelerationStructureEnum acceleration_structure_enum,
+    EntityId forced_program_id)
+{
+    const frame::wow::StaticMesh source = frame::wow::LoadStaticMesh(file);
+    const EntityId selected_program_id =
+        forced_program_id ? forced_program_id : SelectGltfProgramId(level);
+    const ProgramInterface* selected_program =
+        selected_program_id ? &level.GetProgramFromId(selected_program_id)
+                            : nullptr;
+    const bool build_bvh =
+        IsRaytracingProgram(selected_program) ||
+        acceleration_structure_enum == proto::NodeMesh::BVH_ACCELERATION;
+
+    auto point_buffer_id = CreateBufferInLevel(
+        level, source.points, std::format("{}.point", name));
+    auto normal_buffer_id = CreateBufferInLevel(
+        level, source.normals, std::format("{}.normal", name));
+    auto texture_buffer_id = CreateBufferInLevel(
+        level, source.texture_coordinates, std::format("{}.texture", name));
+    auto index_buffer_id = CreateBufferInLevel(
+        level,
+        source.indices,
+        std::format("{}.index", name),
+        opengl::BufferTypeEnum::ELEMENT_ARRAY_BUFFER);
+    if (!point_buffer_id || !normal_buffer_id || !texture_buffer_id ||
+        !index_buffer_id)
+    {
+        return {};
+    }
+
+    const auto triangles = BuildRaytraceTriangles(
+        source.points,
+        source.normals,
+        source.texture_coordinates,
+        source.indices);
+    auto triangle_buffer_id = CreateBufferInLevel(
+        level,
+        triangles,
+        std::format("{}.triangle", name),
+        opengl::BufferTypeEnum::SHADER_STORAGE_BUFFER);
+    if (!triangle_buffer_id)
+    {
+        return {};
+    }
+
+    EntityId bvh_buffer_id = NullId;
+    if (build_bvh)
+    {
+        const auto bvh = frame::BuildBVH(source.points, source.indices);
+        auto maybe_bvh_buffer_id = CreateBufferInLevel(
+            level,
+            bvh,
+            std::format("{}.bvh", name),
+            opengl::BufferTypeEnum::SHADER_STORAGE_BUFFER);
+        if (!maybe_bvh_buffer_id)
+        {
+            return {};
+        }
+        bvh_buffer_id = maybe_bvh_buffer_id.value();
+    }
+
+    MeshParameter parameter = {};
+    parameter.point_buffer_id = point_buffer_id.value();
+    parameter.normal_buffer_id = normal_buffer_id.value();
+    parameter.texture_buffer_id = texture_buffer_id.value();
+    parameter.index_buffer_id = index_buffer_id.value();
+    parameter.triangle_buffer_id = triangle_buffer_id.value();
+    parameter.bvh_buffer_id = bvh_buffer_id;
+
+    auto mesh = std::make_unique<opengl::Mesh>(level, parameter);
+    mesh->SetName(std::format("{}.mesh", name));
+    const EntityId mesh_id = level.AddMesh(std::move(mesh));
+    if (!mesh_id)
+    {
+        return {};
+    }
+
+    auto resolver = [&level](const std::string& node_name) -> NodeInterface* {
+        const EntityId node_id = level.GetIdFromName(node_name);
+        if (!node_id)
+        {
+            throw std::runtime_error(
+                std::format("No scene node named '{}'.", node_name));
+        }
+        return &level.GetSceneNodeFromId(node_id);
+    };
+    auto node = std::make_unique<NodeMesh>(resolver, mesh_id);
+    node->SetName(name);
+    const EntityId node_id = level.AddSceneNode(std::move(node));
+    if (!node_id)
+    {
+        return {};
+    }
+
+    Logger::GetInstance()->info(
+        "Loaded Retail M2 {} (version {}, {} vertices, {} triangles, "
+        "{} skin FileDataID(s), {} texture FileDataID(s)).",
+        file.string(),
+        source.m2_version,
+        source.points.size() / 3,
+        source.indices.size() / 3,
+        source.skin_file_data_ids.size(),
+        source.texture_file_data_ids.size());
+    // JSON scene loading supplies its configured raster/raytrace material.
+    // Texture FileDataIDs are retained by the parser for the later BLP pass.
+    return {{node_id, NullId}};
+}
+
 } // End namespace.
 
 std::vector<std::pair<EntityId, EntityId>> LoadMeshesFromFile(
@@ -2496,7 +2610,14 @@ std::vector<std::pair<EntityId, EntityId>> LoadMeshesFromFile(
     proto::NodeMesh::AccelerationStructureEnum acceleration_structure_enum,
     EntityId forced_program_id)
 {
-    auto extension = file.extension();
+    auto extension = file.extension().string();
+    std::transform(
+        extension.begin(),
+        extension.end(),
+        extension.begin(),
+        [](unsigned char character) {
+            return static_cast<char>(std::tolower(character));
+        });
     std::filesystem::path final_path = ResolveAssetPath(file);
     if (extension == ".gltf" || extension == ".glb")
     {
@@ -2508,12 +2629,20 @@ std::vector<std::pair<EntityId, EntityId>> LoadMeshesFromFile(
             acceleration_structure_enum,
             forced_program_id);
     }
+    if (extension == ".m2")
+    {
+        return LoadMeshFromM2File(
+            level_interface,
+            final_path,
+            name,
+            acceleration_structure_enum,
+            forced_program_id);
+    }
     throw std::runtime_error(
         std::format("Unknown extention for file : {}", file.string()));
 }
 
 } // End namespace frame::opengl::file.
-
 
 
 

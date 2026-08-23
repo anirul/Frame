@@ -23,6 +23,8 @@ set(FRAME_VULKAN_SOURCES
   pipeline_resources.h
   program.cpp
   program.h
+  raytrace_geometry_utils.cpp
+  raytrace_geometry_utils.h
   renderer.cpp
   renderer.h
   raytrace_scene_renderer.cpp
@@ -37,6 +39,8 @@ set(FRAME_VULKAN_SOURCES
   scoped_timer.h
   shader_compiler.cpp
   shader_compiler.h
+  shadow_resources.cpp
+  shadow_resources.h
   skinned_mesh.cpp
   skinned_mesh.h
   static_mesh.cpp

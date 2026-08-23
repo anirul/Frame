@@ -82,6 +82,7 @@ add_dependencies(Frame FrameProto)
 
 set_property(TARGET Frame PROPERTY FOLDER "Frame")
 
+add_subdirectory(wow)
 add_subdirectory(opengl)
 add_subdirectory(vulkan)
 

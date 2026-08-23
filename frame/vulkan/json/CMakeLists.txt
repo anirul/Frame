@@ -28,6 +28,7 @@ target_link_libraries(FrameVulkanJson
   PUBLIC
     Frame
     FrameJson
+    FrameWow
     Vulkan::Vulkan
 )
 

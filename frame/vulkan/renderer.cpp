@@ -18,6 +18,7 @@
 #include "frame/vulkan/pipeline_resources.h"
 #include "frame/vulkan/raytrace_scene_renderer.h"
 #include "frame/vulkan/scene_state.h"
+#include "frame/vulkan/shadow_resources.h"
 #include "frame/vulkan/swapchain_resources.h"
 #include "frame/vulkan/sync_resources.h"
 
@@ -283,10 +284,12 @@ void Renderer::RecordCommandBuffer(
     }
 
     auto render_shadow_map = [&]() {
-        if (!device_.shadow_map_render_pass_ ||
-            !device_.shadow_map_framebuffer_ || !device_.shadow_map_pipeline_ ||
-            !device_.shadow_map_pipeline_layout_ || !device_.mesh_resources_ ||
-            device_.mesh_resources_->Empty() ||
+        if (!device_.shadow_resources_ ||
+            !device_.shadow_resources_->GetRenderPass() ||
+            !device_.shadow_resources_->GetFramebuffer() ||
+            !device_.shadow_resources_->GetPipeline() ||
+            !device_.shadow_resources_->GetPipelineLayout() ||
+            !device_.mesh_resources_ || device_.mesh_resources_->Empty() ||
             scene_state.shadow_enabled < 0.5f)
         {
             return;
@@ -296,27 +299,28 @@ void Renderer::RecordCommandBuffer(
         vk::ClearValue clear_value{};
         clear_value.depthStencil = vk::ClearDepthStencilValue(1.0f, 0);
         vk::RenderPassBeginInfo shadow_pass_info(
-            *device_.shadow_map_render_pass_,
-            *device_.shadow_map_framebuffer_,
+            device_.shadow_resources_->GetRenderPass(),
+            device_.shadow_resources_->GetFramebuffer(),
             vk::Rect2D(
-                {0, 0}, {Device::kShadowMapSize, Device::kShadowMapSize}),
+                {0, 0}, {ShadowResources::kMapSize, ShadowResources::kMapSize}),
             1,
             &clear_value);
         command_buffer.beginRenderPass(
             shadow_pass_info, vk::SubpassContents::eInline);
         command_buffer.bindPipeline(
-            vk::PipelineBindPoint::eGraphics, *device_.shadow_map_pipeline_);
+            vk::PipelineBindPoint::eGraphics,
+            device_.shadow_resources_->GetPipeline());
 
         vk::Viewport viewport(
             0.0f,
             0.0f,
-            static_cast<float>(Device::kShadowMapSize),
-            static_cast<float>(Device::kShadowMapSize),
+            static_cast<float>(ShadowResources::kMapSize),
+            static_cast<float>(ShadowResources::kMapSize),
             0.0f,
             1.0f);
         command_buffer.setViewport(0, 1, &viewport);
         vk::Rect2D scissor(
-            {0, 0}, {Device::kShadowMapSize, Device::kShadowMapSize});
+            {0, 0}, {ShadowResources::kMapSize, ShadowResources::kMapSize});
         command_buffer.setScissor(0, 1, &scissor);
 
         struct alignas(16) ShadowPushConstants
@@ -353,7 +357,7 @@ void Renderer::RecordCommandBuffer(
             ShadowPushConstants push_constants{
                 scene_state.light_view_projection, mesh_model};
             command_buffer.pushConstants(
-                *device_.shadow_map_pipeline_layout_,
+                device_.shadow_resources_->GetPipelineLayout(),
                 vk::ShaderStageFlagBits::eVertex,
                 0,
                 sizeof(ShadowPushConstants),

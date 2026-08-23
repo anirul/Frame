@@ -26,6 +26,7 @@ target_link_libraries(FrameOpenGLFile
     Frame
     FrameFile
     FrameOpenGL
+    FrameWow
     FrameProto
     FrameJson
     glad::glad
@@ -36,4 +37,3 @@ target_link_libraries(FrameOpenGLFile
 )
 
 set_property(TARGET FrameOpenGLFile PROPERTY FOLDER "Frame/OpenGL")
-

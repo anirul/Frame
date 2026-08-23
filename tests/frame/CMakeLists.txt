@@ -47,5 +47,6 @@ add_subdirectory(file)
 add_subdirectory(json)
 add_subdirectory(opengl)
 add_subdirectory(vulkan)
+add_subdirectory(wow)
 
 set_property(TARGET FrameTest PROPERTY FOLDER "FrameTest")

@@ -43,6 +43,7 @@
 #include "frame/vulkan/material.h"
 #include "frame/vulkan/skinned_mesh.h"
 #include "frame/vulkan/static_mesh.h"
+#include "frame/wow/m2_reader.h"
 
 namespace frame::vulkan::json
 {
@@ -2984,6 +2985,128 @@ bool ParseNodeMeshCleanBuffer(
     return true;
 }
 
+bool ParseNodeMeshM2(
+    LevelInterface& level,
+    const frame::proto::NodeMesh& proto_mesh,
+    const std::filesystem::path& path)
+{
+    const frame::wow::StaticMesh source = frame::wow::LoadStaticMesh(path);
+    auto make_buffer = [&level](const auto& data, const std::string& name) {
+        if (data.empty())
+        {
+            return NullId;
+        }
+        auto buffer = std::make_unique<frame::vulkan::Buffer>();
+        buffer->Copy(data.size() * sizeof(data[0]), data.data());
+        buffer->SetName(name);
+        return level.AddBuffer(std::move(buffer));
+    };
+
+    const EntityId point_buffer_id =
+        make_buffer(source.points, std::format("{}.point", proto_mesh.name()));
+    const EntityId normal_buffer_id = make_buffer(
+        source.normals, std::format("{}.normal", proto_mesh.name()));
+    const EntityId texture_buffer_id = make_buffer(
+        source.texture_coordinates,
+        std::format("{}.texture", proto_mesh.name()));
+    const EntityId index_buffer_id =
+        make_buffer(source.indices, std::format("{}.index", proto_mesh.name()));
+    if (!point_buffer_id || !normal_buffer_id || !texture_buffer_id ||
+        !index_buffer_id)
+    {
+        throw std::runtime_error("Failed to create Retail M2 buffers.");
+    }
+
+    const auto triangles = BuildRaytraceTriangles(
+        source.points,
+        source.normals,
+        source.texture_coordinates,
+        source.indices);
+    const EntityId triangle_buffer_id =
+        make_buffer(triangles, std::format("{}.triangle", proto_mesh.name()));
+    if (!triangle_buffer_id)
+    {
+        throw std::runtime_error(
+            "Failed to create Retail M2 raytrace triangle buffer.");
+    }
+
+    EntityId bvh_buffer_id = NullId;
+    const bool build_bvh =
+        IsRaytracingRenderTime(level, proto_mesh.render_time_enum()) ||
+        proto_mesh.acceleration_structure_enum() ==
+            frame::proto::NodeMesh::BVH_ACCELERATION;
+    if (build_bvh)
+    {
+        const auto bvh = frame::BuildBVH(source.points, source.indices);
+        bvh_buffer_id =
+            make_buffer(bvh, std::format("{}.bvh", proto_mesh.name()));
+        if (!bvh_buffer_id)
+        {
+            throw std::runtime_error("Failed to create Retail M2 BVH buffer.");
+        }
+    }
+
+    frame::MeshParameter parameter = {};
+    parameter.point_buffer_id = point_buffer_id;
+    parameter.normal_buffer_id = normal_buffer_id;
+    parameter.texture_buffer_id = texture_buffer_id;
+    parameter.index_buffer_id = index_buffer_id;
+    parameter.triangle_buffer_id = triangle_buffer_id;
+    parameter.bvh_buffer_id = bvh_buffer_id;
+    parameter.render_primitive_enum = proto_mesh.render_primitive_enum();
+
+    auto mesh = std::make_unique<frame::vulkan::StaticMesh>(parameter, true);
+    mesh->SetName(std::format("{}.mesh", proto_mesh.name()));
+    mesh->SetIndexSize(source.indices.size() * sizeof(std::uint32_t));
+    mesh->GetData().set_file_name(proto_mesh.file_name());
+    mesh->GetData().set_acceleration_structure_enum(
+        proto_mesh.acceleration_structure_enum());
+    const EntityId mesh_id = level.AddMesh(std::move(mesh));
+    if (!mesh_id)
+    {
+        throw std::runtime_error("Failed to add Retail M2 mesh to the level.");
+    }
+
+    const std::string mesh_parent =
+        AddAssetBasisNodeIfNeeded(level, proto_mesh);
+    auto node = std::make_unique<frame::NodeMesh>(MakeResolver(level), mesh_id);
+    node->SetName(proto_mesh.name());
+    node->SetParentName(mesh_parent);
+    node->GetData().set_render_time_enum(proto_mesh.render_time_enum());
+    node->GetData().set_acceleration_structure_enum(
+        proto_mesh.acceleration_structure_enum());
+    node->GetData().set_file_name(proto_mesh.file_name());
+    CopyAssetBasisFields(node->GetData(), proto_mesh);
+    const EntityId scene_id = level.AddSceneNode(std::move(node));
+    if (!scene_id)
+    {
+        throw std::runtime_error(
+            "Failed to add Retail M2 scene node to the level.");
+    }
+
+    const EntityId material_id = CreateAutoMaterial(
+        level, proto_mesh.name(), proto_mesh.render_time_enum());
+    ConfigureMaterialProgramsForRenderTime(
+        level, material_id, proto_mesh.render_time_enum());
+    if (ShouldTreatAsRaytracingSourceNode(level, proto_mesh))
+    {
+        ConfigureRaytracingSourceMaterial(level, material_id);
+    }
+    level.AddMeshMaterialId(
+        scene_id, material_id, proto_mesh.render_time_enum());
+
+    Logger::GetInstance()->info(
+        "Loaded Retail M2 {} (version {}, {} vertices, {} triangles, "
+        "{} skin FileDataID(s), {} texture FileDataID(s)).",
+        path.string(),
+        source.m2_version,
+        source.points.size() / 3,
+        source.indices.size() / 3,
+        source.skin_file_data_ids.size(),
+        source.texture_file_data_ids.size());
+    return true;
+}
+
 bool ParseNodeMesh(
     LevelInterface& level,
     const frame::proto::NodeMesh& proto_mesh,
@@ -3008,11 +3131,15 @@ bool ParseNodeMesh(
             extension.end(),
             extension.begin(),
             [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+        if (extension == ".m2")
+        {
+            return ParseNodeMeshM2(level, proto_mesh, path);
+        }
         if (extension != ".glb" && extension != ".gltf")
         {
             throw std::runtime_error(std::format(
                 "Unsupported mesh format for Vulkan JSON parser: {}. "
-                "Only .glb/.gltf are supported.",
+                "Only .m2 and .glb/.gltf are supported.",
                 path.string()));
         }
         Assimp::Importer importer;
